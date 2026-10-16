@@ -1,0 +1,18 @@
+/* Portalab — name_style/spellbound: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="spellbound"] {
+  font-family: "Uncial Antiqua", "Cinzel Decorative", serif;
+  background: linear-gradient(90deg, #b45309, #fde68a, #b45309);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 6px #f59e0b88);
+  animation: name-shimmer 6s linear infinite;
+}
+
+@keyframes name-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}

@@ -1,0 +1,14 @@
+/* Portalab — avatar_frame/retroarc: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="retroarc"] {
+  padding: 18px 6px 4px;
+  border-radius: 0;
+  background: radial-gradient(
+    circle at 50% 100%,
+    transparent 0 50%,
+    #ff8c1a 50% 63%,
+    #ffd23f 63% 76%,
+    #8b4513 76% 89%,
+    transparent 89%
+  );
+}

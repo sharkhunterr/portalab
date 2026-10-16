@@ -1,0 +1,10 @@
+/* Portalab — name_style/futuristic: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="futuristic"] {
+  font-family: "Michroma", sans-serif;
+  letter-spacing: 0.1em;
+  background: linear-gradient(180deg, #ffffff, #94a3b8 50%, #e2e8f0 52%, #64748b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

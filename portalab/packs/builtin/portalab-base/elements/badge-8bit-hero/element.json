@@ -10,8 +10,10 @@
     "fr": "Trois vies et un record."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

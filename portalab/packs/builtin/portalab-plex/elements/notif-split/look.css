@@ -1,0 +1,31 @@
+/* Portalab — notification_style/split: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="split"] .ds-notification {
+  padding-block: 0;
+  padding-inline-start: 0;
+  align-items: stretch;
+  border-color: color-mix(in srgb, var(--tone) 45%, var(--color-border));
+}
+
+.ds-notifications[data-style="split"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="split"] .ds-notification__icon {
+  block-size: auto;
+  min-block-size: 4.2rem;
+  inline-size: 4.2rem;
+  border-radius: 0;
+  background: var(--tone);
+  color: var(--color-surface);
+}
+
+.ds-notifications[data-style="split"] .ds-notification__content {
+  align-self: center;
+  padding-block: var(--space-3);
+}
+
+.ds-notifications[data-style="split"] .ds-notification__close {
+  align-self: start;
+  margin-block-start: var(--space-2);
+}

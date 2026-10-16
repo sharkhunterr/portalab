@@ -10,8 +10,10 @@
     "fr": "Offert pour dix succès."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "rarity": "common",

@@ -1,0 +1,76 @@
+/* Portalab — level_up/fullbloom: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="fullbloom"] {
+  --glow: #f472b6;
+}
+
+.levelup[data-look="fullbloom"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: linear-gradient(180deg, #d6eefa, #f3f8ee);
+}
+
+.levelup[data-look="fullbloom"] .levelup__scene {
+  display: block;
+  inset-block: 8% 0;
+  inset-inline-start: 50%;
+  inline-size: min(34rem, 90vw);
+  background:
+    linear-gradient(#7a5236, #7a5236) 50% 100% / 1.4rem 45% no-repeat,
+    radial-gradient(circle at 30% 40%, #f9a8d4 0 20%, transparent 21%),
+    radial-gradient(circle at 70% 35%, #fbcfe8 0 22%, transparent 23%),
+    radial-gradient(circle at 50% 22%, #f472b6 0 22%, transparent 23%),
+    radial-gradient(circle at 50% 45%, #fbcfe8 0 26%, transparent 27%);
+  translate: -50% 0;
+  transform-origin: 50% 100%;
+  animation: levelup-tree 1.2s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+
+.levelup[data-look="fullbloom"] .levelup__fx {
+  display: block;
+  inset-block-start: -5%;
+  inset-inline-start: var(--x);
+  inline-size: 0.7rem;
+  block-size: 0.5rem;
+  border-radius: 100% 0;
+  background: #f9a8d4;
+  animation: levelup-fall calc(3s + var(--r) * 3s) linear calc(var(--r) * -3s) infinite;
+}
+
+.levelup[data-look="fullbloom"] .levelup__card {
+  --color-text: #1f3320;
+  --color-text-muted: #4a5e48;
+  --color-surface-raised: #f3f8ee;
+  --color-border: #f9a8d4;
+  border: 2px solid #f9a8d4;
+  border-radius: 1.4rem;
+  background: #ffffffee;
+  color: #1f3320;
+  box-shadow: 0 1rem 2rem #b0306a26;
+  animation: levelup-card 0.6s ease-out 0.9s both;
+}
+
+.levelup[data-look="fullbloom"] .levelup__title {
+  font-family: Caveat, "Comic Neue", cursive;
+  font-size: 2.4rem;
+}
+
+@keyframes levelup-tree {
+  from {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes levelup-fall {
+  to {
+    transform: translateY(110vh) rotate(12deg);
+  }
+}
+
+@keyframes levelup-card {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(1.5rem);
+  }
+}

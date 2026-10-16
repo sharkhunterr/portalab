@@ -1,0 +1,33 @@
+/* Portalab — notification_animation/beatdrop: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="beatdrop"] .ds-notification {
+  animation-name: universe-notify-beat;
+  animation-duration: 0.95s;
+  animation-timing-function: ease-out;
+}
+
+@keyframes universe-notify-beat {
+  0% {
+    opacity: 0;
+    transform: translateY(-140%);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(0) scale(1.06, 0.92);
+  }
+  42% {
+    transform: scale(1);
+  }
+  58% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(1);
+  }
+  84% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: none;
+  }
+}

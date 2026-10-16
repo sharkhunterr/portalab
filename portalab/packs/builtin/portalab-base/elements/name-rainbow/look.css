@@ -1,0 +1,18 @@
+/* Portalab — name_style/rainbow: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="rainbow"] {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 700;
+  background: linear-gradient(90deg, #ef4444, #f59e0b, #eab308, #22c55e, #3b82f6, #8b5cf6, #ef4444);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-shimmer 3s linear infinite;
+}
+
+@keyframes name-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}

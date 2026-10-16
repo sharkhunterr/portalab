@@ -1,0 +1,24 @@
+/* Portalab — level_badge/qblock: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="qblock"] {
+  border: 2px solid #000000;
+  border-radius: 0.15rem;
+  background:
+    radial-gradient(circle 1.5px at 4px 4px, #7a3a00 96%, transparent),
+    radial-gradient(circle 1.5px at calc(100% - 4px) 4px, #7a3a00 96%, transparent),
+    radial-gradient(circle 1.5px at 4px calc(100% - 4px), #7a3a00 96%, transparent),
+    radial-gradient(circle 1.5px at calc(100% - 4px) calc(100% - 4px), #7a3a00 96%, transparent), #f8b800;
+  color: #5a2a00;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  box-shadow:
+    inset 2px 2px 0 #ffe08a,
+    inset -2px -2px 0 #c47a00;
+  animation: level-qblock 1.6s steps(1, end) infinite;
+}
+
+@keyframes level-qblock {
+  80% {
+    filter: brightness(1.15);
+  }
+}

@@ -1,0 +1,41 @@
+/* Portalab — ambient/vhs: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="vhs"] {
+  background: repeating-linear-gradient(180deg, #ffffff06 0 1px, transparent 1px 3px);
+}
+
+[data-ambient="vhs"] > span {
+  left: 0;
+  inline-size: 100%;
+  block-size: calc(0.4rem + var(--size) * 1.6rem);
+  background: linear-gradient(180deg, transparent, #ffffff10 30%, #ff2a6d14 50%, #05d9e814 60%, transparent);
+  filter: blur(1px);
+  animation-name: ambient-tracking;
+  animation-duration: calc(5s + var(--size) * 7s);
+}
+
+[data-ambient="vhs"] > span:nth-child(3n) {
+  inline-size: 3px;
+  block-size: 2px;
+  left: var(--x);
+  background: #ffffffaa;
+  filter: none;
+  animation-name: ambient-snow-dot;
+  animation-duration: calc(0.15s + var(--size) * 0.4s);
+  animation-timing-function: steps(1, end);
+}
+
+@keyframes ambient-tracking {
+  from {
+    transform: translate3d(0, -10vh, 0);
+  }
+  to {
+    transform: translate3d(0, 110vh, 0);
+  }
+}
+
+@keyframes ambient-snow-dot {
+  50% {
+    opacity: 0;
+  }
+}

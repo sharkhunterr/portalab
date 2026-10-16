@@ -1,0 +1,12 @@
+/* Portalab — profile_banner/asteroidfield: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="asteroidfield"] {
+  background:
+    radial-gradient(ellipse 1.6rem 1.2rem at 15% 40%, #7a6f64 60%, transparent 62%),
+    radial-gradient(ellipse 0.9rem 0.7rem at 35% 70%, #8c8176 60%, transparent 62%),
+    radial-gradient(ellipse 2.2rem 1.6rem at 60% 30%, #6b625a 60%, transparent 62%),
+    radial-gradient(ellipse 0.7rem 0.6rem at 78% 75%, #9a8e82 60%, transparent 62%),
+    radial-gradient(ellipse 1.2rem 0.9rem at 90% 35%, #7f746a 60%, transparent 62%),
+    radial-gradient(1px 1px at 30% 20%, #fff 99%, transparent) 0 0 / 2.5rem 2rem,
+    linear-gradient(160deg, #0a0c16, #161321);
+}

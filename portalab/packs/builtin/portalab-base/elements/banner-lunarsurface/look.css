@@ -1,0 +1,11 @@
+/* Portalab — profile_banner/lunarsurface: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="lunarsurface"] {
+  background:
+    radial-gradient(circle at 70% 25%, #f2f4f8 0 2.4rem, #c6cad3 2.6rem, transparent 2.7rem),
+    radial-gradient(ellipse 18% 10% at 20% 85%, #6d717a, transparent 70%),
+    radial-gradient(ellipse 12% 7% at 55% 92%, #747882, transparent 70%),
+    radial-gradient(ellipse 140% 55% at 50% 120%, #a4a8b2 0 60%, #8a8e98 70%, transparent 71%),
+    radial-gradient(1px 1px at 12% 20%, #fff 99%, transparent) 0 0 / 2.6rem 2.1rem,
+    linear-gradient(180deg, #05070f, #0d1222);
+}

@@ -1,0 +1,25 @@
+/* Portalab — notification_animation/genie: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="genie"] .ds-notification {
+  transform-origin: 100% 100%;
+  animation-name: universe-notify-genie;
+  animation-duration: 0.75s;
+  animation-timing-function: cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+@keyframes universe-notify-genie {
+  0% {
+    opacity: 0;
+    clip-path: polygon(46% 0, 54% 0, 100% 100%, 92% 100%);
+    transform: translate(20%, 80%) scale(0.2, 0.05) skewX(-30deg);
+  }
+  45% {
+    opacity: 1;
+    clip-path: polygon(20% 0, 80% 0, 100% 100%, 60% 100%);
+    transform: translate(8%, 20%) scale(0.7, 0.6) skewX(-12deg);
+  }
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transform: none;
+  }
+}

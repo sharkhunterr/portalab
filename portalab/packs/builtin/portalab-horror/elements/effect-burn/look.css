@@ -1,0 +1,58 @@
+/* Portalab — effect/burn: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="burn"] .ds-celebration__badge {
+  background: linear-gradient(0deg, #7c2d12, #ea580c 40%, #facc15);
+  background-size: 100% 200%;
+  color: #fff7ed;
+  text-shadow: 0 0 6px #7c2d12;
+  box-shadow:
+    0 -0.4rem 1.6rem #f97316,
+    0 0 2.4rem #ea580c;
+  animation:
+    ds-pop var(--motion-duration-slow) var(--motion-easing-spring) both,
+    fx-char 2s ease-in forwards;
+}
+
+[data-effect="burn"] .celebration-fx {
+  color: #ff7a00;
+  filter: drop-shadow(0 0 6px #ffb000);
+  animation-name: fx-flame;
+  animation-duration: 1.2s;
+  animation-iteration-count: 2;
+  --spread: calc((var(--i) / (var(--n) - 1) - 0.5) * 10rem);
+}
+
+[data-effect="burn"] .celebration-fx svg {
+  fill: #ffd000;
+}
+
+@keyframes fx-char {
+  0%,
+  45% {
+    filter: none;
+    background-position: 0 0;
+  }
+  70% {
+    filter: brightness(0.7) saturate(1.4);
+    background-position: 0 100%;
+  }
+  100% {
+    filter: grayscale(1) brightness(0.35) blur(2px);
+    transform: translateY(-0.6rem) scale(0.9);
+    opacity: 0;
+  }
+}
+
+@keyframes fx-flame {
+  0% {
+    opacity: 0;
+    transform: translate(var(--spread), 1rem) scale(0.6);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--spread) * 0.8), -3.5rem) scale(1.3) rotate(calc(var(--r) / 8));
+  }
+}

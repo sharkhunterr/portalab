@@ -1,0 +1,10 @@
+/* Portalab — profile_banner/earthrise: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="earthrise"] {
+  background:
+    radial-gradient(circle at 60% 45%, transparent 0 2.6rem, #0000 2.6rem),
+    radial-gradient(circle at 62% 42%, #6fb3ff 0 1.2rem, #2a6fd6 1.9rem, #1d3f8a 2.5rem, transparent 2.6rem),
+    radial-gradient(ellipse 140% 50% at 50% 125%, #b7bac2 0 60%, #8e929b 70%, transparent 71%),
+    radial-gradient(1px 1px at 20% 30%, #fff 99%, transparent) 0 0 / 3rem 2.4rem,
+    linear-gradient(180deg, #02040b, #0b1020);
+}

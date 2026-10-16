@@ -1,0 +1,17 @@
+/* Portalab — name_style/wizard: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="wizard"] {
+  font-family: "Cinzel Decorative", "Cinzel", serif;
+  background: linear-gradient(90deg, #b45309, #fde68a, #f59e0b, #fde68a, #b45309);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-shimmer 5s linear infinite;
+}
+
+@keyframes name-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}

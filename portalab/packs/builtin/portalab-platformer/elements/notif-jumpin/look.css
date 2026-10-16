@@ -1,0 +1,32 @@
+/* Portalab — notification_animation/jumpin: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="jumpin"] .ds-notification {
+  transform-origin: 50% 100%;
+  animation-name: universe-notify-jump;
+  animation-duration: 0.75s;
+  animation-timing-function: linear;
+}
+
+@keyframes universe-notify-jump {
+  0% {
+    opacity: 0;
+    transform: translateY(160%) scale(0.9);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  15% {
+    opacity: 1;
+  }
+  45% {
+    transform: translateY(-40%) scale(0.96, 1.06);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  75% {
+    transform: translateY(0) scale(1.08, 0.88);
+  }
+  88% {
+    transform: scale(0.97, 1.03);
+  }
+  100% {
+    transform: none;
+  }
+}

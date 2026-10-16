@@ -1,0 +1,26 @@
+/* Portalab — title/veins: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-title[data-style="veins"] {
+  border-color: #dc2626;
+  background:
+    linear-gradient(#12151f99, #12151f99),
+    var(--veins-web) center / 9rem auto,
+    #12151f;
+  color: #fecaca;
+  text-shadow: 0 0 4px #000;
+  animation: frame-veins 4.6s ease-in-out infinite;
+}
+
+.cosmetic-title[data-style="veins"] {
+  background: var(--veins-strip) center / 100% 100% no-repeat;
+  color: #ff3b4f;
+  text-shadow:
+    0 0 8px #dc2626,
+    0 0 2px #000;
+}
+
+@keyframes frame-veins {
+  50% {
+    box-shadow: 0 0 1.6rem #ef4444;
+  }
+}

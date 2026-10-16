@@ -1,0 +1,59 @@
+/* Portalab — ambient/meadow: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="meadow"] > span {
+  top: auto;
+  bottom: -0.5rem;
+  inline-size: 0.35rem;
+  block-size: calc(2rem + var(--size) * 4rem);
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(#a3e635, #3f6212);
+  opacity: 0.55;
+  transform-origin: bottom;
+  animation-name: ambient-grass;
+  animation-duration: calc(3s + var(--size) * 2s);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+
+[data-ambient="meadow"] > span:nth-child(5n) {
+  bottom: auto;
+  top: var(--y);
+  inline-size: 0.8rem;
+  block-size: 0.6rem;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background:
+    radial-gradient(circle at 25% 50%, #fde047 45%, transparent 50%),
+    radial-gradient(circle at 75% 50%, #fb923c 45%, transparent 50%);
+  opacity: 0.85;
+  animation-name: ambient-butterfly;
+  animation-duration: calc(10s + var(--size) * 8s);
+  animation-direction: normal;
+  animation-timing-function: linear;
+}
+
+@keyframes ambient-grass {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes ambient-butterfly {
+  0% {
+    transform: translate3d(0, 0, 0) scaleX(1);
+  }
+  25% {
+    transform: translate3d(8vw, -4vh, 0) scaleX(0.3);
+  }
+  50% {
+    transform: translate3d(16vw, 2vh, 0) scaleX(1);
+  }
+  75% {
+    transform: translate3d(8vw, 6vh, 0) scaleX(0.3);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scaleX(1);
+  }
+}

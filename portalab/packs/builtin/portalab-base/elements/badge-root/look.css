@@ -1,0 +1,13 @@
+/* Portalab — badge/terminal: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="terminal"] {
+  border-color: #22c55e;
+  background: #031007;
+  color: #4ade80;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+}
+
+.cosmetic-badge[data-style="terminal"]::after {
+  content: "_";
+  animation: shell-caret 1s steps(2, jump-none) infinite;
+}

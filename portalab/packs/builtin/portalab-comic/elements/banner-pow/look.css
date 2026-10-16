@@ -1,0 +1,45 @@
+/* Portalab — profile_banner/pow: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="pow"] {
+  background:
+    radial-gradient(circle, #00000022 1.5px, transparent 2px) 0 0 / 10px 10px,
+    conic-gradient(
+      from 0deg at 50% 50%,
+      #ffd400 0 10deg,
+      #ff3b30 10deg 20deg,
+      #ffd400 20deg 30deg,
+      #ff3b30 30deg 40deg,
+      #ffd400 40deg 50deg,
+      #ff3b30 50deg 60deg,
+      #ffd400 60deg 70deg,
+      #ff3b30 70deg 80deg,
+      #ffd400 80deg 90deg,
+      #ff3b30 90deg 100deg,
+      #ffd400 100deg 110deg,
+      #ff3b30 110deg 120deg,
+      #ffd400 120deg 130deg,
+      #ff3b30 130deg 140deg,
+      #ffd400 140deg 150deg,
+      #ff3b30 150deg 160deg,
+      #ffd400 160deg 170deg,
+      #ff3b30 170deg 180deg,
+      #ffd400 180deg 190deg,
+      #ff3b30 190deg 200deg,
+      #ffd400 200deg 210deg,
+      #ff3b30 210deg 220deg,
+      #ffd400 220deg 230deg,
+      #ff3b30 230deg 240deg,
+      #ffd400 240deg 250deg,
+      #ff3b30 250deg 260deg,
+      #ffd400 260deg 270deg,
+      #ff3b30 270deg 280deg,
+      #ffd400 280deg 290deg,
+      #ff3b30 290deg 300deg,
+      #ffd400 300deg 310deg,
+      #ff3b30 310deg 320deg,
+      #ffd400 320deg 330deg,
+      #ff3b30 330deg 340deg,
+      #ffd400 340deg 350deg,
+      #ff3b30 350deg
+    );
+}

@@ -1,0 +1,25 @@
+/* Portalab — ambient/bokeh: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="bokeh"] > span {
+  inline-size: calc(4rem + var(--size) * 9rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(calc(230deg + var(--i) * 37deg) 90% 68% / 0.35), transparent 68%);
+  filter: blur(calc(6px + var(--size) * 8px));
+  translate: -50% -50%;
+  animation-name: ambient-bokeh;
+  animation-duration: calc(18s + var(--size) * 14s);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+
+@keyframes ambient-bokeh {
+  from {
+    transform: translate3d(0, 0, 0) scale(0.9);
+    opacity: 0.5;
+  }
+  to {
+    transform: translate3d(var(--drift), -8vh, 0) scale(1.15);
+    opacity: 1;
+  }
+}

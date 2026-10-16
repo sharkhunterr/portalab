@@ -1,0 +1,39 @@
+/* Portalab — notification_style/jukebox: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="jukebox"] .ds-notification {
+  --color-text: #fff1dc;
+  --color-text-muted: #e6c9a3;
+  padding-block-start: 1.4rem;
+  border: 3px solid #e8e0d0;
+  border-radius: 2.6rem 2.6rem 0.7rem 0.7rem;
+  background:
+    linear-gradient(90deg, #ff8c1a, #ffd23f, #ff5ca8, #ffd23f, #ff8c1a) 50% 0.45rem / 70% 0.3rem no-repeat,
+    linear-gradient(180deg, #6b3a1c, #3d2214);
+  color: #fff1dc;
+  box-shadow:
+    0 0 0 2px #8a8278,
+    0 0 1.4rem #ff8c1a77;
+}
+
+.ds-notifications[data-style="jukebox"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="jukebox"] .ds-notification__icon {
+  background: radial-gradient(circle, #2a160c 0 22%, #ffd23f 24% 40%, #2a160c 42%);
+  color: transparent;
+}
+
+.ds-notifications[data-style="jukebox"] .ds-notification__title {
+  font-family: Shrikhand, Righteous, cursive;
+  font-weight: 400;
+  color: #ffd23f;
+}
+
+.ds-notifications[data-style="jukebox"] .ds-notification__link {
+  color: #ffd23f;
+}
+
+.ds-notifications[data-style="jukebox"] .ds-notification__timer {
+  background: #ff8c1a;
+}

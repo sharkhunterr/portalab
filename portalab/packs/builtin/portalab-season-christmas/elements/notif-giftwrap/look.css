@@ -1,0 +1,16 @@
+/* Portalab — notification_style/giftwrap: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="giftwrap"] .ds-notification {
+  border: 1px solid #8f0f1f;
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(90deg, transparent 0 1.1rem, #f4d03f 1.1rem 1.6rem, transparent 1.6rem),
+    radial-gradient(circle, #ffffff33 0 1.5px, transparent 2px) 0 0 / 1.2rem 1.2rem,
+    linear-gradient(135deg, #b3132b, #d61f3a);
+  color: #fffaf0;
+  box-shadow: 0 6px 18px #00000055;
+}
+
+.ds-notifications[data-style="giftwrap"] .ds-notification__body {
+  color: #ffe9d6;
+}

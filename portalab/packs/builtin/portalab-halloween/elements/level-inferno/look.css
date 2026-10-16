@@ -1,0 +1,32 @@
+/* Portalab — level_badge/inferno: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="inferno"] {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(0deg, #7f1d1d, #ea580c);
+  color: #fff7ed;
+}
+
+.ds-level[data-look="inferno"]::before {
+  content: "";
+  position: absolute;
+  inset: -0.5rem 0.1rem 40%;
+  z-index: -1;
+  border-radius: 50% 50% 20% 20%;
+  background:
+    radial-gradient(ellipse at 30% 100%, #f97316 30%, transparent 60%),
+    radial-gradient(ellipse at 70% 100%, #facc15 25%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, #ef4444 40%, transparent 70%);
+  filter: blur(2px);
+  animation: level-flames 0.9s ease-in-out infinite alternate;
+  transform-origin: bottom;
+}
+
+@keyframes level-flames {
+  from {
+    transform: scaleY(0.85) skewX(-4deg);
+  }
+  to {
+    transform: scaleY(1.15) skewX(4deg);
+  }
+}

@@ -10,8 +10,10 @@
     "fr": "Du papier rouge étoilé noué d'un ruban doré."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

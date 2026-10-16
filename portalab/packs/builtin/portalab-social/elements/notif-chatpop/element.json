@@ -10,8 +10,10 @@
     "fr": "Trois petits points qui s'écrivent, puis la notification s'ouvre d'un coup."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

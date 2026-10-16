@@ -1,0 +1,15 @@
+/* Portalab — avatar_frame/veins: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="veins"] {
+  background:
+    var(--veins-web) center / cover no-repeat,
+    radial-gradient(circle, #3b0610, #12040a);
+  box-shadow: 0 0 0.9rem #dc2626aa;
+  animation: frame-veins 4.6s ease-in-out infinite;
+}
+
+@keyframes frame-veins {
+  50% {
+    box-shadow: 0 0 1.6rem #ef4444;
+  }
+}

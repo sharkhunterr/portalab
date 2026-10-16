@@ -1,0 +1,14 @@
+/* Portalab — name_style/gametitle: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="gametitle"] {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.85em;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 0 #000000,
+    -1px -1px 0 #000000,
+    1px -1px 0 #000000,
+    -1px 1px 0 #000000,
+    0.18em 0.18em 0 #c84c0c,
+    0.24em 0.24em 0 #000000;
+}

@@ -1,0 +1,11 @@
+/* Portalab — name_style/lunarsilver: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="lunarsilver"] {
+  font-family: Michroma, Orbitron, sans-serif;
+  letter-spacing: 0.06em;
+  background: linear-gradient(180deg, #ffffff 0%, #c9d2e0 50%, #8b96a8 52%, #e9eef6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 0.3em rgb(200 215 240 / 0.5));
+}

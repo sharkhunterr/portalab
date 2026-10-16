@@ -10,8 +10,10 @@
     "fr": "Des notifications qui tombent sur le temps et cognent deux fois."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

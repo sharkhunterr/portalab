@@ -10,8 +10,10 @@
     "fr": "Des ballons brillants qui s'envolent sur tout l'écran."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 250,

@@ -10,8 +10,10 @@
     "fr": "Votre niveau en icône d'application brillante."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 450,

@@ -1,0 +1,16 @@
+/* Portalab — level_badge/easteregg: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="easteregg"] {
+  background: repeating-linear-gradient(
+    160deg,
+    #c4b5fd 0 5px,
+    #fde68a 5px 8px,
+    #a7f3d0 8px 13px,
+    #ffffff 13px 15px
+  );
+  color: #2e1065;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  box-shadow:
+    0 0 0 1.5px #ffffff,
+    0 0 10px #c4b5fd;
+}

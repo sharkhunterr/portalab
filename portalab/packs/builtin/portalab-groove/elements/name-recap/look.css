@@ -1,0 +1,20 @@
+/* Portalab — name_style/recap: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="recap"] {
+  font-family: "Plus Jakarta Sans Variable", "Inter Variable", sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #f573a0, #ff9f43, #1ed760, #f573a0);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 1px #00000066);
+  animation: name-shimmer 6s linear infinite;
+}
+
+@keyframes name-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}

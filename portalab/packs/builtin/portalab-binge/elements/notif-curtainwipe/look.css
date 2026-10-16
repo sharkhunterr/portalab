@@ -1,0 +1,17 @@
+/* Portalab — notification_animation/curtainwipe: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="curtainwipe"] .ds-notification {
+  animation-name: universe-notify-curtain;
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.6, 0, 0.2, 1);
+}
+
+@keyframes universe-notify-curtain {
+  0% {
+    opacity: 0.4;
+    clip-path: inset(0 50% 0 50%);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}

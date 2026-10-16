@@ -1,0 +1,33 @@
+/* Portalab — notification_animation/earth: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="earth"] .ds-notification {
+  animation-name: universe-notify-earth;
+  animation-duration: 0.8s;
+  animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+@keyframes universe-notify-earth {
+  0% {
+    opacity: 0;
+    transform: translateY(110%) scaleY(0.6);
+    filter: brightness(0.5) sepia(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-6%) scaleY(1.04);
+    filter: brightness(0.9) sepia(0.3);
+  }
+  70% {
+    transform: translate(-3px, 2%);
+  }
+  80% {
+    transform: translate(3px, 0);
+  }
+  90% {
+    transform: translate(-1px, 0);
+    filter: none;
+  }
+  100% {
+    transform: none;
+  }
+}

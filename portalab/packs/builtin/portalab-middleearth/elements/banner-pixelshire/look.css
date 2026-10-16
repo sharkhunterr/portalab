@@ -1,0 +1,14 @@
+/* Portalab — profile_banner/pixelshire: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="pixelshire"] {
+  background:
+    linear-gradient(#3f6212 0 0) 0 100% / 100% 22% no-repeat,
+    repeating-linear-gradient(90deg, #4d7c0f 0 16px, #65a30d 16px 32px) 0 78% / 100% 16px no-repeat,
+    linear-gradient(#78350f 0 0) 70% 70% / 28px 36px no-repeat,
+    linear-gradient(#a3e635 0 0) 18% 62% / 64px 32px no-repeat,
+    linear-gradient(#fef08a 0 0) 85% 18% / 32px 32px no-repeat,
+    linear-gradient(#ffffff 0 0) 30% 20% / 64px 16px no-repeat,
+    linear-gradient(#ffffff 0 0) 33% 14% / 32px 16px no-repeat,
+    #7dd3fc;
+  image-rendering: pixelated;
+}

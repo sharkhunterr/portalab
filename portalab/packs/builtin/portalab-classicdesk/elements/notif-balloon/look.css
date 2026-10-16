@@ -1,0 +1,61 @@
+/* Portalab — notification_style/balloon: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="balloon"] .ds-notification {
+  overflow: visible;
+  margin-block-end: 0.8rem;
+  border: 1px solid #1b1b1b;
+  border-radius: 0.6rem;
+  --color-text: #1b1b1b;
+  --color-text-muted: #333333;
+  background: #ffffe1;
+  color: #1b1b1b;
+  font-family: Tahoma, Verdana, sans-serif;
+  box-shadow: 3px 3px 6px #00000044;
+}
+
+.ds-notifications[data-style="balloon"] .ds-notification::before {
+  inset-block: auto -0.85rem;
+  inset-inline: auto 1.6rem;
+  inline-size: 1.2rem;
+  block-size: 0.9rem;
+  background: #1b1b1b;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.ds-notifications[data-style="balloon"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -0.72rem;
+  inset-inline-end: calc(1.6rem + 1px);
+  inline-size: calc(1.2rem - 2px);
+  block-size: 0.75rem;
+  background: #ffffe1;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.ds-notifications[data-style="balloon"] .ds-notification__icon {
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  background: radial-gradient(circle at 35% 30%, #7fb2ff, #1f55c8);
+  color: #ffffff;
+}
+
+.ds-notifications[data-style="balloon"] .ds-notification__title {
+  font-weight: 700;
+}
+
+.ds-notifications[data-style="balloon"] .ds-notification__body {
+  color: #333333;
+}
+
+.ds-notifications[data-style="balloon"] .ds-notification__close {
+  border: 1px solid #a0a0a0;
+  border-radius: 0.2rem;
+  inline-size: 1.2rem;
+  block-size: 1.2rem;
+  color: #333333;
+}
+
+.ds-notifications[data-style="balloon"] .ds-notification__timer {
+  display: none;
+}

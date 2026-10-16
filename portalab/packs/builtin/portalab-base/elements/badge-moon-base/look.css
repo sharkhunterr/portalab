@@ -1,0 +1,8 @@
+/* Portalab — badge/frost: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="frost"] {
+  border-color: #7dd3fc;
+  color: #e0f2fe;
+  background: linear-gradient(135deg, #0c4a6e, #0369a1);
+  box-shadow: 0 0 10px #7dd3fc88;
+}

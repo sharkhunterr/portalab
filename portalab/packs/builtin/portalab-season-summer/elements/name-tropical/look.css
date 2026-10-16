@@ -1,0 +1,26 @@
+/* Portalab — name_style/tropical: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="tropical"] {
+  background: linear-gradient(90deg, #06b6d4, #2dd4bf, #fb7185, #fdba74);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  animation:
+    name-shimmer 6s linear infinite,
+    name-sway 3.2s ease-in-out infinite;
+}
+
+@keyframes name-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes name-sway {
+  50% {
+    translate: 0 -2px;
+    rotate: -1deg;
+  }
+}

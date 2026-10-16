@@ -1,0 +1,79 @@
+/* Portalab — level_up/extraedition: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="extraedition"] {
+  --glow: #1a1a1a;
+}
+
+.levelup[data-look="extraedition"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(circle, #3a3530dd, #1a1a1af0);
+}
+
+.levelup[data-look="extraedition"] .levelup__burst {
+  display: block;
+  inset-block-start: 5%;
+  inset-inline: 0;
+  color: #fbf8f1;
+  font-family: "UnifrakturMaguntia", "Playfair Display", serif;
+  font-size: clamp(2rem, 7vw, 4rem);
+  text-align: center;
+  text-shadow: 0.2rem 0.2rem 0 #a3171d;
+  animation: levelup-kapow 0.6s cubic-bezier(0.2, 1.8, 0.4, 1) 1.3s both;
+}
+
+.levelup[data-look="extraedition"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: var(--x);
+  inline-size: 3rem;
+  aspect-ratio: 0.72;
+  background:
+    repeating-linear-gradient(180deg, #8a8278 0 2px, transparent 2px 6px) 50% 60% / 80% 60% no-repeat,
+    #f3ecdc;
+  opacity: 0.35;
+  animation: levelup-twinkle calc(1s + var(--r) * 1s) ease-in-out infinite alternate;
+}
+
+.levelup[data-look="extraedition"] .levelup__card {
+  --color-text: #1a1a1a;
+  --color-text-muted: #4a4540;
+  --color-surface-raised: #efe7d6;
+  --color-border: #cfc6b4;
+  border: 0;
+  border-block: 4px double #1a1a1a;
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 1.4rem, #1a1a1a0d 1.4rem calc(1.4rem + 1px)), #f3ecdc;
+  color: #1a1a1a;
+  font-family: "EB Garamond", Georgia, serif;
+  box-shadow: 0.6rem 0.8rem 0 #00000066;
+  animation: levelup-paper-spin 1.2s cubic-bezier(0.2, 0.6, 0.3, 1) both;
+}
+
+.levelup[data-look="extraedition"] .levelup__title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 900;
+}
+
+@keyframes levelup-kapow {
+  from {
+    transform: scale(0) rotate(-30deg);
+  }
+}
+
+@keyframes levelup-twinkle {
+  to {
+    opacity: 0.15;
+  }
+}
+
+@keyframes levelup-paper-spin {
+  from {
+    opacity: 0;
+    transform: scale(0.05) rotate(-1440deg);
+  }
+  20% {
+    opacity: 1;
+  }
+}

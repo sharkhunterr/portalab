@@ -1,0 +1,29 @@
+/* Portalab — ambient/aurora: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="aurora"] > span {
+  left: -25vw;
+  top: calc(-10vh + var(--i) * 12vh);
+  inline-size: 150vw;
+  block-size: 45vh;
+  background: linear-gradient(
+    100deg,
+    transparent 10%,
+    hsl(calc(140 + var(--i) * 60) 90% 60% / 0.18) 35%,
+    hsl(calc(260 + var(--i) * 30) 90% 65% / 0.16) 60%,
+    transparent 85%
+  );
+  filter: blur(24px);
+  animation-name: ambient-aurora;
+  animation-duration: calc(14s + var(--i) * 6s);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+
+@keyframes ambient-aurora {
+  from {
+    transform: translate3d(-8vw, 0, 0) skewY(-4deg);
+  }
+  to {
+    transform: translate3d(8vw, 6vh, 0) skewY(4deg);
+  }
+}

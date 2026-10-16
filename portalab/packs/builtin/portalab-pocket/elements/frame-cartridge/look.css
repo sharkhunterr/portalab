@@ -1,0 +1,17 @@
+/* Portalab — avatar_frame/cartridge: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="cartridge"] {
+  padding: 8px 8px 18px;
+  border-radius: 4px 0 4px 4px;
+  background:
+    repeating-linear-gradient(180deg, #8d8a84 0 2px, transparent 2px 5px) 50% calc(100% - 3px) / 70% 9px
+    no-repeat,
+    linear-gradient(180deg, #c8c5bf, #a9a59e);
+  clip-path: polygon(0 0, 84% 0, 100% 12%, 100% 100%, 0 100%);
+  filter: drop-shadow(0 2px 2px #00000055);
+}
+
+.avatar-frame[data-frame="cartridge"] > :not(.avatar-frame__fx) {
+  border-radius: 2px;
+  box-shadow: 0 0 0 3px #e8e6e1;
+}

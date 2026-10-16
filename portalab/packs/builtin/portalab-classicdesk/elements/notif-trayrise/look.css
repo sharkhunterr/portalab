@@ -1,0 +1,25 @@
+/* Portalab — notification_animation/trayrise: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="trayrise"] .ds-notification {
+  transform-origin: 100% 100%;
+  animation-name: universe-notify-tray;
+  animation-duration: 0.9s;
+  animation-timing-function: ease-out;
+}
+
+@keyframes universe-notify-tray {
+  0% {
+    opacity: 0;
+    transform: translateY(120%) scale(0.6);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-8%) scale(1.02);
+  }
+  75% {
+    transform: translateY(3%);
+  }
+  100% {
+    transform: none;
+  }
+}

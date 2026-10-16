@@ -1,0 +1,63 @@
+/* Portalab — effect/pixelhearts: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="pixelhearts"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1.2rem;
+  aspect-ratio: 1;
+  background: #8b1e4f;
+  clip-path: polygon(
+    20% 0,
+    40% 0,
+    40% 10%,
+    60% 10%,
+    60% 0,
+    80% 0,
+    80% 10%,
+    100% 10%,
+    100% 50%,
+    90% 50%,
+    90% 60%,
+    80% 60%,
+    80% 70%,
+    70% 70%,
+    70% 80%,
+    60% 80%,
+    60% 90%,
+    40% 90%,
+    40% 80%,
+    30% 80%,
+    30% 70%,
+    20% 70%,
+    20% 60%,
+    10% 60%,
+    10% 50%,
+    0 50%,
+    0 10%,
+    20% 10%
+  );
+  animation-name: fx-burst;
+  animation-timing-function: steps(10, end);
+}
+
+[data-effect="pixelhearts"] .celebration-fx:nth-child(2n) {
+  background: #306230;
+}
+
+[data-effect="pixelhearts"] .ds-celebration__badge {
+  background: #9bbc0f;
+  color: #0f380f;
+  font-family: "Press Start 2P", monospace;
+  box-shadow: 0 0 0 3px #0f380f;
+}
+
+@keyframes fx-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-6rem - var(--s) * 4rem)) rotate(calc(-1 * var(--angle)))
+      scale(1.2) rotate(var(--r));
+  }
+}

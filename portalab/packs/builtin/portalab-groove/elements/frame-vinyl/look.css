@@ -1,0 +1,22 @@
+/* Portalab — avatar_frame/vinyl: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="vinyl"] {
+  padding: 13px;
+  background:
+    repeating-radial-gradient(circle, #111111 0 1px, #1c1c1c 1px 3px),
+    conic-gradient(from 30deg, #ffffff22, transparent 15%, #ffffff22 50%, transparent 65%);
+  background-blend-mode: screen;
+  box-shadow: 0 0.3rem 0.8rem #00000088;
+  animation: frame-turn 6s linear infinite;
+}
+
+.avatar-frame[data-frame="vinyl"] > :not(.avatar-frame__fx) {
+  box-shadow: 0 0 0 3px #1ed760;
+  animation: frame-turn 6s linear infinite reverse;
+}
+
+@keyframes frame-turn {
+  to {
+    rotate: 360deg;
+  }
+}

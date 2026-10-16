@@ -1,0 +1,62 @@
+/* Portalab — effect/glitch: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="glitch"] .ds-celebration__badge {
+  position: relative;
+  background: #0b0b12;
+  color: #f0f0f0;
+  box-shadow: 0 0 0 2px #00f0ff;
+  animation:
+    ds-pop var(--motion-duration-slow) var(--motion-easing-spring) both,
+    fx-glitch 0.5s steps(1, end) 4;
+}
+
+[data-effect="glitch"] .celebration-fx {
+  inline-size: calc(6rem + var(--s) * 6rem);
+  block-size: 0.35rem;
+  background: hsl(calc(170deg + var(--i) * 30deg) 100% 60%);
+  mix-blend-mode: screen;
+  animation-name: fx-slice;
+  animation-duration: 0.4s;
+  animation-iteration-count: 4;
+  animation-timing-function: steps(2, end);
+}
+
+@keyframes fx-glitch {
+  0% {
+    text-shadow:
+      2px 0 #ff2a6d,
+      -2px 0 #00f0ff;
+    transform: translate(0);
+  }
+  25% {
+    text-shadow:
+      -3px 0 #ff2a6d,
+      3px 0 #00f0ff;
+    transform: translate(-3px, 1px) skewX(-8deg);
+  }
+  50% {
+    text-shadow:
+      1px 0 #ff2a6d,
+      -1px 0 #00f0ff;
+    transform: translate(3px, -1px);
+  }
+  75% {
+    clip-path: inset(30% 0 40% 0);
+    transform: translate(-2px, 0);
+  }
+  100% {
+    clip-path: none;
+    transform: none;
+  }
+}
+
+@keyframes fx-slice {
+  0% {
+    opacity: 0.9;
+    transform: translate(calc((var(--s) - 1.1) * 12rem), calc((var(--i) - 5) * 0.5rem));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((1.1 - var(--s)) * 12rem), calc((var(--i) - 5) * 0.5rem));
+  }
+}

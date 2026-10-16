@@ -1,0 +1,70 @@
+/* Portalab — level_up/nova: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="nova"] {
+  --glow: #8b7bff;
+}
+
+.levelup[data-look="nova"] .levelup__rays {
+  display: block;
+  inset: -20%;
+  background:
+    radial-gradient(35% 45% at 25% 30%, #8b7bffaa, transparent 70%),
+    radial-gradient(35% 45% at 75% 25%, #22d3eeaa, transparent 70%),
+    radial-gradient(40% 50% at 55% 75%, #f472b699, transparent 70%);
+  filter: blur(30px);
+  animation: levelup-nova-mesh 8s ease-in-out infinite alternate;
+}
+
+.levelup[data-look="nova"] .levelup__fx {
+  display: block;
+  inset-inline-start: var(--x);
+  inset-block-start: var(--y);
+  inline-size: calc(3rem + var(--r) * 5rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(calc(250deg + var(--i) * 40deg) 90% 70% / 0.55), transparent 70%);
+  filter: blur(6px);
+  animation: levelup-bokeh calc(5s + var(--r) * 4s) ease-in-out calc(var(--r) * -4s) infinite alternate;
+}
+
+.levelup[data-look="nova"] .levelup__card {
+  --color-text: #f5f5f7;
+  --color-text-muted: #a1a1aa;
+  border-color: #ffffff1f;
+  background: #111118e6;
+  backdrop-filter: blur(30px) saturate(1.6);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6);
+  box-shadow: 0 -20px 60px #00000066;
+  color: #f5f5f7;
+}
+
+.levelup[data-look="nova"] .levelup__title {
+  background: linear-gradient(90deg, #8b7bff, #22d3ee, #f472b6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-family: "Plus Jakarta Sans Variable", "Inter Variable", system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.levelup[data-look="nova"] .levelup__kicker {
+  color: #a1a1aa;
+}
+
+.levelup[data-look="nova"] :is(.levelup__won li, .levelup__list li) {
+  background: #ffffff12;
+}
+
+@keyframes levelup-nova-mesh {
+  to {
+    transform: translate(4%, -3%) rotate(8deg) scale(1.08);
+  }
+}
+
+@keyframes levelup-bokeh {
+  to {
+    opacity: 0.6;
+    transform: translate(2rem, -1.5rem) scale(1.2);
+  }
+}

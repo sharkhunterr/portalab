@@ -1,0 +1,16 @@
+/* Portalab — title/neon: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-title[data-style="neon"] {
+  border-color: #ff2fd1;
+  color: #ffd6f5;
+  background: #1a0016;
+  box-shadow:
+    0 0 6px #ff2fd1,
+    inset 0 0 6px #ff2fd155;
+  text-shadow: 0 0 6px #ff2fd1;
+}
+
+.cosmetic-title[data-style="neon"] {
+  background: none;
+  box-shadow: none;
+}

@@ -1,0 +1,13 @@
+/* Portalab — profile_banner/frontpage: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="frontpage"] {
+  background:
+    linear-gradient(#1a1a1a, #1a1a1a) 50% 10% / 46% 14% no-repeat,
+    linear-gradient(#1a1a1a, #1a1a1a) 50% 30% / 92% 2px no-repeat,
+    linear-gradient(#1a1a1a, #1a1a1a) 50% 33% / 92% 1px no-repeat,
+    linear-gradient(#bdb3a0, #bdb3a0) 6% 48% / 40% 34% no-repeat,
+    repeating-linear-gradient(180deg, #6b645a 0 2px, transparent 2px 7px) 70% 48% / 20% 40% no-repeat,
+    repeating-linear-gradient(180deg, #6b645a 0 2px, transparent 2px 7px) 95% 48% / 20% 40% no-repeat,
+    repeating-linear-gradient(180deg, #6b645a 0 2px, transparent 2px 7px) 6% 98% / 40% 10% no-repeat,
+    #f3ecdc;
+}

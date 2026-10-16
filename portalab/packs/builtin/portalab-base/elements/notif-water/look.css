@@ -1,0 +1,29 @@
+/* Portalab — notification_animation/water: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="water"] .ds-notification {
+  animation-name: universe-notify-water;
+  animation-duration: 1s;
+  animation-timing-function: ease-out;
+}
+
+@keyframes universe-notify-water {
+  0% {
+    opacity: 0;
+    clip-path: ellipse(0% 0% at 50% 100%);
+    transform: translateY(1rem);
+  }
+  45% {
+    opacity: 1;
+    clip-path: ellipse(90% 75% at 50% 100%);
+  }
+  60% {
+    transform: translateY(-3px) scaleY(1.03);
+  }
+  80% {
+    transform: translateY(1px) scaleY(0.99);
+  }
+  100% {
+    clip-path: ellipse(150% 150% at 50% 100%);
+    transform: none;
+  }
+}

@@ -1,0 +1,10 @@
+/* Portalab — name_style/solarfire: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="solarfire"] {
+  font-family: Audiowide, Orbitron, sans-serif;
+  background: linear-gradient(180deg, #fff3b0, #ffb347 45%, #ff5a1f 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 0.35em rgb(255 140 40 / 0.7));
+}

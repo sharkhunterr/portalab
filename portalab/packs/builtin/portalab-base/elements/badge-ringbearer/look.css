@@ -1,0 +1,20 @@
+/* Portalab — badge/ring: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="ring"] {
+  border-color: #d97706;
+  background: linear-gradient(90deg, #451a03, #78350f, #451a03);
+  color: #fde68a;
+  text-shadow: 0 0 6px #f59e0b;
+  animation: badge-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes badge-shimmer {
+  0%,
+  30% {
+    background-position: 160% 0;
+  }
+  70%,
+  100% {
+    background-position: -60% 0;
+  }
+}

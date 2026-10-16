@@ -1,0 +1,41 @@
+/* Portalab — ambient/beachballs: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="beachballs"] > span {
+  top: auto;
+  bottom: 4vh;
+  left: -10%;
+  inline-size: calc(2.2rem + 1.6rem * var(--size));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #ffffff 0 14%, transparent 15%),
+    conic-gradient(
+      #ef4444 0 60deg,
+      #ffffff 60deg 120deg,
+      #3b82f6 120deg 180deg,
+      #ffffff 180deg 240deg,
+      #facc15 240deg 300deg,
+      #ffffff 300deg
+    );
+  box-shadow: inset -0.4rem -0.4rem 0.8rem #00000026;
+  opacity: 0.4;
+  animation:
+    ambient-ball-roll calc(var(--duration) * 1.6) linear var(--delay) infinite,
+    ambient-ball-bounce 1.1s cubic-bezier(0.3, 0, 0.7, 1) var(--delay) infinite alternate;
+}
+
+@keyframes ambient-ball-roll {
+  to {
+    left: 110%;
+    rotate: 720deg;
+  }
+}
+
+@keyframes ambient-ball-bounce {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 -30vh;
+  }
+}

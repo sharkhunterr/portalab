@@ -1,0 +1,10 @@
+/* Portalab — name_style/horror: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="horror"] {
+  font-family: "Creepster", cursive;
+  letter-spacing: 0.05em;
+  color: #dc2626;
+  text-shadow:
+    0 2px 0 #450a0a,
+    0 0 12px #7f1d1d;
+}

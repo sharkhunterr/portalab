@@ -1,0 +1,9 @@
+/* Portalab — avatar_frame/sakura: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="sakura"] {
+  background:
+    radial-gradient(circle at 20% 20%, #fbcfe8 0 5px, transparent 6px),
+    radial-gradient(circle at 80% 30%, #f9a8d4 0 4px, transparent 5px),
+    radial-gradient(circle at 70% 85%, #fbcfe8 0 5px, transparent 6px),
+    conic-gradient(#fce7f3, #f472b6, #fce7f3);
+}

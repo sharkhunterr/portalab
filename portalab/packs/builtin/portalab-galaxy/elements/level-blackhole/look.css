@@ -1,0 +1,55 @@
+/* Portalab — level_badge/blackhole: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="blackhole"] {
+  position: relative;
+  isolation: isolate;
+  background: radial-gradient(circle, #000000 45%, #1e1b4b 70%, #000000);
+  color: #e0e7ff;
+  box-shadow: 0 0 10px #6366f1aa;
+}
+
+.ds-level[data-look="blackhole"]::before {
+  content: "";
+  position: absolute;
+  inset: -0.45rem;
+  z-index: -1;
+  border-radius: 50%;
+  background: conic-gradient(
+    from var(--level-turn, 0deg),
+    transparent,
+    #f97316cc,
+    #fde68a,
+    #f97316cc,
+    transparent 60%
+  );
+  filter: blur(2px);
+  mask: radial-gradient(circle, transparent 52%, #000 56%, #000 68%, transparent 72%);
+  animation: level-elements 2.4s linear infinite;
+}
+
+.ds-level[data-look="blackhole"] > * {
+  animation: level-suck 6s ease-in-out infinite;
+}
+
+@keyframes level-elements {
+  to {
+    --level-turn: 360deg;
+  }
+}
+
+@keyframes level-suck {
+  0%,
+  80%,
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+  88% {
+    transform: scale(0.1) rotate(540deg);
+    opacity: 0;
+  }
+  92% {
+    transform: scale(0.1) rotate(720deg);
+    opacity: 0;
+  }
+}

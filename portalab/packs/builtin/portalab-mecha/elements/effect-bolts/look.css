@@ -1,0 +1,37 @@
+/* Portalab — effect/bolts: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="bolts"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1rem;
+  aspect-ratio: 1.15;
+  background:
+    radial-gradient(circle, #1f2937 0 22%, transparent 24%), linear-gradient(135deg, #e5e7eb, #6b7280);
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  animation-name: fx-burst;
+}
+
+[data-effect="bolts"] .celebration-fx:nth-child(2n) {
+  inline-size: 0.4rem;
+  aspect-ratio: 0.3;
+  border-radius: 0.1rem;
+  clip-path: none;
+  background: repeating-linear-gradient(0deg, #9ca3af 0 2px, #4b5563 2px 3px);
+}
+
+[data-effect="bolts"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #374151, #9ca3af);
+  color: #fff;
+  box-shadow: 0 0 22px #ef4444;
+}
+
+@keyframes fx-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-6rem - var(--s) * 4rem)) rotate(calc(-1 * var(--angle)))
+      scale(1.2) rotate(var(--r));
+  }
+}

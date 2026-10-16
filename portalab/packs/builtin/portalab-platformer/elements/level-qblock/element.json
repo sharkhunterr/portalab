@@ -10,8 +10,10 @@
     "fr": "Votre niveau sur un bloc mystère doré et ses rivets."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 700,

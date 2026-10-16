@@ -1,0 +1,25 @@
+/* Portalab — notification_style/chamfer: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="chamfer"] .ds-notification {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, #ef4444 0 0.3rem, transparent 0.3rem),
+    repeating-linear-gradient(135deg, #ffffff06 0 6px, transparent 6px 12px),
+    linear-gradient(180deg, #4b5563, #1f2937);
+  color: #f9fafb;
+  clip-path: polygon(0.9rem 0, 100% 0, 100% calc(100% - 0.9rem), calc(100% - 0.9rem) 100%, 0 100%, 0 0.9rem);
+  font-family: "Rajdhani", "Chakra Petch", sans-serif;
+  box-shadow: none;
+  filter: drop-shadow(0 6px 12px #00000066);
+}
+
+.ds-notifications[data-style="chamfer"] .ds-notification__title {
+  font-family: "Black Ops One", "Orbitron", sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.ds-notifications[data-style="chamfer"] .ds-notification__body {
+  color: #d1d5db;
+}

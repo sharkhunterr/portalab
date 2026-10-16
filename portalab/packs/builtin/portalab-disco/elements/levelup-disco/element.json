@@ -10,8 +10,10 @@
     "fr": "Les éclats de la boule à facettes balaient la pièce."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 450,

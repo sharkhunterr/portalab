@@ -10,8 +10,10 @@
     "fr": "Des pièces d'or qui tournent dans les airs sur la page."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

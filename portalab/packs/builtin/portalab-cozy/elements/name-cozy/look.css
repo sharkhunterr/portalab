@@ -1,0 +1,7 @@
+/* Portalab — name_style/cozy: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="cozy"] {
+  font-family: "Pacifico", cursive;
+  color: #f2c38a;
+  text-shadow: 0 2px 8px #7c2d1255;
+}

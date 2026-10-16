@@ -1,0 +1,8 @@
+/* Portalab — profile_banner/halloween: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="halloween"] {
+  background:
+    radial-gradient(circle 1.8rem at 84% 32%, #fef3c7, #fde68a 85%, transparent 88%),
+    radial-gradient(70% 60% at 20% 110%, #f97316aa, transparent),
+    linear-gradient(180deg, #1c0a26, #3b0764 60%, #7c2d12);
+}

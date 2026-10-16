@@ -1,0 +1,15 @@
+/* Portalab — name_style/watercolour: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="watercolour"] {
+  font-family: Caveat, "Comic Neue", cursive;
+  font-weight: 700;
+  font-size: 1.2em;
+  background:
+    radial-gradient(circle at 20% 40%, #f472b6, transparent 55%),
+    radial-gradient(circle at 70% 60%, #6fbf5a, transparent 55%), linear-gradient(90deg, #b0306a, #2f7a3a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 0.5px #1f3320aa;
+  filter: drop-shadow(0 1px 0 #ffffffaa);
+}

@@ -1,0 +1,12 @@
+/* Portalab — level_badge/moonphase: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="moonphase"] {
+  padding-inline: 1.5rem 0.6rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 0.75rem 50%, #f2f0e6 0 0.5rem, transparent 0.52rem),
+    radial-gradient(circle at 0.95rem 45%, #10162a 0 0.45rem, transparent 0.47rem),
+    linear-gradient(180deg, #1c2440, #10162a);
+  color: #e6ecff;
+  box-shadow: inset 0 0 0 1px #8fa0d066;
+}

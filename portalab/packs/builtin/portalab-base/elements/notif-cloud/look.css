@@ -1,0 +1,45 @@
+/* Portalab — notification_style/cloud: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="cloud"] .ds-notification {
+  margin-block: 1.1rem 1.4rem;
+  overflow: visible;
+  border: 0;
+  border-radius: 2.2rem;
+  background: var(--color-surface-raised);
+  box-shadow: 0 0.8rem 1.6rem -0.8rem color-mix(in srgb, var(--color-text) 40%, transparent);
+  filter: drop-shadow(0 0 1px color-mix(in srgb, var(--tone) 70%, transparent));
+}
+
+.ds-notifications[data-style="cloud"] .ds-notification::before {
+  inset: -1.15rem 10% auto;
+  inline-size: auto;
+  block-size: 2.4rem;
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 18% 1.6rem, var(--color-surface-raised) 1rem, transparent 1.04rem),
+    radial-gradient(circle at 44% 1.25rem, var(--color-surface-raised) 1.3rem, transparent 1.34rem),
+    radial-gradient(circle at 72% 1.5rem, var(--color-surface-raised) 1.08rem, transparent 1.12rem),
+    radial-gradient(circle at 90% 1.85rem, var(--color-surface-raised) 0.8rem, transparent 0.84rem);
+  z-index: -1;
+}
+
+.ds-notifications[data-style="cloud"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -1.35rem;
+  inset-inline-end: 1.6rem;
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+  box-shadow: 0.85rem 0.6rem 0 -0.2rem var(--color-surface-raised);
+}
+
+.ds-notifications[data-style="cloud"] .ds-notification__icon {
+  background: color-mix(in srgb, var(--tone) 22%, var(--color-surface-raised));
+}
+
+.ds-notifications[data-style="cloud"] .ds-notification__timer {
+  inset-inline: 1.5rem;
+  border-radius: 999px;
+}

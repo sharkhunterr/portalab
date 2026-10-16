@@ -1,0 +1,22 @@
+/* Portalab — notification_style/bloom: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="bloom"] .ds-notification {
+  border: 1px solid #a7d7a0;
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 0.8rem 0.8rem, #f9a8d4 0 4px, #fde68a 4px 5px, transparent 6px),
+    radial-gradient(
+      circle at calc(100% - 0.9rem) calc(100% - 0.8rem),
+      #c4b5fd 0 4px,
+      #fde68a 4px 5px,
+      transparent 6px
+    ),
+    radial-gradient(ellipse 0.9rem 0.4rem at 1.9rem 0.7rem, #6cbf5a 0 95%, transparent),
+    linear-gradient(180deg, #f6fff3, #e3f6dc);
+  color: #1f3d1a;
+  box-shadow: 0 6px 18px #00000033;
+}
+
+.ds-notifications[data-style="bloom"] .ds-notification__body {
+  color: #35602d;
+}

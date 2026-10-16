@@ -1,0 +1,87 @@
+/* Portalab — level_up/viral: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="viral"] {
+  --glow: #1877f2;
+}
+
+.levelup[data-look="viral"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: #f0f2f5f2;
+}
+
+.levelup[data-look="viral"] .levelup__fx {
+  display: block;
+  inset-block-end: -2rem;
+  inset-inline-start: var(--x);
+  inline-size: calc(1.4rem + var(--r) * 1.2rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #4da3ff, #1877f2);
+  box-shadow: 0 0 0 2px #ffffff;
+  animation: levelup-rise calc(1.8s + var(--r) * 1.6s) ease-in calc(var(--i) * 0.08s) infinite;
+}
+
+.levelup[data-look="viral"] .levelup__fx:nth-child(3n) {
+  background: linear-gradient(180deg, #ff6b81, #e41e3f);
+}
+
+.levelup[data-look="viral"] .levelup__fx:nth-child(5n) {
+  background: linear-gradient(180deg, #ffd972, #f7b125);
+}
+
+.levelup[data-look="viral"] .levelup__burst {
+  display: block;
+  inset-block-start: 7%;
+  inset-inline-start: 50%;
+  padding: 0.3rem 1rem;
+  border-radius: 999px;
+  background: #e41e3f;
+  color: #ffffff;
+  font:
+    800 clamp(1.4rem, 4vw, 2.2rem) / 1.1 "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  box-shadow: 0 0.4rem 1.2rem #e41e3f66;
+  translate: -50% 0;
+  animation:
+    levelup-kapow 0.5s cubic-bezier(0.2, 1.8, 0.4, 1) 0.4s both,
+    levelup-pulse 0.9s ease-in-out 1s infinite alternate;
+}
+
+.levelup[data-look="viral"] .levelup__card {
+  border: 0;
+  border-radius: 0.8rem;
+  --color-text: #050505;
+  --color-text-muted: #4b4f56;
+  --color-border: #ced0d4;
+  --color-surface-raised: #f0f2f5;
+  background: #ffffff;
+  color: #050505;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  box-shadow: 0 0.6rem 2rem #00000026;
+}
+
+@keyframes levelup-rise {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-80vh) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes levelup-kapow {
+  from {
+    transform: scale(0) rotate(-30deg);
+  }
+}
+
+@keyframes levelup-pulse {
+  50% {
+    opacity: 0.6;
+  }
+}

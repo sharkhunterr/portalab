@@ -1,0 +1,24 @@
+/* Portalab — notification_animation/surfin: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="surfin"] .ds-notification {
+  animation-name: universe-notify-surf;
+  animation-duration: 1s;
+  animation-timing-function: ease-out;
+}
+
+@keyframes universe-notify-surf {
+  0% {
+    opacity: 0;
+    transform: translate(-120%, 40%) rotate(-10deg);
+  }
+  45% {
+    opacity: 1;
+    transform: translate(-20%, -18%) rotate(6deg);
+  }
+  75% {
+    transform: translate(4%, 4%) rotate(-2deg);
+  }
+  100% {
+    transform: none;
+  }
+}

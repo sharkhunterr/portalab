@@ -1,0 +1,23 @@
+/* Portalab — notification_style/terminal: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="terminal"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="terminal"] .ds-notification {
+  border: 1px solid var(--tone);
+  border-radius: 2px;
+  background: #050a07;
+  color: #c8ffd8;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  box-shadow: 0 0 0.8rem color-mix(in srgb, var(--tone) 30%, transparent);
+}
+
+.ds-notifications[data-style="terminal"] .ds-notification__title::before {
+  content: "> ";
+  color: var(--tone);
+}
+
+.ds-notifications[data-style="terminal"] .ds-notification__body {
+  color: #8fd6a6;
+}

@@ -1,0 +1,65 @@
+/* Portalab — level_up/spell: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="spell"] {
+  --glow: #f5c542;
+}
+
+.levelup[data-look="spell"] .levelup__rays {
+  display: block;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 80vmin;
+  block-size: 80vmin;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from 0deg, #f5c54255 0 3deg, transparent 3deg 15deg),
+    radial-gradient(
+      circle,
+      transparent 54%,
+      #f5c542 55%,
+      transparent 56.5%,
+      transparent 64%,
+      #f5c54299 65%,
+      transparent 66%
+    );
+  mask: radial-gradient(circle, transparent 40%, #000 41%, #000 70%, transparent 71%);
+  transform: translate(-50%, -50%);
+  animation:
+    levelup-spin-centered 12s linear infinite,
+    levelup-fade 1s ease-out both;
+}
+
+.levelup[data-look="spell"] .levelup__fx {
+  display: block;
+  inset-block-end: -2vh;
+  inset-inline-start: var(--x);
+  inline-size: 0.35rem;
+  block-size: 0.35rem;
+  border-radius: 50%;
+  background: #fde68a;
+  box-shadow: 0 0 8px #f5c542;
+  animation: levelup-rise calc(2.5s + var(--r) * 2s) ease-out calc(var(--r) * 1.5s) infinite;
+}
+
+@keyframes levelup-spin-centered {
+  to {
+    transform: translate(-50%, -50%) rotate(1turn);
+  }
+}
+
+@keyframes levelup-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes levelup-rise {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-80vh) scale(0.3);
+    opacity: 0;
+  }
+}

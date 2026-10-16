@@ -1,0 +1,39 @@
+/* Portalab — notification_style/bricks: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="bricks"] .ds-notification {
+  --color-text: #1a1a2e;
+  --color-text-muted: #3d3d5c;
+  border: 0.7rem solid transparent;
+  border-radius: 0;
+  background:
+    linear-gradient(#fff8e8, #fff8e8) padding-box,
+    linear-gradient(#000000 0 2px, transparent 2px) 0 0 / 1.4rem 0.7rem border-box,
+    linear-gradient(90deg, #000000 0 2px, transparent 2px) 0 0 / 1.4rem 1.4rem border-box,
+    linear-gradient(90deg, #000000 0 2px, transparent 2px) 0.7rem 0.7rem / 1.4rem 1.4rem border-box,
+    #c84c0c border-box;
+  color: #1a1a2e;
+  box-shadow: 0.35rem 0.35rem 0 #00000055;
+}
+
+.ds-notifications[data-style="bricks"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="bricks"] .ds-notification__icon {
+  border-radius: 0.15rem;
+  background: #f8b800;
+  color: #5a2a00;
+  box-shadow:
+    inset 2px 2px 0 #ffe08a,
+    inset -2px -2px 0 #c47a00;
+}
+
+.ds-notifications[data-style="bricks"] .ds-notification__title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.66rem;
+  line-height: 1.6;
+}
+
+.ds-notifications[data-style="bricks"] .ds-notification__timer {
+  background: #1e7a1e;
+}

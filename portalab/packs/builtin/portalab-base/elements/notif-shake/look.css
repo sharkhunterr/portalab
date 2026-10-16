@@ -1,0 +1,30 @@
+/* Portalab — notification_animation/shake: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="shake"] .ds-notification {
+  animation-name: universe-notify-shake;
+  animation-duration: 0.75s;
+}
+
+@keyframes universe-notify-shake {
+  0% {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+  25% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  35%,
+  55%,
+  75% {
+    transform: translateX(-6px);
+  }
+  45%,
+  65%,
+  85% {
+    transform: translateX(6px);
+  }
+  100% {
+    transform: none;
+  }
+}

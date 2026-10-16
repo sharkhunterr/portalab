@@ -1,0 +1,18 @@
+/* Portalab — badge/veins: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="veins"] {
+  border-color: #dc2626;
+  background:
+    linear-gradient(#12151f99, #12151f99),
+    var(--veins-web) center / 9rem auto,
+    #12151f;
+  color: #fecaca;
+  text-shadow: 0 0 4px #000;
+  animation: frame-veins 4.6s ease-in-out infinite;
+}
+
+@keyframes frame-veins {
+  50% {
+    box-shadow: 0 0 1.6rem #ef4444;
+  }
+}

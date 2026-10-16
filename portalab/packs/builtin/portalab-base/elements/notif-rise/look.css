@@ -1,0 +1,15 @@
+/* Portalab — notification_animation/rise: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="rise"] .ds-notification {
+  animation-name: universe-notify-rise;
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes universe-notify-rise {
+  from {
+    opacity: 0;
+    transform: translateY(2.5rem) scale(0.96);
+    filter: blur(4px);
+  }
+}

@@ -1,0 +1,13 @@
+/* Portalab — avatar_frame/flames: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="flames"] {
+  background: conic-gradient(#f97316, #ef4444, #facc15, #f97316, #dc2626, #f97316);
+  box-shadow: 0 -0.3rem 1.2rem #f97316aa;
+  animation: cosmetics-flicker 1.6s ease-in-out infinite;
+}
+
+@keyframes cosmetics-flicker {
+  50% {
+    box-shadow: 0 -0.5rem 1.6rem #fb923ccc;
+  }
+}

@@ -1,0 +1,20 @@
+/* Portalab — level_badge/cassette: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="cassette"] {
+  min-inline-size: 2.7rem;
+  padding-inline: 0.55rem;
+  border: 1px solid #000;
+  border-radius: 0.25rem;
+  background:
+    radial-gradient(circle at 0.22rem 0.22rem, #71717a 0 0.07rem, transparent 0.08rem),
+    radial-gradient(circle at calc(100% - 0.22rem) 0.22rem, #71717a 0 0.07rem, transparent 0.08rem),
+    linear-gradient(90deg, #ef4444 0 20%, #f97316 0 40%, #facc15 0 60%, #22c55e 0 80%, #3b82f6 0) 50% 88% /
+    78% 14% no-repeat,
+    linear-gradient(#fafaf9, #e7e5e4) 50% 30% / 78% 56% no-repeat,
+    #1c1917;
+  color: #1c1917;
+  font-family: "VT323", monospace;
+  font-size: 1rem;
+  line-height: 1;
+  padding-block-end: 0.3rem;
+}

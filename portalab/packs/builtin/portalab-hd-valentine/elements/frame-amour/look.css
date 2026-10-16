@@ -1,0 +1,5 @@
+/* Portalab — avatar_frame/amour: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="amour"][data-fx-failed] {
+  background: conic-gradient(#ff3d6e, #ffb3c6, #c2123d, #ff3d6e);
+}

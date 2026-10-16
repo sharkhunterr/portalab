@@ -10,8 +10,10 @@
     "fr": "Bordures et police 8 bits."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

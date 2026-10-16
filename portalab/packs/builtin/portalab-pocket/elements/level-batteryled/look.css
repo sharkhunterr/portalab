@@ -1,0 +1,27 @@
+/* Portalab — level_badge/batteryled: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="batteryled"] {
+  gap: 0.35rem;
+  padding-inline: 0.45rem 0.6rem;
+  border-radius: 0.3rem;
+  background: #5f5d6b;
+  color: #9bbc0f;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65rem;
+}
+
+.ds-level[data-look="batteryled"]::before {
+  content: "";
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  border-radius: 50%;
+  background: #ff3b3b;
+  box-shadow: 0 0 6px #ff3b3b;
+  animation: level-led 2.4s ease-in-out infinite;
+}
+
+@keyframes level-led {
+  50% {
+    opacity: 0.55;
+  }
+}

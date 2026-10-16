@@ -1,0 +1,14 @@
+/* Portalab — avatar_frame/profiletile: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="profiletile"] {
+  padding: 4px;
+  border-radius: 0.45rem;
+  background: #e50914;
+  box-shadow:
+    0 0 0 2px #141414,
+    0 0.4rem 1rem #e5091455;
+}
+
+.avatar-frame[data-frame="profiletile"] > :not(.avatar-frame__fx) {
+  border-radius: 0.3rem;
+}

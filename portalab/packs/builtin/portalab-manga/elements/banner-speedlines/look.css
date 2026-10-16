@@ -1,0 +1,7 @@
+/* Portalab — profile_banner/speedlines: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="speedlines"] {
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%, #111 0 1deg, transparent 1deg 5deg),
+    radial-gradient(circle at 50% 50%, #ffffff 15%, #f2f2f2 40%, #dcdcdc);
+}

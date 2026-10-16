@@ -1,0 +1,10 @@
+/* Portalab — name_style/slime: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="slime"] {
+  background: linear-gradient(180deg, #d9f99d, #65a30d 70%, #3f6212);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 0 #3f6212) drop-shadow(0 0 6px #84cc1688);
+  font-weight: 800;
+}

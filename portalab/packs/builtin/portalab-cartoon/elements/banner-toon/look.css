@@ -1,0 +1,10 @@
+/* Portalab — profile_banner/toon: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="toon"] {
+  background:
+    radial-gradient(14% 30% at 20% 35%, #ffffff 0 60%, transparent 62%),
+    radial-gradient(10% 22% at 28% 30%, #ffffff 0 60%, transparent 62%),
+    radial-gradient(12% 26% at 75% 25%, #ffffff 0 60%, transparent 62%),
+    radial-gradient(100% 45% at 50% 125%, #5ed16b 0 50%, #3fae4e 51% 60%, transparent 61%),
+    linear-gradient(180deg, #38bdf8, #7dd3fc);
+}

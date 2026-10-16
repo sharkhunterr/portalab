@@ -1,0 +1,23 @@
+/* Portalab — avatar_frame/heartbeat: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="heartbeat"] {
+  background: radial-gradient(circle, #ff3d6e 60%, #b3123a);
+  box-shadow: 0 0 0.8rem #ff3d6e;
+  animation: frame-heartbeat 1.2s ease-in-out infinite;
+}
+
+@keyframes frame-heartbeat {
+  0%,
+  40%,
+  100% {
+    box-shadow: 0 0 0.6rem #ff3d6e99;
+  }
+  15% {
+    box-shadow:
+      0 0 0 3px #ff3d6e55,
+      0 0 1.4rem #ff3d6e;
+  }
+  28% {
+    box-shadow: 0 0 1rem #ff3d6ecc;
+  }
+}

@@ -1,0 +1,12 @@
+/* Portalab — title/pulse: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-title[data-style="pulse"] {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--color-accent) 70%, transparent);
+  }
+}

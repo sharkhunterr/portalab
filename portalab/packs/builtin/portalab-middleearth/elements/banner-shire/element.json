@@ -10,8 +10,10 @@
     "fr": "Des collines vertes sous un doux soleil."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 400,

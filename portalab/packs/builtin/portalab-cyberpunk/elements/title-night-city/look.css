@@ -1,0 +1,22 @@
+/* Portalab — title/glitch: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-title[data-style="glitch"] {
+  text-shadow:
+    1.5px 0 #00f0ff,
+    -1.5px 0 #ff2a6d;
+  animation: name-glitch 2.5s steps(1, end) infinite;
+}
+
+@keyframes name-glitch {
+  0%,
+  88%,
+  100% {
+    transform: none;
+  }
+  90% {
+    transform: translateX(-3px) skewX(-8deg);
+  }
+  93% {
+    transform: translateX(3px);
+  }
+}

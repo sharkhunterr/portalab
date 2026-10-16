@@ -1,0 +1,41 @@
+/* Portalab — effect/hearts: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="hearts"] .celebration-fx {
+  left: var(--x);
+  top: auto;
+  bottom: calc(var(--fx-vh, 1vh) * -5);
+  animation-name: fx-rise;
+  animation-timing-function: ease-out;
+}
+
+[data-effect="hearts"] .celebration-fx {
+  color: #ff4d8d;
+  filter: drop-shadow(0 0 6px #ff85b3);
+}
+
+[data-effect="hearts"] .celebration-fx svg {
+  fill: currentColor;
+}
+
+[data-effect="hearts"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #ffd1e8, #ff5c93);
+  color: #3d0018;
+  box-shadow: 0 0 22px #ff85b3;
+}
+
+@keyframes fx-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.6);
+  }
+  20% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(calc(var(--fx-vw, 1vw) * 2), calc(var(--fx-vh, 1vh) * -45), 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(var(--fx-vw, 1vw) * -2), calc(var(--fx-vh, 1vh) * -95), 0) scale(1.1);
+  }
+}

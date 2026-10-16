@@ -1,0 +1,80 @@
+/* Portalab — effect/cardcascade: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="cardcascade"] .celebration-fx {
+  left: var(--x);
+  top: calc(var(--fx-vh, 1vh) * -12);
+  inline-size: 2.6rem;
+  block-size: 3.6rem;
+  border: 1px solid #1b1b1b55;
+  border-radius: 0.25rem;
+  background: #ffffff;
+  color: #1b1b1b;
+  font:
+    700 1.5rem / 1 Georgia,
+    serif;
+  box-shadow: 1px 2px 3px #00000044;
+  animation-name: fx-cascade;
+  animation-duration: 2.6s;
+  animation-timing-function: linear;
+}
+
+[data-effect="cardcascade"] .celebration-fx::after {
+  content: "♠";
+}
+
+[data-effect="cardcascade"] .celebration-fx:nth-child(2n)::after {
+  content: "♥";
+  color: #c81e1e;
+}
+
+[data-effect="cardcascade"] .celebration-fx:nth-child(3n)::after {
+  content: "♦";
+  color: #c81e1e;
+}
+
+[data-effect="cardcascade"] .celebration-fx:nth-child(5n)::after {
+  content: "♣";
+  color: #1b1b1b;
+}
+
+[data-effect="cardcascade"] .celebration-fx:nth-child(2n) {
+  --dir: -1;
+}
+
+[data-effect="cardcascade"] .ds-celebration__badge {
+  background: radial-gradient(ellipse at 30% 0%, #8fe07a, #3c9a2b 45%, #2c7a1f);
+  color: #ffffff;
+  box-shadow: 0 0 18px #3c9a2b;
+}
+
+@keyframes fx-cascade {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+    animation-timing-function: cubic-bezier(0.5, 0, 1, 1);
+  }
+  30% {
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 9), calc(var(--fx-vh, 1vh) * 100));
+    animation-timing-function: cubic-bezier(0, 0, 0.5, 1);
+  }
+  48% {
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 15), calc(var(--fx-vh, 1vh) * 62));
+    animation-timing-function: cubic-bezier(0.5, 0, 1, 1);
+  }
+  66% {
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 21), calc(var(--fx-vh, 1vh) * 100));
+    animation-timing-function: cubic-bezier(0, 0, 0.5, 1);
+  }
+  78% {
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 25), calc(var(--fx-vh, 1vh) * 82));
+    animation-timing-function: cubic-bezier(0.5, 0, 1, 1);
+  }
+  90% {
+    opacity: 1;
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 29), calc(var(--fx-vh, 1vh) * 100));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--dir, 1) * var(--fx-vw, 1vw) * 31), calc(var(--fx-vh, 1vh) * 94));
+  }
+}

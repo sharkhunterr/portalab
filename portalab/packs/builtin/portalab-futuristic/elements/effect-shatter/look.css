@@ -1,0 +1,41 @@
+/* Portalab — effect/shatter: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="shatter"] .ds-celebration__badge {
+  animation:
+    ds-pop var(--motion-duration-slow) var(--motion-easing-spring) both,
+    fx-break 2s steps(1, end) forwards;
+}
+
+[data-effect="shatter"] .celebration-fx {
+  inline-size: 1.2rem;
+  block-size: 1rem;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-alt));
+  clip-path: polygon(50% 0, 100% 100%, 0 70%);
+  --angle: calc(360deg / var(--n) * var(--i));
+  animation-name: fx-shard;
+  animation-duration: 1s;
+  animation-delay: 1s;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@keyframes fx-break {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  52%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fx-shard {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-5rem - var(--s) * 6rem)) rotate(var(--r));
+  }
+}

@@ -10,8 +10,10 @@
     "fr": "Vert sur noir, comme une console."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

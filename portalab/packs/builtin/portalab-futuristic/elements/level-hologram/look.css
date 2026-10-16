@@ -1,0 +1,14 @@
+/* Portalab — level_badge/hologram: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="hologram"] {
+  border: 1px solid #ffffff88;
+  background: linear-gradient(120deg, #7cf7ff, #c58bff, #ff9be3, #7cf7ff) 0 0 / 300% 100%;
+  color: #1e1b4b;
+  animation: universe-holo-level 4s linear infinite;
+}
+
+@keyframes universe-holo-level {
+  to {
+    background-position: 300% 0;
+  }
+}

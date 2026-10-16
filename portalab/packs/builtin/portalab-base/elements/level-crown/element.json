@@ -10,8 +10,10 @@
     "fr": "Une couronne d'or sur votre niveau — réservée aux légendes vivantes (succès « Légende vivante »)."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "rarity": "common",

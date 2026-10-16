@@ -1,0 +1,31 @@
+/* Portalab — badge/saber: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="saber"] {
+  border-color: transparent;
+  background:
+    linear-gradient(#0b0b12, #0b0b12) padding-box,
+    linear-gradient(90deg, transparent, var(--color-accent), #ffffff, var(--color-accent), transparent)
+    border-box;
+  background-size:
+    100% 100%,
+    200% 100%;
+  color: #ffffff;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 70%, transparent);
+  animation: badge-saber 1.6s ease-in-out infinite;
+}
+
+@keyframes badge-saber {
+  0%,
+  100% {
+    background-position:
+      0 0,
+      0 0;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 60%, transparent);
+  }
+  50% {
+    background-position:
+      0 0,
+      100% 0;
+    box-shadow: 0 0 16px color-mix(in srgb, var(--color-accent) 90%, transparent);
+  }
+}

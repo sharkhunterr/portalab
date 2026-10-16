@@ -1,0 +1,29 @@
+/* Portalab — avatar_frame/storyring: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="storyring"] {
+  padding: 6px;
+}
+
+.avatar-frame[data-frame="storyring"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 50%;
+  background: conic-gradient(#feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5, #feda75);
+  mask:
+    repeating-conic-gradient(#000 0 52deg, transparent 52deg 60deg),
+    radial-gradient(circle, transparent 0 calc(50% - 4px), #000 calc(50% - 3.5px));
+  mask-composite: intersect;
+  animation: frame-turn 18s linear infinite;
+}
+
+.avatar-frame[data-frame="storyring"] > :not(.avatar-frame__fx) {
+  box-shadow: 0 0 0 2px var(--color-surface-raised);
+}
+
+@keyframes frame-turn {
+  to {
+    rotate: 360deg;
+  }
+}

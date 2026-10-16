@@ -10,8 +10,10 @@
     "fr": "Un nom en grosses lettres de pixels blanches à l'ombre noire, comme le titre d'un jeu."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

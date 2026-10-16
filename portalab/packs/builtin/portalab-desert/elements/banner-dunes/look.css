@@ -1,0 +1,9 @@
+/* Portalab — profile_banner/dunes: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="dunes"] {
+  background:
+    radial-gradient(16% 30% at 75% 30%, #fff7d6, #ffcf6b 55%, transparent 60%),
+    radial-gradient(120% 60% at 20% 120%, #b4581f 0 50%, transparent 51%),
+    radial-gradient(110% 55% at 85% 125%, #8e3b12 0 50%, transparent 51%),
+    linear-gradient(180deg, #f7b267, #f4845f 55%, #c8553d);
+}

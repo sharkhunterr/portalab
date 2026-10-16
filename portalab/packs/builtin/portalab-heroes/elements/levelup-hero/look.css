@@ -1,0 +1,63 @@
+/* Portalab — level_up/hero: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="hero"] .levelup__rays {
+  display: block;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 90vmin;
+  block-size: 90vmin;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #1d4ed8 0 14%,
+    #f8fafc 14% 26%,
+    #dc2626 26% 40%,
+    #f8fafc 40% 54%,
+    #dc2626 54% 68%,
+    transparent 68%
+  );
+  transform: translate(-50%, -50%);
+  animation: levelup-slam-centered 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+.levelup[data-look="hero"] .levelup__burst {
+  display: block;
+  inset-block-end: 10%;
+  inset-inline-start: 8%;
+  padding: 1rem 1.4rem;
+  background: #fde047;
+  color: #1d4ed8;
+  font-family: "Bangers", sans-serif;
+  font-size: clamp(2rem, 8vw, 4rem);
+  text-shadow: 3px 3px 0 #111;
+  clip-path: polygon(
+    50% 0,
+    61% 22%,
+    92% 8%,
+    78% 38%,
+    100% 52%,
+    76% 62%,
+    86% 96%,
+    54% 76%,
+    26% 100%,
+    30% 68%,
+    0 64%,
+    22% 44%,
+    4% 12%,
+    36% 24%
+  );
+  animation: levelup-kapow 0.5s cubic-bezier(0.2, 1.8, 0.4, 1) 0.4s both;
+}
+
+@keyframes levelup-slam-centered {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3);
+  }
+}
+
+@keyframes levelup-kapow {
+  from {
+    transform: scale(0) rotate(-30deg);
+  }
+}

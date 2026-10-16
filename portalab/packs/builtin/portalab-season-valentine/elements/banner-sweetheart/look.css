@@ -1,0 +1,9 @@
+/* Portalab — profile_banner/sweetheart: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="sweetheart"] {
+  background:
+    radial-gradient(circle at 20% 40%, #ff8fb1 0 2px, transparent 3px) 0 0 / 3rem 3rem,
+    radial-gradient(60% 90% at 50% 120%, #ff5c8a, transparent 70%),
+    radial-gradient(40% 60% at 85% 20%, #ffd1dc88, transparent),
+    linear-gradient(180deg, #3d0a2a, #8b1e4a 55%, #e05780);
+}

@@ -1,0 +1,22 @@
+/* Portalab — profile_banner/postergrid: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="postergrid"] {
+  background:
+    linear-gradient(0deg, #141414 0 8%, transparent 45%),
+    linear-gradient(90deg, #141414, transparent 20% 80%, #141414),
+    repeating-linear-gradient(90deg, transparent 0 1.2%, #141414 1.2% 2%),
+    linear-gradient(
+      90deg,
+      #4a1c1c 0 12%,
+      #1c2f4a 12% 24%,
+      #3d3a1a 24% 36%,
+      #2a1c4a 36% 48%,
+      #1c4a3a 48% 60%,
+      #4a2f1c 60% 72%,
+      #1a3d3d 72% 84%,
+      #4a1c35 84% 100%
+    )
+    0 22% / 100% 56% no-repeat,
+    radial-gradient(ellipse at 50% 120%, #e5091466, transparent 60%),
+    #141414;
+}

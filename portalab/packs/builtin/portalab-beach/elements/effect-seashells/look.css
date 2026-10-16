@@ -1,0 +1,34 @@
+/* Portalab — effect/seashells: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="seashells"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1.3rem;
+  aspect-ratio: 1;
+  background: repeating-conic-gradient(from -60deg at 50% 100%, #ffd6c4 0 10deg, #ffb59a 10deg 20deg);
+  clip-path: polygon(50% 100%, 0 35%, 15% 12%, 35% 2%, 50% 0, 65% 2%, 85% 12%, 100% 35%);
+  animation-name: fx-burst;
+}
+
+[data-effect="seashells"] .celebration-fx:nth-child(2n) {
+  background: #ff9a3c;
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+[data-effect="seashells"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #0b9fb8, #3fd0e0);
+  color: #ffffff;
+  font-family: Pacifico, Fredoka, cursive;
+  box-shadow: 0 0 18px #3fd0e0;
+}
+
+@keyframes fx-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-6rem - var(--s) * 4rem)) rotate(calc(-1 * var(--angle)))
+      scale(1.2) rotate(var(--r));
+  }
+}

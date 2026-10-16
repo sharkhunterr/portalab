@@ -10,8 +10,10 @@
     "fr": "Votre avatar sur un timbre-poste, ses bords dentelés et son cachet."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

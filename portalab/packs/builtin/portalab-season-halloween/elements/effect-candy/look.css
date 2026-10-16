@@ -1,0 +1,47 @@
+/* Portalab — effect/candy: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="candy"] .celebration-fx {
+  left: var(--x);
+  top: calc(var(--fx-vh, 1vh) * -5);
+  inline-size: 2.2rem;
+  block-size: 0.9rem;
+  background:
+    radial-gradient(ellipse 30% 46% at 50% 50%, hsl(var(--h) 85% 58%) 0 95%, transparent),
+    conic-gradient(
+      from 90deg at 18% 50%,
+      transparent 0 60deg,
+      hsl(var(--h) 70% 72%) 60deg 120deg,
+      transparent 0
+    )
+    left / 50% 100% no-repeat,
+    conic-gradient(
+      from -90deg at 82% 50%,
+      transparent 0 60deg,
+      hsl(var(--h) 70% 72%) 60deg 120deg,
+      transparent 0
+    )
+    right / 50% 100% no-repeat;
+  filter: drop-shadow(0 1px 2px #0005);
+  animation-name: fx-candy;
+  animation-timing-function: cubic-bezier(0.3, 0, 0.8, 1);
+}
+
+[data-effect="candy"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #ff9f1c, #a3e635);
+  color: #2a0f00;
+  box-shadow: 0 0 22px #ff9f1c;
+}
+
+@keyframes fx-candy {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.9;
+    transform: translate3d(calc(var(--s) * 3rem - 2rem), calc(var(--fx-vh, 1vh) * 108), 0) rotate(var(--r));
+  }
+}

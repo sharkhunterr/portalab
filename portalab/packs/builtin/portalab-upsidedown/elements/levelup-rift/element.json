@@ -10,8 +10,10 @@
     "fr": "Les lumières vacillent, une brèche rouge déchire le mur, sa membrane palpite — vous y entrez et ressortez dans le monde à l'envers, des cendres qui montent, des éclairs rouges au-dessus, à votre nouveau niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1800,

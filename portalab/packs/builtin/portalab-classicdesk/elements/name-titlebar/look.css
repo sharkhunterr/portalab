@@ -1,0 +1,14 @@
+/* Portalab — name_style/titlebar: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="titlebar"] {
+  font-family: "Trebuchet MS", Tahoma, sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 0 #0831d9,
+    -1px -1px 0 #0831d9,
+    1px -1px 0 #0831d9,
+    -1px 1px 0 #0831d9,
+    2px 2px 3px #00205f;
+}

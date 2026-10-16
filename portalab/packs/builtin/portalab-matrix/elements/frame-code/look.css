@@ -1,0 +1,14 @@
+/* Portalab — avatar_frame/code: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="code"] {
+  background: repeating-linear-gradient(0deg, #00ff55 0 2px, #003311 2px 5px);
+  box-shadow: 0 0 0.8rem #00ff55aa;
+  animation: cosmetics-flicker-green 1.8s steps(2, jump-none) infinite;
+}
+
+@keyframes cosmetics-flicker-green {
+  50% {
+    box-shadow: 0 0 1.4rem #00ff55;
+    filter: brightness(1.3);
+  }
+}

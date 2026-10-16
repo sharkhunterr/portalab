@@ -1,0 +1,10 @@
+/* Portalab — name_style/pirata: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="pirata"] {
+  font-family: "Pirata One", "IM Fell English", serif;
+  letter-spacing: 0.03em;
+  color: #e8c66a;
+  text-shadow:
+    0 1px 0 #5a3a12,
+    0 0 8px #00000088;
+}

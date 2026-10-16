@@ -1,0 +1,46 @@
+/* Portalab — ambient/pixelsky: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="pixelsky"] > span {
+  inline-size: 6px;
+  block-size: 6px;
+  background: #ffffff;
+  box-shadow:
+    6px 0 #ffffff,
+    12px 0 #ffffff,
+    -6px 6px #ffffff,
+    0 6px #ffffff,
+    6px 6px #ffffff,
+    12px 6px #ffffff,
+    18px 6px #ffffff;
+  opacity: 0.18;
+  image-rendering: pixelated;
+  animation-name: ambient-pixel-cloud;
+  animation-timing-function: steps(40, end);
+  animation-duration: calc(30s + var(--size) * 30s);
+}
+
+[data-ambient="pixelsky"] > span:nth-child(2n) {
+  inline-size: 3px;
+  block-size: 3px;
+  box-shadow: none;
+  opacity: 0.8;
+  background: hsl(calc(40 + var(--hue) / 6) 100% 75%);
+  animation-name: ambient-pixel-star;
+  animation-duration: calc(1s + var(--size) * 2s);
+  animation-timing-function: steps(2, jump-none);
+}
+
+@keyframes ambient-pixel-cloud {
+  from {
+    transform: translate3d(-20vw, 0, 0) scale(calc(1 + var(--size)));
+  }
+  to {
+    transform: translate3d(120vw, 0, 0) scale(calc(1 + var(--size)));
+  }
+}
+
+@keyframes ambient-pixel-star {
+  50% {
+    opacity: 0.15;
+  }
+}

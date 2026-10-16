@@ -10,8 +10,10 @@
     "fr": "LEVEL UP ! en 8 bits, étoiles clignotantes et bruit de pièce."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 350,

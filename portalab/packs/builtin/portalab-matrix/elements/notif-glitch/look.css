@@ -1,0 +1,29 @@
+/* Portalab — notification_animation/glitch: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="glitch"] .ds-notification {
+  animation-name: universe-notify-glitch;
+  animation-duration: 0.5s;
+}
+
+@keyframes universe-notify-glitch {
+  0% {
+    opacity: 0;
+    transform: translateX(-12px) skewX(-12deg);
+    filter: hue-rotate(90deg);
+  }
+  30% {
+    opacity: 1;
+    transform: translateX(8px) skewX(8deg);
+  }
+  50% {
+    transform: translateX(-4px);
+    filter: hue-rotate(-60deg);
+  }
+  70% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: none;
+    filter: none;
+  }
+}

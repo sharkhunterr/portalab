@@ -1,0 +1,52 @@
+/* Portalab — level_up/bloodmoon: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="bloodmoon"] {
+  --glow: #dc2626;
+}
+
+.levelup[data-look="bloodmoon"] .levelup__rays {
+  display: block;
+  inset-block-start: 8%;
+  inset-inline-end: 12%;
+  inline-size: 28vmin;
+  block-size: 28vmin;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #fca5a5, #b91c1c 55%, #450a0a);
+  box-shadow: 0 0 6rem #dc262688;
+}
+
+.levelup[data-look="bloodmoon"] .levelup__fx {
+  display: block;
+  inset-block-start: 0;
+  inset-inline-start: var(--x);
+  inline-size: 0.45rem;
+  block-size: calc(3rem + var(--r) * 12rem);
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(#7f1d1d, #dc2626);
+  transform-origin: top;
+  animation: levelup-drip calc(1.5s + var(--r) * 2s) ease-in both;
+}
+
+.levelup[data-look="bloodmoon"] .levelup__card {
+  animation: levelup-flicker-in 1.4s steps(1, end) 0.2s both;
+}
+
+@keyframes levelup-drip {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes levelup-flicker-in {
+  0%,
+  20%,
+  40% {
+    opacity: 0;
+  }
+  10%,
+  30%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+}

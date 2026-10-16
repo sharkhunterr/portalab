@@ -1,0 +1,14 @@
+/* Portalab — profile_banner/hyperspace: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="hyperspace"] {
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%, #cfe3ff22 0 0.7deg, transparent 0.7deg 6deg),
+    radial-gradient(circle at 50% 50%, #ffffff 0, #9ec9ff 4%, #1b2a6b 30%, #04050f 70%);
+  animation: cosmetics-hyperspace 2.5s linear infinite;
+}
+
+@keyframes cosmetics-hyperspace {
+  to {
+    filter: hue-rotate(25deg) brightness(1.15);
+  }
+}

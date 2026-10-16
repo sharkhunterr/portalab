@@ -1,0 +1,36 @@
+/* Portalab — effect/coins: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="coins"] .celebration-fx {
+  left: var(--x);
+  top: calc(var(--fx-vh, 1vh) * -6);
+  color: #f5b700;
+  filter: drop-shadow(0 2px 0 #8a5a00) drop-shadow(0 0 6px #ffd54a);
+  animation-name: fx-coins;
+  animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
+}
+
+[data-effect="coins"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #fff2a8, #f5b700 55%, #b07a00);
+  color: #3a2600;
+  box-shadow:
+    0 0 0 3px #8a5a00,
+    0 0 24px #ffd54a;
+}
+
+@keyframes fx-coins {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotateY(0deg);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(calc(var(--fx-vh, 1vh) * 95)) rotateY(720deg);
+  }
+  90% {
+    transform: translateY(calc(var(--fx-vh, 1vh) * 88)) rotateY(800deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(calc(var(--fx-vh, 1vh) * 95)) rotateY(900deg);
+  }
+}

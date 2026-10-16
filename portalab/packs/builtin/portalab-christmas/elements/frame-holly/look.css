@@ -1,0 +1,9 @@
+/* Portalab — avatar_frame/holly: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="holly"] {
+  background:
+    radial-gradient(circle at 15% 50%, #dc2626 0 3px, transparent 4px),
+    radial-gradient(circle at 85% 50%, #dc2626 0 3px, transparent 4px),
+    radial-gradient(circle at 50% 10%, #dc2626 0 3px, transparent 4px),
+    repeating-conic-gradient(#166534 0 15deg, #22c55e 15deg 30deg);
+}

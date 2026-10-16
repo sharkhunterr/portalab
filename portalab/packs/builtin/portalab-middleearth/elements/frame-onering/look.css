@@ -1,0 +1,15 @@
+/* Portalab — avatar_frame/onering: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="onering"] {
+  background: conic-gradient(from var(--level-turn, 0deg), #fde68a, #b45309, #fef3c7, #d97706, #fde68a);
+  box-shadow:
+    0 0 0.6rem #f59e0b,
+    0 0 1.6rem #f9731655;
+  animation: level-elements 6s linear infinite;
+}
+
+@keyframes level-elements {
+  to {
+    --level-turn: 360deg;
+  }
+}

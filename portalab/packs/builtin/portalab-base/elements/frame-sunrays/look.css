@@ -1,0 +1,31 @@
+/* Portalab — avatar_frame/sunrays: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="sunrays"] {
+  background:
+    radial-gradient(circle, #ffd35c 0 58%, transparent 60%),
+    repeating-conic-gradient(#ffb347 0 6deg, transparent 6deg 15deg);
+  box-shadow: 0 0 1.2rem #ffb34788;
+  animation: cosmetics-spin 40s linear infinite;
+}
+
+.avatar-frame[data-frame="sunrays"] > * {
+  animation: cosmetics-spin 40s linear infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.avatar-frame[data-frame="sunrays"] {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+.avatar-frame[data-frame="sunrays"] > * {
+    animation: none;
+  }
+}
+
+@keyframes cosmetics-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

@@ -1,0 +1,30 @@
+/* Portalab — notification_style/loveletter: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="loveletter"] .ds-notification {
+  position: relative;
+  border: 1px solid #e9b8c3;
+  border-radius: 0.3rem;
+  background:
+    linear-gradient(20deg, transparent 49.5%, #f1cad3 50%, transparent 50.5%) left top / 50% 2.2rem no-repeat,
+    linear-gradient(-20deg, transparent 49.5%, #f1cad3 50%, transparent 50.5%) right top / 50% 2.2rem
+    no-repeat,
+    linear-gradient(180deg, #fff7f8, #ffe4ea);
+  color: #4a0f22;
+  box-shadow: 0 6px 18px #00000040;
+}
+
+.ds-notifications[data-style="loveletter"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset: -0.45rem auto auto 50%;
+  inline-size: 1rem;
+  block-size: 0.9rem;
+  translate: -50% 0;
+  background: #d7263d;
+  clip-path: path("M8 15 C-6 5 2 -3 8 3 C14 -3 22 5 8 15 Z");
+  filter: drop-shadow(0 1px 1px #0004);
+}
+
+.ds-notifications[data-style="loveletter"] .ds-notification__body {
+  color: #7a2a42;
+}

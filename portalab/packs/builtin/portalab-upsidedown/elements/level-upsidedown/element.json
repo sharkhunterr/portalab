@@ -10,8 +10,10 @@
     "fr": "Néon rouge, un reflet pâle, et de temps en temps il se retourne."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 750,

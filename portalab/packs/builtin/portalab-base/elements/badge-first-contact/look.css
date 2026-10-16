@@ -1,0 +1,11 @@
+/* Portalab — badge/neon: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="neon"] {
+  border-color: #ff2fd1;
+  color: #ffd6f5;
+  background: #1a0016;
+  box-shadow:
+    0 0 6px #ff2fd1,
+    inset 0 0 6px #ff2fd155;
+  text-shadow: 0 0 6px #ff2fd1;
+}

@@ -1,0 +1,40 @@
+/* Portalab — effect/bubbles: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="bubbles"] .celebration-fx {
+  left: var(--x);
+  top: auto;
+  bottom: calc(var(--fx-vh, 1vh) * -5);
+  animation-name: fx-rise;
+  animation-timing-function: ease-out;
+}
+
+[data-effect="bubbles"] .celebration-fx {
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  border-radius: 50%;
+  border: 2px solid #bfefff;
+  background: radial-gradient(circle at 30% 30%, #ffffffcc, #9fe7ff33 45%, transparent 62%);
+}
+
+[data-effect="bubbles"] .ds-celebration__badge {
+  background: radial-gradient(circle at 30% 30%, #ffffff, #9fe7ff 60%, #38bdf8);
+  color: #062a3a;
+  box-shadow: 0 0 22px #9fe7ff;
+}
+
+@keyframes fx-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.6);
+  }
+  20% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(calc(var(--fx-vw, 1vw) * 2), calc(var(--fx-vh, 1vh) * -45), 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(var(--fx-vw, 1vw) * -2), calc(var(--fx-vh, 1vh) * -95), 0) scale(1.1);
+  }
+}

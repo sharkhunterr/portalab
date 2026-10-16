@@ -73,4 +73,10 @@ describe("visual packs — sandbox files", () => {
     expect(lookSelectorOk('[data-widget-option~="houle"] ~ .widget-frame', "houle")).toBe(false);
     expect(lookSelectorOk('[data-widget-option~="other"]', "houle")).toBe(false);
   });
+
+  it("028: an nth formula is no combinator, a sibling in its « of S » part still is", () => {
+    expect(lookSelectorOk('[data-ambient="x"] > span:nth-child(3n + 1)', "x")).toBe(true);
+    expect(lookSelectorOk('[data-ambient="x"] > span:nth-child(-n + 2)::after', "x")).toBe(true);
+    expect(lookSelectorOk('[data-ambient="x"] > span:nth-child(2n of .a + .b)', "x")).toBe(false);
+  });
 });

@@ -1,0 +1,166 @@
+/* Portalab — ambient/veins: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="veins"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--veins-edge-a) left bottom / min(40vw, 60vh) auto no-repeat;
+  opacity: 0;
+  animation: vein-strike 11s linear infinite;
+}
+
+[data-ambient="veins"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--veins-edge-a) left bottom / min(40vw, 60vh) auto no-repeat;
+  opacity: 0;
+  animation: vein-strike 11s linear infinite;
+}
+
+[data-ambient="veins"]::after {
+  background: var(--veins-edge-b) left top / min(36vw, 54vh) auto no-repeat;
+  transform: scaleX(-1);
+  animation-delay: -5.5s;
+}
+
+[data-ambient="veins"] > span {
+  inline-size: calc(0.25rem + var(--size) * 0.25rem);
+  block-size: calc(0.25rem + var(--size) * 0.25rem);
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe4e6, #dc2626 45%, #dc262600 72%);
+  opacity: 0;
+  animation-name: ambient-vein-mote;
+  animation-duration: calc(8s + var(--size) * 6s);
+  animation-timing-function: ease-in-out;
+}
+
+[data-ambient="veins"] > span:is(:nth-child(1), :nth-child(6), :nth-child(11)) {
+  --at-1: -24%;
+  --at-2: 20%;
+  --at-3: 4%;
+  inset: 0 auto;
+  left: -50%;
+  inline-size: 200%;
+  block-size: 100%;
+  border-radius: 0;
+  background: var(--veins-rift-c) 0 0 / 100% 100% no-repeat;
+  animation-name: rift-wander;
+  animation-duration: calc(16s + var(--size) * 14s);
+  animation-timing-function: linear;
+}
+
+[data-ambient="veins"] > span:nth-child(6) {
+  --at-1: 28%;
+  --at-2: -18%;
+  --at-3: 36%;
+  background-image: var(--veins-rift-a);
+}
+
+[data-ambient="veins"] > span:nth-child(11) {
+  --at-1: 6%;
+  --at-2: -34%;
+  --at-3: -12%;
+  background-image: var(--veins-rift-d);
+}
+
+@keyframes vein-strike {
+  0% {
+    opacity: 0;
+  }
+  1% {
+    opacity: 1;
+  }
+  2% {
+    opacity: 0.25;
+  }
+  3%,
+  30% {
+    opacity: 1;
+  }
+  31% {
+    opacity: 0.7;
+  }
+  32%,
+  58% {
+    opacity: 1;
+  }
+  59% {
+    opacity: 0.75;
+  }
+  60%,
+  72% {
+    opacity: 0.95;
+  }
+  85%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ambient-vein-mote {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  35% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -14vh, 0);
+  }
+}
+
+@keyframes rift-wander {
+  0% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-1, 0%) / 2));
+  }
+  1% {
+    opacity: var(--rift, 0.45);
+  }
+  1.6% {
+    opacity: 0.1;
+  }
+  2.4%,
+  12% {
+    opacity: var(--rift, 0.45);
+  }
+  12.6% {
+    opacity: 0.25;
+  }
+  13.2%,
+  18% {
+    opacity: var(--rift, 0.45);
+  }
+  23% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-1, 0%) / 2));
+  }
+  23.1% {
+    transform: translateX(calc(var(--at-2, 0%) / 2)) scaleX(-1);
+  }
+  58% {
+    opacity: 0;
+  }
+  59% {
+    opacity: var(--rift, 0.45);
+  }
+  59.6% {
+    opacity: 0.1;
+  }
+  60.4%,
+  74% {
+    opacity: var(--rift, 0.45);
+  }
+  80% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-2, 0%) / 2)) scaleX(-1);
+  }
+  80.1%,
+  100% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-3, 0%) / 2)) scaleX(1);
+  }
+}

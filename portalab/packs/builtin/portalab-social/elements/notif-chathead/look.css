@@ -1,0 +1,58 @@
+/* Portalab — notification_style/chathead: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="chathead"] .ds-notification {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  overflow: visible;
+  margin-inline-start: 3.4rem;
+  border: 0;
+  border-radius: 1.2rem 1.2rem 1.2rem 0.3rem;
+  --color-text: #ffffff;
+  --color-text-muted: #ffffffdd;
+  background: linear-gradient(135deg, #1877f2, #7b4bff 70%, #c13ed2);
+  color: #ffffff;
+  box-shadow: 0 0.4rem 1.2rem #1877f244;
+}
+
+.ds-notifications[data-style="chathead"] .ds-notification::before {
+  inset: auto auto 0.1rem -3.35rem;
+  inline-size: 0.8rem;
+  block-size: 0.8rem;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #31a24c;
+  translate: 2.05rem 0;
+  z-index: 1;
+}
+
+.ds-notifications[data-style="chathead"] .ds-notification__icon {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: -3.4rem;
+  inline-size: 2.8rem;
+  block-size: 2.8rem;
+  background: linear-gradient(135deg, #e4e6eb, #ffffff);
+  color: #1877f2;
+  box-shadow: 0 0.2rem 0.6rem #00000033;
+}
+
+.ds-notifications[data-style="chathead"] .ds-notification__body {
+  color: #ffffffdd;
+}
+
+.ds-notifications[data-style="chathead"] .ds-notification__link {
+  color: #ffffffdd;
+}
+
+.ds-notifications[data-style="chathead"] .ds-notification__close {
+  color: #ffffffdd;
+}
+
+.ds-notifications[data-style="chathead"] .ds-notification__badge {
+  background: #ffffff33;
+  color: #ffffff;
+}
+
+.ds-notifications[data-style="chathead"] .ds-notification__timer {
+  inset-inline: 1rem;
+  background: #ffffff88;
+}

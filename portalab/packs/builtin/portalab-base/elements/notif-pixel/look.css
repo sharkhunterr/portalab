@@ -1,0 +1,20 @@
+/* Portalab — notification_style/pixel: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="pixel"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="pixel"] .ds-notification {
+  border: 0;
+  border-radius: 0;
+  background: var(--color-surface-raised);
+  font-family: "Press Start 2P", ui-monospace, monospace;
+  font-size: 0.7rem;
+  line-height: 1.6;
+  box-shadow:
+    0 -4px 0 0 var(--tone),
+    0 4px 0 0 var(--tone),
+    -4px 0 0 0 var(--tone),
+    4px 0 0 0 var(--tone),
+    6px 8px 0 0 #00000066;
+}

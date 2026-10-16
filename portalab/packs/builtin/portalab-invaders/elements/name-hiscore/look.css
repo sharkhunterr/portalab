@@ -1,0 +1,11 @@
+/* Portalab — name_style/hiscore: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="hiscore"] {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.8em;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 0 #0a3d0a,
+    -1px -1px 0 #0a3d0a,
+    0 0 0.4em #39ff14;
+}

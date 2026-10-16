@@ -1,0 +1,32 @@
+/* Portalab — effect/stars: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="stars"] .celebration-fx {
+  color: #ffd84d;
+  filter: drop-shadow(0 0 8px #ffbf00);
+  --angle: calc(360deg / var(--n) * var(--i));
+  animation-name: fx-burst;
+}
+
+[data-effect="stars"] .celebration-fx svg {
+  fill: currentColor;
+}
+
+[data-effect="stars"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #1e3a8a, #6d28d9);
+  color: #ffe082;
+  box-shadow:
+    0 0 0 2px #ffd84d,
+    0 0 26px #ffbf00;
+}
+
+@keyframes fx-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-6rem - var(--s) * 4rem)) rotate(calc(-1 * var(--angle)))
+      scale(1.2) rotate(var(--r));
+  }
+}

@@ -1,0 +1,18 @@
+/* Portalab — profile_banner/mordor: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="mordor"] {
+  background:
+    radial-gradient(ellipse 0.7rem 1.6rem at 72% 26%, #000 0 30%, #fde047 40%, #f97316 60%, transparent 70%),
+    linear-gradient(to top, #0b0605 0 18%, transparent 18%),
+    conic-gradient(from 160deg at 50% 100%, transparent 0 15deg, #1c0f0b 15deg 40deg, transparent 40deg) 0 0 /
+    100% 100%,
+    radial-gradient(60% 80% at 72% 30%, #f9731666, transparent 70%),
+    linear-gradient(180deg, #450a0a, #1c0f0b 70%);
+  animation: banner-mordor 3s ease-in-out infinite;
+}
+
+@keyframes banner-mordor {
+  50% {
+    filter: brightness(1.15);
+  }
+}

@@ -1,0 +1,16 @@
+/* Portalab — profile_banner/graveyard: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="graveyard"] {
+  background:
+    radial-gradient(circle 1.6rem at 78% 30%, #f4f1de, #e9e4c5 80%, transparent 84%),
+    radial-gradient(circle 3.4rem at 78% 30%, #f4f1de2e, transparent),
+    linear-gradient(0deg, #15131f 0 18%, transparent 18%),
+    linear-gradient(90deg, transparent 21.6%, #6b6880 21.6% 22.4%, transparent 22.4%) 0 62% / 100% 12%
+    no-repeat,
+    linear-gradient(0deg, transparent 40%, #6b6880 40% 52%, transparent 52%) 20.5% 64% / 3.4% 14% no-repeat,
+    radial-gradient(ellipse 50% 55% at 50% 55%, #7d7a91 0 98%, transparent) 10% 84% / 5.5% 30% no-repeat,
+    radial-gradient(ellipse 50% 55% at 50% 55%, #6f6c84 0 98%, transparent) 36% 86% / 4.5% 24% no-repeat,
+    radial-gradient(ellipse 50% 55% at 50% 55%, #85829a 0 98%, transparent) 52% 84% / 6% 34% no-repeat,
+    radial-gradient(ellipse 50% 55% at 50% 55%, #6f6c84 0 98%, transparent) 64% 88% / 4% 22% no-repeat,
+    linear-gradient(180deg, #1b1035, #3a1d5c 60%, #5b2a3c);
+}

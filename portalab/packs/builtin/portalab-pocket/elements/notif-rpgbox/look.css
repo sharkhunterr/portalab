@@ -1,0 +1,49 @@
+/* Portalab — notification_style/rpgbox: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="rpgbox"] .ds-notification {
+  --color-text: #202020;
+  --color-text-muted: #404040;
+  overflow: visible;
+  border: 0.25rem solid #202020;
+  border-radius: 0.35rem;
+  background: #f8f8f0;
+  color: #202020;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.62rem;
+  line-height: 1.7;
+  box-shadow:
+    inset 0 0 0 0.2rem #f8f8f0,
+    inset 0 0 0 0.35rem #6890a8,
+    0.3rem 0.3rem 0 #20202055;
+}
+
+.ds-notifications[data-style="rpgbox"] .ds-notification::before {
+  inset: auto 0.9rem 0.55rem auto;
+  inline-size: 0.6rem;
+  block-size: 0.45rem;
+  background: #202020;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  animation: rpg-arrow 0.8s steps(2, jump-none) infinite;
+}
+
+.ds-notifications[data-style="rpgbox"] .ds-notification__icon {
+  border-radius: 0;
+  background: #306230;
+  color: #e3f1bc;
+}
+
+.ds-notifications[data-style="rpgbox"] :is(.ds-notification__title, .ds-notification__body) {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.62rem;
+  line-height: 1.7;
+}
+
+.ds-notifications[data-style="rpgbox"] .ds-notification__timer {
+  display: none;
+}
+
+@keyframes rpg-arrow {
+  50% {
+    opacity: 0;
+  }
+}

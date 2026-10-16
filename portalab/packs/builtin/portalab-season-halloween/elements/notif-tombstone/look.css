@@ -1,0 +1,25 @@
+/* Portalab — notification_style/tombstone: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="tombstone"] .ds-notification {
+  border: 1px solid #5d5a6b;
+  border-radius: 1.6rem 1.6rem 0.3rem 0.3rem;
+  background:
+    radial-gradient(circle at 20% 30%, #00000022 0 2px, transparent 3px) 0 0 / 1.4rem 1.2rem,
+    radial-gradient(ellipse at 50% 0%, #ffffff18, transparent 60%),
+    linear-gradient(180deg, #8b8798, #5f5b6e);
+  color: #f1effa;
+  box-shadow:
+    0 8px 18px #00000066,
+    inset 0 2px 0 #ffffff22,
+    inset 0 -4px 0 #00000033;
+}
+
+.ds-notifications[data-style="tombstone"] .ds-notification__title {
+  font-family: "Cinzel", Georgia, serif;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 0 #00000088;
+}
+
+.ds-notifications[data-style="tombstone"] .ds-notification__body {
+  color: #dcd8ea;
+}

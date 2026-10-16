@@ -1,0 +1,5 @@
+/* Portalab — ambient/matrix: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ambient--premium[data-ambient="matrix"] {
+  opacity: 0.75;
+}

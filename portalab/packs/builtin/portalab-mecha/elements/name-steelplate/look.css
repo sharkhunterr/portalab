@@ -1,0 +1,11 @@
+/* Portalab — name_style/steelplate: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="steelplate"] {
+  font-family: "Black Ops One", "Orbitron", sans-serif;
+  letter-spacing: 0.05em;
+  background: linear-gradient(180deg, #f9fafb, #9ca3af 48%, #4b5563 52%, #d1d5db);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 #111827) drop-shadow(0 0 4px #ef444455);
+}

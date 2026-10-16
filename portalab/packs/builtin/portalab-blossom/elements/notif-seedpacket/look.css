@@ -1,0 +1,68 @@
+/* Portalab — notification_style/seedpacket: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="seedpacket"] .ds-notification {
+  --color-text: #1f3320;
+  --color-text-muted: #4a5e48;
+  padding-block-start: 2.2rem;
+  border: 0;
+  border-radius: 0 0 0.4rem 0.4rem;
+  background:
+    radial-gradient(circle 0.32rem at 12% 1.05rem, #f472b6 96%, transparent),
+    radial-gradient(circle 0.32rem at 32% 0.95rem, #fde047 96%, transparent),
+    radial-gradient(circle 0.32rem at 52% 1.1rem, #c084fc 96%, transparent),
+    radial-gradient(circle 0.32rem at 72% 0.95rem, #fb7185 96%, transparent),
+    radial-gradient(circle 0.32rem at 90% 1.05rem, #fde047 96%, transparent),
+    linear-gradient(#7cc46a, #7cc46a) 0 1.3rem / 100% 0.35rem no-repeat,
+    linear-gradient(#cfe8c4, #cfe8c4) 0 0 / 100% 1.65rem no-repeat,
+    #fffdf6;
+  color: #1f3320;
+  clip-path: polygon(
+    0 0.4rem,
+    4% 0,
+    8% 0.4rem,
+    12% 0,
+    16% 0.4rem,
+    20% 0,
+    24% 0.4rem,
+    28% 0,
+    32% 0.4rem,
+    36% 0,
+    40% 0.4rem,
+    44% 0,
+    48% 0.4rem,
+    52% 0,
+    56% 0.4rem,
+    60% 0,
+    64% 0.4rem,
+    68% 0,
+    72% 0.4rem,
+    76% 0,
+    80% 0.4rem,
+    84% 0,
+    88% 0.4rem,
+    92% 0,
+    96% 0.4rem,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
+  box-shadow: none;
+}
+
+.ds-notifications[data-style="seedpacket"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="seedpacket"] .ds-notification__icon {
+  background: #7cc46a;
+  color: #ffffff;
+}
+
+.ds-notifications[data-style="seedpacket"] .ds-notification__title {
+  font-family: Caveat, "Comic Neue", cursive;
+  font-size: 1.25rem;
+}
+
+.ds-notifications[data-style="seedpacket"] .ds-notification__timer {
+  background: #b0306a;
+}

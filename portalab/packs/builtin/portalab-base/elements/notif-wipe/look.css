@@ -1,0 +1,16 @@
+/* Portalab — notification_animation/wipe: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="wipe"] .ds-notification {
+  animation-name: universe-notify-wipe;
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@keyframes universe-notify-wipe {
+  from {
+    clip-path: inset(0 100% 0 0 round var(--radius-lg, 0.9rem));
+  }
+  to {
+    clip-path: inset(0 0 0 0 round var(--radius-lg, 0.9rem));
+  }
+}

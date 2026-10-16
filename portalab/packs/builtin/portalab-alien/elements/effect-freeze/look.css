@@ -1,0 +1,43 @@
+/* Portalab — effect/freeze: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="freeze"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #f0f9ff, #bae6fd 45%, #7dd3fc);
+  color: #082f49;
+  box-shadow:
+    0 0 0 2px #e0f2fe,
+    0 0 1.6rem #7dd3fc,
+    inset 0 0 0.8rem #ffffff;
+  animation:
+    ds-pop var(--motion-duration-slow) var(--motion-easing-spring) both,
+    fx-shiver 0.08s linear 0.3s 8;
+}
+
+[data-effect="freeze"] .celebration-fx {
+  color: #e0f2fe;
+  filter: drop-shadow(0 0 4px #7dd3fc);
+  --angle: calc(360deg / var(--n) * var(--i));
+  animation-name: fx-crystal;
+  animation-duration: 1.6s;
+}
+
+@keyframes fx-shiver {
+  50% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes fx-crystal {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-1.6rem) rotate(calc(-1 * var(--angle))) scale(0);
+  }
+  40% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(-2.6rem) rotate(calc(-1 * var(--angle))) scale(1) rotate(60deg);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-2.8rem) rotate(calc(-1 * var(--angle))) scale(0.8)
+      rotate(120deg);
+  }
+}

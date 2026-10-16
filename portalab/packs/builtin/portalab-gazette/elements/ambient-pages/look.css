@@ -1,0 +1,35 @@
+/* Portalab — ambient/pages: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="pages"] > span {
+  left: -12%;
+  inline-size: calc(2rem + 1.4rem * var(--size));
+  aspect-ratio: 0.72;
+  background:
+    linear-gradient(#3a3530, #3a3530) 12% 10% / 76% 9% no-repeat,
+    repeating-linear-gradient(180deg, #8a8278 0 2px, transparent 2px 6px) 12% 30% / 34% 60% no-repeat,
+    repeating-linear-gradient(180deg, #8a8278 0 2px, transparent 2px 6px) 88% 30% / 34% 60% no-repeat,
+    #f3ecdc;
+  box-shadow: 0.2rem 0.3rem 0.5rem #00000026;
+  opacity: 0.22;
+  animation: ambient-page-fly calc(var(--duration) * 1.6) linear var(--delay) infinite;
+}
+
+@keyframes ambient-page-fly {
+  0% {
+    left: -12%;
+    transform: translateY(0) rotate(-10deg) rotateY(0deg);
+  }
+  25% {
+    transform: translateY(-4vh) rotate(8deg) rotateY(90deg);
+  }
+  50% {
+    transform: translateY(3vh) rotate(-6deg) rotateY(180deg);
+  }
+  75% {
+    transform: translateY(-2vh) rotate(10deg) rotateY(270deg);
+  }
+  100% {
+    left: 110%;
+    transform: translateY(0) rotate(-10deg) rotateY(360deg);
+  }
+}

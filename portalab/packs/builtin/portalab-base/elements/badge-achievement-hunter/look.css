@@ -1,0 +1,18 @@
+/* Portalab — badge/shimmer: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="shimmer"] {
+  background-image: linear-gradient(110deg, transparent 30%, #ffffff55 50%, transparent 70%);
+  background-size: 250% 100%;
+  animation: badge-shimmer 2.8s ease-in-out infinite;
+}
+
+@keyframes badge-shimmer {
+  0%,
+  30% {
+    background-position: 160% 0;
+  }
+  70%,
+  100% {
+    background-position: -60% 0;
+  }
+}

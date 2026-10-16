@@ -10,8 +10,10 @@
     "fr": "Pour celles et ceux qui regardent jusqu'à l'aube."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

@@ -10,8 +10,10 @@
     "fr": "Des notifications qui arrivent en piqué comme un hibou qui apporte le courrier."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

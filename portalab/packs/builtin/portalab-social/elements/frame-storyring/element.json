@@ -10,8 +10,10 @@
     "fr": "Votre avatar dans un anneau dégradé découpé en stories."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

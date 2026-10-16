@@ -1,0 +1,71 @@
+/* Portalab — level_up/plunder: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="plunder"] {
+  --glow: #e0a800;
+}
+
+.levelup[data-look="plunder"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(circle at 50% 88%, #ffd54f66, transparent 55%), #0a2a33cc;
+}
+
+.levelup[data-look="plunder"] .levelup__scene {
+  display: block;
+  inset-block-end: 6%;
+  inset-inline-start: 50%;
+  inline-size: 9rem;
+  block-size: 5rem;
+  border-radius: 0.6rem 0.6rem 0.3rem 0.3rem;
+  background:
+    linear-gradient(90deg, transparent 44%, #e0a800 44% 56%, transparent 56%),
+    linear-gradient(0deg, transparent 46%, #e0a800 46% 54%, transparent 54%),
+    linear-gradient(180deg, #8b5a2b, #5c3a1a);
+  box-shadow: 0 -1rem 3rem #ffd54f88;
+  translate: -50% 0;
+}
+
+.levelup[data-look="plunder"] .levelup__fx {
+  display: block;
+  inset-block-end: 12%;
+  inset-inline-start: 50%;
+  inline-size: 1rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff2b3, #e0a800 55%, #8a6200);
+  --angle: calc(-70deg + var(--r) * 140deg);
+  animation: levelup-coin calc(1.4s + var(--r) * 1s) cubic-bezier(0.2, 0.8, 0.4, 1)
+    calc(0.4s + var(--i) * 0.03s) both;
+}
+
+.levelup[data-look="plunder"] .levelup__burst {
+  display: block;
+  inset-block-start: 8%;
+  inset-inline: 0;
+  color: #ffd54f;
+  font-family: "Pirata One", "IM Fell English", serif;
+  font-size: clamp(2.4rem, 8vw, 4.5rem);
+  text-align: center;
+  text-shadow: 0 3px 0 #5c3a1a;
+  animation: levelup-kapow 0.6s cubic-bezier(0.2, 1.8, 0.4, 1) 0.5s both;
+}
+
+@keyframes levelup-coin {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(0) rotateY(0deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-30vh - var(--r) * 30vh)) rotateY(720deg);
+  }
+}
+
+@keyframes levelup-kapow {
+  from {
+    transform: scale(0) rotate(-30deg);
+  }
+}

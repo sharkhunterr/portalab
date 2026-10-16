@@ -1,0 +1,34 @@
+/* Portalab — effect/splash: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="splash"] .celebration-fx {
+  --angle: calc(180deg / var(--n) * var(--i) - 90deg);
+  inline-size: calc(0.45rem + var(--s) * 0.35rem);
+  aspect-ratio: 0.75;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: radial-gradient(circle at 35% 35%, #ffffff, #5ad1e6 45%, #0e7490);
+  opacity: 0.9;
+  animation-name: fx-splash;
+  animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+}
+
+[data-effect="splash"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #a5f3fc, #0891b2);
+  color: #052f3a;
+  box-shadow: 0 0 22px #5ad1e6;
+}
+
+@keyframes fx-splash {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(0.6);
+  }
+  55% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(calc(-4rem - var(--s) * 3rem)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(calc(var(--angle) * 1.3)) translateY(calc(-2rem - var(--s) * 2rem)) translateX(1rem)
+      scale(0.8);
+  }
+}

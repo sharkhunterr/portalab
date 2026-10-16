@@ -1,0 +1,29 @@
+/* Portalab — notification_style/missioncontrol: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="missioncontrol"] .ds-notification {
+  --color-text: #fff2e0;
+  --color-text-muted: #f0c89a;
+  border: 2px solid #ffb000;
+  border-radius: 0.2rem 1rem 0.2rem 1rem;
+  background:
+    linear-gradient(90deg, #ffb000 0 0.35rem, transparent 0.35rem), linear-gradient(180deg, #1c1608, #120e05);
+  color: #fff2e0;
+  font-family: "Chakra Petch", Rajdhani, sans-serif;
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 1.2rem #ffb00044;
+}
+
+.ds-notifications[data-style="missioncontrol"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="missioncontrol"] .ds-notification__title {
+  color: #ffb000;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ds-notifications[data-style="missioncontrol"] .ds-notification__timer {
+  background: #ffb000;
+}

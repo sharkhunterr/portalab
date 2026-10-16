@@ -1,0 +1,30 @@
+/* Portalab — profile_banner/nebula: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="nebula"] {
+  background:
+    radial-gradient(40% 70% at 30% 50%, #7c3aed88, transparent 70%),
+    radial-gradient(35% 60% at 70% 40%, #22d3ee66, transparent 70%),
+    radial-gradient(30% 50% at 55% 75%, #84cc1655, transparent 70%),
+    radial-gradient(1px 1px at 20% 30%, #fff, transparent),
+    radial-gradient(1px 1px at 80% 60%, #fff, transparent), #05030f;
+  background-size:
+    200% 200%,
+    200% 200%,
+    200% 200%,
+    150px 100px,
+    180px 120px,
+    auto;
+  animation: cosmetics-nebula 18s ease-in-out infinite alternate;
+}
+
+@keyframes cosmetics-nebula {
+  to {
+    background-position:
+      100% 30%,
+      0% 70%,
+      40% 0%,
+      0 0,
+      0 0,
+      0 0;
+  }
+}

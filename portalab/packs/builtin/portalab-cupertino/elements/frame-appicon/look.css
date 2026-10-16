@@ -1,0 +1,35 @@
+/* Portalab — avatar_frame/appicon: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="appicon"] {
+  padding: 4px;
+  border-radius: 28%;
+  background: linear-gradient(180deg, #ffffff, #d9d9de);
+  box-shadow:
+    0 4px 10px #00000033,
+    inset 0 0 0 1px #00000014;
+}
+
+.avatar-frame[data-frame="appicon"] > :not(.avatar-frame__fx) {
+  border-radius: 24%;
+}
+
+.avatar-frame[data-frame="appicon"]::after {
+  content: "1";
+  position: absolute;
+  inset-block-start: -6%;
+  inset-inline-end: -6%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  inline-size: 26%;
+  min-inline-size: 1rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ff3b30;
+  color: #ffffff;
+  font:
+    700 0.7rem / 1 -apple-system,
+    "Inter Variable",
+    sans-serif;
+  box-shadow: 0 0 0 2px #ffffff;
+}

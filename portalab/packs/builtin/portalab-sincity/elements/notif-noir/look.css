@@ -1,0 +1,37 @@
+/* Portalab — notification_style/noir: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="noir"] .ds-notification {
+  border: 2px solid #f2f2f2;
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(105deg, #ffffff07 0 1px, transparent 1px 9px),
+    linear-gradient(160deg, #1a1a1a, #000000 70%);
+  color: #f2f2f2;
+  box-shadow:
+    6px 6px 0 #000000,
+    6px 6px 0 2px #f2f2f2;
+}
+
+.ds-notifications[data-style="noir"] .ds-notification::before {
+  inset-block: auto 0;
+  inline-size: 100%;
+  block-size: 3px;
+  background: var(--tone);
+}
+
+.ds-notifications[data-style="noir"] .ds-notification__title {
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ds-notifications[data-style="noir"] .ds-notification__body {
+  color: #bdbdbd;
+}
+
+.ds-notifications[data-style="noir"] .ds-notification__icon {
+  border-radius: 0;
+  background: #f2f2f2;
+  color: var(--tone);
+}

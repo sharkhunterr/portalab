@@ -1,0 +1,163 @@
+/* Portalab — level_up/nostromo: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="nostromo"] {
+  --glow: #3de88a;
+}
+
+.levelup[data-look="nostromo"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    repeating-linear-gradient(180deg, #3de88a0d 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, #0b1a12 0%, #05080c 70%);
+  animation: levelup-crt-on 0.8s ease-out both;
+}
+
+.levelup[data-look="nostromo"] .levelup__stage {
+  z-index: 0;
+}
+
+.levelup[data-look="nostromo"]:not([data-mini]) .levelup__card {
+  z-index: 2;
+  isolation: isolate;
+}
+
+.levelup[data-look="nostromo"] .levelup__scene {
+  display: block;
+  --radar: min(78vmin, 46rem);
+  inset-block-start: calc(50% - var(--radar) / 2);
+  inset-inline-start: calc(50% - var(--radar) / 2);
+  inline-size: var(--radar);
+  block-size: var(--radar);
+  overflow: hidden;
+  border-radius: 50%;
+  background:
+    conic-gradient(from 0deg, #3de88a59, #3de88a00 22%, transparent 100%),
+    repeating-radial-gradient(circle, transparent 0 calc(12.5% - 1px), #3de88a33 calc(12.5% - 1px) 12.5%),
+    linear-gradient(#3de88a26, #3de88a26) center / 1px 100% no-repeat,
+    linear-gradient(#3de88a26, #3de88a26) center / 100% 1px no-repeat;
+  box-shadow:
+    0 0 0 1px #3de88a55,
+    0 0 3rem #3de88a22;
+  animation: levelup-sweep 3.2s linear 0.6s infinite;
+}
+
+.levelup[data-look="nostromo"] .levelup__fx {
+  display: block;
+  inset-inline-start: calc(22% + var(--x) * 0.56);
+  inset-block-start: calc(22% + var(--y) * 0.56);
+  inline-size: 0.6rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #3de88a;
+  box-shadow: 0 0 0.9rem #3de88a;
+  opacity: 0;
+  animation: levelup-blip 3.2s ease-out calc(0.8s + var(--r) * 3.2s) infinite;
+}
+
+.levelup[data-look="nostromo"] .levelup__burst {
+  display: block;
+  inset-block-start: 4%;
+  inset-inline: 0;
+  color: #e8c234;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  letter-spacing: 0.4em;
+  text-align: center;
+  text-shadow: 0 0 0.8rem #e8c23488;
+  animation: levelup-blink 1.2s steps(2, jump-none) infinite;
+}
+
+.levelup[data-look="nostromo"] .levelup__card {
+  --color-text: #c9f7dd;
+  --color-text-muted: #7fbf9a;
+  --bracket: #e8c234;
+  border: 1px solid #3de88a55;
+  border-radius: 0;
+  background:
+    linear-gradient(var(--bracket), var(--bracket)) top left / 1.2rem 2px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) top left / 2px 1.2rem no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) top right / 1.2rem 2px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) top right / 2px 1.2rem no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom left / 1.2rem 2px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom left / 2px 1.2rem no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom right / 1.2rem 2px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom right / 2px 1.2rem no-repeat,
+    repeating-linear-gradient(180deg, #3de88a0a 0 1px, transparent 1px 3px),
+    #05080cea;
+  color: #c9f7dd;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  box-shadow: 0 0 2.4rem #3de88a2e;
+}
+
+.levelup[data-look="nostromo"] .levelup__title {
+  border-inline-end-color: #3de88a;
+  color: #3de88a;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 0.8rem #3de88a88;
+}
+
+.levelup[data-look="nostromo"] .levelup__kicker {
+  color: #e8c234;
+  letter-spacing: 0.3em;
+}
+
+.levelup[data-look="nostromo"] .levelup__badge {
+  filter: drop-shadow(0 0 0.8rem #3de88a66);
+}
+
+.levelup[data-look="nostromo"] :is(.levelup__won li, .levelup__list li) {
+  border: 1px solid #3de88a33;
+  background: #3de88a12;
+}
+
+.levelup[data-look="nostromo"] .levelup__actions .ds-button {
+  border-radius: 0;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.levelup[data-look="nostromo"] :is(.levelup__rays, .levelup__scene, .levelup__fx, .levelup__burst) {
+    animation: none;
+  }
+}
+
+@keyframes levelup-crt-on {
+  0%,
+  35% {
+    clip-path: inset(49.6% 0 49.6% 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes levelup-sweep {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@keyframes levelup-blip {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  6% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+  40% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+}
+
+@keyframes levelup-blink {
+  50% {
+    opacity: 0;
+  }
+}

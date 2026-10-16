@@ -10,8 +10,10 @@
     "fr": "Des notifications dans la boîte de texte d'un jeu de rôle, sa flèche qui clignote."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

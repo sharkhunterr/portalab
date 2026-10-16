@@ -1,0 +1,16 @@
+/* Portalab — notification_animation/pixelreveal: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="pixelreveal"] .ds-notification {
+  animation-name: universe-notify-reveal;
+  animation-duration: 0.8s;
+  animation-timing-function: steps(8, end);
+}
+
+@keyframes universe-notify-reveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(-2rem -2rem -2rem -2rem);
+  }
+}

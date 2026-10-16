@@ -1,0 +1,58 @@
+/* Portalab — notification_style/pirate: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="pirate"] .ds-notification {
+  border: 3px solid transparent;
+  border-radius: 0.35rem;
+  background:
+    radial-gradient(circle at 0.7rem 0.7rem, #d4a64a 0.22rem, #6b4b16 0.27rem, transparent 0.3rem),
+    radial-gradient(
+      circle at calc(100% - 0.7rem) 0.7rem,
+      #d4a64a 0.22rem,
+      #6b4b16 0.27rem,
+      transparent 0.3rem
+    ),
+    radial-gradient(
+      circle at 0.7rem calc(100% - 0.7rem),
+      #d4a64a 0.22rem,
+      #6b4b16 0.27rem,
+      transparent 0.3rem
+    ),
+    radial-gradient(
+      circle at calc(100% - 0.7rem) calc(100% - 0.7rem),
+      #d4a64a 0.22rem,
+      #6b4b16 0.27rem,
+      transparent 0.3rem
+    ),
+    repeating-linear-gradient(180deg, #00000000 0 1.4rem, #0000002e 1.4rem 1.5rem),
+    repeating-linear-gradient(95deg, #ffffff08 0 3px, #00000012 3px 7px),
+    linear-gradient(#4a2f17, #3a2412) padding-box,
+    repeating-linear-gradient(45deg, #c9a46a 0 4px, #8a6a3b 4px 8px) border-box;
+  color: #f3e3c3;
+  box-shadow: 0 0.8rem 1.4rem -0.6rem #000000aa;
+}
+
+.ds-notifications[data-style="pirate"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="pirate"] .ds-notification__title {
+  color: #f2c94c;
+  font-family: "IM Fell English", "EB Garamond", serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+}
+
+.ds-notifications[data-style="pirate"] .ds-notification__body {
+  color: #e2cfa8;
+  font-family: "IM Fell English", "EB Garamond", serif;
+}
+
+.ds-notifications[data-style="pirate"] .ds-notification__icon {
+  border: 2px solid #d4a64a;
+  background: #2a1a0c;
+  color: #f2c94c;
+}
+
+.ds-notifications[data-style="pirate"] :is(.ds-notification__link, .ds-notification__close) {
+  color: #f2c94c;
+}

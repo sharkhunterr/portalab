@@ -1,0 +1,36 @@
+/* Portalab — effect/gifts: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="gifts"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  --wrap: hsl(calc(var(--h) / 4 + 345) 75% 48%);
+  inline-size: 1.5rem;
+  block-size: 1.4rem;
+  border-radius: 0.15rem;
+  background:
+    linear-gradient(90deg, transparent 42%, #f4d03f 42% 58%, transparent 58%),
+    linear-gradient(0deg, transparent 42%, #f4d03f 42% 58%, transparent 58%), var(--wrap);
+  box-shadow: inset 0 -3px 0 #0003;
+  animation-name: fx-burst;
+}
+
+[data-effect="gifts"] .celebration-fx:nth-child(2n) {
+  --wrap: #1f8f4e;
+}
+
+[data-effect="gifts"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #d61f3a, #1f8f4e);
+  color: #fffaf0;
+  box-shadow: 0 0 22px #f4d03f;
+}
+
+@keyframes fx-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-6rem - var(--s) * 4rem)) rotate(calc(-1 * var(--angle)))
+      scale(1.2) rotate(var(--r));
+  }
+}

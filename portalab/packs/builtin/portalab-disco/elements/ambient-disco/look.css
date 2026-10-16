@@ -1,0 +1,23 @@
+/* Portalab — ambient/disco: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="disco"] > span {
+  inline-size: 38vmax;
+  block-size: 38vmax;
+  margin: -19vmax 0 0 -19vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(var(--hue) 100% 60% / 0.24), transparent 62%);
+  mix-blend-mode: screen;
+  animation-name: ambient-disco;
+  animation-duration: calc(var(--duration) * 0.8);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+
+@keyframes ambient-disco {
+  from {
+    transform: translate3d(-20vw, -10vh, 0);
+  }
+  to {
+    transform: translate3d(25vw, 20vh, 0);
+  }
+}

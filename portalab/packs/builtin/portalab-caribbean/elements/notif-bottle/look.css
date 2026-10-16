@@ -1,0 +1,39 @@
+/* Portalab — notification_style/bottle: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="bottle"] .ds-notification {
+  position: relative;
+  margin-inline-start: 2.4rem;
+  border: 2px solid #9bd3c6aa;
+  border-radius: 1.4rem 2.2rem 2.2rem 1.4rem;
+  background:
+    linear-gradient(180deg, #ffffff33, transparent 40%),
+    linear-gradient(180deg, #f1e3bf, #e4cf9c) padding-box;
+  color: #2e2412;
+  box-shadow:
+    inset 0 0 0 4px #7fc4b333,
+    0 6px 18px #00000055;
+}
+
+.ds-notifications[data-style="bottle"] .ds-notification::before {
+  content: "";
+  position: absolute;
+  inset-block: 30%;
+  inset-inline-start: -2.4rem;
+  inline-size: 2.4rem;
+  border-radius: 0.5rem 0 0 0.5rem;
+  background:
+    linear-gradient(90deg, #8b5a2b 0 34%, transparent 34%), linear-gradient(180deg, #a8dccf88, #6fb3a388);
+}
+
+.ds-notifications[data-style="bottle"] .ds-notification__title {
+  font-family: "Pirata One", "IM Fell English", serif;
+  letter-spacing: 0.02em;
+}
+
+.ds-notifications[data-style="bottle"] .ds-notification__body {
+  color: #4a3a1a;
+}
+
+.ds-notifications[data-style="bottle"] .ds-notification {
+  overflow: visible;
+}

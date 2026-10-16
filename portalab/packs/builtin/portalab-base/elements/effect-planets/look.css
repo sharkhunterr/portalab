@@ -1,0 +1,36 @@
+/* Portalab — effect/planets: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="planets"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1.1rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe0a0, #ff8a5c 55%, #7a2e1c);
+  animation-name: fx-burst;
+}
+
+[data-effect="planets"] .celebration-fx:nth-child(3n) {
+  background: radial-gradient(circle at 35% 30%, #c8f0ff, #3f8ad6 55%, #12305a);
+}
+
+[data-effect="planets"] .celebration-fx:nth-child(4n) {
+  box-shadow: 0 0 0 0.12rem #e8d6a8;
+  background: radial-gradient(circle at 35% 30%, #fff1c8, #e8c98a 55%, #8a6a30);
+}
+
+[data-effect="planets"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #2a1a40, #8a5cff);
+  color: #ffffff;
+}
+
+@keyframes fx-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-6rem - var(--s) * 4rem)) rotate(calc(-1 * var(--angle)))
+      scale(1.2) rotate(var(--r));
+  }
+}

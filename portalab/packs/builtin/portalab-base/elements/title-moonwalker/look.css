@@ -1,0 +1,11 @@
+/* Portalab — title/float: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-title[data-style="float"] {
+  animation: badge-float 2.6s ease-in-out infinite;
+}
+
+@keyframes badge-float {
+  50% {
+    transform: translateY(-3px);
+  }
+}

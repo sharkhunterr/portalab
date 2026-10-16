@@ -10,8 +10,10 @@
     "fr": "Un anneau doré brillant autour de votre avatar."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1300,

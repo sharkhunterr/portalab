@@ -1,0 +1,32 @@
+/* Portalab — effect/cupid: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="cupid"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 0.32rem;
+  block-size: 3.2rem;
+  background:
+    radial-gradient(circle at 30% 8%, #ff3d6e 0 22%, transparent 24%),
+    radial-gradient(circle at 70% 8%, #ff3d6e 0 22%, transparent 24%),
+    linear-gradient(180deg, transparent 4%, #ff3d6e 4% 14%, #c9a46a 14% 86%, #ffd1dc 86%);
+  border-radius: 0.2rem;
+  filter: drop-shadow(0 0 4px #ff85b3);
+  animation-name: fx-arrow;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+[data-effect="cupid"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #ffd1dc, #ff3d6e);
+  color: #3d0014;
+  box-shadow: 0 0 22px #ff85b3;
+}
+
+@keyframes fx-arrow {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-7rem - var(--s) * 4rem)) scale(1);
+  }
+}

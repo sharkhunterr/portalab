@@ -1,0 +1,5 @@
+/* Portalab — avatar_frame/verdant: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="verdant"][data-fx-failed] {
+  background: conic-gradient(#14532d, #4ade80, #ecfccb, #4ade80, #14532d);
+}

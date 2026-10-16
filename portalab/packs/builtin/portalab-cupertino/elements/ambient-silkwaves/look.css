@@ -1,0 +1,27 @@
+/* Portalab — ambient/silkwaves: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="silkwaves"] > span {
+  top: calc(-10% + var(--i) * 22%);
+  left: -30%;
+  inline-size: 160%;
+  block-size: 38vh;
+  border-radius: 50%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(calc(200 + var(--i) * 35) 90% 70% / 0.35) 30%,
+    hsl(calc(260 + var(--i) * 35) 85% 75% / 0.3) 65%,
+    transparent
+  );
+  filter: blur(36px);
+  animation: ambient-silk calc(var(--duration) * 2) ease-in-out var(--delay) infinite alternate;
+}
+
+@keyframes ambient-silk {
+  from {
+    transform: translateX(-8%) rotate(-6deg) scaleY(0.8);
+  }
+  to {
+    transform: translateX(8%) rotate(5deg) scaleY(1.2);
+  }
+}

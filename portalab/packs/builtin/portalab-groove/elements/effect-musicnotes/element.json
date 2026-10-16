@@ -10,8 +10,10 @@
     "fr": "Des notes de musique qui s'envolent de la récompense."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 250,

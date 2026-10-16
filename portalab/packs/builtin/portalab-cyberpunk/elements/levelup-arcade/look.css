@@ -1,0 +1,56 @@
+/* Portalab — level_up/arcade: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="arcade"] {
+  --glow: #ffd166;
+}
+
+.levelup[data-look="arcade"] .levelup__card {
+  --color-text: #f8f8f2;
+  --color-text-muted: #c9c9d6;
+  border: 0;
+  border-radius: 0;
+  background: #0b0b1a;
+  color: #f8f8f2;
+  box-shadow:
+    0 -6px 0 #ffd166,
+    0 6px 0 #ffd166,
+    -6px 0 0 #ffd166,
+    6px 0 0 #ffd166,
+    10px 12px 0 #00000088;
+  font-family: "Press Start 2P", ui-monospace, monospace;
+  font-size: 0.7rem;
+  line-height: 1.6;
+  animation: levelup-steps 0.6s steps(6, end) 0.2s both;
+}
+
+.levelup[data-look="arcade"] .levelup__title {
+  font-family: "Press Start 2P", ui-monospace, monospace;
+  font-size: clamp(1rem, 4vw, 1.5rem);
+  color: #ffd166;
+  text-shadow: 3px 3px 0 #ef476f;
+  animation: levelup-blink 0.5s steps(2, jump-none) 0.8s 4 both;
+}
+
+.levelup[data-look="arcade"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: var(--x);
+  inline-size: 6px;
+  block-size: 6px;
+  background: hsl(calc(var(--i) * 47) 100% 70%);
+  image-rendering: pixelated;
+  animation: levelup-blink 0.6s steps(2, jump-none) calc(var(--i) * 0.07s) infinite;
+}
+
+@keyframes levelup-steps {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+@keyframes levelup-blink {
+  50% {
+    opacity: 0;
+  }
+}

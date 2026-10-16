@@ -1,0 +1,144 @@
+/* Portalab — level_up/wavecleared: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="wavecleared"] {
+  --glow: #39ff14;
+}
+
+.levelup[data-look="wavecleared"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    radial-gradient(circle 1px, #ffffff88 96%, transparent) 0 0 / 3rem 2.4rem,
+    #050805f5;
+}
+
+.levelup[data-look="wavecleared"] .levelup__fx {
+  --p: 4px;
+  display: block;
+  inset-block-start: calc(5% + round(down, var(--i) / 8, 1) * 9%);
+  inset-inline-start: calc(6% + mod(var(--i), 8) * 11.5%);
+  inline-size: var(--p);
+  block-size: var(--p);
+  color: #39ff14;
+  box-shadow:
+    calc(2 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(7 * var(--p)) 0 currentColor;
+  animation: levelup-invader-pop 1.2s steps(6, end) calc(0.2s + var(--i) * 0.04s) both;
+}
+
+.levelup[data-look="wavecleared"] .levelup__fx:nth-child(3n) {
+  color: #ff4d6d;
+}
+
+.levelup[data-look="wavecleared"] .levelup__burst {
+  display: block;
+  inset-block-start: 8%;
+  inset-inline: 0;
+  color: #39ff14;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(1.2rem, 4.5vw, 2.4rem);
+  text-align: center;
+  text-shadow: 0 0 0.6rem #39ff14;
+  animation: levelup-flicker-in 0.8s steps(1, end) 1.2s both;
+}
+
+.levelup[data-look="wavecleared"] .levelup__card {
+  --color-text: #effff0;
+  --color-text-muted: #a3d9a5;
+  --color-surface-raised: #0f170f;
+  --color-border: #1f3a1f;
+  border: 2px solid #39ff14;
+  border-radius: 0;
+  background: repeating-linear-gradient(180deg, #39ff140a 0 1px, transparent 1px 3px), #050805;
+  color: #effff0;
+  box-shadow: 0 0 1.4rem #39ff1455;
+  animation: levelup-card 0.4s steps(4, end) 1.4s both;
+}
+
+.levelup[data-look="wavecleared"] .levelup__title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+@keyframes levelup-invader-pop {
+  0%,
+  50% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  65% {
+    filter: brightness(3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.2);
+    filter: blur(2px);
+  }
+}
+
+@keyframes levelup-flicker-in {
+  0%,
+  20%,
+  40% {
+    opacity: 0;
+  }
+  10%,
+  30%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes levelup-card {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(1.5rem);
+  }
+}

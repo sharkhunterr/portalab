@@ -1,0 +1,19 @@
+/* Portalab — name_style/nova: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="nova"] {
+  font-family: "Plus Jakarta Sans Variable", "Inter Variable", system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(90deg, #8b7bff, #22d3ee, #f472b6, #8b7bff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-shimmer 8s linear infinite;
+}
+
+@keyframes name-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}

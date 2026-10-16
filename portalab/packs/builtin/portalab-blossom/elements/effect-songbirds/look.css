@@ -1,0 +1,48 @@
+/* Portalab — effect/songbirds: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="songbirds"] .celebration-fx {
+  left: var(--x);
+  top: auto;
+  bottom: calc(var(--fx-vh, 1vh) * -6);
+  inline-size: 1.8rem;
+  block-size: 0.9rem;
+  background: #3a5a8a;
+  clip-path: polygon(0 20%, 25% 60%, 50% 40%, 75% 60%, 100% 20%, 78% 80%, 50% 62%, 22% 80%);
+  animation:
+    fx-rise 3s ease-out var(--d) both,
+    fx-flap 0.3s ease-in-out infinite alternate;
+}
+
+[data-effect="songbirds"] .celebration-fx:nth-child(3n) {
+  background: #b0306a;
+}
+
+[data-effect="songbirds"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #7cc46a, #2f7a3a);
+  color: #ffffff;
+  font-family: Caveat, "Comic Neue", cursive;
+  box-shadow: 0 0 16px #7cc46a;
+}
+
+@keyframes fx-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.6);
+  }
+  20% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(calc(var(--fx-vw, 1vw) * 2), calc(var(--fx-vh, 1vh) * -45), 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(var(--fx-vw, 1vw) * -2), calc(var(--fx-vh, 1vh) * -95), 0) scale(1.1);
+  }
+}
+
+@keyframes fx-flap {
+  to {
+    scale: 1 0.4;
+  }
+}

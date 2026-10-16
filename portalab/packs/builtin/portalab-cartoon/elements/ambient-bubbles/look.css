@@ -1,0 +1,28 @@
+/* Portalab — ambient/bubbles: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="bubbles"] > span {
+  top: auto;
+  bottom: -6vh;
+  inline-size: calc(1.6rem * var(--size));
+  block-size: calc(1.6rem * var(--size));
+  border-radius: 50%;
+  border: 1.5px solid #ffffff99;
+  background: radial-gradient(circle at 30% 30%, #ffffffaa, #9fe7ff22 45%, transparent 60%);
+  animation-name: ambient-rise;
+  animation-duration: calc(var(--duration) * 1.2);
+  animation-timing-function: ease-in;
+}
+
+@keyframes ambient-rise {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(var(--drift), -105vh, 0) scale(0.3);
+    opacity: 0;
+  }
+}

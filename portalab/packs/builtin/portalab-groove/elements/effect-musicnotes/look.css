@@ -1,0 +1,31 @@
+/* Portalab — effect/musicnotes: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="musicnotes"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  color: #1ed760;
+  filter: drop-shadow(0 0 6px #1ed76088);
+  animation-name: fx-burst;
+}
+
+[data-effect="musicnotes"] .celebration-fx:nth-child(2n) {
+  color: #f573a0;
+  filter: drop-shadow(0 0 6px #f573a088);
+}
+
+[data-effect="musicnotes"] .ds-celebration__badge {
+  background: #1ed760;
+  color: #000000;
+  box-shadow: 0 0 22px #1ed76088;
+}
+
+@keyframes fx-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-6rem - var(--s) * 4rem)) rotate(calc(-1 * var(--angle)))
+      scale(1.2) rotate(var(--r));
+  }
+}

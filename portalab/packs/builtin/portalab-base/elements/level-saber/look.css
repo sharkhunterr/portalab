@@ -1,0 +1,17 @@
+/* Portalab — level_badge/saber: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="saber"] {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(#0b0b12, #0b0b12) padding-box,
+    linear-gradient(90deg, var(--color-accent), #ffffff, var(--color-accent)) border-box;
+  color: #ffffff;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 80%, transparent);
+  animation: level-saber 1.8s ease-in-out infinite;
+}
+
+@keyframes level-saber {
+  50% {
+    box-shadow: 0 0 18px color-mix(in srgb, var(--color-accent) 100%, transparent);
+  }
+}

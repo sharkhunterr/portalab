@@ -1,0 +1,24 @@
+/* Portalab — level_badge/crown: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="crown"] {
+  position: relative;
+  margin-block-start: 0.55rem;
+  background: linear-gradient(135deg, #7c2d12, #b45309 50%, #f59e0b);
+  color: #fef3c7;
+  box-shadow:
+    0 0 0 2px #fde68a,
+    0 0 12px #f59e0b99;
+}
+
+.ds-level[data-look="crown"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -0.7rem;
+  inset-inline-start: 50%;
+  inline-size: 1.3rem;
+  block-size: 0.75rem;
+  background: linear-gradient(#fde68a, #f59e0b);
+  clip-path: polygon(0 100%, 0 20%, 25% 60%, 50% 0, 75% 60%, 100% 20%, 100% 100%);
+  transform: translateX(-50%);
+  filter: drop-shadow(0 0 3px #f59e0b);
+}

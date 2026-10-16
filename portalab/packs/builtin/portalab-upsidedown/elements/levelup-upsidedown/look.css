@@ -1,0 +1,152 @@
+/* Portalab — level_up/upsidedown: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="upsidedown"] {
+  --glow: #ff3b4f;
+}
+
+.levelup[data-look="upsidedown"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 70% 0%, #dc262655, transparent 55%),
+    linear-gradient(180deg, #2a0a10, #12151f 60%, #050608);
+  animation: levelup-upside 1.6s cubic-bezier(0.6, 0, 0.3, 1) both;
+}
+
+.levelup[data-look="upsidedown"] .levelup__scene {
+  display: block;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 47%, #fecaca 48%, transparent 49.5%) no-repeat;
+  opacity: 0;
+  animation: banner-lightning 3s steps(1, end) 0.8s infinite;
+}
+
+.levelup[data-look="upsidedown"] .levelup__stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* each rift image is twice the screen's width, its rift in the middle: one lands at a fifth of the
+     screen, the other at three quarters */
+  background:
+    var(--veins-rift-a) 80% 0 / 200% 100% no-repeat,
+    var(--veins-rift-c) 25% 0 / 200% 100% no-repeat;
+  animation: levelup-strike 2.2s linear 0.5s both;
+}
+
+.levelup[data-look="upsidedown"] .levelup__fx {
+  display: block;
+  inset-block-end: -4vh;
+  inset-inline-start: var(--x);
+  inline-size: calc(0.4rem + var(--r) * 0.6rem);
+  block-size: calc(0.4rem + var(--r) * 0.6rem);
+  background: var(--upside-flake-a) center / contain no-repeat;
+  animation: levelup-ash calc(6s + var(--r) * 5s) linear calc(var(--r) * -6s) infinite;
+}
+
+.levelup[data-look="upsidedown"] .levelup__fx:nth-child(3n) {
+  background-image: var(--upside-flake-b);
+}
+
+.levelup[data-look="upsidedown"] .levelup__fx:nth-child(4n) {
+  inline-size: calc(1rem + var(--r) * 1rem);
+  block-size: calc(1rem + var(--r) * 1rem);
+  background-image: var(--upside-spore);
+}
+
+.levelup[data-look="upsidedown"] .levelup__fx:nth-child(7n) {
+  inline-size: 0.35rem;
+  block-size: 0.35rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe4e6, #ff2a3d 45%, #ff2a3d00 72%);
+}
+
+.levelup[data-look="upsidedown"] .levelup__card {
+  --color-text: #e5e7eb;
+  --color-text-muted: #9ca3af;
+  border-color: #dc262688;
+  background:
+    linear-gradient(#0b0d12cc, #0b0d12cc),
+    var(--veins-strip) center / cover no-repeat,
+    #0b0d12f2;
+  -webkit-box-reflect: below 8px linear-gradient(transparent 70%, #ffffff1f);
+  transform-origin: 50% 100%;
+  animation: levelup-flipup 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s both;
+}
+
+.levelup[data-look="upsidedown"] .levelup__title {
+  color: #ff3b4f;
+  font-family: "EB Garamond", serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px #dc2626;
+}
+
+@keyframes levelup-upside {
+  0% {
+    transform: rotate(180deg);
+    filter: brightness(0.4);
+  }
+  60% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes banner-lightning {
+  0%,
+  88%,
+  92%,
+  100% {
+    opacity: 0;
+  }
+  89%,
+  91% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes levelup-strike {
+  0% {
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  8% {
+    opacity: 0.2;
+  }
+  12%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes levelup-ash {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate3d(1, 0.4, 0.2, 0deg);
+  }
+  10% {
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate3d(-3vw, -50vh, 0) rotate3d(0.3, 1, 0.2, 360deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(2vw, -105vh, 0) rotate3d(1, 0.4, 0.2, 720deg);
+  }
+}
+
+@keyframes levelup-flipup {
+  from {
+    opacity: 0;
+    transform: translateY(20vh) perspective(50rem) rotateX(-180deg);
+  }
+  70% {
+    opacity: 1;
+    transform: perspective(50rem) rotateX(10deg);
+  }
+}

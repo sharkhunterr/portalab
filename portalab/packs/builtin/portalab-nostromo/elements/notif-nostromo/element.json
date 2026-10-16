@@ -10,8 +10,10 @@
     "fr": "Les transmissions de MU/TH/UR : bandeau ambre, texte phosphore, coins de cadre et curseur qui clignote."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

@@ -1,0 +1,32 @@
+/* Portalab — profile_banner/snowfall: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="snowfall"] {
+  background:
+    radial-gradient(3px 3px at 10% 20%, #fff, transparent),
+    radial-gradient(2px 2px at 30% 60%, #fff, transparent),
+    radial-gradient(3px 3px at 55% 30%, #fff, transparent),
+    radial-gradient(2px 2px at 75% 70%, #fff, transparent),
+    radial-gradient(3px 3px at 90% 40%, #fff, transparent),
+    radial-gradient(120% 40% at 50% 120%, #f1f5f9 0 50%, transparent 51%),
+    linear-gradient(180deg, #0f2a44, #1e4a6e 60%, #6b93b8);
+  background-size:
+    160px 120px,
+    200px 140px,
+    180px 110px,
+    220px 150px,
+    190px 130px,
+    auto,
+    auto;
+  animation: cosmetics-fall 12s linear infinite;
+}
+
+@keyframes cosmetics-fall {
+  to {
+    background-position:
+      60px 240px,
+      -40px 280px,
+      30px 260px,
+      -20px 220px,
+      0 0;
+  }
+}

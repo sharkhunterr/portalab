@@ -1,0 +1,32 @@
+/* Portalab — notification_animation/march: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="march"] .ds-notification {
+  animation-name: universe-notify-march;
+  animation-duration: 1.2s;
+  animation-timing-function: steps(1, end);
+}
+
+@keyframes universe-notify-march {
+  0% {
+    opacity: 1;
+    transform: translate(60%, -4rem);
+  }
+  16% {
+    transform: translate(40%, -4rem);
+  }
+  32% {
+    transform: translate(20%, -2.5rem);
+  }
+  48% {
+    transform: translate(0, -2.5rem);
+  }
+  64% {
+    transform: translate(-6%, -1rem);
+  }
+  80% {
+    transform: translate(0, -1rem);
+  }
+  100% {
+    transform: none;
+  }
+}

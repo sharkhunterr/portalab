@@ -10,8 +10,10 @@
     "fr": "Un anneau arc-en-ciel qui tourne."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 350,

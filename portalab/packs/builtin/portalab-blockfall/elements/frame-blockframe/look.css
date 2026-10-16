@@ -1,0 +1,22 @@
+/* Portalab — avatar_frame/blockframe: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="blockframe"] {
+  padding: 10px;
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(90deg, #ffffff55 0 2px, transparent 2px 8px, #00000055 8px 10px),
+    repeating-linear-gradient(180deg, #ffffff55 0 2px, transparent 2px 8px, #00000055 8px 10px),
+    repeating-linear-gradient(
+      90deg,
+      #00e5ff 0 10px,
+      #ffd23f 10px 20px,
+      #c77dff 20px 30px,
+      #3ddc84 30px 40px,
+      #ff5c5c 40px 50px
+    ),
+    #ff9f40;
+}
+
+.avatar-frame[data-frame="blockframe"] > :not(.avatar-frame__fx) {
+  border-radius: 0;
+}

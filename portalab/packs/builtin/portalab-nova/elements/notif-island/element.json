@@ -10,8 +10,10 @@
     "fr": "Une capsule noire en haut de l'écran, comme l'îlot d'un téléphone."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

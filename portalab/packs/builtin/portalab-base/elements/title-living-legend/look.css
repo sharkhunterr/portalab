@@ -1,0 +1,23 @@
+/* Portalab — title/flame: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-title[data-style="flame"] {
+  border-color: #f97316;
+  color: #fed7aa;
+  background: linear-gradient(0deg, #7c2d12, #c2410c);
+  box-shadow: 0 -2px 10px #f97316aa;
+  animation: badge-flame 1.2s ease-in-out infinite alternate;
+}
+
+.cosmetic-title[data-style="flame"] {
+  background: linear-gradient(0deg, #ea580c, #facc15);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  box-shadow: none;
+}
+
+@keyframes badge-flame {
+  to {
+    box-shadow: 0 -4px 16px #facc15;
+  }
+}

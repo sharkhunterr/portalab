@@ -1,0 +1,44 @@
+/* Portalab — notification_style/nextepisode: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="nextepisode"] .ds-notification {
+  --color-text: #ffffff;
+  --color-text-muted: #b3b3b3;
+  border: 1px solid #333333;
+  border-radius: 0.25rem;
+  background: #141414f2;
+  color: #ffffff;
+  box-shadow: 0 1rem 2rem #000000cc;
+}
+
+.ds-notifications[data-style="nextepisode"] .ds-notification::before {
+  inset-inline: 0;
+  inset-block: 0 auto;
+  inline-size: auto;
+  block-size: 3px;
+  background: #e50914;
+}
+
+.ds-notifications[data-style="nextepisode"] .ds-notification__icon {
+  border-radius: 50%;
+  background: #ffffff;
+  color: #000000;
+}
+
+.ds-notifications[data-style="nextepisode"] .ds-notification__title {
+  font-weight: 800;
+}
+
+.ds-notifications[data-style="nextepisode"] .ds-notification__timer {
+  block-size: 4px;
+  background: #e50914;
+  transform-origin: right;
+}
+
+.ds-notifications[data-style="nextepisode"] .ds-notification__link {
+  justify-self: start;
+  padding: 0.2rem 0.8rem;
+  border-radius: 0.2rem;
+  background: #ffffff;
+  color: #000000;
+  font-weight: 700;
+}

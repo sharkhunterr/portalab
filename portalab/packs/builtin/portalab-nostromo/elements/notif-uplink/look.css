@@ -1,0 +1,41 @@
+/* Portalab — notification_animation/uplink: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="uplink"] .ds-notification {
+  animation-name: universe-notify-uplink;
+  animation-duration: 0.9s;
+  animation-timing-function: steps(9, end);
+}
+
+.ds-notifications[data-animation="uplink"] .ds-notification[data-leaving] {
+  animation: universe-notify-cutout 0.45s ease-in forwards !important;
+}
+
+@keyframes universe-notify-uplink {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  10% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.7;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes universe-notify-cutout {
+  40% {
+    opacity: 1;
+    transform: scaleY(0.04) scaleX(1.04);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0.02) scaleX(0);
+  }
+}

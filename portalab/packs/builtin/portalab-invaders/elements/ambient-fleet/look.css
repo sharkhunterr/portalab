@@ -1,0 +1,81 @@
+/* Portalab — ambient/fleet: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="fleet"] > span {
+  --p: calc(2px + 2px * var(--size));
+  left: calc(8% + mod(var(--i), 5) * 18%);
+  top: calc(6% + round(down, var(--i) / 5, 1) * 14%);
+  inline-size: var(--p);
+  block-size: var(--p);
+  color: #39ff14;
+  box-shadow:
+    calc(2 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(7 * var(--p)) 0 currentColor;
+  opacity: 0.3;
+  animation: ambient-fleet 6s steps(6, end) infinite;
+}
+
+[data-ambient="fleet"] > span:nth-child(3n) {
+  color: #ff4d6d;
+}
+
+@keyframes ambient-fleet {
+  0% {
+    translate: 0 0;
+  }
+  45% {
+    translate: 6vw 0;
+  }
+  50% {
+    translate: 6vw 2vh;
+  }
+  95% {
+    translate: 0 2vh;
+  }
+  100% {
+    translate: 0 4vh;
+  }
+}

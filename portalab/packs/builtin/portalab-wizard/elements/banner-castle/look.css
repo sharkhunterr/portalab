@@ -1,0 +1,37 @@
+/* Portalab — profile_banner/castle: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="castle"] {
+  /* a castle on a hill under the stars: towers, conic roofs and a round moon */
+  background:
+    radial-gradient(circle 1.6rem at 84% 26%, #fef9c3, #fde68a 70%, transparent 74%),
+    conic-gradient(from 150deg at 50% 0%, #0b0a17 0 60deg, transparent 0) 21% 37% / 7% 16% no-repeat,
+    conic-gradient(from 150deg at 50% 0%, #0b0a17 0 60deg, transparent 0) 44% 22% / 6% 15% no-repeat,
+    conic-gradient(from 150deg at 50% 0%, #0b0a17 0 60deg, transparent 0) 63% 40% / 6% 14% no-repeat,
+    linear-gradient(#0b0a17, #0b0a17) 21% 100% / 7% 48% no-repeat,
+    linear-gradient(#0b0a17, #0b0a17) 44% 100% / 6% 63% no-repeat,
+    linear-gradient(#0b0a17, #0b0a17) 63% 100% / 6% 46% no-repeat,
+    repeating-linear-gradient(90deg, #0b0a17 0 6px, transparent 6px 12px) 32% 64% / 26% 4% no-repeat,
+    linear-gradient(#0b0a17, #0b0a17) 32% 100% / 26% 32% no-repeat,
+    radial-gradient(120% 40% at 40% 110%, #0b0a17 0 50%, transparent 51%),
+    radial-gradient(1px 1px at 12% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 40% 12%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 66% 25%, #fde68a, transparent),
+    radial-gradient(1px 1px at 92% 55%, #fff, transparent),
+    linear-gradient(180deg, #0b1033, #2a1b5c 60%, #6b3fa0);
+  background-size:
+    auto,
+    7% 16%,
+    6% 15%,
+    6% 14%,
+    7% 48%,
+    6% 63%,
+    6% 46%,
+    26% 4%,
+    26% 32%,
+    auto,
+    220px 140px,
+    260px 160px,
+    300px 150px,
+    240px 130px,
+    auto;
+}

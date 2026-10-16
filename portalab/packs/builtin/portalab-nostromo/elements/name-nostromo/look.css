@@ -1,0 +1,26 @@
+/* Portalab — name_style/nostromo: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="nostromo"] {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3de88a;
+  text-shadow:
+    0 0 6px #3de88aaa,
+    0 0 18px #3de88a55;
+  animation: name-flicker 6s steps(1, end) infinite;
+}
+
+@keyframes name-flicker {
+  0%,
+  42%,
+  46%,
+  100% {
+    opacity: 1;
+  }
+  43%,
+  45% {
+    opacity: 0.25;
+  }
+}

@@ -1,0 +1,23 @@
+/* Portalab — title/pixel: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-title[data-style="pixel"] {
+  border: 0;
+  border-radius: 0;
+  background: #2b2d42;
+  color: #f8f8f2;
+  font-family: "Press Start 2P", ui-monospace, monospace;
+  font-size: 0.6rem;
+  box-shadow:
+    0 -3px 0 #f8f8f2,
+    0 3px 0 #f8f8f2,
+    -3px 0 0 #f8f8f2,
+    3px 0 0 #f8f8f2,
+    4px 5px 0 #00000066;
+}
+
+.cosmetic-title[data-style="pixel"] {
+  background: none;
+  box-shadow: none;
+  color: #ffd166;
+  text-shadow: 2px 2px 0 #00000088;
+}

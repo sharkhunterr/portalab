@@ -1,0 +1,25 @@
+/* Portalab — profile_banner/neon-grid: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="neon-grid"] {
+  background:
+    linear-gradient(transparent 50%, #00f0ff22 50%),
+    repeating-linear-gradient(90deg, #00f0ff55 0 1px, transparent 1px 36px),
+    repeating-linear-gradient(0deg, #00f0ff40 0 1px, transparent 1px 18px),
+    linear-gradient(180deg, #050816, #0b1a3a 55%, #10224d);
+  background-size:
+    auto,
+    auto,
+    100% 200%,
+    auto;
+  animation: cosmetics-grid 2s linear infinite;
+}
+
+@keyframes cosmetics-grid {
+  to {
+    background-position:
+      0 0,
+      0 0,
+      0 36px,
+      0 0;
+  }
+}

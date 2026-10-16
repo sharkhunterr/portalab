@@ -1,0 +1,68 @@
+/* Portalab — level_up/abduction: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="abduction"] {
+  --glow: #a3e635;
+}
+
+.levelup[data-look="abduction"] .levelup__scene {
+  display: block;
+  inset-block-start: 4%;
+  inset-inline-start: 50%;
+  inline-size: 12rem;
+  block-size: 3rem;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 35%, #d9f99d, #4d7c0f 55%, #1a2e05);
+  box-shadow: 0 0 2rem #a3e63588;
+  transform: translateX(-50%);
+}
+
+.levelup[data-look="abduction"] .levelup__rays {
+  display: block;
+  inset-block: 8% 0;
+  inset-inline-start: 50%;
+  inline-size: 60vmin;
+  background: linear-gradient(#d9f99d88, #a3e63522 70%, transparent);
+  clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%);
+  transform: translateX(-50%);
+  animation: levelup-beam 1.4s ease-out both;
+}
+
+.levelup[data-look="abduction"] .levelup__card {
+  animation: levelup-lift 1.6s cubic-bezier(0.3, 0.8, 0.3, 1) 0.5s both;
+}
+
+.levelup[data-look="abduction"] .levelup__fx {
+  display: block;
+  inset-block-end: 0;
+  inset-inline-start: calc(40% + var(--r) * 20%);
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  border-radius: 50%;
+  background: #d9f99d;
+  animation: levelup-rise calc(2s + var(--r) * 2s) linear calc(var(--r) * -2s) infinite;
+}
+
+@keyframes levelup-beam {
+  from {
+    opacity: 0;
+    clip-path: polygon(49% 0, 51% 0, 51% 0, 49% 0);
+  }
+}
+
+@keyframes levelup-lift {
+  from {
+    opacity: 0;
+    transform: translateY(40vh) scale(0.6) rotate(-6deg);
+  }
+}
+
+@keyframes levelup-rise {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-80vh) scale(0.3);
+    opacity: 0;
+  }
+}

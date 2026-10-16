@@ -1,0 +1,8 @@
+/* Portalab — profile_banner/bloodmoon: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="bloodmoon"] {
+  background:
+    radial-gradient(12% 24% at 70% 35%, #ff4d4d, #8b0000 60%, transparent 63%),
+    radial-gradient(70% 50% at 50% 110%, #3a0000cc, transparent),
+    linear-gradient(180deg, #0a0000, #2b0505 60%, #4a0b0b);
+}

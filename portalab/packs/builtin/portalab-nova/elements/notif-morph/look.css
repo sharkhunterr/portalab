@@ -1,0 +1,48 @@
+/* Portalab — notification_animation/morph: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="morph"] .ds-notification {
+  transform-origin: 50% 0;
+  animation-name: universe-notify-morph;
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.2, 1.2, 0.3, 1);
+}
+
+.ds-notifications[data-animation="morph"]
+  .ds-notification
+  > :is(.ds-notification__icon, .ds-notification__content) {
+  animation: universe-morph-content 0.7s ease-out both;
+}
+
+.ds-notifications[data-animation="morph"] .ds-notification[data-leaving] {
+  animation: universe-notify-unmorph 0.45s cubic-bezier(0.6, 0, 0.8, 0.4) forwards !important;
+}
+
+@keyframes universe-notify-morph {
+  0% {
+    opacity: 0;
+    transform: scale(0.3, 0.55);
+    filter: blur(4px);
+  }
+  40% {
+    opacity: 1;
+    filter: none;
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes universe-morph-content {
+  0%,
+  35% {
+    opacity: 0;
+  }
+}
+
+@keyframes universe-notify-unmorph {
+  to {
+    opacity: 0;
+    transform: scale(0.3, 0.5);
+    filter: blur(4px);
+  }
+}

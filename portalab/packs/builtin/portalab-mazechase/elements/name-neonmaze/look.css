@@ -1,0 +1,13 @@
+/* Portalab — name_style/neonmaze: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="neonmaze"] {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.8em;
+  color: #ffe14d;
+  text-shadow:
+    2px 0 0 #2121de,
+    -2px 0 0 #2121de,
+    0 2px 0 #2121de,
+    0 -2px 0 #2121de,
+    0 0 0.5em #2121de;
+}

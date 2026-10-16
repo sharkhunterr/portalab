@@ -1,0 +1,8 @@
+/* Portalab — badge/gold: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="gold"] {
+  border-color: #f59e0b;
+  color: #451a03;
+  background: linear-gradient(135deg, #fde68a, #f59e0b 50%, #fef3c7);
+  box-shadow: 0 0 10px #f59e0b88;
+}

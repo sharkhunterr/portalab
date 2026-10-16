@@ -1,0 +1,27 @@
+/* Portalab — notification_style/ticket: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="ticket"] .ds-notification {
+  border: 0;
+  border-radius: var(--radius-sm, 0.35rem);
+  background: color-mix(in srgb, var(--tone) 12%, var(--color-surface-raised));
+  -webkit-mask:
+    radial-gradient(circle at 0 50%, transparent 0.7rem, #000 0.72rem) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, transparent 0.7rem, #000 0.72rem) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle at 0 50%, transparent 0.7rem, #000 0.72rem) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, transparent 0.7rem, #000 0.72rem) right / 51% 100% no-repeat;
+  padding-inline: 1.3rem;
+}
+
+.ds-notifications[data-style="ticket"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="ticket"] .ds-notification__close {
+  align-self: stretch;
+  block-size: auto;
+  inline-size: 2.6rem;
+  margin-block: calc(-1 * var(--space-2));
+  border-inline-start: 2px dashed color-mix(in srgb, var(--tone) 55%, transparent);
+  border-radius: 0;
+}

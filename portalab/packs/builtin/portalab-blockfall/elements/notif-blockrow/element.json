@@ -10,8 +10,10 @@
     "fr": "Des notifications encadrées d'une ligne de blocs biseautés."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

@@ -1,0 +1,19 @@
+/* Portalab — notification_animation/orbitin: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="orbitin"] .ds-notification {
+  transform-origin: -40% 50%;
+  animation-name: universe-notify-orbitin;
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.3, 0.9, 0.3, 1);
+}
+
+@keyframes universe-notify-orbitin {
+  0% {
+    opacity: 0;
+    transform: rotate(-70deg) scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}

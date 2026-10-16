@@ -1,0 +1,28 @@
+/* Portalab — level_badge/eqbars: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="eqbars"] {
+  gap: 0.3rem;
+  padding-inline: 0.45rem 0.6rem;
+  background: #1ed760;
+  color: #000000;
+}
+
+.ds-level[data-look="eqbars"]::before {
+  content: "";
+  inline-size: 0.7rem;
+  block-size: 0.75rem;
+  background:
+    linear-gradient(#000, #000) 0 100% / 0.16rem 60% no-repeat,
+    linear-gradient(#000, #000) 50% 100% / 0.16rem 100% no-repeat,
+    linear-gradient(#000, #000) 100% 100% / 0.16rem 40% no-repeat;
+  animation: level-eq 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes level-eq {
+  to {
+    background-size:
+      0.16rem 100%,
+      0.16rem 35%,
+      0.16rem 85%;
+  }
+}

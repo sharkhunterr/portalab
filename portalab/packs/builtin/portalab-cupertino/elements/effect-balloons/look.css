@@ -1,0 +1,48 @@
+/* Portalab — effect/balloons: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="balloons"] .celebration-fx {
+  left: var(--x);
+  top: auto;
+  bottom: calc(var(--fx-vh, 1vh) * -12);
+  inline-size: 2.4rem;
+  block-size: 3rem;
+  border-radius: 50% 50% 48% 48% / 56% 56% 44% 44%;
+  background: radial-gradient(circle at 32% 28%, #ffffffcc 0 9%, transparent 22%), hsl(var(--h) 85% 58%);
+  box-shadow: inset -0.3rem -0.4rem 0.6rem #0000002e;
+  animation-name: fx-rise;
+  animation-duration: 3.4s;
+  animation-timing-function: ease-in;
+}
+
+[data-effect="balloons"] .celebration-fx::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: 50%;
+  inline-size: 1px;
+  block-size: 3rem;
+  background: linear-gradient(180deg, #6e6e73, transparent);
+}
+
+[data-effect="balloons"] .ds-celebration__badge {
+  background: linear-gradient(180deg, #3d9bff, #0066cc);
+  color: #ffffff;
+  box-shadow: 0 0 22px #0071e366;
+}
+
+@keyframes fx-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.6);
+  }
+  20% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(calc(var(--fx-vw, 1vw) * 2), calc(var(--fx-vh, 1vh) * -45), 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(var(--fx-vw, 1vw) * -2), calc(var(--fx-vh, 1vh) * -95), 0) scale(1.1);
+  }
+}

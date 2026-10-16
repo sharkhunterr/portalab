@@ -1,0 +1,24 @@
+/* Portalab — notification_style/tag: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="tag"] .ds-notification {
+  border: 0;
+  border-radius: 0 var(--radius-md, 0.6rem) var(--radius-md, 0.6rem) 0;
+  background: color-mix(in srgb, var(--tone) 14%, var(--color-surface-raised));
+  clip-path: polygon(1.6rem 0, 100% 0, 100% 100%, 1.6rem 100%, 0 50%);
+  padding-inline-start: 2.4rem;
+}
+
+.ds-notifications[data-style="tag"] .ds-notification::before {
+  inset-block: calc(50% - 0.32rem) auto;
+  inset-inline-start: 1.05rem;
+  inline-size: 0.64rem;
+  block-size: 0.64rem;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 2px var(--tone);
+}
+
+/* right to left: the pointed end on the other side */
+.ds-notifications[data-style="tag"]:dir(rtl) .ds-notification {
+  clip-path: polygon(0 0, calc(100% - 1.6rem) 0, 100% 50%, calc(100% - 1.6rem) 100%, 0 100%);
+}

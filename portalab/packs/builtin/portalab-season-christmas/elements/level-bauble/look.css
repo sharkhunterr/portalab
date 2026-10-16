@@ -1,0 +1,13 @@
+/* Portalab — level_badge/bauble: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="bauble"] {
+  background:
+    radial-gradient(circle at 32% 28%, #ffffffcc 0 10%, transparent 26%),
+    radial-gradient(circle, #e0263e, #8f0f1f);
+  color: #fff7ed;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  box-shadow:
+    0 -3px 0 -1px #e8b22c,
+    0 0 10px #e0263e88;
+}

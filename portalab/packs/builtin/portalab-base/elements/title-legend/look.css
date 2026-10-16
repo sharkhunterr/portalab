@@ -1,0 +1,16 @@
+/* Portalab — title/gold: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-title[data-style="gold"] {
+  border-color: #f59e0b;
+  color: #451a03;
+  background: linear-gradient(135deg, #fde68a, #f59e0b 50%, #fef3c7);
+  box-shadow: 0 0 10px #f59e0b88;
+}
+
+.cosmetic-title[data-style="gold"] {
+  background: linear-gradient(90deg, #b45309, #fde68a, #b45309);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  box-shadow: none;
+}

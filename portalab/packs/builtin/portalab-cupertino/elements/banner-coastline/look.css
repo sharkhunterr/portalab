@@ -1,0 +1,11 @@
+/* Portalab — profile_banner/coastline: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="coastline"] {
+  background:
+    radial-gradient(circle 1.6rem at 68% 62%, #fff1d6, #ffb88a 70%, transparent 74%),
+    linear-gradient(0deg, #2b2f5c 0 26%, transparent 26%),
+    repeating-linear-gradient(0deg, #ffffff14 0 1px, transparent 1px 6px) 0 100% / 100% 26% no-repeat,
+    linear-gradient(170deg, transparent 0 48%, #241b3a 48%) 0 0 / 38% 100% no-repeat,
+    linear-gradient(195deg, transparent 0 58%, #2f2347 58%) 100% 0 / 30% 100% no-repeat,
+    linear-gradient(180deg, #3b2f7a, #9c4f9e 40%, #f08a8a 68%, #ffc58f);
+}

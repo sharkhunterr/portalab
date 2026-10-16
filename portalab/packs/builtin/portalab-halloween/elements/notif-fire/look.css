@@ -1,0 +1,30 @@
+/* Portalab — notification_animation/fire: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="fire"] .ds-notification {
+  animation-name: universe-notify-fire;
+  animation-duration: 0.9s;
+  animation-timing-function: ease-out;
+}
+
+@keyframes universe-notify-fire {
+  0% {
+    opacity: 0;
+    transform: translateY(0.6rem) scale(0.9);
+    filter: brightness(2.2) saturate(2) hue-rotate(-20deg) blur(2px);
+    box-shadow: 0 0 2.5rem #ff6a00;
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.02);
+    filter: brightness(1.5) saturate(1.6) hue-rotate(-10deg);
+    box-shadow: 0 0 1.6rem #ff8c1a;
+  }
+  70% {
+    filter: brightness(1.15);
+    box-shadow: 0 0 0.8rem #ffb347aa;
+  }
+  100% {
+    transform: none;
+    filter: none;
+  }
+}

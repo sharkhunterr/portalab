@@ -1,0 +1,67 @@
+/* Portalab — ambient/cobwebs: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="cobwebs"] > span {
+  top: -60vh;
+  inline-size: 1px;
+  block-size: 60vh;
+  background: linear-gradient(180deg, transparent, #d6d3e2aa);
+  animation: ambient-spider calc(var(--duration) * 0.8) ease-in-out var(--delay) infinite alternate;
+}
+
+[data-ambient="cobwebs"] > span::after {
+  content: "";
+  position: absolute;
+  inset: auto auto -0.55rem 50%;
+  inline-size: calc(1.4rem + 1rem * var(--size));
+  aspect-ratio: 1.25;
+  translate: -50% 0;
+  background:
+    radial-gradient(circle at 42% 36%, #ff3b3b 0 4%, transparent 5%),
+    radial-gradient(circle at 58% 36%, #ff3b3b 0 4%, transparent 5%),
+    radial-gradient(ellipse 22% 18% at 50% 38%, #2a2438 0 95%, transparent),
+    radial-gradient(ellipse 30% 28% at 50% 68%, #3a3150 0 95%, transparent),
+    repeating-conic-gradient(from 20deg at 50% 52%, #2a2438 0 6deg, transparent 6deg 36deg);
+  mask: radial-gradient(ellipse 50% 50% at 50% 52%, #000 70%, transparent 72%);
+  filter: drop-shadow(0 0 2px #e9e4ffaa) drop-shadow(0 0 6px #d6d3e255);
+}
+
+[data-ambient="cobwebs"] > span:nth-child(-n + 2) {
+  top: -1px;
+  inline-size: 26vmin;
+  block-size: 26vmin;
+  background:
+    repeating-radial-gradient(circle at 0 0, transparent 0 9%, #d6d3e255 9% 9.6%),
+    repeating-conic-gradient(from 0deg at 0 0, #d6d3e266 0 0.6deg, transparent 0.6deg 11deg);
+  mask: radial-gradient(circle at 0 0, #000 60%, transparent 71%);
+  opacity: 0.55;
+  animation: ambient-web-sway 9s ease-in-out infinite alternate;
+}
+
+[data-ambient="cobwebs"] > span:nth-child(-n + 2)::after {
+  content: none;
+}
+
+[data-ambient="cobwebs"] > span:nth-child(1) {
+  left: 0;
+}
+
+[data-ambient="cobwebs"] > span:nth-child(2) {
+  left: auto;
+  right: 0;
+  scale: -1 1;
+}
+
+@keyframes ambient-spider {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 calc(18vh + 46vh * var(--size));
+  }
+}
+
+@keyframes ambient-web-sway {
+  to {
+    rotate: 2deg;
+  }
+}

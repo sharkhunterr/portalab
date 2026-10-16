@@ -1,0 +1,8 @@
+/* Portalab — name_style/minimal: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="minimal"] {
+  font-family: "Inter Variable", sans-serif;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+}

@@ -1,0 +1,56 @@
+/* Portalab — ambient/ornaments: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="ornaments"] > span {
+  --ball: #d61f3a;
+  top: -1px;
+  inline-size: 1px;
+  block-size: calc(6vh + 22vh * var(--size));
+  background: linear-gradient(180deg, #ffffff22, #ffffff88);
+  transform-origin: 50% 0;
+  animation: ambient-swing calc(2.6s + var(--size) * 2.4s) ease-in-out var(--delay) infinite alternate;
+}
+
+[data-ambient="ornaments"] > span:nth-child(3n + 1) {
+  --ball: #e8b22c;
+}
+
+[data-ambient="ornaments"] > span:nth-child(3n + 2) {
+  --ball: #1f8f4e;
+}
+
+[data-ambient="ornaments"] > span::after {
+  content: "";
+  position: absolute;
+  inset: 100% auto auto 50%;
+  inline-size: calc(1.2rem + 1.4rem * var(--size));
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 30%, #ffffffdd 0 9%, #ffffff44 15%, transparent 32%),
+    radial-gradient(circle at 50% 60%, var(--ball), color-mix(in srgb, var(--ball) 55%, #000) 75%);
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--ball) 60%, transparent),
+    inset 0 -4px 8px #0006;
+}
+
+[data-ambient="ornaments"] > span::before {
+  content: "";
+  position: absolute;
+  inset: calc(100% - 0.25rem) auto auto 50%;
+  z-index: 1;
+  inline-size: 0.5rem;
+  block-size: 0.4rem;
+  translate: -50% 0;
+  border-radius: 0.1rem;
+  background: linear-gradient(90deg, #9a7b2f, #f3d98a, #9a7b2f);
+}
+
+@keyframes ambient-swing {
+  from {
+    rotate: -7deg;
+  }
+  to {
+    rotate: 7deg;
+  }
+}

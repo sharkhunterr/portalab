@@ -1,0 +1,10 @@
+/* Portalab — name_style/typewriter: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="typewriter"] {
+  font-family: "Special Elite", "Courier New", monospace;
+  font-weight: 400;
+  color: color-mix(in srgb, var(--color-text) 88%, #8a5a2a);
+  text-shadow:
+    0.5px 0 0 color-mix(in srgb, currentColor 80%, transparent),
+    0 0 1px color-mix(in srgb, currentColor 45%, transparent);
+}

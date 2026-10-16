@@ -1,0 +1,70 @@
+/* Portalab — level_up/owlpost: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="owlpost"] {
+  --glow: #f5c542;
+}
+
+.levelup[data-look="owlpost"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, #1e3a8a66, transparent 60%), #0b1026cc;
+}
+
+.levelup[data-look="owlpost"] .levelup__scene {
+  display: block;
+  inset-block-start: 14%;
+  inset-inline-start: 50%;
+  inline-size: 7rem;
+  block-size: 4.5rem;
+  background:
+    radial-gradient(circle at 42% 40%, #fde68a 0 5%, #111 6% 8%, transparent 9%),
+    radial-gradient(circle at 58% 40%, #fde68a 0 5%, #111 6% 8%, transparent 9%),
+    radial-gradient(ellipse 18% 28% at 50% 50%, #8b5e34 0 95%, transparent),
+    linear-gradient(160deg, transparent 0 30%, #6b4423 30% 50%, transparent 50%) left / 50% 100% no-repeat,
+    linear-gradient(200deg, transparent 0 30%, #6b4423 30% 50%, transparent 50%) right / 50% 100% no-repeat;
+  translate: -50% 0;
+  animation: levelup-owl 1.4s cubic-bezier(0.25, 0.8, 0.3, 1) both;
+}
+
+.levelup[data-look="owlpost"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: var(--x);
+  inline-size: 0.35rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fde68a;
+  box-shadow: 0 0 8px #f5c542;
+  animation: levelup-twinkle calc(0.6s + var(--r) * 1.2s) ease-in-out calc(var(--r) * -2s) infinite alternate;
+}
+
+.levelup[data-look="owlpost"] .levelup__card {
+  animation: levelup-unroll 0.9s ease-out 1s both;
+}
+
+@keyframes levelup-owl {
+  0% {
+    transform: translate(-70vw, -30vh) rotate(-20deg) scale(0.4);
+  }
+  70% {
+    transform: translate(0.5rem, 0.5rem) rotate(4deg) scale(1.05);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes levelup-twinkle {
+  to {
+    opacity: 0.15;
+  }
+}
+
+@keyframes levelup-unroll {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(-1rem -1rem -1rem -1rem);
+  }
+}

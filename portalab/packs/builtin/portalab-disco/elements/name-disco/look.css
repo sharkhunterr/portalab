@@ -1,0 +1,17 @@
+/* Portalab — name_style/disco: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="disco"] {
+  font-family: "Shrikhand", cursive;
+  background: linear-gradient(90deg, #ff5ec7, #ffe45e, #5ee7ff, #b18cff, #ff5ec7);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-shimmer 4s linear infinite;
+}
+
+@keyframes name-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}

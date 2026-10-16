@@ -1,0 +1,6 @@
+/* Portalab — avatar_frame/hero: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="hero"] {
+  background: conic-gradient(#dc2626 0 25%, #f8fafc 0 50%, #1d4ed8 0 75%, #f8fafc 0);
+  box-shadow: 0 0 0.8rem #1d4ed888;
+}

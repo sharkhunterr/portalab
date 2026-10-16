@@ -1,0 +1,19 @@
+/* Portalab — profile_banner/skyline: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="skyline"] {
+  background:
+    linear-gradient(to top, #0b0f2a 0 22%, transparent 22%),
+    repeating-linear-gradient(90deg, #0b0f2a 0 6%, transparent 6% 9%, #0b0f2a 9% 13%, transparent 13% 15%),
+    radial-gradient(60% 80% at 50% 0%, #ff3b3055, transparent 70%), linear-gradient(180deg, #1d4ed8, #b91c1c);
+  background-size:
+    auto,
+    100% 55%,
+    auto,
+    auto;
+  background-position:
+    0 0,
+    0 100%,
+    0 0,
+    0 0;
+  background-repeat: no-repeat, repeat-x, no-repeat, no-repeat;
+}

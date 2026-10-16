@@ -10,8 +10,10 @@
     "fr": "Un nom en lettres de pixels jaunes cernées du bleu du labyrinthe."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

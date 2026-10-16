@@ -1,0 +1,12 @@
+/* Portalab — badge/glass: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="glass"] {
+  border: 1px solid #ffffff40;
+  background: linear-gradient(135deg, #ffffff2e, #ffffff0d), linear-gradient(135deg, #8b7bff66, #22d3ee55);
+  backdrop-filter: blur(10px) saturate(1.6);
+  -webkit-backdrop-filter: blur(10px) saturate(1.6);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 #ffffff66,
+    0 6px 18px #8b7bff33;
+}

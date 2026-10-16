@@ -346,6 +346,8 @@ def selectors_of(text: str) -> list[str]:
 
 # a sibling combinator (``~``, ``+`` — not the attribute operator ``~=``), :has(), the document's root
 ESCAPES = re.compile(r"\+|~(?!=)|:has\(|:root|(?:^|[\s>(,])(?:html|body)\b")
+# the An+B formula of ``:nth-child(3n + 1)``… is not a combinator (its ``of S`` part is still checked)
+NTH = re.compile(r":nth-[a-z-]+\(\s*(?:[-+]?\d*n\s*(?:[-+]\s*\d+)?|[-+]?\d+|odd|even)\s*", re.I)
 
 
 def _first_compound(selector: str) -> str:
@@ -371,7 +373,7 @@ def look_selector_ok(selector: str, look: str) -> bool:
         + r")\]",
         _first_compound(selector),
     )
-    return bool(hook) and not ESCAPES.search(selector)
+    return bool(hook) and not ESCAPES.search(NTH.sub(":nth(", selector))
 
 
 def interface_selector_ok(selector: str, key: str) -> bool:

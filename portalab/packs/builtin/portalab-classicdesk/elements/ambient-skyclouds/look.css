@@ -1,0 +1,23 @@
+/* Portalab — ambient/skyclouds: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="skyclouds"] > span {
+  top: calc(var(--y) * 0.55);
+  left: -25%;
+  inline-size: calc(7rem + 9rem * var(--size));
+  aspect-ratio: 2.6;
+  background:
+    radial-gradient(circle at 30% 62%, #ffffff 0 22%, transparent 23%),
+    radial-gradient(circle at 48% 42%, #ffffff 0 27%, transparent 28%),
+    radial-gradient(circle at 68% 58%, #ffffff 0 22%, transparent 23%),
+    radial-gradient(ellipse 46% 26% at 50% 74%, #ffffff 0 98%, transparent);
+  filter: drop-shadow(0 0.4rem 0.5rem #5b8fd04d) blur(1px);
+  opacity: 0.8;
+  animation-name: ambient-cloud-drift;
+  animation-duration: calc(var(--duration) * 5);
+}
+
+@keyframes ambient-cloud-drift {
+  to {
+    left: 110%;
+  }
+}

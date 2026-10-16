@@ -1,0 +1,11 @@
+/* Portalab — level_badge/sunbadge: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="sunbadge"] {
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 120%, #fff3b0, #ffb347 55%, #ff6a2a);
+  color: #4a1800;
+  font-weight: 800;
+  box-shadow:
+    0 0 0.6rem #ffb34799,
+    inset 0 -2px 0 #c2410c66;
+}

@@ -1,0 +1,33 @@
+/* Portalab — effect/wandsparks: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="wandsparks"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 0.25rem;
+  block-size: 1.4rem;
+  border-radius: 999px;
+  background: linear-gradient(0deg, transparent, #ffd36b 40%, #fffbe0);
+  box-shadow: 0 0 8px #ffbf47;
+  animation-name: fx-arrow;
+}
+
+[data-effect="wandsparks"] .celebration-fx:nth-child(3n) {
+  background: linear-gradient(0deg, transparent, #e11d48 40%, #ffd1dc);
+  box-shadow: 0 0 8px #e11d48;
+}
+
+[data-effect="wandsparks"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #7f1d1d, #b45309 60%, #fde68a);
+  color: #fffbeb;
+  box-shadow: 0 0 22px #f59e0b;
+}
+
+@keyframes fx-arrow {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-7rem - var(--s) * 4rem)) scale(1);
+  }
+}

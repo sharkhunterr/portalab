@@ -10,8 +10,10 @@
     "fr": "Des notifications sous un envahisseur en pixels, encadrées comme un écran au phosphore."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

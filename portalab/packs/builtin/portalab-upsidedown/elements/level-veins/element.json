@@ -10,8 +10,10 @@
     "fr": "Des veines rouges qui pulsent sur votre niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

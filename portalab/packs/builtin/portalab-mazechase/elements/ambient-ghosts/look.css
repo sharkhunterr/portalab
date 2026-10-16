@@ -1,0 +1,54 @@
+/* Portalab — ambient/ghosts: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="ghosts"] > span {
+  --g: #ff0000;
+  left: -10%;
+  top: calc(10% + var(--i) * 14%);
+  inline-size: 2.2rem;
+  block-size: 2.4rem;
+  border-radius: 1.1rem 1.1rem 0 0;
+  background:
+    radial-gradient(circle 0.14rem at 30% 42%, #2121de 96%, transparent),
+    radial-gradient(circle 0.14rem at 68% 42%, #2121de 96%, transparent),
+    radial-gradient(ellipse 0.3rem 0.36rem at 26% 40%, #ffffff 96%, transparent),
+    radial-gradient(ellipse 0.3rem 0.36rem at 64% 40%, #ffffff 96%, transparent), var(--g);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 83% 86%, 66% 100%, 50% 86%, 33% 100%, 17% 86%, 0 100%);
+  opacity: 0.28;
+  animation: ambient-ghost calc(var(--duration) * 1.8) linear var(--delay) infinite;
+}
+
+[data-ambient="ghosts"] > span:nth-child(2) {
+  --g: #ffb8ff;
+}
+
+[data-ambient="ghosts"] > span:nth-child(3) {
+  --g: #00ffff;
+}
+
+[data-ambient="ghosts"] > span:nth-child(4) {
+  --g: #ffb852;
+}
+
+[data-ambient="ghosts"] > span:nth-child(5) {
+  --g: #2121de;
+}
+
+@keyframes ambient-ghost {
+  0% {
+    left: -10%;
+    translate: 0 0;
+  }
+  25% {
+    translate: 0 -1rem;
+  }
+  50% {
+    translate: 0 0.6rem;
+  }
+  75% {
+    translate: 0 -0.6rem;
+  }
+  100% {
+    left: 110%;
+    translate: 0 0;
+  }
+}

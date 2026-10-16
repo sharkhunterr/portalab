@@ -1,0 +1,14 @@
+/* Portalab — profile_banner/jollyship: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="jollyship"] {
+  background:
+    radial-gradient(circle 1.4rem at 82% 28%, #fdf6d8, #efe2b0 80%, transparent 84%),
+    linear-gradient(0deg, #0a2a33 0 30%, transparent 30%),
+    linear-gradient(170deg, transparent 0 54%, #120c08 54% 57%, transparent 57%) 30% 70% / 30% 30% no-repeat,
+    conic-gradient(from 200deg at 40% 40%, transparent 0 40deg, #f3ecd8cc 40deg 70deg, transparent 70deg) 30%
+    30% / 20% 50% no-repeat,
+    conic-gradient(from 210deg at 40% 40%, transparent 0 40deg, #e9e0c8cc 40deg 66deg, transparent 66deg) 40%
+    32% / 18% 46% no-repeat,
+    repeating-linear-gradient(0deg, #0e3a46 0 3px, #134e5e 3px 6px) 0 100% / 100% 30% no-repeat,
+    linear-gradient(180deg, #071526, #123a5a 60%, #2c6a7a);
+}

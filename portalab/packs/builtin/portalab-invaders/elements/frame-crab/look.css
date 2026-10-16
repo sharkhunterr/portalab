@@ -1,0 +1,79 @@
+/* Portalab — avatar_frame/crab: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="crab"] {
+  padding: 5px;
+  border-radius: 0;
+  background:
+    linear-gradient(#39ff14, #39ff14) 8px 0 / calc(100% - 16px) 100% no-repeat,
+    linear-gradient(#39ff14, #39ff14) 0 8px / 100% calc(100% - 16px) no-repeat;
+}
+
+.avatar-frame[data-frame="crab"] > :not(.avatar-frame__fx) {
+  border-radius: 0;
+}
+
+.avatar-frame[data-frame="crab"]::before {
+  --p: 3px;
+  content: "";
+  position: absolute;
+  inset-block-end: calc(100% + 3px);
+  inset-inline-start: calc(50% - 16px);
+  z-index: 2;
+  inline-size: var(--p);
+  block-size: var(--p);
+  color: #39ff14;
+  box-shadow:
+    calc(2 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(7 * var(--p)) 0 currentColor;
+  animation: invader-bob 0.8s steps(2, jump-none) infinite;
+}
+
+@keyframes invader-bob {
+  50% {
+    translate: 0.4rem 0;
+  }
+}

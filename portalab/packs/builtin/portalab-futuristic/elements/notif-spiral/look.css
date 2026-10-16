@@ -1,0 +1,13 @@
+/* Portalab — notification_animation/spiral: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="spiral"] .ds-notification {
+  animation-name: universe-notify-spiral;
+  animation-duration: 0.7s;
+}
+
+@keyframes universe-notify-spiral {
+  from {
+    opacity: 0;
+    transform: rotate(-200deg) scale(0.2);
+  }
+}

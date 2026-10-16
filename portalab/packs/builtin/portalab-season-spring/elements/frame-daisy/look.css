@@ -1,0 +1,8 @@
+/* Portalab — avatar_frame/daisy: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="daisy"] {
+  background:
+    repeating-conic-gradient(#fffdf5 0 12deg, #f4f1e6 12deg 18deg, transparent 18deg 24deg),
+    radial-gradient(circle, #facc15 0 58%, #84cc16 60%);
+  box-shadow: 0 0 0.6rem #fef08a88;
+}

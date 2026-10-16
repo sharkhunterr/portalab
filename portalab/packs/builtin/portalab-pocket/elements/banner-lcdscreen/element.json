@@ -10,8 +10,10 @@
     "fr": "Un écran vert avec des collines en pixels, un nuage et le soleil."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

@@ -1,0 +1,18 @@
+/* Portalab — avatar_frame/saturnring: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="saturnring"] {
+  overflow: visible;
+  background: radial-gradient(circle, #e8c98a 0 62%, transparent 63%);
+}
+
+.avatar-frame[data-frame="saturnring"]::after {
+  content: "";
+  position: absolute;
+  inset: 30% -22%;
+  border: 0.35rem solid #e8d6a8;
+  border-block-start-color: transparent;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #b0956066;
+  transform: rotate(-18deg);
+  pointer-events: none;
+}

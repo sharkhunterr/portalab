@@ -1,0 +1,25 @@
+/* Portalab — name_style/springtime: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="springtime"] {
+  background: linear-gradient(90deg, #c4b5fd, #f9a8d4, #a7f3d0, #fde68a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+}
+
+.name-style[data-name="springtime"]::after {
+  content: "✿";
+  margin-inline-start: 0.25em;
+  color: #f9a8d4;
+  -webkit-text-fill-color: #f9a8d4;
+  display: inline-block;
+  animation: name-bloom 3s ease-in-out infinite;
+}
+
+@keyframes name-bloom {
+  50% {
+    rotate: 25deg;
+    scale: 1.15;
+  }
+}

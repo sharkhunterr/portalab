@@ -10,8 +10,10 @@
     "fr": "Une cassette en pause : lignes de balayage, couleurs décalées et PLAY dans le coin."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 400,

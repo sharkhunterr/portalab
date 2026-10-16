@@ -1,0 +1,5 @@
+/* Portalab — avatar_frame/tinsel: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="tinsel"][data-fx-failed] {
+  background: repeating-conic-gradient(#e8b22c 0 10deg, #1f8f4e 10deg 20deg);
+}

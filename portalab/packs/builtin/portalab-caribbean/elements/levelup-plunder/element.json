@@ -10,8 +10,10 @@
     "fr": "Un coffre au trésor qui s'ouvre, des doublons qui volent : YO HO HO !"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1100,

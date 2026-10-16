@@ -1,0 +1,12 @@
+/* Portalab — level_badge/rocketbadge: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="rocketbadge"] {
+  padding-inline: 0.6rem 0.9rem;
+  border-radius: 999px 0.4rem 0.4rem 999px;
+  background: linear-gradient(90deg, #e9edf5, #c3c9d6);
+  color: #1b2333;
+  font-weight: 800;
+  box-shadow:
+    0.45rem 0 0 -0.1rem #ff5a3c,
+    0.75rem 0 0.6rem -0.2rem #ffb347;
+}

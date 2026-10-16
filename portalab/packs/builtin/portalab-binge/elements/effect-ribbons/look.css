@@ -1,0 +1,35 @@
+/* Portalab — effect/ribbons: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="ribbons"] .celebration-fx {
+  left: -30%;
+  top: calc(var(--x) * 0.9);
+  inline-size: 60%;
+  block-size: calc(0.5rem + var(--s) * 1.4rem);
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #e50914 40%, #ff5a5f 60%, transparent);
+  filter: blur(1px) drop-shadow(0 0 8px #e50914);
+  rotate: calc(-12deg + var(--s) * 8deg);
+  animation-name: fx-ribbon;
+  animation-duration: 1.4s;
+  animation-timing-function: cubic-bezier(0.5, 0, 0.3, 1);
+}
+
+[data-effect="ribbons"] .ds-celebration__badge {
+  background: #e50914;
+  color: #ffffff;
+  box-shadow: 0 0 26px #e50914;
+}
+
+@keyframes fx-ribbon {
+  0% {
+    opacity: 0;
+    transform: translateX(0) scaleX(0.3);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(calc(var(--fx-vw, 1vw) * 190)) scaleX(1.2);
+  }
+}

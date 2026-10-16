@@ -1,0 +1,14 @@
+/* Portalab — level_badge/pixel: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="pixel"] {
+  border-radius: 0;
+  background: #2b2d42;
+  color: #ffd166;
+  font-family: "Press Start 2P", ui-monospace, monospace;
+  font-size: 0.6rem;
+  box-shadow:
+    0 -3px 0 #ffd166,
+    0 3px 0 #ffd166,
+    -3px 0 0 #ffd166,
+    3px 0 0 #ffd166;
+}

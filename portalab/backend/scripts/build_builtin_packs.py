@@ -1,8 +1,10 @@
 """Writes Portalab's own catalog as visual packs (spec 028, US2, slice B1): ``packs/builtin/<pack>/``.
 
 Every look Portalab offers becomes an element of one built-in pack — its key, product, texts, economy and
-contents kept exactly — still drawn by the portal's own code (``render.renderer = "builtin"``) until its
-files move into the pack (slice B2). Packs:
+contents kept exactly — drawn by its own files once they moved into the pack (slice B2:
+``frontend/scripts/extract-builtin-packs.mjs`` writes ``look.css`` in the element's folder; kept here when the
+packs are written again, the element drawn by it), else still by the portal's own code
+(``render.renderer = "builtin"``). Packs:
 
 - ``portalab-socle``: always on — the default interfaces, the looks no product sells (free for everyone) and
   the navigations the interface draws itself;
@@ -228,8 +230,12 @@ def build(out: Path) -> dict[str, int]:
         )
     packs["portalab-socle"]["free"] = free
 
-    # written: one folder per pack, one per element
+    # written: one folder per pack, one per element — the files a look brought (B2) kept, by folder
+    kept: dict[str, dict[str, bytes]] = {}
     if out.exists():
+        for file in out.glob("*/elements/*/*"):
+            if file.is_file() and file.name != "element.json":
+                kept.setdefault(str(file.parent.relative_to(out)), {})[file.name] = file.read_bytes()
         shutil.rmtree(out)
     seen: set[tuple[str, str]] = set()
     counts: dict[str, int] = {}
@@ -247,6 +253,7 @@ def build(out: Path) -> dict[str, int]:
                 seen.add((product["type"], str(look)))
             elements.append(element_of(product, look_free=first))
         names: set[str] = set()
+        contents = hashlib.sha256()
         for element in elements:
             base = (
                 (element.get("product") or f"{element['type']}-{element['look']}").replace("_", "-").lower()
@@ -257,10 +264,17 @@ def build(out: Path) -> dict[str, int]:
             names.add(name)
             target = folder / "elements" / name
             target.mkdir()
+            files = kept.get(str(target.relative_to(out)), {})
+            for file_name, content in sorted(files.items()):
+                (target / file_name).write_bytes(content)
+                contents.update(file_name.encode() + content)
+            if "look.css" in files:
+                element["render"] = {"kind": "css", "css": ["look.css"]}
             (target / "element.json").write_text(json.dumps(element, ensure_ascii=False, indent=2) + "\n")
         # its version: the release's, and the content's fingerprint — a release changing a pack changes it
         digest = hashlib.sha256(
             json.dumps([data["names"], data["descriptions"], elements], sort_keys=True).encode()
+            + contents.digest()
         ).hexdigest()[:10]
         manifest = {
             "format": 1,

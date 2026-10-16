@@ -1,0 +1,96 @@
+/* Portalab — notification_style/nostromo: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="nostromo"] .ds-notification {
+  --bracket: #e8c234;
+  padding-block-start: 2.1rem;
+  border: 1px solid #3de88a55;
+  border-radius: 0;
+  background:
+    linear-gradient(var(--bracket), var(--bracket)) top left / 0.8rem 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) top left / 1px 0.8rem no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom right / 0.8rem 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom right / 1px 0.8rem no-repeat,
+    repeating-linear-gradient(180deg, #3de88a0a 0 1px, transparent 1px 3px),
+    #05080cf2;
+  color: #c9f7dd;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  box-shadow:
+    0 0 1.4rem -0.4rem #3de88a55,
+    0 0.8rem 1.6rem -0.8rem #000000;
+}
+
+.ds-notifications[data-style="nostromo"] .ds-notification::before {
+  content: "INCOMING TRANSMISSION // MU-TH-UR 6000";
+  position: absolute;
+  inset: 0 0 auto;
+  display: block;
+  inline-size: auto;
+  padding: 0.3rem 0.8rem;
+  border-block-end: 1px solid #e8c23455;
+  background: repeating-linear-gradient(-45deg, #e8c2341f 0 6px, transparent 6px 12px), #0b1219;
+  color: #e8c234;
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.ds-notifications[data-style="nostromo"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.55rem;
+  inset-inline-end: 0.7rem;
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  background: #3de88a;
+  box-shadow: 0 0 0.5rem #3de88a;
+  animation: nostromo-lamp 1.6s steps(2, jump-none) infinite;
+}
+
+.ds-notifications[data-style="nostromo"] .ds-notification__title {
+  color: #e8c234;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-shadow: 0 0 0.6rem #e8c23455;
+}
+
+.ds-notifications[data-style="nostromo"] .ds-notification__body {
+  color: #a9e9c5;
+  text-shadow: 0 0 0.4rem #3de88a40;
+}
+
+.ds-notifications[data-style="nostromo"] .ds-notification__body::after {
+  content: "";
+  display: inline-block;
+  inline-size: 0.55em;
+  block-size: 1em;
+  margin-inline-start: 0.3em;
+  vertical-align: -0.12em;
+  background: #3de88a;
+  animation: nostromo-lamp 1s steps(2, jump-none) infinite;
+}
+
+.ds-notifications[data-style="nostromo"] .ds-notification__icon {
+  border: 1px solid #3de88a88;
+  border-radius: 0;
+  background: #3de88a14;
+  color: #3de88a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.ds-notifications[data-style="nostromo"] .ds-notification::after {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+.ds-notifications[data-style="nostromo"] .ds-notification__body::after {
+    animation: none;
+  }
+}
+
+@keyframes nostromo-lamp {
+  50% {
+    opacity: 0.15;
+  }
+}

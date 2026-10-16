@@ -1,0 +1,5 @@
+/* Portalab — avatar_frame/sunburst: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="sunburst"][data-fx-failed] {
+  background: repeating-conic-gradient(#ffb347 0 12deg, #ffe08a 12deg 24deg);
+}

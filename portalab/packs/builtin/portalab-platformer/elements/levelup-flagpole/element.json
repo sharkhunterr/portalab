@@ -10,8 +10,10 @@
     "fr": "Le drapeau glisse le long du mât, un feu d'artifice au-dessus du château : COURSE CLEAR !"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1100,

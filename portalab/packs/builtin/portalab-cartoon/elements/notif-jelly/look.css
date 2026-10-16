@@ -1,0 +1,29 @@
+/* Portalab — notification_animation/jelly: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="jelly"] .ds-notification {
+  animation-name: universe-notify-jelly;
+  animation-duration: 0.8s;
+}
+
+@keyframes universe-notify-jelly {
+  0% {
+    opacity: 0;
+    transform: scale(0.4, 0.4);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.18, 0.82);
+  }
+  45% {
+    transform: scale(0.88, 1.12);
+  }
+  60% {
+    transform: scale(1.06, 0.94);
+  }
+  75% {
+    transform: scale(0.98, 1.02);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}

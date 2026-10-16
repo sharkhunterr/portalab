@@ -1,0 +1,9 @@
+/* Portalab — avatar_frame/lifebuoy: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="lifebuoy"] {
+  padding: 7px;
+  background: repeating-conic-gradient(from 22.5deg, #e23d3d 0 45deg, #ffffff 45deg 90deg), #ffffff;
+  box-shadow:
+    inset 0 0 0 1px #0002,
+    0 2px 6px #0004;
+}

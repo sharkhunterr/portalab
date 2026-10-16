@@ -1,0 +1,14 @@
+/* Portalab — badge/water: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="water"] {
+  border-color: #38bdf8;
+  background: linear-gradient(180deg, #0c4a6e 0 45%, #0284c7 45% 55%, #0369a1 55%) 0 0 / 100% 220%;
+  color: #e0f2fe;
+  animation: badge-water 3s ease-in-out infinite;
+}
+
+@keyframes badge-water {
+  50% {
+    background-position: 0 100%;
+  }
+}

@@ -1,0 +1,40 @@
+/* Portalab — avatar_frame/rings: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="rings"] {
+  --ring: 86%;
+  margin: 12px;
+  background: conic-gradient(#00d8fe var(--ring), #00d8fe33 0);
+  animation: frame-rings 2.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.avatar-frame[data-frame="rings"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+}
+
+.avatar-frame[data-frame="rings"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+}
+
+.avatar-frame[data-frame="rings"]::before {
+  inset: -6px;
+  background: conic-gradient(#a3f900 calc(var(--ring) * 0.8), #a3f90033 0);
+}
+
+.avatar-frame[data-frame="rings"]::after {
+  inset: -12px;
+  background: conic-gradient(#fa114f calc(var(--ring) * 0.65), #fa114f33 0);
+}
+
+@keyframes frame-rings {
+  from {
+    --ring: 0%;
+  }
+}

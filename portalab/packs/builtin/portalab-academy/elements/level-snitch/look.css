@@ -1,0 +1,51 @@
+/* Portalab — level_badge/snitch: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="snitch"] {
+  position: relative;
+  margin-inline: 0.9rem;
+  background: radial-gradient(circle at 35% 30%, #fff7cc, #f5c542 40%, #a16207);
+  color: #3b2400;
+  border-radius: 999px;
+  box-shadow: 0 0 10px #f5c54288;
+  overflow: visible;
+}
+
+.ds-level[data-look="snitch"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 10%;
+  inline-size: 1.1rem;
+  block-size: 0.7rem;
+  background: repeating-linear-gradient(170deg, #f8fafc 0 2px, #cbd5e1 2px 3px);
+  border-radius: 100% 10% 60% 10%;
+  transform-origin: 100% 60%;
+  animation: level-wing 0.25s ease-in-out infinite alternate;
+}
+
+.ds-level[data-look="snitch"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 10%;
+  inline-size: 1.1rem;
+  block-size: 0.7rem;
+  background: repeating-linear-gradient(170deg, #f8fafc 0 2px, #cbd5e1 2px 3px);
+  border-radius: 100% 10% 60% 10%;
+  transform-origin: 100% 60%;
+  animation: level-wing 0.25s ease-in-out infinite alternate;
+}
+
+.ds-level[data-look="snitch"]::before {
+  inset-inline-end: calc(100% - 0.15rem);
+}
+
+.ds-level[data-look="snitch"]::after {
+  inset-inline-start: calc(100% - 0.15rem);
+  scale: -1 1;
+  transform-origin: 0 60%;
+}
+
+@keyframes level-wing {
+  to {
+    rotate: -18deg;
+  }
+}

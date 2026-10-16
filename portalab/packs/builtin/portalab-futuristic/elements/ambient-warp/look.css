@@ -1,0 +1,27 @@
+/* Portalab — ambient/warp: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="warp"] > span {
+  left: 50%;
+  top: 50%;
+  inline-size: calc(4rem * var(--size));
+  block-size: 2px;
+  background: linear-gradient(90deg, transparent, #bfe0ff);
+  transform-origin: 0 50%;
+  animation-name: ambient-warp;
+  animation-duration: calc(1.4s + var(--size) * 1.6s);
+  animation-timing-function: ease-in;
+}
+
+@keyframes ambient-warp {
+  from {
+    transform: rotate(calc(var(--hue) * 1deg)) translateX(2vmin) scaleX(0.2);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  to {
+    transform: rotate(calc(var(--hue) * 1deg)) translateX(75vmax) scaleX(1.4);
+    opacity: 0;
+  }
+}

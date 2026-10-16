@@ -1,0 +1,64 @@
+/* Portalab — level_up/onering: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="onering"] {
+  --glow: #f59e0b;
+}
+
+.levelup[data-look="onering"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(circle at 50% 55%, #451a0355, #000 70%);
+}
+
+.levelup[data-look="onering"] .levelup__scene {
+  display: block;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 70vmin;
+  block-size: 70vmin;
+  border-radius: 50%;
+  background: conic-gradient(from var(--level-turn, 0deg), #fde68a, #b45309, #fef3c7, #d97706, #fde68a);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3.2vmin), #000 calc(100% - 3vmin));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3.2vmin), #000 calc(100% - 3vmin));
+  filter: drop-shadow(0 0 2vmin #f97316);
+  transform: translate(-50%, -50%) perspective(60rem) rotateX(65deg);
+  animation:
+    level-elements 3s linear infinite,
+    levelup-ring-drop 1.4s cubic-bezier(0.3, 0.8, 0.3, 1) both;
+}
+
+.levelup[data-look="onering"] .levelup__fx {
+  display: block;
+  inset-block-end: 0;
+  inset-inline-start: var(--x);
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  border-radius: 50%;
+  background: #fb923c;
+  box-shadow: 0 0 8px #ea580c;
+  animation: levelup-rise calc(3s + var(--r) * 3s) ease-out calc(var(--r) * -3s) infinite;
+}
+
+@keyframes level-elements {
+  to {
+    --level-turn: 360deg;
+  }
+}
+
+@keyframes levelup-ring-drop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -120%) perspective(60rem) rotateX(0deg) scale(0.3);
+  }
+}
+
+@keyframes levelup-rise {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-80vh) scale(0.3);
+    opacity: 0;
+  }
+}

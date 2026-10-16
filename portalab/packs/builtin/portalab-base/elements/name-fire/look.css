@@ -1,0 +1,18 @@
+/* Portalab — name_style/fire: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="fire"] {
+  font-family: "Anton", sans-serif;
+  background: linear-gradient(0deg, #7c2d12, #ea580c 35%, #facc15 70%, #fef9c3);
+  background-size: 100% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 6px #f97316aa);
+  animation: name-fire 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes name-fire {
+  to {
+    background-position: 0 100%;
+  }
+}

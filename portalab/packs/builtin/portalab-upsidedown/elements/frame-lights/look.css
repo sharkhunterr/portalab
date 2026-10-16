@@ -1,0 +1,20 @@
+/* Portalab — avatar_frame/lights: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="lights"] {
+  background:
+    radial-gradient(circle at 50% 0, #ef4444 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 100% 50%, #22c55e 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 50% 100%, #facc15 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 0 50%, #3b82f6 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 15% 15%, #f97316 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 85% 15%, #ef4444 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 85% 85%, #22c55e 0.28rem, transparent 0.32rem),
+    radial-gradient(circle at 15% 85%, #facc15 0.28rem, transparent 0.32rem), #1f2937;
+  animation: banner-bulbs 1.2s steps(2, jump-none) infinite;
+}
+
+@keyframes banner-bulbs {
+  50% {
+    filter: brightness(1.35) saturate(1.3);
+  }
+}

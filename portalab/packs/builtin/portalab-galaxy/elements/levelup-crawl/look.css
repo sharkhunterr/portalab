@@ -1,0 +1,25 @@
+/* Portalab — level_up/crawl: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="crawl"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: #000;
+}
+
+.levelup[data-look="crawl"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: var(--x);
+  inline-size: 2px;
+  block-size: 2px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: calc(0.3 + var(--r) * 0.7);
+  animation: levelup-twinkle calc(1s + var(--r) * 2s) ease-in-out infinite alternate;
+}
+
+@keyframes levelup-twinkle {
+  to {
+    opacity: 0.15;
+  }
+}

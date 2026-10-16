@@ -1,0 +1,27 @@
+/* Portalab — effect/fireworks: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="fireworks"] .celebration-fx {
+  left: calc(20% + mod(var(--i), 3) * 30%);
+  top: calc(20% + mod(var(--i), 2) * 15%);
+  inline-size: 0.35rem;
+  block-size: 0.35rem;
+  border-radius: 50%;
+  background: hsl(calc(mod(var(--i), 3) * 120deg + 40deg) 100% 65%);
+  box-shadow: 0 0 10px hsl(calc(mod(var(--i), 3) * 120deg + 40deg) 100% 65%);
+  --angle: calc(360deg / 12 * var(--i));
+  animation-name: fx-firework;
+  animation-duration: 1.4s;
+  animation-delay: calc(mod(var(--i), 3) * 0.35s);
+  animation-timing-function: cubic-bezier(0.1, 0.8, 0.3, 1);
+}
+
+@keyframes fx-firework {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(1.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-9rem) scale(0.4);
+  }
+}

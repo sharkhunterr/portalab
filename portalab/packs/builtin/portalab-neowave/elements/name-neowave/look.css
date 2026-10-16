@@ -1,0 +1,10 @@
+/* Portalab — name_style/neowave: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="neowave"] {
+  font-family: "Monoton", cursive;
+  font-weight: 400;
+  color: #ff71ce;
+  text-shadow:
+    0 0 6px #ff71ce,
+    0 0 18px #01cdfe;
+}

@@ -10,8 +10,10 @@
     "fr": "Un château de sable s'élève tour par tour, un drapeau à votre nouveau niveau au sommet."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1100,

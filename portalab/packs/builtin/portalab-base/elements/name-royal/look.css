@@ -1,0 +1,17 @@
+/* Portalab — name_style/royal: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="royal"] {
+  font-family: "Cinzel Decorative", serif;
+  background: linear-gradient(90deg, #7c3aed, #fde68a, #7c3aed);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-shimmer 6s linear infinite;
+}
+
+@keyframes name-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}

@@ -10,8 +10,10 @@
     "fr": "Une explosion de BD autour de votre visage."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 350,

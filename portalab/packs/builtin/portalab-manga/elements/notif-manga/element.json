@@ -10,8 +10,10 @@
     "fr": "Trame, lignes de vitesse et un cadre à l'encre coupé en biais."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 600,

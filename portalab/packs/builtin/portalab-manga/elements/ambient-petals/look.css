@@ -1,0 +1,26 @@
+/* Portalab — ambient/petals: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="petals"] > span {
+  top: -4vh;
+  inline-size: calc(0.9rem * var(--size));
+  block-size: calc(0.6rem * var(--size));
+  border-radius: 100% 0 100% 0;
+  background: linear-gradient(135deg, #ffd1e8, #ff8fc4);
+  opacity: 0.85;
+  animation-name: ambient-tumble;
+}
+
+@keyframes ambient-tumble {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(calc(var(--drift) * 0.5), 27vh, 0) rotate(120deg);
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * -0.3), 54vh, 0) rotate(220deg);
+  }
+  to {
+    transform: translate3d(var(--drift), 108vh, 0) rotate(420deg);
+  }
+}

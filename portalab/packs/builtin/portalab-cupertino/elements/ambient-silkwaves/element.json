@@ -10,8 +10,10 @@
     "fr": "De douces vagues de lumière colorée qui glissent lentement derrière la page."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

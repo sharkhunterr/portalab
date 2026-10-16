@@ -1,0 +1,18 @@
+/* Portalab — avatar_frame/window: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="window"] {
+  padding: 16px 4px 4px;
+  border-radius: 7px 7px 2px 2px;
+  background:
+    linear-gradient(135deg, transparent 40%, #ffffff 40% 60%, transparent 60%) right 5px top 3px / 10px 10px
+    no-repeat,
+    linear-gradient(45deg, transparent 40%, #ffffff 40% 60%, transparent 60%) right 5px top 3px / 10px 10px
+    no-repeat,
+    linear-gradient(180deg, #f39a7a, #d6421f) right 3px top 1px / 14px 14px no-repeat,
+    linear-gradient(180deg, #3d8af7 0, #0a5fe8 5px, #0451d6 12px, #0831d9 16px, #0831d9);
+  box-shadow: 2px 3px 6px #00205f55;
+}
+
+.avatar-frame[data-frame="window"] > :not(.avatar-frame__fx) {
+  border-radius: 0;
+}

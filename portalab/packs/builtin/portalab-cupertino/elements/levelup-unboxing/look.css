@@ -1,0 +1,83 @@
+/* Portalab — level_up/unboxing: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="unboxing"] {
+  --glow: #0071e3;
+}
+
+.levelup[data-look="unboxing"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(circle at 50% 70%, #ffffff, #e8e8edf2 60%, #d2d2d7f2);
+}
+
+.levelup[data-look="unboxing"] .levelup__scene {
+  display: block;
+  inset-block-end: 8%;
+  inset-inline-start: 50%;
+  inline-size: min(16rem, 60vw);
+  block-size: 6rem;
+  border-radius: 0.6rem;
+  background: linear-gradient(180deg, #ffffff, #ececf0);
+  box-shadow:
+    0 1.4rem 2.4rem #0000002e,
+    inset 0 -1px 0 #d2d2d7;
+  translate: -50% 0;
+}
+
+.levelup[data-look="unboxing"] .levelup__scene::before {
+  content: "";
+  position: absolute;
+  inset: -0.6rem -0.3rem auto;
+  block-size: 2.2rem;
+  border-radius: 0.7rem;
+  background: linear-gradient(180deg, #ffffff, #f2f2f5);
+  box-shadow: 0 0.3rem 0.8rem #00000026;
+  animation: levelup-lid 1s cubic-bezier(0.5, 0, 0.3, 1) 0.4s both;
+}
+
+.levelup[data-look="unboxing"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: var(--x);
+  inline-size: 0.5rem;
+  aspect-ratio: 1;
+  background: #ffffff;
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  filter: drop-shadow(0 0 4px #0071e3);
+  animation: levelup-twinkle calc(0.8s + var(--r) * 1.2s) ease-in-out calc(var(--r) * -2s) infinite alternate;
+}
+
+.levelup[data-look="unboxing"] .levelup__card {
+  border-color: #ffffffcc;
+  border-radius: 1.4rem;
+  --color-text: #1d1d1f;
+  --color-text-muted: #515154;
+  --color-border: #d2d2d7;
+  --color-surface-raised: #ffffff;
+  background: #ffffffd9;
+  color: #1d1d1f;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 2rem 4rem #0000002e;
+  animation: levelup-rise-out 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.8s both;
+}
+
+@keyframes levelup-lid {
+  to {
+    opacity: 0;
+    transform: translateY(-40vh) rotate(-8deg);
+  }
+}
+
+@keyframes levelup-twinkle {
+  to {
+    opacity: 0.15;
+  }
+}
+
+@keyframes levelup-rise-out {
+  from {
+    opacity: 0;
+    transform: translateY(35vh) scale(0.55);
+  }
+}

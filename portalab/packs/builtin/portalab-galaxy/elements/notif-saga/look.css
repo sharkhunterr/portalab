@@ -1,0 +1,46 @@
+/* Portalab — notification_style/saga: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="saga"] .ds-notification {
+  border: 1px solid #ffe81f55;
+  border-radius: 0.3rem;
+  background:
+    radial-gradient(1px 1px at 12% 30%, #ffffffcc 50%, transparent 51%),
+    radial-gradient(1px 1px at 38% 78%, #ffffff99 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 66% 22%, #ffffffdd 50%, transparent 51%),
+    radial-gradient(1px 1px at 84% 64%, #ffffffaa 50%, transparent 51%),
+    radial-gradient(1px 1px at 92% 18%, #ffffff88 50%, transparent 51%), #000000;
+  color: #ffe81f;
+  box-shadow: 0 0 1.4rem #ffe81f22;
+}
+
+.ds-notifications[data-style="saga"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="saga"] .ds-notification__title {
+  display: inline-block;
+  font-family: "Anton", "Bebas Neue", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: perspective(14rem) rotateX(18deg);
+  transform-origin: bottom;
+}
+
+.ds-notifications[data-style="saga"] .ds-notification__body {
+  color: #f5e9a8;
+  text-align: justify;
+}
+
+.ds-notifications[data-style="saga"] .ds-notification__icon {
+  background: #ffe81f;
+  color: #000000;
+}
+
+.ds-notifications[data-style="saga"] :is(.ds-notification__link, .ds-notification__close) {
+  color: #ffe81f;
+}
+
+.ds-notifications[data-style="saga"] .ds-notification__timer {
+  background: #ffe81f;
+}

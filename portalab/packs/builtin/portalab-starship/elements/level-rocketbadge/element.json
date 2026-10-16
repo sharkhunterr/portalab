@@ -10,8 +10,10 @@
     "fr": "Votre niveau sur la coque d'une fusée, moteur allumé."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 600,

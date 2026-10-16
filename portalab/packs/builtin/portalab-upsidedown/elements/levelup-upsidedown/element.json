@@ -10,8 +10,10 @@
     "fr": "Le monde se retourne, les spores remontent, des éclairs rouges."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 450,

@@ -1,0 +1,17 @@
+/* Portalab — avatar_frame/runes: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="runes"] {
+  background: repeating-conic-gradient(#fbbf24 0 8deg, #78350f 8deg 14deg);
+  box-shadow: 0 0 1rem #fbbf2466;
+  animation: cosmetics-spin 18s linear infinite;
+}
+
+.avatar-frame[data-frame="runes"] > * {
+  animation: cosmetics-spin 18s linear infinite reverse;
+}
+
+@keyframes cosmetics-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

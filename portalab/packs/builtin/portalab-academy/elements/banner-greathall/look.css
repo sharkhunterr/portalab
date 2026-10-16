@@ -1,0 +1,11 @@
+/* Portalab — profile_banner/greathall: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="greathall"] {
+  background:
+    radial-gradient(circle at 12% 30%, #ffd36b 0 2px, transparent 4px) 0 0 / 4.5rem 3rem,
+    radial-gradient(circle at 60% 60%, #ffffffaa 0 1px, transparent 2px) 0 0 / 2.2rem 1.8rem,
+    linear-gradient(0deg, #2a1410 0 16%, transparent 16%),
+    repeating-linear-gradient(90deg, transparent 0 10%, #1a0f0a 10% 11.5%, transparent 11.5% 20%) 0 100% /
+    100% 70% no-repeat,
+    linear-gradient(180deg, #0b1a3a, #1e2f5c 55%, #5a2a1a);
+}

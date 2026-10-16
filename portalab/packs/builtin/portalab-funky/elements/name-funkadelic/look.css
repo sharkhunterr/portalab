@@ -1,0 +1,10 @@
+/* Portalab — name_style/funkadelic: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="funkadelic"] {
+  font-family: Shrikhand, Righteous, cursive;
+  color: #ffd23f;
+  text-shadow:
+    2px 2px 0 #ff8c1a,
+    4px 4px 0 #c2410c,
+    6px 6px 0 #6b3a1c;
+}

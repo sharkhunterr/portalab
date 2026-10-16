@@ -1,0 +1,18 @@
+/* Portalab — ambient/sand: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="sand"] > span {
+  left: -5vw;
+  inline-size: calc(0.25rem * var(--size));
+  block-size: calc(0.25rem * var(--size));
+  border-radius: 50%;
+  background: #e8c27a;
+  opacity: 0.7;
+  animation-name: ambient-blow;
+  animation-duration: calc(var(--duration) * 0.5);
+}
+
+@keyframes ambient-blow {
+  to {
+    transform: translate3d(110vw, calc(var(--drift) * 0.4), 0);
+  }
+}

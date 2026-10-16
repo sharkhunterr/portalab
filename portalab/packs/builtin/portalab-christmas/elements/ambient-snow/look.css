@@ -1,0 +1,24 @@
+/* Portalab — ambient/snow: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="snow"] > span {
+  top: -2vh;
+  inline-size: calc(0.5rem * var(--size));
+  block-size: calc(0.5rem * var(--size));
+  border-radius: 50%;
+  background: #ffffff;
+  opacity: 0.75;
+  box-shadow: 0 0 6px #ffffffaa;
+  animation-name: ambient-fall;
+}
+
+@keyframes ambient-fall {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * 0.5), 52vh, 0);
+  }
+  to {
+    transform: translate3d(var(--drift), 106vh, 0);
+  }
+}

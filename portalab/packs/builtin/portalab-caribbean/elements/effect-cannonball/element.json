@@ -10,8 +10,10 @@
     "fr": "Des boulets de canon qui jaillissent de la récompense dans un nuage de fumée."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 250,

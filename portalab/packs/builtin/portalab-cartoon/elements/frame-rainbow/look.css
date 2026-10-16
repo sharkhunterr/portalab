@@ -1,0 +1,16 @@
+/* Portalab — avatar_frame/rainbow: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="rainbow"] {
+  background: conic-gradient(#ef4444, #f59e0b, #eab308, #22c55e, #3b82f6, #8b5cf6, #ef4444);
+  animation: cosmetics-spin 6s linear infinite;
+}
+
+.avatar-frame[data-frame="rainbow"] > * {
+  animation: cosmetics-spin 6s linear infinite reverse;
+}
+
+@keyframes cosmetics-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

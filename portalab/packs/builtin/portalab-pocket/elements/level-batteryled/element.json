@@ -10,8 +10,10 @@
     "fr": "Votre niveau à côté d'un petit voyant rouge qui brille comme celui de la pile."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 700,

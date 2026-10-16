@@ -1,0 +1,21 @@
+/* Portalab — profile_banner/hawkins: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="hawkins"] {
+  background:
+    radial-gradient(circle at 8% 12%, #ef4444 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 20% 15%, #22c55e 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 32% 12%, #facc15 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 44% 15%, #3b82f6 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 56% 12%, #ef4444 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 68% 15%, #f97316 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 80% 12%, #22c55e 0.25rem, transparent 0.3rem),
+    radial-gradient(circle at 92% 15%, #facc15 0.25rem, transparent 0.3rem),
+    repeating-linear-gradient(90deg, #3a2a1f 0 3.5rem, #2d1f16 3.5rem 7rem);
+  animation: banner-bulbs 1.6s steps(2, jump-none) infinite;
+}
+
+@keyframes banner-bulbs {
+  50% {
+    filter: brightness(1.35) saturate(1.3);
+  }
+}

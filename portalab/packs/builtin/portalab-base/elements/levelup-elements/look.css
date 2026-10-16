@@ -1,0 +1,44 @@
+/* Portalab — level_up/elements: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="elements"] .levelup__fx {
+  display: block;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 5rem;
+  block-size: 5rem;
+  border-radius: 50%;
+  filter: blur(6px);
+  opacity: 0.85;
+  --angle: calc(var(--i) * 90deg);
+  animation: levelup-elements 2.4s cubic-bezier(0.5, 0, 0.3, 1) both;
+}
+
+.levelup[data-look="elements"] .levelup__fx:nth-child(3) {
+  background: radial-gradient(circle, #fde047, #f97316 50%, transparent 70%);
+}
+
+.levelup[data-look="elements"] .levelup__fx:nth-child(4) {
+  background: radial-gradient(circle, #e0f2fe, #38bdf8 50%, transparent 70%);
+}
+
+.levelup[data-look="elements"] .levelup__fx:nth-child(5) {
+  background: radial-gradient(circle, #d9f99d, #65a30d 50%, transparent 70%);
+}
+
+.levelup[data-look="elements"] .levelup__fx:nth-child(6) {
+  background: radial-gradient(circle, #ffffff, #cbd5e1 50%, transparent 70%);
+}
+
+@keyframes levelup-elements {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateX(40vmin) scale(0.4);
+  }
+  70% {
+    transform: translate(-50%, -50%) rotate(calc(var(--angle) + 1.5turn)) translateX(12vmin) scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(calc(var(--angle) + 2turn)) translateX(0) scale(3);
+    opacity: 0.15;
+  }
+}

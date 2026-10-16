@@ -1,0 +1,13 @@
+/* Portalab — profile_banner/bunkers: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="bunkers"] {
+  background:
+    linear-gradient(#39ff14, #39ff14) 0 100% / 100% 4px no-repeat,
+    radial-gradient(ellipse 7% 30% at 20% 100%, #39ff14 95%, transparent),
+    radial-gradient(ellipse 7% 30% at 50% 100%, #39ff14 95%, transparent),
+    radial-gradient(ellipse 7% 30% at 80% 100%, #39ff14 95%, transparent),
+    radial-gradient(circle 3px, #39ff14cc 96%, transparent) 0 8% / 2.4rem 1.4rem repeat-x,
+    radial-gradient(circle 3px, #ff4d6dcc 96%, transparent) 1.2rem 24% / 2.4rem 1.4rem repeat-x,
+    radial-gradient(circle 1px, #ffffff99 96%, transparent) 0 0 / 3rem 2.2rem,
+    #050805;
+}

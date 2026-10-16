@@ -1,0 +1,24 @@
+/* Portalab — ambient/code-rain: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="code-rain"] > span {
+  top: -60vh;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  font-size: calc(0.75rem + 0.4rem * var(--size));
+  line-height: 1;
+  letter-spacing: 0.15em;
+  color: #22ff66;
+  opacity: 0.32;
+  text-shadow: 0 0 6px #00ff55;
+  mask-image: linear-gradient(to bottom, transparent, #000 70%, #fff);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 70%);
+  animation-name: ambient-code;
+  animation-duration: calc(var(--duration) * 0.6);
+}
+
+@keyframes ambient-code {
+  to {
+    transform: translateY(170vh);
+  }
+}

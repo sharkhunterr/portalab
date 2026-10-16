@@ -1,0 +1,52 @@
+/* Portalab — notification_style/blockrow: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="blockrow"] .ds-notification {
+  --color-text: #f5f5ff;
+  --color-text-muted: #c8c8ec;
+  padding-block: 1.25rem;
+  border: 0;
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(90deg, #ffffff55 0 2px, transparent 2px 0.8rem) top / 100% 0.8rem no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      #00e5ff 0 0.8rem,
+      #ffd23f 0.8rem 1.6rem,
+      #c77dff 1.6rem 2.4rem,
+      #3ddc84 2.4rem 3.2rem,
+      #ff5c5c 3.2rem 4rem
+    )
+    top / 100% 0.8rem no-repeat,
+    repeating-linear-gradient(90deg, #00000055 0 2px, transparent 2px 0.8rem) bottom / 100% 0.8rem no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      #ff9f40 0 0.8rem,
+      #5c8cff 0.8rem 1.6rem,
+      #00e5ff 1.6rem 2.4rem,
+      #ffd23f 2.4rem 3.2rem,
+      #c77dff 3.2rem 4rem
+    )
+    bottom / 100% 0.8rem no-repeat,
+    #16163f;
+  color: #f5f5ff;
+  box-shadow: 0 0.6rem 1.4rem #00000088;
+}
+
+.ds-notifications[data-style="blockrow"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="blockrow"] .ds-notification__icon {
+  border-radius: 0;
+  background: #c77dff;
+  color: #0b0b2a;
+  box-shadow:
+    inset 3px 3px 0 #ffffff66,
+    inset -3px -3px 0 #00000055;
+}
+
+.ds-notifications[data-style="blockrow"] .ds-notification__title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.66rem;
+  line-height: 1.6;
+}

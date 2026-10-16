@@ -1,0 +1,22 @@
+/* Portalab — level_badge/aquagel: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="aquagel"] {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+  background: radial-gradient(ellipse 120% 90% at 50% 110%, #8fd8ff, #1e88ff 55%, #0050c8);
+  color: #ffffff;
+  text-shadow: 0 1px 1px #003a8c;
+  box-shadow:
+    0 2px 5px #0050c855,
+    inset 0 -1px 2px #003a8c66;
+}
+
+.ds-level[data-look="aquagel"]::before {
+  content: "";
+  position: absolute;
+  inset: 6% 14% 52%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffffd9, #ffffff22);
+  pointer-events: none;
+}

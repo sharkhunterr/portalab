@@ -1,0 +1,25 @@
+/* Portalab — level_badge/mithril: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="mithril"] {
+  background:
+    radial-gradient(circle, transparent 0.12rem, #94a3b866 0.13rem 0.16rem, transparent 0.17rem) 0 0 / 0.4rem
+    0.4rem,
+    linear-gradient(115deg, transparent 35%, #ffffffcc 50%, transparent 65%) 0 0 / 300% 100%,
+    linear-gradient(135deg, #e2e8f0, #94a3b8);
+  color: #0f172a;
+  animation: level-gem 3.5s ease-in-out infinite;
+}
+
+@keyframes level-gem {
+  0%,
+  60% {
+    background-position:
+      120% 0,
+      0 0;
+  }
+  100% {
+    background-position:
+      -60% 0,
+      0 0;
+  }
+}

@@ -1,0 +1,23 @@
+/* Portalab — ambient/fog: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="fog"] > span {
+  inline-size: 70vw;
+  block-size: 40vh;
+  margin-inline-start: -35vw;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #c9cfe066, transparent);
+  filter: blur(18px);
+  animation-name: ambient-drift;
+  animation-duration: calc(var(--duration) * 3);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+
+@keyframes ambient-drift {
+  from {
+    transform: translate3d(-15vw, 0, 0);
+  }
+  to {
+    transform: translate3d(20vw, -4vh, 0);
+  }
+}

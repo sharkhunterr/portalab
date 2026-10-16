@@ -10,8 +10,10 @@
     "fr": "Des bougies suspendues dans les airs qui flottent, leurs flammes qui vacillent."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

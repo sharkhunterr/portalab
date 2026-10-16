@@ -1,0 +1,33 @@
+/* Portalab — name_style/lovestruck: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="lovestruck"] {
+  background: linear-gradient(90deg, #ff3d6e, #ff9ab6, #ff3d6e);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation:
+    name-shimmer 4s linear infinite,
+    name-beat 1.4s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes name-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes name-beat {
+  0%,
+  45%,
+  100% {
+    scale: 1;
+  }
+  15% {
+    scale: 1.06;
+  }
+  30% {
+    scale: 1.02;
+  }
+}

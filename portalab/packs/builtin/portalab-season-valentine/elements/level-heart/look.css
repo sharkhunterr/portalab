@@ -1,0 +1,10 @@
+/* Portalab — level_badge/heart: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="heart"] {
+  background:
+    radial-gradient(circle at 35% 30%, #ffffff99 0 10%, transparent 28%),
+    linear-gradient(135deg, #ff6b8f, #c2123d);
+  color: #fff;
+  border-radius: 50% 50% 50% 50% / 55% 55% 45% 45%;
+  box-shadow: 0 0 12px #ff3d6e88;
+}

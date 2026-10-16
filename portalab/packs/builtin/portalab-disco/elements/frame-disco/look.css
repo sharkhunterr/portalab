@@ -1,0 +1,20 @@
+/* Portalab — avatar_frame/disco: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="disco"] > * {
+  animation: cosmetics-spin 18s linear infinite reverse;
+}
+
+.avatar-frame[data-frame="disco"] {
+  background: repeating-conic-gradient(#ff5ec7 0 15deg, #ffe45e 15deg 30deg, #5ee7ff 30deg 45deg);
+  animation: cosmetics-spin 5s linear infinite;
+}
+
+.avatar-frame[data-frame="disco"] > * {
+  animation-duration: 5s;
+}
+
+@keyframes cosmetics-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

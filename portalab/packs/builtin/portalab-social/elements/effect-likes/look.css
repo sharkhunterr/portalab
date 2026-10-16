@@ -1,0 +1,39 @@
+/* Portalab — effect/likes: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="likes"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1.9rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #4da3ff, #1877f2);
+  color: #ffffff;
+  box-shadow: 0 0 0 2px #ffffff;
+  animation-name: fx-burst;
+}
+
+[data-effect="likes"] .celebration-fx svg {
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
+}
+
+[data-effect="likes"] .celebration-fx:nth-child(3n) {
+  background: linear-gradient(180deg, #ff6b81, #e41e3f);
+}
+
+[data-effect="likes"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #1877f2, #7b4bff 70%, #c13ed2);
+  color: #ffffff;
+  box-shadow: 0 0 22px #1877f2aa;
+}
+
+@keyframes fx-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-6rem - var(--s) * 4rem)) rotate(calc(-1 * var(--angle)))
+      scale(1.2) rotate(var(--r));
+  }
+}

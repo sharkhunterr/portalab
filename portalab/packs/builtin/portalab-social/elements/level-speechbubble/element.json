@@ -10,8 +10,10 @@
     "fr": "Votre niveau dans une bulle de discussion bleue avec sa petite pointe."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 700,

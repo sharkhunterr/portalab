@@ -10,8 +10,10 @@
     "fr": "Des cartes à jouer qui rebondissent sur l'écran comme une réussite gagnée."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 250,

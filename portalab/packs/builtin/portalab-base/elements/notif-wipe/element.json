@@ -10,8 +10,10 @@
     "fr": "Elles se dévoilent d'un côté à l'autre."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 250,

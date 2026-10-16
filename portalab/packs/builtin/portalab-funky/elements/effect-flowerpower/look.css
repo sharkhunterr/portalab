@@ -1,0 +1,38 @@
+/* Portalab — effect/flowerpower: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="flowerpower"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 1.6rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #ff8c1a 0 22%, transparent 24%),
+    repeating-conic-gradient(#fff1dc 0 22deg, transparent 22deg 36deg);
+  mask: radial-gradient(circle, #000 0 70%, transparent 72%);
+  animation-name: fx-burst;
+}
+
+[data-effect="flowerpower"] .celebration-fx:nth-child(3n) {
+  background:
+    radial-gradient(circle, #c2410c 0 22%, transparent 24%),
+    repeating-conic-gradient(#ffd23f 0 22deg, transparent 22deg 36deg);
+}
+
+[data-effect="flowerpower"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #ff8c1a, #ffd23f);
+  color: #2a1000;
+  font-family: Shrikhand, Righteous, cursive;
+  box-shadow: 3px 3px 0 #6b3a1c;
+}
+
+@keyframes fx-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-6rem - var(--s) * 4rem)) rotate(calc(-1 * var(--angle)))
+      scale(1.2) rotate(var(--r));
+  }
+}

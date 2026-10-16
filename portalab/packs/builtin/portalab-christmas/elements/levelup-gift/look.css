@@ -1,0 +1,70 @@
+/* Portalab — level_up/gift: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="gift"] {
+  --glow: #dc2626;
+}
+
+.levelup[data-look="gift"] .levelup__scene {
+  display: block;
+  inset-block-end: 12%;
+  inset-inline-start: 50%;
+  inline-size: 9rem;
+  block-size: 6rem;
+  background: linear-gradient(90deg, transparent 44%, #fde047 44% 56%, transparent 56%), #b91c1c;
+  border-radius: 0.3rem;
+  transform: translateX(-50%);
+  animation: levelup-box 1s ease-in 0.8s both;
+}
+
+.levelup[data-look="gift"] .levelup__fx {
+  display: block;
+  inset-block-start: -2vh;
+  inset-inline-start: var(--x);
+  inline-size: 0.4rem;
+  block-size: 0.4rem;
+  border-radius: 50%;
+  background: #fff;
+  animation: levelup-fall calc(3s + var(--r) * 3s) linear calc(var(--r) * -3s) infinite;
+}
+
+.levelup[data-look="gift"] .levelup__card {
+  border: 3px solid #15803d;
+  background:
+    linear-gradient(90deg, transparent 47%, #fde04755 47% 53%, transparent 53%),
+    color-mix(in srgb, var(--color-surface-raised) 92%, transparent);
+  animation: levelup-spring 0.8s cubic-bezier(0.2, 1.6, 0.4, 1) 0.6s both;
+}
+
+.levelup[data-look="gift"] .levelup__burst {
+  display: block;
+  inset-block-start: 8%;
+  inset-inline: 0;
+  color: #fff;
+  font-family: "Mountains of Christmas", serif;
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  text-align: center;
+  text-shadow: 0 0 12px #dc2626;
+}
+
+@keyframes levelup-box {
+  60% {
+    transform: translateX(-50%) scaleY(0.9);
+  }
+  to {
+    transform: translateX(-50%) translateY(40vh);
+    opacity: 0;
+  }
+}
+
+@keyframes levelup-fall {
+  to {
+    transform: translateY(110vh) rotate(12deg);
+  }
+}
+
+@keyframes levelup-spring {
+  from {
+    opacity: 0;
+    transform: translateY(30vh) scale(0.2);
+  }
+}

@@ -10,8 +10,10 @@
     "fr": "Des photos épinglées bord à bord, comme une photo de couverture entre amis."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

@@ -1,0 +1,16 @@
+/* Portalab — avatar_frame/visor: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="visor"] {
+  padding: 8px;
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 12% 50%, #d1d5db 0 3px, #374151 4px, transparent 5px),
+    radial-gradient(circle at 88% 50%, #d1d5db 0 3px, #374151 4px, transparent 5px),
+    linear-gradient(135deg, #9ca3af, #374151 45%, #ef4444 46% 54%, #374151 55%, #9ca3af);
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+}
+
+.avatar-frame[data-frame="visor"] > :not(.avatar-frame__fx) {
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  border-radius: 0;
+}

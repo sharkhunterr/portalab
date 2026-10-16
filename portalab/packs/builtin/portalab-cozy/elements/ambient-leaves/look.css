@@ -1,0 +1,51 @@
+/* Portalab — ambient/leaves: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="leaves"] > span {
+  top: -4vh;
+  inline-size: calc(0.9rem * var(--size));
+  block-size: calc(0.6rem * var(--size));
+  border-radius: 100% 0 100% 0;
+  background: linear-gradient(135deg, #ffd1e8, #ff8fc4);
+  opacity: 0.85;
+  animation-name: ambient-tumble;
+}
+
+[data-ambient="leaves"] > span {
+  inline-size: calc(1.1rem * var(--size));
+  block-size: calc(1.1rem * var(--size));
+  background: linear-gradient(
+    135deg,
+    hsl(calc(15 + var(--hue) / 9) 85% 55%),
+    hsl(calc(var(--hue) / 12) 80% 38%)
+  );
+  clip-path: polygon(
+    50% 0,
+    62% 30%,
+    95% 25%,
+    72% 52%,
+    88% 85%,
+    52% 70%,
+    50% 100%,
+    48% 70%,
+    12% 85%,
+    28% 52%,
+    5% 25%,
+    38% 30%
+  );
+  border-radius: 0;
+}
+
+@keyframes ambient-tumble {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(calc(var(--drift) * 0.5), 27vh, 0) rotate(120deg);
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * -0.3), 54vh, 0) rotate(220deg);
+  }
+  to {
+    transform: translate3d(var(--drift), 108vh, 0) rotate(420deg);
+  }
+}

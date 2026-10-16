@@ -1,0 +1,55 @@
+/* Portalab — ambient/seagulls: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="seagulls"] > span {
+  top: calc(var(--y) * 0.55);
+  left: -15%;
+  inline-size: calc(2rem + 2rem * var(--size));
+  aspect-ratio: 3.2;
+  background: linear-gradient(180deg, #ffffff, #d7e3ee);
+  clip-path: polygon(
+    0 18%,
+    16% 30%,
+    34% 62%,
+    46% 70%,
+    50% 84%,
+    54% 70%,
+    66% 62%,
+    84% 30%,
+    100% 18%,
+    86% 46%,
+    68% 82%,
+    54% 100%,
+    46% 100%,
+    32% 82%,
+    14% 46%
+  );
+  filter: drop-shadow(0 2px 2px #0002);
+  opacity: 0.9;
+  animation-name: ambient-glide, ambient-gull-wing;
+  animation-duration: calc(var(--duration) * 2.2), calc(1.6s + var(--size) * 1s);
+  animation-timing-function: linear, ease-in-out;
+  animation-direction: normal, alternate;
+}
+
+@keyframes ambient-glide {
+  from {
+    left: -15%;
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -4vh;
+  }
+  to {
+    left: 115%;
+    translate: 0 2vh;
+  }
+}
+
+@keyframes ambient-gull-wing {
+  from {
+    scale: 1 1;
+  }
+  to {
+    scale: 1 0.55;
+  }
+}

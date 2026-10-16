@@ -1,0 +1,11 @@
+/* Portalab — profile_banner/garden: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="garden"] {
+  background:
+    radial-gradient(circle at 12% 78%, #fef08a 0 4px, #f472b6 5px 9px, transparent 10px),
+    radial-gradient(circle at 38% 84%, #fde68a 0 4px, #c084fc 5px 9px, transparent 10px),
+    radial-gradient(circle at 64% 76%, #fef08a 0 4px, #fb7185 5px 9px, transparent 10px),
+    radial-gradient(circle at 86% 86%, #fde68a 0 4px, #60a5fa 5px 9px, transparent 10px),
+    linear-gradient(0deg, #3f8f3a 0 30%, #6cbf5a 30% 36%, transparent 36%),
+    linear-gradient(180deg, #8fd3ff, #d9f2ff 70%);
+}

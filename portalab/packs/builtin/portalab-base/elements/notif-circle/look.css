@@ -1,0 +1,76 @@
+/* Portalab — notification_style/circle: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="circle"] {
+  align-items: flex-end;
+}
+
+.ds-notifications--top-start[data-style="circle"] {
+  align-items: flex-start;
+}
+
+.ds-notifications--bottom-start[data-style="circle"] {
+  align-items: flex-start;
+}
+
+.ds-notifications[data-style="circle"] .ds-notification {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  align-content: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.ds-notifications[data-style="circle"] .ds-notification__head {
+  justify-content: center;
+}
+
+.ds-notifications[data-style="circle"]
+  :is(.ds-notification__image, .ds-notification::before) {
+  display: none;
+}
+
+.ds-notifications[data-style="circle"] .ds-notification__link {
+  justify-self: center;
+}
+
+.ds-notifications[data-style="circle"] .ds-notification__close {
+  position: absolute;
+  inset-block-start: 0.35rem;
+  inset-inline-end: 0.35rem;
+}
+
+.ds-notifications[data-style="circle"] .ds-notification {
+  inline-size: 11.5rem;
+  block-size: 11.5rem;
+  padding: var(--space-4);
+  border: 3px solid var(--tone);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--tone) 18%, transparent),
+    0 1rem 2rem -1rem color-mix(in srgb, var(--color-text) 45%, transparent);
+}
+
+.ds-notifications[data-style="circle"] .ds-notification__body {
+  -webkit-line-clamp: 2;
+  font-size: var(--font-size-xs, 0.75rem);
+}
+
+.ds-notifications[data-style="circle"] .ds-notification__title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: var(--font-size-sm);
+}
+
+.ds-notifications[data-style="circle"] .ds-notification__close {
+  inset-block-start: 0.9rem;
+  inset-inline-end: 50%;
+  transform: translateX(50%);
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+}
+
+.ds-notifications[data-style="circle"] .ds-notification__timer {
+  display: none;
+}

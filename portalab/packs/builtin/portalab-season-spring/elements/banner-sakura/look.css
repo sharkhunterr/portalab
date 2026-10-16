@@ -1,0 +1,28 @@
+/* Portalab — profile_banner/sakura: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="sakura"] {
+  background:
+    radial-gradient(6px 4px at 15% 30%, #fbcfe8, transparent),
+    radial-gradient(5px 4px at 45% 65%, #f9a8d4, transparent),
+    radial-gradient(6px 5px at 75% 25%, #fbcfe8, transparent),
+    radial-gradient(4px 3px at 88% 75%, #f9a8d4, transparent),
+    linear-gradient(180deg, #fdf2f8, #fbcfe8 60%, #f472b6);
+  background-size:
+    180px 120px,
+    220px 140px,
+    200px 130px,
+    160px 110px,
+    auto;
+  animation: cosmetics-fall 30s linear infinite;
+}
+
+@keyframes cosmetics-fall {
+  to {
+    background-position:
+      60px 240px,
+      -40px 280px,
+      30px 260px,
+      -20px 220px,
+      0 0;
+  }
+}

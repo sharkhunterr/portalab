@@ -10,8 +10,10 @@
     "fr": "Des bras robotisés au-dessus d'une chaîne de montage, des voyants qui clignotent."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

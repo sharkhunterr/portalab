@@ -1,0 +1,50 @@
+/* Portalab — effect/coinpop: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="coinpop"] .celebration-fx {
+  left: calc(50% + (var(--i) - var(--n) / 2) * 1.6rem);
+  top: 50%;
+  inline-size: 1.1rem;
+  aspect-ratio: 0.8;
+  border-radius: 50%;
+  background:
+    linear-gradient(#c47a00, #c47a00) 50% 50% / 18% 50% no-repeat,
+    radial-gradient(ellipse at 40% 35%, #fff2b3, #f8b800 55%, #c47a00);
+  box-shadow: 0 0 0 2px #7a3a00;
+  animation-name: fx-coinpop;
+  animation-timing-function: linear;
+}
+
+[data-effect="coinpop"] .ds-celebration__badge {
+  border: 2px solid #000000;
+  border-radius: 0.2rem;
+  background: #f8b800;
+  color: #5a2a00;
+  font-family: "Press Start 2P", monospace;
+  box-shadow:
+    inset 3px 3px 0 #ffe08a,
+    inset -3px -3px 0 #c47a00;
+}
+
+@keyframes fx-coinpop {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  25% {
+    scale: 0.2 1;
+  }
+  45% {
+    transform: translateY(-6rem);
+    scale: 1 1;
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  70% {
+    scale: 0.2 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-1rem);
+    scale: 1 1;
+  }
+}

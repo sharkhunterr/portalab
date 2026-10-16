@@ -1,0 +1,12 @@
+/* Portalab — level_badge/eighttrack: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="eighttrack"] {
+  padding: 0 0.6rem;
+  border: 3px solid #1a1a1a;
+  border-radius: 0.3rem 0.3rem 0.6rem 0.6rem;
+  background:
+    repeating-linear-gradient(180deg, #ff8c1a 0 2px, #ffd23f 2px 4px) 0 0 / 100% 22% no-repeat,
+    #fff1dc;
+  color: #2a160c;
+  font-weight: 800;
+}

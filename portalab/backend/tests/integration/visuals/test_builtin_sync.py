@@ -64,10 +64,12 @@ async def test_the_first_synchronisation_adopts_what_exists(database: Database, 
     for element in academy:
         product = writer.products[element["product"]]
         assert product.get("keep_existing") is True and product.get("resume") is False
-    # the looks of the live built-in packs are claimed; Portalab's own elements are drawn by its code
+    # the looks of the live built-in packs are claimed; those whose files moved into the pack (B2) reach the
+    # interface like an imported pack's, the others are still drawn by its code (never sent)
     await service.refresh(force=True)
     active = await service.active()
-    assert all(not e.get("pack", "").startswith("portalab-") for e in active["elements"])
+    own = [e for e in active["elements"] if e.get("pack", "").startswith("portalab-")]
+    assert own and all(e["kind"] == "css" and e["css"] for e in own)
     assert "portalab-alien" not in {e.get("pack") for e in active["elements"]}
     assert active["withheld"]  # the alien universe's looks: its wearers see the defaults
     assert "sidebar" in live_looks.of("navigation")  # the socle's built-in navigations

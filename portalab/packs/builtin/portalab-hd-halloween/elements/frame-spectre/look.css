@@ -1,0 +1,5 @@
+/* Portalab — avatar_frame/spectre: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="spectre"][data-fx-failed] {
+  background: conic-gradient(#0f0a1f, #2f6b66, #c8fff0, #2f6b66, #0f0a1f);
+}

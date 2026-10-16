@@ -1,0 +1,17 @@
+/* Portalab — level_badge/elements: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="elements"] {
+  position: relative;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--color-surface-raised), var(--color-surface-raised)) padding-box,
+    conic-gradient(from var(--level-turn, 0deg), #f97316, #38bdf8, #a3a35c, #e0f2fe, #f97316) border-box;
+  color: var(--color-text);
+  animation: level-elements 6s linear infinite;
+}
+
+@keyframes level-elements {
+  to {
+    --level-turn: 360deg;
+  }
+}

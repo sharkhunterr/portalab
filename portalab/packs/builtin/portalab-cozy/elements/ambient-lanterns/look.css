@@ -1,0 +1,31 @@
+/* Portalab — ambient/lanterns: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="lanterns"] > span {
+  top: auto;
+  bottom: -8vh;
+  inline-size: calc(0.9rem * var(--size) + 0.5rem);
+  block-size: calc(1.2rem * var(--size) + 0.7rem);
+  border-radius: 40% 40% 30% 30%;
+  background: radial-gradient(ellipse at 50% 70%, #fff3c4, #ffb347 55%, #e2611a);
+  box-shadow:
+    0 0 14px #ffb347aa,
+    0 0 34px #ff7a1a55;
+  animation-name: ambient-lantern;
+}
+
+@keyframes ambient-lantern {
+  from {
+    transform: translate3d(0, 0, 0) rotate(-3deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * 0.5), -55vh, 0) rotate(3deg);
+  }
+  to {
+    transform: translate3d(var(--drift), -115vh, 0) rotate(-2deg) scale(0.6);
+    opacity: 0;
+  }
+}

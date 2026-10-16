@@ -1,0 +1,9 @@
+/* Portalab — profile_banner/seaside: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="seaside"] {
+  background:
+    radial-gradient(circle 2rem at 70% 52%, #ffe08a, #ffb347 70%, transparent 74%),
+    linear-gradient(0deg, #f2d7a1 0 18%, transparent 18%),
+    repeating-linear-gradient(0deg, #1e88b6 0 3px, #2aa3cf 3px 7px) 0 100% / 100% 40% no-repeat,
+    linear-gradient(180deg, #ff9a6b, #ffcf8f 55%, #ffe6b5 60%);
+}

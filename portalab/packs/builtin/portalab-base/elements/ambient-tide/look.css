@@ -1,0 +1,41 @@
+/* Portalab — ambient/tide: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="tide"] > span {
+  top: auto;
+  bottom: calc(-12vh + var(--i) * 2.5vh);
+  left: -50vw;
+  inline-size: 200vw;
+  block-size: 30vh;
+  border-radius: 45%;
+  background: hsl(calc(190 + var(--i) * 6) 80% calc(40% + var(--i) * 3%) / 0.12);
+  animation-name: ambient-swell;
+  animation-duration: calc(9s + var(--i) * 3s);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+
+[data-ambient="tide"] > span:nth-child(n + 5) {
+  bottom: auto;
+  top: var(--y);
+  left: var(--x);
+  inline-size: calc(2rem + var(--size) * 4rem);
+  block-size: calc(0.6rem + var(--size) * 1rem);
+  background: radial-gradient(ellipse, #a5f3fc22, transparent 70%);
+  animation-name: ambient-caustic;
+}
+
+@keyframes ambient-swell {
+  from {
+    transform: translate3d(-6vw, 0, 0) rotate(-1deg);
+  }
+  to {
+    transform: translate3d(6vw, -3vh, 0) rotate(1deg);
+  }
+}
+
+@keyframes ambient-caustic {
+  50% {
+    transform: translate3d(var(--drift), -2vh, 0) scale(1.4);
+    opacity: 0.4;
+  }
+}

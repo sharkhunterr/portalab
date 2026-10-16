@@ -1,0 +1,40 @@
+/* Portalab — ambient/floatingcandles: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="floatingcandles"] > span {
+  top: calc(var(--y) * 0.7);
+  inline-size: calc(0.45rem + 0.35rem * var(--size));
+  block-size: calc(1.6rem + 1.4rem * var(--size));
+  border-radius: 0.15rem 0.15rem 0.1rem 0.1rem;
+  background: linear-gradient(90deg, #d9cfb8, #fffaf0 40%, #e9e0c9);
+  box-shadow: 0 -0.6rem 1.4rem #ffcf6b33;
+  /* behind the content, never over its words: soft, like candles far up in the hall */
+  opacity: 0.45;
+  animation: ambient-bob calc(3s + var(--size) * 3s) ease-in-out var(--delay) infinite alternate;
+}
+
+[data-ambient="floatingcandles"] > span::after {
+  content: "";
+  position: absolute;
+  inset: auto auto 100% 50%;
+  inline-size: 0.5em;
+  block-size: 0.9em;
+  translate: -50% 0;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 50% 72%, #fffbe0, #ffc14d 50%, #ff8a1f00 72%);
+  box-shadow: 0 0 14px #ffb347;
+  transform-origin: 50% 100%;
+  animation: ambient-flame 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes ambient-bob {
+  to {
+    translate: 0 -1.2rem;
+  }
+}
+
+@keyframes ambient-flame {
+  to {
+    scale: 0.82 1.18;
+    rotate: 4deg;
+  }
+}

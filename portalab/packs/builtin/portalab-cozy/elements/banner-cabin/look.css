@@ -1,0 +1,9 @@
+/* Portalab — profile_banner/cabin: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="cabin"] {
+  background:
+    repeating-linear-gradient(0deg, #8b3a3a33 0 14px, transparent 14px 42px),
+    repeating-linear-gradient(90deg, #f4e1c133 0 14px, transparent 14px 42px),
+    radial-gradient(40% 60% at 70% 60%, #ffb36655, transparent 70%),
+    linear-gradient(135deg, #5b2c1f, #8a4b2d 50%, #c07a43);
+}

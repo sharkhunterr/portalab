@@ -1,0 +1,16 @@
+/* Portalab — name_style/cartoon: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="cartoon"] {
+  font-family: "Luckiest Guy", cursive;
+  color: #ffffff;
+  -webkit-text-stroke: 1.5px #1e3a8a;
+  paint-order: stroke fill;
+  text-shadow: 0 4px 0 #f97316;
+  animation: name-bounce 2.4s ease-in-out infinite;
+}
+
+@keyframes name-bounce {
+  50% {
+    transform: translateY(-3px) rotate(-1deg);
+  }
+}

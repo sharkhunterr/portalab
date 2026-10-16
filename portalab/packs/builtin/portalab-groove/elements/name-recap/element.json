@@ -10,8 +10,10 @@
     "fr": "Un nom en grosses lettres grasses, parcouru d'un dégradé rose, orange et vert."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

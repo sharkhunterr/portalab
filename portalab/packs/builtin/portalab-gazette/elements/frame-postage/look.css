@@ -1,0 +1,25 @@
+/* Portalab — avatar_frame/postage: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="postage"] {
+  padding: 9px;
+  border-radius: 0;
+  background:
+    radial-gradient(
+      circle at 78% 22%,
+      transparent 0 22%,
+      #3a353099 23% 25%,
+      transparent 26% 30%,
+      #3a353066 31% 33%,
+      transparent 34%
+    ),
+    #fbf8f1;
+  mask:
+    radial-gradient(circle 4px at 4px 4px, transparent 98%, #000) -4px -4px / 10px 10px,
+    linear-gradient(#000, #000) 6px 6px / calc(100% - 12px) calc(100% - 12px) no-repeat;
+  filter: drop-shadow(0 2px 3px #00000055);
+}
+
+.avatar-frame[data-frame="postage"] > :not(.avatar-frame__fx) {
+  border-radius: 0;
+  box-shadow: 0 0 0 2px #a3171d;
+}

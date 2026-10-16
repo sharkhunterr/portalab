@@ -1,0 +1,62 @@
+/* Portalab — notification_style/ghostly: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="ghostly"] .ds-notification {
+  --color-text: #1a0033;
+  --color-text-muted: #3d1a52;
+  padding-block-end: 1.6rem;
+  border: 0;
+  border-radius: 2.2rem 2.2rem 0 0;
+  background:
+    radial-gradient(circle 0.22rem at calc(100% - 3.3rem) 1.05rem, #2121de 96%, transparent),
+    radial-gradient(circle 0.22rem at calc(100% - 2.1rem) 1.05rem, #2121de 96%, transparent),
+    radial-gradient(ellipse 0.45rem 0.55rem at calc(100% - 3.4rem) 1rem, #ffffff 96%, transparent),
+    radial-gradient(ellipse 0.45rem 0.55rem at calc(100% - 2.2rem) 1rem, #ffffff 96%, transparent), #ffb8ff;
+  color: #1a0033;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    91.66% calc(100% - 0.8rem),
+    83.33% 100%,
+    75% calc(100% - 0.8rem),
+    66.66% 100%,
+    58.33% calc(100% - 0.8rem),
+    50% 100%,
+    41.66% calc(100% - 0.8rem),
+    33.33% 100%,
+    25% calc(100% - 0.8rem),
+    16.66% 100%,
+    8.33% calc(100% - 0.8rem),
+    0 100%
+  );
+  box-shadow: none;
+}
+
+.ds-notifications[data-style="ghostly"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="ghostly"] .ds-notification__icon {
+  background: #ffe14d;
+  color: #1a1400;
+}
+
+.ds-notifications[data-style="ghostly"] .ds-notification__close {
+  margin-inline-end: 3.6rem;
+}
+
+.ds-notifications[data-style="ghostly"] .ds-notification__link {
+  color: #2121de;
+  font-weight: 700;
+}
+
+.ds-notifications[data-style="ghostly"] .ds-notification__badge {
+  background: #2121de;
+  color: #ffffff;
+}
+
+.ds-notifications[data-style="ghostly"] .ds-notification__timer {
+  inset-block-end: 0.9rem;
+  inset-inline: 1rem;
+  background: #2121de;
+}

@@ -1,0 +1,28 @@
+/* Portalab — effect/confetti: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="confetti"] .celebration-fx {
+  left: var(--x);
+  top: calc(var(--fx-vh, 1vh) * -5);
+  inline-size: 0.5rem;
+  block-size: 1rem;
+  border-radius: 2px;
+  background: hsl(var(--h) 90% 60%);
+  animation-name: fx-rain;
+  animation-timing-function: cubic-bezier(0.3, 0.2, 0.6, 1);
+}
+
+@keyframes fx-rain {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  100% {
+    opacity: 0.9;
+    transform: translate3d(
+        calc((var(--s) - 1.1) * calc(var(--fx-vw, 1vw) * 30)),
+        calc(var(--fx-vh, 1vh) * 110),
+        0
+      )
+      rotate(var(--r));
+  }
+}

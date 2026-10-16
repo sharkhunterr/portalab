@@ -10,8 +10,10 @@
     "fr": "Votre niveau frappé sur un doublon d'or cranté."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 700,

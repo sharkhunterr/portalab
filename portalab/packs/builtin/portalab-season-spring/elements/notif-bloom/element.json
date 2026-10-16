@@ -10,8 +10,10 @@
     "fr": "Des notifications encadrées de feuilles et de fleurs fraîches."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

@@ -1,0 +1,12 @@
+/* Portalab — name_style/marathon: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="marathon"] {
+  font-family: Anton, "Bebas Neue", Impact, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #e50914;
+  text-shadow:
+    0 2px 0 #5c0004,
+    0 0 12px #e5091455;
+}

@@ -1,0 +1,9 @@
+/* Portalab — name_style/pixel: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="pixel"] {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6em;
+  line-height: 1.6;
+  color: #a3e635;
+  text-shadow: 3px 3px 0 #14532d;
+}

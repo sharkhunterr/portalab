@@ -10,8 +10,10 @@
     "fr": "Des œufs peints qui rebondissent hors de la récompense."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 250,

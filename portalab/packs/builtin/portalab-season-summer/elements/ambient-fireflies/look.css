@@ -1,0 +1,39 @@
+/* Portalab — ambient/fireflies: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="fireflies"] > span {
+  inline-size: calc(0.35rem * var(--size));
+  block-size: calc(0.35rem * var(--size));
+  border-radius: 50%;
+  background: #f4ff7a;
+  box-shadow:
+    0 0 10px #e8ff59,
+    0 0 22px #d6ff3d88;
+  animation-name: ambient-wander, ambient-pulse;
+  animation-duration: var(--duration), 2.6s;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate, alternate;
+}
+
+@keyframes ambient-wander {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  33% {
+    transform: translate3d(calc(var(--drift) * 0.6), -6vh, 0);
+  }
+  66% {
+    transform: translate3d(calc(var(--drift) * -0.4), 4vh, 0);
+  }
+  to {
+    transform: translate3d(var(--drift), -10vh, 0);
+  }
+}
+
+@keyframes ambient-pulse {
+  from {
+    opacity: 0.15;
+  }
+  to {
+    opacity: 0.95;
+  }
+}

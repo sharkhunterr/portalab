@@ -1,0 +1,18 @@
+/* Portalab — level_badge/lights: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="lights"] {
+  padding-block-start: 0.3rem;
+  background:
+    radial-gradient(circle at 15% 0.15rem, #ef4444 0.16rem, transparent 0.2rem),
+    radial-gradient(circle at 38% 0.15rem, #22c55e 0.16rem, transparent 0.2rem),
+    radial-gradient(circle at 62% 0.15rem, #facc15 0.16rem, transparent 0.2rem),
+    radial-gradient(circle at 85% 0.15rem, #3b82f6 0.16rem, transparent 0.2rem), #3a2a1f;
+  color: #fef3c7;
+  animation: banner-bulbs 1.2s steps(2, jump-none) infinite;
+}
+
+@keyframes banner-bulbs {
+  50% {
+    filter: brightness(1.35) saturate(1.3);
+  }
+}

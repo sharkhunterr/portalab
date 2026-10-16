@@ -1,0 +1,10 @@
+/* Portalab — profile_banner/wrapping: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="wrapping"] {
+  background:
+    linear-gradient(90deg, transparent 46%, #f4d03f 46% 54%, transparent 54%),
+    linear-gradient(0deg, transparent 40%, #f4d03f 40% 52%, transparent 52%),
+    radial-gradient(circle at 25% 30%, #ffffff55 0 2px, transparent 3px) 0 0 / 2.2rem 2.2rem,
+    radial-gradient(circle at 75% 70%, #f4d03f88 0 2px, transparent 3px) 0 0 / 2.2rem 2.2rem,
+    linear-gradient(135deg, #8f0f1f, #c4162f 50%, #8f0f1f);
+}

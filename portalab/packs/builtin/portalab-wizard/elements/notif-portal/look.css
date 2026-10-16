@@ -1,0 +1,51 @@
+/* Portalab — notification_animation/portal: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="portal"] .ds-notification {
+  animation-name: universe-notify-portal-in;
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ds-notifications[data-animation="portal"] .ds-notification[data-leaving] {
+  animation: universe-notify-portal-out 0.52s ease-in forwards !important;
+}
+
+@keyframes universe-notify-portal-in {
+  0% {
+    opacity: 0;
+    clip-path: ellipse(0% 0% at 50% 50%);
+    transform: perspective(30rem) rotateY(70deg) scale(0.6);
+    box-shadow:
+      0 0 0 3px #22c55e,
+      0 0 2.5rem #22c55e;
+    filter: hue-rotate(90deg) brightness(1.6);
+  }
+  40% {
+    opacity: 1;
+    clip-path: ellipse(30% 70% at 50% 50%);
+  }
+  75% {
+    clip-path: ellipse(80% 90% at 50% 50%);
+    transform: perspective(30rem) rotateY(-8deg) scale(1.02);
+    filter: none;
+  }
+  100% {
+    clip-path: ellipse(150% 150% at 50% 50%);
+    transform: none;
+  }
+}
+
+@keyframes universe-notify-portal-out {
+  from {
+    clip-path: ellipse(150% 150% at 50% 50%);
+  }
+  to {
+    opacity: 0;
+    clip-path: ellipse(0% 0% at 50% 50%);
+    transform: perspective(30rem) rotateY(-70deg) scale(0.6);
+    box-shadow:
+      0 0 0 3px #22c55e,
+      0 0 2rem #22c55e;
+    filter: hue-rotate(90deg) brightness(1.6);
+  }
+}

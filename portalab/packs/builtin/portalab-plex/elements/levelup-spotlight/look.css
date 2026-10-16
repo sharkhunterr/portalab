@@ -1,0 +1,23 @@
+/* Portalab — level_up/spotlight: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="spotlight"] {
+  --glow: #e5a00d;
+}
+
+.levelup[data-look="spotlight"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(ellipse 40% 60% at 30% 50%, #e5a00d33, transparent 70%), #111214;
+  animation: levelup-sweep 1.4s ease-out both;
+}
+
+.levelup[data-look="spotlight"] .levelup__card {
+  border-color: #e5a00d;
+  background: #1c1d1fee;
+}
+
+@keyframes levelup-sweep {
+  to {
+    rotate: 1turn;
+  }
+}

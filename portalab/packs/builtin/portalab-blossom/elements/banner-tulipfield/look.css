@@ -1,0 +1,18 @@
+/* Portalab — profile_banner/tulipfield: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="tulipfield"] {
+  background:
+    radial-gradient(ellipse 0.6rem 0.8rem at 50% 30%, #ef4444 96%, transparent) 0 58% / 1.6rem 1.8rem repeat-x,
+    radial-gradient(ellipse 0.6rem 0.8rem at 50% 30%, #fde047 96%, transparent) 0.8rem 72% / 1.6rem 1.8rem
+    repeat-x,
+    radial-gradient(ellipse 0.6rem 0.8rem at 50% 30%, #f472b6 96%, transparent) 0 88% / 1.6rem 1.8rem repeat-x,
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 0.75rem,
+      #4a8a3a 0.75rem 0.85rem,
+      transparent 0.85rem 1.6rem
+    )
+    0 100% / 100% 50% no-repeat,
+    linear-gradient(#7cc46a, #4a8a3a) 0 100% / 100% 48% no-repeat,
+    linear-gradient(180deg, #a8d8f0, #e8f6fb);
+}

@@ -1,0 +1,46 @@
+/* Portalab — notification_style/telegram: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="telegram"] .ds-notification {
+  --color-text: #1a1a1a;
+  --color-text-muted: #3a3530;
+  border: 1px solid #b9a77f;
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, transparent 0 0.6rem, #a3171d 0.6rem 0.7rem, transparent 0.7rem) 0 0 / 100% 100%,
+    repeating-linear-gradient(0deg, transparent 0 1.3rem, #b9a77f55 1.3rem calc(1.3rem + 1px)),
+    #efe3c4;
+  color: #1a1a1a;
+  font-family: "Special Elite", "Courier New", monospace;
+  box-shadow: 0.2rem 0.3rem 0.6rem #00000040;
+}
+
+.ds-notifications[data-style="telegram"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="telegram"] .ds-notification__icon {
+  border-radius: 0;
+  background: #a3171d;
+  color: #fbf8f1;
+}
+
+.ds-notifications[data-style="telegram"] .ds-notification__title {
+  padding: 0.1rem 0.35rem;
+  background: #fbf8f1;
+  text-transform: uppercase;
+  box-shadow: 0 1px 0 #b9a77f;
+}
+
+.ds-notifications[data-style="telegram"] .ds-notification__title::after {
+  content: " — STOP";
+  color: #a3171d;
+}
+
+.ds-notifications[data-style="telegram"] .ds-notification__body {
+  font-family: "Special Elite", "Courier New", monospace;
+  text-transform: uppercase;
+}
+
+.ds-notifications[data-style="telegram"] .ds-notification__timer {
+  background: #a3171d;
+}

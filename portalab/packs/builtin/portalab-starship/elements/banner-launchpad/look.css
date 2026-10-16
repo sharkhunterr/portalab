@@ -1,0 +1,10 @@
+/* Portalab — profile_banner/launchpad: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="launchpad"] {
+  background:
+    linear-gradient(90deg, transparent 47%, #c9ced8 47% 53%, transparent 53%) 0 100% / 100% 70% no-repeat,
+    radial-gradient(ellipse 30% 18% at 50% 100%, #ffb347, #ff6a2a 50%, transparent 70%),
+    repeating-linear-gradient(90deg, transparent 0 0.6rem, #ff6a2a33 0.6rem 0.7rem) 0 100% / 100% 30%
+    no-repeat,
+    linear-gradient(180deg, #0c1a3a, #2a3e72 60%, #3a2a40);
+}

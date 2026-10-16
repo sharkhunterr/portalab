@@ -1,0 +1,37 @@
+/* Portalab — name_style/surfwave: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="surfwave"] {
+  position: relative;
+  padding-block-end: 0.3em;
+  font-family: Pacifico, Fredoka, cursive;
+  background: linear-gradient(90deg, #0b6f86, #0b9fb8, #3fd0e0, #0b6f86);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-shimmer 6s linear infinite;
+}
+
+.name-style[data-name="surfwave"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 0.28em;
+  background:
+    radial-gradient(circle at 50% 100%, transparent 0.18em, #0b9fb8 0.2em 0.28em, transparent 0.3em) 0 0 /
+    0.6em 0.56em repeat-x;
+  animation: name-wave 2s linear infinite;
+}
+
+@keyframes name-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes name-wave {
+  to {
+    background-position: 0.6em 0;
+  }
+}

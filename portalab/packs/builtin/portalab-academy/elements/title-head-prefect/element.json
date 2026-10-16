@@ -10,8 +10,10 @@
     "fr": "« Head prefect » sous votre nom."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 150,

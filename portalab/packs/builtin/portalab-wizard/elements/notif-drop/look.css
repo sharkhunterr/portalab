@@ -1,0 +1,14 @@
+/* Portalab — notification_animation/drop: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="drop"] .ds-notification {
+  animation-name: universe-notify-drop;
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes universe-notify-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-120%);
+  }
+}

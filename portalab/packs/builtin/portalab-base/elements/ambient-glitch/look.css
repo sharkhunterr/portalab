@@ -1,0 +1,37 @@
+/* Portalab — ambient/glitch: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="glitch"] > span {
+  left: 0;
+  inline-size: 100%;
+  block-size: calc(0.2rem + 1rem * var(--size));
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(calc(160 + var(--hue) / 2) 100% 60% / 0.35),
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation-name: ambient-glitch;
+  animation-duration: calc(3s + var(--size) * 5s);
+  animation-timing-function: steps(1, end);
+}
+
+@keyframes ambient-glitch {
+  0%,
+  92% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  93% {
+    opacity: 1;
+    transform: translateX(-3vw);
+  }
+  95% {
+    opacity: 0.6;
+    transform: translateX(4vw);
+  }
+  97% {
+    opacity: 0;
+  }
+}

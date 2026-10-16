@@ -1,0 +1,10 @@
+/* Portalab — name_style/gingerbread: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="gingerbread"] {
+  color: #9a5a2b;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  -webkit-text-stroke: 1px #fff7ed;
+  paint-order: stroke fill;
+  text-shadow: 0 2px 0 #5c3417;
+}

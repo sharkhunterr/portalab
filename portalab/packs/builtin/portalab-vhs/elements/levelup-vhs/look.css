@@ -1,0 +1,130 @@
+/* Portalab — level_up/vhs: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="vhs"] {
+  --glow: #ffd23f;
+}
+
+.levelup[data-look="vhs"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: repeating-linear-gradient(180deg, #ffffff0a 0 1px, transparent 1px 3px), #1b2bd6;
+  animation: levelup-vhs-on 0.7s ease-out both;
+}
+
+.levelup[data-look="vhs"] .levelup__scene {
+  display: block;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0 46%, #ffffff26 46% 52%, transparent 52%) 0 0 / 100% 300%;
+  animation: levelup-vhs-track 2.6s linear infinite;
+}
+
+.levelup[data-look="vhs"] .levelup__burst {
+  display: block;
+  inset-block-start: 5%;
+  inset-inline-start: 5%;
+  color: #fff;
+  font-family: "VT323", monospace;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  letter-spacing: 0.08em;
+  text-shadow:
+    2px 0 #ff004c99,
+    -2px 0 #00e5ff99;
+  animation: levelup-blink 1s steps(2, jump-none) infinite;
+}
+
+.levelup[data-look="vhs"] .levelup__fx {
+  display: block;
+  inset-inline: 0;
+  inset-block-start: var(--y);
+  block-size: calc(1px + var(--r) * 4px);
+  background: linear-gradient(90deg, transparent, #ffffff99 30%, #ffffffcc 50%, #ffffff66 70%, transparent);
+  opacity: 0;
+  animation: levelup-vhs-noise calc(1.2s + var(--r) * 2s) steps(4) calc(var(--r) * -3s) infinite;
+}
+
+.levelup[data-look="vhs"] .levelup__card {
+  --color-text: #ffffff;
+  --color-text-muted: #c7d2fe;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #fff;
+  font-family: "VT323", monospace;
+  font-size: 1.25rem;
+  text-shadow: 2px 2px 0 #00000055;
+}
+
+.levelup[data-look="vhs"] .levelup__card {
+  justify-items: center;
+  text-align: center;
+}
+
+.levelup[data-look="vhs"] .levelup__title {
+  border-inline-end: 0;
+  color: #fff;
+  font-family: "VT323", monospace;
+  font-size: clamp(2.4rem, 7vw, 4rem);
+  animation: levelup-type 1.2s steps(14, end) 0.8s forwards;
+}
+
+.levelup[data-look="vhs"] .levelup__won {
+  justify-content: center;
+}
+
+.levelup[data-look="vhs"] .levelup__kicker {
+  color: #ffd23f;
+}
+
+.levelup[data-look="vhs"] :is(.levelup__won li, .levelup__list li) {
+  background: #ffffff1a;
+}
+
+.levelup[data-look="vhs"] .levelup__actions .ds-button {
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 1.15rem;
+}
+
+@keyframes levelup-vhs-on {
+  0% {
+    transform: scale(0, 0.005);
+    filter: brightness(4);
+  }
+  40% {
+    transform: scale(1, 0.005);
+  }
+  100% {
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes levelup-vhs-track {
+  to {
+    background-position: 0 100%;
+  }
+}
+
+@keyframes levelup-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes levelup-vhs-noise {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-3%);
+  }
+}
+
+@keyframes levelup-type {
+  to {
+    inline-size: 14ch;
+  }
+}

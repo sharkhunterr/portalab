@@ -1,0 +1,50 @@
+/* Portalab — profile_banner/upsidedown: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="upsidedown"] {
+  background:
+    radial-gradient(1.5px 1.5px at 12% 30%, #f8fafcaa 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 35% 60%, #f8fafc88 50%, transparent 51%),
+    radial-gradient(2px 2px at 62% 25%, #f8fafcaa 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 84% 52%, #f8fafc77 50%, transparent 51%),
+    var(--veins-strip) center bottom / 100% auto no-repeat,
+    linear-gradient(to top, #050608 0 12%, transparent 12%),
+    radial-gradient(60% 90% at 70% 0%, #dc262688, transparent 70%),
+    linear-gradient(180deg, #2a0a10, #12151f 60%, #050608);
+  animation: banner-upside 7s ease-in-out infinite;
+}
+
+.profile-banner[data-banner="upsidedown"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 45%, #fecaca 46%, transparent 47.5%) no-repeat;
+  opacity: 0;
+  animation: banner-lightning 5s steps(1, end) infinite;
+}
+
+@keyframes banner-upside {
+  50% {
+    background-position:
+      0 -6px,
+      0 -10px,
+      0 -4px,
+      0 -8px,
+      center bottom,
+      0 0,
+      0 0,
+      0 0;
+  }
+}
+
+@keyframes banner-lightning {
+  0%,
+  88%,
+  92%,
+  100% {
+    opacity: 0;
+  }
+  89%,
+  91% {
+    opacity: 0.9;
+  }
+}

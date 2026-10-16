@@ -1,0 +1,113 @@
+/* Portalab — notification_style/upsidedown: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="upsidedown"] .ds-notification {
+  padding: 1.15rem 1rem 1.2rem 0.8rem;
+  border: 1px solid #ff2a3d33;
+  border-radius: 0.2rem;
+  background:
+    radial-gradient(ellipse at 50% 120%, #7f1d1d55, transparent 65%),
+    radial-gradient(ellipse at 50% 50%, #0a0a0a, #000);
+  color: #d4d4d4;
+  box-shadow:
+    0 0 1.4rem #ff2a3d22,
+    0 0.8rem 1.6rem -0.8rem #000;
+  -webkit-box-reflect: below 3px linear-gradient(transparent 70%, #ffffff1a);
+}
+
+.ds-notifications[data-style="upsidedown"] .ds-notification::before {
+  content: "";
+  position: absolute;
+  inset-block: 0.5rem auto;
+  inset-inline: 10%;
+  inline-size: auto;
+  block-size: 1.5px;
+  background: linear-gradient(90deg, transparent, #c80000aa 25%, #ff1f3d 50%, #c80000aa 75%, transparent);
+  box-shadow: 0 0 6px #ff1f3d88;
+  transform-origin: 50% 50%;
+  animation: notif-st-bar 2.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.ds-notifications[data-style="upsidedown"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block: 0.5rem auto;
+  inset-inline: 10%;
+  inline-size: auto;
+  block-size: 1.5px;
+  background: linear-gradient(90deg, transparent, #c80000aa 25%, #ff1f3d 50%, #c80000aa 75%, transparent);
+  box-shadow: 0 0 6px #ff1f3d88;
+  transform-origin: 50% 50%;
+  animation: notif-st-bar 2.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.ds-notifications[data-style="upsidedown"] .ds-notification::after {
+  inset-block: auto 0.5rem;
+  animation-delay: 0.25s;
+}
+
+.ds-notifications[data-style="upsidedown"] .ds-notification__title {
+  color: transparent;
+  font-family: "EB Garamond", serif;
+  font-size: 1.12em;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  -webkit-text-stroke: 1px #ff2a3d;
+  text-shadow:
+    0 0 8px #ff1f3dcc,
+    0 0 22px #ff1f3d55;
+  animation:
+    notif-st-close 2.6s cubic-bezier(0.15, 0.6, 0.2, 1) both,
+    notif-st-flicker 6s ease-in-out 2.6s infinite;
+}
+
+.ds-notifications[data-style="upsidedown"] .ds-notification__body {
+  color: #bdbdbd;
+  font-family: "Share Tech Mono", "Courier New", monospace;
+  font-size: 0.82rem;
+}
+
+.ds-notifications[data-style="upsidedown"] .ds-notification__icon {
+  border: 1px solid #ff2a3d;
+  background: #120204;
+  box-shadow: 0 0 10px #ff1f3d66;
+  color: #ff3b4f;
+}
+
+@keyframes notif-st-bar {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+@keyframes notif-st-close {
+  from {
+    opacity: 0;
+    letter-spacing: 0.7em;
+  }
+  25% {
+    opacity: 1;
+  }
+}
+
+@keyframes notif-st-flicker {
+  0%,
+  44%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.35;
+  }
+  46% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 0.5;
+  }
+}

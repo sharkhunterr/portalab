@@ -1,0 +1,12 @@
+/* Portalab — badge/hazard: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="hazard"] {
+  border: 1px solid #e8c234;
+  border-radius: 0;
+  background: repeating-linear-gradient(-45deg, #e8c23433 0 6px, transparent 6px 12px), #05080c;
+  color: #e8c234;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: inset 0 0 0 1px #05080c;
+}

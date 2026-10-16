@@ -1,0 +1,31 @@
+/* Portalab — name_style/bigbang: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="bigbang"] {
+  font-family: Orbitron, Audiowide, sans-serif;
+  font-weight: 800;
+  background: radial-gradient(
+    circle at 50% 50%,
+    #fff 0%,
+    #ffe066 18%,
+    #ff5fa2 45%,
+    #8a5cff 70%,
+    #2fd0ff 100%
+  );
+  background-size: 160% 160%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: cosmos-bang 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.name-style[data-name="bigbang"] {
+    animation: none;
+  }
+}
+
+@keyframes cosmos-bang {
+  50% {
+    background-size: 220% 220%;
+  }
+}

@@ -10,8 +10,10 @@
     "fr": "Une grille phosphore, un battement de cœur qui défile et la bande de danger d'une cloison."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

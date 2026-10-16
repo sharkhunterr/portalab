@@ -1,0 +1,45 @@
+/* Portalab — ambient/butterflies: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="butterflies"] > span {
+  --wing: hsl(calc(260 + var(--hue) / 3) 80% 76%);
+  inline-size: calc(1.3rem + 1.1rem * var(--size));
+  aspect-ratio: 1.15;
+  background:
+    linear-gradient(90deg, transparent 47%, #3b2a3f 47% 53%, transparent 53%),
+    radial-gradient(ellipse 30% 34% at 27% 34%, var(--wing) 0 92%, transparent),
+    radial-gradient(ellipse 30% 34% at 73% 34%, var(--wing) 0 92%, transparent),
+    radial-gradient(ellipse 22% 24% at 31% 72%, color-mix(in srgb, var(--wing) 70%, #fff) 0 92%, transparent),
+    radial-gradient(ellipse 22% 24% at 69% 72%, color-mix(in srgb, var(--wing) 70%, #fff) 0 92%, transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--wing) 50%, transparent));
+  animation-name: ambient-flutter-path, ambient-wingbeat;
+  animation-duration: calc(var(--duration) * 1.6), calc(0.22s + var(--size) * 0.18s);
+  animation-timing-function: ease-in-out, ease-in-out;
+  animation-direction: alternate, alternate;
+}
+
+@keyframes ambient-flutter-path {
+  0% {
+    translate: -12vw 0;
+  }
+  25% {
+    translate: 10vw -6vh;
+  }
+  50% {
+    translate: 26vw 4vh;
+  }
+  75% {
+    translate: 40vw -5vh;
+  }
+  100% {
+    translate: 58vw 2vh;
+  }
+}
+
+@keyframes ambient-wingbeat {
+  from {
+    scale: 1 1;
+  }
+  to {
+    scale: 0.35 1;
+  }
+}

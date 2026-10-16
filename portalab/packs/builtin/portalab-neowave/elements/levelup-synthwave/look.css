@@ -1,0 +1,51 @@
+/* Portalab — level_up/synthwave: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="synthwave"] {
+  --glow: #ff2fd1;
+}
+
+.levelup[data-look="synthwave"] .levelup__stage {
+  perspective: 14rem;
+  perspective-origin: 50% 55%;
+}
+
+.levelup[data-look="synthwave"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 100%, #fde047 0 9vmin, #fb7185 9vmin 18vmin, transparent 18vmin) 0 0 / 100%
+    55% no-repeat,
+    linear-gradient(#1e0b3a, #4c1d95 55%, #12051f 55%);
+}
+
+.levelup[data-look="synthwave"] .levelup__scene {
+  display: block;
+  inset: 55% -50% 0;
+  background:
+    linear-gradient(#ff2fd1 2px, transparent 2px) 0 0 / 100% 3rem,
+    linear-gradient(90deg, #ff2fd1 2px, transparent 2px) 0 0 / 4rem 100%;
+  transform: rotateX(60deg);
+  transform-origin: top;
+  animation: levelup-grid 1s linear infinite;
+}
+
+.levelup[data-look="synthwave"] .levelup__card {
+  border: 2px solid #ff2fd1;
+  background: #12051f;
+  box-shadow: 0 0 2rem #ff2fd188;
+  font-family: "Monoton", "Righteous", sans-serif;
+}
+
+.levelup[data-look="synthwave"] .levelup__title {
+  font-family: "Monoton", "Righteous", sans-serif;
+  color: #fde047;
+  text-shadow: 0 0 12px #ff2fd1;
+}
+
+@keyframes levelup-grid {
+  to {
+    background-position:
+      0 3rem,
+      0 0;
+  }
+}

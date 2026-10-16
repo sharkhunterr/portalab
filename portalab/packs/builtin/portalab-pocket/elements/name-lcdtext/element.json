@@ -10,8 +10,10 @@
     "fr": "Un nom en lettres de pixels, vert sombre avec la légère rémanence de l'écran."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

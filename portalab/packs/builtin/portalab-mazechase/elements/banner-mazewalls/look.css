@@ -1,0 +1,15 @@
+/* Portalab — profile_banner/mazewalls: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="mazewalls"] {
+  background:
+    radial-gradient(circle 0.5rem at 88% 50%, #ffb897 96%, transparent),
+    radial-gradient(circle 2px, #ffb897 96%, transparent) 0.6rem 50% / 1.2rem 1.2rem repeat-x,
+    radial-gradient(circle 2px, #ffb897 96%, transparent) 0.6rem 20% / 1.2rem 1.2rem repeat-x,
+    linear-gradient(#2121de, #2121de) 0 34% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 40% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 62% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 68% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 30% 0 / 3px 34% no-repeat,
+    linear-gradient(#2121de, #2121de) 70% 100% / 3px 32% no-repeat,
+    #000000;
+}

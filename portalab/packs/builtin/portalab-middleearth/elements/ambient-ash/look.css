@@ -1,0 +1,33 @@
+/* Portalab — ambient/ash: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="ash"] {
+  background: radial-gradient(ellipse at 50% 120%, #ea580c44, transparent 55%);
+}
+
+[data-ambient="ash"] > span {
+  top: -3vh;
+  inline-size: calc(0.2rem + var(--size) * 0.35rem);
+  block-size: calc(0.15rem + var(--size) * 0.25rem);
+  border-radius: 30%;
+  background: #78716c;
+  opacity: 0.7;
+  animation-name: ambient-fall;
+  animation-duration: calc(10s + var(--size) * 10s);
+}
+
+[data-ambient="ash"] > span:nth-child(6n) {
+  background: #fb923c;
+  box-shadow: 0 0 6px #ea580c;
+}
+
+@keyframes ambient-fall {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * 0.5), 52vh, 0);
+  }
+  to {
+    transform: translate3d(var(--drift), 106vh, 0);
+  }
+}

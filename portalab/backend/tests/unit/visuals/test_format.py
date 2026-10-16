@@ -186,6 +186,10 @@ async def test_an_answer_too_large_is_cut() -> None:
         ('.dialog:has([data-frame="x"])', False),
         (".purchase .price", False),
         ('[data-frame="other"]', False),
+        # an nth formula is no combinator; a sibling in its ``of S`` part still is
+        ('[data-frame="x"] > span:nth-child(3n + 1)', True),
+        ('[data-frame="x"] > span:nth-of-type(-n + 2)::after', True),
+        ('[data-frame="x"] > span:nth-child(2n of .a + .b)', False),
     ],
 )
 def test_a_look_styles_its_own_element_only(selector: str, ok: bool) -> None:

@@ -1,0 +1,38 @@
+/* Portalab — effect/lasers: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="lasers"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 0.2rem;
+  block-size: 1.2rem;
+  background: #ffffff;
+  box-shadow:
+    0 0 6px #39ff14,
+    0 0 12px #39ff14;
+  animation-name: fx-arrow;
+}
+
+[data-effect="lasers"] .celebration-fx:nth-child(3n) {
+  box-shadow:
+    0 0 6px #ff4d6d,
+    0 0 12px #ff4d6d;
+}
+
+[data-effect="lasers"] .ds-celebration__badge {
+  background: #050805;
+  color: #39ff14;
+  font-family: "Press Start 2P", monospace;
+  box-shadow:
+    0 0 0 2px #39ff14,
+    0 0 18px #39ff14;
+}
+
+@keyframes fx-arrow {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-7rem - var(--s) * 4rem)) scale(1);
+  }
+}

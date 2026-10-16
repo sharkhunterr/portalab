@@ -1,0 +1,27 @@
+/* Portalab — notification_animation/liftoff: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="liftoff"] .ds-notification {
+  animation-name: universe-notify-liftoff;
+  animation-duration: 1s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes universe-notify-liftoff {
+  0% {
+    opacity: 0;
+    transform: translateY(120%);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(100%) translateX(-2px);
+  }
+  25% {
+    transform: translateY(100%) translateX(2px);
+  }
+  35% {
+    transform: translateY(95%) translateX(-1px);
+  }
+  100% {
+    transform: none;
+  }
+}

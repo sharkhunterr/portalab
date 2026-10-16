@@ -1,0 +1,23 @@
+/* Portalab — profile_banner/night-city: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="night-city"] {
+  background:
+    linear-gradient(to top, #050505 0 15%, transparent 15%),
+    repeating-linear-gradient(90deg, #0d0d14 0 5%, transparent 5% 7%, #11111c 7% 12%, transparent 12% 13%),
+    radial-gradient(50% 70% at 70% 30%, #fcee0a55, transparent 70%),
+    radial-gradient(50% 70% at 25% 40%, #00f0ff44, transparent 70%),
+    linear-gradient(180deg, #1a0b2e, #3b0a45 50%, #ff2a6d);
+  background-size:
+    auto,
+    100% 65%,
+    auto,
+    auto,
+    auto;
+  background-position:
+    0 0,
+    0 100%,
+    0 0,
+    0 0,
+    0 0;
+  background-repeat: no-repeat, repeat-x, no-repeat, no-repeat, no-repeat;
+}

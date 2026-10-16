@@ -1,0 +1,46 @@
+/* Portalab — name_style/verified: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="verified"] {
+  font-weight: 800;
+}
+
+.name-style[data-name="verified"]::after {
+  content: "✓";
+  display: inline-grid;
+  place-items: center;
+  inline-size: 0.95em;
+  block-size: 0.95em;
+  margin-inline-start: 0.3em;
+  vertical-align: -0.08em;
+  background: #1877f2;
+  color: #ffffff;
+  font-size: 0.75em;
+  font-weight: 900;
+  line-height: 1;
+  clip-path: polygon(
+    50% 0,
+    61% 9%,
+    75% 7%,
+    80% 20%,
+    93% 25%,
+    91% 39%,
+    100% 50%,
+    91% 61%,
+    93% 75%,
+    80% 80%,
+    75% 93%,
+    61% 91%,
+    50% 100%,
+    39% 91%,
+    25% 93%,
+    20% 80%,
+    7% 75%,
+    9% 61%,
+    0 50%,
+    9% 39%,
+    7% 25%,
+    20% 20%,
+    25% 7%,
+    39% 9%
+  );
+}

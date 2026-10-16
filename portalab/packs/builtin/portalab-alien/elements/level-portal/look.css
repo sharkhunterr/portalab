@@ -1,0 +1,31 @@
+/* Portalab — level_badge/portal: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="portal"] {
+  position: relative;
+  isolation: isolate;
+  background: #052e16;
+  color: #dcfce7;
+  box-shadow: 0 0 10px #22c55eaa;
+}
+
+.ds-level[data-look="portal"]::before {
+  content: "";
+  position: absolute;
+  inset: -0.35rem;
+  z-index: -1;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from var(--level-turn, 0deg),
+    #22c55e 0 12deg,
+    #a3e635 12deg 24deg,
+    #052e16 24deg 36deg
+  );
+  filter: blur(1px);
+  animation: level-elements 1.8s linear infinite;
+}
+
+@keyframes level-elements {
+  to {
+    --level-turn: 360deg;
+  }
+}

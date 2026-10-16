@@ -1,0 +1,11 @@
+/* Portalab — name_style/galaxy: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="galaxy"] {
+  font-family: "Orbitron", sans-serif;
+  letter-spacing: 0.06em;
+  background: linear-gradient(90deg, #a5b4fc, #f0abfc, #67e8f9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 6px #818cf888);
+}

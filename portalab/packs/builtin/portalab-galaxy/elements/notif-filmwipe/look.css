@@ -1,0 +1,21 @@
+/* Portalab — notification_animation/filmwipe: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="filmwipe"] .ds-notification {
+  animation-name: universe-notify-filmwipe;
+  animation-duration: 0.7s;
+  animation-timing-function: linear;
+}
+
+@keyframes universe-notify-filmwipe {
+  from {
+    clip-path: inset(0 0 0 100%);
+    box-shadow: inset 3px 0 0 #ffffff;
+  }
+  92% {
+    clip-path: inset(0 0 0 0);
+    box-shadow: inset 3px 0 0 #ffffff;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}

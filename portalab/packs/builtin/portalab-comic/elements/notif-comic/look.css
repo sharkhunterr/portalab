@@ -1,0 +1,28 @@
+/* Portalab — notification_style/comic: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="comic"] .ds-notification {
+  border: 3px solid #111111;
+  border-radius: 0.4rem;
+  background: #fffbe6;
+  color: #111111;
+  box-shadow: 5px 5px 0 #111111;
+  transform: rotate(-0.6deg);
+}
+
+.ds-notifications[data-style="comic"] .ds-notification__title {
+  font-family: "Bangers", var(--font-display);
+  font-size: 1.15em;
+  letter-spacing: 0.04em;
+}
+
+.ds-notifications[data-style="comic"] .ds-notification__body {
+  color: #333333;
+}
+
+.ds-notifications[data-style="comic"] .ds-notification__icon {
+  border: 2px solid #111111;
+}
+
+.ds-notifications[data-style="comic"] .ds-notification::before {
+  display: none;
+}

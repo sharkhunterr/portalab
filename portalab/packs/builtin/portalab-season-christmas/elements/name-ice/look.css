@@ -1,0 +1,10 @@
+/* Portalab — name_style/ice: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="ice"] {
+  font-family: "Michroma", sans-serif;
+  background: linear-gradient(135deg, #e0f2fe, #7dd3fc 40%, #ffffff 55%, #38bdf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 5px #7dd3fc99);
+}

@@ -1,0 +1,12 @@
+/* Portalab — profile_banner/greenhill: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="greenhill"] {
+  background:
+    radial-gradient(ellipse 9% 16% at 22% 30%, #ffffff 0 96%, transparent),
+    radial-gradient(ellipse 7% 12% at 27% 26%, #ffffff 0 96%, transparent),
+    radial-gradient(ellipse 12% 14% at 70% 22%, #ffffffdd 0 96%, transparent),
+    radial-gradient(ellipse 8% 10% at 76% 18%, #ffffffdd 0 96%, transparent),
+    radial-gradient(ellipse 120% 70% at 35% 135%, #8bd16a 0 60%, #4e9a2f 66%, transparent 67%),
+    radial-gradient(ellipse 90% 50% at 95% 125%, #5fae3f 0 70%, transparent 71%),
+    linear-gradient(180deg, #1d5fd1, #4f8ee6 45%, #a9cdf3);
+}

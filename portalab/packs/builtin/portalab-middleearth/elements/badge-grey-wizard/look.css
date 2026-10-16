@@ -1,0 +1,8 @@
+/* Portalab — badge/elven: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="elven"] {
+  border-color: #bbf7d0;
+  background: linear-gradient(135deg, #14532d, #166534);
+  color: #f0fdf4;
+  box-shadow: 0 0 8px #86efac88;
+}

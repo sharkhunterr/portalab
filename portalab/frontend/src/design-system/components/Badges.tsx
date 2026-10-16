@@ -64,7 +64,7 @@ export function LevelBadge({
       className="ds-level"
       role="img"
       aria-label={label}
-      data-look={look ?? undefined}
+      data-look={shown ?? undefined}
       data-fx={fx}
       data-fx-cycle={fx === "chrono" || undefined}
       data-tier={levelTier(level)}

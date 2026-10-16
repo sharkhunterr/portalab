@@ -1,0 +1,13 @@
+/* Portalab — level_badge/crest: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="crest"] {
+  min-inline-size: 2rem;
+  block-size: 2.1rem;
+  padding-block-end: 0.25rem;
+  border-radius: 0;
+  background: linear-gradient(180deg, #1e3a8a, #172554 60%, #0f172a);
+  color: #fde68a;
+  clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%);
+  box-shadow: inset 0 0 0 2px #f59e0b;
+  font-family: "Cinzel", serif;
+}

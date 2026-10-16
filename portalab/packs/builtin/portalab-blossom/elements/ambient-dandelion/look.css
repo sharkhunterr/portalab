@@ -1,0 +1,35 @@
+/* Portalab — ambient/dandelion: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="dandelion"] > span {
+  top: auto;
+  bottom: -3rem;
+  inline-size: calc(1rem + 0.8rem * var(--size));
+  aspect-ratio: 0.55;
+  background:
+    repeating-conic-gradient(from -70deg at 50% 32%, #6f7f6a 0 3deg, transparent 3deg 14deg) 0 0 / 100% 64%
+    no-repeat,
+    linear-gradient(#6f7f6a, #6f7f6a) 50% 100% / 1.5px 46% no-repeat,
+    radial-gradient(ellipse 18% 8% at 50% 98%, #8a7a5a 96%, transparent);
+  mask:
+    radial-gradient(circle at 50% 32%, #000 0 44%, transparent 46%),
+    linear-gradient(#000, #000) 50% 100% / 3px 60% no-repeat;
+  opacity: 0.8;
+  animation: ambient-seed-float calc(var(--duration) * 1.6) ease-in-out var(--delay) infinite;
+}
+
+@keyframes ambient-seed-float {
+  0% {
+    transform: translate(0, 0) rotate(-10deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(calc(var(--drift) * 0.6), -55vh) rotate(12deg);
+  }
+  100% {
+    transform: translate(var(--drift), -115vh) rotate(-8deg);
+    opacity: 0;
+  }
+}

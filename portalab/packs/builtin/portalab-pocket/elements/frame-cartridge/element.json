@@ -10,8 +10,10 @@
     "fr": "Votre avatar sur l'étiquette d'une cartouche grise, son coin coupé."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

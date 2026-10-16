@@ -1,0 +1,30 @@
+/* Portalab — ambient/wind: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="wind"] > span {
+  left: -30vw;
+  inline-size: calc(8rem + var(--size) * 14rem);
+  block-size: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #e0f2fe55 40%, #ffffff88 70%, transparent);
+  animation-name: ambient-gust;
+  animation-duration: calc(3s + var(--size) * 4s);
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes ambient-gust {
+  from {
+    transform: translate3d(0, 0, 0) scaleX(0.4);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    transform: translate3d(110vw, calc(var(--drift) * -0.3), 0) scaleX(1) rotate(-2deg);
+    opacity: 0.8;
+  }
+  to {
+    transform: translate3d(140vw, calc(var(--drift) * -0.6), 0) scaleX(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+}

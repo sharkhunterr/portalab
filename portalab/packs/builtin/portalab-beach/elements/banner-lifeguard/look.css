@@ -1,0 +1,14 @@
+/* Portalab — profile_banner/lifeguard: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="lifeguard"] {
+  background:
+    linear-gradient(#ef4444, #ef4444) 70% 20% / 1.4rem 0.8rem no-repeat,
+    linear-gradient(#4a3a2a, #4a3a2a) 68% 18% / 2px 2.2rem no-repeat,
+    linear-gradient(#ffffff, #ffffff) 62% 40% / 4rem 1.8rem no-repeat,
+    linear-gradient(#ef4444, #ef4444) 62% 46% / 4.4rem 2.2rem no-repeat,
+    linear-gradient(#8a6a4a, #8a6a4a) 60% 100% / 3px 45% no-repeat,
+    linear-gradient(#8a6a4a, #8a6a4a) 66% 100% / 3px 45% no-repeat,
+    linear-gradient(#f3dcae, #e8c98a) 0 100% / 100% 32% no-repeat,
+    linear-gradient(180deg, #0b9fb8, #3fd0e0) 0 68% / 100% 18% no-repeat,
+    linear-gradient(180deg, #7fc8f2, #c9ecfa);
+}

@@ -10,8 +10,10 @@
     "fr": "Nuée de chauves-souris jaillissent quand vous gagnez une récompense ou un niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

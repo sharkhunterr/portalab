@@ -1,0 +1,10 @@
+/* Portalab — name_style/desert: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="desert"] {
+  font-family: "Cinzel", serif;
+  letter-spacing: 0.12em;
+  background: linear-gradient(180deg, #fde68a, #d97706 60%, #92400e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

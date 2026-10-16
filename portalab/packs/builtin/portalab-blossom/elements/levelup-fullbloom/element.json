@@ -10,8 +10,10 @@
     "fr": "Un arbre se couvre de fleurs, ses pétales tourbillonnent autour de votre nouveau niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1100,

@@ -1,0 +1,13 @@
+/* Portalab — name_style/lcdtext: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="lcdtext"] {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.8em;
+  color: #8bc34a;
+  text-shadow:
+    1px 1px 0 #0f380f,
+    -1px -1px 0 #0f380f,
+    1px -1px 0 #0f380f,
+    -1px 1px 0 #0f380f,
+    0.15em 0.15em 0 #0f380f66;
+}

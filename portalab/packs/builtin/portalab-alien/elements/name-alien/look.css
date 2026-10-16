@@ -1,0 +1,15 @@
+/* Portalab — name_style/alien: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="alien"] {
+  font-family: "Syncopate", sans-serif;
+  font-weight: 700;
+  color: #bef264;
+  text-shadow: 0 0 10px #84cc16;
+  animation: name-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes name-pulse {
+  50% {
+    text-shadow: 0 0 22px #a3e635;
+  }
+}

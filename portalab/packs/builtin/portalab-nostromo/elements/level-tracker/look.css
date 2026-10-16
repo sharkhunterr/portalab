@@ -1,0 +1,36 @@
+/* Portalab — level_badge/tracker: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="tracker"] {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid #3de88a99;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, transparent 0 4px, #3de88a26 4px 5px), #05080c;
+  color: #3de88a;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-weight: 700;
+  text-shadow: 0 0 6px #3de88a;
+  box-shadow: 0 0 0.6rem #3de88a55;
+}
+
+.ds-level[data-look="tracker"]::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  z-index: -1;
+  background: conic-gradient(from 0deg, #3de88a66, transparent 25%);
+  animation: frame-tracker 2.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.ds-level[data-look="tracker"]::before {
+    animation: none;
+  }
+}
+
+@keyframes frame-tracker {
+  to {
+    rotate: 1turn;
+  }
+}

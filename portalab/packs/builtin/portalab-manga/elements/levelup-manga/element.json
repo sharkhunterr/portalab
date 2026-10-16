@@ -10,8 +10,10 @@
     "fr": "Lignes de vitesse et un grand ドン ! sur une planche de manga."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 450,

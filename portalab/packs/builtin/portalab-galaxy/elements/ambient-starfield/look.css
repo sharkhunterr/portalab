@@ -1,0 +1,24 @@
+/* Portalab — ambient/starfield: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="starfield"] > span {
+  inline-size: calc(0.2rem * var(--size));
+  block-size: calc(0.2rem * var(--size));
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 4px #cfe3ff;
+  animation-name: ambient-twinkle;
+  animation-duration: calc(2s + var(--size) * 3s);
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+
+@keyframes ambient-twinkle {
+  from {
+    opacity: 0.15;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}

@@ -1,0 +1,29 @@
+/* Portalab — level_badge/eye: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="eye"] {
+  padding-inline-start: 0.95rem;
+  background:
+    radial-gradient(ellipse 0.1rem 0.6rem at 0.55rem 50%, #000 0 70%, transparent 80%),
+    radial-gradient(ellipse 0.6rem 0.75rem at 0.55rem 50%, #fde047, #f97316 55%, transparent 70%),
+    linear-gradient(90deg, #7f1d1d, #1c0805);
+  color: #fff7ed;
+  text-shadow: 0 0 4px #000;
+  border-radius: 50% / 70%;
+  box-shadow: 0 0 12px #f97316;
+  animation: level-eye 4s ease-in-out infinite;
+}
+
+.ds-level[data-look="eye"] .ds-icon {
+  display: none;
+}
+
+@keyframes level-eye {
+  0%,
+  90%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}

@@ -1,0 +1,9 @@
+/* Portalab — name_style/halloween: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="halloween"] {
+  font-family: "Griffy", cursive;
+  color: #fb923c;
+  text-shadow:
+    2px 2px 0 #581c87,
+    0 0 10px #f97316aa;
+}

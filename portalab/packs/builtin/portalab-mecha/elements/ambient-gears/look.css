@@ -1,0 +1,24 @@
+/* Portalab — ambient/gears: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="gears"] > span {
+  inline-size: calc(2.5rem + 5rem * var(--size));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 18%, #6b7280 19% 52%, transparent 53%),
+    repeating-conic-gradient(#4b5563 0 10deg, transparent 10deg 20deg);
+  mask: radial-gradient(circle, transparent 0 17%, #000 18% 68%, transparent 69%);
+  opacity: 0.32;
+  animation-name: ambient-gear-turn;
+  animation-duration: calc(var(--duration) * 1.5);
+}
+
+[data-ambient="gears"] > span:nth-child(2n) {
+  animation-direction: reverse;
+}
+
+@keyframes ambient-gear-turn {
+  to {
+    rotate: 360deg;
+  }
+}

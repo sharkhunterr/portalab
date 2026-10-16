@@ -1,0 +1,46 @@
+/* Portalab — level_up/hud: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="hud"] {
+  --glow: #22d3ee;
+}
+
+.levelup[data-look="hud"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    linear-gradient(#22d3ee14 1px, transparent 1px) 0 0 / 2.5rem 2.5rem,
+    linear-gradient(90deg, #22d3ee14 1px, transparent 1px) 0 0 / 2.5rem 2.5rem;
+}
+
+.levelup[data-look="hud"] .levelup__scene {
+  display: block;
+  inset-inline: 0;
+  inset-block-start: 0;
+  block-size: 3px;
+  background: #22d3ee;
+  box-shadow: 0 0 18px #22d3ee;
+  animation: levelup-scan 2.4s ease-in-out infinite;
+}
+
+.levelup[data-look="hud"] .levelup__card {
+  border: 1px solid #22d3ee88;
+  border-radius: 0;
+  background:
+    linear-gradient(#22d3ee 0 0) top left / 1.2rem 2px no-repeat,
+    linear-gradient(#22d3ee 0 0) top left / 2px 1.2rem no-repeat,
+    linear-gradient(#22d3ee 0 0) bottom right / 1.2rem 2px no-repeat,
+    linear-gradient(#22d3ee 0 0) bottom right / 2px 1.2rem no-repeat,
+    #04121acc;
+  font-family: "Exo 2", sans-serif;
+  clip-path: polygon(1rem 0, 100% 0, 100% calc(100% - 1rem), calc(100% - 1rem) 100%, 0 100%, 0 1rem);
+}
+
+@keyframes levelup-scan {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(100vh);
+  }
+}

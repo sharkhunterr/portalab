@@ -1,0 +1,29 @@
+/* Portalab — notification_animation/chomp: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="chomp"] .ds-notification {
+  animation-name: universe-notify-chomp;
+  animation-duration: 0.7s;
+  animation-timing-function: steps(6, end);
+}
+
+@keyframes universe-notify-chomp {
+  0% {
+    opacity: 0;
+    clip-path: polygon(0 0, 0 0, 0 50%, 0 100%, 0 100%);
+  }
+  20% {
+    opacity: 1;
+  }
+  35% {
+    clip-path: polygon(0 0, 60% 0, 20% 50%, 60% 100%, 0 100%);
+  }
+  55% {
+    clip-path: polygon(0 0, 70% 0, 70% 50%, 70% 100%, 0 100%);
+  }
+  75% {
+    clip-path: polygon(0 0, 100% 0, 60% 50%, 100% 100%, 0 100%);
+  }
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 50%, 100% 100%, 0 100%);
+  }
+}

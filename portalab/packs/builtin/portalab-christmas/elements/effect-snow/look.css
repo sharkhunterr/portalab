@@ -1,0 +1,33 @@
+/* Portalab — effect/snow: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="snow"] .celebration-fx {
+  left: var(--x);
+  top: calc(var(--fx-vh, 1vh) * -4);
+  color: #ffffff;
+  filter: drop-shadow(0 0 4px #bfe3ff);
+  animation-name: fx-snow;
+  animation-timing-function: linear;
+}
+
+[data-effect="snow"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #e0f2fe, #7dd3fc);
+  color: #0c2a3d;
+  box-shadow: 0 0 22px #bfe3ff;
+}
+
+@keyframes fx-snow {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(calc(var(--fx-vw, 1vw) * 3), calc(var(--fx-vh, 1vh) * 40), 0) rotate(120deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(var(--fx-vw, 1vw) * -2), calc(var(--fx-vh, 1vh) * 85), 0) rotate(240deg);
+  }
+}

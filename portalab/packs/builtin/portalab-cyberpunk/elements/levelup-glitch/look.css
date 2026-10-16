@@ -1,0 +1,44 @@
+/* Portalab — level_up/glitch: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="glitch"] {
+  --glow: #fcee0a;
+}
+
+.levelup[data-look="glitch"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: repeating-linear-gradient(180deg, #fcee0a10 0 2px, transparent 2px 6px), #0a0a0f;
+  animation: levelup-tear 0.4s steps(2, end) 6 both;
+}
+
+.levelup[data-look="glitch"] .levelup__card {
+  --color-text: #fcee0a;
+  --color-text-muted: #ff2a6d;
+  border-color: #fcee0a;
+  background: #0a0a0f;
+  color: #fcee0a;
+}
+
+.levelup[data-look="glitch"] .levelup__title {
+  text-shadow:
+    -3px 0 #ff2a6d,
+    3px 0 #00f0ff;
+}
+
+.levelup[data-look="glitch"] .levelup__burst {
+  display: block;
+  inset-block-end: 8%;
+  inset-inline-end: 6%;
+  color: #ff2a6d;
+  font-family: "Chakra Petch", monospace;
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  text-shadow: 3px 0 #00f0ff;
+  animation: levelup-tear 0.3s steps(2, end) infinite;
+}
+
+@keyframes levelup-tear {
+  50% {
+    clip-path: inset(20% 0 40% 0);
+    transform: translateX(-8px);
+  }
+}

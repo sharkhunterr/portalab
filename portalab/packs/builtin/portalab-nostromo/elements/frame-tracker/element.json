@@ -10,8 +10,10 @@
     "fr": "Des coins ambrés et le balayage d'un détecteur autour de vous."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

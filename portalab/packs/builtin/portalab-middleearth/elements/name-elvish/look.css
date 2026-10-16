@@ -1,0 +1,18 @@
+/* Portalab — name_style/elvish: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="elvish"] {
+  font-family: "Cinzel Decorative", "Cinzel", serif;
+  background: linear-gradient(90deg, #a16207, #fef3c7, #d4af37, #fef3c7, #a16207);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 4px #f59e0b88);
+  animation: name-shimmer 6s linear infinite;
+}
+
+@keyframes name-shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}

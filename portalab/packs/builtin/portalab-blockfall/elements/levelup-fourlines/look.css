@@ -1,0 +1,87 @@
+/* Portalab — level_up/fourlines: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="fourlines"] {
+  --glow: #00e5ff;
+}
+
+.levelup[data-look="fourlines"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, #ffffff08 0 1px, transparent 1px 10vw), #0b0b2af2;
+}
+
+.levelup[data-look="fourlines"] .levelup__fx {
+  display: block;
+  inset-block-end: calc(round(down, var(--i) / 10, 1) * 2.4rem);
+  inset-inline-start: calc(mod(var(--i), 10) * 10%);
+  inline-size: 10%;
+  block-size: 2.4rem;
+  background: hsl(calc(var(--i) * 37) 85% 60%);
+  box-shadow:
+    inset 4px 4px 0 #ffffff66,
+    inset -4px -4px 0 #00000055;
+  animation: levelup-fourlines 1.6s steps(1, end) both;
+}
+
+.levelup[data-look="fourlines"] .levelup__burst {
+  display: block;
+  inset-block-start: 7%;
+  inset-inline: 0;
+  color: #ffd23f;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(1.4rem, 5vw, 2.6rem);
+  text-align: center;
+  text-shadow: 0.2rem 0.2rem 0 #c77dff;
+  animation: levelup-kapow 0.5s steps(5, end) 1s both;
+}
+
+.levelup[data-look="fourlines"] .levelup__card {
+  --color-text: #f5f5ff;
+  --color-text-muted: #c8c8ec;
+  --color-surface-raised: #23235a;
+  --color-border: #3a3a7a;
+  border: 0.35rem solid;
+  border-color: #7fefff #007a8a #007a8a #7fefff;
+  border-radius: 0;
+  background: #16163f;
+  color: #f5f5ff;
+  animation: levelup-card 0.4s steps(4, end) 1.2s both;
+}
+
+.levelup[data-look="fourlines"] .levelup__title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+@keyframes levelup-fourlines {
+  0%,
+  30% {
+    filter: none;
+  }
+  15%,
+  45% {
+    filter: brightness(3);
+  }
+  60% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}
+
+@keyframes levelup-kapow {
+  from {
+    transform: scale(0) rotate(-30deg);
+  }
+}
+
+@keyframes levelup-card {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(1.5rem);
+  }
+}

@@ -1,0 +1,29 @@
+/* Portalab — effect/comets: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="comets"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 2.2rem;
+  block-size: 0.35rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #9fd0ff 70%, #ffffff);
+  box-shadow: 0 0 0.5rem #9fd0ff;
+  animation-name: fx-burst;
+}
+
+[data-effect="comets"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #1d3f8a, #6fb3ff);
+  color: #ffffff;
+  box-shadow: 0 0 1rem #6fb3ff88;
+}
+
+@keyframes fx-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-6rem - var(--s) * 4rem)) rotate(calc(-1 * var(--angle)))
+      scale(1.2) rotate(var(--r));
+  }
+}

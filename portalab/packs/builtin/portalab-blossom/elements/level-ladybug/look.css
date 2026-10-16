@@ -1,0 +1,26 @@
+/* Portalab — level_badge/ladybug: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="ladybug"] {
+  position: relative;
+  overflow: visible;
+  margin-inline-start: 0.5rem;
+  padding-inline: 0.6rem;
+  border-radius: 45%;
+  background:
+    radial-gradient(circle 2.5px at 25% 30%, #1a1a1a 96%, transparent),
+    radial-gradient(circle 2.5px at 78% 70%, #1a1a1a 96%, transparent),
+    radial-gradient(circle 2px at 75% 25%, #1a1a1a 96%, transparent),
+    radial-gradient(circle 2px at 22% 75%, #1a1a1a 96%, transparent), #e11d28;
+  color: #ffffff;
+  text-shadow: 0 1px 1px #1a1a1a;
+}
+
+.ds-level[data-look="ladybug"]::before {
+  content: "";
+  position: absolute;
+  inset-block: 25%;
+  inset-inline-start: -0.45rem;
+  inline-size: 0.6rem;
+  border-radius: 50%;
+  background: #1a1a1a;
+}

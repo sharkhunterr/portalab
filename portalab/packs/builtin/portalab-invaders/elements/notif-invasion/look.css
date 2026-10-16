@@ -1,0 +1,96 @@
+/* Portalab — notification_style/invasion: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="invasion"] .ds-notification {
+  --color-text: #effff0;
+  --color-text-muted: #a3d9a5;
+  overflow: visible;
+  margin-block-start: 1.6rem;
+  border: 2px solid #39ff14;
+  border-radius: 0;
+  background: repeating-linear-gradient(180deg, #39ff140a 0 1px, transparent 1px 3px), #050805;
+  color: #effff0;
+  font-family: "Share Tech Mono", monospace;
+  box-shadow:
+    0 0 0.8rem #39ff1455,
+    inset 0 0 1rem #39ff1422;
+}
+
+.ds-notifications[data-style="invasion"] .ds-notification::before {
+  --p: 3px;
+  inset: calc(-1.6rem - 2px) auto auto 1rem;
+  inline-size: var(--p);
+  block-size: var(--p);
+  background: none;
+  color: #39ff14;
+  box-shadow:
+    calc(2 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(0 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(1 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(2 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(3 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(1 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(9 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(4 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(5 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(5 * var(--p)) 0 currentColor,
+    calc(0 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(2 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(8 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(10 * var(--p)) calc(6 * var(--p)) 0 currentColor,
+    calc(3 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(4 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(6 * var(--p)) calc(7 * var(--p)) 0 currentColor,
+    calc(7 * var(--p)) calc(7 * var(--p)) 0 currentColor;
+  animation: invader-bob 0.6s steps(2, jump-none) infinite;
+}
+
+.ds-notifications[data-style="invasion"] .ds-notification__icon {
+  border-radius: 0;
+  background: #39ff14;
+  color: #001a00;
+}
+
+.ds-notifications[data-style="invasion"] .ds-notification__title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.66rem;
+  line-height: 1.6;
+  color: #39ff14;
+}
+
+.ds-notifications[data-style="invasion"] .ds-notification__timer {
+  background: #ff4d6d;
+}
+
+@keyframes invader-bob {
+  50% {
+    translate: 0.4rem 0;
+  }
+}

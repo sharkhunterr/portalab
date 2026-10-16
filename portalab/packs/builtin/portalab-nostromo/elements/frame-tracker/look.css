@@ -1,0 +1,33 @@
+/* Portalab — avatar_frame/tracker: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="tracker"] {
+  margin: 6px;
+  background: #3de88a55;
+  box-shadow:
+    0 0 0 3px #05080c,
+    0 0 0 4px #e8c23499,
+    0 0 1rem #3de88a55;
+}
+
+.avatar-frame[data-frame="tracker"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -7px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #3de88a, #3de88a00 32%, transparent 100%);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  animation: frame-tracker 2.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.avatar-frame[data-frame="tracker"]::before {
+    animation: none;
+  }
+}
+
+@keyframes frame-tracker {
+  to {
+    rotate: 1turn;
+  }
+}

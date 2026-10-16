@@ -1,0 +1,17 @@
+/* Portalab — level_badge/veins: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="veins"] {
+  background:
+    linear-gradient(#1a0a0e66, #1a0a0e66),
+    var(--veins-web) center / 4.5rem auto,
+    #1a0a0e;
+  color: #fff1f2;
+  text-shadow: 0 0 3px #000;
+  animation: frame-veins 4.6s ease-in-out infinite;
+}
+
+@keyframes frame-veins {
+  50% {
+    box-shadow: 0 0 1.6rem #ef4444;
+  }
+}

@@ -1,0 +1,12 @@
+/* Portalab — level_badge/circuit: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="circuit"] {
+  border-radius: 0.2rem;
+  background:
+    linear-gradient(90deg, transparent 48%, #22c55e 48% 52%, transparent 52%) 0 0 / 0.8rem 0.8rem,
+    linear-gradient(transparent 48%, #22c55e66 48% 52%, transparent 52%) 0 0 / 0.8rem 0.8rem,
+    #022c22;
+  color: #bbf7d0;
+  font-family: "Share Tech Mono", monospace;
+  box-shadow: 0 0 0 1.5px #22c55e;
+}

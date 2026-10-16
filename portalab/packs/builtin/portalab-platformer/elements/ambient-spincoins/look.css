@@ -1,0 +1,33 @@
+/* Portalab — ambient/spincoins: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="spincoins"] > span {
+  inline-size: calc(1rem + 0.8rem * var(--size));
+  aspect-ratio: 0.8;
+  border-radius: 50%;
+  background:
+    linear-gradient(#c47a00, #c47a00) 50% 50% / 18% 50% no-repeat,
+    radial-gradient(ellipse at 40% 35%, #fff2b3, #f8b800 55%, #c47a00);
+  box-shadow: 0 0 0 2px #7a3a00;
+  opacity: 0.4;
+  animation:
+    ambient-coin-spin 0.9s steps(4, end) var(--delay) infinite,
+    ambient-bob calc(2s + var(--size) * 2s) ease-in-out var(--delay) infinite alternate;
+}
+
+@keyframes ambient-coin-spin {
+  25% {
+    scale: 0.6 1;
+  }
+  50% {
+    scale: 0.15 1;
+  }
+  75% {
+    scale: 0.6 1;
+  }
+}
+
+@keyframes ambient-bob {
+  to {
+    translate: 0 -1.2rem;
+  }
+}

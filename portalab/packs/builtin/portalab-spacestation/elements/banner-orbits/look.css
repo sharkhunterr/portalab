@@ -1,0 +1,30 @@
+/* Portalab — profile_banner/orbits: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="orbits"] {
+  background:
+    radial-gradient(
+      circle at 22% 50%,
+      #fff3c4 0 1.1rem,
+      #ffb347 1.3rem,
+      rgb(255 160 60 / 0.25) 2.6rem,
+      transparent 4rem
+    ),
+    radial-gradient(circle at 45% 34%, #6fa8ff 0 0.35rem, transparent 0.4rem),
+    radial-gradient(circle at 63% 70%, #ff7a5c 0 0.3rem, transparent 0.35rem),
+    radial-gradient(circle at 84% 40%, #e8d29a 0 0.55rem, transparent 0.6rem),
+    radial-gradient(ellipse 25% 38% at 22% 50%, transparent 97%, rgb(160 190 255 / 0.4) 98%, transparent 100%),
+    radial-gradient(
+      ellipse 45% 62% at 22% 50%,
+      transparent 98.5%,
+      rgb(160 190 255 / 0.32) 99%,
+      transparent 100%
+    ),
+    radial-gradient(
+      ellipse 66% 88% at 22% 50%,
+      transparent 98.8%,
+      rgb(160 190 255 / 0.26) 99.2%,
+      transparent 100%
+    ),
+    radial-gradient(1px 1px at 12% 20%, #fff 99%, transparent) 0 0 / 3.1rem 2.3rem,
+    linear-gradient(160deg, #0b0f2a, #161040 60%, #090b1c);
+}

@@ -1,0 +1,14 @@
+/* Portalab — profile_banner/lcdscreen: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="lcdscreen"] {
+  background:
+    repeating-linear-gradient(90deg, #0f380f14 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg, #0f380f14 0 1px, transparent 1px 4px),
+    linear-gradient(#e3f1bc, #e3f1bc) 18% 22% / 12% 10% no-repeat,
+    linear-gradient(#e3f1bc, #e3f1bc) 21% 17% / 6% 6% no-repeat,
+    radial-gradient(circle 1.2rem at 80% 28%, #e3f1bc 96%, transparent),
+    radial-gradient(ellipse 34% 40% at 25% 100%, #306230 98%, transparent),
+    radial-gradient(ellipse 42% 32% at 75% 100%, #0f380f 98%, transparent),
+    #9bbc0f;
+  image-rendering: pixelated;
+}

@@ -1,0 +1,27 @@
+/* Portalab — notification_animation/air: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="air"] .ds-notification {
+  animation-name: universe-notify-air;
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes universe-notify-air {
+  0% {
+    opacity: 0;
+    transform: translateX(4rem) rotate(8deg) skewX(-14deg);
+    filter: blur(6px);
+  }
+  45% {
+    opacity: 1;
+    transform: translateX(-0.8rem) rotate(-3deg) skewX(6deg);
+    filter: blur(1px);
+  }
+  70% {
+    transform: translateX(0.3rem) rotate(1deg) skewX(-2deg);
+    filter: none;
+  }
+  100% {
+    transform: none;
+  }
+}

@@ -1,0 +1,12 @@
+/* Portalab — name_style/hero: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="hero"] {
+  font-family: "Anton", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: linear-gradient(180deg, #ef4444 0 50%, #1d4ed8 50%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(2px 2px 0 #fbbf24);
+}

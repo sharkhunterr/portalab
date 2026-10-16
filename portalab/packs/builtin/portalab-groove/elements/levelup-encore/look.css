@@ -1,0 +1,89 @@
+/* Portalab — level_up/encore: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="encore"] {
+  --glow: #1ed760;
+}
+
+.levelup[data-look="encore"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    conic-gradient(from 160deg at 20% 0%, transparent 0 10deg, #1ed76033 10deg 22deg, transparent 22deg)
+    no-repeat,
+    conic-gradient(from 170deg at 80% 0%, transparent 0 8deg, #f573a033 8deg 20deg, transparent 20deg)
+    no-repeat,
+    #000000ee;
+  animation: levelup-stage 2.4s ease-in-out infinite alternate;
+}
+
+.levelup[data-look="encore"] .levelup__scene {
+  display: block;
+  inset-block-start: 6%;
+  inset-inline-start: 50%;
+  inline-size: 8rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #000 0 4%, #1ed760 5% 26%, transparent 27%),
+    conic-gradient(from 20deg, #ffffff30, transparent 12%, #ffffff30 50%, transparent 62%),
+    repeating-radial-gradient(circle, #2c2c2c 0 1px, #161616 1px 3px);
+  box-shadow:
+    0 0 0 2px #3a3a3a,
+    0 0 2.4rem #1ed76066;
+  translate: -50% 0;
+  animation: levelup-spin 1.8s linear infinite;
+}
+
+.levelup[data-look="encore"] .levelup__fx {
+  display: block;
+  inset-block-end: 0;
+  inset-inline-start: calc(var(--i) * 5%);
+  inline-size: calc(5% - 4px);
+  block-size: 45vh;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(0deg, #1ed760, #f573a0);
+  opacity: 0.6;
+  transform-origin: 50% 100%;
+  animation: levelup-eq calc(0.35s + var(--r) * 0.5s) ease-in-out infinite alternate;
+}
+
+.levelup[data-look="encore"] .levelup__card {
+  --color-text: #ffffff;
+  --color-text-muted: #b3b3b3;
+  --color-surface-raised: #282828;
+  --color-border: #333333;
+  border: 0;
+  border-radius: 0.6rem;
+  background: linear-gradient(180deg, #1e6b3c, #121212 45%);
+  color: #ffffff;
+  box-shadow: 0 1.4rem 3rem #000000;
+  animation: levelup-card 0.5s ease-out 0.4s both;
+}
+
+@keyframes levelup-stage {
+  to {
+    filter: hue-rotate(40deg) brightness(1.3);
+  }
+}
+
+@keyframes levelup-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes levelup-eq {
+  from {
+    transform: scaleY(0.1);
+  }
+  to {
+    transform: scaleY(calc(0.4 + var(--r) * 0.6));
+  }
+}
+
+@keyframes levelup-card {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(1.5rem);
+  }
+}

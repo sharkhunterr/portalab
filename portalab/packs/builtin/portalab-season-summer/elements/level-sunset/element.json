@@ -10,8 +10,10 @@
     "fr": "Votre niveau sur le soleil couchant sur la mer."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 700,

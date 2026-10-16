@@ -1,0 +1,46 @@
+/* Portalab — avatar_frame/shipwheel: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="shipwheel"] {
+  padding: 15px;
+  background:
+    radial-gradient(circle, transparent 0 58%, #a0692f 59% 72%, #5c3a1a 73% 75%, transparent 76%),
+    repeating-conic-gradient(from 11.25deg, #7a4f26 0 7deg, transparent 7deg 45deg);
+  filter: drop-shadow(0 0 0.4rem #00000088);
+  clip-path: polygon(
+    50% 0,
+    56% 12%,
+    71% 6%,
+    72% 19%,
+    85% 15%,
+    82% 28%,
+    100% 50%,
+    82% 72%,
+    85% 85%,
+    72% 81%,
+    71% 94%,
+    56% 88%,
+    50% 100%,
+    44% 88%,
+    29% 94%,
+    28% 81%,
+    15% 85%,
+    18% 72%,
+    0 50%,
+    18% 28%,
+    15% 15%,
+    28% 19%,
+    29% 6%,
+    44% 12%
+  );
+  animation: frame-turn 30s linear infinite;
+}
+
+.avatar-frame[data-frame="shipwheel"] > * {
+  animation: frame-turn 30s linear infinite reverse;
+}
+
+@keyframes frame-turn {
+  to {
+    rotate: 360deg;
+  }
+}

@@ -1,0 +1,27 @@
+/* Portalab — notification_style/paper: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="paper"] .ds-notification {
+  border: 0;
+  border-radius: 0.2rem;
+  background: #fffdf6;
+  color: #2b2b2b;
+  box-shadow:
+    0 1px 2px #00000022,
+    0 12px 20px -10px #00000066;
+  transform: rotate(0.5deg);
+}
+
+.ds-notifications[data-style="paper"] .ds-notification__body {
+  color: #555555;
+}
+
+.ds-notifications[data-style="paper"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block-start: -0.5rem;
+  inset-inline-start: 45%;
+  inline-size: 3.5rem;
+  block-size: 1rem;
+  background: #ffe9a6cc;
+  transform: rotate(-3deg);
+}

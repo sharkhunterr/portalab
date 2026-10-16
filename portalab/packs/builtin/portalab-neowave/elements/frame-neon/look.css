@@ -1,0 +1,9 @@
+/* Portalab — avatar_frame/neon: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="neon"] {
+  background: #0b1026;
+  box-shadow:
+    0 0 0 3px #22d3ee,
+    0 0 1rem #22d3eeaa,
+    inset 0 0 0.6rem #22d3ee88;
+}

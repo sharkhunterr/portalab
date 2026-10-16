@@ -1,0 +1,36 @@
+/* Portalab — effect/portal: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-celebration[data-effect="portal"] .ds-celebration__badge {
+  animation: ds-pop var(--motion-duration-slow) var(--motion-easing-spring) 0.95s both;
+}
+
+[data-effect="portal"] .celebration-fx {
+  inline-size: 0.4rem;
+  block-size: 0.4rem;
+  border-radius: 50%;
+  background: hsl(calc(260deg + var(--i) * 6deg) 90% 70%);
+  --angle: calc(360deg / var(--n) * var(--i));
+  animation-name: fx-spiral;
+  animation-duration: 1s;
+}
+
+[data-effect="portal"] .ds-celebration__badge {
+  position: relative;
+  background: linear-gradient(135deg, #312e81, #7c3aed);
+  color: #f5f3ff;
+  box-shadow: 0 0 1.6rem #a78bfa;
+}
+
+@keyframes fx-spiral {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-6rem);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(calc(var(--angle) + 300deg)) translateY(0);
+  }
+}

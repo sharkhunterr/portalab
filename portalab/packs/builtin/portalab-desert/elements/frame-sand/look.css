@@ -1,0 +1,5 @@
+/* Portalab — avatar_frame/sand: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="sand"] {
+  background: conic-gradient(#f4c27a, #b4581f, #f7dca6, #c8553d, #f4c27a);
+}

@@ -1,0 +1,35 @@
+/* Portalab — notification_animation/eye: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="eye"] .ds-notification {
+  animation-name: universe-notify-eye;
+  animation-duration: 1s;
+  animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+.ds-notifications[data-animation="eye"] .ds-notification[data-leaving] {
+  animation: universe-notify-eye-close 0.45s ease-in forwards !important;
+}
+
+@keyframes universe-notify-eye {
+  0% {
+    opacity: 0;
+    clip-path: ellipse(50% 0% at 50% 50%);
+    box-shadow: 0 0 2rem #f97316;
+  }
+  40% {
+    opacity: 1;
+    clip-path: ellipse(60% 18% at 50% 50%);
+    filter: sepia(1) saturate(3) hue-rotate(-20deg);
+  }
+  100% {
+    clip-path: ellipse(120% 120% at 50% 50%);
+    filter: none;
+  }
+}
+
+@keyframes universe-notify-eye-close {
+  to {
+    opacity: 0;
+    clip-path: ellipse(50% 0% at 50% 50%);
+  }
+}

@@ -1,0 +1,12 @@
+/* Portalab — avatar_frame/hologram: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="hologram"] {
+  background: conic-gradient(#7cf7ff, #c58bff, #ff9be3, #fff59b, #7cf7ff);
+  animation: cosmetics-hue 4s linear infinite;
+}
+
+@keyframes cosmetics-hue {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}

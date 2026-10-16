@@ -1,0 +1,59 @@
+/* Portalab — level_up/pumpkin: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="pumpkin"] {
+  --glow: #f97316;
+}
+
+.levelup[data-look="pumpkin"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(circle, #f9731655, transparent 60%);
+  animation: levelup-pulse 1.6s ease-in-out infinite;
+}
+
+.levelup[data-look="pumpkin"] .levelup__fx {
+  display: block;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 2rem;
+  block-size: 1rem;
+  background: #111;
+  clip-path: polygon(0 30%, 18% 0, 30% 40%, 50% 25%, 70% 40%, 82% 0, 100% 30%, 80% 70%, 50% 100%, 20% 70%);
+  --angle: calc(var(--i) * 360deg / var(--n));
+  animation: levelup-burst 2s ease-out calc(var(--i) * 0.08s) both;
+}
+
+.levelup[data-look="pumpkin"] .levelup__burst {
+  display: block;
+  inset-block-start: 10%;
+  inset-inline-start: 50%;
+  color: #f97316;
+  font-family: "Creepster", "Griffy", cursive;
+  font-size: clamp(2.5rem, 10vw, 5rem);
+  text-shadow: 0 0 20px #f97316;
+  transform: translateX(-50%);
+  animation: levelup-kapow 0.6s cubic-bezier(0.2, 1.8, 0.4, 1) 0.2s both;
+}
+
+@keyframes levelup-pulse {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes levelup-burst {
+  from {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(1.4);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-42vmin) scale(0.4);
+  }
+}
+
+@keyframes levelup-kapow {
+  from {
+    transform: scale(0) rotate(-30deg);
+  }
+}

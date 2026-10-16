@@ -1,0 +1,11 @@
+/* Portalab — badge/spin: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="spin"] .ds-icon {
+  animation: cosmetics-spin 3s linear infinite;
+}
+
+@keyframes cosmetics-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

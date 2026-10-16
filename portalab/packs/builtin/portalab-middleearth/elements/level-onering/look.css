@@ -1,0 +1,28 @@
+/* Portalab — level_badge/onering: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="onering"] {
+  position: relative;
+  isolation: isolate;
+  background: #1c1003;
+  color: #fde68a;
+  font-family: "Cinzel", serif;
+  box-shadow: 0 0 10px #f59e0b88;
+}
+
+.ds-level[data-look="onering"]::before {
+  content: "";
+  position: absolute;
+  inset: -0.3rem;
+  z-index: -1;
+  border-radius: 999px;
+  background: conic-gradient(from var(--level-turn, 0deg), #fde68a, #b45309, #fef3c7, #d97706, #fde68a);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 0.28rem), #000 calc(100% - 0.26rem));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 0.28rem), #000 calc(100% - 0.26rem));
+  animation: level-elements 5s linear infinite;
+}
+
+@keyframes level-elements {
+  to {
+    --level-turn: 360deg;
+  }
+}

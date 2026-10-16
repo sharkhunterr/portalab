@@ -1,0 +1,29 @@
+/* Portalab — level_badge/vhs: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="vhs"] {
+  border-radius: 0.15rem;
+  background: repeating-linear-gradient(180deg, #ffffff10 0 1px, transparent 1px 3px), #14102a;
+  color: #e8e8ff;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  text-shadow:
+    -1.5px 0 #ff2a6d,
+    1.5px 0 #05d9e8;
+}
+
+.ds-level[data-look="vhs"] {
+  font-family: "VT323", "Share Tech Mono", monospace;
+  font-size: 1.05rem;
+  background:
+    linear-gradient(180deg, transparent 0 40%, #ffffff26 40% 55%, transparent 55%) 0 0 / 100% 300%,
+    repeating-linear-gradient(180deg, #ffffff10 0 1px, transparent 1px 3px),
+    #14102a;
+  animation: level-vhs-track 2.8s linear infinite;
+}
+
+@keyframes level-vhs-track {
+  to {
+    background-position:
+      0 100%,
+      0 0;
+  }
+}

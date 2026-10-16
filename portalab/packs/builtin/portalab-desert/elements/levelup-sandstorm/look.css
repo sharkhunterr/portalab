@@ -1,0 +1,46 @@
+/* Portalab — level_up/sandstorm: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="sandstorm"] {
+  --glow: #e0a96d;
+}
+
+.levelup[data-look="sandstorm"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: linear-gradient(100deg, #7c4a1e66, #e0a96d88 40%, #f5d6a066 60%, #7c4a1e66);
+  background-size: 200% 100%;
+  animation: levelup-pan 2.5s linear infinite;
+}
+
+.levelup[data-look="sandstorm"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: -20%;
+  inline-size: calc(2rem + var(--r) * 8rem);
+  block-size: 1px;
+  background: linear-gradient(90deg, transparent, #f5d6a0, transparent);
+  animation: levelup-streak calc(0.6s + var(--r) * 0.8s) linear calc(var(--r) * -1s) infinite;
+}
+
+.levelup[data-look="sandstorm"] .levelup__card {
+  animation: levelup-haze 1.4s ease-out 0.3s both;
+}
+
+@keyframes levelup-pan {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes levelup-streak {
+  to {
+    transform: translateX(140vw);
+  }
+}
+
+@keyframes levelup-haze {
+  from {
+    opacity: 0;
+    filter: blur(14px) sepia(1);
+  }
+}

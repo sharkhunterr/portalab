@@ -10,8 +10,10 @@
     "fr": "Le rayon d'une soucoupe soulève votre nouveau niveau."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 450,

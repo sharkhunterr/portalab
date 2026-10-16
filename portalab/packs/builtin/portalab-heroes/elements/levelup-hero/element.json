@@ -10,8 +10,10 @@
     "fr": "Un bouclier d'anneaux s'abat — BAM !"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 450,

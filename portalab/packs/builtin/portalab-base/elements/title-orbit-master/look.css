@@ -1,0 +1,14 @@
+/* Portalab — title/frost: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-title[data-style="frost"] {
+  border-color: #7dd3fc;
+  color: #e0f2fe;
+  background: linear-gradient(135deg, #0c4a6e, #0369a1);
+  box-shadow: 0 0 10px #7dd3fc88;
+}
+
+.cosmetic-title[data-style="frost"] {
+  background: none;
+  color: #7dd3fc;
+  text-shadow: 0 0 8px #7dd3fc;
+}

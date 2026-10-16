@@ -1,0 +1,6 @@
+/* Portalab — avatar_frame/elven: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="elven"] {
+  background: conic-gradient(#e2e8f0, #86efac, #f8fafc, #4ade80, #e2e8f0);
+  box-shadow: 0 0 1rem #bbf7d088;
+}

@@ -10,8 +10,10 @@
     "fr": "Les projecteurs balaient la scène, un disque tourne et l'égaliseur s'emballe : votre nouveau niveau, une fois de plus."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1100,

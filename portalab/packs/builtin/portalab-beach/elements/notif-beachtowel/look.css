@@ -1,0 +1,69 @@
+/* Portalab — notification_style/beachtowel: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="beachtowel"] .ds-notification {
+  --color-text: #173042;
+  --color-text-muted: #3f5a6b;
+  overflow: visible;
+  margin-inline: 0.7rem;
+  padding-inline: 2.2rem 1rem;
+  border: 0;
+  border-radius: 0.3rem;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      #0b9fb8 0 0.45rem,
+      #ffffff 0.45rem 0.7rem,
+      #ff7a45 0.7rem 1.15rem,
+      #ffffff 1.15rem 1.4rem
+    )
+    0 0 / 1.4rem 100% no-repeat,
+    repeating-linear-gradient(
+      180deg,
+      #0b9fb8 0 0.45rem,
+      #ffffff 0.45rem 0.7rem,
+      #ff7a45 0.7rem 1.15rem,
+      #ffffff 1.15rem 1.4rem
+    )
+    100% 0 / 0.5rem 100% no-repeat,
+    #fffaf0;
+  color: #173042;
+  box-shadow: 0 0.5rem 1.2rem #17304233;
+}
+
+.ds-notifications[data-style="beachtowel"] .ds-notification::before {
+  content: "";
+  position: absolute;
+  inset-block: 0.2rem;
+  inline-size: 0.6rem;
+  background: repeating-linear-gradient(180deg, #e8dcc0 0 2px, transparent 2px 5px);
+}
+
+.ds-notifications[data-style="beachtowel"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block: 0.2rem;
+  inline-size: 0.6rem;
+  background: repeating-linear-gradient(180deg, #e8dcc0 0 2px, transparent 2px 5px);
+}
+
+.ds-notifications[data-style="beachtowel"] .ds-notification::before {
+  inset-inline: -0.6rem auto;
+}
+
+.ds-notifications[data-style="beachtowel"] .ds-notification::after {
+  inset-inline: auto -0.6rem;
+}
+
+.ds-notifications[data-style="beachtowel"] .ds-notification__icon {
+  background: #ffd23f;
+  color: #7a4a00;
+}
+
+.ds-notifications[data-style="beachtowel"] .ds-notification__title {
+  font-family: Pacifico, Fredoka, cursive;
+  font-weight: 400;
+}
+
+.ds-notifications[data-style="beachtowel"] .ds-notification__timer {
+  background: #0b9fb8;
+}

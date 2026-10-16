@@ -1,0 +1,31 @@
+/* Portalab — ambient/lights: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="lights"] > span {
+  top: 0.25rem;
+  left: calc(var(--i) * 4% + 1%);
+  inline-size: 0.55rem;
+  block-size: 0.8rem;
+  border-radius: 50% 50% 45% 45%;
+  background: hsl(calc(var(--i) * 72deg) 95% 60%);
+  box-shadow: 0 0 10px hsl(calc(var(--i) * 72deg) 95% 60%);
+  animation-name: ambient-blink;
+  animation-duration: calc(0.8s + var(--size) * 1.2s);
+  animation-timing-function: steps(2, jump-none);
+}
+
+[data-ambient="lights"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0.15rem;
+  block-size: 2px;
+  background: #1f3d23;
+}
+
+@keyframes ambient-blink {
+  50% {
+    opacity: 0.35;
+    box-shadow: none;
+  }
+}

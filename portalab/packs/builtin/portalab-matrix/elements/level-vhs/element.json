@@ -10,8 +10,10 @@
     "fr": "Lignes de balayage et couleurs décalées, tout droit de la cassette."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 350,

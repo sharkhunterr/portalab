@@ -1,0 +1,6 @@
+/* Portalab — name_style/handwritten: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="handwritten"] {
+  font-family: "Caveat", cursive;
+  font-size: 1.25em;
+}

@@ -1,0 +1,22 @@
+/* Portalab — profile_banner/linestack: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="linestack"] {
+  background:
+    repeating-linear-gradient(90deg, #0b0b2a 0 2px, transparent 2px 1.6rem) 0 100% / 100% 50% no-repeat,
+    repeating-linear-gradient(0deg, #0b0b2a 0 2px, transparent 2px 1.6rem) 0 100% / 100% 50% no-repeat,
+    linear-gradient(#ffffffdd, #ffffffdd) 0 52% / 100% 1.6rem no-repeat,
+    linear-gradient(
+      90deg,
+      #00e5ff 0 20%,
+      #ffd23f 20% 35%,
+      #c77dff 35% 55%,
+      #3ddc84 55% 70%,
+      #ff5c5c 70% 85%,
+      #5c8cff 85%
+    )
+    0 100% / 100% 50% no-repeat,
+    linear-gradient(90deg, #ff9f40 0 30%, transparent 30% 45%, #c77dff 45% 60%, #00e5ff 60%) 0 70% / 100%
+    1.6rem no-repeat,
+    repeating-linear-gradient(90deg, #ffffff08 0 1px, transparent 1px 1.6rem),
+    #0b0b2a;
+}

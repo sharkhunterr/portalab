@@ -10,8 +10,10 @@
     "fr": "Une terre sombre, un œil de feu sur sa tour."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 750,

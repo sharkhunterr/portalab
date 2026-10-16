@@ -1,0 +1,39 @@
+/* Portalab — notification_style/postcard: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="postcard"] .ds-notification {
+  position: relative;
+  border: 0.35rem solid transparent;
+  border-radius: 0.25rem;
+  background:
+    linear-gradient(#fffaf0, #fff3dc) padding-box,
+    repeating-linear-gradient(
+      45deg,
+      #e23d3d 0 0.6rem,
+      #fffaf0 0.6rem 1.2rem,
+      #2a6fdb 1.2rem 1.8rem,
+      #fffaf0 1.8rem 2.4rem
+    )
+    border-box;
+  color: #2a2014;
+  box-shadow: 0 6px 18px #00000040;
+}
+
+.ds-notifications[data-style="postcard"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset: 0.45rem 0.45rem auto auto;
+  inline-size: 1.6rem;
+  block-size: 1.9rem;
+  border: 2px dashed #ffffffcc;
+  background: linear-gradient(180deg, #ffb347, #ff6b6b 55%, #2aa3cf 55%);
+  rotate: 6deg;
+}
+
+.ds-notifications[data-style="postcard"] .ds-notification__title {
+  font-family: "Caveat", "Comic Neue", cursive;
+  font-size: 1.15em;
+}
+
+.ds-notifications[data-style="postcard"] .ds-notification__body {
+  color: #4a3a22;
+}

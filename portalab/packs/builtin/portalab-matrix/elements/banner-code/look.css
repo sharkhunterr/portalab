@@ -1,0 +1,22 @@
+/* Portalab — profile_banner/code: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="code"] {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 22px, #00ff5514 22px 24px),
+    repeating-linear-gradient(180deg, #00ff5530 0 2px, transparent 2px 14px),
+    linear-gradient(180deg, #000a03, #001a08);
+  background-size:
+    auto,
+    100% 280px,
+    auto;
+  animation: cosmetics-code 3s linear infinite;
+}
+
+@keyframes cosmetics-code {
+  to {
+    background-position:
+      0 0,
+      0 280px,
+      0 0;
+  }
+}

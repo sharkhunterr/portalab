@@ -1,0 +1,36 @@
+/* Portalab — effect/pellets: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="pellets"] .celebration-fx {
+  --angle: calc(360deg / var(--n) * var(--i));
+  inline-size: 0.45rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffb897;
+  animation-name: fx-burst;
+}
+
+[data-effect="pellets"] .celebration-fx:nth-child(4n) {
+  inline-size: 1rem;
+  box-shadow: 0 0 0.6rem #ffb897;
+}
+
+[data-effect="pellets"] .ds-celebration__badge {
+  background: #000000;
+  color: #ffe14d;
+  font-family: "Press Start 2P", monospace;
+  box-shadow:
+    0 0 0 3px #2121de,
+    0 0 18px #2121de;
+}
+
+@keyframes fx-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-6rem - var(--s) * 4rem)) rotate(calc(-1 * var(--angle)))
+      scale(1.2) rotate(var(--r));
+  }
+}

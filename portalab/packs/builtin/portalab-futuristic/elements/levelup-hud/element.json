@@ -10,8 +10,10 @@
     "fr": "Une ligne de balayage, des coins d'interface et une grille."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 450,

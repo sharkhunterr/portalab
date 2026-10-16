@@ -1,0 +1,25 @@
+/* Portalab — title/shimmer: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-title[data-style="shimmer"] {
+  background-image: linear-gradient(110deg, transparent 30%, #ffffff55 50%, transparent 70%);
+  background-size: 250% 100%;
+  animation: badge-shimmer 2.8s ease-in-out infinite;
+}
+
+.cosmetic-title[data-style="shimmer"] {
+  background-image: linear-gradient(90deg, var(--color-accent-alt), #ffffff, var(--color-accent-alt));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes badge-shimmer {
+  0%,
+  30% {
+    background-position: 160% 0;
+  }
+  70%,
+  100% {
+    background-position: -60% 0;
+  }
+}

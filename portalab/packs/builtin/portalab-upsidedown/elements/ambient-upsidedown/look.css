@@ -1,0 +1,197 @@
+/* Portalab — ambient/upsidedown: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="upsidedown"] {
+  background:
+    radial-gradient(ellipse at 50% 120%, #1e293b66, transparent 60%),
+    radial-gradient(ellipse at 50% -20%, #3b061033, transparent 55%);
+}
+
+[data-ambient="upsidedown"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 70% 0%, #dc262655, transparent 60%);
+  opacity: 0;
+  animation: ambient-red-flash 11s steps(1, end) infinite;
+}
+
+[data-ambient="upsidedown"] > span {
+  top: auto;
+  bottom: -4vh;
+  inline-size: calc(0.7rem + var(--size) * 0.8rem);
+  block-size: calc(0.7rem + var(--size) * 0.8rem);
+  background: var(--upside-flake-a) center / contain no-repeat;
+  opacity: 0;
+  --peak: calc(0.35 + var(--size) * 0.4);
+  animation-name: ambient-ash-tumble;
+  animation-duration: calc(13s + var(--size) * 9s);
+}
+
+[data-ambient="upsidedown"] > span:nth-child(3n + 1) {
+  background-image: var(--upside-flake-b);
+}
+
+[data-ambient="upsidedown"] > span:nth-child(3n + 2) {
+  background-image: var(--upside-flake-c);
+}
+
+[data-ambient="upsidedown"] > span:nth-child(4n) {
+  inline-size: calc(0.9rem + var(--size) * 0.9rem);
+  block-size: calc(0.9rem + var(--size) * 0.9rem);
+  background-image: var(--upside-spore);
+  animation-name: ambient-spore-turn;
+  animation-duration: calc(20s + var(--size) * 12s);
+}
+
+[data-ambient="upsidedown"] > span:nth-child(9n) {
+  inline-size: calc(0.25rem + var(--size) * 0.2rem);
+  block-size: calc(0.25rem + var(--size) * 0.2rem);
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe4e6, #ff2a3d 45%, #ff2a3d00 72%);
+  --peak: 0.9;
+  animation-duration: calc(10s + var(--size) * 6s);
+}
+
+[data-ambient="upsidedown"] > span:nth-child(13n) {
+  inline-size: calc(1.6rem + var(--size) * 1rem);
+  block-size: calc(1.6rem + var(--size) * 1rem);
+  --peak: 0.25;
+  animation-duration: calc(8s + var(--size) * 4s);
+}
+
+[data-ambient="upsidedown"] > span:is(:nth-child(1), :nth-child(17), :nth-child(33)) {
+  --at-1: -30%;
+  --at-2: 18%;
+  --at-3: -4%;
+  inset: 0 auto;
+  left: -50%;
+  inline-size: 200%;
+  block-size: 100%;
+  border-radius: 0;
+  background: var(--veins-rift-a) 0 0 / 100% 100% no-repeat;
+  opacity: 0;
+  animation-name: rift-wander;
+  animation-duration: calc(16s + var(--size) * 14s);
+  animation-timing-function: linear;
+}
+
+[data-ambient="upsidedown"] > span:nth-child(17) {
+  --at-1: 26%;
+  --at-2: -14%;
+  --at-3: 34%;
+  background-image: var(--veins-rift-b);
+}
+
+[data-ambient="upsidedown"] > span:nth-child(33) {
+  --at-1: -8%;
+  --at-2: 32%;
+  --at-3: -24%;
+  background-image: var(--veins-rift-c);
+}
+
+@keyframes ambient-red-flash {
+  0%,
+  3%,
+  100% {
+    opacity: 0;
+  }
+  1%,
+  2% {
+    opacity: 1;
+  }
+}
+
+@keyframes ambient-ash-tumble {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate3d(1, 0.4, 0.2, 0deg);
+  }
+  8%,
+  92% {
+    opacity: var(--peak, 0.6);
+  }
+  25% {
+    transform: translate3d(calc(var(--drift) * 0.5), -28vh, 0) rotate3d(1, 0.4, 0.2, 200deg);
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * -0.3), -56vh, 0) rotate3d(0.3, 1, 0.2, 380deg);
+  }
+  75% {
+    transform: translate3d(calc(var(--drift) * 0.8), -84vh, 0) rotate3d(1, 0.2, 0.5, 560deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -112vh, 0) rotate3d(1, 0.4, 0.2, 720deg);
+  }
+}
+
+@keyframes ambient-spore-turn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0) scale(0.9);
+  }
+  10%,
+  90% {
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * -0.6), -55vh, 0) rotate(160deg) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -112vh, 0) rotate(320deg) scale(0.9);
+  }
+}
+
+@keyframes rift-wander {
+  0% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-1, 0%) / 2));
+  }
+  1% {
+    opacity: var(--rift, 0.45);
+  }
+  1.6% {
+    opacity: 0.1;
+  }
+  2.4%,
+  12% {
+    opacity: var(--rift, 0.45);
+  }
+  12.6% {
+    opacity: 0.25;
+  }
+  13.2%,
+  18% {
+    opacity: var(--rift, 0.45);
+  }
+  23% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-1, 0%) / 2));
+  }
+  23.1% {
+    transform: translateX(calc(var(--at-2, 0%) / 2)) scaleX(-1);
+  }
+  58% {
+    opacity: 0;
+  }
+  59% {
+    opacity: var(--rift, 0.45);
+  }
+  59.6% {
+    opacity: 0.1;
+  }
+  60.4%,
+  74% {
+    opacity: var(--rift, 0.45);
+  }
+  80% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-2, 0%) / 2)) scaleX(-1);
+  }
+  80.1%,
+  100% {
+    opacity: 0;
+    transform: translateX(calc(var(--at-3, 0%) / 2)) scaleX(1);
+  }
+}

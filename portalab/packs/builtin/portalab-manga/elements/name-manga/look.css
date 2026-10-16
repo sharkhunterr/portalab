@@ -1,0 +1,9 @@
+/* Portalab — name_style/manga: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="manga"] {
+  font-family: "Dela Gothic One", sans-serif;
+  color: #ffffff;
+  text-shadow:
+    3px 0 0 #ef4444,
+    -3px 0 0 #111111;
+}

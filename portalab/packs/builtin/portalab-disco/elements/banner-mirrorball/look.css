@@ -1,0 +1,21 @@
+/* Portalab — profile_banner/mirrorball: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="mirrorball"] {
+  background:
+    repeating-conic-gradient(
+      from 0deg at 50% -10%,
+      #ff5ec733 0 8deg,
+      #ffe45e33 8deg 16deg,
+      #5ee7ff33 16deg 24deg,
+      transparent 24deg 32deg
+    ),
+    radial-gradient(10% 22% at 50% 18%, #ffffff, #c0c0c0 50%, #707070 70%, transparent 72%),
+    linear-gradient(180deg, #2b0a3d, #7b1fa2 55%, #ff6f00);
+  animation: cosmetics-disco 6s linear infinite;
+}
+
+@keyframes cosmetics-disco {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}

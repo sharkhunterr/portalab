@@ -1,0 +1,29 @@
+/* Portalab — ambient/equalizer: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="equalizer"] > span {
+  top: auto;
+  bottom: 0;
+  left: calc(var(--i) * (100% / 28));
+  inline-size: calc(100% / 28 - 6px);
+  block-size: 32vh;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(0deg, #1ed760, #1ed760aa 50%, #f573a0);
+  opacity: 0.12;
+  transform-origin: 50% 100%;
+  animation: ambient-eq calc(0.6s + var(--size) * 0.7s) ease-in-out var(--delay) infinite alternate;
+}
+
+@keyframes ambient-eq {
+  from {
+    transform: scaleY(0.08);
+  }
+  to {
+    transform: scaleY(calc(0.35 + var(--size) * 0.6));
+  }
+}
+
+/* in a box (a preview): the bars lower and softer */
+.ambient[data-contained][data-ambient="equalizer"] > span {
+  block-size: 80%;
+  opacity: 0.55;
+}

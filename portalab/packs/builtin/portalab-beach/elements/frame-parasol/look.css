@@ -1,0 +1,36 @@
+/* Portalab — avatar_frame/parasol: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="parasol"] {
+  padding: 22px 6px 4px;
+  border-radius: 0;
+}
+
+.avatar-frame[data-frame="parasol"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: -14%;
+  z-index: 2;
+  block-size: 30px;
+  border-radius: 100% 100% 0 0 / 100% 100% 0 0;
+  background: repeating-conic-gradient(from 270deg at 50% 100%, #ef4444 0 15deg, #ffffff 15deg 30deg);
+  clip-path: polygon(
+    0 100%,
+    0 70%,
+    10% 40%,
+    25% 15%,
+    50% 0,
+    75% 15%,
+    90% 40%,
+    100% 70%,
+    100% 100%,
+    87.5% 88%,
+    75% 100%,
+    62.5% 88%,
+    50% 100%,
+    37.5% 88%,
+    25% 100%,
+    12.5% 88%
+  );
+  filter: drop-shadow(0 3px 2px #00000033);
+}

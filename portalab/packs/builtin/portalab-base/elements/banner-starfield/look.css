@@ -1,0 +1,36 @@
+/* Portalab — profile_banner/starfield: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="starfield"] {
+  background:
+    radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 30% 70%, #fff, transparent),
+    radial-gradient(2px 2px at 55% 30%, #fde68a, transparent),
+    radial-gradient(1px 1px at 70% 80%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 85% 15%, #bfdbfe, transparent),
+    radial-gradient(1px 1px at 92% 60%, #fff, transparent),
+    radial-gradient(60% 100% at 70% 50%, #312e8166, transparent), linear-gradient(180deg, #020617, #0f172a);
+  background-size:
+    200px 120px,
+    260px 140px,
+    300px 160px,
+    220px 130px,
+    280px 150px,
+    240px 110px,
+    auto,
+    auto;
+  animation: cosmetics-drift 60s linear infinite;
+}
+
+@keyframes cosmetics-drift {
+  to {
+    background-position:
+      -400px 0,
+      -300px 0,
+      -200px 0,
+      -350px 0,
+      -250px 0,
+      -300px 0,
+      0 0,
+      0 0;
+  }
+}

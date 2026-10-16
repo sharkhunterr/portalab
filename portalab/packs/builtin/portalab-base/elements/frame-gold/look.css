@@ -1,0 +1,6 @@
+/* Portalab — avatar_frame/gold: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="gold"] {
+  background: conic-gradient(#fde68a, #b45309, #fef3c7, #d97706, #fde68a);
+  box-shadow: 0 0 1rem #f59e0b66;
+}

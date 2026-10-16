@@ -1,0 +1,44 @@
+/* Portalab — profile_banner/synthwave: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="synthwave"] {
+  background: linear-gradient(180deg, #1e0536, #4c1d95 45%, #be185d 62%, #12051f 62%);
+  perspective: 9rem;
+  perspective-origin: 50% 62%;
+}
+
+.profile-banner[data-banner="synthwave"]::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: calc(62% - 3.4rem);
+  inline-size: 6.8rem;
+  block-size: 3.4rem;
+  translate: -50% 0;
+  border-radius: 3.4rem 3.4rem 0 0;
+  background: linear-gradient(180deg, #fde047, #fb7185 60%, #f97316);
+  box-shadow: 0 0 2rem #fb718588;
+  mask:
+    linear-gradient(#000 0 45%, transparent 45%),
+    repeating-linear-gradient(180deg, #000 0 0.42rem, transparent 0.42rem 0.6rem);
+}
+
+.profile-banner[data-banner="synthwave"]::after {
+  content: "";
+  position: absolute;
+  inset: 62% -60% -20%;
+  background:
+    linear-gradient(#ff2fd1 2px, transparent 2px) 0 0 / 100% 2.2rem,
+    linear-gradient(90deg, #ff2fd1 2px, transparent 2px) 50% 0 / 3rem 100%;
+  box-shadow: inset 0 0.6rem 1.2rem #12051f;
+  transform: rotateX(62deg);
+  transform-origin: top;
+  animation: banner-synth-grid 1.2s linear infinite;
+}
+
+@keyframes banner-synth-grid {
+  to {
+    background-position:
+      0 2.2rem,
+      50% 0;
+  }
+}

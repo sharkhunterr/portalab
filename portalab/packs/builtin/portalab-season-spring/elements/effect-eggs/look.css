@@ -1,0 +1,43 @@
+/* Portalab — effect/eggs: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="eggs"] .celebration-fx {
+  left: var(--x);
+  top: auto;
+  bottom: calc(var(--fx-vh, 1vh) * -6);
+  inline-size: 1.5rem;
+  block-size: 1.95rem;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: repeating-linear-gradient(
+    160deg,
+    hsl(var(--h) 70% 82%) 0 0.35rem,
+    hsl(calc(var(--h) + 60) 75% 70%) 0.35rem 0.5rem,
+    #ffffff 0.5rem 0.62rem
+  );
+  box-shadow: inset -3px -4px 6px #0002;
+  animation-name: fx-egg;
+  animation-timing-function: cubic-bezier(0.25, 1.4, 0.5, 1);
+}
+
+[data-effect="eggs"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #fef9c3, #c4b5fd 60%, #a7f3d0);
+  color: #2e1065;
+  box-shadow: 0 0 22px #c4b5fd;
+}
+
+@keyframes fx-egg {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+    transform: translate3d(0, calc(var(--fx-vh, 1vh) * (-35 - var(--s) * 20)), 0) rotate(calc(var(--r) / 4));
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, calc(var(--fx-vh, 1vh) * (-28 - var(--s) * 18)), 0) rotate(calc(var(--r) / 3));
+  }
+}

@@ -1,0 +1,52 @@
+/* Portalab — effect/lineclear: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="lineclear"] .celebration-fx {
+  left: 0;
+  top: calc(30% + var(--i) * 6%);
+  inline-size: 100%;
+  block-size: 1.6rem;
+  background:
+    repeating-linear-gradient(90deg, #ffffff55 0 2px, transparent 2px 1.4rem, #00000055 1.4rem 1.6rem),
+    repeating-linear-gradient(
+      90deg,
+      #00e5ff 0 1.6rem,
+      #ffd23f 1.6rem 3.2rem,
+      #c77dff 3.2rem 4.8rem,
+      #3ddc84 4.8rem 6.4rem,
+      #ff5c5c 6.4rem 8rem
+    );
+  animation-name: fx-lineclear;
+  animation-timing-function: steps(1, end);
+}
+
+[data-effect="lineclear"] .ds-celebration__badge {
+  background: #c77dff;
+  color: #0b0b2a;
+  font-family: "Press Start 2P", monospace;
+  box-shadow:
+    inset 3px 3px 0 #ffffff66,
+    inset -3px -3px 0 #00000055;
+}
+
+@keyframes fx-lineclear {
+  0% {
+    opacity: 1;
+  }
+  20% {
+    filter: brightness(3);
+  }
+  35% {
+    filter: none;
+  }
+  50% {
+    filter: brightness(3);
+  }
+  70% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}

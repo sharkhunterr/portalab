@@ -1,0 +1,21 @@
+/* Portalab — notification_style/parchment: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="parchment"] .ds-notification {
+  border: 1px solid #8a6b3d;
+  border-radius: 0.3rem;
+  background:
+    radial-gradient(ellipse at 10% 0%, #00000014, transparent 60%), linear-gradient(180deg, #f5e7c4, #e8d3a2);
+  color: #3b2a12;
+  font-family: "EB Garamond", Georgia, serif;
+  box-shadow:
+    0 6px 18px #00000055,
+    inset 0 0 1.4rem #8a6b3d33;
+}
+
+.ds-notifications[data-style="parchment"] .ds-notification__title {
+  font-family: "Cinzel", Georgia, serif;
+}
+
+.ds-notifications[data-style="parchment"] .ds-notification__body {
+  color: #5a4220;
+}

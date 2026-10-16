@@ -1,0 +1,22 @@
+/* Portalab — level_badge/flipflop: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="flipflop"] {
+  position: relative;
+  overflow: visible;
+  padding-inline: 0.5rem 0.9rem;
+  border-radius: 999px 1.4rem 1.4rem 999px;
+  background: linear-gradient(180deg, #ff9a6b, #ff7a45);
+  color: #3a1200;
+  box-shadow: inset 0 -3px 0 #c2410c66;
+}
+
+.ds-level[data-look="flipflop"]::after {
+  content: "";
+  position: absolute;
+  inset-block: 15%;
+  inset-inline-end: 0.35rem;
+  inline-size: 0.5rem;
+  border-block: 3px solid #0b9fb8;
+  border-inline-start: 3px solid #0b9fb8;
+  border-radius: 0.6rem 0 0 0.6rem;
+}

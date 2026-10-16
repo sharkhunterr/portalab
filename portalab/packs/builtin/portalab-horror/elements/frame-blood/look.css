@@ -1,0 +1,17 @@
+/* Portalab — avatar_frame/blood: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="blood"] {
+  background: conic-gradient(#7f1d1d, #ef4444, #450a0a, #b91c1c, #7f1d1d);
+  box-shadow: 0 0.5rem 1rem #7f1d1d99;
+}
+
+.avatar-frame[data-frame="blood"]::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -0.45rem;
+  inset-inline-start: 58%;
+  inline-size: 0.45rem;
+  block-size: 0.7rem;
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  background: #b91c1c;
+}

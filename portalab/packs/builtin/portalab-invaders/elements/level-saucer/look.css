@@ -1,0 +1,35 @@
+/* Portalab — level_badge/saucer: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="saucer"] {
+  position: relative;
+  overflow: visible;
+  margin-block-start: 0.4rem;
+  padding-inline: 0.7rem;
+  border-radius: 50% / 45%;
+  background:
+    radial-gradient(circle 2px, #ffe14d 96%, transparent) 0 75% / 0.6rem 0.6rem repeat-x,
+    linear-gradient(180deg, #ff6b81, #c81d3a);
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  animation: level-saucer-lights 0.5s steps(2, jump-none) infinite;
+}
+
+.ds-level[data-look="saucer"]::before {
+  content: "";
+  position: absolute;
+  inset-block-end: 82%;
+  inset-inline-start: 30%;
+  inline-size: 40%;
+  block-size: 0.55rem;
+  border-radius: 999px 999px 0 0;
+  background: #ffb3c0;
+}
+
+@keyframes level-saucer-lights {
+  50% {
+    background-position:
+      0.3rem 75%,
+      0 0;
+  }
+}

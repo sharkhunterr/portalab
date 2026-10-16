@@ -10,8 +10,10 @@
     "fr": "Un nom en lettres de pixels blanches qui brillent dans le tableau des scores."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

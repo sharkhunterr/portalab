@@ -1,0 +1,76 @@
+/* Portalab — ambient/fallingblocks: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="fallingblocks"] > span {
+  --b: calc(0.9rem + 0.5rem * var(--size));
+  --c: #00e5ff;
+  top: -10%;
+  inline-size: var(--b);
+  block-size: var(--b);
+  background: var(--c);
+  box-shadow:
+    inset 3px 3px 0 #ffffff66,
+    inset -3px -3px 0 #00000055,
+    var(--b) 0 0 var(--c),
+    calc(var(--b) * 2) 0 0 var(--c),
+    var(--b) var(--b) 0 var(--c);
+  opacity: 0.35;
+  animation: ambient-block-fall calc(var(--duration) * 1.4) linear var(--delay) infinite;
+}
+
+[data-ambient="fallingblocks"] > span:nth-child(5n + 1) {
+  --c: #ffd23f;
+  box-shadow:
+    inset 3px 3px 0 #ffffff66,
+    inset -3px -3px 0 #00000055,
+    var(--b) 0 0 var(--c),
+    0 var(--b) 0 var(--c),
+    var(--b) var(--b) 0 var(--c);
+}
+
+[data-ambient="fallingblocks"] > span:nth-child(5n + 2) {
+  --c: #c77dff;
+}
+
+[data-ambient="fallingblocks"] > span:nth-child(5n + 3) {
+  --c: #3ddc84;
+  box-shadow:
+    inset 3px 3px 0 #ffffff66,
+    inset -3px -3px 0 #00000055,
+    var(--b) 0 0 var(--c),
+    var(--b) var(--b) 0 var(--c),
+    calc(var(--b) * 2) var(--b) 0 var(--c);
+}
+
+[data-ambient="fallingblocks"] > span:nth-child(5n + 4) {
+  --c: #ff9f40;
+  box-shadow:
+    inset 3px 3px 0 #ffffff66,
+    inset -3px -3px 0 #00000055,
+    0 var(--b) 0 var(--c),
+    0 calc(var(--b) * 2) 0 var(--c),
+    var(--b) calc(var(--b) * 2) 0 var(--c);
+}
+
+[data-ambient="fallingblocks"] > span {
+  animation-timing-function: steps(24, end);
+}
+
+@keyframes ambient-block-fall {
+  0% {
+    top: -10%;
+    rotate: 0deg;
+  }
+  25% {
+    rotate: 90deg;
+  }
+  50% {
+    rotate: 180deg;
+  }
+  75% {
+    rotate: 270deg;
+  }
+  100% {
+    top: 110%;
+    rotate: 360deg;
+  }
+}

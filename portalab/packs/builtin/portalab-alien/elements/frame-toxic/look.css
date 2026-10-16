@@ -1,0 +1,13 @@
+/* Portalab — avatar_frame/toxic: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="toxic"] {
+  background: conic-gradient(#a3e635, #14532d, #84cc16, #052e16, #a3e635);
+  box-shadow: 0 0 1rem #a3e635aa;
+  animation: cosmetics-pulse-green 2.4s ease-in-out infinite;
+}
+
+@keyframes cosmetics-pulse-green {
+  50% {
+    box-shadow: 0 0 1.8rem #bef264;
+  }
+}

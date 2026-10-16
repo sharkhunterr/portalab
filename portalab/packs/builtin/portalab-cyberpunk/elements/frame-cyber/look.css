@@ -1,0 +1,7 @@
+/* Portalab — avatar_frame/cyber: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="cyber"] {
+  border-radius: 0.6rem;
+  background: linear-gradient(135deg, #fcee0a, #fcee0a 70%, #00f0ff 70%);
+  clip-path: polygon(0 12%, 12% 0, 100% 0, 100% 88%, 88% 100%, 0 100%);
+}

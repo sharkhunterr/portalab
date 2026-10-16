@@ -1,0 +1,53 @@
+/* Portalab — ambient/bats: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="bats"] > span {
+  left: -10vw;
+  inline-size: calc(2.6rem * var(--size));
+  block-size: calc(1.2rem * var(--size));
+  background: #14081f;
+  opacity: 0.8;
+  clip-path: polygon(
+    0 20%,
+    15% 35%,
+    25% 25%,
+    38% 45%,
+    46% 30%,
+    50% 40%,
+    54% 30%,
+    62% 45%,
+    75% 25%,
+    85% 35%,
+    100% 20%,
+    92% 60%,
+    78% 55%,
+    66% 80%,
+    55% 62%,
+    50% 78%,
+    45% 62%,
+    34% 80%,
+    22% 55%,
+    8% 60%
+  );
+  animation-name: ambient-fly, ambient-flap;
+  animation-duration: calc(var(--duration) * 1.4), 0.35s;
+  animation-timing-function: linear, ease-in-out;
+  animation-direction: normal, alternate;
+}
+
+@keyframes ambient-fly {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(60vw, -12vh, 0);
+  }
+  to {
+    transform: translate3d(125vw, 6vh, 0);
+  }
+}
+
+@keyframes ambient-flap {
+  to {
+    scale: 1 0.45;
+  }
+}

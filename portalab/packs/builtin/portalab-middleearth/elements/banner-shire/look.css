@@ -1,0 +1,10 @@
+/* Portalab — profile_banner/shire: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="shire"] {
+  background:
+    radial-gradient(120% 60% at 25% 100%, #4d7c0f 0 50%, transparent 51%),
+    radial-gradient(110% 55% at 80% 100%, #65a30d 0 48%, transparent 49%),
+    radial-gradient(140% 70% at 50% 110%, #3f6212 0 52%, transparent 53%),
+    radial-gradient(circle at 80% 22%, #fef3c7 0 2.2rem, #fde68a55 2.3rem, transparent 5rem),
+    linear-gradient(180deg, #7dd3fc, #e0f2fe 70%);
+}

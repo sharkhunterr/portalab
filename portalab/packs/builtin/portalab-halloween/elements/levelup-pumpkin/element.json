@@ -10,8 +10,10 @@
     "fr": "Des chauves-souris s'envolent dans une lueur orange — BOU !"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 450,

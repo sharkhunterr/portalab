@@ -1,0 +1,34 @@
+/* Portalab — notification_style/hologram: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="hologram"] .ds-notification {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--color-surface) 85%, transparent),
+      color-mix(in srgb, var(--color-surface) 85%, transparent)
+    )
+    padding-box,
+    linear-gradient(120deg, #7cf7ff, #c58bff, #ff9be3, #7cf7ff) border-box;
+  background-size:
+    100% 100%,
+    300% 300%;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation:
+    var(--notify-in, ds-notify-slide) var(--motion-duration-slow) var(--motion-easing-out) both,
+    universe-holo 4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.ds-notifications[data-style="hologram"] .ds-notification {
+    animation: none;
+  }
+}
+
+@keyframes universe-holo {
+  to {
+    background-position:
+      0 0,
+      300% 0;
+  }
+}

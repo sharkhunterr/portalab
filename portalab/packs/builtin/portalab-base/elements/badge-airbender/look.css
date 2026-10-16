@@ -1,0 +1,22 @@
+/* Portalab — badge/wind: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="wind"] {
+  border-color: #bae6fd;
+  background: linear-gradient(110deg, #f0f9ff22, #e0f2fe44, #f0f9ff22);
+  color: var(--color-text);
+  animation: badge-wind 2.4s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+@keyframes badge-wind {
+  0%,
+  100% {
+    transform: skewX(0deg);
+  }
+  30% {
+    transform: skewX(-6deg) translateX(1px);
+  }
+  60% {
+    transform: skewX(3deg);
+  }
+}

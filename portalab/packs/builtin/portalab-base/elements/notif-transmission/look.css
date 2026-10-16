@@ -1,0 +1,32 @@
+/* Portalab — notification_style/transmission: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="transmission"] .ds-notification {
+  --color-text: #d8fff0;
+  --color-text-muted: #8fd9bf;
+  border: 1px solid #2fe0a8;
+  border-radius: 0.4rem;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 3px, #2fe0a80d 3px 4px),
+    linear-gradient(180deg, #04150f, #062419);
+  color: #d8fff0;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  box-shadow: 0 0 1rem #2fe0a844;
+}
+
+.ds-notifications[data-style="transmission"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="transmission"] .ds-notification__icon {
+  background: #2fe0a822;
+  color: #2fe0a8;
+}
+
+.ds-notifications[data-style="transmission"] .ds-notification__title::before {
+  content: "◉ RX · ";
+  color: #2fe0a8;
+}
+
+.ds-notifications[data-style="transmission"] .ds-notification__timer {
+  background: #2fe0a8;
+}

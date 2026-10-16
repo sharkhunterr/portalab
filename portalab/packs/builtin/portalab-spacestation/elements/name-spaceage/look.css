@@ -1,0 +1,11 @@
+/* Portalab — name_style/spaceage: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="spaceage"] {
+  font-family: Audiowide, Orbitron, sans-serif;
+  letter-spacing: 0.04em;
+  background: linear-gradient(180deg, #ffffff 0%, #cfe6ff 45%, #6fb8ff 55%, #e8f4ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 0.35em rgb(95 180 255 / 0.55));
+}

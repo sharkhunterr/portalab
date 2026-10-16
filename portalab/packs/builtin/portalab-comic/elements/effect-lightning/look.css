@@ -1,0 +1,39 @@
+/* Portalab — effect/lightning: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="lightning"] .celebration-fx {
+  left: calc(10% + var(--i) * 25%);
+  top: calc(var(--fx-vh, 1vh) * 10);
+  color: #fff35c;
+  filter: drop-shadow(0 0 10px #ffe600) drop-shadow(0 0 22px #fff7a8);
+  scale: calc(3 + var(--s) * 2);
+  animation-name: fx-strike;
+  animation-duration: 0.9s;
+  animation-delay: calc(var(--i) * 0.15s);
+  animation-timing-function: steps(1, end);
+}
+
+[data-effect="lightning"] .celebration-fx svg {
+  fill: currentColor;
+}
+
+[data-effect="lightning"] .ds-celebration__badge {
+  background: #111111;
+  color: #fff35c;
+  box-shadow:
+    0 0 0 3px #fff35c,
+    0 0 28px #ffe600;
+}
+
+@keyframes fx-strike {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  10%,
+  30% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.3;
+  }
+}

@@ -1,0 +1,11 @@
+/* Portalab — level_badge/neon: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="neon"] {
+  border: 1.5px solid #22d3ee;
+  background: #04121a;
+  color: #a5f3fc;
+  text-shadow: 0 0 6px #22d3ee;
+  box-shadow:
+    0 0 8px #22d3ee,
+    inset 0 0 6px #22d3ee66;
+}

@@ -1,0 +1,11 @@
+/* Portalab — name_style/staratlas: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="staratlas"] {
+  font-family: "Cinzel Decorative", Cinzel, serif;
+  font-weight: 700;
+  color: #f2d48a;
+  text-shadow:
+    0 1px 0 #6b4a12,
+    0 -1px 0 #fff3cf,
+    0 0 0.5em rgb(242 212 138 / 0.4);
+}

@@ -1,0 +1,18 @@
+/* Portalab — ambient/cinemaglow: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="cinemaglow"] > span {
+  top: calc(-20% + var(--i) * 30%);
+  left: -20%;
+  inline-size: 70vmax;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #e5091424, #e509140c 45%, transparent 70%);
+  filter: blur(20px);
+  animation: ambient-glow-sweep calc(var(--duration) * 2.2) ease-in-out var(--delay) infinite alternate;
+}
+
+@keyframes ambient-glow-sweep {
+  to {
+    transform: translateX(80vw) scale(1.25);
+  }
+}

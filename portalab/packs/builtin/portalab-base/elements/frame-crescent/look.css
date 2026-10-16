@@ -1,0 +1,6 @@
+/* Portalab — avatar_frame/crescent: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="crescent"] {
+  background: radial-gradient(circle at 18% 50%, #fffbe8 0 30%, #e8e0c0 48%, #4a4f66 72%, #2a2e40);
+  box-shadow: -0.3rem 0 1rem #fdf6d855;
+}

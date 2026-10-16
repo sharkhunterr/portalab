@@ -1,0 +1,21 @@
+/* Portalab — notification_animation/swoop: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="swoop"] .ds-notification {
+  animation-name: universe-notify-swoop;
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.25, 0.8, 0.3, 1);
+}
+
+@keyframes universe-notify-swoop {
+  0% {
+    opacity: 0;
+    transform: translate(-60vw, -40vh) rotate(-25deg) scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(1.5rem, 0.8rem) rotate(6deg) scale(1.04);
+  }
+  100% {
+    transform: none;
+  }
+}

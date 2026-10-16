@@ -1,0 +1,53 @@
+/* Portalab — notification_style/scroll: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="scroll"] .ds-notification {
+  position: relative;
+  margin-inline: 0.9rem;
+  border: 0;
+  border-radius: 0.2rem;
+  background:
+    radial-gradient(ellipse at 15% 20%, #00000012, transparent 55%), linear-gradient(180deg, #f6e7c1, #ead39c);
+  color: #3a2410;
+  font-family: "EB Garamond", Georgia, serif;
+  box-shadow: 0 6px 18px #00000055;
+}
+
+.ds-notifications[data-style="scroll"] .ds-notification::before {
+  content: "";
+  position: absolute;
+  inset-block: -0.35rem;
+  inline-size: 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #b88a4a, #f3dfae 45%, #a87a3a);
+  box-shadow: 0 2px 4px #0005;
+}
+
+.ds-notifications[data-style="scroll"] .ds-notification::after {
+  content: "";
+  position: absolute;
+  inset-block: -0.35rem;
+  inline-size: 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #b88a4a, #f3dfae 45%, #a87a3a);
+  box-shadow: 0 2px 4px #0005;
+}
+
+.ds-notifications[data-style="scroll"] .ds-notification::before {
+  inset-inline-start: -0.8rem;
+}
+
+.ds-notifications[data-style="scroll"] .ds-notification::after {
+  inset-inline-end: -0.8rem;
+}
+
+.ds-notifications[data-style="scroll"] .ds-notification__title {
+  font-family: "Uncial Antiqua", "Cinzel", serif;
+}
+
+.ds-notifications[data-style="scroll"] .ds-notification__body {
+  color: #5a3a1a;
+}
+
+.ds-notifications[data-style="scroll"] .ds-notification {
+  overflow: visible;
+}

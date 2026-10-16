@@ -1,0 +1,36 @@
+/* Portalab — notification_style/manga: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="manga"] .ds-notification {
+  border: 3px solid #111111;
+  border-radius: 0;
+  background:
+    repeating-conic-gradient(from 0deg at 100% 0%, #00000014 0 1.5deg, transparent 1.5deg 6deg),
+    radial-gradient(#00000022 1px, transparent 1.3px) 0 0 / 6px 6px,
+    #ffffff;
+  color: #111111;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 0.9rem), calc(100% - 0.9rem) 100%, 0 100%);
+  box-shadow: none;
+  filter: drop-shadow(4px 4px 0 #111111);
+}
+
+.ds-notifications[data-style="manga"] .ds-notification::before {
+  inline-size: 0.5rem;
+  background: var(--tone);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.ds-notifications[data-style="manga"] .ds-notification__title {
+  font-family: "Dela Gothic One", "Bangers", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.ds-notifications[data-style="manga"] .ds-notification__body {
+  color: #333333;
+}
+
+.ds-notifications[data-style="manga"] .ds-notification__icon {
+  border: 2px solid #111111;
+  background: #ffffff;
+  color: #111111;
+}

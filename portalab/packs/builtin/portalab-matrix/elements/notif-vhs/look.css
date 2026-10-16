@@ -1,0 +1,88 @@
+/* Portalab — notification_style/vhs: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="vhs"] .ds-notification {
+  border: 0;
+  border-radius: 0.15rem;
+  background:
+    repeating-linear-gradient(180deg, #ffffff0a 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #14102a, #0a0814);
+  color: #e8e8ff;
+  font-family: "Share Tech Mono", ui-monospace, monospace;
+  box-shadow:
+    0 0 0 1px #6a5acd66,
+    0 0.6rem 1.4rem -0.6rem #000000;
+}
+
+.ds-notifications[data-style="vhs"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="vhs"] .ds-notification::after {
+  content: "▶ PLAY";
+  position: absolute;
+  inset-block-end: 0.4rem;
+  inset-inline-end: 0.7rem;
+  color: #ffffffcc;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 4px #ffffff88;
+}
+
+.ds-notifications[data-style="vhs"] .ds-notification__title {
+  letter-spacing: 0.05em;
+  text-shadow:
+    -2px 0 #ff2a6d,
+    2px 0 #05d9e8;
+  text-transform: uppercase;
+  animation: universe-vhs-jitter 3.2s steps(1, end) infinite;
+}
+
+.ds-notifications[data-style="vhs"] .ds-notification__body {
+  color: #b8b8e0;
+}
+
+.ds-notifications[data-style="vhs"] .ds-notification__icon {
+  border-radius: 0.15rem;
+  background: #2a2350;
+  color: #05d9e8;
+}
+
+.ds-notifications[data-style="vhs"] .ds-notification {
+  font-family: "VT323", "Share Tech Mono", monospace;
+  font-size: 1.08rem;
+}
+
+.ds-notifications[data-style="vhs"] .ds-notification::before {
+  display: block;
+  inset: 0;
+  inline-size: auto;
+  background: linear-gradient(180deg, transparent 0 45%, #ffffff14 45% 52%, transparent 52%) 0 0 / 100% 300%;
+  pointer-events: none;
+  animation: notif-vhs-track 3.2s linear infinite;
+}
+
+.ds-notifications[data-style="vhs"] .ds-notification::after {
+  content: "PLAY ▶";
+  inset-block: 0.35rem auto;
+  font-size: 0.95rem;
+}
+
+@keyframes universe-vhs-jitter {
+  0%,
+  92%,
+  100% {
+    transform: none;
+  }
+  93% {
+    transform: translateX(-2px) skewX(-6deg);
+  }
+  95% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes notif-vhs-track {
+  to {
+    background-position: 0 100%;
+  }
+}

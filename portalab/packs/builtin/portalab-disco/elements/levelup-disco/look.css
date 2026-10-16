@@ -1,0 +1,32 @@
+/* Portalab — level_up/disco: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="disco"] .levelup__rays {
+  display: block;
+  inset: -50vmax;
+  background: conic-gradient(from 0deg, #f43f5e33, #fde04733, #22d3ee33, #a855f733, #f43f5e33);
+  animation: levelup-spin 6s linear infinite;
+}
+
+.levelup[data-look="disco"] .levelup__fx {
+  display: block;
+  inset-block-start: var(--y);
+  inset-inline-start: var(--x);
+  inline-size: 0.8rem;
+  block-size: 0.8rem;
+  border-radius: 50%;
+  background: hsl(calc(var(--i) * 37) 100% 70%);
+  box-shadow: 0 0 14px hsl(calc(var(--i) * 37) 100% 70%);
+  animation: levelup-spot 2s ease-in-out calc(var(--r) * -2s) infinite alternate;
+}
+
+@keyframes levelup-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes levelup-spot {
+  to {
+    transform: translate(10vw, -8vh) scale(1.6);
+  }
+}

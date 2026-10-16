@@ -1,0 +1,36 @@
+/* Portalab — notification_style/onering: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="onering"] .ds-notification {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(#0b0703, #0b0703) padding-box,
+    conic-gradient(from var(--level-turn, 0deg), #fde68a, #b45309, #fef3c7, #d97706, #fde68a) border-box;
+  color: #fde68a;
+  padding-inline: 1.2rem;
+  box-shadow: 0 0 1.4rem #f59e0b44;
+  animation:
+    var(--notify-in, ds-notify-slide) var(--motion-duration-normal, 0.25s) var(--motion-easing, ease-out) both,
+    level-elements 6s linear infinite;
+}
+
+.ds-notifications[data-style="onering"] .ds-notification::before {
+  display: none;
+}
+
+.ds-notifications[data-style="onering"] .ds-notification__title {
+  font-family: "Cinzel", serif;
+  color: #fde68a;
+  text-shadow: 0 0 6px #f97316;
+}
+
+.ds-notifications[data-style="onering"] .ds-notification__icon {
+  background: radial-gradient(circle, #451a03, #000);
+  color: #fbbf24;
+}
+
+@keyframes level-elements {
+  to {
+    --level-turn: 360deg;
+  }
+}

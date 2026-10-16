@@ -10,8 +10,10 @@
     "fr": "Votre avatar dans une petite fenêtre, sa barre de titre bleue et son bouton fermer rouge."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

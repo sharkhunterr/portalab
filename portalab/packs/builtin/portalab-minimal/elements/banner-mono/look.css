@@ -1,0 +1,5 @@
+/* Portalab — profile_banner/mono: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="mono"] {
+  background: linear-gradient(135deg, #f5f5f4, #d6d3d1 60%, #a8a29e);
+}

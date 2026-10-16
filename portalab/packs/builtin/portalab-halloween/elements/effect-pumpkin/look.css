@@ -1,0 +1,59 @@
+/* Portalab — effect/bats: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="bats"] .celebration-fx {
+  inline-size: 2.4rem;
+  block-size: 1.1rem;
+  background: #1a0b26;
+  clip-path: polygon(
+    0 20%,
+    15% 35%,
+    25% 25%,
+    38% 45%,
+    46% 30%,
+    50% 40%,
+    54% 30%,
+    62% 45%,
+    75% 25%,
+    85% 35%,
+    100% 20%,
+    92% 60%,
+    78% 55%,
+    66% 80%,
+    55% 62%,
+    50% 78%,
+    45% 62%,
+    34% 80%,
+    22% 55%,
+    8% 60%
+  );
+  filter: drop-shadow(0 0 4px #ff8c1a);
+  --angle: calc(-70deg + 140deg * var(--i) / var(--n));
+  animation-name: fx-bats;
+  animation-timing-function: ease-in;
+}
+
+[data-effect="bats"] .ds-celebration__badge {
+  background: linear-gradient(135deg, #3b0764, #ff8c1a);
+  color: #fff1e0;
+  box-shadow: 0 0 22px #ff8c1a;
+}
+
+@keyframes fx-bats {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(0.5, 0.5);
+  }
+  25% {
+    transform: rotate(var(--angle)) translateY(-3rem) scale(1, 0.4);
+  }
+  50% {
+    transform: rotate(var(--angle)) translateY(-8rem) scale(1, 1);
+  }
+  75% {
+    transform: rotate(var(--angle)) translateY(-14rem) scale(1, 0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-22rem) scale(1, 1);
+  }
+}

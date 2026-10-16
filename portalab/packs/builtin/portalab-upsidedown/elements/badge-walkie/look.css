@@ -1,0 +1,25 @@
+/* Portalab — badge/vhs: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="vhs"] {
+  border-color: #6a5acd;
+  background: repeating-linear-gradient(180deg, #ffffff0d 0 1px, transparent 1px 3px), #14102a;
+  color: #e8e8ff;
+  text-shadow:
+    -1.5px 0 #ff2a6d,
+    1.5px 0 #05d9e8;
+  animation: universe-vhs-jitter 3.2s steps(1, end) infinite;
+}
+
+@keyframes universe-vhs-jitter {
+  0%,
+  92%,
+  100% {
+    transform: none;
+  }
+  93% {
+    transform: translateX(-2px) skewX(-6deg);
+  }
+  95% {
+    transform: translateX(2px);
+  }
+}

@@ -10,8 +10,10 @@
     "fr": "Noires, dans un anneau d'or qui tourne."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 1000,

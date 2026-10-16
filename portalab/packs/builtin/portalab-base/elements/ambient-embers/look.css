@@ -1,0 +1,35 @@
+/* Portalab — ambient/embers: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="embers"] > span {
+  top: auto;
+  bottom: -2vh;
+  inline-size: calc(0.35rem * var(--size));
+  block-size: calc(0.35rem * var(--size));
+  border-radius: 50%;
+  background: #ffb347;
+  box-shadow:
+    0 0 8px #ff7b00,
+    0 0 16px #ff3c00aa;
+  animation-name: ambient-rise, ambient-flicker;
+  animation-duration: var(--duration), 1.3s;
+}
+
+@keyframes ambient-rise {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(var(--drift), -105vh, 0) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes ambient-flicker {
+  50% {
+    filter: brightness(1.6);
+  }
+}

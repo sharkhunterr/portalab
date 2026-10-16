@@ -10,8 +10,10 @@
     "fr": "Talkie-walkie toujours sur le canal six."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

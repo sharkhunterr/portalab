@@ -1,0 +1,30 @@
+/* Portalab — ambient/groovywaves: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="groovywaves"] > span {
+  --c: #ff8c1a;
+  top: auto;
+  left: -10vmax;
+  bottom: -10vmax;
+  inline-size: calc(30vmax + var(--i) * 16vmax);
+  aspect-ratio: 1;
+  border: 5vmax solid var(--c);
+  border-radius: 50%;
+  translate: -50% 50%;
+  opacity: 0.13;
+  animation: ambient-groove calc(5s + var(--i) * 1.2s) ease-in-out var(--delay) infinite alternate;
+}
+
+[data-ambient="groovywaves"] > span:nth-child(3n + 2) {
+  --c: #ffd23f;
+}
+
+[data-ambient="groovywaves"] > span:nth-child(3n) {
+  --c: #c2410c;
+}
+
+@keyframes ambient-groove {
+  to {
+    scale: 1.06;
+    rotate: 6deg;
+  }
+}

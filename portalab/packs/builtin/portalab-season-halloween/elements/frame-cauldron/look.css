@@ -1,0 +1,18 @@
+/* Portalab — avatar_frame/cauldron: moved from Portalab's stylesheets (spec 028, B2) */
+
+.avatar-frame[data-frame="cauldron"] {
+  background:
+    radial-gradient(circle at 30% 18%, #b6ff7a 0 7%, transparent 8%),
+    radial-gradient(circle at 62% 10%, #b6ff7a 0 5%, transparent 6%),
+    radial-gradient(circle at 78% 26%, #b6ff7a 0 6%, transparent 7%),
+    conic-gradient(#3b1a5a, #6d28d9, #3b1a5a, #16a34a, #3b1a5a);
+  box-shadow: 0 0 0.9rem #84cc16aa;
+  animation: frame-bubble 2.6s ease-in-out infinite;
+}
+
+@keyframes frame-bubble {
+  50% {
+    box-shadow: 0 0 1.4rem #a3e635cc;
+    filter: hue-rotate(-12deg);
+  }
+}

@@ -1,0 +1,27 @@
+/* Portalab — ambient/cannonsmoke: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="cannonsmoke"] > span {
+  top: calc(var(--y) * 0.9);
+  left: -20%;
+  inline-size: calc(5rem + 7rem * var(--size));
+  aspect-ratio: 1.6;
+  background:
+    radial-gradient(circle at 30% 60%, #d8d4cc99 0 25%, transparent 45%),
+    radial-gradient(circle at 55% 45%, #e6e2da88 0 28%, transparent 48%),
+    radial-gradient(circle at 75% 62%, #cfcac088 0 22%, transparent 42%);
+  filter: blur(6px);
+  opacity: 0.5;
+  animation-name: ambient-smoke-drift;
+  animation-duration: calc(var(--duration) * 2.4);
+}
+
+@keyframes ambient-smoke-drift {
+  from {
+    left: -20%;
+    scale: 0.6;
+  }
+  to {
+    left: 110%;
+    scale: 1.4;
+  }
+}

@@ -1,0 +1,11 @@
+/* Portalab — level_badge/chevron: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="chevron"] {
+  padding-inline: 0.8rem 1rem;
+  border-radius: 0;
+  background: linear-gradient(180deg, #e5e7eb, #6b7280 50%, #374151);
+  color: #fff;
+  clip-path: polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%, 12% 50%);
+  text-shadow: 0 1px 0 #111827;
+  box-shadow: none;
+}

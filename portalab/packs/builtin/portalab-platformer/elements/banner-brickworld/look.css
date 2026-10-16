@@ -1,0 +1,17 @@
+/* Portalab — profile_banner/brickworld: moved from Portalab's stylesheets (spec 028, B2) */
+
+.profile-banner[data-banner="brickworld"] {
+  background:
+    radial-gradient(ellipse 9% 12% at 20% 28%, #ffffff 96%, transparent),
+    radial-gradient(ellipse 6% 9% at 25% 24%, #ffffff 96%, transparent),
+    linear-gradient(#000000 0 3px, transparent 3px) 30% 38% / 26% 22% no-repeat,
+    linear-gradient(#f8b800, #f8b800) 43% 38% / 4% 22% no-repeat,
+    linear-gradient(#000000 0 2px, transparent 2px) 30% 38% / 1.4rem 0.7rem,
+    linear-gradient(#c84c0c, #c84c0c) 30% 38% / 26% 22% no-repeat,
+    linear-gradient(90deg, #1e7a1e 0 10%, #3cb83c 10% 90%, #1e7a1e 90%) 82% 100% / 8% 42% no-repeat,
+    linear-gradient(90deg, #1e7a1e 0 8%, #3cb83c 8% 92%, #1e7a1e 92%) 82% 58% / 10% 9% no-repeat,
+    radial-gradient(ellipse 22% 36% at 8% 100%, #3cb83c 96%, transparent),
+    linear-gradient(#000000 0 2px, transparent 2px) 0 100% / 1.4rem 0.7rem repeat-x,
+    linear-gradient(#c84c0c, #c84c0c) 0 100% / 100% 12% no-repeat,
+    #6fb2ff;
+}

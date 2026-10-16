@@ -10,8 +10,10 @@
     "fr": "Des cœurs et des pouces qui s'envolent comme les réactions d'une vidéo en direct."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 300,

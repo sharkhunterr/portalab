@@ -15,6 +15,8 @@
 
 // a sibling combinator (``~``, ``+`` — not the attribute operator ``~=``), :has(), the document's root
 const ESCAPES = /\+|~(?!=)|:has\(|:root|(?:^|[\s>(,])(?:html|body)\b/i;
+// the An+B formula of ``:nth-child(3n + 1)``… is not a combinator (its ``of S`` part is still checked)
+const NTH = /:nth-[a-z-]+\(\s*(?:[-+]?\d*n\s*(?:[-+]\s*\d+)?|[-+]?\d+|odd|even)\s*/gi;
 const PSEUDO_ELEMENT =
   /(::?(?:before|after|first-line|first-letter|placeholder|marker|selection|backdrop|file-selector-button)|::[\w-]+(?:\([^)]*\))?)$/i;
 const PROTECTED = ":not([data-protected]):not([data-protected] *)";
@@ -60,7 +62,7 @@ export function lookSelectorOk(selector: string, look: string): boolean {
   const value = escapeRegExp(look);
   // its hook, ``=`` or ``~=`` where an element wears several looks (a widget's options, 028)
   const hook = new RegExp(`\\[data-[\\w-]+~?=(?:"${value}"|'${value}'|${value})\\]`);
-  return hook.test(firstCompound(selector)) && !ESCAPES.test(selector);
+  return hook.test(firstCompound(selector)) && !ESCAPES.test(selector.replace(NTH, ":nth("));
 }
 
 export function interfaceSelectorOk(selector: string, key: string): boolean {

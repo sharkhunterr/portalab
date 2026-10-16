@@ -1,0 +1,41 @@
+/* Portalab — notification_animation/flipup: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="flipup"] .ds-notification {
+  transform-origin: 50% 100%;
+  animation-name: universe-notify-flipup;
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ds-notifications[data-animation="flipup"] .ds-notification[data-leaving] {
+  transform-origin: 50% 100%;
+  animation: universe-notify-flipdown 0.5s ease-in forwards !important;
+}
+
+@keyframes universe-notify-flipup {
+  0% {
+    opacity: 0;
+    transform: translateY(4rem) perspective(40rem) rotateX(-180deg);
+    filter: brightness(0.3) hue-rotate(-30deg);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(0) perspective(40rem) rotateX(-20deg);
+    filter: brightness(1.3);
+  }
+  80% {
+    transform: perspective(40rem) rotateX(6deg);
+  }
+  100% {
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes universe-notify-flipdown {
+  to {
+    opacity: 0;
+    transform: translateY(3rem) perspective(40rem) rotateX(-180deg);
+    filter: brightness(0.2);
+  }
+}

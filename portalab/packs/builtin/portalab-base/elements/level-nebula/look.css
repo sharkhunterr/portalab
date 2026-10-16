@@ -1,0 +1,28 @@
+/* Portalab — level_badge/nebula: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="nebula"] {
+  background:
+    radial-gradient(1px 1px at 20% 30%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 60%, #fff 50%, transparent 51%),
+    radial-gradient(circle at 30% 40%, #db2777aa, transparent 50%),
+    radial-gradient(circle at 70% 60%, #6d28d9aa, transparent 55%), #0b0820;
+  background-size:
+    100% 100%,
+    100% 100%,
+    200% 200%,
+    200% 200%,
+    auto;
+  color: #f5d0fe;
+  animation: level-nebula 8s ease-in-out infinite alternate;
+}
+
+@keyframes level-nebula {
+  to {
+    background-position:
+      0 0,
+      0 0,
+      100% 100%,
+      0 100%,
+      0 0;
+  }
+}

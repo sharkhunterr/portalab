@@ -1,0 +1,20 @@
+/* Portalab — badge/rainbow: moved from Portalab's stylesheets (spec 028, B2) */
+
+.cosmetic-badge[data-style="rainbow"] {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--color-surface-raised), var(--color-surface-raised)) padding-box,
+    linear-gradient(90deg, #ef4444, #eab308, #22c55e, #3b82f6, #8b5cf6, #ef4444) border-box;
+  background-size:
+    100% 100%,
+    300% 100%;
+  animation: badge-rainbow 3s linear infinite;
+}
+
+@keyframes badge-rainbow {
+  to {
+    background-position:
+      0 0,
+      300% 0;
+  }
+}

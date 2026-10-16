@@ -1,0 +1,121 @@
+/* Portalab — level_up/powerup: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="powerup"] {
+  --glow: #ffe14d;
+}
+
+.levelup[data-look="powerup"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background:
+    linear-gradient(#2121de, #2121de) 0 12% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 calc(12% + 8px) / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 88% / 100% 3px no-repeat,
+    linear-gradient(#2121de, #2121de) 0 calc(88% - 8px) / 100% 3px no-repeat,
+    #000000f2;
+}
+
+.levelup[data-look="powerup"] .levelup__scene {
+  display: block;
+  inset-block-start: 15%;
+  inset-inline-start: -10%;
+  inline-size: 3.4rem;
+  block-size: 3.4rem;
+  border-radius: 50%;
+  background: conic-gradient(from 60deg, transparent 0 60deg, #ffe14d 60deg);
+  animation:
+    levelup-eater 2.4s linear 0.4s both,
+    maze-chomp 0.3s steps(1, end) infinite;
+}
+
+.levelup[data-look="powerup"] .levelup__fx {
+  display: block;
+  inset-block-start: 15%;
+  inset-inline-start: calc(30% + var(--i) * 12%);
+  inline-size: 3rem;
+  block-size: 3.2rem;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background:
+    radial-gradient(circle 0.2rem at 32% 42%, #ffffff 96%, transparent),
+    radial-gradient(circle 0.2rem at 68% 42%, #ffffff 96%, transparent), #2121de;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 83% 86%, 66% 100%, 50% 86%, 33% 100%, 17% 86%, 0 100%);
+  animation: levelup-flee 2.4s linear 0.4s both;
+}
+
+.levelup[data-look="powerup"] .levelup__burst {
+  display: block;
+  inset-block-start: 30%;
+  inset-inline: 0;
+  color: #ffe14d;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  text-align: center;
+  animation: levelup-gone 1.2s steps(1, end) both;
+}
+
+.levelup[data-look="powerup"] .levelup__card {
+  --color-text: #ffffff;
+  --color-text-muted: #c4c4f0;
+  --color-surface-raised: #0d0d26;
+  --color-border: #2121de;
+  border: 3px double #2121de;
+  border-radius: 1rem;
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 0 1.4rem #2121de88;
+  animation: levelup-card 0.4s steps(4, end) 1.2s both;
+}
+
+.levelup[data-look="powerup"] .levelup__title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: #ffe14d;
+}
+
+@keyframes levelup-eater {
+  to {
+    inset-inline-start: 110%;
+  }
+}
+
+@keyframes maze-chomp {
+  50% {
+    background: #ffe14d;
+  }
+}
+
+@keyframes levelup-flee {
+  0%,
+  60% {
+    opacity: 1;
+    filter: none;
+  }
+  65%,
+  75%,
+  85% {
+    filter: brightness(3) grayscale(1);
+  }
+  70%,
+  80% {
+    filter: none;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(80vw);
+  }
+}
+
+@keyframes levelup-gone {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes levelup-card {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(1.5rem);
+  }
+}

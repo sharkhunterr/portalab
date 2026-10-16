@@ -1,0 +1,43 @@
+/* Portalab — effect/flicker: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-effect="flicker"] .celebration-fx {
+  inline-size: 0.7rem;
+  block-size: 0.9rem;
+  border-radius: 50% 50% 45% 45%;
+  background: hsl(calc(var(--i) * 90deg) 95% 58%);
+  box-shadow: 0 0 12px hsl(calc(var(--i) * 90deg) 95% 58%);
+  --angle: calc(360deg / var(--n) * var(--i));
+  transform: rotate(var(--angle)) translateY(-5rem) rotate(calc(-1 * var(--angle)));
+  animation: fx-bulb calc(0.3s + var(--s) * 0.4s) steps(2, jump-none) infinite;
+}
+
+[data-effect="flicker"] .ds-celebration__badge {
+  background: #12151f;
+  color: #ff3b4f;
+  box-shadow:
+    0 0 0 2px #ff3b4f,
+    0 0 26px #dc2626;
+  animation:
+    ds-pop var(--motion-duration-slow) var(--motion-easing-spring) both,
+    name-flicker 1.6s steps(1, end) 2;
+}
+
+@keyframes fx-bulb {
+  50% {
+    opacity: 0.2;
+    box-shadow: none;
+  }
+}
+
+@keyframes name-flicker {
+  0%,
+  42%,
+  46%,
+  100% {
+    opacity: 1;
+  }
+  43%,
+  45% {
+    opacity: 0.25;
+  }
+}

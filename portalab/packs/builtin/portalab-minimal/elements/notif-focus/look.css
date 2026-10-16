@@ -1,0 +1,14 @@
+/* Portalab — notification_animation/focus: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="focus"] .ds-notification {
+  animation-name: universe-notify-focus;
+  animation-duration: 0.6s;
+}
+
+@keyframes universe-notify-focus {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+    filter: blur(12px);
+  }
+}

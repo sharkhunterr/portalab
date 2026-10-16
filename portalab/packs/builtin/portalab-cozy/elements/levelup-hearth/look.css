@@ -1,0 +1,45 @@
+/* Portalab — level_up/hearth: moved from Portalab's stylesheets (spec 028, B2) */
+
+.levelup[data-look="hearth"] {
+  --glow: #f59e0b;
+}
+
+.levelup[data-look="hearth"] .levelup__rays {
+  display: block;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, #f59e0b55, #7c2d1222 50%, transparent 75%);
+  animation: levelup-pulse 3s ease-in-out infinite;
+}
+
+.levelup[data-look="hearth"] .levelup__fx {
+  display: block;
+  inset-block-end: 0;
+  inset-inline-start: var(--x);
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 6px #f59e0b;
+  animation: levelup-rise calc(4s + var(--r) * 3s) ease-out calc(var(--r) * -4s) infinite;
+}
+
+.levelup[data-look="hearth"] .levelup__card {
+  border-radius: 1.5rem;
+}
+
+@keyframes levelup-pulse {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes levelup-rise {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-80vh) scale(0.3);
+    opacity: 0;
+  }
+}

@@ -1,0 +1,31 @@
+/* Portalab — notification_animation/anchor: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-animation="anchor"] .ds-notification {
+  transform-origin: 50% -2rem;
+  animation-name: universe-notify-anchor;
+  animation-duration: 1.2s;
+  animation-timing-function: ease-out;
+}
+
+@keyframes universe-notify-anchor {
+  0% {
+    opacity: 0;
+    transform: translateY(-110%) rotate(0deg);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(6%) rotate(0deg);
+  }
+  55% {
+    transform: translateY(0) rotate(5deg);
+  }
+  75% {
+    transform: rotate(-3deg);
+  }
+  90% {
+    transform: rotate(1.5deg);
+  }
+  100% {
+    transform: none;
+  }
+}

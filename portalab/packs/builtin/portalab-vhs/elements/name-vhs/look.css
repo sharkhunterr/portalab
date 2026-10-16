@@ -1,0 +1,28 @@
+/* Portalab — name_style/vhs: moved from Portalab's stylesheets (spec 028, B2) */
+
+.name-style[data-name="vhs"] {
+  font-family: "VT323", "Share Tech Mono", monospace;
+  font-size: 1.25em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #f8fafc;
+  text-shadow:
+    -2px 0 #ff004c,
+    2px 0 #00e5ff,
+    0 0 8px #ffffff55;
+  animation: universe-vhs-jitter 3.2s steps(1, end) infinite;
+}
+
+@keyframes universe-vhs-jitter {
+  0%,
+  92%,
+  100% {
+    transform: none;
+  }
+  93% {
+    transform: translateX(-2px) skewX(-6deg);
+  }
+  95% {
+    transform: translateX(2px);
+  }
+}

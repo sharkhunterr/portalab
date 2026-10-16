@@ -1,0 +1,18 @@
+/* Portalab — level_badge/toprank: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-level[data-look="toprank"] {
+  padding-inline: 0.2rem;
+  border-radius: 0;
+  background: none;
+  color: #141414;
+  font-family: Anton, Impact, sans-serif;
+  font-size: 1.35em;
+  -webkit-text-stroke: 1.5px #e5e5e5;
+  text-shadow: 2px 2px 0 #e50914;
+  box-shadow: none;
+}
+
+.ds-level[data-look="toprank"] .ds-icon {
+  -webkit-text-stroke: 0;
+  color: #e50914;
+}

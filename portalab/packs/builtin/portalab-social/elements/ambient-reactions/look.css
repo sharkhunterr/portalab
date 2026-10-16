@@ -1,0 +1,81 @@
+/* Portalab — ambient/reactions: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="reactions"] > span {
+  top: auto;
+  bottom: -3rem;
+  inline-size: calc(1.5rem + 1rem * var(--size));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ff6b81, #e41e3f);
+  box-shadow: 0 0.2rem 0.5rem #00000026;
+  opacity: 0.8;
+  animation-name: ambient-reaction-rise;
+  animation-timing-function: ease-in;
+  animation-duration: calc(var(--duration) * 0.8);
+}
+
+[data-ambient="reactions"] > span::after {
+  content: "";
+  position: absolute;
+  inset: 26%;
+  background: #ffffff;
+  clip-path: path("M5 9 C5 9 0 6 0 3 C0 1 2 0 3 0 C4 0 5 1 5 2 C5 1 6 0 7 0 C8 0 10 1 10 3 C10 6 5 9 5 9 Z");
+  scale: calc(var(--size) * 1.3 + 0.9);
+  transform-origin: 0 0;
+}
+
+[data-ambient="reactions"] > span:nth-child(2n) {
+  background: linear-gradient(180deg, #4da3ff, #1877f2);
+}
+
+[data-ambient="reactions"] > span:nth-child(2n)::after {
+  inset: 24%;
+  clip-path: polygon(
+    0 45%,
+    22% 45%,
+    22% 100%,
+    0 100%,
+    0 45%,
+    30% 45%,
+    52% 0,
+    62% 6%,
+    58% 38%,
+    96% 40%,
+    100% 52%,
+    88% 100%,
+    30% 100%
+  );
+  scale: 1;
+}
+
+[data-ambient="reactions"] > span:nth-child(5n) {
+  background: linear-gradient(180deg, #ffd972, #f7b125);
+}
+
+[data-ambient="reactions"] > span:nth-child(5n)::after {
+  inset: 22%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 38%, #65471b 0 9%, transparent 10%),
+    radial-gradient(circle at 68% 38%, #65471b 0 9%, transparent 10%),
+    radial-gradient(ellipse 34% 20% at 50% 68%, #65471b 0 95%, transparent);
+  clip-path: none;
+  scale: 1;
+}
+
+@keyframes ambient-reaction-rise {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(calc(var(--drift) * 0.4), -55vh) scale(1);
+  }
+  100% {
+    transform: translate(var(--drift), -110vh) scale(1.05);
+    opacity: 0;
+  }
+}

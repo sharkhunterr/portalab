@@ -1,0 +1,30 @@
+/* Portalab — ambient/lcdstars: moved from Portalab's stylesheets (spec 028, B2) */
+
+[data-ambient="lcdstars"] > span {
+  inline-size: 4px;
+  block-size: 4px;
+  background: #306230;
+  box-shadow:
+    4px 0 0 #306230,
+    -4px 0 0 #306230,
+    0 4px 0 #306230,
+    0 -4px 0 #306230;
+  scale: calc(1 + var(--size));
+  opacity: 0.45;
+  animation: ambient-lcd-blink calc(var(--duration) * 0.2) steps(2, jump-none) var(--delay) infinite;
+}
+
+[data-ambient="lcdstars"] > span:nth-child(3n) {
+  background: #8bac0f;
+  box-shadow:
+    4px 0 0 #8bac0f,
+    -4px 0 0 #8bac0f,
+    0 4px 0 #8bac0f,
+    0 -4px 0 #8bac0f;
+}
+
+@keyframes ambient-lcd-blink {
+  50% {
+    opacity: 0.08;
+  }
+}

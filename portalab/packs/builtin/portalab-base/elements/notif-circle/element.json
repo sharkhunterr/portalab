@@ -10,8 +10,10 @@
     "fr": "Une bulle ronde cerclée de la couleur de la notification."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 550,

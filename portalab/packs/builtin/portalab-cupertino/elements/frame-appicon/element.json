@@ -10,8 +10,10 @@
     "fr": "Votre avatar en icône d'app, son carré arrondi et sa pastille rouge."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
   },
   "economy": {
     "price": 650,

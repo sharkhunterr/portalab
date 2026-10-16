@@ -1,0 +1,24 @@
+/* Portalab — notification_style/elven: moved from Portalab's stylesheets (spec 028, B2) */
+
+.ds-notifications[data-style="elven"] .ds-notification {
+  border: 1px solid #bbf7d088;
+  border-radius: 1.6rem 0.3rem 1.6rem 0.3rem;
+  background: linear-gradient(135deg, #052e16f2, #14532df2);
+  color: #f0fdf4;
+  box-shadow: 0 0 1.2rem #86efac33;
+}
+
+.ds-notifications[data-style="elven"] .ds-notification::before {
+  background: linear-gradient(#bbf7d0, #e2e8f0);
+}
+
+.ds-notifications[data-style="elven"] .ds-notification__title {
+  font-family: "Cinzel", serif;
+  color: #dcfce7;
+  text-shadow: 0 0 6px #86efac;
+}
+
+.ds-notifications[data-style="elven"] .ds-notification__icon {
+  background: #166534;
+  color: #f0fdf4;
+}
