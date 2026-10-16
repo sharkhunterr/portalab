@@ -10,8 +10,7 @@
     "fr": "L'argent et le bleu de la lune sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "lunar"
+  "look": "lunar",
+  "palette": {
+    "dark": {
+      "accent": "#cfd8e8",
+      "accentAlt": "#8fa8d8",
+      "contrast": "#10162a"
+    },
+    "light": {
+      "accent": "#4a5570",
+      "accentAlt": "#2f4f8a",
+      "contrast": "#ffffff"
+    }
+  }
 }

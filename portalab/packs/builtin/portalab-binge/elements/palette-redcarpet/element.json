@@ -10,8 +10,7 @@
     "fr": "Le rouge de l'écran et une touche d'or sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "redcarpet"
+  "look": "redcarpet",
+  "palette": {
+    "dark": {
+      "accent": "#e50914",
+      "accentAlt": "#f5c518",
+      "contrast": "#ffffff"
+    },
+    "light": {
+      "accent": "#b20710",
+      "accentAlt": "#8a6a00",
+      "contrast": "#ffffff"
+    }
+  }
 }

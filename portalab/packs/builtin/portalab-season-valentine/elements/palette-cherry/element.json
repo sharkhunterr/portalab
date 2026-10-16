@@ -10,8 +10,7 @@
     "fr": "Rouge cerise profond et rose poudré sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -20,5 +19,17 @@
     "icon": "palette",
     "season": "valentine"
   },
-  "look": "cherry"
+  "look": "cherry",
+  "palette": {
+    "dark": {
+      "accent": "#ff6f91",
+      "accentAlt": "#ffb3c6",
+      "contrast": "#26030d"
+    },
+    "light": {
+      "accent": "#be123c",
+      "accentAlt": "#9d174d",
+      "contrast": "#ffffff"
+    }
+  }
 }

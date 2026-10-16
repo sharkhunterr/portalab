@@ -10,8 +10,7 @@
     "fr": "Orange citrouille et cannelle sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -20,5 +19,17 @@
     "icon": "palette",
     "season": "halloween"
   },
-  "look": "pumpkinspice"
+  "look": "pumpkinspice",
+  "palette": {
+    "dark": {
+      "accent": "#ff9f43",
+      "accentAlt": "#d4a373",
+      "contrast": "#1f0e00"
+    },
+    "light": {
+      "accent": "#b45309",
+      "accentAlt": "#7c4a1e",
+      "contrast": "#ffffff"
+    }
+  }
 }

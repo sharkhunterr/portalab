@@ -10,8 +10,7 @@
     "fr": "Turquoise lagon et corail sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -20,5 +19,17 @@
     "icon": "palette",
     "season": "summer"
   },
-  "look": "tropical"
+  "look": "tropical",
+  "palette": {
+    "dark": {
+      "accent": "#2dd4bf",
+      "accentAlt": "#fb7185",
+      "contrast": "#03201c"
+    },
+    "light": {
+      "accent": "#0f766e",
+      "accentAlt": "#be123c",
+      "contrast": "#ffffff"
+    }
+  }
 }

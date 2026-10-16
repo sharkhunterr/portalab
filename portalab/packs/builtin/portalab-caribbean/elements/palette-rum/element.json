@@ -10,8 +10,7 @@
     "fr": "Rhum ambré et turquoise du lagon sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "rum"
+  "look": "rum",
+  "palette": {
+    "dark": {
+      "accent": "#f0b84a",
+      "accentAlt": "#5eead4",
+      "contrast": "#241500"
+    },
+    "light": {
+      "accent": "#92400e",
+      "accentAlt": "#115e59",
+      "contrast": "#ffffff"
+    }
+  }
 }

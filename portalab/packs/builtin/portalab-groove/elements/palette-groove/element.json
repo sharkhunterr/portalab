@@ -10,8 +10,7 @@
     "fr": "Un vert vif et un rose sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "groove"
+  "look": "groove",
+  "palette": {
+    "dark": {
+      "accent": "#1ed760",
+      "accentAlt": "#f573a0",
+      "contrast": "#000000"
+    },
+    "light": {
+      "accent": "#117a3a",
+      "accentAlt": "#b0236a",
+      "contrast": "#ffffff"
+    }
+  }
 }

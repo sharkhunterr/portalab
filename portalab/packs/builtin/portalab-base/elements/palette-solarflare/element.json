@@ -10,8 +10,7 @@
     "fr": "L'orange et le feu du soleil sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "solarflare"
+  "look": "solarflare",
+  "palette": {
+    "dark": {
+      "accent": "#ffb347",
+      "accentAlt": "#ff6a2a",
+      "contrast": "#2a1000"
+    },
+    "light": {
+      "accent": "#b45309",
+      "accentAlt": "#c2410c",
+      "contrast": "#ffffff"
+    }
+  }
 }

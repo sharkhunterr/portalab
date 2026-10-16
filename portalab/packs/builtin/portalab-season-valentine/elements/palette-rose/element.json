@@ -10,8 +10,7 @@
     "fr": "Des couleurs d'accent posées sur n'importe quel thème — essayez-la avant d'acheter."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 150,
@@ -20,5 +19,17 @@
     "icon": "palette",
     "season": "valentine"
   },
-  "look": "rose"
+  "look": "rose",
+  "palette": {
+    "dark": {
+      "accent": "#fb7185",
+      "accentAlt": "#fda4af",
+      "contrast": "#1f0509"
+    },
+    "light": {
+      "accent": "#be123c",
+      "accentAlt": "#9f1239",
+      "contrast": "#ffffff"
+    }
+  }
 }

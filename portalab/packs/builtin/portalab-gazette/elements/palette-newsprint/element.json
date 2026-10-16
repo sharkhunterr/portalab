@@ -10,8 +10,7 @@
     "fr": "Le noir de l'encre et le rouge de la rédaction sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "newsprint"
+  "look": "newsprint",
+  "palette": {
+    "dark": {
+      "accent": "#f4efe4",
+      "accentAlt": "#ff6b6b",
+      "contrast": "#1a1a1a"
+    },
+    "light": {
+      "accent": "#1a1a1a",
+      "accentAlt": "#a3171d",
+      "contrast": "#fbf8f1"
+    }
+  }
 }

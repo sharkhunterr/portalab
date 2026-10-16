@@ -10,8 +10,7 @@
     "fr": "Le turquoise et le violet d'une nébuleuse sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "nebulateal"
+  "look": "nebulateal",
+  "palette": {
+    "dark": {
+      "accent": "#3fe0d0",
+      "accentAlt": "#b48cff",
+      "contrast": "#022a28"
+    },
+    "light": {
+      "accent": "#0b7a70",
+      "accentAlt": "#6b3fb0",
+      "contrast": "#ffffff"
+    }
+  }
 }

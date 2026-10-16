@@ -10,8 +10,7 @@
     "fr": "Gris graphite et une touche de bleu sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "graphite"
+  "look": "graphite",
+  "palette": {
+    "dark": {
+      "accent": "#d1d5db",
+      "accentAlt": "#7dd3fc",
+      "contrast": "#111827"
+    },
+    "light": {
+      "accent": "#3a3a3c",
+      "accentAlt": "#0066cc",
+      "contrast": "#ffffff"
+    }
+  }
 }

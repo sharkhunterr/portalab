@@ -10,8 +10,7 @@
     "fr": "Des couleurs d'accent posées sur n'importe quel thème — essayez-la avant d'acheter."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 250,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "lavender"
+  "look": "lavender",
+  "palette": {
+    "dark": {
+      "accent": "#c4b5fd",
+      "accentAlt": "#f0abfc",
+      "contrast": "#120a24"
+    },
+    "light": {
+      "accent": "#6d28d9",
+      "accentAlt": "#a21caf",
+      "contrast": "#ffffff"
+    }
+  }
 }

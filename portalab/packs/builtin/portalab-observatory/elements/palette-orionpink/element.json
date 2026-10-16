@@ -10,8 +10,7 @@
     "fr": "Le magenta et le violet d'Orion sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "orionpink"
+  "look": "orionpink",
+  "palette": {
+    "dark": {
+      "accent": "#ff5fa2",
+      "accentAlt": "#9d8cff",
+      "contrast": "#2a0818"
+    },
+    "light": {
+      "accent": "#b0215f",
+      "accentAlt": "#5a3fc0",
+      "contrast": "#ffffff"
+    }
+  }
 }

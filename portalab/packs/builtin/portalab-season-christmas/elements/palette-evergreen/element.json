@@ -10,8 +10,7 @@
     "fr": "Vert sapin et rouge baie sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -20,5 +19,17 @@
     "icon": "palette",
     "season": "christmas"
   },
-  "look": "evergreen"
+  "look": "evergreen",
+  "palette": {
+    "dark": {
+      "accent": "#3ddc84",
+      "accentAlt": "#ff6b6b",
+      "contrast": "#03170b"
+    },
+    "light": {
+      "accent": "#166534",
+      "accentAlt": "#b91c1c",
+      "contrast": "#ffffff"
+    }
+  }
 }

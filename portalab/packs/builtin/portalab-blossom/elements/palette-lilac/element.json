@@ -10,8 +10,7 @@
     "fr": "Du lilas et du vert tendre sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "lilac"
+  "look": "lilac",
+  "palette": {
+    "dark": {
+      "accent": "#c8a2ff",
+      "accentAlt": "#8fdc8f",
+      "contrast": "#1e0a3a"
+    },
+    "light": {
+      "accent": "#6b3fb0",
+      "accentAlt": "#2f7a3a",
+      "contrast": "#ffffff"
+    }
+  }
 }

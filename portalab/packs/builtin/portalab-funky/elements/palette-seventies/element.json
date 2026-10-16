@@ -10,8 +10,7 @@
     "fr": "De l'orange et de la moutarde sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "seventies"
+  "look": "seventies",
+  "palette": {
+    "dark": {
+      "accent": "#ff8c1a",
+      "accentAlt": "#ffd23f",
+      "contrast": "#2a1000"
+    },
+    "light": {
+      "accent": "#a84300",
+      "accentAlt": "#7a5200",
+      "contrast": "#ffffff"
+    }
+  }
 }

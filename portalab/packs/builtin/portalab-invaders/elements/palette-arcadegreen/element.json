@@ -10,8 +10,7 @@
     "fr": "Vert phosphore et rouge d'alerte sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "arcadegreen"
+  "look": "arcadegreen",
+  "palette": {
+    "dark": {
+      "accent": "#39ff14",
+      "accentAlt": "#ff4d6d",
+      "contrast": "#001a00"
+    },
+    "light": {
+      "accent": "#1d7a0b",
+      "accentAlt": "#b0203f",
+      "contrast": "#ffffff"
+    }
+  }
 }

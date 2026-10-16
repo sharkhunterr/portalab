@@ -10,8 +10,7 @@
     "fr": "Le rouge des briques et le vert des tuyaux sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "brickred"
+  "look": "brickred",
+  "palette": {
+    "dark": {
+      "accent": "#ff8a5c",
+      "accentAlt": "#6fdc6f",
+      "contrast": "#2a0a00"
+    },
+    "light": {
+      "accent": "#c4320a",
+      "accentAlt": "#1e7a1e",
+      "contrast": "#ffffff"
+    }
+  }
 }

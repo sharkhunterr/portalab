@@ -10,8 +10,7 @@
     "fr": "Le bleu des barres de titre et le vert du bouton Démarrer sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "luna"
+  "look": "luna",
+  "palette": {
+    "dark": {
+      "accent": "#6ea8ff",
+      "accentAlt": "#7fd36b",
+      "contrast": "#04122e"
+    },
+    "light": {
+      "accent": "#1f55c8",
+      "accentAlt": "#2c7a1f",
+      "contrast": "#ffffff"
+    }
+  }
 }

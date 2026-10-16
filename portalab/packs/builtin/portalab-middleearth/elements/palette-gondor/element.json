@@ -10,8 +10,7 @@
     "fr": "Des couleurs d'accent posées sur n'importe quel thème — essayez-la avant d'acheter."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 550,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "gondor"
+  "look": "gondor",
+  "palette": {
+    "dark": {
+      "accent": "#dbe4ee",
+      "accentAlt": "#d4af37",
+      "contrast": "#10151c"
+    },
+    "light": {
+      "accent": "#334155",
+      "accentAlt": "#8a6d0b",
+      "contrast": "#ffffff"
+    }
+  }
 }

@@ -10,8 +10,7 @@
     "fr": "Des pièces cyan et jaunes sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "blockcolors"
+  "look": "blockcolors",
+  "palette": {
+    "dark": {
+      "accent": "#00e5ff",
+      "accentAlt": "#ffd23f",
+      "contrast": "#001a20"
+    },
+    "light": {
+      "accent": "#0b6e8a",
+      "accentAlt": "#8a5a00",
+      "contrast": "#ffffff"
+    }
+  }
 }

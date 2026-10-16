@@ -10,8 +10,7 @@
     "fr": "Gris acier et rouge d'alerte sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "gunmetal"
+  "look": "gunmetal",
+  "palette": {
+    "dark": {
+      "accent": "#f87171",
+      "accentAlt": "#cbd5e1",
+      "contrast": "#2a0606"
+    },
+    "light": {
+      "accent": "#b91c1c",
+      "accentAlt": "#374151",
+      "contrast": "#ffffff"
+    }
+  }
 }

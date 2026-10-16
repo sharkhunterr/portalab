@@ -10,8 +10,7 @@
     "fr": "Le bleu du labyrinthe et le jaune du glouton sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "mazeblue"
+  "look": "mazeblue",
+  "palette": {
+    "dark": {
+      "accent": "#ffe14d",
+      "accentAlt": "#00ffff",
+      "contrast": "#1a1400"
+    },
+    "light": {
+      "accent": "#1c1cb8",
+      "accentAlt": "#8a6a00",
+      "contrast": "#ffffff"
+    }
+  }
 }

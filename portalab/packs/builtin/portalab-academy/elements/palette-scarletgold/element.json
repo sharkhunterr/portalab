@@ -10,8 +10,7 @@
     "fr": "L'écarlate et l'or d'une maison sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "scarletgold"
+  "look": "scarletgold",
+  "palette": {
+    "dark": {
+      "accent": "#f5c542",
+      "accentAlt": "#f87171",
+      "contrast": "#2a1a00"
+    },
+    "light": {
+      "accent": "#991b1b",
+      "accentAlt": "#92400e",
+      "contrast": "#ffffff"
+    }
+  }
 }

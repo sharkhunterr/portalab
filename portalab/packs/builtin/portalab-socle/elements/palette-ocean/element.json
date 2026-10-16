@@ -6,8 +6,19 @@
     "fr": "Océan"
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
-  "free": true
+  "free": true,
+  "palette": {
+    "dark": {
+      "accent": "#38bdf8",
+      "accentAlt": "#2dd4bf",
+      "contrast": "#04121c"
+    },
+    "light": {
+      "accent": "#0369a1",
+      "accentAlt": "#0f766e",
+      "contrast": "#ffffff"
+    }
+  }
 }

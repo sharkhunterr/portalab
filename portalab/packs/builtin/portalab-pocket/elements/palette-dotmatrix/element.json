@@ -10,8 +10,7 @@
     "fr": "Les quatre verts d'un écran de poche sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "dotmatrix"
+  "look": "dotmatrix",
+  "palette": {
+    "dark": {
+      "accent": "#9bbc0f",
+      "accentAlt": "#e05a8a",
+      "contrast": "#0f380f"
+    },
+    "light": {
+      "accent": "#306230",
+      "accentAlt": "#8b1e4f",
+      "contrast": "#e3f1bc"
+    }
+  }
 }

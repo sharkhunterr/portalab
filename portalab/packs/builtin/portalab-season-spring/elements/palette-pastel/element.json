@@ -10,8 +10,7 @@
     "fr": "Lilas tendre et menthe sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -20,5 +19,17 @@
     "icon": "palette",
     "season": "spring"
   },
-  "look": "pastel"
+  "look": "pastel",
+  "palette": {
+    "dark": {
+      "accent": "#c4b5fd",
+      "accentAlt": "#99f6e4",
+      "contrast": "#1a1033"
+    },
+    "light": {
+      "accent": "#6d28d9",
+      "accentAlt": "#0f766e",
+      "contrast": "#ffffff"
+    }
+  }
 }

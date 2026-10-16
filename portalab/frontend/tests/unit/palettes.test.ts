@@ -3,19 +3,23 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { contrast, LARGE_OR_UI_MIN, TEXT_MIN } from "../../src/design-system/themes/contrast";
-import { PALETTE_COLORS } from "../../src/design-system/themes/palettes";
 
 // 027 — every palette offered has accent colours in both schemes, no two palettes share an accent, and
 // each stays readable: the accent on a plain light or dark page, its contrast colour on the accent.
 
 // 028: the palettes offered are those Portalab's own packs hold (none is listed in the interface's code)
 const PACKS = resolve(dirname(fileURLToPath(import.meta.url)), "../../../packs/builtin");
-const PALETTE_KEYS = readdirSync(PACKS).flatMap((pack) =>
-  readdirSync(join(PACKS, pack, "elements")).flatMap((folder) => {
-    const element = JSON.parse(readFileSync(join(PACKS, pack, "elements", folder, "element.json"), "utf8"));
-    return element.type === "palette" && element.look ? [element.look as string] : [];
-  }),
+type Scheme = { accent: string; accentAlt: string; contrast: string };
+// their colours too: each palette's pack holds them
+const PALETTE_COLORS: Record<string, { dark: Scheme; light: Scheme }> = Object.fromEntries(
+  readdirSync(PACKS).flatMap((pack) =>
+    readdirSync(join(PACKS, pack, "elements")).flatMap((folder) => {
+      const element = JSON.parse(readFileSync(join(PACKS, pack, "elements", folder, "element.json"), "utf8"));
+      return element.type === "palette" && element.palette ? [[element.look as string, element.palette]] : [];
+    }),
+  ),
 );
+const PALETTE_KEYS = [...Object.keys(PALETTE_COLORS), "theme"];
 
 describe("palettes", () => {
   it("covers every palette key, without duplicates", () => {

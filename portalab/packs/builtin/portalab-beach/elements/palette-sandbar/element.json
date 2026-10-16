@@ -10,8 +10,7 @@
     "fr": "Le bleu du lagon et le corail sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "sandbar"
+  "look": "sandbar",
+  "palette": {
+    "dark": {
+      "accent": "#3fd0e0",
+      "accentAlt": "#ffb36b",
+      "contrast": "#022a30"
+    },
+    "light": {
+      "accent": "#0b6f86",
+      "accentAlt": "#c2410c",
+      "contrast": "#ffffff"
+    }
+  }
 }

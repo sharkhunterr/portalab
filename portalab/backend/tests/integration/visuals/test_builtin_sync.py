@@ -70,7 +70,7 @@ async def test_the_first_synchronisation_adopts_what_exists(database: Database, 
     await service.refresh(force=True)
     active = await service.active()
     own = [e for e in active["elements"] if e.get("pack", "").startswith("portalab-")]
-    drawn = {"css": "css", "glsl": "file", "renderer": "params"}
+    drawn = {"css": "css", "glsl": "file", "renderer": "params", "data": "palette"}
     assert own and all(e.get(drawn.get(e["kind"], "-")) for e in own)
     assert "portalab-alien" not in {e.get("pack") for e in active["elements"]}
     assert active["withheld"]  # the alien universe's looks: its wearers see the defaults

@@ -10,8 +10,7 @@
     "fr": "Le dégradé bleu-rose d'une discussion sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "chatgradient"
+  "look": "chatgradient",
+  "palette": {
+    "dark": {
+      "accent": "#7aa7ff",
+      "accentAlt": "#f472b6",
+      "contrast": "#07122a"
+    },
+    "light": {
+      "accent": "#1660c9",
+      "accentAlt": "#b0237a",
+      "contrast": "#ffffff"
+    }
+  }
 }

@@ -232,15 +232,20 @@ def build(out: Path) -> dict[str, int]:
 
     # written: one folder per pack, one per element — the files a look brought (B2) kept, by folder
     kept: dict[str, dict[str, bytes]] = {}
-    drawn: dict[str, dict[str, Any]] = {}  # how a look with files of its own is drawn (its element's render)
+    drawn: dict[str, dict[str, Any]] = {}  # how a look drawn by its pack is drawn (its render, its palette)
     if out.exists():
         for file in out.glob("*/elements/*/*"):
             if file.is_file() and file.name != "element.json":
                 kept.setdefault(str(file.parent.relative_to(out)), {})[file.name] = file.read_bytes()
             elif file.is_file():
-                render = json.loads(file.read_text(encoding="utf-8")).get("render") or {}
+                previous = json.loads(file.read_text(encoding="utf-8"))
+                render = previous.get("render") or {}
                 if render.get("kind") != "renderer" or render.get("renderer") == "layers":
-                    drawn[str(file.parent.relative_to(out))] = render
+                    # its render, and what it carries itself (a palette's colours)
+                    drawn[str(file.parent.relative_to(out))] = {
+                        "render": render,
+                        **({"palette": previous["palette"]} if previous.get("palette") else {}),
+                    }
         shutil.rmtree(out)
     seen: set[tuple[str, str]] = set()
     counts: dict[str, int] = {}
@@ -274,7 +279,7 @@ def build(out: Path) -> dict[str, int]:
                 (target / file_name).write_bytes(content)
                 contents.update(file_name.encode() + content)
             if str(target.relative_to(out)) in drawn:
-                element["render"] = drawn[str(target.relative_to(out))]
+                element.update(drawn[str(target.relative_to(out))])
             (target / "element.json").write_text(json.dumps(element, ensure_ascii=False, indent=2) + "\n")
         # its version: the release's, and the content's fingerprint — a release changing a pack changes it
         digest = hashlib.sha256(

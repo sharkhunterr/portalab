@@ -10,8 +10,7 @@
     "fr": "Le bleu et le turquoise de l'espace lointain sur le thème."
   },
   "render": {
-    "kind": "renderer",
-    "renderer": "builtin"
+    "kind": "data"
   },
   "economy": {
     "price": 200,
@@ -19,5 +18,17 @@
     "collection": "palettes",
     "icon": "palette"
   },
-  "look": "deepspace"
+  "look": "deepspace",
+  "palette": {
+    "dark": {
+      "accent": "#5fb4ff",
+      "accentAlt": "#5ef0d8",
+      "contrast": "#04142a"
+    },
+    "light": {
+      "accent": "#1559a8",
+      "accentAlt": "#0b7a6a",
+      "contrast": "#ffffff"
+    }
+  }
 }
