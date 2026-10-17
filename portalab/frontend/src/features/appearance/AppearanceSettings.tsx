@@ -17,6 +17,7 @@ import { LevelUpPicker } from "./LevelUpPicker";
 import { NotificationLooks } from "./NotificationLooks";
 import { PalettePicker } from "./PalettePicker";
 import { RarityTag } from "./Rarity";
+import { SafeModeSwitch } from "./SafeModeSwitch";
 import { UniverseLooks } from "./UniverseLooks";
 
 /**
@@ -26,8 +27,9 @@ import { UniverseLooks } from "./UniverseLooks";
  */
 export const appearanceStrings = {
   title: "Appearance & accessibility",
-  gallery: "Themes",
-  galleryHint: "A theme can change colors and fonts, but also the layout, the animations and the sounds.",
+  gallery: "Interfaces",
+  galleryHint:
+    "An interface changes colours and fonts, but also the layout, the navigation, the animations and the sounds.",
   current: "Current",
   colorMode: "Light or dark",
   colorModes: { dark: "Dark", light: "Light", system: "Follow my device" },
@@ -48,9 +50,9 @@ export const appearanceStrings = {
     sheet: "Phone sheet",
   } as Record<string, string>,
   footerHeader: "header at the bottom",
-  theme: "Theme",
-  themeDefault: "Portal default",
-  themeFallback: "Your theme is not available right now; the portal default is used.",
+  theme: "Interface",
+  themeDefault: "Portalab (default)",
+  themeFallback: "Your interface is not available right now; Portalab's default is used.",
   density: "Density",
   densities: { compact: "Compact", comfortable: "Comfortable", spacious: "Spacious" },
   textScale: "Text size",
@@ -67,7 +69,7 @@ export const appearanceStrings = {
   },
   notificationStyle: "Notification style",
   styles: { toast: "Toast", banner: "Banner" },
-  campaignThemes: "Show seasonal campaign themes",
+  campaignThemes: "Show seasonal campaign interfaces",
   forcedMotion: "Your administrator reduces motion for everyone.",
   display: "Display",
   displayHint: "Light or dark, density, text size and motion: how the portal reads for you.",
@@ -424,6 +426,7 @@ export function AppearanceSettings() {
         </div>
       </section>
       <UniverseLooks />
+      <SafeModeSwitch />
       <NotificationLooks
         position={field("ui.notificationPosition", (disabled) => (
           <SelectField

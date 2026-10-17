@@ -45,10 +45,12 @@ import {
 import { CommandPalette } from "./palette/CommandPalette";
 import { PaletteContext } from "./palette/PaletteContext";
 import { RegionBoundary } from "./router/RouteBoundary";
+import { isSafeMode } from "./safeMode";
 import { ShortcutManager } from "./shortcuts/ShortcutManager";
 import { AnnouncementBanner } from "./status/AnnouncementBanner";
 import { GlobalStatusBanner } from "./status/GlobalStatusBanner";
 import { MaintenanceBanner } from "./status/MaintenanceBanner";
+import { SafeModeBanner } from "./status/SafeModeBanner";
 import { useShellStrings } from "./strings";
 
 /**
@@ -198,6 +200,7 @@ export function AppShell({
         <ListenHost />
         <AnnouncementBanner />
         <MaintenanceBanner />
+        {isSafeMode() ? <SafeModeBanner /> : null}
         {nav === "topbar" ? (
           <nav aria-label={shellStrings.mainNav} className="shell-topnav">
             <NavContent variant="bar" />
@@ -281,7 +284,8 @@ export function AppShell({
       </div>
       {/* #67: the header's search over the page, for the layouts whose header has none */}
       <HeaderSearch floating />
-      <ExternalVisualsLoader />
+      {/* 029: safe mode loads nothing of any pack */}
+      {isSafeMode() ? null : <ExternalVisualsLoader />}
       <CommandPalette
         open={palette.open}
         initialQuery={palette.query}

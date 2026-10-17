@@ -67,7 +67,7 @@ describe("appearance settings", () => {
         </PreferencesProvider>,
       ),
     );
-    fireEvent.change(screen.getByLabelText("Theme"), { target: { value: "dark" } });
+    fireEvent.change(screen.getByLabelText("Interface"), { target: { value: "dark" } });
     expect(document.documentElement.dataset.theme).toBe("dark");
     fireEvent.click(screen.getByLabelText("High contrast"));
     expect(document.documentElement.dataset.theme).toBe("high-contrast");

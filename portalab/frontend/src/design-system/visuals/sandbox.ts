@@ -87,6 +87,7 @@ export function runSandbox(
   // what it knows now: an update before the frame has loaded is what it starts with (never a stale one)
   let current = context;
   let lastNavigation = 0;
+  let pendingNavigation: ReturnType<typeof setTimeout> | null = null;
   let pinged = 0;
   let answered = 0;
   let heartbeat: ReturnType<typeof setInterval> | null = null;
@@ -157,11 +158,24 @@ export function runSandbox(
         return;
       }
       case "navigate": {
-        // at most a few a second: a script cannot drag the member from page to page
-        const now = Date.now();
-        if (now - lastNavigation < 400 || typeof data.key !== "string") return;
-        lastNavigation = now;
-        handlers.onNavigate?.(data.key.slice(0, 120));
+        // at most a few a second: a script cannot drag the member from page to page — but a key asked in
+        // between is opened once the pause is over (the last one asked), never dropped
+        if (typeof data.key !== "string") return;
+        const key = data.key.slice(0, 120);
+        const wait = lastNavigation + 400 - Date.now();
+        if (pendingNavigation) clearTimeout(pendingNavigation);
+        pendingNavigation = null;
+        if (wait <= 0) {
+          lastNavigation = Date.now();
+          handlers.onNavigate?.(key);
+          return;
+        }
+        pendingNavigation = setTimeout(() => {
+          pendingNavigation = null;
+          if (stopped) return;
+          lastNavigation = Date.now();
+          handlers.onNavigate?.(key);
+        }, wait);
         return;
       }
       case "expand":
@@ -182,6 +196,7 @@ export function runSandbox(
     },
     stop: () => {
       stopped = true;
+      if (pendingNavigation) clearTimeout(pendingNavigation);
       if (heartbeat) clearInterval(heartbeat);
       window.removeEventListener("message", listener);
       frame.removeAttribute("src");

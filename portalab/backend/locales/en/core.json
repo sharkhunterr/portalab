@@ -6,5 +6,10 @@
   "loading": "Loading",
   "notTranslated": "Not available in your language — shown in {language}.",
   "retry": "Retry",
-  "save": "Save"
+  "save": "Save",
+  "safe.title": "Safe mode",
+  "safe.hint": "Portalab's own interface, without anything brought by a pack (no look, palette, scene, navigation or interface of a pack), in this browser until you leave it. Also reachable from any address with ?safe=1.",
+  "safe.switch": "Use safe mode",
+  "safe.on": "Safe mode: nothing brought by a pack is shown.",
+  "safe.leave": "Leave safe mode"
 }

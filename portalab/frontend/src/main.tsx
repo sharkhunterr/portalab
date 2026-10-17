@@ -21,6 +21,7 @@ import "./design-system/themes/upsidedown.css";
 import "./design-system/themes/universe.css";
 import "./design-system/themes/cosmetics.css";
 import "./design-system/charts/charts.css"; // issue 117: every chart in one modern look
+import { applySafeModeFromAddress } from "./shell/safeMode";
 
 /**
  * Entry point: first paint from mirrored preferences, then the sign-in gate (anonymous visitors never see
@@ -49,6 +50,7 @@ async function renderGallery(): Promise<boolean> {
   return true;
 }
 
+applySafeModeFromAddress(); // 029: ?safe=1 / ?safe=0
 const router = createRouter(<ShellLayout />);
 
 void renderGallery().then((gallery) => {

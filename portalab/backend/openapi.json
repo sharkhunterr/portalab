@@ -34539,6 +34539,28 @@
         ]
       }
     },
+    "/api/v1/exposure": {
+      "get": {
+        "description": "What Portalab opens to an extension (forbidden operations are never listed).",
+        "operationId": "exposure_api_v1_exposure_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Exposure Api V1 Exposure Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Exposure",
+        "tags": [
+          "exposure"
+        ]
+      }
+    },
     "/api/v1/feedback": {
       "post": {
         "operationId": "submit_api_v1_feedback_post",

@@ -14,6 +14,7 @@ from portalab.app.main import create_app
 from portalab.app.security import api_routes, public, require, route_access
 from portalab.core.authz_port import DenyAllAuthorizer, Principal, ResourceRef
 from portalab.core.db import Database
+from portalab.modules.privacy.settings import SecurityConfig
 
 ALLOW_LISTED = {
     "/healthz",
@@ -99,6 +100,8 @@ async def test_every_non_public_route_is_denied_by_default(
             migration_heads=heads,
             principal_resolver=FixedPrincipal(principal),
             authorizer=DenyAllAuthorizer(),  # structure test; real grants: tests/security/authz matrix
+            # every route probed in a row from one address: above any per-minute limit on purpose
+            security_config=SecurityConfig(rate_limit_per_ip_per_minute=100_000),
         )
     )
     app.state.intrusion_guard.enabled = False  # 028: probing every route on purpose
