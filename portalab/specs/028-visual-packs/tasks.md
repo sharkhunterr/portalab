@@ -255,8 +255,8 @@ offline analysis reports no blocking finding; it imports and publishes.
 - [X] T095 [P] `backend/tests/security/visuals/test_archives.py`: malformed archives (T003 generators) store nothing; GitHub redirects off-host stop the import
 - [X] T096 [P] `data-protected` coverage test `frontend/tests/unit/visuals/protected-surfaces.test.tsx` (administration frame, dialogs, purchase sheet, booster confirmation, security pages, sign-in) (R16)
 - [X] T097 [P] Regenerate `backend/openapi.json` and `frontend/src/api/generated/schema.ts` (`npm run gen:api && npm run check:api-drift`)
-- [ ] T098 [P] Accessibility sweep (axe) of the workflow pages and pack navigation at 3 widths in `frontend/tests/a11y/visual-packs.spec.ts`
-- [ ] T099 Bundle size check: main chunk smaller than before the extraction (record both in `specs/028-visual-packs/quickstart.md`)
+- [X] T098 [P] Accessibility sweep (axe) of the workflow pages and pack navigation at 3 widths in `frontend/tests/e2e/visual-packs/a11y.spec.ts` (Playwright: the pack navigation's own sweep is `navigation.spec.ts`)
+- [X] T099 Bundle size check: main chunk smaller than before the extraction (record both in `specs/028-visual-packs/quickstart.md`)
 - [ ] T100 Full gates (backend pytest/ruff/mypy/lint-imports; frontend lint/typecheck/test/build/check-tokens/i18n:check) and quickstart scenarios 1–9 run on the POC instance (8444) then on the LAN after redeploy
 
 ---

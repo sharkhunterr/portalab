@@ -82,3 +82,20 @@ uv run portalab visuals analyse tests/fixtures/visual-packs/blocking  # exit 1
 cd backend && uv run pytest -n auto --dist loadfile && uv run ruff check . && uv run mypy && uv run lint-imports --config importlinter.ini
 cd frontend && npm run lint && npm run typecheck && npm test && npm run build && npm run check:api-drift
 ```
+
+## Bundle size (T099)
+
+Measured 2026-10-17 with `npx vite build`, before slice B2 (commit `082d867c`: the looks, their effects and
+the 52 interfaces in the application's code) and after it (the looks and interfaces in their packs, read
+from `/visuals/live/{epoch}` once signed in; only the socle's fallbacks bundled):
+
+| | before B2 | after B2 | |
+|---|---:|---:|---:|
+| entry chunk (JS) | 908.5 KB | 657.6 KB | −28 % |
+| entry chunk (JS, gzip) | 243.8 KB | 193.5 KB | −21 % |
+| entry stylesheet | 792.4 KB | 469.3 KB | −41 % |
+| all stylesheets | 1,192.1 KB | 869.0 KB | −27 % |
+| all scripts | 8,429.4 KB | 7,963.9 KB | −6 % |
+
+The looks now arrive with the packs, once a member is signed in: one gzip answer per registry epoch
+(≈ 870 KB of text, shown 0.9 s after a full load on the POC).
