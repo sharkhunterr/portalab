@@ -2,7 +2,6 @@
 (« classic », free); every look sold in the shop is one its widget accepts, and every look a widget offers
 is on sale."""
 
-from portalab.app.demo_shop import SHOP
 from portalab.capabilities.dashboard import WidgetDefinition, with_styles
 from portalab.modules.community.integrations import ACTIVITY_WIDGET
 from portalab.modules.dashboard.widgets.builtin import CLOCK, COUNTDOWN, SERVICES_SUMMARY
@@ -16,6 +15,7 @@ from portalab.modules.media.providers.insight_widgets import (
 )
 from portalab.modules.media.providers.widgets import CONTINUE
 from portalab.modules.news.integrations import LATEST
+from tests.catalog_fixtures import full_catalog
 from tests.unit.dashboard.fakes import definition
 
 STYLED: tuple[WidgetDefinition, ...] = (
@@ -49,7 +49,7 @@ def test_a_style_setting_defaults_to_the_original_look() -> None:
 def test_every_look_on_sale_is_one_its_widget_offers_and_back() -> None:
     offered = {(w.key, style) for w in STYLED for style in _styles(w) if style != "classic"}
     on_sale = set()
-    for product in SHOP:
+    for product in full_catalog():
         if product["type"] == "widget_option" and ":style=" in product["payload"]["option"]:
             key, style = product["payload"]["option"].split(":style=")
             on_sale.add((key, style))
@@ -62,8 +62,11 @@ def test_every_look_comes_in_a_pack_with_the_widget_it_needs() -> None:
     a look for a sold widget without that widget."""
     from portalab.app.demo_shop import LOOK_NEEDS
 
-    looks = {p["key"] for p in SHOP if p["type"] == "widget_option" and ":style=" in p["payload"]["option"]}
-    packs = [p for p in SHOP if p["type"] == "bundle"]
+    catalog = full_catalog()  # 028: the packs' bundles too
+    looks = {
+        p["key"] for p in catalog if p["type"] == "widget_option" and ":style=" in p["payload"]["option"]
+    }
+    packs = [p for p in catalog if p["type"] == "bundle"]
     in_packs = {key for pack in packs for key in pack["payload"]["products"]}
     assert looks <= in_packs
     for pack in packs:

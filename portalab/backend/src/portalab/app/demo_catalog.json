@@ -1,0 +1,2306 @@
+{
+ "about": "027/028: the demo catalog's products no visual pack holds (features, widgets and their options, statistics, perks, requests). Every look is its pack's (packs/builtin).",
+ "products": [
+  {
+   "key": "backdrop_banner",
+   "type": "profile_backdrop",
+   "price": 1500,
+   "rarity": "epic",
+   "names": {
+    "en": "Film backdrop banner",
+    "fr": "Bannière de film"
+   },
+   "descriptions": {
+    "en": "Use the backdrop of any film or series of the library as your profile banner.",
+    "fr": "Le backdrop de n'importe quel film ou série de la bibliothèque en bannière de profil."
+   },
+   "payload": {
+    "feature": "backdrop"
+   },
+   "collection": "profile",
+   "icon": "film",
+   "featured": false,
+   "level": 8,
+   "supply": 5,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "release_search",
+   "type": "access",
+   "price": 5000,
+   "rarity": "epic",
+   "names": {
+    "en": "Release hunter",
+    "fr": "Chasseur de versions"
+   },
+   "descriptions": {
+    "en": "Search the indexers yourself from a title's page and see every release found (advanced).",
+    "fr": "Interroger soi-même les indexeurs depuis la fiche d'un titre et voir toutes les versions trouvées (avancé)."
+   },
+   "payload": {
+    "permission": "media.release_search"
+   },
+   "collection": "essentials",
+   "icon": "search",
+   "featured": false,
+   "level": 20,
+   "supply": 3,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_poster_wall",
+   "type": "widget",
+   "price": 700,
+   "rarity": "rare",
+   "names": {
+    "en": "Poster wall widget",
+    "fr": "Widget mur d'affiches"
+   },
+   "descriptions": {
+    "en": "The 24 most watched titles of the month as a big poster wall on your dashboard.",
+    "fr": "Les 24 titres les plus vus du mois en grand mur d'affiches sur votre tableau de bord."
+   },
+   "payload": {
+    "widget": "media.poster_wall"
+   },
+   "collection": "widgets",
+   "icon": "image",
+   "featured": true,
+   "level": 4,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "quota_requests",
+   "type": "quota",
+   "price": 150,
+   "rarity": "common",
+   "names": {
+    "en": "+5 media requests",
+    "fr": "+5 demandes de médias"
+   },
+   "descriptions": {
+    "en": "Five extra media requests this month — two packs a month at most.",
+    "fr": "Cinq demandes de médias en plus ce mois-ci — deux par mois au plus."
+   },
+   "payload": {
+    "kind": "media_requests",
+    "units": 5
+   },
+   "collection": "essentials",
+   "icon": "inbox",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": [
+    2,
+    30
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "rescue_1",
+   "type": "media_rescue",
+   "price": 600,
+   "rarity": "rare",
+   "names": {
+    "en": "Rescue a title",
+    "fr": "Sauvetage d'un titre"
+   },
+   "descriptions": {
+    "en": "A title the library's cleanup was about to delete stays: « Save this title » on its page takes it off the list, for everyone.",
+    "fr": "Un titre que le nettoyage de la médiathèque allait supprimer reste : « Sauver ce titre » sur sa fiche le retire de la liste, pour tout le monde."
+   },
+   "payload": {
+    "count": 1
+   },
+   "collection": "essentials",
+   "icon": "shield",
+   "featured": false,
+   "level": 3,
+   "supply": null,
+   "limit": [
+    3,
+    30
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "rescue_3",
+   "type": "media_rescue",
+   "price": 1500,
+   "rarity": "epic",
+   "names": {
+    "en": "Three rescues",
+    "fr": "Trois sauvetages"
+   },
+   "descriptions": {
+    "en": "Three titles saved from the cleanup, whenever you need them — cheaper than one by one.",
+    "fr": "Trois titres sauvés du nettoyage, quand vous en avez besoin — moins cher qu'un par un."
+   },
+   "payload": {
+    "count": 3
+   },
+   "collection": "essentials",
+   "icon": "shield",
+   "featured": false,
+   "level": 8,
+   "supply": null,
+   "limit": [
+    1,
+    30
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "early_unlock",
+   "type": "early_unlock",
+   "price": 2500,
+   "rarity": "epic",
+   "names": {
+    "en": "Level pass",
+    "fr": "Passe-droit"
+   },
+   "descriptions": {
+    "en": "Use it from your reserve on an item you hold but may not wear yet for want of a level: it is yours to wear at once. 25 copies, one a month per member.",
+    "fr": "À utiliser depuis votre réserve sur un élément que vous possédez mais ne pouvez pas encore porter faute de niveau : il est à vous tout de suite. 25 exemplaires, un par mois et par membre."
+   },
+   "payload": {},
+   "collection": "essentials",
+   "icon": "key",
+   "featured": false,
+   "level": null,
+   "supply": 25,
+   "limit": [
+    1,
+    30
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "streak_freeze_1",
+   "type": "streak_freeze",
+   "price": 120,
+   "rarity": "common",
+   "names": {
+    "en": "Streak freeze",
+    "fr": "Gel de série"
+   },
+   "descriptions": {
+    "en": "A missed day no longer breaks your play streak: it is covered automatically, the multiplier goes on.",
+    "fr": "Un jour manqué ne casse plus votre série de jeu : il est couvert automatiquement, le multiplicateur continue."
+   },
+   "payload": {
+    "count": 1
+   },
+   "collection": "essentials",
+   "icon": "snowflake",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": [
+    4,
+    30
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "streak_freeze_3",
+   "type": "streak_freeze",
+   "price": 300,
+   "rarity": "common",
+   "names": {
+    "en": "Three streak freezes",
+    "fr": "Trois gels de série"
+   },
+   "descriptions": {
+    "en": "Three missed days covered — for holidays or a busy week. Cheaper than one by one.",
+    "fr": "Trois jours manqués couverts — pour les vacances ou une semaine chargée. Moins cher qu'un par un."
+   },
+   "payload": {
+    "count": 3
+   },
+   "collection": "essentials",
+   "icon": "snowflake",
+   "featured": false,
+   "level": 3,
+   "supply": null,
+   "limit": [
+    2,
+    30
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "boost_xp_15",
+   "type": "xp_boost",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "XP boost x1.5 — 24 h",
+    "fr": "Boost d'XP x1,5 — 24 h"
+   },
+   "descriptions": {
+    "en": "All the XP you earn is multiplied by 1.5 for 24 hours, on top of your streak and the events.",
+    "fr": "Toute l'XP gagnée est multipliée par 1,5 pendant 24 heures, en plus de votre série et des événements."
+   },
+   "payload": {
+    "factor": 1.5,
+    "hours": 24,
+    "values": [
+     "xp"
+    ]
+   },
+   "collection": "essentials",
+   "icon": "rocket",
+   "featured": true,
+   "level": null,
+   "supply": null,
+   "limit": [
+    3,
+    7
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "boost_xp_2",
+   "type": "xp_boost",
+   "price": 600,
+   "rarity": "rare",
+   "names": {
+    "en": "XP boost x2 — 48 h",
+    "fr": "Boost d'XP x2 — 48 h"
+   },
+   "descriptions": {
+    "en": "Twice the XP for two days: the fastest way to the next level.",
+    "fr": "Deux fois plus d'XP pendant deux jours : le plus court chemin vers le niveau suivant."
+   },
+   "payload": {
+    "factor": 2,
+    "hours": 48,
+    "values": [
+     "xp"
+    ]
+   },
+   "collection": "essentials",
+   "icon": "rocket",
+   "featured": false,
+   "level": 5,
+   "supply": null,
+   "limit": [
+    1,
+    7
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "request_4k",
+   "type": "special_request",
+   "price": 1500,
+   "rarity": "epic",
+   "names": {
+    "en": "A film in 4K",
+    "fr": "Un film en 4K"
+   },
+   "descriptions": {
+    "en": "Ask for a film in 4K UHD with what matters to you — Dolby Atmos, HDR, languages, subtitles. An administrator finds it within a week; declined, your Coins come back.",
+    "fr": "Demandez un film en 4K UHD avec ce qui compte pour vous — Dolby Atmos, HDR, langues, sous-titres. Un administrateur le trouve sous une semaine ; refusée, vos Coins vous sont rendus."
+   },
+   "payload": {
+    "deadline_days": 7,
+    "form": [
+     {
+      "key": "film",
+      "type": "text",
+      "labels": {
+       "en": "Which film (title and year)",
+       "fr": "Quel film (titre et année)"
+      },
+      "options": [],
+      "required": true
+     },
+     {
+      "key": "sound",
+      "type": "multi",
+      "labels": {
+       "en": "Sound",
+       "fr": "Son"
+      },
+      "options": [
+       "Dolby Atmos",
+       "DTS:X",
+       "Dolby TrueHD 7.1",
+       "5.1"
+      ],
+      "required": false
+     },
+     {
+      "key": "hdr",
+      "type": "choice",
+      "labels": {
+       "en": "Picture",
+       "fr": "Image"
+      },
+      "options": [
+       "Dolby Vision",
+       "HDR10+",
+       "HDR10",
+       "No preference"
+      ],
+      "required": false
+     },
+     {
+      "key": "languages",
+      "type": "multi",
+      "labels": {
+       "en": "Languages",
+       "fr": "Langues"
+      },
+      "options": [
+       "French (VFF)",
+       "Quebec French (VFQ)",
+       "Original (VO)"
+      ],
+      "required": false
+     },
+     {
+      "key": "subtitles",
+      "type": "choice",
+      "labels": {
+       "en": "Subtitles",
+       "fr": "Sous-titres"
+      },
+      "options": [
+       "French",
+       "English",
+       "Forced only",
+       "None"
+      ],
+      "required": false
+     },
+     {
+      "key": "notes",
+      "type": "textarea",
+      "labels": {
+       "en": "Anything else",
+       "fr": "Autre chose"
+      },
+      "options": [],
+      "required": false
+     }
+    ]
+   },
+   "collection": "essentials",
+   "icon": "clapperboard",
+   "featured": true,
+   "level": 10,
+   "supply": null,
+   "limit": [
+    1,
+    30
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": 10,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "request_tv_channel",
+   "type": "special_request",
+   "price": 5000,
+   "rarity": "legendary",
+   "names": {
+    "en": "Your own TV channel",
+    "fr": "Votre chaîne TV"
+   },
+   "descriptions": {
+    "en": "A Live TV channel built for you: its name, its theme and what it shows (films, series, a saga, a genre…), on a loop for everyone. An administrator sets it up within two weeks; declined, your Coins come back.",
+    "fr": "Une chaîne de la TV en direct créée pour vous : son nom, son thème et ce qu'elle diffuse (films, séries, une saga, un genre…), en boucle pour tout le monde. Un administrateur la met en place sous deux semaines ; refusée, vos Coins vous sont rendus."
+   },
+   "payload": {
+    "deadline_days": 14,
+    "form": [
+     {
+      "key": "name",
+      "type": "text",
+      "labels": {
+       "en": "Channel name",
+       "fr": "Nom de la chaîne"
+      },
+      "options": [],
+      "required": true
+     },
+     {
+      "key": "theme",
+      "type": "choice",
+      "labels": {
+       "en": "Theme",
+       "fr": "Thème"
+      },
+      "options": [
+       "Films",
+       "Series",
+       "A saga",
+       "A genre",
+       "Cartoons",
+       "Mixed"
+      ],
+      "required": false
+     },
+     {
+      "key": "content",
+      "type": "textarea",
+      "labels": {
+       "en": "What it shows (titles, saga, genre…)",
+       "fr": "Ce qu'elle diffuse (titres, saga, genre…)"
+      },
+      "options": [],
+      "required": true
+     },
+     {
+      "key": "order",
+      "type": "choice",
+      "labels": {
+       "en": "Order",
+       "fr": "Ordre"
+      },
+      "options": [
+       "Shuffle",
+       "In order",
+       "By release date"
+      ],
+      "required": false
+     },
+     {
+      "key": "notes",
+      "type": "textarea",
+      "labels": {
+       "en": "Anything else",
+       "fr": "Autre chose"
+      },
+      "options": [],
+      "required": false
+     }
+    ]
+   },
+   "collection": "essentials",
+   "icon": "tv",
+   "featured": true,
+   "level": 20,
+   "supply": null,
+   "limit": [
+    1,
+    60
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": 30,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "access_romm",
+   "type": "service_access",
+   "price": 800,
+   "rarity": "rare",
+   "names": {
+    "en": "RomM games access",
+    "fr": "Accès Jeux RomM"
+   },
+   "descriptions": {
+    "en": "Your own account on RomM: thousands of retro games to play in the browser, your saves kept. An administrator approves it and your account is created.",
+    "fr": "Votre compte sur RomM : des milliers de jeux rétro à jouer dans le navigateur, vos sauvegardes gardées. Un administrateur la valide et votre compte est créé."
+   },
+   "payload": {
+    "service": "romm",
+    "group": "romm-users",
+    "deadline_days": 3
+   },
+   "collection": "essentials",
+   "icon": "server",
+   "featured": false,
+   "level": 5,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": 30,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "access_grimmory",
+   "type": "service_access",
+   "price": 800,
+   "rarity": "rare",
+   "names": {
+    "en": "Grimmory library access",
+    "fr": "Accès Bibliothèque Grimmory"
+   },
+   "descriptions": {
+    "en": "Your own account on Grimmory: the books and audiobooks to read and listen to, your progress kept. An administrator approves it and your account is created.",
+    "fr": "Votre compte sur Grimmory : les livres et livres audio à lire et écouter, votre progression gardée. Un administrateur la valide et votre compte est créé."
+   },
+   "payload": {
+    "service": "grimmory",
+    "group": "grimmory-users",
+    "deadline_days": 3
+   },
+   "collection": "essentials",
+   "icon": "server",
+   "featured": false,
+   "level": 5,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": 30,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_media_top",
+   "type": "widget",
+   "price": 400,
+   "rarity": "common",
+   "names": {
+    "en": "Top of the week widget",
+    "fr": "Widget Top de la semaine"
+   },
+   "descriptions": {
+    "en": "The most watched titles of the week with their posters.",
+    "fr": "Les titres les plus vus de la semaine, avec leurs affiches."
+   },
+   "payload": {
+    "widget": "media.top"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_media_upcoming",
+   "type": "widget",
+   "price": 350,
+   "rarity": "common",
+   "names": {
+    "en": "Upcoming releases widget",
+    "fr": "Widget Prochaines sorties"
+   },
+   "descriptions": {
+    "en": "The films and episodes coming to the library.",
+    "fr": "Les films et épisodes qui arrivent dans la bibliothèque."
+   },
+   "payload": {
+    "widget": "media.upcoming"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_my_soon",
+   "type": "widget",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "My requests coming soon widget",
+    "fr": "Widget Mes demandes bientôt là"
+   },
+   "descriptions": {
+    "en": "Your requests about to arrive: downloading, importing, coming out.",
+    "fr": "Vos demandes sur le point d'arriver : en téléchargement, en import, bientôt dans les salles."
+   },
+   "payload": {
+    "widget": "media.my_soon"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_progress",
+   "type": "widget",
+   "price": 150,
+   "rarity": "common",
+   "names": {
+    "en": "Progress bar widget",
+    "fr": "Widget Barre de progression"
+   },
+   "descriptions": {
+    "en": "Your level, today's objectives, quests or achievements as a bar across.",
+    "fr": "Votre niveau, vos objectifs du jour, vos quêtes ou vos succès en barre horizontale."
+   },
+   "payload": {
+    "widget": "dashboard.progress"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_progress_vertical",
+   "type": "widget",
+   "price": 250,
+   "rarity": "common",
+   "names": {
+    "en": "Progress column widget",
+    "fr": "Widget Colonne de progression"
+   },
+   "descriptions": {
+    "en": "The same progress as an upright column that fills up.",
+    "fr": "La même progression en colonne verticale qui se remplit."
+   },
+   "payload": {
+    "widget": "dashboard.progress_vertical"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_separator",
+   "type": "widget",
+   "price": 100,
+   "rarity": "common",
+   "names": {
+    "en": "Separator widget",
+    "fr": "Widget Séparateur"
+   },
+   "descriptions": {
+    "en": "A line, dots, a gradient or space — with a label — to group your widgets.",
+    "fr": "Une ligne, des points, un dégradé ou de l'espace — avec un libellé — pour regrouper vos widgets."
+   },
+   "payload": {
+    "widget": "dashboard.separator"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_clock",
+   "type": "widget",
+   "price": 120,
+   "rarity": "common",
+   "names": {
+    "en": "Clock widget",
+    "fr": "Widget Horloge"
+   },
+   "descriptions": {
+    "en": "The time and the date, big, on your dashboard.",
+    "fr": "L'heure et la date, en grand, sur votre tableau de bord."
+   },
+   "payload": {
+    "widget": "dashboard.clock"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_note",
+   "type": "widget",
+   "price": 120,
+   "rarity": "common",
+   "names": {
+    "en": "Sticky note widget",
+    "fr": "Widget Post-it"
+   },
+   "descriptions": {
+    "en": "A coloured note for yourself on your dashboard.",
+    "fr": "Un post-it coloré pour vous sur votre tableau de bord."
+   },
+   "payload": {
+    "widget": "dashboard.note"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_countdown",
+   "type": "widget",
+   "price": 250,
+   "rarity": "common",
+   "names": {
+    "en": "Countdown widget",
+    "fr": "Widget Compte à rebours"
+   },
+   "descriptions": {
+    "en": "The days left until the date you choose: a holiday, a release, a birthday.",
+    "fr": "Les jours restants jusqu'à la date de votre choix : des vacances, une sortie, un anniversaire."
+   },
+   "payload": {
+    "widget": "dashboard.countdown"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_stats_area",
+   "type": "widget_option",
+   "price": 250,
+   "rarity": "common",
+   "names": {
+    "en": "Area chart for « My statistics »",
+    "fr": "Graphique en aires pour « Mes statistiques »"
+   },
+   "descriptions": {
+    "en": "One more setting for this dashboard widget — chosen in its settings once bought.",
+    "fr": "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée."
+   },
+   "payload": {
+    "option": "media.stats:chart=area"
+   },
+   "collection": "widgets",
+   "icon": "settings",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_stats_donut",
+   "type": "widget_option",
+   "price": 300,
+   "rarity": "common",
+   "names": {
+    "en": "Donut chart for « My statistics »",
+    "fr": "Graphique en anneau pour « Mes statistiques »"
+   },
+   "descriptions": {
+    "en": "One more setting for this dashboard widget — chosen in its settings once bought.",
+    "fr": "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée."
+   },
+   "payload": {
+    "option": "media.stats:chart=donut"
+   },
+   "collection": "widgets",
+   "icon": "settings",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_stats_top",
+   "type": "widget_option",
+   "price": 450,
+   "rarity": "common",
+   "names": {
+    "en": "Top list for « My statistics »",
+    "fr": "Classement pour « Mes statistiques »"
+   },
+   "descriptions": {
+    "en": "One more setting for this dashboard widget — chosen in its settings once bought.",
+    "fr": "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée."
+   },
+   "payload": {
+    "option": "media.stats:chart=top"
+   },
+   "collection": "widgets",
+   "icon": "settings",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_stats_year",
+   "type": "widget_option",
+   "price": 250,
+   "rarity": "common",
+   "names": {
+    "en": "One-year period for « My statistics »",
+    "fr": "Période d'un an pour « Mes statistiques »"
+   },
+   "descriptions": {
+    "en": "One more setting for this dashboard widget — chosen in its settings once bought.",
+    "fr": "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée."
+   },
+   "payload": {
+    "option": "media.stats:period=365d"
+   },
+   "collection": "widgets",
+   "icon": "settings",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_stats_all",
+   "type": "widget_option",
+   "price": 500,
+   "rarity": "common",
+   "names": {
+    "en": "All-time period for « My statistics »",
+    "fr": "Depuis toujours pour « Mes statistiques »"
+   },
+   "descriptions": {
+    "en": "One more setting for this dashboard widget — chosen in its settings once bought.",
+    "fr": "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée."
+   },
+   "payload": {
+    "option": "media.stats:period=all"
+   },
+   "collection": "widgets",
+   "icon": "settings",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_stats_server",
+   "type": "widget_option",
+   "price": 300,
+   "rarity": "common",
+   "names": {
+    "en": "Whole server for « My statistics »",
+    "fr": "Tout le serveur pour « Mes statistiques »"
+   },
+   "descriptions": {
+    "en": "One more setting for this dashboard widget — chosen in its settings once bought.",
+    "fr": "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée."
+   },
+   "payload": {
+    "option": "media.stats:scope=all"
+   },
+   "collection": "widgets",
+   "icon": "settings",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_requests_server",
+   "type": "widget_option",
+   "price": 250,
+   "rarity": "common",
+   "names": {
+    "en": "Whole server for « Recently requested »",
+    "fr": "Tout le serveur pour « Demandes récentes »"
+   },
+   "descriptions": {
+    "en": "One more setting for this dashboard widget — chosen in its settings once bought.",
+    "fr": "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée."
+   },
+   "payload": {
+    "option": "media.recently_requested:scope=all"
+   },
+   "collection": "widgets",
+   "icon": "settings",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_chart_storage",
+   "type": "widget_option",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "Storage over time for « Chart »",
+    "fr": "Stockage dans le temps pour « Graphique »"
+   },
+   "descriptions": {
+    "en": "One more setting for this dashboard widget — chosen in its settings once bought.",
+    "fr": "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée."
+   },
+   "payload": {
+    "option": "health.chart:series=storage"
+   },
+   "collection": "widgets",
+   "icon": "settings",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_chart_temperature",
+   "type": "widget_option",
+   "price": 300,
+   "rarity": "common",
+   "names": {
+    "en": "Temperatures for « Chart »",
+    "fr": "Températures pour « Graphique »"
+   },
+   "descriptions": {
+    "en": "One more setting for this dashboard widget — chosen in its settings once bought.",
+    "fr": "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée."
+   },
+   "payload": {
+    "option": "health.chart:series=temperature"
+   },
+   "collection": "widgets",
+   "icon": "settings",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_chart_week",
+   "type": "widget_option",
+   "price": 450,
+   "rarity": "common",
+   "names": {
+    "en": "A week of history for « Chart »",
+    "fr": "Une semaine d'historique pour « Graphique »"
+   },
+   "descriptions": {
+    "en": "One more setting for this dashboard widget — chosen in its settings once bought.",
+    "fr": "Une option de réglage en plus pour ce widget — à choisir dans ses réglages une fois achetée."
+   },
+   "payload": {
+    "option": "health.chart:range=7d"
+   },
+   "collection": "widgets",
+   "icon": "settings",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_chart_network",
+   "type": "widget_option",
+   "price": 600,
+   "rarity": "rare",
+   "names": {
+    "en": "Network traffic for « Chart »",
+    "fr": "Trafic réseau pour « Graphique »"
+   },
+   "descriptions": {
+    "en": "The server's network traffic over time in your « Chart » — for those who take part.",
+    "fr": "Le trafic réseau du serveur dans le temps, dans votre « Graphique » — pour ceux qui s'investissent."
+   },
+   "payload": {
+    "option": "health.chart:series=network"
+   },
+   "collection": "widgets",
+   "icon": "activity",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": 30,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_server",
+   "type": "widget",
+   "price": 1500,
+   "rarity": "epic",
+   "names": {
+    "en": "Server widget",
+    "fr": "Widget Serveur"
+   },
+   "descriptions": {
+    "en": "The server at a glance: processor, memory, temperature, network, uptime and what needs attention.",
+    "fr": "Le serveur d'un coup d'œil : processeur, mémoire, température, réseau, temps de fonctionnement et ce qui demande attention."
+   },
+   "payload": {
+    "widget": "health.host"
+   },
+   "collection": "widgets",
+   "icon": "cpu",
+   "featured": false,
+   "level": 10,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": 30,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_containers",
+   "type": "widget",
+   "price": 2500,
+   "rarity": "epic",
+   "names": {
+    "en": "Containers widget",
+    "fr": "Widget Conteneurs"
+   },
+   "descriptions": {
+    "en": "The server's containers: which run, which have an update, and what the server warns about.",
+    "fr": "Les conteneurs du serveur : lesquels tournent, lesquels ont une mise à jour, et ce que le serveur signale."
+   },
+   "payload": {
+    "widget": "health.containers"
+   },
+   "collection": "widgets",
+   "icon": "package",
+   "featured": false,
+   "level": 15,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": 30,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_downloads",
+   "type": "widget",
+   "price": 1500,
+   "rarity": "epic",
+   "names": {
+    "en": "Downloads widget",
+    "fr": "Widget Téléchargements"
+   },
+   "descriptions": {
+    "en": "What is coming to the server: each title being downloaded, its progress, speed, peers and time left.",
+    "fr": "Ce qui arrive sur le serveur : chaque titre en téléchargement, sa progression, sa vitesse, ses pairs et le temps restant."
+   },
+   "payload": {
+    "widget": "media.downloads"
+   },
+   "collection": "widgets",
+   "icon": "download",
+   "featured": false,
+   "level": 10,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": 30,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_continue_ambient",
+   "type": "widget_option",
+   "price": 350,
+   "rarity": "common",
+   "names": {
+    "en": "Ambient light for « Continue »",
+    "fr": "Lumière d'ambiance pour « Continuer »"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "media.continue:style=ambient"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_services_pulse",
+   "type": "widget_option",
+   "price": 300,
+   "rarity": "common",
+   "names": {
+    "en": "Heartbeat for « Services »",
+    "fr": "Pouls pour « Services »"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "health.services_summary:style=pulse"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_progress_odometer",
+   "type": "widget_option",
+   "price": 450,
+   "rarity": "common",
+   "names": {
+    "en": "Odometer for « My progression »",
+    "fr": "Compteur animé pour « Ma progression »"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "gamification.progress:style=odometer"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_progress_chart",
+   "type": "widget_option",
+   "price": 500,
+   "rarity": "common",
+   "names": {
+    "en": "Curves for « My progression »",
+    "fr": "Courbes pour « Ma progression »"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "gamification.progress:style=chart"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_daily_liquid",
+   "type": "widget_option",
+   "price": 300,
+   "rarity": "common",
+   "names": {
+    "en": "Liquid gauges for « Daily objectives »",
+    "fr": "Jauges liquides pour « Objectifs du jour »"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "gamification.daily_objectives:style=liquid"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_added_deck",
+   "type": "widget_option",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "Card deck for « Recently added »",
+    "fr": "Pile de cartes pour « Ajouts récents »"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "media.recently_added:style=deck"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_releases_deck",
+   "type": "widget_option",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "Card deck for « Recent releases »",
+    "fr": "Pile de cartes pour « Sorties récentes »"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "media.recent_releases:style=deck"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_requested_deck",
+   "type": "widget_option",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "Card deck for « Recently requested »",
+    "fr": "Pile de cartes pour « Demandes récentes »"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "media.recently_requested:style=deck"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_stats_countup",
+   "type": "widget_option",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "Counting figures for « My statistics »",
+    "fr": "Chiffres animés pour « Mes statistiques »"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "media.stats:style=countup"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_wall_kenburns",
+   "type": "widget_option",
+   "price": 500,
+   "rarity": "common",
+   "names": {
+    "en": "Travelling camera for the poster wall",
+    "fr": "Travelling pour le mur d'affiches"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "media.poster_wall:style=kenburns"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_news_ticker",
+   "type": "widget_option",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "Carousel for « Latest news »",
+    "fr": "Carrousel pour « Dernières actualités »"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "news.latest:style=carousel"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_clock_analog",
+   "type": "widget_option",
+   "price": 250,
+   "rarity": "common",
+   "names": {
+    "en": "Analog face for the clock",
+    "fr": "Cadran analogique pour l'horloge"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "dashboard.clock:style=analog"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_countdown_flip",
+   "type": "widget_option",
+   "price": 250,
+   "rarity": "common",
+   "names": {
+    "en": "Flip digits for the countdown",
+    "fr": "Chiffres à palettes pour le compte à rebours"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "dashboard.countdown:style=flip"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "opt_style_activity_live",
+   "type": "widget_option",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "Live feed for « Community activity »",
+    "fr": "Fil en direct pour « Activité de la communauté »"
+   },
+   "descriptions": {
+    "en": "Another look for this dashboard widget — its original look stays yours. Chosen in its settings once bought.",
+    "fr": "Un autre visuel pour ce widget — son visuel d'origine reste disponible. À choisir dans ses réglages une fois acheté."
+   },
+   "payload": {
+    "option": "community.activity:style=live"
+   },
+   "collection": "widgets",
+   "icon": "sparkles",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_on_this_day",
+   "type": "widget",
+   "price": 450,
+   "rarity": "common",
+   "names": {
+    "en": "A year ago widget",
+    "fr": "Widget Il y a un an"
+   },
+   "descriptions": {
+    "en": "Around this date, a year or more ago: what you watched, what came into the library.",
+    "fr": "Autour de cette date, il y a un an ou plus : ce que vous regardiez, ce qui arrivait dans la bibliothèque."
+   },
+   "payload": {
+    "widget": "media.on_this_day"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_next_releases",
+   "type": "widget",
+   "price": 500,
+   "rarity": "common",
+   "names": {
+    "en": "Next releases widget",
+    "fr": "Widget Prochaines sorties"
+   },
+   "descriptions": {
+    "en": "What comes out next among what you asked for and the series you follow — with a live countdown.",
+    "fr": "Ce qui sort bientôt parmi vos demandes et les séries que vous suivez — avec un décompte en direct."
+   },
+   "payload": {
+    "widget": "media.next_releases"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "widget_living_wall",
+   "type": "widget",
+   "price": 650,
+   "rarity": "rare",
+   "names": {
+    "en": "Living wall widget",
+    "fr": "Widget Mur vivant"
+   },
+   "descriptions": {
+    "en": "A wall of posters from the library that turn one by one to reveal others.",
+    "fr": "Un mur d'affiches de la bibliothèque qui se retournent une à une pour en révéler d'autres."
+   },
+   "payload": {
+    "widget": "media.living_wall"
+   },
+   "collection": "widgets",
+   "icon": "dashboard",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_when",
+   "type": "statistic",
+   "price": 300,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: When you watch",
+    "fr": "Statistique : Vos moments de visionnage"
+   },
+   "descriptions": {
+    "en": "Unlocks « When you watch » in the Media statistics.",
+    "fr": "Débloque « Vos moments de visionnage » dans les statistiques Médias."
+   },
+   "payload": {
+    "statistic": "media.insights.when"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_genres",
+   "type": "statistic",
+   "price": 300,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: Your favourite genres",
+    "fr": "Statistique : Vos genres préférés"
+   },
+   "descriptions": {
+    "en": "Unlocks « Your favourite genres » in the Media statistics.",
+    "fr": "Débloque « Vos genres préférés » dans les statistiques Médias."
+   },
+   "payload": {
+    "statistic": "media.insights.genres"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_people",
+   "type": "statistic",
+   "price": 500,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: Actors and directors",
+    "fr": "Statistique : Acteurs et réalisateurs"
+   },
+   "descriptions": {
+    "en": "Unlocks « Actors and directors » in the Media statistics.",
+    "fr": "Débloque « Acteurs et réalisateurs » dans les statistiques Médias."
+   },
+   "payload": {
+    "statistic": "media.insights.people"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": 4,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_decades",
+   "type": "statistic",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: By decade",
+    "fr": "Statistique : Par décennie"
+   },
+   "descriptions": {
+    "en": "Unlocks « By decade » in the Media statistics.",
+    "fr": "Débloque « Par décennie » dans les statistiques Médias."
+   },
+   "payload": {
+    "statistic": "media.insights.decades"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_records",
+   "type": "statistic",
+   "price": 350,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: Your records",
+    "fr": "Statistique : Vos records"
+   },
+   "descriptions": {
+    "en": "Unlocks « Your records » in the Media statistics.",
+    "fr": "Débloque « Vos records » dans les statistiques Médias."
+   },
+   "payload": {
+    "statistic": "media.insights.records"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_box_office",
+   "type": "statistic",
+   "price": 600,
+   "rarity": "rare",
+   "names": {
+    "en": "Statistic: Box office of your films",
+    "fr": "Statistique : Box-office de vos films"
+   },
+   "descriptions": {
+    "en": "Unlocks « Box office of your films » in the Media statistics.",
+    "fr": "Débloque « Box-office de vos films » dans les statistiques Médias."
+   },
+   "payload": {
+    "statistic": "media.insights.box_office"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": 5,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_platforms",
+   "type": "statistic",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: Your platforms",
+    "fr": "Statistique : Vos plateformes"
+   },
+   "descriptions": {
+    "en": "Unlocks « Your platforms » in the Media statistics.",
+    "fr": "Débloque « Vos plateformes » dans les statistiques Médias."
+   },
+   "payload": {
+    "statistic": "media.insights.platforms"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_tab_casting",
+   "type": "statistic",
+   "price": 400,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: Casting in depth",
+    "fr": "Statistique : Le casting en détail"
+   },
+   "descriptions": {
+    "en": "The « Casting » tab: the actors and directors you watch most, with their portraits, compared with the period before.",
+    "fr": "L'onglet « Casting » : les acteurs et réalisateurs que vous regardez le plus, avec leurs portraits, comparés à la période précédente."
+   },
+   "payload": {
+    "statistic": "media.insights.tab.casting"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_tab_production",
+   "type": "statistic",
+   "price": 550,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: Production in depth",
+    "fr": "Statistique : La production en détail"
+   },
+   "descriptions": {
+    "en": "The « Production » tab: the years and countries of your films, their budgets and box office, successes and flops.",
+    "fr": "L'onglet « Production » : les années et pays de vos films, leurs budgets et box-office, succès et flops."
+   },
+   "payload": {
+    "statistic": "media.insights.tab.production"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": 4,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_tab_playback",
+   "type": "statistic",
+   "price": 450,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: Playback in depth",
+    "fr": "Statistique : La lecture en détail"
+   },
+   "descriptions": {
+    "en": "The « Playback » tab: direct play or transcoding, picture quality, platforms and devices.",
+    "fr": "L'onglet « Lecture » : lecture directe ou transcodage, qualité d'image, plateformes et appareils."
+   },
+   "payload": {
+    "statistic": "media.insights.tab.playback"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_tab_profile",
+   "type": "statistic",
+   "price": 600,
+   "rarity": "rare",
+   "names": {
+    "en": "Statistic: Your viewer profile",
+    "fr": "Statistique : Votre profil de spectateur"
+   },
+   "descriptions": {
+    "en": "The « Profile » tab: your viewer portrait — genres new, rising or gone, your hours and days, what you finish.",
+    "fr": "L'onglet « Profil » : votre portrait de spectateur — genres nouveaux, en hausse ou délaissés, vos heures et jours, ce que vous terminez."
+   },
+   "payload": {
+    "statistic": "media.insights.tab.profile"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": 5,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_history",
+   "type": "statistic",
+   "price": 700,
+   "rarity": "rare",
+   "names": {
+    "en": "Statistic: Full history",
+    "fr": "Statistique : Historique complet"
+   },
+   "descriptions": {
+    "en": "Go back further than a year: the year to date, any past year, all time — in Media statistics and My requests.",
+    "fr": "Remontez au-delà d'un an : l'année en cours, n'importe quelle année passée, depuis toujours — dans les statistiques Médias et Mes demandes."
+   },
+   "payload": {
+    "statistic": "media.insights.history"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": 5,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_server",
+   "type": "statistic",
+   "price": 1200,
+   "rarity": "epic",
+   "names": {
+    "en": "Statistic: The whole server's statistics",
+    "fr": "Statistique : Les statistiques de tout le serveur"
+   },
+   "descriptions": {
+    "en": "What the whole community watches, listens to and reads — anonymous, for those who take part.",
+    "fr": "Ce que toute la communauté regarde, écoute et lit — anonyme, pour celles et ceux qui participent."
+   },
+   "payload": {
+    "statistic": "media.insights.server"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": 10,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": 30,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_req_watched",
+   "type": "statistic",
+   "price": 150,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: What became of my requests",
+    "fr": "Statistique : Ce que sont devenues mes demandes"
+   },
+   "descriptions": {
+    "en": "In My requests: how many of the titles you asked for you actually watched.",
+    "fr": "Dans Mes demandes : combien des titres demandés vous avez vraiment regardés."
+   },
+   "payload": {
+    "statistic": "media.requests.watched"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_req_ranking",
+   "type": "statistic",
+   "price": 300,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: My rank among requesters",
+    "fr": "Statistique : Mon rang parmi les demandeurs"
+   },
+   "descriptions": {
+    "en": "In My requests: your position among the members who ask (anonymous) and how it moves.",
+    "fr": "Dans Mes demandes : votre position parmi les membres qui demandent (anonyme) et son évolution."
+   },
+   "payload": {
+    "statistic": "media.requests.ranking"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_req_top_watched",
+   "type": "statistic",
+   "price": 300,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: Community favourites",
+    "fr": "Statistique : Les favoris de la communauté"
+   },
+   "descriptions": {
+    "en": "In My requests: the titles you asked for that the community watches most.",
+    "fr": "Dans Mes demandes : les titres que vous avez demandés et que la communauté regarde le plus."
+   },
+   "payload": {
+    "statistic": "media.requests.top_watched"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_req_genres",
+   "type": "statistic",
+   "price": 200,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: Requested vs watched genres",
+    "fr": "Statistique : Genres demandés vs regardés"
+   },
+   "descriptions": {
+    "en": "In My requests: the genres you ask for against the genres you watch.",
+    "fr": "Dans Mes demandes : les genres que vous demandez face à ceux que vous regardez."
+   },
+   "payload": {
+    "statistic": "media.requests.genres"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_req_acquisition",
+   "type": "statistic",
+   "price": 350,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: Arrival times",
+    "fr": "Statistique : Délais d'arrivée"
+   },
+   "descriptions": {
+    "en": "In My requests: how long your requests take to arrive, step by step.",
+    "fr": "Dans Mes demandes : le temps que mettent vos demandes à arriver, étape par étape."
+   },
+   "payload": {
+    "statistic": "media.requests.acquisition"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": 3,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "project_launch",
+   "type": "project_launch",
+   "price": 1500,
+   "rarity": "epic",
+   "names": {
+    "en": "Launch a community project",
+    "fr": "Lancer un projet communautaire"
+   },
+   "descriptions": {
+    "en": "Ask for a feature or a project: name it and pitch it, it opens as a proposal in the community projects for everyone to fund.",
+    "fr": "Demandez une fonctionnalité ou un projet : donnez-lui un titre et un pitch, il s'ouvre en proposition dans les projets de la communauté pour que chacun le finance."
+   },
+   "payload": {
+    "kind": "feature"
+   },
+   "collection": "essentials",
+   "icon": "lightbulb",
+   "featured": true,
+   "level": 5,
+   "supply": null,
+   "limit": [
+    1,
+    30
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  }
+ ],
+ "retired": [
+  "ambient_cometpass",
+  "banner_live_cometpass",
+  "opt_style_upcoming_flip",
+  "widget_server_playing",
+  "widget_calendar",
+  "bg_starfield",
+  "bg_code_rain",
+  "bg_snow",
+  "bg_embers",
+  "bg_petals",
+  "bg_aurora",
+  "bg_disco",
+  "bg_bats",
+  "bg_fireflies",
+  "bg_rain",
+  "bg_spores",
+  "bg_hearts",
+  "bg_upsidedown",
+  "bg_veins",
+  "bg_meadow",
+  "bg_ash",
+  "bg_vhs",
+  "bg_bokeh",
+  "bg_nostromo",
+  "bg_inferno",
+  "bg_thunderstorm",
+  "bg_reef",
+  "bg_volcano",
+  "bg_whiteout",
+  "bg_blackhole",
+  "bg_liquidmetal",
+  "bg_neoncity",
+  "bg_matrix",
+  "bg_goldenhour",
+  "bg_darkness",
+  "bg_lavalamp",
+  "bg_polar",
+  "bg_plasma",
+  "bg_night_owl"
+ ]
+}

@@ -75,3 +75,16 @@ def test_a_builtin_renderer_is_reserved_to_portalab() -> None:
 
     codes = {i["code"] for i in analyse(Files(files))["items"] if i["level"] == "blocking"}
     assert "render.builtin_reserved" in codes
+
+
+def test_every_builtin_pack_s_version_follows_its_content() -> None:
+    """028: Portalab's packs are edited by hand — a release synchronises an edited pack only under a new
+    version (``scripts/stamp_builtin_packs.py`` stamps them)."""
+    import importlib.util
+
+    script = Path(__file__).resolve().parents[3] / "scripts" / "stamp_builtin_packs.py"
+    spec = importlib.util.spec_from_file_location("stamp_builtin_packs", script)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    assert module.stamp(module.ROOT, check=True) == []

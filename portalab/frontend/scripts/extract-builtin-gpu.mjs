@@ -8,8 +8,8 @@
  * effect's fragment (``premium/badgeFx.ts``, the same contract as an imported pack's) in its element's folder,
  * and is drawn by it: ``render: {kind: "glsl", file, shape, radius, stage, start, cycle}`` — its stylesheet,
  * if it has one, kept beside it. The interface then finds every GPU look through its packs, Portalab's own
- * included. ``backend/scripts/build_builtin_packs.py`` keeps these files and settings when it writes the
- * packs again.
+ * included. The packs are their source since (``backend/scripts/stamp_builtin_packs.py`` stamps their
+ * versions).
  *
  *   node scripts/extract-builtin-gpu.mjs [--dry-run]
  *

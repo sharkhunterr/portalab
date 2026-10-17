@@ -8,8 +8,8 @@
  * the base rules (the fallbacks every family keeps in the code), and the rules a look's stylesheet may not hold
  * (a sibling, `:has()`, the document's root — reported, to rewrite by hand). Each look's stylesheet is written
  * in its element's folder (`packs/builtin/<pack>/elements/<element>/look.css`), the element then drawn by it
- * (`render: {kind: "css"}`); `backend/scripts/build_builtin_packs.py` keeps these files when it writes the packs
- * again. Only looks a built-in pack holds are moved — never the socle's (the fallbacks).
+ * (`render: {kind: "css"}`); the packs are their source since (`backend/scripts/stamp_builtin_packs.py`
+ * stamps their versions). Only looks a built-in pack holds are moved — never the socle's (the fallbacks).
  *
  *   node scripts/extract-builtin-packs.mjs [--family avatar_frame,…] [--dry-run]
  *

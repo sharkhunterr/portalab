@@ -11,10 +11,10 @@ from sqlalchemy import text
 
 from portalab.app import demo_economy
 from portalab.app.demo_seed import MEMBERS, PRODUCTS, seed_demo
-from portalab.app.demo_shop import SHOP
 from portalab.app.wiring import wire_platform
 from portalab.capabilities.catalog import new_registry
 from portalab.core.db import Database
+from tests.catalog_fixtures import full_catalog, pack_products
 
 pytestmark = pytest.mark.integration
 
@@ -58,8 +58,9 @@ async def test_seed_fills_every_domain_and_is_idempotent(database: Database, tmp
     assert first.steps["first run"] == "completed"
     after_first = await counts(database)
     assert after_first["users"] == 1 + len(MEMBERS)
-    assert after_first["products"] == len(PRODUCTS) and after_first["ownerships"] == 0
-    assert after_first["rewards"] == sum(1 for p in SHOP if p["reward_only"])
+    # 028: the demo shop's products and those of every pack (switched on by the demo)
+    assert after_first["products"] == len(PRODUCTS) + len(pack_products()) and after_first["ownerships"] == 0
+    assert after_first["rewards"] == sum(1 for p in full_catalog() if p["reward_only"])
     assert after_first["projects"] == 2 and after_first["fundings"] == 0
     assert after_first["achievements"] == 0 and after_first["campaigns"] == 4  # demo + 3 seasonal (027)
     assert after_first["articles"] == 3 and after_first["pages"] >= 3
