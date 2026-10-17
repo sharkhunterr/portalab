@@ -257,7 +257,7 @@ offline analysis reports no blocking finding; it imports and publishes.
 - [X] T097 [P] Regenerate `backend/openapi.json` and `frontend/src/api/generated/schema.ts` (`npm run gen:api && npm run check:api-drift`)
 - [X] T098 [P] Accessibility sweep (axe) of the workflow pages and pack navigation at 3 widths in `frontend/tests/e2e/visual-packs/a11y.spec.ts` (Playwright: the pack navigation's own sweep is `navigation.spec.ts`)
 - [X] T099 Bundle size check: main chunk smaller than before the extraction (record both in `specs/028-visual-packs/quickstart.md`)
-- [ ] T100 Full gates (backend pytest/ruff/mypy/lint-imports; frontend lint/typecheck/test/build/check-tokens/i18n:check) and quickstart scenarios 1–9 run on the POC instance (8444) then on the LAN after redeploy
+- [ ] T100 Full gates (backend pytest/ruff/mypy/lint-imports; frontend lint/typecheck/test/build/check-tokens/i18n:check) and quickstart scenarios 1–9 run on the POC instance (8444) then on the LAN after redeploy — *2026-10-17: every gate green (backend 2,025 passed; frontend 1,749 passed, lint, typecheck, i18n, API drift, build); on the POC: the built-in synchronisation (85 packs, a dry run then unchanged), Nordlys imported through the six steps and sold at the decided price, a visitor and a member refused, switched off and on again, the isolation campaign, the browser check of CSS and GPU looks; the LAN waits for its redeploy*
 
 ---
 
