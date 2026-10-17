@@ -67,7 +67,9 @@ def vocabulary_key_ok(key: str) -> bool:
     if VOCABULARY.fullmatch(key):
         return True
     word = NAVIGATION_WORD.fullmatch(key)
-    return bool(word) and (word.group(1) is None or word.group(1) in live_looks.shipped("navigation"))
+    if word is None:
+        return False
+    return word.group(1) is None or word.group(1) in live_looks.shipped("navigation")
 
 
 GLSL_RESERVED = re.compile(r"\b(?:float|vec[234]|int)\s+(out|in|input|output|sample|filter|active)\b")

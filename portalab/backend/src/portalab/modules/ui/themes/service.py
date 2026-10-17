@@ -196,6 +196,24 @@ class ThemeService:
             )
             return theme_out(row, admin=True)
 
+    async def adopt(self, actor: Principal, key: str, definition: Mapping[str, Any], *, source: str) -> None:
+        """028: one of Portalab's interfaces seeded by the migrations (``builtin``) taken over by the built-in
+        pack holding it — its definition the pack's, its source the pack's from now on (switched on and off
+        with it, updated by its releases)."""
+        async with self.database.unit_of_work() as uow:
+            row = (
+                await uow.session.execute(select(Theme).where(Theme.key == key).with_for_update())
+            ).scalar_one_or_none()
+            if row is None or row.source != "builtin":
+                raise ThemeConflict("Only a built-in theme is adopted by its pack.")
+            clean, report = self.check({**definition, "key": key})
+            if clean != row.definition:
+                row.definition, row.floor_report, row.name = clean, report, clean["name"]
+                row.version += 1
+            row.source = row.owner = source
+            row.updated_at = utc_now(self.clock)
+            await self._audit(uow.session, actor, "theme.adopted", row, sensitive=False)
+
     async def get(self, key: str) -> Theme:
         async with self.database.session() as session:
             row = (await session.execute(select(Theme).where(Theme.key == key))).scalar_one_or_none()

@@ -207,3 +207,21 @@ async def test_sold_themes_need_ownership(app: FastAPI, client: httpx.AsyncClien
     assert "dark" in listed
     assert (await client.put("/api/v1/me/preferences", json={"ui.theme": "dark"})).status_code == 200
     assert "dark" in await ui.module.themes.allowed_keys()  # campaigns and activation see every theme
+
+
+async def test_a_portalab_pack_adopts_its_seeded_interface(ui: UiHarness) -> None:
+    """028: the migrations seed Portalab's interfaces (``builtin``); the built-in pack holding one takes it
+    over (its definition, its source), an imported pack never does."""
+    from portalab.core.errors import Conflict
+    from portalab.modules.ui.interfaces import PackInterfaces
+
+    interfaces = PackInterfaces(ui.module.themes)
+    assert await interfaces.source_of("dark") == "builtin"
+    with pytest.raises(Conflict):
+        await interfaces.put(SYSTEM_ACTOR, interface_document("dark"), source="visuals:acme")
+    await interfaces.put(SYSTEM_ACTOR, interface_document("dark"), source="visuals:portalab-socle")
+    assert await interfaces.source_of("dark") == "visuals:portalab-socle"
+    # its releases update it from now on, switched on and off with its pack
+    await interfaces.put(SYSTEM_ACTOR, interface_document("dark"), source="visuals:portalab-socle")
+    await interfaces.set_enabled(SYSTEM_ACTOR, "matrix", False)
+    assert (await ui.module.themes.get("matrix")).enabled is False

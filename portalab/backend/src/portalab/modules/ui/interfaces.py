@@ -35,6 +35,9 @@ class PackInterfaces:
         current = await self.source_of(key)
         if current is None:
             await self.themes.register(actor, document, source=source, owner=source)
+        elif current == "builtin" and source.startswith("visuals:portalab-") and key in BUILTIN_KEYS:
+            # 028: seeded by the migrations, taken over by the Portalab pack holding it
+            await self.themes.adopt(actor, key, document, source=source)
         elif current == source:
             await self.themes.update(actor, key, definition=document)
         else:
