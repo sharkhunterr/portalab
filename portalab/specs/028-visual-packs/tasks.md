@@ -251,9 +251,9 @@ offline analysis reports no blocking finding; it imports and publishes.
 
 ## Phase 11: Polish & Cross-Cutting Concerns
 
-- [ ] T094 [P] Isolation campaign `frontend/tests/e2e/visual-packs/isolation.spec.ts` with test-only probe elements in `frontend/tests/fixtures/visual-probes/` (each attempts one forbidden capability — cookies, storage, network, parent DOM, top navigation, popup, form, protected surface by CSS — and reports through the sandbox channel); all must report « refused » (R33, SC-004)
-- [ ] T095 [P] `backend/tests/security/visuals/test_archives.py`: malformed archives (T003 generators) store nothing; GitHub redirects off-host stop the import
-- [ ] T096 [P] `data-protected` coverage test `frontend/tests/unit/visuals/protected-surfaces.test.tsx` (administration frame, dialogs, purchase sheet, booster confirmation, security pages, sign-in) (R16)
+- [X] T094 [P] Isolation campaign `frontend/tests/e2e/visual-packs/isolation.spec.ts` with test-only probe elements in `frontend/tests/fixtures/visual-probes/` (each attempts one forbidden capability — cookies, storage, network, parent DOM, top navigation, popup, form, protected surface by CSS — and reports through the sandbox channel); all must report « refused » (R33, SC-004)
+- [X] T095 [P] `backend/tests/security/visuals/test_archives.py`: malformed archives (T003 generators) store nothing; GitHub redirects off-host stop the import
+- [X] T096 [P] `data-protected` coverage test `frontend/tests/unit/visuals/protected-surfaces.test.tsx` (administration frame, dialogs, purchase sheet, booster confirmation, security pages, sign-in) (R16)
 - [X] T097 [P] Regenerate `backend/openapi.json` and `frontend/src/api/generated/schema.ts` (`npm run gen:api && npm run check:api-drift`)
 - [ ] T098 [P] Accessibility sweep (axe) of the workflow pages and pack navigation at 3 widths in `frontend/tests/a11y/visual-packs.spec.ts`
 - [ ] T099 Bundle size check: main chunk smaller than before the extraction (record both in `specs/028-visual-packs/quickstart.md`)

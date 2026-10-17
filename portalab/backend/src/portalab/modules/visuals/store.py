@@ -75,6 +75,17 @@ def _check(names_sizes: list[tuple[str, int]]) -> None:
             raise PackageError(f"file too large: {name} (more than {MAX_FILE_BYTES // 1024 // 1024} MB)")
 
 
+def _hidden(name: str) -> bool:
+    """What an archiver leaves beside a pack's files (``.DS_Store``, ``__MACOSX/``…): left out."""
+    return any(part.startswith(".") or part == "__MACOSX" for part in PurePosixPath(name).parts)
+
+
+def _kind(name: str) -> None:
+    """028 (T095): a file of a kind a pack may not hold refuses the whole archive — nothing is kept."""
+    if PurePosixPath(name).suffix.lower() not in ALLOWED:
+        raise PackageError(f"a pack may not hold this kind of file: {name[:80]!r}")
+
+
 def _root_of(names: list[str]) -> str:
     """The folder holding ``pack.json`` nearest the root ('' when at the root)."""
     candidates = sorted(
@@ -105,8 +116,9 @@ def read_zip(data: bytes, subdir: str = "") -> Files:
     root = _root_of(names)
     entries: dict[str, bytes] = {}
     for name in names:
-        if not name.startswith(root) or name == root:
+        if not name.startswith(root) or name == root or _hidden(name[len(root) :]):
             continue
+        _kind(name[len(root) :])
         data = archive.read(name)
         if len(data) > MAX_FILE_BYTES:  # an archive lying about its sizes
             raise PackageError(f"file too large: {name}")
@@ -128,7 +140,10 @@ def read_folder(folder: Path) -> Files:
     _check([(p.relative_to(folder).as_posix(), p.stat().st_size) for p in files])
     root = _root_of([p.relative_to(folder).as_posix() for p in files])
     base = folder / root if root else folder
-    return Files({p.relative_to(base).as_posix(): p.read_bytes() for p in files if base in p.parents})
+    own = [p for p in files if base in p.parents and not _hidden(p.relative_to(base).as_posix())]
+    for path in own:
+        _kind(path.relative_to(base).as_posix())
+    return Files({p.relative_to(base).as_posix(): p.read_bytes() for p in own})
 
 
 def read_source(path: Path) -> Files:

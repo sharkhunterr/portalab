@@ -431,7 +431,7 @@ export function BoosterReveal({
         <Icon name="close" size={20} />
       </button>
       {coins !== undefined ? (
-        <p className="booster-stage__preview">
+        <p className="booster-stage__preview" data-protected="">
           <Icon name="coins" size={14} />
           {t("marketplace:booster.balance", { coins: format.number(coins) })}
         </p>
@@ -472,7 +472,8 @@ export function BoosterReveal({
               ))}
             </span>
           </button>
-          <p className="booster-stage__hint" aria-live="polite">
+          {/* 028 (R16): the price it charges is Portalab's, never restyled by a pack */}
+          <p className="booster-stage__hint" aria-live="polite" data-protected="">
             {opening.isError
               ? failure
               : opening.isPending
@@ -532,7 +533,7 @@ export function BoosterReveal({
                 ))}
               </ul>
               {refund ? (
-                <p className="booster-summary__refund">
+                <p className="booster-summary__refund" data-protected="">
                   <Icon name="coins" size={16} />
                   {t("marketplace:booster.refundTotal", { coins: format.number(refund) })}
                 </p>
@@ -545,7 +546,7 @@ export function BoosterReveal({
                   .filter(Boolean)
                   .join(" · ")}
               </p>
-              <div className="booster-summary__actions">
+              <div className="booster-summary__actions" data-protected="">
                 <Button variant="secondary" onClick={onClose}>
                   {t("marketplace:booster.close")}
                 </Button>

@@ -70,6 +70,9 @@ export interface AppShellProps {
   children?: ReactNode;
 }
 
+/** 028 (R16): the pages no imported interface restyles — their content keeps Portalab's own look. */
+export const PROTECTED_PAGES = /^\/(admin|account|privacy)(\/|$)/;
+
 export function AppShell({
   userName,
   onSignOut,
@@ -103,7 +106,8 @@ export function AppShell({
   useExternalRevision();
   const packNavigation = externalLook("navigation", arrangement.nav);
   const [packFailed, setPackFailed] = useState<string | null>(null);
-  const protectedSurface = location.pathname.startsWith("/admin");
+  // the administration, the account and its security, privacy: always Portalab's own (028, R16)
+  const protectedSurface = PROTECTED_PAGES.test(location.pathname);
   const packNav =
     packNavigation && !protectedSurface && packFailed !== packNavigation.product ? packNavigation : null;
   const fallbackNav = arrangement.device === "phone" ? "bottom-bar" : "sidebar";
