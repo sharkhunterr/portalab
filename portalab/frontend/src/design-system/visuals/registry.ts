@@ -211,7 +211,17 @@ function bundleOf(base: string, pack: string, sha: string): Promise<Record<strin
   return known;
 }
 
+// 028 (B2): every file of the live packs, read in one answer for the registry's epoch (``/visuals/live``)
+let preloaded: Record<string, string> = {};
+
+/** The live packs' files, all at once (an address not in it is read from its version's bundle). */
+export function preloadFiles(files: Record<string, string> | null | undefined): void {
+  preloaded = files ?? {};
+}
+
 async function text(url: string): Promise<string | null> {
+  const known = preloaded[url];
+  if (known !== undefined) return known;
   const parts = FILE.exec(url);
   if (parts) {
     const [, base, pack, sha, path] = parts as unknown as [string, string, string, string, string];

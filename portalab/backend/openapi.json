@@ -45715,6 +45715,47 @@
         ]
       }
     },
+    "/api/v1/visuals/live/{epoch}": {
+      "get": {
+        "description": "028 (B2): every stylesheet and shader of the live packs in one gzip answer \u2014 immutable for the epoch\nasked when it is the current one (another epoch is answered with the current files, never cached).",
+        "operationId": "live_files_api_v1_visuals_live__epoch__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "epoch",
+            "required": true,
+            "schema": {
+              "title": "Epoch",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Live Files",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
     "/api/v1/visuals/looks": {
       "get": {
         "description": "028: the vocabulary of looks \u2014 what the interface's pickers and the shop's editor offer (none is\nwritten in the interface's code).",

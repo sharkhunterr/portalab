@@ -1,6 +1,7 @@
 """028: the registry of visual packs in PostgreSQL — import, the workflow's steps, publication with the look
 claims, switching off and on, rollback, archive / removal / purge, and what members are served."""
 
+import gzip
 import json
 import shutil
 from collections.abc import Iterator
@@ -74,6 +75,11 @@ async def test_the_workflow_from_the_inbox_to_the_shop(database: Database, tmp_p
     async with database.session() as session:
         topics = [e.topic for e in (await session.execute(select(LiveEvent))).scalars()]
     assert "visuals.changed" in topics
+    # every live file in one gzip answer for this epoch (the page reads all the looks in one request)
+    epoch, body = await service.live_files()
+    live = json.loads(gzip.decompress(body))
+    assert live["epoch"] == epoch and live["files"][level_up["file"]].strip()
+    assert (await service.live_files())[1] is body  # cached for the epoch
     # the vocabulary the interface's pickers read (none is written in its code): Portalab's own looks first,
     # then the live packs' — the socle's free for everyone
     vocabulary = await service.looks()

@@ -9219,6 +9219,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/visuals/live/{epoch}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Live Files
+         * @description 028 (B2): every stylesheet and shader of the live packs in one gzip answer — immutable for the epoch
+         *     asked when it is the current one (another epoch is answered with the current files, never cached).
+         */
+        get: operations["live_files_api_v1_visuals_live__epoch__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/visuals/looks": {
         parameters: {
             query?: never;
@@ -34315,6 +34336,37 @@ export interface operations {
                 pack: string;
                 sha: string;
                 name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    live_files_api_v1_visuals_live__epoch__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                epoch: number;
             };
             cookie?: never;
         };

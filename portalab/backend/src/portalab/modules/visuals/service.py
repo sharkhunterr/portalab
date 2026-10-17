@@ -17,6 +17,7 @@ equipped and refunded the usual way. Interfaces go through ``ui.interface_regist
 """
 
 import asyncio
+import gzip
 import json
 import time
 from collections.abc import Awaitable, Callable, Iterable, Mapping
@@ -181,6 +182,7 @@ class VisualPacks:
         self._checked = 0.0
         self._refreshing = asyncio.Lock()
         self._bundles: dict[str, dict[str, str]] = {}  # a version's folder → its texts (immutable)
+        self._live_files: tuple[int, bytes] | None = None  # every live file, gzipped, for one epoch
 
     # --- infrastructure ----------------------------------------------------------------------------------
     @staticmethod
@@ -1370,6 +1372,32 @@ class VisualPacks:
             self._bundles.clear()
         self._bundles[str(folder)] = out
         return out
+
+    async def live_files(self) -> tuple[int, bytes]:
+        """028 (B2): every stylesheet and shader the live packs' elements use, in one gzip answer keyed by
+        their addresses — a page loads all the looks in one request rather than one per pack (a browser
+        caches nothing from an origin whose certificate it does not trust: the LAN's). Cached per epoch."""
+        await self.refresh()
+        epoch = int(self._manifest.get("epoch", -1))
+        if self._live_files is not None and self._live_files[0] == epoch:
+            return self._live_files
+        files: dict[str, str] = {}
+        prefix = "/api/v1/visuals/files/"
+        for element in self._manifest.get("elements", []):
+            for address in [*(element.get("css") or []), element.get("file")]:
+                if not address or not address.startswith(prefix) or address in files:
+                    continue
+                pack, sha, name = address[len(prefix) :].split("/", 2)
+                found = await self.bundle(pack, sha, manager=False)
+                if found is not None and name in found:
+                    files[address] = found[name]
+                elif name.endswith(".json"):  # an interface's definition
+                    path = await self.served(pack, sha, name, manager=False)
+                    if path is not None:
+                        files[address] = path.read_text(encoding="utf-8", errors="replace")
+        body = gzip.compress(json.dumps({"epoch": epoch, "files": files}, ensure_ascii=False).encode(), 6)
+        self._live_files = (epoch, body)
+        return self._live_files
 
     # --- the proof of concept's registry --------------------------------------------------------------------
     async def import_poc_state(self, actor: Principal) -> int:

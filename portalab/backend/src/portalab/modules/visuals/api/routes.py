@@ -163,6 +163,19 @@ async def live_file(_: Member, packs: Packs, pack: str, sha: str, name: str) -> 
     return _file(await packs.served(pack, sha, name, manager=False), live=True)
 
 
+@members.get("/visuals/live/{epoch}")
+async def live_files(_: Member, packs: Packs, epoch: int) -> Response:
+    """028 (B2): every stylesheet and shader of the live packs in one gzip answer — immutable for the epoch
+    asked when it is the current one (another epoch is answered with the current files, never cached)."""
+    current, body = await packs.live_files()
+    cache = "private, max-age=31536000, immutable" if epoch == current else "private, no-store"
+    return Response(
+        body,
+        media_type="application/json",
+        headers={**FILE_HEADERS, "Content-Encoding": "gzip", "Cache-Control": cache},
+    )
+
+
 @members.get("/visuals/bundle/{pack}/{sha}")
 async def live_bundle(_: Member, packs: Packs, pack: str, sha: str) -> Response:
     """A live version's stylesheets and shaders in one answer (immutable: its address is its fingerprint)."""

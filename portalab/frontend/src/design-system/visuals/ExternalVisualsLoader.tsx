@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { api } from "../../api/client";
 import { connectStream } from "../../api/stream";
-import { type ExternalElement, installElements, setWithheld, uninstallScope } from "./registry";
+import { type ExternalElement, installElements, preloadFiles, setWithheld, uninstallScope } from "./registry";
 import { LOOKS_KEY } from "./vocabulary";
 
 export const ACTIVE_VISUALS_KEY = ["visuals", "active"] as const;
@@ -41,8 +41,16 @@ export function ExternalVisualsLoader({ live = typeof EventSource !== "undefined
   // biome-ignore lint/correctness/useExhaustiveDependencies: installed again only when the registry changes
   useEffect(() => {
     if (!active.data) return;
-    setWithheld(active.data.withheld);
-    void installElements(active.data.elements, "live");
+    const { elements, withheld } = active.data;
+    setWithheld(withheld);
+    // 028 (B2): all their files in one answer for this epoch, then installed (a file it lacks is read alone)
+    void fetch(`/api/v1/visuals/live/${epoch}`, { credentials: "same-origin" })
+      .then((response) => (response.ok ? response.json() : null))
+      .catch(() => null)
+      .then((data) => {
+        preloadFiles((data?.files as Record<string, string> | undefined) ?? null);
+        return installElements(elements, "live");
+      });
   }, [epoch]);
   useEffect(() => () => uninstallScope("live"), []);
   return null;
