@@ -1,0 +1,22 @@
+/* A common card: moonstone (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform. */
+[data-card-face="celeste-moonstone"] .booster-card__face {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.8rem;
+  background: linear-gradient(160deg, #f4f7ff, #b9c3dd 40%, #8d97b5 60%, #e9eefc);
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.55rem rgba(180, 200, 255, 0.55));
+}
+[data-card-face="celeste-moonstone"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  border-radius: 0.8rem;
+  background: radial-gradient(ellipse 80% 55% at 50% 28%, rgba(190, 210, 255, 0.25), transparent 70%), linear-gradient(175deg, #1b2036, #0d1020);
+}
+[data-card-face="celeste-moonstone"] .booster-card__rarity,
+[data-card-face="celeste-moonstone"] .booster-card__name {
+  color: #e6ecff;
+  text-shadow: 0 0 0.6rem rgba(180, 200, 255, 0.55);
+}

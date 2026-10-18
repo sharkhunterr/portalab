@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "graveyard",
+  "names": {
+    "fr": "Cimetière sous la lune",
+    "en": "Graveyard under the moon"
+  },
+  "descriptions": {
+    "fr": "Toute la scène dans un cimetière : une pleine lune voilée, des tombes et un arbre mort en silhouette, la brume qui rampe et des chauves-souris qui passent (HD).",
+    "en": "The whole stage in a graveyard: a veiled full moon, tombstones and a dead tree in silhouette, creeping mist and bats flitting by (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "graveyard.glsl",
+    "stage": true
+  }
+}

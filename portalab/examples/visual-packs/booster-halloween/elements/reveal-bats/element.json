@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "halloween-bats",
+  "names": {
+    "fr": "Nuée de chauves-souris",
+    "en": "Swarm of bats"
+  },
+  "descriptions": {
+    "fr": "Une nuée de chauves-souris jaillit de derrière la carte dans une lueur violette (HD).",
+    "en": "A swarm of bats bursts out from behind the card in a violet glow (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.2,
+    "rarity": "epic"
+  }
+}

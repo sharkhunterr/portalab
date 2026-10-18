@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "halloween-scene",
+  "version": "1.0.1",
+  "names": {
+    "fr": "Halloween — scène de booster",
+    "en": "Halloween — a booster scene"
+  },
+  "descriptions": {
+    "fr": "L'ouverture d'un booster dans un cimetière brumeux sous la pleine lune : une citrouille qui s'illumine et dont le chapeau saute dans un tourbillon de fantômes et de chauves-souris, des dos de carte en toile d'araignée et des faces holographiques — du parchemin à la lune de sang.",
+    "en": "A booster opened in a misty graveyard under the full moon: a jack-o'-lantern lighting up, its lid popping off in a whirl of ghosts and bats, spiderweb card backs and holographic faces — from parchment to the blood moon."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

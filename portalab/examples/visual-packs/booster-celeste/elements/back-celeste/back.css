@@ -1,0 +1,43 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
+[data-card-back="celeste"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.9rem;
+  background:
+    radial-gradient(circle at 18% 22%, #fff3d0 0 1px, transparent 1.6px),
+    radial-gradient(circle at 76% 14%, #fff3d0 0 1.2px, transparent 2px),
+    radial-gradient(circle at 84% 72%, #dfe9ff 0 1px, transparent 1.8px),
+    radial-gradient(circle at 12% 86%, #dfe9ff 0 1.3px, transparent 2px),
+    radial-gradient(circle at 50% 50%, #ffffff 0 0.6px, transparent 1.2px) 0 0 / 14px 17px,
+    radial-gradient(ellipse 80% 60% at 50% 46%, rgba(130, 90, 230, 0.45), transparent 70%),
+    linear-gradient(160deg, #0d0b33, #1a1452 50%, #070620);
+  box-shadow: inset 0 0 0 2px rgba(240, 210, 140, 0.8), inset 0 0 1.5rem rgba(0, 0, 20, 0.8);
+}
+/* the holographic gleam (issue 151): two colours sliding over the chart */
+[data-card-back="celeste"] .booster-card__back::after {
+  background: linear-gradient(115deg, transparent 30%, rgba(120, 220, 255, 0.35) 46%, rgba(255, 140, 230, 0.32) 54%, transparent 70%);
+  mix-blend-mode: screen;
+}
+/* the astrolabe's circles */
+[data-card-back="celeste"] .booster-card__back-pattern {
+  inset: 12% 8%;
+  border: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 47%, rgba(240, 210, 140, 0.75) 48% 49%, transparent 50% 63%, rgba(240, 210, 140, 0.45) 64% 64.6%, transparent 65.5% 98%, rgba(240, 210, 140, 0.6) 99% 100%),
+    conic-gradient(from 0deg, rgba(240, 210, 140, 0.5) 0 1deg, transparent 1deg 45deg, rgba(240, 210, 140, 0.5) 45deg 46deg, transparent 46deg 90deg, rgba(240, 210, 140, 0.5) 90deg 91deg, transparent 91deg 135deg, rgba(240, 210, 140, 0.5) 135deg 136deg, transparent 136deg 180deg, rgba(240, 210, 140, 0.5) 180deg 181deg, transparent 181deg 225deg, rgba(240, 210, 140, 0.5) 225deg 226deg, transparent 226deg 270deg, rgba(240, 210, 140, 0.5) 270deg 271deg, transparent 271deg 315deg, rgba(240, 210, 140, 0.5) 315deg 316deg, transparent 316deg);
+}
+/* the eight-pointed star */
+[data-card-back="celeste"] .booster-card__back-sigil {
+  inline-size: 44%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(50% 0, 57% 36%, 85% 15%, 64% 43%, 100% 50%, 64% 57%, 85% 85%, 57% 64%, 50% 100%, 43% 64%, 15% 85%, 36% 57%, 0 50%, 36% 43%, 15% 15%, 43% 36%);
+  background: radial-gradient(circle, #fffbe8 0 12%, #ffd98a 30%, #c9922e 70%);
+  filter: drop-shadow(0 0 0.6rem rgba(255, 220, 140, 0.9));
+}
+[data-card-back="celeste"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

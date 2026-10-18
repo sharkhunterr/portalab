@@ -44,6 +44,7 @@ async def test_a_scene_bound_at_review_dresses_every_booster(database: Database,
     # administrators may make a booster of (its scenes; its parts are never a pack's sold items)
     bindings = (await service.scene_bindings())["bindings"]
     assert bindings["*"]["pack"] == "maree" and bindings["*"]["booster_look"] == "maree"
+    assert bindings["*"]["card_back"] == "maree"  # the shop shows a card face down, its back
     options = await service.booster_options()
     assert {(s["pack"], s["look"]) for s in options["scenes"]} == {("maree", "maree")}
     assert "maree" not in {p["id"] for p in options["packs"]}
@@ -80,3 +81,27 @@ async def test_a_scene_naming_a_missing_part_is_refused(database: Database, tmp_
         zip_of({p.relative_to(pack).as_posix(): p.read_bytes() for p in pack.rglob("*") if p.is_file()}),
     )
     assert (await service.detail(imported.pack, imported.version))["outcomes"]["analysis"] == "blocking"
+
+
+async def test_a_new_version_keeps_the_boosters_scenes(database: Database, tmp_path: Path) -> None:
+    """Issue 153: a booster given a pack's scene keeps it when the pack's next version is published."""
+    import json
+
+    service, _, _ = _service(database, tmp_path)
+    first = tmp_path / "inbox" / "maree"
+    shutil.copytree(EXAMPLE, first)
+    await service.scan(ADMIN)
+    version = json.loads((EXAMPLE / "pack.json").read_text())["version"]
+    await service.publish(ADMIN, "maree", version)
+    await service.bind_scene(ADMIN, "booster_tide", ("maree", "maree"))
+    shutil.rmtree(first)
+    second = tmp_path / "inbox" / "maree-next"
+    shutil.copytree(EXAMPLE, second)
+    manifest = json.loads((second / "pack.json").read_text())
+    manifest["version"] = "9.0.0"
+    (second / "pack.json").write_text(json.dumps(manifest))
+    await service.scan(ADMIN)
+    await service.publish(ADMIN, "maree", "9.0.0")
+    scene = await service.scene_for("booster_tide")
+    assert scene is not None and scene["look"] == "maree"
+    assert (await service.scene_bindings())["bindings"]["booster_tide"]["card_back"] == "maree"

@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "halloween-bloodmoon",
+  "names": {
+    "fr": "Face de lune de sang",
+    "en": "Blood moon face"
+  },
+  "descriptions": {
+    "fr": "Une carte légendaire rouge sang cerclée d'or, une lune rouge, l'holographie, les paillettes et l'image qui s'incline.",
+    "en": "A legendary card of blood red ringed with gold, a red moon, holography, glitter and the art leaning."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

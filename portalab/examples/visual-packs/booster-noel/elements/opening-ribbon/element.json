@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "noel-ribbon",
+  "names": {
+    "fr": "Le ruban se dénoue",
+    "en": "The ribbon comes undone"
+  },
+  "descriptions": {
+    "fr": "Le cadeau sautille d'impatience, son ruban se dénoue, le couvercle saute : une gerbe d'étoiles d'or, de flocons et de confettis — et les cartes s'en échappent (HD).",
+    "en": "The gift hops with impatience, its ribbon comes undone, the lid pops off: a spray of golden stars, snowflakes and confetti — and the cards escape (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "burst.glsl",
+    "css": [
+      "lid.css"
+    ],
+    "stage": true,
+    "duration": 2.4
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "celeste-nebula",
+  "names": {
+    "fr": "Nébuleuse qui s'ouvre",
+    "en": "Nebula unfolding"
+  },
+  "descriptions": {
+    "fr": "Une nébuleuse rose et bleue tourbillonne et s'ouvre derrière la carte, des étoiles naissent (HD).",
+    "en": "A pink and blue nebula swirls and unfolds behind the card, stars being born (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.2,
+    "rarity": "epic"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "noel-snowflake",
+  "names": {
+    "fr": "Flocon géant",
+    "en": "Giant snowflake"
+  },
+  "descriptions": {
+    "fr": "Un grand flocon de cristal se dessine derrière la carte, tourne et éclate en poudreuse (HD).",
+    "en": "A great crystal snowflake draws itself behind the card, turns and bursts into powder (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

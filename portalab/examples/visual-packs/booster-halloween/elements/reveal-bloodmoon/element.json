@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "halloween-bloodmoon",
+  "names": {
+    "fr": "Éclipse de sang",
+    "en": "Blood eclipse"
+  },
+  "descriptions": {
+    "fr": "La lune se teinte de sang derrière la carte : une éclipse et sa couronne de feu, une brume rouge qui tourbillonne, des braises qui montent (HD).",
+    "en": "The moon turns to blood behind the card: an eclipse and its corona of fire, a red mist swirling, embers rising (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.8,
+    "rarity": "legendary"
+  }
+}

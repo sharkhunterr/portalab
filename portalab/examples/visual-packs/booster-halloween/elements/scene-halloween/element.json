@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "graveyard",
+  "names": {
+    "fr": "Scène d'Halloween",
+    "en": "Halloween scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture dans un cimetière sous la lune. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening in a graveyard under the moon. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-pumpkin",
+      "backdrop": "backdrop-graveyard",
+      "opening": "opening-haunt",
+      "back": {
+        "common": "back-web"
+      },
+      "face": {
+        "common": "face-parchment",
+        "rare": "face-ectoplasm",
+        "epic": "face-grimoire",
+        "legendary": "face-bloodmoon"
+      },
+      "reveal": {
+        "rare": "reveal-wisps",
+        "epic": "reveal-bats",
+        "legendary": "reveal-bloodmoon"
+      }
+    }
+  }
+}

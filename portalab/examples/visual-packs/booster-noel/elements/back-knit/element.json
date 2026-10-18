@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "noel",
+  "names": {
+    "fr": "Dos tricoté",
+    "en": "Knitted back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est un pull de Noël : mailles rouges et vertes, frises de zigzags, une étoile d'or brodée au centre, un reflet de givre qui passe.",
+    "en": "Face down, every card is a Christmas jumper: red and green stitches, zigzag bands, a golden star embroidered in the middle, a frosty gleam passing over."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

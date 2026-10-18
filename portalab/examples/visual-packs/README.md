@@ -3,7 +3,7 @@
 Every customizable look of Portalab can come from outside, its animations in its own files: Portalab only
 provides the renderers, the sandbox and the contracts — all described in the authors' guide,
 **[`docs/visual-packs.md`](../../docs/visual-packs.md)** (format, every element type, the sandbox protocol, the
-data contracts of widgets, the analysis codes, the workflow). Four complete examples:
+data contracts of widgets, the analysis codes, the workflow). Complete examples:
 
 - `nordlys/`: an interface (on a built-in navigation), a GPU level-up, GPU and CSS frames, a name style with its
   own font, a JavaScript celebration, a GPU ambience, a palette, a title, a badge, the theme pack and a booster;
@@ -12,6 +12,13 @@ data contracts of widgets, the analysis codes, the workflow). Four complete exam
   booster as a cursed pirate's chest (its strip becomes the lid, its emblem a skull on the lock), an opening
   of its own that replaces Portalab's tear (the lid swings open, light, bubbles and coins, the cards escaping),
   card faces and backs shaped per rarity and GPU reveals for rare, epic and legendary cards;
+- `booster-celeste/` (`celeste`), `booster-noel/` (`noel`), `booster-halloween/` (`graveyard`): **three more
+  booster scenes**, each a whole opening — a GPU stage (deep space with nebulae and a ringed planet; a snowy
+  night with an aurora and a garland; a graveyard under the moon with mist and bats), the sealed pack's own look
+  (a starred foil and its moons; a gift box; a jack-o'-lantern and its candle), an opening of its own (a
+  supernova; the ribbon undone in a spray of stars; ghosts and bats out of the pumpkin), a card back, a face
+  per rarity with the holographic effect of issue 151 from rare up (a sheen sliding in ``screen``, glitter, the
+  legendary art leaning) and GPU reveals for rare, epic and legendary cards;
 - `widgets/` (`vigie`): **self-contained widgets** (spec 028, US6) — everything they do is in the pack: a new
   widget « Heading » (a compass of the member's progression, drawing itself on one line, in a column or as a
   block, with its own setting « dial » whose silver value is sold and night value offered, reading the

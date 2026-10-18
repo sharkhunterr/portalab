@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "celeste-nebula",
+  "names": {
+    "fr": "Face de nébuleuse",
+    "en": "Nebula face"
+  },
+  "descriptions": {
+    "fr": "Une carte épique taillée en losange, nébuleuse rose et violette, holographique et pailletée.",
+    "en": "An epic card cut like a gem, a pink and violet nebula, holographic and glittering."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

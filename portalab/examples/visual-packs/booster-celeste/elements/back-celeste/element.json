@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "celeste",
+  "names": {
+    "fr": "Carte du ciel",
+    "en": "Sky chart"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est une carte du ciel : un champ d'étoiles bleu nuit, les cercles d'un astrolabe d'or et une étoile à huit branches au centre, un reflet holographique qui passe.",
+    "en": "Face down, every card is a sky chart: a midnight field of stars, the circles of a golden astrolabe and an eight-pointed star in the middle, a holographic gleam passing over."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

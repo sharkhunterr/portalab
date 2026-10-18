@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -76,14 +77,36 @@ export function BoosterPack({
 }
 
 /**
- * A booster product's pack (its shop tile, its sheet) — issue 153: in its own scene's look when it has one
- * (the scene every booster opens with does not change their tiles), drawn at the scene's size then fitted in
- * the tile's place.
+ * A booster product's pack (its shop tile, its sheet) — issue 153: a booster with a scene of its own shows a card
+ * of it face down (its scene's back), else its sealed pack in its scene's look; the scene every booster opens
+ * with does not change their tiles.
  */
 export function ProductPack({ product, size }: { product: Product; size?: "card" | "mini" | undefined }) {
   const info = boosterOf(product);
   const scene = useSceneBindings()[product.key];
   const booster = { names: product.names, look: info?.look ?? "cosmos", cards: info?.cards ?? 5 };
+  if (scene?.card_back) {
+    return (
+      <span className="booster-scene-card" data-size={size} aria-hidden="true">
+        <span
+          className="booster-card"
+          data-state="hidden"
+          data-card-back={scene.card_back}
+          style={{ "--i": 0, "--offset": 0 } as CSSProperties}
+        >
+          <span className="booster-card__inner">
+            <span className="booster-card__back">
+              <span className="booster-card__back-pattern" />
+              <span className="booster-card__back-sigil">
+                <Icon name="sparkles" size={size === "mini" ? 10 : 26} />
+              </span>
+            </span>
+          </span>
+        </span>
+        {size === "mini" ? null : <span className="booster-scene-card__count">×{booster.cards}</span>}
+      </span>
+    );
+  }
   return scene?.booster_look ? (
     <span className="booster-scene-pack" data-booster-look={scene.booster_look} data-size={size}>
       <BoosterPack booster={booster} />

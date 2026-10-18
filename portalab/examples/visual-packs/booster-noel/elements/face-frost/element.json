@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "noel-frost",
+  "names": {
+    "fr": "Face de givre",
+    "en": "Frost face"
+  },
+  "descriptions": {
+    "fr": "Une carte rare de cristal de givre, holographique et pailletée de neige.",
+    "en": "A rare card of frost crystal, holographic and glittering with snow."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

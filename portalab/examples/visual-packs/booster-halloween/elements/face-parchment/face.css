@@ -1,0 +1,22 @@
+/* A common card: old parchment (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform. */
+[data-card-face="halloween-parchment"] .booster-card__face {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.8rem;
+  background: radial-gradient(ellipse at 50% 50%, #e8d3a8 55%, #8a5a2a 90%, #3a2010);
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.55rem rgba(255, 170, 90, 0.4));
+}
+[data-card-face="halloween-parchment"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  border-radius: 0.8rem;
+  background: radial-gradient(ellipse 85% 60% at 50% 35%, rgba(255, 240, 200, 0.2), transparent 70%), linear-gradient(175deg, #3a2a1a, #1c120a);
+}
+[data-card-face="halloween-parchment"] .booster-card__rarity,
+[data-card-face="halloween-parchment"] .booster-card__name {
+  color: #f4e2bc;
+  text-shadow: 0 0 0.6rem rgba(255, 170, 90, 0.4);
+}

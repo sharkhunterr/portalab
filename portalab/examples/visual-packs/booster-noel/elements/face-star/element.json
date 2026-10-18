@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "noel-star",
+  "names": {
+    "fr": "Face d'étoile d'or",
+    "en": "Golden star face"
+  },
+  "descriptions": {
+    "fr": "Une carte légendaire d'or, une étoile rayonnante, l'holographie arc-en-ciel, les paillettes et l'image qui s'incline vers la lumière.",
+    "en": "A legendary card of gold, a radiant star, rainbow holography, glitter and the art leaning toward the light."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "noel",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Noël — scène de booster",
+    "en": "Christmas — a booster scene"
+  },
+  "descriptions": {
+    "fr": "L'ouverture d'un booster une nuit de Noël : la neige qui tombe, les guirlandes qui scintillent, un paquet-cadeau dont le ruban se dénoue dans une gerbe d'étoiles, des dos de carte tricotés et des faces holographiques — du papier kraft à l'étoile d'or.",
+    "en": "A booster opened on Christmas night: falling snow, twinkling garlands, a gift whose ribbon comes undone in a spray of stars, knitted card backs and holographic faces — from kraft paper to the golden star."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

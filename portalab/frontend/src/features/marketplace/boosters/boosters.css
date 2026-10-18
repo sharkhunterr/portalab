@@ -2021,3 +2021,38 @@
   padding: 0;
   border: 0;
 }
+
+/* issue 153: a booster with a scene of its own shows one of its cards face down in the shop — its back, as the
+   scene draws it — and how many it holds */
+.booster-scene-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  min-block-size: 7rem;
+  max-block-size: 11rem;
+  aspect-ratio: 5 / 7.4;
+  padding-block-start: 1.4rem;
+  perspective: 900px;
+}
+.booster-scene-card .booster-card {
+  inline-size: auto;
+  block-size: 100%;
+  animation: none;
+  filter: drop-shadow(0 0.6rem 0.9rem color-mix(in srgb, var(--booster-ink) 80%, transparent));
+}
+.booster-scene-card__count {
+  position: absolute;
+  inset: auto -0.6rem 0.2rem auto;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--booster-ink) 80%, transparent);
+  color: var(--booster-light);
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-bold);
+}
+.booster-scene-card[data-size="mini"] {
+  min-block-size: 0;
+  block-size: 3.9rem;
+  padding: 0;
+}

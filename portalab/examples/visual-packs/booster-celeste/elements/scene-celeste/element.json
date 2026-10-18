@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "celeste",
+  "names": {
+    "fr": "Scène Céleste",
+    "en": "Celestial scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture parmi les astres. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening among the stars. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-celeste",
+      "backdrop": "backdrop-celeste",
+      "opening": "opening-supernova",
+      "back": {
+        "common": "back-celeste"
+      },
+      "face": {
+        "common": "face-moonstone",
+        "rare": "face-comet",
+        "epic": "face-nebula",
+        "legendary": "face-sun"
+      },
+      "reveal": {
+        "rare": "reveal-comet",
+        "epic": "reveal-nebula",
+        "legendary": "reveal-sun"
+      }
+    }
+  }
+}

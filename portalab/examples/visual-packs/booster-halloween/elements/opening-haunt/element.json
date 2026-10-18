@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "halloween-haunt",
+  "names": {
+    "fr": "La citrouille hantée",
+    "en": "The haunted pumpkin"
+  },
+  "descriptions": {
+    "fr": "La citrouille tremble et ricane, sa lueur s'emballe, puis son chapeau saute : un éclair violet, des fantômes qui s'échappent en spirale, une nuée de chauves-souris — et les cartes avec eux (HD).",
+    "en": "The pumpkin shudders and cackles, its glow racing, then its lid pops: a violet flash, ghosts spiralling out, a cloud of bats — and the cards with them (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "haunt.glsl",
+    "css": [
+      "lid.css"
+    ],
+    "stage": true,
+    "duration": 2.5
+  }
+}

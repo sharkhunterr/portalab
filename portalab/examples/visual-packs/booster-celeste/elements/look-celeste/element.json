@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "celeste",
+  "names": {
+    "fr": "Paquet constellé",
+    "en": "Starred pack"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient une feuille bleu nuit gravée de constellations d'or, un astrolabe en emblème, et trois petites lunes qui tournent autour de lui (HD).",
+    "en": "The pack becomes a midnight-blue foil engraved with golden constellations, an astrolabe for an emblem, and three little moons circling it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "orbit.glsl",
+    "css": [
+      "foil.css"
+    ],
+    "stage": true
+  }
+}

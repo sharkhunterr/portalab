@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "noel-baubles",
+  "names": {
+    "fr": "Pluie de boules",
+    "en": "Shower of baubles"
+  },
+  "descriptions": {
+    "fr": "Des boules de Noël brillantes jaillissent autour de la carte, rebondissent et scintillent (HD).",
+    "en": "Shiny Christmas baubles spring out around the card, bounce and sparkle (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.2,
+    "rarity": "epic"
+  }
+}

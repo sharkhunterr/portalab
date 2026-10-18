@@ -1,0 +1,38 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening): the pumpkin shudders, its lid pops. */
+[data-opening="halloween-haunt"] .booster-stage__tear .booster-pack {
+  animation: halloween-shudder 2.5s linear both;
+}
+[data-opening="halloween-haunt"][data-booster-look] .booster-stage__tear .booster-pack .booster-pack__flap {
+  visibility: visible;
+  animation: halloween-lid 2.5s cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+[data-opening="halloween-haunt"][data-booster-look] .booster-stage__tear .booster-stage__rising span {
+  border: 1px solid rgba(200, 140, 255, 0.8);
+  border-radius: 0.45rem;
+  background: linear-gradient(160deg, #2a0f3a, #120618);
+  box-shadow: 0 0 1rem rgba(170, 90, 255, 0.6);
+  animation: halloween-rise 2.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.07s);
+}
+@keyframes halloween-shudder {
+  0% { transform: none; filter: none; }
+  10%, 22%, 34% { transform: translateX(-3px) rotate(-2deg); filter: brightness(1.2); }
+  16%, 28%, 40% { transform: translateX(3px) rotate(2deg); filter: brightness(1.5); }
+  46% { transform: scale(1.06); filter: brightness(2); }
+  52%, 100% { transform: none; filter: brightness(1.2); }
+}
+@keyframes halloween-lid {
+  0%, 46% { transform: none; }
+  60% { transform: translateY(-180%) rotate(35deg); opacity: 1; }
+  100% { transform: translateY(-300%) rotate(70deg); opacity: 0; }
+}
+@keyframes halloween-rise {
+  0%, 50% { opacity: 0; transform: translateY(40%) scale(0.6); }
+  58% { opacity: 1; }
+  100% { opacity: 1; transform: translate(calc((var(--i, 0) - 2) * 40%), -18%) rotate(calc((var(--i, 0) - 2) * 8deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="halloween-haunt"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

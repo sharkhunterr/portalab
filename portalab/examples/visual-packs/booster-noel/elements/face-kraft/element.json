@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "noel-kraft",
+  "names": {
+    "fr": "Face en papier kraft",
+    "en": "Kraft paper face"
+  },
+  "descriptions": {
+    "fr": "Une carte commune en papier kraft, nouée d'une ficelle rouge et blanche.",
+    "en": "A common card in kraft paper, tied with red and white twine."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

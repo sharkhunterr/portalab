@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "noel",
+  "names": {
+    "fr": "Paquet-cadeau",
+    "en": "Gift box"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient un cadeau de papier rouge à motifs, noué d'un ruban d'or, une étoile en emblème, des lumières qui scintillent autour (HD).",
+    "en": "The pack becomes a gift in patterned red paper tied with a golden ribbon, a star for an emblem, lights twinkling around it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "twinkle.glsl",
+    "css": [
+      "gift.css"
+    ],
+    "stage": true
+  }
+}

@@ -1,0 +1,41 @@
+/* The sealed pack (its hook: data-booster-look): a ribbed pumpkin, its stalk on the flap, a carved face. */
+[data-booster-look="graveyard"] .booster-pack {
+  inline-size: 12rem;
+  aspect-ratio: 1.15 / 1;
+  border-radius: 46% 46% 42% 42% / 52% 52% 46% 46%;
+  background:
+    radial-gradient(ellipse 18% 50% at 18% 52%, rgba(0, 0, 0, 0.22), transparent 70%),
+    radial-gradient(ellipse 18% 50% at 82% 52%, rgba(0, 0, 0, 0.22), transparent 70%),
+    radial-gradient(ellipse 14% 52% at 36% 52%, rgba(0, 0, 0, 0.16), transparent 70%),
+    radial-gradient(ellipse 14% 52% at 64% 52%, rgba(0, 0, 0, 0.16), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 45% 35%, #ffb04a, #f07c12 55%, #a8450a);
+  box-shadow: inset 0 -0.8rem 1.4rem rgba(80, 20, 0, 0.6), 0 0 2.2rem rgba(255, 140, 30, 0.45);
+}
+/* the stalk */
+[data-booster-look="graveyard"] .booster-pack__flap {
+  background: radial-gradient(ellipse 9% 40% at 50% 30%, #4c7a24 0 70%, transparent 75%);
+}
+[data-booster-look="graveyard"] .booster-pack__stars,
+[data-booster-look="graveyard"] .booster-pack__foil {
+  opacity: 0;
+}
+/* the carved face: eyes and a jagged grin, lit from inside */
+[data-booster-look="graveyard"] .booster-pack__emblem {
+  inline-size: 66%;
+  margin-block-end: 1.2rem;
+  aspect-ratio: 1.6;
+  border-radius: 0;
+  background: radial-gradient(ellipse 50% 40% at 50% 50%, #fff2a8, #ffb21f 60%, #ff7a00);
+  clip-path: polygon(10% 8%, 30% 8%, 20% 38%, 10% 8%, 70% 8%, 90% 8%, 80% 38%, 70% 8%, 5% 55%, 20% 62%, 30% 54%, 40% 64%, 50% 54%, 60% 64%, 70% 54%, 80% 62%, 95% 55%, 82% 88%, 50% 95%, 18% 88%);
+  color: transparent;
+  filter: drop-shadow(0 0 0.7rem rgba(255, 190, 60, 0.95));
+}
+/* its name below the carved face, small, like a label tied to the stalk */
+[data-booster-look="graveyard"] .booster-pack__name,
+[data-booster-look="graveyard"] .booster-pack[data-stage] .booster-pack__name {
+  inset: auto 0 5%;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  color: #ffe0a0;
+  text-shadow: 0 1px 0 #4a1a00, 0 0 0.6rem rgba(255, 150, 40, 0.8);
+}

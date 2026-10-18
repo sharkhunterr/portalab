@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "celeste-moonstone",
+  "names": {
+    "fr": "Face de pierre de lune",
+    "en": "Moonstone face"
+  },
+  "descriptions": {
+    "fr": "Une carte commune en pierre de lune : argent laiteux, un reflet bleuté.",
+    "en": "A common card of moonstone: milky silver, a bluish sheen."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

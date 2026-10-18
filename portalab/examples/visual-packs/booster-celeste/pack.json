@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "celeste",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Céleste — scène de booster",
+    "en": "Celestial — a booster scene"
+  },
+  "descriptions": {
+    "fr": "L'ouverture d'un booster parmi les astres : des nébuleuses qui dérivent, une planète à anneaux, un paquet constellé d'or qui s'effondre en supernova, des dos de carte en carte du ciel et des faces holographiques qui montent avec la rareté — de la pierre de lune au soleil.",
+    "en": "A booster opened among the stars: drifting nebulae, a ringed planet, a gold-starred pack collapsing into a supernova, sky-chart card backs and holographic faces rising with the rarity — from moonstone to the sun."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

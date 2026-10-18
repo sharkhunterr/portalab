@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "halloween-wisps",
+  "names": {
+    "fr": "Feux follets",
+    "en": "Will-o'-the-wisps"
+  },
+  "descriptions": {
+    "fr": "Des feux follets verts tournent autour de la carte en laissant une traînée de brume (HD).",
+    "en": "Green will-o'-the-wisps circle the card, leaving a trail of mist (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.9,
+    "rarity": "rare"
+  }
+}

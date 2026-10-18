@@ -1,0 +1,38 @@
+/* The sealed pack (its hook: data-booster-look): a midnight foil starred with gold, an astrolabe for an emblem. */
+[data-booster-look="celeste"] .booster-pack {
+  border-radius: 0.9rem;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 225, 150, 0.9) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 72% 30%, rgba(255, 225, 150, 0.9) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle at 58% 70%, rgba(255, 225, 150, 0.9) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle at 24% 78%, rgba(255, 225, 150, 0.9) 0 1px, transparent 2px),
+    radial-gradient(ellipse 70% 50% at 50% 40%, rgba(120, 90, 220, 0.45), transparent 70%),
+    linear-gradient(160deg, #0b0a2e, #1c1450 45%, #0a1838 75%, #050414);
+  box-shadow: inset 0 0 0 2px rgba(240, 210, 140, 0.75), inset 0 0 0 5px rgba(10, 8, 30, 0.9),
+    inset 0 0 0 6px rgba(240, 210, 140, 0.35), 0 0 2.4rem rgba(120, 100, 255, 0.45);
+}
+/* the constellations: thin golden lines between the stars */
+[data-booster-look="celeste"] .booster-pack__stars {
+  opacity: 0.85;
+  background:
+    linear-gradient(28deg, transparent 49.4%, rgba(255, 220, 150, 0.55) 49.6% 50.4%, transparent 50.6%) 18% 18% / 40% 22% no-repeat,
+    linear-gradient(-62deg, transparent 49.4%, rgba(255, 220, 150, 0.55) 49.6% 50.4%, transparent 50.6%) 56% 28% / 22% 46% no-repeat,
+    linear-gradient(140deg, transparent 49.4%, rgba(255, 220, 150, 0.45) 49.6% 50.4%, transparent 50.6%) 22% 70% / 38% 14% no-repeat;
+}
+[data-booster-look="celeste"] .booster-pack__flap {
+  background: linear-gradient(180deg, rgba(240, 210, 140, 0.35), transparent);
+}
+/* the astrolabe: gold rings round the emblem */
+[data-booster-look="celeste"] .booster-pack__emblem {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 52%, rgba(240, 210, 140, 0.95) 54% 57%, transparent 59% 68%, rgba(240, 210, 140, 0.6) 70% 71%, transparent 73%),
+    conic-gradient(from 0deg, rgba(240, 210, 140, 0.4) 0 2deg, transparent 2deg 30deg, rgba(240, 210, 140, 0.4) 30deg 32deg, transparent 32deg 60deg, rgba(240, 210, 140, 0.4) 60deg 62deg, transparent 62deg 90deg);
+  color: #ffe2a0;
+  filter: drop-shadow(0 0 0.6rem rgba(255, 210, 120, 0.8));
+}
+[data-booster-look="celeste"] .booster-pack__name {
+  color: #ffe2a0;
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 0.7rem rgba(255, 200, 110, 0.7);
+}

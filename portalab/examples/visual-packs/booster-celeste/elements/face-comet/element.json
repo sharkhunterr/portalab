@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "celeste-comet",
+  "names": {
+    "fr": "Face de comète",
+    "en": "Comet face"
+  },
+  "descriptions": {
+    "fr": "Une carte rare aux reflets de glace : bleu de comète, un éclat holographique qui glisse.",
+    "en": "A rare card with an icy sheen: comet blue, a holographic gleam gliding over it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "noel",
+  "names": {
+    "fr": "Nuit de Noël",
+    "en": "Christmas night"
+  },
+  "descriptions": {
+    "fr": "Toute la scène une nuit d'hiver : une aurore verte au loin, la neige qui tombe en trois couches, une guirlande de lumières qui scintille en haut de la scène (HD).",
+    "en": "The whole stage on a winter night: a green aurora far away, snow falling in three layers, a garland of lights twinkling across the top (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "night.glsl",
+    "stage": true
+  }
+}

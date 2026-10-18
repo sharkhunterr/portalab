@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "graveyard",
+  "names": {
+    "fr": "Dos en toile d'araignée",
+    "en": "Spiderweb back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est une toile d'araignée argentée sur fond violet nuit, une chauve-souris au centre, un reflet vert spectral qui passe.",
+    "en": "Face down, every card is a silver spiderweb on night violet, a bat in the middle, a ghostly green gleam passing over."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

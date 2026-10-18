@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "celeste",
+  "names": {
+    "fr": "Espace profond",
+    "en": "Deep space"
+  },
+  "descriptions": {
+    "fr": "Toute la scène dans l'espace : des nébuleuses violettes et turquoise qui dérivent, des étoiles qui scintillent, une planète à anneaux éclairée de côté et, de temps en temps, une étoile filante (HD).",
+    "en": "The whole stage in space: violet and teal nebulae drifting, twinkling stars, a ringed planet lit from the side and, now and then, a shooting star (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "space.glsl",
+    "stage": true
+  }
+}

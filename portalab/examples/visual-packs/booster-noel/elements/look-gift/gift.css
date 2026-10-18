@@ -1,0 +1,30 @@
+/* The sealed pack (its hook: data-booster-look): a gift in red paper, tied with a golden ribbon and its bow. */
+[data-booster-look="noel"] .booster-pack {
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(90deg, transparent 44%, #f6d36b 44% 46%, #d9a531 46% 54%, #f6d36b 54% 56%, transparent 56%),
+    linear-gradient(0deg, transparent 52%, #f6d36b 52% 54%, #d9a531 54% 60%, #f6d36b 60% 62%, transparent 62%),
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.22) 0 3px, transparent 4px) 0 0 / 22px 22px,
+    radial-gradient(circle at 75% 75%, rgba(255, 220, 140, 0.25) 0 2px, transparent 3px) 0 0 / 22px 22px,
+    linear-gradient(160deg, #d8263a, #a3121f 55%, #6e0b14);
+  box-shadow: inset 0 0 0 2px rgba(255, 220, 140, 0.6), 0 0 2rem rgba(255, 90, 80, 0.35);
+}
+/* the bow, on the flap */
+[data-booster-look="noel"] .booster-pack__flap {
+  background:
+    radial-gradient(ellipse 22% 60% at 36% 60%, #f6d36b 0 55%, transparent 60%),
+    radial-gradient(ellipse 22% 60% at 64% 60%, #f6d36b 0 55%, transparent 60%),
+    radial-gradient(circle at 50% 62%, #d9a531 0 9%, transparent 10%);
+  filter: drop-shadow(0 2px 2px rgba(80, 20, 0, 0.5));
+}
+[data-booster-look="noel"] .booster-pack__stars {
+  opacity: 0;
+}
+[data-booster-look="noel"] .booster-pack__emblem {
+  color: #fff3c4;
+  filter: drop-shadow(0 0 0.6rem rgba(255, 220, 120, 0.9));
+}
+[data-booster-look="noel"] .booster-pack__name {
+  color: #fff3c4;
+  text-shadow: 0 1px 0 #6e0b14, 0 0 0.6rem rgba(255, 200, 110, 0.7);
+}

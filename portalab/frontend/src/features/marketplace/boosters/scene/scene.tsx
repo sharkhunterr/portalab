@@ -77,6 +77,8 @@ export interface SceneBinding {
   names: Record<string, string>;
   /** the look its sealed pack takes (its scene's ``booster_look`` part, when it styles one) */
   booster_look: string | null;
+  /** its cards' back — what the shop shows of the booster: a card face down */
+  card_back?: string | null;
 }
 
 export function useSceneBindings(): Record<string, SceneBinding> {

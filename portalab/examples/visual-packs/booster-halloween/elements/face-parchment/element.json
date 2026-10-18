@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "halloween-parchment",
+  "names": {
+    "fr": "Face de parchemin",
+    "en": "Parchment face"
+  },
+  "descriptions": {
+    "fr": "Une carte commune de vieux parchemin aux bords roussis.",
+    "en": "A common card of old parchment with scorched edges."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "halloween-grimoire",
+  "names": {
+    "fr": "Face de grimoire",
+    "en": "Grimoire face"
+  },
+  "descriptions": {
+    "fr": "Une carte épique en cuir de grimoire violet, ses runes qui luisent, holographique.",
+    "en": "An epic card of violet grimoire leather, its runes glowing, holographic."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

@@ -840,6 +840,8 @@ class VisualPacks:
             holder.current_version_id = row.id
             if enable:
                 holder.state = "enabled"
+            await session.flush()
+            await self._carry_bindings(session, pack, row.id)
             for look, booster in ((row.draft or {}).get("bindings") or {}).items():
                 if booster:  # the scenes the Review step bound (a booster's key, or ``*`` for all)
                     await session.flush()
@@ -904,6 +906,33 @@ class VisualPacks:
             actor, "scene_bound", booster=booster_key, scene=":".join(scene) if scene else None
         )
 
+    @staticmethod
+    async def _carry_bindings(session: AsyncSession, pack: str, version_id: Any) -> None:
+        """Issue 153: a new version of a pack keeps the boosters' scenes — each binding to one of its earlier
+        scenes moves to the scene of the same look in the version now published (dropped when it has none)."""
+        old = (
+            await session.execute(
+                select(SceneBinding, Element.look)
+                .join(Element, Element.id == SceneBinding.element_id)
+                .join(PackVersion, PackVersion.id == Element.version_id)
+                .where(PackVersion.pack_id == pack, Element.version_id != version_id)
+            )
+        ).all()
+        for binding, look in old:
+            target = (
+                await session.execute(
+                    select(Element.id).where(
+                        Element.version_id == version_id,
+                        Element.type == "booster_scene",
+                        Element.look == look,
+                    )
+                )
+            ).scalar_one_or_none()
+            if target is None:
+                await session.delete(binding)
+            else:
+                binding.element_id = target
+
     async def scene_for(self, booster_key: str) -> dict[str, Any] | None:
         """The scene a booster opens with — its own, else the default one bound to every booster, else none
         (Portalab's own scene). Only a live pack's scene counts; its parts are drawn by their own kind."""
@@ -938,7 +967,7 @@ class VisualPacks:
 
     async def scene_bindings(self) -> dict[str, Any]:
         """Issue 153: the scene each booster wears (``*``: every booster without its own): its pack, its
-        look, and the look its sealed pack takes (its ``booster_look`` part's), for the shop's tiles."""
+        look, its sealed pack's look and its cards' back (the shop shows a card face down)."""
         async with self.database.session() as session:
             rows = (
                 await session.execute(
@@ -950,28 +979,35 @@ class VisualPacks:
                 )
             ).all()
             out: dict[str, Any] = {}
-            for booster_key, pack_id, version_id, scene in rows:
-                folder = str(((scene.data.get("payload") or {}).get("parts") or {}).get("booster_look") or "")
-                look = None
-                if folder:
-                    part = (
-                        await session.execute(
-                            select(Element).where(
-                                Element.version_id == version_id,
-                                Element.folder.in_((folder, f"elements/{folder}")),
-                            )
+
+            async def styled(version_id: Any, folder: Any) -> str | None:
+                """The look a part styles its hook with (``None``: none, or no stylesheet of its own)."""
+                if not folder:
+                    return None
+                part = (
+                    await session.execute(
+                        select(Element).where(
+                            Element.version_id == version_id,
+                            Element.folder.in_((str(folder), f"elements/{folder}")),
                         )
-                    ).scalar_one_or_none()
-                    styled = part is not None and (
-                        part.kind == "css" or (part.data.get("render") or {}).get("css")
                     )
-                    if part is not None and styled:
-                        look = part.look
+                ).scalar_one_or_none()
+                if part is None or not (part.kind == "css" or (part.data.get("render") or {}).get("css")):
+                    return None
+                return part.look
+
+            for booster_key, pack_id, version_id, scene in rows:
+                parts = (scene.data.get("payload") or {}).get("parts") or {}
+                back = parts.get("back")
                 out[booster_key] = {
                     "pack": pack_id,
                     "look": scene.look,
                     "names": scene.data.get("names") or {},
-                    "booster_look": look,
+                    "booster_look": await styled(version_id, parts.get("booster_look")),
+                    # what the shop shows of it: a card face down, its back (issue 153)
+                    "card_back": await styled(
+                        version_id, back.get("common") if isinstance(back, dict) else back
+                    ),
                 }
         return {"bindings": out}
 

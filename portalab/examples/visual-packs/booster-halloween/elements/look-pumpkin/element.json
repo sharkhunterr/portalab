@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "graveyard",
+  "names": {
+    "fr": "Citrouille",
+    "en": "Jack-o'-lantern"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient une citrouille à côtes, sa queue verte pour chapeau, un visage taillé qui luit, la flamme d'une bougie qui vacille à l'intérieur (HD).",
+    "en": "The pack becomes a ribbed pumpkin, its green stalk for a lid, a carved face glowing, a candle flame flickering inside (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "candle.glsl",
+    "css": [
+      "pumpkin.css"
+    ],
+    "stage": true
+  }
+}

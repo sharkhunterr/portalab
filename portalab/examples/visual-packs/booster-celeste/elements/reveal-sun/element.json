@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "celeste-sun",
+  "names": {
+    "fr": "Naissance d'une étoile",
+    "en": "A star is born"
+  },
+  "descriptions": {
+    "fr": "Une étoile s'allume derrière la carte : une couronne de flammes solaires, des rayons qui tournent, un anneau planétaire qui balaie la scène et une pluie de poussière d'or (HD).",
+    "en": "A star kindles behind the card: a corona of solar flares, turning rays, a planetary ring sweeping the stage and a shower of golden dust (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.8,
+    "rarity": "legendary"
+  }
+}

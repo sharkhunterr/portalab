@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "noel-star",
+  "names": {
+    "fr": "L'étoile du berger",
+    "en": "The guiding star"
+  },
+  "descriptions": {
+    "fr": "Une étoile s'allume au-dessus de la carte : de longs rayons, un halo doré et une neige d'or qui tombe doucement (HD).",
+    "en": "A star lights up above the card: long rays, a golden halo and golden snow gently falling (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.8,
+    "rarity": "legendary"
+  }
+}

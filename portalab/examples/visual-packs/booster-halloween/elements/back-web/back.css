@@ -1,0 +1,33 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
+[data-card-back="graveyard"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.8rem;
+  background:
+    repeating-conic-gradient(from 0deg at 50% 48%, rgba(220, 220, 240, 0.35) 0 0.6deg, transparent 0.6deg 30deg),
+    repeating-radial-gradient(circle at 50% 48%, transparent 0 13px, rgba(220, 220, 240, 0.3) 13px 14px),
+    radial-gradient(ellipse 80% 60% at 50% 48%, rgba(140, 60, 200, 0.45), transparent 70%),
+    linear-gradient(160deg, #1d0b2b, #2e1144 50%, #0d0414);
+  box-shadow: inset 0 0 0 2px rgba(255, 150, 40, 0.7), inset 0 0 1.4rem rgba(0, 0, 0, 0.8);
+}
+[data-card-back="graveyard"] .booster-card__back::after {
+  background: linear-gradient(115deg, transparent 35%, rgba(120, 255, 150, 0.3) 47%, rgba(200, 120, 255, 0.3) 53%, transparent 65%);
+  mix-blend-mode: screen;
+}
+[data-card-back="graveyard"] .booster-card__back-pattern {
+  opacity: 0;
+}
+/* the bat */
+[data-card-back="graveyard"] .booster-card__back-sigil {
+  inline-size: 56%;
+  aspect-ratio: 2;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(50% 30%, 44% 18%, 42% 34%, 30% 22%, 18% 20%, 2% 34%, 14% 40%, 20% 58%, 30% 52%, 40% 70%, 50% 82%, 60% 70%, 70% 52%, 80% 58%, 86% 40%, 98% 34%, 82% 20%, 70% 22%, 58% 34%, 56% 18%);
+  background: linear-gradient(180deg, #ff9a2e, #c2410c);
+  filter: drop-shadow(0 0 0.5rem rgba(255, 140, 40, 0.8));
+}
+[data-card-back="graveyard"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

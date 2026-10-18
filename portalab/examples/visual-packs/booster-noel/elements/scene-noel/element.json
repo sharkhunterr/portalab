@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "noel",
+  "names": {
+    "fr": "Scène de Noël",
+    "en": "Christmas scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture une nuit de Noël. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening on Christmas night. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-gift",
+      "backdrop": "backdrop-noel",
+      "opening": "opening-ribbon",
+      "back": {
+        "common": "back-knit"
+      },
+      "face": {
+        "common": "face-kraft",
+        "rare": "face-frost",
+        "epic": "face-velvet",
+        "legendary": "face-star"
+      },
+      "reveal": {
+        "rare": "reveal-snowflake",
+        "epic": "reveal-baubles",
+        "legendary": "reveal-star"
+      }
+    }
+  }
+}

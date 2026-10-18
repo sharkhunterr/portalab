@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "celeste-supernova",
+  "names": {
+    "fr": "Supernova",
+    "en": "Supernova"
+  },
+  "descriptions": {
+    "fr": "Le paquet s'effondre sur lui-même en une étoile qui palpite, puis explose : un éclair blanc, une onde de choc aux couleurs de nébuleuse, des rayons, une poussière d'étoiles — et les cartes en jaillissent (HD).",
+    "en": "The pack collapses into a throbbing star, then bursts: a white flash, a shockwave in nebula colours, rays, stardust — and the cards fly out of it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "nova.glsl",
+    "css": [
+      "collapse.css"
+    ],
+    "stage": true,
+    "duration": 2.4
+  }
+}

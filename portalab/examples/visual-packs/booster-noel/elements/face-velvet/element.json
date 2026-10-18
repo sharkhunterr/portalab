@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "noel-velvet",
+  "names": {
+    "fr": "Face de velours",
+    "en": "Velvet face"
+  },
+  "descriptions": {
+    "fr": "Une carte épique de velours rouge passepoilé d'or, holographique.",
+    "en": "An epic card of red velvet piped with gold, holographic."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}
