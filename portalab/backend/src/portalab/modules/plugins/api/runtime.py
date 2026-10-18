@@ -14,7 +14,7 @@ from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import Forbidden, NotFound
 from portalab.modules.plugins.api.admin import Module
-from portalab.sdk.pages import DataBlock, FormBlock, MarkdownBlock
+from portalab.sdk.pages import ActionsBlock, DataBlock, FormBlock, MarkdownBlock
 
 router = APIRouter(prefix="/api/v1", tags=["plugins"])
 Member = Annotated[Principal, require("users.self.manage")]
@@ -37,6 +37,8 @@ def _block(block: Any) -> dict[str, Any]:
             "data": block.data,
             "columns": list(block.columns),
             "chart": block.chart,
+            "action": block.action,
+            "live": block.live,
         }
     if isinstance(block, FormBlock):
         return {
@@ -45,7 +47,10 @@ def _block(block: Any) -> dict[str, Any]:
             "schema": block.schema,
             "action": block.action,
             "submit_key": block.submit_key,
+            "data": block.data,
         }
+    if isinstance(block, ActionsBlock):
+        return {"kind": "actions", "buttons": [dict(b) for b in block.buttons]}
     return {"kind": "unknown"}
 
 
@@ -66,6 +71,83 @@ async def pages(principal: Member, request: Request, module: Module) -> list[dic
             if await authorizer.is_allowed(principal, page.required_permission):
                 out.append({"plugin": plugin.key, "key": page.key, "title_key": page.title_key})
     return out
+
+
+@router.get("/plugins/slots")
+async def slots(principal: Member, request: Request, module: Module) -> list[dict[str, Any]]:
+    """030: what enabled plugins add to Portalab's screens for this member (drawn by Portalab)."""
+    from sqlalchemy import select
+
+    from portalab.modules.plugins.models import SlotSetting
+
+    authorizer = request.app.state.authorizer
+    manifests = await module.lifecycle.manifests()
+    async with module.database.session() as session:
+        settings = {
+            (r.slot, r.contribution): r for r in (await session.execute(select(SlotSetting))).scalars()
+        }
+    out: list[dict[str, Any]] = []
+    for plugin in await module.lifecycle.all():
+        manifest = manifests.get(plugin.key)
+        if plugin.state != "enabled" or manifest is None or not manifest.slots:
+            continue
+        if "slots" not in await module.grants.active(plugin.key, plugin.current_version):
+            continue
+        for item in manifest.slots:
+            ident = f"{plugin.key}:{item['key']}"
+            setting = settings.get((item["slot"], ident))
+            if setting is not None and setting.hidden:
+                continue
+            if not await authorizer.is_allowed(principal, str(item["permission"])):
+                continue
+            out.append(
+                {
+                    "id": ident,
+                    "plugin": plugin.key,
+                    "slot": item["slot"],
+                    "key": item["key"],
+                    "label_key": item["label_key"],
+                    "icon": item.get("icon"),
+                    "opens": item.get("opens"),
+                    "link": item.get("link"),
+                    "badge": item.get("badge"),
+                    "live": f"plugin.{plugin.key}.{item['live']}" if item.get("live") else None,
+                    "position": setting.position if setting is not None else None,
+                }
+            )
+    out.sort(key=lambda c: (c["slot"], c["position"] if c["position"] is not None else 500, c["id"]))
+    return out
+
+
+@router.get("/plugins/{key}/surfaces/{surface}")
+async def surface(
+    principal: Member, key: str, surface: str, request: Request, module: Module
+) -> dict[str, Any]:
+    """030: a modal or a drawer a plugin's slot opens, as blocks Portalab draws."""
+    from portalab.modules.plugins.context.plugin_context import page_from
+
+    await _live(module, key)
+    manifest = (await module.lifecycle.manifests()).get(key)
+    found = manifest.surface(surface) if manifest is not None else None
+    if found is None or not await request.app.state.authorizer.is_allowed(
+        principal, str(found["permission"])
+    ):
+        raise NotFound("No such surface.", code="plugin.surface_not_found")
+    definition = page_from(
+        {
+            "key": surface,
+            "title_key": found["title_key"],
+            "permission": found["permission"],
+            "blocks": found["blocks"],
+        }
+    )
+    return {
+        "plugin": key,
+        "key": surface,
+        "kind": found["kind"],
+        "title_key": found["title_key"],
+        "blocks": [_block(b) for b in definition.blocks],
+    }
 
 
 @router.get("/plugins/{key}/pages/{page}")

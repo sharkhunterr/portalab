@@ -1,0 +1,162 @@
+# Playlist (spec 030, slots): a « + Playlist » button on every media page opening Portalab's modal (add to a
+# playlist, or create one), a page of the member's playlists, a modal to edit one, deleting it confirmed by
+# Portalab. Everything is drawn by Portalab; the plugin's code runs confined.
+schema_version = 2
+key = "playlist"
+name = "Playlists"
+description = "Your own playlists of titles."
+version = "1.0.0"
+requires_portal = ">=0.1"
+maturity = "beta"
+entry_point = "playlist_plugin:register"
+migrations = "migrations"
+permissions = [{ name = "use", description = "Make playlists" }]
+
+[capabilities]
+storage = { quota_mb = 50 }
+operations = true
+pages = true
+slots = ["media.actions", "nav"]
+privacy = true
+portal_data = { operations = ["GET /api/v1/media/{object_id}"] }
+
+[personal_data]
+enabled = true
+classes = ["playlists"]
+
+[[routes]]
+path = "lists"
+method = "GET"
+permission = "plugin:playlist.use"
+exposure = "read"
+
+[[routes]]
+path = "toggle"
+method = "POST"
+permission = "plugin:playlist.use"
+exposure = "action"
+
+[[routes]]
+path = "playlists"
+method = "POST"
+permission = "plugin:playlist.use"
+exposure = "action"
+
+[[routes]]
+path = "mine"
+method = "GET"
+permission = "plugin:playlist.use"
+exposure = "read"
+
+[[routes]]
+path = "items"
+method = "GET"
+permission = "plugin:playlist.use"
+exposure = "read"
+
+[[routes]]
+path = "values"
+method = "GET"
+permission = "plugin:playlist.use"
+exposure = "read"
+
+[[routes]]
+path = "update"
+method = "POST"
+permission = "plugin:playlist.use"
+exposure = "action"
+
+[[routes]]
+path = "delete"
+method = "POST"
+permission = "plugin:playlist.use"
+exposure = "committing"
+
+[[slots]]
+slot = "media.actions"
+key = "add"
+label_key = "plugin.playlist:action.add"
+icon = "list-plus"
+permission = "plugin:playlist.use"
+opens = "add_to"
+
+[[surfaces]]
+key = "add_to"
+kind = "modal"
+title_key = "plugin.playlist:surface.add"
+permission = "plugin:playlist.use"
+blocks = [
+  { kind = "checklist", title_key = "plugin.playlist:block.lists", data = "lists", action = "toggle" },
+  { kind = "form", title_key = "plugin.playlist:block.new", action = "playlists", submit_key = "plugin.playlist:action.create", schema = { type = "object", properties = { name = { type = "string", maxLength = 80, title = "plugin.playlist:field.name" } }, required = ["name"] } },
+]
+
+[[surfaces]]
+key = "edit"
+kind = "modal"
+title_key = "plugin.playlist:surface.edit"
+permission = "plugin:playlist.use"
+blocks = [
+  { kind = "form", title_key = "plugin.playlist:block.edit", data = "values", action = "update", submit_key = "plugin.playlist:action.save", schema = { type = "object", properties = { name = { type = "string", maxLength = 80, title = "plugin.playlist:field.name" }, description = { type = "string", maxLength = 400, title = "plugin.playlist:field.description", format = "textarea" } }, required = ["name"], order = ["name", "description"] } },
+]
+
+[ui]
+sections = [{ label_key = "plugin.playlist:nav.section", icon = "list-music" }]
+nav = [{ key = "mine", label_key = "plugin.playlist:nav.mine", route = "/plugins/playlist/mine", permission = "plugin:playlist.use", section = "plugin-playlist" }]
+
+[[ui.pages]]
+key = "mine"
+title_key = "plugin.playlist:page.mine"
+permission = "plugin:playlist.use"
+blocks = [
+  { kind = "cards", title_key = "plugin.playlist:block.mine", data = "mine" },
+  { kind = "form", title_key = "plugin.playlist:block.new", action = "playlists", submit_key = "plugin.playlist:action.create", schema = { type = "object", properties = { name = { type = "string", maxLength = 80, title = "plugin.playlist:field.name" } }, required = ["name"] } },
+]
+
+[[ui.pages]]
+key = "list"
+title_key = "plugin.playlist:page.list"
+permission = "plugin:playlist.use"
+blocks = [
+  { kind = "actions", buttons = [ { label_key = "plugin.playlist:action.edit", opens = "edit" }, { label_key = "plugin.playlist:action.delete", action = "delete", then = "/plugins/playlist/mine" } ] },
+  { kind = "list", title_key = "plugin.playlist:block.items", data = "items" },
+]
+
+[i18n.en."plugin.playlist"]
+"nav.section" = "Playlists"
+"nav.mine" = "My playlists"
+"action.add" = "+ Playlist"
+"action.create" = "Create"
+"action.edit" = "Edit"
+"action.delete" = "Delete"
+"action.save" = "Save"
+"surface.add" = "Add to a playlist"
+"surface.edit" = "Edit the playlist"
+"block.lists" = "Your playlists"
+"block.new" = "New playlist"
+"block.edit" = "Playlist"
+"block.mine" = "Your playlists"
+"block.items" = "Titles"
+"field.name" = "Name"
+"field.description" = "Description"
+"page.mine" = "My playlists"
+"page.list" = "Playlist"
+
+[i18n.fr."plugin.playlist"]
+"nav.section" = "Playlists"
+"nav.mine" = "Mes playlists"
+"action.add" = "+ Playlist"
+"action.create" = "Créer"
+"action.edit" = "Modifier"
+"action.delete" = "Supprimer"
+"action.save" = "Enregistrer"
+"surface.add" = "Ajouter à une playlist"
+"surface.edit" = "Modifier la playlist"
+"block.lists" = "Vos playlists"
+"block.new" = "Nouvelle playlist"
+"block.edit" = "Playlist"
+"block.mine" = "Vos playlists"
+"block.items" = "Titres"
+"field.name" = "Nom"
+"field.description" = "Description"
+"page.mine" = "Mes playlists"
+"page.list" = "Playlist"

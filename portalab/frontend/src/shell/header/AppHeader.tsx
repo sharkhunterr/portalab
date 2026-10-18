@@ -4,6 +4,7 @@ import { api } from "../../api/client";
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import type { DeviceClass } from "../../design-system/components/Layout";
+import { PluginSlot } from "../../features/plugins/slots/PluginSlot";
 import { useT } from "../../i18n/hooks/useT";
 import { MenuWaiting } from "../nav/MenuWaiting";
 import { useNavigationView } from "../nav/NavigationProvider";
@@ -64,6 +65,7 @@ export function AppHeader({
         </div>
         <div className="shell-header__end">
           <IncidentsButton />
+          <PluginSlot name="header.action" compact />
           {data.progression ? (
             <RegionBoundary resetKey="progression">
               <ProgressChip progression={data.progression} compact />
@@ -112,6 +114,7 @@ export function AppHeader({
       <div className="shell-header__end">
         <AssistantButton />
         <IncidentsButton />
+        <PluginSlot name="header.action" compact />
         {bottomBar ? null : <NotificationButton unread={data.unread} />}
         {data.progression ? (
           <RegionBoundary resetKey="progression">

@@ -41751,6 +41751,33 @@
         ]
       }
     },
+    "/api/v1/plugins/slots": {
+      "get": {
+        "description": "030: what enabled plugins add to Portalab's screens for this member (drawn by Portalab).",
+        "operationId": "slots_api_v1_plugins_slots_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Slots Api V1 Plugins Slots Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Slots",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
     "/api/v1/plugins/{key}/assets/{path}": {
       "get": {
         "operationId": "asset_api_v1_plugins__key__assets__path__get",
@@ -41848,6 +41875,60 @@
           }
         },
         "summary": "Page",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
+    "/api/v1/plugins/{key}/surfaces/{surface}": {
+      "get": {
+        "description": "030: a modal or a drawer a plugin's slot opens, as blocks Portalab draws.",
+        "operationId": "surface_api_v1_plugins__key__surfaces__surface__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "surface",
+            "required": true,
+            "schema": {
+              "title": "Surface",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Surface Api V1 Plugins  Key  Surfaces  Surface  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Surface",
         "tags": [
           "plugins"
         ]

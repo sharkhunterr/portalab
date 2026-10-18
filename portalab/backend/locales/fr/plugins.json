@@ -22,6 +22,7 @@
   "attempt.storage_quota": "Son stockage est plein",
   "attempt.timeout": "Trop long à répondre",
   "attempt.unresponsive": "Ne répond plus",
+  "block.failed": "L'action a échoué.",
   "block.removed": "Ce message a été retiré.",
   "capability.events": "Recevoir et envoyer des événements du portail.",
   "capability.jobs": "Exécuter des tâches de fond dans le worker de Portalab.",
@@ -140,6 +141,7 @@
   "state.quarantined": "En quarantaine",
   "state.update_failed": "Mise à jour échouée",
   "state.update_pending": "Mise à jour en attente de redémarrage",
+  "surface.close": "Fermer",
   "title": "Extensions",
   "update.package": "Paquet de la nouvelle version"
 }

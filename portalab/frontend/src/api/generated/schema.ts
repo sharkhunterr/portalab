@@ -8019,6 +8019,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/plugins/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Slots
+         * @description 030: what enabled plugins add to Portalab's screens for this member (drawn by Portalab).
+         */
+        get: operations["slots_api_v1_plugins_slots_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/plugins/{key}/assets/{path}": {
         parameters: {
             query?: never;
@@ -8045,6 +8065,26 @@ export interface paths {
         };
         /** Page */
         get: operations["page_api_v1_plugins__key__pages__page__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/plugins/{key}/surfaces/{surface}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Surface
+         * @description 030: a modal or a drawer a plugin's slot opens, as blocks Portalab draws.
+         */
+        get: operations["surface_api_v1_plugins__key__surfaces__surface__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -31890,6 +31930,28 @@ export interface operations {
             };
         };
     };
+    slots_api_v1_plugins_slots_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
     asset_api_v1_plugins__key__assets__path__get: {
         parameters: {
             query?: never;
@@ -31929,6 +31991,40 @@ export interface operations {
             path: {
                 key: string;
                 page: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    surface_api_v1_plugins__key__surfaces__surface__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+                surface: string;
             };
             cookie?: never;
         };

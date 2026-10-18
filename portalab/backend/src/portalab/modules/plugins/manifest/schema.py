@@ -28,7 +28,8 @@ CAPABILITIES = (
     "search", "moderation", "privacy", "product_types", "settings", "network", "portal_data",
 )  # fmt: skip
 SLOTS = (
-    "nav", "page", "home.section", "media.actions", "media.panel", "person.panel", "profile.section",
+    "nav", "page", "header.action", "home.section", "media.actions", "media.panel", "person.panel",
+    "profile.section",
     "player.overlay", "player.button", "settings.member", "settings.admin", "dashboard.widget",
     "search.kind", "notification.kind",
 )  # fmt: skip
@@ -137,6 +138,41 @@ SCHEMA: dict[str, Any] = {
         "schema_version": {"type": "integer", "enum": [1, 2]},
         "runtime": {"enum": list(RUNTIMES)},
         "capabilities": _CAPABILITIES,
+        # 030: what a plugin adds to Portalab's screens (drawn by Portalab), and the surfaces it opens
+        "slots": {
+            **_LIST,
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["slot", "key", "label_key", "permission"],
+                "properties": {
+                    "slot": {"enum": list(SLOTS)},
+                    "key": {"type": "string", "pattern": NAME},
+                    "label_key": {"type": "string", "maxLength": 120},
+                    "icon": {"type": "string", "pattern": r"^[a-z0-9-]{1,40}$"},
+                    "permission": {"type": "string", "maxLength": 96},
+                    "opens": {"type": "string", "pattern": NAME},
+                    "link": {"type": "string", "maxLength": 200},
+                    "badge": {"type": "string", "pattern": r"^[a-z0-9_\-/]{1,120}$"},
+                    "live": {"type": "string", "pattern": NAME},
+                },
+            },
+        },
+        "surfaces": {
+            **_LIST,
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["key", "kind", "title_key", "permission", "blocks"],
+                "properties": {
+                    "key": {"type": "string", "pattern": NAME},
+                    "kind": {"enum": ["modal", "drawer"]},
+                    "title_key": {"type": "string", "maxLength": 120},
+                    "permission": {"type": "string", "maxLength": 96},
+                    "blocks": {**_LIST, "items": {"type": "object"}},
+                },
+            },
+        },
         "routes": {
             **_LIST,
             "items": {
@@ -348,6 +384,13 @@ class Manifest:
         return None
 
     @property
+    def slots(self) -> list[dict[str, Any]]:
+        return [dict(x) for x in self.raw.get("slots", [])]
+
+    def surface(self, key: str) -> dict[str, Any] | None:
+        return next((dict(x) for x in self.raw.get("surfaces", []) if x["key"] == key), None)
+
+    @property
     def network_hosts(self) -> list[dict[str, Any]]:
         hosts = dict(self.capabilities.get("network") or {}).get("hosts") or []
         return [
@@ -425,8 +468,8 @@ def validate(raw: dict[str, Any]) -> Manifest:
     version_2 = int(raw.get("schema_version", 1)) >= 2
     if version_2:
         problems += _problems_v2(raw)
-    elif "runtime" in raw or "capabilities" in raw or "routes" in raw:
-        problems.append("runtime, capabilities and routes need schema_version = 2")
+    elif any(k in raw for k in ("runtime", "capabilities", "routes", "slots", "surfaces")):
+        problems.append("runtime, capabilities, routes, slots and surfaces need schema_version = 2")
     if version_2 and personal.get("enabled") and not dict(raw.get("capabilities", {})).get("privacy"):
         problems.append("personal_data: a plugin keeping personal data must ask for the privacy capability")
     elif personal.get("enabled") and not personal.get("erasure_participant") and not version_2:
@@ -493,6 +536,26 @@ def _problems_v2(raw: dict[str, Any]) -> list[str]:
             problems.append(f"routes/{route['path']}: permission {permission} is not one of this plugin's")
         elif not permission.startswith("plugin:") and "." not in permission and permission not in declared:
             problems.append(f"routes/{route['path']}: permission {permission} is not declared")
+    surfaces = {str(x["key"]) for x in raw.get("surfaces", [])}
+    asked_slots = set(capabilities.get("slots") or [])
+    gets = {r["path"].strip("/") for r in raw.get("routes", []) if r["method"] == "GET"}
+    topics = set(dict(capabilities.get("live") or {}).get("topics") or [])
+    for item in raw.get("slots", []):
+        where = f"slots/{item['slot']}:{item['key']}"
+        if item["slot"] not in asked_slots:
+            problems.append(f"{where}: the slot is not asked in capabilities.slots")
+        if item.get("opens") and item["opens"] not in surfaces:
+            problems.append(f"{where}: opens a surface that is not declared")
+        if item.get("link") and not str(item["link"]).startswith(f"/plugins/{raw['key']}/"):
+            problems.append(f"{where}: a link goes to one of the plugin's own pages")
+        if item.get("badge") and item["badge"].strip("/") not in gets:
+            problems.append(f"{where}: its badge reads a route that is not declared")
+        if item.get("live") and item["live"] not in topics:
+            problems.append(f"{where}: its live topic is not declared")
+        if not (item.get("opens") or item.get("link")):
+            problems.append(f"{where}: a slot opens a surface or links to a page")
+    if raw.get("slots") and not raw.get("capabilities", {}).get("slots"):
+        problems.append("slots: declaring slots needs the slots capability")
     keys = [(r["method"], r["path"].strip("/")) for r in raw.get("routes", [])]
     if len(keys) != len(set(keys)):
         problems.append("routes: the same route twice")

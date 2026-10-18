@@ -132,6 +132,8 @@ import {
   Lightbulb,
   Link,
   List,
+  ListMusic,
+  ListPlus,
   ListVideo,
   LocateFixed,
   Lock,
@@ -146,6 +148,7 @@ import {
   Megaphone,
   Menu,
   MessageCircle,
+  MessageSquare,
   Mic,
   Minimize,
   Minus,
@@ -505,6 +508,11 @@ export const ICONS: Record<string, LucideIcon> = {
   mail: Mail,
   brain: Brain,
   dna: Dna,
+  // 030: icons plugins name for their slots
+  "list-plus": ListPlus,
+  "list-music": ListMusic,
+  "message-circle": MessageCircle,
+  "message-square": MessageSquare,
 };
 
 export interface IconProps {

@@ -22,6 +22,7 @@
   "attempt.storage_quota": "Its storage is full",
   "attempt.timeout": "Too long to answer",
   "attempt.unresponsive": "Stopped answering",
+  "block.failed": "The action failed.",
   "block.removed": "This message was removed.",
   "capability.events": "Receive and send portal events.",
   "capability.jobs": "Run background jobs in Portalab's worker.",
@@ -140,6 +141,7 @@
   "state.quarantined": "Quarantined",
   "state.update_failed": "Update failed",
   "state.update_pending": "Update waiting for a restart",
+  "surface.close": "Close",
   "title": "Plugins",
   "update.package": "Package of the new version"
 }

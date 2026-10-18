@@ -21,11 +21,13 @@ class DataBlock:
     """``stat`` / ``list`` / ``table`` / ``chart`` / ``thread`` / ``cards`` filled from
     ``GET /api/v1/plugins/<key>/<data>``."""
 
-    kind: Literal["stat", "list", "table", "chart", "thread", "cards"]
+    kind: Literal["stat", "list", "table", "chart", "thread", "cards", "checklist"]
     title_key: str
     data: str  # a plugin route path, e.g. "stats/today"
     columns: tuple[str, ...] = ()
     chart: Literal["line", "bar"] = "line"
+    action: str = ""  # 030 checklist: the route a ticked or unticked item is posted to
+    live: str = ""  # 030: a live topic of the plugin; the block is read again when it says so
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,9 +37,19 @@ class FormBlock:
     action: str  # a plugin route path receiving the POST
     submit_key: str = "plugins:page.submit"
     kind: Literal["form"] = "form"
+    data: str = ""  # 030: a route giving the current values (``{"values": {...}}``), to edit
 
 
-Block = MarkdownBlock | DataBlock | FormBlock
+@dataclass(frozen=True, slots=True)
+class ActionsBlock:
+    """030: buttons — each opens one of the plugin's surfaces (``opens``) or posts to a route (``action``),
+    then optionally goes to one of its pages (``then``); the page's parameters go along."""
+
+    buttons: tuple[dict[str, str], ...] = ()
+    kind: Literal["actions"] = "actions"
+
+
+Block = MarkdownBlock | DataBlock | FormBlock | ActionsBlock
 
 
 @dataclass(frozen=True, slots=True)

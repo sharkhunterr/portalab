@@ -1,0 +1,103 @@
+# Messenger (spec 030, slots + live): an icon in Portalab's top bar with the unread count opens a drawer with
+# the member's conversations and sends a message directly; a conversation's page updates live. Drawn by
+# Portalab; the plugin's code runs confined and holds no connection of its own.
+schema_version = 2
+key = "messenger"
+name = "Messenger"
+description = "Direct messages between members."
+version = "1.0.0"
+requires_portal = ">=0.1"
+maturity = "beta"
+entry_point = "messenger_plugin:register"
+migrations = "migrations"
+permissions = [{ name = "use", description = "Send and receive direct messages" }]
+
+[capabilities]
+storage = { quota_mb = 100 }
+operations = true
+pages = true
+slots = ["header.action"]
+live = { topics = ["new"] }
+privacy = true
+portal_data = { operations = ["GET /api/v1/community/members", "GET /api/v1/community/members/{member_id}"] }
+
+[personal_data]
+enabled = true
+classes = ["messages"]
+
+[[routes]]
+path = "unread"
+method = "GET"
+permission = "plugin:messenger.use"
+exposure = "read"
+
+[[routes]]
+path = "conversations"
+method = "GET"
+permission = "plugin:messenger.use"
+exposure = "read"
+
+[[routes]]
+path = "messages"
+method = "GET"
+permission = "plugin:messenger.use"
+exposure = "read"
+
+[[routes]]
+path = "send"
+method = "POST"
+permission = "plugin:messenger.use"
+exposure = "action"
+
+[[slots]]
+slot = "header.action"
+key = "inbox"
+label_key = "plugin.messenger:slot.inbox"
+icon = "message-circle"
+permission = "plugin:messenger.use"
+opens = "inbox"
+badge = "unread"
+live = "new"
+
+[[surfaces]]
+key = "inbox"
+kind = "drawer"
+title_key = "plugin.messenger:surface.inbox"
+permission = "plugin:messenger.use"
+blocks = [
+  { kind = "list", title_key = "plugin.messenger:block.conversations", data = "conversations", live = "new" },
+  { kind = "form", title_key = "plugin.messenger:block.new", action = "send", submit_key = "plugin.messenger:action.send", schema = { type = "object", properties = { to = { type = "string", maxLength = 64, title = "plugin.messenger:field.to" }, body = { type = "string", maxLength = 2000, title = "plugin.messenger:field.body", format = "textarea" } }, required = ["to", "body"] } },
+]
+
+[[ui.pages]]
+key = "chat"
+title_key = "plugin.messenger:page.chat"
+permission = "plugin:messenger.use"
+blocks = [
+  { kind = "thread", title_key = "plugin.messenger:block.thread", data = "messages", live = "new" },
+  { kind = "form", title_key = "plugin.messenger:block.reply", action = "send", submit_key = "plugin.messenger:action.send", schema = { type = "object", properties = { body = { type = "string", maxLength = 2000, title = "plugin.messenger:field.body", format = "textarea" } }, required = ["body"] } },
+]
+
+[i18n.en."plugin.messenger"]
+"slot.inbox" = "Messages"
+"surface.inbox" = "Messages"
+"block.conversations" = "Conversations"
+"block.new" = "New message"
+"block.thread" = "Conversation"
+"block.reply" = "Reply"
+"field.to" = "To (a member's name)"
+"field.body" = "Message"
+"action.send" = "Send"
+"page.chat" = "Conversation"
+
+[i18n.fr."plugin.messenger"]
+"slot.inbox" = "Messages"
+"surface.inbox" = "Messages"
+"block.conversations" = "Conversations"
+"block.new" = "Nouveau message"
+"block.thread" = "Conversation"
+"block.reply" = "Répondre"
+"field.to" = "À (le nom d'un membre)"
+"field.body" = "Message"
+"action.send" = "Envoyer"
+"page.chat" = "Conversation"

@@ -15,6 +15,7 @@ import {
 import "../media.css";
 import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
+import { PluginSlot } from "../../plugins/slots/PluginSlot";
 import { useListenInfo, useReadInfo } from "../books/api";
 import { useDiscoverTitle } from "../discover/api";
 import { RequestDialog } from "../discover/RequestDialog";
@@ -876,7 +877,10 @@ export function DetailPage() {
             <RequestButton objectId={media.id} kind={media.kind} tmdb={media.ids?.tmdb} />
           )
         }
-      />
+      >
+        {/* 030: what plugins add to a title's page (« + Playlist »…), drawn by Portalab */}
+        <PluginSlot name="media.actions" params={{ item: media.id }} />
+      </TitleHero>
       <LeavingNotice objectId={media.id} />
       <RequestJourney objectId={media.id} />
       {metadata.data ? (

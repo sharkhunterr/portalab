@@ -24,7 +24,7 @@ from portalab.core.time import utc_now
 from portalab.modules.plugins.context.registries import PluginRoute, Registries
 from portalab.modules.plugins.guard.guard import GuardedCalendar, GuardedSearch, GuardedWidget, PluginGuard
 from portalab.sdk import PluginDb
-from portalab.sdk.pages import DataBlock, FormBlock, MarkdownBlock, PageDefinition
+from portalab.sdk.pages import ActionsBlock, DataBlock, FormBlock, MarkdownBlock, PageDefinition
 
 SYSTEM = Principal(channel="system")
 
@@ -346,7 +346,7 @@ def page_from(raw: Mapping[str, Any]) -> PageDefinition:
         kind = block.get("kind")
         if kind == "markdown":
             blocks.append(MarkdownBlock(str(block.get("text", ""))[:20_000]))
-        elif kind in ("stat", "list", "table", "chart", "thread", "cards"):
+        elif kind in ("stat", "list", "table", "chart", "thread", "cards", "checklist"):
             blocks.append(
                 DataBlock(
                     kind,
@@ -354,8 +354,19 @@ def page_from(raw: Mapping[str, Any]) -> PageDefinition:
                     str(block.get("data", "")),
                     tuple(block.get("columns", ())),
                     block.get("chart", "line"),
+                    str(block.get("action", "")),
+                    str(block.get("live", "")),
                 )
             )
+        elif kind == "actions":
+            buttons = []
+            for button in list(block.get("buttons", []))[:6]:
+                clean = {
+                    k: str(button[k])[:200] for k in ("label_key", "opens", "action", "then") if button.get(k)
+                }
+                if clean.get("label_key") and (clean.get("opens") or clean.get("action")):
+                    buttons.append(clean)
+            blocks.append(ActionsBlock(tuple(buttons)))
         elif kind == "form":
             blocks.append(
                 FormBlock(
@@ -363,6 +374,7 @@ def page_from(raw: Mapping[str, Any]) -> PageDefinition:
                     dict(block.get("schema", {})),
                     str(block.get("action", "")),
                     str(block.get("submit_key", "plugins:page.submit")),
+                    data=str(block.get("data", "")),
                 )
             )
     return PageDefinition(

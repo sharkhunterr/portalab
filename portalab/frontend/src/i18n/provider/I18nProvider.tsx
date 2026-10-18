@@ -92,8 +92,11 @@ export function I18nProvider({
     staleTime: 5 * 60_000,
     queryFn: async () => {
       try {
-        const listed = ((await api.GET("/api/v1/plugins/pages")).data ?? []) as Array<{ plugin: string }>;
-        return [...new Set(listed.map((page) => `plugin.${page.plugin}`))];
+        const data = (await api.GET("/api/v1/plugins/pages")).data as unknown;
+        const listed = (Array.isArray(data) ? data : []) as Array<{ plugin?: unknown }>;
+        return [
+          ...new Set(listed.filter((p) => typeof p.plugin === "string").map((p) => `plugin.${p.plugin}`)),
+        ];
       } catch {
         return [] as string[]; // signed out, or plugins unavailable
       }
