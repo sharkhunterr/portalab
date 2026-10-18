@@ -55,8 +55,7 @@ const TYPES = [
   "xp_boost",
   // #57: saving a title from the library's cleanup (Maintainerr)
   "media_rescue",
-  // #81: a sealed pack drawn at random (its odds and refunds: « Boosters » below)
-  "booster",
+  // #81 / issue 153: a booster is made in « Boosters » (its looks, scene and packs come from the visual packs)
 ] as const;
 /** 030: a kind of product an enabled plugin adds to the shop (the shop keeps coins and ownership). */
 interface PluginType {
@@ -580,14 +579,6 @@ export function NewProductDialog({
         return { count: units };
       case "xp_boost":
         return { factor, hours, values: ["xp"] };
-      case "booster": // the classic's settings, tuned afterwards in « Boosters »
-        return {
-          pool: "looks",
-          cards: 5,
-          odds: { common: 62, rare: 26, epic: 10, legendary: 2 },
-          guarantee: "rare",
-          look: "cosmos",
-        };
       default:
         if (pluginType) {
           // 030: a plugin's kind of product: the settings it declares, as the Admin filled them
@@ -636,7 +627,7 @@ export function NewProductDialog({
               const body = availabilityBody(availability);
               return {
                 availability: body.availability,
-                repeatable: ["quota", "streak_freeze", "xp_boost", "media_rescue", "booster"].includes(type),
+                repeatable: ["quota", "streak_freeze", "xp_boost", "media_rescue"].includes(type),
               };
             })(),
             version: {

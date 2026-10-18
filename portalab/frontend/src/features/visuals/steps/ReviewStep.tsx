@@ -34,13 +34,13 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
     contracts: detail.draft?.confirmations?.contracts ?? [],
   }));
   const [error, setError] = useState<string | null>(null);
-  // 028: the booster scenes, bound to every booster (« * »), one booster (its key) or none
+  // 028: the booster scenes, bound to every booster (« * »), one booster (its key) or none — issue 153: none
+  // unless the administrators say so (a booster is given its scene in Shop › Boosters)
   const scenes = detail.report.elements.filter((e) => e.type === "booster_scene" && e.look);
   const [modes, setModes] = useState<Record<string, "all" | "one" | "none">>({});
-  const [bindings, setBindings] = useState<Record<string, string>>(() => ({
-    ...Object.fromEntries(scenes.map((s) => [s.look as string, "*"])),
-    ...((detail.draft as { bindings?: Record<string, string> } | null)?.bindings ?? {}),
-  }));
+  const [bindings, setBindings] = useState<Record<string, string>>(
+    () => (detail.draft as { bindings?: Record<string, string> } | null)?.bindings ?? {},
+  );
   const number = (value: string) => (value.trim() === "" ? null : Math.max(0, Math.round(Number(value))));
   const decide = (product: string, change: Partial<Economy>) =>
     setEconomy((all) => ({ ...all, [product]: { ...(all[product] ?? {}), ...change } }));
@@ -164,7 +164,11 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
         </section>
       </AdminSection>
       {scenes.length ? (
-        <AdminSection title={t("admin:visuals.review.scenes")} icon="gift">
+        <AdminSection
+          title={t("admin:visuals.review.scenes")}
+          icon="gift"
+          description={t("admin:visuals.review.scenesHint")}
+        >
           <div className="visuals-confirmations">
             {scenes.map((scene) => {
               const look = scene.look as string;

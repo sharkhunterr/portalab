@@ -147,5 +147,17 @@
   "title": "Extensions",
   "update.package": "Paquet de la nouvelle version",
   "view.failed": "La vue de cette extension n'a pas pu être affichée.",
-  "review.shelf": "Dans la boutique : {department} › {shelf} ({types})"
+  "review.shelf": "Dans la boutique : {department} › {shelf} ({types})",
+  "search": "Chercher un plugin",
+  "runtime.confined": "code confiné",
+  "runtime.declarative": "déclarations seulement",
+  "runtime.in_process": "code non confiné",
+  "source.admin_upload": "envoi",
+  "source.local_dir": "dossier",
+  "source.marketplace": "catalogue",
+  "stateVersion": "{state} · {version}",
+  "menu": "Actions sur {name}",
+  "toApprove": "À approuver",
+  "showDetails": "Réglages, confinement et diagnostic",
+  "hideDetails": "Masquer les réglages, le confinement et le diagnostic"
 }

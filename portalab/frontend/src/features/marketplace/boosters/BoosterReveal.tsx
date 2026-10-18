@@ -6,6 +6,7 @@ import { FxLayer } from "../../../design-system/components/Fx";
 import { Icon } from "../../../design-system/components/Icon";
 import { sound } from "../../../design-system/sound/SoundService";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
+import type { ExternalElement } from "../../../design-system/visuals/registry";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
@@ -267,18 +268,23 @@ export function BoosterReveal({
   booster,
   sealed = false,
   onClose,
+  demo,
 }: {
   booster: Booster;
   /** one of the sealed ones I keep (offered, or bought earlier): opened for free */
   sealed?: boolean;
   onClose: () => void;
+  /** issue 154: a try of a scene (the Test step) — these cards, this scene; nothing drawn, nothing charged */
+  demo?: { cards: BoosterCard[]; scene: Scene | null };
 }) {
   const t = useT();
   const format = useFormat();
   const { locale } = useLocaleContext();
   const reduced = useTheme().effective.reducedMotion;
   const opening = useOpenBooster();
-  const scene = useBoosterScene(booster.key); // 028: a pack's scene, Portalab's own otherwise
+  const live = useBoosterScene(demo ? null : booster.key); // 028: a pack's scene, Portalab's own otherwise
+  const scene = demo ? demo.scene : live;
+  const [tried, setTried] = useState(false); // issue 154: the demo's pack opened
   // one key per opening: a replayed request is answered without charging twice
   const attempt = useRef(requestKey());
   const coins = useProgression().data?.coins;
@@ -286,13 +292,13 @@ export function BoosterReveal({
   const can = useCanOpen(shown);
   // this opening: a sealed one I keep, or one bought now
   const [gift, setGift] = useState(sealed && booster.sealed > 0);
-  const ready = gift || can.ok;
+  const ready = Boolean(demo) || gift || can.ok;
   const [phase, setPhase] = useState<Phase>("sealed");
   const [states, setStates] = useState<CardState[]>([]);
   const [moment, setMoment] = useState<string | null>(null);
   const timers = useRef<number[]>([]);
   const dialog = useRef<HTMLDivElement>(null);
-  const cards = opening.data?.cards ?? [];
+  const cards = demo ? (tried ? demo.cards : []) : (opening.data?.cards ?? []);
   const later = useCallback((fn: () => void, ms: number) => {
     timers.current.push(window.setTimeout(fn, ms));
   }, []);
@@ -302,6 +308,7 @@ export function BoosterReveal({
     for (const id of timers.current) window.clearTimeout(id);
     timers.current = [];
     opening.reset();
+    setTried(false);
     attempt.current = requestKey();
     setGift(shown.sealed > 0);
     setStates([]);
@@ -344,6 +351,12 @@ export function BoosterReveal({
   // a tap opens it for real: charged and drawn on the server, then it tears
   const open = () => {
     if (phase !== "sealed" || opening.isPending || !ready) return;
+    if (demo) {
+      setTried(true);
+      setStates(demo.cards.map(() => "hidden"));
+      tear();
+      return;
+    }
     opening.mutate({ key: booster.key, requestKey: attempt.current, sealed: gift }, { onSuccess: tear });
   };
   const code = String((opening.error as { code?: string } | null)?.code ?? "").replace("marketplace.", "");
@@ -431,7 +444,7 @@ export function BoosterReveal({
       >
         <Icon name="close" size={20} />
       </button>
-      {coins !== undefined ? (
+      {coins !== undefined && !demo ? (
         <p className="booster-stage__preview" data-protected="">
           <Icon name="coins" size={14} />
           {t("marketplace:booster.balance", { coins: format.number(coins) })}
@@ -481,11 +494,13 @@ export function BoosterReveal({
                 ? t("marketplace:booster.sealing")
                 : phase !== "sealed"
                   ? t("marketplace:booster.tearing")
-                  : gift
-                    ? t("marketplace:booster.tapToOpenGift")
-                    : can.ok
-                      ? t("marketplace:booster.tapToOpen", { price: format.number(booster.price) })
-                      : can.reason}
+                  : demo
+                    ? t("marketplace:booster.tapToTry")
+                    : gift
+                      ? t("marketplace:booster.tapToOpenGift")
+                      : can.ok
+                        ? t("marketplace:booster.tapToOpen", { price: format.number(booster.price) })
+                        : can.reason}
           </p>
         </div>
       ) : (
@@ -559,13 +574,15 @@ export function BoosterReveal({
                 ) : null}
                 <Button
                   onClick={again}
-                  disabled={!(shown.sealed > 0 || can.ok)}
+                  disabled={!(demo || shown.sealed > 0 || can.ok)}
                   title={shown.sealed > 0 ? undefined : (can.reason ?? undefined)}
                 >
                   <Icon name="sparkles" size={16} />
-                  {shown.sealed > 0
-                    ? t("marketplace:booster.againGift", { count: shown.sealed })
-                    : t("marketplace:booster.again", { price: format.number(shown.price) })}
+                  {demo
+                    ? t("marketplace:booster.tryAgain")
+                    : shown.sealed > 0
+                      ? t("marketplace:booster.againGift", { count: shown.sealed })
+                      : t("marketplace:booster.again", { price: format.number(shown.price) })}
                 </Button>
               </div>
             </section>
@@ -574,5 +591,139 @@ export function BoosterReveal({
       )}
     </div>,
     document.body,
+  );
+}
+
+/** Issue 154: a booster to try a scene with — nothing on sale, nothing charged. */
+export function demoBooster(names: Record<string, string>, cards = 5): Booster {
+  return {
+    key: "demo",
+    names,
+    descriptions: {},
+    price: 0,
+    rarity: "rare",
+    theme: "",
+    on_sale: true,
+    left: null,
+    sealed: 0,
+    cards,
+    odds: { common: 40, rare: 30, epic: 20, legendary: 10 },
+    weights: { common: 40, rare: 30, epic: 20, legendary: 10 },
+    guarantee: "common",
+    refunds: { common: 0, rare: 0, epic: 0, legendary: 0 },
+    pool: "looks",
+    kind: "looks",
+    season: null,
+    until: null,
+    per_member: null,
+    look: "cosmos",
+  };
+}
+
+/** Issue 154: the cards of a try — one of each rarity (two commons), named by their rarity. */
+export function demoCards(name: (rarity: string) => string): BoosterCard[] {
+  return (["common", "rare", "common", "epic", "legendary"] as const).map((rarity, index) => ({
+    product: {
+      key: `demo_${index}`,
+      type: "badge",
+      name: name(rarity),
+      names: {},
+      descriptions: {},
+      rarity,
+      icon: "sparkles",
+      preview: {},
+      conditions: [],
+      eligibility: [],
+      owned: false,
+      locked: false,
+      state: "available",
+      version: 1,
+    } as unknown as BoosterCard["product"],
+    outcome: "new" as const,
+    duplicate: false,
+    refund: 0,
+    locked: false,
+  }));
+}
+
+/**
+ * Issue 154: one part of a scene drawn as members see it (the Test step) — a card's back, face or reveal, the
+ * sealed pack's look, its opening or the stage's background — in a small stage of its own.
+ */
+export function ScenePartPreview({
+  element,
+  rarity = "common",
+  booster,
+  card,
+}: {
+  element: ExternalElement;
+  rarity?: Rarity;
+  booster: Booster;
+  card: BoosterCard;
+}) {
+  const reduced = useTheme().effective.reducedMotion;
+  const scene = (parts: Scene["parts"]): Scene => ({ pack: element.pack, look: element.look ?? "", parts });
+  const type = element.type;
+  if (type === "card_back" || type === "card_face" || type === "card_reveal") {
+    const parts: Scene["parts"] =
+      type === "card_back"
+        ? { back: { common: element } }
+        : type === "card_face"
+          ? { face: { [rarity]: element } }
+          : { reveal: { [rarity]: element } };
+    return (
+      <div
+        className="booster-stage booster-stage--preview"
+        data-phase="spread"
+        data-reduced={reduced || undefined}
+      >
+        <ul className="booster-cards">
+          <Card
+            card={{ ...card, product: { ...card.product, rarity } }}
+            index={0}
+            total={1}
+            state={type === "card_back" ? "hidden" : "revealed"}
+            scene={scene(parts)}
+            reduced={reduced}
+            onReveal={() => {}}
+          />
+        </ul>
+      </div>
+    );
+  }
+  const opening = type === "booster_opening";
+  return (
+    <div
+      className="booster-stage booster-stage--preview"
+      data-phase={opening ? "tearing" : "sealed"}
+      data-own-opening={opening ? "" : undefined}
+      data-reduced={reduced || undefined}
+    >
+      {type === "booster_backdrop" ? (
+        <span className="booster-stage__backdrop" data-booster-backdrop={hookOf(element)}>
+          <ScenePart
+            element={element}
+            className="booster-stage__backdrop-layer"
+            context={{ reducedMotion: reduced, phase: "sealed" }}
+          />
+        </span>
+      ) : null}
+      <div
+        className="booster-stage__pack"
+        data-booster-look={type === "booster_look" ? hookOf(element) : undefined}
+        data-opening={opening ? hookOf(element) : undefined}
+      >
+        {type === "booster_look" || opening ? (
+          <ScenePart
+            element={element}
+            className={opening ? "booster-stage__opening" : "booster-stage__look"}
+            context={{ reducedMotion: reduced, phase: opening ? "tearing" : "sealed" }}
+          />
+        ) : null}
+        <span className="booster-stage__tear">
+          <BoosterPack booster={booster} stage />
+        </span>
+      </div>
+    </div>
   );
 }

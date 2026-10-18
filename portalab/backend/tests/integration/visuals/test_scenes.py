@@ -40,6 +40,16 @@ async def test_a_scene_bound_at_review_dresses_every_booster(database: Database,
     assert parts["reveal"]["legendary"]["kind"] == "glsl" and "common" not in parts["reveal"]
     assert set(parts["face"]) == {"common", "rare", "epic", "legendary"}
     assert parts["back"]["common"]["css"][0].endswith("back.css")
+    # issue 153: what the shop's tiles read (the sealed pack takes the chest's stylesheet) and what the
+    # administrators may make a booster of (its scenes; its parts are never a pack's sold items)
+    bindings = (await service.scene_bindings())["bindings"]
+    assert bindings["*"]["pack"] == "maree" and bindings["*"]["booster_look"] == "maree"
+    options = await service.booster_options()
+    assert {(s["pack"], s["look"]) for s in options["scenes"]} == {("maree", "maree")}
+    assert "maree" not in {p["id"] for p in options["packs"]}
+    # issue 154: the Test step rebuilds the scene from the version's own elements, found by their folder
+    detail = await service.detail("maree", version)
+    assert {e.get("folder") for e in detail["elements"]} >= {"scene-maree", "look-maree", "back-maree"}
     # a booster bound to no scene of its own takes the default one; unbinding gives Portalab's back
     await service.bind_scene(ADMIN, "*", None)
     assert await service.scene_for("booster_classic") is None

@@ -57,6 +57,8 @@ export interface ExternalElement {
   params?: Record<string, unknown> | null;
   rarity?: string | null;
   parts?: Record<string, unknown> | null;
+  /** its folder in the pack (the administrators' preview only): a scene names its parts by it */
+  folder?: string | null;
   contracts?: string[] | null;
   /** 028: a widget (its sizes, pace, words when empty, own settings), a widget style or option (the widget
    * it is for — every one when absent —, an option's setting and value, or its script's place) */

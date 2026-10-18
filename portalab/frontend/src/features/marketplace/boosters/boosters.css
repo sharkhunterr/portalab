@@ -1974,3 +1974,48 @@
 .booster-stage[data-own-opening][data-phase="tearing"] .booster-pack__flap {
   visibility: hidden;
 }
+
+/* issue 153: a sealed pack in its own scene's look, in the shop — the scene's stylesheet draws it at the
+   opening's size: fitted in the tile's place, never spilling out of it */
+.booster-scene-pack {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  contain: paint;
+  inline-size: 11rem;
+  max-inline-size: 100%;
+  aspect-ratio: 1 / 1;
+}
+.booster-scene-pack > .booster-pack {
+  zoom: 0.5;
+}
+.booster-scene-pack[data-size="mini"] {
+  inline-size: 2.8rem;
+}
+.booster-scene-pack[data-size="mini"] > .booster-pack {
+  zoom: 0.16;
+}
+
+/* issue 154: a part of a scene previewed in the Test step — a small stage of its own, in the page */
+.booster-stage.booster-stage--preview {
+  position: relative;
+  inset: auto;
+  z-index: 0;
+  min-block-size: 18rem;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  animation: none;
+}
+.booster-stage--preview .booster-stage__pack {
+  transform: scale(0.7);
+}
+
+/* issue 153: the visual packs a booster may draw from, ticked */
+.admin-booster__packs {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}

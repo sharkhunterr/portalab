@@ -147,5 +147,17 @@
   "title": "Plugins",
   "update.package": "Package of the new version",
   "view.failed": "This extension's view could not be shown.",
-  "review.shelf": "In the shop: {department} › {shelf} ({types})"
+  "review.shelf": "In the shop: {department} › {shelf} ({types})",
+  "search": "Find a plugin",
+  "runtime.confined": "confined code",
+  "runtime.declarative": "declarations only",
+  "runtime.in_process": "unconfined code",
+  "source.admin_upload": "upload",
+  "source.local_dir": "folder",
+  "source.marketplace": "marketplace",
+  "stateVersion": "{state} · {version}",
+  "menu": "Actions on {name}",
+  "toApprove": "To approve",
+  "showDetails": "Settings, confinement and diagnostics",
+  "hideDetails": "Hide the settings, confinement and diagnostics"
 }

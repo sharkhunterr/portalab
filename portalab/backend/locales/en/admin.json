@@ -963,5 +963,8 @@
   "widgetPacks.shop": "Shop",
   "widgetPacks.sold": "{price} coins · {rarity}",
   "widgetPacks.title": "Widgets",
-  "widgetPacks.what": "What it is"
+  "widgetPacks.what": "What it is",
+  "visuals.test.tryScene": "Try the scene « {name} »",
+  "visuals.test.try": "Try",
+  "visuals.review.scenesHint": "A scene dresses the opening of the boosters it is given to. None by default: give it to a booster in Shop › Boosters (or here, to every booster or to one)."
 }

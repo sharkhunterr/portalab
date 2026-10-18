@@ -3907,6 +3907,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/visuals/booster-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Booster Options
+         * @description Issue 153: what a booster may be made of: sealed packs' looks, scenes, visual packs.
+         */
+        get: operations["booster_options_api_v1_admin_visuals_booster_options_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/visuals/builtin/state": {
         parameters: {
             query?: never;
@@ -9521,6 +9541,26 @@ export interface paths {
          * @description A pack's element failed in this member's page (counted for the administrators, an hour apart).
          */
         post: operations["report_api_v1_visuals_reports_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/visuals/scenes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Scenes
+         * @description Issue 153: the scene each booster wears (its sealed pack's look in the shop comes from it).
+         */
+        get: operations["scenes_api_v1_visuals_scenes_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -24521,6 +24561,28 @@ export interface operations {
             };
         };
     };
+    booster_options_api_v1_admin_visuals_booster_options_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     builtin_state_api_v1_admin_visuals_builtin_state_post: {
         parameters: {
             query?: never;
@@ -35075,6 +35137,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    scenes_api_v1_visuals_scenes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };

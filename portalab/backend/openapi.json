@@ -30403,6 +30403,30 @@
         ]
       }
     },
+    "/api/v1/admin/visuals/booster-options": {
+      "get": {
+        "description": "Issue 153: what a booster may be made of: sealed packs' looks, scenes, visual packs.",
+        "operationId": "booster_options_api_v1_admin_visuals_booster_options_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Booster Options Api V1 Admin Visuals Booster Options Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Booster Options",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
     "/api/v1/admin/visuals/builtin/state": {
       "post": {
         "description": "Portalab's whole catalog switched on \u2014 or off, the socle staying on.",
@@ -46406,6 +46430,30 @@
           }
         },
         "summary": "Report",
+        "tags": [
+          "visuals"
+        ]
+      }
+    },
+    "/api/v1/visuals/scenes": {
+      "get": {
+        "description": "Issue 153: the scene each booster wears (its sealed pack's look in the shop comes from it).",
+        "operationId": "scenes_api_v1_visuals_scenes_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Scenes Api V1 Visuals Scenes Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Scenes",
         "tags": [
           "visuals"
         ]

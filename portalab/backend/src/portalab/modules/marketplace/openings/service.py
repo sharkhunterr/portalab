@@ -23,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from portalab.capabilities.economy import PERKS, InsufficientCoins
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.visuals import VISUAL_POOL, pack_products
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import Conflict, Forbidden
@@ -96,10 +97,17 @@ class Drawn:
 
 
 def pool_keys(rows: list[tuple[Product, ProductVersion]], prefixes: tuple[str, ...]) -> set[str] | None:
-    """The products the packs starting with ``prefixes`` hold (``None``: no such limit)."""
+    """The products the packs starting with ``prefixes`` hold (``None``: no such limit) — the shop's packs
+    (bundles), or a visual pack's whole catalogue (``visual:<pack>``, issue 153)."""
     if not prefixes:
         return None
     keys: set[str] = set()
+    for entry in prefixes:
+        if entry.startswith(VISUAL_POOL):
+            keys.update(pack_products.of(entry.removeprefix(VISUAL_POOL)))
+    prefixes = tuple(p for p in prefixes if not p.startswith(VISUAL_POOL))
+    if not prefixes:
+        return keys
     for product, version in rows:
         if product.type == "bundle" and product.key.startswith(prefixes):
             keys.update(str(k) for k in (version.payload or {}).get("products") or [])
@@ -185,6 +193,8 @@ class Openings:
         """What the booster may hold now: its types, priced, its season's or its packs' if it says so —
         and no limited look with no copy left (one the member owns stays: it comes out as a duplicate)."""
         rows = await self.catalog.listing()
+        if any(p.startswith(VISUAL_POOL) for p in booster.packs):
+            await pack_products.ready()
         keys = pool_keys(rows, booster.packs)
         pool = [
             (product, version)

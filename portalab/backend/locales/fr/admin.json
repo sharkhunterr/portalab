@@ -963,5 +963,8 @@
   "widgetPacks.shop": "Boutique",
   "widgetPacks.sold": "{price} pièces · {rarity}",
   "widgetPacks.title": "Widgets",
-  "widgetPacks.what": "Ce que c'est"
+  "widgetPacks.what": "Ce que c'est",
+  "visuals.test.tryScene": "Essayer la scène « {name} »",
+  "visuals.test.try": "Essayer",
+  "visuals.review.scenesHint": "Une scène habille l'ouverture des boosters auxquels elle est donnée. Aucun par défaut : donnez-la à un booster dans Boutique › Boosters (ou ici, à tous les boosters ou à un seul)."
 }

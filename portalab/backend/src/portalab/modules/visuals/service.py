@@ -38,6 +38,7 @@ from portalab.capabilities.visuals import (
     CatalogWriter,
     InterfaceRegistry,
     live_looks,
+    pack_products,
 )
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
@@ -183,6 +184,7 @@ class VisualPacks:
         self._refreshing = asyncio.Lock()
         self._bundles: dict[str, dict[str, str]] = {}  # a version's folder → its texts (immutable)
         self._live_files: tuple[int, bytes] | None = None  # every live file, gzipped, for one epoch
+        pack_products.loader = self.refresh  # issue 153: a booster drawing from packs asks for them fresh
 
     # --- infrastructure ----------------------------------------------------------------------------------
     @staticmethod
@@ -934,6 +936,84 @@ class VisualPacks:
                 parts[slot] = part(value)
         return {"pack": pack_id, "look": scene.look, "names": scene.data.get("names"), "parts": parts}
 
+    async def scene_bindings(self) -> dict[str, Any]:
+        """Issue 153: the scene each booster wears (``*``: every booster without its own): its pack, its
+        look, and the look its sealed pack takes (its ``booster_look`` part's), for the shop's tiles."""
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(SceneBinding.booster_key, Pack.id, PackVersion.id, Element)
+                    .join(Element, Element.id == SceneBinding.element_id)
+                    .join(PackVersion, PackVersion.id == Element.version_id)
+                    .join(Pack, Pack.current_version_id == PackVersion.id)
+                    .where(Pack.state == "enabled")
+                )
+            ).all()
+            out: dict[str, Any] = {}
+            for booster_key, pack_id, version_id, scene in rows:
+                folder = str(((scene.data.get("payload") or {}).get("parts") or {}).get("booster_look") or "")
+                look = None
+                if folder:
+                    part = (
+                        await session.execute(
+                            select(Element).where(
+                                Element.version_id == version_id,
+                                Element.folder.in_((folder, f"elements/{folder}")),
+                            )
+                        )
+                    ).scalar_one_or_none()
+                    styled = part is not None and (
+                        part.kind == "css" or (part.data.get("render") or {}).get("css")
+                    )
+                    if part is not None and styled:
+                        look = part.look
+                out[booster_key] = {
+                    "pack": pack_id,
+                    "look": scene.look,
+                    "names": scene.data.get("names") or {},
+                    "booster_look": look,
+                }
+        return {"bindings": out}
+
+    async def booster_options(self) -> dict[str, Any]:
+        """Issue 153: what a booster may be made of — the looks of a sealed pack (the live packs' boosters'),
+        the scenes it may open with, the visual packs it may draw from; none is written in the interface."""
+        await self.refresh()
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(Pack, Element)
+                    .join(PackVersion, PackVersion.id == Pack.current_version_id)
+                    .join(Element, Element.version_id == PackVersion.id)
+                    .where(Pack.state == "enabled", Element.type.in_(("booster", "booster_scene")))
+                    .order_by(Pack.id, Element.folder)
+                )
+            ).all()
+            names = {
+                pack.id: pack.names or {}
+                for pack in (await session.execute(select(Pack).where(Pack.state == "enabled"))).scalars()
+            }
+        looks: dict[str, dict[str, Any]] = {}
+        scenes: list[dict[str, Any]] = []
+        for pack, element in rows:
+            if element.type == "booster":
+                look = str((element.data.get("payload") or {}).get("look") or "")
+                if look and look not in looks:
+                    looks[look] = {"look": look, "names": element.data.get("names") or {}, "pack": pack.id}
+            elif element.look:
+                named = element.data.get("names") or {}
+                scenes.append({"pack": pack.id, "look": element.look, "names": named})
+        packs = [
+            {"id": pack, "names": names.get(pack, {}), "products": count}
+            for pack, count in pack_products.packs().items()
+        ]
+        return {
+            "looks": list(looks.values()),
+            "scenes": scenes,
+            "packs": packs,
+            **(await self.scene_bindings()),
+        }
+
     # --- the pack's life ------------------------------------------------------------------------------------
     async def set_state(self, actor: Principal, pack: str, enabled: bool) -> None:
         """Off: its products leave the shop (owners keep them), its files are no longer served, its looks
@@ -1194,6 +1274,8 @@ class VisualPacks:
                 "params": render.get("params") or None,
                 "rarity": render.get("rarity"),
                 "parts": (element.get("payload") or {}).get("parts"),
+                # its folder in the pack: a scene names its parts by it (to rebuild a scene being tested)
+                "folder": str(element["folder"]).removeprefix("elements/") if admin else None,
                 "contracts": element.get("contracts") or None,
                 # a widget: the sizes it takes and what it shows when it has nothing (its data: contracts)
                 "widget": widget_render(element),
@@ -1290,6 +1372,13 @@ class VisualPacks:
                 if (kind, look) not in live:
                     withheld.setdefault(str(kind), []).append(str(look))
             live_looks.replace(by_type, epoch, held=withheld)
+            # issue 153: what each live pack sells — a booster may draw from chosen packs
+            sold: dict[str, set[str]] = {}
+            for pack_id, _, element in rows:
+                product = element.data.get("product")
+                if product and element.type not in NOT_SOLD and element.type != "booster":
+                    sold.setdefault(str(pack_id), set()).add(str(product))
+            pack_products.replace(sold)
             if self.widgets is not None:
                 self.widgets.sync(
                     {

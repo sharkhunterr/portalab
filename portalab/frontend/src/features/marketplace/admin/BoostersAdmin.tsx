@@ -1,36 +1,52 @@
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../../api/client";
 import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { SelectField, TextField } from "../../../design-system/components/Field";
+import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import type { Product } from "../api";
-import { type BoosterInfo, boosterOf } from "../boosters/api";
+import { type BoosterInfo, boosterOf, localized } from "../boosters/api";
 import { ProductPack } from "../boosters/Boosters";
+import type { SceneBinding } from "../boosters/scene/scene";
 import { withConfirmation } from "./confirm";
 import type { Season } from "./console/api";
 import { RARITIES, SEASONS } from "./ProductEditor";
 
+// what a booster draws (the shop's draw rules — not looks): Portalab's looks, the HD ones, the reserve's items
 const POOLS = ["looks", "hd", "reserve"] as const;
-const LOOKS = [
-  "cosmos",
-  "legend",
-  "prestige",
-  "reserve",
-  "discovery",
-  "valentine",
-  "spring",
-  "summer",
-  "halloween",
-  "winter",
-  "celestial",
-] as const;
+// a booster's pool may name visual packs (issue 153): what that live pack sells
+const VISUAL = "visual:";
+
+/**
+ * Issue 153: what a booster may be made of — the sealed packs' looks, the scenes it may open with, the
+ * visual packs it may draw from (Portalab's and the imported ones) and which scene each booster wears; all
+ * read from the server, none written here.
+ */
+interface BoosterOptions {
+  looks: Array<{ look: string; names: Record<string, string>; pack: string }>;
+  scenes: Array<{ pack: string; look: string; names: Record<string, string> }>;
+  packs: Array<{ id: string; names: Record<string, string>; products: number }>;
+  bindings: Record<string, SceneBinding>;
+}
+
+function useBoosterOptions() {
+  return useQuery({
+    queryKey: ["visuals", "booster-options"],
+    queryFn: async () =>
+      (await api.GET("/api/v1/admin/visuals/booster-options")).data as unknown as BoosterOptions,
+  });
+}
 
 interface Draft {
+  nameEn: string;
+  nameFr: string;
+  rarity: string;
   price: string;
   cards: string;
   odds: Record<string, string>;
@@ -40,44 +56,307 @@ interface Draft {
   season: string;
   perMember: string;
   look: string;
-}
-
-function draftOf(product: Product, info: BoosterInfo): Draft {
-  return {
-    price: String(product.price_coins ?? 0),
-    cards: String(info.cards),
-    odds: Object.fromEntries(RARITIES.map((r) => [r, String(info.weights?.[r] ?? 0)])),
-    guarantee: info.guarantee,
-    refunds: Object.fromEntries(RARITIES.map((r) => [r, String(info.refunds[r] ?? 0)])),
-    pool: info.pool,
-    season: info.season ?? "",
-    perMember: info.per_member ? String(info.per_member) : "",
-    look: info.look,
-  };
+  /** ``pack:look`` of its own scene, or "" (the one every booster wears, else Portalab's) */
+  scene: string;
+  /** the visual packs it draws from (none: all its pool holds) */
+  visualPacks: string[];
+  /** the shop's packs it draws from (kept as they are) */
+  shopPacks: string[];
 }
 
 const whole = (value: string) => Math.max(0, Math.round(Number(value) || 0));
 
-/** One booster's settings — what it holds, its odds, what a duplicate gives back: a new version. */
+function draftOf(
+  product: Product | null,
+  info: BoosterInfo | null,
+  options: BoosterOptions | undefined,
+): Draft {
+  const own = product ? options?.bindings[product.key] : undefined;
+  const packs = info?.packs ?? [];
+  return {
+    nameEn: product?.names?.en ?? "",
+    nameFr: product?.names?.fr ?? "",
+    rarity: product?.rarity ?? "rare",
+    price: String(product?.price_coins ?? 300),
+    cards: String(info?.cards ?? 5),
+    odds: Object.fromEntries(
+      RARITIES.map((r) => [
+        r,
+        String(info?.weights?.[r] ?? { common: 62, rare: 26, epic: 10, legendary: 2 }[r]),
+      ]),
+    ),
+    guarantee: info?.guarantee ?? "common",
+    refunds: Object.fromEntries(
+      RARITIES.map((r) => [
+        r,
+        String(info?.refunds[r] ?? { common: 10, rare: 15, epic: 20, legendary: 30 }[r]),
+      ]),
+    ),
+    pool: info?.pool ?? "looks",
+    season: info?.season ?? "",
+    perMember: info?.per_member ? String(info.per_member) : "",
+    look: info?.look ?? options?.looks[0]?.look ?? "",
+    scene: own ? `${own.pack}:${own.look}` : "",
+    visualPacks: packs.filter((p) => p.startsWith(VISUAL)).map((p) => p.slice(VISUAL.length)),
+    shopPacks: packs.filter((p) => !p.startsWith(VISUAL)),
+  };
+}
+
+function payloadOf(value: Draft) {
+  const packs = [...value.shopPacks, ...value.visualPacks.map((p) => `${VISUAL}${p}`)];
+  return {
+    pool: value.pool,
+    cards: Math.min(10, Math.max(1, whole(value.cards))),
+    odds: Object.fromEntries(RARITIES.map((r) => [r, whole(value.odds[r] ?? "0")])),
+    guarantee: value.guarantee,
+    refunds: Object.fromEntries(RARITIES.map((r) => [r, whole(value.refunds[r] ?? "0")])),
+    look: value.look,
+    ...(value.season ? { season: value.season } : {}),
+    ...(packs.length ? { packs } : {}),
+    ...(whole(value.perMember) ? { per_member: whole(value.perMember) } : {}),
+  };
+}
+
+/** A key for a new booster, from its name (``booster_<name>``; a number when it is taken). */
+function keyFor(name: string, taken: ReadonlySet<string>): string {
+  const base = `booster_${
+    name
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .slice(0, 40) || "new"
+  }`;
+  let key = base;
+  for (let n = 2; taken.has(key); n += 1) key = `${base}_${n}`;
+  return key;
+}
+
+const bindScene = (key: string, scene: string) => {
+  const [pack, look] = scene ? scene.split(":") : [null, null];
+  return api.PUT("/api/v1/admin/visuals/scenes/{booster_key}", {
+    params: { path: { booster_key: key } },
+    body: { pack: pack ?? null, look: look ?? null },
+  });
+};
+
+/** The form of a booster — what it is, what it draws, how it looks — to create one or tune it. */
+function BoosterForm({
+  value,
+  patch,
+  options,
+  creating,
+}: {
+  value: Draft;
+  patch: (next: Partial<Draft>) => void;
+  options: BoosterOptions | undefined;
+  creating: boolean;
+}) {
+  const t = useT();
+  const format = useFormat();
+  const { locale } = useLocaleContext();
+  const total = RARITIES.reduce((sum, r) => sum + whole(value.odds[r] ?? "0"), 0);
+  const name = (names: Record<string, string>, fallback: string) => localized(names, locale) || fallback;
+  return (
+    <div className="admin-booster__form">
+      <fieldset className="product-editor__fields">
+        <legend>{t("marketplace:admin.boosters.what")}</legend>
+        <TextField
+          label={t("marketplace:admin.nameEn")}
+          value={value.nameEn}
+          required
+          onChange={(e) => patch({ nameEn: e.target.value })}
+        />
+        <TextField
+          label={t("marketplace:admin.nameFr")}
+          value={value.nameFr}
+          onChange={(e) => patch({ nameFr: e.target.value })}
+        />
+        <SelectField
+          label={t("marketplace:admin.rarity")}
+          value={value.rarity}
+          onChange={(e) => patch({ rarity: e.target.value })}
+        >
+          {RARITIES.map((r) => (
+            <option key={r} value={r}>
+              {t(`marketplace:rarity.${r}`)}
+            </option>
+          ))}
+        </SelectField>
+        <TextField
+          label={t("marketplace:sheet.price")}
+          type="number"
+          min={1}
+          value={value.price}
+          onChange={(e) => patch({ price: e.target.value })}
+        />
+        <TextField
+          label={t("marketplace:admin.boosters.cards")}
+          type="number"
+          min={1}
+          max={10}
+          value={value.cards}
+          onChange={(e) => patch({ cards: e.target.value })}
+        />
+        <SelectField
+          label={t("marketplace:admin.season")}
+          value={value.season}
+          onChange={(e) => patch({ season: e.target.value })}
+        >
+          <option value="">{t("marketplace:admin.boosters.allYear")}</option>
+          {SEASONS.map((season) => (
+            <option key={season} value={season}>
+              {t(`marketplace:season.${season}`)}
+            </option>
+          ))}
+        </SelectField>
+        <SelectField
+          label={t("marketplace:admin.boosters.guarantee")}
+          value={value.guarantee}
+          onChange={(e) => patch({ guarantee: e.target.value })}
+        >
+          {RARITIES.map((r) => (
+            <option key={r} value={r}>
+              {r === "common" ? t("marketplace:admin.boosters.noGuarantee") : t(`marketplace:rarity.${r}`)}
+            </option>
+          ))}
+        </SelectField>
+        <TextField
+          label={t("marketplace:admin.boosters.perMember")}
+          hint={t("marketplace:admin.boosters.perMemberHint")}
+          type="number"
+          min={0}
+          value={value.perMember}
+          onChange={(e) => patch({ perMember: e.target.value })}
+        />
+      </fieldset>
+      <fieldset className="product-editor__fields">
+        <legend>{t("marketplace:admin.boosters.looks")}</legend>
+        <SelectField
+          label={t("marketplace:admin.boosters.look")}
+          value={value.look}
+          onChange={(e) => patch({ look: e.target.value })}
+        >
+          {(options?.looks ?? []).map((look) => (
+            <option key={look.look} value={look.look}>
+              {name(look.names, look.look)}
+            </option>
+          ))}
+          {value.look && !options?.looks.some((l) => l.look === value.look) ? (
+            <option value={value.look}>{value.look}</option>
+          ) : null}
+        </SelectField>
+        <SelectField
+          label={t("marketplace:admin.boosters.scene")}
+          hint={t("marketplace:admin.boosters.sceneHint")}
+          value={value.scene}
+          onChange={(e) => patch({ scene: e.target.value })}
+        >
+          <option value="">
+            {options?.bindings["*"]
+              ? t("marketplace:admin.boosters.sceneAll", {
+                  name: name(options.bindings["*"].names, options.bindings["*"].look),
+                })
+              : t("marketplace:admin.boosters.scenePortalab")}
+          </option>
+          {(options?.scenes ?? []).map((scene) => (
+            <option key={`${scene.pack}:${scene.look}`} value={`${scene.pack}:${scene.look}`}>
+              {name(scene.names, scene.look)}
+            </option>
+          ))}
+        </SelectField>
+      </fieldset>
+      <fieldset className="product-editor__fields">
+        <legend>{t("marketplace:admin.boosters.pool")}</legend>
+        <SelectField
+          label={t("marketplace:admin.boosters.poolKind")}
+          value={value.pool}
+          onChange={(e) => patch({ pool: e.target.value })}
+        >
+          {POOLS.map((pool) => (
+            <option key={pool} value={pool}>
+              {t(`marketplace:booster.pool.${pool}`)}
+            </option>
+          ))}
+        </SelectField>
+        {value.pool === "reserve" ? null : (
+          <fieldset className="admin-booster__packs">
+            <legend className="visually-hidden">{t("marketplace:admin.boosters.packs")}</legend>
+            <p className="admin-muted">{t("marketplace:admin.boosters.packsHint")}</p>
+            {(options?.packs ?? []).map((pack) => (
+              <CheckboxField
+                key={pack.id}
+                label={`${name(pack.names, pack.id)} · ${t("marketplace:admin.boosters.packCount", {
+                  count: pack.products,
+                })}`}
+                checked={value.visualPacks.includes(pack.id)}
+                onChange={(e) =>
+                  patch({
+                    visualPacks: e.target.checked
+                      ? [...value.visualPacks, pack.id]
+                      : value.visualPacks.filter((p) => p !== pack.id),
+                  })
+                }
+              />
+            ))}
+          </fieldset>
+        )}
+      </fieldset>
+      <fieldset className="product-editor__fields admin-booster__table">
+        <legend>{t("marketplace:admin.boosters.odds")}</legend>
+        <p className="admin-muted">{t("marketplace:admin.boosters.oddsHint")}</p>
+        {RARITIES.map((r) => (
+          <div key={r} className="admin-booster__row" data-rarity={r}>
+            <span className="admin-booster__rarity">{t(`marketplace:rarity.${r}`)}</span>
+            <TextField
+              label={t("marketplace:admin.boosters.weight")}
+              type="number"
+              min={0}
+              value={value.odds[r] ?? "0"}
+              onChange={(e) => patch({ odds: { ...value.odds, [r]: e.target.value } })}
+            />
+            <span className="admin-booster__percent">
+              {total ? format.number(Math.round((whole(value.odds[r] ?? "0") * 1000) / total) / 10) : 0} %
+            </span>
+            <TextField
+              label={t("marketplace:admin.boosters.refund")}
+              type="number"
+              min={0}
+              value={value.refunds[r] ?? "0"}
+              onChange={(e) => patch({ refunds: { ...value.refunds, [r]: e.target.value } })}
+            />
+          </div>
+        ))}
+      </fieldset>
+      {creating ? <p className="admin-muted">{t("marketplace:admin.boosters.createHint")}</p> : null}
+    </div>
+  );
+}
+
+/** One booster's settings — what it holds, its odds, what a duplicate gives back, its looks: a new version. */
 function BoosterSettings({
   product,
   onSaved,
   seasons,
+  options,
 }: {
   product: Product;
   onSaved: () => void;
   seasons?: readonly Season[] | undefined;
+  options: BoosterOptions | undefined;
 }) {
   const t = useT();
   const format = useFormat();
+  const { locale } = useLocaleContext();
   const info = boosterOf(product);
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [error, setError] = useState(false);
   if (!info) return null;
-  const value = draft ?? draftOf(product, info);
-  const total = RARITIES.reduce((sum, r) => sum + whole(value.odds[r] ?? "0"), 0);
+  const value = draft ?? draftOf(product, info, options);
   const patch = (next: Partial<Draft>) => setDraft({ ...value, ...next });
+  const scene = options?.bindings[product.key] ?? options?.bindings["*"];
   const save = async () => {
     setError(false);
     try {
@@ -90,21 +369,15 @@ function BoosterSettings({
                 confirmation: confirmation ?? null,
                 definition: {
                   price_coins: whole(value.price) || null,
-                  names: product.names,
+                  names: {
+                    ...product.names,
+                    en: value.nameEn,
+                    ...(value.nameFr ? { fr: value.nameFr } : {}),
+                  },
                   descriptions: product.descriptions,
                   conditions: product.conditions,
                   refund_policy: product.refund_policy,
-                  payload: {
-                    pool: value.pool,
-                    cards: Math.min(10, Math.max(1, whole(value.cards))),
-                    odds: Object.fromEntries(RARITIES.map((r) => [r, whole(value.odds[r] ?? "0")])),
-                    guarantee: value.guarantee,
-                    refunds: Object.fromEntries(RARITIES.map((r) => [r, whole(value.refunds[r] ?? "0")])),
-                    look: value.look,
-                    ...(value.season ? { season: value.season } : {}),
-                    ...(info.packs?.length ? { packs: info.packs } : {}), // issue 130: kept as it is
-                    ...(whole(value.perMember) ? { per_member: whole(value.perMember) } : {}),
-                  },
+                  payload: payloadOf(value),
                 },
               } as never,
             })
@@ -113,6 +386,24 @@ function BoosterSettings({
             }),
         () => window.confirm(t("marketplace:admin.confirm")),
       );
+      if (value.rarity !== (product.rarity ?? "common")) {
+        await api.PUT("/api/v1/admin/marketplace/products/{key}/presentation", {
+          params: { path: { key: product.key } },
+          body: {
+            presentation: {
+              rarity: value.rarity,
+              featured: product.featured,
+              poster_effect: product.poster_effect,
+              icon: product.icon ?? null,
+              season: product.season ?? null,
+            },
+            category: product.category ?? null,
+          } as never,
+        });
+      }
+      const before = options?.bindings[product.key];
+      if (value.scene !== (before ? `${before.pack}:${before.look}` : ""))
+        await bindScene(product.key, value.scene);
       setOpen(false);
       setDraft(null);
       onSaved();
@@ -133,6 +424,9 @@ function BoosterSettings({
           {info.season ? ` · ${t(`marketplace:season.${info.season}`)}` : ""} ·{" "}
           {t("marketplace:booster.cards", { count: info.cards })} · {format.number(product.price_coins ?? 0)}{" "}
           Coins
+          {scene
+            ? ` · ${t("marketplace:admin.boosters.wears", { name: localized(scene.names, locale) || scene.look })}`
+            : ""}
         </span>
         <span className="admin-booster__odds">
           {RARITIES.filter((r) => (info.odds[r] ?? 0) > 0).map((r) => (
@@ -146,7 +440,7 @@ function BoosterSettings({
         open={open}
         onOpenChange={(next) => {
           setOpen(next);
-          if (next) setDraft(draftOf(product, info));
+          if (next) setDraft(draftOf(product, info, options));
         }}
         size="lg"
         title={`${t("marketplace:admin.boosters.edit")} · ${product.name}`}
@@ -159,118 +453,100 @@ function BoosterSettings({
         }
         footer={<Button onClick={save}>{t("marketplace:admin.save")}</Button>}
       >
-        <div className="admin-booster__form">
-          <fieldset className="product-editor__fields">
-            <legend>{t("marketplace:admin.boosters.what")}</legend>
-            <TextField
-              label={t("marketplace:sheet.price")}
-              type="number"
-              min={1}
-              value={value.price}
-              onChange={(e) => patch({ price: e.target.value })}
-            />
-            <TextField
-              label={t("marketplace:admin.boosters.cards")}
-              type="number"
-              min={1}
-              max={10}
-              value={value.cards}
-              onChange={(e) => patch({ cards: e.target.value })}
-            />
-            <SelectField
-              label={t("marketplace:admin.boosters.pool")}
-              value={value.pool}
-              onChange={(e) => patch({ pool: e.target.value })}
-            >
-              {POOLS.map((pool) => (
-                <option key={pool} value={pool}>
-                  {t(`marketplace:booster.pool.${pool}`)}
-                </option>
-              ))}
-            </SelectField>
-            <SelectField
-              label={t("marketplace:admin.season")}
-              value={value.season}
-              onChange={(e) => patch({ season: e.target.value })}
-            >
-              <option value="">{t("marketplace:admin.boosters.allYear")}</option>
-              {SEASONS.map((season) => (
-                <option key={season} value={season}>
-                  {t(`marketplace:season.${season}`)}
-                </option>
-              ))}
-            </SelectField>
-            <SelectField
-              label={t("marketplace:admin.boosters.guarantee")}
-              value={value.guarantee}
-              onChange={(e) => patch({ guarantee: e.target.value })}
-            >
-              {RARITIES.map((r) => (
-                <option key={r} value={r}>
-                  {r === "common"
-                    ? t("marketplace:admin.boosters.noGuarantee")
-                    : t(`marketplace:rarity.${r}`)}
-                </option>
-              ))}
-            </SelectField>
-            <TextField
-              label={t("marketplace:admin.boosters.perMember")}
-              hint={t("marketplace:admin.boosters.perMemberHint")}
-              type="number"
-              min={0}
-              value={value.perMember}
-              onChange={(e) => patch({ perMember: e.target.value })}
-            />
-            <SelectField
-              label={t("marketplace:admin.boosters.look")}
-              value={value.look}
-              onChange={(e) => patch({ look: e.target.value })}
-            >
-              {LOOKS.map((look) => (
-                <option key={look} value={look}>
-                  {look}
-                </option>
-              ))}
-            </SelectField>
-          </fieldset>
-          <fieldset className="product-editor__fields admin-booster__table">
-            <legend>{t("marketplace:admin.boosters.odds")}</legend>
-            <p className="admin-muted">{t("marketplace:admin.boosters.oddsHint")}</p>
-            {RARITIES.map((r) => (
-              <div key={r} className="admin-booster__row" data-rarity={r}>
-                <span className="admin-booster__rarity">{t(`marketplace:rarity.${r}`)}</span>
-                <TextField
-                  label={t("marketplace:admin.boosters.weight")}
-                  type="number"
-                  min={0}
-                  value={value.odds[r] ?? "0"}
-                  onChange={(e) => patch({ odds: { ...value.odds, [r]: e.target.value } })}
-                />
-                <span className="admin-booster__percent">
-                  {total ? format.number(Math.round((whole(value.odds[r] ?? "0") * 1000) / total) / 10) : 0} %
-                </span>
-                <TextField
-                  label={t("marketplace:admin.boosters.refund")}
-                  type="number"
-                  min={0}
-                  value={value.refunds[r] ?? "0"}
-                  onChange={(e) => patch({ refunds: { ...value.refunds, [r]: e.target.value } })}
-                />
-              </div>
-            ))}
-          </fieldset>
-        </div>
+        <BoosterForm value={value} patch={patch} options={options} creating={false} />
         {error ? <p role="alert">{t("marketplace:admin.error")}</p> : null}
       </Dialog>
     </li>
   );
 }
 
-/**
- * #81: the boosters — each one's odds per rarity, what a duplicate gives back, how many cards and what it
- * draws from (a new version of the product: what was opened before keeps its own). Offering one: a level
- * reward (Engagement › Levels) or an achievement (Engagement › Achievements) gives it sealed.
- */
+/** Issue 153: a new booster, made of the visuals there are — created, put on sale, its scene bound. */
+function NewBooster({
+  taken,
+  options,
+  onSaved,
+}: {
+  taken: ReadonlySet<string>;
+  options: BoosterOptions | undefined;
+  onSaved: () => void;
+}) {
+  const t = useT();
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<Draft | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const value = draft ?? draftOf(null, null, options);
+  const patch = (next: Partial<Draft>) => setDraft({ ...value, ...next });
+  const create = async () => {
+    setError(null);
+    if (!value.nameEn.trim()) {
+      setError(t("marketplace:admin.boosters.nameNeeded"));
+      return;
+    }
+    const key = keyFor(value.nameEn, taken);
+    try {
+      const created = await api.POST("/api/v1/admin/marketplace/products", {
+        body: {
+          definition: {
+            key,
+            type: "booster",
+            category: "boosters",
+            repeatable: true,
+            presentation: { rarity: value.rarity, featured: false, poster_effect: "auto", icon: "sparkles" },
+            version: {
+              price_coins: whole(value.price),
+              conditions: [],
+              names: { en: value.nameEn.trim(), ...(value.nameFr.trim() ? { fr: value.nameFr.trim() } : {}) },
+              descriptions: {},
+              payload: payloadOf(value),
+            },
+          },
+        } as never,
+      });
+      if (created.error) throw created.error;
+      await withConfirmation(
+        (confirmation) =>
+          api
+            .POST("/api/v1/admin/marketplace/products/{key}/{transition}", {
+              params: { path: { key, transition: "publish" } },
+              body: { confirmation: confirmation ?? null },
+            })
+            .then(({ error: failure }) => {
+              if (failure) throw failure;
+            }),
+        () => window.confirm(t("marketplace:admin.confirm")),
+      );
+      if (value.scene) await bindScene(key, value.scene);
+      setOpen(false);
+      setDraft(null);
+      onSaved();
+    } catch {
+      setError(t("marketplace:admin.error"));
+    }
+  };
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (next) setDraft(draftOf(null, null, options));
+      }}
+      size="lg"
+      title={t("marketplace:admin.boosters.new")}
+      closeLabel={t("marketplace:admin.cancel")}
+      trigger={
+        <Button>
+          <Icon name="plus" size={16} />
+          {t("marketplace:admin.boosters.new")}
+        </Button>
+      }
+      footer={<Button onClick={create}>{t("marketplace:admin.boosters.create")}</Button>}
+    >
+      <BoosterForm value={value} patch={patch} options={options} creating />
+      {error ? <p role="alert">{error}</p> : null}
+    </Dialog>
+  );
+}
+
 /** #98: a season's booster is on sale in its weeks only — whether it is now, else when it will be. */
 function SeasonState({ season }: { season: Season | undefined }) {
   const t = useT();
@@ -286,6 +562,12 @@ function SeasonState({ season }: { season: Season | undefined }) {
   );
 }
 
+/**
+ * #81: the boosters — each one's odds per rarity, what a duplicate gives back, how many cards and what it
+ * draws from (a new version of the product: what was opened before keeps its own). Offering one: a level
+ * reward (Engagement › Levels) or an achievement (Engagement › Achievements) gives it sealed. Issue 153: a
+ * new one is made here of the visuals there are — its pack's look, its scene, the visual packs it draws from.
+ */
 export function BoostersAdmin({
   products,
   onSaved,
@@ -296,9 +578,20 @@ export function BoostersAdmin({
   seasons?: readonly Season[] | undefined;
 }) {
   const t = useT();
+  const options = useBoosterOptions();
   const boosters = products.filter((p) => p.type === "booster" && p.state !== "archived");
+  const saved = () => {
+    void options.refetch();
+    onSaved();
+  };
   return (
-    <AdminSection title={t("marketplace:admin.boosters.title")} icon="sparkles">
+    <AdminSection
+      title={t("marketplace:admin.boosters.title")}
+      icon="sparkles"
+      actions={
+        <NewBooster taken={new Set(products.map((p) => p.key))} options={options.data} onSaved={saved} />
+      }
+    >
       <p className="admin-muted">
         {t("marketplace:admin.boosters.pitch")}{" "}
         <Link to="/admin/gamification">{t("marketplace:admin.boosters.gifts")}</Link>
@@ -306,7 +599,13 @@ export function BoostersAdmin({
       {boosters.length ? (
         <ul className="admin-boosters">
           {boosters.map((product) => (
-            <BoosterSettings key={product.key} product={product} onSaved={onSaved} seasons={seasons} />
+            <BoosterSettings
+              key={product.key}
+              product={product}
+              onSaved={saved}
+              seasons={seasons}
+              options={options.data}
+            />
           ))}
         </ul>
       ) : (

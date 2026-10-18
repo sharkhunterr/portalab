@@ -69,6 +69,59 @@ export function useBoosterScene(boosterKey: string | null | undefined): Scene | 
   return scene;
 }
 
+/** Issue 153: the scene each booster wears (``*``: every booster without its own) — the look its sealed pack
+ * takes in the shop comes from it. */
+export interface SceneBinding {
+  pack: string;
+  look: string;
+  names: Record<string, string>;
+  /** the look its sealed pack takes (its scene's ``booster_look`` part, when it styles one) */
+  booster_look: string | null;
+}
+
+export function useSceneBindings(): Record<string, SceneBinding> {
+  const query = useQuery({
+    queryKey: ["visuals", "scenes"],
+    retry: false,
+    staleTime: 60_000,
+    queryFn: async () =>
+      (await api.GET("/api/v1/visuals/scenes")).data as unknown as { bindings: Record<string, SceneBinding> },
+  });
+  return query.data?.bindings ?? {};
+}
+
+/** The scene a booster wears: its own, else the one every booster wears. */
+export function bindingOf(
+  bindings: Record<string, SceneBinding>,
+  boosterKey: string,
+): SceneBinding | undefined {
+  return bindings[boosterKey] ?? bindings["*"];
+}
+
+/**
+ * Issue 154: a scene rebuilt from a pack version's own elements (the Test step tries it before it is
+ * published) — its parts found by their folder, as the server does for a live one.
+ */
+export function sceneFrom(elements: ExternalElement[], scene: ExternalElement): Scene {
+  const byFolder = new Map(elements.filter((e) => e.folder).map((e) => [String(e.folder), e]));
+  const find = (folder: unknown) => byFolder.get(String(folder).replace(/^elements\//, ""));
+  const parts: Scene["parts"] = {};
+  for (const [slot, value] of Object.entries(scene.parts ?? {})) {
+    if (value && typeof value === "object") {
+      const perRarity: Partial<Record<Rarity, ExternalElement>> = {};
+      for (const [rarity, folder] of Object.entries(value as Record<string, unknown>)) {
+        const part = find(folder);
+        if (part) perRarity[rarity as Rarity] = part;
+      }
+      (parts as Record<string, unknown>)[slot] = perRarity;
+    } else {
+      const part = find(value);
+      if (part) (parts as Record<string, unknown>)[slot] = part;
+    }
+  }
+  return { pack: scene.pack, look: scene.look ?? "", parts };
+}
+
 /** A part drawn by itself over a place of the scene: a GPU stage, or a script in its sandbox; a CSS part
  * styles its hook (the ``data-*`` attribute the scene sets) and needs nothing here. */
 export function ScenePart({

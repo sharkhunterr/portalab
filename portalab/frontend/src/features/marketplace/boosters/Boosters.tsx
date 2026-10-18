@@ -15,6 +15,7 @@ import {
   useBoosters,
   useOpenings,
 } from "./api";
+import { useSceneBindings } from "./scene/scene";
 import "./boosters.css";
 
 const RARITIES = ["common", "rare", "epic", "legendary"] as const;
@@ -74,14 +75,21 @@ export function BoosterPack({
   );
 }
 
-/** A booster product's pack (its shop tile, its sheet). */
+/**
+ * A booster product's pack (its shop tile, its sheet) — issue 153: in its own scene's look when it has one
+ * (the scene every booster opens with does not change their tiles), drawn at the scene's size then fitted in
+ * the tile's place.
+ */
 export function ProductPack({ product, size }: { product: Product; size?: "card" | "mini" | undefined }) {
   const info = boosterOf(product);
-  return (
-    <BoosterPack
-      booster={{ names: product.names, look: info?.look ?? "cosmos", cards: info?.cards ?? 5 }}
-      size={size}
-    />
+  const scene = useSceneBindings()[product.key];
+  const booster = { names: product.names, look: info?.look ?? "cosmos", cards: info?.cards ?? 5 };
+  return scene?.booster_look ? (
+    <span className="booster-scene-pack" data-booster-look={scene.booster_look} data-size={size}>
+      <BoosterPack booster={booster} />
+    </span>
+  ) : (
+    <BoosterPack booster={booster} size={size} />
   );
 }
 

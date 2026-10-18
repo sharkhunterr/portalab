@@ -152,6 +152,12 @@ async def report(principal: Member, packs: Packs, body: ReportIn) -> None:
     await packs.report_failure(principal, body.pack, body.sha, body.element, body.reason)
 
 
+@members.get("/visuals/scenes")
+async def scenes(_: Member, packs: Packs) -> dict[str, Any]:
+    """Issue 153: the scene each booster wears (its sealed pack's look in the shop comes from it)."""
+    return await packs.scene_bindings()
+
+
 @members.get("/visuals/scenes/{booster_key}")
 async def scene(_: Member, packs: Packs, booster_key: str) -> dict[str, Any]:
     """The scene a booster opens with (``null``: Portalab's own)."""
@@ -338,6 +344,12 @@ class SceneIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     pack: str | None = Field(default=None, max_length=48)
     look: str | None = Field(default=None, max_length=48)
+
+
+@admin.get("/admin/visuals/booster-options")
+async def booster_options(_: Manager, packs: Packs) -> dict[str, Any]:
+    """Issue 153: what a booster may be made of: sealed packs' looks, scenes, visual packs."""
+    return await packs.booster_options()
 
 
 @admin.put("/admin/visuals/scenes/{booster_key}", status_code=204)

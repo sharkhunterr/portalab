@@ -22,7 +22,7 @@ JS), never in the application's code.
 import json
 import os
 import re
-from collections.abc import Iterable, Mapping
+from collections.abc import Awaitable, Callable, Iterable, Mapping
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -288,6 +288,35 @@ class LiveLooks:
 
 live_looks = LiveLooks()
 external_looks = live_looks  # the proof of concept's name, kept for the modules reading it
+
+# a booster's pool may name visual packs: ``visual:<pack id>`` draws from what that live pack sells
+VISUAL_POOL = "visual:"
+
+
+class PackProducts:
+    """Issue 153: the shop products each live visual pack sells (Portalab's own packs and imported ones), kept
+    by the visuals module as its packs change; a booster drawing from packs reads them here."""
+
+    def __init__(self) -> None:
+        self._by_pack: dict[str, frozenset[str]] = {}
+        self.loader: Callable[[], Awaitable[None]] | None = None  # brings them up to date (visuals)
+
+    def replace(self, by_pack: Mapping[str, Iterable[str]]) -> None:
+        self._by_pack = {pack: frozenset(keys) for pack, keys in by_pack.items()}
+
+    async def ready(self) -> None:
+        if self.loader is not None:
+            await self.loader()
+
+    def of(self, pack: str) -> frozenset[str]:
+        return self._by_pack.get(pack, frozenset())
+
+    def packs(self) -> dict[str, int]:
+        """Each live pack selling something, with how many products."""
+        return {pack: len(keys) for pack, keys in sorted(self._by_pack.items()) if keys}
+
+
+pack_products = PackProducts()
 
 
 @runtime_checkable

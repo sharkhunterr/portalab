@@ -2,15 +2,36 @@ import { useState } from "react";
 import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
-import { externalFx, fxName, normaliseElement } from "../../../design-system/visuals/registry";
+import {
+  type ExternalElement,
+  externalFx,
+  fxName,
+  normaliseElement,
+} from "../../../design-system/visuals/registry";
 import { runSandbox } from "../../../design-system/visuals/sandbox";
 import { useT } from "../../../i18n/hooks/useT";
+import {
+  BoosterReveal,
+  demoBooster,
+  demoCards,
+  ScenePartPreview,
+} from "../../marketplace/boosters/BoosterReveal";
+import { type Rarity, sceneFrom } from "../../marketplace/boosters/scene/scene";
 import { ProductArt } from "../../marketplace/catalog/ProductArt";
 import { TryOn } from "../../marketplace/product/ProductSheet";
 import { type Measure, packPath, useVisualAction, type VersionDetail } from "../api";
 import { asProduct, nameOf, OutcomeBadge } from "../parts";
 
 const READY_MS = 4000;
+// issue 154: the parts of a booster scene — drawn on a small stage of their own, tried in a whole opening
+const SCENE_PARTS = new Set([
+  "booster_look",
+  "booster_backdrop",
+  "booster_opening",
+  "card_back",
+  "card_face",
+  "card_reveal",
+]);
 const FPS_MS = 3000;
 
 /** A script's readiness in its sandbox: how long it takes to say it is ready (4 s at most). */
@@ -51,6 +72,21 @@ export function TestStep({ detail }: { detail: VersionDetail }) {
   const [running, setRunning] = useState(false);
   const measures = detail.measures?.results ?? [];
   const byElement = new Map(measures.map((m) => [m.element, m]));
+  // issue 154: the scenes of this version, rebuilt from its own elements, and each part's rarity in them
+  const drawn = new Map(detail.elements.map((e) => [`${e.type}:${e.look ?? ""}`, e]));
+  const scenes = detail.elements.filter((e) => e.type === "booster_scene");
+  const rarityOf = new Map<string, Rarity>();
+  for (const scene of scenes) {
+    for (const value of Object.values(scene.parts ?? {})) {
+      if (!value || typeof value !== "object") continue;
+      for (const [rarity, folder] of Object.entries(value as Record<string, unknown>)) {
+        rarityOf.set(String(folder).replace(/^elements\//, ""), rarity as Rarity);
+      }
+    }
+  }
+  const [trying, setTrying] = useState<ExternalElement | null>(null);
+  const cards = demoCards((rarity) => t(`marketplace:rarity.${rarity}`));
+  const booster = demoBooster(scenes[0]?.names ?? { en: detail.pack }, cards.length);
 
   const measure = async () => {
     setRunning(true);
@@ -130,13 +166,51 @@ export function TestStep({ detail }: { detail: VersionDetail }) {
       }
       description={t("admin:visuals.test.help")}
     >
+      {scenes.length ? (
+        <div className="ds-stack--row visuals-test__scenes">
+          {scenes.map((scene) => (
+            <Button key={scene.look ?? scene.folder ?? ""} onClick={() => setTrying(scene)}>
+              <Icon name="sparkles" size={16} />
+              {t("admin:visuals.test.tryScene", { name: nameOf(scene.names, scene.look ?? "") })}
+            </Button>
+          ))}
+        </div>
+      ) : null}
+      {trying ? (
+        <BoosterReveal
+          booster={{ ...booster, names: trying.names }}
+          demo={{ cards, scene: sceneFrom(detail.elements, trying) }}
+          onClose={() => setTrying(null)}
+        />
+      ) : null}
       <ul className="visuals-elements">
         {detail.report.elements.map((element) => {
           const result = byElement.get(element.product);
+          const own = drawn.get(`${element.type}:${element.look ?? ""}`);
+          // a scene shows its sealed pack (its own look), its parts below; a part shows itself
+          const part =
+            element.type === "booster_scene" && own
+              ? sceneFrom(detail.elements, own).parts.booster_look
+              : SCENE_PARTS.has(element.type)
+                ? own
+                : undefined;
           return (
             <li className="visuals-element" key={element.product}>
               <div className="visuals-element__art">
-                <ProductArt product={asProduct(element, element.economy)} size="card" />
+                {part ? (
+                  <ScenePartPreview
+                    element={part}
+                    rarity={rarityOf.get(String(part.folder ?? "")) ?? "common"}
+                    booster={booster}
+                    card={
+                      cards.find(
+                        (c) => c.product.rarity === (rarityOf.get(String(part.folder ?? "")) ?? "common"),
+                      ) ?? (cards[0] as (typeof cards)[number])
+                    }
+                  />
+                ) : (
+                  <ProductArt product={asProduct(element, element.economy)} size="card" />
+                )}
               </div>
               <div className="visuals-element__body">
                 <p className="visuals-element__name">
@@ -157,9 +231,17 @@ export function TestStep({ detail }: { detail: VersionDetail }) {
                           : t("admin:visuals.test.shown")}
                   </p>
                 ) : null}
-                <div className="ds-stack--row">
-                  <TryOn product={asProduct(element, element.economy)} />
-                </div>
+                {element.type === "booster_scene" && own ? (
+                  <div className="ds-stack--row">
+                    <Button variant="secondary" onClick={() => setTrying(own)}>
+                      <Icon name="sparkles" size={16} /> {t("admin:visuals.test.try")}
+                    </Button>
+                  </div>
+                ) : part ? null : (
+                  <div className="ds-stack--row">
+                    <TryOn product={asProduct(element, element.economy)} />
+                  </div>
+                )}
               </div>
             </li>
           );

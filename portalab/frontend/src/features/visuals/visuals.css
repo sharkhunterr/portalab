@@ -702,3 +702,19 @@ a.vp-card__name:hover {
     justify-content: center;
   }
 }
+
+/* issue 152: a plugin's card (Extensions › Plugins) — its name opens its settings, the strip below too */
+.vp-card__toggle {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+button.vp-waiting {
+  inline-size: 100%;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
