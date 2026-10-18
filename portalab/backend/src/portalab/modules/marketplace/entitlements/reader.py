@@ -169,7 +169,7 @@ class CosmeticsReader:
         return out
 
     async def details(self, kind: str, field: str) -> dict[str, dict[str, Any]]:
-        """#71: for each choice sold, the product selling it: its key, rarity and price."""
+        """#71: for each choice sold, the product selling it: its key, rarity, price and names (030)."""
         async with self.database.session() as session:
             rows = await session.execute(
                 select(
@@ -177,6 +177,7 @@ class CosmeticsReader:
                     Product.key,
                     Product.rarity,
                     ProductVersion.price_coins,
+                    ProductVersion.names,
                 )
                 .join(Product, Product.id == ProductVersion.product_id)
                 .where(
@@ -186,8 +187,8 @@ class CosmeticsReader:
                 )
             )
             return {
-                choice: {"product": key, "rarity": rarity, "price": price}
-                for choice, key, rarity, price in rows
+                choice: {"product": key, "rarity": rarity, "price": price, "names": dict(names or {})}
+                for choice, key, rarity, price, names in rows
                 if choice
             }
 

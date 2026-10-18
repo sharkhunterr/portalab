@@ -408,7 +408,14 @@ class Lifecycle:
         for item in manifest.visual_types:
             kinds = frozenset(item.get("render") or ["css"])
             plugin_visual_types.register(
-                PluginVisualType(f"plugin:{key}.{item['key']}", owner, str(item["label_key"]), kinds)
+                PluginVisualType(
+                    f"plugin:{key}.{item['key']}",
+                    owner,
+                    str(item["label_key"]),
+                    kinds,
+                    item.get("icon"),
+                    manifest.name,
+                )
             )
 
     def _unconfined_allowed(self, plugin: Plugin) -> bool:

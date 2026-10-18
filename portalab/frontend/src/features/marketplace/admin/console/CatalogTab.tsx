@@ -8,6 +8,13 @@ import { Icon } from "../../../../design-system/components/Icon";
 import { FunctionalState } from "../../../../design-system/state/FunctionalState";
 import { useT } from "../../../../i18n/hooks/useT";
 import type { Category, Product } from "../../api";
+import {
+  DEPARTMENTS,
+  departmentOfProduct,
+  shelfLabel,
+  usePluginShelves,
+  withPluginShelves,
+} from "../../catalog/CatalogPage";
 import { ProductArt } from "../../catalog/ProductArt";
 import { productTypeLabel } from "../../typeLabel";
 import { withConfirmation } from "../confirm";
@@ -53,6 +60,20 @@ export function CatalogTab({ categories }: { categories: Category[] }) {
     );
   const types = Object.entries(page.data?.types ?? {}).sort((a, b) => b[1] - a[1]);
   const items = (page.data?.items ?? []) as Product[];
+  // 030: a plugin's product shows where the shop puts it (the department and shelf its manifest names)
+  const departments = withPluginShelves(
+    DEPARTMENTS,
+    usePluginShelves(),
+    items.map((p) => p.type),
+  );
+  const placeOf = (product: Product) => {
+    if (!product.type.startsWith("plugin:")) return "";
+    const department = departmentOfProduct(product, departments);
+    const shelf = departments
+      .find((d) => d.key === department)
+      ?.shelves.find((s) => s.types.includes(product.type));
+    return ` · ${t(`marketplace:department.${department}`)}${shelf ? ` › ${shelfLabel(t, shelf)}` : ""}`;
+  };
   return (
     <AdminSection
       title={t("marketplace:admin.products")}
@@ -116,6 +137,7 @@ export function CatalogTab({ categories }: { categories: Category[] }) {
               <span className="widget__meta">
                 {productTypeLabel(t, p.type)} · {t(`marketplace:rarity.${p.rarity ?? "common"}`)} · v
                 {p.version}
+                {placeOf(p)}
                 {p.price_coins ? ` · ${p.price_coins} Coins` : ""}
                 {p.supply ? ` · ${p.remaining ?? 0}/${p.supply}` : ""}
                 {p.min_level ? ` · ${t("marketplace:card.level", { level: p.min_level })}` : ""}

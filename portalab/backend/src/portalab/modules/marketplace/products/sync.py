@@ -8,6 +8,7 @@ from typing import Any
 
 from sqlalchemy import func, select
 
+from portalab.capabilities.visuals import plugin_visual_types
 from portalab.core.authz_port import Principal
 from portalab.modules.marketplace.models import Ownership, Product
 from portalab.modules.marketplace.products.definition import AvailabilityIn, PresentationIn
@@ -119,6 +120,12 @@ class MarketplaceCatalogWriter:
         self.catalog = catalog
 
     async def publish(self, actor: Principal, product: Entry) -> str:
+        kind = plugin_visual_types.get(str(product.get("type", "")))
+        if kind is not None and product.get("collection"):
+            # 030: the aisle of a plugin's kind of visual, named after it, made when its first look is sold
+            await self.catalog.add_category(
+                str(product["collection"]), kind.label_key, 55, kind.icon or "sparkles"
+            )
         return await sync_product(self.catalog, actor, product, resume=bool(product.get("resume", True)))
 
     async def withdraw(self, actor: Principal, key: str) -> bool:

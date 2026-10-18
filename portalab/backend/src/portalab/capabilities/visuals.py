@@ -363,6 +363,8 @@ class PluginVisualType:
     owner: str
     label_key: str
     kinds: frozenset[str] = frozenset({"css"})
+    icon: str | None = None  # its aisle's in the shop
+    plugin_name: str = ""  # the plugin's own name, said in Appearance
 
     @property
     def prefix(self) -> str:

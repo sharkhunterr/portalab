@@ -30,9 +30,12 @@ export default function mount(root, api) {
       background:linear-gradient(135deg,var(--color-accent),var(--color-accent-alt,var(--color-accent)));
       color:var(--color-accent-contrast);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold)}
     .bubbles{flex:1;overflow:auto;display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-2)}
-    .bubble{max-width:80%;padding:var(--space-2) var(--space-3);border-radius:var(--radius-lg);white-space:pre-wrap;
-      background:var(--color-surface-raised,var(--color-surface));border:1px solid var(--color-border);align-self:flex-start}
-    .bubble[data-mine]{align-self:flex-end;background:var(--color-accent);color:var(--color-accent-contrast);border-color:transparent}
+    .bubble{max-width:80%;padding:var(--space-2) var(--space-3);white-space:pre-wrap;align-self:flex-start}
+    .bubble[data-mine]{align-self:flex-end}
+    /* the plain look of the bubbles, kept below any look chosen in Appearance (no specificity: a look wins) */
+    :where(.bubble){background:var(--color-surface-raised,var(--color-surface));border:1px solid var(--color-border);
+      border-radius:var(--radius-lg)}
+    :where(.bubble[data-mine]){background:var(--color-accent);color:var(--color-accent-contrast);border-color:transparent}
     .bubble small{display:block;opacity:.7;font-size:var(--font-size-xs);margin-top:var(--space-1)}
     .composer{display:flex;gap:var(--space-2);padding:var(--space-2);border-top:1px solid var(--color-border)}
     .composer{flex-wrap:wrap}
@@ -42,16 +45,20 @@ export default function mount(root, api) {
   `), h("div", { class: "chat" }));
   const app = root.querySelector(".chat");
   let open = api.params.conversation || null;
-  // the look of the member's own bubbles (a pack's look of this plugin's kind « bubble », bought in the shop)
+  // the look of the member's own bubbles: a pack's look of this plugin's kind « bubble », bought in the shop
+  // and chosen in Portalab's Appearance page (handed in the context, again whenever the member changes it)
   const bubbleStyle = document.createElement("style");
   document.head.append(bubbleStyle);
   let bubble = null;
-  let owned = [];
   const wear = async () => {
-    const data = await api.get("bubbles").catch(() => ({ items: [], chosen: null }));
-    owned = data.items || [];
-    bubble = data.chosen || null;
+    const chosen = (api.context.looks && api.context.looks.bubble) || null;
+    if (chosen === bubble) return;
+    bubble = chosen;
     bubbleStyle.textContent = bubble ? await api.look("bubble", bubble).catch(() => "") : "";
+    for (const mine of app.querySelectorAll(".bubble[data-mine]")) {
+      if (bubble) mine.setAttribute("data-bubble", bubble);
+      else mine.removeAttribute("data-bubble");
+    }
   };
 
   const composer = (placeholder, send, extra = []) => {
@@ -90,13 +97,6 @@ export default function mount(root, api) {
               item.unread ? h("span", { class: "pl-badge" }, String(item.unread)) : null))
           : h("p", { class: "pl-muted" }, t("view.empty")),
       ),
-      owned.length ? h("label", { class: "pl-row pl-muted", style: "padding:0 var(--space-2)" }, t("view.style"),
-        h("select", { class: "pl-input", style: "width:auto", on: { change: async (event) => {
-          await api.post("bubble", { look: event.target.value });
-          await wear();
-        } } },
-          h("option", { value: "" }, t("view.plain")),
-          ...owned.map((o) => h("option", { value: o.look, selected: o.look === bubble ? "" : null }, o.look)))) : null,
       h("div", { class: "pl-muted", style: "padding:0 var(--space-2)" }, t("view.new")),
       composer(t("view.placeholder"), async (body, [name]) => {
         const result = await api.post("send", { to: name, body });
@@ -131,5 +131,6 @@ export default function mount(root, api) {
     if (open && String(payload.conversation) === String(open)) conversation(open);
     else if (!open) conversations();
   });
+  api.onContext(() => { wear(); });
   wear().then(() => (open ? conversation(open) : conversations())).catch((error) => app.replaceChildren(h("p", { class: "pl-error" }, error.message)));
 }

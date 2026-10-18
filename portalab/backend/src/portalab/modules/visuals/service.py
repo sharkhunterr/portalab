@@ -566,7 +566,13 @@ class VisualPacks:
             "names": {k: v for k, v in element["names"].items() if v},
             "descriptions": {k: v for k, v in element["descriptions"].items() if v},
             "payload": payload,
-            "collection": economy.get("collection") or DEFAULT_COLLECTIONS.get(element["type"], "looks"),
+            "collection": economy.get("collection")
+            # 030: a plugin's kind of visual has its own aisle (``messenger_bubble``), made when first sold
+            or (
+                str(element["type"]).removeprefix("plugin:").replace(".", "_")
+                if str(element["type"]).startswith("plugin:")
+                else DEFAULT_COLLECTIONS.get(element["type"], "looks")
+            ),
             "icon": economy.get("icon"),
             "featured": bool(economy.get("featured")),
             "level": economy.get("level"),

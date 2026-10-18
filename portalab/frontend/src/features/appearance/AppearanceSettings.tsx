@@ -16,6 +16,7 @@ import { LevelBadgePicker } from "./LevelBadgePicker";
 import { LevelUpPicker } from "./LevelUpPicker";
 import { NotificationLooks } from "./NotificationLooks";
 import { PalettePicker } from "./PalettePicker";
+import { PluginLooks } from "./PluginLooks";
 import { RarityTag } from "./Rarity";
 import { SafeModeSwitch } from "./SafeModeSwitch";
 import { UniverseLooks } from "./UniverseLooks";
@@ -333,6 +334,7 @@ export function AppearanceSettings() {
       <PalettePicker />
       <LevelBadgePicker />
       <LevelUpPicker />
+      <PluginLooks />
       <section className="appearance-card" aria-labelledby="appearance-display">
         <h3 id="appearance-display">{appearanceStrings.display}</h3>
         <p className="ds-page-header__context">{appearanceStrings.displayHint}</p>

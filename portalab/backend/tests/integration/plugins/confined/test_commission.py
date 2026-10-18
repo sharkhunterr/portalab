@@ -56,6 +56,11 @@ async def test_the_shop_tells_the_plugin(pl: PlHarness, client: httpx.AsyncClien
     await product.handler.deactivate(view)  # a refund
     mine = (await client.get("/api/v1/plugins/commission/mine")).json()
     assert [i["status"] for i in mine["items"]] == ["cancelled"]
+    # where the shop shows its kind: the shelf its manifest declares, in the department it names
+    shelves = (await client.get("/api/v1/plugins/shelves")).json()
+    assert [(s["key"], s["department"], s["types"]) for s in shelves] == [
+        ("plugin:commission.commissions", "profile", ["plugin:commission.avatar"])
+    ]
 
 
 FAULTY = """

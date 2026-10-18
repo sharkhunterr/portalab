@@ -9,6 +9,13 @@ import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import { looksOf, useLooks } from "../../../design-system/visuals/vocabulary";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Category, Product } from "../api";
+import {
+  DEPARTMENTS,
+  departmentOf,
+  shelfLabel,
+  usePluginShelves,
+  withPluginShelves,
+} from "../catalog/CatalogPage";
 import { ProductArt } from "../catalog/ProductArt";
 import { productTypeLabel } from "../typeLabel";
 import { withConfirmation } from "./confirm";
@@ -506,6 +513,17 @@ export function NewProductDialog({
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<string>("badge");
   const pluginTypes = usePluginTypes(open).data ?? [];
+  // 030: where the shop puts each plugin's kind of product (its manifest's shelf)
+  const shelved = withPluginShelves(
+    DEPARTMENTS,
+    usePluginShelves(),
+    pluginTypes.map((p) => p.key),
+  );
+  const placeOf = (type: string) => {
+    const department = departmentOf(type, shelved);
+    const shelf = shelved.find((d) => d.key === department)?.shelves.find((s) => s.types.includes(type));
+    return `${t(`marketplace:department.${department}`)}${shelf ? ` › ${shelfLabel(t, shelf)}` : ""}`;
+  };
   const pluginType = pluginTypes.find((p) => p.key === type);
   const [pluginValues, setPluginValues] = useState<Record<string, string>>({});
   const [key, setKey] = useState("");
@@ -682,7 +700,7 @@ export function NewProductDialog({
               <optgroup label={t("marketplace:admin.pluginTypes")}>
                 {pluginTypes.map((p) => (
                   <option key={p.key} value={p.key}>
-                    {p.label_key ? t(p.label_key) : p.key}
+                    {p.label_key ? t(p.label_key) : p.key} — {placeOf(p.key)}
                   </option>
                 ))}
               </optgroup>

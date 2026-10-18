@@ -39,6 +39,8 @@ export const UNIVERSE_THEMES = [
 
 /** issue 1: the form of an imported look's key (the server checks it exists). */
 const IMPORTED_LOOK = /^[a-z0-9][a-z0-9_.-]{0,63}$/;
+/** 030: a kind of visual a plugin adds (``plugin:<plugin>.<kind>``). */
+const PLUGIN_KIND = /^plugin:[a-z][a-z0-9_-]{0,63}\.[a-z][a-z0-9_-]{0,63}$/;
 
 export type Density = "compact" | "comfortable" | "spacious";
 export type ReducedMotion = "system" | "on" | "off";
@@ -82,6 +84,8 @@ export interface UiPreferences {
   campaignThemes: "allow" | "ignore";
   /** Light/dark choice for theme families (027 R8): dark by default, or follow the device. */
   colorMode: "dark" | "light" | "system";
+  /** 030: the look chosen for each kind of visual a plugin adds (``plugin:<key>.<kind>`` → look). */
+  pluginLooks: Record<string, string>;
 }
 
 export interface UiPolicy {
@@ -110,6 +114,7 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   levelUp: "theme",
   campaignThemes: "allow",
   colorMode: "dark",
+  pluginLooks: {},
 };
 
 export const DEFAULT_POLICY: UiPolicy = {
@@ -148,6 +153,7 @@ export const PREFERENCE_KEYS: Record<keyof UiPreferences, string> = {
   levelUp: "ui.levelUp",
   campaignThemes: "ui.campaignThemes",
   colorMode: "ui.colorMode",
+  pluginLooks: "ui.pluginLooks",
 };
 
 /** Accept only known fields with valid values (an option removed by an update falls back to its default). */
@@ -180,6 +186,14 @@ export function sanitize(input: object): UiPreferences {
   pickLook("levelUp");
   pick("campaignThemes", ["allow", "ignore"]);
   pick("colorMode", ["dark", "light", "system"]);
+  if (raw.pluginLooks && typeof raw.pluginLooks === "object" && !Array.isArray(raw.pluginLooks)) {
+    out.pluginLooks = Object.fromEntries(
+      Object.entries(raw.pluginLooks as Record<string, unknown>).filter(
+        (entry): entry is [string, string] =>
+          PLUGIN_KIND.test(entry[0]) && typeof entry[1] === "string" && IMPORTED_LOOK.test(entry[1]),
+      ),
+    );
+  }
   if (typeof raw.soundEnabled === "boolean") out.soundEnabled = raw.soundEnabled;
   if (typeof raw.textScale === "number" && Number.isFinite(raw.textScale)) out.textScale = raw.textScale;
   if (typeof raw.notificationDurationSeconds === "number") {

@@ -54,6 +54,14 @@ async def notification_looks(
     return await module.looks.catalog(principal.user_id)
 
 
+@router.get("/ui/plugin-looks")
+async def plugin_looks(
+    principal: Annotated[Principal, require("users.self.manage")], module: Module
+) -> list[dict[str, Any]]:
+    """030: the kinds of visuals plugins add, each with the member's looks and those the shop sells."""
+    return await module.looks.plugin_catalog(principal.user_id)
+
+
 class PlaceOut(BaseModel):
     name: str | None = None
     latitude: float

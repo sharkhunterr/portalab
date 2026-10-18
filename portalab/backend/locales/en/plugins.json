@@ -146,5 +146,6 @@
   "surface.close": "Close",
   "title": "Plugins",
   "update.package": "Package of the new version",
-  "view.failed": "This extension's view could not be shown."
+  "view.failed": "This extension's view could not be shown.",
+  "review.shelf": "In the shop: {department} › {shelf} ({types})"
 }

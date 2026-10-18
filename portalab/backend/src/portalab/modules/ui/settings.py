@@ -94,6 +94,8 @@ USER_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
         "Celebration effect for rewards (theme: the theme's); some are sold in the shop (027).",
     ),
     ("ui.layoutPresets", dict[str, Any], {}, "Saved layout presets (dashboard layouts are owned by 009)."),
+    # 030: the look worn for each kind of visual a plugin adds (``plugin:messenger.bubble`` → ``aurora``)
+    ("ui.pluginLooks", dict[str, LOOK], {}, "Looks chosen for the kinds of visuals plugins add (030)."),
     ("ui.campaignThemes", Literal["allow", "ignore"], "allow", "Apply campaign theme overlays."),
     ("ui.colorMode", Literal["dark", "light", "system"], "dark", "Light or dark variant of a theme family."),
     # #68, #70: where the « live weather » ambience looks at the sky — each member's own place, the value

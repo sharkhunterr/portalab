@@ -3,6 +3,7 @@ import { useIntl } from "react-intl";
 import { useNavigate } from "react-router";
 import { api } from "../../../api/client";
 import { connectStream, type StreamHandle } from "../../../api/stream";
+import { usePreferences } from "../../../design-system/a11y/PreferencesProvider";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import { externalLook } from "../../../design-system/visuals/registry";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
@@ -196,6 +197,16 @@ export function PluginView({
   const { effective } = useTheme();
   const paramsKey = JSON.stringify(params);
   const prefix = `plugin.${plugin}:`;
+  // the looks the member chose in Appearance for this plugin's own kinds of visuals (``bubble`` → look)
+  const { preferences } = usePreferences();
+  const kindPrefix = `plugin:${plugin}.`;
+  const looksKey = JSON.stringify(
+    Object.fromEntries(
+      Object.entries(preferences.pluginLooks ?? {})
+        .filter(([kind]) => kind.startsWith(kindPrefix))
+        .map(([kind, look]) => [kind.slice(kindPrefix.length), look]),
+    ),
+  );
   const messages = useMemo(() => {
     const out: Record<string, string> = {};
     for (const [key, value] of Object.entries(intl.messages)) {
@@ -215,8 +226,9 @@ export function PluginView({
       language: locale.language,
       direction: locale.direction,
       messages,
+      looks: JSON.parse(looksKey) as Record<string, string>,
     }),
-    [plugin, paramsKey, effective, locale.language, locale.direction, messages],
+    [plugin, paramsKey, effective, locale.language, locale.direction, messages, looksKey],
   );
   const started = useRef(false);
   const live = useRef<StreamHandle[]>([]);
@@ -395,7 +407,8 @@ export function PluginView({
         case "look": {
           // 030: a look of the plugin's own kind of visual — only its own kinds, from the live packs
           const kind = String(data.kind ?? "");
-          const key = String(data.look ?? "");
+          // no look named: the one the member chose in Appearance
+          const key = String(data.look ?? "") || (latest.current.context().looks[kind] ?? "");
           const element = NAME.test(kind) ? externalLook(`plugin:${plugin}.${kind}`, key) : undefined;
           if (!element) {
             answer(data.id, false, null, { code: "not_found", message: "no such look" });

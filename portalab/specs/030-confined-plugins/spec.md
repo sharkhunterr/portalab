@@ -94,6 +94,28 @@ interface, no trust layer and no seal any more, and this spec no longer relies o
   or a side drawer — holding blocks (forms filled with the current values for editing, a checklist « add
   to… », a live thread). These two become the slot examples (Playlist; Messenger, which is the Chat example);
   « Moments » and « Home sections » are no longer required examples.
+- Q: Portalab's blocks look too uniform: may a plugin draw its own interface? → A (owner): yes — a plugin
+  either uses the visuals Portalab provides (blocks, enriched as needed) or ships **its own views** (its
+  modal like the notifications', a message button in a bottom corner opening a panel or a sidebar, the
+  forum's and the playlists' own pages), which must always follow the member's theme, interface and palette.
+  Decided by default: a view runs in spec 028's sandbox (an opaque origin, no network, no session) and acts
+  only through Portalab (its own routes as the member, committing ones still confirmed by Portalab, its own
+  live topics and surfaces); Portalab hands it the theme's tokens and a base kit on them, again whenever they
+  change, keeps its frame (the plugin's name, closing) and shows the plugin's blocks instead in safe mode.
+- Q: Where does a plugin's feature appear — a section of its own? → A (owner): in Portalab's own pages, as a
+  tab of any page (the Forum a tab of Community): a plugin's navigation entry placed in one of Portalab's
+  sections becomes a tab of those pages (their hub tabs). Its kinds of products appear in the shop's
+  administration like Portalab's own.
+- Q: A plugin's own kind of visual (Messenger's message bubbles): where is it sold and chosen? → A (owner):
+  the plugin brings the kind and its product type (nothing written in Portalab), separate visual packs bring
+  its looks; the look is chosen in Portalab's Appearance page, in a block of its own named by the kind (not
+  inside the plugin), and the plugin wears the choice; the plugin's manifest names where the shop shows its
+  products — one of the shop's departments and a shelf of its own there (`[[shelves]]`, reviewed with
+  `product_types`; a visual kind goes among the interfaces) — and the administration shows that place.
+- Q: The rest of the hardening? → A (decided, owner left it open): per-module database roles (FR-025) are
+  postponed — the risk they cover (a flaw in one module reading another's tables) is now far smaller than
+  the one confinement removed, and they touch every module; the simulator is replaced by installing on a
+  test portal, `portalab plugin new` giving the starting point.
 - Q: What happens to 023's code plugins on an existing install at upgrade? → A: they keep running as they
   do (unconfined), with a permanent warning in the administration, until migrated; on a new install
   unconfined plugins are off; every newly installed code plugin runs confined.
@@ -431,6 +453,11 @@ and the analysis reports what the Admin's will.
   panels, dashboard widgets (028), notification kinds and search result kinds; a slot's action MAY open a
   surface drawn by Portalab (a modal or a side drawer) holding the extension's blocks; each slot's content is declared as blocks Portalab draws with its own components
   (or a 028 sandboxed element), never on the administration, security, account or sign-in pages.
+- **FR-029a**: An extension MAY ship its own views for its pages, surfaces and slots, including a launcher
+  in a bottom corner of every screen and a floating panel; a view MUST run sandboxed with no network and no
+  session, reach only its own extension's operations and live topics through Portalab, receive the member's
+  theme tokens (kept in step with their changes) and stay inside a frame drawn by Portalab that names the
+  extension; in safe mode its blocks MUST be shown instead.
 - **FR-030**: In the player slot, an extension MUST receive only the title being played and, when it shows
   something, the moment it is for; it MAY declare overlays at given times and simple actions (go to a time,
   open a form) that Portalab's player draws and performs; it MUST NOT receive the stream itself.

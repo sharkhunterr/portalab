@@ -146,5 +146,6 @@
   "surface.close": "Fermer",
   "title": "Extensions",
   "update.package": "Paquet de la nouvelle version",
-  "view.failed": "La vue de cette extension n'a pas pu être affichée."
+  "view.failed": "La vue de cette extension n'a pas pu être affichée.",
+  "review.shelf": "Dans la boutique : {department} › {shelf} ({types})"
 }

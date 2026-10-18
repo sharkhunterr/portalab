@@ -18,6 +18,7 @@ def _codes(report: dict) -> set[str]:
 
 def test_a_look_of_a_plugins_kind() -> None:
     files = read_files(PACK)
+    plugin_visual_types.remove("plugin:messenger")  # another test may have enabled the plugin
     assert "element.type" in _codes(analyse(files))  # nobody draws it
     plugin_visual_types.register(
         PluginVisualType("plugin:messenger.bubble", "plugin:messenger", "plugin.messenger:type.bubble")

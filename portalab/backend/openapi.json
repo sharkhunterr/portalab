@@ -41832,6 +41832,33 @@
         ]
       }
     },
+    "/api/v1/plugins/shelves": {
+      "get": {
+        "description": "030: where the shop shows the kinds of products enabled plugins sell \u2014 a shelf of their own in one of\nthe shop's departments, named by the plugin.",
+        "operationId": "shelves_api_v1_plugins_shelves_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Shelves Api V1 Plugins Shelves Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Shelves",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
     "/api/v1/plugins/slots": {
       "get": {
         "description": "030: what enabled plugins add to Portalab's screens for this member (drawn by Portalab).",
@@ -45211,6 +45238,33 @@
           }
         },
         "summary": "Notification Looks",
+        "tags": [
+          "ui"
+        ]
+      }
+    },
+    "/api/v1/ui/plugin-looks": {
+      "get": {
+        "description": "030: the kinds of visuals plugins add, each with the member's looks and those the shop sells.",
+        "operationId": "plugin_looks_api_v1_ui_plugin_looks_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Plugin Looks Api V1 Ui Plugin Looks Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Plugin Looks",
         "tags": [
           "ui"
         ]

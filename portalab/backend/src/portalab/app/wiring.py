@@ -198,6 +198,10 @@ def wire_platform(
         administration.registry.register_user_validator(
             setting, ui.looks.validator(setting), owner="module:ui"
         )
+    # 030: the looks of plugins' kinds of visuals — owned ones only
+    administration.registry.register_user_validator(
+        "ui.pluginLooks", ui.looks.plugin_errors, owner="module:ui"
+    )
     shell = ShellModule(database, events, authz.engine, capabilities)
     shell.register()
     i18n = I18nModule(database, events, authz.audit, capabilities)

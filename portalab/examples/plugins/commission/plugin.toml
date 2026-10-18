@@ -5,7 +5,7 @@ schema_version = 2
 key = "commission"
 name = "Commissions"
 description = "Order a custom avatar from the shop."
-version = "1.0.0"
+version = "1.1.0"
 requires_portal = ">=0.1"
 maturity = "beta"
 entry_point = "commission_plugin:register"
@@ -22,6 +22,14 @@ privacy = true
 [personal_data]
 enabled = true
 classes = ["commissions"]
+
+# its commissions sold in the shop's « Profile » department, on a shelf of their own
+[[shelves]]
+key = "commissions"
+department = "profile"
+label_key = "plugin.commission:shelf.commissions"
+icon = "palette"
+types = ["avatar"]
 
 [[routes]]
 path = "mine"
@@ -40,12 +48,14 @@ blocks = [{ kind = "table", title_key = "plugin.commission:block.mine", data = "
 
 [i18n.en."plugin.commission"]
 "type.avatar" = "Avatar commission"
+"shelf.commissions" = "Commissions by artists"
 "nav.mine" = "My commissions"
 "page.mine" = "My commissions"
 "block.mine" = "Your orders"
 
 [i18n.fr."plugin.commission"]
 "type.avatar" = "Commande d'avatar"
+"shelf.commissions" = "Commandes aux artistes"
 "nav.mine" = "Mes commandes"
 "page.mine" = "Mes commandes"
 "block.mine" = "Vos commandes"

@@ -34,6 +34,8 @@ SLOTS = (
     "search.kind", "notification.kind",
 )  # fmt: skip
 EXPOSURES = ("read", "action", "committing")
+# 030: the shop's departments a plugin may put a shelf of its own in (the shop's own layout, spec 027)
+SHOP_DEPARTMENTS = ("themes", "profile", "effects", "features", "packs")
 HOST = r"^(?=.{1,253}$)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$"
 EXTENSION_POINTS = (
     "nav",
@@ -119,6 +121,7 @@ _CAPABILITIES: dict[str, Any] = {
                     "key": {"type": "string", "pattern": NAME},
                     "label_key": {"type": "string", "maxLength": 120},
                     "render": {"type": "array", "items": {"enum": ["css", "glsl"]}, "maxItems": 2},
+                    "icon": {"type": "string", "pattern": r"^[a-z0-9-]{1,40}$"},
                 },
             },
         },
@@ -199,6 +202,23 @@ SCHEMA: dict[str, Any] = {
                     "title_key": {"type": "string", "maxLength": 120},
                     "permission": {"type": "string", "maxLength": 96},
                     "blocks": {**_LIST, "items": {"type": "object"}},
+                },
+            },
+        },
+        # where the shop shows the products of its own kinds: a department of Portalab's shop, a shelf of
+        # its own there (named by the plugin), the kinds of products it holds
+        "shelves": {
+            **_LIST,
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["key", "department", "label_key", "types"],
+                "properties": {
+                    "key": {"type": "string", "pattern": NAME},
+                    "department": {"enum": list(SHOP_DEPARTMENTS)},
+                    "label_key": {"type": "string", "maxLength": 120},
+                    "icon": {"type": "string", "pattern": r"^[a-z0-9-]{1,40}$"},
+                    "types": {**_NAMES, "minItems": 1},
                 },
             },
         },
@@ -417,6 +437,14 @@ class Manifest:
         return [dict(v) for v in self.capabilities.get("visual_types") or []]
 
     @property
+    def shelves(self) -> list[dict[str, Any]]:
+        """Where the shop shows its kinds of products (``types`` are the full ``plugin:<key>.<type>``)."""
+        return [
+            {**dict(x), "types": [f"plugin:{self.key}.{t}" for t in x["types"]]}
+            for x in self.raw.get("shelves", [])
+        ]
+
+    @property
     def slots(self) -> list[dict[str, Any]]:
         return [dict(x) for x in self.raw.get("slots", [])]
 
@@ -501,8 +529,8 @@ def validate(raw: dict[str, Any]) -> Manifest:
     version_2 = int(raw.get("schema_version", 1)) >= 2
     if version_2:
         problems += _problems_v2(raw)
-    elif any(k in raw for k in ("runtime", "capabilities", "routes", "slots", "surfaces")):
-        problems.append("runtime, capabilities, routes, slots and surfaces need schema_version = 2")
+    elif any(k in raw for k in ("runtime", "capabilities", "routes", "slots", "surfaces", "shelves")):
+        problems.append("runtime, capabilities, routes, slots, surfaces and shelves need schema_version = 2")
     if version_2 and personal.get("enabled") and not dict(raw.get("capabilities", {})).get("privacy"):
         problems.append("personal_data: a plugin keeping personal data must ask for the privacy capability")
     elif personal.get("enabled") and not personal.get("erasure_participant") and not version_2:
@@ -594,6 +622,17 @@ def _problems_v2(raw: dict[str, Any]) -> list[str]:
             problems.append(f"surfaces/{item['key']}: a surface holds blocks or the plugin's view")
     if raw.get("slots") and not raw.get("capabilities", {}).get("slots"):
         problems.append("slots: declaring slots needs the slots capability")
+    sold = set(capabilities.get("product_types") or [])
+    shelved: set[str] = set()
+    for item in raw.get("shelves", []):
+        for kind in item["types"]:
+            if kind not in sold:
+                problems.append(f"shelves/{item['key']}: {kind} is not one of its product_types")
+            if kind in shelved:
+                problems.append(f"shelves/{item['key']}: {kind} is already on another shelf")
+            shelved.add(kind)
+    if len({x["key"] for x in raw.get("shelves", [])}) != len(raw.get("shelves", [])):
+        problems.append("shelves: the same shelf twice")
     keys = [(r["method"], r["path"].strip("/")) for r in raw.get("routes", [])]
     if len(keys) != len(set(keys)):
         problems.append("routes: the same route twice")

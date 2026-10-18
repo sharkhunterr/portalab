@@ -8059,6 +8059,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/plugins/shelves": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Shelves
+         * @description 030: where the shop shows the kinds of products enabled plugins sell — a shelf of their own in one of
+         *     the shop's departments, named by the plugin.
+         */
+        get: operations["shelves_api_v1_plugins_shelves_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/plugins/slots": {
         parameters: {
             query?: never;
@@ -9079,6 +9100,26 @@ export interface paths {
          * @description 027: the notification styles and animations, those sold in the shop marked locked unless owned.
          */
         get: operations["notification_looks_api_v1_ui_notification_looks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ui/plugin-looks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Plugin Looks
+         * @description 030: the kinds of visuals plugins add, each with the member's looks and those the shop sells.
+         */
+        get: operations["plugin_looks_api_v1_ui_plugin_looks_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -32026,6 +32067,28 @@ export interface operations {
             };
         };
     };
+    shelves_api_v1_plugins_shelves_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
     slots_api_v1_plugins_slots_get: {
         parameters: {
             query?: never;
@@ -34171,6 +34234,28 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    plugin_looks_api_v1_ui_plugin_looks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
                 };
             };
         };

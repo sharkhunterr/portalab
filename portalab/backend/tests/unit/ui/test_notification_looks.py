@@ -144,3 +144,43 @@ async def test_a_style_whose_pack_is_off_shows_to_its_owner_only() -> None:
         assert live_looks.listed("notification_style")[-1] == "tide"
     finally:
         live_looks.replace({})
+
+
+async def test_looks_of_plugins_kinds_of_visuals() -> None:
+    """030: a kind of visual an enabled plugin adds (message bubbles) is listed in Appearance with the looks
+    the shop sells of it, the member's own to choose; the preference keeps those kinds and owned looks."""
+    from portalab.capabilities.visuals import PluginVisualType, plugin_visual_types
+
+    kind = "plugin:messenger.bubble"
+
+    class _Bubbles(_Shop):
+        async def sold(self, kind_: str, field: str) -> frozenset[str]:
+            return frozenset({"aurora", "ember"}) if (kind_, field) == (kind, "look") else frozenset()
+
+        async def owned(self, user_id: UUID, kind_: str, field: str) -> frozenset[str]:
+            return frozenset({"aurora"}) if user_id == OWNER and kind_ == kind else frozenset()
+
+        async def details(self, kind_: str, field: str) -> dict[str, dict[str, object]]:
+            names = {"en": "Aurora bubbles"}
+            return {"aurora": {"product": "messenger_bubble_aurora", "rarity": "rare", "names": names}}
+
+    registry = CapabilityRegistry()
+    registry.declare(COSMETICS_SPEC)
+    registry.provide(COSMETICS, _Bubbles(), instance_ref="shop", owner="test")
+    looks = NotificationLooks(registry)
+    plugin_visual_types.register(
+        PluginVisualType(kind, "plugin:messenger", "plugin.messenger:type.bubble", ("css",), "message-circle")
+    )
+    try:
+        (listed,) = [k for k in await looks.plugin_catalog(OWNER) if k["type"] == kind]
+        assert listed["plugin"] == "messenger" and listed["icon"] == "message-circle"
+        shown = {look["key"]: look for look in listed["looks"]}
+        assert shown["aurora"]["locked"] is False and shown["aurora"]["names"]["en"] == "Aurora bubbles"
+        assert shown["ember"]["locked"] is True
+        assert await looks.plugin_errors({kind: "aurora"}, str(OWNER)) == []
+        assert await looks.plugin_errors({kind: "ember"}, str(OWNER)) != []  # sold, not owned
+        assert await looks.plugin_errors({"plugin:gone.kind": "aurora"}, str(OWNER)) != []
+        assert await looks.plugin_errors({kind: None}, str(OWNER)) == []
+        assert await looks.plugin_errors({}) == []
+    finally:
+        plugin_visual_types.remove("plugin:messenger")

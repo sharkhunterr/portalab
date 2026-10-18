@@ -8,7 +8,14 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { type OwnershipRow, type Product, useOwnedActions, useProducts, usePurchases } from "../api";
-import { DEPARTMENTS, departmentOf, departmentOfProduct } from "../catalog/CatalogPage";
+import {
+  DEPARTMENTS,
+  type Department,
+  departmentOf,
+  departmentOfProduct,
+  usePluginShelves,
+  withPluginShelves,
+} from "../catalog/CatalogPage";
 import { ProductArt } from "../catalog/ProductArt";
 import "../marketplace.css";
 import { PageHeader } from "../../../design-system/components/PageHeader";
@@ -80,8 +87,8 @@ function NeedsConfiguration({ row }: { row: OwnershipRow }) {
 }
 
 /** 027: which shelf a bought product sits on (the shop's own departments: theme packs apart from packs). */
-function departmentKey(row: OwnershipRow, product: Product | undefined): string {
-  return product ? departmentOfProduct(product) : departmentOf(row.product_type);
+function departmentKey(row: OwnershipRow, product: Product | undefined, departments: Department[]): string {
+  return product ? departmentOfProduct(product, departments) : departmentOf(row.product_type, departments);
 }
 
 /**
@@ -106,12 +113,17 @@ export default function OwnedPage() {
   const spent = rows
     .filter((r) => r.origin === "purchase" && !["refunded"].includes(r.state))
     .reduce((sum, r) => sum + r.price_paid, 0);
-  const departments = DEPARTMENTS.filter((d) =>
-    collection.some((r) => departmentOf(r.product_type) === d.key),
+  const placed = withPluginShelves(
+    DEPARTMENTS,
+    usePluginShelves(),
+    collection.map((r) => r.product_type),
+  );
+  const departments = placed.filter((d) =>
+    collection.some((r) => departmentOf(r.product_type, placed) === d.key),
   );
   const shown = collection.filter(
     (r) =>
-      (!department || departmentOf(r.product_type) === department) &&
+      (!department || departmentOf(r.product_type, placed) === department) &&
       (!query.trim() || r.product_name.toLowerCase().includes(query.trim().toLowerCase())),
   );
   const columns: Column<OwnershipRow>[] = [
@@ -235,7 +247,7 @@ export default function OwnedPage() {
                   <div className="owned-item__body">
                     <strong>{row.product_name}</strong>
                     <span className="owned-item__meta">
-                      {t(`marketplace:department.${departmentKey(row, product)}`)} ·{" "}
+                      {t(`marketplace:department.${departmentKey(row, product, placed)}`)} ·{" "}
                       {productTypeLabel(t, row.product_type)}
                     </span>
                     <span className="owned-item__meta">

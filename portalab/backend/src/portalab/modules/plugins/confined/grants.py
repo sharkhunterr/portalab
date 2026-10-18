@@ -49,6 +49,13 @@ def parameters_of(manifest: Manifest, capability: str) -> dict[str, Any]:
         return {"operations": manifest.portal_operations, "job_permissions": manifest.job_permissions}
     if capability == "permissions":
         return {"names": [str(p["name"]) for p in manifest.raw.get("permissions", [])]}
+    if capability == "product_types" and manifest.shelves:
+        # where the shop shows them, reviewed with the kinds themselves
+        shelves = [
+            {"key": x["key"], "department": x["department"], "types": list(x["types"])}
+            for x in manifest.shelves
+        ]
+        return {"names": list(value or []), "shelves": shelves}
     if isinstance(value, Mapping):
         return dict(value)
     if isinstance(value, list):

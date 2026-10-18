@@ -1,15 +1,36 @@
 """028 (US8, T093): every example pack of ``examples/visual-packs`` passes the analysis — nothing blocking,
-nothing to warn about — so authors can start from any of them."""
+nothing to warn about — so authors can start from any of them (030: a look of a kind an example plugin adds,
+with that plugin enabled)."""
 
+import tomllib
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
 
+from portalab.capabilities.visuals import PluginVisualType, plugin_visual_types
 from portalab.modules.visuals.analysis import analyse
 from portalab.modules.visuals.store import read_folder
 from tests.unit.visuals.support import FakeInterfaces
 
 EXAMPLES = Path(__file__).resolve().parents[4] / "examples" / "visual-packs"
+PLUGINS = EXAMPLES.parent / "plugins"
+
+
+@pytest.fixture(autouse=True)
+def example_plugins() -> Iterator[None]:
+    """The kinds of visuals the example plugins declare, as when they are enabled."""
+    owners = []
+    for manifest in sorted(PLUGINS.glob("*/plugin.toml")):
+        raw = tomllib.loads(manifest.read_text())
+        owner = f"plugin:{raw['key']}"
+        for item in raw.get("capabilities", {}).get("visual_types", []):
+            kind = PluginVisualType(f"{owner}.{item['key']}", owner, item["label_key"], icon=item.get("icon"))
+            plugin_visual_types.register(kind)
+            owners.append(owner)
+    yield
+    for owner in set(owners):
+        plugin_visual_types.remove(owner)
 
 
 @pytest.mark.parametrize("folder", sorted(p.name for p in EXAMPLES.iterdir() if (p / "pack.json").exists()))

@@ -45,7 +45,30 @@ export function ReviewConsent({
             {review.requested_capabilities.map((item) => {
               const key = `plugins:capability.${item.capability}`;
               const text = t(key);
-              return <li key={item.capability}>{text === key ? item.description : text}</li>;
+              const shelves = (item.parameters?.shelves ?? []) as Array<{
+                key: string;
+                department: string;
+                types: string[];
+              }>;
+              return (
+                <li key={item.capability}>
+                  {text === key ? item.description : text}
+                  {shelves.length ? (
+                    // 030: where the shop will show its kinds of products
+                    <ul>
+                      {shelves.map((shelf) => (
+                        <li key={shelf.key}>
+                          {t("plugins:review.shelf", {
+                            department: t(`marketplace:department.${shelf.department}`),
+                            shelf: shelf.key,
+                            types: shelf.types.join(", "),
+                          })}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </li>
+              );
             })}
           </ul>
         </>

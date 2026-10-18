@@ -142,6 +142,33 @@ async def slots(principal: Member, request: Request, module: Module) -> list[dic
     return out
 
 
+@router.get("/plugins/shelves")
+async def shelves(_: Member, module: Module) -> list[dict[str, Any]]:
+    """030: where the shop shows the kinds of products enabled plugins sell — a shelf of their own in one of
+    the shop's departments, named by the plugin."""
+    manifests = await module.lifecycle.manifests()
+    out: list[dict[str, Any]] = []
+    for plugin in await module.lifecycle.all():
+        manifest = manifests.get(plugin.key)
+        if plugin.state != "enabled" or manifest is None or not manifest.shelves:
+            continue
+        if "product_types" not in await module.grants.active(plugin.key, plugin.current_version):
+            continue
+        for item in manifest.shelves:
+            out.append(
+                {
+                    "key": f"plugin:{plugin.key}.{item['key']}",
+                    "plugin": plugin.key,
+                    "department": item["department"],
+                    "label_key": item["label_key"],
+                    "icon": item.get("icon"),
+                    "types": item["types"],
+                }
+            )
+    out.sort(key=lambda shelf: shelf["key"])
+    return out
+
+
 @router.get("/plugins/{key}/surfaces/{surface}")
 async def surface(
     principal: Member, key: str, surface: str, request: Request, module: Module

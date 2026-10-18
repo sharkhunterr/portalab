@@ -8,7 +8,7 @@ from uuid import UUID
 
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.themes import COSMETICS
-from portalab.capabilities.visuals import external_looks
+from portalab.capabilities.visuals import external_looks, plugin_visual_types
 
 # each setting: the product type selling its looks and the payload field naming them — the looks themselves
 # are the packs' (``live_looks``); the socle's are free for everyone, as is « theme » (the interface's own)
@@ -110,6 +110,59 @@ class NotificationLooks:
         except Exception:
             return {}
         return result
+
+    # --- 030: the kinds of visuals plugins add (their looks sold in the shop, product type = the kind) ---
+    async def plugin_catalog(self, user_id: UUID | None) -> list[dict[str, Any]]:
+        """Each kind an enabled plugin draws, with its looks: the member's (to choose) and those sold."""
+        entitlements = self._entitlements()
+        out: list[dict[str, Any]] = []
+        for kind in plugin_visual_types.all():
+            sold: frozenset[str] = frozenset()
+            owned: frozenset[str] = frozenset()
+            if entitlements is not None:
+                sold = await entitlements.sold(kind.key, "look")
+                owned = await entitlements.owned(user_id, kind.key, "look") if user_id else frozenset()
+            details = await self.details(kind.key, "look")
+            looks = [
+                {"key": key, "locked": key not in owned, **details.get(key, {})}
+                for key in sorted(owned | sold)
+            ]
+            out.append(
+                {
+                    "type": kind.key,
+                    "plugin": kind.owner.removeprefix("plugin:"),
+                    "plugin_name": kind.plugin_name or kind.owner.removeprefix("plugin:"),
+                    "label_key": kind.label_key,
+                    "icon": kind.icon,
+                    "looks": looks,
+                }
+            )
+        return out
+
+    async def plugin_errors(self, value: Any, user_ref: str | None = None) -> list[str]:
+        """``ui.pluginLooks``: only kinds plugins draw, only looks the member owns."""
+        if not value:
+            return []
+        if not isinstance(value, dict):
+            return ["a map of kinds to looks"]
+        try:
+            user = UUID(user_ref) if user_ref else None
+        except ValueError:
+            user = None
+        entitlements = self._entitlements()
+        errors: list[str] = []
+        for kind, look in value.items():
+            if plugin_visual_types.get(str(kind)) is None:
+                errors.append(f"{kind!r} is not a kind of visual of an enabled plugin")
+                continue
+            if look is None:
+                continue
+            owned = (
+                await entitlements.owned(user, str(kind), "look") if entitlements and user else frozenset()
+            )
+            if look not in owned:
+                errors.append(f"{look!r} is sold in the shop: buy it to use it")
+        return errors
 
     @staticmethod
     def choices(setting: str) -> tuple[str, ...]:

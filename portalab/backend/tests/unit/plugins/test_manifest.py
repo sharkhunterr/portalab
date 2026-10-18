@@ -62,3 +62,17 @@ def test_schema_and_size() -> None:
         parse_toml('key = "big"\n' + "#" * 70_000)
     with pytest.raises(InvalidManifest):
         parse_toml("key = [unclosed")
+
+
+def test_shop_shelves() -> None:
+    """030: a plugin names the shelf of the shop its own kinds of products are shown on, in one of the shop's
+    departments; only kinds it sells, each on one shelf."""
+    shelf = {"key": "bubbles", "department": "effects", "label_key": "plugin.hello:s", "types": ["bubble"]}
+    v2 = {"schema_version": 2, "runtime": "declarative", "capabilities": {"product_types": ["bubble"]}}
+    manifest = validate({**BASE, **v2, "shelves": [shelf]})
+    assert manifest.shelves[0]["types"] == ["plugin:hello.bubble"]
+    unsold = problems(**v2, shelves=[{**shelf, "types": ["x"]}])
+    assert any("not one of its product_types" in p for p in unsold)
+    assert any("another shelf" in p for p in problems(**v2, shelves=[shelf, {**shelf, "key": "again"}]))
+    assert problems(**v2, shelves=[{**shelf, "department": "admin"}])
+    assert any("schema_version = 2" in p for p in problems(shelves=[shelf]))
