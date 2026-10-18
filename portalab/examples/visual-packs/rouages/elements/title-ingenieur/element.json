@@ -1,0 +1,28 @@
+{
+  "type": "title",
+  "look": "rouages-grave",
+  "product": "title_ingenieur_des_brumes",
+  "names": {
+    "fr": "Titre : Ingénieur des brumes",
+    "en": "Title: Engineer of the mists"
+  },
+  "descriptions": {
+    "fr": "« Ingénieur des brumes » gravé sous votre nom.",
+    "en": "« Engineer of the mists » engraved under your name."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "payload": {
+    "label": "Engineer of the mists"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  }
+}

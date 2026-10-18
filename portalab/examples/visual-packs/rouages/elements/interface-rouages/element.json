@@ -1,0 +1,27 @@
+{
+  "type": "theme",
+  "look": "rouages",
+  "product": "theme_rouages",
+  "names": {
+    "fr": "Interface Rouages",
+    "en": "Cogwork interface"
+  },
+  "descriptions": {
+    "fr": "Un atelier d'horloger : laiton, cuivre et bois sombre, titres gravés, la navigation en onglets de classeur, des engrenages qui tournent derrière, et le vocabulaire d'une guilde d'inventeurs (l'atelier, le kinétoscope, la boutique de l'horloger…).",
+    "en": "A clockmaker's workshop: brass, copper and dark wood, engraved headings, the navigation as binder tabs, gears turning behind, and an inventors' guild's words (the workshop, the kinetoscope, the clockmaker's shop…)."
+  },
+  "render": {
+    "kind": "theme",
+    "file": "interface.json",
+    "css": [
+      "interface.css"
+    ]
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "themes",
+    "icon": "palette"
+  }
+}

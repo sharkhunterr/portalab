@@ -1,0 +1,14 @@
+/* the Olympus interface's own touches: a Greek key under the header, gold-edged cards */
+[data-theme="olympe"] .shell-header {
+  border-block-end: 0;
+  background-image:
+    repeating-linear-gradient(90deg, #8a641055 0 2px, transparent 2px 10px, #8a641055 10px 12px, transparent 12px 20px);
+  background-size: 100% 4px;
+  background-repeat: no-repeat;
+  background-position: bottom;
+}
+[data-theme="olympe"] .ds-card,
+[data-theme="olympe"] .admin-section {
+  border-color: #d9cfbc;
+  box-shadow: 0 0 0 1px #ffffff inset, 0 0.4rem 1.2rem -0.8rem #8a641044;
+}

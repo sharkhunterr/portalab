@@ -1,0 +1,23 @@
+{
+  "type": "profile_background",
+  "look": "atelier",
+  "product": "background_atelier",
+  "names": {
+    "fr": "Fond atelier d'horloger",
+    "en": "Clockmaker's workshop background"
+  },
+  "descriptions": {
+    "fr": "Derrière votre profil, l'atelier : engrenages qui tournent, étincelles d'une meule, lueur de lampe.",
+    "en": "Behind your profile, the workshop: gears turning, a grinder's sparks, a lamp's glow."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "atelier.glsl"
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "sparkles"
+  }
+}

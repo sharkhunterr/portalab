@@ -1,0 +1,29 @@
+{
+  "type": "badge",
+  "look": "ruee-or",
+  "product": "badge_pepite",
+  "names": {
+    "fr": "Badge Pépite",
+    "en": "Nugget badge"
+  },
+  "descriptions": {
+    "fr": "Une pépite d'or sur votre profil.",
+    "en": "A gold nugget on your profile."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "payload": {
+    "label": "Gold nugget",
+    "icon": "star"
+  },
+  "economy": {
+    "price": 220,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "type": "level_up",
+  "look": "chaudiere",
+  "product": "levelup_chaudiere",
+  "names": {
+    "fr": "Chaudière en surchauffe",
+    "en": "Boiler overheating"
+  },
+  "descriptions": {
+    "fr": "Des engrenages surgissent et s'emballent, un manomètre monte dans le rouge, la vapeur jaillit de partout — et votre nouveau niveau apparaît dans un anneau de laiton (HD).",
+    "en": "Gears burst in and race, a gauge climbs into the red, steam blasts from everywhere — and your new level appears in a brass ring (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "boiler.glsl",
+    "css": [
+      "card.css"
+    ],
+    "stage": true,
+    "reveal": 2.4
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "levels",
+    "icon": "trophy"
+  }
+}

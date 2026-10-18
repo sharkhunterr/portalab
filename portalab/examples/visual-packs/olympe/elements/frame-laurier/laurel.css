@@ -1,0 +1,28 @@
+/* a gold laurel wreath round the avatar: two branches of leaves, open at the top */
+.avatar-frame[data-frame="laurier"] {
+  background: #f6f2ea;
+  box-shadow: 0 0 0 2px #e6c15a, 0 0 0.8rem #e6c15a66;
+}
+.avatar-frame[data-frame="laurier"]::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  z-index: -1;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 200deg, #c9a03a 0 7deg, #f2d77a 7deg 11deg, transparent 11deg 16deg);
+  -webkit-mask:
+    conic-gradient(from 160deg, #000 0 320deg, transparent 320deg),
+    radial-gradient(circle, transparent 0 62%, #000 63% 74%, transparent 75%);
+  -webkit-mask-composite: source-in;
+  mask:
+    conic-gradient(from 160deg, #000 0 320deg, transparent 320deg),
+    radial-gradient(circle, transparent 0 62%, #000 63% 74%, transparent 75%);
+  mask-composite: intersect;
+  animation: olympe-quiver 5s ease-in-out infinite;
+}
+@keyframes olympe-quiver {
+  50% { transform: rotate(2deg) scale(1.02); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .avatar-frame[data-frame="laurier"]::before { animation: none; }
+}

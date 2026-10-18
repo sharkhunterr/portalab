@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "look": "laurier",
+  "product": "frame_laurier",
+  "names": {
+    "fr": "Couronne de laurier",
+    "en": "Laurel wreath"
+  },
+  "descriptions": {
+    "fr": "Une couronne de laurier dorée autour de votre avatar, ses feuilles qui frémissent.",
+    "en": "A gold laurel wreath round your avatar, its leaves quivering."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "laurel.css"
+    ]
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  }
+}

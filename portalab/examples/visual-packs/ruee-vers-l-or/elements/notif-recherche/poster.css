@@ -1,0 +1,11 @@
+.ds-notifications[data-style="avis-recherche"] .ds-notification {
+  border: 0;
+  border-radius: 0.15rem;
+  background:
+    radial-gradient(circle at 50% 6px, #8a1a1a 0 3px, transparent 4px),
+    radial-gradient(ellipse at 20% 20%, #00000014, transparent 50%),
+    linear-gradient(180deg, #f2dfb5, #e2c48a);
+  color: #2a1708;
+  font-family: "Rockwell", "Courier New", serif;
+  box-shadow: 0 6px 16px #0007;
+}

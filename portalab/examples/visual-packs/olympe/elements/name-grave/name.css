@@ -1,0 +1,8 @@
+.name-style[data-name="grave-grec"] {
+  font-family: "Trajan Pro", "Cinzel", Georgia, serif;
+  font-variant: small-caps;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: #8a6410;
+  text-shadow: 0 1px 0 #ffffff, 0 -1px 0 #00000026;
+}

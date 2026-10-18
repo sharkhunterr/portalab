@@ -1,0 +1,39 @@
+{
+  "type": "bundle",
+  "product": "ultimate_ruee",
+  "names": {
+    "fr": "Pack de thème Ruée vers l'or",
+    "en": "Gold Rush theme pack"
+  },
+  "descriptions": {
+    "fr": "Tout l'univers Ruée vers l'or : son interface et tout ce qui va avec.",
+    "en": "The whole Gold Rush universe: its interface and everything that goes with it."
+  },
+  "payload": {
+    "products": [
+      "theme_ruee",
+      "palette_ruee",
+      "ambient_canyon",
+      "background_feudecamp",
+      "frame_lasso",
+      "frame_etoile_sherif",
+      "banner_mesas",
+      "name_affiche",
+      "level_etoile",
+      "levelup_duel",
+      "effect_pepites",
+      "notif_avis_recherche",
+      "notifanim_galop",
+      "title_chasseur_de_primes",
+      "badge_pepite"
+    ]
+  },
+  "economy": {
+    "price": 5400,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "ultimate",
+    "icon": "crown",
+    "supply": 10
+  }
+}

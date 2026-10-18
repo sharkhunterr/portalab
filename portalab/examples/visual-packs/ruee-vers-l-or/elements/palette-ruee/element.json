@@ -1,0 +1,31 @@
+{
+  "type": "palette",
+  "look": "ruee",
+  "product": "palette_ruee",
+  "names": {
+    "fr": "Palette or et turquoise",
+    "en": "Gold and turquoise palette"
+  },
+  "descriptions": {
+    "fr": "L'or des pépites et la turquoise des bijoux du désert sur n'importe quelle interface.",
+    "en": "Nuggets' gold and desert jewellery's turquoise over any interface."
+  },
+  "palette": {
+    "dark": {
+      "accent": "#e0a33a",
+      "accentAlt": "#4fc0b8",
+      "contrast": "#1c120c"
+    },
+    "light": {
+      "accent": "#8a5a10",
+      "accentAlt": "#1f7a72",
+      "contrast": "#ffffff"
+    }
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  }
+}

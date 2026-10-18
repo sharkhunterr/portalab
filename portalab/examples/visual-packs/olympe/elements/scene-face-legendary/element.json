@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "olympe-or",
+  "names": {
+    "fr": "Face d'or divin",
+    "en": "Divine gold face"
+  },
+  "descriptions": {
+    "fr": "Une carte légendaire d'or divin, rayonnante comme un soleil, une couronne de laurier, holographie, paillettes, l'image qui s'incline.",
+    "en": "A legendary card of divine gold, radiant like a sun, a laurel wreath, holography, glitter, the art leaning."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

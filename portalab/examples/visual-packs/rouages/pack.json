@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "rouages",
+  "version": "1.0.1",
+  "names": {
+    "fr": "Rouages — univers steampunk",
+    "en": "Cogwork — a steampunk universe"
+  },
+  "descriptions": {
+    "fr": "Un univers complet de laiton et de vapeur : une interface d'atelier d'horloger, des engrenages qui tournent derrière le portail, des cadres, une bannière de dirigeable, un nom gravé dans le laiton, une chaudière qui surchauffe à chaque niveau, des notifications sur plaque rivetée — et son booster, un coffre-fort à manomètres qu'on ouvre dans un nuage de vapeur.",
+    "en": "A whole universe of brass and steam: a clockmaker's workshop interface, gears turning behind the portal, frames, an airship banner, a name engraved in brass, a boiler overheating at every level, notifications on a riveted plate — and its booster, a gauge-studded safe opened in a cloud of steam."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

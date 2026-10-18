@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "ruee",
+  "names": {
+    "fr": "Caisse de dynamite",
+    "en": "Dynamite crate"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient une caisse de dynamite en planches, des bâtons rouges qui dépassent, une mèche qui pend ; la chaleur tremble autour (HD).",
+    "en": "The pack becomes a planked dynamite crate, red sticks poking out, a fuse hanging; the heat shimmers round it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "look.glsl",
+    "css": [
+      "look.css"
+    ],
+    "stage": true
+  }
+}

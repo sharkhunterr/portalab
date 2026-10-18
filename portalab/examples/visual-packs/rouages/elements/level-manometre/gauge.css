@@ -1,0 +1,27 @@
+.ds-level[data-look="manometre"] {
+  position: relative;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 40%, #fbf1dc, #e6d2a8 60%, #b9862f 62%, #6b4419 70%);
+  color: #2a1708;
+  box-shadow: 0 0 0 2px #d39b45, 0 0 0.6rem #d39b4566;
+  overflow: visible;
+}
+.ds-level[data-look="manometre"]::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 50%;
+  inset-inline-start: calc(50% - 1px);
+  inline-size: 2px;
+  block-size: 40%;
+  background: #b0201a;
+  transform-origin: 50% 100%;
+  rotate: 35deg;
+  opacity: 0.55;
+  animation: rouages-needle 1.6s ease-in-out infinite;
+}
+@keyframes rouages-needle {
+  50% { rotate: 42deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-level[data-look="manometre"]::after { animation: none; }
+}

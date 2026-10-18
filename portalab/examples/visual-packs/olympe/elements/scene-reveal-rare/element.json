@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "olympe-laurier",
+  "names": {
+    "fr": "Couronne de laurier",
+    "en": "Laurel crown"
+  },
+  "descriptions": {
+    "fr": "Une couronne de laurier dorée se referme autour de la carte, quelques feuilles s'envolent (HD).",
+    "en": "A gold laurel wreath closes round the card, a few leaves flying off (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

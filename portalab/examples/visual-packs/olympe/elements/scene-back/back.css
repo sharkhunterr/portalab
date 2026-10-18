@@ -1,0 +1,32 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
+[data-card-back="olympe"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(118deg, transparent 30%, #b8b0a044 34%, transparent 40%, transparent 62%, #a8a09033 66%, transparent 70%),
+    linear-gradient(40deg, transparent 45%, #c0b8a833 48%, transparent 52%),
+    linear-gradient(160deg, #ffffff, #efe9de 60%, #e2dacb);
+  box-shadow: inset 0 0 0 3px #c9a03a, inset 0 0 0 5px #ffffff, inset 0 0 0 6px #c9a03a88;
+}
+[data-card-back="olympe"] .booster-card__back::after {
+  background: linear-gradient(110deg, transparent 40%, #ffffffaa 50%, transparent 60%);
+  mix-blend-mode: soft-light;
+}
+[data-card-back="olympe"] .booster-card__back-pattern {
+  inset: 8%;
+  border: 0;
+  background:
+    repeating-linear-gradient(90deg, #c9a03a 0 3px, transparent 3px 6px, #c9a03a 6px 9px, transparent 9px 14px) top / 100% 4px no-repeat,
+    repeating-linear-gradient(90deg, #c9a03a 0 3px, transparent 3px 6px, #c9a03a 6px 9px, transparent 9px 14px) bottom / 100% 4px no-repeat;
+  opacity: 0.9;
+}
+[data-card-back="olympe"] .booster-card__back-sigil {
+  inline-size: 44%;
+  aspect-ratio: 1;
+  border: 2px solid #c9a03a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 4px #c9a03a66;
+  background: radial-gradient(circle at 35% 30%, #ffffff, #c8ccd2 55%, #8a9098);
+  color: #1e2a3a;
+}

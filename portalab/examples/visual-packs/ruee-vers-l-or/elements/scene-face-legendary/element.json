@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "ruee-or",
+  "names": {
+    "fr": "Face de filon d'or",
+    "en": "Gold lode face"
+  },
+  "descriptions": {
+    "fr": "Une carte légendaire taillée dans un filon d'or, une étoile de shérif, holographie, paillettes, l'image qui s'incline.",
+    "en": "A legendary card cut from a gold lode, a sheriff's star, holography, glitter, the art leaning."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

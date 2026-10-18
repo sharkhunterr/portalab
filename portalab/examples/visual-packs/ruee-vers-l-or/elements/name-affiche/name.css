@@ -1,0 +1,8 @@
+.name-style[data-name="affiche"] {
+  font-family: "Rockwell", "Courier New", serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #f7e6cc;
+  text-shadow: 1px 1px 0 #8a5a10, 2px 2px 0 #3a2410;
+}

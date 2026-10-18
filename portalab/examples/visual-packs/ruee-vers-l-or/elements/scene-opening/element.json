@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "ruee-meche",
+  "names": {
+    "fr": "La mèche",
+    "en": "The fuse"
+  },
+  "descriptions": {
+    "fr": "La mèche s'allume et crépite en descendant, la caisse tremble… puis tout saute : un éclair, un nuage de poussière et une pluie de pépites d'or — et les cartes avec (HD).",
+    "en": "The fuse catches and fizzles down, the crate shakes… then it all blows: a flash, a cloud of dust and a shower of gold nuggets — and the cards with it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "opening.glsl",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 3.0
+  }
+}

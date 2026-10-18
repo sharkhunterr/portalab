@@ -1,0 +1,100 @@
+/* An epic card: tooled leather (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform. */
+[data-card-face="ruee-cuir"] .booster-card__face {
+  isolation: isolate;
+  border: 0;
+  clip-path: polygon(0.0% 0.0%, 100.0% 0.0%, 100.0% 44.0%, 96.0% 50.0%, 100.0% 56.0%, 100.0% 100.0%, 0.0% 100.0%, 0.0% 56.0%, 4.0% 50.0%, 0.0% 44.0%);
+  background: linear-gradient(160deg, #e0a33a, #8a5a2c 50%, #4a2c14);
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.55rem rgba(224, 120, 160, 0.75));
+}
+[data-card-face="ruee-cuir"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  clip-path: polygon(0.0% 0.0%, 100.0% 0.0%, 100.0% 44.0%, 96.0% 50.0%, 100.0% 56.0%, 100.0% 100.0%, 0.0% 100.0%, 0.0% 56.0%, 4.0% 50.0%, 0.0% 44.0%);
+  background: repeating-radial-gradient(circle at 50% 30%, transparent 0 10px, #e0a33a1a 10px 11px), linear-gradient(175deg, #5a3418, #2a1708);
+}
+[data-card-face="ruee-cuir"] .booster-card__rarity,
+[data-card-face="ruee-cuir"] .booster-card__name {
+  color: #ffe0b0;
+  text-shadow: 0 0 0.6rem rgba(224, 120, 160, 0.75);
+}
+/* the holographic sheen: two colours in a band sliding over the card, lighter where they cross */
+[data-card-face="ruee-cuir"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: linear-gradient(115deg, transparent 0%, rgb(255, 120, 160) 30%, transparent 47.5%, transparent 52.5%, rgb(255, 210, 100) 70%, transparent 100%);
+  background-size: 300% 300%;
+  background-position: 50% 50%;
+  mix-blend-mode: screen;
+  opacity: 0.35;
+  animation: ruee-holo 9s ease infinite both;
+}
+/* glitter over the art, glimmering as the light moves */
+[data-card-face="ruee-cuir"] .booster-card__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 30%, #fff0e0 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 20%, #fff0e0 0 1.2px, transparent 2px),
+    radial-gradient(circle at 45% 75%, #fff0e0 0 0.9px, transparent 1.5px),
+    radial-gradient(circle at 85% 65%, #fff0e0 0 1.1px, transparent 1.8px);
+  background-size: 23px 29px, 31px 37px, 19px 23px, 41px 43px;
+  mix-blend-mode: screen;
+  opacity: 0.25;
+  animation: ruee-glitter 9s ease infinite both;
+}
+@keyframes ruee-holo {
+  0%, 100% { opacity: 0.12; background-position: 50% 50%; }
+  33% { opacity: 0.6; background-position: 100% 100%; }
+  66% { opacity: 0.6; background-position: 0% 0%; }
+}
+@keyframes ruee-glitter {
+  0%, 5%, 100% { opacity: 0.2; background-position: 50% 50%; }
+  33% { opacity: 0.9; background-position: 40% 40%; filter: brightness(1.8); }
+  45% { opacity: 0.35; }
+  66% { opacity: 0.9; background-position: 60% 60%; filter: brightness(1.8); }
+}
+@keyframes ruee-lean {
+  0%, 100% { transform: perspective(40rem) rotateX(0deg) rotateY(0deg); }
+  33% { transform: perspective(40rem) rotateX(6deg) rotateY(-7deg); }
+  66% { transform: perspective(40rem) rotateX(-6deg) rotateY(7deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="ruee-cuir"] .booster-card__face::after,
+  [data-card-face="ruee-cuir"] .booster-card__art::after,
+  [data-card-face="ruee-cuir"] .booster-card__art {
+    animation: none;
+  }
+}
+/* it keeps living: its glow pulsing, its frame shimmering, a light sweeping over it now and then */
+[data-card-face="ruee-cuir"] .booster-card__face {
+  background-size: 220% 220%;
+  animation: ruee-pulse-cuir 3s ease-in-out infinite;
+}
+@keyframes ruee-pulse-cuir {
+  0%, 100% { filter: drop-shadow(0 0 0.45rem rgba(224, 120, 160, 0.75)); background-position: 0% 50%; }
+  50% { filter: drop-shadow(0 0 1rem rgba(224, 120, 160, 0.75)); background-position: 100% 50%; }
+}
+[data-card-face="ruee-cuir"] .booster-card__shine {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.45) 50%, transparent 58%);
+  mix-blend-mode: screen;
+  animation: ruee-sweep 4.2s ease-in-out infinite;
+}
+@keyframes ruee-sweep {
+  0%, 55% { transform: translateX(-70%); }
+  85%, 100% { transform: translateX(70%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="ruee-cuir"] .booster-card__face,
+  [data-card-face="ruee-cuir"] .booster-card__shine {
+    animation: none;
+  }
+}

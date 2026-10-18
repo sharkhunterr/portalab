@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ruee",
+  "names": {
+    "fr": "Dos de cuir",
+    "en": "Leather back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est un cuir repoussé, une étoile de shérif au centre, des coutures sur les bords.",
+    "en": "Face down, every card is tooled leather, a sheriff's star in the middle, stitching along the edges."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

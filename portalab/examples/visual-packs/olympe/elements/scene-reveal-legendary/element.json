@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "olympe-foudre",
+  "names": {
+    "fr": "La foudre de Zeus",
+    "en": "Zeus's thunderbolt"
+  },
+  "descriptions": {
+    "fr": "Zeus en personne : des éclairs frappent autour de la carte, un halo d'or divin, des rayons de soleil, les nuages qui s'écartent (HD).",
+    "en": "Zeus himself: bolts striking round the card, a halo of divine gold, sunbeams, the clouds parting (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary"
+  }
+}

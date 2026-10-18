@@ -1,0 +1,28 @@
+{
+  "type": "title",
+  "look": "olympe-grave",
+  "product": "title_heros_de_l_olympe",
+  "names": {
+    "fr": "Titre : Héros de l'Olympe",
+    "en": "Title: Hero of Olympus"
+  },
+  "descriptions": {
+    "fr": "« Héros de l'Olympe » gravé en or sous votre nom.",
+    "en": "« Hero of Olympus » carved in gold under your name."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "payload": {
+    "label": "Hero of Olympus"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  }
+}

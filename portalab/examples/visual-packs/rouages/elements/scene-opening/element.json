@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "rouages-ouverture",
+  "names": {
+    "fr": "Le coffre se déverrouille",
+    "en": "The safe unlocks"
+  },
+  "descriptions": {
+    "fr": "La roue de combinaison tourne, les manomètres s'affolent, les soupapes lâchent la vapeur — puis la porte s'ouvre dans un éclair doré (HD).",
+    "en": "The combination wheel spins, the gauges go wild, the valves let off steam — then the door swings open in a golden flash (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "opening.glsl",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.8
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "olympe",
+  "names": {
+    "fr": "Dos de marbre",
+    "en": "Marble back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est une plaque de marbre veiné, une frise grecque dorée sur le pourtour, la chouette d'Athéna au centre.",
+    "en": "Face down, every card is a veined marble plaque, a gold Greek key round the edge, Athena's owl in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

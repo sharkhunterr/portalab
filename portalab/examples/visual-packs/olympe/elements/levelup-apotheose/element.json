@@ -1,0 +1,29 @@
+{
+  "type": "level_up",
+  "look": "apotheose",
+  "product": "levelup_apotheose",
+  "names": {
+    "fr": "Apothéose",
+    "en": "Apotheosis"
+  },
+  "descriptions": {
+    "fr": "Les nuages s'ouvrent, une colonne de lumière descend de l'Olympe, des plumes dorées tombent, une couronne de laurier se pose sur votre nouveau niveau (HD).",
+    "en": "The clouds part, a column of light comes down from Olympus, golden feathers fall, a laurel wreath settles on your new level (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "apotheosis.glsl",
+    "css": [
+      "card.css"
+    ],
+    "stage": true,
+    "reveal": 2.2
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "levels",
+    "icon": "trophy"
+  }
+}

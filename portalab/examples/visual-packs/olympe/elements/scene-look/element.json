@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "olympe",
+  "names": {
+    "fr": "Amphore à figures noires",
+    "en": "Black-figure amphora"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient une amphore de terre cuite à figures noires, une frise grecque, deux anses ; une lueur dorée palpite derrière (HD).",
+    "en": "The pack becomes a terracotta black-figure amphora, a Greek key, two handles; a golden glow throbs behind (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "look.glsl",
+    "css": [
+      "look.css"
+    ],
+    "stage": true
+  }
+}

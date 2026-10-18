@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "rouages-tesla",
+  "names": {
+    "fr": "Bobine de Tesla",
+    "en": "Tesla coil"
+  },
+  "descriptions": {
+    "fr": "Un mécanisme d'horloge géant tourne derrière la carte, des arcs électriques bleus jaillissent de bobines, un éclair doré et une pluie d'étincelles (HD).",
+    "en": "A giant clockwork turns behind the card, blue arcs leap from coils, a golden flash and a rain of sparks (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary"
+  }
+}

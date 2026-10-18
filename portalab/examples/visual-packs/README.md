@@ -30,6 +30,14 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   (a scrolling pixel world, a cartridge, a console powering on, pixel coins and fireworks) and **a cyberpunk
   megacity in the rain** (holograms, flying cars, a data shard hacked, its ICE shattering, neon arcs). Every
   scene's effects fade out inside an ellipse of their layer, so its box never shows.
+- `rouages/`, `ruee-vers-l-or/`, `olympe/`: **three complete universes**, each one pack of every kind of look a
+  member wears (no messenger bubble): an interface (colours, fonts, layout, sounds, its own words — « L'atelier »,
+  « Le saloon », « Le temple »…; Olympe is a light one, on marble), a palette, a GPU ambience and profile
+  background, a CSS frame and a GPU frame, a banner, a name style, a level badge, a GPU level-up, a GPU
+  celebration, a notification style and animation, a title, a badge, the theme pack selling them all, and its
+  booster in a whole scene of its own — a brass safe in an engine room (steampunk), a dynamite crate whose fuse
+  burns down on Main Street at dusk (Wild West), a black-figure amphora shattered by Zeus's thunderbolt on the
+  summit of Olympus (Greek myth) — with its card back, a face shaped per rarity and GPU reveals.
 - `widgets/` (`vigie`): **self-contained widgets** (spec 028, US6) — everything they do is in the pack: a new
   widget « Heading » (a compass of the member's progression, drawing itself on one line, in a column or as a
   block, with its own setting « dial » whose silver value is sold and night value offered, reading the

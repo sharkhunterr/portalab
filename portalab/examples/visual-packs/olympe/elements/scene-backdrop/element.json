@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "olympe",
+  "names": {
+    "fr": "Le sommet de l'Olympe",
+    "en": "The summit of Olympus"
+  },
+  "descriptions": {
+    "fr": "Toute la scène au sommet de l'Olympe : un temple de marbre au-dessus d'une mer de nuages, des rayons de soleil, un aigle qui tourne, des éclairs lointains dans les nuages (HD).",
+    "en": "The whole stage on the summit of Olympus: a marble temple above a sea of clouds, sunbeams, an eagle circling, far lightning in the clouds (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "stage.glsl",
+    "stage": true
+  }
+}

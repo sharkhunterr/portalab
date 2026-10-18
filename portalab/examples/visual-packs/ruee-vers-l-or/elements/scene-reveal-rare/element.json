@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "ruee-lasso",
+  "names": {
+    "fr": "Coup de lasso",
+    "en": "Lasso throw"
+  },
+  "descriptions": {
+    "fr": "Un lasso tournoie autour de la carte et se resserre, de la poussière s'en échappe (HD).",
+    "en": "A lasso whirls round the card and tightens, dust flying off it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

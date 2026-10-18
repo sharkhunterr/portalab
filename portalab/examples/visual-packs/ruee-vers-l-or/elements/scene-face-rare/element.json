@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "ruee-turquoise",
+  "names": {
+    "fr": "Face turquoise",
+    "en": "Turquoise face"
+  },
+  "descriptions": {
+    "fr": "Une carte rare d'argent serti de turquoise, coins tranchés, holographique.",
+    "en": "A rare card of silver set with turquoise, cut corners, holographic."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

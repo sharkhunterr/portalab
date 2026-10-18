@@ -1,0 +1,22 @@
+/* a braided lasso rope turning round the avatar */
+.avatar-frame[data-frame="lasso"] {
+  background: #1c120c;
+  box-shadow: 0 0 0.6rem #e0a33a55;
+}
+.avatar-frame[data-frame="lasso"]::before {
+  content: "";
+  position: absolute;
+  inset: -4%;
+  z-index: -1;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, #c89a5a 0 6deg, #8a6234 6deg 9deg, #e4c28a 9deg 12deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 60%, #000 61% 69%, transparent 70%);
+  mask: radial-gradient(circle, transparent 0 60%, #000 61% 69%, transparent 70%);
+  animation: ruee-spin 9s linear infinite;
+}
+@keyframes ruee-spin {
+  to { transform: rotate(1turn); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .avatar-frame[data-frame="lasso"]::before { animation: none; }
+}

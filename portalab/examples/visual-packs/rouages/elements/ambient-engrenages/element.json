@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "look": "engrenages",
+  "product": "ambient_engrenages",
+  "names": {
+    "fr": "Salle des machines",
+    "en": "Engine room"
+  },
+  "descriptions": {
+    "fr": "Derrière le portail, une salle des machines : de grands engrenages de laiton qui tournent aux bords, des bouffées de vapeur qui montent, la lueur d'une chaudière.",
+    "en": "Behind the portal, an engine room: great brass gears turning at the edges, puffs of steam rising, a boiler's glow."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "gears.glsl"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "level": 12,
+    "collection": "ambients",
+    "icon": "telescope"
+  }
+}

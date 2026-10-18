@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "rouages-cuivre",
+  "names": {
+    "fr": "Face de cuivre",
+    "en": "Copper face"
+  },
+  "descriptions": {
+    "fr": "Une carte commune en cuivre patiné.",
+    "en": "A common card of weathered copper."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

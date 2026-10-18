@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "ruee",
+  "names": {
+    "fr": "La grand-rue",
+    "en": "Main Street"
+  },
+  "descriptions": {
+    "fr": "Toute la scène dans la grand-rue au crépuscule : le saloon et ses lanternes, une éolienne qui tourne, des buissons qui roulent, un tourbillon de poussière, des vautours (HD).",
+    "en": "The whole stage on Main Street at dusk: the saloon and its lanterns, a windmill turning, tumbleweeds rolling, a dust devil, vultures (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "stage.glsl",
+    "stage": true
+  }
+}

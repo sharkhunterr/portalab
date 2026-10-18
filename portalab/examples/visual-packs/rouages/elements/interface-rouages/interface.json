@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 2,
+  "key": "rouages",
+  "name": "Rouages",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#1a1410",
+    "surfaceRaised": "#261c14",
+    "text": "#f3e6cf",
+    "textMuted": "#c2a984",
+    "border": "#4a3726",
+    "accent": "#d39b45",
+    "accentContrast": "#1a1008",
+    "focus": "#f0c070",
+    "accentAlt": "#b4532a",
+    "rarity": {
+      "common": "#c2a984",
+      "rare": "#6fc3b8",
+      "epic": "#d08bd9",
+      "legendary": "#ffd27a"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2f2c3b",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#252c33",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#352a2e",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#332a2c",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#352534",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#332736",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#2d263e",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#342639",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#2d2938",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#272a3d",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Georgia, \"Plus Jakarta Sans Variable\", serif",
+    "headingFamily": "\"Rockwell\", Georgia, serif",
+    "headingCase": "none",
+    "headingEffect": "glow"
+  },
+  "radii": {
+    "sm": 0.3,
+    "md": 0.5
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "jetvapeur",
+    "fastMs": 170,
+    "normalMs": 360,
+    "levelUp": "chaudiere"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "tabs",
+      "tablet": "tabs",
+      "phone": "drawer"
+    },
+    "header": "centered",
+    "headerPosition": "top",
+    "cards": "ornate",
+    "content": "wide",
+    "corners": "round",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "search": "compass",
+      "shop": "package"
+    }
+  },
+  "background": {
+    "fallback": "#1a1410",
+    "pattern": "none",
+    "ambient": "engrenages"
+  },
+  "sounds": {
+    "notification": "asset:tracker/notification.wav",
+    "alert": "asset:tracker/alert.wav",
+    "success": "asset:tracker/success.wav",
+    "reward": "asset:tracker/reward.wav",
+    "levelUp": "asset:tracker/level-up.wav",
+    "ui": "asset:tracker/ui.wav"
+  },
+  "notification": {
+    "style": "plaque-laiton",
+    "animation": "piston"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "L'atelier",
+      "nav:nav.section.home": "L'atelier",
+      "dashboard:title": "L'atelier",
+      "nav:nav.media": "Le kinétoscope",
+      "nav:nav.section.media": "Le kinétoscope",
+      "media:home.title": "Le kinétoscope",
+      "nav:nav.section.content": "Les gazettes",
+      "nav:nav.news": "La gazette de la guilde",
+      "news:title": "La gazette de la guilde",
+      "nav:nav.wiki": "Le grand manuel",
+      "wiki:title": "Le grand manuel",
+      "nav:nav.community": "La guilde",
+      "nav:nav.section.community": "La guilde",
+      "community:title": "La guilde",
+      "nav:nav.marketplace": "La boutique de l'horloger",
+      "nav:nav.section.marketplace": "La boutique de l'horloger",
+      "marketplace:catalog.title": "La boutique de l'horloger",
+      "nav:nav.support": "L'infirmerie à vapeur",
+      "nav:nav.section.support": "L'infirmerie à vapeur",
+      "gamification:value.coins": "Écrous"
+    },
+    "en": {
+      "nav:nav.home": "The workshop",
+      "nav:nav.section.home": "The workshop",
+      "dashboard:title": "The workshop",
+      "nav:nav.media": "The kinetoscope",
+      "nav:nav.section.media": "The kinetoscope",
+      "media:home.title": "The kinetoscope",
+      "nav:nav.section.content": "The gazettes",
+      "nav:nav.news": "The guild gazette",
+      "news:title": "The guild gazette",
+      "nav:nav.wiki": "The great manual",
+      "wiki:title": "The great manual",
+      "nav:nav.community": "The guild",
+      "nav:nav.section.community": "The guild",
+      "community:title": "The guild",
+      "nav:nav.marketplace": "The clockmaker's shop",
+      "nav:nav.section.marketplace": "The clockmaker's shop",
+      "marketplace:catalog.title": "The clockmaker's shop",
+      "nav:nav.support": "The steam infirmary",
+      "nav:nav.section.support": "The steam infirmary",
+      "gamification:value.coins": "Bolts"
+    }
+  }
+}

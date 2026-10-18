@@ -1,0 +1,6 @@
+.cosmetic-badge[data-style="rouages-laiton"] {
+  border-color: #d39b45;
+  color: #2a1708;
+  background: linear-gradient(135deg, #f3cf86, #d39b45 50%, #b9862f);
+  box-shadow: 0 0 10px #d39b4588;
+}

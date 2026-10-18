@@ -1,0 +1,39 @@
+{
+  "type": "bundle",
+  "product": "ultimate_rouages",
+  "names": {
+    "fr": "Pack de thème Rouages",
+    "en": "Cogwork theme pack"
+  },
+  "descriptions": {
+    "fr": "Tout l'univers Rouages : son interface et tout ce qui va avec.",
+    "en": "The whole Cogwork universe: its interface and everything that goes with it."
+  },
+  "payload": {
+    "products": [
+      "theme_rouages",
+      "palette_rouages",
+      "ambient_engrenages",
+      "background_atelier",
+      "frame_engrenage",
+      "frame_horloge",
+      "banner_dirigeable",
+      "name_laiton",
+      "level_manometre",
+      "levelup_chaudiere",
+      "effect_jetvapeur",
+      "notif_plaque_laiton",
+      "notifanim_piston",
+      "title_ingenieur_des_brumes",
+      "badge_rouage_or"
+    ]
+  },
+  "economy": {
+    "price": 5400,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "ultimate",
+    "icon": "crown",
+    "supply": 10
+  }
+}

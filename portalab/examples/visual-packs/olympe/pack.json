@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "olympe",
+  "version": "1.0.5",
+  "names": {
+    "fr": "Olympe — univers des dieux grecs",
+    "en": "Olympus — a universe of the Greek gods"
+  },
+  "descriptions": {
+    "fr": "Un univers complet de mythologie grecque : une interface de marbre, d'or et de bleu égéen, de la poussière d'or et des feuilles d'olivier derrière le portail, une couronne de laurier et le bouclier de Zeus, une bannière du Parthénon, un nom gravé à la grecque, une apothéose à chaque niveau, une pluie d'or — et son booster, une amphore à figures noires qui vole en éclats.",
+    "en": "A whole Greek-myth universe: an interface of marble, gold and Aegean blue, gold dust and olive leaves behind the portal, a laurel wreath and Zeus's shield, a Parthenon banner, a Greek-carved name, an apotheosis at every level, a shower of gold — and its booster, a black-figure amphora that shatters."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

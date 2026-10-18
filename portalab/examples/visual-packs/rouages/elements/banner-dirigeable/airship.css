@@ -1,0 +1,26 @@
+/* a copper airship drifting across a sunset above the rooftops */
+.profile-banner[data-banner="dirigeable"] {
+  background:
+    linear-gradient(0deg, #1a1008 0 14%, transparent 14%),
+    repeating-linear-gradient(90deg, #2a1a0e 0 6%, transparent 6% 9%, #2a1a0e 9% 13%, transparent 13% 20%) 0 100% / 100% 34% no-repeat,
+    radial-gradient(circle at 75% 70%, #ffcf7a 0 6%, #ff9a4a 12%, transparent 30%),
+    linear-gradient(180deg, #3a2a4a, #b4532a 60%, #e8a050);
+}
+.profile-banner[data-banner="dirigeable"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 18%;
+  inset-inline-start: -20%;
+  inline-size: 22%;
+  aspect-ratio: 3.2;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #d0703e, #7a3412);
+  box-shadow: 0 0.9rem 0 -0.55rem #3a2010;
+  animation: rouages-fly 28s linear infinite;
+}
+@keyframes rouages-fly {
+  to { transform: translateX(560%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-banner[data-banner="dirigeable"]::before { animation: none; inset-inline-start: 30%; }
+}

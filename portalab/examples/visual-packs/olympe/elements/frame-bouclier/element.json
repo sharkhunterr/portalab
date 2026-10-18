@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "look": "bouclier-zeus",
+  "product": "frame_bouclier_zeus",
+  "names": {
+    "fr": "Bouclier de Zeus",
+    "en": "Zeus's shield"
+  },
+  "descriptions": {
+    "fr": "Un bouclier de bronze autour de votre avatar, parcouru d'éclairs bleus (HD).",
+    "en": "A bronze shield round your avatar, crackling with blue lightning (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "shield.glsl",
+    "shape": 3
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "level": 14,
+    "collection": "profile",
+    "icon": "user"
+  }
+}

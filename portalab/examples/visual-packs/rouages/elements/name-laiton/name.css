@@ -1,0 +1,17 @@
+.name-style[data-name="laiton"] {
+  font-family: "Rockwell", Georgia, serif;
+  letter-spacing: 0.05em;
+  background: linear-gradient(100deg, #8a5a1c 20%, #f3cf86 45%, #b9862f 55%, #8a5a1c 80%);
+  background-size: 240% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 #2a1708);
+  animation: rouages-gleam 5s ease-in-out infinite;
+}
+@keyframes rouages-gleam {
+  50% { background-position: 100% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .name-style[data-name="laiton"] { animation: none; }
+}

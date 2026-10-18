@@ -1,0 +1,25 @@
+{
+  "type": "notification_style",
+  "look": "avis-recherche",
+  "product": "notif_avis_recherche",
+  "names": {
+    "fr": "Notifications avis de recherche",
+    "en": "Wanted poster notifications"
+  },
+  "descriptions": {
+    "fr": "Des notifications sur un papier d'affiche jauni, punaisé.",
+    "en": "Notifications on yellowed poster paper, pinned up."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "poster.css"
+    ]
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  }
+}

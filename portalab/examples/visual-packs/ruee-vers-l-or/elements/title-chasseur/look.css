@@ -1,0 +1,7 @@
+.cosmetic-title[data-style="ruee-affiche"] {
+  font-family: "Rockwell", "Courier New", serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #e0a33a;
+  text-shadow: 1px 1px 0 #3a2410;
+}

@@ -1,0 +1,26 @@
+{
+  "type": "effect",
+  "look": "jetvapeur",
+  "product": "effect_jetvapeur",
+  "names": {
+    "fr": "Jet de vapeur",
+    "en": "Steam blast"
+  },
+  "descriptions": {
+    "fr": "Un jet de vapeur jaillit de la récompense, des écrous et des engrenages s'envolent en tournant (HD).",
+    "en": "A blast of steam bursts from the reward, bolts and gears flying out spinning (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "steam.glsl",
+    "stage": true,
+    "duration": 3.0
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "epic",
+    "level": 9,
+    "collection": "celebrations",
+    "icon": "party"
+  }
+}

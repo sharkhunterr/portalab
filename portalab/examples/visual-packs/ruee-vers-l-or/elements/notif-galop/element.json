@@ -1,0 +1,25 @@
+{
+  "type": "notification_animation",
+  "look": "galop",
+  "product": "notifanim_galop",
+  "names": {
+    "fr": "Animation de notification galop",
+    "en": "Gallop notification animation"
+  },
+  "descriptions": {
+    "fr": "Les notifications arrivent au galop, en rebondissant.",
+    "en": "Notifications come in at a gallop, bouncing."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "gallop.css"
+    ]
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  }
+}

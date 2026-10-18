@@ -1,0 +1,25 @@
+/* a toothed brass crown turning round the avatar (a conic gradient, its teeth a repeating cone) */
+.avatar-frame[data-frame="engrenage"] {
+  background: #1a1008;
+  box-shadow: 0 0 0.8rem #d39b4566;
+}
+.avatar-frame[data-frame="engrenage"]::before {
+  content: "";
+  position: absolute;
+  inset: -5%;
+  z-index: -1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 62%, #6b4419 63% 66%, transparent 67%),
+    repeating-conic-gradient(from 0deg, #e2b25a 0 7deg, #8a5a1c 7deg 10deg, transparent 10deg 15deg),
+    radial-gradient(circle, #b98637 0 74%, transparent 75%);
+  -webkit-mask: radial-gradient(circle, transparent 0 58%, #000 59%);
+  mask: radial-gradient(circle, transparent 0 58%, #000 59%);
+  animation: rouages-turn 18s linear infinite;
+}
+@keyframes rouages-turn {
+  to { transform: rotate(1turn); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .avatar-frame[data-frame="engrenage"]::before { animation: none; }
+}

@@ -1,0 +1,43 @@
+/* The sealed pack (its hook: data-booster-look): a riveted brass safe, its combination wheel, two gauges. */
+[data-booster-look="rouages"] .booster-pack {
+  border-radius: 0.4rem;
+  background:
+    radial-gradient(circle at 10% 8%, #6b4419 0 2px, transparent 3px), radial-gradient(circle at 90% 8%, #6b4419 0 2px, transparent 3px),
+    radial-gradient(circle at 10% 92%, #6b4419 0 2px, transparent 3px), radial-gradient(circle at 90% 92%, #6b4419 0 2px, transparent 3px),
+    radial-gradient(circle at 26% 22%, #fbf1dc 0 8%, #b9862f 8.5% 10%, transparent 10.5%),
+    radial-gradient(circle at 74% 22%, #fbf1dc 0 8%, #b9862f 8.5% 10%, transparent 10.5%),
+    linear-gradient(160deg, #e2b25a, #b9862f 40%, #8a5a1c 75%, #d39b45);
+  box-shadow: inset 0 0 0 3px #6b4419, inset 0 0 1.4rem #2a1708aa, 0 0 2rem #b4532a55;
+}
+[data-booster-look="rouages"] .booster-pack__stars,
+[data-booster-look="rouages"] .booster-pack__foil { opacity: 0; }
+[data-booster-look="rouages"] .booster-pack__flap { border: 0; background: none; }
+/* the combination wheel */
+[data-booster-look="rouages"] .booster-pack__emblem {
+  inline-size: 44%;
+  background:
+    repeating-conic-gradient(from 0deg, #2a1708 0 2deg, transparent 2deg 15deg),
+    radial-gradient(circle, #f3cf86 0 18%, #8a5a1c 20% 24%, #d39b45 26% 66%, #6b4419 68%);
+  color: transparent;
+  box-shadow: 0 0 0 3px #6b4419;
+  filter: none;
+}
+[data-booster-look="rouages"] .booster-pack__name { color: #2a1708; text-shadow: 0 1px 0 #f3cf86; letter-spacing: 0.1em; }
+
+/* tension: the sealed pack breathes, a double heartbeat now and then — waiting to be opened */
+[data-booster-look="rouages"] .booster-stage__tear {
+  animation: booster-hover 4s ease-in-out infinite, rouages-heartbeat 3.4s ease-in-out infinite;
+}
+/* on « scale », added to the float of Portalab's own (never replacing it) */
+@keyframes rouages-heartbeat {
+  0%, 60%, 100% { scale: 1; }
+  66% { scale: 1.022; }
+  71% { scale: 0.996; }
+  77% { scale: 1.035; }
+  86% { scale: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="rouages"] .booster-stage__tear {
+    animation: none;
+  }
+}

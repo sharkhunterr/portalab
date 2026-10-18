@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "ruee",
+  "names": {
+    "fr": "Scène Ruée vers l'or",
+    "en": "Gold Rush scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture dans une ville du Far West. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening in a Wild West town. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "scene-look",
+      "backdrop": "scene-backdrop",
+      "opening": "scene-opening",
+      "back": {
+        "common": "scene-back"
+      },
+      "face": {
+        "common": "scene-face-common",
+        "rare": "scene-face-rare",
+        "epic": "scene-face-epic",
+        "legendary": "scene-face-legendary"
+      },
+      "reveal": {
+        "rare": "scene-reveal-rare",
+        "epic": "scene-reveal-epic",
+        "legendary": "scene-reveal-legendary"
+      }
+    }
+  }
+}

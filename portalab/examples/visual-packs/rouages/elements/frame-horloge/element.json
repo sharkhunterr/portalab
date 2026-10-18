@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "look": "horloge",
+  "product": "frame_horloge",
+  "names": {
+    "fr": "Cadre horloge",
+    "en": "Clock frame"
+  },
+  "descriptions": {
+    "fr": "Un cadran d'horloge de laiton autour de votre avatar, ses graduations, une aiguille qui avance par à-coups et un éclat de vapeur (HD).",
+    "en": "A brass clock dial round your avatar, its graduations, a hand ticking forward and a puff of steam (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "clock.glsl",
+    "shape": 0
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "level": 14,
+    "collection": "profile",
+    "icon": "user"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "type": "level_badge",
+  "look": "manometre",
+  "product": "level_manometre",
+  "names": {
+    "fr": "Badge de niveau manomètre",
+    "en": "Pressure gauge level badge"
+  },
+  "descriptions": {
+    "fr": "Votre niveau sur un manomètre de laiton, son aiguille qui frémit.",
+    "en": "Your level on a brass pressure gauge, its needle quivering."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "gauge.css"
+    ]
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  }
+}

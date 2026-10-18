@@ -1,0 +1,27 @@
+{
+  "type": "theme",
+  "look": "olympe",
+  "product": "theme_olympe",
+  "names": {
+    "fr": "Interface Olympe",
+    "en": "Olympus interface"
+  },
+  "descriptions": {
+    "fr": "Un temple clair : marbre veiné, or et bleu égéen, titres en petites capitales, la navigation en onglets comme une frise, une frise grecque sous l'en-tête, et le vocabulaire de l'Olympe (le temple, l'agora, le marché d'Athènes…).",
+    "en": "A bright temple: veined marble, gold and Aegean blue, small-capital headings, the navigation as tabs like a frieze, a Greek key under the header, and Olympus's words (the temple, the agora, the Athens market…)."
+  },
+  "render": {
+    "kind": "theme",
+    "file": "interface.json",
+    "css": [
+      "interface.css"
+    ]
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "themes",
+    "icon": "palette"
+  }
+}

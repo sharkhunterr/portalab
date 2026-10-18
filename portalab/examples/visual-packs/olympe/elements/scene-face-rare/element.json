@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "olympe-bronze",
+  "names": {
+    "fr": "Face de bronze",
+    "en": "Bronze face"
+  },
+  "descriptions": {
+    "fr": "Une carte rare en bronze poli, coins tranchés comme un bouclier d'hoplite, holographique.",
+    "en": "A rare card of polished bronze, cut corners like a hoplite's shield, holographic."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

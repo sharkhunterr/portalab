@@ -1,0 +1,11 @@
+/* the level's card on a riveted brass plate (only this look's card) */
+.levelup[data-look="chaudiere"] .levelup__card {
+  border: 2px solid #d39b45;
+  background: linear-gradient(180deg, #2a1d12f2, #1a1008f2);
+  color: #f3e6cf;
+  box-shadow: 0 0 2.4rem #b4532a66, inset 0 0 0 4px #1a1008, inset 0 0 0 5px #8a5a1c;
+}
+.levelup[data-look="chaudiere"] .levelup__title {
+  color: #f3cf86;
+  text-shadow: 0 0 0.8rem #d39b45aa;
+}

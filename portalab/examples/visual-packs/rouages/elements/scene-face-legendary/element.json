@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "rouages-horloge",
+  "names": {
+    "fr": "Face mécanique d'or",
+    "en": "Golden clockwork face"
+  },
+  "descriptions": {
+    "fr": "Une carte légendaire d'or ouvragé, un mécanisme d'horloge visible, holographie, paillettes, l'image qui s'incline.",
+    "en": "A legendary card of wrought gold, a clockwork movement showing, holography, glitter, the art leaning."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

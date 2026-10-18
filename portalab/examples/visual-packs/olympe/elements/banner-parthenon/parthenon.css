@@ -1,0 +1,29 @@
+/* the Parthenon on its hill, the Aegean behind, a gull gliding across */
+.profile-banner[data-banner="parthenon"] {
+  background:
+    linear-gradient(0deg, #c8b48a 0 14%, transparent 14%),
+    linear-gradient(to top left, #e6dccb 49%, transparent 51%) 38.3% 37% / 19% 8% no-repeat,
+    linear-gradient(to top right, #e6dccb 49%, transparent 51%) 61.7% 37% / 19% 8% no-repeat,
+    linear-gradient(180deg, #f2ece0 0 60%, #d8ccb6 60%) 50% 45.6% / 38% 8% no-repeat,
+    repeating-linear-gradient(90deg, #f6f2ea 0 5%, transparent 5% 9%) 50% 76% / 34% 36% no-repeat,
+    linear-gradient(180deg, transparent 0 58%, #2f7ab8 58% 86%, transparent 86%),
+    linear-gradient(180deg, #8ec5ef, #d8ecfa 60%);
+}
+.profile-banner[data-banner="parthenon"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 22%;
+  inset-inline-start: -6%;
+  inline-size: 3%;
+  aspect-ratio: 3;
+  border-block-start: 2px solid #ffffff;
+  border-radius: 50% 50% 0 0;
+  animation: olympe-gull 16s linear infinite;
+}
+@keyframes olympe-gull {
+  50% { translate: 1800% 0.6rem; }
+  to { translate: 3600% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-banner[data-banner="parthenon"]::after { animation: none; inset-inline-start: 70%; }
+}

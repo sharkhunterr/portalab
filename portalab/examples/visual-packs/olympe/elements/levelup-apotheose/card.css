@@ -1,0 +1,12 @@
+/* the level's card as a marble tablet edged in gold (only this look's card) */
+.levelup[data-look="apotheose"] .levelup__card {
+  border: 2px solid #c9a03a;
+  background: linear-gradient(180deg, #fffdf8f2, #efe8dbf2);
+  color: #1e2a3a;
+  box-shadow: 0 0 2.4rem #e6c15a77;
+}
+.levelup[data-look="apotheose"] .levelup__title {
+  color: #8a6410;
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+}

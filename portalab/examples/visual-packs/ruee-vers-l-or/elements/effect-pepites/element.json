@@ -1,0 +1,26 @@
+{
+  "type": "effect",
+  "look": "pepites",
+  "product": "effect_pepites",
+  "names": {
+    "fr": "Pluie de pépites",
+    "en": "Nugget burst"
+  },
+  "descriptions": {
+    "fr": "Des pépites d'or jaillissent de la récompense, étincellent et retombent dans un nuage de poussière (HD).",
+    "en": "Gold nuggets burst from the reward, glint and fall back in a cloud of dust (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "nuggets.glsl",
+    "stage": true,
+    "duration": 3.0
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "epic",
+    "level": 9,
+    "collection": "celebrations",
+    "icon": "party"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "rouages-tempete",
+  "names": {
+    "fr": "Tempête d'engrenages",
+    "en": "Gear storm"
+  },
+  "descriptions": {
+    "fr": "Une tempête d'engrenages tourne autour de la carte, s'engrène et s'emballe, de la vapeur entre eux (HD).",
+    "en": "A storm of gears whirls round the card, meshing and racing, steam between them (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic"
+  }
+}

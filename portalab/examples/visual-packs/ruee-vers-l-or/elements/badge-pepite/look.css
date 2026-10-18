@@ -1,0 +1,6 @@
+.cosmetic-badge[data-style="ruee-or"] {
+  border-color: #e0a33a;
+  color: #2a1708;
+  background: radial-gradient(circle at 35% 30%, #fff0b8, #e0a33a 55%, #8a5a10);
+  box-shadow: 0 0 10px #e0a33a88;
+}

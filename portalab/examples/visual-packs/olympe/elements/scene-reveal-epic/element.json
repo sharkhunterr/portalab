@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "olympe-pegase",
+  "names": {
+    "fr": "Les ailes de Pégase",
+    "en": "Pegasus's wings"
+  },
+  "descriptions": {
+    "fr": "Deux grandes ailes blanches se déploient derrière la carte, des plumes s'envolent dans un vent doré (HD).",
+    "en": "Two great white wings unfold behind the card, feathers flying in a golden wind (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.2,
+    "rarity": "epic"
+  }
+}

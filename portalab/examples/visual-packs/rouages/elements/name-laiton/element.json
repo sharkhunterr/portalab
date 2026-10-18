@@ -1,0 +1,25 @@
+{
+  "type": "name_style",
+  "look": "laiton",
+  "product": "name_laiton",
+  "names": {
+    "fr": "Laiton gravé",
+    "en": "Engraved brass"
+  },
+  "descriptions": {
+    "fr": "Votre nom gravé dans le laiton, un reflet qui glisse dessus.",
+    "en": "Your name engraved in brass, a gleam gliding over it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "name.css"
+    ]
+  },
+  "economy": {
+    "price": 380,
+    "rarity": "rare",
+    "collection": "names",
+    "icon": "feather"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "look": "olivier",
+  "product": "ambient_olivier",
+  "names": {
+    "fr": "Poussière d'or et oliviers",
+    "en": "Gold dust and olive leaves"
+  },
+  "descriptions": {
+    "fr": "Derrière le portail, une poussière d'or qui flotte dans un rayon de soleil et des feuilles d'olivier qui tombent doucement.",
+    "en": "Behind the portal, gold dust floating in a sunbeam and olive leaves drifting gently down."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "olive.glsl"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "level": 12,
+    "collection": "ambients",
+    "icon": "telescope"
+  }
+}

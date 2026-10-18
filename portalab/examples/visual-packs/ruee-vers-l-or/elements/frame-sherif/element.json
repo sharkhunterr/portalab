@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "look": "etoile-sherif",
+  "product": "frame_etoile_sherif",
+  "names": {
+    "fr": "Cadre étoile de shérif",
+    "en": "Sheriff's star frame"
+  },
+  "descriptions": {
+    "fr": "Une étoile de shérif en or autour de votre avatar, qui étincelle au soleil (HD).",
+    "en": "A gold sheriff's star round your avatar, glinting in the sun (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "star.glsl",
+    "shape": 4
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "level": 14,
+    "collection": "profile",
+    "icon": "user"
+  }
+}

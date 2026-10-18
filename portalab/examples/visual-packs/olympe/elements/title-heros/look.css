@@ -1,0 +1,7 @@
+.cosmetic-title[data-style="olympe-grave"] {
+  font-family: "Trajan Pro", "Cinzel", Georgia, serif;
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+  color: #8a6410;
+  text-shadow: 0 1px 0 #ffffff;
+}

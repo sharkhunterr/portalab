@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "rouages-laiton",
+  "names": {
+    "fr": "Face de laiton",
+    "en": "Brass face"
+  },
+  "descriptions": {
+    "fr": "Une carte rare de laiton poli, coins tranchés, holographique.",
+    "en": "A rare card of polished brass, cut corners, holographic."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

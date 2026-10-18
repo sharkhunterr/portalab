@@ -1,0 +1,39 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening): the wheel spins, the safe shudders, the
+   door swings open on its hinge and is gone. */
+[data-opening="rouages-ouverture"] .booster-stage__tear .booster-pack {
+  transform-origin: 0% 50%;
+  animation: rouages-door 2.8s cubic-bezier(0.5, 0, 0.7, 0.4) both;
+}
+[data-opening="rouages-ouverture"][data-booster-look] .booster-stage__tear .booster-pack .booster-pack__emblem {
+  animation: rouages-wheel 2.8s ease-in-out both;
+}
+[data-opening="rouages-ouverture"][data-booster-look] .booster-stage__tear .booster-stage__rising span {
+  border: 1px solid #f3cf86;
+  border-radius: 0.3rem;
+  background: linear-gradient(160deg, #6b4419, #2a1708);
+  box-shadow: 0 0 1.1rem #ffcf7aaa;
+  animation: rouages-out 2.8s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.06s);
+}
+@keyframes rouages-wheel {
+  0% { rotate: 0deg; }
+  20% { rotate: 200deg; }
+  35% { rotate: 80deg; }
+  50%, 100% { rotate: 360deg; }
+}
+@keyframes rouages-door {
+  0%, 10% { transform: none; filter: none; }
+  20%, 30%, 40% { transform: translateX(-2px); filter: brightness(1.15); }
+  25%, 35%, 45% { transform: translateX(2px); }
+  55% { transform: perspective(40rem) rotateY(-10deg); filter: brightness(1.4); opacity: 1; }
+  70% { transform: perspective(40rem) rotateY(-95deg); filter: brightness(2); opacity: 1; }
+  76%, 100% { transform: perspective(40rem) rotateY(-110deg); opacity: 0; }
+}
+@keyframes rouages-out {
+  0%, 66% { opacity: 0; transform: scale(0.3); }
+  72% { opacity: 1; }
+  100% { opacity: 1; transform: translate(calc((var(--i, 0) - 2) * 42%), -14%) rotate(calc((var(--i, 0) - 2) * 7deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="rouages-ouverture"] .booster-stage__tear .booster-pack { animation: none; }
+}

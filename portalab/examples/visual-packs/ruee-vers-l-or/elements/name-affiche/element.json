@@ -1,0 +1,25 @@
+{
+  "type": "name_style",
+  "look": "affiche",
+  "product": "name_affiche",
+  "names": {
+    "fr": "Avis de recherche",
+    "en": "Wanted poster"
+  },
+  "descriptions": {
+    "fr": "Votre nom en grandes lettres d'affiche à l'encre usée, un liseré d'or.",
+    "en": "Your name in big poster letters of worn ink, a gold edging."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "name.css"
+    ]
+  },
+  "economy": {
+    "price": 380,
+    "rarity": "rare",
+    "collection": "names",
+    "icon": "feather"
+  }
+}

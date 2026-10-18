@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "rouages-anneau",
+  "names": {
+    "fr": "Anneau de vapeur",
+    "en": "Steam ring"
+  },
+  "descriptions": {
+    "fr": "Un anneau de vapeur s'élargit autour de la carte, des étincelles de laiton jaillissent (HD).",
+    "en": "A ring of steam widens round the card, brass sparks spring out (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

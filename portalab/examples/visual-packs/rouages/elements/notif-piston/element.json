@@ -1,0 +1,25 @@
+{
+  "type": "notification_animation",
+  "look": "piston",
+  "product": "notifanim_piston",
+  "names": {
+    "fr": "Animation de notification piston",
+    "en": "Piston notification animation"
+  },
+  "descriptions": {
+    "fr": "Les notifications arrivent comme un piston : poussées d'un coup, un rebond, un tremblement.",
+    "en": "Notifications come in like a piston: pushed in one go, a rebound, a shudder."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "piston.css"
+    ]
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  }
+}

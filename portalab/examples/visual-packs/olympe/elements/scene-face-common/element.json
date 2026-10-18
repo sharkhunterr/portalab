@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "olympe-marbre",
+  "names": {
+    "fr": "Face de marbre",
+    "en": "Marble face"
+  },
+  "descriptions": {
+    "fr": "Une carte commune en marbre blanc veiné, un liseré gris.",
+    "en": "A common card of veined white marble, a grey edging."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

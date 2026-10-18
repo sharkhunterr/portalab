@@ -1,0 +1,31 @@
+{
+  "type": "palette",
+  "look": "rouages",
+  "product": "palette_rouages",
+  "names": {
+    "fr": "Palette laiton et cuivre",
+    "en": "Brass and copper palette"
+  },
+  "descriptions": {
+    "fr": "Le laiton et le cuivre des machines à vapeur sur n'importe quelle interface.",
+    "en": "Steam engines' brass and copper over any interface."
+  },
+  "palette": {
+    "dark": {
+      "accent": "#d39b45",
+      "accentAlt": "#d0703e",
+      "contrast": "#1a1008"
+    },
+    "light": {
+      "accent": "#8a5a14",
+      "accentAlt": "#8f3a17",
+      "contrast": "#ffffff"
+    }
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "rouages",
+  "names": {
+    "fr": "La salle des machines",
+    "en": "The engine room"
+  },
+  "descriptions": {
+    "fr": "Toute la scène dans la salle des machines : de grands engrenages qui tournent, une chaudière rougeoyante, des jets de vapeur, un dirigeable qui passe derrière une verrière (HD).",
+    "en": "The whole stage in the engine room: great gears turning, a glowing boiler, jets of steam, an airship passing behind a glass roof (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "stage.glsl",
+    "stage": true
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "type": "name_style",
+  "look": "grave-grec",
+  "product": "name_grave_grec",
+  "names": {
+    "fr": "Gravé à la grecque",
+    "en": "Greek carving"
+  },
+  "descriptions": {
+    "fr": "Votre nom en capitales gravées dans le marbre, rehaussées d'or.",
+    "en": "Your name in capitals carved in marble, picked out in gold."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "name.css"
+    ]
+  },
+  "economy": {
+    "price": 380,
+    "rarity": "rare",
+    "collection": "names",
+    "icon": "feather"
+  }
+}

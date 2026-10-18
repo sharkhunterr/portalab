@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "look": "engrenage",
+  "product": "frame_engrenage",
+  "names": {
+    "fr": "Cadre engrenage",
+    "en": "Gear frame"
+  },
+  "descriptions": {
+    "fr": "Une couronne dentée de laiton qui tourne lentement autour de votre avatar.",
+    "en": "A toothed brass crown turning slowly round your avatar."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "gear.css"
+    ]
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  }
+}

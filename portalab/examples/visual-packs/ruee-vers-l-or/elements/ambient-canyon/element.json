@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "look": "canyon",
+  "product": "ambient_canyon",
+  "names": {
+    "fr": "Canyon au crépuscule",
+    "en": "Canyon at dusk"
+  },
+  "descriptions": {
+    "fr": "Derrière le portail, un canyon au crépuscule : des mesas en silhouette, des vautours qui tournent, un buisson qui roule, la chaleur qui tremble.",
+    "en": "Behind the portal, a canyon at dusk: mesas in silhouette, vultures circling, a tumbleweed rolling, the heat shimmering."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "canyon.glsl"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "level": 12,
+    "collection": "ambients",
+    "icon": "telescope"
+  }
+}

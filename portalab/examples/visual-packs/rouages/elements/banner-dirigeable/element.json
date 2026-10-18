@@ -1,0 +1,25 @@
+{
+  "type": "profile_banner",
+  "look": "dirigeable",
+  "product": "banner_dirigeable",
+  "names": {
+    "fr": "Bannière dirigeable",
+    "en": "Airship banner"
+  },
+  "descriptions": {
+    "fr": "Un dirigeable de cuivre qui traverse un ciel de couchant au-dessus des toits.",
+    "en": "A copper airship crossing a sunset sky above the rooftops."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "airship.css"
+    ]
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  }
+}

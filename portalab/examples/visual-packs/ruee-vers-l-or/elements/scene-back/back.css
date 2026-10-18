@@ -1,0 +1,32 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
+[data-card-back="ruee"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.3rem;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 50%, #b07a4455, transparent 70%),
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 14px, #00000018 14px 15px),
+    linear-gradient(160deg, #8a5a2c, #6a4220 50%, #4a2c14);
+  box-shadow: inset 0 0 0 3px #3a2410, inset 0 0 0 5px transparent, inset 0 0 0 6px #e0a33a88;
+}
+[data-card-back="ruee"] .booster-card__back::after {
+  background: linear-gradient(110deg, transparent 40%, #fff0c844 50%, transparent 60%);
+  mix-blend-mode: screen;
+}
+[data-card-back="ruee"] .booster-card__back-pattern {
+  inset: 6%;
+  border: 2px dashed #e0a33a99;
+  border-radius: 0.2rem;
+  background: none;
+}
+[data-card-back="ruee"] .booster-card__back-sigil {
+  inline-size: 46%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(50% 0, 61% 32%, 96% 34%, 68% 55%, 79% 90%, 50% 70%, 21% 90%, 32% 55%, 4% 34%, 39% 32%);
+  background: linear-gradient(160deg, #fff0b8, #e0a33a 50%, #8a5a10);
+  filter: drop-shadow(0 2px 2px #0006);
+}
+[data-card-back="ruee"] .booster-card__back-sigil svg { opacity: 0; }

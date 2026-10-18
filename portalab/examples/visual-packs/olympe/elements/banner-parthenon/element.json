@@ -1,0 +1,25 @@
+{
+  "type": "profile_banner",
+  "look": "parthenon",
+  "product": "banner_parthenon",
+  "names": {
+    "fr": "Bannière Parthénon",
+    "en": "Parthenon banner"
+  },
+  "descriptions": {
+    "fr": "Le Parthénon sur l'Acropole au soleil de midi, la mer Égée derrière, des mouettes qui passent.",
+    "en": "The Parthenon on the Acropolis at noon, the Aegean behind, gulls passing."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "parthenon.css"
+    ]
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  }
+}

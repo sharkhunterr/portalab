@@ -1,0 +1,25 @@
+{
+  "type": "profile_banner",
+  "look": "mesas",
+  "product": "banner_mesas",
+  "names": {
+    "fr": "Bannière mesas",
+    "en": "Mesa banner"
+  },
+  "descriptions": {
+    "fr": "Des mesas rouges sous un soleil couchant, un cavalier qui passe à l'horizon.",
+    "en": "Red mesas under a setting sun, a rider passing on the horizon."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "mesas.css"
+    ]
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  }
+}

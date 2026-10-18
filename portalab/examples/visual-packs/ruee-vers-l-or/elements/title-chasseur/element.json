@@ -1,0 +1,28 @@
+{
+  "type": "title",
+  "look": "ruee-affiche",
+  "product": "title_chasseur_de_primes",
+  "names": {
+    "fr": "Titre : Chasseur de primes",
+    "en": "Title: Bounty hunter"
+  },
+  "descriptions": {
+    "fr": "« Chasseur de primes » en lettres d'affiche sous votre nom.",
+    "en": "« Bounty hunter » in poster letters under your name."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "payload": {
+    "label": "Bounty hunter"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  }
+}

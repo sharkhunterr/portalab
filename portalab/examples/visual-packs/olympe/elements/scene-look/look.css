@@ -1,0 +1,56 @@
+/* The sealed pack (its hook: data-booster-look): a terracotta amphora — a rounded belly, a narrow neck (the flap),
+   black-figure bands and a Greek key, two handles. */
+[data-booster-look="olympe"] .booster-pack {
+  overflow: visible;
+  border: 0;
+  border-radius: 46% 46% 40% 40% / 30% 30% 62% 62%;
+  background:
+    repeating-linear-gradient(90deg, #1a1008 0 6%, transparent 6% 9%, #1a1008 9% 12%, transparent 12% 18%) 0 22% / 100% 4% no-repeat,
+    linear-gradient(0deg, transparent 30%, #1a1008 30% 33%, transparent 33% 70%, #1a1008 70% 73%, transparent 73%),
+    radial-gradient(ellipse 50% 40% at 40% 40%, #f0a060, transparent 70%),
+    linear-gradient(90deg, #8a3a14, #c8642a 40%, #d8783a 55%, #8a3a14);
+  box-shadow: inset -0.6rem -0.4rem 1rem #00000055, 0 1rem 1.6rem #0006;
+}
+[data-booster-look="olympe"] .booster-pack__stars,
+[data-booster-look="olympe"] .booster-pack__foil { opacity: 0; }
+/* the neck and the two handles */
+[data-booster-look="olympe"] .booster-pack__flap {
+  inset: -12% 30% auto 30%;
+  block-size: 16%;
+  border: 0;
+  border-radius: 0.4rem 0.4rem 0 0;
+  background: linear-gradient(90deg, #8a3a14, #c8642a 50%, #8a3a14);
+  box-shadow: -1.4rem 1.2rem 0 -0.6rem transparent;
+}
+[data-booster-look="olympe"] .booster-pack__flap::before,
+[data-booster-look="olympe"] .booster-pack__flap::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 40%;
+  inline-size: 70%;
+  block-size: 180%;
+  border: 0.32rem solid #9a4a1c;
+  border-radius: 50%;
+}
+[data-booster-look="olympe"] .booster-pack__flap::before { inset-inline-start: -78%; border-inline-end-color: transparent; }
+[data-booster-look="olympe"] .booster-pack__flap::after { inset-inline-end: -78%; border-inline-start-color: transparent; }
+[data-booster-look="olympe"] .booster-pack__emblem { color: #1a1008; background: none; filter: none; }
+[data-booster-look="olympe"] .booster-pack__name { color: #1a1008; font-family: "Trajan Pro", "Cinzel", Georgia, serif; font-variant: small-caps; font-size: 0.7em; letter-spacing: 0; white-space: nowrap; text-shadow: 0 1px 0 #f0a06088; }
+
+/* tension: the sealed pack breathes, a double heartbeat now and then — waiting to be opened */
+[data-booster-look="olympe"] .booster-stage__tear {
+  animation: booster-hover 4s ease-in-out infinite, olympe-heartbeat 3.4s ease-in-out infinite;
+}
+/* on « scale », added to the float of Portalab's own (never replacing it) */
+@keyframes olympe-heartbeat {
+  0%, 60%, 100% { scale: 1; }
+  66% { scale: 1.022; }
+  71% { scale: 0.996; }
+  77% { scale: 1.035; }
+  86% { scale: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="olympe"] .booster-stage__tear {
+    animation: none;
+  }
+}

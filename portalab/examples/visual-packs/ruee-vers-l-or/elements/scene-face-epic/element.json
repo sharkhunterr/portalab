@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "ruee-cuir",
+  "names": {
+    "fr": "Face de cuir repoussé",
+    "en": "Tooled leather face"
+  },
+  "descriptions": {
+    "fr": "Une carte épique de cuir repoussé aux arabesques dorées, holographique et vivante.",
+    "en": "An epic card of tooled leather with gold scrolls, holographic and alive."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

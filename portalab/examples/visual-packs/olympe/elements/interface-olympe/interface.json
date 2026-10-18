@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 2,
+  "key": "olympe",
+  "name": "Olympe",
+  "colorScheme": "light",
+  "colors": {
+    "surface": "#f6f2ea",
+    "surfaceRaised": "#ffffff",
+    "text": "#1e2a3a",
+    "textMuted": "#55606f",
+    "border": "#d9cfbc",
+    "accent": "#8a6410",
+    "accentContrast": "#ffffff",
+    "focus": "#1f5fa8",
+    "accentAlt": "#1f5fa8",
+    "rarity": {
+      "common": "#5f6670",
+      "rare": "#1f5fa8",
+      "epic": "#7a3a9a",
+      "legendary": "#8a6410"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#3b3f4a",
+      "bg": "#ece7dc",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#1f6b3a",
+      "bg": "#e3efe4",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#7a4b00",
+      "bg": "#f6ead2",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#6e5300",
+      "bg": "#f3ecd4",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#8f1d24",
+      "bg": "#f6e0e0",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#7a2a3a",
+      "bg": "#f1e2e6",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#4b3a8a",
+      "bg": "#e8e4f4",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#7a2a5a",
+      "bg": "#f1e2ec",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#4a4f5a",
+      "bg": "#ebe8e1",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#1f4f7a",
+      "bg": "#e1eaf3",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"Plus Jakarta Sans Variable\", \"Inter Variable\", sans-serif",
+    "headingFamily": "\"Trajan Pro\", \"Cinzel\", Georgia, serif",
+    "headingCase": "smallcaps",
+    "headingEffect": "emboss"
+  },
+  "radii": {
+    "sm": 0.3,
+    "md": 0.6
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "pluie-or",
+    "fastMs": 170,
+    "normalMs": 360,
+    "levelUp": "apotheose"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "tabs",
+      "tablet": "tabs",
+      "phone": "bottom-bar"
+    },
+    "header": "centered",
+    "headerPosition": "top",
+    "cards": "ornate",
+    "content": "wide",
+    "corners": "soft",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "trophy": "crown",
+      "community": "users"
+    }
+  },
+  "background": {
+    "fallback": "#f6f2ea",
+    "pattern": "marble",
+    "ambient": "olivier"
+  },
+  "sounds": {
+    "notification": "asset:soft/notification.wav",
+    "alert": "asset:soft/alert.wav",
+    "success": "asset:soft/success.wav",
+    "reward": "asset:soft/reward.wav",
+    "levelUp": "asset:soft/level-up.wav",
+    "ui": "asset:soft/ui.wav"
+  },
+  "notification": {
+    "style": "tablette-marbre",
+    "animation": "ascension"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Le temple",
+      "nav:nav.section.home": "Le temple",
+      "dashboard:title": "Le temple",
+      "nav:nav.media": "L'amphithéâtre",
+      "nav:nav.section.media": "L'amphithéâtre",
+      "media:home.title": "L'amphithéâtre",
+      "nav:nav.section.content": "Les rouleaux",
+      "nav:nav.news": "Les oracles",
+      "news:title": "Les oracles",
+      "nav:nav.wiki": "La bibliothèque d'Alexandrie",
+      "wiki:title": "La bibliothèque d'Alexandrie",
+      "nav:nav.community": "L'agora",
+      "nav:nav.section.community": "L'agora",
+      "community:title": "L'agora",
+      "nav:nav.marketplace": "Le marché d'Athènes",
+      "nav:nav.section.marketplace": "Le marché d'Athènes",
+      "marketplace:catalog.title": "Le marché d'Athènes",
+      "nav:nav.support": "L'oracle de Delphes",
+      "nav:nav.section.support": "L'oracle de Delphes",
+      "gamification:value.coins": "Drachmes"
+    },
+    "en": {
+      "nav:nav.home": "The temple",
+      "nav:nav.section.home": "The temple",
+      "dashboard:title": "The temple",
+      "nav:nav.media": "The amphitheatre",
+      "nav:nav.section.media": "The amphitheatre",
+      "media:home.title": "The amphitheatre",
+      "nav:nav.section.content": "The scrolls",
+      "nav:nav.news": "The oracles",
+      "news:title": "The oracles",
+      "nav:nav.wiki": "The library of Alexandria",
+      "wiki:title": "The library of Alexandria",
+      "nav:nav.community": "The agora",
+      "nav:nav.section.community": "The agora",
+      "community:title": "The agora",
+      "nav:nav.marketplace": "The Athens market",
+      "nav:nav.section.marketplace": "The Athens market",
+      "marketplace:catalog.title": "The Athens market",
+      "nav:nav.support": "The oracle of Delphi",
+      "nav:nav.section.support": "The oracle of Delphi",
+      "gamification:value.coins": "Drachmas"
+    }
+  }
+}

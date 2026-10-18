@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "rouages",
+  "names": {
+    "fr": "Dos de laiton",
+    "en": "Brass back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est une plaque de laiton rivetée, un engrenage gravé au centre, un reflet qui passe.",
+    "en": "Face down, every card is a riveted brass plate, a gear engraved in the middle, a gleam passing over."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

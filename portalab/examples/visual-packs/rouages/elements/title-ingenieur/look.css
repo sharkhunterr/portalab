@@ -1,0 +1,7 @@
+.cosmetic-title[data-style="rouages-grave"] {
+  background-image: linear-gradient(100deg, #8a5a1c, #f3cf86 50%, #8a5a1c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.06em;
+}

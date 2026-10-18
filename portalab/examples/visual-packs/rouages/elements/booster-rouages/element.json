@@ -1,0 +1,28 @@
+{
+  "type": "booster",
+  "product": "booster_rouages",
+  "names": {
+    "fr": "Booster Rouages",
+    "en": "Cogwork booster"
+  },
+  "descriptions": {
+    "fr": "Cinq apparences de l'univers Rouages, ouvertes dans un coffre-fort à vapeur.",
+    "en": "Five looks of the Cogwork universe, opened in a steam safe."
+  },
+  "payload": {
+    "pool": "looks",
+    "packs": [
+      "ultimate_rouages"
+    ],
+    "cards": 5,
+    "guarantee": "rare",
+    "look": "legend"
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "epic",
+    "collection": "boosters",
+    "icon": "sparkles",
+    "repeatable": true
+  }
+}

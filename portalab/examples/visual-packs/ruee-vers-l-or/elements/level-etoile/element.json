@@ -1,0 +1,25 @@
+{
+  "type": "level_badge",
+  "look": "etoile",
+  "product": "level_etoile",
+  "names": {
+    "fr": "Badge de niveau étoile",
+    "en": "Star level badge"
+  },
+  "descriptions": {
+    "fr": "Votre niveau sur une étoile de shérif en or qui étincelle.",
+    "en": "Your level on a gold sheriff's star, glinting."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "star.css"
+    ]
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  }
+}

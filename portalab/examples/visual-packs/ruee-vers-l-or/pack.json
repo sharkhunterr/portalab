@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ruee-vers-l-or",
+  "version": "1.0.2",
+  "names": {
+    "fr": "Ruée vers l'or — univers Far West",
+    "en": "Gold Rush — a Wild West universe"
+  },
+  "descriptions": {
+    "fr": "Un univers complet de Far West : une interface de ville minière, un canyon au crépuscule derrière le portail, un cadre en lasso et une étoile de shérif, une bannière de mesas, un nom d'avis de recherche, un duel à midi à chaque niveau, des pépites qui jaillissent — et son booster, une caisse de dynamite dont on allume la mèche.",
+    "en": "A whole Wild West universe: a mining-town interface, a canyon at dusk behind the portal, a lasso frame and a sheriff's star, a mesa banner, a wanted-poster name, a high-noon duel at every level, gold nuggets bursting out — and its booster, a dynamite crate whose fuse you light."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

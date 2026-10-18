@@ -1,0 +1,22 @@
+/* A common card: white marble (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform. */
+[data-card-face="olympe-marbre"] .booster-card__face {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.5rem;
+  background: linear-gradient(160deg, #e8e4dc, #b8b2a6);
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.55rem rgba(180, 170, 150, 0.4));
+}
+[data-card-face="olympe-marbre"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  border-radius: 0.5rem;
+  background: linear-gradient(118deg, transparent 30%, #b8b0a033 34%, transparent 40%), linear-gradient(175deg, #ffffff, #ece6da);
+}
+[data-card-face="olympe-marbre"] .booster-card__rarity,
+[data-card-face="olympe-marbre"] .booster-card__name {
+  color: #1e2a3a;
+  text-shadow: 0 0 0.6rem rgba(180, 170, 150, 0.4);
+}

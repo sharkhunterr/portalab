@@ -1,0 +1,11 @@
+.ds-notifications[data-style="tablette-marbre"] .ds-notification {
+  border: 1px solid #d9cfbc;
+  border-radius: 0.3rem;
+  background:
+    repeating-linear-gradient(90deg, #c9a03a 0 3px, transparent 3px 8px) top / 100% 3px no-repeat,
+    linear-gradient(125deg, transparent 40%, #b8b0a033 45%, transparent 52%),
+    linear-gradient(160deg, #ffffff, #efe9de);
+  color: #1e2a3a;
+  font-variant: small-caps;
+  box-shadow: 0 6px 16px #1e2a3a2a;
+}

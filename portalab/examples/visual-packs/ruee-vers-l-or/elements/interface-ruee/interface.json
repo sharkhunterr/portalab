@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 2,
+  "key": "ruee",
+  "name": "Ruée vers l'or",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#1c120c",
+    "surfaceRaised": "#2a1b12",
+    "text": "#f7e6cc",
+    "textMuted": "#c9a882",
+    "border": "#5a3b24",
+    "accent": "#e0a33a",
+    "accentContrast": "#1c120c",
+    "focus": "#ffd27a",
+    "accentAlt": "#3fa7a0",
+    "rarity": {
+      "common": "#c9a882",
+      "rare": "#5fd0c6",
+      "epic": "#e08aa0",
+      "legendary": "#ffd27a"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#d8dee9",
+      "bg": "#2f2c3b",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#8fe0b0",
+      "bg": "#252c33",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#ffd08a",
+      "bg": "#352a2e",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#f2d27a",
+      "bg": "#332a2c",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#ffadb3",
+      "bg": "#352534",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#f0b8c6",
+      "bg": "#332736",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#c9b6ff",
+      "bg": "#2d263e",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#f7b2d6",
+      "bg": "#342639",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#c4cad4",
+      "bg": "#2d2938",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#9ed2f5",
+      "bg": "#272a3d",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "Georgia, \"Plus Jakarta Sans Variable\", serif",
+    "headingFamily": "\"Rockwell\", \"Courier New\", serif",
+    "headingCase": "uppercase",
+    "headingEffect": "none"
+  },
+  "radii": {
+    "sm": 0.2,
+    "md": 0.35
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "pepites",
+    "fastMs": 170,
+    "normalMs": 360,
+    "levelUp": "duel"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "topbar",
+      "tablet": "topbar",
+      "phone": "bottom-bar"
+    },
+    "header": "centered",
+    "headerPosition": "top",
+    "cards": "paper",
+    "content": "wide",
+    "corners": "square",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "trophy": "star",
+      "shop": "package"
+    }
+  },
+  "background": {
+    "fallback": "#1c120c",
+    "pattern": "none",
+    "ambient": "canyon"
+  },
+  "sounds": {
+    "notification": "asset:toon/notification.wav",
+    "alert": "asset:toon/alert.wav",
+    "success": "asset:toon/success.wav",
+    "reward": "asset:toon/reward.wav",
+    "levelUp": "asset:toon/level-up.wav",
+    "ui": "asset:toon/ui.wav"
+  },
+  "notification": {
+    "style": "avis-recherche",
+    "animation": "galop"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "Le saloon",
+      "nav:nav.section.home": "Le saloon",
+      "dashboard:title": "Le saloon",
+      "nav:nav.media": "Le théâtre de la ville",
+      "nav:nav.section.media": "Le théâtre de la ville",
+      "media:home.title": "Le théâtre de la ville",
+      "nav:nav.section.content": "Les affiches",
+      "nav:nav.news": "Le courrier de l'Ouest",
+      "news:title": "Le courrier de l'Ouest",
+      "nav:nav.wiki": "Le registre du comté",
+      "wiki:title": "Le registre du comté",
+      "nav:nav.community": "La bande",
+      "nav:nav.section.community": "La bande",
+      "community:title": "La bande",
+      "nav:nav.marketplace": "Le magasin général",
+      "nav:nav.section.marketplace": "Le magasin général",
+      "marketplace:catalog.title": "Le magasin général",
+      "nav:nav.support": "Le bureau du shérif",
+      "nav:nav.section.support": "Le bureau du shérif",
+      "gamification:value.coins": "Pépites"
+    },
+    "en": {
+      "nav:nav.home": "The saloon",
+      "nav:nav.section.home": "The saloon",
+      "dashboard:title": "The saloon",
+      "nav:nav.media": "The town theatre",
+      "nav:nav.section.media": "The town theatre",
+      "media:home.title": "The town theatre",
+      "nav:nav.section.content": "The posters",
+      "nav:nav.news": "The western mail",
+      "news:title": "The western mail",
+      "nav:nav.wiki": "The county register",
+      "wiki:title": "The county register",
+      "nav:nav.community": "The posse",
+      "nav:nav.section.community": "The posse",
+      "community:title": "The posse",
+      "nav:nav.marketplace": "The general store",
+      "nav:nav.section.marketplace": "The general store",
+      "marketplace:catalog.title": "The general store",
+      "nav:nav.support": "The sheriff's office",
+      "nav:nav.section.support": "The sheriff's office",
+      "gamification:value.coins": "Nuggets"
+    }
+  }
+}

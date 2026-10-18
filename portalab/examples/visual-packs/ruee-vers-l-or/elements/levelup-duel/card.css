@@ -1,0 +1,12 @@
+/* the level's card as a wanted poster (only this look's card) */
+.levelup[data-look="duel"] .levelup__card {
+  border: 2px solid #8a5a10;
+  background: linear-gradient(180deg, #f2dfb5f2, #e2c48af2);
+  color: #2a1708;
+  box-shadow: 0 0 2rem #e0a33a66;
+}
+.levelup[data-look="duel"] .levelup__title {
+  color: #5a2a0a;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}

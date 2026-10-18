@@ -1,0 +1,29 @@
+{
+  "type": "badge",
+  "look": "olympe-chouette",
+  "product": "badge_chouette_d_athena",
+  "names": {
+    "fr": "Badge Chouette d'Athéna",
+    "en": "Athena's owl badge"
+  },
+  "descriptions": {
+    "fr": "La chouette d'Athéna, sur une drachme d'argent.",
+    "en": "Athena's owl, on a silver drachma."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "payload": {
+    "label": "Athena's owl",
+    "icon": "eye"
+  },
+  "economy": {
+    "price": 260,
+    "rarity": "rare",
+    "collection": "badges",
+    "icon": "star"
+  }
+}

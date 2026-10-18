@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "rouages",
+  "names": {
+    "fr": "Coffre-fort à manomètres",
+    "en": "Gauge-studded safe"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient un coffre-fort de laiton rivé, une roue de combinaison et deux manomètres ; de la vapeur fuit par ses joints (HD).",
+    "en": "The pack becomes a riveted brass safe, a combination wheel and two gauges; steam leaks from its seams (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "look.glsl",
+    "css": [
+      "look.css"
+    ],
+    "stage": true
+  }
+}

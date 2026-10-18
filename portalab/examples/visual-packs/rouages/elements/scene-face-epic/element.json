@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "rouages-emeraude",
+  "names": {
+    "fr": "Face de verre émeraude",
+    "en": "Emerald glass face"
+  },
+  "descriptions": {
+    "fr": "Une carte épique de verre émeraude serti de laiton, holographique et vivante.",
+    "en": "An epic card of emerald glass set in brass, holographic and alive."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

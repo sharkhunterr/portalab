@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "olympe-eclats",
+  "names": {
+    "fr": "Le courroux de Zeus",
+    "en": "The wrath of Zeus"
+  },
+  "descriptions": {
+    "fr": "Le ciel s'assombrit, l'amphore tremble, des fissures dorées la parcourent… puis la foudre de Zeus la frappe : elle vole en éclats dans un éclair, et les cartes jaillissent dans la lumière (HD).",
+    "en": "The sky darkens, the amphora shakes, golden cracks run across it… then Zeus's thunderbolt strikes it: it shatters in a flash, and the cards burst out into the light (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "opening.glsl",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.8
+  }
+}

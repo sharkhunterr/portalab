@@ -1,0 +1,25 @@
+{
+  "type": "notification_animation",
+  "look": "ascension",
+  "product": "notifanim_ascension",
+  "names": {
+    "fr": "Animation de notification ascension",
+    "en": "Ascension notification animation"
+  },
+  "descriptions": {
+    "fr": "Les notifications montent des nuages, portées par une lueur dorée.",
+    "en": "Notifications rise from the clouds, carried on a golden glow."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "ascension.css"
+    ]
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  }
+}

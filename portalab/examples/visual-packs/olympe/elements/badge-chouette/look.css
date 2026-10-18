@@ -1,0 +1,6 @@
+.cosmetic-badge[data-style="olympe-chouette"] {
+  border-color: #8a8f96;
+  color: #1e2a3a;
+  background: radial-gradient(circle at 35% 30%, #ffffff, #c8ccd2 55%, #7a8088);
+  box-shadow: 0 0 0 1px #f6f2ea, 0 2px 6px #1e2a3a44;
+}

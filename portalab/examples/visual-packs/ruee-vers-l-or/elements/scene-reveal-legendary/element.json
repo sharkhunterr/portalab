@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "ruee-filon",
+  "names": {
+    "fr": "Le filon",
+    "en": "The mother lode"
+  },
+  "descriptions": {
+    "fr": "Le filon ! Une tempête de pépites d'or tourbillonne autour de la carte, des rayons de soleil, une étoile de shérif immense qui étincelle derrière (HD).",
+    "en": "The mother lode! A storm of gold nuggets whirls round the card, sunbeams, a huge sheriff's star glinting behind it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "type": "effect",
+  "look": "pluie-or",
+  "product": "effect_pluie_or",
+  "names": {
+    "fr": "Pluie d'or",
+    "en": "Shower of gold"
+  },
+  "descriptions": {
+    "fr": "Une pluie d'or tombe sur la récompense, étincelante, et des feuilles de laurier tourbillonnent (HD).",
+    "en": "A shower of gold falls on the reward, sparkling, and laurel leaves whirl (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "gold.glsl",
+    "stage": true,
+    "duration": 3.0
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "epic",
+    "level": 9,
+    "collection": "celebrations",
+    "icon": "party"
+  }
+}

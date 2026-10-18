@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "look": "lasso",
+  "product": "frame_lasso",
+  "names": {
+    "fr": "Cadre lasso",
+    "en": "Lasso frame"
+  },
+  "descriptions": {
+    "fr": "Une corde de lasso tressée qui tourne autour de votre avatar.",
+    "en": "A braided lasso rope turning round your avatar."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "lasso.css"
+    ]
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  }
+}

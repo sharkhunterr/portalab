@@ -1,0 +1,29 @@
+{
+  "type": "level_up",
+  "look": "duel",
+  "product": "levelup_duel",
+  "names": {
+    "fr": "Duel à midi",
+    "en": "High noon duel"
+  },
+  "descriptions": {
+    "fr": "Midi dans la grand-rue : le soleil écrase tout, la poussière vole, un buisson roule… un coup de feu éclate et votre nouveau niveau apparaît sur une étoile de shérif (HD).",
+    "en": "Noon on Main Street: the sun crushing everything, dust flying, a tumbleweed rolling… a shot rings out and your new level appears on a sheriff's star (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "duel.glsl",
+    "css": [
+      "card.css"
+    ],
+    "stage": true,
+    "reveal": 2.4
+  },
+  "economy": {
+    "price": 1600,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "levels",
+    "icon": "trophy"
+  }
+}

@@ -1,0 +1,75 @@
+/* A rare card: silver and turquoise (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform. */
+[data-card-face="ruee-turquoise"] .booster-card__face {
+  isolation: isolate;
+  border: 0;
+  clip-path: polygon(8.0% 0.0%, 92.0% 0.0%, 100.0% 5.6%, 100.0% 94.4%, 92.0% 100.0%, 8.0% 100.0%, 0.0% 94.4%, 0.0% 5.6%);
+  background: linear-gradient(160deg, #e8eef0, #9aa4a8 40%, #5a6468 70%, #d0d8dc);
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.55rem rgba(63, 167, 160, 0.7));
+}
+[data-card-face="ruee-turquoise"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  clip-path: polygon(8.0% 0.0%, 92.0% 0.0%, 100.0% 5.6%, 100.0% 94.4%, 92.0% 100.0%, 8.0% 100.0%, 0.0% 94.4%, 0.0% 5.6%);
+  background: radial-gradient(ellipse 70% 50% at 50% 30%, #3fa7a066, transparent 70%), linear-gradient(175deg, #0d3a38, #041614);
+}
+[data-card-face="ruee-turquoise"] .booster-card__rarity,
+[data-card-face="ruee-turquoise"] .booster-card__name {
+  color: #d8fffb;
+  text-shadow: 0 0 0.6rem rgba(63, 167, 160, 0.7);
+}
+/* the holographic sheen: two colours in a band sliding over the card, lighter where they cross */
+[data-card-face="ruee-turquoise"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: linear-gradient(115deg, transparent 0%, rgb(80, 220, 210) 30%, transparent 47.5%, transparent 52.5%, rgb(255, 200, 120) 70%, transparent 100%);
+  background-size: 300% 300%;
+  background-position: 50% 50%;
+  mix-blend-mode: screen;
+  opacity: 0.35;
+  animation: ruee-holo 9s ease infinite both;
+}
+/* glitter over the art, glimmering as the light moves */
+[data-card-face="ruee-turquoise"] .booster-card__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 30%, #eafffd 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 20%, #eafffd 0 1.2px, transparent 2px),
+    radial-gradient(circle at 45% 75%, #eafffd 0 0.9px, transparent 1.5px),
+    radial-gradient(circle at 85% 65%, #eafffd 0 1.1px, transparent 1.8px);
+  background-size: 23px 29px, 31px 37px, 19px 23px, 41px 43px;
+  mix-blend-mode: screen;
+  opacity: 0.25;
+  animation: ruee-glitter 9s ease infinite both;
+}
+@keyframes ruee-holo {
+  0%, 100% { opacity: 0.12; background-position: 50% 50%; }
+  33% { opacity: 0.6; background-position: 100% 100%; }
+  66% { opacity: 0.6; background-position: 0% 0%; }
+}
+@keyframes ruee-glitter {
+  0%, 5%, 100% { opacity: 0.2; background-position: 50% 50%; }
+  33% { opacity: 0.9; background-position: 40% 40%; filter: brightness(1.8); }
+  45% { opacity: 0.35; }
+  66% { opacity: 0.9; background-position: 60% 60%; filter: brightness(1.8); }
+}
+@keyframes ruee-lean {
+  0%, 100% { transform: perspective(40rem) rotateX(0deg) rotateY(0deg); }
+  33% { transform: perspective(40rem) rotateX(6deg) rotateY(-7deg); }
+  66% { transform: perspective(40rem) rotateX(-6deg) rotateY(7deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="ruee-turquoise"] .booster-card__face::after,
+  [data-card-face="ruee-turquoise"] .booster-card__art::after,
+  [data-card-face="ruee-turquoise"] .booster-card__art {
+    animation: none;
+  }
+}

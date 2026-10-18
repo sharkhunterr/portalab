@@ -1,0 +1,27 @@
+{
+  "type": "theme",
+  "look": "ruee",
+  "product": "theme_ruee",
+  "names": {
+    "fr": "Interface Ruée vers l'or",
+    "en": "Gold Rush interface"
+  },
+  "descriptions": {
+    "fr": "Une ville minière : cuir, bois et or, titres d'affiche, la navigation en barre du haut comme une enseigne, le canyon au crépuscule derrière, et le vocabulaire du Far West (le saloon, le magasin général, le bureau du shérif…).",
+    "en": "A mining town: leather, wood and gold, poster headings, the navigation as a top bar like a shop sign, the canyon at dusk behind, and the Wild West's words (the saloon, the general store, the sheriff's office…)."
+  },
+  "render": {
+    "kind": "theme",
+    "file": "interface.json",
+    "css": [
+      "interface.css"
+    ]
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "themes",
+    "icon": "palette"
+  }
+}

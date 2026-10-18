@@ -1,0 +1,13 @@
+.ds-notifications[data-animation="galop"] .ds-notification {
+  animation-name: ruee-gallop;
+  animation-duration: 0.9s;
+  animation-timing-function: linear;
+}
+@keyframes ruee-gallop {
+  0% { opacity: 0; transform: translateX(110%); }
+  25% { opacity: 1; transform: translate(60%, -8px); }
+  45% { transform: translate(30%, 0); }
+  65% { transform: translate(8%, -6px); }
+  85% { transform: translate(-2%, 0); }
+  100% { transform: none; }
+}

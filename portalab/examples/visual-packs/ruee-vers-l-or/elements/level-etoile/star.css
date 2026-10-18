@@ -1,0 +1,14 @@
+.ds-level[data-look="etoile"] {
+  border-radius: 0;
+  clip-path: polygon(50% 0, 61% 32%, 96% 34%, 68% 55%, 79% 90%, 50% 70%, 21% 90%, 32% 55%, 4% 34%, 39% 32%);
+  background: linear-gradient(160deg, #fff0b8, #e0a33a 50%, #8a5a10);
+  color: #2a1708;
+  padding-block: 0.4rem;
+  animation: ruee-glint 3s ease-in-out infinite;
+}
+@keyframes ruee-glint {
+  50% { filter: brightness(1.3); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-level[data-look="etoile"] { animation: none; }
+}

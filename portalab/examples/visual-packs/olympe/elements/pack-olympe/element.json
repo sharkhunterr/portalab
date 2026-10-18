@@ -1,0 +1,39 @@
+{
+  "type": "bundle",
+  "product": "ultimate_olympe",
+  "names": {
+    "fr": "Pack de thème Olympe",
+    "en": "Olympus theme pack"
+  },
+  "descriptions": {
+    "fr": "Tout l'univers Olympe : son interface et tout ce qui va avec.",
+    "en": "The whole Olympus universe: its interface and everything that goes with it."
+  },
+  "payload": {
+    "products": [
+      "theme_olympe",
+      "palette_olympe",
+      "ambient_olivier",
+      "background_nuees",
+      "frame_laurier",
+      "frame_bouclier_zeus",
+      "banner_parthenon",
+      "name_grave_grec",
+      "level_medaille",
+      "levelup_apotheose",
+      "effect_pluie_or",
+      "notif_tablette_marbre",
+      "notifanim_ascension",
+      "title_heros_de_l_olympe",
+      "badge_chouette_d_athena"
+    ]
+  },
+  "economy": {
+    "price": 5400,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "ultimate",
+    "icon": "crown",
+    "supply": 10
+  }
+}

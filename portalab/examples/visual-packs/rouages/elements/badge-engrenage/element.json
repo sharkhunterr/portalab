@@ -1,0 +1,29 @@
+{
+  "type": "badge",
+  "look": "rouages-laiton",
+  "product": "badge_rouage_or",
+  "names": {
+    "fr": "Badge Rouage d'or",
+    "en": "Golden cog badge"
+  },
+  "descriptions": {
+    "fr": "Un rouage d'or sur votre profil.",
+    "en": "A golden cog on your profile."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "payload": {
+    "label": "Golden cog",
+    "icon": "compass"
+  },
+  "economy": {
+    "price": 220,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  }
+}

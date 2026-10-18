@@ -1,0 +1,30 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
+[data-card-back="rouages"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.4rem;
+  background:
+    radial-gradient(circle at 8% 6%, #6b4419 0 2px, transparent 3px), radial-gradient(circle at 92% 6%, #6b4419 0 2px, transparent 3px),
+    radial-gradient(circle at 8% 94%, #6b4419 0 2px, transparent 3px), radial-gradient(circle at 92% 94%, #6b4419 0 2px, transparent 3px),
+    repeating-linear-gradient(90deg, #ffffff08 0 1px, transparent 1px 5px),
+    linear-gradient(160deg, #e2b25a, #b9862f 45%, #8a5a1c 80%, #d39b45);
+  box-shadow: inset 0 0 0 3px #6b4419, inset 0 0 0 6px #d39b45;
+}
+[data-card-back="rouages"] .booster-card__back::after {
+  background: linear-gradient(110deg, transparent 40%, #fff3d455 50%, transparent 60%);
+  mix-blend-mode: screen;
+}
+[data-card-back="rouages"] .booster-card__back-pattern { opacity: 0; }
+[data-card-back="rouages"] .booster-card__back-sigil {
+  inline-size: 52%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  background:
+    radial-gradient(circle, #8a5a1c 0 14%, transparent 15% 34%, #6b4419 35% 40%, transparent 41%),
+    repeating-conic-gradient(from 0deg, #6b4419 0 9deg, transparent 9deg 22.5deg);
+  -webkit-mask: radial-gradient(circle, #000 0 70%, transparent 71%);
+  mask: radial-gradient(circle, #000 0 70%, transparent 71%);
+}
+[data-card-back="rouages"] .booster-card__back-sigil svg { opacity: 0; }

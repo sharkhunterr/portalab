@@ -1,0 +1,25 @@
+{
+  "type": "level_badge",
+  "look": "medaille",
+  "product": "level_medaille",
+  "names": {
+    "fr": "Médaille olympique",
+    "en": "Olympic medal"
+  },
+  "descriptions": {
+    "fr": "Votre niveau frappé sur une médaille d'or ceinte de laurier.",
+    "en": "Your level struck on a gold medal girt with laurel."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "medal.css"
+    ]
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  }
+}

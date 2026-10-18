@@ -1,0 +1,10 @@
+/* the Gold Rush interface's own touches: weathered wood and a dusty glow */
+[data-theme="ruee"] .shell-header {
+  box-shadow: 0 1px 0 #e0a33a55, 0 0.6rem 1.4rem -1rem #e0a33a77;
+  background-image: repeating-linear-gradient(90deg, #ffffff05 0 2px, transparent 2px 22px);
+}
+[data-theme="ruee"] .ds-card,
+[data-theme="ruee"] .admin-section {
+  border-color: #6a4528;
+  background-image: repeating-linear-gradient(0deg, #ffffff04 0 1px, transparent 1px 7px);
+}
