@@ -1,0 +1,51 @@
+# Commission (spec 030): a new kind of product for the shop — « Avatar commission ». The shop keeps buying,
+# coins, ownership and refunds; the plugin is only told: an activation opens the member's request, a
+# deactivation (a refund) cancels it. Its code runs confined.
+schema_version = 2
+key = "commission"
+name = "Commissions"
+description = "Order a custom avatar from the shop."
+version = "1.0.0"
+requires_portal = ">=0.1"
+maturity = "beta"
+entry_point = "commission_plugin:register"
+migrations = "migrations"
+permissions = [{ name = "use", description = "See your commissions" }]
+
+[capabilities]
+storage = { quota_mb = 20 }
+operations = true
+pages = true
+product_types = ["avatar"]
+privacy = true
+
+[personal_data]
+enabled = true
+classes = ["commissions"]
+
+[[routes]]
+path = "mine"
+method = "GET"
+permission = "plugin:commission.use"
+exposure = "read"
+
+[ui]
+nav = [{ key = "mine", label_key = "plugin.commission:nav.mine", route = "/plugins/commission/mine", permission = "plugin:commission.use" }]
+
+[[ui.pages]]
+key = "mine"
+title_key = "plugin.commission:page.mine"
+permission = "plugin:commission.use"
+blocks = [{ kind = "table", title_key = "plugin.commission:block.mine", data = "mine", columns = ["product", "status", "since"] }]
+
+[i18n.en."plugin.commission"]
+"type.avatar" = "Avatar commission"
+"nav.mine" = "My commissions"
+"page.mine" = "My commissions"
+"block.mine" = "Your orders"
+
+[i18n.fr."plugin.commission"]
+"type.avatar" = "Commande d'avatar"
+"nav.mine" = "Mes commandes"
+"page.mine" = "Mes commandes"
+"block.mine" = "Vos commandes"

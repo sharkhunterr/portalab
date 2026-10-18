@@ -167,6 +167,14 @@ def replay(
                     ctx.provide(EXPORT_CAPABILITY, participant)
                 if erase is not None:
                     ctx.provide(ERASURE_CAPABILITY, participant)
+            elif method == "product_type":
+                product = args[0]
+                declared = set(manifest.capabilities.get("product_types") or [])
+                name = str(getattr(product, "key", "")).removeprefix(f"plugin:{ctx.key}.")
+                if name not in declared:
+                    refuse(method, str(getattr(product, "key", "?")), "the product type is not declared")
+                    continue
+                ctx.product_type(product)
             elif method == "slot":
                 slot, key = str(args[0]), str(args[1])
                 if slot not in SLOTS or slot not in slots:
