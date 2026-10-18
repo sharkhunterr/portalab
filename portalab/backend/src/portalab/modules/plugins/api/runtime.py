@@ -192,6 +192,7 @@ async def page(principal: Member, key: str, page: str, request: Request, module:
         "key": definition.key,
         "title_key": definition.title_key,
         "view": raw.get("view"),  # 030: the plugin's own view of the page
+        "header": raw.get("header", True) is not False,  # its view may draw its own title
         "blocks": [_block(b) for b in definition.blocks],
     }
 

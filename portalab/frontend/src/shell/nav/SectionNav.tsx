@@ -29,10 +29,14 @@ export function sectionEntries(section: NavSection): NavEntry[] {
 
 /** The entry whose route best matches the location (longest prefix), so /admin/x does not light /admin. */
 export function currentEntry(sections: readonly NavSection[], pathname: string): NavEntry | undefined {
-  return sections
-    .flatMap(sectionEntries)
+  const entries = sections.flatMap(sectionEntries);
+  const found = entries
     .filter((entry) => isCurrent(entry.route, pathname))
     .sort((a, b) => (b.route?.length ?? 0) - (a.route?.length ?? 0))[0];
+  if (found) return found;
+  // 030: a plugin's other pages (a topic, a playlist) belong where its entry is — the same tab stays lit
+  const plugin = /^\/plugins\/([a-z][a-z0-9_]*)\//.exec(pathname)?.[1];
+  return plugin ? entries.find((entry) => entry.route?.startsWith(`/plugins/${plugin}/`)) : undefined;
 }
 
 /** A place grouping related pages, shown as tabs above the content (027). */

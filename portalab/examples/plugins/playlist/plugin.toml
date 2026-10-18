@@ -5,7 +5,7 @@ schema_version = 2
 key = "playlist"
 name = "Playlists"
 description = "Your own playlists of titles."
-version = "1.3.0"
+version = "1.3.1"
 requires_portal = ">=0.1"
 maturity = "beta"
 entry_point = "playlist_plugin:register"
@@ -112,6 +112,7 @@ nav = [{ key = "mine", label_key = "plugin.playlist:nav.mine", route = "/plugins
 
 [[ui.pages]]
 key = "mine"
+header = false  # its view draws its own title
 title_key = "plugin.playlist:page.mine"
 permission = "plugin:playlist.use"
 view = "playlists.js"  # its own look (covers, cards); in safe mode, the blocks below
@@ -122,6 +123,7 @@ blocks = [
 
 [[ui.pages]]
 key = "list"
+header = false  # its view draws its own title
 title_key = "plugin.playlist:page.list"
 permission = "plugin:playlist.use"
 view = "playlist.js"  # its own look, filled with the services' metadata; in safe mode, the blocks below

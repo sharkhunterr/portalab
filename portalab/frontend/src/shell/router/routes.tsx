@@ -123,7 +123,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
         {
           path: "plugins/:pluginKey/:pageKey",
           element: <PluginPage />,
-          handle: h({ crumb: "Plugin", existenceSensitive: true }),
+          handle: h({ existenceSensitive: true }), // 030: named by its navigation entry (Breadcrumbs)
         },
         {
           path: "marketplace",

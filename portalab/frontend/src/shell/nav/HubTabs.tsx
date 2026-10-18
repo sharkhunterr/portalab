@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router";
 import { CountBadge } from "../../design-system/components/CountBadge";
 import { Icon } from "../../design-system/components/Icon";
@@ -19,6 +20,13 @@ export function HubTabs() {
   const attention = useAttention();
   const location = useLocation();
   const { view } = useNavigationView();
+  const bar = useRef<HTMLElement | null>(null);
+  // the current tab is in sight on a narrow screen (the bar scrolls sideways), again on each page
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the page changed: the active tab may have too
+  useEffect(() => {
+    const active = bar.current?.querySelector<HTMLElement>("[data-active='true']");
+    active?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+  }, [location.pathname]);
   // « My account » (027): the personal pages of the avatar menu are a hub too
   const personal = [...view.personal]
     .filter((entry) => isCurrent(entry.route, location.pathname))
@@ -29,7 +37,12 @@ export function HubTabs() {
   if (!hub || hub.entries.length < 2) return null;
   const current = personal ?? currentEntry(view.sections, location.pathname);
   return (
-    <nav className="hub-tabs" data-audience={hub.audience} aria-label={strings.label(hub.label_key)}>
+    <nav
+      ref={bar}
+      className="hub-tabs"
+      data-audience={hub.audience}
+      aria-label={strings.label(hub.label_key)}
+    >
       <p className="hub-tabs__title">
         <Icon name={hub.icon ?? "settings"} size={24} />
         {strings.label(hub.label_key)}

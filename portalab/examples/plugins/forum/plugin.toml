@@ -6,7 +6,7 @@ schema_version = 2
 key = "forum"
 name = "Forum"
 description = "Topics and replies, for the whole community."
-version = "1.2.0"
+version = "1.2.1"
 requires_portal = ">=0.1"
 maturity = "beta"
 entry_point = "forum_plugin:register"
@@ -71,6 +71,7 @@ notification_categories = [{ name = "replies", label_key = "plugin.forum:categor
 
 [[ui.pages]]
 key = "topics"
+header = false  # its view draws its own title
 title_key = "plugin.forum:page.topics"
 permission = "plugin:forum.read"
 view = "forum.js"  # its own look; the blocks below are what safe mode shows
@@ -81,6 +82,7 @@ blocks = [
 
 [[ui.pages]]
 key = "topic"
+header = false  # its view draws its own title
 title_key = "plugin.forum:page.topic"
 permission = "plugin:forum.read"
 view = "forum.js"

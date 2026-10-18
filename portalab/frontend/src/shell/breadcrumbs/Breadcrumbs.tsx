@@ -30,6 +30,10 @@ export function Breadcrumbs({ max = 4 }: { max?: number }) {
   }
   // 027 FR-017: section → page — the section (not a page itself) is shown, unlinked, after the root.
   const entry = currentEntry(view.sections, location.pathname);
+  if (location.pathname.startsWith("/plugins/") && entry?.route) {
+    // 030: a plugin's page is named by its navigation entry (members never see « plugin »)
+    items = [...items, { path: entry.route, text: shellStrings.label(entry.label_key) }];
+  }
   const section = view.sections.find((s) => !s.direct && sectionEntries(s).some((e) => e.key === entry?.key));
   const sectionLabel = section ? shellStrings.label(section.label_key) : "";
   if (section && items.length > 1 && items[1]?.text !== sectionLabel) {

@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useLocation, useParams } from "react-router";
 import { api } from "../../../api/client";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
+import { useNavigationView } from "../../../shell/nav/NavigationProvider";
+import { currentEntry } from "../../../shell/nav/SectionNav";
 import { isSafeMode } from "../../../shell/safeMode";
 import { PluginView } from "../views/PluginView";
 import { type Block, PluginBlocks, usePageParams } from "./Blocks";
@@ -17,6 +19,8 @@ interface Page {
   key: string;
   title_key: string;
   view?: string | null;
+  /** 030: ``false`` when the plugin's view draws its own title */
+  header?: boolean;
   blocks: Block[];
 }
 
@@ -28,6 +32,10 @@ interface Page {
  */
 export default function PageRenderer() {
   const t = useT();
+  // 030: the page wears its navigation entry's icon (never a « plugin » sign)
+  const location = useLocation();
+  const { view: navigation } = useNavigationView();
+  const entry = currentEntry(navigation.sections, location.pathname);
   const { pluginKey = "", pageKey = "" } = useParams();
   const params = usePageParams();
   const [surface, setSurface] = useState<{ key: string; params: Record<string, string> } | null>(null);
@@ -52,7 +60,9 @@ export default function PageRenderer() {
   }
   return (
     <div className="ds-stack">
-      <PageHeader icon="plug" title={t(page.data.title_key)} />
+      {page.data.header === false ? null : (
+        <PageHeader icon={entry?.icon ?? "sparkles"} title={t(page.data.title_key)} />
+      )}
       {page.data.view && !isSafeMode() ? (
         <PluginView
           plugin={pluginKey}
