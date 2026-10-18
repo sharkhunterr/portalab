@@ -500,18 +500,23 @@
 }
 /* #78: a celebration drawn by the GPU over the whole screen, fading out at its end */
 .celebration-gpu {
-  position: fixed;
-  inset: 0;
-  /* the same box as its celebration's (the viewport less its scrollbar), so both share one centre */
+  /* as big as the screen, but centred on the « +XP » bubble (its celebration's box, under the header): the scene
+     is drawn round its centre, so round the bubble */
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 50%;
   inline-size: 100%;
-  block-size: 100%;
+  block-size: 100vh;
+  translate: 0 -50%;
   pointer-events: none;
   animation: fx-celebration-out 3.2s linear both;
 }
 .ds-celebration[data-contained] .celebration-gpu {
   position: absolute;
+  inset: 0;
   inline-size: 100%;
   block-size: 100%;
+  translate: none;
 }
 @keyframes fx-celebration-out {
   0%,

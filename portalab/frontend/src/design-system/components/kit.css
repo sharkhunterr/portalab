@@ -609,11 +609,6 @@
   place-items: center;
   pointer-events: none;
 }
-/* a celebration drawn over the whole screen (by the GPU or a pack's script) is drawn round the screen's centre:
-   its bubble sits there with it, not under the header */
-.ds-celebration[data-full] {
-  inset-block: 0;
-}
 .ds-celebration__badge {
   padding: var(--space-2) var(--space-5);
   border-radius: var(--radius-pill);
