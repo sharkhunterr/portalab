@@ -6,8 +6,8 @@ from pathlib import Path
 
 from portalab.capabilities.visuals import PluginVisualType, plugin_visual_types
 from portalab.modules.visuals.analysis import analyse
-from portalab.modules.visuals.store import read_source as read_files
 from portalab.modules.visuals.service import VisualPacks
+from portalab.modules.visuals.store import read_source as read_files
 
 PACK = Path(__file__).resolve().parents[4] / "examples" / "visual-packs" / "messenger-bubbles"
 
