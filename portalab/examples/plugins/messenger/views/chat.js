@@ -42,6 +42,17 @@ export default function mount(root, api) {
   `), h("div", { class: "chat" }));
   const app = root.querySelector(".chat");
   let open = api.params.conversation || null;
+  // the look of the member's own bubbles (a pack's look of this plugin's kind « bubble », bought in the shop)
+  const bubbleStyle = document.createElement("style");
+  document.head.append(bubbleStyle);
+  let bubble = null;
+  let owned = [];
+  const wear = async () => {
+    const data = await api.get("bubbles").catch(() => ({ items: [], chosen: null }));
+    owned = data.items || [];
+    bubble = data.chosen || null;
+    bubbleStyle.textContent = bubble ? await api.look("bubble", bubble).catch(() => "") : "";
+  };
 
   const composer = (placeholder, send, extra = []) => {
     const input = h("input", { class: "pl-input", placeholder, "aria-label": placeholder, maxlength: 2000 });
@@ -79,6 +90,13 @@ export default function mount(root, api) {
               item.unread ? h("span", { class: "pl-badge" }, String(item.unread)) : null))
           : h("p", { class: "pl-muted" }, t("view.empty")),
       ),
+      owned.length ? h("label", { class: "pl-row pl-muted", style: "padding:0 var(--space-2)" }, t("view.style"),
+        h("select", { class: "pl-input", style: "width:auto", on: { change: async (event) => {
+          await api.post("bubble", { look: event.target.value });
+          await wear();
+        } } },
+          h("option", { value: "" }, t("view.plain")),
+          ...owned.map((o) => h("option", { value: o.look, selected: o.look === bubble ? "" : null }, o.look)))) : null,
       h("div", { class: "pl-muted", style: "padding:0 var(--space-2)" }, t("view.new")),
       composer(t("view.placeholder"), async (body, [name]) => {
         const result = await api.post("send", { to: name, body });
@@ -92,7 +110,7 @@ export default function mount(root, api) {
     open = id;
     const data = await api.get("messages", { conversation: id });
     const bubbles = h("div", { class: "bubbles", "aria-live": "polite" },
-      (data.items || []).map((item) => h("div", { class: "bubble", "data-mine": item.mine ? "" : null },
+      (data.items || []).map((item) => h("div", { class: "bubble", "data-mine": item.mine ? "" : null, "data-bubble": item.mine && bubble ? bubble : null },
         item.body, h("small", {}, `${item.mine ? "" : `${item.author} · `}${time(item.at, api.context.language)}`))));
     app.replaceChildren(
       h("div", { class: "chat__top" },
@@ -113,5 +131,5 @@ export default function mount(root, api) {
     if (open && String(payload.conversation) === String(open)) conversation(open);
     else if (!open) conversations();
   });
-  (open ? conversation(open) : conversations()).catch((error) => app.replaceChildren(h("p", { class: "pl-error" }, error.message)));
+  wear().then(() => (open ? conversation(open) : conversations())).catch((error) => app.replaceChildren(h("p", { class: "pl-error" }, error.message)));
 }

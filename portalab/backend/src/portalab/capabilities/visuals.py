@@ -350,3 +350,46 @@ INTERFACE_REGISTRY_SPEC = CapabilitySpec(
     multi_provider=False,
     description="Validates and registers the interfaces visual packs bring (028)",
 )
+
+
+# --- spec 030: kinds of visuals plugins add ---------------------------------------------------------------
+@dataclass(frozen=True, slots=True)
+class PluginVisualType:
+    """A kind of visual an enabled plugin draws (``plugin:<plugin>.<name>``, e.g. its message bubbles): packs
+    may bring looks of it (CSS scoped to its look, like any look), the shop sells them, the plugin wears the
+    one its member chose."""
+
+    key: str
+    owner: str
+    label_key: str
+    kinds: frozenset[str] = frozenset({"css"})
+
+    @property
+    def prefix(self) -> str:
+        return self.key.replace("plugin:", "").replace(".", "_")
+
+
+class PluginVisualTypes:
+    def __init__(self) -> None:
+        self._types: dict[str, PluginVisualType] = {}
+
+    def register(self, visual: PluginVisualType) -> None:
+        held = self._types.get(visual.key)
+        if held is not None and held.owner != visual.owner:
+            raise ValueError(f"{visual.key} is another's")
+        self._types[visual.key] = visual
+
+    def remove(self, owner: str) -> int:
+        doomed = [k for k, v in self._types.items() if v.owner == owner]
+        for key in doomed:
+            del self._types[key]
+        return len(doomed)
+
+    def get(self, key: str) -> PluginVisualType | None:
+        return self._types.get(key)
+
+    def all(self) -> list[PluginVisualType]:
+        return sorted(self._types.values(), key=lambda v: v.key)
+
+
+plugin_visual_types = PluginVisualTypes()

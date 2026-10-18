@@ -20,6 +20,7 @@ from sqlalchemy import select
 from portalab.capabilities.administration import PLUGIN_PERMISSIONS_CAPABILITY
 from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, WithPermission
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.visuals import PluginVisualType, plugin_visual_types
 from portalab.core.audit_port import AuditRecord, AuditSink
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.db import Database
@@ -372,6 +373,7 @@ class Lifecycle:
         )
         ctx = Context(key, self.registries, self.guard, db, priority=priority)
         apply_manifest(ctx, manifest.raw)
+        self._visual_types(key, manifest)
         waiting = False
         if manifest.runtime == "confined":
             await self._register_confined(ctx, key, row.version, package, manifest)
@@ -398,6 +400,16 @@ class Lifecycle:
                 key, point, contribution_id, priority=priority, state=state, detail=detail
             )
         return waiting
+
+    def _visual_types(self, key: str, manifest: Manifest) -> None:
+        """030: the kinds of visuals it draws — packs may then bring looks of them (028 analysis)."""
+        owner = f"plugin:{key}"
+        plugin_visual_types.remove(owner)
+        for item in manifest.visual_types:
+            kinds = frozenset(item.get("render") or ["css"])
+            plugin_visual_types.register(
+                PluginVisualType(f"plugin:{key}.{item['key']}", owner, str(item["label_key"]), kinds)
+            )
 
     def _unconfined_allowed(self, plugin: Plugin) -> bool:
         mode = str(getattr(self.config(), "unconfined", "existing"))
@@ -491,6 +503,7 @@ class Lifecycle:
         return await self._transition(actor, key, "enabled", "enabled")
 
     async def _remove(self, key: str) -> dict[str, int]:
+        plugin_visual_types.remove(f"plugin:{key}")
         if self.runtime is not None:
             await self.runtime.stop(key)
         removed = await self.registries.remove(f"plugin:{key}")

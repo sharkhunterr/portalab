@@ -37,6 +37,7 @@ DESCRIPTIONS: dict[str, str] = {
     "settings": "Have settings, its secrets kept by Portalab.",
     "network": "Reach the outside hosts listed here, through Portalab.",
     "portal_data": "Read portal data through the operations listed here, with the member's rights.",
+    "visual_types": "Add kinds of visuals packs can bring and the shop can sell (drawn by the plugin).",
 }
 
 

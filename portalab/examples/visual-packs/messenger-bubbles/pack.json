@@ -1,0 +1,12 @@
+{
+  "format": 1,
+  "id": "messenger-bubbles",
+  "version": "1.0.0",
+  "names": { "fr": "Bulles de messagerie", "en": "Message bubbles" },
+  "descriptions": {
+    "fr": "Des looks pour vos bulles dans Messenger — un type de visuel apporté par l'extension Messenger.",
+    "en": "Looks for your bubbles in Messenger — a kind of visual the Messenger extension brings."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

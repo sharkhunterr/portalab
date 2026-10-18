@@ -5,7 +5,7 @@ schema_version = 2
 key = "messenger"
 name = "Messenger"
 description = "Direct messages between members."
-version = "1.1.1"
+version = "1.2.0"
 requires_portal = ">=0.1"
 maturity = "beta"
 entry_point = "messenger_plugin:register"
@@ -18,6 +18,10 @@ operations = true
 pages = true
 slots = ["corner", "header.action"]
 live = { topics = ["new"] }
+# a kind of visual of its own — the look of a member's message bubbles: packs bring looks of it, the shop sells
+# them (a product of its kind), the chat wears the one the member chose
+product_types = ["bubble"]
+visual_types = [{ key = "bubble", label_key = "plugin.messenger:type.bubble" }]
 privacy = true
 portal_data = { operations = ["GET /api/v1/community/members", "GET /api/v1/community/members/{member_id}"] }
 
@@ -42,6 +46,18 @@ path = "messages"
 method = "GET"
 permission = "plugin:messenger.use"
 exposure = "read"
+
+[[routes]]
+path = "bubbles"
+method = "GET"
+permission = "plugin:messenger.use"
+exposure = "read"
+
+[[routes]]
+path = "bubble"
+method = "POST"
+permission = "plugin:messenger.use"
+exposure = "action"
 
 [[routes]]
 path = "send"
@@ -109,6 +125,9 @@ blocks = [
 "view.placeholder" = "Your message…"
 "view.back" = "Conversations"
 "view.to" = "A member's name"
+"type.bubble" = "Message bubble"
+"view.style" = "Your bubbles"
+"view.plain" = "Plain"
 
 [i18n.fr."plugin.messenger"]
 "slot.inbox" = "Messages"
@@ -126,3 +145,6 @@ blocks = [
 "view.placeholder" = "Votre message…"
 "view.back" = "Conversations"
 "view.to" = "Le nom d'un membre"
+"type.bubble" = "Bulle de message"
+"view.style" = "Vos bulles"
+"view.plain" = "Simples"

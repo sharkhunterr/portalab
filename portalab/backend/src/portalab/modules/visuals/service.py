@@ -538,7 +538,10 @@ class VisualPacks:
         """The shop entry of an element: what it proposes, as the administrator decided."""
         economy = {**element["economy"], **{k: v for k, v in decided.items() if k in ECONOMY_FIELDS}}
         payload = dict(element.get("payload") or {})
-        field = LOOK_FIELD.get(element["type"])
+        # 030: a plugin's kind of visual names its look ``look`` (the plugin's product type reads it)
+        field = LOOK_FIELD.get(element["type"]) or (
+            "look" if str(element["type"]).startswith("plugin:") else None
+        )
         if field and element.get("look"):
             payload[field] = element["look"]
         if element["type"] == "widget_style":

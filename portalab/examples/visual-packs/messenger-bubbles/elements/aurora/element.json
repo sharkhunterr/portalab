@@ -1,0 +1,11 @@
+{
+  "type": "plugin:messenger.bubble",
+  "look": "aurora",
+  "names": { "fr": "Bulles aurore", "en": "Aurora bubbles" },
+  "descriptions": {
+    "fr": "Vos messages dans un dégradé d'aurore boréale qui ondule doucement.",
+    "en": "Your messages in a gently shifting northern-lights gradient."
+  },
+  "render": { "kind": "css", "css": ["aurora.css"] },
+  "economy": { "price": 150, "rarity": "rare", "collection": "looks", "icon": "message-circle" }
+}

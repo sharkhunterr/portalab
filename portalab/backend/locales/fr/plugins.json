@@ -40,6 +40,7 @@
   "capability.settings": "Avoir des réglages, ses secrets gardés par Portalab.",
   "capability.slots": "Ajouter du contenu à des endroits des écrans de Portalab, dessiné par Portalab.",
   "capability.storage": "Garder ses propres données (un stockage à part, dans un quota).",
+  "capability.visual_types": "Ajouter des types de visuels que des packs peuvent apporter et la boutique vendre (dessinés par l'extension).",
   "category.quarantined": "Extensions mises en quarantaine",
   "category.update": "Mises à jour d'extensions",
   "confined.attempts": "Tentatives refusées",

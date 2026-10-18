@@ -25,7 +25,7 @@ RUNTIMES = ("declarative", "confined", "in_process")
 # spec 030 (FR-005): the closed list of what a confined plugin may be granted
 CAPABILITIES = (
     "storage", "operations", "permissions", "pages", "slots", "live", "events", "jobs", "notifications",
-    "search", "moderation", "privacy", "product_types", "settings", "network", "portal_data",
+    "search", "moderation", "privacy", "product_types", "settings", "network", "portal_data", "visual_types",
 )  # fmt: skip
 SLOTS = (
     "nav", "page", "header.action", "corner", "home.section", "media.actions", "media.panel", "person.panel",
@@ -108,6 +108,20 @@ _CAPABILITIES: dict[str, Any] = {
         "moderation": {"type": "boolean"},
         "privacy": {"type": "boolean"},
         "product_types": _NAMES,
+        # kinds of visuals it draws (its message bubbles…): packs bring looks of them, the shop sells them
+        "visual_types": {
+            **_LIST,
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["key", "label_key"],
+                "properties": {
+                    "key": {"type": "string", "pattern": NAME},
+                    "label_key": {"type": "string", "maxLength": 120},
+                    "render": {"type": "array", "items": {"enum": ["css", "glsl"]}, "maxItems": 2},
+                },
+            },
+        },
         "settings": {"type": "boolean"},
         "network": {
             "type": "object",
@@ -397,6 +411,10 @@ class Manifest:
             if route["method"] == method.upper() and route["path"].strip("/") == path.strip("/"):
                 return str(route["exposure"])
         return None
+
+    @property
+    def visual_types(self) -> list[dict[str, Any]]:
+        return [dict(v) for v in self.capabilities.get("visual_types") or []]
 
     @property
     def slots(self) -> list[dict[str, Any]]:

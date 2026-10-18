@@ -202,6 +202,8 @@ class Element(BaseModel):
         if self.product:
             return self.product
         prefix = TYPES.get(self.type, (frozenset(), self.type))[1]
+        if self.type.startswith("plugin:"):  # 030: a plugin's kind of visual (``plugin:messenger.bubble``)
+            prefix = self.type.removeprefix("plugin:").replace(".", "_")
         if self.type == "widget_option" and not self.look:  # named by what it sells: its widget's value
             what = f"{self.payload.get('widget', 'item')}_{self.payload.get('value', '')}"
             return f"{prefix}_{re.sub(r'[^a-z0-9_]', '_', what.lower())}"[:64]

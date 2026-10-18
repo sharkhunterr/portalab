@@ -30,6 +30,7 @@ from portalab.capabilities.visuals import (
     InterfaceRegistry,
     contract_known,
     live_looks,
+    plugin_visual_types,
 )
 from portalab.modules.visuals.manifest import (
     GIVEABLE,
@@ -229,6 +230,8 @@ def _element(
     key = element.product_key
     kind = element.render.kind
     allowed = TYPES.get(element.type)
+    if allowed is None and (plugin_type := plugin_visual_types.get(element.type)) is not None:
+        allowed = (plugin_type.kinds, plugin_type.prefix)  # 030: a kind of visual an enabled plugin draws
     if allowed is None:
         report.add("blocking", "element.type", key, type=element.type)
         return

@@ -56,6 +56,9 @@ VIEW_BOOTSTRAP = r"""
     .then(
     (answer) => URL.createObjectURL(new Blob([answer.buffer], { type: String(answer.mime || "") })),
   );
+  // a look of one of the plugin's own kinds of visuals (its CSS, from a pack Portalab analysed)
+  const look = (kind, key) =>
+    ask({ type: "look", kind: String(kind), look: String(key) }).then((answer) => answer.css);
   const resize = () => send({ type: "resize", height: Math.ceil(document.documentElement.scrollHeight) });
   window.addEventListener("message", async (event) => {
     if (event.source !== host || !event.data || typeof event.data !== "object") return;
@@ -134,6 +137,7 @@ VIEW_BOOTSTRAP = r"""
         asset,
         image,
         artwork,
+        look,
         open: (surface, params) => send({ type: "open", surface: String(surface), params: params || {} }),
         close: () => send({ type: "close" }),
         navigate: (to) => send({ type: "navigate", to: String(to) }),

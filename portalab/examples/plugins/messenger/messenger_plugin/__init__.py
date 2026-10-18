@@ -1,6 +1,7 @@
 """Messenger — a confined plugin (spec 030): direct messages between members. Live updates go through
 Portalab's channels to the two members of a conversation only; names are read with the member's rights."""
 
+from portalab.sdk import ActivationResult, ProductType
 from portalab.sdk.confined.recording import Denied
 
 MEMBERS = "GET /api/v1/community/members"
@@ -152,7 +153,52 @@ def register(ctx):
     async def erase(user_id):
         await ctx.db.execute("DELETE FROM conversations WHERE a = :u OR b = :u", {"u": user_id})
 
+    # --- the look of a member's bubbles: bought in the shop (a product of its own kind), worn in the chat ---
+    class Bubble:
+        async def activate(self, ownership):
+            look = str((ownership.payload or {}).get("look") or "")[:48]
+            if not look:
+                return ActivationResult("activation_failed", "no look")
+            member = str(ownership.user_id)
+            await ctx.db.execute(
+                "INSERT INTO bubbles (member, look, chosen) VALUES (:m, :l, "
+                "NOT EXISTS (SELECT 1 FROM bubbles WHERE member = :m AND chosen)) ON CONFLICT DO NOTHING",
+                {"m": member, "l": look},
+            )
+            return ActivationResult("active", "worn in the chat")
+
+        async def deactivate(self, ownership):
+            look = str((ownership.payload or {}).get("look") or "")
+            await ctx.db.execute(
+                "DELETE FROM bubbles WHERE member = :m AND look = :l", {"m": str(ownership.user_id), "l": look}
+            )
+
+    async def bubbles(principal, query, body):
+        rows = await ctx.db.execute(
+            "SELECT look, chosen FROM bubbles WHERE member = :m ORDER BY look", {"m": str(principal.user_id)}
+        )
+        chosen = next((r["look"] for r in rows if r["chosen"]), None)
+        return {"state": "available", "items": [{"look": r["look"]} for r in rows], "chosen": chosen}
+
+    async def choose(principal, query, body):
+        look = str((body or {}).get("look") or "")
+        member = str(principal.user_id)
+        await ctx.db.execute("UPDATE bubbles SET chosen = (look = :l) WHERE member = :m", {"m": member, "l": look})
+        return {"state": "available"}
+
+    ctx.product_type(
+        ProductType(
+            key="plugin:messenger.bubble",
+            owner="plugin:messenger",
+            handler=Bubble(),
+            payload_fields=("look",),
+            label_key="plugin.messenger:type.bubble",
+        )
+    )
+
     use = "plugin:messenger.use"
+    ctx.route("GET", "bubbles", bubbles, permission=use, exposure="read")
+    ctx.route("POST", "bubble", choose, permission=use, exposure="action")
     ctx.route("GET", "unread", unread, permission=use, exposure="read")
     ctx.route("GET", "conversations", conversations, permission=use, exposure="read")
     ctx.route("GET", "messages", messages, permission=use, exposure="read")

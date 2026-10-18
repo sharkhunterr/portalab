@@ -1,0 +1,19 @@
+/* the member's own message bubbles in Messenger, as a northern-lights gradient */
+[data-bubble="aurora"] {
+  background: linear-gradient(120deg, #22d3ee, #a78bfa, #34d399, #22d3ee);
+  background-size: 300% 300%;
+  color: #04131f;
+  border-color: transparent;
+  box-shadow: 0 0.25rem 1rem #22d3ee44;
+  animation: messenger-aurora 8s ease-in-out infinite;
+}
+@keyframes messenger-aurora {
+  50% {
+    background-position: 100% 50%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-bubble="aurora"] {
+    animation: none;
+  }
+}

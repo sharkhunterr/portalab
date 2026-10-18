@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { api } from "../../../api/client";
 import { connectStream, type StreamHandle } from "../../../api/stream";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
+import { externalLook } from "../../../design-system/visuals/registry";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import { ApiError } from "../../../state/regions";
 import { ownLink } from "../pages/Blocks";
@@ -389,6 +390,25 @@ export function PluginView({
             },
             [buffer],
           );
+          return;
+        }
+        case "look": {
+          // 030: a look of the plugin's own kind of visual — only its own kinds, from the live packs
+          const kind = String(data.kind ?? "");
+          const key = String(data.look ?? "");
+          const element = NAME.test(kind) ? externalLook(`plugin:${plugin}.${kind}`, key) : undefined;
+          if (!element) {
+            answer(data.id, false, null, { code: "not_found", message: "no such look" });
+            return;
+          }
+          const sheets = await Promise.all(
+            element.css.map((url) =>
+              fetch(url, { credentials: "same-origin" })
+                .then((r) => (r.ok ? r.text() : ""))
+                .catch(() => ""),
+            ),
+          );
+          answer(data.id, true, { css: sheets.join("\n") });
           return;
         }
         case "subscribe": {

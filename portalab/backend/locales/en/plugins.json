@@ -40,6 +40,7 @@
   "capability.settings": "Have settings, its secrets kept by Portalab.",
   "capability.slots": "Add content to places of Portalab's screens, drawn by Portalab.",
   "capability.storage": "Keep its own data (a separate storage, within a quota).",
+  "capability.visual_types": "Add kinds of visuals packs can bring and the shop can sell (drawn by the plugin).",
   "category.quarantined": "Plugins quarantined",
   "category.update": "Plugin updates",
   "confined.attempts": "Refused attempts",
