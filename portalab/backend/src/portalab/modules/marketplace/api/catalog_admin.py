@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 from portalab.capabilities.administration import AUDIT_QUERY_CAPABILITY
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
-from portalab.core.errors import Unavailable
+from portalab.core.errors import Unavailable, ValidationFailed
 from portalab.modules.marketplace.api.admin import _confirm_generic
 from portalab.modules.marketplace.api.catalog import (
     MarketplaceOwnershipOut,
@@ -75,6 +75,8 @@ class MarketplaceGrantIn(BaseModel):
     product: str = Field(max_length=96)
     reason: str = Field(min_length=1, max_length=500)
     expires_at: datetime | None = None
+    # issue 155: several copies at once (a product one may own more than once: boosters, perks), one reason
+    quantity: int = Field(default=1, ge=1, le=50)
     confirmation: str | None = None
 
 
@@ -191,11 +193,21 @@ async def present_product(
 
 @router.post("/admin/marketplace/grants", response_model=MarketplaceOwnershipOut, status_code=201)
 async def grant(principal: Granter, body: MarketplaceGrantIn, module: Module) -> MarketplaceOwnershipOut:
-    await _confirm_generic(
-        module, principal, GRANT, f"user:{body.user_id}", {"product": body.product}, body.confirmation
-    )
-    row = await module.grants.grant(principal, body.user_id, body.product, body.reason, body.expires_at)
-    return await ownership_out(module, row)
+    what: dict[str, Any] = {"product": body.product}
+    if body.quantity > 1:
+        product, _ = await module.catalog.get(body.product)
+        if not product.repeatable:
+            raise ValidationFailed(
+                "This product is owned once: give one.", code="marketplace.quantity_not_repeatable"
+            )
+        what["quantity"] = body.quantity  # what is confirmed is the number given too
+    await _confirm_generic(module, principal, GRANT, f"user:{body.user_id}", what, body.confirmation)
+    # each copy a gift of its own (activated as any: a booster sealed in the reserve), under one reason
+    rows = [
+        await module.grants.grant(principal, body.user_id, body.product, body.reason, body.expires_at)
+        for _ in range(body.quantity)
+    ]
+    return await ownership_out(module, rows[0])
 
 
 @router.post("/admin/marketplace/ownerships/{ownership_id}/revoke", response_model=MarketplaceOwnershipOut)

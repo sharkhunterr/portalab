@@ -35,7 +35,9 @@ interface Ask {
   detail?: string | undefined;
   action: string;
   danger?: boolean | undefined;
-  run: (reason: string) => Promise<unknown>;
+  /** issue 155: how many copies — asked for a product one may own more than once */
+  quantity?: boolean | undefined;
+  run: (reason: string, copies: number) => Promise<unknown>;
 }
 
 const LIVE = ["active", "needs_configuration", "activation_failed", "locked"];
@@ -117,6 +119,7 @@ function MemberConsole({ userId, name }: { userId: string; name: string }) {
   // #98: every action asks its reason in a small dialog, which is its confirmation too
   const [ask, setAsk] = useState<Ask | null>(null);
   const [reason, setReason] = useState("");
+  const [copies, setCopies] = useState("1");
   const [value, setValue] = useState<Value>("coins");
   const [amount, setAmount] = useState("50");
   const [search, setSearch] = useState("");
@@ -150,8 +153,10 @@ function MemberConsole({ userId, name }: { userId: string; name: string }) {
   });
   const request = (next: Ask) => {
     setReason("");
+    setCopies("1");
     setAsk(next);
   };
+  const count = Math.min(50, Math.max(1, Math.floor(Number(copies) || 1)));
   const quantity = Math.max(0, Math.floor(Number(amount) || 0));
   const give = () =>
     request({
@@ -188,15 +193,22 @@ function MemberConsole({ userId, name }: { userId: string; name: string }) {
           body: { user_id: userId, value, amount: quantity, reason: why },
         }),
     });
-  const offer = (product: string, productName: string) =>
+  const offer = (product: string, productName: string, repeatable: boolean) =>
     request({
       title: t("marketplace:shopadmin.ask.offer", { what: productName, name }),
       action: t("marketplace:admin.grant"),
-      run: (why) =>
+      quantity: repeatable,
+      run: (why, many) =>
         withConfirmation(
           (confirmation) =>
             api.POST("/api/v1/admin/marketplace/grants", {
-              body: { user_id: userId, product, reason: why, confirmation: confirmation ?? null },
+              body: {
+                user_id: userId,
+                product,
+                reason: why,
+                quantity: many,
+                confirmation: confirmation ?? null,
+              },
             }),
           confirm,
         ),
@@ -267,13 +279,24 @@ function MemberConsole({ userId, name }: { userId: string; name: string }) {
               const current = ask;
               if (!current) return;
               setAsk(null);
-              run.mutate(() => current.run(reason.trim()));
+              run.mutate(() => current.run(reason.trim(), current.quantity ? count : 1));
             }}
           >
             {ask?.action}
           </Button>
         }
       >
+        {ask?.quantity ? (
+          <TextField
+            label={t("marketplace:shopadmin.quantity")}
+            hint={t("marketplace:shopadmin.quantityHint")}
+            type="number"
+            min={1}
+            max={50}
+            value={copies}
+            onChange={(e) => setCopies(e.target.value)}
+          />
+        ) : null}
         <TextField
           label={t("marketplace:shopadmin.reason")}
           hint={t("marketplace:shopadmin.reasonHint")}
@@ -354,7 +377,10 @@ function MemberConsole({ userId, name }: { userId: string; name: string }) {
                     {t(`marketplace:rarity.${product.rarity ?? "common"}`)}
                   </small>
                 </span>
-                <Button disabled={run.isPending} onClick={() => offer(product.key, product.name)}>
+                <Button
+                  disabled={run.isPending}
+                  onClick={() => offer(product.key, product.name, Boolean(product.repeatable))}
+                >
                   {t("marketplace:admin.grant")}
                 </Button>
               </li>

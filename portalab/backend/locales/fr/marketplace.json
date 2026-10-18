@@ -758,5 +758,7 @@
   "admin.boosters.wears": "scène {name}",
   "admin.boosters.new": "Nouveau booster",
   "admin.boosters.create": "Créer et mettre en vente",
-  "admin.boosters.nameNeeded": "Donnez-lui un nom."
+  "admin.boosters.nameNeeded": "Donnez-lui un nom.",
+  "shopadmin.quantity": "Combien",
+  "shopadmin.quantityHint": "Jusqu'à 50 — chaque exemplaire est un don, sous le même motif."
 }

@@ -8004,6 +8004,13 @@
             "title": "Product",
             "type": "string"
           },
+          "quantity": {
+            "default": 1,
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          },
           "reason": {
             "maxLength": 500,
             "minLength": 1,

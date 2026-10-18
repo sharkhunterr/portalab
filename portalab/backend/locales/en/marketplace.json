@@ -758,5 +758,7 @@
   "admin.boosters.wears": "scene {name}",
   "admin.boosters.new": "New booster",
   "admin.boosters.create": "Create and put on sale",
-  "admin.boosters.nameNeeded": "Give it a name."
+  "admin.boosters.nameNeeded": "Give it a name.",
+  "shopadmin.quantity": "How many",
+  "shopadmin.quantityHint": "Up to 50 — each copy given as one gift, under the same reason."
 }

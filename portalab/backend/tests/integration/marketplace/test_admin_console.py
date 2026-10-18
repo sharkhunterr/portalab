@@ -91,3 +91,31 @@ async def test_a_purchase_to_validate_is_a_badge(mk: MkHarness) -> None:
     attention = ShopAttention(mk.database, mk.module.authorizer)
     assert await attention.counts(mk.p("boss")) == {"marketplace.admin_requests": 1}
     assert await attention.counts(ursula) == {}
+
+
+async def test_several_copies_given_at_once(mk: MkHarness, client: AsyncClient) -> None:
+    """Issue 155: a product one may own more than once given several times in one go, one reason; a product
+    owned once is refused more than one copy."""
+    from tests.integration.marketplace.conftest import product_def
+
+    await mk.module.catalog.create(
+        mk.p("boss"), {**product_def("freeze", "quota", price_coins=40), "repeatable": True}
+    )
+    await mk.module.catalog.move(mk.p("boss"), "freeze", "available")
+    await published(mk, "lynx", "badge", price_coins=30, payload={"label": "Lynx"})
+    await login(client, "boss")
+    ulrich = str(mk.people["ulrich"])
+    given = await confirmed(
+        client,
+        "POST",
+        "/api/v1/admin/marketplace/grants",
+        {"user_id": ulrich, "product": "freeze", "reason": "Three for the trip", "quantity": 3},
+    )
+    assert given.status_code == 201, given.text
+    inventory = (await client.get(f"/api/v1/admin/marketplace/members/{ulrich}/inventory")).json()
+    assert sum(1 for i in inventory if i["product"] == "freeze") == 3
+    once = await client.post(
+        "/api/v1/admin/marketplace/grants",
+        json={"user_id": ulrich, "product": "lynx", "reason": "Two badges", "quantity": 2},
+    )
+    assert once.status_code == 422 and once.json()["code"] == "marketplace.quantity_not_repeatable"

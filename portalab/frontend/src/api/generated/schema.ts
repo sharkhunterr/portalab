@@ -12726,6 +12726,11 @@ export interface components {
             expires_at?: string | null;
             /** Product */
             product: string;
+            /**
+             * Quantity
+             * @default 1
+             */
+            quantity: number;
             /** Reason */
             reason: string;
             /**
