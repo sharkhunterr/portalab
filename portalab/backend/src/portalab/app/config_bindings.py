@@ -9,6 +9,7 @@ from dataclasses import replace
 from datetime import timedelta
 from typing import Any
 
+from portalab.core import egress
 from portalab.core.logging import get_logger
 from portalab.modules.administration.config.service import ConfigService
 from portalab.modules.connectors.settings import SETTINGS as CONNECTORS_FIELDS
@@ -112,6 +113,11 @@ async def refresh(platform: Any) -> None:
     search = getattr(platform, "search", None)
     if search is not None:
         search.config = replace(search.config, **await _values(config, SEARCH_FIELDS))
+    # 030 (issue 144): the outbound allow-list
+    egress.EGRESS.configure(
+        enabled=bool((await config.get("security.egress.enabled")).value),
+        hosts=list((await config.get("security.egress.hosts")).value or []),
+    )
 
 
 async def safe_refresh(platform: Any) -> bool:

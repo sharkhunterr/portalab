@@ -12,6 +12,7 @@ from typing import Any
 
 import httpx
 
+from portalab.core import egress
 from portalab.modules.visuals.manifest import ManifestError, parse_pack
 from portalab.modules.visuals.store import MAX_BYTES, PackageError
 
@@ -63,6 +64,8 @@ def parse_address(url: str) -> Repository:
 
 
 HOSTS = frozenset({"github.com", "api.github.com", "raw.githubusercontent.com", "codeload.github.com"})
+for _host in HOSTS:  # 030: the pack sources are known hosts of the outbound allow-list
+    egress.EGRESS.allow(_host, "pack sources")
 MAX_REDIRECTS = 5
 MAX_JSON_BYTES = 1024 * 1024
 
@@ -98,7 +101,7 @@ class GitHub:
         if self.client is not None:
             status, body = await self._fetch(self.client, url, accept, limit)
         else:
-            async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+            async with httpx.AsyncClient(timeout=TIMEOUT, event_hooks=egress.hooks()) as client:
                 status, body = await self._fetch(client, url, accept, limit)
         return httpx.Response(status, content=body)
 

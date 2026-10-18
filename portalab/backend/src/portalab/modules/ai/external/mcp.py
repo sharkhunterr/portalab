@@ -13,10 +13,12 @@ import re
 import time
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any
+from urllib.parse import urlsplit
 
 import httpx
 
 from portalab.capabilities.ai import AITool, ExternalToolDef, ResultState, Sensitivity, SourceRef, ToolResult
+from portalab.core import egress
 from portalab.core.authz_port import Principal
 from portalab.core.permissions import PermissionRegistry, default_permissions
 from portalab.core.time import Clock, utc_now
@@ -51,6 +53,7 @@ class McpHttpSource:
     ) -> None:
         self.name = name
         self.url = url
+        egress.EGRESS.allow(urlsplit(url).hostname, "ai tools")  # 030: a configured tool server
         self.token = token
         self.transport = transport
         self.timeout = timeout
@@ -102,7 +105,7 @@ class McpHttpSource:
 
     async def _session(self, method: str, params: Mapping[str, Any]) -> Any:
         async with httpx.AsyncClient(
-            transport=self.transport, timeout=self.timeout, follow_redirects=False
+            transport=self.transport, timeout=self.timeout, follow_redirects=False, event_hooks=egress.hooks()
         ) as client:
             _, session = await self._post(
                 client,

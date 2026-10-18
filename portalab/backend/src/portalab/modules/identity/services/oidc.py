@@ -14,7 +14,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import Any
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 from uuid import UUID
 
 import httpx
@@ -22,6 +22,7 @@ import jwt
 from sqlalchemy import delete, func, select
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
+from portalab.core import egress
 from portalab.core.errors import Unauthorized, Unavailable
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.domain.state_machine import AccountState
@@ -105,7 +106,10 @@ class OidcService:
 
     async def _metadata(self, issuer: str) -> Mapping[str, Any]:
         if issuer not in self._discovery:
-            async with httpx.AsyncClient(timeout=TIMEOUT, transport=self.transport) as client:
+            egress.EGRESS.allow(urlsplit(issuer).hostname, "sign-in")  # the configured provider
+            async with httpx.AsyncClient(
+                timeout=TIMEOUT, transport=self.transport, event_hooks=egress.hooks()
+            ) as client:
                 answer = await client.get(f"{issuer}/.well-known/openid-configuration")
                 answer.raise_for_status()
                 metadata = answer.json()
@@ -158,7 +162,10 @@ class OidcService:
         self, config: OidcSettings, code: str, redirect_uri: str, login: OidcLogin
     ) -> dict[str, Any]:
         metadata = await self._metadata(config.issuer)
-        async with httpx.AsyncClient(timeout=TIMEOUT, transport=self.transport) as client:
+        egress.EGRESS.allow(urlsplit(str(metadata["token_endpoint"])).hostname, "sign-in")
+        async with httpx.AsyncClient(
+            timeout=TIMEOUT, transport=self.transport, event_hooks=egress.hooks()
+        ) as client:
             answer = await client.post(
                 str(metadata["token_endpoint"]),
                 data={

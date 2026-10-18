@@ -20,6 +20,7 @@ from urllib.parse import quote, urlencode, urlsplit, urlunsplit
 import httpx
 from sqlalchemy.dialects.postgresql import insert
 
+from portalab.core import egress
 from portalab.core.db import Database
 from portalab.core.secrets import SecretBox
 from portalab.core.time import Clock, utc_now
@@ -198,7 +199,11 @@ class Network:
         timeout = min(MAX_TIMEOUT, max(0.5, float(args.get("timeout_s") or MAX_TIMEOUT)))
         extensions = {"sni_hostname": host} if scheme == "https" else {}
         async with httpx.AsyncClient(
-            transport=self.transport, timeout=timeout, follow_redirects=False, trust_env=False
+            transport=self.transport,
+            timeout=timeout,
+            follow_redirects=False,
+            trust_env=False,
+            event_hooks=egress.hooks(),
         ) as client:
             try:
                 request = client.build_request(

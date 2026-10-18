@@ -373,11 +373,37 @@ def _cmd_security_blocks(args: argparse.Namespace) -> int:
     return asyncio.run(_security_blocks(args))
 
 
+async def _doctor(settings: Any) -> int:
+    from portalab.app.doctor import database_checks, local_checks, render
+    from portalab.core.db import Database
+
+    checks = local_checks(Path(settings.data_dir) if settings.data_dir else None)
+    try:
+        database = Database.from_url(settings.database_url.reveal())
+        try:
+            checks += await database_checks(database)
+        finally:
+            await database.dispose()
+    except Exception as error:  # the local checks stand alone
+        checks.append(("database", "warn", f"not read ({type(error).__name__})"))
+    text_out, code = render(checks)
+    print(text_out)
+    return code
+
+
+def _cmd_doctor(args: argparse.Namespace) -> int:
+    """030 (issue 144): how this deployment stands (user, read-only code, confinement, egress, plugins)."""
+    return asyncio.run(_doctor(load_settings()))
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="portalab", description="Portalab — personal extensible portal")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("serve", help="run the HTTP API").set_defaults(func=_cmd_serve)
     sub.add_parser("worker", help="run the background job worker").set_defaults(func=_cmd_worker)
+    sub.add_parser("doctor", help="check how this deployment stands (changes nothing)").set_defaults(
+        func=_cmd_doctor
+    )
     migrate = sub.add_parser("migrate", help="apply database migrations")
     migrate.add_argument("revision", nargs="?", default="heads")
     migrate.add_argument("--status", action="store_true", help="only report whether migrations are pending")

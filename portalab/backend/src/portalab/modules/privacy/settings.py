@@ -32,6 +32,9 @@ class SecurityConfig:
     max_body_bytes: int = 10 * 1024 * 1024
     rate_limit_per_ip_per_minute: int = 600
     rate_limit_per_user_per_minute: int = 300
+    # 030 (issue 144): outgoing calls only to known hosts, when switched on
+    egress_enabled: bool = False
+    egress_hosts: list[str] = field(default_factory=list)
 
 
 def declare_privacy_settings(catalog: SettingCatalog = default_catalog) -> None:
@@ -58,6 +61,19 @@ def declare_privacy_settings(catalog: SettingCatalog = default_catalog) -> None:
             int,
             security.rate_limit_per_ip_per_minute,
             "Requests per minute per client address.",
+        ),
+        (
+            "security.egress.enabled",
+            bool,
+            security.egress_enabled,
+            "Outgoing calls only to known hosts: configured services, sign-in, pack sources, AI providers, "
+            "plugins' accepted hosts and the hosts listed below.",
+        ),
+        (
+            "security.egress.hosts",
+            list[str],
+            [],
+            "More hosts Portalab may call (an asterisk: any subdomain).",
         ),
         (
             "security.rateLimit.perUserPerMinute",

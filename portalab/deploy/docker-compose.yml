@@ -23,6 +23,15 @@ x-portalab: &portalab
   secrets: [database_url, secret_key]
   volumes:
     - portalab-data:/var/lib/portalab
+  # 030 (issue 144): the image's files cannot be changed, no privilege can be gained or used; Portalab writes
+  # only its data volume and a scratch /tmp (check with `portalab doctor`)
+  read_only: true
+  tmpfs:
+    - /tmp
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
   restart: unless-stopped
 
 services:

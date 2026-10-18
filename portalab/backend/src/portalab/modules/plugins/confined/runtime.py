@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.core import egress
 from portalab.core.confinement import Support, probe
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
@@ -130,6 +131,8 @@ class ConfinedRuntime:
         )
         self.hosts[key] = host
         self.manifests[key] = manifest
+        for listed in manifest.network_hosts:  # 030: hosts the Admin accepted are known to the allow-list
+            egress.EGRESS.allow(listed["host"], f"plugin:{key}")
         self.versions[key] = version
         await host.start()
         return host
@@ -137,6 +140,7 @@ class ConfinedRuntime:
     async def stop(self, key: str) -> None:
         host = self.hosts.pop(key, None)
         self.registered.pop(key, None)
+        egress.EGRESS.forget(f"plugin:{key}")
         if host is not None:
             await host.stop()
         await self.storage.close(key)

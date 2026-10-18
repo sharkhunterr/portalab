@@ -3,10 +3,12 @@ configured provider. Registered only when ``ai.embeddings.model`` and ``ai.embed
 semantic search stays off otherwise."""
 
 from collections.abc import Callable, Sequence
+from urllib.parse import urlsplit
 
 import httpx
 
 from portalab.capabilities.ai import ProviderError
+from portalab.core import egress
 
 
 class OpenAICompatibleEmbeddings:
@@ -26,13 +28,14 @@ class OpenAICompatibleEmbeddings:
         self.transport = transport
 
     async def embed(self, texts: Sequence[str], language: str | None) -> Sequence[Sequence[float]]:
+        egress.EGRESS.allow(urlsplit(self.endpoint()).hostname, "ai provider")  # 030: the configured one
         headers = {}
         key = self.api_key()
         if key:
             headers["Authorization"] = f"Bearer {key}"
         try:
             async with httpx.AsyncClient(
-                transport=self.transport, timeout=30, follow_redirects=False
+                transport=self.transport, timeout=30, follow_redirects=False, event_hooks=egress.hooks()
             ) as client:
                 response = await client.post(
                     f"{self.endpoint().rstrip('/')}/embeddings",

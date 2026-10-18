@@ -5,6 +5,7 @@ LM Studio…). Streams Server-Sent Events, assembles streamed tool calls, maps e
 import json
 from collections.abc import AsyncIterator, Callable, Sequence
 from typing import Any
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -16,6 +17,7 @@ from portalab.capabilities.ai import (
     ToolCall,
     ToolSpec,
 )
+from portalab.core import egress
 
 MAX_LINE = 1_000_000
 
@@ -47,6 +49,7 @@ class OpenAICompatibleProvider:
         max_context: int = 8192,
     ) -> None:
         self.endpoint = endpoint.rstrip("/")
+        egress.EGRESS.allow(urlsplit(self.endpoint).hostname, "ai provider")  # 030: a configured provider
         self.model = model
         self.api_key = api_key
         self.transport = transport
@@ -92,7 +95,10 @@ class OpenAICompatibleProvider:
         try:
             async with (
                 httpx.AsyncClient(
-                    transport=self.transport, timeout=timeout, follow_redirects=False
+                    transport=self.transport,
+                    timeout=timeout,
+                    follow_redirects=False,
+                    event_hooks=egress.hooks(),
                 ) as client,
                 client.stream(
                     "POST", f"{self.endpoint}/chat/completions", json=body, headers=headers

@@ -19,6 +19,7 @@ import httpx
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.core import egress
 from portalab.core.logging import get_logger
 
 log = get_logger("portalab.ui.weather")
@@ -50,6 +51,8 @@ Intensity = Literal["light", "moderate", "heavy"]
 Phase = Literal["dawn", "day", "dusk", "night"]
 URL = "https://api.open-meteo.com/v1/forecast"
 GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
+egress.EGRESS.allow("api.open-meteo.com", "weather")  # 030: known hosts of the outbound allow-list
+egress.EGRESS.allow("geocoding-api.open-meteo.com", "weather")
 KEEP_SECONDS = 15 * 60
 KEPT_PLACES = 500  # places kept at once (each member may have their own)
 TWILIGHT = timedelta(minutes=40)  # either side of sunrise and sunset: dawn, dusk
@@ -283,7 +286,7 @@ class WeatherService:
     async def _get(self, url: str, params: dict[str, Any]) -> httpx.Response:
         if self.client is not None:
             return await self.client.get(url, params=params, timeout=8)
-        async with httpx.AsyncClient(timeout=8) as client:
+        async with httpx.AsyncClient(timeout=8, event_hooks=egress.hooks()) as client:
             return await client.get(url, params=params)
 
     async def _ask(self, place: tuple[float, float]) -> Weather | None:

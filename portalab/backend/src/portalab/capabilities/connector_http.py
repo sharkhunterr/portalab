@@ -15,6 +15,7 @@ from urllib.parse import urljoin, urlsplit
 
 import httpx
 
+from portalab.core import egress
 from portalab.core.logging import get_correlation_id, redact_text, register_secret_value
 from portalab.core.metrics import Timer
 
@@ -71,6 +72,7 @@ class ConnectorHttpClient:
             raise ConnectorHttpError("base URL must be an absolute http(s) URL")
         self.base_url = base_url.rstrip("/") + "/"
         self.host = parts.netloc
+        egress.EGRESS.allow(parts.hostname, "service")  # a configured service is a known host
         self.timeout = timeout_seconds
         self.max_bytes = max_response_bytes
         self.retries = retries
@@ -83,7 +85,11 @@ class ConnectorHttpClient:
 
     def _client(self) -> httpx.AsyncClient:
         return httpx.AsyncClient(
-            timeout=self.timeout, verify=self.verify_tls, follow_redirects=False, transport=self.transport
+            timeout=self.timeout,
+            verify=self.verify_tls,
+            follow_redirects=False,
+            transport=self.transport,
+            event_hooks=egress.hooks(),
         )
 
     async def request(self, method: str, path: str, **kwargs: Any) -> HttpResponse:
@@ -173,7 +179,11 @@ class ConnectorHttpClient:
         try:
             async with (
                 httpx.AsyncClient(
-                    timeout=timeout, verify=self.verify_tls, follow_redirects=False, transport=self.transport
+                    timeout=timeout,
+                    verify=self.verify_tls,
+                    follow_redirects=False,
+                    transport=self.transport,
+                    event_hooks=egress.hooks(),
                 ) as client,
                 client.stream(method.upper(), url, headers=sent, params=params) as response,
             ):
