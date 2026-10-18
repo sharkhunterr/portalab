@@ -2,6 +2,7 @@
 .plugin-view {
   display: block;
   border: 0;
+  transition: opacity var(--motion-duration-fast) var(--motion-easing);
   width: 100%;
   background: transparent;
   color-scheme: normal;

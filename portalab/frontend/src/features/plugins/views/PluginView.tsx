@@ -186,6 +186,8 @@ export function PluginView({
   const frame = useRef<HTMLIFrameElement | null>(null);
   const [height, setHeight] = useState(mode === "page" ? 480 : 0);
   const [failed, setFailed] = useState(false);
+  // hidden until the view says it is drawn: a frame shows its blank document first (a white flash)
+  const [ready, setReady] = useState(false);
   const navigate = useNavigate();
   const action = usePluginAction(plugin);
   const intl = useIntl();
@@ -238,6 +240,7 @@ export function PluginView({
     const current = frame.current;
     if (!current) return undefined;
     started.current = false; // a new frame (another view, plugin or place) starts again
+    setReady(false);
     let stopped = false;
     const answer = (id: unknown, ok: boolean, value: unknown, error?: { code: string; message: string }) =>
       post({ type: "answer", id, ok, value: ok ? value : null, error: ok ? null : error });
@@ -266,6 +269,9 @@ export function PluginView({
           post({ type: "run", source, css, fonts, context: latest.current.context() });
           return;
         }
+        case "ready":
+          setReady(true);
+          return;
         case "error":
           setFailed(true);
           return;
@@ -422,7 +428,7 @@ export function PluginView({
     };
   }, [plugin, view, mode, paramsKey, post]);
 
-  const scheme = { colorScheme: effective.scheme };
+  const scheme = { colorScheme: effective.scheme, opacity: ready ? 1 : 0 };
   const style =
     mode === "page"
       ? { ...scheme, height }
