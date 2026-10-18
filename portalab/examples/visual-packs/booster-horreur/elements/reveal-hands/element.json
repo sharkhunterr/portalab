@@ -6,8 +6,8 @@
     "en": "The hands"
   },
   "descriptions": {
-    "fr": "Des ombres de mains rampent des bords vers la carte, leurs doigts qui s'allongent, puis se retirent (HD).",
-    "en": "Shadows of hands crawl from the edges toward the card, their fingers stretching, then draw back (HD)."
+    "fr": "Des mains livides, éclairées de rouge, rampent des bords vers la carte, leurs doigts qui s'allongent, puis se retirent dans le noir (HD).",
+    "en": "Livid hands, lit red, crawl from the edges toward the card, their fingers stretching, then draw back into the dark (HD)."
   },
   "render": {
     "kind": "glsl",

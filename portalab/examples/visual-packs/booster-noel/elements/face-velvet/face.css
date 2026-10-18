@@ -2,7 +2,7 @@
 [data-card-face="noel-velvet"] .booster-card__face {
   isolation: isolate;
   border: 0;
-  border-radius: 1rem 1rem 0.5rem 0.5rem;
+  clip-path: polygon(0.0% 0.0%, 100.0% 0.0%, 100.0% 44.0%, 96.5% 50.0%, 100.0% 56.0%, 100.0% 100.0%, 0.0% 100.0%, 0.0% 56.0%, 3.5% 50.0%, 0.0% 44.0%);
   background: linear-gradient(160deg, #ffe9a6, #d9a531 30%, #8a5a12 55%, #f6d36b);
   box-shadow: none;
   filter: drop-shadow(0 0 0.55rem rgba(255, 90, 90, 0.75));
@@ -12,7 +12,7 @@
   position: absolute;
   inset: 5px;
   z-index: -1;
-  border-radius: 1rem 1rem 0.5rem 0.5rem;
+  clip-path: polygon(0.0% 0.0%, 100.0% 0.0%, 100.0% 44.0%, 96.5% 50.0%, 100.0% 56.0%, 100.0% 100.0%, 0.0% 100.0%, 0.0% 56.0%, 3.5% 50.0%, 0.0% 44.0%);
   background: radial-gradient(ellipse 80% 55% at 50% 28%, rgba(255, 80, 90, 0.35), transparent 70%), linear-gradient(175deg, #7a0d1a, #3a050c);
 }
 [data-card-face="noel-velvet"] .booster-card__rarity,

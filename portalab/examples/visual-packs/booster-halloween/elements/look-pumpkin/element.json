@@ -6,8 +6,8 @@
     "en": "Jack-o'-lantern"
   },
   "descriptions": {
-    "fr": "Le paquet devient une citrouille à côtes, sa queue verte pour chapeau, un visage taillé qui luit, la flamme d'une bougie qui vacille à l'intérieur (HD).",
-    "en": "The pack becomes a ribbed pumpkin, its green stalk for a lid, a carved face glowing, a candle flame flickering inside (HD)."
+    "fr": "Le paquet devient une citrouille à côtes et à lobes, sa tige recourbée, deux yeux en colère et un sourire maléfique à crocs taillés dedans, éclairés par une bougie qui vacille ; un filet de fumée monte (HD).",
+    "en": "The pack becomes a lobed, ribbed pumpkin, its curly stalk, two angry eyes and an evil fanged grin carved in it, lit by a flickering candle; a thread of smoke rising (HD)."
   },
   "render": {
     "kind": "glsl",

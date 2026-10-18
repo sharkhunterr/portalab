@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "horreur",
+  "names": {
+    "fr": "Dos entaillé",
+    "en": "Slashed back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est noire et calcinée, entaillée de trois plaies qui saignent, un œil rouge au centre qui s'allume par moments.",
+    "en": "Face down, every card is black and charred, slashed with three bleeding wounds, a red eye in the middle that lights up at times."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

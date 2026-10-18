@@ -1,38 +1,60 @@
-/* The opening (its hook: the scene's pack while it opens, data-opening): the pumpkin shudders, its lid pops. */
+/* The opening (its hook: the scene's pack while it opens, data-opening): the pumpkin shudders and giggles,
+   its stalk pops off, then one dives into it through its grin — the light inside swallowing everything — and
+   the cards come out of the dark. */
 [data-opening="halloween-haunt"] .booster-stage__tear .booster-pack {
-  animation: halloween-shudder 2.5s linear both;
+  transform-origin: 50% 70%;
+  animation: halloween-dive 2.8s cubic-bezier(0.55, 0, 0.75, 0.3) both;
 }
 [data-opening="halloween-haunt"][data-booster-look] .booster-stage__tear .booster-pack .booster-pack__flap {
   visibility: visible;
-  animation: halloween-lid 2.5s cubic-bezier(0.3, 0, 0.2, 1) both;
+  animation: halloween-stalk 2.8s cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+/* the light inside, once in: it fills the place, then ebbs */
+[data-opening="halloween-haunt"] .booster-stage__tear::after {
+  content: "";
+  position: absolute;
+  inset: -120% -140%;
+  z-index: 3;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 220, 140, 0.95), rgba(255, 130, 20, 0.75) 35%, rgba(120, 30, 0, 0.6) 60%, transparent 72%);
+  pointer-events: none;
+  animation: halloween-inside 2.8s ease-out both;
 }
 [data-opening="halloween-haunt"][data-booster-look] .booster-stage__tear .booster-stage__rising span {
-  border: 1px solid rgba(200, 140, 255, 0.8);
+  border: 1px solid rgba(255, 170, 60, 0.85);
   border-radius: 0.45rem;
-  background: linear-gradient(160deg, #2a0f3a, #120618);
-  box-shadow: 0 0 1rem rgba(170, 90, 255, 0.6);
-  animation: halloween-rise 2.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  background: radial-gradient(circle at 50% 40%, rgba(255, 200, 90, 0.5), transparent 60%), linear-gradient(160deg, #2a0f3a, #120618);
+  box-shadow: 0 0 1.1rem rgba(255, 140, 30, 0.7);
+  animation: halloween-rise 2.8s cubic-bezier(0.2, 0.7, 0.3, 1) both;
   animation-delay: calc(var(--i, 0) * 0.07s);
 }
-@keyframes halloween-shudder {
-  0% { transform: none; filter: none; }
-  10%, 22%, 34% { transform: translateX(-3px) rotate(-2deg); filter: brightness(1.2); }
-  16%, 28%, 40% { transform: translateX(3px) rotate(2deg); filter: brightness(1.5); }
-  46% { transform: scale(1.06); filter: brightness(2); }
-  52%, 100% { transform: none; filter: brightness(1.2); }
+@keyframes halloween-dive {
+  0% { transform: none; filter: none; opacity: 1; }
+  8%, 20%, 32% { transform: translateX(-3px) rotate(-3deg); filter: brightness(1.15); }
+  14%, 26%, 38% { transform: translateX(3px) rotate(3deg); filter: brightness(1.35); }
+  44% { transform: scale(0.95); filter: brightness(1.6); }
+  50% { transform: scale(1.05); filter: brightness(1.8); }
+  70% { transform: scale(9); filter: brightness(2.6); opacity: 1; }
+  76%, 100% { transform: scale(12); filter: brightness(3); opacity: 0; }
 }
-@keyframes halloween-lid {
-  0%, 46% { transform: none; }
-  60% { transform: translateY(-180%) rotate(35deg); opacity: 1; }
-  100% { transform: translateY(-300%) rotate(70deg); opacity: 0; }
+@keyframes halloween-stalk {
+  0%, 40% { transform: none; opacity: 1; }
+  48% { transform: translateY(-220%) rotate(-40deg); opacity: 1; }
+  58%, 100% { transform: translateY(-360%) rotate(-80deg); opacity: 0; }
+}
+@keyframes halloween-inside {
+  0%, 62% { opacity: 0; transform: scale(0.2); }
+  72% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.3); }
 }
 @keyframes halloween-rise {
-  0%, 50% { opacity: 0; transform: translateY(40%) scale(0.6); }
-  58% { opacity: 1; }
+  0%, 72% { opacity: 0; transform: translateY(30%) scale(0.6); }
+  80% { opacity: 1; }
   100% { opacity: 1; transform: translate(calc((var(--i, 0) - 2) * 40%), -18%) rotate(calc((var(--i, 0) - 2) * 8deg)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-opening="halloween-haunt"] .booster-stage__tear .booster-pack {
+  [data-opening="halloween-haunt"] .booster-stage__tear .booster-pack,
+  [data-opening="halloween-haunt"] .booster-stage__tear::after {
     animation: none;
   }
 }

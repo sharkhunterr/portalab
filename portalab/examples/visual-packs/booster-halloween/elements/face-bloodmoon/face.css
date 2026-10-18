@@ -2,7 +2,7 @@
 [data-card-face="halloween-bloodmoon"] .booster-card__face {
   isolation: isolate;
   border: 0;
-  border-radius: 0.8rem;
+  clip-path: polygon(0.0% 11.0%, 5.0% 10.2%, 10.0% 8.9%, 15.0% 7.4%, 20.0% 5.8%, 25.0% 4.2%, 30.0% 2.8%, 35.0% 1.6%, 40.0% 0.7%, 45.0% 0.2%, 50.0% 0.0%, 50.0% 0.0%, 55.0% 0.2%, 60.0% 0.7%, 65.0% 1.6%, 70.0% 2.8%, 75.0% 4.2%, 80.0% 5.8%, 85.0% 7.4%, 90.0% 8.9%, 95.0% 10.2%, 100.0% 11.0%, 100.0% 100.0%, 0.0% 100.0%);
   background: conic-gradient(from 30deg, #ffe0a0, #c9922e, #8a0f1a, #ffe0a0, #c9922e, #ffe0a0);
   box-shadow: none;
   filter: drop-shadow(0 0 0.55rem rgba(255, 60, 40, 0.85));
@@ -12,7 +12,7 @@
   position: absolute;
   inset: 5px;
   z-index: -1;
-  border-radius: 0.8rem;
+  clip-path: polygon(0.0% 11.0%, 5.0% 10.2%, 10.0% 8.9%, 15.0% 7.4%, 20.0% 5.8%, 25.0% 4.2%, 30.0% 2.8%, 35.0% 1.6%, 40.0% 0.7%, 45.0% 0.2%, 50.0% 0.0%, 50.0% 0.0%, 55.0% 0.2%, 60.0% 0.7%, 65.0% 1.6%, 70.0% 2.8%, 75.0% 4.2%, 80.0% 5.8%, 85.0% 7.4%, 90.0% 8.9%, 95.0% 10.2%, 100.0% 11.0%, 100.0% 100.0%, 0.0% 100.0%);
   background: radial-gradient(circle at 50% 30%, #ff5a3c 0 18%, rgba(255, 60, 40, 0.35) 24%, transparent 45%), linear-gradient(175deg, #3a0508, #120203);
 }
 [data-card-face="halloween-bloodmoon"] .booster-card__rarity,

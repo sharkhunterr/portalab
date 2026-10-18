@@ -6,8 +6,8 @@
     "en": "The haunted pumpkin"
   },
   "descriptions": {
-    "fr": "La citrouille tremble et ricane, sa lueur s'emballe, puis son chapeau saute : un éclair violet, des fantômes qui s'échappent en spirale, une nuée de chauves-souris — et les cartes avec eux (HD).",
-    "en": "The pumpkin shudders and cackles, its glow racing, then its lid pops: a violet flash, ghosts spiralling out, a cloud of bats — and the cards with them (HD)."
+    "fr": "La citrouille tremble et ricane, sa tige saute, puis on plonge dedans par son sourire — la lumière avalant tout — et du noir surgissent un éclair violet, des fantômes, des chauves-souris et les cartes (HD).",
+    "en": "The pumpkin shudders and cackles, its stalk pops off, then one dives into it through its grin — the light swallowing all — and out of the dark come a violet flash, ghosts, bats and the cards (HD)."
   },
   "render": {
     "kind": "glsl",
@@ -16,6 +16,6 @@
       "lid.css"
     ],
     "stage": true,
-    "duration": 2.5
+    "duration": 2.8
   }
 }

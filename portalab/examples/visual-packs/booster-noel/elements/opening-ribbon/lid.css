@@ -1,38 +1,84 @@
-/* The opening (its hook: the scene's pack while it opens, data-opening): the gift hops, its lid pops off. */
+/* The opening (its hook: the scene's pack while it opens, data-opening): the gift hops with impatience, its
+   bow comes undone, the lid lifts — light leaking — then flies off; beams of light rise out of the box and the
+   cards come up through them. */
 [data-opening="noel-ribbon"] .booster-stage__tear .booster-pack {
-  animation: noel-hop 2.4s ease-out both;
+  animation: noel-hop 2.6s ease-out both;
 }
 [data-opening="noel-ribbon"][data-booster-look] .booster-stage__tear .booster-pack .booster-pack__flap {
   visibility: visible;
-  animation: noel-lid 2.4s cubic-bezier(0.3, 0, 0.2, 1) both;
+  animation: noel-lid 2.6s cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+[data-opening="noel-ribbon"][data-booster-look] .booster-stage__tear .booster-pack .booster-pack__flap::before {
+  animation: noel-untie-left 2.6s ease-in both;
+}
+[data-opening="noel-ribbon"][data-booster-look] .booster-stage__tear .booster-pack .booster-pack__flap::after {
+  animation: noel-untie-right 2.6s ease-in both;
+}
+/* the beams, rising out of the open box */
+[data-opening="noel-ribbon"] .booster-stage__tear::before {
+  content: "";
+  position: absolute;
+  inset: -150% -80% 80% -80%;
+  z-index: 0;
+  background: repeating-conic-gradient(from -70deg at 50% 100%, rgba(255, 240, 190, 0) 0 5deg, rgba(255, 244, 200, 0.6) 5deg 8deg, rgba(255, 240, 190, 0) 8deg 13deg);
+  mask: radial-gradient(ellipse 45% 100% at 50% 100%, #000 25%, transparent 75%);
+  mix-blend-mode: screen;
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  animation: noel-beams 2.6s ease-out both;
+}
+/* the cards rise out of the box (hidden below its rim) */
+[data-opening="noel-ribbon"][data-booster-look] .booster-stage__tear .booster-stage__rising {
+  inset: auto 28% 82% 28%;
+  z-index: 3;
+  block-size: 80%;
+  clip-path: inset(-500% -400% 0 -400%);
 }
 [data-opening="noel-ribbon"][data-booster-look] .booster-stage__tear .booster-stage__rising span {
-  border: 1px solid rgba(255, 230, 160, 0.85);
+  border: 1px solid rgba(255, 230, 160, 0.9);
   border-radius: 0.45rem;
-  background: linear-gradient(160deg, #a3121f, #6e0b14);
-  box-shadow: 0 0 1rem rgba(255, 200, 110, 0.6);
-  animation: noel-rise 2.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  background: radial-gradient(circle at 50% 45%, rgba(255, 245, 210, 0.85) 0 6%, transparent 8%), linear-gradient(160deg, #a3121f, #6e0b14);
+  box-shadow: 0 0 1.2rem rgba(255, 220, 140, 0.8);
+  animation: noel-rise 2.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
   animation-delay: calc(var(--i, 0) * 0.07s);
 }
 @keyframes noel-hop {
   0%, 100% { transform: none; }
-  10%, 26% { transform: translateY(-6%) rotate(-3deg); }
-  18%, 34% { transform: translateY(0) rotate(3deg); }
-  42% { transform: translateY(-3%) scale(1.04, 0.96); }
-  48% { transform: none; }
+  8%, 22% { transform: translateY(-6%) rotate(-3deg); }
+  15%, 29% { transform: translateY(0) rotate(3deg); }
+  36% { transform: translateY(-3%) scale(1.04, 0.96); }
+  42% { transform: none; }
+}
+@keyframes noel-untie-left {
+  0%, 30% { rotate: -18deg; opacity: 1; }
+  40% { rotate: -70deg; translate: -20% 30%; opacity: 0.9; }
+  46%, 100% { rotate: -110deg; translate: -40% 80%; opacity: 0; }
+}
+@keyframes noel-untie-right {
+  0%, 30% { rotate: 18deg; opacity: 1; }
+  40% { rotate: 70deg; translate: 20% 30%; opacity: 0.9; }
+  46%, 100% { rotate: 110deg; translate: 40% 80%; opacity: 0; }
 }
 @keyframes noel-lid {
-  0%, 44% { transform: none; }
-  60% { transform: translateY(-150%) rotate(-25deg); opacity: 1; }
-  100% { transform: translateY(-260%) rotate(-50deg); opacity: 0; }
+  0%, 44% { transform: none; box-shadow: 0 0.35rem 0.5rem rgba(40, 0, 0, 0.55); }
+  48% { transform: translateY(-14%) rotate(-2deg); box-shadow: 0 0.6rem 1.4rem rgba(255, 230, 160, 0.9); }
+  52% { transform: translateY(-8%) rotate(1deg); }
+  64% { transform: translateY(-320%) translateX(-60%) rotate(-38deg); opacity: 1; }
+  100% { transform: translateY(-520%) translateX(-120%) rotate(-80deg); opacity: 0; }
+}
+@keyframes noel-beams {
+  0%, 46% { opacity: 0; transform: scaleY(0.15); }
+  56% { opacity: 1; transform: scaleY(1); }
+  100% { opacity: 0.85; transform: scaleY(1.08) rotate(4deg); }
 }
 @keyframes noel-rise {
-  0%, 48% { opacity: 0; transform: translateY(60%); }
-  56% { opacity: 1; }
-  100% { opacity: 1; transform: translate(calc((var(--i, 0) - 2) * 40%), -18%) rotate(calc((var(--i, 0) - 2) * 8deg)); }
+  0%, 56% { opacity: 0; transform: translateY(105%); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: translate(calc((var(--i, 0) - 2) * 44%), -34%) rotate(calc((var(--i, 0) - 2) * 9deg)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-opening="noel-ribbon"] .booster-stage__tear .booster-pack {
+  [data-opening="noel-ribbon"] .booster-stage__tear .booster-pack,
+  [data-opening="noel-ribbon"] .booster-stage__tear::before {
     animation: none;
   }
 }

@@ -26,13 +26,30 @@
   float body = smoothstep(0.012, 0.0, max(abs(f.x) - 0.035 + f.y * 0.06, abs(f.y + 0.03) - 0.11));
   o = over(o, vec3(0.0), clamp(head + body, 0.0, 1.0) * there * (0.5 + 0.5 * light));
   o = over(o, vec3(0.9, 0.05, 0.05), smoothstep(0.004, 0.0, length(f - vec2(-0.008, 0.103))) * there + smoothstep(0.004, 0.0, length(f - vec2(0.008, 0.103))) * there);
-  // streaks running down from the top
-  for (int k = 0; k < 7; k++) {
+  // blood running down from the top: a pooled edge, then runs of uneven width that wobble as they go, a drop
+  // swelling at each tip until it falls
+  o = over(o, vec3(0.22, 0.0, 0.015), smoothstep(0.455, 0.5, c.y) * (0.55 + 0.45 * noise(vec2(c.x * 22.0, 1.0))));
+  for (int k = 0; k < 8; k++) {
     float fk = float(k);
-    float x = -0.85 + fk * 0.27 + 0.06 * hash(vec2(fk, 1.0));
-    float len = 0.08 + 0.25 * fract(t * 0.02 * (0.5 + hash(vec2(fk, 2.0))) + hash(vec2(fk, 3.0)));
-    float drip = smoothstep(0.006, 0.0, abs(c.x - x)) * step(0.5 - len, c.y);
-    o = over(o, vec3(0.28, 0.0, 0.02), drip * 0.85);
+    float x0 = -0.92 + fk * 0.245 + 0.08 * hash(vec2(fk, 1.0));
+    float cycle = fract(t * (0.01 + 0.018 * hash(vec2(fk, 2.0))) + hash(vec2(fk, 3.0)));
+    float len = 0.06 + 0.48 * cycle;
+    float below = 0.48 - c.y;
+    float wob = 0.014 * (noise(vec2(fk * 7.0, c.y * 7.0)) - 0.5) + 0.003 * sin(c.y * 37.0 + fk);
+    float width = mix(0.011, 0.0035, smoothstep(0.0, len, below)) * (0.7 + 0.6 * hash(vec2(fk, 4.0)));
+    float dx = c.x - x0 - wob;
+    float run = smoothstep(width, width * 0.45, abs(dx)) * step(0.0, below) * step(below, len);
+    vec2 tip = vec2(x0 + 0.014 * (noise(vec2(fk * 7.0, (0.48 - len) * 7.0)) - 0.5), 0.48 - len);
+    float swell = fract(cycle * 4.0);
+    float rad = 0.005 + 0.007 * swell;
+    float drop = smoothstep(rad, rad * 0.55, length((c - tip - vec2(0.0, -rad * 0.4)) * vec2(1.0, 0.82)));
+    vec2 falling = tip - vec2(0.0, 0.01 + swell * swell * 2.5);
+    float droplet = smoothstep(0.005, 0.0025, length((c - falling) * vec2(1.0, 0.55))) * step(swell, 0.18);
+    float blood = clamp(run + drop + droplet, 0.0, 1.0);
+    o = over(o, vec3(0.3, 0.0, 0.02), blood * 0.95);
+    // the wet gleam along its left side
+    o = over(o, vec3(0.75, 0.2, 0.2), smoothstep(width * 0.3, 0.0, abs(dx + width * 0.4)) * run * 0.45 * light);
+    o = over(o, vec3(0.9, 0.4, 0.4), smoothstep(rad * 0.35, 0.0, length(c - tip - vec2(-rad * 0.35, rad * 0.1))) * 0.6 * light);
   }
   // grain, and the red pulse at the edges — a heart racing
   o.rgb += (hash(gl_FragCoord.xy + floor(t * 24.0)) - 0.5) * 0.09;

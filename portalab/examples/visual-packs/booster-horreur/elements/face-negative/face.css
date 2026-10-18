@@ -2,7 +2,7 @@
 [data-card-face="horreur-negative"] .booster-card__face {
   isolation: isolate;
   border: 0;
-  border-radius: 0.3rem;
+  clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
   background: linear-gradient(160deg, #d9fbff, #4fd6e8 40%, #13606e 70%, #9ff0ff);
   box-shadow: none;
   filter: drop-shadow(0 0 0.55rem rgba(60, 220, 255, 0.6));
@@ -12,7 +12,7 @@
   position: absolute;
   inset: 5px;
   z-index: -1;
-  border-radius: 0.3rem;
+  clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
   background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 3px), linear-gradient(175deg, #062a33, #01090c);
 }
 [data-card-face="horreur-negative"] .booster-card__rarity,

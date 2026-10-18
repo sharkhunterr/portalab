@@ -1,13 +1,21 @@
-// Noël — the gift opening (u_age: seconds, 2.4 s): a glow under the lid, then at 1.1 s a spray of golden stars,
-  // snowflakes and confetti thrown up and falling back, a warm flash.
+// Noël — the gift opening (u_age: seconds, 2.6 s): light leaking under the lid as the bow comes undone, then
+  // at 1.2 s, the lid off, beams rising out of the box and a spray of golden stars, snowflakes and confetti
+  // thrown up from its rim and falling back.
   vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
   float age = u_age;
-  float pop = 1.1;
-  o = over(o, vec3(1.0, 0.8, 0.45), exp(-dot(c, c) * 30.0) * smoothstep(0.0, pop, age) * 0.4);
+  float pop = 1.2;
+  vec2 rim = vec2(0.0, 0.17);
+  vec2 dv = c - rim;
+  o = over(o, vec3(1.0, 0.88, 0.55), exp(-dv.y * dv.y * 1200.0) * smoothstep(0.25, 0.0, abs(dv.x) - 0.12) * smoothstep(0.7, pop, age) * 0.7);
   if (age > pop) {
     float s = age - pop;
-    float fade = smoothstep(1.3, 0.7, s);
-    o = over(o, vec3(1.0, 0.95, 0.8), exp(-length(c) * 7.0) * smoothstep(0.4, 0.0, s));
+    float fade = smoothstep(1.4, 0.8, s);
+    // the beams, fanning up out of the box
+    float ang = atan(dv.x, max(dv.y, 0.001));
+    float beams = pow(0.5 + 0.5 * sin(ang * 14.0 + s * 0.6), 4.0) * step(0.0, dv.y);
+    o = over(o, vec3(1.0, 0.93, 0.7), beams * smoothstep(0.0, 0.25, s) * exp(-length(dv) * 2.2) * smoothstep(0.0, 0.03, dv.y) * 0.6 * fade);
+    o = over(o, vec3(1.0, 0.95, 0.8), exp(-length(dv * vec2(1.0, 2.0)) * 9.0) * smoothstep(0.5, 0.0, s));
+    c = dv;
     for (int k = 0; k < 46; k++) {
       float fk = float(k);
       float ang = 1.5708 + (hash(vec2(fk, 1.0)) - 0.5) * 2.4;

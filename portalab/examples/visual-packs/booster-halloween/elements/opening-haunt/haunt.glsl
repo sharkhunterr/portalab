@@ -1,10 +1,15 @@
-// Halloween — the haunted pumpkin opening (u_age: seconds, 2.5 s): its glow racing, then at 1.15 s a violet
-  // flash, ghosts spiralling out of it, a cloud of bats bursting up.
+// Halloween — the haunted pumpkin opening (u_age: seconds, 2.8 s): its glow racing while it giggles, the dive
+  // into it (1.4 s to 2.0 s: the light inside swallowing all), then out of the dark a violet flash, ghosts
+  // spiralling out and a cloud of bats bursting up.
   vec2 c = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
   float age = u_age;
-  float pop = 1.15;
-  float race = smoothstep(0.0, pop, age);
+  float pop = 2.0;
+  float race = smoothstep(0.0, 1.4, age) * step(age, pop);
   o = over(o, vec3(1.0, 0.55, 0.1), exp(-dot(c, c) * 14.0) * race * (0.4 + 0.3 * sin(age * age * 25.0)));
+  // the dive: the light inside swallowing everything, its fibrous walls rushing past
+  float into = smoothstep(1.4, 2.0, age) * smoothstep(2.4, 2.0, age);
+  float walls = fbm(vec2(atan(c.y, c.x) * 3.0, 1.0 / (length(c) + 0.05) + age * 6.0));
+  o = over(o, mix(vec3(1.0, 0.45, 0.05), vec3(1.0, 0.85, 0.5), walls), into * (0.6 + 0.3 * walls));
   if (age > pop) {
     float s = age - pop;
     float fade = smoothstep(1.35, 0.8, s);

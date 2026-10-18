@@ -1,28 +1,68 @@
-/* The sealed pack (its hook: data-booster-look): a gift in red paper, tied with a golden ribbon and its bow. */
+/* The sealed pack (its hook: data-booster-look): a gift box in red paper, a golden ribbon round it, its lid on
+   top (the flap) and a big bow on the lid. */
 [data-booster-look="noel"] .booster-pack {
-  border-radius: 0.5rem;
+  overflow: visible;
+  border-radius: 0.35rem;
   background:
-    linear-gradient(90deg, transparent 44%, #f6d36b 44% 46%, #d9a531 46% 54%, #f6d36b 54% 56%, transparent 56%),
-    linear-gradient(0deg, transparent 52%, #f6d36b 52% 54%, #d9a531 54% 60%, #f6d36b 60% 62%, transparent 62%),
-    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.22) 0 3px, transparent 4px) 0 0 / 22px 22px,
-    radial-gradient(circle at 75% 75%, rgba(255, 220, 140, 0.25) 0 2px, transparent 3px) 0 0 / 22px 22px,
+    linear-gradient(90deg, transparent 44%, #f6d36b 44% 45.5%, #d9a531 45.5% 54.5%, #f6d36b 54.5% 56%, transparent 56%),
+    linear-gradient(0deg, transparent 47%, #f6d36b 47% 48.5%, #d9a531 48.5% 55.5%, #f6d36b 55.5% 57%, transparent 57%),
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.2) 0 3px, transparent 4px) 0 0 / 22px 22px,
+    radial-gradient(circle at 75% 75%, rgba(255, 220, 140, 0.22) 0 2px, transparent 3px) 0 0 / 22px 22px,
+    linear-gradient(90deg, rgba(0, 0, 0, 0.25), transparent 12%, transparent 88%, rgba(0, 0, 0, 0.3)),
     linear-gradient(160deg, #d8263a, #a3121f 55%, #6e0b14);
-  box-shadow: inset 0 0 0 2px rgba(255, 220, 140, 0.6), 0 0 2rem rgba(255, 90, 80, 0.35);
+  box-shadow: inset 0 0 0 2px rgba(255, 220, 140, 0.45), 0 1.2rem 2rem rgba(0, 0, 0, 0.5), 0 0 2rem rgba(255, 90, 80, 0.3);
 }
-/* the bow, on the flap */
+/* the lid: a little wider than the box, its own band of ribbon, its shadow on the box */
 [data-booster-look="noel"] .booster-pack__flap {
+  inset: -3% -5% auto;
+  block-size: 21%;
+  border: 0;
+  border-radius: 0.35rem;
   background:
-    radial-gradient(ellipse 22% 60% at 36% 60%, #f6d36b 0 55%, transparent 60%),
-    radial-gradient(ellipse 22% 60% at 64% 60%, #f6d36b 0 55%, transparent 60%),
-    radial-gradient(circle at 50% 62%, #d9a531 0 9%, transparent 10%);
-  filter: drop-shadow(0 2px 2px rgba(80, 20, 0, 0.5));
+    linear-gradient(90deg, transparent 44%, #f6d36b 44% 45.5%, #d9a531 45.5% 54.5%, #f6d36b 54.5% 56%, transparent 56%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 40%, rgba(0, 0, 0, 0.25)),
+    linear-gradient(160deg, #e2303f, #b0141f 60%, #7a0c16);
+  box-shadow: 0 0.35rem 0.5rem rgba(40, 0, 0, 0.55);
+  transform-origin: 50% 100%;
 }
-[data-booster-look="noel"] .booster-pack__stars {
+/* the bow: two loops on the lid and their knot */
+[data-booster-look="noel"] .booster-pack__flap::before,
+[data-booster-look="noel"] .booster-pack__flap::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 70%;
+  inline-size: 26%;
+  aspect-ratio: 1.5;
+  border: 3px solid #f6d36b;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at 50% 60%, rgba(120, 70, 0, 0.35), transparent 70%), #d9a531;
+  box-shadow: inset 0 0 0 4px #d9a531;
+}
+[data-booster-look="noel"] .booster-pack__flap::before {
+  inset-inline-end: 50%;
+  transform-origin: 100% 100%;
+  rotate: -18deg;
+}
+[data-booster-look="noel"] .booster-pack__flap::after {
+  inset-inline-start: 50%;
+  transform-origin: 0% 100%;
+  rotate: 18deg;
+}
+[data-booster-look="noel"] .booster-pack__stars,
+[data-booster-look="noel"] .booster-pack__foil {
   opacity: 0;
 }
+/* a gift tag hanging on the front, with its star */
 [data-booster-look="noel"] .booster-pack__emblem {
-  color: #fff3c4;
-  filter: drop-shadow(0 0 0.6rem rgba(255, 220, 120, 0.9));
+  inline-size: 30%;
+  aspect-ratio: 0.8;
+  border-radius: 0.2rem;
+  translate: 55% 30%;
+  rotate: 10deg;
+  background: linear-gradient(160deg, #fbf3dc, #e8d7ad);
+  box-shadow: 0 0.2rem 0.4rem rgba(60, 10, 0, 0.45);
+  color: #c9922e;
+  filter: none;
 }
 [data-booster-look="noel"] .booster-pack__name {
   color: #fff3c4;

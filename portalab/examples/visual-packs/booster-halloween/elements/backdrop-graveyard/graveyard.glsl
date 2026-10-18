@@ -43,4 +43,28 @@
     float body = smoothstep(0.5, 0.3, length(q * vec2(1.4, 0.9)));
     o = over(o, vec3(0.0), clamp(wing + body, 0.0, 1.0));
   }
+  // eyes in the dark, low behind the stones: they open, blink, and are gone
+  for (int k = 0; k < 3; k++) {
+    float fk = float(k);
+    vec2 ep = vec2(-0.7 + fk * 0.62 + 0.1 * hash(vec2(fk, 7.0)), -0.27 + 0.03 * hash(vec2(fk, 8.0)));
+    float awake = smoothstep(0.55, 0.75, sin(t * (0.21 + 0.05 * fk) + fk * 2.3));
+    float lid = step(0.06, fract(t * 0.37 + fk * 0.31));
+    float pair = smoothstep(0.007, 0.003, length((c - ep - vec2(-0.016, 0.0)) * vec2(1.0, 2.2))) + smoothstep(0.007, 0.003, length((c - ep - vec2(0.016, 0.0)) * vec2(1.0, 2.2)));
+    o = over(o, vec3(1.0, 0.85, 0.2), pair * awake * lid);
+    o = over(o, vec3(1.0, 0.7, 0.1), exp(-length(c - ep) * 40.0) * 0.25 * awake * lid);
+  }
+  // a ghost drifting slowly through the mist
+  float gx = mod(t * 0.035, 2.8) - 1.4;
+  vec2 gq = (c - vec2(gx, -0.04 + 0.03 * sin(t * 0.8))) * vec2(18.0, 15.0);
+  float ghead = smoothstep(1.0, 0.7, length(gq - vec2(0.0, 0.45)));
+  float gwide = 0.95 + 0.3 * smoothstep(0.4, -1.4, gq.y);
+  float gsheet = smoothstep(0.2, 0.0, abs(gq.x) - gwide) * step(gq.y, 0.45) * smoothstep(-1.6, -1.15, gq.y + 0.22 * sin(gq.x * 6.0 + t * 3.0));
+  float ghost = clamp(ghead + gsheet, 0.0, 1.0) * (0.6 + 0.4 * fbm(gq * 0.6 + t * 0.3));
+  float geyes = smoothstep(0.17, 0.1, length(gq - vec2(-0.32, 0.55))) + smoothstep(0.17, 0.1, length(gq - vec2(0.32, 0.55)));
+  o = over(o, vec3(0.85, 0.9, 1.0), ghost * 0.24);
+  o = over(o, vec3(0.05, 0.0, 0.1), geyes * ghost * 0.6);
+  // lightning now and then: the sky flares, a bolt forks down behind the hill
+  float strike = step(0.965, hash(vec2(floor(t * 4.0), 9.0)));
+  float fork = smoothstep(0.006, 0.0, abs(c.x - 0.15 - 0.08 * (noise(vec2(c.y * 14.0, floor(t * 4.0))) - 0.5) - c.y * 0.1)) * step(-0.28, c.y);
+  o = over(o, vec3(0.75, 0.72, 1.0), strike * (0.3 * smoothstep(-0.3, 0.5, c.y) + fork));
   o.rgb *= mix(0.35, 1.0, smoothstep(1.1, 0.3, length(c * vec2(0.7, 1.0))));

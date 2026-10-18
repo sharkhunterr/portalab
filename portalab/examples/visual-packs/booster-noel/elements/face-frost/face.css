@@ -2,7 +2,7 @@
 [data-card-face="noel-frost"] .booster-card__face {
   isolation: isolate;
   border: 0;
-  border-radius: 0.8rem;
+  clip-path: polygon(7.0% 0.0%, 93.0% 0.0%, 100.0% 4.9%, 100.0% 95.1%, 93.0% 100.0%, 7.0% 100.0%, 0.0% 95.1%, 0.0% 4.9%);
   background: linear-gradient(160deg, #ffffff, #bfe7ff 30%, #7ab8e8 60%, #e8f7ff);
   box-shadow: none;
   filter: drop-shadow(0 0 0.55rem rgba(160, 220, 255, 0.75));
@@ -12,7 +12,7 @@
   position: absolute;
   inset: 5px;
   z-index: -1;
-  border-radius: 0.8rem;
+  clip-path: polygon(7.0% 0.0%, 93.0% 0.0%, 100.0% 4.9%, 100.0% 95.1%, 93.0% 100.0%, 7.0% 100.0%, 0.0% 95.1%, 0.0% 4.9%);
   background: repeating-conic-gradient(from 0deg at 50% 30%, rgba(255, 255, 255, 0.07) 0 30deg, transparent 30deg 60deg), linear-gradient(175deg, #10314d, #071827);
 }
 [data-card-face="noel-frost"] .booster-card__rarity,

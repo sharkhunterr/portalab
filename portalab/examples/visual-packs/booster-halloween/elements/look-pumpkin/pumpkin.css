@@ -1,43 +1,108 @@
-/* The sealed pack (its hook: data-booster-look): a ribbed pumpkin, its stalk on the flap, a carved face. */
+/* The sealed pack (its hook: data-booster-look): a jack-o'-lantern — lobed and ribbed, its curly stalk on the
+   flap, two angry eyes, a nose and an evil grin with fangs carved in it, lit by a candle that flickers. */
 [data-booster-look="graveyard"] .booster-pack {
+  overflow: visible;
   inline-size: 12rem;
   aspect-ratio: 1.15 / 1;
-  border-radius: 46% 46% 42% 42% / 52% 52% 46% 46%;
+  border-radius: 48% 48% 44% 44% / 56% 56% 44% 44%;
   background:
-    radial-gradient(ellipse 18% 50% at 18% 52%, rgba(0, 0, 0, 0.22), transparent 70%),
-    radial-gradient(ellipse 18% 50% at 82% 52%, rgba(0, 0, 0, 0.22), transparent 70%),
-    radial-gradient(ellipse 14% 52% at 36% 52%, rgba(0, 0, 0, 0.16), transparent 70%),
-    radial-gradient(ellipse 14% 52% at 64% 52%, rgba(0, 0, 0, 0.16), transparent 70%),
-    radial-gradient(ellipse 70% 60% at 45% 35%, #ffb04a, #f07c12 55%, #a8450a);
-  box-shadow: inset 0 -0.8rem 1.4rem rgba(80, 20, 0, 0.6), 0 0 2.2rem rgba(255, 140, 30, 0.45);
+    radial-gradient(ellipse 10% 34% at 29% 33%, rgba(255, 225, 160, 0.42), transparent 70%),
+    radial-gradient(ellipse 7% 24% at 63% 28%, rgba(255, 225, 160, 0.3), transparent 70%),
+    radial-gradient(ellipse 3.5% 50% at 17% 52%, rgba(95, 32, 0, 0.6), transparent 70%),
+    radial-gradient(ellipse 4% 52% at 34% 50%, rgba(95, 32, 0, 0.5), transparent 70%),
+    radial-gradient(ellipse 4% 52% at 66% 50%, rgba(95, 32, 0, 0.5), transparent 70%),
+    radial-gradient(ellipse 3.5% 50% at 83% 52%, rgba(95, 32, 0, 0.6), transparent 70%),
+    radial-gradient(ellipse 62% 56% at 50% 47%, transparent 55%, rgba(80, 22, 0, 0.8) 98%),
+    radial-gradient(ellipse 70% 60% at 45% 35%, #ffb54d, #f07c12 48%, #b0490a 78%, #6a2405);
+  box-shadow: inset 0 -0.9rem 1.4rem rgba(70, 18, 0, 0.65), 0 0 2.4rem rgba(255, 140, 30, 0.45);
 }
-/* the stalk */
+/* the stalk, and its curl */
 [data-booster-look="graveyard"] .booster-pack__flap {
-  background: radial-gradient(ellipse 9% 40% at 50% 30%, #4c7a24 0 70%, transparent 75%);
+  inset: -13% 45% auto 45%;
+  block-size: 20%;
+  border: 0;
+  border-radius: 35% 35% 20% 20% / 20% 20% 10% 10%;
+  background: linear-gradient(90deg, #26400f, #5c8a24 45%, #2a4010);
+  rotate: 9deg;
 }
-[data-booster-look="graveyard"] .booster-pack__stars,
+[data-booster-look="graveyard"] .booster-pack__flap::after {
+  content: "";
+  position: absolute;
+  inset: 5% auto auto 70%;
+  inline-size: 180%;
+  aspect-ratio: 1;
+  border: 2px solid #4f7d26;
+  border-color: #4f7d26 #4f7d26 transparent transparent;
+  border-radius: 50%;
+  rotate: 30deg;
+}
 [data-booster-look="graveyard"] .booster-pack__foil {
   opacity: 0;
 }
-/* the carved face: eyes and a jagged grin, lit from inside */
-[data-booster-look="graveyard"] .booster-pack__emblem {
-  inline-size: 66%;
-  margin-block-end: 1.2rem;
-  aspect-ratio: 1.6;
-  border-radius: 0;
-  background: radial-gradient(ellipse 50% 40% at 50% 50%, #fff2a8, #ffb21f 60%, #ff7a00);
-  clip-path: polygon(10% 8%, 30% 8%, 20% 38%, 10% 8%, 70% 8%, 90% 8%, 80% 38%, 70% 8%, 5% 55%, 20% 62%, 30% 54%, 40% 64%, 50% 54%, 60% 64%, 70% 54%, 80% 62%, 95% 55%, 82% 88%, 50% 95%, 18% 88%);
-  color: transparent;
-  filter: drop-shadow(0 0 0.7rem rgba(255, 190, 60, 0.95));
+/* the eyes: angry triangles, slanted toward the nose */
+[data-booster-look="graveyard"] .booster-pack::before,
+[data-booster-look="graveyard"] .booster-pack::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 26%;
+  inline-size: 23%;
+  aspect-ratio: 1.3;
+  background: radial-gradient(ellipse 70% 70% at 50% 60%, #fff6c0, #ffc23a 45%, #ff7a00 80%, #a83200);
+  animation: halloween-candle 1.7s steps(1, end) infinite;
 }
-/* its name below the carved face, small, like a label tied to the stalk */
+[data-booster-look="graveyard"] .booster-pack::before {
+  inset-inline-start: 19%;
+  clip-path: polygon(0% 8%, 100% 66%, 38% 100%);
+}
+[data-booster-look="graveyard"] .booster-pack::after {
+  inset-inline-end: 19%;
+  clip-path: polygon(100% 8%, 0% 66%, 62% 100%);
+}
+/* the nose */
+[data-booster-look="graveyard"] .booster-pack__stars {
+  inset: 47% 45% 42% 45%;
+  opacity: 1;
+  background: radial-gradient(ellipse at 50% 70%, #ffe08a, #ff9a1a 70%, #a83200);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  animation: halloween-candle 1.7s steps(1, end) infinite;
+}
+/* the grin: wide, its corners up, two fangs down and two teeth up */
+[data-booster-look="graveyard"] .booster-pack__emblem {
+  position: relative;
+  inline-size: 64%;
+  aspect-ratio: 2.3;
+  border-radius: 0;
+  translate: 0 46%;
+  background: radial-gradient(ellipse 60% 80% at 50% 40%, #fff6c0, #ffc23a 40%, #ff7a00 75%, #a83200);
+  clip-path: polygon(0% 0%, 9% 22%, 18% 30%, 24% 31%, 28% 58%, 33% 35%, 45% 38%, 50% 52%, 55% 38%, 67% 35%, 72% 58%, 76% 31%, 82% 30%, 91% 22%, 100% 0%, 93% 34%, 82% 64%, 68% 84%, 63% 62%, 58% 90%, 42% 90%, 37% 62%, 32% 84%, 18% 64%, 7% 34%);
+  color: transparent;
+  filter: none;
+  animation: halloween-candle 1.7s steps(1, end) infinite;
+}
+@keyframes halloween-candle {
+  0%, 100% { filter: brightness(1); }
+  18% { filter: brightness(0.82); }
+  31% { filter: brightness(1.12); }
+  47% { filter: brightness(0.9); }
+  63% { filter: brightness(1.18); }
+  80% { filter: brightness(0.86); }
+}
 [data-booster-look="graveyard"] .booster-pack__name,
 [data-booster-look="graveyard"] .booster-pack[data-stage] .booster-pack__name {
-  inset: auto 0 5%;
+  inset: auto 0 -16%;
   font-size: 0.62rem;
   letter-spacing: 0.14em;
   color: #ffe0a0;
   text-shadow: 0 1px 0 #4a1a00, 0 0 0.6rem rgba(255, 150, 40, 0.8);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="graveyard"] .booster-pack::before,
+  [data-booster-look="graveyard"] .booster-pack::after,
+  [data-booster-look="graveyard"] .booster-pack__stars,
+  [data-booster-look="graveyard"] .booster-pack__emblem {
+    animation: none;
+  }
 }
 
 /* tension: the sealed pack breathes, a double heartbeat now and then — waiting to be opened */

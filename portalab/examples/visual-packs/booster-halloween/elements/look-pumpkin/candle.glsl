@@ -9,6 +9,11 @@
     vec2 e = vec2((hash(vec2(fk, 3.0)) - 0.5) * 0.3 + 0.03 * sin(life * 12.0 + fk), -0.05 + life * 0.5);
     o = over(o, vec3(1.0, 0.6, 0.2), exp(-length(c - e) * 160.0) * smoothstep(1.0, 0.6, life) * smoothstep(0.0, 0.1, life));
   }
+  // a thin smoke curling up from round the stalk
+  vec2 sm = c - vec2(0.02, 0.2);
+  float curl = fbm(vec2(sm.x * 9.0 + 0.6 * sin(sm.y * 8.0 - t * 0.9), sm.y * 4.0 - t * 0.6));
+  float plume = smoothstep(0.06, 0.0, abs(sm.x - 0.03 * sin(sm.y * 9.0 - t * 1.3)) - sm.y * 0.12) * step(0.0, sm.y) * smoothstep(0.35, 0.05, sm.y);
+  o = over(o, vec3(0.55, 0.5, 0.6), plume * smoothstep(0.45, 0.75, curl) * 0.35);
   // tension: the glow swells with the pack's double heartbeat (3.4 s), a held breath between
   float beatph = fract(t / 3.4);
   float beat = exp(-pow((beatph - 0.66) * 30.0, 2.0)) + 1.3 * exp(-pow((beatph - 0.77) * 26.0, 2.0));

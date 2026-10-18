@@ -6,8 +6,8 @@
     "en": "Graveyard under the moon"
   },
   "descriptions": {
-    "fr": "Toute la scène dans un cimetière : une pleine lune voilée, des tombes et un arbre mort en silhouette, la brume qui rampe et des chauves-souris qui passent (HD).",
-    "en": "The whole stage in a graveyard: a veiled full moon, tombstones and a dead tree in silhouette, creeping mist and bats flitting by (HD)."
+    "fr": "Toute la scène dans un cimetière : une pleine lune voilée, des tombes et un arbre mort en silhouette, la brume qui rampe, des chauves-souris, un fantôme qui dérive, des yeux qui s'ouvrent dans le noir et parfois un éclair (HD).",
+    "en": "The whole stage in a graveyard: a veiled full moon, tombstones and a dead tree in silhouette, creeping mist, bats, a drifting ghost, eyes opening in the dark and now and then lightning (HD)."
   },
   "render": {
     "kind": "glsl",

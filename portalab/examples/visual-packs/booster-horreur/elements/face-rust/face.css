@@ -2,7 +2,7 @@
 [data-card-face="horreur-rust"] .booster-card__face {
   isolation: isolate;
   border: 0;
-  clip-path: polygon(4% 0, 96% 0, 100% 3%, 100% 97%, 96% 100%, 4% 100%, 0 97%, 0 3%);
+  clip-path: polygon(4.5% 0.0%, 37.4% 1.6%, 69.4% 0.0%, 100.0% 6.0%, 98.2% 40.4%, 100.0% 94.7%, 74.4% 100.0%, 36.5% 98.2%, 0.0% 97.5%, 0.9% 48.7%, 0.0% 3.6%);
   background: linear-gradient(170deg, #b8693a, #6d2f14 40%, #3a160a 70%, #8f4a24);
   box-shadow: none;
   filter: drop-shadow(0 0 0.55rem rgba(200, 30, 10, 0.7));
@@ -12,7 +12,7 @@
   position: absolute;
   inset: 5px;
   z-index: -1;
-  clip-path: polygon(4% 0, 96% 0, 100% 3%, 100% 97%, 96% 100%, 4% 100%, 0 97%, 0 3%);
+  clip-path: polygon(4.5% 0.0%, 37.4% 1.6%, 69.4% 0.0%, 100.0% 6.0%, 98.2% 40.4%, 100.0% 94.7%, 74.4% 100.0%, 36.5% 98.2%, 0.0% 97.5%, 0.9% 48.7%, 0.0% 3.6%);
   background: linear-gradient(180deg, rgba(110, 0, 0, 0.6) 0 3%, transparent 3%) 18% 0 / 5% 40% no-repeat, linear-gradient(180deg, rgba(110, 0, 0, 0.55) 0 3%, transparent 3%) 70% 0 / 4% 60% no-repeat, radial-gradient(ellipse 80% 55% at 50% 30%, rgba(160, 20, 10, 0.3), transparent 70%), linear-gradient(175deg, #2a0a06, #0d0302);
 }
 [data-card-face="horreur-rust"] .booster-card__rarity,

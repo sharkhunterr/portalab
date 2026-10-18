@@ -4,13 +4,17 @@
   border: 0;
   border-radius: 0.5rem;
   background:
-    linear-gradient(58deg, transparent 47%, rgba(200, 190, 180, 0.45) 48% 48.6%, transparent 49.5%) 10% 18% / 50% 30% no-repeat,
-    linear-gradient(58deg, transparent 47%, rgba(200, 190, 180, 0.4) 48% 48.6%, transparent 49.5%) 16% 22% / 50% 30% no-repeat,
-    linear-gradient(58deg, transparent 47%, rgba(200, 190, 180, 0.35) 48% 48.6%, transparent 49.5%) 22% 26% / 50% 30% no-repeat,
-    linear-gradient(-52deg, transparent 47%, rgba(140, 0, 0, 0.6) 48% 48.8%, transparent 49.6%) 85% 82% / 45% 26% no-repeat,
-    linear-gradient(-52deg, transparent 47%, rgba(140, 0, 0, 0.5) 48% 48.8%, transparent 49.6%) 80% 86% / 45% 26% no-repeat,
-    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(80, 0, 0, 0.35), transparent 70%),
-    radial-gradient(circle at 30% 70%, rgba(60, 50, 40, 0.3), transparent 40%),
+    /* three gashes, black inside, raw at their lips, each with its run of blood */
+    radial-gradient(ellipse 2.2% 13% at 27% 30%, #030000 0 40%, #6e0006 55%, rgba(110, 0, 6, 0) 75%),
+    radial-gradient(ellipse 1.8% 10% at 72% 24%, #030000 0 40%, #6e0006 55%, rgba(110, 0, 6, 0) 75%),
+    radial-gradient(ellipse 2% 12% at 62% 72%, #030000 0 40%, #6e0006 55%, rgba(110, 0, 6, 0) 75%),
+    radial-gradient(ellipse 1.2% 1.4% at 27.4% 63%, #4a0004 0 60%, transparent 70%),
+    linear-gradient(#4a0004, #4a0004) 27.2% 43% / 0.9% 20% no-repeat,
+    radial-gradient(ellipse 1% 1.2% at 72.3% 49%, #4a0004 0 60%, transparent 70%),
+    linear-gradient(#4a0004, #4a0004) 72.2% 34% / 0.7% 15% no-repeat,
+    radial-gradient(ellipse 6% 18% at 27% 30%, rgba(80, 0, 20, 0.35), transparent 70%),
+    radial-gradient(ellipse 6% 16% at 62% 72%, rgba(80, 0, 20, 0.35), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(80, 0, 0, 0.3), transparent 70%),
     linear-gradient(160deg, #141010, #070505 60%, #000);
   box-shadow: inset 0 0 0 2px rgba(110, 0, 0, 0.7), inset 0 0 1.8rem rgba(0, 0, 0, 0.95);
 }
