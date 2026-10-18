@@ -346,7 +346,7 @@ def page_from(raw: Mapping[str, Any]) -> PageDefinition:
         kind = block.get("kind")
         if kind == "markdown":
             blocks.append(MarkdownBlock(str(block.get("text", ""))[:20_000]))
-        elif kind in ("stat", "list", "table", "chart", "thread", "cards", "checklist"):
+        elif kind in ("stat", "list", "table", "chart", "thread", "cards", "checklist", "media"):
             blocks.append(
                 DataBlock(
                     kind,

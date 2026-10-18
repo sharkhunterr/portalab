@@ -24,13 +24,17 @@ def register(ctx):
         return rows[0] if rows else None
 
     async def title_of(principal, item):
+        """(title, poster, kind) of a title this member may see, read through Portalab; None otherwise."""
         try:
             answer = await ctx.portal.call(TITLE, {"object_id": item})
         except Denied:
             return None
         if answer.get("status") != 200:
-            return None  # not a title this member may see
-        return _clean(answer["body"].get("title"), 160) or None
+            return None
+        body = answer["body"]
+        title = _clean(body.get("title"), 160)
+        image = str(body.get("image_id") or "")[:40] or None
+        return (title, image, _clean(body.get("kind") or "movie", 20)) if title else None
 
     async def lists(principal, query, body):
         item = _clean(query.get("item"), 80)
@@ -49,12 +53,13 @@ def register(ctx):
         if not item or await own(principal, playlist) is None:
             return {"state": "error", "message": "Not one of your playlists."}
         if body.get("checked"):
-            title = await title_of(principal, item)
-            if title is None:
+            found = await title_of(principal, item)
+            if found is None:
                 return {"state": "error", "message": "This title is not available."}
             await ctx.db.execute(
-                "INSERT INTO entries (playlist_id, item, title) VALUES (:p, :i, :t) ON CONFLICT DO NOTHING",
-                {"p": playlist, "i": item, "t": title},
+                "INSERT INTO entries (playlist_id, item, title, image_id, kind) VALUES (:p, :i, :t, :m, :k) "
+                "ON CONFLICT DO NOTHING",
+                {"p": playlist, "i": item, "t": found[0], "m": found[1], "k": found[2]},
             )
         else:
             await ctx.db.execute("DELETE FROM entries WHERE playlist_id = :p AND item = :i", {"p": playlist, "i": item})
@@ -70,17 +75,19 @@ def register(ctx):
         )
         item = _clean(body.get("item"), 80)
         if item:  # created from a media page: the title goes in at once
-            title = await title_of(principal, item)
-            if title is not None:
+            found = await title_of(principal, item)
+            if found is not None:
                 await ctx.db.execute(
-                    "INSERT INTO entries (playlist_id, item, title) VALUES (:p, :i, :t)",
-                    {"p": rows[0]["id"], "i": item, "t": title},
+                    "INSERT INTO entries (playlist_id, item, title, image_id, kind) VALUES (:p, :i, :t, :m, :k)",
+                    {"p": rows[0]["id"], "i": item, "t": found[0], "m": found[1], "k": found[2]},
                 )
         return {"state": "available", "message": "Created."}
 
     async def mine(principal, query, body):
         rows = await ctx.db.execute(
-            "SELECT p.id, p.name, count(e.item) AS n FROM playlists p LEFT JOIN entries e ON e.playlist_id = p.id "
+            "SELECT p.id, p.name, p.description, count(e.item) AS n, "
+            "(array_agg(e.image_id ORDER BY e.added_at) FILTER (WHERE e.image_id IS NOT NULL))[1:4] AS covers "
+            "FROM playlists p LEFT JOIN entries e ON e.playlist_id = p.id "
             "WHERE p.owner = :o GROUP BY p.id ORDER BY p.name",
             {"o": str(principal.user_id)},
         )
@@ -89,7 +96,15 @@ def register(ctx):
         return {
             "state": "available",
             "items": [
-                {"title": r["name"], "subtitle": str(r["n"]), "link": f"/plugins/playlist/list?playlist={r['id']}"}
+                {
+                    "id": r["id"],
+                    "title": r["name"],
+                    "subtitle": str(r["n"]),
+                    "count": int(r["n"]),
+                    "description": r["description"],
+                    "covers": list(r["covers"] or []),
+                    "link": f"/plugins/playlist/list?playlist={r['id']}",
+                }
                 for r in rows
             ],
         }
@@ -99,12 +114,15 @@ def register(ctx):
         if found is None:
             return {"state": "no-data", "items": []}
         rows = await ctx.db.execute(
-            "SELECT item, title FROM entries WHERE playlist_id = :p ORDER BY added_at", {"p": found["id"]}
+            "SELECT item, title, image_id, kind FROM entries WHERE playlist_id = :p ORDER BY added_at",
+            {"p": found["id"]},
         )
         return {
             "state": "available" if rows else "no-data",
             "title": found["name"],
-            "items": [{"label": r["title"], "link": f"/media/{r['item']}"} for r in rows],
+            "items": [
+                {"item": r["item"], "title": r["title"], "image_id": r["image_id"], "kind": r["kind"]} for r in rows
+            ],
         }
 
     async def values(principal, query, body):

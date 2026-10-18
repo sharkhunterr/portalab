@@ -141,7 +141,9 @@
   "state.quarantined": "En quarantaine",
   "state.update_failed": "Mise à jour échouée",
   "state.update_pending": "Mise à jour en attente de redémarrage",
+  "surface.by": "Par l'extension {name}",
   "surface.close": "Fermer",
   "title": "Extensions",
-  "update.package": "Paquet de la nouvelle version"
+  "update.package": "Paquet de la nouvelle version",
+  "view.failed": "La vue de cette extension n'a pas pu être affichée."
 }

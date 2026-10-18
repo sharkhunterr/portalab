@@ -33,9 +33,13 @@ def register(ctx):
             "state": "available",
             "items": [
                 {
+                    "id": r["id"],
                     "label": r["title"],
                     "link": f"/plugins/forum/topic?topic={r['id']}",
                     "meta": f"{r['author_name']} · {max(0, int(r['posts']) - 1)}",
+                    "author": r["author_name"],
+                    "replies": max(0, int(r["posts"]) - 1),
+                    "last_at": r["last_at"].isoformat(),
                 }
                 for r in rows
             ],

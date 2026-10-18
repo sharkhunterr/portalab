@@ -28488,6 +28488,60 @@
         ]
       }
     },
+    "/api/v1/admin/plugins/{key}/versions/{version}/grants": {
+      "post": {
+        "description": "Accept what a version (an update waiting to be confirmed) asks: its review's capabilities, granted.",
+        "operationId": "grant_version_api_v1_admin_plugins__key__versions__version__grants_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "title": "Version",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Grant Version Api V1 Admin Plugins  Key  Versions  Version  Grants Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Grant Version",
+        "tags": [
+          "plugins-admin"
+        ]
+      }
+    },
     "/api/v1/admin/policies": {
       "post": {
         "operationId": "apply_policy_api_v1_admin_policies_post",

@@ -81,4 +81,5 @@ async def run_worker(settings: BootstrapSettings) -> None:
         await scheduler
         await dispatcher
         await services
+        await platform.plugins.runtime.stop_all()  # 030: no confined plugin process outlives the worker
         await database.dispose()

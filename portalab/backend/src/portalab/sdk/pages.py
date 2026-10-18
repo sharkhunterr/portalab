@@ -21,7 +21,7 @@ class DataBlock:
     """``stat`` / ``list`` / ``table`` / ``chart`` / ``thread`` / ``cards`` filled from
     ``GET /api/v1/plugins/<key>/<data>``."""
 
-    kind: Literal["stat", "list", "table", "chart", "thread", "cards", "checklist"]
+    kind: Literal["stat", "list", "table", "chart", "thread", "cards", "checklist", "media"]
     title_key: str
     data: str  # a plugin route path, e.g. "stats/today"
     columns: tuple[str, ...] = ()

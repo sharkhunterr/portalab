@@ -28,7 +28,7 @@ CAPABILITIES = (
     "search", "moderation", "privacy", "product_types", "settings", "network", "portal_data",
 )  # fmt: skip
 SLOTS = (
-    "nav", "page", "header.action", "home.section", "media.actions", "media.panel", "person.panel",
+    "nav", "page", "header.action", "corner", "home.section", "media.actions", "media.panel", "person.panel",
     "profile.section",
     "player.overlay", "player.button", "settings.member", "settings.admin", "dashboard.widget",
     "search.kind", "notification.kind",
@@ -61,6 +61,15 @@ EXTENSION_POINTS = (
     "route",
 )
 _LIST = {"type": "array", "maxItems": 50}
+VIEW = r"^[a-z0-9_\-]{1,40}(/[a-z0-9_\-]{1,40}){0,3}\.m?js$"
+_SIZE = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "width": {"type": "integer", "minimum": 24, "maximum": 480},
+        "height": {"type": "integer", "minimum": 24, "maximum": 720},
+    },
+}
 _NAMES = {**_LIST, "items": {"type": "string", "pattern": r"^[a-z][a-z0-9_]{0,47}$"}}
 _CAPABILITIES: dict[str, Any] = {
     "type": "object",
@@ -155,6 +164,10 @@ SCHEMA: dict[str, Any] = {
                     "link": {"type": "string", "maxLength": 200},
                     "badge": {"type": "string", "pattern": r"^[a-z0-9_\-/]{1,120}$"},
                     "live": {"type": "string", "pattern": NAME},
+                    # its own look: a view of the plugin drawn in a sandbox at the slot (a launcher…)
+                    "view": {"type": "string", "pattern": VIEW},
+                    "size": _SIZE,
+                    "position": {"enum": ["bottom-right", "bottom-left"]},
                 },
             },
         },
@@ -163,10 +176,12 @@ SCHEMA: dict[str, Any] = {
             "items": {
                 "type": "object",
                 "additionalProperties": False,
-                "required": ["key", "kind", "title_key", "permission", "blocks"],
+                "required": ["key", "kind", "title_key", "permission"],
                 "properties": {
                     "key": {"type": "string", "pattern": NAME},
-                    "kind": {"enum": ["modal", "drawer"]},
+                    "kind": {"enum": ["modal", "drawer", "drawer-left", "panel"]},
+                    "view": {"type": "string", "pattern": VIEW},
+                    "position": {"enum": ["bottom-right", "bottom-left"]},
                     "title_key": {"type": "string", "maxLength": 120},
                     "permission": {"type": "string", "maxLength": 96},
                     "blocks": {**_LIST, "items": {"type": "object"}},
@@ -552,8 +567,13 @@ def _problems_v2(raw: dict[str, Any]) -> list[str]:
             problems.append(f"{where}: its badge reads a route that is not declared")
         if item.get("live") and item["live"] not in topics:
             problems.append(f"{where}: its live topic is not declared")
-        if not (item.get("opens") or item.get("link")):
-            problems.append(f"{where}: a slot opens a surface or links to a page")
+        if not (item.get("opens") or item.get("link") or item.get("view")):
+            problems.append(f"{where}: a slot opens a surface, links to a page or shows its view")
+        if item["slot"] == "corner" and not item.get("position"):
+            problems.append(f"{where}: a corner slot says which corner (position)")
+    for item in raw.get("surfaces", []):
+        if not item.get("view") and not item.get("blocks"):
+            problems.append(f"surfaces/{item['key']}: a surface holds blocks or the plugin's view")
     if raw.get("slots") and not raw.get("capabilities", {}).get("slots"):
         problems.append("slots: declaring slots needs the slots capability")
     keys = [(r["method"], r["path"].strip("/")) for r in raw.get("routes", [])]

@@ -141,7 +141,9 @@
   "state.quarantined": "Quarantined",
   "state.update_failed": "Update failed",
   "state.update_pending": "Update waiting for a restart",
+  "surface.by": "By the extension {name}",
   "surface.close": "Close",
   "title": "Plugins",
-  "update.package": "Package of the new version"
+  "update.package": "Package of the new version",
+  "view.failed": "This extension's view could not be shown."
 }

@@ -201,3 +201,13 @@ async def clear_secret(principal: Manager, key: str, name: str, body: ConfirmIn,
                 sensitive=True,
             ),
         )
+
+
+@router.post("/admin/plugins/{key}/versions/{version}/grants")
+async def grant_version(principal: Manager, key: str, version: str, module: Module) -> dict[str, Any]:
+    """Accept what a version (an update waiting to be confirmed) asks: its review's capabilities, granted."""
+    await module.lifecycle.get(key)
+    row = await module.lifecycle.version(key, version)
+    manifest = validate(dict(row.manifest))
+    granted = await module.grants.grant_all(principal, key, version, manifest)
+    return {"version": version, "granted": granted}

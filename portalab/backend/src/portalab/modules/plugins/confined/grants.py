@@ -178,6 +178,53 @@ class Grants:
                 for g in rows
             ]
 
+    async def carry_over(self, key: str, version: str, manifest: Manifest) -> bool:
+        """An update asking nothing more than what the running version was granted keeps those grants (FR-006:
+        only an update asking more is reviewed again). Returns whether every capability is now granted."""
+        async with self.database.session() as session:
+            rows = list(
+                (
+                    await session.execute(
+                        select(Grant)
+                        .where(Grant.plugin_key == key, Grant.version != version, Grant.revoked_at.is_(None))
+                        .order_by(Grant.granted_at.desc())
+                    )
+                ).scalars()
+            )
+        if not rows:
+            return False
+        latest = rows[0].version
+        previous = {g.capability: dict(g.parameters or {}) for g in rows if g.version == latest}
+        for name in manifest.requested_capabilities():
+            if name not in CAPABILITIES:
+                continue
+            if name not in previous or not _within(parameters_of(manifest, name), previous[name]):
+                return False
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            for name in manifest.requested_capabilities():
+                if name not in CAPABILITIES:
+                    continue
+                exists = await session.scalar(
+                    select(Grant).where(
+                        Grant.plugin_key == key, Grant.version == version, Grant.capability == name
+                    )
+                )
+                if exists is None:
+                    session.add(
+                        Grant(
+                            plugin_key=key,
+                            version=version,
+                            capability=name,
+                            parameters=parameters_of(manifest, name),
+                            granted_by=None,  # carried over from the version the Admin reviewed
+                            granted_at=now,
+                        )
+                    )
+        self._cache.pop((key, version), None)
+        return True
+
     async def missing(self, key: str, version: str, manifest: Manifest) -> list[str]:
         granted = await self.active(key, version)
         return [n for n in manifest.requested_capabilities() if n in CAPABILITIES and n not in granted]
@@ -185,3 +232,19 @@ class Grants:
     def forget(self, key: str) -> None:
         for cached in [k for k in self._cache if k[0] == key]:
             self._cache.pop(cached, None)
+
+
+def _within(asked: Mapping[str, Any], granted: Mapping[str, Any]) -> bool:
+    """``asked`` reaches no further than ``granted`` (lists included in theirs, quotas no larger)."""
+    for name, value in asked.items():
+        had = granted.get(name)
+        if isinstance(value, list):
+            known = [repr(v) for v in had] if isinstance(had, list) else []
+            if any(repr(v) not in known for v in value):
+                return False
+        elif isinstance(value, (int, float)) and not isinstance(value, bool):
+            if not isinstance(had, (int, float)) or value > had:
+                return False
+        elif value != had:
+            return False
+    return True

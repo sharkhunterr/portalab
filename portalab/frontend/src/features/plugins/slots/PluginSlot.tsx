@@ -7,8 +7,10 @@ import { Button } from "../../../design-system/components/Button";
 import { CountBadge } from "../../../design-system/components/CountBadge";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
+import { isSafeMode } from "../../../shell/safeMode";
 import { ownLink } from "../pages/Blocks";
 import { Surface } from "../pages/Surface";
+import { PluginView } from "../views/PluginView";
 
 /** What an enabled plugin adds to a place of Portalab's screens, for this member (spec 030, slots). */
 export interface Contribution {
@@ -22,6 +24,10 @@ export interface Contribution {
   link?: string | null;
   badge?: string | null;
   live?: string | null;
+  /** its own look: a view of the plugin drawn in a sandbox at the slot (a launcher) */
+  view?: string | null;
+  size?: { width?: number; height?: number } | null;
+  corner?: "bottom-right" | "bottom-left" | null;
 }
 
 export function useContributions() {
@@ -66,16 +72,43 @@ function SlotButton({
   contribution,
   params,
   compact,
+  floating = false,
 }: {
   contribution: Contribution;
   params: Record<string, string>;
   compact: boolean;
+  floating?: boolean;
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const count = useBadge(contribution);
   const label = t(contribution.label_key);
   const link = ownLink(contribution.plugin, contribution.link);
+  const [surface, setSurface] = useState<{ key: string; params: Record<string, string> } | null>(null);
+  if (contribution.view && !isSafeMode()) {
+    // the plugin draws its own launcher; it opens its surfaces through Portalab
+    return (
+      <>
+        <PluginView
+          plugin={contribution.plugin}
+          view={contribution.view}
+          params={params}
+          mode="launcher"
+          title={label}
+          size={contribution.size ?? null}
+          onOpen={(key, more) => setSurface({ key, params: { ...params, ...more } })}
+        />
+        {surface ? (
+          <Surface
+            plugin={contribution.plugin}
+            surface={surface.key}
+            params={surface.params}
+            onClose={() => setSurface(null)}
+          />
+        ) : null}
+      </>
+    );
+  }
   const content = (
     <>
       <Icon name={contribution.icon ?? "plug"} />
@@ -97,8 +130,9 @@ function SlotButton({
   return (
     <>
       <Button
-        variant={compact ? "ghost" : "secondary"}
+        variant={floating ? "primary" : compact ? "ghost" : "secondary"}
         size={compact ? "icon" : undefined}
+        className={floating ? "plugin-corner__button" : undefined}
         aria-label={compact ? label : undefined}
         data-plugin-slot={contribution.id}
         onClick={() => setOpen(true)}
@@ -139,6 +173,30 @@ export function PluginSlot({
       {here.map((contribution) => (
         <SlotButton key={contribution.id} contribution={contribution} params={params} compact={compact} />
       ))}
+    </>
+  );
+}
+
+/**
+ * 030: what plugins place in a corner of every screen (a messenger's button, bottom right or left): their own
+ * launcher view, or Portalab's round button with their icon and count, opening their panel or drawer.
+ */
+export function PluginCorners() {
+  const contributions = useContributions();
+  const corners = (contributions.data ?? []).filter((c) => c.slot === "corner");
+  if (!corners.length) return null;
+  return (
+    <>
+      {(["bottom-right", "bottom-left"] as const).map((corner) => {
+        const here = corners.filter((c) => (c.corner ?? "bottom-right") === corner);
+        return here.length ? (
+          <div key={corner} className="plugin-corner" data-corner={corner}>
+            {here.map((contribution) => (
+              <SlotButton key={contribution.id} contribution={contribution} params={{}} compact floating />
+            ))}
+          </div>
+        ) : null;
+      })}
     </>
   );
 }

@@ -6,7 +6,7 @@ schema_version = 2
 key = "forum"
 name = "Forum"
 description = "Topics and replies, for the whole community."
-version = "1.0.0"
+version = "1.1.1"
 requires_portal = ">=0.1"
 maturity = "beta"
 entry_point = "forum_plugin:register"
@@ -73,6 +73,7 @@ notification_categories = [{ name = "replies", label_key = "plugin.forum:categor
 key = "topics"
 title_key = "plugin.forum:page.topics"
 permission = "plugin:forum.read"
+view = "forum.js"  # its own look; the blocks below are what safe mode shows
 blocks = [
   { kind = "list", title_key = "plugin.forum:block.topics", data = "topics" },
   { kind = "form", title_key = "plugin.forum:block.new", action = "topics", submit_key = "plugin.forum:action.publish", schema = { type = "object", properties = { title = { type = "string", maxLength = 120, title = "plugin.forum:field.title" }, body = { type = "string", maxLength = 4000, title = "plugin.forum:field.body", format = "textarea" } }, required = ["title", "body"] } },
@@ -82,6 +83,7 @@ blocks = [
 key = "topic"
 title_key = "plugin.forum:page.topic"
 permission = "plugin:forum.read"
+view = "forum.js"
 blocks = [
   { kind = "thread", title_key = "plugin.forum:block.thread", data = "thread" },
   { kind = "form", title_key = "plugin.forum:block.reply", action = "replies", submit_key = "plugin.forum:action.reply", schema = { type = "object", properties = { body = { type = "string", maxLength = 4000, title = "plugin.forum:field.body", format = "textarea" } }, required = ["body"] } },
@@ -101,6 +103,13 @@ blocks = [
 "field.body" = "Message"
 "action.publish" = "Publish"
 "action.reply" = "Reply"
+"view.search" = "Search the topics"
+"view.new" = "New topic"
+"view.cancel" = "Cancel"
+"view.empty" = "No topic yet. Start the first one!"
+"view.replies" = "{count} replies"
+"view.back" = "All topics"
+"view.placeholder" = "Write your message…"
 
 [i18n.fr."plugin.forum"]
 "nav.section" = "Forum"
@@ -116,3 +125,10 @@ blocks = [
 "field.body" = "Message"
 "action.publish" = "Publier"
 "action.reply" = "Répondre"
+"view.search" = "Chercher un sujet"
+"view.new" = "Nouveau sujet"
+"view.cancel" = "Annuler"
+"view.empty" = "Pas encore de sujet. Lancez le premier !"
+"view.replies" = "{count} réponses"
+"view.back" = "Tous les sujets"
+"view.placeholder" = "Écrivez votre message…"

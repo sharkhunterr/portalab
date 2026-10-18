@@ -5,7 +5,7 @@ schema_version = 2
 key = "playlist"
 name = "Playlists"
 description = "Your own playlists of titles."
-version = "1.0.0"
+version = "1.1.0"
 requires_portal = ">=0.1"
 maturity = "beta"
 entry_point = "playlist_plugin:register"
@@ -107,6 +107,7 @@ nav = [{ key = "mine", label_key = "plugin.playlist:nav.mine", route = "/plugins
 key = "mine"
 title_key = "plugin.playlist:page.mine"
 permission = "plugin:playlist.use"
+view = "playlists.js"  # its own look (covers, cards); in safe mode, the blocks below
 blocks = [
   { kind = "cards", title_key = "plugin.playlist:block.mine", data = "mine" },
   { kind = "form", title_key = "plugin.playlist:block.new", action = "playlists", submit_key = "plugin.playlist:action.create", schema = { type = "object", properties = { name = { type = "string", maxLength = 80, title = "plugin.playlist:field.name" } }, required = ["name"] } },
@@ -118,7 +119,7 @@ title_key = "plugin.playlist:page.list"
 permission = "plugin:playlist.use"
 blocks = [
   { kind = "actions", buttons = [ { label_key = "plugin.playlist:action.edit", opens = "edit" }, { label_key = "plugin.playlist:action.delete", action = "delete", then = "/plugins/playlist/mine" } ] },
-  { kind = "list", title_key = "plugin.playlist:block.items", data = "items" },
+  { kind = "media", title_key = "plugin.playlist:block.items", data = "items" },
 ]
 
 [i18n.en."plugin.playlist"]
@@ -140,6 +141,10 @@ blocks = [
 "field.description" = "Description"
 "page.mine" = "My playlists"
 "page.list" = "Playlist"
+"view.new" = "New playlist"
+"view.create" = "Create"
+"view.empty" = "No playlist yet: add a title from its page with « + Playlist », or create one here."
+"view.count" = "{count} titles"
 
 [i18n.fr."plugin.playlist"]
 "nav.section" = "Playlists"
@@ -160,3 +165,7 @@ blocks = [
 "field.description" = "Description"
 "page.mine" = "Mes playlists"
 "page.list" = "Playlist"
+"view.new" = "Nouvelle playlist"
+"view.create" = "Créer"
+"view.empty" = "Pas encore de playlist : ajoutez un titre depuis sa fiche avec « + Playlist », ou créez-en une ici."
+"view.count" = "{count} titres"

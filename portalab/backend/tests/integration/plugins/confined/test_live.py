@@ -1,5 +1,5 @@
-"""030 T046 (US3) — live channels for a plugin: only its declared topics, under its own name, to the members it
-names (or holders of one of its own permissions), bounded in size and rate."""
+"""030 T046 (US3) — live channels for a plugin: only its declared topics, under its own name, to the members
+it names (or holders of one of its own permissions), bounded in size and rate."""
 
 from uuid import uuid4
 

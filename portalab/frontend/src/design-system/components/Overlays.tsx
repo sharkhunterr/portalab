@@ -32,6 +32,8 @@ export interface DialogProps {
   size?: "md" | "lg" | "full" | undefined;
   /** 027: actions shown in a footer that stays visible, after the close button (e.g. « Buy »). */
   footer?: ReactNode;
+  /** 030: the side a drawer opens from (``end`` by default) */
+  side?: "start" | "end" | undefined;
 }
 
 /** 027: where a dialog's own actions go — its footer, on the close button's line. */
@@ -89,6 +91,7 @@ export function Dialog({
   variant = "dialog",
   size = "md",
   footer,
+  side = "end",
 }: DialogProps) {
   const [slot, setSlot] = useState<HTMLElement | null>(null);
   return (
@@ -102,6 +105,7 @@ export function Dialog({
         <DialogPrimitive.Content
           className={variant === "drawer" ? "ds-drawer" : "ds-dialog"}
           data-size={variant === "drawer" ? undefined : size}
+          data-side={variant === "drawer" ? side : undefined}
           data-protected="" // issue 1: what a member confirms here is never restyled by an imported interface
         >
           <DialogPrimitive.Title>{title}</DialogPrimitive.Title>

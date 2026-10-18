@@ -10,6 +10,8 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { SafeHtml } from "../../content/SafeHtml";
+import { imageUrl } from "../../media/api";
+import { Poster } from "../../media/MediaGrid";
 import { Cancelled, usePluginAction } from "./PluginConfirm";
 import { Surface } from "./Surface";
 
@@ -37,7 +39,8 @@ export interface Block {
     | "thread"
     | "cards"
     | "checklist"
-    | "actions";
+    | "actions"
+    | "media";
   live?: string;
   buttons?: Array<{ label_key: string; opens?: string; action?: string; then?: string }>;
   html?: string;
@@ -179,6 +182,29 @@ function Checklist({ plugin, block, params, items }: BlockProps & { items: Item[
   );
 }
 
+const IMAGE = /^[0-9a-f-]{32,36}$/;
+const ITEM = /^[A-Za-z0-9_-]{1,80}$/;
+
+/** 030: titles of the library as Portalab draws them (poster, title, year), each opening its own page. */
+function MediaItems({ items }: { items: Item[] }) {
+  return (
+    <div className="media-grid">
+      {items
+        .filter((item) => typeof item.item === "string" && ITEM.test(item.item))
+        .map((item) => {
+          const image = typeof item.image_id === "string" && IMAGE.test(item.image_id) ? item.image_id : null;
+          return (
+            <Link key={String(item.item)} to={`/media/${String(item.item)}`} className="media-card">
+              <Poster src={imageUrl(image)} kind={String(item.kind ?? "movie")} />
+              <span className="media-card__title">{String(item.title ?? "")}</span>
+              {item.year ? <span className="media-card__meta">{String(item.year)}</span> : null}
+            </Link>
+          );
+        })}
+    </div>
+  );
+}
+
 function DataBlock({ plugin, block, params }: BlockProps) {
   const t = useT();
   const format = useFormat();
@@ -202,6 +228,7 @@ function DataBlock({ plugin, block, params }: BlockProps) {
       ) : null}
       {query.data && block.kind === "list" ? <ListItems plugin={plugin} items={items} /> : null}
       {query.data && block.kind === "thread" ? <Thread items={items} /> : null}
+      {query.data && block.kind === "media" ? <MediaItems items={items} /> : null}
       {query.data && block.kind === "cards" ? <Cards plugin={plugin} items={items} /> : null}
       {query.data && block.kind === "checklist" ? (
         <Checklist plugin={plugin} block={block} params={params} items={items} />

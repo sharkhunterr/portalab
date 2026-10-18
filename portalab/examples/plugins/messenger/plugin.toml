@@ -5,7 +5,7 @@ schema_version = 2
 key = "messenger"
 name = "Messenger"
 description = "Direct messages between members."
-version = "1.0.0"
+version = "1.1.1"
 requires_portal = ">=0.1"
 maturity = "beta"
 entry_point = "messenger_plugin:register"
@@ -16,7 +16,7 @@ permissions = [{ name = "use", description = "Send and receive direct messages" 
 storage = { quota_mb = 100 }
 operations = true
 pages = true
-slots = ["header.action"]
+slots = ["corner", "header.action"]
 live = { topics = ["new"] }
 privacy = true
 portal_data = { operations = ["GET /api/v1/community/members", "GET /api/v1/community/members/{member_id}"] }
@@ -49,15 +49,30 @@ method = "POST"
 permission = "plugin:messenger.use"
 exposure = "action"
 
+# a round button in the bottom-right corner of every screen (drawn by Portalab, the member's theme), its count
+# of unread messages, opening the plugin's own chat panel
 [[slots]]
-slot = "header.action"
-key = "inbox"
+slot = "corner"
+key = "chat"
+position = "bottom-right"
 label_key = "plugin.messenger:slot.inbox"
 icon = "message-circle"
 permission = "plugin:messenger.use"
-opens = "inbox"
+opens = "chat"
 badge = "unread"
 live = "new"
+
+[[surfaces]]
+key = "chat"
+kind = "panel"
+position = "bottom-right"
+title_key = "plugin.messenger:surface.inbox"
+permission = "plugin:messenger.use"
+view = "chat.js"  # its own look; in safe mode, the blocks below
+blocks = [
+  { kind = "list", title_key = "plugin.messenger:block.conversations", data = "conversations", live = "new" },
+  { kind = "form", title_key = "plugin.messenger:block.new", action = "send", submit_key = "plugin.messenger:action.send", schema = { type = "object", properties = { to = { type = "string", maxLength = 64, title = "plugin.messenger:field.to" }, body = { type = "string", maxLength = 2000, title = "plugin.messenger:field.body", format = "textarea" } }, required = ["to", "body"] } },
+]
 
 [[surfaces]]
 key = "inbox"
@@ -89,6 +104,11 @@ blocks = [
 "field.body" = "Message"
 "action.send" = "Send"
 "page.chat" = "Conversation"
+"view.new" = "New conversation"
+"view.empty" = "No conversation yet."
+"view.placeholder" = "Your message…"
+"view.back" = "Conversations"
+"view.to" = "A member's name"
 
 [i18n.fr."plugin.messenger"]
 "slot.inbox" = "Messages"
@@ -101,3 +121,8 @@ blocks = [
 "field.body" = "Message"
 "action.send" = "Envoyer"
 "page.chat" = "Conversation"
+"view.new" = "Nouvelle conversation"
+"view.empty" = "Pas encore de conversation."
+"view.placeholder" = "Votre message…"
+"view.back" = "Conversations"
+"view.to" = "Le nom d'un membre"

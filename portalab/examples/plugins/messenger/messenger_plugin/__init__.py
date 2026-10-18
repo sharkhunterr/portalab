@@ -65,9 +65,11 @@ def register(ctx):
             "state": "available",
             "items": [
                 {
+                    "id": r["id"],
                     "label": r["other"],
                     "link": f"/plugins/messenger/chat?conversation={r['id']}",
                     "meta": str(r["unread"]) if r["unread"] else "",
+                    "unread": int(r["unread"]),
                 }
                 for r in rows
             ],
@@ -92,7 +94,13 @@ def register(ctx):
             "state": "available",
             "title": other,
             "items": [
-                {"id": r["id"], "author": names.get(str(r["author"]), "?"), "at": r["created_at"].isoformat(), "body": r["body"]}
+                {
+                    "id": r["id"],
+                    "author": names.get(str(r["author"]), "?"),
+                    "at": r["created_at"].isoformat(),
+                    "body": r["body"],
+                    "mine": str(r["author"]) == me,
+                }
                 for r in reversed(rows)
             ],
         }
@@ -128,7 +136,12 @@ def register(ctx):
         )
         await ctx.db.execute("UPDATE conversations SET last_at = now() WHERE id = :c", {"c": conversation})
         await ctx.live.publish("new", {"conversation": conversation}, users=[me, other], author=me)
-        return {"state": "available", "message": "Sent.", "link": f"/plugins/messenger/chat?conversation={conversation}"}
+        return {
+            "state": "available",
+            "message": "Sent.",
+            "conversation": conversation,
+            "link": f"/plugins/messenger/chat?conversation={conversation}",
+        }
 
     async def export(user_id):
         rows = await ctx.db.execute(

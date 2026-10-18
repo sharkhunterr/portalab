@@ -1,0 +1,83 @@
+/* 030: a plugin's own views — their frames are Portalab's, their insides the plugin's (themed by tokens). */
+.plugin-view {
+  display: block;
+  border: 0;
+  width: 100%;
+  background: transparent;
+  color-scheme: normal;
+}
+.plugin-view--fill {
+  min-height: 24rem;
+  height: 100%;
+}
+.plugin-view--launcher {
+  width: auto;
+  border-radius: var(--radius-pill);
+}
+.plugin-surface--view {
+  display: flex;
+  flex-direction: column;
+  min-height: 24rem;
+  height: calc(100vh - 12rem);
+}
+.ds-dialog .plugin-surface--view {
+  height: min(70vh, 40rem);
+}
+.plugin-panel {
+  position: fixed;
+  inset-block-end: var(--space-4);
+  inset-inline-end: var(--space-4);
+  z-index: var(--z-overlay);
+  width: min(24rem, calc(100vw - 2rem));
+  height: min(36rem, calc(100vh - 6rem));
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.plugin-panel[data-corner="bottom-left"] {
+  inset-inline-end: auto;
+  inset-inline-start: var(--space-4);
+}
+.plugin-panel__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-block-end: 1px solid var(--color-border);
+}
+.plugin-panel__owner {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  margin-inline-end: auto;
+}
+.plugin-panel .plugin-surface--view {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+.plugin-corner {
+  position: fixed;
+  inset-block-end: var(--space-4);
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.plugin-corner[data-corner="bottom-right"] {
+  inset-inline-end: var(--space-4);
+}
+.plugin-corner[data-corner="bottom-left"] {
+  inset-inline-start: var(--space-4);
+}
+.plugin-corner__button {
+  position: relative;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+}

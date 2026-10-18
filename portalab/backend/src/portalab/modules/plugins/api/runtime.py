@@ -7,13 +7,14 @@ from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 
 from portalab.capabilities.content.render import render_markdown
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import Forbidden, NotFound
 from portalab.modules.plugins.api.admin import Module
+from portalab.modules.plugins.views import VIEW_DOCUMENT, VIEW_FILE_HEADERS, VIEW_HEADERS, VIEW_TYPES
 from portalab.sdk.pages import ActionsBlock, DataBlock, FormBlock, MarkdownBlock
 
 router = APIRouter(prefix="/api/v1", tags=["plugins"])
@@ -73,6 +74,25 @@ async def pages(principal: Member, request: Request, module: Module) -> list[dic
     return out
 
 
+@router.get("/plugins/sandbox", include_in_schema=False)
+async def view_sandbox(_: Member) -> HTMLResponse:
+    """030: the page a plugin's own view runs in (framed by Portalab, sandboxed, no network)."""
+    return HTMLResponse(VIEW_DOCUMENT, headers=VIEW_HEADERS)
+
+
+@router.get("/plugins/{key}/views/{path:path}", include_in_schema=False)
+async def view_file(_: Member, key: str, path: str, module: Module) -> FileResponse:
+    """030: a file of a plugin's ``views/`` folder (its module, styles, images, fonts), for Portalab only."""
+    await _live(module, key)
+    plugin = await module.lifecycle.get(key)
+    root = (module.store.target(key, plugin.current_version) / "views").resolve()
+    target = (root / path).resolve()
+    suffix = Path(path).suffix.lower()
+    if root not in target.parents or suffix not in VIEW_TYPES or not target.is_file():
+        raise NotFound("No such view file.", code="plugin.view_not_found")
+    return FileResponse(target, media_type=VIEW_TYPES[suffix], headers=VIEW_FILE_HEADERS)
+
+
 @router.get("/plugins/slots")
 async def slots(principal: Member, request: Request, module: Module) -> list[dict[str, Any]]:
     """030: what enabled plugins add to Portalab's screens for this member (drawn by Portalab)."""
@@ -112,6 +132,9 @@ async def slots(principal: Member, request: Request, module: Module) -> list[dic
                     "link": item.get("link"),
                     "badge": item.get("badge"),
                     "live": f"plugin.{plugin.key}.{item['live']}" if item.get("live") else None,
+                    "view": item.get("view"),
+                    "size": item.get("size"),
+                    "corner": item.get("position"),
                     "position": setting.position if setting is not None else None,
                 }
             )
@@ -138,7 +161,7 @@ async def surface(
             "key": surface,
             "title_key": found["title_key"],
             "permission": found["permission"],
-            "blocks": found["blocks"],
+            "blocks": found.get("blocks", []),
         }
     )
     return {
@@ -146,6 +169,9 @@ async def surface(
         "key": surface,
         "kind": found["kind"],
         "title_key": found["title_key"],
+        "view": found.get("view"),
+        "position": found.get("position"),
+        "plugin_name": manifest.name if manifest is not None else key,
         "blocks": [_block(b) for b in definition.blocks],
     }
 
@@ -158,10 +184,14 @@ async def page(principal: Member, key: str, page: str, request: Request, module:
         raise NotFound("No such page.", code="plugin.page_not_found")
     if not await request.app.state.authorizer.is_allowed(principal, definition.required_permission):
         raise NotFound("No such page.", code="plugin.page_not_found")  # hide existence
+    manifest = (await module.lifecycle.manifests()).get(key)
+    pages = manifest.raw.get("ui", {}).get("pages", []) if manifest is not None else []
+    raw: dict[str, Any] = next((dict(p) for p in pages if p.get("key") == page), {})
     return {
         "plugin": key,
         "key": definition.key,
         "title_key": definition.title_key,
+        "view": raw.get("view"),  # 030: the plugin's own view of the page
         "blocks": [_block(b) for b in definition.blocks],
     }
 

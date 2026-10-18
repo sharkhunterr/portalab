@@ -107,6 +107,11 @@
   inset-inline-end: 0;
   width: min(24rem, 100vw);
 }
+/* 030: a drawer opening from the start side (a plugin's sidebar) */
+.ds-drawer[data-side="start"] {
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+}
 .ds-tabs__list {
   display: flex;
   flex-wrap: wrap;

@@ -9,6 +9,7 @@ import { LevelUpMoment } from "../features/gamification/levelup/LevelUpMoment";
 import { BoosterStageHost } from "../features/marketplace/boosters/StageHost";
 import { ListenHost } from "../features/media/listen/ListenHost";
 import { useListen } from "../features/media/listen/store";
+import { PluginCorners } from "../features/plugins/slots/PluginSlot";
 import { Breadcrumbs, RelatedLinks } from "./breadcrumbs/Breadcrumbs";
 import { AppHeader } from "./header/AppHeader";
 import { focusHeaderSearch, HeaderSearch, openFloatingSearch } from "./header/HeaderSearch";
@@ -286,6 +287,8 @@ export function AppShell({
       <HeaderSearch floating />
       {/* 029: safe mode loads nothing of any pack */}
       {isSafeMode() ? null : <ExternalVisualsLoader />}
+      {/* 030: what plugins place in a corner of every screen (a messenger's button…) */}
+      <PluginCorners />
       <CommandPalette
         open={palette.open}
         initialQuery={palette.query}

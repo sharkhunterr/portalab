@@ -364,6 +364,9 @@ def create_app(
             await app.state.platform.start_services()
             if app.state.platform.visuals is not None:
                 await app.state.platform.visuals.start()
+            # 030: this process serves the plugins' pages, routes and slots: the enabled ones load at start
+            # (only the worker did; a restart left them all out until each was enabled again)
+            await app.state.platform.plugins.start()
         flusher = (
             asyncio.create_task(_flush_loop(app.state.platform.observability))
             if app.state.platform is not None
@@ -381,6 +384,9 @@ def create_app(
             visuals_module = app.state._state.get("visuals_module")
             if visuals_module is not None:
                 await visuals_module.stop()
+            plugins_module = app.state._state.get("plugins_module")
+            if plugins_module is not None:
+                await plugins_module.runtime.stop_all()  # 030: no confined process outlives Portalab
             if guarding is not None:
                 guarding.cancel()
                 with contextlib.suppress(asyncio.CancelledError):

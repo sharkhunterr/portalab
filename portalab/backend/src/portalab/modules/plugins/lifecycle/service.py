@@ -412,6 +412,8 @@ class Lifecycle:
         if not ok:
             raise Held("held_confinement", "This system cannot confine plugins (and the weaker mode is off).")
         missing = await self.runtime.grants.missing(key, version, manifest)
+        if missing and await self.runtime.grants.carry_over(key, version, manifest):
+            missing = []  # an update asking nothing more keeps what the Admin granted
         if missing:
             raise CapabilitiesNotGranted(
                 "Review the plugin and accept its capabilities first.", extensions={"missing": missing}

@@ -1,10 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { api } from "../../../api/client";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
+import { isSafeMode } from "../../../shell/safeMode";
+import { PluginView } from "../views/PluginView";
 import { type Block, PluginBlocks, usePageParams } from "./Blocks";
+import { Surface } from "./Surface";
 
 export { ownLink } from "./Blocks";
 
@@ -12,6 +16,7 @@ interface Page {
   plugin: string;
   key: string;
   title_key: string;
+  view?: string | null;
   blocks: Block[];
 }
 
@@ -25,6 +30,7 @@ export default function PageRenderer() {
   const t = useT();
   const { pluginKey = "", pageKey = "" } = useParams();
   const params = usePageParams();
+  const [surface, setSurface] = useState<{ key: string; params: Record<string, string> } | null>(null);
   const page = useQuery({
     queryKey: ["plugin-page", pluginKey, pageKey],
     retry: false,
@@ -47,7 +53,26 @@ export default function PageRenderer() {
   return (
     <div className="ds-stack">
       <PageHeader icon="plug" title={t(page.data.title_key)} />
-      <PluginBlocks plugin={pluginKey} blocks={page.data.blocks} params={params} />
+      {page.data.view && !isSafeMode() ? (
+        <PluginView
+          plugin={pluginKey}
+          view={page.data.view}
+          params={params}
+          mode="page"
+          title={t(page.data.title_key)}
+          onOpen={(surface, more) => setSurface({ key: surface, params: { ...params, ...more } })}
+        />
+      ) : (
+        <PluginBlocks plugin={pluginKey} blocks={page.data.blocks} params={params} />
+      )}
+      {surface ? (
+        <Surface
+          plugin={pluginKey}
+          surface={surface.key}
+          params={surface.params}
+          onClose={() => setSurface(null)}
+        />
+      ) : null}
     </div>
   );
 }
