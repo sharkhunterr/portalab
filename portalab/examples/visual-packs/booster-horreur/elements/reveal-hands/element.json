@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "horreur-hands",
+  "names": {
+    "fr": "Les mains",
+    "en": "The hands"
+  },
+  "descriptions": {
+    "fr": "Des ombres de mains rampent des bords vers la carte, leurs doigts qui s'allongent, puis se retirent (HD).",
+    "en": "Shadows of hands crawl from the edges toward the card, their fingers stretching, then draw back (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic"
+  }
+}

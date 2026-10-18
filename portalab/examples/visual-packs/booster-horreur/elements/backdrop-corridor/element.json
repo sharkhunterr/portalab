@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "horreur",
+  "names": {
+    "fr": "Le couloir",
+    "en": "The corridor"
+  },
+  "descriptions": {
+    "fr": "Toute la scène au fond d'un couloir : une ampoule qui grésille et s'éteint par moments, du grain, des traînées qui coulent du haut, un pouls rouge au bord de l'écran — et parfois, quand la lumière revient, une silhouette au fond (HD).",
+    "en": "The whole stage at the end of a corridor: a bulb buzzing and dying at times, grain, streaks running down from the top, a red pulse at the edges — and sometimes, as the light comes back, a figure at the far end (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "corridor.glsl",
+    "stage": true
+  }
+}

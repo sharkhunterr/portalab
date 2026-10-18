@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "horreur",
+  "names": {
+    "fr": "Le coffret enchaîné",
+    "en": "The chained box"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient un coffret de fer rouillé, entravé de chaînes, un cadenas pour emblème — et dans la serrure, un œil rouge qui cligne et vous suit (HD).",
+    "en": "The pack becomes a rusted iron box bound in chains, a padlock for an emblem — and in the keyhole, a red eye that blinks and follows you (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "eye.glsl",
+    "css": [
+      "box.css"
+    ],
+    "stage": true
+  }
+}

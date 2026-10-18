@@ -17,6 +17,11 @@
     vec2 e = c / vec2(rx, rx * (0.22 + 0.08 * fk));
     o = over(o, vec3(0.8, 0.75, 1.0), smoothstep(0.03, 0.0, abs(length(e) - 1.0)) * 0.08);
   }
+  // tension: the glow swells with the pack's double heartbeat (3.4 s), a held breath between
+  float beatph = fract(t / 3.4);
+  float beat = exp(-pow((beatph - 0.66) * 30.0, 2.0)) + 1.3 * exp(-pow((beatph - 0.77) * 26.0, 2.0));
+  vec2 bc = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+  o = over(o, vec3(0.6, 0.5, 1.0), exp(-dot(bc * vec2(1.3, 1.0), bc * vec2(1.3, 1.0)) * 7.0) * 0.22 * beat);
   // its edges fade out: never the outline of its box
   vec2 edgeuv = gl_FragCoord.xy / u_res;
   o *= smoothstep(0.0, 0.25, min(edgeuv.x, 1.0 - edgeuv.x)) * smoothstep(0.0, 0.25, min(edgeuv.y, 1.0 - edgeuv.y));

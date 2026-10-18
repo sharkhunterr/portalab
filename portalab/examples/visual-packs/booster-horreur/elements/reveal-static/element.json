@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "horreur-static",
+  "names": {
+    "fr": "Parasites",
+    "en": "Static"
+  },
+  "descriptions": {
+    "fr": "L'image se brouille autour de la carte : de la neige d'écran, des lignes qui se déchirent (HD).",
+    "en": "The picture breaks up round the card: screen snow, lines tearing apart (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.6,
+    "rarity": "rare"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "horreur",
+  "names": {
+    "fr": "Scène d'horreur",
+    "en": "Horror scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture pour avoir peur. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening, to be scared by. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-chained",
+      "backdrop": "backdrop-corridor",
+      "opening": "opening-escape",
+      "back": {
+        "common": "back-scratched"
+      },
+      "face": {
+        "common": "face-photo",
+        "rare": "face-negative",
+        "epic": "face-rust",
+        "legendary": "face-eye"
+      },
+      "reveal": {
+        "rare": "reveal-static",
+        "epic": "reveal-hands",
+        "legendary": "reveal-gaze"
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "horreur-rust",
+  "names": {
+    "fr": "Face de rouille et de sang",
+    "en": "Rust and blood face"
+  },
+  "descriptions": {
+    "fr": "Une carte épique au cadre de fer rouillé, des coulures sombres, holographique rouge.",
+    "en": "An epic card in a rusted iron frame, dark runs down it, red holographic."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

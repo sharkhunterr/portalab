@@ -39,6 +39,12 @@
       o = over(o, col, shape * fade);
     }
   }
+  // tension: before it gives way, the dark closes in round it and its beats quicken
+  vec2 dc = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+  float dread = smoothstep(0.0, 1.0, u_age) * smoothstep(1.35, 1.0, u_age);
+  float quick = pow(0.5 + 0.5 * sin(u_age * u_age * 14.0), 8.0);
+  o = over(o, vec3(0.0), smoothstep(0.12, 0.6, length(dc * vec2(0.8, 1.0))) * dread * 0.6);
+  o = over(o, vec3(1.0, 0.95, 0.9), exp(-length(dc) * 9.0) * quick * dread * 0.25);
   // its edges fade out: never the outline of its box
   vec2 edgeuv = gl_FragCoord.xy / u_res;
   o *= smoothstep(0.0, 0.25, min(edgeuv.x, 1.0 - edgeuv.x)) * smoothstep(0.0, 0.25, min(edgeuv.y, 1.0 - edgeuv.y));

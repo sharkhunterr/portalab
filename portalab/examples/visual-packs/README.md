@@ -19,6 +19,12 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   supernova; the ribbon undone in a spray of stars; ghosts and bats out of the pumpkin), a card back, a face
   per rarity with the holographic effect of issue 151 from rare up (a sheen sliding in ``screen``, glitter, the
   legendary art leaning) and GPU reveals for rare, epic and legendary cards;
+  each scene carries a little tension — the sealed pack breathing with a double heartbeat, the dark closing in
+  while it opens;
+- `booster-horreur/` (`horreur`): **a scene made for dread** — a dying bulb at the end of a corridor and a
+  figure standing in the doorway now and then, a chained box with a red eye at its keyhole, a long opening
+  where the light dies, the heart races and claw marks appear before a red strobe, glitching faces (the
+  photograph, the negative, rust and blood, the Eye) and reveals (static, crawling hands, the eye watching);
 - `widgets/` (`vigie`): **self-contained widgets** (spec 028, US6) — everything they do is in the pack: a new
   widget « Heading » (a compass of the member's progression, drawing itself on one line, in a column or as a
   block, with its own setting « dial » whose silver value is sold and night value offered, reading the

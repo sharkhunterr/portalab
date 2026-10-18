@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "horreur",
+  "names": {
+    "fr": "Dos griffé",
+    "en": "Scratched back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est noire et calcinée, lacérée de griffures, un œil rouge au centre qui s'allume par moments.",
+    "en": "Face down, every card is black and charred, torn by claw marks, a red eye in the middle that lights up at times."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

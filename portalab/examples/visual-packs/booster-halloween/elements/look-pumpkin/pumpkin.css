@@ -39,3 +39,21 @@
   color: #ffe0a0;
   text-shadow: 0 1px 0 #4a1a00, 0 0 0.6rem rgba(255, 150, 40, 0.8);
 }
+
+/* tension: the sealed pack breathes, a double heartbeat now and then — waiting to be opened */
+[data-booster-look="graveyard"] .booster-stage__tear {
+  animation: booster-hover 4s ease-in-out infinite, halloween-heartbeat 3.4s ease-in-out infinite;
+}
+/* on « scale », added to the float of Portalab's own (never replacing it) */
+@keyframes halloween-heartbeat {
+  0%, 60%, 100% { scale: 1; }
+  66% { scale: 1.022; }
+  71% { scale: 0.996; }
+  77% { scale: 1.035; }
+  86% { scale: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="graveyard"] .booster-stage__tear {
+    animation: none;
+  }
+}

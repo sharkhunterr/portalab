@@ -1,0 +1,22 @@
+/* A common card: a yellowed photograph (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform. */
+[data-card-face="horreur-photo"] .booster-card__face {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.3rem;
+  background: linear-gradient(160deg, #e9dcc0, #bfa97f 60%, #8a7652);
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.55rem rgba(120, 80, 30, 0.5));
+}
+[data-card-face="horreur-photo"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  border-radius: 0.3rem;
+  background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 23px), radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(60, 35, 10, 0.65)), linear-gradient(175deg, #4a3c28, #241b10);
+}
+[data-card-face="horreur-photo"] .booster-card__rarity,
+[data-card-face="horreur-photo"] .booster-card__name {
+  color: #efe2c4;
+  text-shadow: 0 0 0.6rem rgba(120, 80, 30, 0.5);
+}

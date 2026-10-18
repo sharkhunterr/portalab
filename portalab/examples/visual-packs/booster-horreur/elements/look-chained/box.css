@@ -1,0 +1,48 @@
+/* The sealed pack (its hook: data-booster-look): a rusted iron box, chains crossed over it, a padlock. */
+[data-booster-look="horreur"] .booster-pack {
+  border-radius: 0.3rem;
+  background:
+    repeating-linear-gradient(35deg, transparent 0 38%, #3a3632 38% 39%, #8a837a 39% 40.5%, #2a2622 40.5% 41.5%, transparent 41.5% 58%, #3a3632 58% 59%, #8a837a 59% 60.5%, #2a2622 60.5% 61.5%, transparent 61.5% 100%),
+    repeating-linear-gradient(-35deg, transparent 0 44%, #3a3632 44% 45%, #8a837a 45% 46.5%, #2a2622 46.5% 47.5%, transparent 47.5% 100%),
+    radial-gradient(ellipse 40% 30% at 30% 70%, rgba(120, 50, 20, 0.55), transparent 70%),
+    radial-gradient(ellipse 30% 40% at 75% 25%, rgba(110, 45, 15, 0.5), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.25) 0 1px, transparent 1px 9px),
+    linear-gradient(160deg, #3b2f28, #231b16 55%, #120d0a);
+  box-shadow: inset 0 0 0 3px #110c09, inset 0 0 1.6rem rgba(0, 0, 0, 0.85), 0 0 1.8rem rgba(140, 0, 0, 0.35);
+}
+[data-booster-look="horreur"] .booster-pack__stars,
+[data-booster-look="horreur"] .booster-pack__flap {
+  opacity: 0;
+}
+/* the padlock, its keyhole dark (the eye is drawn in it) */
+[data-booster-look="horreur"] .booster-pack__emblem {
+  inline-size: 30%;
+  aspect-ratio: 0.85;
+  border-radius: 0.3rem 0.3rem 0.5rem 0.5rem;
+  background:
+    radial-gradient(circle at 50% 55%, #050202 0 14%, transparent 15%),
+    linear-gradient(160deg, #6d6257, #3a332c);
+  box-shadow: inset 0 0 0 2px #1a1612, 0 -1.1rem 0 -0.55rem #4a423a;
+  color: transparent;
+}
+[data-booster-look="horreur"] .booster-pack__name {
+  color: #c9b8a6;
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 0.4rem rgba(160, 0, 0, 0.9);
+}
+/* it is not still: a jolt now and then, as if something inside moved */
+[data-booster-look="horreur"] .booster-stage__tear {
+  animation: booster-hover 4s ease-in-out infinite, horreur-jolt 5.3s steps(1, end) infinite;
+}
+@keyframes horreur-jolt {
+  0%, 71%, 74%, 77%, 100% { translate: 0 0; rotate: 0deg; }
+  72% { translate: -3px 1px; rotate: -1.5deg; }
+  73% { translate: 4px -1px; rotate: 1deg; }
+  75% { translate: -2px 0; rotate: -0.5deg; }
+  76% { translate: 1px 1px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="horreur"] .booster-stage__tear {
+    animation: none;
+  }
+}

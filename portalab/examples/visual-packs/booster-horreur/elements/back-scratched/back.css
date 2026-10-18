@@ -1,0 +1,49 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
+[data-card-back="horreur"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(58deg, transparent 47%, rgba(200, 190, 180, 0.45) 48% 48.6%, transparent 49.5%) 10% 18% / 50% 30% no-repeat,
+    linear-gradient(58deg, transparent 47%, rgba(200, 190, 180, 0.4) 48% 48.6%, transparent 49.5%) 16% 22% / 50% 30% no-repeat,
+    linear-gradient(58deg, transparent 47%, rgba(200, 190, 180, 0.35) 48% 48.6%, transparent 49.5%) 22% 26% / 50% 30% no-repeat,
+    linear-gradient(-52deg, transparent 47%, rgba(140, 0, 0, 0.6) 48% 48.8%, transparent 49.6%) 85% 82% / 45% 26% no-repeat,
+    linear-gradient(-52deg, transparent 47%, rgba(140, 0, 0, 0.5) 48% 48.8%, transparent 49.6%) 80% 86% / 45% 26% no-repeat,
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(80, 0, 0, 0.35), transparent 70%),
+    radial-gradient(circle at 30% 70%, rgba(60, 50, 40, 0.3), transparent 40%),
+    linear-gradient(160deg, #141010, #070505 60%, #000);
+  box-shadow: inset 0 0 0 2px rgba(110, 0, 0, 0.7), inset 0 0 1.8rem rgba(0, 0, 0, 0.95);
+}
+[data-card-back="horreur"] .booster-card__back::after {
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 30, 30, 0.22) 50%, transparent 60%);
+  mix-blend-mode: screen;
+}
+[data-card-back="horreur"] .booster-card__back-pattern {
+  opacity: 0;
+}
+/* the eye: red, lighting up at times */
+[data-card-back="horreur"] .booster-card__back-sigil {
+  inline-size: 46%;
+  aspect-ratio: 2.1;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  background:
+    radial-gradient(ellipse 9% 40% at 50% 50%, #000 0 70%, transparent 75%),
+    radial-gradient(circle at 50% 50%, #ff2a1a 0 22%, #7a0000 30%, transparent 32%),
+    radial-gradient(ellipse at 50% 50%, #d8cfc4 0 55%, #5a4f45 70%, transparent 72%);
+  animation: horreur-wake 6s ease-in-out infinite;
+}
+[data-card-back="horreur"] .booster-card__back-sigil svg {
+  opacity: 0;
+}
+@keyframes horreur-wake {
+  0%, 70%, 100% { filter: brightness(0.35); }
+  78% { filter: brightness(1.2) drop-shadow(0 0 0.7rem rgba(255, 30, 20, 0.9)); }
+  86% { filter: brightness(0.8); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-back="horreur"] .booster-card__back-sigil {
+    animation: none;
+  }
+}

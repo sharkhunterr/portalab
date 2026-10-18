@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "horreur",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Horreur — scène de booster",
+    "en": "Horror — a booster scene"
+  },
+  "descriptions": {
+    "fr": "Une ouverture pour avoir peur : une ampoule mourante dans le noir, quelque chose qui se tient au fond, un coffret enchaîné avec un œil à la serrure, une ouverture où la lumière meurt et le cœur s'emballe, des cartes qui se dérèglent — de la photo jaunie à l'Œil.",
+    "en": "An opening to be scared by: a dying bulb in the dark, something standing at the far end, a chained box with an eye at its keyhole, an opening where the light dies and the heart races, cards glitching — from the yellowed photograph to the Eye."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

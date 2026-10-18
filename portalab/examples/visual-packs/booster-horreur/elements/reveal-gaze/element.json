@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "horreur-gaze",
+  "names": {
+    "fr": "Il te regarde",
+    "en": "It is watching you"
+  },
+  "descriptions": {
+    "fr": "Un œil immense s'ouvre derrière la carte, sa pupille qui se resserre ; un stroboscope rouge, des fissures qui courent, puis l'œil se referme dans le noir (HD).",
+    "en": "A huge eye opens behind the card, its pupil narrowing; a red strobe, cracks running out, then the eye closes in the dark (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary"
+  }
+}

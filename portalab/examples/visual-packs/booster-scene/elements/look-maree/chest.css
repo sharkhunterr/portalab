@@ -121,3 +121,21 @@
   box-shadow: inset 0 0 0 1px rgba(160, 255, 210, 0.35);
   color: #a8f0c8;
 }
+
+/* tension: the sealed pack breathes, a double heartbeat now and then — waiting to be opened */
+[data-booster-look="maree"] .booster-stage__tear {
+  animation: booster-hover 4s ease-in-out infinite, maree-heartbeat 3.4s ease-in-out infinite;
+}
+/* on « scale », added to the float of Portalab's own (never replacing it) */
+@keyframes maree-heartbeat {
+  0%, 60%, 100% { scale: 1; }
+  66% { scale: 1.022; }
+  71% { scale: 0.996; }
+  77% { scale: 1.035; }
+  86% { scale: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="maree"] .booster-stage__tear {
+    animation: none;
+  }
+}

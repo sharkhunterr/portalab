@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "horreur-negative",
+  "names": {
+    "fr": "Face de négatif",
+    "en": "Negative face"
+  },
+  "descriptions": {
+    "fr": "Une carte rare comme un négatif photo, cyan glacé, holographique, ses mots qui se dérèglent.",
+    "en": "A rare card like a photo negative, icy cyan, holographic, its words glitching."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

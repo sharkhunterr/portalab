@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "horreur-escape",
+  "names": {
+    "fr": "Quelque chose s'échappe",
+    "en": "Something gets out"
+  },
+  "descriptions": {
+    "fr": "Les chaînes s'agitent de plus en plus fort, la lumière meurt, le cœur s'emballe, des griffures apparaissent dans le noir — puis tout cède dans un stroboscope rouge et blanc, l'œil grand ouvert, et les cartes s'échappent (HD).",
+    "en": "The chains rattle harder and harder, the light dies, the heart races, scratches appear in the dark — then everything gives way in a red and white strobe, the eye wide open, and the cards get out (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "escape.glsl",
+    "css": [
+      "rattle.css"
+    ],
+    "stage": true,
+    "duration": 3.6
+  }
+}

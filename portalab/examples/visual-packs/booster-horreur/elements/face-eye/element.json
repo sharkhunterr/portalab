@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "horreur-eye",
+  "names": {
+    "fr": "Face de l'Œil",
+    "en": "The Eye face"
+  },
+  "descriptions": {
+    "fr": "Une carte légendaire noire, un œil rouge immense dans son panneau, l'holographie pourpre, les paillettes, l'image qui s'incline — et ses mots qui se dérèglent.",
+    "en": "A legendary black card, a huge red eye in its panel, crimson holography, glitter, the art leaning — and its words glitching."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

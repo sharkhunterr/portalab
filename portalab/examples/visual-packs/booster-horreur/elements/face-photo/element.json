@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "horreur-photo",
+  "names": {
+    "fr": "Face de photo jaunie",
+    "en": "Yellowed photograph face"
+  },
+  "descriptions": {
+    "fr": "Une carte commune comme une vieille photo jaunie, rayée, tachée aux coins.",
+    "en": "A common card like an old yellowed photograph, scratched, stained at the corners."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}
