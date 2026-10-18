@@ -82,6 +82,12 @@ def command(args: argparse.Namespace) -> int:
         return validate(Path(args.path))
     if args.plugin_command == "pack":
         return pack(Path(args.path), Path(args.output))
+    if args.plugin_command == "new":  # offline: a confined plugin to start from (030)
+        from portalab.app.plugin_template import new_plugin
+
+        folder = new_plugin(args.key, Path(args.path), name=args.name, section=args.section)
+        print(f"created {folder} — next: portalab plugin validate {folder}")
+        return validate(folder)
     configure_logging(load_settings().log_level)
     system = Principal(channel="system")
     match args.plugin_command:
@@ -130,6 +136,11 @@ def add_parser(sub: Any) -> None:
     )
     validate_cmd = plugin.add_parser("validate", help="validate a plugin package (manifest + import scan)")
     validate_cmd.add_argument("path")
+    new_cmd = plugin.add_parser("new", help="create a confined plugin to start from (spec 030)")
+    new_cmd.add_argument("key")
+    new_cmd.add_argument("--path", default=".")
+    new_cmd.add_argument("--name", default=None)
+    new_cmd.add_argument("--section", default="content", help="the section whose tab it becomes")
     pack_cmd = plugin.add_parser("pack", help="validate and zip a plugin directory")
     pack_cmd.add_argument("path")
     pack_cmd.add_argument("output")
