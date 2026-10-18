@@ -2,18 +2,18 @@
   "type": "card_reveal",
   "look": "celeste-nebula",
   "names": {
-    "fr": "Nébuleuse qui s'ouvre",
-    "en": "Nebula unfolding"
+    "fr": "Galaxie spirale",
+    "en": "Spiral galaxy"
   },
   "descriptions": {
-    "fr": "Une nébuleuse rose et bleue tourbillonne et s'ouvre derrière la carte, des étoiles naissent (HD).",
-    "en": "A pink and blue nebula swirls and unfolds behind the card, stars being born (HD)."
+    "fr": "Une galaxie spirale tourne derrière la carte, ses bras de poussière et d'étoiles bleues ; des étoiles s'allument avec leurs aigrettes, un anneau de lumière s'élargit (HD).",
+    "en": "A spiral galaxy wheels behind the card, its arms of dust and blue stars; stars kindle with their cross flares, a ring of light rolls out (HD)."
   },
   "render": {
     "kind": "glsl",
     "file": "reveal.glsl",
     "stage": true,
-    "duration": 2.2,
+    "duration": 2.4,
     "rarity": "epic"
   }
 }

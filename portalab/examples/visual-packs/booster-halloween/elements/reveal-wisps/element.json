@@ -2,18 +2,18 @@
   "type": "card_reveal",
   "look": "halloween-wisps",
   "names": {
-    "fr": "Feux follets",
-    "en": "Will-o'-the-wisps"
+    "fr": "Flammes spectrales",
+    "en": "Spectral flames"
   },
   "descriptions": {
-    "fr": "Des feux follets verts tournent autour de la carte en laissant une traînée de brume (HD).",
-    "en": "Green will-o'-the-wisps circle the card, leaving a trail of mist (HD)."
+    "fr": "Des flammes vertes spectrales montent autour de la carte, des feux follets les traversent en tournant, des étincelles jaillissent (HD).",
+    "en": "Spectral green flames rise round the card, will-o'-the-wisps circling through them, sparks spat up (HD)."
   },
   "render": {
     "kind": "glsl",
     "file": "reveal.glsl",
     "stage": true,
-    "duration": 1.9,
+    "duration": 2.0,
     "rarity": "rare"
   }
 }

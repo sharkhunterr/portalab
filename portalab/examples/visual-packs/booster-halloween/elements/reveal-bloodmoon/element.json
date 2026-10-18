@@ -6,14 +6,14 @@
     "en": "Blood eclipse"
   },
   "descriptions": {
-    "fr": "La lune se teinte de sang derrière la carte : une éclipse et sa couronne de feu, une brume rouge qui tourbillonne, des braises qui montent (HD).",
-    "en": "The moon turns to blood behind the card: an eclipse and its corona of fire, a red mist swirling, embers rising (HD)."
+    "fr": "La lune se teinte de sang derrière la carte, sa couronne de feu ; des éclairs rouges, une onde de choc, une tempête de braises — et le visage d'un démon qui sort du noir au-dessus d'elle (HD).",
+    "en": "The moon turns to blood behind the card, its corona of fire; red lightning, a shockwave, an ember storm — and a demon's face looming out of the dark above it (HD)."
   },
   "render": {
     "kind": "glsl",
     "file": "reveal.glsl",
     "stage": true,
-    "duration": 2.8,
+    "duration": 3.0,
     "rarity": "legendary"
   }
 }

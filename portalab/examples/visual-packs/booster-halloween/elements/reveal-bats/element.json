@@ -2,18 +2,18 @@
   "type": "card_reveal",
   "look": "halloween-bats",
   "names": {
-    "fr": "Nuée de chauves-souris",
-    "en": "Swarm of bats"
+    "fr": "Sabbat",
+    "en": "Sabbath"
   },
   "descriptions": {
-    "fr": "Une nuée de chauves-souris jaillit de derrière la carte dans une lueur violette (HD).",
-    "en": "A swarm of bats bursts out from behind the card in a violet glow (HD)."
+    "fr": "Un cercle de runes s'allume et tourne autour de la carte, des éclairs violets crépitent entre ses pointes, des chauves-souris jaillissent en spirale (HD).",
+    "en": "A circle of runes kindles and turns round the card, violet lightning crackles between its points, bats spiral out (HD)."
   },
   "render": {
     "kind": "glsl",
     "file": "reveal.glsl",
     "stage": true,
-    "duration": 2.2,
+    "duration": 2.4,
     "rarity": "epic"
   }
 }

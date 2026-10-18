@@ -2,7 +2,7 @@
 [data-card-face="celeste-sun"] .booster-card__face {
   isolation: isolate;
   border: 0;
-  clip-path: polygon(0.0% 0.0%, 11.1% 1.8%, 22.2% 0.0%, 33.3% 1.8%, 44.4% 0.0%, 55.6% 1.8%, 66.7% 0.0%, 77.8% 1.8%, 88.9% 0.0%, 98.2% 0.0%, 100.0% 11.1%, 98.2% 22.2%, 100.0% 33.3%, 98.2% 44.4%, 100.0% 55.6%, 98.2% 66.7%, 100.0% 77.8%, 98.2% 88.9%, 100.0% 100.0%, 88.9% 98.2%, 77.8% 100.0%, 66.7% 98.2%, 55.6% 100.0%, 44.4% 98.2%, 33.3% 100.0%, 22.2% 98.2%, 11.1% 100.0%, 1.8% 100.0%, 0.0% 88.9%, 1.8% 77.8%, 0.0% 66.7%, 1.8% 55.6%, 0.0% 44.4%, 1.8% 33.3%, 0.0% 22.2%, 1.8% 11.1%);
+  clip-path: polygon(0.0% 0.0%, 8.3% 3.2%, 16.7% 0.0%, 25.0% 3.2%, 33.3% 0.0%, 41.7% 3.2%, 50.0% 0.0%, 58.3% 3.2%, 66.7% 0.0%, 75.0% 3.2%, 83.3% 0.0%, 91.7% 3.2%, 100.0% 0.0%, 96.8% 8.3%, 100.0% 16.7%, 96.8% 25.0%, 100.0% 33.3%, 96.8% 41.7%, 100.0% 50.0%, 96.8% 58.3%, 100.0% 66.7%, 96.8% 75.0%, 100.0% 83.3%, 96.8% 91.7%, 100.0% 100.0%, 91.7% 96.8%, 83.3% 100.0%, 75.0% 96.8%, 66.7% 100.0%, 58.3% 96.8%, 50.0% 100.0%, 41.7% 96.8%, 33.3% 100.0%, 25.0% 96.8%, 16.7% 100.0%, 8.3% 96.8%, 0.0% 100.0%, 3.2% 91.7%, 0.0% 83.3%, 3.2% 75.0%, 0.0% 66.7%, 3.2% 58.3%, 0.0% 50.0%, 3.2% 41.7%, 0.0% 33.3%, 3.2% 25.0%, 0.0% 16.7%, 3.2% 8.3%);
   background: conic-gradient(from 0deg, #fff3c4, #f2c94c, #ff9a3c, #f2c94c, #fff3c4, #e8b64a, #fff3c4);
   box-shadow: none;
   filter: drop-shadow(0 0 0.55rem rgba(255, 190, 80, 0.85));
@@ -12,7 +12,7 @@
   position: absolute;
   inset: 5px;
   z-index: -1;
-  clip-path: polygon(0.0% 0.0%, 11.1% 1.8%, 22.2% 0.0%, 33.3% 1.8%, 44.4% 0.0%, 55.6% 1.8%, 66.7% 0.0%, 77.8% 1.8%, 88.9% 0.0%, 98.2% 0.0%, 100.0% 11.1%, 98.2% 22.2%, 100.0% 33.3%, 98.2% 44.4%, 100.0% 55.6%, 98.2% 66.7%, 100.0% 77.8%, 98.2% 88.9%, 100.0% 100.0%, 88.9% 98.2%, 77.8% 100.0%, 66.7% 98.2%, 55.6% 100.0%, 44.4% 98.2%, 33.3% 100.0%, 22.2% 98.2%, 11.1% 100.0%, 1.8% 100.0%, 0.0% 88.9%, 1.8% 77.8%, 0.0% 66.7%, 1.8% 55.6%, 0.0% 44.4%, 1.8% 33.3%, 0.0% 22.2%, 1.8% 11.1%);
+  clip-path: polygon(0.0% 0.0%, 8.3% 3.2%, 16.7% 0.0%, 25.0% 3.2%, 33.3% 0.0%, 41.7% 3.2%, 50.0% 0.0%, 58.3% 3.2%, 66.7% 0.0%, 75.0% 3.2%, 83.3% 0.0%, 91.7% 3.2%, 100.0% 0.0%, 96.8% 8.3%, 100.0% 16.7%, 96.8% 25.0%, 100.0% 33.3%, 96.8% 41.7%, 100.0% 50.0%, 96.8% 58.3%, 100.0% 66.7%, 96.8% 75.0%, 100.0% 83.3%, 96.8% 91.7%, 100.0% 100.0%, 91.7% 96.8%, 83.3% 100.0%, 75.0% 96.8%, 66.7% 100.0%, 58.3% 96.8%, 50.0% 100.0%, 41.7% 96.8%, 33.3% 100.0%, 25.0% 96.8%, 16.7% 100.0%, 8.3% 96.8%, 0.0% 100.0%, 3.2% 91.7%, 0.0% 83.3%, 3.2% 75.0%, 0.0% 66.7%, 3.2% 58.3%, 0.0% 50.0%, 3.2% 41.7%, 0.0% 33.3%, 3.2% 25.0%, 0.0% 16.7%, 3.2% 8.3%);
   background: repeating-conic-gradient(from 0deg at 50% 32%, rgba(255, 220, 120, 0.12) 0 6deg, transparent 6deg 12deg), radial-gradient(circle at 50% 32%, rgba(255, 210, 110, 0.45), transparent 60%), linear-gradient(175deg, #2a1a05, #120a02);
 }
 [data-card-face="celeste-sun"] .booster-card__rarity,
@@ -74,6 +74,31 @@
   [data-card-face="celeste-sun"] .booster-card__face::after,
   [data-card-face="celeste-sun"] .booster-card__art::after,
   [data-card-face="celeste-sun"] .booster-card__art {
+    animation: none;
+  }
+}
+/* it keeps living: its glow pulsing, its frame shimmering, a light sweeping over it now and then */
+[data-card-face="celeste-sun"] .booster-card__face {
+  background-size: 220% 220%;
+  animation: celeste-pulse-sun 2.2s ease-in-out infinite;
+}
+@keyframes celeste-pulse-sun {
+  0%, 100% { filter: drop-shadow(0 0 0.45rem rgba(255, 190, 80, 0.85)); background-position: 0% 50%; }
+  50% { filter: drop-shadow(0 0 1.3rem rgba(255, 190, 80, 0.85)) drop-shadow(0 0 2.6rem rgba(255, 190, 80, 0.85)); background-position: 100% 50%; }
+}
+[data-card-face="celeste-sun"] .booster-card__shine {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.65) 50%, transparent 58%);
+  mix-blend-mode: screen;
+  animation: celeste-sweep 2.8s ease-in-out infinite;
+}
+@keyframes celeste-sweep {
+  0%, 55% { transform: translateX(-70%); }
+  85%, 100% { transform: translateX(70%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="celeste-sun"] .booster-card__face,
+  [data-card-face="celeste-sun"] .booster-card__shine {
     animation: none;
   }
 }

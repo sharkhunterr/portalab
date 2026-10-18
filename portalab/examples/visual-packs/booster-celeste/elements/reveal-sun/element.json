@@ -6,14 +6,14 @@
     "en": "A star is born"
   },
   "descriptions": {
-    "fr": "Une étoile s'allume derrière la carte : une couronne de flammes solaires, des rayons qui tournent, un anneau planétaire qui balaie la scène et une pluie de poussière d'or (HD).",
-    "en": "A star kindles behind the card: a corona of solar flares, turning rays, a planetary ring sweeping the stage and a shower of golden dust (HD)."
+    "fr": "Un événement cosmique : un disque d'accrétion brûlant tourne autour de la carte, la lumière se courbe en anneau, un long reflet horizontal, trois planètes sur leurs orbites, des constellations qui se tracent et une poussière d'or (HD).",
+    "en": "A cosmic event: a burning accretion disc wheels round the card, light bends into a ring, a long horizontal flare, three planets on their orbits, constellations drawing themselves and golden dust (HD)."
   },
   "render": {
     "kind": "glsl",
     "file": "reveal.glsl",
     "stage": true,
-    "duration": 2.8,
+    "duration": 3.0,
     "rarity": "legendary"
   }
 }

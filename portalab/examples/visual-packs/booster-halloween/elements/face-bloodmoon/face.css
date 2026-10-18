@@ -77,3 +77,28 @@
     animation: none;
   }
 }
+/* it keeps living: its glow pulsing, its frame shimmering, a light sweeping over it now and then */
+[data-card-face="halloween-bloodmoon"] .booster-card__face {
+  background-size: 220% 220%;
+  animation: halloween-pulse-bloodmoon 2.2s ease-in-out infinite;
+}
+@keyframes halloween-pulse-bloodmoon {
+  0%, 100% { filter: drop-shadow(0 0 0.45rem rgba(255, 60, 40, 0.85)); background-position: 0% 50%; }
+  50% { filter: drop-shadow(0 0 1.3rem rgba(255, 60, 40, 0.85)) drop-shadow(0 0 2.6rem rgba(255, 60, 40, 0.85)); background-position: 100% 50%; }
+}
+[data-card-face="halloween-bloodmoon"] .booster-card__shine {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.65) 50%, transparent 58%);
+  mix-blend-mode: screen;
+  animation: halloween-sweep 2.8s ease-in-out infinite;
+}
+@keyframes halloween-sweep {
+  0%, 55% { transform: translateX(-70%); }
+  85%, 100% { transform: translateX(70%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="halloween-bloodmoon"] .booster-card__face,
+  [data-card-face="halloween-bloodmoon"] .booster-card__shine {
+    animation: none;
+  }
+}

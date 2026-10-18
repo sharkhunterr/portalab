@@ -2,7 +2,7 @@
 [data-card-face="celeste-comet"] .booster-card__face {
   isolation: isolate;
   border: 0;
-  clip-path: polygon(5.0% 0.0%, 95.0% 0.0%, 100.0% 3.5%, 100.0% 96.5%, 95.0% 100.0%, 5.0% 100.0%, 0.0% 96.5%, 0.0% 3.5%);
+  clip-path: polygon(20% 0, 100% 0, 100% 80%, 80% 100%, 0 100%, 0 20%);
   background: linear-gradient(160deg, #e7fbff, #6fd3ff 30%, #2a6fd6 60%, #b7ecff);
   box-shadow: none;
   filter: drop-shadow(0 0 0.55rem rgba(90, 200, 255, 0.7));
@@ -12,7 +12,7 @@
   position: absolute;
   inset: 5px;
   z-index: -1;
-  clip-path: polygon(5.0% 0.0%, 95.0% 0.0%, 100.0% 3.5%, 100.0% 96.5%, 95.0% 100.0%, 5.0% 100.0%, 0.0% 96.5%, 0.0% 3.5%);
+  clip-path: polygon(20% 0, 100% 0, 100% 80%, 80% 100%, 0 100%, 0 20%);
   background: radial-gradient(ellipse 80% 55% at 50% 26%, rgba(110, 210, 255, 0.3), transparent 70%), linear-gradient(175deg, #0b2442, #06101f);
 }
 [data-card-face="celeste-comet"] .booster-card__rarity,

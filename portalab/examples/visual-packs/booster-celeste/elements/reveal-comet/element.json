@@ -2,18 +2,18 @@
   "type": "card_reveal",
   "look": "celeste-comet",
   "names": {
-    "fr": "Queue de comète",
-    "en": "Comet tail"
+    "fr": "Deux comètes",
+    "en": "Two comets"
   },
   "descriptions": {
-    "fr": "Une comète fait le tour de la carte et laisse une traîne de glace étincelante (HD).",
-    "en": "A comet circles the card, leaving a sparkling icy trail (HD)."
+    "fr": "Deux comètes balaient la carte sur des orbites croisées, leur queue bleue et leur queue d'or, une pluie de météores derrière, les coins de la carte qui scintillent (HD).",
+    "en": "Two comets sweep round the card on crossed orbits, their blue and golden tails, a meteor shower behind, the card's corners sparkling (HD)."
   },
   "render": {
     "kind": "glsl",
     "file": "reveal.glsl",
     "stage": true,
-    "duration": 1.8,
+    "duration": 2.0,
     "rarity": "rare"
   }
 }
