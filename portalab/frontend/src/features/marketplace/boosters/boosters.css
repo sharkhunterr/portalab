@@ -1982,12 +1982,14 @@
   place-items: center;
   overflow: hidden;
   contain: paint;
-  inline-size: 11rem;
-  max-inline-size: 100%;
-  aspect-ratio: 1 / 1;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 7rem;
+  max-block-size: 11rem;
+  padding-block-start: 1.6rem; /* below the tile's label */
 }
 .booster-scene-pack > .booster-pack {
-  zoom: 0.5;
+  zoom: 0.4;
 }
 .booster-scene-pack[data-size="mini"] {
   inline-size: 2.8rem;
