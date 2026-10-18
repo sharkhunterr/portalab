@@ -226,6 +226,7 @@ export function CelebrationScene({
       data-effect={effect}
       data-reduced={reduced ? "true" : undefined}
       data-contained={contained || undefined}
+      data-full={(!reduced && Boolean(gpu || imported?.kind === "js")) || undefined}
       aria-hidden="true"
     >
       {reduced || !count ? null : spec.layer === "screen" ? (

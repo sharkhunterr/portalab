@@ -502,8 +502,9 @@
 .celebration-gpu {
   position: fixed;
   inset: 0;
-  inline-size: 100vw;
-  block-size: 100vh;
+  /* the same box as its celebration's (the viewport less its scrollbar), so both share one centre */
+  inline-size: 100%;
+  block-size: 100%;
   pointer-events: none;
   animation: fx-celebration-out 3.2s linear both;
 }
