@@ -1,0 +1,118 @@
+# Forum (spec 030): a complete feature in a confined plugin — its own storage, its operations (publishing is
+# confirmed by Portalab with the exact content), its permissions, a navigation entry and pages drawn by
+# Portalab, notifications, search results, an event and the members' export and erasure.
+# Check it with `portalab plugin validate examples/plugins/forum`.
+schema_version = 2
+key = "forum"
+name = "Forum"
+description = "Topics and replies, for the whole community."
+version = "1.0.0"
+requires_portal = ">=0.1"
+maturity = "beta"
+entry_point = "forum_plugin:register"
+migrations = "migrations"
+permissions = [
+  { name = "read", description = "Read the forum" },
+  { name = "post", description = "Start topics and reply" },
+  { name = "moderate", description = "Remove posts" },
+]
+
+[capabilities]
+storage = { quota_mb = 100 }
+operations = true
+pages = true
+notifications = true
+search = true
+events = { produces = ["topic_posted"] }
+privacy = true
+portal_data = { operations = ["GET /api/v1/community/members/{member_id}"] }
+
+[personal_data]
+enabled = true
+classes = ["posts"]
+
+[[routes]]
+path = "topics"
+method = "GET"
+permission = "plugin:forum.read"
+exposure = "read"
+
+[[routes]]
+path = "topics"
+method = "POST"
+permission = "plugin:forum.post"
+exposure = "committing"
+
+[[routes]]
+path = "thread"
+method = "GET"
+permission = "plugin:forum.read"
+exposure = "read"
+
+[[routes]]
+path = "replies"
+method = "POST"
+permission = "plugin:forum.post"
+exposure = "committing"
+
+[[routes]]
+path = "remove"
+method = "POST"
+permission = "plugin:forum.moderate"
+exposure = "action"
+
+[events]
+produces = ["topic_posted"]
+
+[ui]
+sections = [{ label_key = "plugin.forum:nav.section", icon = "message-square" }]
+nav = [{ key = "home", label_key = "plugin.forum:nav.home", route = "/plugins/forum/topics", permission = "plugin:forum.read", section = "plugin-forum" }]
+notification_categories = [{ name = "replies", label_key = "plugin.forum:category.replies" }]
+
+[[ui.pages]]
+key = "topics"
+title_key = "plugin.forum:page.topics"
+permission = "plugin:forum.read"
+blocks = [
+  { kind = "list", title_key = "plugin.forum:block.topics", data = "topics" },
+  { kind = "form", title_key = "plugin.forum:block.new", action = "topics", submit_key = "plugin.forum:action.publish", schema = { type = "object", properties = { title = { type = "string", maxLength = 120, title = "plugin.forum:field.title" }, body = { type = "string", maxLength = 4000, title = "plugin.forum:field.body", format = "textarea" } }, required = ["title", "body"] } },
+]
+
+[[ui.pages]]
+key = "topic"
+title_key = "plugin.forum:page.topic"
+permission = "plugin:forum.read"
+blocks = [
+  { kind = "thread", title_key = "plugin.forum:block.thread", data = "thread" },
+  { kind = "form", title_key = "plugin.forum:block.reply", action = "replies", submit_key = "plugin.forum:action.reply", schema = { type = "object", properties = { body = { type = "string", maxLength = 4000, title = "plugin.forum:field.body", format = "textarea" } }, required = ["body"] } },
+]
+
+[i18n.en."plugin.forum"]
+"nav.section" = "Forum"
+"nav.home" = "Forum"
+"category.replies" = "Replies in the forum"
+"page.topics" = "Forum"
+"page.topic" = "Topic"
+"block.topics" = "Topics"
+"block.new" = "Start a topic"
+"block.thread" = "Messages"
+"block.reply" = "Reply"
+"field.title" = "Title"
+"field.body" = "Message"
+"action.publish" = "Publish"
+"action.reply" = "Reply"
+
+[i18n.fr."plugin.forum"]
+"nav.section" = "Forum"
+"nav.home" = "Forum"
+"category.replies" = "Réponses dans le forum"
+"page.topics" = "Forum"
+"page.topic" = "Sujet"
+"block.topics" = "Sujets"
+"block.new" = "Lancer un sujet"
+"block.thread" = "Messages"
+"block.reply" = "Répondre"
+"field.title" = "Titre"
+"field.body" = "Message"
+"action.publish" = "Publier"
+"action.reply" = "Répondre"

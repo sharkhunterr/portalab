@@ -20,6 +20,8 @@ LIFECYCLE = (
     "plugin.purged",
     "plugin.configuration_changed",
     "plugin.incompatible",
+    "plugin.held_unconfined",  # 030
+    "plugin.held_confinement",
 )
 
 

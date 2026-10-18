@@ -54,6 +54,7 @@ class PluginOut(BaseModel):
     approved: bool
     needs_restart: bool
     quarantine_reason: str | None
+    runtime: str = "declarative"  # 030: declarative, in_process (Portalab's process) or confined
     installed_at: datetime
     updated_at: datetime
 
@@ -88,6 +89,7 @@ def plugin_out(plugin: Plugin) -> PluginOut:
         approved=plugin.approved,
         needs_restart=plugin.needs_restart,
         quarantine_reason=plugin.quarantine_reason,
+        runtime=plugin.runtime,
         installed_at=plugin.installed_at,
         updated_at=plugin.updated_at,
     )

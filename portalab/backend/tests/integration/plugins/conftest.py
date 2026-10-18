@@ -8,7 +8,7 @@ import shutil
 import sys
 import textwrap
 from collections.abc import AsyncIterator, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid4
@@ -35,6 +35,7 @@ from portalab.core.authz_port import Principal
 from portalab.core.config_declaration import SettingCatalog
 from portalab.core.db import Database
 from portalab.core.errors import NotFound
+from portalab.core.secrets import SecretBox
 from portalab.core.time import FixedClock
 from portalab.modules.i18n.catalog.plugins import PluginCatalogs
 from portalab.modules.plugins.context.registries import Registries
@@ -207,11 +208,15 @@ async def harness(database: Database, tmp_path: Path, clock: FixedClock) -> Asyn
         root=root,
         role_prefix=f"plugin_{uuid4().hex[:8]}_",
         registries=registries,
+        secret_box=SecretBox(b"t" * 32),
     )
     module.register()
+    # spec 023's suites exercise in-process code plugins: an install that allows them (030, FR-020a)
+    module.config = replace(module.config, unconfined="allow")
     await ev.full.authz.catalog.sync()
     harness = PlHarness(ev, module, clock, root, themes, catalogs)
     yield harness
+    await module.runtime.stop_all()  # 030: confined plugins' processes
     for plugin in await module.lifecycle.all():  # roles are cluster-wide: drop them
         with contextlib.suppress(Exception):
             await module.storage.drop(plugin.key)

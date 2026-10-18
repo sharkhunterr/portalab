@@ -12483,6 +12483,11 @@
             ],
             "title": "Quarantine Reason"
           },
+          "runtime": {
+            "default": "declarative",
+            "title": "Runtime",
+            "type": "string"
+          },
           "scope": {
             "title": "Scope",
             "type": "string"
@@ -14774,6 +14779,32 @@
           "now"
         ],
         "title": "SeasonOut",
+        "type": "object"
+      },
+      "SecretIn": {
+        "properties": {
+          "confirmation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmation"
+          },
+          "value": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "title": "SecretIn",
         "type": "object"
       },
       "SeenIn": {
@@ -19064,6 +19095,23 @@
           "boosters"
         ],
         "title": "DayOut",
+        "type": "object"
+      },
+      "portalab__modules__plugins__api__confined__ConfirmIn": {
+        "properties": {
+          "confirmation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmation"
+          }
+        },
+        "title": "ConfirmIn",
         "type": "object"
       },
       "portalab__modules__privacy__api__routes__PolicyIn": {
@@ -27554,6 +27602,30 @@
         ]
       }
     },
+    "/api/v1/admin/plugins/runtime": {
+      "get": {
+        "description": "Can this system confine plugins (Landlock, seccomp), and what the Admin allows otherwise.",
+        "operationId": "runtime_api_v1_admin_plugins_runtime_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Runtime Api V1 Admin Plugins Runtime Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Runtime",
+        "tags": [
+          "plugins-admin"
+        ]
+      }
+    },
     "/api/v1/admin/plugins/upload": {
       "post": {
         "description": "Raw ``application/zip`` body (no multipart); the package lands in ``plugins/available``.",
@@ -27738,6 +27810,123 @@
         ]
       }
     },
+    "/api/v1/admin/plugins/{key}/attempts": {
+      "get": {
+        "operationId": "attempts_api_v1_admin_plugins__key__attempts_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "before",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Before"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Attempts Api V1 Admin Plugins  Key  Attempts Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Attempts",
+        "tags": [
+          "plugins-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/plugins/{key}/confinement": {
+      "get": {
+        "operationId": "confinement_api_v1_admin_plugins__key__confinement_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Confinement Api V1 Admin Plugins  Key  Confinement Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Confinement",
+        "tags": [
+          "plugins-admin"
+        ]
+      }
+    },
     "/api/v1/admin/plugins/{key}/diagnostics": {
       "get": {
         "operationId": "diagnostics_api_v1_admin_plugins__key__diagnostics_get",
@@ -27878,6 +28067,69 @@
         ]
       }
     },
+    "/api/v1/admin/plugins/{key}/grants/{capability}/revoke": {
+      "post": {
+        "operationId": "revoke_api_v1_admin_plugins__key__grants__capability__revoke_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "capability",
+            "required": true,
+            "schema": {
+              "title": "Capability",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/portalab__modules__plugins__api__confined__ConfirmIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Revoke Api V1 Admin Plugins  Key  Grants  Capability  Revoke Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Revoke",
+        "tags": [
+          "plugins-admin"
+        ]
+      }
+    },
     "/api/v1/admin/plugins/{key}/purge": {
       "post": {
         "operationId": "purge_api_v1_admin_plugins__key__purge_post",
@@ -27971,6 +28223,114 @@
           }
         },
         "summary": "Rollback",
+        "tags": [
+          "plugins-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/plugins/{key}/secrets/{name}": {
+      "put": {
+        "operationId": "set_secret_api_v1_admin_plugins__key__secrets__name__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Secret",
+        "tags": [
+          "plugins-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/plugins/{key}/secrets/{name}/clear": {
+      "post": {
+        "operationId": "clear_secret_api_v1_admin_plugins__key__secrets__name__clear_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/portalab__modules__plugins__api__confined__ConfirmIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Clear Secret",
         "tags": [
           "plugins-admin"
         ]

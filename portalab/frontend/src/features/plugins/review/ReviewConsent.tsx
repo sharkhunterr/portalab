@@ -37,6 +37,19 @@ export function ReviewConsent({
           <dd>{review.schema}</dd>
         </div>
       </dl>
+      {review.runtime ? <p>{t(`plugins:confined.runtime.${review.runtime}`)}</p> : null}
+      {review.requested_capabilities?.length ? (
+        <>
+          <h3>{t("plugins:review.capabilities")}</h3>
+          <ul>
+            {review.requested_capabilities.map((item) => {
+              const key = `plugins:capability.${item.capability}`;
+              const text = t(key);
+              return <li key={item.capability}>{text === key ? item.description : text}</li>;
+            })}
+          </ul>
+        </>
+      ) : null}
       <h3>{t("plugins:review.permissions")}</h3>
       <ul>
         {review.permissions.map((p) => (

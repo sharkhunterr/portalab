@@ -1,6 +1,10 @@
 """Declarative pages (spec 023 R12): a plugin page is a list of design-system blocks — sanitized Markdown,
 stat/list/table/chart bound to the plugin's own data routes (typed states), and forms generated from a JSON
-Schema that post to a plugin action. No plugin JavaScript ever runs in the SPA."""
+Schema that post to a plugin action. No plugin JavaScript ever runs in the SPA.
+
+Spec 030 adds ``thread`` (messages with an author and a time) and ``cards`` (titles or people as Portalab's
+cards) to the data blocks; the page's own address parameters (``?topic=12``) are passed to its data routes
+and its forms."""
 
 from dataclasses import dataclass, field
 from typing import Any, Literal
@@ -14,9 +18,10 @@ class MarkdownBlock:
 
 @dataclass(frozen=True, slots=True)
 class DataBlock:
-    """``stat`` / ``list`` / ``table`` / ``chart`` filled from ``GET /api/v1/plugins/<key>/<data>``."""
+    """``stat`` / ``list`` / ``table`` / ``chart`` / ``thread`` / ``cards`` filled from
+    ``GET /api/v1/plugins/<key>/<data>``."""
 
-    kind: Literal["stat", "list", "table", "chart"]
+    kind: Literal["stat", "list", "table", "chart", "thread", "cards"]
     title_key: str
     data: str  # a plugin route path, e.g. "stats/today"
     columns: tuple[str, ...] = ()

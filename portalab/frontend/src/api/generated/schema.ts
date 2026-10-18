@@ -2863,6 +2863,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/plugins/runtime": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Runtime
+         * @description Can this system confine plugins (Landlock, seccomp), and what the Admin allows otherwise.
+         */
+        get: operations["runtime_api_v1_admin_plugins_runtime_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/plugins/upload": {
         parameters: {
             query?: never;
@@ -2934,6 +2954,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/plugins/{key}/attempts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Attempts */
+        get: operations["attempts_api_v1_admin_plugins__key__attempts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/plugins/{key}/confinement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Confinement */
+        get: operations["confinement_api_v1_admin_plugins__key__confinement_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/plugins/{key}/diagnostics": {
         parameters: {
             query?: never;
@@ -2985,6 +3039,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/plugins/{key}/grants/{capability}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke */
+        post: operations["revoke_api_v1_admin_plugins__key__grants__capability__revoke_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/plugins/{key}/purge": {
         parameters: {
             query?: never;
@@ -3013,6 +3084,40 @@ export interface paths {
         put?: never;
         /** Rollback */
         post: operations["rollback_api_v1_admin_plugins__key__rollback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/plugins/{key}/secrets/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set Secret */
+        put: operations["set_secret_api_v1_admin_plugins__key__secrets__name__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/plugins/{key}/secrets/{name}/clear": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clear Secret */
+        post: operations["clear_secret_api_v1_admin_plugins__key__secrets__name__clear_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -14101,6 +14206,11 @@ export interface components {
             needs_restart: boolean;
             /** Quarantine Reason */
             quarantine_reason: string | null;
+            /**
+             * Runtime
+             * @default declarative
+             */
+            runtime: string;
             /** Scope */
             scope: string;
             /** Source */
@@ -14907,6 +15017,13 @@ export interface components {
                 number,
                 number
             ];
+        };
+        /** SecretIn */
+        SecretIn: {
+            /** Confirmation */
+            confirmation?: string | null;
+            /** Value */
+            value: string;
         };
         /** SeenIn */
         SeenIn: {
@@ -16402,6 +16519,11 @@ export interface components {
             grants: number;
             /** Purchases */
             purchases: number;
+        };
+        /** ConfirmIn */
+        portalab__modules__plugins__api__confined__ConfirmIn: {
+            /** Confirmation */
+            confirmation?: string | null;
         };
         /** PolicyIn */
         portalab__modules__privacy__api__routes__PolicyIn: {
@@ -22209,6 +22331,28 @@ export interface operations {
             };
         };
     };
+    runtime_api_v1_admin_plugins_runtime_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     upload_api_v1_admin_plugins_upload_post: {
         parameters: {
             query: {
@@ -22341,6 +22485,75 @@ export interface operations {
             };
         };
     };
+    attempts_api_v1_admin_plugins__key__attempts_get: {
+        parameters: {
+            query?: {
+                before?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confinement_api_v1_admin_plugins__key__confinement_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     diagnostics_api_v1_admin_plugins__key__diagnostics_get: {
         parameters: {
             query?: never;
@@ -22442,6 +22655,44 @@ export interface operations {
             };
         };
     };
+    revoke_api_v1_admin_plugins__key__grants__capability__revoke_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+                capability: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["portalab__modules__plugins__api__confined__ConfirmIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     purge_api_v1_admin_plugins__key__purge_post: {
         parameters: {
             query?: never;
@@ -22500,6 +22751,74 @@ export interface operations {
                         [key: string]: unknown;
                     };
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_secret_api_v1_admin_plugins__key__secrets__name__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SecretIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clear_secret_api_v1_admin_plugins__key__secrets__name__clear_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["portalab__modules__plugins__api__confined__ConfirmIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

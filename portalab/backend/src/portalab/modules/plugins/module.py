@@ -4,6 +4,7 @@ guard (quarantine), the lifecycle, updates with probation and rollback, purge, d
 module lifecycle and per-user activation for Marketplace plugin products. The core runs unchanged with
 ``plugins.enabled = false`` or no plugin at all (no import path from the core to plugins)."""
 
+import contextlib
 from dataclasses import replace
 from datetime import timedelta
 from pathlib import Path
@@ -28,9 +29,14 @@ from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
+from portalab.core.secrets import SecretBox
 from portalab.core.time import Clock, utc_now
 from portalab.modules.plugins import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.plugins.activation.service import Activations
+from portalab.modules.plugins.confined.confirmations import Confirmations
+from portalab.modules.plugins.confined.grants import Grants
+from portalab.modules.plugins.confined.runtime import ConfinedRuntime
+from portalab.modules.plugins.confined.services import JOB_KIND as CONFINED_JOB
 from portalab.modules.plugins.context.registries import Registries
 from portalab.modules.plugins.contributions.ledger_store import Ledger
 from portalab.modules.plugins.db.plugin_db import PluginStorage
@@ -68,8 +74,11 @@ class PluginsModule:
         root: Path | None = None,
         role_prefix: str = "plugin_",
         registries: Registries | None = None,
+        secret_box: SecretBox | None = None,
+        forbidden: tuple[Path, ...] = (),
     ) -> None:
         self.database = database
+        self.audit = audit
         self.capabilities = capabilities
         self.authorizer = authorizer
         self.clock = clock
@@ -81,6 +90,22 @@ class PluginsModule:
         self.storage = PluginStorage(database, role_prefix=role_prefix)
         self.ledger = Ledger(database, clock=clock)
         self.guard = PluginGuard(database, config, clock=clock)
+        # 030: confined plugins (one process each), their grants and their requests
+        self.grants = Grants(database, audit, clock=clock)
+        self.runtime = ConfinedRuntime(
+            database,
+            self.guard,
+            self.grants,
+            config,
+            box=secret_box,
+            run_root=self.root.parent / "plugins-run" if root is not None else Path("plugins-run"),
+            forbidden=forbidden,
+            clock=clock,
+            role_prefix=role_prefix,
+            events=events,
+            capabilities=capabilities,
+        )
+        self.confirmations = Confirmations(database, clock=clock)
         self.lifecycle = Lifecycle(
             database,
             events,
@@ -93,6 +118,7 @@ class PluginsModule:
             self.guard,
             config,
             clock=clock,
+            runtime=self.runtime,
         )
         self.updates = Updates(self.lifecycle)
         self.purges = Purges(self.lifecycle)
@@ -153,8 +179,37 @@ class PluginsModule:
                     delete(ErrorStat).where(ErrorStat.window_start < utc_now(self.clock) - timedelta(days=30))
                 )
 
+        async def confined_job(payload: dict[str, Any]) -> None:
+            """030: a confined plugin's job, run in its process (dropped when the plugin no longer runs)."""
+            plugin, job = str(payload.get("plugin", "")), str(payload.get("job", ""))
+            registered = self.runtime.registered.get(plugin)
+            if registered is None or job not in registered.jobs:
+                return
+            await self.guard.run(
+                plugin, "job", registered.jobs[job]["handler"], dict(payload.get("payload") or {})
+            )
+
+        async def confined_tick() -> None:
+            minute = int(utc_now(self.clock).timestamp() // 60)
+            for plugin, registered in list(self.runtime.registered.items()):
+                for job in registered.jobs.values():
+                    every = job.get("every_minutes")
+                    if every and minute % max(1, int(every)) == 0:
+                        with contextlib.suppress(Exception):  # counted by the guard; the tick goes on
+                            await self.guard.run(plugin, "job", job["handler"], {})
+
+        jobs.register(
+            CONFINED_JOB,
+            confined_job,
+            idempotency="the plugin's job is idempotent",
+            owner=OWNER,
+            timeout_seconds=90,
+        )
         return [
             self.start,
+            register_periodic(
+                jobs, self.database, "plugins.confined_tick", timedelta(minutes=1), confined_tick, owner=OWNER
+            ),
             register_periodic(
                 jobs, self.database, "plugins.probation", timedelta(minutes=1), probation, owner=OWNER
             ),

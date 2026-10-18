@@ -263,7 +263,15 @@ def wire_platform(
         database, events, authz.audit, capabilities, root=data_dir / "visuals", authorizer=authz.engine
     )
     plugins = PluginsModule(
-        database, events, authz.audit, capabilities, authz.engine, root=data_dir / "plugins"
+        database,
+        events,
+        authz.audit,
+        capabilities,
+        authz.engine,
+        root=data_dir / "plugins",
+        secret_box=SecretBox(secret_key),
+        # 030: a plugin's process must never be able to read the portal's data or secrets
+        forbidden=(data_dir,),
     )
     plugins.register()
     seeds: list[Callable[[], Awaitable[None]]] = []

@@ -62,6 +62,8 @@ function writeCache(language: string, namespace: string, messages: Record<string
   }
 }
 
+const NONE: string[] = [];
+
 export function I18nProvider({
   children,
   namespaces = DEFAULT_NAMESPACES,
@@ -83,8 +85,24 @@ export function I18nProvider({
     ...(override ?? {}),
     ...(pseudo ? { language: pseudo, direction: pseudo === "ar-XB" ? "rtl" : "ltr" } : {}),
   };
+  // 030: the catalogs of the plugins this member sees (their pages, navigation and messages)
+  const plugins = useQuery({
+    queryKey: ["i18n", "plugin-namespaces"],
+    retry: false,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      try {
+        const listed = ((await api.GET("/api/v1/plugins/pages")).data ?? []) as Array<{ plugin: string }>;
+        return [...new Set(listed.map((page) => `plugin.${page.plugin}`))];
+      } catch {
+        return [] as string[]; // signed out, or plugins unavailable
+      }
+    },
+  });
+  const pluginNamespaces = plugins.data ?? NONE;
+  const allNamespaces = useMemo(() => [...namespaces, ...pluginNamespaces], [namespaces, pluginNamespaces]);
   const catalogs = useQueries({
-    queries: namespaces.map((namespace) => ({
+    queries: allNamespaces.map((namespace) => ({
       queryKey: ["i18n", "catalog", locale.language, namespace],
       enabled: context.isSuccess || override !== undefined,
       staleTime: 5 * 60_000,
@@ -110,11 +128,11 @@ export function I18nProvider({
   const messages = useMemo(() => {
     const merged: Record<string, string> = { ...BUNDLED_MESSAGES };
     catalogs.forEach((query, index) => {
-      if (query.data) Object.assign(merged, flatten(namespaces[index] as string, query.data));
+      if (query.data) Object.assign(merged, flatten(allNamespaces[index] as string, query.data));
     });
     Object.assign(merged, externalMessages(locale.language));
     return pseudo ? pseudoCatalog(merged, pseudo) : merged;
-  }, [catalogs, namespaces, pseudo, externalRevision, locale.language]);
+  }, [catalogs, allNamespaces, pseudo, externalRevision, locale.language]);
   useEffect(() => {
     document.documentElement.lang = locale.language;
     document.documentElement.dir = locale.direction;

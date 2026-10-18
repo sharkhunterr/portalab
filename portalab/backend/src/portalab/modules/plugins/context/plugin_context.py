@@ -346,7 +346,7 @@ def page_from(raw: Mapping[str, Any]) -> PageDefinition:
         kind = block.get("kind")
         if kind == "markdown":
             blocks.append(MarkdownBlock(str(block.get("text", ""))[:20_000]))
-        elif kind in ("stat", "list", "table", "chart"):
+        elif kind in ("stat", "list", "table", "chart", "thread", "cards"):
             blocks.append(
                 DataBlock(
                     kind,
@@ -362,6 +362,7 @@ def page_from(raw: Mapping[str, Any]) -> PageDefinition:
                     str(block.get("title_key", "")),
                     dict(block.get("schema", {})),
                     str(block.get("action", "")),
+                    str(block.get("submit_key", "plugins:page.submit")),
                 )
             )
     return PageDefinition(
@@ -385,6 +386,8 @@ def apply_manifest(ctx: Context, manifest: Mapping[str, Any]) -> None:
         )
     types = {"string": str, "integer": int, "boolean": bool, "number": float}
     for setting in manifest.get("settings", []):
+        if setting.get("secret"):  # 030: kept by Portalab (secret settings), never a plain setting
+            continue
         ctx.setting(
             setting["name"], types[setting["type"]], setting["default"], setting.get("description", "")
         )

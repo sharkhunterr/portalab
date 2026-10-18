@@ -345,6 +345,7 @@ def create_app(
         app.state.marketplace_module = platform.marketplace
         app.state.visuals_module = platform.visuals
         app.state.plugins_module = platform.plugins
+        platform.plugins.runtime.portal.app = app  # 030: portal data through the app itself
         app.state.authz_module = platform.authz
         app.state.privacy_module = platform.privacy
         app.state.identity_module = platform.identity
@@ -433,6 +434,8 @@ def create_app(
     app.state.marketplace_module = marketplace
     app.state.visuals_module = visuals
     app.state.plugins_module = plugins
+    if plugins is not None:
+        plugins.runtime.portal.app = app  # 030: confined plugins read portal data through the app itself
     app.state.platform = None
     app.state.principal_resolver = principal_resolver or SessionPrincipalResolver()
     app.state.identity_module = None

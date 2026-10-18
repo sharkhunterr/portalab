@@ -120,7 +120,24 @@ async def _dispatch(
             body = None
         if body is not None and len(str(body)) > 64_000:
             raise Forbidden("The payload is too large.", code="plugin.payload_too_large")
-    return await route.handler(principal, dict(request.query_params), body)
+    query = dict(request.query_params)
+    registered = module.runtime.registered.get(key)
+    meta = registered.routes.get((method, path.strip("/"))) if registered is not None else None
+    if meta is not None and meta["exposure"] == "committing" and meta.get("describe") is not None:
+        # 030 (R6): confirmed by the member in Portalab's own dialog, with the exact content, first
+        token = request.headers.get("X-Portalab-Confirmation") or (body or {}).get("confirmation")
+        body = {k: v for k, v in (body or {}).items() if k != "confirmation"} if body is not None else None
+        describe = meta["describe"]
+        clean = body
+        await module.confirmations.require(
+            user_id=principal.user_id,
+            plugin=key,
+            route=f"{method} {path.strip('/')}",
+            body=clean,
+            token=str(token) if token else None,
+            describe=lambda: module.guard.run(key, "route", describe, principal, query, clean),
+        )
+    return await route.handler(principal, query, body)
 
 
 @router.get("/plugins/{key}/{path:path}")

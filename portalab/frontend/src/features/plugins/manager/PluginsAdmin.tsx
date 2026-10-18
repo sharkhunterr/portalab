@@ -17,6 +17,7 @@ import {
 } from "../api";
 import { Diagnostics } from "../diagnostics/Diagnostics";
 import { ReviewConsent } from "../review/ReviewConsent";
+import { Confinement } from "./Confinement";
 
 function PluginDetail({ pluginKey }: { pluginKey: string }) {
   const t = useT();
@@ -100,6 +101,7 @@ function PluginDetail({ pluginKey }: { pluginKey: string }) {
         </Button>
       </div>
       {action.error instanceof ApiError ? <p role="alert">{action.error.message}</p> : null}
+      <Confinement pluginKey={pluginKey} />
       <Diagnostics pluginKey={pluginKey} />
     </div>
   );

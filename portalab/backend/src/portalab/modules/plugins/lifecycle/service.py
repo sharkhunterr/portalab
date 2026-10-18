@@ -27,6 +27,9 @@ from portalab.core.errors import Conflict, Forbidden, NotFound
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.plugins.compat.checker import check
+from portalab.modules.plugins.confined.grants import review_items
+from portalab.modules.plugins.confined.replay import replay
+from portalab.modules.plugins.confined.runtime import ConfinedRuntime
 from portalab.modules.plugins.context.plugin_context import Context, apply_manifest
 from portalab.modules.plugins.context.registries import Registries
 from portalab.modules.plugins.contributions.ledger_store import Ledger
@@ -42,7 +45,15 @@ from portalab.modules.plugins.scanner.scanner import scan_package
 from portalab.modules.plugins.store.package import PackageError, PackageStore, read_manifest
 
 SYSTEM = Principal(channel="system")
-ENABLE_FROM = ("installed", "disabled", "needs_configuration", "incompatible", "quarantined")
+ENABLE_FROM = (
+    "installed",
+    "disabled",
+    "needs_configuration",
+    "incompatible",
+    "quarantined",
+    "held_unconfined",
+    "held_confinement",
+)
 
 
 class PluginNotFound(NotFound):
@@ -70,6 +81,22 @@ class InvalidState(Conflict):
     default_title = "Not possible in this state"
 
 
+class Held(Conflict):
+    """030: the plugin cannot run here (its code would run in Portalab's process, or cannot be confined)."""
+
+    default_code = "plugin.held"
+    default_title = "This plugin is held"
+
+    def __init__(self, state: str, message: str) -> None:
+        super().__init__(message, code=f"plugin.{state}")
+        self.state = state
+
+
+class CapabilitiesNotGranted(Forbidden):
+    default_code = "plugin.capabilities_not_granted"
+    default_title = "Capabilities not granted"
+
+
 def review_of(manifest: Manifest, sha256: str) -> dict[str, Any]:
     raw = manifest.raw
     return {
@@ -95,6 +122,10 @@ def review_of(manifest: Manifest, sha256: str) -> dict[str, Any]:
         "schema": f"plugin_{manifest.key}",
         "migrations": raw.get("migrations"),
         "sha256": sha256,
+        # 030: where its code runs, and what the Admin grants by approving
+        "runtime": manifest.runtime,
+        "requested_capabilities": review_items(manifest) if manifest.schema_version >= 2 else [],
+        "routes": manifest.routes,
     }
 
 
@@ -113,6 +144,7 @@ class Lifecycle:
         config: Callable[[], Any],
         *,
         clock: Clock | None = None,
+        runtime: ConfinedRuntime | None = None,
     ) -> None:
         self.database = database
         self.events = events
@@ -125,6 +157,7 @@ class Lifecycle:
         self.guard = guard
         self.config = config
         self.clock = clock
+        self.runtime = runtime
         guard.on_threshold = self.quarantine
 
     # --- reads -------------------------------------------------------------------------------------------
@@ -228,7 +261,7 @@ class Lifecycle:
             if await session.get(Plugin, manifest.key) is not None:
                 raise Conflict("This plugin is installed already; update it instead.", code="plugin.exists")
         stored = self.store.extract(source)
-        if manifest.entry_point:
+        if manifest.entry_point and manifest.runtime == "in_process":  # confined code: the kernel confines it
             findings = scan_package(stored.path, manifest.entry_point.split(":")[0].split(".")[0])
             if findings:
                 raise PackageError(
@@ -254,6 +287,8 @@ class Lifecycle:
                     installed_by=actor.acting_for or actor.user_id,
                     installed_at=now,
                     updated_at=now,
+                    runtime=manifest.runtime,
+                    predates_confinement=False,
                 )
             )
             await session.flush()
@@ -299,6 +334,7 @@ class Lifecycle:
                     capabilities=[review["capabilities"]],
                 )
             )
+            current.runtime = manifest.runtime
             await self.audit.record(
                 session,
                 AuditRecord(
@@ -310,6 +346,8 @@ class Lifecycle:
                     sensitive=True,
                 ),
             )
+        if self.runtime is not None and manifest.schema_version >= 2:
+            await self.runtime.grants.grant_all(actor, key, plugin.current_version, manifest)
         return await self.get(key)
 
     async def _permissions(self, key: str, enabled: bool) -> None:
@@ -335,7 +373,14 @@ class Lifecycle:
         ctx = Context(key, self.registries, self.guard, db, priority=priority)
         apply_manifest(ctx, manifest.raw)
         waiting = False
-        if manifest.entry_point:
+        if manifest.runtime == "confined":
+            await self._register_confined(ctx, key, row.version, package, manifest)
+        elif manifest.entry_point:
+            if not self._unconfined_allowed(plugin):
+                raise Held(
+                    "held_unconfined",
+                    "This plugin's code would run inside Portalab: use a confined version or allow it.",
+                )
             if with_code or loader.loaded(manifest.entry_point, package):
                 register = loader.load(manifest.entry_point, package)
 
@@ -353,6 +398,54 @@ class Lifecycle:
                 key, point, contribution_id, priority=priority, state=state, detail=detail
             )
         return waiting
+
+    def _unconfined_allowed(self, plugin: Plugin) -> bool:
+        mode = str(getattr(self.config(), "unconfined", "existing"))
+        return mode == "allow" or (mode == "existing" and bool(plugin.predates_confinement))
+
+    async def _register_confined(
+        self, ctx: Context, key: str, version: str, package: Path, manifest: Manifest
+    ) -> None:
+        if self.runtime is None:
+            raise Held("held_confinement", "Confined plugins are not available in this process.")
+        ok, _weak = self.runtime.can_run()
+        if not ok:
+            raise Held("held_confinement", "This system cannot confine plugins (and the weaker mode is off).")
+        missing = await self.runtime.grants.missing(key, version, manifest)
+        if missing:
+            raise CapabilitiesNotGranted(
+                "Review the plugin and accept its capabilities first.", extensions={"missing": missing}
+            )
+        host = await self.runtime.start(key, version, package, manifest, self._settings_of(key, manifest))
+        granted = await self.runtime.grants.active(key, version)
+        pending: list[tuple[str, str]] = []
+        registered = replay(
+            ctx,
+            manifest,
+            host.calls,
+            granted,
+            lambda method, why: pending.append((method, why)),
+            wrap_consumer=self.runtime.consumer,
+        )
+        self.runtime.registered[key] = registered
+        for method, why in pending:
+            await self.runtime.attempt(key, "denied_capability", {"registration": method, "why": why})
+        async with self.database.unit_of_work() as uow:
+            current = await uow.session.get(Plugin, key, with_for_update=True)
+            if current is not None:
+                current.confinement = dict(host.confinement)
+                current.runtime = "confined"
+
+    def _settings_of(self, key: str, manifest: Manifest) -> dict[str, Any]:
+        """The plugin's non-secret settings (defaults; the values set by the Admin when available)."""
+        values: dict[str, Any] = {}
+        for setting in manifest.raw.get("settings", []):
+            if not setting.get("secret"):
+                values[str(setting["name"])] = setting.get("default")
+        return values
+
+    async def _hold(self, key: str, held: Held) -> None:
+        await self._transition(SYSTEM, key, held.state, held.state, str(held)[:300])
 
     async def enable(self, actor: Principal, key: str) -> Plugin:
         plugin = await self.get(key)
@@ -382,7 +475,12 @@ class Lifecycle:
         package = self.store.verify(key, row.version, row.sha256)
         await self.storage.provision(key, self.config().statement_timeout_ms)
         await self.storage.migrate(key, package, manifest.raw.get("migrations"), expand_only=False)
-        waiting = await self._register(key, with_code=False)
+        try:
+            waiting = await self._register(key, with_code=False)
+        except Held as held:
+            await self.registries.remove(f"plugin:{key}")
+            await self._hold(key, held)
+            raise
         await self._permissions(key, True)
         async with self.database.unit_of_work() as uow:
             current = await uow.session.get(Plugin, key, with_for_update=True)
@@ -391,6 +489,8 @@ class Lifecycle:
         return await self._transition(actor, key, "enabled", "enabled")
 
     async def _remove(self, key: str) -> dict[str, int]:
+        if self.runtime is not None:
+            await self.runtime.stop(key)
         removed = await self.registries.remove(f"plugin:{key}")
         await self.ledger.removed(key)
         await self._permissions(key, False)
@@ -460,6 +560,9 @@ class Lifecycle:
                     if row is not None:
                         row.needs_restart = False
                 loaded.append(key)
+            except Held as held:
+                await self.registries.remove(f"plugin:{key}")
+                await self._hold(key, held)
             except Exception as error:
                 log.warning(
                     "plugin failed to load", extra={"fields": {"plugin": key, "error": type(error).__name__}}

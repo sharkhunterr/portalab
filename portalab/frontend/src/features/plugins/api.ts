@@ -19,6 +19,61 @@ export interface Review {
   personal_data: boolean;
   schema: string;
   sha256: string;
+  /** 030: where its code runs, and the capabilities approving grants */
+  runtime?: "declarative" | "in_process" | "confined";
+  requested_capabilities?: Array<{
+    capability: string;
+    description: string;
+    parameters: Record<string, unknown>;
+  }>;
+}
+
+/** 030: a plugin's confinement, grants, attempts, outgoing calls and secret settings. */
+export interface Confinement {
+  runtime: string;
+  state: string;
+  running: boolean;
+  confinement: { landlock_abi?: number; seccomp?: boolean; weak?: boolean } | null;
+  warning: "unconfined" | "weak" | null;
+  requested: Array<{ capability: string; description: string; parameters: Record<string, unknown> }>;
+  grants: Array<{ capability: string; description: string; granted_at: string; revoked_at: string | null }>;
+  attempts: Array<{ kind: string; detail: Record<string, unknown>; occurred_at: string }>;
+  network: {
+    hosts: Array<{ host: string; port: number; scheme: string; private: boolean }>;
+    last_24h: Record<string, { calls: number; refused: number }>;
+  };
+  secrets: Array<{ name: string; description: string; set: boolean }>;
+}
+
+export function useConfinement(key: string) {
+  return useQuery({
+    queryKey: [...KEY, "confinement", key],
+    queryFn: async () =>
+      // biome-ignore lint/suspicious/noExplicitAny: an admin route added by spec 030
+      ((await api.GET(`/api/v1/admin/plugins/${key}/confinement` as any, {})).data ??
+        null) as Confinement | null,
+  });
+}
+
+/** PUT a secret setting (write-only), asking once for the confirmation the server requires. */
+export async function putSecret(
+  key: string,
+  name: string,
+  value: string,
+  confirm: () => boolean,
+): Promise<void> {
+  const path = `/api/v1/admin/plugins/${key}/secrets/${name}`;
+  // biome-ignore lint/suspicious/noExplicitAny: an admin route added by spec 030
+  const call = (extra: Record<string, unknown>) => api.PUT(path as any, { body: { value, ...extra } as any });
+  try {
+    await call({});
+  } catch (error) {
+    if (error instanceof ApiError && error.code === "authz.confirmation_required" && confirm()) {
+      await call({ confirmation: String(error.extensions.confirmation ?? "") });
+      return;
+    }
+    throw error;
+  }
 }
 
 export interface Discovered {
