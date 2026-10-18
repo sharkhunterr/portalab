@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "neon2077",
+  "names": {
+    "fr": "Dos chromé",
+    "en": "Chrome back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est noire et chromée, une bande jaune en biais, un code-barres, des pistes de circuit et une puce qui luit au centre.",
+    "en": "Face down, every card is black chrome, a slanted yellow band, a barcode, circuit traces and a chip glowing in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

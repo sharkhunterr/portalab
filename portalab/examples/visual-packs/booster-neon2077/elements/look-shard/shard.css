@@ -1,0 +1,63 @@
+/* The sealed pack (its hook: data-booster-look): a data shard — black chrome, a slanted yellow band, cyan
+   circuit traces; it glitches now and then (its colours split, a slice jolted). */
+[data-booster-look="neon2077"] .booster-pack {
+  border-radius: 0;
+  clip-path: polygon(0 0, 82% 0, 100% 10%, 100% 100%, 18% 100%, 0 90%);
+  background:
+    linear-gradient(115deg, transparent 58%, #fcee0a 58% 66%, transparent 66%),
+    linear-gradient(90deg, transparent 20%, rgba(40, 240, 255, 0.8) 20% 21%, transparent 21%) 0 30% / 100% 1px no-repeat,
+    linear-gradient(rgba(40, 240, 255, 0.8), rgba(40, 240, 255, 0.8)) 20% 30% / 1px 30% no-repeat,
+    linear-gradient(90deg, transparent 20%, rgba(40, 240, 255, 0.8) 20% 45%, transparent 45%) 0 60% / 100% 1px no-repeat,
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px),
+    linear-gradient(160deg, #2a2a33, #0c0c12 55%, #1a1a24);
+  box-shadow: inset 0 0 0 2px rgba(252, 238, 10, 0.6), 0 0 2rem rgba(255, 40, 160, 0.35);
+  animation: neon2077-glitch 3.7s steps(1, end) infinite;
+}
+@keyframes neon2077-glitch {
+  0%, 88%, 92%, 100% { filter: none; translate: 0 0; }
+  89% { filter: drop-shadow(-3px 0 0 rgba(255, 0, 80, 0.8)) drop-shadow(3px 0 0 rgba(0, 240, 255, 0.8)); translate: 3px 0; }
+  90% { filter: drop-shadow(4px 0 0 rgba(255, 0, 80, 0.8)) drop-shadow(-4px 0 0 rgba(0, 240, 255, 0.8)); translate: -4px 1px; }
+  91% { translate: 1px 0; }
+}
+[data-booster-look="neon2077"] .booster-pack__stars,
+[data-booster-look="neon2077"] .booster-pack__foil {
+  opacity: 0;
+}
+[data-booster-look="neon2077"] .booster-pack__flap {
+  border: 0;
+  background: none;
+}
+[data-booster-look="neon2077"] .booster-pack__emblem {
+  color: #fcee0a;
+  background: radial-gradient(circle, rgba(252, 238, 10, 0.25), transparent 70%);
+  filter: drop-shadow(0 0 0.6rem rgba(252, 238, 10, 0.8));
+}
+[data-booster-look="neon2077"] .booster-pack__name {
+  color: #fcee0a;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.16em;
+  text-shadow: 2px 0 0 rgba(255, 0, 80, 0.7), -2px 0 0 rgba(0, 240, 255, 0.7);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="neon2077"] .booster-pack {
+    animation: none;
+  }
+}
+
+/* tension: the sealed pack breathes, a double heartbeat now and then — waiting to be opened */
+[data-booster-look="neon2077"] .booster-stage__tear {
+  animation: booster-hover 4s ease-in-out infinite, neon2077-heartbeat 3.4s ease-in-out infinite;
+}
+/* on « scale », added to the float of Portalab's own (never replacing it) */
+@keyframes neon2077-heartbeat {
+  0%, 60%, 100% { scale: 1; }
+  66% { scale: 1.022; }
+  71% { scale: 0.996; }
+  77% { scale: 1.035; }
+  86% { scale: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="neon2077"] .booster-stage__tear {
+    animation: none;
+  }
+}

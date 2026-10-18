@@ -21,6 +21,6 @@
   // the ring of light
   float front = 0.12 + age * 0.4;
   o = over(o, vec3(0.75, 0.6, 1.0), smoothstep(0.02, 0.0, abs(length(c) - front)) * smoothstep(1.6, 0.6, age) * fade);
-  // its edges fade out, narrowly: never the outline of its box
-  vec2 edgeuv = gl_FragCoord.xy / u_res;
-  o *= smoothstep(0.0, 0.08, min(edgeuv.x, 1.0 - edgeuv.x)) * smoothstep(0.0, 0.08, min(edgeuv.y, 1.0 - edgeuv.y));
+  // its edges fade out: an ellipse inside its box, reaching close to its sides yet never showing them
+  vec2 edgeuv = gl_FragCoord.xy / u_res * 2.0 - 1.0;
+  o *= smoothstep(1.0, 0.72, length(edgeuv));

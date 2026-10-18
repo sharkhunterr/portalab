@@ -39,6 +39,6 @@
   float quick = pow(0.5 + 0.5 * sin(u_age * u_age * 14.0), 8.0);
   o = over(o, vec3(0.0), smoothstep(0.12, 0.6, length(dc * vec2(0.8, 1.0))) * dread * 0.6);
   o = over(o, vec3(1.0, 0.95, 0.9), exp(-length(dc) * 9.0) * quick * dread * 0.25);
-  // its edges fade out: never the outline of its box
-  vec2 edgeuv = gl_FragCoord.xy / u_res;
-  o *= smoothstep(0.0, 0.25, min(edgeuv.x, 1.0 - edgeuv.x)) * smoothstep(0.0, 0.25, min(edgeuv.y, 1.0 - edgeuv.y));
+  // its edges fade out: an ellipse inside its box, fading to nothing well before its sides (never a rectangle)
+  vec2 edgeuv = gl_FragCoord.xy / u_res * 2.0 - 1.0;
+  o *= smoothstep(1.0, 0.62, length(edgeuv));

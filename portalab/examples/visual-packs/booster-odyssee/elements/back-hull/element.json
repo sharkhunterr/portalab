@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "odyssee",
+  "names": {
+    "fr": "Plaque de coque",
+    "en": "Hull plate"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est une plaque de coque rivetée, des circuits cyan qui luisent, un insigne en chevron au centre et un reflet de métal qui passe.",
+    "en": "Face down, every card is a riveted hull plate, glowing cyan circuits, a chevron insignia in the middle and a metallic gleam passing over."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

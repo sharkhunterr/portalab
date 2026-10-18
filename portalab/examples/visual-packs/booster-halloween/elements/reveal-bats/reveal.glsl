@@ -41,6 +41,6 @@
     float wing = step(abs(q.x), 2.2) * smoothstep(0.4, 0.0, abs(q.y - abs(q.x) * 0.45 * flap - 0.25 * sin(abs(q.x) * 3.0)));
     o = over(o, vec3(0.03, 0.0, 0.05), clamp(wing + smoothstep(0.5, 0.3, length(q * vec2(1.4, 0.9))), 0.0, 1.0) * fade);
   }
-  // its edges fade out, narrowly: never the outline of its box
-  vec2 edgeuv = gl_FragCoord.xy / u_res;
-  o *= smoothstep(0.0, 0.08, min(edgeuv.x, 1.0 - edgeuv.x)) * smoothstep(0.0, 0.08, min(edgeuv.y, 1.0 - edgeuv.y));
+  // its edges fade out: an ellipse inside its box, reaching close to its sides yet never showing them
+  vec2 edgeuv = gl_FragCoord.xy / u_res * 2.0 - 1.0;
+  o *= smoothstep(1.0, 0.72, length(edgeuv));

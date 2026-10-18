@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "odyssee",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Odyssée — scène de booster",
+    "en": "Odyssey — a booster scene"
+  },
+  "descriptions": {
+    "fr": "L'ouverture d'un booster en plein espace, en pleine guerre : une bataille au loin, des astéroïdes, des chasseurs qui les évitent, un caisson de cargaison tombé d'un vaisseau qui se dépressurise puis s'ouvre dans un saut hyperspatial — des cartes en plaque de coque jusqu'au cœur de réacteur.",
+    "en": "A booster opened in deep space, at war: a battle far off, asteroids, fighters dodging them, a cargo container from a starship venting then opening in a hyperspace jump — from hull-plate cards to the reactor core."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

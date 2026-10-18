@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "odyssee-core",
+  "names": {
+    "fr": "Face de cœur de réacteur",
+    "en": "Reactor core face"
+  },
+  "descriptions": {
+    "fr": "Une carte légendaire comme un cœur de réacteur : or et blanc incandescent, encoches de maintenance, holographie, paillettes, l'image qui s'incline.",
+    "en": "A legendary card like a reactor core: gold and white-hot, maintenance notches, holography, glitter, the art leaning."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

@@ -1,0 +1,37 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
+[data-card-back="neon2077"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0;
+  clip-path: polygon(0 0, 88% 0, 100% 7%, 100% 100%, 12% 100%, 0 93%);
+  background:
+    linear-gradient(120deg, transparent 70%, #fcee0a 70% 76%, transparent 76%),
+    repeating-linear-gradient(90deg, #e8e8e8 0 2px, transparent 2px 4px, #e8e8e8 4px 5px, transparent 5px 8px) 10% 88% / 40% 6% no-repeat,
+    linear-gradient(90deg, transparent 15%, rgba(40, 240, 255, 0.7) 15% 16%, transparent 16%) 0 25% / 100% 1px no-repeat,
+    linear-gradient(rgba(40, 240, 255, 0.7), rgba(40, 240, 255, 0.7)) 15% 25% / 1px 25% no-repeat,
+    linear-gradient(90deg, transparent 15%, rgba(40, 240, 255, 0.7) 15% 40%, transparent 40%) 0 50% / 100% 1px no-repeat,
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px),
+    linear-gradient(160deg, #2a2a33, #0c0c12 55%, #1a1a24);
+  box-shadow: inset 0 0 0 2px rgba(255, 40, 160, 0.6);
+}
+[data-card-back="neon2077"] .booster-card__back::after {
+  background: linear-gradient(110deg, transparent 40%, rgba(255, 40, 160, 0.3) 47%, rgba(40, 240, 255, 0.3) 53%, transparent 60%);
+  mix-blend-mode: screen;
+}
+[data-card-back="neon2077"] .booster-card__back-pattern {
+  opacity: 0;
+}
+/* the chip */
+[data-card-back="neon2077"] .booster-card__back-sigil {
+  inline-size: 32%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0.15rem;
+  box-shadow: 0 0 0 3px #0c0c12, 0 0 0 4px #fcee0a, 0 0 1rem rgba(252, 238, 10, 0.6);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 18%, rgba(252, 238, 10, 0.5) 18% 22%),
+    linear-gradient(160deg, #3a3a44, #15151c);
+}
+[data-card-back="neon2077"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

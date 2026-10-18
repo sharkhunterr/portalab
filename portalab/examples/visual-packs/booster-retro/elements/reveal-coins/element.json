@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "retro8-coins",
+  "names": {
+    "fr": "Pluie de pièces",
+    "en": "Coin shower"
+  },
+  "descriptions": {
+    "fr": "Des pièces de pixels jaillissent autour de la carte en tournant, avec leurs éclats (HD).",
+    "en": "Pixel coins spring out round the card, spinning, with their glints (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

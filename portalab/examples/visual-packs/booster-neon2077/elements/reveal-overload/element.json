@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "neon2077-overload",
+  "names": {
+    "fr": "Surcharge",
+    "en": "Overload"
+  },
+  "descriptions": {
+    "fr": "Tout surcharge derrière la carte : des arcs de néon crépitent, la ville holographique se dessine en filaire, une onde jaune, des glitchs et une pluie d'étincelles (HD).",
+    "en": "Everything overloads behind the card: neon arcs crackle, a wireframe holographic city draws itself, a yellow shockwave, glitches and a rain of sparks (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary"
+  }
+}

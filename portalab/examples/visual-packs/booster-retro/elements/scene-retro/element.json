@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "retro8",
+  "names": {
+    "fr": "Scène Rétro",
+    "en": "Retro scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture dans un jeu 8 bits. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening in an 8-bit game. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-cartridge",
+      "backdrop": "backdrop-crt",
+      "opening": "opening-poweron",
+      "back": {
+        "common": "back-8bit"
+      },
+      "face": {
+        "common": "face-grey",
+        "rare": "face-lcd",
+        "epic": "face-arcade",
+        "legendary": "face-highscore"
+      },
+      "reveal": {
+        "rare": "reveal-coins",
+        "epic": "reveal-combo",
+        "legendary": "reveal-fireworks"
+      }
+    }
+  }
+}

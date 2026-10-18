@@ -1,0 +1,36 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
+[data-card-back="odyssee"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.35rem;
+  background:
+    linear-gradient(90deg, transparent 20%, rgba(80, 230, 255, 0.6) 20% 21%, transparent 21%) 0 30% / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent 60%, rgba(80, 230, 255, 0.6) 60% 61%, transparent 61%) 0 70% / 100% 1px no-repeat,
+    linear-gradient(rgba(80, 230, 255, 0.55), rgba(80, 230, 255, 0.55)) 20% 30% / 1px 40% no-repeat,
+    linear-gradient(rgba(80, 230, 255, 0.55), rgba(80, 230, 255, 0.55)) 80% 30% / 1px 40% no-repeat,
+    radial-gradient(circle, #8a949d 0 1.5px, transparent 2.2px) 6px 6px / 22px 22px,
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0 1px, transparent 1px 30%),
+    linear-gradient(160deg, #4a535c, #2b3238 50%, #1a1f24);
+  box-shadow: inset 0 0 0 2px #10151a, inset 0 0 0 4px rgba(120, 140, 160, 0.35);
+}
+[data-card-back="odyssee"] .booster-card__back::after {
+  background: linear-gradient(110deg, transparent 40%, rgba(220, 240, 255, 0.35) 50%, transparent 60%);
+  mix-blend-mode: screen;
+}
+[data-card-back="odyssee"] .booster-card__back-pattern {
+  opacity: 0;
+}
+/* the chevron insignia */
+[data-card-back="odyssee"] .booster-card__back-sigil {
+  inline-size: 40%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(50% 0, 100% 70%, 78% 100%, 50% 60%, 22% 100%, 0 70%);
+  background: linear-gradient(180deg, #7cf2ff, #1aa6c9);
+  filter: drop-shadow(0 0 0.5rem rgba(80, 230, 255, 0.9));
+}
+[data-card-back="odyssee"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

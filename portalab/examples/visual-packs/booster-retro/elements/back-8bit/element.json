@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "retro8",
+  "names": {
+    "fr": "Dos 8 bits",
+    "en": "8-bit back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est un damier de pixels violet, un cadre en escalier et une croix directionnelle au centre.",
+    "en": "Face down, every card is a violet pixel checkerboard, a stepped frame and a directional pad in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

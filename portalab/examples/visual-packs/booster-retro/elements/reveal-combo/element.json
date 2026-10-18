@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "retro8-combo",
+  "names": {
+    "fr": "Combo",
+    "en": "Combo"
+  },
+  "descriptions": {
+    "fr": "Des anneaux de pixels explosent en rafale autour de la carte, des étoiles 8 bits fusent, l'écran clignote (HD).",
+    "en": "Pixel rings explode in bursts round the card, 8-bit stars shoot out, the screen flashes (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.2,
+    "rarity": "epic"
+  }
+}

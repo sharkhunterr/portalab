@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "odyssee",
+  "names": {
+    "fr": "Bataille spatiale",
+    "en": "Space battle"
+  },
+  "descriptions": {
+    "fr": "Toute la scène en plein espace : des étoiles en profondeur, une bataille au loin (tirs laser, explosions, un croiseur), des astéroïdes qui tournent et des chasseurs qui les évitent en zigzag (HD).",
+    "en": "The whole stage in deep space: stars in depth, a battle far off (laser fire, explosions, a cruiser), tumbling asteroids and fighters weaving between them (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "battle.glsl",
+    "stage": true
+  }
+}

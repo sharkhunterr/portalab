@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "odyssee-warp",
+  "names": {
+    "fr": "Le grand saut",
+    "en": "The great jump"
+  },
+  "descriptions": {
+    "fr": "La carte jaillit d'un tunnel hyperspatial : des anneaux de lumière qui défilent, des traînées d'étoiles, un vaisseau-mère qui passe au-dessus, un reflet anamorphique et une onde de choc (HD).",
+    "en": "The card bursts out of a hyperspace tunnel: rings of light rushing past, star streaks, a mothership passing overhead, an anamorphic flare and a shockwave (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "odyssee-plasma",
+  "names": {
+    "fr": "Face de plasma",
+    "en": "Plasma face"
+  },
+  "descriptions": {
+    "fr": "Une carte épique de plasma magenta, en hexagone allongé, holographique et vivante.",
+    "en": "An epic card of magenta plasma, an elongated hexagon, holographic and alive."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

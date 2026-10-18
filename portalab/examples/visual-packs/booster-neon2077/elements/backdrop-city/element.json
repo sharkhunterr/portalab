@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "neon2077",
+  "names": {
+    "fr": "Mégapole",
+    "en": "Megacity"
+  },
+  "descriptions": {
+    "fr": "Toute la scène dans une mégapole la nuit : des tours aux fenêtres allumées, des hologrammes roses et cyan qui grésillent, des voitures volantes qui filent, la pluie, des flaques qui reflètent les néons et des bandes de glitch par moments (HD).",
+    "en": "The whole stage in a megacity at night: towers with lit windows, pink and cyan holograms crackling, flying cars streaking by, rain, puddles mirroring the neon and glitch bands now and then (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "city.glsl",
+    "stage": true
+  }
+}

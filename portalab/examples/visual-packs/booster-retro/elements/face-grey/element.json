@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "retro8-grey",
+  "names": {
+    "fr": "Face grise",
+    "en": "Grey face"
+  },
+  "descriptions": {
+    "fr": "Une carte commune grise comme une vieille console.",
+    "en": "A common card grey as an old console."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

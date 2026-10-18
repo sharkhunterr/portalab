@@ -1,0 +1,30 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
+[data-card-back="retro8"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0;
+  background:
+    conic-gradient(#3a2a7a 25%, #4a37a0 0 50%, #3a2a7a 0 75%, #4a37a0 0) 0 0 / 16px 16px;
+  box-shadow: inset 0 0 0 4px #1b1240, inset 0 0 0 8px #ffd23d, inset 0 0 0 12px #1b1240;
+  image-rendering: pixelated;
+}
+[data-card-back="retro8"] .booster-card__back::after {
+  background: linear-gradient(115deg, transparent 45%, rgba(255, 255, 255, 0.25) 45% 52%, transparent 52%);
+}
+[data-card-back="retro8"] .booster-card__back-pattern {
+  opacity: 0;
+}
+/* the directional pad */
+[data-card-back="retro8"] .booster-card__back-sigil {
+  inline-size: 40%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(35% 0, 65% 0, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0 65%, 0 35%, 35% 35%);
+  background: linear-gradient(180deg, #2a2a2e, #111);
+  filter: drop-shadow(3px 3px 0 #ffd23d);
+}
+[data-card-back="retro8"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

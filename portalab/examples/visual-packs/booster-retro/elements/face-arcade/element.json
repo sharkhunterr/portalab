@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "retro8-arcade",
+  "names": {
+    "fr": "Face d'arcade",
+    "en": "Arcade face"
+  },
+  "descriptions": {
+    "fr": "Une carte épique de borne d'arcade, néon violet et rose, holographique et vivante.",
+    "en": "An epic arcade-cabinet card, violet and pink neon, holographic and alive."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

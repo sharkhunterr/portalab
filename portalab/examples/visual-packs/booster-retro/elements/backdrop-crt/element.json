@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "retro8",
+  "names": {
+    "fr": "Monde 1-1",
+    "en": "World 1-1"
+  },
+  "descriptions": {
+    "fr": "Toute la scène dans un jeu de plateformes 8 bits sur un écran cathodique : ciel en dégradé tramé, nuages et collines qui défilent en parallaxe, sol de briques, pièces qui tournent, un envahisseur qui descend, lignes de balayage et bords bombés (HD).",
+    "en": "The whole stage in an 8-bit platformer on a CRT: a dithered sky, clouds and hills scrolling in parallax, a brick floor, spinning coins, an invader coming down, scanlines and curved edges (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "crt.glsl",
+    "stage": true
+  }
+}

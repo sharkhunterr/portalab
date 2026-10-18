@@ -40,6 +40,6 @@
     float glint = exp(-abs(g.x) * 200.0) * exp(-abs(g.y) * 25.0) + exp(-abs(g.y) * 200.0) * exp(-abs(g.x) * 25.0);
     o = over(o, vec3(0.9, 0.97, 1.0), glint * tw * fade);
   }
-  // its edges fade out, narrowly: never the outline of its box
-  vec2 edgeuv = gl_FragCoord.xy / u_res;
-  o *= smoothstep(0.0, 0.08, min(edgeuv.x, 1.0 - edgeuv.x)) * smoothstep(0.0, 0.08, min(edgeuv.y, 1.0 - edgeuv.y));
+  // its edges fade out: an ellipse inside its box, reaching close to its sides yet never showing them
+  vec2 edgeuv = gl_FragCoord.xy / u_res * 2.0 - 1.0;
+  o *= smoothstep(1.0, 0.72, length(edgeuv));

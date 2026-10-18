@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "retro8",
+  "names": {
+    "fr": "Cartouche",
+    "en": "Cartridge"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient une cartouche de jeu en plastique gris, ses rainures, son étiquette en dégradé de pixels et sa diode ; des étoiles de pixels clignotent autour (HD).",
+    "en": "The pack becomes a grey plastic game cartridge, its ridges, its pixel-gradient label and its LED; pixel stars blink round it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "sparkle.glsl",
+    "css": [
+      "cartridge.css"
+    ],
+    "stage": true
+  }
+}

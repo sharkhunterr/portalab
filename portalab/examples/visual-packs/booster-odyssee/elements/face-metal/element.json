@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "odyssee-metal",
+  "names": {
+    "fr": "Face de métal",
+    "en": "Metal face"
+  },
+  "descriptions": {
+    "fr": "Une carte commune en plaque de métal brossé.",
+    "en": "A common card of brushed metal plate."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

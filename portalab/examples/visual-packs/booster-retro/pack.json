@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "retro",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Rétro — scène de booster",
+    "en": "Retro — a booster scene"
+  },
+  "descriptions": {
+    "fr": "L'ouverture d'un booster dans un jeu 8 bits sur un vieil écran cathodique : un monde de pixels qui défile, une cartouche de jeu qu'on insère, une console qui s'allume dans un éclair, des pièces, des combos et un feu d'artifice de pixels — de la carte grise à la carte « high score ».",
+    "en": "A booster opened in an 8-bit game on an old CRT: a scrolling pixel world, a game cartridge pushed in, a console powering on in a flash, coins, combos and pixel fireworks — from the grey card to the « high score » card."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

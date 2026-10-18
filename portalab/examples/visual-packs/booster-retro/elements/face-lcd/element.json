@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "retro8-lcd",
+  "names": {
+    "fr": "Face d'écran LCD",
+    "en": "LCD face"
+  },
+  "descriptions": {
+    "fr": "Une carte rare vert d'écran LCD de console portable, holographique.",
+    "en": "A rare card in a handheld's green LCD, holographic."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

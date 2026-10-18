@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "odyssee",
+  "names": {
+    "fr": "Scène Odyssée",
+    "en": "Odyssey scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture en plein espace, en pleine bataille. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening in deep space, in the middle of a battle. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-container",
+      "backdrop": "backdrop-battle",
+      "opening": "opening-jump",
+      "back": {
+        "common": "back-hull"
+      },
+      "face": {
+        "common": "face-metal",
+        "rare": "face-shield",
+        "epic": "face-plasma",
+        "legendary": "face-core"
+      },
+      "reveal": {
+        "rare": "reveal-shield",
+        "epic": "reveal-squadron",
+        "legendary": "reveal-warp"
+      }
+    }
+  }
+}

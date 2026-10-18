@@ -1,0 +1,63 @@
+/* The sealed pack (its hook: data-booster-look): a game cartridge — grey plastic, ridges at the top, a label in
+   pixel bands, its LED. */
+[data-booster-look="retro8"] .booster-pack {
+  border-radius: 0.45rem 0.45rem 0.2rem 0.2rem;
+  clip-path: polygon(0 0, 100% 0, 100% 86%, 92% 86%, 92% 100%, 8% 100%, 8% 86%, 0 86%);
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.25) 0 2px, transparent 2px 8px) top / 100% 12% no-repeat,
+    linear-gradient(180deg, #ff4a6b 0 6%, #ffb02e 6% 12%, #ffe23d 12% 18%, #41d36b 18% 24%, #3ab0ff 24% 30%, #7a5cff 30% 36%) 50% 32% / 78% 36% no-repeat,
+    linear-gradient(180deg, #a7a9ad, #8c8e93 60%, #74767b);
+  box-shadow: inset 0 0 0 2px #5c5e63;
+  image-rendering: pixelated;
+}
+[data-booster-look="retro8"] .booster-pack__stars,
+[data-booster-look="retro8"] .booster-pack__foil {
+  opacity: 0;
+}
+[data-booster-look="retro8"] .booster-pack__flap {
+  border: 0;
+  background: none;
+}
+/* the label's frame, and the emblem on it as a pixel heart */
+[data-booster-look="retro8"] .booster-pack__emblem {
+  inline-size: 22%;
+  translate: 0 -40%;
+  border-radius: 0;
+  clip-path: polygon(20% 10%, 40% 10%, 40% 20%, 60% 20%, 60% 10%, 80% 10%, 80% 20%, 90% 20%, 90% 50%, 80% 50%, 80% 60%, 70% 60%, 70% 70%, 60% 70%, 60% 80%, 40% 80%, 40% 70%, 30% 70%, 30% 60%, 20% 60%, 20% 50%, 10% 50%, 10% 20%, 20% 20%);
+  background: #ff3355;
+  color: transparent;
+  filter: none;
+}
+[data-booster-look="retro8"] .booster-pack__name {
+  inset: auto 0 22%;
+  color: #2a2a2e;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-shadow: none;
+}
+/* the LED */
+[data-booster-look="retro8"] .booster-pack__count {
+  inset: auto auto 18% 12%;
+  background: #ff3355;
+  color: #fff;
+  border-radius: 0.15rem;
+  box-shadow: 0 0 0.5rem rgba(255, 51, 85, 0.9);
+}
+
+/* tension: the sealed pack breathes, a double heartbeat now and then — waiting to be opened */
+[data-booster-look="retro8"] .booster-stage__tear {
+  animation: booster-hover 4s ease-in-out infinite, retro-heartbeat 3.4s ease-in-out infinite;
+}
+/* on « scale », added to the float of Portalab's own (never replacing it) */
+@keyframes retro-heartbeat {
+  0%, 60%, 100% { scale: 1; }
+  66% { scale: 1.022; }
+  71% { scale: 0.996; }
+  77% { scale: 1.035; }
+  86% { scale: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="retro8"] .booster-stage__tear {
+    animation: none;
+  }
+}

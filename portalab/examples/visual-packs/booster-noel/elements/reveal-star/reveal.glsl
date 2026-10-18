@@ -19,6 +19,6 @@
     float size = 0.003 + 0.004 * hash(vec2(fk, 4.0));
     o = over(o, vec3(1.0, 0.88, 0.5), smoothstep(size, 0.0, length(c - vec2(x + 0.03 * sin(age * 2.0 + fk), y))) * step(0.3, age) * fade);
   }
-  // its edges fade out: never the outline of its box
-  vec2 edgeuv = gl_FragCoord.xy / u_res;
-  o *= smoothstep(0.0, 0.25, min(edgeuv.x, 1.0 - edgeuv.x)) * smoothstep(0.0, 0.25, min(edgeuv.y, 1.0 - edgeuv.y));
+  // its edges fade out: an ellipse inside its box, fading to nothing well before its sides (never a rectangle)
+  vec2 edgeuv = gl_FragCoord.xy / u_res * 2.0 - 1.0;
+  o *= smoothstep(1.0, 0.62, length(edgeuv));

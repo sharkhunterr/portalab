@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "neon2077-hack",
+  "names": {
+    "fr": "Le piratage",
+    "en": "The hack"
+  },
+  "descriptions": {
+    "fr": "Le fragment est piraté : du code défile, une grille hexagonale de glace l'entoure, une alerte rouge clignote, puis la glace se brise en hexagones dans un éclair cyan et les cartes en sortent (HD).",
+    "en": "The shard is hacked: code streams, a hexagonal ICE grid closes round it, a red alert flashes, then the ICE shatters into hexagons in a cyan flash and the cards come out (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "hack.glsl",
+    "css": [
+      "decrypt.css"
+    ],
+    "stage": true,
+    "duration": 2.8
+  }
+}

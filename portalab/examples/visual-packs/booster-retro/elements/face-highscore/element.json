@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "retro8-highscore",
+  "names": {
+    "fr": "Face high score",
+    "en": "High score face"
+  },
+  "descriptions": {
+    "fr": "Une carte légendaire d'or « high score », un arc-en-ciel de bandes, holographie, paillettes, l'image qui s'incline.",
+    "en": "A legendary gold « high score » card, rainbow bands, holography, glitter, the art leaning."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

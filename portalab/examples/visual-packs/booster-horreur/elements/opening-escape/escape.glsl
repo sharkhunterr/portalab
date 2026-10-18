@@ -80,6 +80,6 @@
     o = over(o, vec3(0.7, 0.0, 0.0), eye * iris * fade);
     o = over(o, vec3(0.0), eye * pupil * fade);
   }
-  // its edges fade out: never the outline of its box
-  vec2 edgeuv = gl_FragCoord.xy / u_res;
-  o *= smoothstep(0.0, 0.25, min(edgeuv.x, 1.0 - edgeuv.x)) * smoothstep(0.0, 0.25, min(edgeuv.y, 1.0 - edgeuv.y));
+  // its edges fade out: an ellipse inside its box, fading to nothing well before its sides (never a rectangle)
+  vec2 edgeuv = gl_FragCoord.xy / u_res * 2.0 - 1.0;
+  o *= smoothstep(1.0, 0.62, length(edgeuv));

@@ -23,6 +23,6 @@
     crack += smoothstep(0.01, 0.0, abs(sin(a - dir - 0.12 * sin(length(c) * 30.0 + fk))) * length(c)) * step(0.3, length(c)) * step(length(c), (age - 0.6) * 0.8);
   }
   o = over(o, vec3(1.0, 0.85, 0.8), clamp(crack, 0.0, 1.0) * fade);
-  // its edges fade out: never the outline of its box
-  vec2 edgeuv = gl_FragCoord.xy / u_res;
-  o *= smoothstep(0.0, 0.25, min(edgeuv.x, 1.0 - edgeuv.x)) * smoothstep(0.0, 0.25, min(edgeuv.y, 1.0 - edgeuv.y));
+  // its edges fade out: an ellipse inside its box, fading to nothing well before its sides (never a rectangle)
+  vec2 edgeuv = gl_FragCoord.xy / u_res * 2.0 - 1.0;
+  o *= smoothstep(1.0, 0.62, length(edgeuv));

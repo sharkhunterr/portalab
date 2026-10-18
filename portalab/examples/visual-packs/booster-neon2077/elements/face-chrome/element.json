@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "neon2077-chrome",
+  "names": {
+    "fr": "Face chromée",
+    "en": "Chrome face"
+  },
+  "descriptions": {
+    "fr": "Une carte commune de chrome noir, un liseré jaune.",
+    "en": "A common card of black chrome, a yellow trim."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

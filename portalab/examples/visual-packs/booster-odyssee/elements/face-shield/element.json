@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "odyssee-shield",
+  "names": {
+    "fr": "Face de bouclier",
+    "en": "Shield face"
+  },
+  "descriptions": {
+    "fr": "Une carte rare d'énergie de bouclier cyan, holographique.",
+    "en": "A rare card of cyan shield energy, holographic."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

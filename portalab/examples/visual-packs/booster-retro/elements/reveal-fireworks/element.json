@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "retro8-fireworks",
+  "names": {
+    "fr": "Niveau terminé",
+    "en": "Level clear"
+  },
+  "descriptions": {
+    "fr": "Le niveau est terminé : des feux d'artifice de pixels éclatent, des bandes arc-en-ciel défilent, l'écran tremble et une pluie d'étoiles retombe (HD).",
+    "en": "Level clear: pixel fireworks burst, rainbow bands scroll, the screen shakes and a shower of stars falls (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary"
+  }
+}

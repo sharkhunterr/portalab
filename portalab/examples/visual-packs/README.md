@@ -25,6 +25,11 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   figure standing in the doorway now and then, a chained box with a red eye at its keyhole, a long opening
   where the light dies, the heart races and claw marks appear before a red strobe, glitching faces (the
   photograph, the negative, rust and blood, the Eye) and reveals (static, crawling hands, the eye watching);
+- `booster-odyssee/` (`odyssee`), `booster-retro/` (`retro8`), `booster-neon2077/` (`neon2077`): **a space
+  battle** (asteroids, fighters weaving, a cargo container venting, a hyperspace jump), **an 8-bit game on a CRT**
+  (a scrolling pixel world, a cartridge, a console powering on, pixel coins and fireworks) and **a cyberpunk
+  megacity in the rain** (holograms, flying cars, a data shard hacked, its ICE shattering, neon arcs). Every
+  scene's effects fade out inside an ellipse of their layer, so its box never shows.
 - `widgets/` (`vigie`): **self-contained widgets** (spec 028, US6) — everything they do is in the pack: a new
   widget « Heading » (a compass of the member's progression, drawing itself on one line, in a column or as a
   block, with its own setting « dial » whose silver value is sold and night value offered, reading the

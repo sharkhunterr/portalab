@@ -25,6 +25,6 @@
     o = over(o, vec3(0.62, 0.0, 0.03), smoothstep(0.0, 1.0, hand) * 0.35 * reach);
     o = over(o, mix(vec3(0.32, 0.29, 0.28), vec3(0.6, 0.55, 0.52), smoothstep(-0.05, 0.08, r.y)), hand * 0.92 * reach);
   }
-  // its edges fade out: never the outline of its box
-  vec2 edgeuv = gl_FragCoord.xy / u_res;
-  o *= smoothstep(0.0, 0.25, min(edgeuv.x, 1.0 - edgeuv.x)) * smoothstep(0.0, 0.25, min(edgeuv.y, 1.0 - edgeuv.y));
+  // its edges fade out: an ellipse inside its box, fading to nothing well before its sides (never a rectangle)
+  vec2 edgeuv = gl_FragCoord.xy / u_res * 2.0 - 1.0;
+  o *= smoothstep(1.0, 0.62, length(edgeuv));

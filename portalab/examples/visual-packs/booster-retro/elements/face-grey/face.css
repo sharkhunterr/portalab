@@ -1,0 +1,22 @@
+/* A common card: an old console's grey (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform. */
+[data-card-face="retro8-grey"] .booster-card__face {
+  isolation: isolate;
+  border: 0;
+  clip-path: polygon(0.0% 5.0%, 2.5% 5.0%, 2.5% 2.5%, 5.0% 2.5%, 95.0% 2.5%, 97.5% 2.5%, 97.5% 5.0%, 100.0% 5.0%, 100.0% 95.0%, 97.5% 95.0%, 97.5% 97.5%, 95.0% 97.5%, 5.0% 97.5%, 2.5% 97.5%, 2.5% 95.0%, 0.0% 95.0%);
+  background: linear-gradient(180deg, #c4c6ca, #8c8e93);
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.55rem rgba(200, 200, 210, 0.35));
+}
+[data-card-face="retro8-grey"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  clip-path: polygon(0.0% 5.0%, 2.5% 5.0%, 2.5% 2.5%, 5.0% 2.5%, 95.0% 2.5%, 97.5% 2.5%, 97.5% 5.0%, 100.0% 5.0%, 100.0% 95.0%, 97.5% 95.0%, 97.5% 97.5%, 95.0% 97.5%, 5.0% 97.5%, 2.5% 97.5%, 2.5% 95.0%, 0.0% 95.0%);
+  background: linear-gradient(175deg, #3a3a40, #26262b);
+}
+[data-card-face="retro8-grey"] .booster-card__rarity,
+[data-card-face="retro8-grey"] .booster-card__name {
+  color: #f4f4f4;
+  text-shadow: 0 0 0.6rem rgba(200, 200, 210, 0.35);
+}

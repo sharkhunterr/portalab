@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "neon2077-neon",
+  "names": {
+    "fr": "Face de néon rose",
+    "en": "Pink neon face"
+  },
+  "descriptions": {
+    "fr": "Une carte épique de néon rose, encochée, holographique et vivante.",
+    "en": "An epic card of pink neon, notched, holographic and alive."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

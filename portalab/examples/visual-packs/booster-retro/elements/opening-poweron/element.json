@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "retro8-poweron",
+  "names": {
+    "fr": "Mise sous tension",
+    "en": "Power on"
+  },
+  "descriptions": {
+    "fr": "La cartouche s'enfonce dans la console, l'écran s'allume comme un vieux tube — une ligne blanche qui s'ouvre, un éclair — puis une gerbe de pièces et d'étoiles de pixels, et les cartes en sortent (HD).",
+    "en": "The cartridge pushes into the console, the screen comes on like an old tube — a white line opening up, a flash — then a burst of pixel coins and stars, and the cards come out (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "poweron.glsl",
+    "css": [
+      "insert.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

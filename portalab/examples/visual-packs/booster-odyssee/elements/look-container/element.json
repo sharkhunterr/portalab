@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "odyssee",
+  "names": {
+    "fr": "Caisson de cargaison",
+    "en": "Cargo container"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient un caisson de cargaison tombé d'un vaisseau : plaques de métal, bandes de danger, joints lumineux cyan, un écran d'état ; un faisceau de scan le balaie, des voyants clignotent et des anneaux holographiques tournent autour (HD).",
+    "en": "The pack becomes a cargo container from a starship: metal plates, hazard bands, cyan glowing seams, a status screen; a scan beam sweeps it, lights blink and holographic rings turn round it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "scan.glsl",
+    "css": [
+      "container.css"
+    ],
+    "stage": true
+  }
+}

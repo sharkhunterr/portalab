@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "neon2077-glitch",
+  "names": {
+    "fr": "Glitch",
+    "en": "Glitch"
+  },
+  "descriptions": {
+    "fr": "L'image se dérègle autour de la carte : tranches décalées, couleurs séparées en rose et cyan, lignes de balayage qui se déchirent (HD).",
+    "en": "The picture breaks up round the card: shifted slices, colours split into pink and cyan, tearing scanlines (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

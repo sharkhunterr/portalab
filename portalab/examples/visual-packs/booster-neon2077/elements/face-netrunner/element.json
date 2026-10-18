@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "neon2077-netrunner",
+  "names": {
+    "fr": "Face de netrunner",
+    "en": "Netrunner face"
+  },
+  "descriptions": {
+    "fr": "Une carte rare de netrunner, cyan électrique, coins tranchés, holographique, ses mots qui glitchent.",
+    "en": "A rare netrunner card, electric cyan, cut corners, holographic, its words glitching."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

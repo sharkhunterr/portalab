@@ -30,6 +30,6 @@
     vec2 s = vec2(cos(ang) * 0.3, sin(ang) * 0.38) + vec2(0.02 * sin(life * 9.0 + fk), life * 0.25);
     o = over(o, vec3(0.8, 1.0, 0.85), exp(-length(c - s) * 260.0) * smoothstep(1.0, 0.5, life) * fade);
   }
-  // its edges fade out, narrowly: never the outline of its box
-  vec2 edgeuv = gl_FragCoord.xy / u_res;
-  o *= smoothstep(0.0, 0.08, min(edgeuv.x, 1.0 - edgeuv.x)) * smoothstep(0.0, 0.08, min(edgeuv.y, 1.0 - edgeuv.y));
+  // its edges fade out: an ellipse inside its box, reaching close to its sides yet never showing them
+  vec2 edgeuv = gl_FragCoord.xy / u_res * 2.0 - 1.0;
+  o *= smoothstep(1.0, 0.72, length(edgeuv));

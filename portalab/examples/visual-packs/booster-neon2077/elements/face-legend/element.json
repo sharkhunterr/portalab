@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "neon2077-legend",
+  "names": {
+    "fr": "Face Légende",
+    "en": "Legend face"
+  },
+  "descriptions": {
+    "fr": "Une carte légendaire jaune et noire, bandes de danger, éclat brisé, holographie, paillettes, l'image qui s'incline — et ses mots qui glitchent.",
+    "en": "A legendary yellow and black card, hazard bands, a broken shard, holography, glitter, the art leaning — and its words glitching."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

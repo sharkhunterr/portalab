@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "odyssee-jump",
+  "names": {
+    "fr": "Saut hyperspatial",
+    "en": "Hyperspace jump"
+  },
+  "descriptions": {
+    "fr": "Les verrous du caisson sautent, il se dépressurise en jets de vapeur, ses panneaux s'écartent — puis les étoiles s'étirent en saut hyperspatial, un éclair blanc, et les cartes en jaillissent (HD).",
+    "en": "The container's locks blow, it vents in jets of steam, its panels slide apart — then the stars stretch into a hyperspace jump, a white flash, and the cards burst out (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "jump.glsl",
+    "css": [
+      "panels.css"
+    ],
+    "stage": true,
+    "duration": 2.8
+  }
+}

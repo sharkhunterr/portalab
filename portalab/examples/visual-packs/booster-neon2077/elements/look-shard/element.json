@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "neon2077",
+  "names": {
+    "fr": "Fragment de données",
+    "en": "Data shard"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient un fragment de données en chrome noir, une bande jaune et des pistes de circuit cyan, qui se dérègle par moments ; un halo de néon et des glyphes qui défilent autour (HD).",
+    "en": "The pack becomes a black chrome data shard, a yellow band and cyan circuit traces, glitching now and then; a neon halo and glyphs streaming round it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "glow.glsl",
+    "css": [
+      "shard.css"
+    ],
+    "stage": true
+  }
+}

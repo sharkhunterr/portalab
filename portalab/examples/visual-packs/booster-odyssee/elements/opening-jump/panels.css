@@ -1,0 +1,41 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening): the locks blow, it shudders as it
+   vents, its top panel slides away, then it is pulled into the jump and gone. */
+[data-opening="odyssee-jump"] .booster-stage__tear .booster-pack {
+  animation: odyssee-vent 2.8s cubic-bezier(0.5, 0, 0.8, 0.4) both;
+}
+[data-opening="odyssee-jump"][data-booster-look] .booster-stage__tear .booster-pack .booster-pack__flap {
+  visibility: visible;
+  animation: odyssee-panel 2.8s ease-in both;
+}
+[data-opening="odyssee-jump"][data-booster-look] .booster-stage__tear .booster-stage__rising span {
+  border: 1px solid rgba(80, 230, 255, 0.85);
+  border-radius: 0.3rem;
+  background: repeating-linear-gradient(0deg, rgba(80, 230, 255, 0.1) 0 1px, transparent 1px 4px), linear-gradient(160deg, #2b3238, #10151a);
+  box-shadow: 0 0 1.2rem rgba(80, 230, 255, 0.7);
+  animation: odyssee-out 2.8s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+}
+@keyframes odyssee-vent {
+  0% { transform: none; filter: none; opacity: 1; }
+  8%, 18% { transform: translate(-2px, 1px); filter: brightness(1.2); }
+  13%, 23% { transform: translate(2px, -1px); }
+  30%, 40% { transform: translate(-3px, 0) rotate(-1deg); }
+  35%, 45% { transform: translate(3px, 0) rotate(1deg); }
+  55% { transform: scale(1.02); filter: brightness(1.5); }
+  64% { transform: scale(0.92, 1.06); filter: brightness(2.5); opacity: 1; }
+  70%, 100% { transform: scale(0.1, 2.4); filter: brightness(4); opacity: 0; }
+}
+@keyframes odyssee-panel {
+  0%, 40% { transform: none; }
+  52%, 100% { transform: translateY(-260%); opacity: 0; }
+}
+@keyframes odyssee-out {
+  0%, 66% { opacity: 0; transform: scale(0.2); }
+  72% { opacity: 1; }
+  100% { opacity: 1; transform: translate(calc((var(--i, 0) - 2) * 42%), -14%) rotate(calc((var(--i, 0) - 2) * 7deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="odyssee-jump"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "neon2077",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Néon 2077 — scène de booster",
+    "en": "Neon 2077 — a booster scene"
+  },
+  "descriptions": {
+    "fr": "L'ouverture d'un booster dans une mégapole cyberpunk sous la pluie : gratte-ciel et hologrammes publicitaires, voitures volantes, flaques de néon ; un fragment de données à pirater, sa glace qui se brise en hexagones, des glitchs et des arcs de néon — du chrome à la carte « Légende ».",
+    "en": "A booster opened in a cyberpunk megacity in the rain: towers and holographic ads, flying cars, neon puddles; a data shard to hack, its ICE shattering into hexagons, glitches and neon arcs — from chrome to the « Legend » card."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

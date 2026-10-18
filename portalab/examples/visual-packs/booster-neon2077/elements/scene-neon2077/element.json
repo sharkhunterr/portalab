@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "neon2077",
+  "names": {
+    "fr": "Scène Néon 2077",
+    "en": "Neon 2077 scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture dans une mégapole cyberpunk. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening in a cyberpunk megacity. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-shard",
+      "backdrop": "backdrop-city",
+      "opening": "opening-hack",
+      "back": {
+        "common": "back-chrome"
+      },
+      "face": {
+        "common": "face-chrome",
+        "rare": "face-netrunner",
+        "epic": "face-neon",
+        "legendary": "face-legend"
+      },
+      "reveal": {
+        "rare": "reveal-glitch",
+        "epic": "reveal-intrusion",
+        "legendary": "reveal-overload"
+      }
+    }
+  }
+}

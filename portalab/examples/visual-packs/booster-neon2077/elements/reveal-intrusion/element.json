@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "neon2077-intrusion",
+  "names": {
+    "fr": "Intrusion",
+    "en": "Intrusion"
+  },
+  "descriptions": {
+    "fr": "Une grille hexagonale se propage autour de la carte, des flux de données y courent en rose et cyan, une onde jaune la traverse (HD).",
+    "en": "A hexagonal grid spreads round the card, data streams running through it in pink and cyan, a yellow wave crossing it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic"
+  }
+}

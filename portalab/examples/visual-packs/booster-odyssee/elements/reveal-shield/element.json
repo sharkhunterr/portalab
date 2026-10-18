@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "odyssee-shield",
+  "names": {
+    "fr": "Bouclier déflecteur",
+    "en": "Deflector shield"
+  },
+  "descriptions": {
+    "fr": "Une bulle de bouclier hexagonale s'allume autour de la carte, des tirs la frappent et elle ondule à chaque impact (HD).",
+    "en": "A hexagonal shield bubble lights up round the card, shots strike it and it ripples at each hit (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.0,
+    "rarity": "rare"
+  }
+}

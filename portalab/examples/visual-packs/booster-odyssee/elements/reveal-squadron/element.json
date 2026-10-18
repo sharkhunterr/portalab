@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "odyssee-squadron",
+  "names": {
+    "fr": "Escadrille",
+    "en": "Squadron"
+  },
+  "descriptions": {
+    "fr": "Une escadrille de chasseurs tourne autour de la carte en échangeant des tirs laser, des explosions éclatent (HD).",
+    "en": "A squadron of fighters circles the card trading laser fire, explosions bursting (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic"
+  }
+}
