@@ -2,12 +2,12 @@
   "type": "booster_backdrop",
   "look": "ruee",
   "names": {
-    "fr": "La grand-rue",
-    "en": "Main Street"
+    "fr": "Le train de l'Ouest",
+    "en": "The western train"
   },
   "descriptions": {
-    "fr": "Toute la scène dans la grand-rue au crépuscule : le saloon et ses lanternes, une éolienne qui tourne, des buissons qui roulent, un tourbillon de poussière, des vautours (HD).",
-    "en": "The whole stage on Main Street at dusk: the saloon and its lanterns, a windmill turning, tumbleweeds rolling, a dust devil, vultures (HD)."
+    "fr": "Toute la scène dans un wagon du train de l'Ouest, au coucher du soleil : par la fenêtre, le désert qui défile — mesas au loin, buttes, prairie et saguaros, poteaux télégraphiques qui filent, leurs fils qui montent et descendent, la fumée de la locomotive qui passe sur la vitre ; dedans, des boiseries d'acajou, des rideaux de velours, un porte-bagages en laiton où tressaute une valise, des lampes à huile — et le wagon qui tangue sur les joints des rails (HD).",
+    "en": "The whole stage inside a carriage of the western train at sunset: through the window the desert rolls by — far mesas, buttes, prairie and saguaros, telegraph poles flashing past, their wires rising and falling, the locomotive's smoke drifting across the glass; inside, mahogany panels, velvet curtains, a brass luggage rack where a suitcase jolts, oil lamps — and the carriage rocking on the rails' joints (HD)."
   },
   "render": {
     "kind": "glsl",

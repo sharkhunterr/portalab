@@ -2,12 +2,12 @@
   "type": "booster_backdrop",
   "look": "olympe",
   "names": {
-    "fr": "Le sommet de l'Olympe",
-    "en": "The summit of Olympus"
+    "fr": "La salle des dieux",
+    "en": "The hall of the gods"
   },
   "descriptions": {
-    "fr": "Toute la scène au sommet de l'Olympe : un temple de marbre au-dessus d'une mer de nuages, des rayons de soleil, un aigle qui tourne, des éclairs lointains dans les nuages (HD).",
-    "en": "The whole stage on the summit of Olympus: a marble temple above a sea of clouds, sunbeams, an eagle circling, far lightning in the clouds (HD)."
+    "fr": "Toute la scène dans la salle des dieux : deux colonnades de marbre qui s'enfoncent vers un grand portail ouvert sur le soleil couchant et la mer de nuages, un plafond à caissons rehaussés d'or, un dallage de marbre poli où se reflètent colonnes et feux, des braseros au pied des colonnes, des nuages qui coulent au ras du sol, la lumière qui entre en rayons, une poussière d'or, un éclair au loin de temps en temps — et la caméra qui avance lentement, sans fin (HD).",
+    "en": "The whole stage in the hall of the gods: two marble colonnades running away to a great portal open on the setting sun and the sea of clouds, a coffered ceiling picked out in gold, a polished marble floor mirroring the columns and the fires, braziers at the columns' feet, clouds flowing along the floor, the light pouring in in rays, gold dust, lightning far away now and then — and the camera gliding slowly forward, for ever (HD)."
   },
   "render": {
     "kind": "glsl",

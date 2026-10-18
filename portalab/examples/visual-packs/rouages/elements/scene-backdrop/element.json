@@ -6,8 +6,8 @@
     "en": "The engine room"
   },
   "descriptions": {
-    "fr": "Toute la scène dans la salle des machines : de grands engrenages qui tournent, une chaudière rougeoyante, des jets de vapeur, un dirigeable qui passe derrière une verrière (HD).",
-    "en": "The whole stage in the engine room: great gears turning, a glowing boiler, jets of steam, an airship passing behind a glass roof (HD)."
+    "fr": "Toute la scène au fond d'une salle des machines : un mur de briques posées à la main que le four fait respirer, la lumière d'une haute fenêtre en rais dans la poussière, de grands engrenages usés qui s'engrènent (les lointains flous, un proche sombre), un tuyau de cuivre qui ploie, un manomètre dont l'aiguille tremble, des vannes qui crachent une vapeur qui s'enroule, une chaîne qui se balance, des braises qui montent (HD).",
+    "en": "The whole stage deep in an engine room: a hand-laid brick wall breathing with the furnace, light from a high window falling in shafts through the dust, great worn gears meshing (the far ones soft, a near one dark), a sagging copper pipe, a gauge whose needle trembles, valves hissing out curling steam, a chain swaying, embers rising (HD)."
   },
   "render": {
     "kind": "glsl",
