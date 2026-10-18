@@ -312,47 +312,55 @@ class ConfinedHost:
     async def call(self, hid: int, method: str | None, args: Iterable[Any], kwargs: Mapping[str, Any]) -> Any:
         if self.state != "running":
             await self.start()
-        if self._slots.locked():
+        # at most ``concurrency`` calls at once: the next ones wait for a place, within their deadline
+        try:
+            await asyncio.wait_for(self._slots.acquire(), timeout=self.config.deadline_s)
+        except TimeoutError:
             await self.on_attempt("busy", {"concurrency": self.config.concurrency})
-            raise Busy("busy", "the plugin is busy")
-        async with self._slots:
-            cid = next(self._ids)
-            future: asyncio.Future[dict[str, Any]] = asyncio.get_running_loop().create_future()
-            self._pending[cid] = future
-            exposed_before = set(self._exposed)
-            acting = next((a for a in args if _is_member(a)), None)
-            if acting is not None:
-                self._acting[cid] = acting
-            message = {
-                "t": "call",
-                "id": cid,
-                "hid": hid,
-                "method": method,
-                "deadline_ms": int(self.config.deadline_s * 1000),
-                "args": self.codec.encode(list(args)),
-                "kwargs": self.codec.encode(dict(kwargs)),
-            }
-            try:
-                self._write(message)
-                answer = await asyncio.wait_for(future, timeout=self.config.deadline_s)
-            except TimeoutError:
-                self._pending.pop(cid, None)
-                await self.on_attempt("timeout", {"deadline_s": self.config.deadline_s})
-                self._spawn_task(self._check_alive())
-                raise ChildFailed("timeout", "the plugin did not answer in time") from None
-            except Oversize:
-                self._pending.pop(cid, None)
-                raise ChildFailed("oversize", "the request is too large") from None
-            finally:
-                self._acting.pop(cid, None)
-                for oid in set(self._exposed) - exposed_before:
-                    self._exposed.pop(oid, None)
-            if not answer.get("ok"):
-                error = answer.get("error") or {}
-                raise ChildFailed(
-                    "error", f"{error.get('type', 'Error')}: {str(error.get('message', ''))[:300]}"
-                )
-            return self.codec.decode(answer.get("value"))
+            raise Busy("busy", "the plugin is busy") from None
+        try:
+            return await self._call(hid, method, args, kwargs)
+        finally:
+            self._slots.release()
+
+    async def _call(
+        self, hid: int, method: str | None, args: Iterable[Any], kwargs: Mapping[str, Any]
+    ) -> Any:
+        cid = next(self._ids)
+        future: asyncio.Future[dict[str, Any]] = asyncio.get_running_loop().create_future()
+        self._pending[cid] = future
+        exposed_before = set(self._exposed)
+        acting = next((a for a in args if _is_member(a)), None)
+        if acting is not None:
+            self._acting[cid] = acting
+        message = {
+            "t": "call",
+            "id": cid,
+            "hid": hid,
+            "method": method,
+            "deadline_ms": int(self.config.deadline_s * 1000),
+            "args": self.codec.encode(list(args)),
+            "kwargs": self.codec.encode(dict(kwargs)),
+        }
+        try:
+            self._write(message)
+            answer = await asyncio.wait_for(future, timeout=self.config.deadline_s)
+        except TimeoutError:
+            self._pending.pop(cid, None)
+            await self.on_attempt("timeout", {"deadline_s": self.config.deadline_s})
+            self._spawn_task(self._check_alive())
+            raise ChildFailed("timeout", "the plugin did not answer in time") from None
+        except Oversize:
+            self._pending.pop(cid, None)
+            raise ChildFailed("oversize", "the request is too large") from None
+        finally:
+            self._acting.pop(cid, None)
+            for oid in set(self._exposed) - exposed_before:
+                self._exposed.pop(oid, None)
+        if not answer.get("ok"):
+            error = answer.get("error") or {}
+            raise ChildFailed("error", f"{error.get('type', 'Error')}: {str(error.get('message', ''))[:300]}")
+        return self.codec.decode(answer.get("value"))
 
     async def _check_alive(self) -> None:
         """After a timeout: a process that no longer answers is restarted (its event loop is stuck)."""

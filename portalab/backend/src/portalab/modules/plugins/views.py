@@ -51,6 +51,11 @@ VIEW_BOOTSTRAP = r"""
   const image = (id) => ask({ type: "image", image: String(id) }).then(
     (answer) => URL.createObjectURL(new Blob([answer.buffer], { type: String(answer.mime || "") })),
   );
+  // a title's artwork (a ``ref`` of /media/{id}/metadata: a backdrop, a face), fetched by Portalab
+  const artwork = (ref, size) => ask({ type: "artwork", ref: String(ref), size: String(size || "w500") })
+    .then(
+    (answer) => URL.createObjectURL(new Blob([answer.buffer], { type: String(answer.mime || "") })),
+  );
   const resize = () => send({ type: "resize", height: Math.ceil(document.documentElement.scrollHeight) });
   window.addEventListener("message", async (event) => {
     if (event.source !== host || !event.data || typeof event.data !== "object") return;
@@ -128,6 +133,7 @@ VIEW_BOOTSTRAP = r"""
         },
         asset,
         image,
+        artwork,
         open: (surface, params) => send({ type: "open", surface: String(surface), params: params || {} }),
         close: () => send({ type: "close" }),
         navigate: (to) => send({ type: "navigate", to: String(to) }),

@@ -92,7 +92,6 @@ class PluginDatabase:
         self._engines: dict[str, AsyncEngine] = {}
         self._read_only: dict[str, bool] = {}
         self._measured: dict[str, float] = {}
-        self._last: dict[str, Any] = {}
 
     def role(self, key: str) -> str:
         role = f"{self.role_prefix}{key}"
@@ -181,18 +180,18 @@ class PluginDatabase:
         engine = await self.engine(key, timeout_ms)
         async with engine.connect() as conn:
             try:
-                await self._run(conn, sql, params, timeout_ms, read_only)
+                answer = await self._run(conn, sql, params, timeout_ms, read_only)
             finally:
                 # nothing a statement left behind (a session setting, an advisory lock) outlives the call
                 await conn.rollback()
                 await conn.execute(text("RESET ALL"))
                 await conn.execute(text("SELECT pg_advisory_unlock_all()"))
                 await conn.commit()
-        return self._last
+        return answer
 
     async def _run(
         self, conn: Any, sql: str, params: Mapping[str, Any] | None, timeout_ms: int, read_only: bool
-    ) -> None:
+    ) -> dict[str, Any]:
         try:
             async with conn.begin():
                 if read_only:
@@ -221,7 +220,8 @@ class PluginDatabase:
             if state == "57014":
                 raise StatementRefused("timeout", "the statement took too long") from None
             raise StatementRefused("failed", f"the statement failed ({state or 'error'})") from None
-        self._last = {"rows": rows, "rowcount": rowcount, "read_only": read_only}
+        # each call its own answer (calls run concurrently: nothing is kept on the instance)
+        return {"rows": rows, "rowcount": rowcount, "read_only": read_only}
 
     async def close(self, key: str | None = None) -> None:
         keys = [key] if key else list(self._engines)

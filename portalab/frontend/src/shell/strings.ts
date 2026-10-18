@@ -110,6 +110,11 @@ function build(t: Translate): ShellStrings {
     out[key] = PLURALS.has(key) ? (count: number) => t(`shell:${key}`, { count }) : t(`shell:${key}`);
   }
   out.label = (key: string) => {
+    if (key.includes(":")) {
+      // 030: a key with its own namespace (a plugin's ``plugin.<key>:nav.home``) is read from that catalog
+      const own = t(key);
+      if (own !== key && !key.endsWith(own)) return own;
+    }
     const text = t(`nav:${key}`);
     return text === key ? label(key) : text;
   };

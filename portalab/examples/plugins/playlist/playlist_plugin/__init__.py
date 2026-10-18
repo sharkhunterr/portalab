@@ -4,6 +4,7 @@ and changes only their own playlists; a title's name is read through Portalab wi
 from portalab.sdk.confined.recording import Denied
 
 TITLE = "GET /api/v1/media/{object_id}"
+METADATA = "GET /api/v1/media/{object_id}/metadata"
 
 
 def _clean(text, limit):
@@ -125,6 +126,52 @@ def register(ctx):
             ],
         }
 
+    async def details(principal, query, body):
+        """A title of the playlist with what the services know of it (library, then enriched metadata)."""
+        item = _clean(query.get("item"), 80)
+        try:
+            base = await ctx.portal.call(TITLE, {"object_id": item})
+        except Denied:
+            return {"state": "unavailable"}
+        if base.get("status") != 200:
+            return {"state": "unavailable"}
+        title = base["body"]
+        out = {
+            "state": "available",
+            "item": item,
+            "title": title.get("title"),
+            "year": title.get("year"),
+            "kind": title.get("kind"),
+            "image_id": title.get("image_id"),
+            "overview": title.get("overview"),
+            "genres": title.get("genres") or [],
+        }
+        try:
+            extra = await ctx.portal.call(METADATA, {"object_id": item})
+        except Denied:
+            extra = {}
+        if extra.get("status") == 200:
+            data = extra["body"]
+            people = data.get("people") or []
+            out.update(
+                {
+                    "tagline": data.get("tagline"),
+                    "overview": data.get("overview") or out["overview"],
+                    "genres": data.get("genres") or out["genres"],
+                    "runtime_min": data.get("runtime_min"),
+                    "vote_average": data.get("vote_average"),
+                    "release_date": data.get("release_date"),
+                    "backdrop": data.get("backdrop"),
+                    "director": next((p["name"] for p in people if p.get("role") == "Director"), None),
+                    "cast": [
+                        {"name": p.get("name"), "role": p.get("role"), "image": p.get("image")}
+                        for p in people
+                        if p.get("department") == "cast"
+                    ][:6],
+                }
+            )
+        return out
+
     async def values(principal, query, body):
         found = await own(principal, _id(query.get("playlist")))
         if found is None:
@@ -171,6 +218,7 @@ def register(ctx):
     ctx.route("GET", "mine", mine, permission=use, exposure="read")
     ctx.route("GET", "items", items, permission=use, exposure="read")
     ctx.route("GET", "values", values, permission=use, exposure="read")
+    ctx.route("GET", "details", details, permission=use, exposure="read")
     ctx.route("POST", "update", update, permission=use, exposure="action")
     ctx.route("POST", "delete", delete, permission=use, exposure="committing", describe=describe_delete)
     ctx.privacy(export=export, erase=erase)

@@ -5,7 +5,7 @@ schema_version = 2
 key = "playlist"
 name = "Playlists"
 description = "Your own playlists of titles."
-version = "1.1.0"
+version = "1.2.0"
 requires_portal = ">=0.1"
 maturity = "beta"
 entry_point = "playlist_plugin:register"
@@ -18,7 +18,8 @@ operations = true
 pages = true
 slots = ["media.actions", "nav"]
 privacy = true
-portal_data = { operations = ["GET /api/v1/media/{object_id}"] }
+# the services' data through Portalab, with the member's rights: a title, its enriched metadata (TMDB…)
+portal_data = { operations = ["GET /api/v1/media/{object_id}", "GET /api/v1/media/{object_id}/metadata"] }
 
 [personal_data]
 enabled = true
@@ -50,6 +51,12 @@ exposure = "read"
 
 [[routes]]
 path = "items"
+method = "GET"
+permission = "plugin:playlist.use"
+exposure = "read"
+
+[[routes]]
+path = "details"
 method = "GET"
 permission = "plugin:playlist.use"
 exposure = "read"
@@ -117,6 +124,7 @@ blocks = [
 key = "list"
 title_key = "plugin.playlist:page.list"
 permission = "plugin:playlist.use"
+view = "playlist.js"  # its own look, filled with the services' metadata; in safe mode, the blocks below
 blocks = [
   { kind = "actions", buttons = [ { label_key = "plugin.playlist:action.edit", opens = "edit" }, { label_key = "plugin.playlist:action.delete", action = "delete", then = "/plugins/playlist/mine" } ] },
   { kind = "media", title_key = "plugin.playlist:block.items", data = "items" },
@@ -145,6 +153,13 @@ blocks = [
 "view.create" = "Create"
 "view.empty" = "No playlist yet: add a title from its page with « + Playlist », or create one here."
 "view.count" = "{count} titles"
+"view.remove" = "Remove"
+"view.edit" = "Edit"
+"view.delete" = "Delete the playlist"
+"view.director" = "Directed by {name}"
+"view.with" = "With"
+"view.minutes" = "{count} min"
+"view.nothing" = "This playlist is empty: add titles from their page with « + Playlist »."
 
 [i18n.fr."plugin.playlist"]
 "nav.section" = "Playlists"
@@ -169,3 +184,10 @@ blocks = [
 "view.create" = "Créer"
 "view.empty" = "Pas encore de playlist : ajoutez un titre depuis sa fiche avec « + Playlist », ou créez-en une ici."
 "view.count" = "{count} titres"
+"view.remove" = "Retirer"
+"view.edit" = "Modifier"
+"view.delete" = "Supprimer la playlist"
+"view.director" = "Réalisé par {name}"
+"view.with" = "Avec"
+"view.minutes" = "{count} min"
+"view.nothing" = "Cette playlist est vide : ajoutez des titres depuis leur fiche avec « + Playlist »."

@@ -2,6 +2,7 @@
 holding its permission only, it opens a modal Portalab draws from the plugin's blocks; its page and edit modal
 work; deleting a playlist is confirmed by Portalab; disabled, nothing of it is offered any more."""
 
+import asyncio
 import shutil
 from dataclasses import replace
 from pathlib import Path
@@ -55,6 +56,15 @@ async def test_a_plugin_adds_an_action_to_media_pages(pl: PlHarness, client: htt
     link = mine["items"][0]["link"]
     playlist = link.split("=")[-1]
     assert mine["items"][0]["title"] == "Friday"
+    # calls of one plugin run at the same time: each gets its own answer (the storage keeps nothing shared)
+    together = await asyncio.gather(
+        *[client.get(f"/api/v1/plugins/playlist/values?playlist={playlist}") for _ in range(6)],
+        *[client.get("/api/v1/plugins/playlist/mine") for _ in range(6)],
+    )
+    bodies = [r.text[:160] for r in together]
+    assert all(r.status_code == 200 for r in together), bodies
+    assert all(r.json()["values"]["name"] == "Friday" for r in together[:6]), bodies
+    assert all(r.json()["items"][0]["title"] == "Friday" for r in together[6:])
     values = (await client.get(f"/api/v1/plugins/playlist/values?playlist={playlist}")).json()
     assert values["values"]["name"] == "Friday"
     saved = await client.post(

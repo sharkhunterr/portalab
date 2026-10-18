@@ -355,6 +355,36 @@ export function PluginView({
           );
           return;
         }
+        case "artwork": {
+          const ref = String(data.ref ?? "");
+          const size = String(data.size ?? "w500");
+          if (
+            !ref ||
+            ref.length > 200 ||
+            ref.includes("..") ||
+            !/^(w\d{2,4}|h\d{2,4}|original)$/.test(size)
+          ) {
+            answer(data.id, false, null, { code: "refused", message: "not an artwork of the library" });
+            return;
+          }
+          const url = `/api/v1/media/metadata-images?ref=${encodeURIComponent(ref)}&size=${size}`;
+          const response = await fetch(url, { credentials: "same-origin" });
+          if (!response.ok) {
+            answer(data.id, false, null, { code: "not_found", message: "not found" });
+            return;
+          }
+          const buffer = await response.arrayBuffer();
+          post(
+            {
+              type: "answer",
+              id: data.id,
+              ok: true,
+              value: { buffer, mime: response.headers.get("content-type") ?? "" },
+            },
+            [buffer],
+          );
+          return;
+        }
         case "subscribe": {
           const topic = String(data.topic ?? "");
           if (!NAME.test(topic)) return;
