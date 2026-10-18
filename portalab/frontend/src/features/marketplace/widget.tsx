@@ -6,6 +6,7 @@ import { CompactLine } from "../dashboard/widgets/compact";
 import { registerWidgetComponent, type WidgetProps } from "../dashboard/widgets/registry";
 import { TYPE_ICONS } from "./catalog/ProductPoster";
 import "./marketplace.css";
+import { productTypeLabel } from "./typeLabel";
 
 interface Featured {
   key: string;
@@ -32,7 +33,7 @@ function FeaturedWidget({ payload, compact }: WidgetProps) {
         to={`/marketplace?product=${encodeURIComponent(first.key)}`}
         icon={first.icon ?? TYPE_ICONS[first.type] ?? "shop"}
         title={first.name}
-        detail={t(`marketplace:type.${first.type}`)}
+        detail={productTypeLabel(t, first.type)}
         end={
           first.price ? (
             <>
@@ -65,7 +66,7 @@ function FeaturedWidget({ payload, compact }: WidgetProps) {
               </span>
               <span className="shop-window__name">{item.name}</span>
               <span className="shop-window__meta">
-                <span className="shop-window__type">{t(`marketplace:type.${item.type}`)}</span>
+                <span className="shop-window__type">{productTypeLabel(t, item.type)}</span>
                 <span className="shop-window__price">
                   {item.price ? (
                     <>

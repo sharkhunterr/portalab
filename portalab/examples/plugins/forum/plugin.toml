@@ -6,7 +6,7 @@ schema_version = 2
 key = "forum"
 name = "Forum"
 description = "Topics and replies, for the whole community."
-version = "1.1.1"
+version = "1.2.0"
 requires_portal = ">=0.1"
 maturity = "beta"
 entry_point = "forum_plugin:register"
@@ -65,8 +65,8 @@ exposure = "action"
 produces = ["topic_posted"]
 
 [ui]
-sections = [{ label_key = "plugin.forum:nav.section", icon = "message-square" }]
-nav = [{ key = "home", label_key = "plugin.forum:nav.home", route = "/plugins/forum/topics", permission = "plugin:forum.read", section = "plugin-forum" }]
+# a tab of Portalab's Community pages (the « community » hub), next to its own
+nav = [{ key = "home", label_key = "plugin.forum:nav.home", route = "/plugins/forum/topics", permission = "plugin:forum.read", section = "community", icon = "message-square" }]
 notification_categories = [{ name = "replies", label_key = "plugin.forum:category.replies" }]
 
 [[ui.pages]]

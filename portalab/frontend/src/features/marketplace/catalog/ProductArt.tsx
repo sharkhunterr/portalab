@@ -20,6 +20,7 @@ import { TYPE_ICONS } from "./ProductPoster";
 import "../../appearance/notification-looks.css";
 import { ProductPack } from "../boosters/Boosters";
 import "../product-art.css";
+import { productTypeLabel } from "../typeLabel";
 
 /** 027: a widget product shows the widget itself, in miniature, with the member's own data — a look for a
  * widget (#30) shows that widget wearing it. */
@@ -447,7 +448,7 @@ export function ProductArt({ product, size = "card" }: { product: Product; size?
         <>
           <span className="product-art__type">
             <Icon name={TYPE_BADGE_ICON[product.type] ?? "shop"} size={12} />
-            {t(`marketplace:type.${product.type}`)}
+            {productTypeLabel(t, product.type)}
           </span>
           {product.owned && !product.repeatable ? (
             <span className="product-art__acquired">

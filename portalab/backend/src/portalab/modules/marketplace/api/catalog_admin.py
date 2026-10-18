@@ -142,6 +142,21 @@ async def add_category(_: Manager, body: MarketplaceCategoryIn, module: Module) 
     return {"key": category.key}
 
 
+@router.get("/admin/marketplace/types")
+async def product_types(_: Manager, module: Module) -> list[dict[str, Any]]:
+    """The kinds of products the shop can sell now — Portalab's and those enabled plugins add (spec 030)."""
+    return [
+        {
+            "key": t.key,
+            "owner": t.owner,
+            "label_key": t.label_key,
+            "payload_fields": list(t.payload_fields),
+            "refundable_by_default": t.refundable_by_default,
+        }
+        for t in sorted(module.catalog.types.all(), key=lambda t: t.key)
+    ]
+
+
 @router.post("/admin/marketplace/products", response_model=MarketplaceProductOut, status_code=201)
 async def create_product(
     principal: Manager, body: MarketplaceProductIn, module: Module

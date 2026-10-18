@@ -30,7 +30,7 @@ permission = "plugin:commission.use"
 exposure = "read"
 
 [ui]
-nav = [{ key = "mine", label_key = "plugin.commission:nav.mine", route = "/plugins/commission/mine", permission = "plugin:commission.use" }]
+nav = [{ key = "mine", label_key = "plugin.commission:nav.mine", route = "/plugins/commission/mine", permission = "plugin:commission.use", section = "marketplace", icon = "palette" }]
 
 [[ui.pages]]
 key = "mine"

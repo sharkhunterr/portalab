@@ -15,6 +15,7 @@ import { Dialog } from "../../../../design-system/components/Overlays";
 import { useFormat } from "../../../../i18n/format/useFormat";
 import { useT } from "../../../../i18n/hooks/useT";
 import { ApiError } from "../../../../state/regions";
+import { productTypeLabel } from "../../typeLabel";
 import { withConfirmation } from "../confirm";
 import {
   type InventoryItem,
@@ -349,7 +350,7 @@ function MemberConsole({ userId, name }: { userId: string; name: string }) {
                 <span className="mk-console__product">
                   <strong>{product.name}</strong>
                   <small>
-                    {t(`marketplace:type.${product.type}`)} ·{" "}
+                    {productTypeLabel(t, product.type)} ·{" "}
                     {t(`marketplace:rarity.${product.rarity ?? "common"}`)}
                   </small>
                 </span>
@@ -376,7 +377,7 @@ function MemberConsole({ userId, name }: { userId: string; name: string }) {
               render: (row) => (
                 <span className="mk-console__product">
                   <strong>{nameOf(row.names, row.product)}</strong>
-                  <small>{t(`marketplace:type.${row.type}`)}</small>
+                  <small>{productTypeLabel(t, row.type)}</small>
                 </span>
               ),
             },

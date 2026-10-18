@@ -24808,6 +24808,33 @@
         ]
       }
     },
+    "/api/v1/admin/marketplace/types": {
+      "get": {
+        "description": "The kinds of products the shop can sell now \u2014 Portalab's and those enabled plugins add (spec 030).",
+        "operationId": "product_types_api_v1_admin_marketplace_types_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Product Types Api V1 Admin Marketplace Types Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Product Types",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
     "/api/v1/admin/media/accounts": {
       "get": {
         "description": "027: every account of the connected services, its member (or a suggestion) \u2014 for the mapping screen.",

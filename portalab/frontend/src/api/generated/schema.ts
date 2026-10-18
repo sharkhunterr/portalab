@@ -1831,6 +1831,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/marketplace/types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Product Types
+         * @description The kinds of products the shop can sell now — Portalab's and those enabled plugins add (spec 030).
+         */
+        get: operations["product_types_api_v1_admin_marketplace_types_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/media/accounts": {
         parameters: {
             query?: never;
@@ -20401,6 +20421,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SeasonOut"][];
+                };
+            };
+        };
+    };
+    product_types_api_v1_admin_marketplace_types_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
                 };
             };
         };

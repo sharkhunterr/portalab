@@ -740,5 +740,6 @@
   "type.card_back": "Card back",
   "type.widget_style": "Widget style",
   "type.theme_pack": "Theme pack",
-  "type.booster_backdrop": "Booster background"
+  "type.booster_backdrop": "Booster background",
+  "admin.pluginTypes": "Added by extensions"
 }

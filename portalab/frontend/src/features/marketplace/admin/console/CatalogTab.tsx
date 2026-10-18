@@ -9,6 +9,7 @@ import { FunctionalState } from "../../../../design-system/state/FunctionalState
 import { useT } from "../../../../i18n/hooks/useT";
 import type { Category, Product } from "../../api";
 import { ProductArt } from "../../catalog/ProductArt";
+import { productTypeLabel } from "../../typeLabel";
 import { withConfirmation } from "../confirm";
 import { PresentationDialog } from "../ProductEditor";
 import { useCatalogPage } from "./api";
@@ -82,7 +83,7 @@ export function CatalogTab({ categories }: { categories: Category[] }) {
           <option value="">{t("marketplace:shopadmin.allTypes")}</option>
           {types.map(([key, count]) => (
             <option key={key} value={key}>
-              {t(`marketplace:type.${key}`)} ({count})
+              {productTypeLabel(t, key)} ({count})
             </option>
           ))}
         </SelectField>
@@ -113,7 +114,7 @@ export function CatalogTab({ categories }: { categories: Category[] }) {
             <div className="admin-product__body">
               <strong>{p.name}</strong>
               <span className="widget__meta">
-                {t(`marketplace:type.${p.type}`)} · {t(`marketplace:rarity.${p.rarity ?? "common"}`)} · v
+                {productTypeLabel(t, p.type)} · {t(`marketplace:rarity.${p.rarity ?? "common"}`)} · v
                 {p.version}
                 {p.price_coins ? ` · ${p.price_coins} Coins` : ""}
                 {p.supply ? ` · ${p.remaining ?? 0}/${p.supply}` : ""}

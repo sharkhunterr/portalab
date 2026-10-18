@@ -10,6 +10,7 @@ import { looksOf, useLooks } from "../../../design-system/visuals/vocabulary";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Category, Product } from "../api";
 import { ProductArt } from "../catalog/ProductArt";
+import { productTypeLabel } from "../typeLabel";
 import { withConfirmation } from "./confirm";
 
 /**
@@ -50,6 +51,28 @@ const TYPES = [
   // #81: a sealed pack drawn at random (its odds and refunds: « Boosters » below)
   "booster",
 ] as const;
+/** 030: a kind of product an enabled plugin adds to the shop (the shop keeps coins and ownership). */
+interface PluginType {
+  key: string;
+  owner: string;
+  label_key: string;
+  payload_fields: string[];
+}
+
+function usePluginTypes(enabled: boolean) {
+  return useQuery({
+    queryKey: ["marketplace", "plugin-types"],
+    enabled,
+    queryFn: async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: an admin route added by spec 030
+      const data = (await api.GET("/api/v1/admin/marketplace/types" as any, {})).data as unknown;
+      return (Array.isArray(data) ? data : []).filter((type: PluginType) =>
+        String(type.owner).startsWith("plugin:"),
+      ) as PluginType[];
+    },
+  });
+}
+
 /** #81: the seasons a product may belong to (its season's booster and pack draw from it). */
 export const SEASONS = ["valentine", "spring", "summer", "halloween", "christmas"] as const;
 /** 027: the cosmetic types selling a design — the payload field naming it and where its names are; the
@@ -481,7 +504,10 @@ export function NewProductDialog({
   const vocabulary = useLooks().data; // 028: the looks one may sell, the packs'
   const { themes } = useTheme();
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<(typeof TYPES)[number]>("badge");
+  const [type, setType] = useState<string>("badge");
+  const pluginTypes = usePluginTypes(open).data ?? [];
+  const pluginType = pluginTypes.find((p) => p.key === type);
+  const [pluginValues, setPluginValues] = useState<Record<string, string>>({});
   const [key, setKey] = useState("");
   const [nameEn, setNameEn] = useState("");
   const [nameFr, setNameFr] = useState("");
@@ -545,8 +571,14 @@ export function NewProductDialog({
           look: "cosmos",
         };
       default:
+        if (pluginType) {
+          // 030: a plugin's kind of product: the settings it declares, as the Admin filled them
+          return Object.fromEntries(
+            pluginType.payload_fields.map((field) => [field, pluginValues[field] ?? ""]),
+          );
+        }
         {
-          const designed = DESIGNS[type];
+          const designed = DESIGNS[type as (typeof TYPES)[number]];
           if (designed) return { [designed.field]: design };
         }
         return JSON.parse(extra || "{}") as Record<string, unknown>;
@@ -639,14 +671,33 @@ export function NewProductDialog({
           <SelectField
             label={t("marketplace:admin.type")}
             value={type}
-            onChange={(e) => setType(e.target.value as (typeof TYPES)[number])}
+            onChange={(e) => setType(e.target.value)}
           >
             {TYPES.map((value) => (
               <option key={value} value={value}>
                 {t(`marketplace:type.${value}`)}
               </option>
             ))}
+            {pluginTypes.length ? (
+              <optgroup label={t("marketplace:admin.pluginTypes")}>
+                {pluginTypes.map((p) => (
+                  <option key={p.key} value={p.key}>
+                    {p.label_key ? t(p.label_key) : p.key}
+                  </option>
+                ))}
+              </optgroup>
+            ) : null}
           </SelectField>
+          {pluginType
+            ? pluginType.payload_fields.map((field) => (
+                <TextField
+                  key={field}
+                  label={field}
+                  value={pluginValues[field] ?? ""}
+                  onChange={(e) => setPluginValues({ ...pluginValues, [field]: e.target.value })}
+                />
+              ))
+            : null}
           <TextField
             label={t("marketplace:admin.key")}
             value={key}
@@ -712,7 +763,7 @@ export function NewProductDialog({
               ))}
             </SelectField>
           ) : null}
-          {DESIGNS[type] ? (
+          {DESIGNS[type as (typeof TYPES)[number]] ? (
             <SelectField
               label={t("marketplace:admin.design")}
               value={design}
@@ -724,7 +775,7 @@ export function NewProductDialog({
                 .filter((value) => value !== "none" && value !== "theme")
                 .map((value) => (
                   <option key={value} value={value}>
-                    {t(`${DESIGNS[type]?.ns}.${value}`)}
+                    {t(`${DESIGNS[type as (typeof TYPES)[number]]?.ns}.${value}`)}
                   </option>
                 ))}
             </SelectField>
@@ -767,7 +818,7 @@ export function NewProductDialog({
                 .map((p) => (
                   <CheckboxField
                     key={p.key}
-                    label={`${p.name} · ${t(`marketplace:type.${p.type}`)}`}
+                    label={`${p.name} · ${productTypeLabel(t, p.type)}`}
                     checked={packed.includes(p.key)}
                     onChange={(e) =>
                       setPacked(e.target.checked ? [...packed, p.key] : packed.filter((k) => k !== p.key))

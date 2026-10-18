@@ -5,7 +5,7 @@ schema_version = 2
 key = "playlist"
 name = "Playlists"
 description = "Your own playlists of titles."
-version = "1.2.0"
+version = "1.3.0"
 requires_portal = ">=0.1"
 maturity = "beta"
 entry_point = "playlist_plugin:register"
@@ -107,8 +107,8 @@ blocks = [
 ]
 
 [ui]
-sections = [{ label_key = "plugin.playlist:nav.section", icon = "list-music" }]
-nav = [{ key = "mine", label_key = "plugin.playlist:nav.mine", route = "/plugins/playlist/mine", permission = "plugin:playlist.use", section = "plugin-playlist" }]
+# a tab of Portalab's Media pages (the « media » hub)
+nav = [{ key = "mine", label_key = "plugin.playlist:nav.mine", route = "/plugins/playlist/mine", permission = "plugin:playlist.use", section = "media", icon = "list-music" }]
 
 [[ui.pages]]
 key = "mine"

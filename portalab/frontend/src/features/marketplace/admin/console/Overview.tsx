@@ -10,6 +10,7 @@ import {
 import { FunctionalState } from "../../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../../i18n/format/useFormat";
 import { useT } from "../../../../i18n/hooks/useT";
+import { productTypeLabel } from "../../typeLabel";
 import { type Activity, useEconomy, useMemberName, useNameOf, useOverview } from "./api";
 import { Kpis } from "./Kpis";
 
@@ -202,7 +203,7 @@ export function Overview({ onMember }: { onMember: (id: string) => void }) {
                 render: (row) => (
                   <span className="mk-console__product">
                     <strong>{nameOf(row.names, row.key)}</strong>
-                    <small>{t(`marketplace:type.${row.type}`)}</small>
+                    <small>{productTypeLabel(t, row.type)}</small>
                   </span>
                 ),
               },

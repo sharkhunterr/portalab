@@ -11,6 +11,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import { useProgression } from "../../gamification/api";
 import { ProductArt } from "../catalog/ProductArt";
+import { productTypeLabel } from "../typeLabel";
 import { type Booster, type BoosterCard, localized, requestKey, useOpenBooster } from "./api";
 import { BoosterPack, useCanOpen } from "./Boosters";
 import { hookOf, type Rarity, type Scene, ScenePart, useBoosterScene } from "./scene/scene";
@@ -203,7 +204,7 @@ function Card({
             </span>
             <span className="booster-card__rarity">{t(`marketplace:rarity.${rarity}`)}</span>
             <strong className="booster-card__name">{card.product.name}</strong>
-            <span className="booster-card__type">{t(`marketplace:type.${card.product.type}`)}</span>
+            <span className="booster-card__type">{productTypeLabel(t, card.product.type)}</span>
             {card.outcome === "duplicate" ? (
               <span className="booster-card__stamp">{t("marketplace:booster.duplicate")}</span>
             ) : card.outcome === "reserve" ? (

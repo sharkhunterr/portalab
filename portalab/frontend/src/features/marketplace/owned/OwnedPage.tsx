@@ -12,6 +12,7 @@ import { DEPARTMENTS, departmentOf, departmentOfProduct } from "../catalog/Catal
 import { ProductArt } from "../catalog/ProductArt";
 import "../marketplace.css";
 import { PageHeader } from "../../../design-system/components/PageHeader";
+import { productTypeLabel } from "../typeLabel";
 import { MyRequests, RequestForm } from "./Requests";
 
 /** 027: a bought project launch — name the project and pitch it; it opens as a community proposal. */
@@ -235,7 +236,7 @@ export default function OwnedPage() {
                     <strong>{row.product_name}</strong>
                     <span className="owned-item__meta">
                       {t(`marketplace:department.${departmentKey(row, product)}`)} ·{" "}
-                      {t(`marketplace:type.${row.product_type}`)}
+                      {productTypeLabel(t, row.product_type)}
                     </span>
                     <span className="owned-item__meta">
                       {row.origin === "purchase"

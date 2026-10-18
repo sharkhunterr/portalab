@@ -17,6 +17,7 @@ import { BoosterActions, BoosterDetails } from "../boosters/Boosters";
 import { Price, priceOf } from "../catalog/Price";
 import { ProductArt, TYPE_BADGE_ICON } from "../catalog/ProductArt";
 import { useEquipment } from "../equip";
+import { productTypeLabel } from "../typeLabel";
 import { ConditionsChecklist } from "./ConditionsChecklist";
 
 /**
@@ -43,7 +44,7 @@ function PackItem({ item }: { item: Product }) {
             </>
           ) : null}
           {" · "}
-          {t(`marketplace:type.${item.type}`)}
+          {productTypeLabel(t, item.type)}
         </span>
         {description ? <span className="pack-item__description">{description}</span> : null}
       </div>
@@ -162,7 +163,7 @@ export function ProductSheet({ product }: { product: Product }) {
         </span>
         <span className="product-chip">
           <Icon name={TYPE_BADGE_ICON[product.type] ?? "shop"} size={14} />
-          {t(`marketplace:type.${product.type}`)}
+          {productTypeLabel(t, product.type)}
         </span>
         {isHdProduct(product) ? <HdTag large /> : null}
         {product.owned && !product.repeatable ? (

@@ -15,6 +15,7 @@ import { Price, priceOf } from "./Price";
 import { ProductCard } from "./ProductCard";
 import { ProductModal } from "./ProductModal";
 import "../marketplace.css";
+import { productTypeLabel } from "../typeLabel";
 
 /**
  * ``/marketplace`` (spec 015 T021, 027 US8): a shop in departments — themes (theme packs, interfaces,
@@ -257,7 +258,7 @@ export default function CatalogPage() {
       {type ? (
         <p className="shop-type-filter">
           <Icon name="list" size={16} />
-          {t(`marketplace:type.${type}`)}
+          {productTypeLabel(t, type)}
           <Button variant="ghost" onClick={() => setParams({ department: current.key })}>
             <Icon name="close" size={14} />
             {t("marketplace:shop.allTypes")}
