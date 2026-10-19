@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "cinema",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Cinéma — scène de booster",
+    "en": "Cinema — a booster scene"
+  },
+  "descriptions": {
+    "fr": "L'ouverture d'un booster dans un vieux palace de cinéma : un clap de tournage, le faisceau du projecteur dans la poussière, l'écran qui scintille, le décompte de l'amorce, la pellicule qui brûle dans le couloir de projection — de la carte muette en sépia à la carte d'or de la soirée de gala.",
+    "en": "A booster opened in an old movie palace: a clapperboard, the projector's beam through the dust, the flickering screen, the countdown leader, the film burning in the gate — from the silent sepia card to the golden one of the gala night."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

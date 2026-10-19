@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "cinema-silent",
+  "names": {
+    "fr": "Face muette",
+    "en": "Silent face"
+  },
+  "descriptions": {
+    "fr": "Une carte commune en sépia de film muet, son grain et ses rayures.",
+    "en": "A common card in silent-film sepia, its grain and its scratches."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

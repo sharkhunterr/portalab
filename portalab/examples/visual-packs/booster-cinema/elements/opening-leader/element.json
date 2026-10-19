@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "cinema-leader",
+  "names": {
+    "fr": "Action !",
+    "en": "Action!"
+  },
+  "descriptions": {
+    "fr": "Le clap claque dans un éclair — « Action ! » ; l'amorce du film décompte 3, 2, 1 sous son aiguille, la pellicule défile à toute vitesse, puis brûle dans le couloir de projection : la lumière du projecteur jaillit et les cartes avec elle (HD).",
+    "en": "The clapstick snaps shut in a flash — « Action! »; the film's leader counts down 3, 2, 1 under its sweeping hand, the film races through, then burns in the gate: the projector's light bursts through and the cards with it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "leader.glsl",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 3.4
+  }
+}

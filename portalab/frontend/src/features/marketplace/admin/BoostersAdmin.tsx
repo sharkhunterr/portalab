@@ -411,6 +411,23 @@ function BoosterSettings({
       setError(t("marketplace:admin.error"));
     }
   };
+  // the booster leaves the shop (archived: past openings and sealed ones offered keep theirs) — its looks, its
+  // scene and the visual packs stay as they are; only what it was made of goes
+  const remove = async () => {
+    if (!window.confirm(t("marketplace:admin.boosters.deleteConfirm", { name: product.name }))) return;
+    setError(null);
+    const { error: failure } = await api.POST("/api/v1/admin/marketplace/products/{key}/{transition}", {
+      params: { path: { key: product.key, transition: "archive" } },
+      body: { confirmation: null },
+    });
+    if (failure) {
+      setError(t("marketplace:admin.error"));
+      return;
+    }
+    if (options?.bindings[product.key]) await bindScene(product.key, "");
+    setOpen(false);
+    onSaved();
+  };
   return (
     <li className="admin-booster" data-rarity={product.rarity ?? "common"}>
       <span className="admin-booster__pack">
@@ -457,7 +474,15 @@ function BoosterSettings({
             {t("marketplace:admin.boosters.tune")}
           </Button>
         }
-        footer={<Button onClick={save}>{t("marketplace:admin.save")}</Button>}
+        footer={
+          <>
+            <Button variant="danger" onClick={remove}>
+              <Icon name="trash" size={16} />
+              {t("marketplace:admin.boosters.delete")}
+            </Button>
+            <Button onClick={save}>{t("marketplace:admin.save")}</Button>
+          </>
+        }
       >
         <BoosterForm value={value} patch={patch} options={options} products={products} creating={false} />
         {error ? <p role="alert">{error}</p> : null}

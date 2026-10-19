@@ -34,10 +34,14 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   member wears (no messenger bubble): an interface (colours, fonts, layout, sounds, its own words — « L'atelier »,
   « Le saloon », « Le temple »…; Olympe is a light one, on marble), a palette, a GPU ambience and profile
   background, a CSS frame and a GPU frame, a banner, a name style, a level badge, a GPU level-up, a GPU
-  celebration, a notification style and animation, a title, a badge, the theme pack selling them all, and its
-  booster in a whole scene of its own — a brass safe in an engine room (steampunk), a dynamite crate whose fuse
-  burns down on Main Street at dusk (Wild West), a black-figure amphora shattered by Zeus's thunderbolt on the
-  summit of Olympus (Greek myth) — with its card back, a face shaped per rarity and GPU reveals.
+  celebration, a notification style and animation, a title, a badge and the theme pack selling them all — and a
+  whole booster scene any booster may wear (an engine room, a western train with the desert rolling by, the hall
+  of the gods), with its card back, a face shaped per rarity and GPU reveals. They bring no booster of their own:
+  a booster names the packs it draws from (Shop › Boosters).
+- `booster-cinema/` (`cinema`): **a movie palace** — the old film flickering on the screen, velvet curtains, the
+  projector's beam through the dust, the audience in silhouette; a clapperboard as the sealed pack, an opening
+  where it claps, the leader counts down and the film burns in the gate; film-frame backs and faces from the
+  silent sepia card to the gala night's gold. The Cinema booster wears it and draws from every film universe.
 - `widgets/` (`vigie`): **self-contained widgets** (spec 028, US6) — everything they do is in the pack: a new
   widget « Heading » (a compass of the member's progression, drawing itself on one line, in a column or as a
   block, with its own setting « dial » whose silver value is sold and night value offered, reading the

@@ -775,5 +775,7 @@
   "admin.boosters.poolMissing": "None of: {rarities} (the draw falls back to the rarity below)",
   "admin.boosters.poolNeeded": "Say what it draws: at least one pack or one item.",
   "admin.boosters.notDrawable": "never drawn (not on sale, or not of this booster's kind)",
-  "admin.boosters.undefinedPool": "Pool to define: it still draws as before (its season, or every look) — choose its packs or items."
+  "admin.boosters.undefinedPool": "Pool to define: it still draws as before (its season, or every look) — choose its packs or items.",
+  "admin.boosters.delete": "Delete",
+  "admin.boosters.deleteConfirm": "Delete the booster « {name} »? It leaves the shop for good — its looks, its scene and the visual packs stay; past openings and the sealed ones already given keep theirs."
 }

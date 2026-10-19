@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "cinema-marquee-lights",
+  "names": {
+    "fr": "La marquise s'allume",
+    "en": "The marquee lights up"
+  },
+  "descriptions": {
+    "fr": "Un cadre d'ampoules s'allume autour de la carte en chenillard, des rubans de pellicule dorés s'envolent (HD).",
+    "en": "A frame of bulbs lights up round the card, chasing, golden film ribbons flying off (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.2,
+    "rarity": "epic"
+  }
+}

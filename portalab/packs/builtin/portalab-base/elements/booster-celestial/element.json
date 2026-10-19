@@ -6,8 +6,8 @@
     "fr": "Booster Céleste"
   },
   "descriptions": {
-    "en": "Five looks of the cosmos drawn at random — nebulae, planets, comets, constellations, the zodiac… at least one rare.",
-    "fr": "Cinq looks du cosmos tirés au hasard — nébuleuses, planètes, comètes, constellations, zodiaque… dont au moins un rare."
+    "fr": "Cinq looks de l'espace tirés au hasard — nébuleuses, planètes, comètes, constellations, zodiaque, vaisseaux, stations, batailles spatiales et le futur… dont au moins un rare.",
+    "en": "Five looks of space drawn at random — nebulae, planets, comets, constellations, the zodiac, starships, stations, space battles and the future… one at least rare."
   },
   "render": {
     "kind": "renderer",
@@ -34,7 +34,16 @@
       "pack_spacecrew",
       "pack_sunmoon",
       "visual:portalab-observatory",
-      "pack_hd_aurora"
+      "pack_hd_aurora",
+      "visual:portalab-alien",
+      "visual:portalab-futuristic",
+      "visual:portalab-hd-comets",
+      "visual:portalab-hd-cosmos",
+      "visual:portalab-hd-planets",
+      "visual:portalab-nostromo",
+      "visual:portalab-spacestation",
+      "visual:portalab-starship",
+      "visual:portalab-galaxy"
     ],
     "cards": 5,
     "odds": {

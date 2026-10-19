@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "cinema-searchlights",
+  "names": {
+    "fr": "Projecteurs de première",
+    "en": "Premiere searchlights"
+  },
+  "descriptions": {
+    "fr": "Deux projecteurs de première balaient le ciel derrière la carte et se croisent sur elle (HD).",
+    "en": "Two premiere searchlights sweep the sky behind the card and cross on it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

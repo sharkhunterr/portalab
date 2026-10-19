@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "cinema",
+  "names": {
+    "fr": "Clap de tournage",
+    "en": "Clapperboard"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient un clap de tournage : l'ardoise noire et ses lignes à la craie, la barre rayée noir et blanc entrouverte ; un projecteur de plateau l'éclaire d'en haut, la poussière dans sa lumière (HD).",
+    "en": "The pack becomes a clapperboard: the black slate and its chalk lines, the black-and-white striped stick held open; a set light shines down on it, dust in its light (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "spot.glsl",
+    "css": [
+      "clapper.css"
+    ],
+    "stage": true
+  }
+}

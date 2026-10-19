@@ -1,0 +1,22 @@
+/* A common card: a silent film (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform. */
+[data-card-face="cinema-silent"] .booster-card__face {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.35rem;
+  background: linear-gradient(160deg, #3a2c1c, #1c140b);
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.55rem rgba(200, 170, 120, 0.35));
+}
+[data-card-face="cinema-silent"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  border-radius: 0.35rem;
+  background: repeating-linear-gradient(90deg, transparent 0 37px, rgba(255, 245, 220, 0.12) 37px 38px), radial-gradient(ellipse at 50% 40%, #c9b28a, #8c7350 75%, #5a4630);
+}
+[data-card-face="cinema-silent"] .booster-card__rarity,
+[data-card-face="cinema-silent"] .booster-card__name {
+  color: #2a1d10;
+  text-shadow: 0 0 0.6rem rgba(200, 170, 120, 0.35);
+}

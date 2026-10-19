@@ -1,0 +1,39 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening): the clapstick snaps shut, the slate
+   jolts, then it is gone into the film; the cards come out of the light. */
+[data-opening="cinema-leader"] .booster-stage__tear .booster-pack__flap {
+  animation: cinema-clap 0.42s cubic-bezier(0.7, 0, 0.9, 0.4) both;
+}
+[data-opening="cinema-leader"] .booster-stage__tear .booster-pack {
+  animation: cinema-slate 3.4s ease-in both;
+}
+[data-opening="cinema-leader"][data-booster-look] .booster-stage__tear .booster-stage__rising span {
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 0.3rem;
+  background: linear-gradient(160deg, #2a2a2e, #0c0c0e);
+  box-shadow: 0 0 1.2rem rgba(255, 245, 220, 0.8);
+  animation: cinema-out 3.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+}
+@keyframes cinema-clap {
+  0% { rotate: -16deg; }
+  80% { rotate: 1deg; }
+  100% { rotate: 0deg; }
+}
+@keyframes cinema-slate {
+  0%, 10% { transform: none; opacity: 1; filter: none; }
+  13% { transform: translateY(3px) scale(0.99); }
+  16% { transform: none; }
+  60% { transform: scale(0.96); opacity: 1; filter: grayscale(1) brightness(0.8); }
+  72%, 100% { transform: scale(0.85); opacity: 0; filter: grayscale(1) brightness(3); }
+}
+@keyframes cinema-out {
+  0%, 74% { opacity: 0; transform: scale(0.3); }
+  80% { opacity: 1; }
+  100% { opacity: 1; transform: translate(calc((var(--i, 0) - 2) * 44%), -14%) rotate(calc((var(--i, 0) - 2) * 8deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="cinema-leader"] .booster-stage__tear .booster-pack,
+  [data-opening="cinema-leader"] .booster-stage__tear .booster-pack__flap {
+    animation: none;
+  }
+}

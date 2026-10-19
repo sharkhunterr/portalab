@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "cinema-marquee",
+  "names": {
+    "fr": "Face marquise",
+    "en": "Marquee face"
+  },
+  "descriptions": {
+    "fr": "Une carte épique cerclée d'ampoules qui s'allument en chenillard, comme la marquise d'un cinéma, holographique et vivante.",
+    "en": "An epic card ringed with bulbs chasing round it like a cinema marquee, holographic and alive."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

@@ -775,5 +775,7 @@
   "admin.boosters.poolMissing": "Aucun : {rarities} (le tirage se rabat sur la rareté en dessous)",
   "admin.boosters.poolNeeded": "Dites ce qu'il tire : au moins un pack ou un élément.",
   "admin.boosters.notDrawable": "jamais tiré (pas en vente, ou pas du genre de ce booster)",
-  "admin.boosters.undefinedPool": "Pool à définir : il tire encore comme avant (sa saison, ou tous les looks) — choisissez ses packs ou ses éléments."
+  "admin.boosters.undefinedPool": "Pool à définir : il tire encore comme avant (sa saison, ou tous les looks) — choisissez ses packs ou ses éléments.",
+  "admin.boosters.delete": "Supprimer",
+  "admin.boosters.deleteConfirm": "Supprimer le booster « {name} » ? Il quitte la boutique pour de bon — ses looks, sa scène et les packs visuels restent ; les ouvertures passées et les boosters scellés déjà donnés gardent les leurs."
 }

@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "cinema",
+  "names": {
+    "fr": "Le palace",
+    "en": "The movie palace"
+  },
+  "descriptions": {
+    "fr": "Toute la scène dans un palace de cinéma la nuit : l'écran où passe un vieux film qui scintille et saute, les rideaux de velours et leur lambrequin à franges d'or, le faisceau du projecteur où tourne la poussière, les rangées de fauteuils et les spectateurs en ombres chinoises, les appliques art déco (HD).",
+    "en": "The whole stage in a movie palace at night: the screen showing an old film that flickers and jumps, the velvet curtains and their gold-fringed valance, the projector's beam with dust turning in it, the rows of seats and the audience in silhouette, the art deco sconces (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "palace.glsl",
+    "stage": true
+  }
+}

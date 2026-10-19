@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "cinema",
+  "names": {
+    "fr": "Dos de pellicule",
+    "en": "Film back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est une image de pellicule 35 mm : ses perforations de chaque côté, son cadre, et une bobine au centre.",
+    "en": "Face down, every card is a frame of 35 mm film: its sprocket holes down each side, its frame, and a reel in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "cinema-gala",
+  "names": {
+    "fr": "Face soirée de gala",
+    "en": "Gala night face"
+  },
+  "descriptions": {
+    "fr": "Une carte légendaire d'or, rayonnante comme une statuette, des faisceaux de projecteurs, holographie, paillettes, l'image qui s'incline.",
+    "en": "A legendary card of gold, radiant like a statuette, searchlight beams, holography, glitter, the art leaning."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

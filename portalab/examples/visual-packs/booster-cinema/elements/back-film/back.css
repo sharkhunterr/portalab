@@ -1,0 +1,42 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
+[data-card-back="cinema"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.3rem;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 5px, #e9e2d0 5px 12px, transparent 12px 18px) 4px 0 / 9px 100% no-repeat,
+    repeating-linear-gradient(180deg, transparent 0 5px, #e9e2d0 5px 12px, transparent 12px 18px) calc(100% - 4px) 0 / 9px 100% no-repeat,
+    radial-gradient(ellipse at 50% 45%, #3a3226 0%, #17130e 70%),
+    #0d0b08;
+  box-shadow: inset 0 0 0 2px #2a241a;
+}
+[data-card-back="cinema"] .booster-card__back::after {
+  background: linear-gradient(110deg, transparent 40%, rgba(255, 245, 220, 0.25) 50%, transparent 60%);
+  mix-blend-mode: screen;
+}
+/* the frame between the sprocket holes */
+[data-card-back="cinema"] .booster-card__back-pattern {
+  inset: 9% 20%;
+  border: 2px solid rgba(233, 226, 208, 0.55);
+  border-radius: 0.15rem;
+  background: linear-gradient(180deg, rgba(233, 226, 208, 0.08), transparent);
+}
+/* a film reel: its rim, its hub, five holes */
+[data-card-back="cinema"] .booster-card__back-sigil {
+  inline-size: 46%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0.8rem rgba(255, 220, 150, 0.35);
+  background:
+    radial-gradient(circle, #d9c9a0 0 10%, #8a7a58 10% 14%, transparent 14%),
+    radial-gradient(circle at 50% 22%, #17130e 0 11%, transparent 11.5%),
+    radial-gradient(circle at 78% 41%, #17130e 0 11%, transparent 11.5%),
+    radial-gradient(circle at 67% 75%, #17130e 0 11%, transparent 11.5%),
+    radial-gradient(circle at 33% 75%, #17130e 0 11%, transparent 11.5%),
+    radial-gradient(circle at 22% 41%, #17130e 0 11%, transparent 11.5%),
+    radial-gradient(circle, #cdbb8e 0 46%, #8a7a58 46% 50%, transparent 51%);
+}
+[data-card-back="cinema"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

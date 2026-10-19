@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "cinema",
+  "names": {
+    "fr": "Scène Cinéma",
+    "en": "Cinema scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture dans un palace de cinéma. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening in a movie palace. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-clapper",
+      "backdrop": "backdrop-palace",
+      "opening": "opening-leader",
+      "back": {
+        "common": "back-film"
+      },
+      "face": {
+        "common": "face-silent",
+        "rare": "face-technicolor",
+        "epic": "face-marquee",
+        "legendary": "face-gala"
+      },
+      "reveal": {
+        "rare": "reveal-searchlights",
+        "epic": "reveal-marquee",
+        "legendary": "reveal-gala"
+      }
+    }
+  }
+}

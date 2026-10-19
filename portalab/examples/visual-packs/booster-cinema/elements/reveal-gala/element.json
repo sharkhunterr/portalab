@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "cinema-gala-night",
+  "names": {
+    "fr": "Le tapis rouge",
+    "en": "The red carpet"
+  },
+  "descriptions": {
+    "fr": "La soirée de gala : les flashs des photographes crépitent tout autour, deux projecteurs dorés se croisent, des étoiles d'or tombent, le tapis rouge rougeoie dessous (HD).",
+    "en": "The gala night: the photographers' flashes crackle all round, two golden searchlights cross, golden stars fall, the red carpet glows beneath (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary"
+  }
+}
