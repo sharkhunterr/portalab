@@ -11,6 +11,9 @@ Four complete examples live in [`examples/visual-packs/`](../examples/visual-pac
 interface and its looks), `abysses` (the same with a navigation of its own), `booster-scene` (a whole booster
 scene) and `widgets` (self-contained widgets, their looks and options).
 
+How to make each element **good** — composition, light, motion, phone first, the rarity staircase and the
+pitfalls met so far — is in [**crafting looks that work**](visual-craft.md).
+
 ## Contents
 
 1. [The workflow](#the-workflow)

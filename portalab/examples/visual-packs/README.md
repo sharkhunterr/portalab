@@ -50,6 +50,9 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   logbook » (a script showing « Recently added » otherwise, with what the member is watching). Each element
   carries its rarity and its price, or is offered; the administrator decides at Review.
 
+How to craft each kind of element well, with these examples as models:
+**[`docs/visual-craft.md`](../../docs/visual-craft.md)**.
+
 ## Trying one
 
 Drop a folder (or its `.zip`) into `DATA_DIR/visuals/inbox/` and read the inbox in Administration → Shop →
