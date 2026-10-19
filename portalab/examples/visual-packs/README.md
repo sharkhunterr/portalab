@@ -38,6 +38,13 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   whole booster scene any booster may wear (an engine room, a western train with the desert rolling by, the hall
   of the gods), with its card back, a face shaped per rarity and GPU reveals. They bring no booster of their own:
   a booster names the packs it draws from (Shop › Boosters).
+- `briques/`: **a building-bricks universe, light and HD** — a bright plastic interface (studs along the header,
+  cards set like bricks, the builders' words), and for several kinds both a light CSS look and an HD one drawn by
+  the GPU: a brick rain (CSS) and bricks falling and stacking on a plate (HD), a town building itself brick by
+  brick behind the profile, studded frames, banners, a name in plastic letters, level badges, a « Click! »
+  level-up (CSS) and towers stacking up to a gold brick (HD), a burst of bricks, notifications on a plate that
+  click in; and a booster scene all on the GPU — a playroom with a brick town, a crane and a window's light, a
+  giant brick bursting into little ones, faces grey, clear blue, chrome and gold.
 - `booster-cinema/` (`cinema`): **a movie palace** — the old film flickering on the screen, velvet curtains, the
   projector's beam through the dust, the audience in silhouette; a clapperboard as the sealed pack, an opening
   where it claps, the leader counts down and the film burns in the gate; film-frame backs and faces from the

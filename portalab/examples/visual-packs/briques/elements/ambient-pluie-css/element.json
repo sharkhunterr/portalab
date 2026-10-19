@@ -1,0 +1,25 @@
+{
+  "type": "ambient",
+  "look": "briques-pluie",
+  "product": "ambient_briques_pluie",
+  "names": {
+    "fr": "Pluie de briques",
+    "en": "Brick rain"
+  },
+  "descriptions": {
+    "fr": "Version légère : de petites briques de couleur tombent doucement derrière le portail, en tournoyant.",
+    "en": "Light version: little coloured bricks drift down behind the portal, turning."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "rain.css"
+    ]
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "rare",
+    "collection": "ambients",
+    "icon": "snowflake"
+  }
+}

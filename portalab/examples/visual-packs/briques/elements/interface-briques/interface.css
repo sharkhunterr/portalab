@@ -1,0 +1,12 @@
+/* the Bricks interface's own touches: a row of studs along the header, cards set like bricks */
+[data-theme="briques"] .shell-header {
+  background-image: radial-gradient(circle at 50% 50%, rgba(214, 40, 40, 0.22) 0 3px, transparent 3.6px);
+  background-size: 16px 8px;
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+}
+[data-theme="briques"] .ds-card,
+[data-theme="briques"] .admin-section {
+  border-color: #dcd6c8;
+  box-shadow: 0 4px 0 #dcd6c8, 0 0.6rem 1rem -0.6rem rgba(0, 0, 0, 0.2);
+}

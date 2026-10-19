@@ -1,0 +1,12 @@
+.ds-notifications[data-animation="briques-clic"] .ds-notification {
+  animation-name: briques-click;
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.3, 0, 0.6, 1);
+}
+@keyframes briques-click {
+  0% { opacity: 0; transform: translateY(-2.5rem); }
+  55% { opacity: 1; transform: translateY(0); }
+  70% { transform: translateY(-0.35rem) scaleY(1.03); }
+  85% { transform: translateY(0) scaleY(0.97); }
+  100% { transform: none; }
+}

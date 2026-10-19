@@ -1,0 +1,25 @@
+{
+  "type": "profile_banner",
+  "look": "briques-chantier",
+  "product": "banner_briques_chantier",
+  "names": {
+    "fr": "Bannière chantier de briques",
+    "en": "Brick building site banner"
+  },
+  "descriptions": {
+    "fr": "Un mur de briques de couleur en cours de construction sur une plaque verte, une brique qui descend au bout d'une grue.",
+    "en": "A wall of coloured bricks being built on a green plate, a brick coming down at the end of a crane."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "site.css"
+    ]
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  }
+}

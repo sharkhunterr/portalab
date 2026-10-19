@@ -1,0 +1,25 @@
+{
+  "type": "notification_style",
+  "look": "briques-plaque-notif",
+  "product": "notif_briques_plaque_notif",
+  "names": {
+    "fr": "Notifications plaque à tenons",
+    "en": "Studded plate notifications"
+  },
+  "descriptions": {
+    "fr": "Des notifications posées sur une plaque blanche, une rangée de tenons en haut, l'épaisseur du plastique dessous.",
+    "en": "Notifications set on a white plate, a row of studs on top, the plastic's thickness underneath."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "plate.css"
+    ]
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell"
+  }
+}

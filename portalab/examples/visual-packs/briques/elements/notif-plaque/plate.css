@@ -1,0 +1,9 @@
+.ds-notifications[data-style="briques-plaque-notif"] .ds-notification {
+  border: 0;
+  border-radius: 0.35rem;
+  background:
+    radial-gradient(circle at 50% 100%, #ffffff 0 4px, #d8d4c8 4.5px, transparent 5px) 0 -6px / 18px 12px repeat-x,
+    linear-gradient(180deg, #ffffff, #efece3);
+  color: #1b1b1b;
+  box-shadow: 0 4px 0 #cfc9b8, 0 8px 18px rgba(0, 0, 0, 0.18);
+}

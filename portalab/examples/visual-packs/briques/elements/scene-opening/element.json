@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "briques-eclate",
+  "names": {
+    "fr": "La brique éclate",
+    "en": "The brick bursts"
+  },
+  "descriptions": {
+    "fr": "La brique géante tremble, ses tenons s'allument un à un… puis elle éclate en une gerbe de petites briques de toutes les couleurs qui retombent en tournoyant — et les cartes en sortent (HD).",
+    "en": "The giant brick shakes, its studs light up one by one… then it bursts into a spray of little bricks of every colour falling back spinning — and the cards come out (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "opening.glsl",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 3.0
+  }
+}

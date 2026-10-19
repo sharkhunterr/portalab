@@ -1,0 +1,24 @@
+{
+  "type": "level_badge",
+  "look": "briques-tenon-hd",
+  "product": "level_briques_tenon_hd",
+  "names": {
+    "fr": "Badge de niveau tenons HD",
+    "en": "Studs level badge HD"
+  },
+  "descriptions": {
+    "fr": "Votre niveau sur une plaque à tenons dont la couleur passe du rouge au bleu et au jaune, un reflet qui court (HD).",
+    "en": "Your level on a studded plate turning from red to blue to yellow, a gleam running over it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "studs.glsl"
+  },
+  "economy": {
+    "price": 1100,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "levels",
+    "icon": "star"
+  }
+}

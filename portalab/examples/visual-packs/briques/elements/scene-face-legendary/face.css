@@ -1,0 +1,108 @@
+/* A legendary card: gold bricks (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform. */
+[data-card-face="briques-or"] .booster-card__face {
+  isolation: isolate;
+  border: 0;
+  clip-path: polygon(0.0% 0.0%, 12.5% 2.0%, 25.0% 0.0%, 37.5% 2.0%, 50.0% 0.0%, 62.5% 2.0%, 75.0% 0.0%, 87.5% 2.0%, 100.0% 0.0%, 98.0% 12.5%, 100.0% 25.0%, 98.0% 37.5%, 100.0% 50.0%, 98.0% 62.5%, 100.0% 75.0%, 98.0% 87.5%, 100.0% 100.0%, 87.5% 98.0%, 75.0% 100.0%, 62.5% 98.0%, 50.0% 100.0%, 37.5% 98.0%, 25.0% 100.0%, 12.5% 98.0%, 0.0% 100.0%, 2.0% 87.5%, 0.0% 75.0%, 2.0% 62.5%, 0.0% 50.0%, 2.0% 37.5%, 0.0% 25.0%, 2.0% 12.5%);
+  background: conic-gradient(from 0deg, #fff3c0, #e0a83a, #8a5a12, #f4cf6a, #fff3c0);
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.55rem rgba(255, 210, 90, 0.9));
+}
+[data-card-face="briques-or"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  clip-path: polygon(0.0% 0.0%, 12.5% 2.0%, 25.0% 0.0%, 37.5% 2.0%, 50.0% 0.0%, 62.5% 2.0%, 75.0% 0.0%, 87.5% 2.0%, 100.0% 0.0%, 98.0% 12.5%, 100.0% 25.0%, 98.0% 37.5%, 100.0% 50.0%, 98.0% 62.5%, 100.0% 75.0%, 98.0% 87.5%, 100.0% 100.0%, 87.5% 98.0%, 75.0% 100.0%, 62.5% 98.0%, 50.0% 100.0%, 37.5% 98.0%, 25.0% 100.0%, 12.5% 98.0%, 0.0% 100.0%, 2.0% 87.5%, 0.0% 75.0%, 2.0% 62.5%, 0.0% 50.0%, 2.0% 37.5%, 0.0% 25.0%, 2.0% 12.5%);
+  background: linear-gradient(175deg, #8a5a12, #3a2406);
+}
+[data-card-face="briques-or"] .booster-card__rarity,
+[data-card-face="briques-or"] .booster-card__name {
+  color: #fff6d8;
+  text-shadow: 0 0 0.6rem rgba(255, 210, 90, 0.9);
+}
+/* the holographic sheen: two colours in a band sliding over the card, lighter where they cross */
+[data-card-face="briques-or"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: linear-gradient(115deg, transparent 0%, rgb(255, 220, 120) 30%, transparent 47.5%, transparent 52.5%, rgb(255, 140, 200) 70%, transparent 100%);
+  background-size: 300% 300%;
+  background-position: 50% 50%;
+  mix-blend-mode: screen;
+  opacity: 0.35;
+  animation: briques-holo 9s ease infinite both;
+}
+/* glitter over the art, glimmering as the light moves */
+[data-card-face="briques-or"] .booster-card__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 30%, #fff8e0 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 20%, #fff8e0 0 1.2px, transparent 2px),
+    radial-gradient(circle at 45% 75%, #fff8e0 0 0.9px, transparent 1.5px),
+    radial-gradient(circle at 85% 65%, #fff8e0 0 1.1px, transparent 1.8px);
+  background-size: 23px 29px, 31px 37px, 19px 23px, 41px 43px;
+  mix-blend-mode: screen;
+  opacity: 0.25;
+  animation: briques-glitter 9s ease infinite both;
+}
+/* the art leans slowly, catching the light */
+[data-card-face="briques-or"] .booster-card__art {
+  animation: briques-lean 9s ease-in-out infinite;
+}
+@keyframes briques-holo {
+  0%, 100% { opacity: 0.12; background-position: 50% 50%; }
+  33% { opacity: 0.6; background-position: 100% 100%; }
+  66% { opacity: 0.6; background-position: 0% 0%; }
+}
+@keyframes briques-glitter {
+  0%, 5%, 100% { opacity: 0.2; background-position: 50% 50%; }
+  33% { opacity: 0.9; background-position: 40% 40%; filter: brightness(1.8); }
+  45% { opacity: 0.35; }
+  66% { opacity: 0.9; background-position: 60% 60%; filter: brightness(1.8); }
+}
+@keyframes briques-lean {
+  0%, 100% { transform: perspective(40rem) rotateX(0deg) rotateY(0deg); }
+  33% { transform: perspective(40rem) rotateX(6deg) rotateY(-7deg); }
+  66% { transform: perspective(40rem) rotateX(-6deg) rotateY(7deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="briques-or"] .booster-card__face::after,
+  [data-card-face="briques-or"] .booster-card__art::after,
+  [data-card-face="briques-or"] .booster-card__art {
+    animation: none;
+  }
+}
+/* it keeps living: its glow pulsing, its frame shimmering, a light sweeping over it now and then */
+[data-card-face="briques-or"] .booster-card__face {
+  background-size: 220% 220%;
+  animation: briques-pulse-or 2.2s ease-in-out infinite;
+}
+@keyframes briques-pulse-or {
+  0%, 100% { filter: drop-shadow(0 0 0.45rem rgba(255, 210, 90, 0.9)); background-position: 0% 50%; }
+  50% { filter: drop-shadow(0 0 1.3rem rgba(255, 210, 90, 0.9)) drop-shadow(0 0 2.6rem rgba(255, 210, 90, 0.9)); background-position: 100% 50%; }
+}
+[data-card-face="briques-or"] .booster-card__shine {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.65) 50%, transparent 58%);
+  mix-blend-mode: screen;
+  animation: briques-sweep 2.8s ease-in-out infinite;
+}
+@keyframes briques-sweep {
+  0%, 55% { transform: translateX(-70%); }
+  85%, 100% { transform: translateX(70%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="briques-or"] .booster-card__face,
+  [data-card-face="briques-or"] .booster-card__shine {
+    animation: none;
+  }
+}
+/* the GPU's drawing sits in the panel, inside the frame */
+[data-card-face="briques-or"] .booster-card__gpu {
+  inset: 6px;
+}

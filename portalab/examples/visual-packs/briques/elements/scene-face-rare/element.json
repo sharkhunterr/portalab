@@ -1,0 +1,21 @@
+{
+  "type": "card_face",
+  "look": "briques-translucide",
+  "names": {
+    "fr": "Face translucide",
+    "en": "Clear blue face"
+  },
+  "descriptions": {
+    "fr": "Une carte rare en plastique bleu translucide, la lumière qui s'y réfracte en ondes, holographique.",
+    "en": "A rare card of clear blue plastic, the light refracting through it in ripples, holographic."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "face.glsl",
+    "css": [
+      "face.css"
+    ],
+    "stage": true,
+    "rarity": "rare"
+  }
+}

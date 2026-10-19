@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "briques-cadre",
+  "names": {
+    "fr": "Le cadre s'emboîte",
+    "en": "The frame clicks together"
+  },
+  "descriptions": {
+    "fr": "Des briques arrivent de tous côtés et s'emboîtent en cadre autour de la carte, chacune avec son petit éclat (HD).",
+    "en": "Bricks fly in from every side and click into a frame round the card, each with its little flash (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

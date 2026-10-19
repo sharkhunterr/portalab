@@ -1,0 +1,24 @@
+{
+  "type": "ambient",
+  "look": "briques-pile",
+  "product": "ambient_briques_pile",
+  "names": {
+    "fr": "Pluie de briques HD",
+    "en": "Brick rain HD"
+  },
+  "descriptions": {
+    "fr": "Derrière le portail, des briques de toutes les couleurs tombent en tournoyant et s'empilent sur une plaque verte en bas de l'écran (HD).",
+    "en": "Behind the portal, bricks of every colour fall turning and stack on a green plate at the bottom of the screen (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "pile.glsl"
+  },
+  "economy": {
+    "price": 1200,
+    "rarity": "epic",
+    "level": 8,
+    "collection": "ambients",
+    "icon": "telescope"
+  }
+}

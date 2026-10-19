@@ -1,0 +1,21 @@
+{
+  "type": "card_face",
+  "look": "briques-grise",
+  "names": {
+    "fr": "Face plaque grise",
+    "en": "Grey plate face"
+  },
+  "descriptions": {
+    "fr": "Une carte commune en plaque grise à tenons.",
+    "en": "A common card of grey studded plate."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "face.glsl",
+    "css": [
+      "face.css"
+    ],
+    "stage": true,
+    "rarity": "common"
+  }
+}

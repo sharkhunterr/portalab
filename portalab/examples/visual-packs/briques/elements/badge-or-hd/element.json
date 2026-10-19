@@ -1,0 +1,28 @@
+{
+  "type": "badge",
+  "look": "briques-or-hd",
+  "product": "badge_briques_or_hd",
+  "names": {
+    "fr": "Badge Brique d'or HD",
+    "en": "Gold brick badge HD"
+  },
+  "descriptions": {
+    "fr": "Une brique d'or 2×2 vue de dessus, ses tenons en relief, un éclat qui passe (HD).",
+    "en": "A gold 2×2 brick seen from above, its studs in relief, a glint passing (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "gold.glsl"
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "epic",
+    "level": 8,
+    "collection": "badges",
+    "icon": "star"
+  },
+  "payload": {
+    "label": "Gold brick",
+    "icon": "crown"
+  }
+}

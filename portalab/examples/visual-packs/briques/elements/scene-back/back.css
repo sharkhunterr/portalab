@@ -1,0 +1,33 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
+[data-card-back="briques"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.4rem;
+  background: linear-gradient(180deg, #2f7fe0, #154e9a);
+  box-shadow: inset 0 0 0 3px #103d78, 0 4px 0 #0c2f5c;
+}
+[data-card-back="briques"] .booster-card__back-pattern {
+  opacity: 0;
+}
+/* a yellow 2×2 brick in the middle */
+[data-card-back="briques"] .booster-card__back-sigil {
+  inline-size: 40%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0.3rem;
+  box-shadow: 0 4px 0 #a87808, 0 0.4rem 0.8rem rgba(0, 0, 0, 0.35);
+  background:
+    radial-gradient(circle at 28% 28%, #ffe27a 0 14%, #c99a0c 16%, transparent 18%),
+    radial-gradient(circle at 72% 28%, #ffe27a 0 14%, #c99a0c 16%, transparent 18%),
+    radial-gradient(circle at 28% 72%, #ffe27a 0 14%, #c99a0c 16%, transparent 18%),
+    radial-gradient(circle at 72% 72%, #ffe27a 0 14%, #c99a0c 16%, transparent 18%),
+    linear-gradient(160deg, #ffd94a, #e0ad12);
+}
+[data-card-back="briques"] .booster-card__back-sigil svg {
+  opacity: 0;
+}
+
+/* the GPU's drawing sits inside the back's frame */
+[data-card-back="briques"] .booster-card__gpu {
+  inset: 6px;
+}

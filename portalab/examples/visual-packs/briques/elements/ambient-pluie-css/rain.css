@@ -1,0 +1,33 @@
+/* little coloured bricks drifting down behind the portal, turning (Portalab's spans: --size, --duration, --drift) */
+[data-ambient="briques-pluie"] > span {
+  inline-size: calc(0.9rem * var(--size));
+  block-size: calc(0.45rem * var(--size));
+  border-radius: 0.12rem;
+  background:
+    radial-gradient(circle at 25% 0, rgba(255, 255, 255, 0.55) 0 18%, transparent 20%) 0 0 / 50% 40% repeat-x,
+    linear-gradient(180deg, #e23a3a, #b31d1d);
+  opacity: 0.75;
+  animation-name: briques-drift;
+  animation-duration: var(--duration);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+[data-ambient="briques-pluie"] > span:nth-child(4n + 1) {
+  background:
+    radial-gradient(circle at 25% 0, rgba(255, 255, 255, 0.55) 0 18%, transparent 20%) 0 0 / 50% 40% repeat-x,
+    linear-gradient(180deg, #ffd94a, #e0ad12);
+}
+[data-ambient="briques-pluie"] > span:nth-child(4n + 2) {
+  background:
+    radial-gradient(circle at 25% 0, rgba(255, 255, 255, 0.55) 0 18%, transparent 20%) 0 0 / 50% 40% repeat-x,
+    linear-gradient(180deg, #4f8fe8, #1f5fc0);
+}
+[data-ambient="briques-pluie"] > span:nth-child(4n + 3) {
+  background:
+    radial-gradient(circle at 25% 0, rgba(255, 255, 255, 0.55) 0 18%, transparent 20%) 0 0 / 50% 40% repeat-x,
+    linear-gradient(180deg, #4cc06a, #2a9d4a);
+}
+@keyframes briques-drift {
+  from { transform: translate3d(0, -12vh, 0) rotate(0deg); }
+  to { transform: translate3d(var(--drift), 112vh, 0) rotate(1turn); }
+}

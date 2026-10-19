@@ -1,0 +1,7 @@
+.cosmetic-title[data-style="briques-titre"] {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #1f5fc0;
+  text-shadow: 0 1px 0 #154e9a, 0 2px 0 #103d78;
+}

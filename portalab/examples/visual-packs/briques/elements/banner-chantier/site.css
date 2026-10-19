@@ -1,0 +1,28 @@
+/* a wall of coloured bricks being built on a green plate, a brick coming down on a crane's line */
+.profile-banner[data-banner="briques-chantier"] {
+  background:
+    linear-gradient(0deg, #2a9d4a 0 10%, transparent 10%),
+    repeating-linear-gradient(90deg, #d62828 0 12%, #9a1a1a 12% 12.5%, #f7c51e 12.5% 24.5%, #b88f0f 24.5% 25%, #1f6fd6 25% 37%, #154e9a 37% 37.5%, #f4f4f0 37.5% 49.5%, #c9c9c2 49.5% 50%) 0 90% / 64% 14% no-repeat,
+    repeating-linear-gradient(90deg, #1f6fd6 0 12%, #154e9a 12% 12.5%, #d62828 12.5% 24.5%, #9a1a1a 24.5% 25%, #f7c51e 25% 37%, #b88f0f 37% 37.5%) 6% 76% / 52% 14% no-repeat,
+    linear-gradient(180deg, #8fc8ff, #d8ecff);
+}
+.profile-banner[data-banner="briques-chantier"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 72%;
+  inline-size: 8%;
+  block-size: 30%;
+  background:
+    linear-gradient(90deg, transparent 49%, #333 49% 51%, transparent 51%) top / 100% 70% no-repeat,
+    linear-gradient(#d62828, #a41c1c) bottom / 100% 30% no-repeat;
+  animation: briques-lower 6s ease-in-out infinite;
+}
+@keyframes briques-lower {
+  0%, 15% { translate: 0 -40%; }
+  60%, 80% { translate: 0 120%; }
+  100% { translate: 0 -40%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-banner[data-banner="briques-chantier"]::after { animation: none; }
+}

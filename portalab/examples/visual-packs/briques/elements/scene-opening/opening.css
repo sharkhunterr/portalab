@@ -1,0 +1,29 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening): the brick wobbles as its studs light
+   up, then pops and is gone; the cards come out of the burst. */
+[data-opening="briques-eclate"] .booster-stage__tear .booster-pack {
+  animation: briques-wobble 3s cubic-bezier(0.5, 0, 0.8, 0.4) both;
+}
+[data-opening="briques-eclate"][data-booster-look] .booster-stage__tear .booster-stage__rising span {
+  border: 0;
+  border-radius: 0.3rem;
+  background: linear-gradient(180deg, #ffffff, #e9e6dc);
+  box-shadow: 0 4px 0 #c9c4b4, 0 0 1rem rgba(255, 255, 255, 0.8);
+  animation: briques-out 3s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+}
+@keyframes briques-wobble {
+  0%, 15% { transform: none; opacity: 1; }
+  25%, 35%, 45% { transform: rotate(-2deg) scale(1.01); }
+  30%, 40%, 50% { transform: rotate(2deg) scale(1.01); }
+  56% { transform: scale(1.08); filter: brightness(1.2); opacity: 1; }
+  60% { transform: scale(0.95); }
+  64%, 100% { transform: scale(1.5); opacity: 0; filter: brightness(2); }
+}
+@keyframes briques-out {
+  0%, 62% { opacity: 0; transform: scale(0.3); }
+  70% { opacity: 1; }
+  100% { opacity: 1; transform: translate(calc((var(--i, 0) - 2) * 44%), -14%) rotate(calc((var(--i, 0) - 2) * 8deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="briques-eclate"] .booster-stage__tear .booster-pack { animation: none; }
+}

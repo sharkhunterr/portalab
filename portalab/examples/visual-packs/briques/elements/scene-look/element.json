@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "briques",
+  "names": {
+    "fr": "Brique géante",
+    "en": "Giant brick"
+  },
+  "descriptions": {
+    "fr": "Le paquet devient une brique rouge géante 2×4, ses quatre tenons en relief sur le dessus, son plastique brillant ; de petites briques tournent autour dans la lumière (HD).",
+    "en": "The pack becomes a giant red 2×4 brick, its four studs in relief on top, its shiny plastic; little bricks turn round it in the light (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "look.glsl",
+    "css": [
+      "look.css"
+    ],
+    "stage": true
+  }
+}

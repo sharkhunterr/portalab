@@ -1,0 +1,44 @@
+{
+  "type": "bundle",
+  "product": "ultimate_briques",
+  "names": {
+    "fr": "Pack de thème Briques",
+    "en": "Bricks theme pack"
+  },
+  "descriptions": {
+    "fr": "Tout l'univers Briques : son interface et tous ses looks, légers et HD.",
+    "en": "The whole Bricks universe: its interface and all its looks, light and HD."
+  },
+  "payload": {
+    "products": [
+      "theme_briques",
+      "palette_briques",
+      "ambient_briques_pile",
+      "background_briques_ville",
+      "frame_briques_tenons",
+      "frame_briques_plaque",
+      "banner_briques_chantier",
+      "name_briques_plastique",
+      "level_briques_2x2",
+      "levelup_briques_tours",
+      "effect_briques_explosion",
+      "notif_briques_plaque_notif",
+      "notifanim_briques_clic",
+      "ambient_briques_pluie",
+      "levelup_briques_clic_niveau",
+      "banner_briques_plaque_verte",
+      "badge_briques_or_hd",
+      "level_briques_tenon_hd",
+      "title_maitre_batisseur",
+      "badge_brique_rouge"
+    ]
+  },
+  "economy": {
+    "price": 5400,
+    "rarity": "legendary",
+    "level": 20,
+    "collection": "ultimate",
+    "icon": "crown",
+    "supply": 10
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "type": "name_style",
+  "look": "briques-plastique",
+  "product": "name_briques_plastique",
+  "names": {
+    "fr": "Lettres en plastique",
+    "en": "Plastic letters"
+  },
+  "descriptions": {
+    "fr": "Votre nom en grosses lettres de plastique rouge, épaisses, avec leur tranche.",
+    "en": "Your name in big red plastic letters, thick, with their edge."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "name.css"
+    ]
+  },
+  "economy": {
+    "price": 380,
+    "rarity": "rare",
+    "collection": "names",
+    "icon": "feather"
+  }
+}

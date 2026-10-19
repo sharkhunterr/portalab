@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "briques",
+  "names": {
+    "fr": "La salle de jeux",
+    "en": "The playroom"
+  },
+  "descriptions": {
+    "fr": "Toute la scène dans une salle de jeux : un parquet qui file au loin, une grande plaque verte où s'élève une ville de briques, une grue qui descend une brique, des briques éparpillées au premier plan, la lumière d'une fenêtre et sa poussière (HD).",
+    "en": "The whole stage in a playroom: a wooden floor running away, a big green plate where a brick town rises, a crane lowering a brick, bricks scattered in the foreground, light from a window and its dust (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "stage.glsl",
+    "stage": true
+  }
+}

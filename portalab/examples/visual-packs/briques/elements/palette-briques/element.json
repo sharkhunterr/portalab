@@ -1,0 +1,31 @@
+{
+  "type": "palette",
+  "look": "briques",
+  "product": "palette_briques",
+  "names": {
+    "fr": "Palette primaire",
+    "en": "Primary palette"
+  },
+  "descriptions": {
+    "fr": "Le rouge et le bleu des briques sur n'importe quelle interface.",
+    "en": "The bricks' red and blue over any interface."
+  },
+  "palette": {
+    "dark": {
+      "accent": "#ff4a4a",
+      "accentAlt": "#4f9bff",
+      "contrast": "#1b0505"
+    },
+    "light": {
+      "accent": "#c42222",
+      "accentAlt": "#1f5fc0",
+      "contrast": "#ffffff"
+    }
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "palettes",
+    "icon": "palette"
+  }
+}

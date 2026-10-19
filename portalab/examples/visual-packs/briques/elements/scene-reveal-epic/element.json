@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "briques-spirale",
+  "names": {
+    "fr": "La spirale arc-en-ciel",
+    "en": "The rainbow spiral"
+  },
+  "descriptions": {
+    "fr": "Une spirale de briques arc-en-ciel s'élève autour de la carte en tournant, des étincelles s'en échappent (HD).",
+    "en": "A spiral of rainbow bricks rises round the card, turning, sparks flying off it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.2,
+    "rarity": "epic"
+  }
+}

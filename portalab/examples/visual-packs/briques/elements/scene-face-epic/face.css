@@ -1,0 +1,104 @@
+/* An epic card: chrome bricks (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform. */
+[data-card-face="briques-chrome"] .booster-card__face {
+  isolation: isolate;
+  border: 0;
+  clip-path: polygon(8.0% 0.0%, 92.0% 0.0%, 100.0% 5.6%, 100.0% 94.4%, 92.0% 100.0%, 8.0% 100.0%, 0.0% 94.4%, 0.0% 5.6%);
+  background: linear-gradient(160deg, #e6d6ff, #7b3fc4 40%, #2a0f4a 70%, #e6d6ff);
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.55rem rgba(170, 110, 255, 0.8));
+}
+[data-card-face="briques-chrome"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  clip-path: polygon(8.0% 0.0%, 92.0% 0.0%, 100.0% 5.6%, 100.0% 94.4%, 92.0% 100.0%, 8.0% 100.0%, 0.0% 94.4%, 0.0% 5.6%);
+  background: linear-gradient(175deg, #4a2080, #1a0830);
+}
+[data-card-face="briques-chrome"] .booster-card__rarity,
+[data-card-face="briques-chrome"] .booster-card__name {
+  color: #f4ecff;
+  text-shadow: 0 0 0.6rem rgba(170, 110, 255, 0.8);
+}
+/* the holographic sheen: two colours in a band sliding over the card, lighter where they cross */
+[data-card-face="briques-chrome"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: linear-gradient(115deg, transparent 0%, rgb(200, 140, 255) 30%, transparent 47.5%, transparent 52.5%, rgb(120, 220, 255) 70%, transparent 100%);
+  background-size: 300% 300%;
+  background-position: 50% 50%;
+  mix-blend-mode: screen;
+  opacity: 0.35;
+  animation: briques-holo 9s ease infinite both;
+}
+/* glitter over the art, glimmering as the light moves */
+[data-card-face="briques-chrome"] .booster-card__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 30%, #f8f0ff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 20%, #f8f0ff 0 1.2px, transparent 2px),
+    radial-gradient(circle at 45% 75%, #f8f0ff 0 0.9px, transparent 1.5px),
+    radial-gradient(circle at 85% 65%, #f8f0ff 0 1.1px, transparent 1.8px);
+  background-size: 23px 29px, 31px 37px, 19px 23px, 41px 43px;
+  mix-blend-mode: screen;
+  opacity: 0.25;
+  animation: briques-glitter 9s ease infinite both;
+}
+@keyframes briques-holo {
+  0%, 100% { opacity: 0.12; background-position: 50% 50%; }
+  33% { opacity: 0.6; background-position: 100% 100%; }
+  66% { opacity: 0.6; background-position: 0% 0%; }
+}
+@keyframes briques-glitter {
+  0%, 5%, 100% { opacity: 0.2; background-position: 50% 50%; }
+  33% { opacity: 0.9; background-position: 40% 40%; filter: brightness(1.8); }
+  45% { opacity: 0.35; }
+  66% { opacity: 0.9; background-position: 60% 60%; filter: brightness(1.8); }
+}
+@keyframes briques-lean {
+  0%, 100% { transform: perspective(40rem) rotateX(0deg) rotateY(0deg); }
+  33% { transform: perspective(40rem) rotateX(6deg) rotateY(-7deg); }
+  66% { transform: perspective(40rem) rotateX(-6deg) rotateY(7deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="briques-chrome"] .booster-card__face::after,
+  [data-card-face="briques-chrome"] .booster-card__art::after,
+  [data-card-face="briques-chrome"] .booster-card__art {
+    animation: none;
+  }
+}
+/* it keeps living: its glow pulsing, its frame shimmering, a light sweeping over it now and then */
+[data-card-face="briques-chrome"] .booster-card__face {
+  background-size: 220% 220%;
+  animation: briques-pulse-chrome 3s ease-in-out infinite;
+}
+@keyframes briques-pulse-chrome {
+  0%, 100% { filter: drop-shadow(0 0 0.45rem rgba(170, 110, 255, 0.8)); background-position: 0% 50%; }
+  50% { filter: drop-shadow(0 0 1rem rgba(170, 110, 255, 0.8)); background-position: 100% 50%; }
+}
+[data-card-face="briques-chrome"] .booster-card__shine {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.45) 50%, transparent 58%);
+  mix-blend-mode: screen;
+  animation: briques-sweep 4.2s ease-in-out infinite;
+}
+@keyframes briques-sweep {
+  0%, 55% { transform: translateX(-70%); }
+  85%, 100% { transform: translateX(70%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="briques-chrome"] .booster-card__face,
+  [data-card-face="briques-chrome"] .booster-card__shine {
+    animation: none;
+  }
+}
+/* the GPU's drawing sits in the panel, inside the frame */
+[data-card-face="briques-chrome"] .booster-card__gpu {
+  inset: 6px;
+}

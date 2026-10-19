@@ -1,0 +1,28 @@
+{
+  "type": "title",
+  "look": "briques-titre",
+  "product": "title_maitre_batisseur",
+  "names": {
+    "fr": "Titre : Maître bâtisseur",
+    "en": "Title: Master builder"
+  },
+  "descriptions": {
+    "fr": "« Maître bâtisseur » en lettres de plastique sous votre nom.",
+    "en": "« Master builder » in plastic letters under your name."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "payload": {
+    "label": "Master builder"
+  },
+  "economy": {
+    "price": 300,
+    "rarity": "rare",
+    "collection": "titles",
+    "icon": "trophy"
+  }
+}

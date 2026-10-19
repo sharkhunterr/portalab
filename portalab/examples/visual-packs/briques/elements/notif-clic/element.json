@@ -1,0 +1,25 @@
+{
+  "type": "notification_animation",
+  "look": "briques-clic",
+  "product": "notifanim_briques_clic",
+  "names": {
+    "fr": "Animation de notification clic",
+    "en": "Click notification animation"
+  },
+  "descriptions": {
+    "fr": "Les notifications tombent d'en haut et s'emboîtent avec un petit rebond, clic !",
+    "en": "Notifications drop from above and click into place with a little bounce, click!"
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "click.css"
+    ]
+  },
+  "economy": {
+    "price": 500,
+    "rarity": "rare",
+    "collection": "looks",
+    "icon": "bell-ring"
+  }
+}

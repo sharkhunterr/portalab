@@ -1,0 +1,21 @@
+{
+  "type": "card_face",
+  "look": "briques-chrome",
+  "names": {
+    "fr": "Face chromée",
+    "en": "Chrome face"
+  },
+  "descriptions": {
+    "fr": "Une carte épique en briques chromées violettes, le reflet d'une pièce qui glisse sur leurs tenons, holographique et vivante.",
+    "en": "An epic card of chrome purple bricks, a room's reflection sliding over their studs, holographic and alive."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "face.glsl",
+    "css": [
+      "face.css"
+    ],
+    "stage": true,
+    "rarity": "epic"
+  }
+}

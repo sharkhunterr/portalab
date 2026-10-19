@@ -1,0 +1,21 @@
+{
+  "type": "card_back",
+  "look": "briques",
+  "names": {
+    "fr": "Dos de plaque bleue",
+    "en": "Blue plate back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte est une plaque bleue à tenons vue de dessus, un reflet qui passe, une brique jaune 2×2 au centre.",
+    "en": "Face down, every card is a blue studded plate seen from above, a gleam passing, a yellow 2×2 brick in the middle."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "back.glsl",
+    "css": [
+      "back.css"
+    ],
+    "stage": true,
+    "rarity": "common"
+  }
+}

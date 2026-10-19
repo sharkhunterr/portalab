@@ -1,0 +1,26 @@
+/* A common card: a grey plate (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform. */
+[data-card-face="briques-grise"] .booster-card__face {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.4rem;
+  background: linear-gradient(180deg, #a8a8a2, #7a7a74);
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.55rem rgba(160, 160, 150, 0.4));
+}
+[data-card-face="briques-grise"] .booster-card__face::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  border-radius: 0.4rem;
+  background: linear-gradient(180deg, #c9c9c2, #a8a8a2);
+}
+[data-card-face="briques-grise"] .booster-card__rarity,
+[data-card-face="briques-grise"] .booster-card__name {
+  color: #1b1b1b;
+  text-shadow: 0 0 0.6rem rgba(160, 160, 150, 0.4);
+}
+/* the GPU's drawing sits in the panel, inside the frame */
+[data-card-face="briques-grise"] .booster-card__gpu {
+  inset: 5px;
+}

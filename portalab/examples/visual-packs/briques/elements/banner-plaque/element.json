@@ -1,0 +1,25 @@
+{
+  "type": "profile_banner",
+  "look": "briques-plaque-verte",
+  "product": "banner_briques_plaque_verte",
+  "names": {
+    "fr": "Bannière plaque verte",
+    "en": "Green plate banner"
+  },
+  "descriptions": {
+    "fr": "Une grande plaque verte à tenons vue de dessus, avec quelques briques posées dessus.",
+    "en": "A big green studded plate seen from above, with a few bricks laid on it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "plate.css"
+    ]
+  },
+  "economy": {
+    "price": 250,
+    "rarity": "common",
+    "collection": "profile",
+    "icon": "image"
+  }
+}

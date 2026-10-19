@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "look": "briques-plaque",
+  "product": "frame_briques_plaque",
+  "names": {
+    "fr": "Cadre plaque HD",
+    "en": "Studded plate frame HD"
+  },
+  "descriptions": {
+    "fr": "Une plaque à tenons autour de votre avatar, chaque tenon en relief, un reflet qui passe sur le plastique, sa couleur qui change doucement (HD).",
+    "en": "A studded plate round your avatar, each stud in relief, a gleam passing over the plastic, its colour slowly changing (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "plate.glsl",
+    "shape": 0
+  },
+  "economy": {
+    "price": 1300,
+    "rarity": "epic",
+    "level": 14,
+    "collection": "profile",
+    "icon": "user"
+  }
+}

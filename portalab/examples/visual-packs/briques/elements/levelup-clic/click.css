@@ -1,0 +1,39 @@
+/* the level's card drops and clicks into place; coloured studs hop round it */
+.levelup[data-look="briques-clic-niveau"] .levelup__card {
+  border: 0;
+  border-radius: 0.4rem;
+  background: linear-gradient(180deg, #ffffff, #e9e6dc);
+  color: #1b1b1b;
+  box-shadow: 0 6px 0 #c9c4b4, 0 1.2rem 2rem rgba(0, 0, 0, 0.3);
+  animation: briques-snap 0.9s cubic-bezier(0.3, 0, 0.6, 1) both;
+}
+.levelup[data-look="briques-clic-niveau"] .levelup__title {
+  color: #c42222;
+  text-transform: uppercase;
+}
+.levelup[data-look="briques-clic-niveau"] .levelup__fx {
+  display: block;
+  inset: 0;
+  background:
+    radial-gradient(circle, #e23a3a 0 7px, transparent 8px) 20% 60% / 30px 30px no-repeat,
+    radial-gradient(circle, #ffd94a 0 7px, transparent 8px) 80% 55% / 30px 30px no-repeat,
+    radial-gradient(circle, #4f8fe8 0 7px, transparent 8px) 30% 30% / 30px 30px no-repeat,
+    radial-gradient(circle, #4cc06a 0 7px, transparent 8px) 70% 28% / 30px 30px no-repeat;
+  animation: briques-hop 1.2s ease-out 0.5s both;
+}
+@keyframes briques-snap {
+  0% { transform: translateY(-60vh); }
+  55% { transform: translateY(0); }
+  68% { transform: translateY(-1.2rem) scaleY(1.04); }
+  82% { transform: translateY(0) scaleY(0.97); }
+  100% { transform: none; }
+}
+@keyframes briques-hop {
+  0% { opacity: 0; transform: scale(0.6); }
+  40% { opacity: 1; transform: scale(1.1) translateY(-0.8rem); }
+  100% { opacity: 0; transform: scale(1) translateY(0.4rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .levelup[data-look="briques-clic-niveau"] .levelup__card,
+  .levelup[data-look="briques-clic-niveau"] .levelup__fx { animation: none; }
+}

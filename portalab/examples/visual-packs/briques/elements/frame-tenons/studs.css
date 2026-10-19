@@ -1,0 +1,22 @@
+/* a ring of red studs round the avatar, turning slowly */
+.avatar-frame[data-frame="briques-tenons"] {
+  background: #ffffff;
+  box-shadow: 0 0 0 3px #c42222, 0 4px 0 3px #8a1414;
+}
+.avatar-frame[data-frame="briques-tenons"]::before {
+  content: "";
+  position: absolute;
+  inset: -16%;
+  z-index: -1;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, #e23a3a 0 9deg, #b31d1d 9deg 11deg, transparent 11deg 20deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 66%, #000 67% 80%, transparent 81%);
+  mask: radial-gradient(circle, transparent 0 66%, #000 67% 80%, transparent 81%);
+  animation: briques-turn 14s linear infinite;
+}
+@keyframes briques-turn {
+  to { transform: rotate(1turn); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .avatar-frame[data-frame="briques-tenons"]::before { animation: none; }
+}

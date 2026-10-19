@@ -1,0 +1,29 @@
+{
+  "type": "badge",
+  "look": "briques-rouge",
+  "product": "badge_brique_rouge",
+  "names": {
+    "fr": "Badge Brique rouge",
+    "en": "Red brick badge"
+  },
+  "descriptions": {
+    "fr": "Une brique rouge 2×4 sur votre profil.",
+    "en": "A red 2×4 brick on your profile."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "payload": {
+    "label": "Red brick",
+    "icon": "package"
+  },
+  "economy": {
+    "price": 180,
+    "rarity": "common",
+    "collection": "badges",
+    "icon": "star"
+  }
+}

@@ -1,0 +1,10 @@
+/* a green studded plate seen from above, a few bricks laid on it */
+.profile-banner[data-banner="briques-plaque-verte"] {
+  background:
+    radial-gradient(circle at 50% 50%, #ffd94a 0 30%, #c99a0c 32%, transparent 34%) 62% 40% / 12% 40% no-repeat,
+    linear-gradient(#f7c51e, #e0ad12) 60% 38% / 16% 48% no-repeat,
+    linear-gradient(#e23a3a, #b31d1d) 18% 60% / 22% 30% no-repeat,
+    linear-gradient(#4f8fe8, #1f5fc0) 84% 70% / 10% 56% no-repeat,
+    radial-gradient(circle at 50% 50%, #43b862 0 32%, #237f3c 36%, transparent 40%) 0 0 / 18px 18px,
+    #2a9d4a;
+}

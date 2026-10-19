@@ -1,0 +1,21 @@
+{
+  "type": "card_face",
+  "look": "briques-or",
+  "names": {
+    "fr": "Face d'or",
+    "en": "Gold face"
+  },
+  "descriptions": {
+    "fr": "Une carte légendaire en briques d'or, des éclats qui courent sur les tenons, un arc-en-ciel qui passe, holographie, paillettes, l'image qui s'incline.",
+    "en": "A legendary card of gold bricks, glints running over the studs, a rainbow passing, holography, glitter, the art leaning."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "face.glsl",
+    "css": [
+      "face.css"
+    ],
+    "stage": true,
+    "rarity": "legendary"
+  }
+}

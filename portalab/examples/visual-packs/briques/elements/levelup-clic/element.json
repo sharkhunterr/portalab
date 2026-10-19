@@ -1,0 +1,25 @@
+{
+  "type": "level_up",
+  "look": "briques-clic-niveau",
+  "product": "levelup_briques_clic_niveau",
+  "names": {
+    "fr": "Clic !",
+    "en": "Click!"
+  },
+  "descriptions": {
+    "fr": "Version légère : la carte du niveau tombe et s'emboîte avec un rebond, des tenons de couleur sautent autour.",
+    "en": "Light version: the level's card drops and clicks into place with a bounce, coloured studs hopping round it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "click.css"
+    ]
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  }
+}

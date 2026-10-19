@@ -1,0 +1,27 @@
+{
+  "type": "theme",
+  "look": "briques",
+  "product": "theme_briques",
+  "names": {
+    "fr": "Interface Briques",
+    "en": "Bricks interface"
+  },
+  "descriptions": {
+    "fr": "Du plastique clair et brillant, des couleurs primaires, des titres en capitales, des cartes posées comme des briques sur une plaque à tenons, et le vocabulaire des bâtisseurs (la salle de jeu, le club des bâtisseurs, le magasin de briques, des tenons pour monnaie).",
+    "en": "Bright shiny plastic, primary colours, capital headings, cards set like bricks on a studded plate, and the builders' words (the playroom, the builders' club, the brick shop, studs as coins)."
+  },
+  "render": {
+    "kind": "theme",
+    "file": "interface.json",
+    "css": [
+      "interface.css"
+    ]
+  },
+  "economy": {
+    "price": 1500,
+    "rarity": "epic",
+    "level": 10,
+    "collection": "themes",
+    "icon": "palette"
+  }
+}

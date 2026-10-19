@@ -1,0 +1,25 @@
+{
+  "type": "avatar_frame",
+  "look": "briques-tenons",
+  "product": "frame_briques_tenons",
+  "names": {
+    "fr": "Cadre à tenons",
+    "en": "Studded frame"
+  },
+  "descriptions": {
+    "fr": "Un anneau de tenons rouges autour de votre avatar, qui tourne doucement.",
+    "en": "A ring of red studs round your avatar, turning slowly."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "studs.css"
+    ]
+  },
+  "economy": {
+    "price": 450,
+    "rarity": "rare",
+    "collection": "profile",
+    "icon": "user"
+  }
+}

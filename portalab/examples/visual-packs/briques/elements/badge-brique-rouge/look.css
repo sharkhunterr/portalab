@@ -1,0 +1,11 @@
+.cosmetic-badge[data-style="briques-rouge"] {
+  border-color: #8a1414;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 20% 30%, #ff6a6a 0 7%, transparent 8%),
+    radial-gradient(circle at 40% 30%, #ff6a6a 0 7%, transparent 8%),
+    radial-gradient(circle at 60% 30%, #ff6a6a 0 7%, transparent 8%),
+    radial-gradient(circle at 80% 30%, #ff6a6a 0 7%, transparent 8%),
+    linear-gradient(160deg, #e23a3a, #b31d1d);
+  box-shadow: 0 3px 0 #6f1010;
+}

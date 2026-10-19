@@ -1,0 +1,26 @@
+{
+  "type": "effect",
+  "look": "briques-explosion",
+  "product": "effect_briques_explosion",
+  "names": {
+    "fr": "Explosion de briques HD",
+    "en": "Brick burst HD"
+  },
+  "descriptions": {
+    "fr": "Des briques de toutes les couleurs jaillissent de la récompense en tournoyant, puis retombent ; quelques tenons étincellent (HD).",
+    "en": "Bricks of every colour burst from the reward, spinning, then fall back; a few studs sparkle (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "burst.glsl",
+    "stage": true,
+    "duration": 3.0
+  },
+  "economy": {
+    "price": 900,
+    "rarity": "epic",
+    "level": 9,
+    "collection": "celebrations",
+    "icon": "party"
+  }
+}

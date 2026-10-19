@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 2,
+  "key": "briques",
+  "name": "Briques",
+  "colorScheme": "light",
+  "colors": {
+    "surface": "#f6f4ee",
+    "surfaceRaised": "#ffffff",
+    "text": "#1b1b1b",
+    "textMuted": "#585858",
+    "border": "#dcd6c8",
+    "accent": "#c42222",
+    "accentContrast": "#ffffff",
+    "focus": "#1f6fd6",
+    "accentAlt": "#1f6fd6",
+    "rarity": {
+      "common": "#6b6b6b",
+      "rare": "#1f5fc0",
+      "epic": "#7b3fc4",
+      "legendary": "#a87808"
+    }
+  },
+  "states": {
+    "loading": {
+      "fg": "#3b3f4a",
+      "bg": "#ece7dc",
+      "icon": "spinner"
+    },
+    "available": {
+      "fg": "#1f6b3a",
+      "bg": "#e3efe4",
+      "icon": "check"
+    },
+    "partial": {
+      "fg": "#7a4b00",
+      "bg": "#f6ead2",
+      "icon": "half"
+    },
+    "stale": {
+      "fg": "#6e5300",
+      "bg": "#f3ecd4",
+      "icon": "clock"
+    },
+    "error": {
+      "fg": "#8f1d24",
+      "bg": "#f6e0e0",
+      "icon": "warning"
+    },
+    "unavailable": {
+      "fg": "#7a2a3a",
+      "bg": "#f1e2e6",
+      "icon": "blocked"
+    },
+    "maintenance": {
+      "fg": "#4b3a8a",
+      "bg": "#e8e4f4",
+      "icon": "wrench"
+    },
+    "unauthorized": {
+      "fg": "#7a2a5a",
+      "bg": "#f1e2ec",
+      "icon": "lock"
+    },
+    "no-data": {
+      "fg": "#4a4f5a",
+      "bg": "#ebe8e1",
+      "icon": "lines"
+    },
+    "syncing": {
+      "fg": "#1f4f7a",
+      "bg": "#e1eaf3",
+      "icon": "sync"
+    }
+  },
+  "typography": {
+    "fontFamily": "\"Plus Jakarta Sans Variable\", \"Inter Variable\", sans-serif",
+    "headingFamily": "\"Plus Jakarta Sans Variable\", sans-serif",
+    "headingCase": "uppercase",
+    "headingEffect": "shadow"
+  },
+  "radii": {
+    "sm": 0.35,
+    "md": 0.6
+  },
+  "motion": {
+    "profile": "subtle",
+    "celebration": "briques-explosion",
+    "fastMs": 170,
+    "normalMs": 360,
+    "levelUp": "briques-tours"
+  },
+  "layout": {
+    "nav": {
+      "desktop": "topbar",
+      "tablet": "topbar",
+      "phone": "bottom-bar"
+    },
+    "header": "centered",
+    "headerPosition": "top",
+    "cards": "elevated",
+    "content": "wide",
+    "corners": "soft",
+    "widgetFrame": "card"
+  },
+  "icons": {
+    "set": "outline",
+    "overrides": {
+      "shop": "package",
+      "trophy": "crown"
+    }
+  },
+  "background": {
+    "fallback": "#f6f4ee",
+    "pattern": "dots",
+    "ambient": "briques-pile"
+  },
+  "sounds": {
+    "notification": "asset:toon/notification.wav",
+    "alert": "asset:toon/alert.wav",
+    "success": "asset:toon/success.wav",
+    "reward": "asset:toon/reward.wav",
+    "levelUp": "asset:toon/level-up.wav",
+    "ui": "asset:toon/ui.wav"
+  },
+  "notification": {
+    "style": "briques-plaque-notif",
+    "animation": "briques-clic"
+  },
+  "vocabulary": {
+    "fr": {
+      "nav:nav.home": "La salle de jeu",
+      "nav:nav.section.home": "La salle de jeu",
+      "dashboard:title": "La salle de jeu",
+      "nav:nav.media": "Le cinéma des briques",
+      "nav:nav.section.media": "Le cinéma des briques",
+      "media:home.title": "Le cinéma des briques",
+      "nav:nav.section.content": "Les notices",
+      "nav:nav.news": "Le journal des briques",
+      "news:title": "Le journal des briques",
+      "nav:nav.wiki": "Le grand manuel",
+      "wiki:title": "Le grand manuel",
+      "nav:nav.community": "Le club des bâtisseurs",
+      "nav:nav.section.community": "Le club des bâtisseurs",
+      "community:title": "Le club des bâtisseurs",
+      "nav:nav.marketplace": "Le magasin de briques",
+      "nav:nav.section.marketplace": "Le magasin de briques",
+      "marketplace:catalog.title": "Le magasin de briques",
+      "nav:nav.support": "L'atelier de réparation",
+      "nav:nav.section.support": "L'atelier de réparation",
+      "gamification:value.coins": "Tenons"
+    },
+    "en": {
+      "nav:nav.home": "The playroom",
+      "nav:nav.section.home": "The playroom",
+      "dashboard:title": "The playroom",
+      "nav:nav.media": "The brick cinema",
+      "nav:nav.section.media": "The brick cinema",
+      "media:home.title": "The brick cinema",
+      "nav:nav.section.content": "The instructions",
+      "nav:nav.news": "The brick news",
+      "news:title": "The brick news",
+      "nav:nav.wiki": "The big manual",
+      "wiki:title": "The big manual",
+      "nav:nav.community": "The builders' club",
+      "nav:nav.section.community": "The builders' club",
+      "community:title": "The builders' club",
+      "nav:nav.marketplace": "The brick shop",
+      "nav:nav.section.marketplace": "The brick shop",
+      "marketplace:catalog.title": "The brick shop",
+      "nav:nav.support": "The repair workshop",
+      "nav:nav.section.support": "The repair workshop",
+      "gamification:value.coins": "Studs"
+    }
+  }
+}

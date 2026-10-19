@@ -1,0 +1,25 @@
+{
+  "type": "level_badge",
+  "look": "briques-2x2",
+  "product": "level_briques_2x2",
+  "names": {
+    "fr": "Badge de niveau brique 2×2",
+    "en": "2×2 brick level badge"
+  },
+  "descriptions": {
+    "fr": "Votre niveau sur une brique jaune 2×2 vue de dessus, ses quatre tenons.",
+    "en": "Your level on a yellow 2×2 brick seen from above, its four studs."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "brick.css"
+    ]
+  },
+  "economy": {
+    "price": 700,
+    "rarity": "rare",
+    "collection": "levels",
+    "icon": "trophy"
+  }
+}

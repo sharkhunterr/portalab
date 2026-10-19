@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "briques-tour-or",
+  "names": {
+    "fr": "La tour d'or",
+    "en": "The golden tower"
+  },
+  "descriptions": {
+    "fr": "Une tour de briques d'or se dresse derrière la carte, brique après brique, des rayons d'or jaillissent et trois gerbes de tenons éclatent comme un feu d'artifice (HD).",
+    "en": "A tower of gold bricks rises behind the card, brick after brick, gold rays burst out and three sprays of studs explode like fireworks (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary"
+  }
+}

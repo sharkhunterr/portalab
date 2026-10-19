@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "briques",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Briques — univers des briques de construction",
+    "en": "Bricks — a building-bricks universe"
+  },
+  "descriptions": {
+    "fr": "Un univers complet de briques de construction, en version légère et en HD : une interface de plastique clair aux couleurs primaires, des briques qui tombent et s'empilent derrière le portail, une ville qui se construit derrière votre profil, des cadres et des badges à tenons, des tours qui s'empilent à chaque niveau, une explosion de briques — et une scène de booster dans une salle de jeux.",
+    "en": "A whole universe of building bricks, light and HD: a bright plastic interface in primary colours, bricks falling and stacking behind the portal, a town building itself behind your profile, studded frames and badges, towers stacking up at every level, a burst of bricks — and a booster scene in a playroom."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}
