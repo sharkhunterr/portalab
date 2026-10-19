@@ -440,6 +440,16 @@
 .booster-stage__gpu {
   z-index: 1;
 }
+/* 028: a card's face or back drawn by the GPU — on the panel's own plane (after it: over it), under its art and
+   words, cut by its shape; a scene may set where it sits on its own hook (inside a thick frame) */
+.booster-card__gpu {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
 .booster-stage__gpu-canvas {
   position: absolute;
   inset: 0;

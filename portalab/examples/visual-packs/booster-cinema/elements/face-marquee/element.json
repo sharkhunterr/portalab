@@ -6,14 +6,16 @@
     "en": "Marquee face"
   },
   "descriptions": {
-    "fr": "Une carte épique cerclée d'ampoules qui s'allument en chenillard, comme la marquise d'un cinéma, holographique et vivante.",
-    "en": "An epic card ringed with bulbs chasing round it like a cinema marquee, holographic and alive."
+    "fr": "Une carte épique en marquise de cinéma : un bandeau d'ampoules qui s'allument en chenillard avec leur halo, un velours rouge à plis, un soleil art déco doré qui se lève, holographique et vivante.",
+    "en": "An epic card as a cinema marquee: a band of bulbs chasing round it with their halo, red velvet in folds, a gold art deco sunburst rising, holographic and alive."
   },
   "render": {
-    "kind": "css",
+    "kind": "glsl",
+    "file": "face.glsl",
     "css": [
       "face.css"
     ],
+    "stage": true,
     "rarity": "epic"
   }
 }

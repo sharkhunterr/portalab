@@ -50,14 +50,26 @@
   opacity: 0.25;
   animation: cinema-glitter 9s ease infinite both;
 }
+/* the marquee: a wide band of bulbs round the card, chasing two by two, each with its halo */
 [data-card-face="cinema-marquee"] .booster-card__face {
   background:
-    radial-gradient(circle, #fff6c8 0 2.2px, #ffc040 2.6px, transparent 3.4px) 0 0 / 11px 11px,
-    linear-gradient(160deg, #e8b84a, #8a5a12 50%, #e8b84a);
-  animation: cinema-bulbs 1.1s steps(2) infinite;
+    radial-gradient(circle, #fffbe6 0 2.2px, #ffd36a 2.9px, rgba(255, 176, 48, 0.55) 3.8px, transparent 5.5px) 0 0 / 14px 14px,
+    linear-gradient(160deg, #f6d27a, #9a6514 42%, #f6d27a 52%, #7a4a0c 78%, #e8b84a);
+  animation: cinema-bulbs 0.8s steps(2) infinite;
 }
 @keyframes cinema-bulbs {
-  to { background-position: 5.5px 0, 0 0; }
+  to { background-position: 7px 7px, 0 0; }
+}
+/* inside the bulbs: red velvet in folds, a gold art deco sunburst rising from the bottom, a gold rule */
+[data-card-face="cinema-marquee"] .booster-card__face::before {
+  inset: 13px;
+  background:
+    linear-gradient(90deg, transparent 0 3px, rgba(255, 214, 120, 0.85) 3px 4px, transparent 4px calc(100% - 4px), rgba(255, 214, 120, 0.85) calc(100% - 4px) calc(100% - 3px), transparent 0),
+    linear-gradient(180deg, transparent 0 3px, rgba(255, 214, 120, 0.85) 3px 4px, transparent 4px calc(100% - 4px), rgba(255, 214, 120, 0.85) calc(100% - 4px) calc(100% - 3px), transparent 0),
+    repeating-conic-gradient(from -90deg at 50% 112%, rgba(255, 205, 100, 0.2) 0 3deg, transparent 3deg 9deg),
+    radial-gradient(ellipse 60% 30% at 50% 100%, rgba(255, 190, 80, 0.35), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.28) 0 2px, transparent 2px 5px, rgba(255, 255, 255, 0.04) 5px 6px, transparent 6px 10px),
+    radial-gradient(ellipse at 50% 18%, #c01c32, #6a0816 58%, #2a0208);
 }
 @media (prefers-reduced-motion: reduce) {
   [data-card-face="cinema-marquee"] .booster-card__face { animation: none; }
@@ -109,4 +121,8 @@
   [data-card-face="cinema-marquee"] .booster-card__shine {
     animation: none;
   }
+}
+/* the GPU's drawing sits in the panel, inside the frame */
+[data-card-face="cinema-marquee"] .booster-card__gpu {
+  inset: 13px;
 }

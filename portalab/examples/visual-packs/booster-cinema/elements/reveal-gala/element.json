@@ -2,12 +2,12 @@
   "type": "card_reveal",
   "look": "cinema-gala-night",
   "names": {
-    "fr": "Le tapis rouge",
-    "en": "The red carpet"
+    "fr": "La première",
+    "en": "The premiere"
   },
   "descriptions": {
-    "fr": "La soirée de gala : les flashs des photographes crépitent tout autour, deux projecteurs dorés se croisent, des étoiles d'or tombent, le tapis rouge rougeoie dessous (HD).",
-    "en": "The gala night: the photographers' flashes crackle all round, two golden searchlights cross, golden stars fall, the red carpet glows beneath (HD)."
+    "fr": "Le soir de la première : une onde d'or et un éclair blanc, une gloire de rayons qui tourne derrière la carte, le tapis rouge qui descend vers vous entre ses potelets dorés, trois projecteurs qui balaient le ciel, les flashs des photographes qui crépitent, des confettis d'or qui virevoltent (HD).",
+    "en": "The premiere night: a golden wave and a white flash, a glory of rays turning behind the card, the red carpet running down to you between its gold posts, three searchlights sweeping the sky, the photographers' flashes crackling, golden confetti fluttering down (HD)."
   },
   "render": {
     "kind": "glsl",

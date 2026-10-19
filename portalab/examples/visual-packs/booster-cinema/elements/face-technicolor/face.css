@@ -73,3 +73,7 @@
     animation: none;
   }
 }
+/* the GPU's drawing sits in the panel, inside the frame */
+[data-card-face="cinema-technicolor"] .booster-card__gpu {
+  inset: 5px;
+}

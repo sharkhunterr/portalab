@@ -179,11 +179,12 @@ lightly, unless the scene is made for dread).
 | **backdrop** | behind everything, full screen | a real place in depth (parallax, a perspective, light, things living); the centre calm enough for the pack and the cards; phone slice checked |
 | **booster look** | the sealed pack, centre stage, and the shop tile | an object of the universe (a dynamite crate, an amphora, a clapperboard), shaped with `clip-path`, its flap `.booster-pack__flap` and pseudo-elements as parts (sticks, handles, a fuse); the pack's name stays readable — move the emblem if it covers it; a GLSL stage around it (a set light, sparks, a halo) |
 | **opening** | when it is opened, ≤ 4 s | a gesture of the universe (the fuse burning down then the blast; the clap, the countdown, the film burning) — CSS moves the pack, GLSL draws the event; the cards come at its end |
-| **card back** | every card face down, and as the booster's thumbnail in the shop | one design for all (it never tells the rarity), the universe's emblem in the middle |
-| **faces** | each card turned | the rarity staircase: common plain and material; rare cut corners + holographic sheen; epic a shape + pulse; legendary a radiant shape (sunburst) + leaning art + glitter. Each face styles **only its own look** |
+| **card back** | every card face down, and as the booster's thumbnail in the shop | one design for all (it never tells the rarity), the universe's emblem in the middle; may be drawn by the GPU (light turning behind the emblem) |
+| **faces** | each card turned | best drawn by the GPU (HD: a living panel — a film, swirling dyes, a curtain, a gala night — under the art) with a stylesheet for the frame and the words; the rarity staircase: common plain and material; rare cut corners + holographic sheen; epic a shape + pulse; legendary a radiant shape (sunburst) + leaning art + glitter. Each face styles **only its own look** |
 | **reveals** | when a rare, epic or legendary card turns, ≤ 3 s | escalate too: a gesture (a lasso, searchlights), a burst (gunfire, a marquee lighting up), an apotheosis (the mother lode, the red carpet's flashes) — wide elliptical fade |
 
-Start from: `booster-cinema/` (the whole scene), `ruee-vers-l-or/elements/scene-*`, `booster-horreur/` (dread).
+Everything is the pack's: its shaders and stylesheets; Portalab only draws what the pack brings, where the
+contracts say. Start from: `booster-cinema/` (the whole scene, every part on the GPU), `ruee-vers-l-or/elements/scene-*`, `booster-horreur/` (dread).
 
 ## Pitfalls met so far
 

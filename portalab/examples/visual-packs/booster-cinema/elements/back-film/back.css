@@ -1,3 +1,8 @@
+/* the GPU's drawing sits in the frame between the sprocket holes */
+[data-card-back="cinema"] .booster-card__gpu {
+  inset: 9% 20%;
+  border-radius: 0.15rem;
+}
 /* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity. */
 [data-card-back="cinema"] .booster-card__back {
   isolation: isolate;

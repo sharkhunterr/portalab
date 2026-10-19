@@ -10,10 +10,12 @@
     "en": "A rare card in Technicolor's saturated colours, cut corners, holographic."
   },
   "render": {
-    "kind": "css",
+    "kind": "glsl",
+    "file": "face.glsl",
     "css": [
       "face.css"
     ],
+    "stage": true,
     "rarity": "rare"
   }
 }

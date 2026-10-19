@@ -6,14 +6,16 @@
     "en": "Gala night face"
   },
   "descriptions": {
-    "fr": "Une carte légendaire d'or, rayonnante comme une statuette, des faisceaux de projecteurs, holographie, paillettes, l'image qui s'incline.",
-    "en": "A legendary card of gold, radiant like a statuette, searchlight beams, holography, glitter, the art leaning."
+    "fr": "Une carte légendaire de soirée de gala : un cadre d'or où passe un reflet, le noir et l'or traversés de rayons de projecteurs, le tapis rouge qui descend vers vous entre ses cordons dorés, des étoiles, holographie, paillettes, l'image qui s'incline.",
+    "en": "A legendary card of the gala night: a gold frame with a shine passing, black and gold crossed by searchlight rays, the red carpet running down to you between its gold ropes, stars, holography, glitter, the art leaning."
   },
   "render": {
-    "kind": "css",
+    "kind": "glsl",
+    "file": "face.glsl",
     "css": [
       "face.css"
     ],
+    "stage": true,
     "rarity": "legendary"
   }
 }

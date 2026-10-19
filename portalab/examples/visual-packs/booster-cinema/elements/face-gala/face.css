@@ -54,6 +54,34 @@
 [data-card-face="cinema-gala"] .booster-card__art {
   animation: cinema-lean 9s ease-in-out infinite;
 }
+/* the gala night: a gold frame with a shine sweeping round it */
+[data-card-face="cinema-gala"] .booster-card__face {
+  background:
+    linear-gradient(115deg, transparent 38%, rgba(255, 255, 240, 0.95) 48%, rgba(255, 240, 190, 0.6) 52%, transparent 62%) 0 0 / 300% 100%,
+    conic-gradient(from 20deg, #fff3c0, #e0a83a, #7a4a0c, #f4cf6a, #fff8dc, #b07a1c, #fff3c0);
+  animation: cinema-shine 3.2s ease-in-out infinite;
+}
+@keyframes cinema-shine {
+  0% { background-position: 110% 0, 0 0; }
+  60%, 100% { background-position: -10% 0, 0 0; }
+}
+/* inside: black and gold, searchlight rays from the top, the red carpet running down to us, stars */
+[data-card-face="cinema-gala"] .booster-card__face::before {
+  inset: 8px;
+  background:
+    radial-gradient(circle at 18% 22%, #fff6d0 0 1px, transparent 1.6px),
+    radial-gradient(circle at 78% 16%, #fff6d0 0 1.2px, transparent 1.8px),
+    radial-gradient(circle at 64% 34%, #fff6d0 0 0.8px, transparent 1.4px),
+    radial-gradient(circle at 30% 40%, #fff6d0 0 0.9px, transparent 1.5px),
+    conic-gradient(from 160deg at 50% 58%, transparent 0deg, #a8101e 0deg 40deg, transparent 40deg),
+    conic-gradient(from 158deg at 50% 58%, transparent 0deg, #e8b84a 0deg 2deg, transparent 2deg 42deg, #e8b84a 42deg 44deg, transparent 44deg),
+    repeating-conic-gradient(from 150deg at 50% -8%, rgba(255, 228, 160, 0.2) 0 5deg, transparent 5deg 14deg),
+    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(255, 220, 140, 0.45), transparent 70%),
+    linear-gradient(175deg, #1c1408, #0a0602 70%, #1a0204);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="cinema-gala"] .booster-card__face { animation: none; }
+}
 @keyframes cinema-holo {
   0%, 100% { opacity: 0.12; background-position: 50% 50%; }
   33% { opacity: 0.6; background-position: 100% 100%; }
@@ -101,4 +129,8 @@
   [data-card-face="cinema-gala"] .booster-card__shine {
     animation: none;
   }
+}
+/* the GPU's drawing sits in the panel, inside the frame */
+[data-card-face="cinema-gala"] .booster-card__gpu {
+  inset: 8px;
 }

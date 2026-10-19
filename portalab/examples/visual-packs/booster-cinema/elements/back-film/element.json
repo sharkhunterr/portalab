@@ -10,10 +10,12 @@
     "en": "Face down, every card is a frame of 35 mm film: its sprocket holes down each side, its frame, and a reel in the middle."
   },
   "render": {
-    "kind": "css",
+    "kind": "glsl",
+    "file": "back.glsl",
     "css": [
       "back.css"
     ],
+    "stage": true,
     "rarity": "common"
   }
 }

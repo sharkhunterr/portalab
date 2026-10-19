@@ -6,8 +6,8 @@
     "en": "The marquee lights up"
   },
   "descriptions": {
-    "fr": "Un cadre d'ampoules s'allume autour de la carte en chenillard, des rubans de pellicule dorés s'envolent (HD).",
-    "en": "A frame of bulbs lights up round the card, chasing, golden film ribbons flying off (HD)."
+    "fr": "Un éventail art déco doré se déploie derrière la carte, ses ampoules s'allument une à une puis courent en chenillard, deux rubans de pellicule s'enroulent autour d'elle, des étincelles d'or montent (HD).",
+    "en": "A gold art deco fan unfolds behind the card, its bulbs light up one by one then chase, two film ribbons coil round it, gold sparks rise (HD)."
   },
   "render": {
     "kind": "glsl",

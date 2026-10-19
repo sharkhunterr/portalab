@@ -181,6 +181,12 @@ function Card({
       >
         <span className="booster-card__inner">
           <span className="booster-card__back" aria-hidden="true">
+            {/* a back drawn by the GPU (HD), under its pattern and its sigil */}
+            <ScenePart
+              element={back}
+              className="booster-card__gpu"
+              context={{ reducedMotion: reduced, phase: "back", index, count: total }}
+            />
             <span className="booster-card__back-pattern" />
             <span className="booster-card__back-sigil">
               <Icon name="sparkles" size={30} />
@@ -198,6 +204,14 @@ function Card({
             </svg>
           </span>
           <span className="booster-card__face" aria-hidden="true">
+            {/* a face drawn by the GPU (HD), under the art and the words — only once it turns */}
+            {state === "hidden" ? null : (
+              <ScenePart
+                element={face}
+                className="booster-card__gpu"
+                context={{ reducedMotion: reduced, phase: "face", rarity, index, count: total }}
+              />
+            )}
             <span className="booster-card__shine" />
             <span className="booster-card__art">
               {/* the card says itself whether it is new or a duplicate */}

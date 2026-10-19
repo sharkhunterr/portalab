@@ -10,10 +10,12 @@
     "en": "A common card in silent-film sepia, its grain and its scratches."
   },
   "render": {
-    "kind": "css",
+    "kind": "glsl",
+    "file": "face.glsl",
     "css": [
       "face.css"
     ],
+    "stage": true,
     "rarity": "common"
   }
 }

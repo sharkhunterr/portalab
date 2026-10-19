@@ -20,3 +20,7 @@
   color: #2a1d10;
   text-shadow: 0 0 0.6rem rgba(200, 170, 120, 0.35);
 }
+/* the GPU's drawing sits in the panel, inside the frame */
+[data-card-face="cinema-silent"] .booster-card__gpu {
+  inset: 5px;
+}
