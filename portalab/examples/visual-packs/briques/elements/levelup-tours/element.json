@@ -3,12 +3,12 @@
   "look": "briques-tours",
   "product": "levelup_briques_tours",
   "names": {
-    "fr": "Les tours HD",
-    "en": "The towers HD"
+    "fr": "L'arche de briques HD",
+    "en": "The brick arch HD"
   },
   "descriptions": {
-    "fr": "Des briques tombent du ciel et s'empilent en deux tours de chaque côté, chacune avec son rebond et son petit clic ; une brique d'or coiffe chaque tour et votre nouveau niveau jaillit dans une gerbe de tenons (HD).",
-    "en": "Bricks fall from the sky and stack into two towers on each side, each with its bounce and its little click; a gold brick crowns each tower and your new level springs out in a spray of studs (HD)."
+    "fr": "Sous la carte du niveau, un mur de briques se monte rangée après rangée, chaque brique tombant et s'emboîtant avec un éclat ; au-dessus, une arche de briques se referme depuis les deux bords, puis une clé de voûte en or tombe au sommet et une gerbe de tenons en jaillit (HD).",
+    "en": "Under the level's card a wall of bricks is built row after row, each brick dropping and clicking in with a flash; above it an arch of bricks closes in from both sides, then a gold keystone drops into the top and studs spray out of it (HD)."
   },
   "render": {
     "kind": "glsl",

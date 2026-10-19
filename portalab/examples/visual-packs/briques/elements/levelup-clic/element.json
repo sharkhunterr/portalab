@@ -7,8 +7,8 @@
     "en": "Click!"
   },
   "descriptions": {
-    "fr": "Version légère : la carte du niveau tombe et s'emboîte avec un rebond, des tenons de couleur sautent autour.",
-    "en": "Light version: the level's card drops and clicks into place with a bounce, coloured studs hopping round it."
+    "fr": "Version légère : deux tours de briques montent brique par brique sur une plaque verte, des briques de couleur pleuvent et rebondissent, puis la carte du niveau tombe, s'écrase en s'emboîtant et rebondit — clic !",
+    "en": "Light version: two towers of bricks rise brick by brick on a green plate, coloured bricks rain down and hop, then the level's card drops, squashes as it clicks in and bounces — click!"
   },
   "render": {
     "kind": "css",
