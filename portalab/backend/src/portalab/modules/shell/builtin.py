@@ -844,6 +844,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "observability.read",
     },
     {
+        "key": "observability.logs",
+        "owner": "module:observability",
+        "kind": "entry",
+        "label_key": "nav.admin.logs",
+        "icon": "terminal",
+        "route": "/admin/observability/logs",
+        "group": "admin",
+        "topic": "pilot",
+        "order_hint": 2,
+        "required_permission": "observability.logs.read",
+    },
+    {
         "key": "statistics.admin",
         "owner": "module:statistics",
         "kind": "entry",

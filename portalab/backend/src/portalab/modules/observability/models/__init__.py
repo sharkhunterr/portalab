@@ -6,7 +6,18 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Boolean, CheckConstraint, Float, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    CheckConstraint,
+    Float,
+    Identity,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -162,3 +173,29 @@ class Contribution(ObsBase):
     kind: Mapped[str] = mapped_column(String(32), nullable=False)
     declared_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+
+class LogEntry(ObsBase):
+    """Issue 158: one line of the server's or the worker's log, already redacted (``core.logging``), kept a
+    few days for the administrators' journal (bounded by age and by count)."""
+
+    __tablename__ = "log_entries"
+    __table_args__ = (
+        Index("ix_log_entries_at", "at"),
+        Index("ix_log_entries_correlation", "correlation_id"),
+        Index("ix_log_entries_source_seq", "source", "seq"),
+    )
+
+    seq: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
+    at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    process: Mapped[str] = mapped_column(String(32), nullable=False)
+    level: Mapped[str] = mapped_column(String(16), nullable=False)
+    logger: Mapped[str] = mapped_column(String(200), nullable=False)
+    source: Mapped[str] = mapped_column(String(128), nullable=False)
+    message: Mapped[str] = mapped_column(
+        Text, nullable=False, info=not_personal("redacted technical log line")
+    )
+    correlation_id: Mapped[str | None] = mapped_column(String(64))
+    fields: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, nullable=False, default=dict, info=not_personal("redacted structured log fields")
+    )

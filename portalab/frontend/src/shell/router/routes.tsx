@@ -24,6 +24,7 @@ const TermsAdmin = lazy(() => import("../../features/terms/TermsAdmin"));
 const Audit = lazy(() => import("../../pages/admin/AuditRoute"));
 const Events = lazy(() => import("../../pages/admin/EventsRoute"));
 const Observability = lazy(() => import("../../pages/admin/ObservabilityRoute"));
+const Logs = lazy(() => import("../../pages/admin/LogsRoute"));
 const Incidents = lazy(() => import("../../features/support/incidents/IncidentsPage"));
 const IncidentConsole = lazy(() => import("../../features/support/incidents/IncidentConsole"));
 const Statistics = lazy(() => import("../../features/statistics/StatisticsPage"));
@@ -422,6 +423,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "audit", element: <Audit />, handle: h({ crumb: "Audit" }) },
             { path: "events", element: <Events />, handle: h({ crumb: "Events" }) },
             { path: "observability", element: <Observability />, handle: h({ crumb: "Observability" }) },
+            { path: "observability/logs", element: <Logs />, handle: h({ crumb: "Logs" }) },
           ],
         },
         { path: "*", element: <NotAvailable /> },

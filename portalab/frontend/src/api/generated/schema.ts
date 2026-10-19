@@ -2785,6 +2785,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/observability/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Logs */
+        get: operations["read_logs_api_v1_admin_observability_logs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/observability/logs/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Logs
+         * @description The selection as a file (oldest first, as a log reads), at most 5,000 lines.
+         */
+        get: operations["export_logs_api_v1_admin_observability_logs_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/observability/overview": {
         parameters: {
             query?: never;
@@ -12631,12 +12668,47 @@ export interface components {
             /** Track */
             track?: number | null;
         };
+        /** LogLineOut */
+        LogLineOut: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Correlation Id */
+            correlation_id: string | null;
+            /** Fields */
+            fields: {
+                [key: string]: unknown;
+            };
+            /** Level */
+            level: string;
+            /** Logger */
+            logger: string;
+            /** Message */
+            message: string;
+            /** Process */
+            process: string;
+            /** Seq */
+            seq: number;
+            /** Source */
+            source: string;
+        };
         /** LoginRequest */
         LoginRequest: {
             /** Login */
             login: string;
             /** Password */
             password: string;
+        };
+        /** LogsOut */
+        LogsOut: {
+            /** Items */
+            items: components["schemas"]["LogLineOut"][];
+            /** Levels */
+            levels: string[];
+            /** Sources */
+            sources: string[] | null;
         };
         /** LooksOut */
         LooksOut: {
@@ -22434,6 +22506,88 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_logs_api_v1_admin_observability_logs_get: {
+        parameters: {
+            query?: {
+                level?: ("DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL")[] | null;
+                source?: string[] | null;
+                exclude?: string[] | null;
+                process?: string | null;
+                q?: string | null;
+                since?: string | null;
+                until?: string | null;
+                correlation?: string | null;
+                before?: number | null;
+                after?: number | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_logs_api_v1_admin_observability_logs_export_get: {
+        parameters: {
+            query?: {
+                format?: "text" | "json";
+                level?: ("DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL")[] | null;
+                source?: string[] | null;
+                exclude?: string[] | null;
+                process?: string | null;
+                q?: string | null;
+                since?: string | null;
+                until?: string | null;
+                correlation?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "text/plain": unknown;
                 };
             };
             /** @description Validation Error */

@@ -41,6 +41,15 @@ def register_targets(config: Callable[[], ObservabilityConfig]) -> None:
             window=lambda: timedelta(days=config().error_retention_days),
         ),
         RetentionTarget(
+            "observability.logs",
+            "obs.log_entries",
+            "technical",
+            "at",
+            "delete",
+            OWNER,
+            window=lambda: timedelta(days=config().log_retention_days),
+        ),
+        RetentionTarget(
             "observability.anomalies",
             "obs.anomalies",
             "technical",

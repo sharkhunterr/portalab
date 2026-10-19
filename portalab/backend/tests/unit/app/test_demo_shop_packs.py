@@ -110,7 +110,7 @@ def test_levels_spread_over_the_whole_curve() -> None:
     useful = {p["key"]: p["level"] for p in gated if p["type"] in USEFUL}
     assert useful["release_search"] == 20 and useful["request_tv_channel"] == 20
     assert {p["key"]: p["level"] for p in sold if p["type"] == "booster" and p["level"]} == {
-        "booster_prestige": 15,
-        "booster_legend": 30,
+        "booster_prestige": 5,  # lowered on the owner's request (2026-10-19)
+        "booster_legend": 10,
         "booster_celestial": 5,  # #130: the cosmos' own
     }

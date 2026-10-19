@@ -372,6 +372,11 @@ def create_app(
             if app.state.platform is not None
             else None
         )
+        journal = (  # issue 158: this process's log lines into the journal
+            asyncio.create_task(app.state.platform.observability.logs.run("serve"))
+            if app.state.platform is not None
+            else None
+        )
         blocks: BlockStore | None = app.state._state.get("security_blocks")
         platform = app.state._state.get("platform")
         config = platform.administration.config if platform is not None else None
@@ -395,6 +400,10 @@ def create_app(
                 flusher.cancel()
                 with contextlib.suppress(asyncio.CancelledError):
                     await flusher
+            if journal is not None:
+                journal.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await journal
             if owns_database and app.state.database is not None:
                 await app.state.database.dispose()
 

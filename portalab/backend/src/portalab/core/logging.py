@@ -9,6 +9,8 @@ import json
 import logging
 import re
 import sys
+import threading
+from collections import deque
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from contextvars import ContextVar
@@ -121,14 +123,51 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(payload, default=str, ensure_ascii=False)
 
 
+class LogTap(logging.Handler):
+    """Issue 158: the last lines of this process, already redacted, kept for the log journal
+    (``observability``) to store — bounded: under a flood the oldest lines waiting are dropped, never the
+    process slowed. Lines of the journal itself are left out (it would feed on its own writes)."""
+
+    IGNORED = ("portalab.modules.observability.logs", "sqlalchemy.engine")
+
+    def __init__(self, capacity: int = 5_000) -> None:
+        super().__init__(logging.INFO)
+        self._lines: deque[dict[str, Any]] = deque(maxlen=capacity)
+        self._lock = threading.Lock()
+        self.dropped = 0
+        self._json = JsonFormatter()
+
+    def emit(self, record: logging.LogRecord) -> None:
+        if record.name.startswith(self.IGNORED):
+            return
+        try:
+            line = json.loads(self._json.format(record))
+        except Exception:  # never let a log line break the caller
+            return
+        with self._lock:
+            if len(self._lines) == self._lines.maxlen:
+                self.dropped += 1
+            self._lines.append(line)
+
+    def drain(self, limit: int = 1_000) -> list[dict[str, Any]]:
+        with self._lock:
+            taken = [self._lines.popleft() for _ in range(min(limit, len(self._lines)))]
+        return taken
+
+
+log_tap = LogTap()
+
+
 def configure_logging(level: str = "INFO", *, stream: IO[str] | None = None) -> None:
-    """Install the JSON handler on the root logger (idempotent)."""
+    """Install the JSON handler on the root logger (idempotent), and the journal's tap (issue 158)."""
     handler = logging.StreamHandler(stream or sys.stdout)
     handler.setFormatter(JsonFormatter())
     root = logging.getLogger()
     for existing in list(root.handlers):
         root.removeHandler(existing)
     root.addHandler(handler)
+    log_tap.setLevel(logging.DEBUG if level.upper() == "DEBUG" else logging.INFO)
+    root.addHandler(log_tap)
     root.setLevel(level.upper())
 
 

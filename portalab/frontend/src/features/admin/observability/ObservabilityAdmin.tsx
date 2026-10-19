@@ -14,6 +14,7 @@ import {
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
 import { DataRegion } from "../../../state/regions";
+import { useHasPermission } from "../../authz/useMyPermissions";
 
 /**
  * Portal observability (spec 025 T033): action-first overview, two-axis component health, errors with
@@ -53,6 +54,7 @@ export const observabilityStrings = {
   trends: "Trends (failed jobs per day)",
   noTrend: "No data for this period.",
   diagnostics: "Diagnostics",
+  logs: "Read the logs",
   states: {
     pending_validation: "To review",
     validated: "Validated",
@@ -440,12 +442,20 @@ function Trends() {
 }
 
 export function ObservabilityAdmin() {
+  const logs = useHasPermission("observability.logs.read"); // issue 158
   return (
     <AdminPage
       icon="activity"
       title={observabilityStrings.title}
       description={observabilityStrings.description}
       wide
+      secondary={
+        logs ? (
+          <Link className="ds-button ds-button--secondary" to="/admin/observability/logs">
+            {observabilityStrings.logs}
+          </Link>
+        ) : undefined
+      }
     >
       <Overview />
       <AdminSection title={observabilityStrings.errors} icon="alert" flush>

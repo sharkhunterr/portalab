@@ -96,6 +96,7 @@ async def run_worker(settings: BootstrapSettings) -> None:
     dispatcher = asyncio.create_task(dispatch_events(platform, stop))
     services = asyncio.create_task(provide_services(platform, stop))
     audit = asyncio.create_task(copy_audit(platform, database, Path(settings.data_dir), stop))
+    journal = asyncio.create_task(platform.observability.logs.run("worker", stop))  # issue 158
     try:
         await Worker(database, default_registry, queues=QUEUES).run_forever(stop)
     finally:
@@ -104,5 +105,6 @@ async def run_worker(settings: BootstrapSettings) -> None:
         await dispatcher
         await services
         await audit
+        await journal
         await platform.plugins.runtime.stop_all()  # 030: no confined plugin process outlives the worker
         await database.dispose()

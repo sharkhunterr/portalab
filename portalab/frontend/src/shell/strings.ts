@@ -68,6 +68,7 @@ export const shellStrings = {
     "nav.admin.audit": "Audit",
     "nav.admin.events": "Events",
     "nav.admin.observability": "Observability",
+    "nav.admin.logs": "Logs",
     "nav.group.main": "Portal",
     "nav.group.me": "My account",
     "nav.group.admin": "Administration",

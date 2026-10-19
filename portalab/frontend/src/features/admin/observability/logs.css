@@ -1,0 +1,235 @@
+/* Issue 158: the log journal — one line per entry, folded; the level by its badge (icon + word), never by
+   colour alone; readable on a phone (the source and the message wrap under the time). */
+.logs-export {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.logs-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.logs-levels {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.logs-filters__wide {
+  grid-column: 1 / -1;
+}
+
+.logs-levels legend {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-block-end: var(--space-2);
+}
+
+.logs-levels__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: 2.25rem;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.logs-levels__chip[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+  font-weight: var(--font-weight-semibold);
+}
+
+.logs-correlation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.logs-state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.logs-state__dot {
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  border-radius: 50%;
+  background: var(--state-available-fg);
+  animation: logs-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes logs-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logs-state__dot {
+    animation: none;
+  }
+}
+
+.logs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.logs-line {
+  border-block-end: 1px solid var(--color-border);
+}
+
+.logs-line[data-level="error"],
+.logs-line[data-level="critical"] {
+  box-shadow: inset 3px 0 0 var(--state-error-fg);
+}
+
+.logs-line[data-level="warning"] {
+  box-shadow: inset 3px 0 0 var(--state-partial-fg);
+}
+
+.logs-line__head {
+  display: grid;
+  grid-template-columns: auto auto minmax(6rem, 10rem) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  inline-size: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: start;
+  font: inherit;
+  cursor: pointer;
+}
+
+.logs-line__head:hover,
+.logs-line[data-open] .logs-line__head {
+  background: color-mix(in srgb, var(--color-accent) 7%, transparent);
+}
+
+.logs-line__time,
+.logs-line__process {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.logs-line__source {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logs-line__text {
+  font-size: var(--font-size-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logs-line__level .status-badge {
+  white-space: nowrap;
+}
+
+.logs-line__detail {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-4);
+}
+
+.logs-line__facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.logs-line__facts dt {
+  color: var(--color-text-muted);
+}
+
+.logs-line__facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.logs-line__message {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.logs-line__fields {
+  margin: 0;
+  padding: var(--space-3);
+  max-block-size: 24rem;
+  overflow: auto;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  font-size: var(--font-size-xs);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.logs-line__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  text-decoration: underline;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  text-align: start;
+}
+
+.logs-line__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+@media (max-width: 40rem) {
+  .logs-line__head {
+    grid-template-columns: auto auto minmax(0, 1fr);
+  }
+
+  .logs-line__process {
+    display: none;
+  }
+
+  .logs-line__text {
+    grid-column: 1 / -1;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .logs-line[data-open] .logs-line__text {
+    display: none;
+  }
+}

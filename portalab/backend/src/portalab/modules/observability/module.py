@@ -37,6 +37,7 @@ from portalab.modules.observability.components.evaluator import Evaluation, Heal
 from portalab.modules.observability.detectors.runner import DetectorRunner
 from portalab.modules.observability.errors.service import ErrorService
 from portalab.modules.observability.escalation.service import EscalationService
+from portalab.modules.observability.logs.service import LogJournal
 from portalab.modules.observability.models import Anomaly
 from portalab.modules.observability.observability import log
 from portalab.modules.observability.overview.service import (
@@ -100,6 +101,7 @@ class ObservabilityModule:
             on_anomaly=self._alert_anomaly,
         )
         self.overview = OverviewService(database, registry)
+        self.logs = LogJournal(database, audit, lambda: self.config, clock=clock)  # issue 158
 
     def register_capabilities(self) -> None:
         config = lambda: self.config  # noqa: E731
@@ -198,6 +200,7 @@ class ObservabilityModule:
         async def rollup() -> None:
             await self.ensure_partitions()
             await self.collector.rollup()
+            await self.logs.trim()
 
         return [
             register_periodic(

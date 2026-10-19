@@ -5,6 +5,7 @@ from portalab.core.permissions import PermissionRegistry, default_permissions
 OWNER = "module:observability"
 OBSERVABILITY_READ = "observability.read"
 OBSERVABILITY_MANAGE = "observability.manage"
+OBSERVABILITY_LOGS = "observability.logs.read"
 
 
 def declare_observability_permissions(registry: PermissionRegistry = default_permissions) -> None:
@@ -17,6 +18,12 @@ def declare_observability_permissions(registry: PermissionRegistry = default_per
     registry.declare(
         OBSERVABILITY_MANAGE,
         "Acknowledge/resolve errors and validate/dismiss anomalies",
+        sensitive=True,
+        owner=OWNER,
+    )
+    registry.declare(
+        OBSERVABILITY_LOGS,
+        "Read the server's and the worker's logs (redacted; every reading audited)",
         sensitive=True,
         owner=OWNER,
     )

@@ -13,6 +13,8 @@ class ObservabilityConfig:
     sample_retention_days: int = 14
     rollup_retention_months: int = 13
     error_retention_days: int = 90
+    log_retention_days: int = 7  # issue 158: the log journal, by age…
+    log_max_lines: int = 200_000  # … and by count
     escalation_auto_severity: str = "critical"
     escalation_require_validation: bool = True
     metrics_endpoint_enabled: bool = False
@@ -39,6 +41,8 @@ SETTINGS: dict[str, str] = {
     "sample_retention_days": "observability.sampleRetentionDays",
     "rollup_retention_months": "observability.rollupRetentionMonths",
     "error_retention_days": "observability.errorRetentionDays",
+    "log_retention_days": "observability.logRetentionDays",
+    "log_max_lines": "observability.logMaxLines",
     "escalation_auto_severity": "observability.escalation.autoSeverity",
     "escalation_require_validation": "observability.escalation.requireValidation",
     "metrics_endpoint_enabled": "observability.metricsEndpointEnabled",
