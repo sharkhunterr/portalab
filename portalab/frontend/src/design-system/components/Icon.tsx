@@ -244,6 +244,7 @@ import {
   X,
   Zap,
 } from "lucide-react";
+import { useSiteLook } from "../site/SiteLook";
 import { useTheme } from "../themes/ThemeProvider";
 import { ZODIAC_ICONS } from "./constellationIcons";
 
@@ -526,7 +527,10 @@ export interface IconProps {
 export function Icon({ name: asked, label, size = 20, className }: IconProps) {
   // 027: a theme may swap the portal's icons for its own (``icons.overrides``: home → castle)
   const overrides = useTheme().effective.theme.icons?.overrides;
-  const name = (asked && overrides?.[asked] && ICONS[overrides[asked]] ? overrides[asked] : asked) ?? asked;
+  // issue 159: the site's currency icon — after the member's theme, which may have its own
+  const currency = useSiteLook().currencyIcon;
+  const site = asked === "coins" && currency && ICONS[currency] ? currency : asked;
+  const name = (asked && overrides?.[asked] && ICONS[overrides[asked]] ? overrides[asked] : site) ?? asked;
   const Component = (name && ICONS[name]) || Circle;
   const a11y = label ? { role: "img", "aria-label": label } : { "aria-hidden": true as const };
   return (

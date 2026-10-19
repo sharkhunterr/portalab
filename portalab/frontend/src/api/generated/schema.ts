@@ -3570,6 +3570,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/site": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Site Admin */
+        get: operations["site_admin_api_v1_admin_site_get"];
+        /** Site Update */
+        put: operations["site_update_api_v1_admin_site_put"];
+        post?: never;
+        /**
+         * Site Reset
+         * @description Portalab's own name, slogan, images and currency back.
+         */
+        delete: operations["site_reset_api_v1_admin_site_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/site/{which}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Site Image Set */
+        put: operations["site_image_set_api_v1_admin_site__which__put"];
+        post?: never;
+        /** Site Image Remove */
+        delete: operations["site_image_remove_api_v1_admin_site__which__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/statistics/definitions": {
         parameters: {
             query?: never;
@@ -4674,6 +4714,80 @@ export interface paths {
         put?: never;
         /** Register */
         post: operations["register_api_v1_auth_register_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/site": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Site
+         * @description The site's name, slogan, images and currency — the sign-in page shows them, so they are public.
+         */
+        get: operations["site_api_v1_auth_site_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/site/icon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Site Icon */
+        get: operations["site_icon_api_v1_auth_site_icon_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/site/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Site Logo */
+        get: operations["site_logo_api_v1_auth_site_logo_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/site/manifest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Site Manifest
+         * @description The home-screen manifest: the site's name and icon (installed on a phone, it is the site's).
+         */
+        get: operations["site_manifest_api_v1_auth_site_manifest_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -15502,6 +15616,88 @@ export interface components {
             /** Label */
             label: string;
         };
+        /** SiteAdminOut */
+        SiteAdminOut: {
+            /** Currency */
+            currency: {
+                [key: string]: components["schemas"]["SiteCurrency"];
+            };
+            /** Currency Icon */
+            currency_icon: string | null;
+            /** Currency Short */
+            currency_short: string | null;
+            /** Custom */
+            custom: boolean;
+            /** Default Name */
+            default_name: string;
+            /** Icon */
+            icon: string | null;
+            /** Logo */
+            logo: string | null;
+            /** Name */
+            name: string | null;
+            /** Short Name */
+            short_name: string | null;
+            /** Tagline */
+            tagline: {
+                [key: string]: string;
+            };
+            /** Version */
+            version: number;
+        };
+        /** SiteCurrency */
+        SiteCurrency: {
+            /** One */
+            one?: string | null;
+            /** Other */
+            other?: string | null;
+        };
+        /** SiteIn */
+        SiteIn: {
+            /** Currency */
+            currency?: {
+                [key: string]: components["schemas"]["SiteCurrency"];
+            };
+            /** Currency Icon */
+            currency_icon?: string | null;
+            /** Currency Short */
+            currency_short?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Short Name */
+            short_name?: string | null;
+            /** Tagline */
+            tagline?: {
+                [key: string]: string;
+            };
+        };
+        /** SiteOut */
+        SiteOut: {
+            /** Currency */
+            currency: {
+                [key: string]: components["schemas"]["SiteCurrency"];
+            };
+            /** Currency Icon */
+            currency_icon: string | null;
+            /** Currency Short */
+            currency_short: string | null;
+            /** Custom */
+            custom: boolean;
+            /** Icon */
+            icon: string | null;
+            /** Logo */
+            logo: string | null;
+            /** Name */
+            name: string;
+            /** Short Name */
+            short_name: string;
+            /** Tagline */
+            tagline: {
+                [key: string]: string;
+            };
+            /** Version */
+            version: number;
+        };
         /** SourceDayOut */
         SourceDayOut: {
             /** Amounts */
@@ -24083,6 +24279,148 @@ export interface operations {
             };
         };
     };
+    site_admin_api_v1_admin_site_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAdminOut"];
+                };
+            };
+        };
+    };
+    site_update_api_v1_admin_site_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SiteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    site_reset_api_v1_admin_site_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAdminOut"];
+                };
+            };
+        };
+    };
+    site_image_set_api_v1_admin_site__which__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                which: "logo" | "icon";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "image/gif": string;
+                "image/jpeg": string;
+                "image/png": string;
+                "image/webp": string;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    site_image_remove_api_v1_admin_site__which__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                which: "logo" | "icon";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_definitions_api_v1_admin_statistics_definitions_get: {
         parameters: {
             query?: never;
@@ -26204,6 +26542,82 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    site_api_v1_auth_site_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteOut"];
+                };
+            };
+        };
+    };
+    site_icon_api_v1_auth_site_icon_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    site_logo_api_v1_auth_site_logo_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    site_manifest_api_v1_auth_site_manifest_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };

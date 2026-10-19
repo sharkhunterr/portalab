@@ -12,6 +12,7 @@ import { DirectionBridge, I18nProvider } from "./i18n";
 import { NavigationProvider } from "./shell/nav/NavigationProvider";
 import { createRouter } from "./shell/router/routes";
 import { ShellLayout } from "./shell/ShellLayout";
+import { SiteRoot } from "./shell/site/site";
 import { watchStaleBuild } from "./shell/staleBuild";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/plus-jakarta-sans";
@@ -60,21 +61,23 @@ void renderGallery().then((gallery) => {
       <QueryClientProvider client={queryClient}>
         <DirectionProvider language="en">
           <AnnounceProvider>
-            <AuthGate>
-              {() => (
-                <I18nProvider>
-                  <DirectionBridge>
-                    <AppearanceRoot>
-                      <TermsGate>
-                        <NavigationProvider>
-                          <RouterProvider router={router} />
-                        </NavigationProvider>
-                      </TermsGate>
-                    </AppearanceRoot>
-                  </DirectionBridge>
-                </I18nProvider>
-              )}
-            </AuthGate>
+            <SiteRoot>
+              <AuthGate>
+                {() => (
+                  <I18nProvider>
+                    <DirectionBridge>
+                      <AppearanceRoot>
+                        <TermsGate>
+                          <NavigationProvider>
+                            <RouterProvider router={router} />
+                          </NavigationProvider>
+                        </TermsGate>
+                      </AppearanceRoot>
+                    </DirectionBridge>
+                  </I18nProvider>
+                )}
+              </AuthGate>
+            </SiteRoot>
           </AnnounceProvider>
         </DirectionProvider>
       </QueryClientProvider>

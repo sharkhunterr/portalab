@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { AuthLayout } from "../../design-system/components/AuthLayout";
 import { FunctionalState } from "../../design-system/FunctionalState";
+import { inLanguage, useSite } from "../../shell/site/site";
 import { stateForError } from "../../state/regions";
 import { FirstRunWizard } from "../admin/FirstRunWizard";
 import { LoginForm } from "./LoginForm";
@@ -20,11 +21,15 @@ export function AuthGate({
   location?: Pick<Location, "pathname" | "search">;
 }) {
   const me = useMe();
+  // issue 159: the site's name, logo and slogan (in the browser's language, else the default one)
+  const site = useSite();
+  const tagline = inLanguage(site.tagline, globalThis.navigator?.language ?? "en") ?? t.tagline;
+  const layout = { brand: site.name, logo: site.logo, tagline };
   if (location?.pathname === "/setup") return <FirstRunWizard />;
   if (location?.pathname === "/verify") {
     const token = new URLSearchParams(location.search).get("token") ?? "";
     return (
-      <AuthLayout tagline={t.tagline}>
+      <AuthLayout {...layout}>
         <VerifyForm initialToken={token} />
       </AuthLayout>
     );
@@ -34,7 +39,7 @@ export function AuthGate({
     return <FunctionalState state={stateForError(me.error)} onRetry={() => void me.refetch()} />;
   if (!me.data)
     return (
-      <AuthLayout tagline={t.tagline}>
+      <AuthLayout {...layout}>
         <LoginForm />
       </AuthLayout>
     );

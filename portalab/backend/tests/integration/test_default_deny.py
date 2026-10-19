@@ -29,6 +29,10 @@ ALLOW_LISTED = {
     "/api/v1/auth/oidc/start",
     "/api/v1/auth/oidc/callback",
     "/api/v1/auth/terms",  # issue 157: only while the administrators offer the terms on the sign-in page
+    "/api/v1/auth/site",  # issue 159: the site's name, slogan and images, on the sign-in page
+    "/api/v1/auth/site/logo",
+    "/api/v1/auth/site/icon",
+    "/api/v1/auth/site/manifest",
     "/api/v1/media/remote/{ticket}/session/{path:path}",  # 027 (#11): a cast device's stream
     "/api/v1/admin/first-run",  # spec 020: public only until the sole Admin exists
     "/metrics",  # spec 025: disabled by default; own token/permission check

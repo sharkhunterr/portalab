@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import { Button } from "../../../design-system/components/Button";
 import { FxLayer } from "../../../design-system/components/Fx";
 import { Icon } from "../../../design-system/components/Icon";
+import { CurrencyShort } from "../../../design-system/site/SiteLook";
 import { sound } from "../../../design-system/sound/SoundService";
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import type { ExternalElement } from "../../../design-system/visuals/registry";
@@ -260,6 +261,7 @@ function Card({
       {state === "revealed" && card.duplicate ? (
         <span className="booster-card__refund" aria-hidden="true">
           <Icon name="coins" size={14} />+{format.number(card.refund)}
+          <CurrencyShort />
         </span>
       ) : null}
     </li>

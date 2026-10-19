@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
+import { CurrencyShort } from "../../design-system/site/SiteLook";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { CompactLine } from "../dashboard/widgets/compact";
@@ -39,6 +40,7 @@ function FeaturedWidget({ payload, compact }: WidgetProps) {
             <>
               <Icon name="coins" size={12} />
               {format.number(first.price)}
+              <CurrencyShort />
             </>
           ) : (
             t("marketplace:purchase.free")
@@ -72,6 +74,7 @@ function FeaturedWidget({ payload, compact }: WidgetProps) {
                     <>
                       <Icon name="coins" size={12} />
                       {format.number(item.price)}
+                      <CurrencyShort />
                     </>
                   ) : (
                     t("marketplace:purchase.free")

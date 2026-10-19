@@ -25,6 +25,7 @@ const Audit = lazy(() => import("../../pages/admin/AuditRoute"));
 const Events = lazy(() => import("../../pages/admin/EventsRoute"));
 const Observability = lazy(() => import("../../pages/admin/ObservabilityRoute"));
 const Logs = lazy(() => import("../../pages/admin/LogsRoute"));
+const Site = lazy(() => import("../../pages/admin/SiteRoute")); // issue 159
 const Incidents = lazy(() => import("../../features/support/incidents/IncidentsPage"));
 const IncidentConsole = lazy(() => import("../../features/support/incidents/IncidentConsole"));
 const Statistics = lazy(() => import("../../features/statistics/StatisticsPage"));
@@ -424,6 +425,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "events", element: <Events />, handle: h({ crumb: "Events" }) },
             { path: "observability", element: <Observability />, handle: h({ crumb: "Observability" }) },
             { path: "observability/logs", element: <Logs />, handle: h({ crumb: "Logs" }) },
+            { path: "site", element: <Site />, handle: h({ crumb: "Site identity" }) },
           ],
         },
         { path: "*", element: <NotAvailable /> },

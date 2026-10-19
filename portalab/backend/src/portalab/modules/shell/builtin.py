@@ -772,6 +772,19 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "configuration.manage",
     },
     {
+        # issue 159: the site's name, slogan, logo, icon and currency
+        "key": "ui.site_identity",
+        "owner": "module:ui",
+        "kind": "entry",
+        "label_key": "nav.admin.site",
+        "icon": "sparkles",
+        "route": "/admin/site",
+        "group": "admin",
+        "topic": "system",
+        "order_hint": 0,
+        "required_permission": "site.manage",
+    },
+    {
         "key": "connectors.services",
         "owner": "module:connectors",
         "kind": "entry",

@@ -10,6 +10,7 @@ import { MenuWaiting } from "../nav/MenuWaiting";
 import { useNavigationView } from "../nav/NavigationProvider";
 import { usePalette } from "../palette/PaletteContext";
 import { RegionBoundary } from "../router/RouteBoundary";
+import { useSite } from "../site/site";
 import { useSlots } from "../slots/providers";
 import { useShellStrings } from "../strings";
 import { HeaderSearch } from "./HeaderSearch";
@@ -50,6 +51,7 @@ export function AppHeader({
 }: AppHeaderProps) {
   const strings = useShellStrings();
   const phone = device === "phone";
+  const site = useSite(); // issue 159: the site's name, short name and logo
   const name = data.me?.display_name ?? data.me?.login ?? fallbackName;
   // 027: on a phone with the menu in a panel, the header keeps the essentials — home and search on the
   // left; incidents, level and Coins, notifications and the menu on the right (the profile lives in the menu)
@@ -101,11 +103,23 @@ export function AppHeader({
             <MenuWaiting />
           </Button>
         ) : null}
-        <a className="shell-brand" href="/" aria-label={strings.brand}>
-          <span className="shell-brand__mark" aria-hidden="true">
-            <Icon name="sparkles" size={18} />
-          </span>
-          {phone ? null : <span className="shell-brand__name">{strings.brand}</span>}
+        <a className="shell-brand" href="/" aria-label={site.name}>
+          {site.logo ? (
+            <img className="shell-brand__logo" src={site.logo} alt="" />
+          ) : (
+            <span className="shell-brand__mark" aria-hidden="true">
+              <Icon name="sparkles" size={18} />
+            </span>
+          )}
+          {phone ? (
+            site.custom ? (
+              <span className="shell-brand__name" aria-hidden="true">
+                {site.short_name}
+              </span>
+            ) : null
+          ) : (
+            <span className="shell-brand__name">{site.name}</span>
+          )}
         </a>
       </div>
       {bottomBar ? null : (
