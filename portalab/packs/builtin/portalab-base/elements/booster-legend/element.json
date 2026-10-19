@@ -16,7 +16,7 @@
   "economy": {
     "price": 3000,
     "rarity": "legendary",
-    "level": 30,
+    "level": 10,
     "collection": "boosters",
     "icon": "sparkles",
     "repeatable": true
