@@ -1,16 +1,18 @@
 """UI API (T015, T037): the user's theme catalog (policy-filtered) and the admin theme registry."""
 
 from dataclasses import asdict
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
-from fastapi import APIRouter, Depends, Query, Request, status
-from pydantic import BaseModel, ConfigDict
+from fastapi import APIRouter, Depends, Query, Request, Response, status
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ConfigDict, Field
 
-from portalab.core.authorization import require
+from portalab.core.authorization import public, require
 from portalab.core.authz_port import Principal
-from portalab.core.errors import Unavailable
+from portalab.core.errors import NotFound, Unavailable
 from portalab.modules.ui.module import UiModule
-from portalab.modules.ui.permissions import APPEARANCE_MANAGE
+from portalab.modules.ui.permissions import APPEARANCE_MANAGE, SITE_MANAGE
+from portalab.modules.ui.site import MAX_IMAGE_BYTES, InvalidSiteIdentity
 from portalab.modules.ui.themes.service import theme_out
 from portalab.modules.ui.weather import KEEP_SECONDS
 
@@ -160,3 +162,153 @@ async def check_theme(_: Manager, body: ThemeIn, module: Module) -> dict[str, An
 
     theme, errors = validate_definition(body.definition)
     return {"errors": errors, "report": floor_report(theme) if theme else None}
+
+
+# --- issue 159: the site's identity ---------------------------------------------------------------------
+SiteManager = Annotated[Principal, require(SITE_MANAGE)]
+IMAGE_BODY = {
+    "requestBody": {
+        "required": True,
+        "content": {
+            t: {"schema": {"type": "string", "format": "binary"}}
+            for t in ("image/png", "image/jpeg", "image/webp", "image/gif")
+        },
+    }
+}
+
+
+class SiteCurrency(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    one: str | None = Field(default=None, max_length=60)
+    other: str | None = Field(default=None, max_length=60)
+
+
+class SiteOut(BaseModel):
+    name: str
+    short_name: str
+    custom: bool
+    tagline: dict[str, str]
+    currency: dict[str, SiteCurrency]
+    currency_short: str | None
+    currency_icon: str | None
+    logo: str | None
+    icon: str | None
+    version: int
+
+
+class SiteAdminOut(BaseModel):
+    name: str | None
+    short_name: str | None
+    default_name: str
+    custom: bool
+    tagline: dict[str, str]
+    currency: dict[str, SiteCurrency]
+    currency_short: str | None
+    currency_icon: str | None
+    logo: str | None
+    icon: str | None
+    version: int
+
+
+class SiteIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    name: str | None = Field(default=None, max_length=80)
+    short_name: str | None = Field(default=None, max_length=40)
+    tagline: dict[str, str] = Field(default_factory=dict)
+    currency: dict[str, SiteCurrency] = Field(default_factory=dict)
+    currency_short: str | None = Field(default=None, max_length=40)
+    currency_icon: str | None = Field(default=None, max_length=40)
+
+
+@router.get("/auth/site", response_model=SiteOut)
+@public
+async def site(module: Module) -> dict[str, Any]:
+    """The site's name, slogan, images and currency — the sign-in page shows them, so they are public."""
+    return await module.site.public()
+
+
+async def _site_image(module: UiModule, which: str) -> Response:
+    found = await module.site.image(which)
+    if found is None:
+        raise NotFound("No image.", code="ui.site_image_missing")
+    data, kind = found
+    return Response(
+        data,
+        media_type=kind,
+        headers={"Cache-Control": "public, max-age=86400", "X-Content-Type-Options": "nosniff"},
+    )
+
+
+@router.get("/auth/site/logo", response_class=Response)
+@public
+async def site_logo(module: Module) -> Response:
+    return await _site_image(module, "logo")
+
+
+@router.get("/auth/site/icon", response_class=Response)
+@public
+async def site_icon(module: Module) -> Response:
+    return await _site_image(module, "icon")
+
+
+@router.get("/auth/site/manifest", response_class=JSONResponse)
+@public
+async def site_manifest(module: Module) -> JSONResponse:
+    """The home-screen manifest: the site's name and icon (installed on a phone, it is the site's)."""
+    identity = await module.site.public()
+    icons = (
+        [{"src": identity["icon"], "sizes": "512x512", "type": "image/png", "purpose": "any"}]
+        if identity["icon"]
+        else []
+    )
+    return JSONResponse(
+        {
+            "name": identity["name"],
+            "short_name": identity["short_name"],
+            "start_url": "/",
+            "scope": "/",
+            "display": "standalone",
+            "icons": icons,
+        },
+        media_type="application/manifest+json",
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+@router.get("/admin/site", response_model=SiteAdminOut)
+async def site_admin(_: SiteManager, module: Module) -> dict[str, Any]:
+    return await module.site.admin()
+
+
+@router.put("/admin/site", response_model=SiteAdminOut)
+async def site_update(principal: SiteManager, body: SiteIn, module: Module) -> dict[str, Any]:
+    return await module.site.update(principal, body.model_dump())
+
+
+@router.delete("/admin/site", response_model=SiteAdminOut)
+async def site_reset(principal: SiteManager, module: Module) -> dict[str, Any]:
+    """Portalab's own name, slogan, images and currency back."""
+    return await module.site.reset(principal)
+
+
+async def _body(request: Request) -> bytes:
+    data = bytearray()
+    async for chunk in request.stream():
+        data.extend(chunk)
+        if len(data) > MAX_IMAGE_BYTES:
+            raise InvalidSiteIdentity("The image is larger than 2 MiB.", extensions={"reason": "too_large"})
+    return bytes(data)
+
+
+@router.put("/admin/site/{which}", response_model=SiteAdminOut, openapi_extra=IMAGE_BODY)
+async def site_image_set(
+    principal: SiteManager, which: Literal["logo", "icon"], request: Request, module: Module
+) -> dict[str, Any]:
+    return await module.site.set_image(principal, which, await _body(request))
+
+
+@router.delete("/admin/site/{which}", response_model=SiteAdminOut)
+async def site_image_remove(
+    principal: SiteManager, which: Literal["logo", "icon"], module: Module
+) -> dict[str, Any]:
+    return await module.site.remove_image(principal, which)

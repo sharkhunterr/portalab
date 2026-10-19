@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CurrencyShort } from "../site/SiteLook";
 import { useGpuLook } from "../visuals/gpu";
 import { FxLayer } from "./Fx";
 import { Icon } from "./Icon";
@@ -106,7 +107,10 @@ export function CoinBadge({ amount, label, locale }: { amount: number; label: st
   return (
     <span className="ds-coins" role="img" aria-label={`${label}: ${exact}`} title={exact}>
       <Icon name="coins" size={18} />
-      <span aria-hidden="true">{compactNumber(amount, locale)}</span>
+      <span aria-hidden="true">
+        {compactNumber(amount, locale)}
+        <CurrencyShort />
+      </span>
     </span>
   );
 }

@@ -125,6 +125,12 @@
   color: var(--color-accent-contrast);
   box-shadow: var(--shadow-1);
 }
+.shell-brand__logo {
+  /* issue 159: the site's logo, in place of the mark — never taller than the header's controls */
+  block-size: 2.25rem;
+  max-inline-size: 9rem;
+  object-fit: contain;
+}
 .shell-search {
   display: flex;
   align-items: center;

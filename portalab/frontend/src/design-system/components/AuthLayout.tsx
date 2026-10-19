@@ -7,20 +7,27 @@ import { Icon } from "./Icon";
  */
 export function AuthLayout({
   brand = "Portalab",
+  logo,
   tagline,
   children,
 }: {
   brand?: string;
-  tagline?: string;
+  /** issue 159: the site's logo, in place of the mark */
+  logo?: string | null | undefined;
+  tagline?: string | undefined;
   children: ReactNode;
 }) {
   return (
     <div className="ds-auth">
       <div className="ds-auth__card">
         <div className="ds-auth__brand">
-          <span className="ds-auth__mark" aria-hidden="true">
-            <Icon name="sparkles" size={26} />
-          </span>
+          {logo ? (
+            <img className="ds-auth__logo" src={logo} alt="" />
+          ) : (
+            <span className="ds-auth__mark" aria-hidden="true">
+              <Icon name="sparkles" size={26} />
+            </span>
+          )}
           <span className="ds-auth__name">{brand}</span>
         </div>
         {tagline ? <p className="ds-auth__tagline">{tagline}</p> : null}

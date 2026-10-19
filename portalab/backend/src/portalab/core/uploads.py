@@ -99,3 +99,21 @@ def clean_upload(
         stem = name.rsplit(".", 1)[0] or "image"
         name = f"{stem}.{'png' if kind == 'image/png' else 'jpg'}"
     return CleanUpload(data, kind, name)
+
+
+def square_icon(data: bytes, *, side: int = 512) -> bytes:
+    """Issue 159: a site's icon (tab, home screen) — re-encoded, centred on a transparent square of ``side``
+    pixels (a PWA icon is square), as PNG."""
+    cleaned, _ = reencode_image(data, max_side=side)
+    with Image.open(io.BytesIO(cleaned)) as image:
+        frame = image.convert("RGBA")
+    canvas = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+    scale = side / max(frame.size)
+    if scale > 1:  # a small image grows to fill its square
+        frame = frame.resize(
+            (round(frame.width * scale), round(frame.height * scale)), Image.Resampling.LANCZOS
+        )
+    canvas.paste(frame, ((side - frame.width) // 2, (side - frame.height) // 2), frame)
+    output = io.BytesIO()
+    canvas.save(output, format="PNG", optimize=True)
+    return output.getvalue()

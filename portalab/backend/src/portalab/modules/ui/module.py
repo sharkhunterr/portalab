@@ -6,6 +6,7 @@ from portalab.capabilities.events import (
     default_consumers,
     default_event_types,
 )
+from portalab.capabilities.i18n import SITE_TERMS
 from portalab.capabilities.plugins import THEME_REGISTRY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.themes import CAPABILITY as THEME_CATALOG
@@ -19,6 +20,7 @@ from portalab.modules.ui import settings as _settings  # noqa: F401 — declares
 from portalab.modules.ui.events import CONSUMER, preference_consumer, register_event_types
 from portalab.modules.ui.interfaces import PackInterfaces
 from portalab.modules.ui.looks import NotificationLooks
+from portalab.modules.ui.site import SiteIdentityService
 from portalab.modules.ui.themes.service import ThemeService
 from portalab.modules.ui.weather import WeatherService
 
@@ -44,6 +46,7 @@ class UiModule:
         self.weather = WeatherService(capabilities)  # #68: the « live weather » ambience
         self.looks = NotificationLooks(capabilities)
         self.interfaces = PackInterfaces(self.themes)  # 028: the interfaces visual packs bring
+        self.site = SiteIdentityService(database, audit, clock=clock)  # issue 159: the site's identity
         self.event_types = event_types
         self.consumers = consumers
 
@@ -56,6 +59,8 @@ class UiModule:
             self.capabilities.provide(
                 INTERFACE_REGISTRY, self.interfaces, instance_ref="ui", owner="module:ui"
             )
+        if not self.capabilities.system_providers(SITE_TERMS):
+            self.capabilities.provide(SITE_TERMS, self.site, instance_ref="ui", owner="module:ui")
         if self.event_types.get("theme.changed") is None:
             register_event_types(self.event_types)
         if self.consumers.get(CONSUMER) is None:

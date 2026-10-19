@@ -15332,6 +15332,309 @@
         "title": "SingleSignOn",
         "type": "object"
       },
+      "SiteAdminOut": {
+        "properties": {
+          "currency": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SiteCurrency"
+            },
+            "title": "Currency",
+            "type": "object"
+          },
+          "currency_icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency Icon"
+          },
+          "currency_short": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency Short"
+          },
+          "custom": {
+            "title": "Custom",
+            "type": "boolean"
+          },
+          "default_name": {
+            "title": "Default Name",
+            "type": "string"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
+          "logo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "short_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Short Name"
+          },
+          "tagline": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Tagline",
+            "type": "object"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "short_name",
+          "default_name",
+          "custom",
+          "tagline",
+          "currency",
+          "currency_short",
+          "currency_icon",
+          "logo",
+          "icon",
+          "version"
+        ],
+        "title": "SiteAdminOut",
+        "type": "object"
+      },
+      "SiteCurrency": {
+        "additionalProperties": false,
+        "properties": {
+          "one": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "One"
+          },
+          "other": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Other"
+          }
+        },
+        "title": "SiteCurrency",
+        "type": "object"
+      },
+      "SiteIn": {
+        "additionalProperties": false,
+        "properties": {
+          "currency": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SiteCurrency"
+            },
+            "title": "Currency",
+            "type": "object"
+          },
+          "currency_icon": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency Icon"
+          },
+          "currency_short": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency Short"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "short_name": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Short Name"
+          },
+          "tagline": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Tagline",
+            "type": "object"
+          }
+        },
+        "title": "SiteIn",
+        "type": "object"
+      },
+      "SiteOut": {
+        "properties": {
+          "currency": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SiteCurrency"
+            },
+            "title": "Currency",
+            "type": "object"
+          },
+          "currency_icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency Icon"
+          },
+          "currency_short": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency Short"
+          },
+          "custom": {
+            "title": "Custom",
+            "type": "boolean"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
+          "logo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "short_name": {
+            "title": "Short Name",
+            "type": "string"
+          },
+          "tagline": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Tagline",
+            "type": "object"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "short_name",
+          "custom",
+          "tagline",
+          "currency",
+          "currency_short",
+          "currency_icon",
+          "logo",
+          "icon",
+          "version"
+        ],
+        "title": "SiteOut",
+        "type": "object"
+      },
       "SourceDayOut": {
         "properties": {
           "amounts": {
@@ -30107,6 +30410,205 @@
         ]
       }
     },
+    "/api/v1/admin/site": {
+      "delete": {
+        "description": "Portalab's own name, slogan, images and currency back.",
+        "operationId": "site_reset_api_v1_admin_site_delete",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteAdminOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Site Reset",
+        "tags": [
+          "ui"
+        ]
+      },
+      "get": {
+        "operationId": "site_admin_api_v1_admin_site_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteAdminOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Site Admin",
+        "tags": [
+          "ui"
+        ]
+      },
+      "put": {
+        "operationId": "site_update_api_v1_admin_site_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteAdminOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Site Update",
+        "tags": [
+          "ui"
+        ]
+      }
+    },
+    "/api/v1/admin/site/{which}": {
+      "delete": {
+        "operationId": "site_image_remove_api_v1_admin_site__which__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "which",
+            "required": true,
+            "schema": {
+              "enum": [
+                "logo",
+                "icon"
+              ],
+              "title": "Which",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteAdminOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Site Image Remove",
+        "tags": [
+          "ui"
+        ]
+      },
+      "put": {
+        "operationId": "site_image_set_api_v1_admin_site__which__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "which",
+            "required": true,
+            "schema": {
+              "enum": [
+                "logo",
+                "icon"
+              ],
+              "title": "Which",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "image/gif": {
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            },
+            "image/jpeg": {
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            },
+            "image/png": {
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            },
+            "image/webp": {
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteAdminOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Site Image Set",
+        "tags": [
+          "ui"
+        ]
+      }
+    },
     "/api/v1/admin/statistics/definitions": {
       "get": {
         "operationId": "list_definitions_api_v1_admin_statistics_definitions_get",
@@ -33153,6 +33655,76 @@
         "summary": "Register",
         "tags": [
           "identity"
+        ]
+      }
+    },
+    "/api/v1/auth/site": {
+      "get": {
+        "description": "The site's name, slogan, images and currency \u2014 the sign-in page shows them, so they are public.",
+        "operationId": "site_api_v1_auth_site_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Site",
+        "tags": [
+          "ui"
+        ]
+      }
+    },
+    "/api/v1/auth/site/icon": {
+      "get": {
+        "operationId": "site_icon_api_v1_auth_site_icon_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Site Icon",
+        "tags": [
+          "ui"
+        ]
+      }
+    },
+    "/api/v1/auth/site/logo": {
+      "get": {
+        "operationId": "site_logo_api_v1_auth_site_logo_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Site Logo",
+        "tags": [
+          "ui"
+        ]
+      }
+    },
+    "/api/v1/auth/site/manifest": {
+      "get": {
+        "description": "The home-screen manifest: the site's name and icon (installed on a phone, it is the site's).",
+        "operationId": "site_manifest_api_v1_auth_site_manifest_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Site Manifest",
+        "tags": [
+          "ui"
         ]
       }
     },

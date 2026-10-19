@@ -21,6 +21,7 @@ RENDERER = "i18n.renderer"
 FORMATTER = "i18n.formatter"
 TIME = "i18n.time"
 CONTENT = "i18n.content"
+SITE_TERMS = "i18n.site_terms"  # issue 159: the site's own name and currency, written into the catalogs
 
 Direction = Literal["ltr", "rtl"]
 ContentState = Literal["source", "translated", "untranslated", "machine_draft"]
@@ -84,6 +85,32 @@ class TimeRendererPort(Protocol):
 
 
 @dataclass(frozen=True, slots=True)
+class SiteTerms:
+    """Issue 159: the site's words in one language — its name instead of « Portalab », its currency instead
+    of « Coins » (singular and plural). ``None``: the catalogs' own word."""
+
+    name: str | None = None
+    currency_one: str | None = None
+    currency_other: str | None = None
+
+    @property
+    def empty(self) -> bool:
+        return not (self.name or self.currency_one or self.currency_other)
+
+
+@runtime_checkable
+class SiteTermsPort(Protocol):
+    """Provided by the module that keeps the site's identity; the catalogs ask it in every process."""
+
+    @property
+    def version(self) -> int: ...
+
+    def terms(self, language: str) -> SiteTerms: ...
+
+    async def refresh(self) -> None: ...
+
+
+@dataclass(frozen=True, slots=True)
 class LocalizedContent:
     content_kind: str
     content_id: str
@@ -141,4 +168,5 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(FORMATTER, FormatterPort, "CLDR formatting (026)"),
     _spec(TIME, TimeRendererPort, "Time zone rendering and wall-clock resolution (026)"),
     _spec(CONTENT, ContentLocalizerPort, "Multilingual content versions (026)"),
+    _spec(SITE_TERMS, SiteTermsPort, "The site's name and currency in the catalogs (issue 159)"),
 )

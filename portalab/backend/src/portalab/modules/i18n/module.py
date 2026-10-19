@@ -11,7 +11,7 @@ from portalab.capabilities.events import (
     default_consumers,
     default_event_types,
 )
-from portalab.capabilities.i18n import CONTENT, FORMATTER, RENDERER, RESOLVER, TIME
+from portalab.capabilities.i18n import CONTENT, FORMATTER, RENDERER, RESOLVER, SITE_TERMS, TIME
 from portalab.capabilities.observability import (
     Check,
     CheckResult,
@@ -69,7 +69,9 @@ class I18nModule:
         self.events = events
         self.capabilities = capabilities
         self.resolver = LocaleResolver(capabilities)
-        self.catalogs = CatalogService(database, plugins=plugins, clock=clock)
+        self.catalogs = CatalogService(
+            database, plugins=plugins, clock=clock, terms=lambda: self._provider(SITE_TERMS)
+        )
         self.plugins = plugins
         self.formatter = Formatter()
         self.time = TimeRenderer(self.formatter)
@@ -83,6 +85,13 @@ class I18nModule:
         self.event_types = event_types
         self.consumers = consumers
         self.observables = observables
+
+    def _provider(self, name: str) -> Any | None:
+        try:
+            providers = self.capabilities.system_providers(name)
+        except Exception:
+            return None
+        return providers[0].provider if providers else None
 
     def register(self) -> None:
         for name, provider in (

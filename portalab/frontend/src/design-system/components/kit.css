@@ -210,6 +210,12 @@
 .ds-coins .ds-icon {
   color: var(--color-accent-alt);
 }
+.ds-currency-short {
+  /* issue 159: the currency's short name after a compact amount (« 120 XC ») */
+  font-size: 0.85em;
+  font-weight: var(--font-weight-semibold);
+  opacity: 0.85;
+}
 
 /* ---------------------------------------------------------------- page header */
 .ds-page-header {
@@ -977,6 +983,12 @@ input[type="file"] {
   background: var(--xp-gradient);
   color: var(--color-accent-contrast);
   box-shadow: var(--shadow-glow);
+}
+.ds-auth__logo {
+  /* issue 159: the site's logo on the sign-in card */
+  block-size: 3rem;
+  max-inline-size: 12rem;
+  object-fit: contain;
 }
 .ds-auth__name {
   font-family: var(--font-display);

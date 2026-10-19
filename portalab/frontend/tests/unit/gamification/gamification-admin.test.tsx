@@ -245,13 +245,7 @@ describe("gamification administration", () => {
     fireEvent.click(screen.getByRole("button", { name: /Show table/ }));
     const table = await screen.findByRole("table", { name: "How members progress" });
     const heads = Array.from(table.querySelectorAll("th")).map((th) => th.textContent);
-    expect(heads).toEqual([
-      "Day",
-      "Plays (other kinds)",
-      "Quests and objectives",
-      "Achievements",
-      "XP",
-    ]);
+    expect(heads).toEqual(["Day", "Plays (other kinds)", "Quests and objectives", "Achievements", "XP"]);
     expect(table.querySelectorAll("tbody tr")).toHaveLength(2);
     expect(screen.getByText("Running XP of every member")).toBeTruthy();
 

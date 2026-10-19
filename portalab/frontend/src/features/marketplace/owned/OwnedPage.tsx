@@ -3,6 +3,7 @@ import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { type Column, Table } from "../../../design-system/components/Layout";
+import { CurrencyShort } from "../../../design-system/site/SiteLook";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -167,6 +168,7 @@ export default function OwnedPage() {
           <dt>{t("marketplace:owned.statSpent")}</dt>
           <dd>
             <Icon name="coins" size={18} /> {format.number(spent)}
+            <CurrencyShort />
           </dd>
         </div>
         <div>

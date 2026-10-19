@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { levelProgress } from "../../design-system/components/Badges";
 import { Icon } from "../../design-system/components/Icon";
+import { CurrencyShort } from "../../design-system/site/SiteLook";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { useActiveCampaigns } from "../campaigns/api";
@@ -281,6 +282,7 @@ function DailyObjectivesWidget({ payload, compact }: WidgetProps) {
         <span className="daily-reward" data-value="coins">
           <Icon name="coins" size={13} />
           {format.number(coins(quests.filter((q) => q.completed)))} / {format.number(coins(quests))}
+          <CurrencyShort />
         </span>
       </Link>
     );
@@ -295,6 +297,7 @@ function DailyObjectivesWidget({ payload, compact }: WidgetProps) {
         <span className="daily-reward" data-value="coins">
           <Icon name="coins" size={13} />
           {format.number(coins(quests.filter((q) => q.completed)))} / {format.number(coins(quests))}
+          <CurrencyShort />
         </span>
       </p>
       <span className="daily-objectives__track" aria-hidden="true">

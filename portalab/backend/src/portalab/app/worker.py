@@ -97,6 +97,8 @@ async def run_worker(settings: BootstrapSettings) -> None:
     services = asyncio.create_task(provide_services(platform, stop))
     audit = asyncio.create_task(copy_audit(platform, database, Path(settings.data_dir), stop))
     journal = asyncio.create_task(platform.observability.logs.run("worker", stop))  # issue 158
+    # issue 159: the e-mails speak the site's current name and currency (and the published overrides)
+    catalogs = asyncio.create_task(platform.i18n.catalogs.keep_fresh(stop))
     try:
         await Worker(database, default_registry, queues=QUEUES).run_forever(stop)
     finally:
@@ -106,5 +108,6 @@ async def run_worker(settings: BootstrapSettings) -> None:
         await services
         await audit
         await journal
+        await catalogs
         await platform.plugins.runtime.stop_all()  # 030: no confined plugin process outlives the worker
         await database.dispose()

@@ -1,0 +1,84 @@
+/* Issue 159 — the site's identity: its images, its currency per language, the preview of the result. */
+.site-admin__subtitle {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+}
+.site-admin__currency {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.site-admin__currency legend {
+  padding-inline: var(--space-1);
+  font-weight: var(--font-weight-semibold);
+}
+.site-image {
+  display: grid;
+  gap: var(--space-2);
+  margin-block-end: var(--space-4);
+}
+.site-image__frame {
+  display: grid;
+  place-items: center;
+  min-block-size: 5rem;
+  padding: var(--space-3);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+}
+.site-image__frame img {
+  max-inline-size: 100%;
+  max-block-size: 6rem;
+  object-fit: contain;
+}
+.site-image[data-which="icon"] .site-image__frame img {
+  inline-size: 4rem;
+  block-size: 4rem;
+  border-radius: var(--radius-md);
+}
+.site-image__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.site-preview {
+  display: grid;
+  gap: var(--space-3);
+}
+.site-preview__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--glass-bg);
+  font-family: var(--font-display);
+}
+.site-preview__phone {
+  margin-inline-start: auto;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.site-preview__card {
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-1);
+  text-align: center;
+}
+.site-preview__card p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+}
+.site-preview__lines {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding-inline-start: var(--space-4);
+}

@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
+import { CurrencyShort } from "../../../design-system/site/SiteLook";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
@@ -199,6 +200,7 @@ export function BoosterDetails({ product }: { product: Product }) {
                 })}
               >
                 <Icon name="coins" size={12} />+{format.number(info.refunds[rarity] ?? 0)}
+                <CurrencyShort />
                 <span className="visually-hidden">
                   {t("marketplace:booster.refundPer", { coins: format.number(info.refunds[rarity] ?? 0) })}
                 </span>

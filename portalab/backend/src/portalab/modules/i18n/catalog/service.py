@@ -3,21 +3,24 @@
 by a content hash (ETag). Lookups walk the fallback chain; a missing key renders the fallback value (or
 the key itself), is counted in ``missing_key_stats`` and never raises."""
 
+import asyncio
+import contextlib
 import hashlib
 import json
 import threading
 from collections import Counter
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 
-from portalab.capabilities.i18n import LocaleContext
+from portalab.capabilities.i18n import LocaleContext, SiteTerms, SiteTermsPort
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
 from portalab.modules.i18n.catalog.plugins import PluginCatalogs, default_plugin_catalogs
+from portalab.modules.i18n.catalog.terms import rewrite_all
 from portalab.modules.i18n.models import CatalogEntry, MissingKeyStat
 from portalab.modules.i18n.observability import metrics
 from portalab.modules.i18n.render.icu import MessageSyntaxError, render
@@ -38,11 +41,13 @@ class CatalogService:
         locales_dir: Path = LOCALES_DIR,
         plugins: PluginCatalogs = default_plugin_catalogs,
         clock: Clock | None = None,
+        terms: Callable[[], SiteTermsPort | None] | None = None,
     ) -> None:
         self.database = database
         self.locales_dir = locales_dir
         self.plugins = plugins
         self.clock = clock
+        self.terms = terms  # issue 159: the site's name and currency, written into every message
         self._overrides: dict[tuple[str, str], dict[str, str]] = {}
         self._loaded = False
         self._missing: Counter[tuple[str, str, str]] = Counter()
@@ -88,9 +93,43 @@ class CatalogService:
                 await self.reload_overrides()
             except Exception:
                 self._loaded = True  # serve the base bundles if the store is down
+        source = self._terms_source()
+        if source is not None:
+            with contextlib.suppress(Exception):
+                await source.refresh()
+
+    async def keep_fresh(self, stop: asyncio.Event | None = None, interval: float = 30.0) -> None:
+        """For a process that renders without serving the catalogs (the worker's e-mails): the published
+        overrides and the site's words read again every ``interval`` seconds, until ``stop``."""
+        while stop is None or not stop.is_set():
+            with contextlib.suppress(Exception):
+                await self.reload_overrides()
+            source = self._terms_source()
+            if source is not None:
+                with contextlib.suppress(Exception):
+                    await source.refresh()
+            if stop is None:
+                await asyncio.sleep(interval)
+            else:
+                with contextlib.suppress(TimeoutError):
+                    await asyncio.wait_for(stop.wait(), timeout=interval)
+
+    def _terms_source(self) -> SiteTermsPort | None:
+        try:
+            return self.terms() if self.terms is not None else None
+        except Exception:
+            return None
 
     def effective(self, namespace: str, language: str) -> dict[str, str]:
-        return {**self.base(namespace, language), **self._overrides.get((namespace, language), {})}
+        merged = {**self.base(namespace, language), **self._overrides.get((namespace, language), {})}
+        source = self._terms_source()
+        if source is None:
+            return merged
+        try:
+            terms = source.terms(language)
+        except Exception:
+            terms = SiteTerms()
+        return rewrite_all(namespace, merged, terms)
 
     def bundle(self, namespace: str, ctx: LocaleContext) -> tuple[dict[str, str], str]:
         """Merged messages for the context's fallback chain (most preferred wins) and their version hash."""

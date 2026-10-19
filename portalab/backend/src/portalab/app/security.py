@@ -157,6 +157,11 @@ ANONYMOUS_PATHS = frozenset(
         "/api/v1/auth/verify",
         "/api/v1/auth/deletion/cancel",
         "/api/v1/admin/first-run",
+        # issue 159: the site's name, slogan, images and home-screen manifest — the sign-in page shows them
+        "/api/v1/auth/site",
+        "/api/v1/auth/site/logo",
+        "/api/v1/auth/site/icon",
+        "/api/v1/auth/site/manifest",
     }
 )
 ANONYMOUS_PREFIXES = ("/api/v1/media/remote/",)  # a casting device's stream, by its ticket
