@@ -2350,6 +2350,39 @@
         "title": "BoostOut",
         "type": "object"
       },
+      "BoosterPoolIn": {
+        "description": "What a booster would draw from: its kind of pool, its packs and its items named one by one.",
+        "properties": {
+          "items": {
+            "items": {
+              "maxLength": 96,
+              "type": "string"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "packs": {
+            "items": {
+              "maxLength": 96,
+              "type": "string"
+            },
+            "title": "Packs",
+            "type": "array"
+          },
+          "pool": {
+            "default": "looks",
+            "enum": [
+              "looks",
+              "hd",
+              "reserve"
+            ],
+            "title": "Pool",
+            "type": "string"
+          }
+        },
+        "title": "BoosterPoolIn",
+        "type": "object"
+      },
       "BroadcastIn": {
         "additionalProperties": false,
         "properties": {
@@ -23838,6 +23871,50 @@
           }
         },
         "summary": "Audit",
+        "tags": [
+          "marketplace-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/marketplace/boosters/pool": {
+      "post": {
+        "description": "What a booster naming these packs and items may draw now \u2014 each look on sale it holds, how many per\nrarity and per kind, and the items named that it can never draw (not on sale, or of another kind).",
+        "operationId": "booster_pool_api_v1_admin_marketplace_boosters_pool_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BoosterPoolIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Booster Pool Api V1 Admin Marketplace Boosters Pool Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Booster Pool",
         "tags": [
           "marketplace-admin"
         ]

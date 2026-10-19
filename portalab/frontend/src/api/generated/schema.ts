@@ -1505,6 +1505,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/marketplace/boosters/pool": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Booster Pool
+         * @description What a booster naming these packs and items may draw now — each look on sale it holds, how many per
+         *     rarity and per kind, and the items named that it can never draw (not on sale, or of another kind).
+         */
+        post: operations["booster_pool_api_v1_admin_marketplace_boosters_pool_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/marketplace/catalog": {
         parameters: {
             query?: never;
@@ -10708,6 +10729,22 @@ export interface components {
              */
             until: string;
         };
+        /**
+         * BoosterPoolIn
+         * @description What a booster would draw from: its kind of pool, its packs and its items named one by one.
+         */
+        BoosterPoolIn: {
+            /** Items */
+            items?: string[];
+            /** Packs */
+            packs?: string[];
+            /**
+             * Pool
+             * @default looks
+             * @enum {string}
+             */
+            pool: "looks" | "hd" | "reserve";
+        };
         /** BroadcastIn */
         BroadcastIn: {
             /** Action Url */
@@ -19872,6 +19909,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MarketplaceAuditPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    booster_pool_api_v1_admin_marketplace_boosters_pool_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BoosterPoolIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

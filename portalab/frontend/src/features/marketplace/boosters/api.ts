@@ -18,6 +18,10 @@ export interface BoosterInfo {
   season: string | null;
   /** issue 130: the packs it draws from (a collection's booster) */
   packs?: string[];
+  /** and the items it draws, named one by one */
+  items?: string[];
+  /** whether it names what it may draw (one saved before that rule: ``false``, to define) */
+  defined?: boolean;
   /** a season's: the last day it is on sale */
   until: string | null;
   per_member: number | null;

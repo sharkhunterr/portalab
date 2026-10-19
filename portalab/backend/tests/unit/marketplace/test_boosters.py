@@ -94,3 +94,22 @@ def test_a_collection_booster_draws_from_its_packs_only() -> None:
     assert booster_of("h", {}, 1, {"pool": "hd"}).packs == HD_PACKS  # the Prestige HD booster, as before
     assert booster_of("p", {}, 1, {}).packs == ()
     assert booster_info("c", {"en": "C"}, 500, {"packs": ["pack_zodiac"]}, None)["packs"] == ["pack_zodiac"]
+
+
+def test_a_booster_names_its_packs_and_its_items() -> None:
+    """The owner (2026-10-19): a booster says exactly what it may draw — its packs and/or its items named one
+    by one (each once, in their order, as many as it wants); one saved before (neither) draws as it did."""
+    named = booster_of(
+        "n", {}, 1, {"packs": ["visual:abysses", "pack_hd_ocean"], "items": ["a", "b", "a", 3, ""]}
+    )
+    assert named.defined and named.items == ("a", "b") and named.packs == ("visual:abysses", "pack_hd_ocean")
+    only = booster_of("o", {}, 1, {"pool": "hd", "items": ["x"]})
+    assert only.defined and only.packs == ()  # named: no longer the HD packs it drew before
+    legacy = booster_of("l", {}, 1, {"pool": "hd", "season": "halloween"})
+    assert not legacy.defined and legacy.packs == HD_PACKS and legacy.season == "halloween"
+    many = booster_of(
+        "m", {}, 1, {"items": [f"k{i}" for i in range(900)], "packs": [f"p{i}" for i in range(200)]}
+    )
+    assert len(many.items) == 900 and len(many.packs) == 200  # no limit
+    info = booster_info("n", {}, 1, {"items": ["a"]}, None)
+    assert info["items"] == ["a"] and info["defined"] is True

@@ -2021,6 +2021,59 @@
   padding: 0;
   border: 0;
 }
+/* the owner (2026-10-19): what a booster may draw — packs ticked, items named one by one, what that makes */
+.admin-booster__pool {
+  display: grid;
+  gap: var(--space-4);
+}
+.admin-booster__ticks {
+  display: grid;
+  gap: var(--space-1);
+  max-block-size: 14rem;
+  overflow-y: auto;
+  padding-inline-end: var(--space-2);
+}
+.admin-booster__pool-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+.admin-booster__pool-summary[data-empty],
+.admin-booster__pool-missing,
+.admin-booster__undefined {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--state-partial-fg);
+}
+.admin-booster__chips,
+.admin-booster__candidates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.admin-booster__chips > li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-inline-start: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+.admin-booster__chips > li[data-lost] {
+  border-style: dashed;
+}
+.admin-booster__candidates > li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
 
 /* issue 153: a booster with a scene of its own shows one of its cards face down in the shop — its back, as the
    scene draws it — and how many it holds */

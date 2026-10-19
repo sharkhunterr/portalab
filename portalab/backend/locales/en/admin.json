@@ -966,5 +966,6 @@
   "widgetPacks.what": "What it is",
   "visuals.test.tryScene": "Try the scene « {name} »",
   "visuals.test.try": "Try",
-  "visuals.review.scenesHint": "A scene dresses the opening of the boosters it is given to. None by default: give it to a booster in Shop › Boosters (or here, to every booster or to one)."
+  "visuals.review.scenesHint": "A scene dresses the opening of the boosters it is given to. None by default: give it to a booster in Shop › Boosters (or here, to every booster or to one).",
+  "visuals.check.booster.pool_undefined": "The booster names neither packs nor items: it must say exactly what it may draw (its packs and/or its items)."
 }

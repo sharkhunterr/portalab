@@ -23,6 +23,20 @@
   },
   "payload": {
     "pool": "looks",
+    "packs": [
+      "visual:portalab-season-spring",
+      "visual:portalab-blossom",
+      "pack_hd_spring",
+      "pack_hd_sakura"
+    ],
+    "items": [
+      "ambient_meadow",
+      "ambient_petals",
+      "banner_live_meadow",
+      "effect_bloom",
+      "effect_petals",
+      "frame_sakura"
+    ],
     "season": "spring",
     "cards": 5,
     "odds": {

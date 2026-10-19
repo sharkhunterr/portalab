@@ -2,10 +2,15 @@
 
 A booster is a product of the catalog (type ``booster``): a tile in the shop and its sheet like any
 other, a price, versions and presentation set by the administrators — and in its payload what it holds
-(``pool``: the looks, the looks drawn by the graphics chip, or the items one keeps), the season it draws
-from or the packs it draws from (#130: a collection's own booster), how many cards, the odds per rarity,
-the rarity guaranteed, what a duplicate gives back per rarity, how many times a member may open it and its
-pack's look. A season's booster is on sale only in its weeks.
+(``pool``: the looks, the looks drawn by the graphics chip, or the items one keeps), exactly what it may
+draw — the packs it draws from (#130: a collection's own booster; a visual pack's catalogue, issue 153)
+and/or items named one by one (``items``) —, how many cards, the odds per rarity, the rarity guaranteed,
+what a duplicate gives back per rarity, how many times a member may open it and its pack's look. A season's
+booster is on sale only in its weeks; its season no longer says what it holds (its packs and items do).
+
+A booster saved before its pool had to be declared (no ``packs``, no ``items``) still draws as it did — its
+season's looks, the HD packs, or every look — and is shown to the administrators as « to define »: a new
+version must name its packs or items.
 
 The draw happens on the server (a system random source): each card's rarity by the odds, one at least the
 guaranteed rarity, never the same item twice in a pack, the cards then shuffled (their place tells
@@ -50,7 +55,19 @@ DUPLICATE_REFUNDS: Mapping[str, int] = {"common": 10, "rare": 15, "epic": 20, "l
 DEFAULT_ODDS: Mapping[str, int] = {"common": 62, "rare": 26, "epic": 10, "legendary": 2}
 # Prestige HD: the looks the packs drawn by the graphics chip hold
 HD_PACKS = ("pack_hd_", "pack_living_badges")
-PAYLOAD_FIELDS = ("pool", "season", "packs", "cards", "odds", "guarantee", "refunds", "per_member", "look")
+PAYLOAD_FIELDS = (
+    "pool",
+    "season",
+    "packs",
+    "items",
+    "cards",
+    "odds",
+    "guarantee",
+    "refunds",
+    "per_member",
+    "look",
+)
+# a booster may name as many packs and single items as it wants (the owner, 2026-10-19: no limit)
 
 Day = tuple[int, int]  # (month, day)
 
@@ -122,6 +139,13 @@ class Booster:
     look: str = "cosmos"  # how its pack looks
     # #130: draws only from what these packs hold (keys, or the start of keys) — a collection's booster
     from_packs: tuple[str, ...] = ()
+    # and/or these items, named one by one
+    items: tuple[str, ...] = ()
+
+    @property
+    def defined(self) -> bool:
+        """Whether it names what it may draw (its packs, its items) — every booster saved now does."""
+        return bool(self.from_packs or self.items)
 
     @property
     def types(self) -> frozenset[str]:
@@ -129,9 +153,16 @@ class Booster:
 
     @property
     def packs(self) -> tuple[str, ...]:
-        if self.from_packs:
+        if self.defined:
             return self.from_packs
-        return HD_PACKS if self.pool == "hd" else ()
+        return HD_PACKS if self.pool == "hd" else ()  # one saved before: as it drew then
+
+
+def _keys(raw: Any) -> tuple[str, ...]:
+    """Keys from a payload's list, each once, in their order."""
+    if not isinstance(raw, list):
+        return ()
+    return tuple(dict.fromkeys(str(key)[:96] for key in raw if isinstance(key, str) and key))
 
 
 def booster_of(key: str, names: Mapping[str, str], price: int | None, payload: Mapping[str, Any]) -> Booster:
@@ -139,10 +170,8 @@ def booster_of(key: str, names: Mapping[str, str], price: int | None, payload: M
     odds = _weights(payload.get("odds"), {r: 0 for r in RARITIES}, 10_000)
     season = payload.get("season")
     per_member = payload.get("per_member")
-    packs = payload.get("packs")
-    from_packs: tuple[str, ...] = ()
-    if isinstance(packs, list):
-        from_packs = tuple(str(key)[:64] for key in packs if isinstance(key, str) and key)[:20]
+    from_packs = _keys(payload.get("packs"))
+    items = _keys(payload.get("items"))
     return Booster(
         key=key,
         names=dict(names),
@@ -156,6 +185,7 @@ def booster_of(key: str, names: Mapping[str, str], price: int | None, payload: M
         per_member=_int(per_member, 1, 1, 1000) if per_member else None,
         look=str(payload.get("look") or "cosmos")[:24],
         from_packs=from_packs,
+        items=items,
     )
 
 
@@ -188,6 +218,8 @@ def booster_info(
         "kind": "reserve" if booster.pool == "reserve" else "looks",
         "season": booster.season,
         "packs": list(booster.from_packs),
+        "items": list(booster.items),
+        "defined": booster.defined,
         "until": end.isoformat() if end else None,
         "per_member": booster.per_member,
         "look": booster.look,

@@ -107,7 +107,7 @@ PAYLOAD_FIELDS: dict[str, frozenset[str]] = {
     "widget": frozenset({"sizes", "refresh_s", "empty", "options"}),
     "widget_option": frozenset({"widget", "setting", "value"}),
     "booster": frozenset(
-        {"pool", "season", "packs", "cards", "odds", "guarantee", "refunds", "per_member", "look"}
+        {"pool", "season", "packs", "items", "cards", "odds", "guarantee", "refunds", "per_member", "look"}
     ),
 }
 

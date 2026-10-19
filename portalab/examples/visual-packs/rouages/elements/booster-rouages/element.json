@@ -12,7 +12,9 @@
   "payload": {
     "pool": "looks",
     "packs": [
-      "ultimate_rouages"
+      "ultimate_rouages",
+      "pack_hd_time_portal",
+      "visual:portalab-gazette"
     ],
     "cards": 5,
     "guarantee": "rare",

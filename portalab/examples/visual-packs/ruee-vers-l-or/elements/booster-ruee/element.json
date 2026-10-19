@@ -12,7 +12,9 @@
   "payload": {
     "pool": "looks",
     "packs": [
-      "ultimate_ruee"
+      "ultimate_ruee",
+      "visual:portalab-desert",
+      "pack_hd_treasure"
     ],
     "cards": 5,
     "guarantee": "rare",

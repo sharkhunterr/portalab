@@ -23,6 +23,15 @@
   },
   "payload": {
     "pool": "looks",
+    "packs": [
+      "visual:portalab-season-halloween",
+      "visual:portalab-halloween",
+      "pack_hd_halloween"
+    ],
+    "items": [
+      "ambient_leaves",
+      "name_horror"
+    ],
     "season": "halloween",
     "cards": 5,
     "odds": {

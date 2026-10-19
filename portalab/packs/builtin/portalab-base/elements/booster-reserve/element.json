@@ -22,6 +22,18 @@
   },
   "payload": {
     "pool": "reserve",
+    "items": [
+      "boost_xp_15",
+      "boost_xp_2",
+      "project_launch",
+      "quota_requests",
+      "request_4k",
+      "request_tv_channel",
+      "rescue_1",
+      "rescue_3",
+      "streak_freeze_1",
+      "streak_freeze_3"
+    ],
     "cards": 3,
     "odds": {
       "common": 60,

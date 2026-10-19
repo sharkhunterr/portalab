@@ -23,6 +23,19 @@
   },
   "payload": {
     "pool": "looks",
+    "packs": [
+      "visual:portalab-season-christmas",
+      "visual:portalab-christmas",
+      "pack_hd_christmas",
+      "pack_hd_ice"
+    ],
+    "items": [
+      "effect_flicker",
+      "frame_lights",
+      "level_lights",
+      "levelup_hearth",
+      "name_cozy"
+    ],
     "season": "christmas",
     "cards": 5,
     "odds": {

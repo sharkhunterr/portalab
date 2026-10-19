@@ -2,8 +2,9 @@
 openings left; opening one charges its price, grants the looks not owned yet, gives the duplicates' Coins
 back at once (a fixed amount per rarity) and is replayed by its ``Idempotency-Key``; a look won below its
 level or Contribution is held ``locked`` and usable once they are reached; a booster offered (a level
-reward, an achievement) waits sealed in the reserve and opens for free; a season's booster draws from its
-season's looks and is on sale in its weeks only; the reserve booster fills the reserve (items stack, never
+reward, an achievement) waits sealed in the reserve and opens for free; a booster draws only what it names
+(its packs, its items — never a look it does not name, never one of another kind) and must name them; a
+season's booster is on sale in its weeks only; the reserve booster fills the reserve (items stack, never
 a duplicate), using an item grants it as a purchase would; Discovery opens three times per member."""
 
 from typing import Any
@@ -49,7 +50,9 @@ async def test_opening_a_booster(mk: MkHarness, client: AsyncClient) -> None:
         await look(mk, key, rarity)
     await look(mk, "pulsar", "common", "title", payload={"label": "Pulsar"})
     await published(mk, "some_widget", "widget", price_coins=300)  # not a look: never in a booster
-    await booster(mk, "booster_cosmos", 450, guarantee="rare")
+    await look(mk, "outsider", "legendary")  # a look it does not name: never drawn
+    items = ["night_owl", "early_bird", "comet", "nova", "pulsar", "some_widget"]
+    await booster(mk, "booster_cosmos", 450, guarantee="rare", items=items)
     await mk.module.grants.grant(mk.p("boss"), mk.people["ursula"], "night_owl", "gift")
     await mk.coins("ursula", 1000)
     await login(client, "ursula")
@@ -128,8 +131,8 @@ async def test_locked_until_its_conditions_then_offered_and_seasons(
         conditions=[{"kind": "min_contribution", "contribution": 5}],
     )
     await look(mk, "snowman", "common", season="christmas")
-    await booster(mk, "booster_halloween", 450, season="halloween", cards=1)
-    await booster(mk, "booster_christmas", 450, season="christmas", cards=1)
+    await booster(mk, "booster_halloween", 450, season="halloween", cards=1, items=["pumpkin"])
+    await booster(mk, "booster_christmas", 450, season="christmas", cards=1, items=["snowman"])
     await mk.coins("ursula", 1000)
     await login(client, "ursula")
     # 1 October: Halloween's booster is on sale, Christmas' is not
@@ -205,7 +208,8 @@ async def test_the_reserve(mk: MkHarness, client: AsyncClient) -> None:
         await mk.module.catalog.create(mk.p("boss"), body)
         await mk.module.catalog.move(mk.p("boss"), key, "available")
     await look(mk, "night_owl", "common")  # a look: never in the reserve booster
-    await booster(mk, "booster_reserve", 300, pool="reserve", cards=3, guarantee="rare")
+    items = ["plus_3", "plus_5", "plus_10", "night_owl"]
+    await booster(mk, "booster_reserve", 300, pool="reserve", cards=3, guarantee="rare", items=items)
     await mk.coins("ursula", 1000)
     await login(client, "ursula")
     for _ in range(2):
@@ -241,7 +245,7 @@ async def test_the_reserve(mk: MkHarness, client: AsyncClient) -> None:
 async def test_discovery_opens_three_times(mk: MkHarness, client: AsyncClient) -> None:
     for index in range(4):
         await look(mk, f"look_{index}", "common")
-    await booster(mk, "booster_discovery", 120, cards=3, per_member=3)
+    await booster(mk, "booster_discovery", 120, cards=3, per_member=3, items=[f"look_{i}" for i in range(4)])
     await mk.coins("ursula", 1000)
     await login(client, "ursula")
     for left in (2, 1, 0):
@@ -263,7 +267,7 @@ async def test_a_look_waiting_for_its_level_is_listed_locked_with_its_level(
     level = [{"kind": "min_level", "level": 7}]
     await look(mk, "level_neon", "common", kind="level_badge", payload={"style": "neon"}, conditions=level)
     await look(mk, "night_owl", "common", conditions=level)
-    await booster(mk, "booster_looks", 100, cards=2)
+    await booster(mk, "booster_looks", 100, cards=2, items=["level_neon", "night_owl"])
     await mk.coins("ursula", 1000)
     await login(client, "ursula")
     opened = (await client.post("/api/v1/marketplace/boosters/booster_looks/open")).json()
@@ -286,7 +290,7 @@ async def test_a_early_unlock_unlocks_an_item_waiting_for_its_level(
     level = [{"kind": "min_level", "level": 30}]
     await look(mk, "night_owl", "common", conditions=level)
     await look(mk, "early_bird", "common", conditions=level)
-    await booster(mk, "booster_looks", 100, cards=2)
+    await booster(mk, "booster_looks", 100, cards=2, items=["night_owl", "early_bird"])
     body = {**product_def("early_unlock", "early_unlock", price_coins=2500, payload={}), "repeatable": True}
     await mk.module.catalog.create(mk.p("boss"), body)
     await mk.module.catalog.move(mk.p("boss"), "early_unlock", "available")
@@ -318,3 +322,47 @@ async def test_a_early_unlock_unlocks_an_item_waiting_for_its_level(
     )
     assert again.status_code == 409 and again.json()["code"] == "marketplace.reserve_empty"
     assert await mk.balance("ursula") == 3000 - 100 - 2500  # no Coins moved by the pass itself
+
+
+async def test_a_booster_names_what_it_may_draw(mk: MkHarness, client: AsyncClient) -> None:
+    """The owner (2026-10-19): each booster says exactly what it may draw — packs and/or items named one by
+    one; one naming neither is refused. A pack and items add up; the season says when, not what."""
+    import pytest
+
+    from portalab.core.errors import ValidationFailed
+
+    with pytest.raises(ValidationFailed) as refused:
+        await booster(mk, "booster_vague", 100)
+    assert refused.value.code == "marketplace.booster_pool_undefined"
+    for key in ("pack_a", "pack_b", "single"):
+        await look(mk, key, "common")
+    await look(mk, "elsewhere", "common", season="halloween")  # its season's, but not named: never drawn
+    body = {
+        **product_def("pack_spooky", "bundle", price_coins=300, payload={"products": ["pack_a", "pack_b"]}),
+        "presentation": {"rarity": "rare"},
+    }
+    await mk.module.catalog.create(mk.p("boss"), body)
+    await mk.module.catalog.move(mk.p("boss"), "pack_spooky", "available")
+    await booster(
+        mk, "booster_named", 100, cards=3, season="halloween", packs=["pack_spooky"], items=["single"]
+    )
+    # the administrators see what a booster would draw before saving it
+    await login(client, "boss")
+    preview = (
+        await client.post(
+            "/api/v1/admin/marketplace/boosters/pool",
+            json={"packs": ["pack_spooky"], "items": ["single", "nothing_such"]},
+        )
+    ).json()
+    assert preview["count"] == 3 and preview["rarities"] == {"common": 3}
+    assert [i["key"] for i in preview["items"]] == ["pack_a", "pack_b", "single"]
+    assert preview["not_drawable"] == ["nothing_such"]
+    empty = (await client.post("/api/v1/admin/marketplace/boosters/pool", json={})).json()
+    assert empty["count"] == 0
+    await mk.coins("ursula", 1000)
+    await login(client, "ursula")
+    shelf = {b["key"]: b for b in (await client.get("/api/v1/marketplace/boosters")).json()}
+    assert shelf["booster_named"]["items"] == ["single"] and shelf["booster_named"]["defined"] is True
+    for _ in range(3):
+        opened = (await client.post("/api/v1/marketplace/boosters/booster_named/open")).json()
+        assert {c["product"]["key"] for c in opened["cards"]} == {"pack_a", "pack_b", "single"}

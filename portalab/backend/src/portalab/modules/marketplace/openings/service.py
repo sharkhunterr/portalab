@@ -189,20 +189,30 @@ class Openings:
             )
             return list(rows.scalars())
 
+    @staticmethod
+    async def pool_of(booster: Booster, rows: list[tuple[Product, ProductVersion]]) -> set[str] | None:
+        """The keys the booster may draw — what its packs hold and its items (``None``: one saved before its
+        pool had to be declared, with no packs — every look of its kind)."""
+        if any(p.startswith(VISUAL_POOL) for p in booster.packs):
+            await pack_products.ready()
+        if not booster.defined:
+            return pool_keys(rows, booster.packs)
+        return (pool_keys(rows, booster.from_packs) or set()) | set(booster.items)
+
     async def _pool(self, booster: Booster, owned: set[UUID]) -> list[tuple[Product, ProductVersion]]:
         """What the booster may hold now: its types, priced, its season's or its packs' if it says so —
         and no limited look with no copy left (one the member owns stays: it comes out as a duplicate)."""
         rows = await self.catalog.listing()
-        if any(p.startswith(VISUAL_POOL) for p in booster.packs):
-            await pack_products.ready()
-        keys = pool_keys(rows, booster.packs)
+        keys = await self.pool_of(booster, rows)
+        # one saved before its pool had to be declared draws its season's looks; now its packs and items say
+        season = None if booster.defined else booster.season
         pool = [
             (product, version)
             for product, version in rows
             if product.type in booster.types
             and version.price_coins
             and (keys is None or product.key in keys)
-            and (booster.season is None or product.season == booster.season)
+            and (season is None or product.season == season)
         ]
         stock = await self.availability.stock(p for p, _ in pool)
         return [

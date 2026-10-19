@@ -17,6 +17,7 @@ from portalab.core.db import Database
 from portalab.core.errors import Conflict, NotFound, ValidationFailed
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
+from portalab.modules.marketplace.boosters import booster_of
 from portalab.modules.marketplace.models import Category, Product, ProductVersion
 from portalab.modules.marketplace.products.definition import (
     AvailabilityIn,
@@ -97,6 +98,12 @@ class Catalog:
         if registered is None:
             raise ValidationFailed("Unknown product type.", code="marketplace.invalid_product")
         check_payload(version.payload, registered.payload_fields)
+        if product_type == "booster" and not booster_of("", {}, None, version.payload).defined:
+            # every booster says exactly what it may draw: its packs and/or its items
+            raise ValidationFailed(
+                "A booster must name the packs or the items it draws from.",
+                code="marketplace.booster_pool_undefined",
+            )
 
     def _version_row(
         self, product: Product, number: int, version: ProductVersionIn, actor: Principal

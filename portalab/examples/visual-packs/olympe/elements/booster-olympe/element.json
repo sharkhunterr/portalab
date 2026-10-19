@@ -12,7 +12,10 @@
   "payload": {
     "pool": "looks",
     "packs": [
-      "ultimate_olympe"
+      "ultimate_olympe",
+      "pack_hd_sunmoon",
+      "pack_hd_voltage",
+      "pack_hd_blaze"
     ],
     "cards": 5,
     "guarantee": "rare",

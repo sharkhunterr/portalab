@@ -302,6 +302,8 @@ def _element(
         report.add("blocking", "payload.fields", key, fields=extra)
     if element.type == "bundle":
         _bundle(report, key, element, own_products)
+    if element.type == "booster" and not (element.payload.get("packs") or element.payload.get("items")):
+        report.add("blocking", "booster.pool_undefined", key)  # it must say exactly what it may draw
     if element.type == "booster_scene":
         _scene(report, key, element, scene_parts)
     if element.type in ("booster_opening", "card_reveal") and (element.render.duration or 0) > (

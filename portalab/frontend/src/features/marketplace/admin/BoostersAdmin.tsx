@@ -4,7 +4,7 @@ import { Link } from "react-router";
 import { api } from "../../../api/client";
 import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
+import { SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -14,6 +14,7 @@ import type { Product } from "../api";
 import { type BoosterInfo, boosterOf, localized } from "../boosters/api";
 import { ProductPack } from "../boosters/Boosters";
 import type { SceneBinding } from "../boosters/scene/scene";
+import { PoolPicker, PoolSummary, poolNamed, poolPacks, usePoolPreview } from "./BoosterPool";
 import { withConfirmation } from "./confirm";
 import type { Season } from "./console/api";
 import { RARITIES, SEASONS } from "./ProductEditor";
@@ -58,10 +59,12 @@ interface Draft {
   look: string;
   /** ``pack:look`` of its own scene, or "" (the one every booster wears, else Portalab's) */
   scene: string;
-  /** the visual packs it draws from (none: all its pool holds) */
+  /** the visual packs it draws from */
   visualPacks: string[];
-  /** the shop's packs it draws from (kept as they are) */
+  /** the shop's packs it draws from */
   shopPacks: string[];
+  /** and the items it draws, named one by one */
+  items: string[];
 }
 
 const whole = (value: string) => Math.max(0, Math.round(Number(value) || 0));
@@ -99,11 +102,12 @@ function draftOf(
     scene: own ? `${own.pack}:${own.look}` : "",
     visualPacks: packs.filter((p) => p.startsWith(VISUAL)).map((p) => p.slice(VISUAL.length)),
     shopPacks: packs.filter((p) => !p.startsWith(VISUAL)),
+    items: info?.items ?? [],
   };
 }
 
 function payloadOf(value: Draft) {
-  const packs = [...value.shopPacks, ...value.visualPacks.map((p) => `${VISUAL}${p}`)];
+  const packs = poolPacks(value);
   return {
     pool: value.pool,
     cards: Math.min(10, Math.max(1, whole(value.cards))),
@@ -113,6 +117,7 @@ function payloadOf(value: Draft) {
     look: value.look,
     ...(value.season ? { season: value.season } : {}),
     ...(packs.length ? { packs } : {}),
+    ...(value.items.length ? { items: value.items } : {}),
     ...(whole(value.perMember) ? { per_member: whole(value.perMember) } : {}),
   };
 }
@@ -146,11 +151,13 @@ function BoosterForm({
   value,
   patch,
   options,
+  products,
   creating,
 }: {
   value: Draft;
   patch: (next: Partial<Draft>) => void;
   options: BoosterOptions | undefined;
+  products: readonly Product[];
   creating: boolean;
 }) {
   const t = useT();
@@ -280,28 +287,13 @@ function BoosterForm({
             </option>
           ))}
         </SelectField>
-        {value.pool === "reserve" ? null : (
-          <fieldset className="admin-booster__packs">
-            <legend className="visually-hidden">{t("marketplace:admin.boosters.packs")}</legend>
-            <p className="admin-muted">{t("marketplace:admin.boosters.packsHint")}</p>
-            {(options?.packs ?? []).map((pack) => (
-              <CheckboxField
-                key={pack.id}
-                label={`${name(pack.names, pack.id)} · ${t("marketplace:admin.boosters.packCount", {
-                  count: pack.products,
-                })}`}
-                checked={value.visualPacks.includes(pack.id)}
-                onChange={(e) =>
-                  patch({
-                    visualPacks: e.target.checked
-                      ? [...value.visualPacks, pack.id]
-                      : value.visualPacks.filter((p) => p !== pack.id),
-                  })
-                }
-              />
-            ))}
-          </fieldset>
-        )}
+        <PoolPicker
+          value={value}
+          patch={patch}
+          visualPacks={options?.packs ?? []}
+          products={products}
+          odds={value.odds}
+        />
       </fieldset>
       <fieldset className="product-editor__fields admin-booster__table">
         <legend>{t("marketplace:admin.boosters.odds")}</legend>
@@ -337,11 +329,13 @@ function BoosterForm({
 /** One booster's settings — what it holds, its odds, what a duplicate gives back, its looks: a new version. */
 function BoosterSettings({
   product,
+  products,
   onSaved,
   seasons,
   options,
 }: {
   product: Product;
+  products: readonly Product[];
   onSaved: () => void;
   seasons?: readonly Season[] | undefined;
   options: BoosterOptions | undefined;
@@ -352,13 +346,19 @@ function BoosterSettings({
   const info = boosterOf(product);
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Draft | null>(null);
-  const [error, setError] = useState(false);
-  if (!info) return null;
-  const value = draft ?? draftOf(product, info, options);
+  const [error, setError] = useState<string | null>(null);
+  const current = info ? draftOf(product, info, options) : null;
+  const preview = usePoolPreview(current);
+  if (!info || !current) return null;
+  const value = draft ?? current;
   const patch = (next: Partial<Draft>) => setDraft({ ...value, ...next });
   const scene = options?.bindings[product.key] ?? options?.bindings["*"];
   const save = async () => {
-    setError(false);
+    setError(null);
+    if (!poolNamed(value)) {
+      setError(t("marketplace:admin.boosters.poolNeeded"));
+      return;
+    }
     try {
       await withConfirmation(
         (confirmation) =>
@@ -408,7 +408,7 @@ function BoosterSettings({
       setDraft(null);
       onSaved();
     } catch {
-      setError(true);
+      setError(t("marketplace:admin.error"));
     }
   };
   return (
@@ -428,6 +428,12 @@ function BoosterSettings({
             ? ` · ${t("marketplace:admin.boosters.wears", { name: localized(scene.names, locale) || scene.look })}`
             : ""}
         </span>
+        {info.defined === false ? (
+          <span className="admin-booster__undefined">
+            <Icon name="warning" size={14} /> {t("marketplace:admin.boosters.undefinedPool")}
+          </span>
+        ) : null}
+        <PoolSummary preview={preview.data} odds={value.odds} />
         <span className="admin-booster__odds">
           {RARITIES.filter((r) => (info.odds[r] ?? 0) > 0).map((r) => (
             <span key={r} data-rarity={r}>
@@ -453,8 +459,8 @@ function BoosterSettings({
         }
         footer={<Button onClick={save}>{t("marketplace:admin.save")}</Button>}
       >
-        <BoosterForm value={value} patch={patch} options={options} creating={false} />
-        {error ? <p role="alert">{t("marketplace:admin.error")}</p> : null}
+        <BoosterForm value={value} patch={patch} options={options} products={products} creating={false} />
+        {error ? <p role="alert">{error}</p> : null}
       </Dialog>
     </li>
   );
@@ -463,10 +469,12 @@ function BoosterSettings({
 /** Issue 153: a new booster, made of the visuals there are — created, put on sale, its scene bound. */
 function NewBooster({
   taken,
+  products,
   options,
   onSaved,
 }: {
   taken: ReadonlySet<string>;
+  products: readonly Product[];
   options: BoosterOptions | undefined;
   onSaved: () => void;
 }) {
@@ -480,6 +488,10 @@ function NewBooster({
     setError(null);
     if (!value.nameEn.trim()) {
       setError(t("marketplace:admin.boosters.nameNeeded"));
+      return;
+    }
+    if (!poolNamed(value)) {
+      setError(t("marketplace:admin.boosters.poolNeeded"));
       return;
     }
     const key = keyFor(value.nameEn, taken);
@@ -541,7 +553,7 @@ function NewBooster({
       }
       footer={<Button onClick={create}>{t("marketplace:admin.boosters.create")}</Button>}
     >
-      <BoosterForm value={value} patch={patch} options={options} creating />
+      <BoosterForm value={value} patch={patch} options={options} products={products} creating />
       {error ? <p role="alert">{error}</p> : null}
     </Dialog>
   );
@@ -589,7 +601,12 @@ export function BoostersAdmin({
       title={t("marketplace:admin.boosters.title")}
       icon="sparkles"
       actions={
-        <NewBooster taken={new Set(products.map((p) => p.key))} options={options.data} onSaved={saved} />
+        <NewBooster
+          taken={new Set(products.map((p) => p.key))}
+          products={products}
+          options={options.data}
+          onSaved={saved}
+        />
       }
     >
       <p className="admin-muted">
@@ -602,6 +619,7 @@ export function BoostersAdmin({
             <BoosterSettings
               key={product.key}
               product={product}
+              products={products}
               onSaved={saved}
               seasons={seasons}
               options={options.data}

@@ -2,6 +2,7 @@
 new version are sensitive and need a confirmation), ``marketplace.grant``, ``marketplace.revoke``,
 ``marketplace.refund`` (confirmed) and ``marketplace.audit`` (the marketplace audit trail)."""
 
+from collections import Counter
 from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
@@ -22,6 +23,7 @@ from portalab.modules.marketplace.api.catalog import (
     product_out,
 )
 from portalab.modules.marketplace.api.projects import Module
+from portalab.modules.marketplace.boosters import booster_of
 from portalab.modules.marketplace.permissions import AUDIT, GRANT, MANAGE, REFUND, REVOKE
 from portalab.modules.marketplace.products.definition import AvailabilityIn, PresentationIn
 
@@ -64,6 +66,14 @@ class MarketplaceAvailabilityIn(BaseModel):
 
 class MarketplaceRaritiesIn(BaseModel):
     supply: dict[str, int | None]
+
+
+class BoosterPoolIn(BaseModel):
+    """What a booster would draw from: its kind of pool, its packs and its items named one by one."""
+
+    pool: Literal["looks", "hd", "reserve"] = "looks"
+    packs: list[Annotated[str, Field(max_length=96)]] = Field(default_factory=list)
+    items: list[Annotated[str, Field(max_length=96)]] = Field(default_factory=list)
 
 
 class MarketplaceConfirmIn(BaseModel):
@@ -136,6 +146,31 @@ async def product_availability(
     product, version = await module.catalog.get(key)
     stock = await module.availability.stock([product])
     return product_out(product, version, False, categories=await category_keys(module), stock=stock)
+
+
+@router.post("/admin/marketplace/boosters/pool")
+async def booster_pool(_: Manager, body: BoosterPoolIn, module: Module) -> dict[str, Any]:
+    """What a booster naming these packs and items may draw now — each look on sale it holds, how many per
+    rarity and per kind, and the items named that it can never draw (not on sale, or of another kind)."""
+    booster = booster_of("preview", {}, 0, body.model_dump())
+    rows = await module.catalog.listing()
+    keys = await module.openings.pool_of(booster, rows) if booster.defined else set()
+    drawn = [
+        (product, version)
+        for product, version in rows
+        if product.type in booster.types and version.price_coins and keys is not None and product.key in keys
+    ]
+    held = {product.key for product, _ in drawn}
+    return {
+        "count": len(drawn),
+        "rarities": dict(Counter(product.rarity or "common" for product, _ in drawn)),
+        "types": dict(Counter(product.type for product, _ in drawn)),
+        "items": [
+            {"key": p.key, "type": p.type, "rarity": p.rarity or "common", "names": dict(v.names)}
+            for p, v in sorted(drawn, key=lambda row: row[0].key)
+        ],
+        "not_drawable": [key for key in booster.items if key not in held],
+    }
 
 
 @router.post("/admin/marketplace/categories", status_code=201)

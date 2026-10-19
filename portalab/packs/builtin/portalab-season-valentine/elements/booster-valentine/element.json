@@ -23,6 +23,14 @@
   },
   "payload": {
     "pool": "looks",
+    "packs": [
+      "visual:portalab-season-valentine",
+      "pack_hd_valentine",
+      "pack_hd_candy"
+    ],
+    "items": [
+      "effect_hearts"
+    ],
     "season": "valentine",
     "cards": 5,
     "odds": {

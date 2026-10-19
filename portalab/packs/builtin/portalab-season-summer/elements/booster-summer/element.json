@@ -23,6 +23,18 @@
   },
   "payload": {
     "pool": "looks",
+    "packs": [
+      "visual:portalab-season-summer",
+      "visual:portalab-beach",
+      "pack_hd_summer"
+    ],
+    "items": [
+      "ambient_sand",
+      "frame_sand",
+      "levelup_sandstorm",
+      "name_desert",
+      "title_sand_lord"
+    ],
     "season": "summer",
     "cards": 5,
     "odds": {

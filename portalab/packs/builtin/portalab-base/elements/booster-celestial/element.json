@@ -32,7 +32,9 @@
       "pack_zodiac",
       "pack_hd_sunmoon",
       "pack_spacecrew",
-      "pack_sunmoon"
+      "pack_sunmoon",
+      "visual:portalab-observatory",
+      "pack_hd_aurora"
     ],
     "cards": 5,
     "odds": {
