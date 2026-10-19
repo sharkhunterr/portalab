@@ -77,3 +77,28 @@ async def test_members_must_accept_the_terms_in_force(
     assert [r.data["version"] for r in await participant.export(member)] == [1, 3]
     await participant.erase(member, "final")
     assert await participant.export(member) == []
+
+
+async def test_the_sign_in_page_offers_the_terms_only_when_asked_to(
+    app: FastAPI, client: httpx.AsyncClient, full: FullPlatform
+) -> None:
+    """Issue 157: off by default — a visitor gets the generic answer of every other address; on, the terms in
+    force; and never while the terms are not asked or none is published."""
+    boss = await create_user(module_of(app), "boss")
+    terms = full.privacy.terms
+    assert (await client.get("/api/v1/auth/terms")).status_code == 401  # nothing published, off
+    await terms.set_on_sign_in(user(boss), True)
+    assert (await client.get("/api/v1/auth/terms")).status_code == 401  # on, but nothing published
+    await terms.publish(
+        user(boss), title="Conditions", summary="", body_md="Be kind.", requires_acceptance=True
+    )
+    shown = await client.get("/api/v1/auth/terms")
+    assert shown.status_code == 200 and shown.json()["terms"]["title"] == "Conditions"
+    await terms.set_enabled(user(boss), False)  # not asked: not offered either
+    assert (await client.get("/api/v1/auth/terms")).status_code == 401
+    await terms.set_enabled(user(boss), True)
+    await terms.set_on_sign_in(user(boss), False)
+    refused = await client.get("/api/v1/auth/terms")
+    unknown = await client.get("/api/v1/does-not-exist")
+    assert refused.status_code == 401 and refused.content == unknown.content
+    assert await terms.sign_in_setting() is False and await terms.enabled() is True

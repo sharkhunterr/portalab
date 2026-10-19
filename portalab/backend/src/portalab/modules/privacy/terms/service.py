@@ -60,6 +60,7 @@ class TermsService:
         self.clock = clock
         self._required: tuple[float, int | None] | None = None  # (fetched at, version members must accept)
         self._accepted: dict[UUID, int] = {}  # member → highest accepted version (only ever grows)
+        self._sign_in: tuple[float, bool] | None = None  # (fetched at, shown on the sign-in page)
 
     # --- reading ------------------------------------------------------------------------------------
 
@@ -100,29 +101,56 @@ class TermsService:
             settings = await session.get(TermsSettings, 1)
         return settings is None or settings.enabled
 
+    async def on_sign_in(self) -> bool:
+        """Issue 157: whether the sign-in page offers the terms to read (off by default) — only while they
+        are asked and some are published."""
+        cached = self._sign_in
+        if cached is not None and time.monotonic() - cached[0] < CACHE_SECONDS:
+            return cached[1]
+        async with self.database.session() as session:
+            settings = await session.get(TermsSettings, 1)
+        shown = settings is not None and settings.enabled and settings.on_sign_in
+        if shown:
+            shown = await self.current() is not None
+        self._sign_in = (time.monotonic(), shown)
+        return shown
+
+    async def sign_in_setting(self) -> bool:
+        """The administrators' switch itself (``on_sign_in`` also needs the terms asked and published)."""
+        async with self.database.session() as session:
+            settings = await session.get(TermsSettings, 1)
+        return settings is not None and settings.on_sign_in
+
     async def set_enabled(self, actor: Principal, enabled: bool) -> None:
+        await self._set(actor, "privacy.terms_enforcement", enabled=enabled)
+
+    async def set_on_sign_in(self, actor: Principal, shown: bool) -> None:
+        await self._set(actor, "privacy.terms_on_sign_in", on_sign_in=shown)
+
+    async def _set(self, actor: Principal, action: str, **values: bool) -> None:
         async with self.database.unit_of_work() as uow:
             await uow.session.execute(
                 insert(TermsSettings)
-                .values(id=1, enabled=enabled, updated_at=utc_now(self.clock))
+                .values(id=1, updated_at=utc_now(self.clock), **values)
                 .on_conflict_do_update(
                     index_elements=[TermsSettings.id],
-                    set_={"enabled": enabled, "updated_at": utc_now(self.clock)},
+                    set_={**values, "updated_at": utc_now(self.clock)},
                 )
             )
             await self.audit.record(
                 uow.session,
                 AuditRecord(
-                    action="privacy.terms_enforcement",
+                    action=action,
                     actor=actor,
                     resource=ResourceRef("terms", "settings"),
                     decision="allow",
                     result="success",
-                    context={"enabled": enabled},
+                    context=dict(values),
                     sensitive=True,
                 ),
             )
         self._required = None
+        self._sign_in = None
 
     async def _accepted_version(self, user_id: UUID) -> tuple[int | None, datetime | None]:
         async with self.database.session() as session:
@@ -233,6 +261,7 @@ class TermsService:
                 ),
             )
         self._required = None
+        self._sign_in = None
         return published
 
 

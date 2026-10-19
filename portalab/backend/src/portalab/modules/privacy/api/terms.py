@@ -7,7 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 
-from portalab.core.authorization import require
+from portalab.core.authorization import public, require
 from portalab.core.authz_port import Principal
 from portalab.modules.privacy.api.routes import Module
 from portalab.modules.privacy.models import TermsVersion
@@ -59,11 +59,17 @@ class TermsAdminOut(BaseModel):
     versions: list[TermsEditorOut]
     members_up_to_date: int
     enabled: bool  # optional: off, members are asked nothing (the versions stay)
+    on_sign_in: bool  # issue 157: offered to read on the sign-in page (off by default)
 
 
 class EnforcementIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     enabled: bool
+
+
+class SignInIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    shown: bool
 
 
 def _out(version: TermsVersion) -> TermsOut:
@@ -90,6 +96,16 @@ def _mine(standing: TermsStatus) -> MyTermsOut:
 async def current_terms(_: Annotated[Principal, require("users.self.manage")], module: Module) -> TermsPublic:
     """028: read once signed in (the acceptance gate shows them): nothing answers a visitor but sign-in."""
     current = await module.terms.current() if await module.terms.enabled() else None
+    return TermsPublic(terms=_out(current) if current else None)
+
+
+@router.get("/auth/terms", response_model=TermsPublic)
+@public
+async def sign_in_terms(module: Module) -> TermsPublic:
+    """Issue 157: the terms in force, offered on the sign-in page — only when the administrators chose so
+    (off by default). Off, a visitor gets the generic answer of every other address (the security
+    middleware checks ``on_sign_in`` before this route)."""
+    current = await module.terms.current() if await module.terms.on_sign_in() else None
     return TermsPublic(terms=_out(current) if current else None)
 
 
@@ -122,6 +138,7 @@ async def terms_history(module: Module, _: Principal = require(TERMS_MANAGE)) ->
         versions=versions,
         members_up_to_date=await module.terms.up_to_date(),
         enabled=await module.terms.enabled(),
+        on_sign_in=await module.terms.sign_in_setting(),
     )
 
 
@@ -130,6 +147,14 @@ async def set_terms_enforcement(
     body: EnforcementIn, module: Module, principal: Principal = require(TERMS_MANAGE)
 ) -> Response:
     await module.terms.set_enabled(principal, body.enabled)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.put("/admin/terms/sign-in", status_code=status.HTTP_204_NO_CONTENT)
+async def set_terms_on_sign_in(
+    body: SignInIn, module: Module, principal: Principal = require(TERMS_MANAGE)
+) -> Response:
+    await module.terms.set_on_sign_in(principal, body.shown)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

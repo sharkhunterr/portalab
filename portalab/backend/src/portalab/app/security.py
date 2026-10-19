@@ -160,6 +160,8 @@ ANONYMOUS_PATHS = frozenset(
     }
 )
 ANONYMOUS_PREFIXES = ("/api/v1/media/remote/",)  # a casting device's stream, by its ticket
+# issue 157: the terms of use, on the sign-in page — only while the administrators offer them there
+SIGN_IN_TERMS_PATH = "/api/v1/auth/terms"
 ANONYMOUS_CATALOGS = frozenset({"auth", "common", "errors"})  # the sign-in page's words
 HEALTH_PATHS = frozenset({"/healthz", "/readyz", "/metrics"})
 # who may ask the health checks: the machine itself and the local networks (the administrator narrows it)
@@ -182,6 +184,16 @@ def anonymous_allowed(path: str) -> bool:
     if path.startswith("/api/v1/i18n/catalogs/"):
         return path.rsplit("/", 1)[-1] in ANONYMOUS_CATALOGS
     return not path.startswith("/api/")
+
+
+async def _terms_on_sign_in(app_state: Any) -> bool:
+    terms = getattr(getattr(app_state, "privacy_module", None), "terms", None) if app_state else None
+    if terms is None:
+        return False
+    try:
+        return bool(await terms.on_sign_in())
+    except Exception:
+        return False  # the database away: the generic answer
 
 
 def public_assets_of(static_dir: Path | None) -> frozenset[str] | None:
@@ -374,6 +386,8 @@ class SecurityMiddleware:
         if anonymous_allowed(path):
             return True
         app_state = getattr(scope.get("app"), "state", None)
+        if path == SIGN_IN_TERMS_PATH and await _terms_on_sign_in(app_state):
+            return True
         if app_state is None or app_state._state.get("principal_resolver") is None:
             return True  # no identity wired (tests of a bare app): the routes answer for themselves
         try:

@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { api } from "../../api/client";
+import { Dialog } from "../../design-system/components/Overlays";
 import { ApiError } from "../../state/regions";
+import { useSignInTerms } from "../terms/api";
 import "../content/content.css";
 import { FormMessage } from "./FormMessage";
 import { authStrings as t } from "./strings";
@@ -44,6 +46,33 @@ function SingleSignOn() {
       </a>
       <p className="auth-sso__or">{t.ssoOr}</p>
     </div>
+  );
+}
+
+/** Issue 157: the terms of use in force, readable before signing in — only when the administrators offer
+ * them on the sign-in page (off by default: the server then answers nothing). */
+function TermsLink() {
+  const terms = useSignInTerms();
+  if (!terms.data) return null;
+  return (
+    <p className="auth-terms">
+      <Dialog
+        size="lg"
+        title={terms.data.title}
+        closeLabel={t.close}
+        trigger={
+          <button type="button" className="auth-terms__link">
+            {t.termsLink}
+          </button>
+        }
+      >
+        <div
+          className="content-body"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: server-sanitized by the single Markdown pipeline (nh3 allowlist)
+          dangerouslySetInnerHTML={{ __html: terms.data.html }}
+        />
+      </Dialog>
+    </p>
   );
 }
 
@@ -120,6 +149,7 @@ export function LoginForm() {
           {t.cancelDeletion}
         </button>
       ) : null}
+      <TermsLink />
     </form>
   );
 }

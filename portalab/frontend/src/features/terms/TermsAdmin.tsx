@@ -27,17 +27,23 @@ import "./terms.css";
  * switch is off. A new version starts from the one in force; « members must accept again » (the default)
  * brings every member the acceptance sheet, a mere correction does not. The history counts acceptances.
  */
-function Enforcement({ enabled }: { enabled: boolean }) {
+function Enforcement({ enabled, onSignIn }: { enabled: boolean; onSignIn: boolean }) {
   const t = useT();
   const client = useQueryClient();
+  const refresh = () => {
+    void client.invalidateQueries({ queryKey: ["admin", "terms"] });
+    void client.invalidateQueries({ queryKey: ["terms"] });
+    void client.invalidateQueries({ queryKey: MY_TERMS_KEY });
+  };
   const change = useMutation({
     mutationFn: async (next: boolean) =>
       api.PUT("/api/v1/admin/terms/enforcement", { body: { enabled: next } }),
-    onSuccess: () => {
-      void client.invalidateQueries({ queryKey: ["admin", "terms"] });
-      void client.invalidateQueries({ queryKey: ["terms"] });
-      void client.invalidateQueries({ queryKey: MY_TERMS_KEY });
-    },
+    onSuccess: refresh,
+  });
+  // issue 157: offered to read on the sign-in page — off by default
+  const signIn = useMutation({
+    mutationFn: async (next: boolean) => api.PUT("/api/v1/admin/terms/sign-in", { body: { shown: next } }),
+    onSuccess: refresh,
   });
   return (
     <div className="terms-admin__switch">
@@ -50,6 +56,13 @@ function Enforcement({ enabled }: { enabled: boolean }) {
         checked={enabled}
         disabled={change.isPending}
         onChange={(event) => change.mutate(event.target.checked)}
+      />
+      <CheckboxField
+        label={t("admin:terms.onSignIn")}
+        hint={t("admin:terms.onSignInHint")}
+        checked={onSignIn}
+        disabled={signIn.isPending || !enabled}
+        onChange={(event) => signIn.mutate(event.target.checked)}
       />
     </div>
   );
@@ -199,7 +212,7 @@ export default function TermsAdmin() {
       />
       <AdminGrid>
         <AdminSection title={t("admin:terms.state")} icon="shield" span="full">
-          <Enforcement enabled={enabled} />
+          <Enforcement enabled={enabled} onSignIn={admin.data?.on_sign_in ?? false} />
         </AdminSection>
         <Editor base={current} next={(current?.version ?? 0) + 1} />
         <AdminSection title={t("admin:terms.history")} icon="hourglass" span="full" flush>

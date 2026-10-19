@@ -22,6 +22,7 @@ export interface TermsAdmin {
   versions: Array<Terms & { body_md: string; acceptances: number }>;
   members_up_to_date: number;
   enabled: boolean;
+  on_sign_in: boolean;
 }
 
 export const MY_TERMS_KEY = ["me", "terms"] as const;
@@ -46,6 +47,17 @@ export function usePublicTerms(enabled = true) {
     retry: false,
     staleTime: 5 * 60_000,
     queryFn: async () => ((await api.GET("/api/v1/terms")).data?.terms ?? null) as Terms | null,
+  });
+}
+
+/** Issue 157: the terms offered on the sign-in page — answered only when the administrators chose so. */
+export function useSignInTerms() {
+  return useQuery({
+    queryKey: ["auth", "terms"],
+    retry: false,
+    staleTime: 5 * 60_000,
+    // off, the server gives the generic 401 of every other address: the query fails, nothing is shown
+    queryFn: async () => ((await api.GET("/api/v1/auth/terms")).data?.terms ?? null) as Terms | null,
   });
 }
 

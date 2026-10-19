@@ -110,4 +110,5 @@ class TermsSettings(PrivacyBase):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    on_sign_in: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)  # issue 157
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

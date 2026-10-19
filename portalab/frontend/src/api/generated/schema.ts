@@ -3805,6 +3805,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/terms/sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set Terms On Sign In */
+        put: operations["set_terms_on_sign_in_api_v1_admin_terms_sign_in_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/toggles/{kind}/{ref}": {
         parameters: {
             query?: never;
@@ -4599,6 +4616,28 @@ export interface paths {
         put?: never;
         /** Register */
         post: operations["register_api_v1_auth_register_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sign In Terms
+         * @description Issue 157: the terms in force, offered on the sign-in page — only when the administrators chose so
+         *     (off by default). Off, a visitor gets the generic answer of every other address (the security
+         *     middleware checks ``on_sign_in`` before this route).
+         */
+        get: operations["sign_in_terms_api_v1_auth_terms_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -15298,6 +15337,11 @@ export interface components {
              */
             user_id: string;
         };
+        /** SignInIn */
+        SignInIn: {
+            /** Shown */
+            shown: boolean;
+        };
         /**
          * SingleSignOn
          * @description 027: whether the sign-in page offers the single sign-on, and under which name.
@@ -15792,6 +15836,8 @@ export interface components {
             enabled: boolean;
             /** Members Up To Date */
             members_up_to_date: number;
+            /** On Sign In */
+            on_sign_in: boolean;
             /** Versions */
             versions: components["schemas"]["TermsEditorOut"][];
         };
@@ -24378,6 +24424,37 @@ export interface operations {
             };
         };
     };
+    set_terms_on_sign_in_api_v1_admin_terms_sign_in_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignInIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     toggle_api_v1_admin_toggles__kind___ref__post: {
         parameters: {
             query?: never;
@@ -25862,6 +25939,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sign_in_terms_api_v1_auth_terms_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TermsPublic"];
                 };
             };
         };

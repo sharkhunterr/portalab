@@ -93,6 +93,26 @@ describe("LoginForm", () => {
   });
 });
 
+describe("LoginForm terms (issue 157)", () => {
+  it("shows no terms link while the administrators do not offer them", async () => {
+    fake.handler = () => json(401, { code: "unauthorized", title: "Authentication required", status: 401 });
+    render(withClient(<LoginForm />));
+    await waitFor(() => expect(fake.requests.some((r) => r.url.endsWith("/api/v1/auth/terms"))).toBe(true));
+    expect(screen.queryByRole("button", { name: "Terms of use" })).toBeNull();
+  });
+
+  it("offers the terms in force when the administrators chose so", async () => {
+    const terms = { version: 2, title: "Rules", summary: "", html: "<p>Be kind.</p>" };
+    fake.handler = (request) =>
+      request.url.endsWith("/api/v1/auth/terms")
+        ? json(200, { terms: { ...terms, requires_acceptance: true, published_at: "2026-10-19T00:00:00Z" } })
+        : json(404, {});
+    render(withClient(<LoginForm />));
+    fireEvent.click(await screen.findByRole("button", { name: "Terms of use" }));
+    expect(await screen.findByRole("dialog", { name: "Rules" })).toHaveTextContent("Be kind.");
+  });
+});
+
 describe("CSRF", () => {
   it("sends the CSRF header on unsafe methods only", async () => {
     // jsdom refuses __Host- cookies outside a secure context, so the cookie jar is stubbed

@@ -15088,6 +15088,20 @@
         "title": "SessionInfo",
         "type": "object"
       },
+      "SignInIn": {
+        "additionalProperties": false,
+        "properties": {
+          "shown": {
+            "title": "Shown",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "shown"
+        ],
+        "title": "SignInIn",
+        "type": "object"
+      },
       "SingleSignOn": {
         "description": "027: whether the sign-in page offers the single sign-on, and under which name.",
         "properties": {
@@ -16489,6 +16503,10 @@
             "title": "Members Up To Date",
             "type": "integer"
           },
+          "on_sign_in": {
+            "title": "On Sign In",
+            "type": "boolean"
+          },
           "versions": {
             "items": {
               "$ref": "#/components/schemas/TermsEditorOut"
@@ -16500,7 +16518,8 @@
         "required": [
           "versions",
           "members_up_to_date",
-          "enabled"
+          "enabled",
+          "on_sign_in"
         ],
         "title": "TermsAdminOut",
         "type": "object"
@@ -30151,6 +30170,40 @@
         ]
       }
     },
+    "/api/v1/admin/terms/sign-in": {
+      "put": {
+        "operationId": "set_terms_on_sign_in_api_v1_admin_terms_sign_in_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Terms On Sign In",
+        "tags": [
+          "terms"
+        ]
+      }
+    },
     "/api/v1/admin/toggles/{kind}/{ref}": {
       "post": {
         "operationId": "toggle_api_v1_admin_toggles__kind___ref__post",
@@ -32375,6 +32428,28 @@
         "summary": "Register",
         "tags": [
           "identity"
+        ]
+      }
+    },
+    "/api/v1/auth/terms": {
+      "get": {
+        "description": "Issue 157: the terms in force, offered on the sign-in page \u2014 only when the administrators chose so\n(off by default). Off, a visitor gets the generic answer of every other address (the security\nmiddleware checks ``on_sign_in`` before this route).",
+        "operationId": "sign_in_terms_api_v1_auth_terms_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TermsPublic"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Sign In Terms",
+        "tags": [
+          "terms"
         ]
       }
     },
