@@ -90,21 +90,6 @@ RULES: dict[str, dict[str, Any]] = {
     },
 }
 
-# issue 160: the demo members' plays — (kind, minutes, finished) — so the progression shows its kinds apart
-PLAYS: dict[str, list[tuple[str, int, bool]]] = {
-    "alice": [
-        ("episode", 45, True),
-        ("episode", 42, True),
-        ("movie", 128, True),
-        ("audiobook", 75, False),
-        ("episode", 44, True),
-        ("live", 35, False),
-        ("book", 90, True),
-    ],
-    "bruno": [("movie", 112, True), ("movie", 95, False), ("live", 60, False), ("episode", 25, True)],
-    "chloe": [("audiobook", 140, True), ("book", 60, False), ("episode", 50, True), ("episode", 48, True)],
-}
-
 # play streaks: x1.5 from 2 days in a row, x2 from 5, x2.5 from 10 — on XP and Coins of plays; a day counts
 # from 5 minutes watched, listened to or read, finished or not (#94)
 STREAK: dict[str, Any] = {
