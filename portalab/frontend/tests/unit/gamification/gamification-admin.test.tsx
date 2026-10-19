@@ -247,7 +247,7 @@ describe("gamification administration", () => {
     const heads = Array.from(table.querySelectorAll("th")).map((th) => th.textContent);
     expect(heads).toEqual([
       "Day",
-      "Plays (films, series, books)",
+      "Plays (other kinds)",
       "Quests and objectives",
       "Achievements",
       "XP",
@@ -260,7 +260,7 @@ describe("gamification administration", () => {
     const mine = screen.getByRole("table", { name: "How members progress" });
     expect(Array.from(mine.querySelectorAll("th")).map((th) => th.textContent)).toEqual([
       "Day",
-      "Plays (films, series, books)",
+      "Plays (other kinds)",
       "Achievements",
       "XP",
     ]);

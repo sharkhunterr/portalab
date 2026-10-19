@@ -1187,6 +1187,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/gamification/plays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * All Plays
+         * @description Issue 160: every member's plays by kind (or one member's) — sittings, works finished, time, the XP and
+         *     Coins they earned and how many members played each kind.
+         */
+        get: operations["all_plays_api_v1_admin_gamification_plays_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/gamification/population": {
         parameters: {
             query?: never;
@@ -7159,6 +7180,26 @@ export interface paths {
          * @description #114: my own journal — the same table as the administration's, mine only.
          */
         get: operations["my_operations_api_v1_me_progression_operations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/progression/plays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Plays
+         * @description Issue 160: my plays by kind over the period — sittings, works finished, time, XP and Coins.
+         */
+        get: operations["my_plays_api_v1_me_progression_plays_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -14234,12 +14275,16 @@ export interface components {
              * Format: date-time
              */
             occurred_at: string;
+            /** Play */
+            play?: string | null;
             /** Reason */
             reason: string | null;
             /** Source */
             source: string;
             /** Source Kind */
             source_kind: string;
+            /** Title */
+            title?: string | null;
             /**
              * User Id
              * Format: uuid
@@ -14427,6 +14472,23 @@ export interface components {
              */
             own: boolean;
         };
+        /** PlayKindOut */
+        PlayKindOut: {
+            /** Coins */
+            coins: number;
+            /** Finished */
+            finished: number;
+            /** Members */
+            members: number;
+            /** Play */
+            play: string;
+            /** Sittings */
+            sittings: number;
+            /** Watched S */
+            watched_s: number;
+            /** Xp */
+            xp: number;
+        };
         /** PlayableItemOut */
         PlayableItemOut: {
             /** Chapters */
@@ -14490,6 +14552,22 @@ export interface components {
             position_s: number;
             /** State */
             state: string;
+        };
+        /** PlaysDayOut */
+        PlaysDayOut: {
+            /** Day */
+            day: string;
+            /** Sittings */
+            sittings: {
+                [key: string]: number;
+            };
+        };
+        /** PlaysOut */
+        PlaysOut: {
+            /** Days */
+            days: components["schemas"]["PlaysDayOut"][];
+            /** Kinds */
+            kinds: components["schemas"]["PlayKindOut"][];
         };
         /** PluginDisableIn */
         PluginDisableIn: {
@@ -19262,6 +19340,7 @@ export interface operations {
                 value?: ("xp" | "contribution" | "coins") | null;
                 cursor?: string | null;
                 limit?: number;
+                play?: string | null;
             };
             header?: never;
             path?: never;
@@ -19329,6 +19408,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PaceConfig"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    all_plays_api_v1_admin_gamification_plays_get: {
+        parameters: {
+            query?: {
+                days?: number;
+                member?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlaysOut"];
                 };
             };
             /** @description Validation Error */
@@ -30709,6 +30820,7 @@ export interface operations {
                 value?: ("xp" | "contribution" | "coins") | null;
                 cursor?: string | null;
                 limit?: number;
+                play?: string | null;
             };
             header?: never;
             path?: never;
@@ -30723,6 +30835,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OperationsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_plays_api_v1_me_progression_plays_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlaysOut"];
                 };
             };
             /** @description Validation Error */

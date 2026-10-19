@@ -28,6 +28,7 @@ ALLOW_LISTED = {
     "/api/v1/auth/oidc",  # 027: the single sign-on (whether offered, start, the provider's way back)
     "/api/v1/auth/oidc/start",
     "/api/v1/auth/oidc/callback",
+    "/api/v1/auth/terms",  # issue 157: only while the administrators offer the terms on the sign-in page
     "/api/v1/media/remote/{ticket}/session/{path:path}",  # 027 (#11): a cast device's stream
     "/api/v1/admin/first-run",  # spec 020: public only until the sole Admin exists
     "/metrics",  # spec 025: disabled by default; own token/permission check

@@ -11,6 +11,7 @@ import { SOURCES } from "../progression/GainSources";
 import { type Operation, useOperations, VALUES } from "./tuning";
 
 const SIZES = [25, 50, 100];
+const PLAYS = ["episode", "movie", "live", "book", "audiobook", "music", "game"];
 
 /**
  * Issue 107 — the journal: every operation of every member over the period (or one member's, under the
@@ -35,16 +36,17 @@ export function Operations({
   const t = useT();
   const format = useFormat();
   const [value, setValue] = useState<Value | "">("");
+  const [play, setPlay] = useState(""); // issue 160: one kind of play only
   const [size, setSize] = useState(SIZES[0] ?? 25);
   // where each page starts (the first at the top); a change of filter starts over
-  const filters = `${days}|${member}|${value}|${size}`;
+  const filters = `${days}|${member}|${value}|${size}|${play}`;
   const [pages, setPages] = useState<{ filters: string; cursors: (string | null)[] }>({
     filters,
     cursors: [null],
   });
   const cursors = pages.filters === filters ? pages.cursors : [null];
   const page = cursors.length - 1;
-  const journal = useOperations(days, member, value, cursors[page] ?? null, size, mine);
+  const journal = useOperations(days, member, value, cursors[page] ?? null, size, mine, play);
   const rows = journal.data?.items ?? [];
   const total = journal.data?.total ?? 0;
   const next = journal.data?.next_cursor ?? null;
@@ -73,18 +75,32 @@ export function Operations({
         mine ? t("gamification:history.hint", { days }) : t("gamification:admin.operations.hint", { days })
       }
       actions={
-        <SelectField
-          label={t("gamification:sources.value")}
-          value={value}
-          onChange={(event) => setValue(event.target.value as Value | "")}
-        >
-          <option value="">{t("gamification:admin.operations.allValues")}</option>
-          {VALUES.map((v) => (
-            <option key={v} value={v}>
-              {t(`gamification:value.${v}`)}
-            </option>
-          ))}
-        </SelectField>
+        <span className="gam-ops__filters">
+          <SelectField
+            label={t("gamification:sources.value")}
+            value={value}
+            onChange={(event) => setValue(event.target.value as Value | "")}
+          >
+            <option value="">{t("gamification:admin.operations.allValues")}</option>
+            {VALUES.map((v) => (
+              <option key={v} value={v}>
+                {t(`gamification:value.${v}`)}
+              </option>
+            ))}
+          </SelectField>
+          <SelectField
+            label={t("gamification:plays.filter")}
+            value={play}
+            onChange={(event) => setPlay(event.target.value)}
+          >
+            <option value="">{t("gamification:plays.allKinds")}</option>
+            {PLAYS.map((kind) => (
+              <option key={kind} value={kind}>
+                {t(`gamification:sources.${kind}`)}
+              </option>
+            ))}
+          </SelectField>
+        </span>
       }
       flush
     >
@@ -150,7 +166,8 @@ export function Operations({
                       </span>
                     </td>
                     <td className="gam-ops__what">
-                      {what(row)}
+                      {row.title ? <strong>{row.title}</strong> : null}
+                      {row.title ? <span className="admin-muted">{what(row)}</span> : what(row)}
                       {row.reason ? <span className="admin-muted">{row.reason}</span> : null}
                     </td>
                     <td data-align="end" className="gam-ops__num">

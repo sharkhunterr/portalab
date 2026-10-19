@@ -10,6 +10,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useRules, useVerify, type Value } from "../api";
 import { SOURCES } from "../progression/GainSources";
+import { PlaysByKind } from "../progression/PlaysByKind";
 import { AnomalyQueue } from "./AnomalyQueue";
 import { MemberDetails } from "./MemberDetails";
 import { Operations } from "./Operations";
@@ -275,6 +276,7 @@ export function Overview() {
           </table>
         ) : null}
       </AdminSection>
+      <PlaysByKind admin days={days} member={member} />
       <Operations
         days={days}
         member={member}

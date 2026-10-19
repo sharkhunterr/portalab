@@ -529,6 +529,7 @@ class DemoSeeder:
         await self._step("community projects", self.projects)
         await self._step("campaign", self.campaign)
         await self._step("economy", self.economy)
+        await self._step("plays", self.plays)
         await self._step("seasonal campaigns", self.seasonal_campaigns)
         await self._step("quests of the year", self.year_quests)
         await self._step("feedback request", self.feedback_request)
@@ -734,6 +735,7 @@ class DemoSeeder:
             await gamification.rules.publish(self.admin, key, rule.version)
             made += 1
         retired = await self._retire_rules(gamification)
+        made += await self._replace_rules(gamification)
         writer = gamification.capabilities.system_providers(CONFIG_WRITER_CAPABILITY)
         await gamification.refresh_config()
         settings = 0
@@ -764,6 +766,82 @@ class DemoSeeder:
             await gamification.levels.publish(demo_economy.CURVE)
             settings += 1
         return f"{made} rules, {retired} retired, {settings} settings"
+
+    async def plays(self) -> str:
+        """Issue 160: a few days of plays of every kind for each member — episodes, films, live TV, books and
+        audiobooks, finished or interrupted — so the progression shows its gains by kind. Published once
+        (each sitting has its own session), dated after the rules came into force so they earn."""
+        if await self._scalar(
+            "SELECT 1 FROM events.events WHERE source_system = 'demo' "
+            "AND type LIKE 'media.playback_%' LIMIT 1"
+        ):
+            return "exist"
+        rules = [v for v in await self.platform.gamification.rules.published() if v.key == "media_watch_time"]
+        now = utc_now()
+        start = max([now - timedelta(days=10), *(v.effective_from + timedelta(minutes=1) for v in rules)])
+        span = max(timedelta(minutes=30), now - start)
+        made = 0
+        for person, sittings in demo_economy.PLAYS.items():
+            if person not in self.people:
+                continue
+            for index, (kind, minutes, finished) in enumerate(sittings):
+                at = start + span * (index + 1) / (len(sittings) + 1)
+                session = f"demo-{person}-{index}"
+                async with self.database.unit_of_work() as uow:
+                    await self.platform.events.publisher.publish(
+                        uow.session,
+                        "media.playback_finished" if finished else "media.playback_abandoned",
+                        {
+                            "object": None,
+                            "kind": kind,
+                            "service": "demo",
+                            "session": session,
+                            "state_seq": 1,
+                            "position_s": minutes * 60.0,
+                            "duration_s": minutes * 60.0 if finished else minutes * 120.0,
+                            "percent": 100.0 if finished else 50.0,
+                            "occurred_at": at.isoformat(),
+                            "watched_s": minutes * 60.0,
+                        },
+                        occurred_at=at,
+                        actor=self.p(person),
+                        source="demo",
+                    )
+                made += 1
+        return f"{made} plays"
+
+    async def _current_rule(self, key: str) -> dict[str, Any] | None:
+        current = await self._scalar(
+            "SELECT definition FROM gamification.reward_rules WHERE key = :k AND status = 'active' "
+            "ORDER BY version DESC LIMIT 1",
+            k=key,
+        )
+        return current if isinstance(current, dict) else None
+
+    async def _replace_rules(self, gamification: Any) -> int:
+        """Issue 160: a former demo rule still as the demo published it gets the demo's new version."""
+        replaced = 0
+        for key, former in demo_economy.REPLACED_RULES.items():
+            current = await self._current_rule(key)
+            if current is None:
+                continue
+            try:
+                was, old = (
+                    RuleDefinition.model_validate({**raw, "label": "", "limits": {}})
+                    for raw in (current, former)
+                )
+                same = (was.event_type, was.grants, was.predicate) == (
+                    old.event_type,
+                    old.grants,
+                    old.predicate,
+                )
+            except ValueError:
+                same = False
+            if same:
+                rule = await gamification.rules.save(self.admin, key, demo_economy.RULES[key])
+                await gamification.rules.publish(self.admin, key, rule.version)
+                replaced += 1
+        return replaced
 
     async def _retire_rules(self, gamification: Any) -> int:
         """#94: a former demo rule still as the demo published it is retired (one an administrator changed

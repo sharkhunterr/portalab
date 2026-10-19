@@ -238,6 +238,23 @@ class AppliedEvent(GamificationBase):
     applied_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, index=True)
 
 
+class PlayKind(GamificationBase):
+    """Issue 160: what a sitting the economy saw was (a play finished or interrupted) — an episode, a film, a
+    book, an audiobook, live TV… — so its gains show by kind (the ledger itself is append-only and names only
+    the triggering event), with the time it lasted and whether the work was finished."""
+
+    __tablename__ = "play_kinds"
+    __table_args__ = (Index("ix_play_kinds_user_occurred", "user_id", "occurred_at"),)
+
+    event_id: Mapped[UUID] = mapped_column(primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)  # FK identity.users (DB), CASCADE
+    kind: Mapped[str] = mapped_column(String(24), nullable=False)
+    object: Mapped[str | None] = mapped_column(String(64))  # the media object played (its title, shown)
+    finished: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)  # watched to the end
+    watched_s: Mapped[int] = mapped_column(Integer, nullable=False, default=0)  # time watched, listened, read
+    occurred_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
 class ProgressionPreference(GamificationBase):
     """The owner's visibility level for the ``progression`` datum class (021)."""
 

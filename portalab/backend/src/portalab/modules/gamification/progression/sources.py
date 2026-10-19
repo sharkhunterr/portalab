@@ -12,7 +12,7 @@ from uuid import UUID
 from sqlalchemy import Date, cast, func, or_, select
 
 from portalab.core.db import Database
-from portalab.modules.gamification.models import LedgerTransaction, RewardRule
+from portalab.modules.gamification.models import LedgerTransaction, PlayKind, RewardRule
 
 GAINS = ("grant", "manual", "refund", "correction")
 QUESTS = {"quest", "daily", "challenge", "discovery"}  # #104: discovery missions are quests too
@@ -27,10 +27,35 @@ ACTIONS = (
 )
 
 
-def action_of(event_type: str | None) -> str:
+# issue 160: a play's gains show by what was played — the kinds the media services report, grouped as members
+# think of them; a play of an unknown kind stays « media »
+PLAY_SOURCES = {
+    "episode": "episode",
+    "season": "episode",
+    "series": "episode",
+    "show": "episode",
+    "movie": "movie",
+    "live": "live",
+    "book": "book",
+    "comic": "book",
+    "audiobook": "audiobook",
+    "track": "music",
+    "album": "music",
+    "artist": "music",
+    "music": "music",
+    "game": "game",
+}
+PLAY_KINDS = ("episode", "movie", "live", "book", "audiobook", "music", "game", "media")
+
+
+def play_source(kind: str | None) -> str:
+    return PLAY_SOURCES.get(kind or "", "media")
+
+
+def action_of(event_type: str | None, kind: str | None = None) -> str:
     for prefix, source in ACTIONS:
         if event_type and event_type.startswith(prefix):
-            return source
+            return play_source(kind) if source == "media" else source
     return "activity"
 
 
@@ -85,7 +110,10 @@ async def sources(database: Database, user: UUID, value: str, since: datetime, z
                     LedgerTransaction.delta,
                     LedgerTransaction.base_amount,
                     LedgerTransaction.modifiers,
-                ).where(
+                    PlayKind.kind,
+                )
+                .outerjoin(PlayKind, PlayKind.event_id == LedgerTransaction.trigger_event_id)
+                .where(
                     LedgerTransaction.user_id == user,
                     LedgerTransaction.value == value,
                     # a correction takes back part of a gain: counted against the day it is dated
@@ -97,9 +125,9 @@ async def sources(database: Database, user: UUID, value: str, since: datetime, z
         ).all()
     per_day: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
     totals: dict[str, float] = defaultdict(float)
-    for when, kind, rule_key, delta, base, modifiers in rows:
+    for when, kind, rule_key, delta, base, modifiers, played in rows:
         if kind == "reward_rule":
-            action = action_of(events.get(rule_key or ""))
+            action = action_of(events.get(rule_key or ""), played)
         elif kind in QUESTS:
             action = "quests"
         elif kind == "achievement":

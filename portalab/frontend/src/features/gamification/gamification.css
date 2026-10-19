@@ -1812,3 +1812,122 @@
   outline: var(--focus-ring-width) solid var(--color-focus);
   outline-offset: 2px;
 }
+
+/* issue 160: plays by kind — the table first (it reads on a phone), the chart beside it on a wide screen */
+.plays {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.plays__body {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 64rem) {
+  .plays__body {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: start;
+  }
+}
+
+.plays__table {
+  overflow-x: auto;
+}
+
+.plays__table tfoot th,
+.plays__table tfoot td {
+  border-block-start: 1px solid var(--color-border);
+}
+
+.plays__kind {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.plays__chart {
+  margin: 0;
+}
+
+.plays__chart figcaption {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-block-end: var(--space-2);
+}
+
+.gam-ops__filters {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* issue 160: the kinds of play a rule rewards, as chips */
+.gam-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.gam-kinds__chip {
+  min-block-size: 2.25rem;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.gam-kinds__chip[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+  font-weight: var(--font-weight-semibold);
+}
+
+.plays__grid {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.plays__grid th,
+.plays__grid td {
+  padding: var(--space-2) var(--space-2);
+  border-block-end: 1px solid var(--color-border);
+  text-align: start;
+  white-space: nowrap;
+}
+
+.plays__grid thead th {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.plays__grid tbody th {
+  font-weight: var(--font-weight-medium);
+}
+
+.plays__grid [data-align="end"] {
+  text-align: end;
+}
+
+@media (max-width: 40rem) {
+  .plays__grid th,
+  .plays__grid td {
+    padding-inline: var(--space-1);
+  }
+
+  .plays__kind .gain-sources__dot {
+    display: none;
+  }
+}

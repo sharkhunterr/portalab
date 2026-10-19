@@ -116,7 +116,7 @@ export function actionLabel(t: Translate, name: string): string {
 }
 
 /** Durations are counted per minute in forms; events carry seconds. */
-export const PER_MINUTE_FIELDS = new Set(["duration_s", "position_s"]);
+export const PER_MINUTE_FIELDS = new Set(["duration_s", "position_s", "watched_s"]);
 
 export function useEventTypes() {
   return useQuery({
@@ -202,9 +202,10 @@ export function useOperations(
   cursor: string | null,
   limit: number,
   mine = false,
+  play = "",
 ) {
   return useQuery({
-    queryKey: [...KEY, "operations", mine, days, member, value, cursor, limit],
+    queryKey: [...KEY, "operations", mine, days, member, value, cursor, limit, play],
     placeholderData: keepPreviousData,
     queryFn: async () => {
       const query = {
@@ -212,6 +213,7 @@ export function useOperations(
         limit,
         ...(value ? { value } : {}),
         ...(cursor ? { cursor } : {}),
+        ...(play ? { play } : {}),
       };
       const result = mine
         ? await api.GET("/api/v1/me/progression/operations", { params: { query } })

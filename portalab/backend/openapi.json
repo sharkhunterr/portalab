@@ -11701,6 +11701,17 @@
             "title": "Occurred At",
             "type": "string"
           },
+          "play": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Play"
+          },
           "reason": {
             "anyOf": [
               {
@@ -11719,6 +11730,17 @@
           "source_kind": {
             "title": "Source Kind",
             "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
           },
           "user_id": {
             "format": "uuid",
@@ -12318,6 +12340,49 @@
         "title": "PlaceOut",
         "type": "object"
       },
+      "PlayKindOut": {
+        "properties": {
+          "coins": {
+            "title": "Coins",
+            "type": "integer"
+          },
+          "finished": {
+            "title": "Finished",
+            "type": "integer"
+          },
+          "members": {
+            "title": "Members",
+            "type": "integer"
+          },
+          "play": {
+            "title": "Play",
+            "type": "string"
+          },
+          "sittings": {
+            "title": "Sittings",
+            "type": "integer"
+          },
+          "watched_s": {
+            "title": "Watched S",
+            "type": "integer"
+          },
+          "xp": {
+            "title": "Xp",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "play",
+          "sittings",
+          "finished",
+          "watched_s",
+          "xp",
+          "coins",
+          "members"
+        ],
+        "title": "PlayKindOut",
+        "type": "object"
+      },
       "PlayableItemOut": {
         "properties": {
           "chapters": {
@@ -12562,6 +12627,51 @@
           "position_s"
         ],
         "title": "PlayerTimelineIn",
+        "type": "object"
+      },
+      "PlaysDayOut": {
+        "properties": {
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "sittings": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Sittings",
+            "type": "object"
+          }
+        },
+        "required": [
+          "day",
+          "sittings"
+        ],
+        "title": "PlaysDayOut",
+        "type": "object"
+      },
+      "PlaysOut": {
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/PlaysDayOut"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "kinds": {
+            "items": {
+              "$ref": "#/components/schemas/PlayKindOut"
+            },
+            "title": "Kinds",
+            "type": "array"
+          }
+        },
+        "required": [
+          "kinds",
+          "days"
+        ],
+        "title": "PlaysOut",
         "type": "object"
       },
       "PluginDisableIn": {
@@ -22844,6 +22954,23 @@
               "title": "Limit",
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "play",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 24,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Play"
+            }
           }
         ],
         "responses": {
@@ -22929,6 +23056,69 @@
           }
         },
         "summary": "Put Pace",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/gamification/plays": {
+      "get": {
+        "description": "Issue 160: every member's plays by kind (or one member's) \u2014 sittings, works finished, time, the XP and\nCoins they earned and how many members played each kind.",
+        "operationId": "all_plays_api_v1_admin_gamification_plays_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 7,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "member",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Member"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaysOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "All Plays",
         "tags": [
           "gamification-admin"
         ]
@@ -39681,6 +39871,23 @@
               "title": "Limit",
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "play",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 24,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Play"
+            }
           }
         ],
         "responses": {
@@ -39706,6 +39913,52 @@
           }
         },
         "summary": "My Operations",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/me/progression/plays": {
+      "get": {
+        "description": "Issue 160: my plays by kind over the period \u2014 sittings, works finished, time, XP and Coins.",
+        "operationId": "my_plays_api_v1_me_progression_plays_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 7,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaysOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Plays",
         "tags": [
           "gamification-admin"
         ]

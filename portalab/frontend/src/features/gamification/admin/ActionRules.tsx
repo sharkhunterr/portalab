@@ -38,6 +38,18 @@ const OWNER_ICONS: Record<string, string> = {
   campaigns: "flame",
 };
 const OPS: Condition["op"][] = ["eq", "ne", "in", "gt", "gte", "lt", "lte"];
+// issue 160: the kinds a play may be — picked as chips for the playback actions, shown by their names
+const PLAY_KINDS: Array<[raw: string, source: string]> = [
+  ["episode", "episode"],
+  ["movie", "movie"],
+  ["live", "live"],
+  ["book", "book"],
+  ["audiobook", "audiobook"],
+  ["track", "music"],
+  ["game", "game"],
+];
+const playName = (t: (key: string) => string, raw: string) =>
+  t(`gamification:sources.${PLAY_KINDS.find(([kind]) => kind === raw)?.[1] ?? "media"}`);
 
 export function ownerIcon(eventType: string): string {
   const head = eventType.split(".")[0] ?? "";
@@ -196,6 +208,21 @@ function RuleForm({
   const info = types.find((type) => type.name === eventType);
   const fields = info?.fields ?? [];
   const numericFields = fields.filter((f) => f.numeric);
+  // issue 160: the playback actions pick their kinds of play as chips (a « kind » condition underneath)
+  const playKinds = eventType.startsWith("media.playback_") && fields.some((f) => f.name === "kind");
+  const kindIndex = conditions.findIndex((c) => c.field === "kind" && (c.op === "in" || c.op === "eq"));
+  const chosenKinds =
+    kindIndex < 0
+      ? []
+      : (conditions[kindIndex]?.value ?? "")
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean);
+  const toggleKind = (raw: string) => {
+    const next = chosenKinds.includes(raw) ? chosenKinds.filter((k) => k !== raw) : [...chosenKinds, raw];
+    const rest = conditions.filter((_, i) => i !== kindIndex);
+    setConditions(next.length ? [...rest, { field: "kind", op: "in", value: next.join(", ") }] : rest);
+  };
   const definition: RuleDefinition = {
     event_type: eventType,
     label,
@@ -350,59 +377,85 @@ function RuleForm({
         </div>
       </fieldset>
 
+      {playKinds ? (
+        <fieldset className="gam-fieldset">
+          <legend>{t("gamification:admin.rule.playKinds")}</legend>
+          <p className="admin-muted">{t("gamification:admin.rule.playKindsHint")}</p>
+          <div className="gam-kinds">
+            {PLAY_KINDS.map(([raw]) => (
+              <button
+                key={raw}
+                type="button"
+                className="gam-kinds__chip"
+                aria-pressed={chosenKinds.includes(raw)}
+                onClick={() => toggleKind(raw)}
+              >
+                {playName(t, raw)}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
+
       {fields.length ? (
         <fieldset className="gam-fieldset">
           <legend>{t("gamification:admin.rule.conditions")}</legend>
-          {conditions.map((condition, index) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: rows have no identity of their own
-            <div key={index} className="gam-condition">
-              <SelectField
-                label={t("gamification:admin.rule.field")}
-                value={condition.field}
-                onChange={(e) =>
-                  setConditions(conditions.map((c, i) => (i === index ? { ...c, field: e.target.value } : c)))
-                }
-              >
-                {fields.map((f) => (
-                  <option key={f.name} value={f.name}>
-                    {f.name}
-                  </option>
-                ))}
-              </SelectField>
-              <SelectField
-                label={t("gamification:admin.rule.op")}
-                value={condition.op}
-                onChange={(e) =>
-                  setConditions(
-                    conditions.map((c, i) =>
-                      i === index ? { ...c, op: e.target.value as Condition["op"] } : c,
-                    ),
-                  )
-                }
-              >
-                {OPS.map((op) => (
-                  <option key={op} value={op}>
-                    {t(`gamification:admin.op.${op}`)}
-                  </option>
-                ))}
-              </SelectField>
-              <TextField
-                label={t("gamification:admin.rule.value")}
-                value={condition.value}
-                onChange={(e) =>
-                  setConditions(conditions.map((c, i) => (i === index ? { ...c, value: e.target.value } : c)))
-                }
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label={t("gamification:admin.remove")}
-                onClick={() => setConditions(conditions.filter((_, i) => i !== index))}
-              >
-                <Icon name="trash" size={16} />
-              </Button>
-            </div>
-          ))}
+          {conditions.map((condition, index) =>
+            playKinds && index === kindIndex ? null : (
+              // biome-ignore lint/suspicious/noArrayIndexKey: rows have no identity of their own
+              <div key={index} className="gam-condition">
+                <SelectField
+                  label={t("gamification:admin.rule.field")}
+                  value={condition.field}
+                  onChange={(e) =>
+                    setConditions(
+                      conditions.map((c, i) => (i === index ? { ...c, field: e.target.value } : c)),
+                    )
+                  }
+                >
+                  {fields.map((f) => (
+                    <option key={f.name} value={f.name}>
+                      {f.name}
+                    </option>
+                  ))}
+                </SelectField>
+                <SelectField
+                  label={t("gamification:admin.rule.op")}
+                  value={condition.op}
+                  onChange={(e) =>
+                    setConditions(
+                      conditions.map((c, i) =>
+                        i === index ? { ...c, op: e.target.value as Condition["op"] } : c,
+                      ),
+                    )
+                  }
+                >
+                  {OPS.map((op) => (
+                    <option key={op} value={op}>
+                      {t(`gamification:admin.op.${op}`)}
+                    </option>
+                  ))}
+                </SelectField>
+                <TextField
+                  label={t("gamification:admin.rule.value")}
+                  value={condition.value}
+                  onChange={(e) =>
+                    setConditions(
+                      conditions.map((c, i) => (i === index ? { ...c, value: e.target.value } : c)),
+                    )
+                  }
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t("gamification:admin.remove")}
+                  onClick={() => setConditions(conditions.filter((_, i) => i !== index))}
+                >
+                  <Icon name="trash" size={16} />
+                </Button>
+              </div>
+            ),
+          )}
           <Button
             variant="secondary"
             onClick={() =>
@@ -530,12 +583,19 @@ function RuleCard({
               {grantText(t, grant)}
             </span>
           ))}
-          {(definition.predicate ?? []).map((c) => (
-            <span key={`${c.field}${c.op}`} className="gam-chip" data-kind="if">
-              {c.field} {t(`gamification:admin.op.${c.op}`)}{" "}
-              {Array.isArray(c.value) ? c.value.join(", ") : String(c.value)}
-            </span>
-          ))}
+          {(definition.predicate ?? []).map((c) =>
+            c.field === "kind" && (c.op === "in" || c.op === "eq") ? (
+              <span key={`${c.field}${c.op}`} className="gam-chip" data-kind="if">
+                <Icon name="play" size={12} />{" "}
+                {(Array.isArray(c.value) ? c.value : [c.value]).map((v) => playName(t, String(v))).join(", ")}
+              </span>
+            ) : (
+              <span key={`${c.field}${c.op}`} className="gam-chip" data-kind="if">
+                {c.field} {t(`gamification:admin.op.${c.op}`)}{" "}
+                {Array.isArray(c.value) ? c.value.join(", ") : String(c.value)}
+              </span>
+            ),
+          )}
           {definition.limits?.cooldown_seconds ? (
             <span className="gam-chip" data-kind="limit">
               <Icon name="clock" size={12} />{" "}

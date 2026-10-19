@@ -25,7 +25,7 @@ from portalab.modules.gamification.antiabuse.guards import Guards
 from portalab.modules.gamification.calculator.calculator import base_amounts
 from portalab.modules.gamification.events import OWN_TYPES
 from portalab.modules.gamification.ledger.writer import Entry, LedgerWriter, lock_user
-from portalab.modules.gamification.models import AppliedEvent, Withheld
+from portalab.modules.gamification.models import AppliedEvent, PlayKind, Withheld
 from portalab.modules.gamification.modifiers.combiner import ModifierCombiner
 from portalab.modules.gamification.notify import Note, Notifier
 from portalab.modules.gamification.observability import metrics
@@ -34,6 +34,17 @@ from portalab.modules.gamification.rules.store import RuleStore, RuleVersion
 
 CONSUMER = "gamification.rewards"
 OWNER = "module:gamification"
+
+
+# issue 160: the sittings whose kind the progression shows (a play finished or interrupted)
+SITTINGS = frozenset({"media.playback_finished", "media.playback_abandoned"})
+
+
+def _seconds(raw: Any) -> int:
+    try:
+        return max(0, min(86_400, int(float(raw))))
+    except (TypeError, ValueError):
+        return 0
 
 
 @dataclass
@@ -118,6 +129,22 @@ class RewardPipeline:
             if first is None:
                 metrics.increment("gamification.events.duplicate")
                 return outcome
+            kind = envelope.payload.get("kind")
+            if envelope.type in SITTINGS and isinstance(kind, str) and kind:
+                # issue 160: the play's kind, so its gains show by kind (episode, film, book…)
+                await session.execute(
+                    insert(PlayKind)
+                    .values(
+                        event_id=envelope.event_id,
+                        user_id=user,
+                        kind=kind[:24],
+                        object=str(envelope.payload.get("object") or "")[:64] or None,
+                        finished=envelope.type == "media.playback_finished",
+                        watched_s=_seconds(envelope.payload.get("watched_s")),
+                        occurred_at=envelope.occurred_at,
+                    )
+                    .on_conflict_do_nothing()
+                )
             for rule in rules:
                 if matches(rule.definition.predicate, envelope.payload):
                     await self._apply(session, user, rule, envelope, outcome)

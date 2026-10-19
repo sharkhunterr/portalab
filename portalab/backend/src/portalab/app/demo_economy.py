@@ -42,12 +42,20 @@ RULES: dict[str, dict[str, Any]] = {
         "grants": [{"value": "xp", "amount": 5}, {"value": "coins", "amount": 1}],
         "limits": {"caps": [{"period": "day", "max_amount": 60, "value": "xp"}]},
     },
+    # issue 160: each kind of play its own bonus — a book and an audiobook apart
     "media_finished_book": {
         "event_type": "media.playback_finished",
-        "label": "Livre ou livre audio terminé",
-        "predicate": [{"field": "kind", "op": "in", "value": ["book", "audiobook"]}],
+        "label": "Livre lu jusqu'au bout",
+        "predicate": [{"field": "kind", "op": "in", "value": ["book"]}],
         "grants": [{"value": "xp", "amount": 50}, {"value": "coins", "amount": 10}],
         "limits": {"caps": [{"period": "day", "max_amount": 150, "value": "xp"}]},
+    },
+    "media_finished_audiobook": {
+        "event_type": "media.playback_finished",
+        "label": "Livre audio écouté jusqu'au bout",
+        "predicate": [{"field": "kind", "op": "in", "value": ["audiobook"]}],
+        "grants": [{"value": "xp", "amount": 40}, {"value": "coins", "amount": 8}],
+        "limits": {"caps": [{"period": "day", "max_amount": 120, "value": "xp"}]},
     },
     "shop_purchase": {
         "event_type": "marketplace.purchase",
@@ -82,6 +90,21 @@ RULES: dict[str, dict[str, Any]] = {
     },
 }
 
+# issue 160: the demo members' plays — (kind, minutes, finished) — so the progression shows its kinds apart
+PLAYS: dict[str, list[tuple[str, int, bool]]] = {
+    "alice": [
+        ("episode", 45, True),
+        ("episode", 42, True),
+        ("movie", 128, True),
+        ("audiobook", 75, False),
+        ("episode", 44, True),
+        ("live", 35, False),
+        ("book", 90, True),
+    ],
+    "bruno": [("movie", 112, True), ("movie", 95, False), ("live", 60, False), ("episode", 25, True)],
+    "chloe": [("audiobook", 140, True), ("book", 60, False), ("episode", 50, True), ("episode", 48, True)],
+}
+
 # play streaks: x1.5 from 2 days in a row, x2 from 5, x2.5 from 10 — on XP and Coins of plays; a day counts
 # from 5 minutes watched, listened to or read, finished or not (#94)
 STREAK: dict[str, Any] = {
@@ -94,6 +117,16 @@ STREAK: dict[str, Any] = {
         {"days": 5, "multiplier": 2.0},
         {"days": 10, "multiplier": 2.5},
     ],
+}
+
+# issue 160: a former demo rule replaced by a new version where the demo left it as it published it (one an
+# administrator changed stays theirs) — the book bonus shared with audiobooks becomes the books' own
+REPLACED_RULES: dict[str, dict[str, Any]] = {
+    "media_finished_book": {
+        "event_type": "media.playback_finished",
+        "predicate": [{"field": "kind", "op": "in", "value": ["book", "audiobook"]}],
+        "grants": [{"value": "xp", "amount": 50}, {"value": "coins", "amount": 10}],
+    },
 }
 
 # #94: the former rule (a play's whole length, only once finished) — retired where it was left unchanged

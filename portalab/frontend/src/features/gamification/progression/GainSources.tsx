@@ -18,6 +18,14 @@ type Streak = components["schemas"]["MyStreakOut"];
 export const SOURCES: Record<string, { color: string; icon: string }> = {
   // issue 125: one colour each — the chart series' hues, so two sources never look alike side by side
   media: { color: "var(--chart-3)", icon: "play" },
+  // issue 160: plays by kind — the media family's hue, each kind its own shade and icon
+  episode: { color: "color-mix(in oklab, var(--chart-3) 80%, var(--chart-1))", icon: "tv" },
+  movie: { color: "color-mix(in oklab, var(--chart-3) 55%, black)", icon: "film" },
+  live: { color: "color-mix(in oklab, var(--chart-3) 45%, var(--chart-9))", icon: "radio" },
+  book: { color: "color-mix(in oklab, var(--chart-4) 55%, var(--chart-7))", icon: "book" },
+  audiobook: { color: "color-mix(in oklab, var(--chart-7) 60%, white)", icon: "headphones" },
+  music: { color: "color-mix(in oklab, var(--chart-2) 50%, var(--chart-10))", icon: "music" },
+  game: { color: "color-mix(in oklab, var(--chart-6) 50%, var(--chart-8))", icon: "gamepad" },
   requests: { color: "color-mix(in oklab, var(--chart-6) 55%, white)", icon: "inbox" }, // issue 129
   quests: { color: "var(--chart-8)", icon: "target" },
   streak: { color: "var(--chart-2)", icon: "flame" },

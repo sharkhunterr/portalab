@@ -14,15 +14,23 @@ from sqlalchemy.orm import aliased
 
 from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
+from portalab.capabilities.media_core import CATALOG as MEDIA_CATALOG
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import Unavailable
 from portalab.core.time import utc_now
 from portalab.modules.gamification.api.me import Me, Module, _me
 from portalab.modules.gamification.events import OWN_TYPES
-from portalab.modules.gamification.models import Achievement, LedgerTransaction, Quest, RewardRule
+from portalab.modules.gamification.models import Achievement, LedgerTransaction, PlayKind, Quest, RewardRule
 from portalab.modules.gamification.permissions import MANAGE
-from portalab.modules.gamification.progression.sources import QUESTS, action_of, since_days
+from portalab.modules.gamification.progression.plays import plays as plays_by_kind
+from portalab.modules.gamification.progression.sources import (
+    PLAY_SOURCES,
+    QUESTS,
+    action_of,
+    play_source,
+    since_days,
+)
 from portalab.modules.gamification.progression.sources import sources as gain_sources
 from portalab.modules.gamification.progression.timeline import timeline as gain_timeline
 from portalab.modules.gamification.settings import SETTINGS
@@ -410,6 +418,48 @@ async def my_sources(
     return MySourcesOut.model_validate(result)
 
 
+class PlayKindOut(BaseModel):
+    play: str  # episode, movie, live, book, audiobook, music, game — or media (an unknown kind)
+    sittings: int  # plays finished or interrupted
+    finished: int  # works watched (listened to, read) to the end
+    watched_s: int  # time watched, listened to or read
+    xp: int  # XP earned by these plays, bonuses included
+    coins: int
+    members: int  # how many members played this kind
+
+
+class PlaysDayOut(BaseModel):
+    day: str
+    sittings: dict[str, int]
+
+
+class PlaysOut(BaseModel):
+    kinds: list[PlayKindOut]
+    days: list[PlaysDayOut]
+
+
+@router.get("/me/progression/plays", response_model=PlaysOut)
+async def my_plays(principal: Me, module: Module, days: Annotated[int, Query(ge=7, le=365)] = 30) -> PlaysOut:
+    """Issue 160: my plays by kind over the period — sittings, works finished, time, XP and Coins."""
+    since = since_days(utc_now(module.clock), days)
+    result = await plays_by_kind(module.database, _me(principal), since, module.config.timezone or "UTC")
+    return PlaysOut.model_validate(result)
+
+
+@router.get("/admin/gamification/plays", response_model=PlaysOut)
+async def all_plays(
+    _: Manager,
+    module: Module,
+    days: Annotated[int, Query(ge=7, le=365)] = 30,
+    member: UUID | None = None,
+) -> PlaysOut:
+    """Issue 160: every member's plays by kind (or one member's) — sittings, works finished, time, the XP and
+    Coins they earned and how many members played each kind."""
+    since = since_days(utc_now(module.clock), days)
+    result = await plays_by_kind(module.database, member, since, module.config.timezone or "UTC")
+    return PlaysOut.model_validate(result)
+
+
 class MemberProgressOut(BaseModel):
     user_id: UUID
     name: str | None
@@ -680,6 +730,8 @@ class OperationOut(BaseModel):
     balance: int  # the member's balance of this value right after
     level: int | None  # for XP: the level right after
     level_up: bool  # for XP: a new level was reached
+    play: str | None = None  # issue 160: for a play, what was played (episode, movie, book, audiobook…)
+    title: str | None = None  # and its title, when the catalog still knows it
 
 
 class OperationsOut(BaseModel):
@@ -691,9 +743,11 @@ class OperationsOut(BaseModel):
 OPERATIONS_PAGE = 100
 
 
-def _source(kind: str, source_kind: str, delta: int, event_type: str | None) -> str:
+def _source(
+    kind: str, source_kind: str, delta: int, event_type: str | None, played: str | None = None
+) -> str:
     if source_kind == "reward_rule":
-        return action_of(event_type)
+        return action_of(event_type, played)
     if source_kind in QUESTS:
         return "quests"
     if source_kind == "achievement":
@@ -733,18 +787,19 @@ def _label_of(labels: dict[tuple[str, str], str], source_ref: str | None, rule_k
 
 @router.get("/admin/gamification/operations", response_model=OperationsOut)
 async def operations(
-    _: Manager,
+    principal: Manager,
     module: Module,
     days: Annotated[int, Query(ge=7, le=365)] = 30,
     member: UUID | None = None,
     value: Literal["xp", "coins", "contribution"] | None = None,
     cursor: str | None = None,
     limit: Annotated[int, Query(ge=5, le=OPERATIONS_PAGE)] = OPERATIONS_PAGE,
+    play: Annotated[str | None, Query(max_length=24)] = None,
 ) -> OperationsOut:
     """#107: every operation of every member (or one member) over the period, the latest first (by the time
     it happened: a play rewarded late from a history sits on its day) — what was gained or spent, what made
     it, the balance after it in that order and, for XP, the level reached."""
-    return await _operations(module, days, member, value, cursor, limit)
+    return await _operations(module, principal, days, member, value, cursor, limit, play)
 
 
 @router.get("/me/progression/operations", response_model=OperationsOut)
@@ -755,18 +810,21 @@ async def my_operations(
     value: Literal["xp", "coins", "contribution"] | None = None,
     cursor: str | None = None,
     limit: Annotated[int, Query(ge=5, le=OPERATIONS_PAGE)] = OPERATIONS_PAGE,
+    play: Annotated[str | None, Query(max_length=24)] = None,
 ) -> OperationsOut:
     """#114: my own journal — the same table as the administration's, mine only."""
-    return await _operations(module, days, _me(principal), value, cursor, limit)
+    return await _operations(module, principal, days, _me(principal), value, cursor, limit, play)
 
 
 async def _operations(
     module: Any,
+    viewer: Principal,
     days: int,
     member: UUID | None,
     value: str | None,
     cursor: str | None,
     limit: int,
+    play: str | None = None,
 ) -> OperationsOut:
     since = since_days(utc_now(module.clock), days)
     curve = await module.levels.curve()
@@ -787,6 +845,11 @@ async def _operations(
     row = aliased(LedgerTransaction, ledger)
     query = select(row, ledger.c.running).where(row.occurred_at >= since)
     counted = select(func.count()).select_from(ledger).where(ledger.c.occurred_at >= since)
+    if play:  # issue 160: only the gains of one kind of play (episodes, films, books…) — balances unchanged
+        raw = [kind for kind, source in PLAY_SOURCES.items() if source == play] or [play]
+        of_play = select(PlayKind.event_id).where(PlayKind.kind.in_(raw))
+        query = query.where(row.trigger_event_id.in_(of_play))
+        counted = counted.where(ledger.c.trigger_event_id.in_(of_play))
     after = _cursor(cursor)
     if after is not None:
         query = query.where(tuple_(row.occurred_at, row.seq) < tuple_(literal(after[0]), literal(after[1])))
@@ -802,8 +865,20 @@ async def _operations(
                 await session.execute(select(RewardRule.key, RewardRule.event_type))
             ).all()
         }
-    more = len(rows) > limit
-    rows = rows[:limit]
+        more = len(rows) > limit
+        rows = rows[:limit]
+        triggers = {t.trigger_event_id for t, _ in rows if t.trigger_event_id is not None}
+        plays: dict[UUID, tuple[str, str | None]] = {
+            event: (kind, played)
+            for event, kind, played in (
+                await session.execute(
+                    select(PlayKind.event_id, PlayKind.kind, PlayKind.object).where(
+                        PlayKind.event_id.in_(triggers)
+                    )
+                )
+            ).all()
+        }
+    titles = await _titles(module, viewer, {o for _, o in plays.values() if o})
     names = await _names(module, {t.user_id for t, _ in rows})
     items: list[OperationOut] = []
     for t, running_after in rows:
@@ -820,12 +895,20 @@ async def _operations(
                 delta=int(t.delta),
                 kind=t.kind,
                 source_kind=t.source_kind,
-                source=_source(t.kind, t.source_kind, int(t.delta), events.get(t.rule_key or "")),
+                source=_source(
+                    t.kind,
+                    t.source_kind,
+                    int(t.delta),
+                    events.get(t.rule_key or ""),
+                    played[0] if (played := plays.get(t.trigger_event_id)) else None,
+                ),
                 label=_label_of(labels, t.source_ref, t.rule_key),
                 reason=t.reason,
                 balance=after_it,
                 level=level,
                 level_up=level is not None and before is not None and level > before,
+                play=play_source(played[0]) if played else None,
+                title=titles.get(played[1] or "") if played else None,
             )
         )
     last = rows[-1][0] if more and rows else None
@@ -843,6 +926,22 @@ def _cursor(cursor: str | None) -> tuple[datetime, int] | None:
         return datetime.fromisoformat(when), int(seq)
     except ValueError:
         return None
+
+
+async def _titles(module: Any, viewer: Principal, objects: set[str]) -> dict[str, str]:
+    """Issue 160: the titles of the plays shown, as the viewer may see them (the catalog decides)."""
+    catalog = module.capabilities.system_providers(MEDIA_CATALOG)
+    out: dict[str, str] = {}
+    if not catalog:
+        return out
+    for raw in objects:
+        try:
+            summary = await catalog[0].provider.get(UUID(raw), viewer)
+        except Exception:
+            summary = None  # gone from the catalog, or hidden from this viewer: the kind alone shows
+        if summary is not None:
+            out[raw] = summary.title
+    return out
 
 
 async def _names(module: Any, ids: set[UUID]) -> dict[UUID, str | None]:
