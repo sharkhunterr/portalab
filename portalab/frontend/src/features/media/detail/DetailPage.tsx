@@ -181,20 +181,83 @@ const SEEN_WORD: Record<string, string> = {
   album: "listened",
 };
 
+interface JourneyStep {
+  key: string;
+  status: string;
+  detail?: string;
+  cinema?: string;
+  digital?: string;
+  physical?: string;
+  first_aired?: string;
+  items?: Array<{ progress?: number | null }>;
+}
+interface Journey {
+  request?: { state?: string } | null;
+  steps?: JourneyStep[];
+}
+interface Stage {
+  key: string;
+  progress?: number;
+  date?: string | undefined;
+}
+
+const STAGE_BADGE_TONE: Record<string, string> = {
+  available: "available",
+  downloading: "downloading",
+  importing: "downloading",
+  import_blocked: "unavailable",
+  declined: "unavailable",
+  failed: "unavailable",
+};
+const STAGE_ICONS: Record<string, string> = {
+  available: "check",
+  pending: "hourglass",
+  awaiting_release: "calendar",
+  searching: "search",
+  downloading: "package",
+  importing: "package",
+  import_blocked: "blocked",
+  declined: "blocked",
+  failed: "blocked",
+};
+
+/** Issue 172: where a requested title stands, from its journey — the first step not done yet. */
+export function stageOf(journey: Journey | undefined): Stage | null {
+  const steps = journey?.steps ?? [];
+  const at = steps.find((step) => step.status !== "done");
+  if (at) {
+    if (at.key === "requested" || at.key === "approved")
+      return at.status === "failed"
+        ? { key: at.detail === "cancelled" ? "cancelled" : at.detail === "failed" ? "failed" : "declined" }
+        : { key: "pending" };
+    if (at.key === "released")
+      return { key: "awaiting_release", date: at.cinema ?? at.digital ?? at.physical ?? at.first_aired };
+    if (at.key === "searched") return { key: "searching" };
+    if (at.key === "downloading") {
+      const progress = at.items?.find((item) => typeof item.progress === "number")?.progress;
+      return progress == null ? { key: "downloading" } : { key: "downloading", progress };
+    }
+    if (at.key === "imported") return { key: at.status === "blocked" ? "import_blocked" : "importing" };
+    if (at.key === "available") return { key: "importing" };
+  }
+  const state = journey?.request?.state; // no journey to tell: the request's own word, never « downloading »
+  if (state === "pending" || state === "approved") return { key: "pending" };
+  if (state === "processing") return { key: "searching" };
+  if (state === "declined" || state === "failed" || state === "cancelled") return { key: state };
+  return null;
+}
+
 /** 027 (#22): up top — is it here (or on its way), and did I see it already (or how far I am). */
 function TitleBadges({ media }: { media: { id: string; kind: string; available: boolean } }) {
   const t = useT();
-  const journey = useJourney(media.id).data as { request?: { state?: string } | null } | undefined;
+  const format = useFormat();
+  const journey = useJourney(media.id).data as Journey | undefined;
   const player = usePlayerInfo(media.id, null, media.available && PLAYABLE.includes(media.kind)).data?.item;
   const viewing = (useSection(media.id, "viewing").data?.data ?? {}) as Data;
-  const request = journey?.request?.state;
-  const availability = media.available
-    ? "available"
-    : request === "processing"
-      ? "downloading"
-      : request === "pending" || request === "approved"
-        ? "requested"
-        : "unavailable";
+  // issue 172: the badge says the journey's own stage (the step it is at), never the request's raw state —
+  // a request « processing » for a film not out yet is « Out on … », not « Downloading »
+  const stage = media.available ? { key: "available" } : stageOf(journey);
+  const availability = stage ? (STAGE_BADGE_TONE[stage.key] ?? "requested") : "unavailable";
   const resume =
     player && player.resume_s > 30 && (!player.duration_s || player.resume_s < player.duration_s * 0.95)
       ? player
@@ -209,19 +272,13 @@ function TitleBadges({ media }: { media: { id: string; kind: string; available: 
   return (
     <span className="media-badges">
       <span className="media-badge" data-tone={availability}>
-        <Icon
-          name={
-            availability === "available"
-              ? "check"
-              : availability === "downloading"
-                ? "package"
-                : availability === "requested"
-                  ? "hourglass"
-                  : "blocked"
-          }
-          size={14}
-        />
-        {t(`media:badge.${availability}`)}
+        <Icon name={STAGE_ICONS[stage?.key ?? ""] ?? "blocked"} size={14} />
+        {stage
+          ? t(`media:myRequests.stage.${stage.key}`, {
+              percent: Math.round((stage.progress ?? 0) * 100),
+              date: stage.date ? format.date(stage.date.slice(0, 10), "medium") : "",
+            })
+          : t("media:badge.unavailable")}
       </span>
       {resume && series && resume.label ? (
         <span className="media-badge" data-tone="progress">
