@@ -5,7 +5,7 @@ never use (``ai_forbidden``). Secrets are write-only: responses only say whether
 import time
 from typing import Annotated, Any, Literal
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from pydantic import BaseModel, ConfigDict, Field
 
 from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
@@ -212,6 +212,15 @@ async def model_servers(_: Manager, module: Module) -> list[dict[str, Any]]:
     """Issue 169: the model servers of the connected services (Ollama) — where to point the assistant, which
     model to choose, what is in memory."""
     return await module.servers()
+
+
+@router.get("/admin/ai/dashboard")
+async def dashboard(
+    _: Manager, module: Module, days: int = Query(default=30, ge=1, le=365)
+) -> dict[str, Any]:
+    """Issue 176: who used the assistant and when, how often it answered and how fast, with which tools, what
+    the members thought of it — and the answers rated « not as expected »."""
+    return await module.insights.dashboard(days)
 
 
 @router.get("/admin/ai/usage", response_model=AiUsageOut)

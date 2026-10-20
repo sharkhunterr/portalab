@@ -1,6 +1,9 @@
 {
   "nav.account": "Compte",
-  "nav.admin.ai": "Réglages de l'assistant",
+  "nav.admin.ai": "Tableau de bord",
+  "nav.admin.ai_identity": "Identité et consignes",
+  "nav.admin.ai_model": "Modèle",
+  "nav.admin.ai_tools": "Outils",
   "nav.admin.announcements": "Annonces",
   "nav.admin.audit": "Audit",
   "nav.admin.automations": "Automatisations",
@@ -57,6 +60,7 @@
   "nav.group.me": "Mon compte",
   "nav.guide": "Visites guidées",
   "nav.home": "Accueil",
+  "nav.hub.ai": "Assistant",
   "nav.hub.automations": "Automatisations",
   "nav.hub.communication": "Communication",
   "nav.hub.engagement": "Engagement",

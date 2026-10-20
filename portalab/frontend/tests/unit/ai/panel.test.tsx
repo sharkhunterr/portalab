@@ -286,6 +286,64 @@ describe("a message's actions (issue 171)", () => {
   });
 });
 
+describe("the member's verdict (issue 176)", () => {
+  it("rates an answer, says what was expected and takes a verdict back", async () => {
+    const verdicts: unknown[] = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (request.method === "GET") return json(200, []);
+      if (path === "/api/v1/ai/conversations") return json(201, CONVERSATION);
+      if (path.endsWith("/messages"))
+        return sse([
+          [
+            "done",
+            {
+              content: "Open your account.",
+              sources: [],
+              caveats: [],
+              interpretation: false,
+              pending_actions: [],
+              message_id: "m1",
+            },
+          ],
+        ]);
+      if (path === "/api/v1/ai/messages/m1/feedback") {
+        const body = (await request.json()) as { rating: string | null; comment: string };
+        verdicts.push(body);
+        return json(200, {
+          rating: body.rating === "up" ? 1 : body.rating ? -1 : null,
+          comment: body.comment,
+        });
+      }
+      return json(404, {});
+    };
+    show();
+    fireEvent.change(screen.getByLabelText("Ask the assistant…"), { target: { value: "My avatar?" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    const down = await screen.findByRole("button", { name: "Not as expected" });
+    fireEvent.click(down);
+    await waitFor(() => expect(down.getAttribute("aria-pressed")).toBe("true"));
+    // the member is told who may read it, and may say what was expected
+    expect(screen.getByText(/can be read by the administrators/)).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("What did you expect? (optional)"), {
+      target: { value: "The menu moved" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Send my comment" }));
+    expect(await screen.findByText("Thanks — your comment was sent.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Not as expected" })); // pressed again: taken back
+    await waitFor(() =>
+      expect(verdicts).toEqual([
+        { rating: "down", comment: "" },
+        { rating: "down", comment: "The menu moved" },
+        { rating: null, comment: "" },
+      ]),
+    );
+    expect(screen.getByRole("button", { name: "Not as expected" }).getAttribute("aria-pressed")).toBe(
+      "false",
+    );
+  });
+});
+
 describe("today's allowance (issue 171)", () => {
   it("shows what is left of it", () => {
     fake.handler = () => json(200, []);

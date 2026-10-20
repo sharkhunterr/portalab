@@ -78,6 +78,8 @@ class TurnOutcome:
     tokens_out: int = 0
     error: str | None = None
     latency_ms: int = 0
+    model: str = ""  # issue 176: which model answered
+    nudged: bool = False  # issue 176: asked again once, its first answer made up from thin air
 
 
 class Orchestrator:
@@ -163,6 +165,7 @@ class Orchestrator:
         if provider is None:
             raise AiUnavailable("The assistant is not configured.")
         config = self.config()
+        outcome.model = config.provider_model
         started = time.monotonic()
         offered = await self.catalog.for_principal(principal, policy)
         by_wire = {wire_name(name): tool for name, tool in offered.items()}
@@ -211,9 +214,10 @@ class Orchestrator:
                 yield event("error", code="ai.unavailable", reason=code)
                 return
             if hold and not calls:
-                if not nudged and needs_lookup(conversation):
+                if not nudged and not seed_sources and needs_lookup(conversation):
                     # a small model answered a real question from thin air: once, it is asked to look first
-                    nudged = True
+                    # (not when the answer is drawn from sources handed with the question — the search's)
+                    nudged = outcome.nudged = True
                     metrics.increment("ai.nudged")
                     conversation.append(ChatMessage("user", NUDGE))
                     continue

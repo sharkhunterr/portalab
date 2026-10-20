@@ -20,6 +20,9 @@ export interface ChatMessage {
   pending: string[];
   streaming: boolean;
   error?: string;
+  /** issue 176: the answer as kept, and the member's verdict on it */
+  messageId?: string;
+  rating?: "up" | "down" | null;
 }
 
 const empty = (role: ChatMessage["role"], content = ""): ChatMessage => ({
@@ -102,6 +105,7 @@ export function useAiChat(context?: { route?: string; title?: string }) {
                   interpretation: event.data.interpretation,
                   pending: event.data.pending_actions,
                   streaming: false,
+                  ...(event.data.message_id ? { messageId: event.data.message_id, rating: null } : {}),
                 }));
                 break;
               default:
@@ -156,9 +160,17 @@ export function useAiChat(context?: { route?: string; title?: string }) {
             interpretation: m.role === "assistant" && Boolean(blocks.interpretation),
             pending: blocks.pending_actions ?? [],
             ...(blocks.error ? { error: "ai.unavailable" } : {}),
+            ...(m.role === "assistant" && m.id
+              ? { messageId: m.id, rating: m.rating === 1 ? "up" : m.rating === -1 ? "down" : null }
+              : {}),
           };
         }),
     );
+  }, []);
+
+  /** issue 176: a verdict given (or taken back) shows at once on its answer */
+  const rated = useCallback((messageId: string, rating: "up" | "down" | null) => {
+    setMessages((current) => current.map((m) => (m.messageId === messageId ? { ...m, rating } : m)));
   }, []);
 
   const reset = useCallback(() => {
@@ -167,5 +179,5 @@ export function useAiChat(context?: { route?: string; title?: string }) {
     setError(null);
   }, []);
 
-  return { conversationId, messages, busy, error, send, stop, open, reset };
+  return { conversationId, messages, busy, error, send, stop, open, reset, rated };
 }

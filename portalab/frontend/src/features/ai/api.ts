@@ -44,6 +44,8 @@ export interface TurnDone {
   caveats: AiCaveat[];
   interpretation: boolean;
   pending_actions: string[];
+  /** issue 176: the answer as kept — to rate it */
+  message_id?: string | null;
 }
 export type TurnEvent =
   | { event: "delta"; data: { text: string } }
@@ -216,6 +218,60 @@ export function useAiAdmin() {
     onSuccess: settle,
   });
   return { save, test, saveServers };
+}
+
+/** Issue 176: the member's verdict on an answer — as expected, not, or taken back. */
+export type AiRating = "up" | "down" | null;
+export async function rateAnswer(messageId: string, rating: AiRating, comment = "") {
+  const { data } = await api.PUT("/api/v1/ai/messages/{message_id}/feedback", {
+    params: { path: { message_id: messageId } },
+    body: { rating, comment },
+  });
+  return data as { rating: number | null; comment: string };
+}
+
+/** Issue 176: the administrators' view of the assistant — figures, and the answers rated « not as expected ». */
+export interface AiDashboard {
+  days: number;
+  totals: {
+    questions: number;
+    members: number;
+    answered: number;
+    errors: number;
+    unanswered: number;
+    sourced: number;
+    nudged: number;
+    latency_median_ms: number | null;
+    latency_p90_ms: number | null;
+    tokens_per_answer: number | null;
+    rated_up: number;
+    rated_down: number;
+  };
+  errors: { code: string; count: number }[];
+  models: { model: string; answers: number }[];
+  per_day: { day: string; questions: number; members: number; errors: number }[];
+  hours_utc: number[];
+  members: { user_id: string; name: string | null; questions: number; last_at: string }[];
+  tools: { name: string; calls: number; failed: number }[];
+  rated_down: {
+    message_id: string;
+    member: string | null;
+    at: string;
+    comment: string;
+    question: string;
+    answer: string;
+    tools: string[];
+    error: string | null;
+  }[];
+}
+
+export function useAiDashboard(days: number) {
+  return useQuery({
+    queryKey: [...KEY, "admin", "dashboard", days],
+    queryFn: async () =>
+      (await api.GET("/api/v1/admin/ai/dashboard", { params: { query: { days } } }))
+        .data as unknown as AiDashboard,
+  });
 }
 
 export function useAiUsage() {

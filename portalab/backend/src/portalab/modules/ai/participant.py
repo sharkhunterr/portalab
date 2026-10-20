@@ -9,7 +9,7 @@ from sqlalchemy import delete, select
 
 from portalab.capabilities.privacy_participants import ErasureMode, ExportRecord
 from portalab.core.db import Database
-from portalab.modules.ai.models import Conversation, Message, PendingAction, UsageDaily
+from portalab.modules.ai.models import Conversation, Feedback, Message, PendingAction, UsageDaily
 
 
 class AiParticipant:
@@ -29,6 +29,13 @@ class AiParticipant:
                 .scalars()
                 .all()
             )
+            # issue 176: the member's verdicts on the answers go with them
+            rated = {
+                f.message_id: f
+                for f in (
+                    await session.execute(select(Feedback).where(Feedback.user_id == user_id))
+                ).scalars()
+            }
             records: list[ExportRecord] = []
             for conversation in conversations:
                 messages = (
@@ -49,7 +56,16 @@ class AiParticipant:
                             "title": conversation.title,
                             "created_at": conversation.created_at.isoformat(),
                             "messages": [
-                                {"role": m.role, "content": m.content, "created_at": m.created_at.isoformat()}
+                                {
+                                    "role": m.role,
+                                    "content": m.content,
+                                    "created_at": m.created_at.isoformat(),
+                                    **(
+                                        {"rating": rated[m.id].rating, "comment": rated[m.id].comment}
+                                        if m.id in rated
+                                        else {}
+                                    ),
+                                }
                                 for m in messages
                             ],
                         },
@@ -59,5 +75,5 @@ class AiParticipant:
 
     async def erase(self, user_id: UUID, mode: ErasureMode) -> None:
         async with self.database.unit_of_work() as uow:
-            for model in (PendingAction, Conversation, UsageDaily):
+            for model in (PendingAction, Feedback, Conversation, UsageDaily):
                 await uow.session.execute(delete(model).where(model.user_id == user_id))

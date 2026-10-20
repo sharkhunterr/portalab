@@ -8,7 +8,7 @@ session (CSRF applies as for every mutating route); the AI can never reach these
 import json
 from collections.abc import AsyncIterator
 from datetime import datetime
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, Response
@@ -74,6 +74,19 @@ class AiMessageOut(BaseModel):
     content: str
     blocks: dict[str, Any]
     created_at: datetime
+    id: UUID | None = None  # issue 176: to rate an answer
+    rating: int | None = None  # issue 176: the member's verdict (1 / -1)
+
+
+class AiFeedbackIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    rating: Literal["up", "down"] | None = None  # None takes the verdict back
+    comment: str = Field(default="", max_length=1000)
+
+
+class AiFeedbackOut(BaseModel):
+    rating: int | None
+    comment: str
 
 
 class AiConversationDetailOut(AiConversationOut):
@@ -110,9 +123,15 @@ def _conversation(row: Conversation) -> AiConversationOut:
     )
 
 
-def _message(row: Message) -> AiMessageOut:
+def _message(row: Message, rating: int | None = None) -> AiMessageOut:
     return AiMessageOut(
-        seq=row.seq, role=row.role, content=row.content, blocks=row.blocks, created_at=row.created_at
+        seq=row.seq,
+        role=row.role,
+        content=row.content,
+        blocks=row.blocks,
+        created_at=row.created_at,
+        id=row.id,
+        rating=rating,
     )
 
 
@@ -180,8 +199,19 @@ async def list_conversations(principal: User, module: Module) -> list[AiConversa
 @router.get("/ai/conversations/{conversation_id}", response_model=AiConversationDetailOut)
 async def get_conversation(principal: User, conversation_id: UUID, module: Module) -> AiConversationDetailOut:
     row = await module.conversations.owned(principal, conversation_id)
-    messages = [_message(m) for m in await module.conversations.messages(conversation_id)]
+    rows = await module.conversations.messages(conversation_id)
+    ratings = await module.insights.ratings_of([m.id for m in rows if m.role == "assistant"])
+    messages = [_message(m, (ratings.get(m.id) or {}).get("rating")) for m in rows]
     return AiConversationDetailOut(**_conversation(row).model_dump(), messages=messages)
+
+
+@router.put("/ai/messages/{message_id}/feedback", response_model=AiFeedbackOut)
+async def rate_answer(
+    principal: User, message_id: UUID, body: AiFeedbackIn, module: Module
+) -> dict[str, Any]:
+    """Issue 176: the member's verdict on one of their answers — as expected or not, and why."""
+    rating = {"up": 1, "down": -1}.get(body.rating or "")
+    return await module.insights.rate(principal, message_id, rating, body.comment)
 
 
 @router.delete("/ai/conversations/{conversation_id}", status_code=204)
