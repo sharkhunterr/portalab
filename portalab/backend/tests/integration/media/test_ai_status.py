@@ -27,6 +27,9 @@ async def test_media_status_tells_the_journey(
         [
             library_record("h", title="Heat", ids={"tmdb": "949"}, available=False),
             library_record("h2", title="Heat Wave", ids={"tmdb": "950"}, available=True),
+            library_record(
+                "ar", title="Le prophete blanc_L_Assassin_royal_7", kind="audiobook", available=True
+            ),
         ],
         library,
     )
@@ -75,7 +78,8 @@ async def test_media_status_tells_the_journey(
     assert by_id.data["title"] == "Heat" and by_id.data["steps"] == data["steps"]
     assert (await status.handler(zoe, {"id": "not-an-id"})).data["found"] is False
     assert "leaving_library" not in data  # no cleanup tool: nothing said
-    assert data["my_viewing"] == {"watched": False, "plays": 0}  # zoe never played it
+    assert data["my_viewing"]["watched"] is False and data["my_viewing"]["plays"] == 0  # zoe never played it
+    assert data["my_viewing"]["summary"] == "The member has never played this title."
 
     class _Cleanup:  # Maintainerr put it on its deletion list
         def configured(self) -> bool:
@@ -97,6 +101,9 @@ async def test_media_status_tells_the_journey(
         "saved": False,
         "can_be_rescued": True,
     }
+    royal = (await status.handler(zoe, {"title": "L'Assassin royal", "kind": "book"})).data  # every kind
+    assert royal["title"] == "Le prophete blanc_L_Assassin_royal_7" and royal["kind"] == "audiobook"
+    assert royal["kind_note"] == "Asked as a book, found as a audiobook." and royal["available"]
     unknown = await status.handler(zoe, {"title": "Some film nobody asked for"})
     assert unknown.data["found"] is False and "requested" in unknown.data["hint"]
     history = registry.get("media.my_history")

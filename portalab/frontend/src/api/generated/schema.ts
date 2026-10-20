@@ -10343,6 +10343,12 @@ export interface components {
         };
         /** AiConfigIn */
         AiConfigIn: {
+            /** Assistant Fallback */
+            assistant_fallback?: string | null;
+            /** Assistant Name */
+            assistant_name?: string | null;
+            /** Assistant Role */
+            assistant_role?: string | null;
             /** Auto Navigate */
             auto_navigate?: boolean | null;
             /** Daily Token Budget Per User */
@@ -10529,6 +10535,11 @@ export interface components {
             auto_navigate: boolean;
             /** Available */
             available: boolean;
+            /**
+             * Name
+             * @default
+             */
+            name: string;
             /** Provider State */
             provider_state: string;
         };

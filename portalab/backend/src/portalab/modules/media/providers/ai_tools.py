@@ -9,6 +9,7 @@ step with the facts that explain it, and the step it is stuck at."""
 
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
+from difflib import SequenceMatcher
 from typing import Any
 from uuid import UUID
 
@@ -18,6 +19,7 @@ from portalab.core.errors import NotFound
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.catalog import CatalogQuery
 from portalab.modules.media.discovery.shelves import Discovery
+from portalab.modules.media.matching import fold
 from portalab.modules.media.permissions import MEDIA_READ
 from portalab.modules.media.providers.ports import HistoryReader
 from portalab.modules.media.sections.service import SEEN
@@ -33,6 +35,17 @@ class ToolDefinition:
 
 
 OWNER = "module:media"
+
+
+def closeness(asked: str, title: str, same_kind: bool) -> float:
+    """How close a title is to the one asked (folded, « _ » as spaces), a little more for the kind asked."""
+    a, b = fold(asked), fold(title.replace("_", " "))
+    score = SequenceMatcher(None, a, b).ratio()
+    if a and a in b:
+        score += 0.3  # every word asked is in the title
+    return score + (0.15 if same_kind else 0.0)
+
+
 STUCK = ("blocked", "failed")
 UNDER_WAY = ("current", "waiting")
 MAX_TEXT = 200
@@ -101,14 +114,14 @@ class MediaAiTools:
         if not await self._allowed(principal):
             return {"items": []}
         year = params.get("year")
+        q = str(params.get("q") or "")[:200] or None
+        genre = params.get("genre") or None
+        year_of = int(year) if isinstance(year, int | str) and str(year).isdigit() else None
         rows, _ = await self.catalog.browse(
-            principal,
-            q=str(params.get("q") or "")[:200] or None,
-            kind=params.get("kind") or None,
-            genre=params.get("genre") or None,
-            year=int(year) if isinstance(year, int | str) and str(year).isdigit() else None,
-            limit=10,
+            principal, q=q, kind=params.get("kind") or None, genre=genre, year=year_of, limit=10
         )
+        if not rows and params.get("kind"):  # issue 171: a « book » may be an audiobook — every kind then
+            rows, _ = await self.catalog.browse(principal, q=q, genre=genre, year=year_of, limit=10)
         return {
             "items": [
                 {
@@ -165,15 +178,18 @@ class MediaAiTools:
                 return ToolResult("ok", {"found": False, "id": wanted})
             found, images = [view], {view.id: getattr(view, "image_id", None)}
         else:
+            # issue 171: every kind, the closest first — a « book » may be an audiobook, a title stored as
+            # « Le prophete blanc_L_Assassin_royal_7 » is still « l'assassin royal »
             year = params.get("year")
             rows, _ = await self.catalog.browse(
                 principal,
                 q=title,
-                kind=params.get("kind") or None,
                 year=int(year) if isinstance(year, int) else None,
-                limit=5,
+                limit=12,
             )
-            found = [r for r, _ in rows]
+            wanted_kind = str(params.get("kind") or "")
+            rows = sorted(rows, key=lambda row: -closeness(title, row[0].title, row[0].kind == wanted_kind))
+            found = [r for r, _ in rows[:5]]
             images = {r.id: image for r, image in rows}
         if not found:
             return ToolResult(
@@ -181,12 +197,11 @@ class MediaAiTools:
                 {
                     "found": False,
                     "title": title,
-                    "hint": "Not in the portal's catalog: nobody asked for it and it is not in the library. "
-                    "It can be requested from the media page.",
+                    "hint": "Not in the portal's catalog, whatever its kind: nobody asked for it and it is "
+                    "not in the library. It can be requested from the media page.",
                 },
             )
-        folded = (title or found[0].title).casefold()
-        best = next((r for r in found if r.title.casefold() == folded), found[0])
+        best = found[0]
         data: dict[str, Any] = {
             "found": True,
             "title": best.title,
@@ -197,6 +212,8 @@ class MediaAiTools:
                 :4
             ],
         }
+        if params.get("kind") and best.kind != params.get("kind"):
+            data["kind_note"] = f"Asked as a {params['kind']}, found as a {best.kind}."
         state: ResultState = "ok"
         if self.journey is not None:
             try:
@@ -231,8 +248,8 @@ class MediaAiTools:
             return None
         data = section.data or {}
         mine = [m for m in data.get("mine") or [] if isinstance(m, Mapping)]
-        if not mine:
-            return {"watched": False, "plays": 0}
+        if not mine:  # a sentence: a small model follows it better than a bare false
+            return {"watched": False, "plays": 0, "summary": "The member has never played this title."}
         last = mine[0]
         out: dict[str, Any] = {
             "plays": int(data.get("mine_total") or len(mine)),
@@ -249,6 +266,10 @@ class MediaAiTools:
             out["status"] = data.get("status") or "started"
             if data.get("percent") is not None:
                 out["percent"] = round(float(data["percent"]) * 100)
+            out["summary"] = {
+                "seen": "The member has seen it.",
+                "in_progress": f"The member started it ({out.get('percent', 0)} %), not finished.",
+            }.get(str(out["status"]), "The member started it.")
         return out
 
     async def _leaving(self, principal: Principal, object_id: Any) -> dict[str, Any] | None:
@@ -366,7 +387,8 @@ class MediaAiTools:
             wrap(recommended, {"type": "object", "properties": {}, "additionalProperties": False}),
             AITool(
                 "media.status",
-                "Where a film, series, book or game stands for the portal: in the library or not, and if "
+                "Where any title stands for the portal — film, series, book, audiobook, game… (it searches "
+                "every kind and takes the closest title): in the library or not, and if "
                 "it was requested, each step of its journey (requested, approved, released, searched by the "
                 "download manager, downloading, imported, available) with what explains it, and whether "
                 "it is on the library's deletion list (« leaving soon »: the rule, the day) — use it to say "

@@ -65,7 +65,7 @@ export function useAiStatus() {
       try {
         return (await api.GET("/api/v1/ai/status")).data as AiStatus;
       } catch {
-        return { available: false, provider_state: "unavailable", auto_navigate: false };
+        return { available: false, provider_state: "unavailable", auto_navigate: false, name: "" };
       }
     },
   });

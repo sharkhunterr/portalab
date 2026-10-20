@@ -26,11 +26,13 @@ export interface AiPanelProps {
   available: boolean;
   autoNavigate: boolean;
   context?: { route?: string; title?: string; question?: string; asked?: number } | undefined;
+  /** issue 171: the assistant's name (the administrators'), else « Assistant » */
+  name?: string | undefined;
 }
 
 const IDEAS = ["services", "tickets", "news", "media"] as const;
 
-export function AiPanel({ open, onOpenChange, available, autoNavigate, context }: AiPanelProps) {
+export function AiPanel({ open, onOpenChange, available, autoNavigate, context, name }: AiPanelProps) {
   const t = useT();
   const format = useFormat();
   // issue 171: the page the member is on, in a few words (never more than the route and one line)
@@ -93,7 +95,9 @@ export function AiPanel({ open, onOpenChange, available, autoNavigate, context }
               <Icon name="sparkles" size={20} />
             </span>
             <div className="ai-modal__titles">
-              <DialogPrimitive.Title className="ai-modal__title">{t("ai:panel.title")}</DialogPrimitive.Title>
+              <DialogPrimitive.Title className="ai-modal__title">
+                {name || t("ai:panel.title")}
+              </DialogPrimitive.Title>
               <DialogPrimitive.Description className="ai-modal__description">
                 {t("ai:panel.description")}
               </DialogPrimitive.Description>

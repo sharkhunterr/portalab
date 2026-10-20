@@ -1,7 +1,8 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { CheckboxField, TextField } from "../../../design-system/components/Field";
+import { CheckboxField, TextAreaField, TextField } from "../../../design-system/components/Field";
+import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import { type AiConfig, type AiConfigUpdate, useAiAdmin, useAiConfig, useAiUsage } from "../api";
 import { ModelServer } from "./ModelServer";
@@ -43,6 +44,9 @@ export function AiSettings() {
       provider_endpoint: String(values.provider_endpoint ?? ""),
       provider_model: String(values.provider_model ?? ""),
       provider_reasoning: String(values.provider_reasoning ?? "") as "" | "none" | "low" | "medium" | "high",
+      assistant_name: String(values.assistant_name ?? "").trim(),
+      assistant_role: String(values.assistant_role ?? "").trim(),
+      assistant_fallback: String(values.assistant_fallback ?? "").trim(),
       auto_navigate: Boolean(values.auto_navigate),
       tools_disabled: [...disabled],
       ...Object.fromEntries(NUMBERS.map(([key]) => [key, Number(values[key])])),
@@ -64,6 +68,35 @@ export function AiSettings() {
           onChange={(event) => setValues({ ...values, enabled: event.target.checked })}
         />
         <ModelServer values={values} onChange={setValues} />
+        <fieldset className="ai-persona">
+          <legend>
+            <Icon name="sparkles" size={16} /> {t("ai:admin.persona.title")}
+          </legend>
+          <TextField
+            label={t("ai:admin.persona.name")}
+            hint={t("ai:admin.persona.nameHint")}
+            placeholder="Assistant"
+            maxLength={40}
+            value={String(values.assistant_name ?? "")}
+            onChange={(event) => setValues({ ...values, assistant_name: event.target.value })}
+          />
+          <TextAreaField
+            label={t("ai:admin.persona.role")}
+            hint={t("ai:admin.persona.roleHint")}
+            rows={3}
+            maxLength={800}
+            value={String(values.assistant_role ?? "")}
+            onChange={(event) => setValues({ ...values, assistant_role: event.target.value })}
+          />
+          <TextAreaField
+            label={t("ai:admin.persona.fallback")}
+            hint={t("ai:admin.persona.fallbackHint")}
+            rows={3}
+            maxLength={800}
+            value={String(values.assistant_fallback ?? "")}
+            onChange={(event) => setValues({ ...values, assistant_fallback: event.target.value })}
+          />
+        </fieldset>
         <TextField
           label={t("ai:admin.access")}
           type="password"

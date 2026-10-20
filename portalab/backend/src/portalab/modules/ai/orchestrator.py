@@ -67,7 +67,9 @@ class Orchestrator:
         language: Callable[[UUID], Awaitable[str]] | None = None,
         secrets: Callable[[], Iterable[str | None]] = tuple,
         who: Callable[[UUID], Awaitable[str | None]] | None = None,
+        site: Callable[[str], str | None] | None = None,
     ) -> None:
+        self.site = site  # issue 171: the site's name (its identity), for the assistant to say where it is
         self.who = who  # issue 171: the member the assistant speaks with (their display name)
         self.provider = provider
         self.catalog = catalog
@@ -96,7 +98,19 @@ class Orchestrator:
         self, user: UUID, history: list[ChatMessage], page: dict[str, Any] | None
     ) -> list[ChatMessage]:
         member = {"id": str(user), "name": await self.name_of(user)}
-        system = ChatMessage("system", system_prompt(await self.language_for(user), page, member))
+        language = await self.language_for(user)
+        config = self.config()
+        try:
+            site = self.site(language) if self.site is not None else None
+        except Exception:
+            site = None
+        persona = {
+            "name": config.assistant_name,
+            "role": config.assistant_role,
+            "fallback": config.assistant_fallback,
+            "site": site,
+        }
+        system = ChatMessage("system", system_prompt(language, page, member, persona))
         budget = max(500, self.config().max_context_tokens - MAX_ANSWER_TOKENS - len(system.content) // 4)
         kept = window(history, budget)
         # issue 171: a small model forgets the system's rules as a conversation grows — the rule it needs

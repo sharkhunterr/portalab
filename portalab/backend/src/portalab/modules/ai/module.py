@@ -18,7 +18,7 @@ from portalab.capabilities.ai import INVOKE, MODELS, AIToolRegistry, LLMProvider
 from portalab.capabilities.automation_actions import ActionRegistry, ActionType, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
-from portalab.capabilities.i18n import RESOLVER
+from portalab.capabilities.i18n import RESOLVER, SITE_TERMS
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.navigation import NavigationRegistry, default_navigation
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
@@ -107,6 +107,7 @@ class AiModule:
             lambda: self.config,
             language=self._language,
             who=self._who,
+            site=self._site,
             secrets=lambda: (self.api_key, *self.mcp_tokens.values()),
         )
         self.conversations = Conversations(database, events, clock=clock)
@@ -170,6 +171,11 @@ class AiModule:
                 entry["state"] = "unavailable"
             found.append(entry)
         return found
+
+    def _site(self, language: str) -> str | None:
+        """Issues 159/171: the site's own name, else none — the prompt then says « this portal »."""
+        providers = self.capabilities.system_providers(SITE_TERMS)
+        return providers[0].provider.terms(language).name if providers else None
 
     async def _who(self, user: Any) -> str | None:
         """Issue 171: the member's display name, for the assistant to know whom it speaks with."""
