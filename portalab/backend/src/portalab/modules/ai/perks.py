@@ -14,6 +14,7 @@ from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.ai import PERK_KINDS
 from portalab.core.db import Database
+from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.ai.models import Perk
 from portalab.modules.ai.settings import AiConfig
@@ -75,8 +76,14 @@ def offerable(config: AiConfig, perk: str) -> bool:
 
 class Perks:
     def __init__(
-        self, database: Database, config: Callable[[], AiConfig], *, clock: Clock | None = None
+        self,
+        database: Database,
+        config: Callable[[], AiConfig],
+        *,
+        clock: Clock | None = None,
+        events: EventPublisher | None = None,
     ) -> None:
+        self.events = events  # issue 181: a capacity gained is told (the achievements count them)
         self.database = database
         self.config = config
         self.clock = clock
@@ -102,7 +109,7 @@ class Perks:
             if remaining <= 0:
                 return False
         async with self.database.unit_of_work() as uow:
-            await uow.session.execute(
+            made = await uow.session.execute(
                 insert(Perk)
                 .values(
                     user_id=user,
@@ -114,7 +121,17 @@ class Perks:
                     expires_at=expires,
                 )
                 .on_conflict_do_nothing(index_elements=["source_ref"])
+                .returning(Perk.id)
             )
+            if made.scalar_one_or_none() is not None and self.events is not None:
+                await self.events.publish(
+                    uow.session,
+                    "ai.capacity_gained",
+                    {"perk": perk},
+                    occurred_at=now,
+                    subject=SubjectRef("user", str(user)),
+                    dedup_key=f"ai.capacity_gained:{source_ref[:200]}",
+                )
         return True
 
     async def revoke(self, source_ref: str) -> None:

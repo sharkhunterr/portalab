@@ -41,9 +41,15 @@ interface Backend {
   preferences?: Array<{ key: string; value: unknown }>;
   welcome?: { enabled: boolean; message: string };
   quests?: unknown[];
+  assistant?: boolean;
 }
 
-function backend({ preferences = [], welcome = { enabled: true, message: "" }, quests = [] }: Backend) {
+function backend({
+  preferences = [],
+  welcome = { enabled: true, message: "" },
+  quests = [],
+  assistant = false,
+}: Backend) {
   const puts: Array<Record<string, unknown>> = [];
   const posts: string[] = [];
   fake.handler = async (request) => {
@@ -60,6 +66,12 @@ function backend({ preferences = [], welcome = { enabled: true, message: "" }, q
     if (path === "/api/v1/me/preferences") return json(200, { preferences });
     if (path === "/api/v1/me/onboarding/welcome") return json(200, welcome);
     if (path === "/api/v1/me/quests") return json(200, quests);
+    if (path === "/api/v1/ai/status")
+      return json(200, {
+        available: assistant,
+        provider_state: assistant ? "ok" : "disabled",
+        auto_navigate: false,
+      });
     return json(404, {});
   };
   return { puts, posts };
@@ -216,6 +228,19 @@ describe("guide", () => {
     expect(screen.getByRole("heading", { name: "Ask the support" })).toBeInTheDocument();
     expect(await screen.findByText("+25 XP · +10 Coins")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "See again : Service status" })).toBeInTheDocument();
+    // issue 181: the assistant's tours only while it is switched on
+    expect(screen.getAllByRole("heading", { level: 4 })).toHaveLength(
+      TOURS.filter((tour) => !tour.requires).length - 1,
+    );
+    expect(screen.queryByRole("heading", { name: "The assistant" })).toBeNull();
+  });
+
+  it("offers the assistant's tours while it is on", async () => {
+    window.localStorage.clear();
+    backend({ assistant: true, quests: [mission("discover_assistant")] });
+    show(<GuidePage />);
+    expect(await screen.findByRole("heading", { name: "The assistant" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Power up the assistant" })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 4 })).toHaveLength(TOURS.length - 1);
   });
 });

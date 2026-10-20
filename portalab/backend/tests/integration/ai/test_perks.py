@@ -8,6 +8,7 @@ from uuid import UUID
 
 import httpx
 import pytest
+from sqlalchemy import text
 
 from portalab.capabilities.ai import PERKS
 from tests.integration.ai.conftest import AiHarness, make_tool, start
@@ -46,6 +47,13 @@ async def test_capacities_bought(ai: AiHarness, client: httpx.AsyncClient, peopl
     assert await perks.grant(ursula, "model", 0, 24, "marketplace:m1")
     assert await perks.grant(ursula, "tools", 0, 0, "marketplace:t1")
     assert not await perks.grant(ursula, "wishes", 3, 0, "marketplace:x1")
+    async with ai.full.database.session() as session:  # issue 181: one per grant, for the achievements
+        gained = (
+            await session.execute(
+                text("SELECT subject_id FROM core.event_outbox WHERE type = 'ai.capacity_gained'")
+            )
+        ).scalars()
+        assert list(gained) == [str(ursula)] * 4
     status = (await client.get("/api/v1/ai/status")).json()
     assert status["daily_budget"] == 80  # 50 + 1000, to the administrators' ceiling
     assert status["recharge"] == 60_000 and {"model", "tools", "daily_tokens"} <= set(status["perks"])

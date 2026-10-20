@@ -5,6 +5,7 @@ import { PageHeader } from "../../design-system/components/PageHeader";
 import { useT } from "../../i18n/hooks/useT";
 import { useNavigationView } from "../../shell/nav/NavigationProvider";
 import { useShellPreference } from "../../shell/preferences";
+import { useAiStatus } from "../ai/api";
 import { openWelcome, rewardOf, startTour, useMissions } from "./api";
 import { TOURS, type TourDef, type TourGroup } from "./tours";
 import "./onboarding.css";
@@ -35,7 +36,8 @@ export default function GuidePage() {
   const [seen] = useShellPreference<string[]>("shell.onboarding.toursSeen", []);
   const missions = useMissions();
   const missionOf = (tour: TourDef) => missions.data?.find((m) => m.key === tour.mission);
-  const tours = TOURS.filter(reachable);
+  const assistant = useAiStatus().data?.available === true; // issue 181: its tours while it is on
+  const tours = TOURS.filter((tour) => reachable(tour) && (tour.requires !== "assistant" || assistant));
   const portal = tours.find((tour) => tour.key === "portal");
   return (
     <section aria-labelledby={headingId} className="guide-page">

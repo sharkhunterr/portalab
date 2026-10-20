@@ -97,6 +97,19 @@ class Conversations:
             if m.role in ("user", "assistant") and m.content
         ]
 
+    async def announce(self, principal: Principal, message: Message, *, sourced: bool, tools: int) -> None:
+        """Issue 181: an answer given, told once (the achievements count them) — never its text."""
+        async with self.database.unit_of_work() as uow:
+            await self.events.publish(
+                uow.session,
+                "ai.answered",
+                {"conversation": str(message.conversation_id), "sourced": sourced, "tools": tools},
+                occurred_at=message.created_at,
+                actor=principal,
+                subject=SubjectRef("ai_conversation", str(message.conversation_id)),
+                dedup_key=f"ai.answered:{message.id}",
+            )
+
     async def append(
         self,
         conversation_id: UUID,

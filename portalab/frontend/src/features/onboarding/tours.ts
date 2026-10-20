@@ -25,6 +25,8 @@ export interface TourDef {
   steps: readonly TourStep[];
   /** The « first steps » mission it leads to, if any. */
   mission?: string;
+  /** issue 181: offered only while this feature is there (the assistant switched on) */
+  requires?: "assistant";
 }
 
 const done: TourStep = { key: "done", icon: "rocket", targets: [] };
@@ -213,6 +215,48 @@ export const TOURS: readonly TourDef[] = [
       { key: "describe", icon: "message", targets: [".new-ticket .ds-field"] },
       { key: "diagnosis", icon: "lightbulb", targets: [".support-diagnosis"] },
       { key: "send", icon: "check", targets: ["[data-tour='ticket-submit']"] },
+      done,
+    ],
+  },
+  {
+    // issue 181: the assistant — reached from any page, what it knows, how to ask, read and rate an answer
+    key: "assistant",
+    icon: "sparkles",
+    group: "help",
+    route: "/",
+    mission: "discover_assistant",
+    requires: "assistant",
+    steps: [
+      { key: "fab", icon: "sparkles", targets: [".ai-fab"], click: true },
+      { key: "context", icon: "map-pin", targets: [".ai-context"] },
+      { key: "ideas", icon: "lightbulb", targets: [".ai-ideas"] },
+      { key: "ask", icon: "message", targets: [".ai-composer"] },
+      { key: "sources", icon: "book-open", targets: [".ai-cards", ".ai-sources"] },
+      { key: "rate", icon: "thumbs-up", targets: [".ai-bubble[data-role='assistant'] .ai-actions"] },
+      { key: "usage", icon: "activity", targets: [".ai-usage"] },
+      { key: "history", icon: "clock", targets: ["[data-tour='ai-history']"] },
+      done,
+    ],
+  },
+  {
+    // issue 181: the assistant's capacities in the shop, and where its day's use shows
+    key: "assistant_shop",
+    icon: "zap",
+    group: "play",
+    route: "/marketplace",
+    requires: "assistant",
+    steps: [
+      {
+        key: "shelf",
+        icon: "brain",
+        route: "/marketplace?type=ai_capacity",
+        targets: [".shop-shelf", ".product-card"],
+      },
+      { key: "daily", icon: "zap", targets: [".product-card"] },
+      { key: "coins", icon: "coins", targets: [".shell-progress__coins", ".shell-progress"] },
+      { key: "fab", icon: "sparkles", targets: [".ai-fab"], click: true },
+      { key: "usage", icon: "activity", targets: [".ai-usage"], click: true },
+      { key: "details", icon: "info", targets: [".ai-usage__pop"] },
       done,
     ],
   },

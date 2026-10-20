@@ -245,6 +245,24 @@ DISCOVERY: dict[str, dict[str, Any]] = {
         "rewards": [{"value": "xp", "amount": 30}],
         "complete_on": "any",
     },
+    # issue 181: the assistant — follow its tour, or ask it a first question
+    "discover_assistant": {
+        "kind": "discovery",
+        "label": "Meet the assistant",
+        "description": "Follow its tour, or ask it a first question.",
+        "icon": "sparkles",
+        "steps": [
+            {"kind": "event_count", "event_type": "ai.answered", "count": 1},
+            {
+                "kind": "event_count",
+                "event_type": "user.tour_completed",
+                "filter": [{"field": "tour", "op": "eq", "value": "assistant"}],
+                "count": 1,
+            },
+        ],
+        "rewards": [{"value": "xp", "amount": 30}, {"value": "coins", "amount": 15}],
+        "complete_on": "any",
+    },
 }
 
 # what earlier releases shipped, per key — replaced at start when an administrator never changed it

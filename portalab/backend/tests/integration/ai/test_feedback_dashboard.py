@@ -2,10 +2,12 @@
 the administrators' dashboard counts the questions, answers, errors, tools, response times and verdicts,
 and shows the answers rated « not as expected » with their question; members cannot reach it."""
 
+import json
 from uuid import UUID
 
 import httpx
 import pytest
+from sqlalchemy import text
 
 from portalab.capabilities.ai.testkit import call
 from tests.integration.ai.conftest import AiHarness, make_tool, parse_sse, start
@@ -33,6 +35,31 @@ async def test_verdicts_and_the_dashboard(
     assert rated.status_code == 200 and rated.json() == {"rating": -1, "comment": "The menu moved."}
     detail = (await client.get(f"/api/v1/ai/conversations/{conversation}")).json()
     assert [m["rating"] for m in detail["messages"] if m["role"] == "assistant"] == [-1]
+
+    # issue 181: what the achievements count — the answer once, its first verdict, its first comment
+    assert (
+        await client.put(f"/api/v1/ai/messages/{answer}/feedback", json={"rating": "up"})
+    ).status_code == 200
+    async with ai.full.database.session() as session:
+        told = (
+            await session.execute(
+                text(
+                    "SELECT type, metadata::text FROM core.event_outbox "
+                    "WHERE type IN ('ai.answered', 'ai.answer_rated')"
+                )
+            )
+        ).all()
+    assert sorted((kind, json.dumps(json.loads(data), sort_keys=True)) for kind, data in told) == sorted(
+        (kind, json.dumps(data, sort_keys=True))
+        for kind, data in (
+            ("ai.answered", {"conversation": conversation, "sourced": False, "tools": 1}),
+            ("ai.answer_rated", {"rating": "down", "commented": False}),
+            ("ai.answer_rated", {"rating": "down", "commented": True}),
+        )
+    )
+    await client.put(
+        f"/api/v1/ai/messages/{answer}/feedback", json={"rating": "down", "comment": "The menu moved."}
+    )
 
     await login(client, "ulrich")  # another member cannot rate it, nor reach the dashboard
     assert (

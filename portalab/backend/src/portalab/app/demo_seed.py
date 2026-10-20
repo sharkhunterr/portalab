@@ -99,6 +99,42 @@ ACHIEVEMENTS: dict[str, dict[str, Any]] = {
     },
 }
 
+# issue 181: the assistant — asked, trusted with the portal's data, rated, taught, delegated to, powered up
+ACHIEVEMENTS |= {
+    key: {"category": category, "label": label, "description": about, "icon": icon, "criteria": criteria,
+          "rewards": rewards}
+    for key, category, label, about, icon, criteria, rewards in (
+        ("ai_first_words", "service_usage", "First words", "Ask the assistant your first question.",
+         "sparkles", [{"kind": "event_count", "event_type": "ai.answered", "count": 1}],
+         [{"value": "xp", "amount": 10}, {"value": "coins", "amount": 10}]),
+        ("ai_curious", "service_usage", "Curious mind", "Get 25 answers from the assistant.", "message",
+         [{"kind": "event_count", "event_type": "ai.answered", "count": 25}],
+         [{"value": "xp", "amount": 50}]),
+        ("ai_know_it_all", "service_usage", "Know-it-all", "Get 250 answers from the assistant.", "brain",
+         [{"kind": "event_count", "event_type": "ai.answered", "count": 250}],
+         [{"value": "xp", "amount": 200}, {"value": "coins", "amount": 50}]),
+        ("ai_fact_checker", "service_usage", "Fact checker",
+         "Get 20 answers drawn from the portal's own data, with their sources.", "book-open",
+         [{"kind": "event_count", "event_type": "ai.answered",
+           "filter": [{"field": "sourced", "op": "eq", "value": True}], "count": 20}],
+         [{"value": "xp", "amount": 50}]),
+        ("ai_critic", "community", "Critic", "Rate 10 of the assistant's answers.", "thumbs-up",
+         [{"kind": "event_count", "event_type": "ai.answer_rated",
+           "filter": [{"field": "commented", "op": "eq", "value": False}], "count": 10}],
+         [{"value": "xp", "amount": 30}, {"value": "coins", "amount": 10}]),
+        ("ai_mentor", "community", "Mentor",
+         "Tell the assistant three times what you expected from an answer.", "lightbulb",
+         [{"kind": "event_count", "event_type": "ai.answer_rated",
+           "filter": [{"field": "commented", "op": "eq", "value": True}], "count": 3}],
+         [{"value": "contribution", "amount": 15}, {"value": "xp", "amount": 30}]),
+        ("ai_delegator", "service_usage", "Delegator", "Confirm an action the assistant proposed.", "check",
+         [{"kind": "event_count", "event_type": "ai.action_confirmed", "count": 1}],
+         [{"value": "xp", "amount": 25}]),
+        ("ai_power_user", "purchase", "Power user", "Get one of the assistant's capacities in the shop.",
+         "zap", [{"kind": "event_count", "event_type": "ai.capacity_gained", "count": 1}],
+         [{"value": "xp", "amount": 25}]),
+    )
+}  # fmt: skip
 ACHIEVEMENTS |= {
     "first_purchase": {
         "category": "purchase",

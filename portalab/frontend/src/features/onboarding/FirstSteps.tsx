@@ -23,6 +23,7 @@ const ORDER = [
   "discover_stats",
   "discover_ticket",
   "discover_shop",
+  "discover_assistant", // issue 181
 ];
 const SHOWN = 4;
 
