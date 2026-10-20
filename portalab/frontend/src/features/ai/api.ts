@@ -117,6 +117,7 @@ export async function streamTurn(
   content: string,
   onEvent: (event: TurnEvent) => void,
   signal?: AbortSignal,
+  context?: { route?: string; title?: string },
 ): Promise<void> {
   const token = readCookie(CSRF_COOKIE);
   const response = await fetch(`/api/v1/ai/conversations/${encodeURIComponent(conversationId)}/messages`, {
@@ -127,7 +128,8 @@ export async function streamTurn(
       Accept: "text/event-stream",
       ...(token ? { [CSRF_HEADER]: token } : {}),
     },
-    body: JSON.stringify({ content }),
+    // issue 171: the page this message is asked from (a conversation goes on across pages)
+    body: JSON.stringify(context?.route ? { content, context } : { content }),
     ...(signal ? { signal } : {}),
   });
   if (!response.ok || !response.body) {

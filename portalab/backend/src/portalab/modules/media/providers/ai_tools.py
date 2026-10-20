@@ -56,7 +56,9 @@ class MediaAiTools:
         discovery: Discovery,
         journey: Any = None,
         clock: Clock | None = None,
+        cleanup: Any = None,
     ) -> None:
+        self.cleanup = cleanup  # issue 171: whether a title leaves the library (Maintainerr), and when
         self.catalog = catalog
         self.history = history
         self.discovery = discovery
@@ -200,7 +202,30 @@ class MediaAiTools:
                 data["under_way"] = next((s["key"] for s in steps if s.get("status") in UNDER_WAY), None)
                 if not steps:
                     data["note"] = "Nobody asked for it and no download manager follows it."
+        leaving = await self._leaving(principal, best.id)
+        if leaving:
+            data["leaving_library"] = leaving
         return ToolResult(state, data, [self._card(best, images.get(best.id))])
+
+    async def _leaving(self, principal: Principal, object_id: Any) -> dict[str, Any] | None:
+        """« Leaving soon »: the cleanup rule that put it on the deletion list, the day it goes, and
+        whether someone saved it (a member can spend a rescue on the title's page)."""
+        user = principal.acting_for or principal.user_id
+        if self.cleanup is None or user is None or not self.cleanup.configured():
+            return None
+        try:
+            status = await self.cleanup.status(object_id, user)
+        except Exception:
+            return None
+        if not status.get("leaving"):
+            return None
+        return {
+            "deletion_list": True,
+            "rules": sorted({str(e.get("collection") or "") for e in status["leaving"]} - {""})[:4],
+            "delete_at": status.get("delete_at"),
+            "saved": bool(status.get("saved")),
+            "can_be_rescued": not status.get("saved"),
+        }
 
     async def _posters(self, ids: list[str]) -> dict[str, str]:
         """The posters of some titles, as the portal's own image addresses (the cards beside an answer)."""
@@ -293,8 +318,10 @@ class MediaAiTools:
                 "media.status",
                 "Where a film, series, book or game stands for the portal: in the library or not, and if "
                 "it was requested, each step of its journey (requested, approved, released, searched by the "
-                "download manager, downloading, imported, available) with what explains it — use it to say "
-                "why a title is not available yet. Give its title, or its id when the user is on its page.",
+                "download manager, downloading, imported, available) with what explains it, and whether "
+                "it is on the library's deletion list (« leaving soon »: the rule, the day) — use it to say "
+                "why a title is not available yet or why it will leave. Give its title, or its id when the "
+                "user is on its page.",
                 {
                     "type": "object",
                     "properties": {

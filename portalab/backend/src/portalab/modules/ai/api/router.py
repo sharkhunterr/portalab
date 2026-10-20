@@ -78,6 +78,8 @@ class AiConversationDetailOut(AiConversationOut):
 class AiMessageIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     content: str = Field(min_length=1, max_length=4000)
+    # issue 171: the page the member asks from (a conversation goes on across pages)
+    context: AiPageContext | None = None
 
 
 class AiActionOut(BaseModel):
@@ -171,7 +173,8 @@ async def delete_conversation(principal: User, conversation_id: UUID, module: Mo
 async def send_message(
     principal: User, conversation_id: UUID, body: AiMessageIn, module: Module
 ) -> StreamingResponse:
-    turn = await module.chat.prepare(principal, conversation_id, body.content)
+    page = body.context.model_dump(exclude_none=True) if body.context else None
+    turn = await module.chat.prepare(principal, conversation_id, body.content, page=page)
 
     async def stream() -> AsyncIterator[bytes]:
         async for item in module.chat.events(turn):

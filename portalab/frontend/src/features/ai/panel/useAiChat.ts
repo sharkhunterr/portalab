@@ -98,6 +98,7 @@ export function useAiChat(context?: { route?: string; title?: string }) {
             }
           },
           abort.current.signal,
+          context,
         );
       } catch (caught) {
         if ((caught as Error).name !== "AbortError") {

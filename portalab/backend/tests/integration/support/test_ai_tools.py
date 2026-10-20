@@ -1,6 +1,6 @@
 """Issue 171 — the assistant's support tools, run as the member it acts for: their own tickets, one ticket by
-its number with its public replies (never the staff's internal notes, never another member's ticket), and a
-ticket prepared as a draft the member opens, reads and submits — the assistant itself still cannot submit."""
+its number or id with its public replies (never the staff's internal notes, never another member's ticket),
+and a ticket the member confirms in Portalab, opened in their name — the assistant alone still cannot."""
 
 from uuid import UUID
 
@@ -11,7 +11,6 @@ from portalab.core.authz_port import Principal
 from portalab.core.errors import Forbidden
 from portalab.modules.support.ai_tools import SupportAiTools
 from portalab.modules.support.tickets.service import TicketRequest
-from tests.integration.identity.helpers import login
 from tests.integration.support.conftest import SupportHarness
 
 
@@ -30,8 +29,9 @@ async def test_my_tickets_one_ticket_and_a_draft(
     await tickets.comment(support.p("sam"), mine.id, "Probably the codec again", internal=True)
     await tickets.comment(support.p("ursula"), mine.id, "Same in Firefox.")
     tools = {t.name: t for t in SupportAiTools(support.module).tools()}
-    assert set(tools) == {"support.my_tickets", "support.ticket", "support.draft_ticket"}
-    assert tools["support.draft_ticket"].sensitivity == "write"
+    assert set(tools) == {"support.my_tickets", "support.ticket", "support.create_ticket"}
+    create = tools["support.create_ticket"]
+    assert create.sensitivity == "sensitive"  # never inline: the member confirms its exact content
 
     listed = await tools["support.my_tickets"].handler(ai(people["ursula"]), {})
     assert [(t["number"], t["title"], t["state"]) for t in listed.data["tickets"]] == [
@@ -54,17 +54,18 @@ async def test_my_tickets_one_ticket_and_a_draft(
         "found"
     ] is False
 
-    drafted = await tools["support.draft_ticket"].handler(
-        ai(people["ursula"]),
-        {"title": "Subtitles out of sync", "description": "On every episode of season 2.", "type": "nope"},
-    )
-    assert drafted.state == "ok" and drafted.data["url"] == f"/support/new?draft={drafted.data['draft']}"
-    assert drafted.data["type"] in {t.key for t in await support.module.definitions.types()}
-    assert len(await tickets.mine(people["ursula"])) == 1  # nothing sent
-    await login(client, "ursula")
-    draft = (await client.get(f"/api/v1/tickets/drafts/{drafted.data['draft']}")).json()
-    assert draft["payload"]["title"] == "Subtitles out of sync"
-    await login(client, "ulrich")
-    assert (await client.get(f"/api/v1/tickets/drafts/{drafted.data['draft']}")).status_code == 404
+    content = {
+        "title": "Subtitles out of sync",
+        "description": "On every episode of season 2.",
+        "type": "nope",
+    }
+    assert "Subtitles out of sync" in create.summarize(content)  # what the confirmation card shows
+    opened = await create.handler(ai(people["ursula"]), content)  # run by the confirmation
+    assert opened.state == "ok" and opened.data["created"] and opened.sources[0].url.startswith("/support/")
+    theirs = await tickets.mine(people["ursula"])
+    new = next(t for t in theirs if t.title == "Subtitles out of sync")
+    assert len(theirs) == 2 and new.source == "ai_diagnosis" and new.number == opened.data["number"]
+    lacking = await create.handler(ai(people["ursula"]), {**content, "type": "bug"})  # « bug » asks for steps
+    assert lacking.state == "error" and lacking.data["missing"] == ["steps"]
     with pytest.raises(Forbidden):  # the assistant never submits
         await tickets.create(ai(people["ursula"]), TicketRequest("bug", "x", "y", {"steps": "z"}))

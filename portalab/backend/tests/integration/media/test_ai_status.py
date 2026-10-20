@@ -74,6 +74,28 @@ async def test_media_status_tells_the_journey(
     by_id = await status.handler(zoe, {"id": heat_id})  # the page the member is on names it
     assert by_id.data["title"] == "Heat" and by_id.data["steps"] == data["steps"]
     assert (await status.handler(zoe, {"id": "not-an-id"})).data["found"] is False
+    assert "leaving_library" not in data  # no cleanup tool: nothing said
+
+    class _Cleanup:  # Maintainerr put it on its deletion list
+        def configured(self) -> bool:
+            return True
+
+        async def status(self, object_id: object, user: object) -> dict[str, object]:
+            return {
+                "leaving": [{"collection": "Films demandés non vus"}],
+                "delete_at": "2026-11-01T00:00:00+00:00",
+                "saved": None,
+            }
+
+    media.module.ai_tools.cleanup = _Cleanup()
+    leaving = (await status.handler(zoe, {"id": heat_id})).data["leaving_library"]
+    assert leaving == {
+        "deletion_list": True,
+        "rules": ["Films demandés non vus"],
+        "delete_at": "2026-11-01T00:00:00+00:00",
+        "saved": False,
+        "can_be_rescued": True,
+    }
     unknown = await status.handler(zoe, {"title": "Some film nobody asked for"})
     assert unknown.data["found"] is False and "requested" in unknown.data["hint"]
     found = await registry.get("media.search_catalog").handler(zoe, {"q": "heat"})  # type: ignore[union-attr]
