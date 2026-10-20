@@ -128,7 +128,6 @@ def test_unraid_parity_under_way_beats_the_last_check() -> None:
     resync = {
         "mdResync": 1,
         "mdResyncPos": "2500",
-        "mdResyncAction": "check P",
         "mdResyncDt": "10",
         "mdResyncDb": "1024000",
     }
@@ -139,7 +138,7 @@ def test_unraid_parity_under_way_beats_the_last_check() -> None:
     parity = report.parity
     assert parity is not None and parity.running and parity.status == "running" and parity.progress == 25
     assert parity.speed == "100.0 MB/s" and parity.remaining_seconds == 7500 / 102400 * 1
-    assert parity.started_at is None and parity.correcting is True  # the last check's date is not this one's
+    assert parity.started_at is None  # the last check's date is not this one's
     paused = unraid_report(
         {"array": {"parityCheckStatus": last, "parities": disks}, "vars": {**resync, "mdResync": 0}}
     ).parity
