@@ -49,6 +49,7 @@ class AiAdminToolOut(BaseModel):
     permission: str
     sensitivity: str
     disabled: bool
+    description: str = ""  # issue 171: what it does, for the tools without a translated label
 
 
 class AiConfigOut(BaseModel):
@@ -119,6 +120,7 @@ def _config_out(module: Any) -> AiConfigOut:
                 permission=t.required_permission,
                 sensitivity=t.sensitivity,
                 disabled=t.name in disabled,
+                description=t.description[:300],
             )
             for t in module.catalog.all()
         ],

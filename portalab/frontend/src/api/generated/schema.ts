@@ -10325,6 +10325,11 @@ export interface components {
         };
         /** AiAdminToolOut */
         AiAdminToolOut: {
+            /**
+             * Description
+             * @default
+             */
+            description: string;
             /** Disabled */
             disabled: boolean;
             /** Name */
@@ -10444,6 +10449,7 @@ export interface components {
         AiMessageIn: {
             /** Content */
             content: string;
+            context?: components["schemas"]["AiPageContext"] | null;
         };
         /** AiMessageOut */
         AiMessageOut: {

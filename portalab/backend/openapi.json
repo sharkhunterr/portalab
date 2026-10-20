@@ -441,6 +441,11 @@
       },
       "AiAdminToolOut": {
         "properties": {
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
           "disabled": {
             "title": "Disabled",
             "type": "boolean"
@@ -838,6 +843,16 @@
             "minLength": 1,
             "title": "Content",
             "type": "string"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiPageContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [

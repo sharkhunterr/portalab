@@ -5,6 +5,7 @@ import { CheckboxField, TextField } from "../../../design-system/components/Fiel
 import { useT } from "../../../i18n/hooks/useT";
 import { type AiConfig, type AiConfigUpdate, useAiAdmin, useAiConfig, useAiUsage } from "../api";
 import { ModelServer } from "./ModelServer";
+import { ToolChoice } from "./ToolChoice";
 
 /**
  * Assistant settings (spec 018 T031, ``ai.manage``): provider, limits and tools; the provider credential is
@@ -88,23 +89,14 @@ export function AiSettings() {
           checked={Boolean(values.auto_navigate)}
           onChange={(event) => setValues({ ...values, auto_navigate: event.target.checked })}
         />
-        <fieldset>
-          <legend>{t("ai:admin.tools")}</legend>
-          {data.tools.map((tool) => (
-            <CheckboxField
-              key={tool.name}
-              label={`${t("ai:admin.tool.enabled", { tool: tool.name })} — ${t(`ai:admin.sensitivity.${tool.sensitivity}`)}`}
-              checked={!disabled.has(tool.name)}
-              disabled={tool.sensitivity === "ai_forbidden"}
-              onChange={(event) => {
-                const next = new Set(disabled);
-                if (event.target.checked) next.delete(tool.name);
-                else next.add(tool.name);
-                setValues({ ...values, tools_disabled: [...next] });
-              }}
-            />
-          ))}
-        </fieldset>
+        <div className="ai-tools-section">
+          <h3>{t("ai:admin.tools")}</h3>
+          <ToolChoice
+            tools={data.tools}
+            disabled={disabled}
+            onChange={(next) => setValues({ ...values, tools_disabled: [...next] })}
+          />
+        </div>
         <div className="ds-stack--row">
           <Button type="submit" disabled={save.isPending}>
             {t("ai:admin.save")}
