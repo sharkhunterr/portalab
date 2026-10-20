@@ -147,8 +147,12 @@ describe("leaderboard table", () => {
       />,
     );
     expect(screen.getByRole("table")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Ursula" }).getAttribute("href")).toBe("/community/members/u1");
-    expect(screen.getByText("Ulrich (you)")).toBeTruthy();
+    const ursula = screen.getByRole("link", { name: /Ursula/ });
+    expect(ursula.getAttribute("href")).toBe("/community/members/u1");
+    expect(ursula.querySelector(".rank-who, [class*='avatar']") ?? ursula.firstElementChild).toBeTruthy(); // issue 177
+    expect(screen.getByRole("link", { name: /Ulrich \(you\)/ }).getAttribute("href")).toBe(
+      "/community/members/u2", // issue 177: mine too, as on the podium
+    );
     expect(screen.getByText("Your position: #2 (20)")).toBeTruthy();
   });
 });

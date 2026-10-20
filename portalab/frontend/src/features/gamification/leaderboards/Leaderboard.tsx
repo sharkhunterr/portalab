@@ -63,10 +63,17 @@ export function RankWho({ row, link = false }: { row: RankRow; link?: boolean })
   const text = (
     <MemberName name={row.me ? `${label} (${t("gamification:leaderboard.you")})` : label} look={row.look} />
   );
-  return (
+  const face = <MemberAvatar id={row.user_id} name={label} look={row.look} />;
+  // issue 177: the avatar and the name open the member's profile together, as on the podium (mine too)
+  return link ? (
+    <Link to={`/community/members/${row.user_id}`} className="rank-who rank-who--link">
+      {face}
+      {text}
+    </Link>
+  ) : (
     <span className="rank-who">
-      <MemberAvatar id={row.user_id} name={label} look={row.look} />
-      {link && !row.me ? <Link to={`/community/members/${row.user_id}`}>{text}</Link> : <span>{text}</span>}
+      {face}
+      <span>{text}</span>
     </span>
   );
 }
