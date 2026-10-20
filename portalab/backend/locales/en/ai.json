@@ -93,6 +93,7 @@
   "navigation.title": "Suggested pages",
   "panel.assistant": "Assistant",
   "panel.close": "Close",
+  "panel.context": "On this page: {page}",
   "panel.delete": "Delete conversation",
   "panel.description": "Ask about the portal. The assistant only sees and does what you can.",
   "panel.empty": "No conversation yet.",

@@ -826,7 +826,10 @@ export function DetailPage() {
   const requested = Boolean(useJourney(objectId).data?.request); // 027: asked already — no second request
   const info = useSection(objectId, "info").data?.data as Data | undefined;
   // issue 171: « this title » for the assistant
-  useAssistantPage(known ? `media id=${known.id}` : null);
+  useAssistantPage(
+    known ? `media id=${known.id}` : null,
+    known ? `${known.title}${known.year ? ` (${known.year})` : ""} · ${t(`media:kind.${known.kind}`)}` : null,
+  );
   if (detail.isPending) return <FunctionalState state="loading" />;
   if (detail.isError || !detail.data)
     return <FunctionalState state="unavailable" onRetry={() => detail.refetch()} />;

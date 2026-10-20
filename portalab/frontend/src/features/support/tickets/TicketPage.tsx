@@ -30,7 +30,10 @@ export function TicketPage() {
   const [internal, setInternal] = useState(false);
   const file = useRef<HTMLInputElement>(null);
   // issue 171: « this ticket » for the assistant
-  useAssistantPage(ticket.data ? `ticket id=${ticket.data.id}` : null);
+  useAssistantPage(
+    ticket.data ? `ticket id=${ticket.data.id}` : null,
+    ticket.data ? `${ticket.data.reference} · ${ticket.data.title}` : null,
+  );
   if (ticket.isPending) return <FunctionalState state="loading" />;
   if (ticket.isError || !ticket.data)
     return <FunctionalState state="unavailable" label={t("support:ticket.notFound")} />;

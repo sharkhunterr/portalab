@@ -6,7 +6,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { deleteConversation, useConversations } from "../api";
 import { ConfirmationCard } from "../confirmation/ConfirmationCard";
-import { pageContext } from "../pageContext";
+import { pageContext, pageLabel } from "../pageContext";
 import { SourceList } from "../sources/SourceList";
 import { AnswerText } from "./AnswerText";
 import { NavigationSuggestion } from "./NavigationSuggestion";
@@ -35,6 +35,7 @@ export function AiPanel({ open, onOpenChange, available, autoNavigate, context }
   const format = useFormat();
   // issue 171: the page the member is on, in a few words (never more than the route and one line)
   const page = useMemo(() => (open ? pageContext(context?.route) : undefined), [open, context?.route]);
+  const where = useMemo(() => (open ? pageLabel(context?.route) : undefined), [open, context?.route]);
   const chat = useAiChat(page);
   const conversations = useConversations(open && available);
   const [draft, setDraft] = useState("");
@@ -177,6 +178,12 @@ export function AiPanel({ open, onOpenChange, available, autoNavigate, context }
                 </nav>
               ) : null}
 
+              {where ? (
+                // issue 171: what « this » means here — the page the member asks from
+                <p className="ai-context">
+                  <Icon name="map-pin" size={14} /> {t("ai:panel.context", { page: where })}
+                </p>
+              ) : null}
               <div className="ai-log" ref={log} role="log" aria-live="polite" aria-busy={chat.busy}>
                 {chat.messages.length === 0 ? (
                   <div className="ai-welcome">
