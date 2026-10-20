@@ -11,6 +11,7 @@ from portalab.capabilities.ai import SourceRef, ToolResult
 
 MARKER = re.compile(r"\[(\d{1,3})\]")
 CAVEAT_STATES = ("partial", "stale", "unavailable", "error")
+UNCITED_CARDS = 8
 
 
 def source_dict(number: int, source: SourceRef) -> dict[str, Any]:
@@ -53,7 +54,11 @@ class Attributor:
         return [source_dict(index[(s.kind, s.ref)], s) for s in result.sources if (s.kind, s.ref) in index]
 
     def finalize(self, text: str) -> tuple[str, list[dict[str, Any]], bool]:
-        """(answer without invalid markers, cited sources, ``interpretation`` = nothing cited)."""
+        """(answer without invalid markers, its sources, ``interpretation`` = no portal data behind it).
+
+        Issue 171: an answer that cites nothing still shows what the portal handed it this turn (its
+        cards: the titles found, the tickets read…, at most :data:`UNCITED_CARDS`); only an answer with no
+        portal data at all is labelled the assistant's interpretation."""
         cited: list[int] = []
 
         def keep(match: re.Match[str]) -> str:
@@ -65,5 +70,6 @@ class Attributor:
             return ""
 
         clean = MARKER.sub(keep, text)
-        sources = [source_dict(n, self.sources[n - 1]) for n in sorted(cited)]
+        numbers = sorted(cited) or list(range(1, min(len(self.sources), UNCITED_CARDS) + 1))
+        sources = [source_dict(n, self.sources[n - 1]) for n in numbers]
         return clean, sources, not sources
