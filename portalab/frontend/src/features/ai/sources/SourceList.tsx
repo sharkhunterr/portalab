@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { maybe } from "../../automations/labels";
 import type { AiCaveat, AiSource } from "../api";
 
 // issue 171: what each kind of source looks like when it has no picture of its own
@@ -40,7 +41,9 @@ export function SourceList({
         <div role="note" className="ai-caveats">
           {caveats.map((caveat) => (
             <p key={`${caveat.tool}-${caveat.state}`}>
-              {t(`ai:sources.caveat.${caveat.state}`, { tool: caveat.tool })}
+              {t(`ai:sources.caveat.${caveat.state}`, {
+                tool: maybe(t, `ai:tool.${caveat.tool}.label`, caveat.tool), // issue 171: in words
+              })}
             </p>
           ))}
         </div>
