@@ -59,7 +59,8 @@ SECTIONS: dict[str, str] = {
       parityCheckStatus { status progress running errors speed date duration paused correcting }
     }""",
     # the check under way, as the array driver counts it (parityCheckStatus may still tell the last one)
-    "resync": "vars { mdResync mdResyncPos mdResyncSize mdResyncAction mdResyncDt mdResyncDb }",
+    # (not mdResyncSize: past 2^31 kilobytes the API cannot tell it — the parity disk's size says it)
+    "resync": "vars { mdResync mdResyncPos mdResyncAction mdResyncDt mdResyncDb }",
     "docker": "docker { containers { names state status image isUpdateAvailable autoStart } }",
     "notifications": """notifications {
       list(filter: {type: UNREAD, offset: 0, limit: 20}) { title subject description importance timestamp }
@@ -212,7 +213,7 @@ def _cpu_name(value: Any) -> str | None:
 def _resync(raw: Mapping[str, Any], resync: Mapping[str, Any]) -> Mapping[str, Any]:
     """The check under way as the array driver counts it (``vars.mdResync*``): Unraid's
     ``parityCheckStatus`` may still describe the last check while a new one runs — the counters win."""
-    size = _number(resync.get("mdResyncSize"))
+    size = _number(resync.get("mdResyncSize")) or _number(resync.get("size"))
     position = _number(resync.get("mdResyncPos"))
     if not size or not position or position <= 0:
         return raw
@@ -322,7 +323,8 @@ def build_report(data: Mapping[str, Any]) -> HostReport:
     memory = _map(metrics.get("memory"))
     mem_total = _number(memory.get("total"))
     cap_total = _number(capacity.get("total"))
-    parity = _parity(_map(array.get("parityCheckStatus")), _map(data.get("vars")))
+    parity_size = max((_number(p.get("size")) or 0 for p in _list(array.get("parities"))), default=0)
+    parity = _parity(_map(array.get("parityCheckStatus")), {"size": parity_size, **_map(data.get("vars"))})
     packages = (
         _list(cpu.get("packages")) if isinstance(cpu.get("packages"), list) else [_map(cpu.get("packages"))]
     )

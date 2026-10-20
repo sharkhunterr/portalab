@@ -128,19 +128,25 @@ def test_unraid_parity_under_way_beats_the_last_check() -> None:
     resync = {
         "mdResync": 1,
         "mdResyncPos": "2500",
-        "mdResyncSize": 10000,
         "mdResyncAction": "check P",
         "mdResyncDt": "10",
         "mdResyncDb": "1024000",
     }
-    report = unraid_report({"array": {"state": "STARTED", "parityCheckStatus": last}, "vars": resync})
+    disks = [{"name": "parity", "status": "DISK_OK", "size": 10000}]  # its size: the length of the check
+    report = unraid_report(
+        {"array": {"state": "STARTED", "parityCheckStatus": last, "parities": disks}, "vars": resync}
+    )
     parity = report.parity
     assert parity is not None and parity.running and parity.status == "running" and parity.progress == 25
     assert parity.speed == "100.0 MB/s" and parity.remaining_seconds == 7500 / 102400 * 1
     assert parity.started_at is None and parity.correcting is True  # the last check's date is not this one's
-    paused = unraid_report({"array": {"parityCheckStatus": last}, "vars": {**resync, "mdResync": 0}}).parity
+    paused = unraid_report(
+        {"array": {"parityCheckStatus": last, "parities": disks}, "vars": {**resync, "mdResync": 0}}
+    ).parity
     assert paused is not None and paused.paused and not paused.running and paused.status == "paused"
-    idle = unraid_report({"array": {"parityCheckStatus": last}, "vars": {**resync, "mdResyncPos": 0}}).parity
+    idle = unraid_report(
+        {"array": {"parityCheckStatus": last, "parities": disks}, "vars": {**resync, "mdResyncPos": 0}}
+    ).parity
     assert idle is not None and not idle.running and idle.status == "completed"
 
 
