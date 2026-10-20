@@ -9,7 +9,7 @@ import type { AiSource } from "../api";
  */
 // an address naming one item (an id): a link only when it is one of the answer's sources — never an item made up
 const NAMES_ONE = /\/[0-9a-f]{8}-?[0-9a-f-]{4,}|\/\d{2,}(\/|$|\?)/i;
-const INLINE = /(\*\*[^*\n]+\*\*|\[[^\]\n]+\]\([^)\s]+\)|\[\d{1,2}\]|`[^`\n]+`|\*[^*\n]+\*|_[^_\n]+_)/g;
+const INLINE = /(\*\*[^*\n]+\*\*|\[[^\]\n]+\]\([^)\s]+\)|\[\d{1,2}\]|`[^`\n]+`|\*[^*\n]+\*)/g;
 
 function inline(text: string, sources: AiSource[], key: string): ReactNode[] {
   return text.split(INLINE).map((part, index) => {
@@ -43,7 +43,8 @@ function inline(text: string, sources: AiSource[], key: string): ReactNode[] {
         <Fragment key={at}>{label}</Fragment>
       );
     }
-    if ((part.startsWith("*") && part.endsWith("*")) || (part.startsWith("_") && part.endsWith("_")))
+    // italics by asterisks only: « _ » sits inside titles (« blanc_L_Assassin_royal_7 »)
+    if (part.startsWith("*") && part.endsWith("*"))
       return part.length > 2 ? <em key={at}>{part.slice(1, -1)}</em> : part;
     return part;
   });

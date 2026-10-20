@@ -28,6 +28,8 @@ async def test_each_message_tells_its_page(
     assert second.status_code == 200
     system = ai.provider.calls[-1][0][0].content
     assert '"/media/m1"' in system and "media id=m1" in system and "look it up" in system
+    assert "decide whether the question is about what this page shows" in system  # else: the page is ignored
+    assert "ignore the page entirely" in system
     assert f'You speak with the member "ursula" (id {people["ursula"]})' in system  # who « me » is
     asked = next(m for m in ai.provider.calls[-1][0] if m.content.startswith("Why is this leaving?"))
     assert (

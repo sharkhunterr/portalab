@@ -159,7 +159,7 @@ describe("the assistant's window (issue 171)", () => {
           element: (
             <AnswerText
               text={
-                "**Heat** waits:\n- requested [1]\n- [see it](/media/m1) or [elsewhere](https://evil.example)\n\n[made up](/media/7a07167c-b1b2-74a3) and [the shop](/marketplace). Done."
+                "**Heat** waits:\n- requested [1]\n- [see it](/media/m1) or [elsewhere](https://evil.example)\n\n[made up](/media/7a07167c-b1b2-74a3) and [the shop](/marketplace). Done.\n\nLe prophete blanc_L_Assassin_royal_7"
               }
               sources={[
                 {
@@ -185,6 +185,7 @@ describe("the assistant's window (issue 171)", () => {
     expect(screen.queryByRole("link", { name: "elsewhere" })).toBeNull();
     expect(document.querySelectorAll(".ai-answer li")[1]?.textContent).toBe("see it or elsewhere");
     expect(screen.queryByRole("link", { name: "made up" })).toBeNull(); // an item no source names
+    expect(screen.getByText(/blanc_L_Assassin_royal_7/)).toBeTruthy(); // « _ » in a title is no italics
     expect(screen.getByRole("link", { name: "the shop" }).getAttribute("href")).toBe("/marketplace");
   });
 

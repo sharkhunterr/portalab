@@ -74,8 +74,10 @@ def system_prompt(
         title = str(page.get("title") or "")[:200]
         if route or title:
             prompt += (
-                f"\nThe user is on the page {json.dumps(route)} ({json.dumps(title)}): « this », « it » "
-                "mean what this page shows; look it up with your tools when the question is about it."
+                f"\nThe user is on the page {json.dumps(route)} ({json.dumps(title)}). Before answering, "
+                "decide whether the question is about what this page shows: if it is (« this », « it », or "
+                "it names it), use the page's id with your tools; if it names something else, ignore the "
+                "page entirely and look up what the question names."
             )
     return prompt
 
