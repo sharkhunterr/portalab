@@ -45,6 +45,7 @@ class AiStatusOut(BaseModel):
     # issue 171: what is left of the member's daily allowance (tokens), for the window to show
     daily_budget: int = 0
     used_today: int = 0
+    ideas: list[str] = Field(default_factory=list)  # issue 174: the administrators' questions to start with
 
 
 class AiPageContext(BaseModel):
@@ -142,6 +143,7 @@ async def status(principal: User, module: Module) -> AiStatusOut:
         auto_navigate=module.config.auto_navigate,
         name=module.config.assistant_name,
         daily_budget=module.config.daily_token_budget_per_user,
+        ideas=[i for i in module.config.assistant_ideas if isinstance(i, str) and i.strip()][:8],
         used_today=await _used(module, principal),
     )
 

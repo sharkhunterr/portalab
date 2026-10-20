@@ -137,8 +137,13 @@ async def test_the_assistants_name(ai: AiHarness, client: httpx.AsyncClient, peo
     await login(client, "boss")
     saved = await client.put(
         "/api/v1/admin/ai/config",
-        json={"assistant_name": "Xeno", "assistant_fallback": "send them to the FAQ"},
+        json={
+            "assistant_name": "Xeno",
+            "assistant_fallback": "send them to the FAQ",
+            "assistant_ideas": ["Mes demandes en cours ?", "Quoi de neuf ?"],  # issue 174
+        },
     )
     assert saved.status_code == 200 and saved.json()["values"]["assistant_name"] == "Xeno"
     await login(client, "ursula")
-    assert (await client.get("/api/v1/ai/status")).json()["name"] == "Xeno"
+    status = (await client.get("/api/v1/ai/status")).json()
+    assert status["name"] == "Xeno" and status["ideas"] == ["Mes demandes en cours ?", "Quoi de neuf ?"]

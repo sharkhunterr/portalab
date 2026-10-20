@@ -492,6 +492,23 @@
             ],
             "title": "Assistant Fallback"
           },
+          "assistant_ideas": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 120,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 8,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assistant Ideas"
+          },
           "assistant_name": {
             "anyOf": [
               {
@@ -1154,6 +1171,13 @@
             "default": 0,
             "title": "Daily Budget",
             "type": "integer"
+          },
+          "ideas": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Ideas",
+            "type": "array"
           },
           "name": {
             "default": "",

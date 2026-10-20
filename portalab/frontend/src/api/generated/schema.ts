@@ -10345,6 +10345,8 @@ export interface components {
         AiConfigIn: {
             /** Assistant Fallback */
             assistant_fallback?: string | null;
+            /** Assistant Ideas */
+            assistant_ideas?: string[] | null;
             /** Assistant Name */
             assistant_name?: string | null;
             /** Assistant Role */
@@ -10540,6 +10542,8 @@ export interface components {
              * @default 0
              */
             daily_budget: number;
+            /** Ideas */
+            ideas?: string[];
             /**
              * Name
              * @default

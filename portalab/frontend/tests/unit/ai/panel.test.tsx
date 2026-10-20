@@ -302,6 +302,7 @@ describe("today's allowance (issue 171)", () => {
               autoNavigate={false}
               name="Nova"
               quota={{ budget: 1000, used: 250 }}
+              ideas={["Mes demandes en cours ?"]}
             />
           ),
         },
@@ -315,5 +316,8 @@ describe("today's allowance (issue 171)", () => {
     );
     expect(screen.getByText("75 % of today's allowance left")).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Nova" })).toBeTruthy();
+    // issue 174: the administrators' questions instead of the defaults
+    expect(screen.getByRole("button", { name: "Mes demandes en cours ?" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Are all the services working?" })).toBeNull();
   });
 });

@@ -72,6 +72,7 @@ export function useAiStatus() {
           name: "",
           daily_budget: 0,
           used_today: 0,
+          ideas: [],
         };
       }
     },

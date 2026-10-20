@@ -26,6 +26,8 @@
   "admin.pendingTtl": "Confirmation window (minutes)",
   "admin.persona.fallback": "When it does not know",
   "admin.persona.fallbackHint": "What it does when its tools do not hold the answer — by default: say so, give the wiki page's link, else offer a support ticket.",
+  "admin.persona.ideas": "Questions offered to start with",
+  "admin.persona.ideasHint": "One a line, eight at most — shown as buttons when a conversation starts. Empty: the questions shown here, in each member's language.",
   "admin.persona.name": "Its name",
   "admin.persona.nameHint": "Told to the model and shown at the top of its window — « Nova » to start with, yours to change.",
   "admin.persona.role": "What it is for",
