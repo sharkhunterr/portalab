@@ -72,6 +72,7 @@ import {
   Command,
   Compass,
   Cookie,
+  Copy,
   Cpu,
   Crosshair,
   Crown,
@@ -516,6 +517,8 @@ export const ICONS: Record<string, LucideIcon> = {
   "message-circle": MessageCircle,
   "message-square": MessageSquare,
   send: SendHorizontal, // issue 171: the assistant's « send »
+  copy: Copy, // issue 171: copy a message
+  retry: RotateCcw, // issue 171: send a message again
 };
 
 export interface IconProps {
