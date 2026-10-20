@@ -88,7 +88,11 @@ async def test_incidents_in_progress_and_lately_resolved(
         summary="Ralentissement",
         message="On it.",
     )
-    [tool] = [t for t in SupportAiTools(support.module).tools() if t.name == "incidents.current"]
+    [tool] = [
+        t
+        for t in SupportAiTools(support.module, support.module.clock).tools()
+        if t.name == "incidents.current"
+    ]
     answer = await tool.handler(ai(people["ursula"]), {})
     [current] = answer.data["in_progress"]
     assert (current["reference"], current["title"], current["severity"]) == (
@@ -99,3 +103,13 @@ async def test_incidents_in_progress_and_lately_resolved(
     assert current["services"] == ["the whole portal"] and current["summary"] == "Ralentissement"
     assert answer.data["summary"].startswith("1 incident(s) in progress.")
     assert answer.sources[0].url == f"/incidents/{outage.id}"
+    slow, _ = await incidents.create(
+        support.p("sam"), title="Lecture lente", severity="minor", service_ids=["s1"]
+    )
+    await incidents.resolve(support.p("sam"), slow.id, message="Fixed.")
+    on_media = (await tool.handler(ai(people["ursula"]), {"service": "media", "days": 3})).data
+    assert [i["title"] for i in on_media["resolved_lately"]] == ["Lecture lente"]  # the service's own
+    assert on_media["resolved_lately"][0]["services"] == ["Media"]
+    assert [i["title"] for i in on_media["in_progress"]] == ["Panne générale"]  # the whole portal's too
+    on_books = (await tool.handler(ai(people["ursula"]), {"service": "books"})).data
+    assert on_books["resolved_lately"] == []  # another service's incident is not this one's

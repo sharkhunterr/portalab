@@ -173,7 +173,15 @@ class SupportAiTools:
             return ToolResult("unavailable", {"incidents": []})
         names = await self._service_names()
         now = utc_now(self.clock)
-        opened = await self.module.incidents.list(state="open", limit=10)
+        # issue 171: one service (« Plex »), and how far back the resolved ones go (« lately »: 7 days)
+        wanted = str(params.get("service") or "").strip().casefold()
+        days = min(max(int(params.get("days") or 7), 1), 90)
+        ids = {sid for sid, name in names.items() if wanted and wanted in name.casefold()}
+
+        def concerns(view: Any) -> bool:  # the whole portal's incidents concern every service
+            return not wanted or not view.service_ids or bool(ids & set(view.service_ids))
+
+        opened = [v for v in await self.module.incidents.list(state="open", limit=20) if concerns(v)][:10]
         ongoing = []
         for view in opened:
             full = await self.module.incidents.get(view.id)  # its timeline: the last word on it
@@ -191,10 +199,18 @@ class SupportAiTools:
                 }
             )
         recent = [
-            {"reference": v.reference, "title": v.title, "resolved_at": v.resolved_at.isoformat()}
-            for v in await self.module.incidents.list(state="resolved", limit=10)
-            if v.resolved_at is not None and now - v.resolved_at <= timedelta(days=7)
-        ][:5]
+            {
+                "reference": v.reference,
+                "title": v.title,
+                "severity": v.severity,
+                "services": [names.get(s, s) for s in v.service_ids][:8] or ["the whole portal"],
+                "started_at": v.created_at.isoformat(),
+                "resolved_at": v.resolved_at.isoformat(),
+                "lasted_minutes": round((v.resolved_at - v.created_at).total_seconds() / 60),
+            }
+            for v in await self.module.incidents.list(state="resolved", limit=50)
+            if v.resolved_at is not None and now - v.resolved_at <= timedelta(days=days) and concerns(v)
+        ][:10]
         sources = [
             SourceRef(
                 "incident",
@@ -227,8 +243,14 @@ class SupportAiTools:
             AITool(
                 "incidents.current",
                 "The portal's incidents: those in progress (severity, stage, the services hit, the last "
-                "update) and those resolved in the last days — what is wrong now, beyond the probes.",
-                schema({}),
+                "update) and those resolved in the last days — what is wrong now, beyond the probes; "
+                "optionally for one service, and how many days back.",
+                schema(
+                    {
+                        "service": {"type": "string", "maxLength": 100},
+                        "days": {"type": "integer", "minimum": 1, "maximum": 90},
+                    }
+                ),
                 INCIDENTS_READ,
                 "read",
                 self.incidents,

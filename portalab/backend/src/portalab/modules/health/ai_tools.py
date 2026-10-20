@@ -29,7 +29,14 @@ class HealthAiTools:
 
     async def windows(self, principal: Principal, params: Mapping[str, Any]) -> ToolResult:
         names = await self._names()
-        rows = (await self.module.maintenance.windows())[:MAX_WINDOWS]
+        wanted = str(params.get("service") or "").strip().casefold()  # issue 171: one service (« Plex »)
+        rows = [
+            row
+            for row in await self.module.maintenance.windows()
+            if not wanted
+            or row["service_id"] is None  # the whole portal's concerns every service
+            or wanted in names.get(row["service_id"], "").casefold()
+        ][:MAX_WINDOWS]
         items = [
             {
                 "title": row["title"],
@@ -59,8 +66,12 @@ class HealthAiTools:
             AITool(
                 "maintenance.windows",
                 "The maintenance under way and planned: which service (or the whole portal), when it starts "
-                "and ends, what it is about.",
-                {"type": "object", "properties": {}, "additionalProperties": False},
+                "and ends, what it is about; optionally for one service.",
+                {
+                    "type": "object",
+                    "properties": {"service": {"type": "string", "maxLength": 100}},
+                    "additionalProperties": False,
+                },
                 SERVICES_READ,
                 "read",
                 self.windows,
