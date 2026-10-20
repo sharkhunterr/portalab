@@ -24,6 +24,9 @@ export interface AiSource {
   class: SourceClass;
   as_of: string | null;
   url: string | null;
+  /** issue 171: the card beside the answer — a poster of the portal's own, a short line */
+  image?: string | null;
+  detail?: string | null;
 }
 export interface AiCaveat {
   tool: string;

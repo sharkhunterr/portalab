@@ -105,7 +105,13 @@ class MediaAiTools:
         )
         return {
             "items": [
-                {"id": str(r.id), "kind": r.kind, "title": r.title, "year": r.year, "available": r.available}
+                {
+                    "id": str(r.id),
+                    "kind": r.kind,
+                    "title": r.title,
+                    "year": r.year,
+                    "available": r.available,
+                }
                 for r, _ in rows
             ]
         }
@@ -138,11 +144,13 @@ class MediaAiTools:
         if not await self._allowed(principal):
             return ToolResult("ok", {"found": False, "title": title})
         found: list[Any] = []
+        images: dict[Any, Any] = {}
         if wanted:  # the page the member is on names it (« media id=… »)
             try:
-                found = [await self.catalog.get(principal, UUID(wanted))]
+                view = await self.catalog.get(principal, UUID(wanted))
             except (ValueError, NotFound):
                 return ToolResult("ok", {"found": False, "id": wanted})
+            found, images = [view], {view.id: getattr(view, "image_id", None)}
         else:
             year = params.get("year")
             rows, _ = await self.catalog.browse(
@@ -153,6 +161,7 @@ class MediaAiTools:
                 limit=5,
             )
             found = [r for r, _ in rows]
+            images = {r.id: image for r, image in rows}
         if not found:
             return ToolResult(
                 "ok",
@@ -191,11 +200,28 @@ class MediaAiTools:
                 data["under_way"] = next((s["key"] for s in steps if s.get("status") in UNDER_WAY), None)
                 if not steps:
                     data["note"] = "Nobody asked for it and no download manager follows it."
-        url = f"/media/{best.id}"
-        return ToolResult(
-            state,
-            data,
-            [SourceRef("media", f"media:{best.id}", best.title, "real", utc_now(self.clock), url)],
+        return ToolResult(state, data, [self._card(best, images.get(best.id))])
+
+    async def _posters(self, ids: list[str]) -> dict[str, str]:
+        """The posters of some titles, as the portal's own image addresses (the cards beside an answer)."""
+        try:
+            async with self.catalog.database.session() as session:
+                found = await CatalogQuery._images(session, [UUID(i) for i in ids])
+        except Exception:
+            return {}
+        return {str(k): f"/api/v1/media/images/{v}" for k, v in found.items()}
+
+    def _card(self, item: Any, image: Any) -> SourceRef:
+        """Issue 171: a title as the answer's card — its poster and « year · kind » beside the answer."""
+        return SourceRef(
+            "media",
+            f"media:{item.id}",
+            item.title,
+            "real",
+            utc_now(self.clock),
+            f"/media/{item.id}",
+            image=f"/api/v1/media/images/{image}" if image else None,
+            detail=" · ".join(str(v) for v in (item.year, item.kind) if v),
         )
 
     def assistant_tools(self) -> list[AITool]:
@@ -203,7 +229,27 @@ class MediaAiTools:
 
         def wrap(definition: ToolDefinition, schema: Mapping[str, Any]) -> AITool:
             async def handler(principal: Principal, params: Mapping[str, Any]) -> ToolResult:
-                return ToolResult("ok", dict(await definition.run(principal, params)))
+                data = dict(await definition.run(principal, params))
+                cards = [
+                    SourceRef(
+                        "media",
+                        f"media:{i['id']}",
+                        str(i.get("title") or ""),
+                        "real",
+                        utc_now(self.clock),
+                        f"/media/{i['id']}",
+                        detail=" · ".join(str(v) for v in (i.get("year"), i.get("kind")) if v),
+                        image=i.get("image"),
+                    )
+                    for i in data.get("items", [])[:6]
+                    if isinstance(i, Mapping) and i.get("id")
+                ]
+                # the posters are for the cards, not the model: its context stays small
+                data["items"] = [
+                    {k: v for k, v in i.items() if k != "image"} if isinstance(i, Mapping) else i
+                    for i in data.get("items", [])
+                ]
+                return ToolResult("ok", data, cards)
 
             return AITool(
                 definition.name,

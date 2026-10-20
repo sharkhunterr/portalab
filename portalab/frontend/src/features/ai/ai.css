@@ -16,6 +16,7 @@
   translate: -50% -50%;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr); /* never wider than the window: long lines wrap or ellipsize */
   inline-size: min(46rem, calc(100vw - 2rem));
   block-size: min(44rem, calc(100dvh - 3rem));
   border: 1px solid var(--glass-border, var(--color-border));
@@ -30,10 +31,17 @@
   .ai-modal {
     inset: 0;
     translate: none;
-    inline-size: 100vw;
-    block-size: 100dvh;
+    inline-size: auto;
+    max-inline-size: 100%;
+    block-size: auto;
     border: 0;
     border-radius: 0;
+  }
+  .ai-modal__description {
+    display: none; /* the title says enough on a phone */
+  }
+  .ai-bubble {
+    max-inline-size: 92%;
   }
 }
 @keyframes ai-fade {
@@ -120,6 +128,7 @@
   position: relative;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   min-block-size: 0;
 }
 
@@ -349,6 +358,7 @@
 }
 .ai-composer textarea {
   flex: 1;
+  min-inline-size: 0;
   min-block-size: 2.25rem;
   max-block-size: 10rem;
   padding: var(--space-2) var(--space-2);
@@ -401,12 +411,78 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
-.ai-source-list {
-  display: grid;
-  gap: 0.15rem;
+/* the sources as cards: a poster or the kind's icon, the title, a short line; a row that scrolls */
+.ai-cards {
+  display: flex;
+  gap: var(--space-2);
   margin: 0;
-  padding-inline-start: 1.25rem;
+  padding: 0 0 var(--space-1);
+  overflow-x: auto;
+  list-style: none;
+  scroll-snap-type: x proximity;
+}
+.ai-cards li {
+  flex: none;
+  scroll-snap-align: start;
+}
+.ai-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  inline-size: 14rem;
+  min-block-size: 3.5rem;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+}
+a.ai-card:hover {
+  border-color: var(--color-accent);
+}
+.ai-card__poster {
+  flex: none;
+  inline-size: 2.75rem;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background: var(--color-surface-raised);
+}
+.ai-card__icon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-accent);
+}
+.ai-card__text {
+  display: grid;
+  gap: 0.1rem;
+  min-inline-size: 0;
+}
+.ai-card__title {
+  display: -webkit-box;
+  overflow: hidden;
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.ai-card__n {
+  margin-inline-end: 0.35rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.ai-card__detail {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* the assistant from any page: a round button in a corner, above the page's own bars */

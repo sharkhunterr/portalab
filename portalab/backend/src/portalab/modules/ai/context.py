@@ -48,8 +48,10 @@ def system_prompt(language: str, page: Mapping[str, Any] | None) -> str:
 
 def frame_tool_result(name: str, result: ToolResult, sources: Sequence[Mapping[str, Any]]) -> str:
     """The model sees tool output as quoted data; markup that could close the frame is neutralized."""
+    # issue 171: the cards' pictures and lines are for the member, not the model (its context stays small)
+    seen = [{k: v for k, v in s.items() if k not in ("image", "detail")} for s in sources]
     payload = json.dumps(
-        {"state": result.state, "detail": result.detail, "data": result.data, "sources": list(sources)},
+        {"state": result.state, "detail": result.detail, "data": result.data, "sources": seen},
         default=str,
         ensure_ascii=False,
     )
