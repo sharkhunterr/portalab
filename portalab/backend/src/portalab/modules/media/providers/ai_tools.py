@@ -175,9 +175,16 @@ class MediaAiTools:
             try:
                 view = await self.catalog.get(principal, UUID(wanted))
             except (ValueError, NotFound):
-                return ToolResult("ok", {"found": False, "id": wanted})
-            found, images = [view], {view.id: getattr(view, "image_id", None)}
-        else:
+                if not title:
+                    return ToolResult("ok", {"found": False, "id": wanted})
+                view = None  # a made-up id: the title still searches
+            if view is not None:
+                found, images = [view], {view.id: getattr(view, "image_id", None)}
+            if view is not None and title and closeness(title, view.title, False) < 0.5:
+                # issue 171: the page names one title, the question another (« Avatar 5 » asked on an
+                # audiobook's page) — the question wins
+                found, wanted = [], ""
+        if not found and title:
             # issue 171: every kind, the closest first — a « book » may be an audiobook, a title stored as
             # « Le prophete blanc_L_Assassin_royal_7 » is still « l'assassin royal »
             year = params.get("year")
@@ -230,6 +237,9 @@ class MediaAiTools:
                 data["under_way"] = next((s["key"] for s in steps if s.get("status") in UNDER_WAY), None)
                 if not steps:
                     data["note"] = "Nobody asked for it and no download manager follows it."
+        about = await self._about(principal, best.id)
+        if about:
+            data["about"] = about
         viewing = await self._viewing(principal, best.id, best.kind)
         if viewing:
             data["my_viewing"] = viewing
@@ -237,6 +247,43 @@ class MediaAiTools:
         if leaving:
             data["leaving_library"] = leaving
         return ToolResult(state, data, [self._card(best, images.get(best.id))])
+
+    async def _about(self, principal: Principal, object_id: Any) -> dict[str, Any] | None:
+        """What the title's page tells of it, in short: who made it (authors, narrators, people), its series,
+        publisher, genres, length and a few lines of its overview."""
+        if self.sections is None:
+            return None
+        try:
+            info = (await self.sections.load("info", object_id, principal)).data or {}
+        except Exception:
+            return None
+
+        def names(value: Any) -> list[str]:
+            out = []
+            for item in value if isinstance(value, list) else []:
+                name = item.get("name") if isinstance(item, Mapping) else item
+                role = item.get("role") or item.get("job") if isinstance(item, Mapping) else None
+                if name:
+                    out.append(f"{name} ({role})" if role else str(name))
+            return out[:6]
+
+        about: dict[str, Any] = {
+            "authors": names(info.get("authors")),
+            "narrators": names(info.get("narrators")),
+            "people": names(info.get("people")),
+            "series": info.get("series"),
+            "series_position": info.get("series_position"),
+            "publisher": info.get("publisher"),
+            "released": info.get("released"),
+            "genres": info.get("genres"),
+            "minutes": round(info["duration_s"] / 60)
+            if isinstance(info.get("duration_s"), int | float)
+            else None,
+            "pages": info.get("pages"),
+            "platform": info.get("platform"),
+            "overview": str(info.get("overview") or "")[:300] or None,
+        }
+        return {k: v for k, v in about.items() if v not in (None, "", [])} or None
 
     async def _viewing(self, principal: Principal, object_id: Any, kind: str) -> dict[str, Any] | None:
         """The member's own plays of the title (a series: its episodes), as the title's page shows them."""

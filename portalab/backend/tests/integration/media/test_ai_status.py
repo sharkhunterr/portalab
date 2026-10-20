@@ -77,6 +77,10 @@ async def test_media_status_tells_the_journey(
     by_id = await status.handler(zoe, {"id": heat_id})  # the page the member is on names it
     assert by_id.data["title"] == "Heat" and by_id.data["steps"] == data["steps"]
     assert (await status.handler(zoe, {"id": "not-an-id"})).data["found"] is False
+    other = await status.handler(zoe, {"id": heat_id, "title": "Le prophete blanc L Assassin royal 7"})
+    assert (
+        other.data["title"] == "Le prophete blanc_L_Assassin_royal_7"
+    )  # the question's title beats the page
     assert "leaving_library" not in data  # no cleanup tool: nothing said
     assert data["my_viewing"]["watched"] is False and data["my_viewing"]["plays"] == 0  # zoe never played it
     assert data["my_viewing"]["summary"] == "The member has never played this title."
