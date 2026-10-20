@@ -36,8 +36,16 @@ def estimate_tokens(text: str) -> int:
     return len(text) // CHARS_PER_TOKEN + 1
 
 
-def system_prompt(language: str, page: Mapping[str, Any] | None) -> str:
+def system_prompt(
+    language: str, page: Mapping[str, Any] | None, member: Mapping[str, Any] | None = None
+) -> str:
     prompt = SYSTEM_POLICY.format(language=language or "en")
+    if member and member.get("id"):
+        # issue 171: who is speaking — the tools already act as them (« my history », « my tickets »)
+        name = str(member.get("name") or "")[:80]
+        prompt += (
+            f"\nYou speak with the member {json.dumps(name)} (id {member['id']}); « my », « me » mean them."
+        )
     if page:
         route = str(page.get("route") or "")[:200]
         title = str(page.get("title") or "")[:200]

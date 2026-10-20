@@ -31,6 +31,7 @@ from portalab.modules.ai.tools.catalog import CHAT, ToolCatalog, ToolPolicy, too
 
 Event = dict[str, Any]
 MAX_ANSWER_TOKENS = 1024
+THINKING_TOKENS = 3072
 
 
 def event(name: str, /, **data: Any) -> Event:
@@ -61,7 +62,9 @@ class Orchestrator:
         *,
         language: Callable[[UUID], Awaitable[str]] | None = None,
         secrets: Callable[[], Iterable[str | None]] = tuple,
+        who: Callable[[UUID], Awaitable[str | None]] | None = None,
     ) -> None:
+        self.who = who  # issue 171: the member the assistant speaks with (their display name)
         self.provider = provider
         self.catalog = catalog
         self.executor = executor
@@ -77,10 +80,19 @@ class Orchestrator:
         except Exception:
             return "en"
 
+    async def name_of(self, user: UUID) -> str | None:
+        if self.who is None:
+            return None
+        try:
+            return await asyncio.wait_for(self.who(user), timeout=2)
+        except Exception:
+            return None
+
     async def messages_for(
         self, user: UUID, history: list[ChatMessage], page: dict[str, Any] | None
     ) -> list[ChatMessage]:
-        system = ChatMessage("system", system_prompt(await self.language_for(user), page))
+        member = {"id": str(user), "name": await self.name_of(user)}
+        system = ChatMessage("system", system_prompt(await self.language_for(user), page, member))
         budget = max(500, self.config().max_context_tokens - MAX_ANSWER_TOKENS - len(system.content) // 4)
         return [system, *window(history, budget)]
 
@@ -121,7 +133,9 @@ class Orchestrator:
                     async for item in provider.chat(
                         conversation,
                         tools,
-                        max_tokens=MAX_ANSWER_TOKENS,
+                        # issue 171: a thinking model's thoughts count in its length — room for them too
+                        max_tokens=MAX_ANSWER_TOKENS
+                        + (0 if config.provider_reasoning == "none" else THINKING_TOKENS),
                         timeout=config.request_timeout_seconds,
                     ):
                         if item.kind == "delta" and item.text:

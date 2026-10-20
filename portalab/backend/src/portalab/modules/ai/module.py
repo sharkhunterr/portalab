@@ -19,6 +19,7 @@ from portalab.capabilities.automation_actions import ActionRegistry, ActionType,
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
 from portalab.capabilities.i18n import RESOLVER
+from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.navigation import NavigationRegistry, default_navigation
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
@@ -105,6 +106,7 @@ class AiModule:
             self.executor,
             lambda: self.config,
             language=self._language,
+            who=self._who,
             secrets=lambda: (self.api_key, *self.mcp_tokens.values()),
         )
         self.conversations = Conversations(database, events, clock=clock)
@@ -168,6 +170,14 @@ class AiModule:
                 entry["state"] = "unavailable"
             found.append(entry)
         return found
+
+    async def _who(self, user: Any) -> str | None:
+        """Issue 171: the member's display name, for the assistant to know whom it speaks with."""
+        providers = self.capabilities.system_providers(DIRECTORY)
+        if not providers:
+            return None
+        summary = await providers[0].provider.get_user_summary(user)
+        return summary.display_name if summary is not None else None
 
     async def _language(self, user: Any) -> str:
         providers = self.capabilities.system_providers(RESOLVER)

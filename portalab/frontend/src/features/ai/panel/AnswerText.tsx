@@ -7,6 +7,8 @@ import type { AiSource } from "../api";
  * portal's own pages (``/…`` only — any other address stays text) and the ``[n]`` source numbers as links to
  * their source. Built as React elements from the text: nothing the model writes is ever read as HTML.
  */
+// an address naming one item (an id): a link only when it is one of the answer's sources — never an item made up
+const NAMES_ONE = /\/[0-9a-f]{8}-?[0-9a-f-]{4,}|\/\d{2,}(\/|$|\?)/i;
 const INLINE = /(\*\*[^*\n]+\*\*|\[[^\]\n]+\]\([^)\s]+\)|\[\d{1,2}\]|`[^`\n]+`|\*[^*\n]+\*|_[^_\n]+_)/g;
 
 function inline(text: string, sources: AiSource[], key: string): ReactNode[] {
@@ -32,7 +34,8 @@ function inline(text: string, sources: AiSource[], key: string): ReactNode[] {
     const link = /^\[([^\]]+)\]\(([^)\s]+)\)$/.exec(part);
     if (link) {
       const [, label, href] = link;
-      return href?.startsWith("/") && !href.startsWith("//") ? (
+      const known = !NAMES_ONE.test(href ?? "") || sources.some((s) => s.url === href);
+      return href?.startsWith("/") && !href.startsWith("//") && known ? (
         <Link key={at} to={href}>
           {label}
         </Link>

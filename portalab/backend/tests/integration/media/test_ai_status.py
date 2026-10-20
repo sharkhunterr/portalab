@@ -98,5 +98,7 @@ async def test_media_status_tells_the_journey(
     }
     unknown = await status.handler(zoe, {"title": "Some film nobody asked for"})
     assert unknown.data["found"] is False and "requested" in unknown.data["hint"]
+    history = registry.get("media.my_history")
+    assert history is not None and "kind" in history.params_schema["properties"]  # « my last film »
     found = await registry.get("media.search_catalog").handler(zoe, {"q": "heat"})  # type: ignore[union-attr]
     assert {i["title"] for i in found.data["items"]} == {"Heat", "Heat Wave"}
