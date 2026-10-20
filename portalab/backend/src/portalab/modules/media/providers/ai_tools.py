@@ -20,6 +20,7 @@ from portalab.modules.media.catalog import CatalogQuery
 from portalab.modules.media.discovery.shelves import Discovery
 from portalab.modules.media.permissions import MEDIA_READ
 from portalab.modules.media.providers.ports import HistoryReader
+from portalab.modules.media.sections.service import SEEN
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,7 +58,9 @@ class MediaAiTools:
         journey: Any = None,
         clock: Clock | None = None,
         cleanup: Any = None,
+        sections: Any = None,
     ) -> None:
+        self.sections = sections  # issue 171: what the member saw of the title (the page's « viewing »)
         self.cleanup = cleanup  # issue 171: whether a title leaves the library (Maintainerr), and when
         self.catalog = catalog
         self.history = history
@@ -210,10 +213,43 @@ class MediaAiTools:
                 data["under_way"] = next((s["key"] for s in steps if s.get("status") in UNDER_WAY), None)
                 if not steps:
                     data["note"] = "Nobody asked for it and no download manager follows it."
+        viewing = await self._viewing(principal, best.id, best.kind)
+        if viewing:
+            data["my_viewing"] = viewing
         leaving = await self._leaving(principal, best.id)
         if leaving:
             data["leaving_library"] = leaving
         return ToolResult(state, data, [self._card(best, images.get(best.id))])
+
+    async def _viewing(self, principal: Principal, object_id: Any, kind: str) -> dict[str, Any] | None:
+        """The member's own plays of the title (a series: its episodes), as the title's page shows them."""
+        if self.sections is None:
+            return None
+        try:
+            section = await self.sections.load("viewing", object_id, principal)
+        except Exception:
+            return None
+        data = section.data or {}
+        mine = [m for m in data.get("mine") or [] if isinstance(m, Mapping)]
+        if not mine:
+            return {"watched": False, "plays": 0}
+        last = mine[0]
+        out: dict[str, Any] = {
+            "plays": int(data.get("mine_total") or len(mine)),
+            "last_at": str(last.get("at"))[:10],
+        }
+        if kind in ("series", "season"):
+            finished = {m.get("title") for m in mine if (m.get("progress") or 0) >= SEEN}
+            out["episodes_finished"] = len(finished)
+            out["last_episode"] = last.get("title")
+            out["note"] = (
+                "Counts only the episodes played lately (at most 30 plays): not a full season tally."
+            )
+        else:
+            out["status"] = data.get("status") or "started"
+            if data.get("percent") is not None:
+                out["percent"] = round(float(data["percent"]) * 100)
+        return out
 
     async def _leaving(self, principal: Principal, object_id: Any) -> dict[str, Any] | None:
         """« Leaving soon »: the cleanup rule that put it on the deletion list, the day it goes, and
