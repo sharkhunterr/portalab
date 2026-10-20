@@ -563,6 +563,7 @@ a.ai-card:hover {
 
 /* issue 169: where the assistant thinks — a model server and one of its models; issue 171: who it is */
 .ai-persona,
+.ai-limits,
 .ai-server {
   grid-column: 1 / -1; /* the whole row of the settings' grid */
   display: grid;
@@ -578,6 +579,7 @@ a.ai-card:hover {
   margin: 0;
 }
 .ai-persona legend,
+.ai-limits legend,
 .ai-server legend {
   display: inline-flex;
   align-items: center;
@@ -698,6 +700,8 @@ a.ai-card:hover {
 /* issue 171: under a message — copy it, send it again */
 .ai-actions {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-1);
   margin-block-start: calc(var(--space-1) * -1);
   opacity: 0.7;
@@ -725,6 +729,59 @@ a.ai-card:hover {
 }
 .ai-action:hover {
   background: color-mix(in srgb, currentColor 12%, transparent);
+}
+.ai-action[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-accent);
+}
+.ai-action--primary {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.ai-action--primary:hover {
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--color-text));
+}
+.ai-action:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+/* issue 176: a verdict given, and what was expected */
+.ai-verdict__thanks {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.ai-verdict {
+  display: grid;
+  flex: 1 1 100%;
+  gap: var(--space-1);
+  margin-block-start: var(--space-1);
+}
+.ai-verdict__label {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+}
+.ai-verdict__text {
+  inline-size: 100%;
+  min-inline-size: 0;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  resize: vertical;
+}
+.ai-verdict__notice {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.ai-verdict__buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-1);
 }
 .ai-action:focus-visible {
   outline: 2px solid var(--color-focus);
@@ -756,4 +813,80 @@ a.ai-card:hover {
 }
 .ai-quota[data-low] .ai-quota__bar span {
   background: var(--state-partial-fg);
+}
+
+/* issue 176: the assistant's dashboard */
+.ai-board__period {
+  justify-self: start;
+}
+.ai-board__chart {
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+.ai-board__hours {
+  display: grid;
+  grid-template-columns: repeat(24, minmax(0, 1fr));
+  align-items: end;
+  gap: 2px;
+  block-size: 6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ai-board__hour {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  block-size: 100%;
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+.ai-board__hour-bar {
+  align-self: end;
+  min-block-size: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--color-accent);
+}
+.ai-board__hour[data-empty] .ai-board__hour-bar {
+  background: var(--color-border);
+}
+.ai-board__rated {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ai-board__case {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  min-inline-size: 0;
+}
+.ai-board__case header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.ai-board__question {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+.ai-board__answer {
+  margin: 0;
+  max-block-size: 8rem;
+  overflow: auto;
+  color: var(--color-text-muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.ai-board__comment {
+  margin: 0;
+  padding-inline-start: var(--space-2);
+  border-inline-start: 3px solid var(--color-accent);
+  overflow-wrap: anywhere;
 }

@@ -39,6 +39,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/ai/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dashboard
+         * @description Issue 176: who used the assistant and when, how often it answered and how fast, with which tools, what
+         *     the members thought of it — and the answers rated « not as expected ».
+         */
+        get: operations["dashboard_api_v1_admin_ai_dashboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/ai/mcp-servers": {
         parameters: {
             query?: never;
@@ -4518,6 +4539,26 @@ export interface paths {
         put?: never;
         /** Send Message */
         post: operations["send_message_api_v1_ai_conversations__conversation_id__messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ai/messages/{message_id}/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Rate Answer
+         * @description Issue 176: the member's verdict on one of their answers — as expected or not, and why.
+         */
+        put: operations["rate_answer_api_v1_ai_messages__message_id__feedback_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -10453,6 +10494,23 @@ export interface components {
              */
             updated_at: string;
         };
+        /** AiFeedbackIn */
+        AiFeedbackIn: {
+            /**
+             * Comment
+             * @default
+             */
+            comment: string;
+            /** Rating */
+            rating?: ("up" | "down") | null;
+        };
+        /** AiFeedbackOut */
+        AiFeedbackOut: {
+            /** Comment */
+            comment: string;
+            /** Rating */
+            rating: number | null;
+        };
         /** AiMessageIn */
         AiMessageIn: {
             /** Content */
@@ -10472,6 +10530,10 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /** Id */
+            id?: string | null;
+            /** Rating */
+            rating?: number | null;
             /** Role */
             role: string;
             /** Seq */
@@ -17326,6 +17388,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AiConfigOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dashboard_api_v1_admin_ai_dashboard_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -26278,6 +26373,41 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rate_answer_api_v1_ai_messages__message_id__feedback_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                message_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiFeedbackIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiFeedbackOut"];
+                };
             };
             /** @description Validation Error */
             422: {

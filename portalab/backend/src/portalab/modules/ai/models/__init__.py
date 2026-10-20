@@ -83,3 +83,24 @@ class UsageDaily(AiBase):
     tokens_out: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     requests: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     tool_calls: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+
+class Feedback(AiBase):
+    """Issue 176: the member's verdict on one answer — as expected (+1) or not (-1), with a word on why. An
+    answer rated is shown to the administrators (question, answer, tools) to improve the assistant: the
+    member is told so when rating. Gone with the conversation."""
+
+    __tablename__ = "feedback"
+    __table_args__ = (
+        CheckConstraint("rating IN (-1, 1)", name="rating"),
+        Index("ix_feedback_rating", "rating", "updated_at"),
+    )
+
+    message_id: Mapped[UUID] = mapped_column(
+        ForeignKey("ai.messages.id", ondelete="CASCADE"), primary_key=True
+    )
+    user_id: Mapped[UUID] = mapped_column(nullable=False)  # FK identity.users (migration), CASCADE
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    comment: Mapped[str] = mapped_column(Text, nullable=False, default="", info=pii("content", tombstone=""))
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

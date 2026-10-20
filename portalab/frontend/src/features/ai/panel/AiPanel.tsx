@@ -1,11 +1,11 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import { deleteConversation, useConversations } from "../api";
+import { type AiRating, deleteConversation, rateAnswer, useConversations } from "../api";
 import { ConfirmationCard } from "../confirmation/ConfirmationCard";
 import { pageContext, pageLabel } from "../pageContext";
 import { SourceList } from "../sources/SourceList";
@@ -289,7 +289,15 @@ export function AiPanel({
                                 : () => ask(questionBefore(chat.messages, index) ?? "")
                             }
                             resendLabel={t("ai:panel.retry")}
-                          />
+                          >
+                            {message.messageId ? (
+                              <Verdict
+                                messageId={message.messageId}
+                                rating={message.rating ?? null}
+                                onRated={chat.rated}
+                              />
+                            ) : null}
+                          </MessageActions>
                         ) : null}
                       </>
                     )}
@@ -379,10 +387,12 @@ function MessageActions({
   text,
   resend,
   resendLabel,
+  children,
 }: {
   text: string;
   resend: (() => void) | undefined;
   resendLabel: string;
+  children?: ReactNode;
 }) {
   const t = useT();
   const [copied, setCopied] = useState(false);
@@ -431,7 +441,105 @@ function MessageActions({
           <Icon name="retry" size={14} />
         </button>
       ) : null}
+      {children}
     </div>
+  );
+}
+
+/**
+ * Issue 176 — under an answer: « as expected » or « not as expected » (pressed again: taken back); « not »
+ * opens a line to say what was expected. The member is told the rated answers reach the administrators.
+ */
+function Verdict({
+  messageId,
+  rating,
+  onRated,
+}: {
+  messageId: string;
+  rating: AiRating;
+  onRated: (messageId: string, rating: AiRating) => void;
+}) {
+  const t = useT();
+  const [writing, setWriting] = useState(false);
+  const [comment, setComment] = useState("");
+  const [state, setState] = useState<"idle" | "sent" | "failed">("idle");
+  const give = async (next: AiRating, text = "") => {
+    const before = rating;
+    onRated(messageId, next);
+    try {
+      await rateAnswer(messageId, next, text);
+      setState(text ? "sent" : "idle");
+    } catch {
+      onRated(messageId, before);
+      setState("failed");
+    }
+  };
+  const press = (choice: "up" | "down") => {
+    const next = rating === choice ? null : choice;
+    setWriting(next === "down");
+    setState("idle");
+    void give(next);
+  };
+  const send = (event: FormEvent) => {
+    event.preventDefault();
+    setWriting(false);
+    void give("down", comment.trim());
+  };
+  return (
+    <>
+      <button
+        type="button"
+        className="ai-action"
+        aria-pressed={rating === "up"}
+        aria-label={t("ai:panel.verdict.up")}
+        title={t("ai:panel.verdict.up")}
+        onClick={() => press("up")}
+      >
+        <Icon name="thumbs-up" size={14} />
+      </button>
+      <button
+        type="button"
+        className="ai-action"
+        aria-pressed={rating === "down"}
+        aria-label={t("ai:panel.verdict.down")}
+        title={t("ai:panel.verdict.down")}
+        onClick={() => press("down")}
+      >
+        <Icon name="thumbs-down" size={14} />
+      </button>
+      {rating ? (
+        <span className="ai-verdict__thanks" role="status">
+          {state === "failed"
+            ? t("ai:panel.verdict.failed")
+            : state === "sent"
+              ? t("ai:panel.verdict.sent")
+              : t("ai:panel.verdict.thanks")}
+        </span>
+      ) : null}
+      {writing ? (
+        <form className="ai-verdict" onSubmit={send}>
+          <label className="ai-verdict__label">
+            {t("ai:panel.verdict.what")}
+            <textarea
+              className="ai-verdict__text"
+              rows={2}
+              maxLength={1000}
+              value={comment}
+              onChange={(event) => setComment(event.target.value)}
+            />
+          </label>
+          <p className="ai-verdict__notice">{t("ai:panel.verdict.notice")}</p>
+          <div className="ai-verdict__buttons">
+            <button type="button" className="ai-action" onClick={() => setWriting(false)}>
+              {t("ai:panel.verdict.skip")}
+            </button>
+            <button type="submit" className="ai-action ai-action--primary" disabled={!comment.trim()}>
+              {t("ai:panel.verdict.send")}
+            </button>
+          </div>
+        </form>
+      ) : null}
+    </>
   );
 }
 

@@ -366,7 +366,13 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               handle: h({ crumb: "Statistic definitions" }),
             },
             { path: "support", element: <SupportDefinitions />, handle: h({ crumb: "Support settings" }) },
-            { path: "ai", element: <AiAdmin />, handle: h({ crumb: "Assistant settings" }) },
+            { path: "ai", element: <AiAdmin />, handle: h({ crumb: "Assistant" }) },
+            // issue 176: the assistant's hub — its model, its identity, its tools
+            ...(["model", "identity", "tools"] as const).map((view) => ({
+              path: `ai/${view}`,
+              element: <AiAdmin view={view} />,
+              handle: h({ crumb: "Assistant" }),
+            })),
             { path: "gamification", element: <GamificationAdmin />, handle: h({ crumb: "Gamification" }) },
             { path: "campaigns", element: <CampaignConsole />, handle: h({ crumb: "Campaigns" }) },
             { path: "automations", element: <Automations />, handle: h({ crumb: "Automations" }) },

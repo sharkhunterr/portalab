@@ -51,8 +51,10 @@ async def test_sections_for_users_and_admins(sh: ShellHarness) -> None:
         "shop",
         "automations",  # 027: a hub of its own
         "extensions",  # 028: visual packs, widgets, plugins, modules
+        "ai",  # issue 176: the assistant's dashboard, model, identity and tools
         "system",
     ]
+    assert {"ai.admin", "ai.model", "ai.identity", "ai.tools"} <= topics["ai"]
     assert {"automations.admin", "automations.history"} <= topics["automations"]
     assert {"authz.roles", "identity.members"} <= topics["members"] and "authz.audit" in topics["pilot"]
     assert {"support.queue", "wiki.admin"} <= topics["support"]

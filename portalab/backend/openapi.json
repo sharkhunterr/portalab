@@ -888,6 +888,59 @@
         "title": "AiConversationOut",
         "type": "object"
       },
+      "AiFeedbackIn": {
+        "additionalProperties": false,
+        "properties": {
+          "comment": {
+            "default": "",
+            "maxLength": 1000,
+            "title": "Comment",
+            "type": "string"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "enum": [
+                  "up",
+                  "down"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          }
+        },
+        "title": "AiFeedbackIn",
+        "type": "object"
+      },
+      "AiFeedbackOut": {
+        "properties": {
+          "comment": {
+            "title": "Comment",
+            "type": "string"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          }
+        },
+        "required": [
+          "rating",
+          "comment"
+        ],
+        "title": "AiFeedbackOut",
+        "type": "object"
+      },
       "AiMessageIn": {
         "additionalProperties": false,
         "properties": {
@@ -929,6 +982,29 @@
             "format": "date-time",
             "title": "Created At",
             "type": "string"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
           },
           "role": {
             "title": "Role",
@@ -20151,6 +20227,54 @@
         ]
       }
     },
+    "/api/v1/admin/ai/dashboard": {
+      "get": {
+        "description": "Issue 176: who used the assistant and when, how often it answered and how fast, with which tools, what\nthe members thought of it \u2014 and the answers rated \u00ab not as expected \u00bb.",
+        "operationId": "dashboard_api_v1_admin_ai_dashboard_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Dashboard Api V1 Admin Ai Dashboard Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Dashboard",
+        "tags": [
+          "ai-admin"
+        ]
+      }
+    },
     "/api/v1/admin/ai/mcp-servers": {
       "get": {
         "operationId": "get_mcp_api_v1_admin_ai_mcp_servers_get",
@@ -33239,6 +33363,60 @@
           }
         },
         "summary": "Send Message",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/v1/ai/messages/{message_id}/feedback": {
+      "put": {
+        "description": "Issue 176: the member's verdict on one of their answers \u2014 as expected or not, and why.",
+        "operationId": "rate_answer_api_v1_ai_messages__message_id__feedback_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "message_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Message Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiFeedbackIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiFeedbackOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rate Answer",
         "tags": [
           "ai"
         ]

@@ -44,6 +44,7 @@ from portalab.modules.ai.facades.diagnosis import DiagnosisFacade
 from portalab.modules.ai.facades.embeddings import OpenAICompatibleEmbeddings
 from portalab.modules.ai.facades.search_assistant import SearchAssistantFacade
 from portalab.modules.ai.governor import Governor
+from portalab.modules.ai.insights import Insights
 from portalab.modules.ai.observability import log
 from portalab.modules.ai.orchestrator import Orchestrator
 from portalab.modules.ai.participant import AiParticipant
@@ -113,6 +114,7 @@ class AiModule:
         self.conversations = Conversations(database, events, clock=clock)
         self.governor = Governor(database, lambda: self.config, clock=clock)
         self.chat = ChatService(self.conversations, self.governor, self.orchestrator)
+        self.insights = Insights(database, capabilities, clock=clock)  # issue 176: verdicts and dashboard
         self.baseline = BaselineTools(
             capabilities, authorizer, search=search, navigation=navigation, clock=clock
         )
