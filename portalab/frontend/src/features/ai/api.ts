@@ -65,7 +65,14 @@ export function useAiStatus() {
       try {
         return (await api.GET("/api/v1/ai/status")).data as AiStatus;
       } catch {
-        return { available: false, provider_state: "unavailable", auto_navigate: false, name: "" };
+        return {
+          available: false,
+          provider_state: "unavailable",
+          auto_navigate: false,
+          name: "",
+          daily_budget: 0,
+          used_today: 0,
+        };
       }
     },
   });

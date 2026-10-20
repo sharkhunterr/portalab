@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
+from portalab.modules.ai.context import DEFAULT_FALLBACK, DEFAULT_ROLE
 
 OWNER = "module:ai"
 API_KEY = "ai.provider.apiKey"
@@ -17,9 +18,10 @@ class AiConfig:
     provider_endpoint: str = ""
     provider_model: str = ""
     provider_reasoning: str = ""
-    assistant_name: str = ""
-    assistant_role: str = ""
-    assistant_fallback: str = ""
+    # issue 171: the setting's own values — shown in the settings, changed there (never fixed in the code)
+    assistant_name: str = "Nova"
+    assistant_role: str = DEFAULT_ROLE
+    assistant_fallback: str = DEFAULT_FALLBACK
     max_tool_calls_per_turn: int = 8
     max_context_tokens: int = 6000
     request_timeout_seconds: int = 60
@@ -61,10 +63,9 @@ _DESCRIPTIONS = {
     "provider_kind": "Provider adapter: openai_compatible (hosted APIs or local servers).",
     "provider_endpoint": "Base URL of the provider (e.g. http://ollama:11434/v1).",
     "provider_model": "Model name sent to the provider.",
-    "assistant_name": "The assistant's name, told to the model and shown atop its window (empty: Assistant).",
-    "assistant_role": "What the assistant is for on this portal (empty: the portal's own description).",
-    "assistant_fallback": "What it does when its tools do not hold the answer (empty: a wiki page's link, "
-    "else a support ticket).",
+    "assistant_name": "The assistant's name, told to the model and shown atop its window.",
+    "assistant_role": "What the assistant is for on this portal (it begins « you… »).",
+    "assistant_fallback": "What it does when its tools do not hold the answer.",
     "provider_reasoning": "How much a thinking model reflects before answering (none: at once — faster, and "
     "its thoughts never eat the answer's length); empty: the model's default.",
     "max_tool_calls_per_turn": "Maximum tool calls in one answer.",

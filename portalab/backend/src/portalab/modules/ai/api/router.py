@@ -41,7 +41,10 @@ class AiStatusOut(BaseModel):
     available: bool
     provider_state: str
     auto_navigate: bool
-    name: str = ""  # issue 171: the assistant's name (empty: « Assistant »)
+    name: str = ""  # issue 171: the assistant's name, as the settings say
+    # issue 171: what is left of the member's daily allowance (tokens), for the window to show
+    daily_budget: int = 0
+    used_today: int = 0
 
 
 class AiPageContext(BaseModel):
@@ -126,7 +129,7 @@ def _action(view: PendingView) -> AiActionOut:
 
 
 @router.get("/ai/status", response_model=AiStatusOut)
-async def status(_: User, module: Module) -> AiStatusOut:
+async def status(principal: User, module: Module) -> AiStatusOut:
     if not module.config.enabled:
         state = "disabled"
     elif not module.available():
@@ -138,7 +141,19 @@ async def status(_: User, module: Module) -> AiStatusOut:
         provider_state=state,
         auto_navigate=module.config.auto_navigate,
         name=module.config.assistant_name,
+        daily_budget=module.config.daily_token_budget_per_user,
+        used_today=await _used(module, principal),
     )
+
+
+async def _used(module: AiModule, principal: Principal) -> int:
+    user = principal.acting_for or principal.user_id
+    if user is None:
+        return 0
+    try:
+        return await module.governor.used_today(user)
+    except Exception:
+        return 0
 
 
 @router.get("/ai/tools", response_model=list[AiToolOut])

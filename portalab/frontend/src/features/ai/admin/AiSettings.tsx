@@ -75,7 +75,7 @@ export function AiSettings() {
           <TextField
             label={t("ai:admin.persona.name")}
             hint={t("ai:admin.persona.nameHint")}
-            placeholder="Assistant"
+            placeholder="Nova"
             maxLength={40}
             value={String(values.assistant_name ?? "")}
             onChange={(event) => setValues({ ...values, assistant_name: event.target.value })}

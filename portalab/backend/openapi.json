@@ -1150,6 +1150,11 @@
             "title": "Available",
             "type": "boolean"
           },
+          "daily_budget": {
+            "default": 0,
+            "title": "Daily Budget",
+            "type": "integer"
+          },
           "name": {
             "default": "",
             "title": "Name",
@@ -1158,6 +1163,11 @@
           "provider_state": {
             "title": "Provider State",
             "type": "string"
+          },
+          "used_today": {
+            "default": 0,
+            "title": "Used Today",
+            "type": "integer"
           }
         },
         "required": [

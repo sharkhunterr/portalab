@@ -1,4 +1,5 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
@@ -28,11 +29,13 @@ export interface AiPanelProps {
   context?: { route?: string; title?: string; question?: string; asked?: number } | undefined;
   /** issue 171: the assistant's name (the administrators'), else « Assistant » */
   name?: string | undefined;
+  /** issue 171: today's allowance and what the member used of it (tokens) */
+  quota?: { budget: number; used: number } | undefined;
 }
 
 const IDEAS = ["services", "tickets", "news", "media"] as const;
 
-export function AiPanel({ open, onOpenChange, available, autoNavigate, context, name }: AiPanelProps) {
+export function AiPanel({ open, onOpenChange, available, autoNavigate, context, name, quota }: AiPanelProps) {
   const t = useT();
   const format = useFormat();
   // issue 171: the page the member is on, in a few words (never more than the route and one line)
@@ -41,6 +44,13 @@ export function AiPanel({ open, onOpenChange, available, autoNavigate, context, 
   const chat = useAiChat(page);
   const conversations = useConversations(open && available);
   const [draft, setDraft] = useState("");
+  const client = useQueryClient();
+  // issue 171: the allowance shown is refreshed once an answer is done
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on each answer's end only
+  useEffect(() => {
+    if (!chat.busy) void client.invalidateQueries({ queryKey: ["ai", "status"] });
+  }, [chat.busy]);
+  const left = quota ? Math.max(0, Math.round(100 - (quota.used / quota.budget) * 100)) : undefined;
   const [history, setHistory] = useState(false);
   const input = useRef<HTMLTextAreaElement>(null);
   const log = useRef<HTMLDivElement>(null);
@@ -279,6 +289,14 @@ export function AiPanel({ open, onOpenChange, available, autoNavigate, context, 
                 ) : null}
               </div>
 
+              {left !== undefined ? (
+                <p className="ai-quota" data-low={left <= 15 || undefined}>
+                  <span className="ai-quota__bar" aria-hidden="true">
+                    <span style={{ inlineSize: `${left}%` }} />
+                  </span>
+                  {t("ai:panel.quota", { percent: left })}
+                </p>
+              ) : null}
               <form className="ai-composer" onSubmit={submit}>
                 <label className="visually-hidden" htmlFor="ai-input">
                   {t("ai:panel.placeholder")}

@@ -10536,12 +10536,22 @@ export interface components {
             /** Available */
             available: boolean;
             /**
+             * Daily Budget
+             * @default 0
+             */
+            daily_budget: number;
+            /**
              * Name
              * @default
              */
             name: string;
             /** Provider State */
             provider_state: string;
+            /**
+             * Used Today
+             * @default 0
+             */
+            used_today: number;
         };
         /** AiToolOut */
         AiToolOut: {
