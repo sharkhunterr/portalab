@@ -249,3 +249,39 @@ describe("the assistant's window (issue 171)", () => {
     expect(open).toHaveBeenCalledWith({ route: "/wiki" });
   });
 });
+
+describe("a message's actions (issue 171)", () => {
+  it("copies a message without its source numbers and asks a question again", async () => {
+    const asked: string[] = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (request.method === "GET") return json(200, []);
+      if (path === "/api/v1/ai/conversations") return json(201, CONVERSATION);
+      if (path.endsWith("/messages")) {
+        asked.push(((await request.json()) as { content: string }).content);
+        return sse([
+          [
+            "done",
+            { content: "All good [1].", sources: [], caveats: [], interpretation: true, pending_actions: [] },
+          ],
+        ]);
+      }
+      return json(404, {});
+    };
+    const written: string[] = [];
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async (text: string) => written.push(text) },
+    });
+    show();
+    fireEvent.change(screen.getByLabelText("Ask the assistant…"), { target: { value: "Is it all up?" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    await waitFor(() => expect(document.querySelector(".ai-answer")?.textContent).toContain("All good"));
+    const copies = screen.getAllByRole("button", { name: "Copy" });
+    fireEvent.click(copies[1] as HTMLElement); // the answer
+    await waitFor(() => expect(written).toEqual(["All good."]));
+    expect(await screen.findByText("Copied")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Send again" }));
+    await waitFor(() => expect(asked).toEqual(["Is it all up?", "Is it all up?"]));
+  });
+});

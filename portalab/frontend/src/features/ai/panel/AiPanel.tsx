@@ -213,7 +213,14 @@ export function AiPanel({ open, onOpenChange, available, autoNavigate, context, 
                     aria-label={message.role === "user" ? t("ai:panel.you") : t("ai:panel.assistant")}
                   >
                     {message.role === "user" ? (
-                      <p className="ai-bubble__text">{message.content}</p>
+                      <>
+                        <p className="ai-bubble__text">{message.content}</p>
+                        <MessageActions
+                          text={message.content}
+                          resend={chat.busy ? undefined : () => ask(message.content)}
+                          resendLabel={t("ai:panel.resend")}
+                        />
+                      </>
                     ) : (
                       <>
                         {message.content ? (
@@ -250,6 +257,17 @@ export function AiPanel({ open, onOpenChange, available, autoNavigate, context, 
                         {message.pending.map((id) => (
                           <ConfirmationCard key={id} actionId={id} />
                         ))}
+                        {!message.streaming && message.content ? (
+                          <MessageActions
+                            text={message.content}
+                            resend={
+                              chat.busy || !questionBefore(chat.messages, index)
+                                ? undefined
+                                : () => ask(questionBefore(chat.messages, index) ?? "")
+                            }
+                            resendLabel={t("ai:panel.retry")}
+                          />
+                        ) : null}
                       </>
                     )}
                   </article>
@@ -313,6 +331,76 @@ export function AiPanel({ open, onOpenChange, available, autoNavigate, context, 
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
+  );
+}
+
+/** The member's question an answer replied to (to ask it again). */
+function questionBefore(messages: { role: string; content: string }[], index: number): string | undefined {
+  for (let at = index - 1; at >= 0; at -= 1) {
+    const message = messages[at];
+    if (message?.role === "user") return message.content;
+  }
+  return undefined;
+}
+
+/** Issue 171 — under a message: copy it, send it again (a question) or ask again (an answer). */
+function MessageActions({
+  text,
+  resend,
+  resendLabel,
+}: {
+  text: string;
+  resend: (() => void) | undefined;
+  resendLabel: string;
+}) {
+  const t = useT();
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    const plain = text.replace(/\s*\[\d{1,2}\]/g, ""); // without the source numbers
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(plain);
+      else {
+        // an older browser: the selection's copy
+        const area = document.createElement("textarea");
+        area.value = plain;
+        area.setAttribute("readonly", "");
+        area.style.position = "absolute";
+        area.style.insetInlineStart = "-9999px";
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+      }
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      setCopied(false);
+    }
+  };
+  return (
+    <div className="ai-actions">
+      <button
+        type="button"
+        className="ai-action"
+        aria-label={copied ? t("ai:panel.copied") : t("ai:panel.copy")}
+        title={copied ? t("ai:panel.copied") : t("ai:panel.copy")}
+        onClick={() => void copy()}
+      >
+        <Icon name={copied ? "check" : "copy"} size={14} />
+        {copied ? <span>{t("ai:panel.copied")}</span> : null}
+      </button>
+      {resend ? (
+        <button
+          type="button"
+          className="ai-action"
+          aria-label={resendLabel}
+          title={resendLabel}
+          onClick={resend}
+        >
+          <Icon name="retry" size={14} />
+        </button>
+      ) : null}
+    </div>
   );
 }
 
