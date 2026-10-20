@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import Any
 
 from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
+from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.content import default_calendar_sources
 from portalab.capabilities.health import INFRA_HISTORY, SERVICE_STATE
 from portalab.capabilities.registry import CapabilityRegistry
@@ -17,6 +18,7 @@ from portalab.core.jobs.registry import JobRegistry
 from portalab.core.time import Clock
 from portalab.modules.health import event_types as _event_types  # noqa: F401 — registers event types
 from portalab.modules.health import settings as _settings  # noqa: F401 — declares settings
+from portalab.modules.health.ai_tools import HealthAiTools
 from portalab.modules.health.calendar_source import MaintenanceCalendarSource
 from portalab.modules.health.detail.assembler import DetailAssembler
 from portalab.modules.health.detail.history import HistoryQuery
@@ -48,7 +50,9 @@ class HealthModule:
         *,
         config: HealthConfig | None = None,
         clock: Clock | None = None,
+        ai_tools: AIToolRegistry = default_ai_tools,
     ) -> None:
+        self.ai_tools = ai_tools  # issue 171: the assistant's maintenance tool
         self.database = database
         self.capabilities = capabilities
         self.state = StateService(database, events, capabilities, config=config, clock=clock)
@@ -77,6 +81,7 @@ class HealthModule:
         self.state.config = value
 
     def register_capabilities(self) -> None:
+        HealthAiTools(self, self.state.clock).register(self.ai_tools)
         self.capabilities.provide(SERVICE_STATE, self.reader, instance_ref="health", owner=OWNER)
         self.capabilities.provide(INFRA_HISTORY, self.infra_history, instance_ref="health", owner=OWNER)
         default_admin_surfaces.register(

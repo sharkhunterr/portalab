@@ -13,7 +13,8 @@ from portalab.capabilities.ai import ChatMessage, ToolResult
 DEFAULT_NAME = "Assistant"
 DEFAULT_ROLE = (
     "help the members with this portal: their media (requests, availability, what they watched or read), "
-    "their support tickets, the announcements, the wiki, the services' state, the shop and their progression"
+    "their support tickets, the announcements, the wiki, the services' state, incidents and maintenance, the "
+    "shop and their progression"
 )
 DEFAULT_FALLBACK = (
     "say plainly that you do not know, then give the link of the wiki page that covers it (search the wiki "
