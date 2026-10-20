@@ -143,6 +143,7 @@
   "art.ai.context": "Longer memory",
   "art.ai.daily": "tokens a day",
   "art.ai.for": "{hours, plural, =0 {for good} one {# hour} other {# hours}}",
+  "art.ai.forDays": "{days, plural, one {# day} other {# days}}",
   "art.ai.model": "Stronger model",
   "art.ai.recharge": "tokens in reserve",
   "art.ai.reflection": "More reflection",
