@@ -12,6 +12,7 @@ import { pageContext, pageLabel } from "../pageContext";
 import { SourceList } from "../sources/SourceList";
 import { AnswerText } from "./AnswerText";
 import { NavigationSuggestion } from "./NavigationSuggestion";
+import { type Usage, UsageMeter } from "./UsageMeter";
 import { useAiChat } from "./useAiChat";
 import "../ai.css";
 
@@ -31,7 +32,7 @@ export interface AiPanelProps {
   /** issue 171: the assistant's name (the administrators'), else « Assistant » */
   name?: string | undefined;
   /** issue 171: today's allowance and what the member used of it (tokens) */
-  quota?: { budget: number; used: number; recharge?: number; shop?: boolean } | undefined;
+  quota?: Usage | undefined;
   /** issue 174: the administrators' questions to start with (none: the translated defaults) */
   ideas?: string[] | undefined;
 }
@@ -62,7 +63,6 @@ export function AiPanel({
   useEffect(() => {
     if (!chat.busy) void client.invalidateQueries({ queryKey: ["ai", "status"] });
   }, [chat.busy]);
-  const left = quota ? Math.max(0, Math.round(100 - (quota.used / quota.budget) * 100)) : undefined;
   const [history, setHistory] = useState(false);
   const input = useRef<HTMLTextAreaElement>(null);
   const log = useRef<HTMLDivElement>(null);
@@ -125,6 +125,7 @@ export function AiPanel({
               </DialogPrimitive.Description>
             </div>
             <div className="ai-modal__actions">
+              {available && quota ? <UsageMeter usage={quota} /> : null}
               {available ? (
                 <>
                   <button
@@ -317,25 +318,6 @@ export function AiPanel({
                 ) : null}
               </div>
 
-              {left !== undefined ? (
-                <p className="ai-quota" data-low={left <= 15 || undefined}>
-                  <span className="ai-quota__bar" aria-hidden="true">
-                    <span style={{ inlineSize: `${left}%` }} />
-                  </span>
-                  {t("ai:panel.quota", { percent: left })}
-                  {quota?.recharge ? (
-                    <span className="ai-quota__reserve">
-                      {" · "}
-                      {t("ai:panel.reserve", { amount: format.compact(quota.recharge) })}
-                    </span>
-                  ) : null}
-                  {quota?.shop && left <= 15 ? (
-                    <Link className="ai-quota__shop" to="/marketplace?type=ai_capacity">
-                      {t("ai:panel.more")}
-                    </Link>
-                  ) : null}
-                </p>
-              ) : null}
               <form className="ai-composer" onSubmit={submit}>
                 <label className="visually-hidden" htmlFor="ai-input">
                   {t("ai:panel.placeholder")}

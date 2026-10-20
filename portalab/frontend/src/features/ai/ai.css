@@ -789,30 +789,93 @@ a.ai-card:hover {
 }
 
 /* issue 171: what is left of today's allowance, quietly above the composer */
-.ai-quota {
-  display: flex;
-  flex: none;
+/* issue 179: today's use, in the window's header — pressed, the details */
+.ai-usage {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  margin: 0 var(--space-4) var(--space-1);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-}
-.ai-quota__bar {
-  display: block;
-  inline-size: 4rem;
-  block-size: 0.3rem;
+  gap: var(--space-1);
+  min-block-size: 2rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
-  background: var(--color-surface-raised);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.ai-usage:hover {
+  color: var(--color-text);
+}
+.ai-usage:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+.ai-usage__ring {
+  --ai-usage-tone: var(--color-accent);
+  inline-size: 1rem;
+  block-size: 1rem;
+  border-radius: 50%;
+  background: conic-gradient(var(--ai-usage-tone) var(--ai-usage), var(--color-border) 0);
+  mask: radial-gradient(circle, transparent 45%, currentColor 47%);
+}
+.ai-usage[data-tone="low"] .ai-usage__ring,
+.ai-usage__pop[data-tone="low"] .ai-usage__bar span {
+  --ai-usage-tone: var(--state-partial-fg);
+}
+.ai-usage[data-tone="over"] .ai-usage__ring {
+  --ai-usage-tone: var(--state-error-fg);
+}
+.ai-usage__pop {
+  display: grid;
+  gap: var(--space-2);
+  inline-size: min(18rem, calc(100vw - 2rem));
+  font-size: var(--font-size-sm);
+}
+.ai-usage__title,
+.ai-usage__subtitle {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+.ai-usage__bar {
+  display: block;
+  block-size: 0.35rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
   overflow: hidden;
 }
-.ai-quota__bar span {
+.ai-usage__bar span {
   display: block;
   block-size: 100%;
   background: var(--color-accent);
 }
-.ai-quota[data-low] .ai-quota__bar span {
-  background: var(--state-partial-fg);
+.ai-usage__facts {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+}
+.ai-usage__facts dt {
+  color: var(--color-text-muted);
+}
+.ai-usage__facts dd {
+  margin: 0;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+.ai-usage__perks {
+  margin: 0;
+  padding-inline-start: var(--space-4);
+}
+.ai-usage__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.ai-usage__shop {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* issue 176: the assistant's dashboard */
@@ -889,11 +952,4 @@ a.ai-card:hover {
   padding-inline-start: var(--space-2);
   border-inline-start: 3px solid var(--color-accent);
   overflow-wrap: anywhere;
-}
-
-/* issue 173: tokens held in reserve, and where to get more */
-.ai-quota__shop {
-  margin-inline-start: auto;
-  color: var(--color-accent);
-  font-weight: var(--font-weight-semibold);
 }

@@ -112,6 +112,9 @@ async def test_assistant_capacities_go_to_the_assistant() -> None:
         async def revoke(self, source_ref: str) -> None:
             revoked.append(source_ref)
 
+        def offers(self, perk: str) -> bool:
+            return perk == "daily_tokens"
+
     registry = CapabilityRegistry()
     registry.declare(next(spec for spec in AI_SPECS if spec.name == AI_PERKS))
     handler = AiCapacityHandler(registry)
@@ -123,3 +126,12 @@ async def test_assistant_capacities_go_to_the_assistant() -> None:
     await handler.deactivate(tokens)
     assert granted[0] == ("daily_tokens", 20000, 168, f"marketplace:{tokens.id}")
     assert revoked == [f"marketplace:{tokens.id}"] and "ai_capacity" in NOT_REFUNDABLE
+    # the shop neither shows nor sells a capacity the assistant does not offer now
+    from portalab.capabilities.marketplace import ProductType, ProductTypeRegistry
+    from portalab.modules.marketplace.types.registry import offered
+
+    types = ProductTypeRegistry()
+    types.register(ProductType("ai_capacity", "module:marketplace", handler))
+    assert offered(types, "ai_capacity", {"perk": "daily_tokens"})
+    assert not offered(types, "ai_capacity", {"perk": "model"})
+    assert offered(types, "badge", {})  # a type that does not say: always sold

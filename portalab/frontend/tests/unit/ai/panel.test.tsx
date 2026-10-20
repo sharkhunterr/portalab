@@ -345,7 +345,7 @@ describe("the member's verdict (issue 176)", () => {
 });
 
 describe("today's allowance (issue 171)", () => {
-  it("shows what is left of it", () => {
+  it("shows what was used of it", async () => {
     fake.handler = () => json(200, []);
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const router = createMemoryRouter(
@@ -359,7 +359,7 @@ describe("today's allowance (issue 171)", () => {
               available
               autoNavigate={false}
               name="Nova"
-              quota={{ budget: 1000, used: 250 }}
+              quota={{ budget: 1000, used: 250, recharge: 5000, shop: true, perks: { model: "forever" } }}
               ideas={["Mes demandes en cours ?"]}
             />
           ),
@@ -372,7 +372,15 @@ describe("today's allowance (issue 171)", () => {
         <RouterProvider router={router} />
       </QueryClientProvider>,
     );
-    expect(screen.getByText("75 % of today's allowance left")).toBeTruthy();
+    // issue 179: in the header, what was used — pressed, the details and where to get more
+    const meter = screen.getByRole("button", { name: "25 % of today's allowance used — details" });
+    fireEvent.click(meter);
+    expect(await screen.findByText("250 of 1K (25 %)")).toBeTruthy();
+    expect(screen.getByText("5K left, spent past the day's")).toBeTruthy();
+    expect(screen.getByText(/Stronger model — for good/)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Get more in the shop." }).getAttribute("href")).toBe(
+      "/marketplace?type=ai_capacity",
+    );
     expect(screen.getByRole("heading", { name: "Nova" })).toBeTruthy();
     // issue 174: the administrators' questions instead of the defaults
     expect(screen.getByRole("button", { name: "Mes demandes en cours ?" })).toBeTruthy();

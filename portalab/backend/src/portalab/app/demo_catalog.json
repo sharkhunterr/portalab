@@ -2260,6 +2260,231 @@
    "contribution": null,
    "config_required": false,
    "season": null
+  },
+  {
+   "key": "ai_daily_25k",
+   "type": "ai_capacity",
+   "price": 250,
+   "rarity": "common",
+   "names": {
+    "en": "Assistant: +25,000 tokens a day — 7 days",
+    "fr": "Assistant : +25 000 jetons par jour — 7 jours"
+   },
+   "descriptions": {
+    "en": "Your daily allowance with the assistant rises by 25,000 tokens for a week.",
+    "fr": "Votre quota quotidien avec l'assistant augmente de 25 000 jetons pendant une semaine."
+   },
+   "payload": {
+    "perk": "daily_tokens",
+    "amount": 25000,
+    "hours": 168
+   },
+   "collection": "assistant",
+   "featured": true,
+   "supply": null,
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null,
+   "icon": "zap",
+   "level": null,
+   "limit": [
+    2,
+    30
+   ]
+  },
+  {
+   "key": "ai_recharge_50k",
+   "type": "ai_capacity",
+   "price": 150,
+   "rarity": "common",
+   "names": {
+    "en": "Assistant recharge: 50,000 tokens",
+    "fr": "Recharge de l'assistant : 50 000 jetons"
+   },
+   "descriptions": {
+    "en": "Kept in reserve until spent: used only once your day's allowance is reached.",
+    "fr": "Gardés en réserve jusqu'à épuisement : utilisés seulement une fois le quota du jour atteint."
+   },
+   "payload": {
+    "perk": "recharge",
+    "amount": 50000
+   },
+   "collection": "assistant",
+   "featured": false,
+   "supply": null,
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null,
+   "icon": "battery",
+   "level": null,
+   "limit": [
+    5,
+    30
+   ]
+  },
+  {
+   "key": "ai_recharge_200k",
+   "type": "ai_capacity",
+   "price": 500,
+   "rarity": "rare",
+   "names": {
+    "en": "Assistant recharge: 200,000 tokens",
+    "fr": "Recharge de l'assistant : 200 000 jetons"
+   },
+   "descriptions": {
+    "en": "A big reserve for long conversations — cheaper than four small ones.",
+    "fr": "Une grosse réserve pour les longues conversations — moins cher que quatre petites."
+   },
+   "payload": {
+    "perk": "recharge",
+    "amount": 200000
+   },
+   "collection": "assistant",
+   "featured": false,
+   "supply": null,
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null,
+   "icon": "battery",
+   "level": null,
+   "limit": [
+    2,
+    30
+   ]
+  },
+  {
+   "key": "ai_reflection_7d",
+   "type": "ai_capacity",
+   "price": 400,
+   "rarity": "rare",
+   "names": {
+    "en": "Assistant: more reflection — 7 days",
+    "fr": "Assistant : plus de réflexion — 7 jours"
+   },
+   "descriptions": {
+    "en": "The assistant thinks longer before answering: better understanding of tricky questions, a few seconds more.",
+    "fr": "L'assistant réfléchit plus longtemps avant de répondre : il comprend mieux les questions délicates, quelques secondes de plus."
+   },
+   "payload": {
+    "perk": "reflection",
+    "hours": 168
+   },
+   "collection": "assistant",
+   "featured": false,
+   "supply": null,
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null,
+   "icon": "lightbulb",
+   "level": null,
+   "limit": [
+    2,
+    30
+   ]
+  },
+  {
+   "key": "ai_memory_7d",
+   "type": "ai_capacity",
+   "price": 400,
+   "rarity": "rare",
+   "names": {
+    "en": "Assistant: longer memory — 7 days",
+    "fr": "Assistant : mémoire plus longue — 7 jours"
+   },
+   "descriptions": {
+    "en": "Longer conversations remembered, and more look-ups for each answer.",
+    "fr": "Des conversations plus longues gardées en mémoire, et plus de recherches pour chaque réponse."
+   },
+   "payload": {
+    "perk": "context",
+    "hours": 168
+   },
+   "collection": "assistant",
+   "featured": false,
+   "supply": null,
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null,
+   "icon": "book-open",
+   "level": null,
+   "limit": [
+    2,
+    30
+   ]
+  },
+  {
+   "key": "ai_model_24h",
+   "type": "ai_capacity",
+   "price": 300,
+   "rarity": "epic",
+   "names": {
+    "en": "Assistant: stronger model — 24 h",
+    "fr": "Assistant : modèle plus puissant — 24 h"
+   },
+   "descriptions": {
+    "en": "For a day, the assistant answers with the portal's stronger model.",
+    "fr": "Pendant une journée, l'assistant répond avec le modèle plus puissant du portail."
+   },
+   "payload": {
+    "perk": "model",
+    "hours": 24
+   },
+   "collection": "assistant",
+   "featured": false,
+   "supply": null,
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null,
+   "icon": "brain",
+   "level": 5,
+   "limit": [
+    3,
+    30
+   ]
+  },
+  {
+   "key": "ai_tools_30d",
+   "type": "ai_capacity",
+   "price": 800,
+   "rarity": "epic",
+   "names": {
+    "en": "Assistant: extra tools — 30 days",
+    "fr": "Assistant : outils en plus — 30 jours"
+   },
+   "descriptions": {
+    "en": "The tools the administrators keep for the assistant's keenest users, for a month.",
+    "fr": "Les outils que les administrateurs réservent aux plus grands utilisateurs de l'assistant, pendant un mois."
+   },
+   "payload": {
+    "perk": "tools",
+    "hours": 720
+   },
+   "collection": "assistant",
+   "featured": false,
+   "supply": null,
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null,
+   "icon": "wrench",
+   "level": 5,
+   "limit": [
+    1,
+    30
+   ]
   }
  ],
  "retired": [

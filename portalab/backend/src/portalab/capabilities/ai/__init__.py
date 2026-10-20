@@ -262,6 +262,10 @@ class AiPerks(Protocol):
 
     async def revoke(self, source_ref: str) -> None: ...
 
+    def offers(self, perk: str) -> bool:
+        """Whether the portal offers this perk now — the shop neither shows nor sells one it does not."""
+        ...
+
 
 PERKS_SPEC = CapabilitySpec(
     name=PERKS,

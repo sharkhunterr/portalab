@@ -25,6 +25,7 @@ from portalab.modules.marketplace.module import MarketplaceModule
 from portalab.modules.marketplace.permissions import PURCHASE, READ
 from portalab.modules.marketplace.pricing import active_discounts, price_now
 from portalab.modules.marketplace.products.service import ProductNotFound
+from portalab.modules.marketplace.types.registry import offered
 
 router = APIRouter(prefix="/api/v1", tags=["marketplace"])
 Reader = Annotated[Principal, require(READ)]
@@ -295,6 +296,8 @@ async def products(
     today = module.openings.today()
     # #81: a season's booster is in the shop in its weeks only
     rows = [(p, v) for p, v in rows if p.type != "booster" or module.openings.sold(p, v, today)]
+    # issue 173: a product its type cannot deliver now (a capacity the assistant does not offer) is not shown
+    rows = [(p, v) for p, v in rows if offered(module.product_types, p.type, v.payload or {})]
     keys = await category_keys(module)
     stock = await module.availability.stock(p for p, _ in rows)
     discounts = await active_discounts(module.capabilities, utc_now(module.clock))
