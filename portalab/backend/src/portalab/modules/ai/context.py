@@ -81,3 +81,102 @@ def window(history: Sequence[ChatMessage], budget_tokens: int) -> list[ChatMessa
         kept.append(message)
         used += cost
     return list(reversed(kept))
+
+
+# issue 171: the language a question is written in — a small model answers in the language of the data it
+# read (English) unless told by name
+_FRENCH = frozenset(
+    (
+        "le",
+        "la",
+        "les",
+        "des",
+        "est",
+        "sont",
+        "je",
+        "tu",
+        "il",
+        "elle",
+        "nous",
+        "vous",
+        "mon",
+        "ma",
+        "mes",
+        "ton",
+        "ta",
+        "tes",
+        "que",
+        "qui",
+        "quoi",
+        "pourquoi",
+        "comment",
+        "quand",
+        "où",
+        "ou",
+        "un",
+        "une",
+        "du",
+        "au",
+        "aux",
+        "avec",
+        "pour",
+        "dans",
+        "sur",
+        "ce",
+        "cette",
+        "ces",
+        "pas",
+        "plus",
+        "tous",
+        "toutes",
+        "ai",
+        "as",
+        "a",
+        "quel",
+        "quelle",
+        "quels",
+    )
+)
+_ENGLISH = frozenset(
+    (
+        "the",
+        "is",
+        "are",
+        "i",
+        "you",
+        "my",
+        "your",
+        "what",
+        "why",
+        "how",
+        "when",
+        "where",
+        "which",
+        "do",
+        "does",
+        "did",
+        "a",
+        "an",
+        "of",
+        "to",
+        "in",
+        "on",
+        "with",
+        "for",
+        "all",
+        "any",
+    )
+)
+
+
+def language_of(text: str) -> str | None:
+    words = [
+        w.strip("?!.,;:«»\"'()").casefold() for w in text.replace("'", " ").replace("\u2019", " ").split()
+    ]
+    french = sum(w in _FRENCH for w in words) + sum(any(c in w for c in "éèêàçùô") for w in words)
+    english = sum(w in _ENGLISH for w in words)
+    if french > english:
+        return "French"
+    if english > french:
+        return "English"
+    return None

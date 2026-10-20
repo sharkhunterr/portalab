@@ -32,3 +32,12 @@ def test_an_answer_citing_nothing_still_shows_what_the_portal_handed_it() -> Non
     _, cited, _ = attributor.finalize("Film 3 is here [4].")
     assert [s["n"] for s in cited] == [4]  # cited: only those
     assert Attributor().finalize("Hello.")[2] is True  # no portal data: the assistant's interpretation
+
+
+def test_the_language_a_question_is_written_in() -> None:
+    from portalab.modules.ai.context import language_of
+
+    assert language_of("Est ce que tous les services fonctionnent ?") == "French"
+    assert language_of("Pourquoi ce film a un badge leaving soon") == "French"
+    assert language_of("Are all the services working?") == "English"
+    assert language_of("Heat") is None

@@ -20,7 +20,7 @@ from portalab.capabilities.ai import ChatMessage, LLMProvider, ProviderError, So
 from portalab.capabilities.observability import AiOutcome, report_ai_call
 from portalab.core.authz_port import Principal
 from portalab.modules.ai.attribution import Attributor
-from portalab.modules.ai.context import frame_tool_result, system_prompt, window
+from portalab.modules.ai.context import frame_tool_result, language_of, system_prompt, window
 from portalab.modules.ai.errors import AiUnavailable
 from portalab.modules.ai.executor import ToolExecutor
 from portalab.modules.ai.observability import log, metrics
@@ -33,7 +33,7 @@ Event = dict[str, Any]
 MAX_ANSWER_TOKENS = 1024
 REMINDER = (
     "(Answer from what your tools return now — look it up even if the conversation spoke of it before; never "
-    "invent a service, a title, a ticket or a date. In the language of this question.)"
+    "invent a service, a title, a ticket or a date. Never copy raw field names or timestamps.)"
 )
 THINKING_TOKENS = 3072
 
@@ -102,7 +102,9 @@ class Orchestrator:
         # issue 171: a small model forgets the system's rules as a conversation grows — the rule it needs
         # most rides on the question it answers (sent to the model only, never stored)
         if kept and kept[-1].role == "user":
-            kept[-1] = replace(kept[-1], content=f"{kept[-1].content}\n\n{REMINDER}")
+            spoken = language_of(kept[-1].content)
+            said = f"Answer in {spoken}." if spoken else "Answer in the language of this question."
+            kept[-1] = replace(kept[-1], content=f"{kept[-1].content}\n\n{REMINDER} {said}")
         return [system, *kept]
 
     async def run(

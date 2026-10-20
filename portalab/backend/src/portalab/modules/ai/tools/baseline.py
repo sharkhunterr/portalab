@@ -22,6 +22,7 @@ from portalab.core.time import Clock, utc_now
 
 OWNER = "module:ai"
 PORT_TIMEOUT = 4.0
+OPERATIONAL = ("operational",)
 _QUERY = {
     "type": "object",
     "properties": {"query": {"type": "string", "minLength": 1, "maxLength": 200}},
@@ -149,15 +150,13 @@ class BaselineTools:
             name = names.get(view.service_id, view.service_id)
             if wanted and wanted not in name.casefold() and wanted != view.service_id:
                 continue
-            rows.append(
-                {
-                    "service": name,
-                    "state": view.state,
-                    "since": view.since.isoformat(),
-                    "availability_24h": view.availability,
-                    "as_of": view.as_of.isoformat(),
-                }
-            )
+            # issue 171: what an answer needs — a small model lost itself in raw timestamps
+            row: dict[str, Any] = {"service": name, "state": view.state}
+            if view.availability is not None:  # a share of OK probes over 24 h
+                row["availability_24h_percent"] = round(view.availability * 100, 1)
+            if view.state not in OPERATIONAL:
+                row["since"] = view.since.date().isoformat()
+            rows.append(row)
             sources.append(
                 SourceRef(
                     "service",
@@ -168,7 +167,13 @@ class BaselineTools:
                     f"/services/{view.service_id}",
                 )
             )
-        return ToolResult("ok", {"services": rows[:30]}, sources[:30])
+        trouble = [r["service"] for r in rows if r["state"] not in OPERATIONAL]
+        summary = {
+            "all_operational": not trouble,
+            "operational": len(rows) - len(trouble),
+            "in_trouble": trouble,
+        }
+        return ToolResult("ok", {"summary": summary, "services": rows[:30]}, sources[:30])
 
     # --- 017 statistics --------------------------------------------------------------------------------
     async def statistics_list(self, principal: Principal, params: Mapping[str, Any]) -> ToolResult:
