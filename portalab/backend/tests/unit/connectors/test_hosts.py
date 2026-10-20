@@ -114,6 +114,36 @@ def test_unraid_report() -> None:
     assert report.warnings == ("storage_low", "disk_errors")  # disk1 98 % full; the cache has errors
 
 
+def test_unraid_parity_under_way_beats_the_last_check() -> None:
+    """Unraid's ``parityCheckStatus`` can still tell the last check (« completed ») while a new one runs: the
+    array driver's counters say what is under way — its progress and pace — and a pause stays a pause."""
+    last = {
+        "status": "COMPLETED",
+        "progress": 0,
+        "running": False,
+        "paused": False,
+        "date": "2026-09-20T22:00:01Z",
+        "duration": 119649,
+    }
+    resync = {
+        "mdResync": 1,
+        "mdResyncPos": "2500",
+        "mdResyncSize": 10000,
+        "mdResyncAction": "check P",
+        "mdResyncDt": "10",
+        "mdResyncDb": "1024000",
+    }
+    report = unraid_report({"array": {"state": "STARTED", "parityCheckStatus": last}, "vars": resync})
+    parity = report.parity
+    assert parity is not None and parity.running and parity.status == "running" and parity.progress == 25
+    assert parity.speed == "100.0 MB/s" and parity.remaining_seconds == 7500 / 102400 * 1
+    assert parity.started_at is None and parity.correcting is True  # the last check's date is not this one's
+    paused = unraid_report({"array": {"parityCheckStatus": last}, "vars": {**resync, "mdResync": 0}}).parity
+    assert paused is not None and paused.paused and not paused.running and paused.status == "paused"
+    idle = unraid_report({"array": {"parityCheckStatus": last}, "vars": {**resync, "mdResyncPos": 0}}).parity
+    assert idle is not None and not idle.running and idle.status == "completed"
+
+
 def test_a_warning_degrades_without_counting_as_an_outage() -> None:
     from datetime import UTC, datetime
 

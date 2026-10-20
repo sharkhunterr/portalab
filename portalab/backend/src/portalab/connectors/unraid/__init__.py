@@ -58,6 +58,8 @@ SECTIONS: dict[str, str] = {
       caches { name status temp size numErrors fsSize fsFree fsUsed }
       parityCheckStatus { status progress running errors speed date duration paused correcting }
     }""",
+    # the check under way, as the array driver counts it (parityCheckStatus may still tell the last one)
+    "resync": "vars { mdResync mdResyncPos mdResyncSize mdResyncAction mdResyncDt mdResyncDb }",
     "docker": "docker { containers { names state status image isUpdateAvailable autoStart } }",
     "notifications": """notifications {
       list(filter: {type: UNREAD, offset: 0, limit: 20}) { title subject description importance timestamp }
@@ -207,8 +209,41 @@ def _cpu_name(value: Any) -> str | None:
     return text[4:] if text.startswith("Gen ") else text
 
 
-def _parity(raw: Mapping[str, Any]) -> ParityCheck | None:
+def _resync(raw: Mapping[str, Any], resync: Mapping[str, Any]) -> Mapping[str, Any]:
+    """The check under way as the array driver counts it (``vars.mdResync*``): Unraid's
+    ``parityCheckStatus`` may still describe the last check while a new one runs — the counters win."""
+    size = _number(resync.get("mdResyncSize"))
+    position = _number(resync.get("mdResyncPos"))
+    if not size or not position or position <= 0:
+        return raw
+    active = bool(_number(resync.get("mdResync")))
+    progress = round(min(100.0, 100 * position / size), 1)
+    action = str(resync.get("mdResyncAction") or "").lower()
+    seconds, done = _number(resync.get("mdResyncDt")), _number(resync.get("mdResyncDb"))
+    speed = f"{done / seconds / 1024:.1f} MB/s" if active and seconds and done else raw.get("speed")
+    return {
+        **raw,
+        # the time left at the driver's pace (kilobytes left over kilobytes a second)
+        "_remaining": (size - position) / (done / seconds) if active and seconds and done else None,
+        "status": "running" if active else "paused",
+        "running": active,
+        "paused": not active,
+        "progress": progress,
+        "speed": speed,
+        "correcting": ("nocorrect" not in action) if action.startswith("check") else raw.get("correcting"),
+        # the last check's own dates are not this one's
+        "date": None
+        if str(raw.get("status") or "").lower() not in ("running", "paused")
+        else raw.get("date"),
+        "duration": None
+        if str(raw.get("status") or "").lower() not in ("running", "paused")
+        else raw.get("duration"),
+    }
+
+
+def _parity(raw: Mapping[str, Any], resync: Mapping[str, Any] | None = None) -> ParityCheck | None:
     """The parity check: its state, progress, time so far and (when running) the time left at its pace."""
+    raw = _resync(raw, resync or {})
     if not raw:
         return None
     running = raw.get("running") is True
@@ -219,8 +254,8 @@ def _parity(raw: Mapping[str, Any]) -> ParityCheck | None:
     started = parse_time(raw.get("date"))
     if elapsed is None and started is not None and (running or paused):
         elapsed = max(0.0, (datetime.now(UTC) - started).total_seconds())
-    remaining = None
-    if (running or paused) and progress and 0 < progress < 100 and elapsed:
+    remaining = _number(raw.get("_remaining"))
+    if remaining is None and (running or paused) and progress and 0 < progress < 100 and elapsed:
         remaining = elapsed * (100 - progress) / progress
     return ParityCheck(
         status=status,
@@ -287,7 +322,7 @@ def build_report(data: Mapping[str, Any]) -> HostReport:
     memory = _map(metrics.get("memory"))
     mem_total = _number(memory.get("total"))
     cap_total = _number(capacity.get("total"))
-    parity = _parity(_map(array.get("parityCheckStatus")))
+    parity = _parity(_map(array.get("parityCheckStatus")), _map(data.get("vars")))
     packages = (
         _list(cpu.get("packages")) if isinstance(cpu.get("packages"), list) else [_map(cpu.get("packages"))]
     )
