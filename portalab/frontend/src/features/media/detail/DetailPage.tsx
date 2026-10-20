@@ -827,7 +827,8 @@ export function DetailPage() {
   const info = useSection(objectId, "info").data?.data as Data | undefined;
   // issue 171: « this title » for the assistant
   useAssistantPage(
-    known ? `media id=${known.id}` : null,
+    // the name and kind too: without them the model cannot tell whether a question is about this page
+    known ? `media id=${known.id} « ${known.title} » (${known.kind})` : null,
     known ? `${known.title}${known.year ? ` (${known.year})` : ""} · ${t(`media:kind.${known.kind}`)}` : null,
   );
   if (detail.isPending) return <FunctionalState state="loading" />;

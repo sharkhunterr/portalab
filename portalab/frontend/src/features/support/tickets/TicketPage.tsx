@@ -31,7 +31,7 @@ export function TicketPage() {
   const file = useRef<HTMLInputElement>(null);
   // issue 171: « this ticket » for the assistant
   useAssistantPage(
-    ticket.data ? `ticket id=${ticket.data.id}` : null,
+    ticket.data ? `ticket id=${ticket.data.id} « ${ticket.data.title} »` : null,
     ticket.data ? `${ticket.data.reference} · ${ticket.data.title}` : null,
   );
   if (ticket.isPending) return <FunctionalState state="loading" />;
