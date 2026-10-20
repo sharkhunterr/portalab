@@ -48,6 +48,17 @@ class AiConfigIn(BaseModel):
     tools_disabled: list[str] | None = Field(default=None, max_length=500)
     embeddings_model: str | None = Field(default=None, max_length=200)
     embeddings_dimension: int | None = Field(default=None, ge=0, le=8192)
+    # issue 173: what the shop may sell of the assistant, and how far it goes
+    perks_offered: (
+        list[Literal["daily_tokens", "recharge", "model", "reflection", "context", "tools"]] | None
+    ) = Field(default=None, max_length=6)
+    premium_model: str | None = Field(default=None, max_length=200)
+    premium_reasoning: Literal["", "none", "low", "medium", "high"] | None = None
+    premium_context_tokens: int | None = Field(default=None, ge=1000, le=1_000_000)
+    premium_tool_calls: int | None = Field(default=None, ge=0, le=40)
+    premium_tools: list[str] | None = Field(default=None, max_length=500)
+    max_daily_tokens_per_user: int | None = Field(default=None, ge=0, le=100_000_000)
+    max_recharge_tokens: int | None = Field(default=None, ge=0, le=100_000_000)
 
 
 class AiAdminToolOut(BaseModel):

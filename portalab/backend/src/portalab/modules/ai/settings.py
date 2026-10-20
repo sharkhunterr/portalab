@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 from typing import Any
 
+from portalab.capabilities.ai import PERK_KINDS
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
 from portalab.modules.ai.context import DEFAULT_FALLBACK, DEFAULT_ROLE
 
@@ -36,6 +37,15 @@ class AiConfig:
     mcp_servers: list[dict[str, Any]] = field(default_factory=list)
     embeddings_model: str = ""
     embeddings_dimension: int = 0
+    # issue 173: what the shop may sell of the assistant, and how far it goes
+    perks_offered: list[str] = field(default_factory=lambda: list(PERK_KINDS))
+    premium_model: str = ""  # the stronger model, on the same server (empty: not sold)
+    premium_reasoning: str = "medium"
+    premium_context_tokens: int = 16_000
+    premium_tool_calls: int = 12
+    premium_tools: list[str] = field(default_factory=list)  # tools reserved for those who bought them
+    max_daily_tokens_per_user: int = 0  # the ceiling of a day's allowance with what was bought (0: none)
+    max_recharge_tokens: int = 0  # the most a member may hold in recharges (0: no ceiling)
 
 
 SETTINGS: dict[str, str] = {
@@ -60,6 +70,14 @@ SETTINGS: dict[str, str] = {
     "mcp_servers": "ai.mcp.servers",
     "embeddings_model": "ai.embeddings.model",
     "embeddings_dimension": "ai.embeddings.dimension",
+    "perks_offered": "ai.perks.offered",
+    "premium_model": "ai.perks.premiumModel",
+    "premium_reasoning": "ai.perks.premiumReasoning",
+    "premium_context_tokens": "ai.perks.premiumContextTokens",
+    "premium_tool_calls": "ai.perks.premiumToolCalls",
+    "premium_tools": "ai.perks.premiumTools",
+    "max_daily_tokens_per_user": "ai.perks.maxDailyTokensPerUser",
+    "max_recharge_tokens": "ai.perks.maxRechargeTokens",
 }
 _DESCRIPTIONS = {
     "enabled": "Turn the assistant on (kill switch when off).",
@@ -84,6 +102,15 @@ _DESCRIPTIONS = {
     "mcp_servers": "MCP servers (name, url, allowlist of {tool, permission, sensitivity}).",
     "embeddings_model": "Embedding model for semantic search (empty: semantic search off).",
     "embeddings_dimension": "Vector size of the embedding model.",
+    "perks_offered": "Assistant capacities the shop may sell (daily_tokens, recharge, model, reflection, "
+    "context, tools).",
+    "premium_model": "The stronger model sold in the shop, on the same server (empty: not sold).",
+    "premium_reasoning": "The reflection sold in the shop (low, medium, high).",
+    "premium_context_tokens": "The longer memory sold in the shop (approximate tokens).",
+    "premium_tool_calls": "Look-ups per answer with the longer memory bought.",
+    "premium_tools": "Tools offered only to members who bought them.",
+    "max_daily_tokens_per_user": "Ceiling of a member's daily allowance, with what was bought (0: none).",
+    "max_recharge_tokens": "Most tokens a member may hold in recharges (0: no ceiling).",
 }
 
 
@@ -95,6 +122,8 @@ def declare_ai_settings(catalog: SettingCatalog = default_catalog) -> None:
         "tools_disabled": list[str],
         "mcp_servers": list[dict[str, Any]],
         "assistant_ideas": list[str],
+        "perks_offered": list[str],
+        "premium_tools": list[str],
     }
     for name, key in SETTINGS.items():
         if key not in known:

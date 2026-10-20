@@ -688,6 +688,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "ai.manage",
     },
     {
+        "key": "ai.shop",
+        "owner": "module:ai",
+        "kind": "entry",
+        "label_key": "nav.admin.ai_shop",
+        "icon": "shop",
+        "route": "/admin/ai/shop",
+        "group": "admin",
+        "topic": "ai",
+        "order_hint": 5,
+        "required_permission": "ai.manage",
+    },
+    {
         "key": "news.admin",
         "owner": "module:news",
         "kind": "entry",

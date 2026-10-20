@@ -606,6 +606,32 @@
             ],
             "title": "Max Context Tokens"
           },
+          "max_daily_tokens_per_user": {
+            "anyOf": [
+              {
+                "maximum": 100000000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Daily Tokens Per User"
+          },
+          "max_recharge_tokens": {
+            "anyOf": [
+              {
+                "maximum": 100000000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Recharge Tokens"
+          },
           "max_tool_calls_per_turn": {
             "anyOf": [
               {
@@ -631,6 +657,100 @@
               }
             ],
             "title": "Pending Action Ttl Minutes"
+          },
+          "perks_offered": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "daily_tokens",
+                    "recharge",
+                    "model",
+                    "reflection",
+                    "context",
+                    "tools"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 6,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Perks Offered"
+          },
+          "premium_context_tokens": {
+            "anyOf": [
+              {
+                "maximum": 1000000.0,
+                "minimum": 1000.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premium Context Tokens"
+          },
+          "premium_model": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premium Model"
+          },
+          "premium_reasoning": {
+            "anyOf": [
+              {
+                "enum": [
+                  "",
+                  "none",
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premium Reasoning"
+          },
+          "premium_tool_calls": {
+            "anyOf": [
+              {
+                "maximum": 40.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premium Tool Calls"
+          },
+          "premium_tools": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 500,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premium Tools"
           },
           "provider_endpoint": {
             "anyOf": [
@@ -1260,9 +1380,26 @@
             "title": "Name",
             "type": "string"
           },
+          "perks": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Perks",
+            "type": "object"
+          },
           "provider_state": {
             "title": "Provider State",
             "type": "string"
+          },
+          "recharge": {
+            "default": 0,
+            "title": "Recharge",
+            "type": "integer"
+          },
+          "shop": {
+            "default": false,
+            "title": "Shop",
+            "type": "boolean"
           },
           "used_today": {
             "default": 0,

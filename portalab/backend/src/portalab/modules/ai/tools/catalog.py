@@ -52,7 +52,9 @@ class ToolCatalog:
         disabled: Callable[[], Iterable[str]] = tuple,
         external: Callable[[], Iterable[AITool]] = tuple,
         refresh: Callable[[], Awaitable[None]] | None = None,
+        reserved: Callable[[], Iterable[str]] = tuple,
     ) -> None:
+        self.reserved = reserved  # issue 173: tools offered only to the members who bought them
         self.refresh = refresh
         self.authorizer = authorizer
         self.registry = registry
@@ -80,13 +82,17 @@ class ToolCatalog:
         except Exception:
             return False
 
-    async def for_principal(self, principal: Principal, policy: ToolPolicy = CHAT) -> dict[str, AITool]:
+    async def for_principal(
+        self, principal: Principal, policy: ToolPolicy = CHAT, *, reserved: bool = False
+    ) -> dict[str, AITool]:
         if self.refresh is not None and policy.sensitivities:
             try:
                 await self.refresh()
             except Exception:
                 log.warning("external ai tools not refreshed")  # optional: their tools are omitted
         disabled = set(self.disabled())
+        if not reserved:
+            disabled |= set(self.reserved())
         candidates = [
             t
             for t in self.all()

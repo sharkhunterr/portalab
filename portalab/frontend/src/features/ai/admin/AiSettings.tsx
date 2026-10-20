@@ -1,9 +1,16 @@
 import { type FormEvent, type ReactNode, useEffect, useState } from "react";
+import { Link } from "react-router";
 import { AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { CheckboxField, TextAreaField, TextField } from "../../../design-system/components/Field";
+import {
+  CheckboxField,
+  SelectField,
+  TextAreaField,
+  TextField,
+} from "../../../design-system/components/Field";
 import { useT } from "../../../i18n/hooks/useT";
-import { type AiConfig, type AiConfigUpdate, useAiAdmin, useAiConfig } from "../api";
+import { maybe } from "../../automations/labels";
+import { type AiConfig, type AiConfigUpdate, useAiAdmin, useAiConfig, useAiServers } from "../api";
 import { IDEAS } from "../panel/AiPanel";
 import { ModelServer } from "./ModelServer";
 import { ToolChoice } from "./ToolChoice";
@@ -243,6 +250,136 @@ export function ToolSettings() {
           onChange={(next) => set({ ...values, tools_disabled: [...next] })}
         />
       )}
+    </SettingsForm>
+  );
+}
+
+const PERKS = ["daily_tokens", "recharge", "model", "reflection", "context", "tools"] as const;
+type PerkKind = (typeof PERKS)[number];
+const SHOP_NUMBERS = [
+  ["premium_context_tokens", "ai:admin.shop.context"],
+  ["premium_tool_calls", "ai:admin.shop.toolCalls"],
+  ["max_daily_tokens_per_user", "ai:admin.shop.maxDaily"],
+  ["max_recharge_tokens", "ai:admin.shop.maxRecharge"],
+] as const;
+
+/**
+ * Issue 173 — what the shop may sell of the assistant: which capacities, the stronger model (on the same
+ * server) and its reflection, the longer memory, the tools kept for those who bought them, and the ceilings.
+ * The products themselves are made in the shop's catalog (type « Assistant capacity »).
+ */
+export function ShopSettings() {
+  const t = useT();
+  const servers = useAiServers().data ?? [];
+  const listOf = (value: unknown) => (Array.isArray(value) ? value.map(String) : []);
+  return (
+    <SettingsForm
+      title={t("ai:admin.shop.title")}
+      icon="shop"
+      description={t("ai:admin.shop.hint")}
+      build={(values) => ({
+        perks_offered: listOf(values.perks_offered).filter((p): p is PerkKind =>
+          (PERKS as readonly string[]).includes(p),
+        ),
+        premium_model: String(values.premium_model ?? ""),
+        premium_reasoning: String(values.premium_reasoning ?? "") as "" | "none" | "low" | "medium" | "high",
+        premium_tools: listOf(values.premium_tools),
+        ...Object.fromEntries(SHOP_NUMBERS.map(([key]) => [key, Number(values[key])])),
+      })}
+      extra={
+        <Link className="ds-button ds-button--secondary" to="/admin/marketplace/catalog">
+          {t("ai:admin.shop.catalog")}
+        </Link>
+      }
+    >
+      {(values, set, data) => {
+        const offered = new Set(listOf(values.perks_offered));
+        const reserved = new Set(listOf(values.premium_tools));
+        const endpoint = String(values.provider_endpoint ?? "");
+        const models = (servers.find((s) => s.endpoint === endpoint)?.models ?? []).filter(
+          (m) => !m.embedding,
+        );
+        const toggle = (key: string, set_: Set<string>, item: string, on: boolean) => {
+          const next = new Set(set_);
+          if (on) next.add(item);
+          else next.delete(item);
+          set({ ...values, [key]: [...next] });
+        };
+        return (
+          <>
+            <fieldset className="ai-limits">
+              <legend>{t("ai:admin.shop.offered")}</legend>
+              {PERKS.map((perk) => (
+                <CheckboxField
+                  key={perk}
+                  label={t(`ai:admin.shop.perk.${perk === "daily_tokens" ? "daily" : perk}`)}
+                  checked={offered.has(perk)}
+                  onChange={(event) => toggle("perks_offered", offered, perk, event.target.checked)}
+                />
+              ))}
+            </fieldset>
+            <fieldset className="ai-limits">
+              <legend>{t("ai:admin.shop.premium")}</legend>
+              {models.length ? (
+                <SelectField
+                  label={t("ai:admin.shop.model")}
+                  hint={t("ai:admin.shop.modelHint")}
+                  value={String(values.premium_model ?? "")}
+                  onChange={(event) => set({ ...values, premium_model: event.target.value })}
+                >
+                  <option value="">{t("ai:admin.shop.noModel")}</option>
+                  {models.map((m) => (
+                    <option key={m.name} value={m.name}>
+                      {[m.name, m.parameters].filter(Boolean).join(" · ")}
+                    </option>
+                  ))}
+                </SelectField>
+              ) : (
+                <TextField
+                  label={t("ai:admin.shop.model")}
+                  hint={t("ai:admin.shop.modelHint")}
+                  value={String(values.premium_model ?? "")}
+                  onChange={(event) => set({ ...values, premium_model: event.target.value })}
+                />
+              )}
+              <SelectField
+                label={t("ai:admin.shop.reflection")}
+                value={String(values.premium_reasoning ?? "")}
+                onChange={(event) => set({ ...values, premium_reasoning: event.target.value })}
+              >
+                {(["low", "medium", "high"] as const).map((level) => (
+                  <option key={level} value={level}>
+                    {t(`ai:admin.server.reasoning.${level}`)}
+                  </option>
+                ))}
+              </SelectField>
+              {SHOP_NUMBERS.map(([key, label]) => (
+                <TextField
+                  key={key}
+                  label={t(label)}
+                  type="number"
+                  min={0}
+                  value={String(values[key] ?? "")}
+                  onChange={(event) => set({ ...values, [key]: event.target.value })}
+                />
+              ))}
+            </fieldset>
+            <fieldset className="ai-limits">
+              <legend>{t("ai:admin.shop.tools")}</legend>
+              {data.tools
+                .filter((tool) => !tool.disabled && tool.sensitivity !== "ai_forbidden")
+                .map((tool) => (
+                  <CheckboxField
+                    key={tool.name}
+                    label={maybe(t, `ai:tool.${tool.name}.label`, tool.name)}
+                    checked={reserved.has(tool.name)}
+                    onChange={(event) => toggle("premium_tools", reserved, tool.name, event.target.checked)}
+                  />
+                ))}
+            </fieldset>
+          </>
+        );
+      }}
     </SettingsForm>
   );
 }

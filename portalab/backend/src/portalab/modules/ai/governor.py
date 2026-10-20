@@ -17,6 +17,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.ai.errors import AiBudgetExceeded, AiRateLimited, AiUnavailable
 from portalab.modules.ai.models import UsageDaily
 from portalab.modules.ai.observability import metrics
+from portalab.modules.ai.perks import Perks, Upgrade, allowance
 from portalab.modules.ai.settings import AiConfig
 
 PER_USER_CONCURRENCY = 2
@@ -25,8 +26,14 @@ GLOBAL_CONCURRENCY = 32
 
 class Governor:
     def __init__(
-        self, database: Database, config: Callable[[], AiConfig], *, clock: Clock | None = None
+        self,
+        database: Database,
+        config: Callable[[], AiConfig],
+        *,
+        clock: Clock | None = None,
+        perks: Perks | None = None,
     ) -> None:
+        self.perks = perks  # issue 173: what a member bought raises their day
         self.database = database
         self.config = config
         self.clock = clock
@@ -58,6 +65,20 @@ class Governor:
             row = await session.get(UsageDaily, (user, self.today()))
         return 0 if row is None else row.tokens_in + row.tokens_out
 
+    async def upgrade(self, user: UUID) -> Upgrade:
+        if self.perks is None:
+            return Upgrade()
+        try:
+            return await self.perks.upgrade(user)
+        except Exception:
+            metrics.increment("ai.perks.unreadable")
+            return Upgrade()  # what was bought cannot be read: the portal's own day still holds
+
+    async def allowance(self, user: UUID) -> tuple[int, Upgrade]:
+        """The member's day (with what they bought, to the ceiling) and what they hold."""
+        upgrade = await self.upgrade(user)
+        return allowance(self.config(), upgrade), upgrade
+
     async def admit(self, user: UUID) -> None:
         """Refuses before any provider call: disabled, rate-limited or out of budget."""
         if not self.config().enabled:
@@ -67,7 +88,8 @@ class Governor:
             used = await self.used_today(user)
         except Exception as exc:
             raise AiUnavailable("The assistant budget cannot be checked right now.") from exc
-        if used >= self.config().daily_token_budget_per_user:
+        limit, upgrade = await self.allowance(user)
+        if used >= limit and upgrade.recharge <= 0:
             metrics.increment("ai.guard.budget_exceeded")
             raise AiBudgetExceeded("You reached today's assistant budget; it resets tomorrow.")
 
@@ -89,6 +111,12 @@ class Governor:
                 self._global -= 1
 
     async def record(self, user: UUID, tokens_in: int, tokens_out: int, tool_calls: int) -> None:
+        before = None
+        if self.perks is not None and tokens_in + tokens_out > 0:
+            try:
+                before = await self.used_today(user)
+            except Exception:
+                before = None
         values = {"tokens_in": tokens_in, "tokens_out": tokens_out, "requests": 1, "tool_calls": tool_calls}
         statement = insert(UsageDaily).values(user_id=user, day=self.today(), **values)
         statement = statement.on_conflict_do_update(
@@ -102,6 +130,15 @@ class Governor:
             metrics.increment("ai.usage.record_failed")
         metrics.increment("ai.tokens.in", tokens_in)
         metrics.increment("ai.tokens.out", tokens_out)
+        if before is not None and self.perks is not None:
+            # issue 173: what goes past the day's allowance is taken from the member's recharges
+            limit, _ = await self.allowance(user)
+            beyond = max(0, before + tokens_in + tokens_out - limit) - max(0, before - limit)
+            if beyond:
+                try:
+                    await self.perks.spend(user, beyond)
+                except Exception:
+                    metrics.increment("ai.perks.spend_failed")
 
     async def usage(self, days: int = 30) -> list[dict[str, int | str]]:
         """Aggregates per day (no user ids, no content) for the admin usage view."""

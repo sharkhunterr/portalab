@@ -890,3 +890,10 @@ a.ai-card:hover {
   border-inline-start: 3px solid var(--color-accent);
   overflow-wrap: anywhere;
 }
+
+/* issue 173: tokens held in reserve, and where to get more */
+.ai-quota__shop {
+  margin-inline-start: auto;
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+}

@@ -16,7 +16,7 @@ import {
   usePluginShelves,
   withPluginShelves,
 } from "../catalog/CatalogPage";
-import { ProductArt } from "../catalog/ProductArt";
+import { aiPerkWord, ProductArt } from "../catalog/ProductArt";
 import { productTypeLabel } from "../typeLabel";
 import { withConfirmation } from "./confirm";
 
@@ -55,8 +55,11 @@ const TYPES = [
   "xp_boost",
   // #57: saving a title from the library's cleanup (Maintainerr)
   "media_rescue",
+  // issue 173: the assistant's capacities (the administrators choose what is sold in Assistant › Shop)
+  "ai_capacity",
   // #81 / issue 153: a booster is made in « Boosters » (its looks, scene and packs come from the visual packs)
 ] as const;
+const AI_PERKS = ["daily_tokens", "recharge", "model", "reflection", "context", "tools"] as const;
 /** 030: a kind of product an enabled plugin adds to the shop (the shop keeps coins and ownership). */
 interface PluginType {
   key: string;
@@ -542,6 +545,8 @@ export function NewProductDialog({
   const [extra, setExtra] = useState("{}");
   const [deadline, setDeadline] = useState(7);
   const [factor, setFactor] = useState(1.5);
+  const [aiPerk, setAiPerk] = useState("daily_tokens");
+  const [aiAmount, setAiAmount] = useState(20000);
   const [hours, setHours] = useState(24);
   const [fields, setFields] = useState<FormFieldDraft[]>([
     { label: "", type: "text", options: "", required: true },
@@ -579,6 +584,12 @@ export function NewProductDialog({
         return { count: units };
       case "xp_boost":
         return { factor, hours, values: ["xp"] };
+      case "ai_capacity":
+        return {
+          perk: aiPerk,
+          hours: aiPerk === "recharge" ? 0 : hours,
+          ...(aiPerk === "daily_tokens" || aiPerk === "recharge" ? { amount: aiAmount } : {}),
+        };
       default:
         if (pluginType) {
           // 030: a plugin's kind of product: the settings it declares, as the Admin filled them
@@ -627,7 +638,9 @@ export function NewProductDialog({
               const body = availabilityBody(availability);
               return {
                 availability: body.availability,
-                repeatable: ["quota", "streak_freeze", "xp_boost", "media_rescue"].includes(type),
+                repeatable: ["quota", "streak_freeze", "xp_boost", "media_rescue", "ai_capacity"].includes(
+                  type,
+                ),
               };
             })(),
             version: {
@@ -900,6 +913,44 @@ export function NewProductDialog({
                 value={String(hours)}
                 onChange={(e) => setHours(Number(e.target.value))}
               />
+            </>
+          ) : null}
+          {type === "ai_capacity" ? (
+            <>
+              <SelectField
+                label={t("marketplace:admin.aiPerk")}
+                hint={t("marketplace:admin.aiPerkHint")}
+                value={aiPerk}
+                onChange={(e) => setAiPerk(e.target.value)}
+              >
+                {AI_PERKS.map((perk) => (
+                  <option key={perk} value={perk}>
+                    {t(`marketplace:art.ai.${aiPerkWord(perk)}`)}
+                  </option>
+                ))}
+              </SelectField>
+              {aiPerk === "daily_tokens" || aiPerk === "recharge" ? (
+                <TextField
+                  label={t("marketplace:admin.aiAmount")}
+                  type="number"
+                  min={100}
+                  max={10000000}
+                  step={100}
+                  value={String(aiAmount)}
+                  onChange={(e) => setAiAmount(Number(e.target.value))}
+                />
+              ) : null}
+              {aiPerk !== "recharge" ? (
+                <TextField
+                  label={t("marketplace:admin.aiHours")}
+                  hint={t("marketplace:admin.aiHoursHint")}
+                  type="number"
+                  min={0}
+                  max={8784}
+                  value={String(hours)}
+                  onChange={(e) => setHours(Number(e.target.value))}
+                />
+              ) : null}
             </>
           ) : null}
           {type === "special_request" || type === "service_access" ? (

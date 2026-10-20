@@ -1,17 +1,18 @@
 import { AdminPage } from "../../../design-system/admin/AdminKit";
 import { useT } from "../../../i18n/hooks/useT";
 import { AiDashboard } from "./AiDashboard";
-import { IdentitySettings, ModelSettings, ToolSettings } from "./AiSettings";
+import { IdentitySettings, ModelSettings, ShopSettings, ToolSettings } from "./AiSettings";
 import { McpAllowlist } from "./McpAllowlist";
 import "../ai.css";
 
-export type AiAdminView = "dashboard" | "model" | "identity" | "tools";
+export type AiAdminView = "dashboard" | "model" | "identity" | "tools" | "shop";
 
 const ICONS: Record<AiAdminView, string> = {
   dashboard: "chart",
   model: "brain",
   identity: "sparkles",
   tools: "wrench",
+  shop: "shop",
 };
 
 /**
@@ -30,6 +31,7 @@ export default function AiAdminPage({ view = "dashboard" }: { view?: AiAdminView
       {view === "dashboard" ? <AiDashboard /> : null}
       {view === "model" ? <ModelSettings /> : null}
       {view === "identity" ? <IdentitySettings /> : null}
+      {view === "shop" ? <ShopSettings /> : null}
       {view === "tools" ? (
         <>
           <ToolSettings />

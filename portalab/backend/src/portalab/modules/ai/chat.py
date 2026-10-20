@@ -51,14 +51,16 @@ class ChatService:
         stored = False
         try:
             async with self.governor.slot(turn.user):
+                upgrade = await self.governor.upgrade(turn.user)  # issue 173: what the member bought
                 history = await self.conversations.history(turn.conversation_id)
-                messages = await self.orchestrator.messages_for(turn.user, history, turn.page)
+                messages = await self.orchestrator.messages_for(turn.user, history, turn.page, upgrade)
                 async for item in self.orchestrator.run(
                     turn.principal,
                     messages,
                     policy=CHAT,
                     conversation_id=turn.conversation_id,
                     outcome=outcome,
+                    upgrade=upgrade,
                 ):
                     if item["event"] == "done" and not stored:
                         # issue 176: kept before the end is told, so the answer can be rated by its id

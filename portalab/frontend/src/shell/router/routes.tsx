@@ -368,7 +368,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "support", element: <SupportDefinitions />, handle: h({ crumb: "Support settings" }) },
             { path: "ai", element: <AiAdmin />, handle: h({ crumb: "Assistant" }) },
             // issue 176: the assistant's hub — its model, its identity, its tools
-            ...(["model", "identity", "tools"] as const).map((view) => ({
+            ...(["model", "identity", "tools", "shop"] as const).map((view) => ({
               path: `ai/${view}`,
               element: <AiAdmin view={view} />,
               handle: h({ crumb: "Assistant" }),

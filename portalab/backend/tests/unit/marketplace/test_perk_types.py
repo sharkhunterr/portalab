@@ -92,3 +92,34 @@ async def test_rescues_are_credited_to_media() -> None:
         "incompatible"
     )
     assert granted == [(3, f"marketplace:{rescue.id}")] and "media_rescue" in NOT_REFUNDABLE
+
+
+async def test_assistant_capacities_go_to_the_assistant() -> None:
+    """Issue 173: a capacity of the assistant is handed to ``ai.perks`` (keyed by the ownership), one the
+    portal does not offer is « incompatible », a revoke withdraws it; not refundable."""
+    from portalab.capabilities.ai import PERKS as AI_PERKS
+    from portalab.capabilities.ai import SPECS as AI_SPECS
+    from portalab.modules.marketplace.types.registry import AiCapacityHandler
+
+    granted: list[tuple[str, int, int, str]] = []
+    revoked: list[str] = []
+
+    class _AiPerks:
+        async def grant(self, user: UUID, perk: str, amount: int, hours: int, source_ref: str) -> bool:
+            granted.append((perk, amount, hours, source_ref))
+            return perk != "unknown"
+
+        async def revoke(self, source_ref: str) -> None:
+            revoked.append(source_ref)
+
+    registry = CapabilityRegistry()
+    registry.declare(next(spec for spec in AI_SPECS if spec.name == AI_PERKS))
+    handler = AiCapacityHandler(registry)
+    tokens = _owned("ai_capacity", {"perk": "daily_tokens", "amount": 20000, "hours": 168})
+    assert (await handler.activate(tokens)).state == "failed"  # no assistant: nothing granted
+    registry.provide(AI_PERKS, _AiPerks(), instance_ref="ai", owner="test")
+    assert (await handler.activate(tokens)).state == "active"
+    assert (await handler.activate(_owned("ai_capacity", {"perk": "unknown"}))).state == "incompatible"
+    await handler.deactivate(tokens)
+    assert granted[0] == ("daily_tokens", 20000, 168, f"marketplace:{tokens.id}")
+    assert revoked == [f"marketplace:{tokens.id}"] and "ai_capacity" in NOT_REFUNDABLE

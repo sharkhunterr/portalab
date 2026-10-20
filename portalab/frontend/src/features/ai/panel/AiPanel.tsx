@@ -1,6 +1,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -30,7 +31,7 @@ export interface AiPanelProps {
   /** issue 171: the assistant's name (the administrators'), else « Assistant » */
   name?: string | undefined;
   /** issue 171: today's allowance and what the member used of it (tokens) */
-  quota?: { budget: number; used: number } | undefined;
+  quota?: { budget: number; used: number; recharge?: number; shop?: boolean } | undefined;
   /** issue 174: the administrators' questions to start with (none: the translated defaults) */
   ideas?: string[] | undefined;
 }
@@ -306,6 +307,12 @@ export function AiPanel({
                 {chat.error && !chat.messages.some((m) => m.error) ? (
                   <p className="ai-bubble__error" role="alert">
                     {errorText(t, chat.error)}
+                    {chat.error === "ai.budget_exceeded" && quota?.shop ? (
+                      <>
+                        {" "}
+                        <Link to="/marketplace?type=ai_capacity">{t("ai:panel.moreInShop")}</Link>
+                      </>
+                    ) : null}
                   </p>
                 ) : null}
               </div>
@@ -316,6 +323,17 @@ export function AiPanel({
                     <span style={{ inlineSize: `${left}%` }} />
                   </span>
                   {t("ai:panel.quota", { percent: left })}
+                  {quota?.recharge ? (
+                    <span className="ai-quota__reserve">
+                      {" · "}
+                      {t("ai:panel.reserve", { amount: format.compact(quota.recharge) })}
+                    </span>
+                  ) : null}
+                  {quota?.shop && left <= 15 ? (
+                    <Link className="ai-quota__shop" to="/marketplace?type=ai_capacity">
+                      {t("ai:panel.more")}
+                    </Link>
+                  ) : null}
                 </p>
               ) : null}
               <form className="ai-composer" onSubmit={submit}>

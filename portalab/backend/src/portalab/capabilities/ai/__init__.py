@@ -7,6 +7,8 @@
 * ``LLMProvider`` — chat with tool calling and streaming; the portal chooses no model.
 * ``ExternalToolSource`` — MCP servers (e.g. MCParr), exposed only through an Admin allow-list.
 * ``ai.invoke`` — the read-only text facade for automations (019).
+* ``ai.perks`` — issue 173: what a member bought for the assistant in the shop (more tokens a day, a
+  recharge, a stronger model, more reflection, a longer memory, reserved tools), granted per purchase.
 * ``ai.models`` — a model server a connector reaches (issue 169: Ollama): its models, which are loaded, and
   the OpenAI-compatible address the assistant talks to.
 The registry is owner-tagged: ``unregister(owner)`` removes a module's or plugin's tools.
@@ -17,12 +19,14 @@ from collections.abc import AsyncIterator, Awaitable, Callable, Mapping, Sequenc
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Literal, Protocol, runtime_checkable
+from uuid import UUID
 
 from portalab.capabilities.registry import CapabilitySpec
 from portalab.core.authz_port import Principal
 
 INVOKE = "ai.invoke"
 MODELS = "ai.models"
+PERKS = "ai.perks"
 Sensitivity = Literal["read", "write", "sensitive", "ai_forbidden"]
 ResultState = Literal["ok", "partial", "stale", "unavailable", "error", "pending"]
 SourceClass = Literal["real", "historical", "knowledge"]
@@ -242,4 +246,28 @@ MODELS_SPEC = CapabilitySpec(
     multi_provider=True,
     description="A model server's models and its OpenAI-compatible address (issue 169: Ollama)",
 )
-SPECS: tuple[CapabilitySpec, ...] = (INVOKE_SPEC, MODELS_SPEC)
+# --- the assistant's capacities, sold in the shop (issue 173) ---------------------------------------------
+# daily_tokens: more tokens each day (``amount``) · recharge: tokens once (``amount``), spent past the day's ·
+# model: the administrators' stronger model · reflection: more reflection · context: a longer memory and more
+# look-ups per answer · tools: the tools the administrators reserve. ``hours``: how long (0: for good; a
+# recharge lasts until spent).
+PERK_KINDS: tuple[str, ...] = ("daily_tokens", "recharge", "model", "reflection", "context", "tools")
+
+
+@runtime_checkable
+class AiPerks(Protocol):
+    async def grant(self, user: UUID, perk: str, amount: int, hours: int, source_ref: str) -> bool:
+        """Grant a perk (idempotent per ``source_ref``); ``False`` when the portal does not offer it."""
+        ...
+
+    async def revoke(self, source_ref: str) -> None: ...
+
+
+PERKS_SPEC = CapabilitySpec(
+    name=PERKS,
+    version="1.0",
+    protocol=AiPerks,
+    multi_provider=False,
+    description="The assistant's capacities a member bought in the shop (issue 173)",
+)
+SPECS: tuple[CapabilitySpec, ...] = (INVOKE_SPEC, MODELS_SPEC, PERKS_SPEC)

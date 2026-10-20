@@ -10404,10 +10404,26 @@ export interface components {
             enabled?: boolean | null;
             /** Max Context Tokens */
             max_context_tokens?: number | null;
+            /** Max Daily Tokens Per User */
+            max_daily_tokens_per_user?: number | null;
+            /** Max Recharge Tokens */
+            max_recharge_tokens?: number | null;
             /** Max Tool Calls Per Turn */
             max_tool_calls_per_turn?: number | null;
             /** Pending Action Ttl Minutes */
             pending_action_ttl_minutes?: number | null;
+            /** Perks Offered */
+            perks_offered?: ("daily_tokens" | "recharge" | "model" | "reflection" | "context" | "tools")[] | null;
+            /** Premium Context Tokens */
+            premium_context_tokens?: number | null;
+            /** Premium Model */
+            premium_model?: string | null;
+            /** Premium Reasoning */
+            premium_reasoning?: ("" | "none" | "low" | "medium" | "high") | null;
+            /** Premium Tool Calls */
+            premium_tool_calls?: number | null;
+            /** Premium Tools */
+            premium_tools?: string[] | null;
             /** Provider Endpoint */
             provider_endpoint?: string | null;
             /** Provider Kind */
@@ -10611,8 +10627,22 @@ export interface components {
              * @default
              */
             name: string;
+            /** Perks */
+            perks?: {
+                [key: string]: string;
+            };
             /** Provider State */
             provider_state: string;
+            /**
+             * Recharge
+             * @default 0
+             */
+            recharge: number;
+            /**
+             * Shop
+             * @default false
+             */
+            shop: boolean;
             /**
              * Used Today
              * @default 0

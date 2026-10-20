@@ -91,6 +91,9 @@ async def test_disabled_assistant_and_classic_api(
         "daily_budget": 50000,
         "used_today": 0,
         "ideas": [],  # issue 174: none set — the window shows the translated defaults
+        "recharge": 0,  # issue 173: nothing bought in the shop yet, which sells the assistant's capacities
+        "perks": {},
+        "shop": True,
     }
     ai.module.config = type(ai.module.config)(enabled=False)
     assert (await client.get("/api/v1/ai/status")).json()["available"] is False
