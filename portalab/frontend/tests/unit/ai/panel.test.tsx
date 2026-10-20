@@ -18,6 +18,9 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 });
 
 import { AiPanel } from "../../../src/features/ai/panel/AiPanel";
+import { AnswerText } from "../../../src/features/ai/panel/AnswerText";
+import { AssistantFab } from "../../../src/features/ai/panel/AssistantFab";
+import { ShellSlotsProvider } from "../../../src/shell/slots/providers";
 import { json } from "../../support/fake-api";
 
 const CONVERSATION = {
@@ -107,9 +110,12 @@ describe("AiPanel", () => {
     show();
     fireEvent.change(screen.getByLabelText("Ask the assistant…"), { target: { value: "is media up?" } });
     fireEvent.click(screen.getByRole("button", { name: "Send" }));
-    expect(await screen.findByText("<b>Media</b> is down [1]")).toBeTruthy();
-    expect(document.querySelector(".ai-log b")).toBeNull();
-    expect(screen.getByText("Using services.status")).toBeTruthy();
+    await waitFor(() =>
+      expect(document.querySelector(".ai-answer")?.textContent).toBe("<b>Media</b> is down 1"),
+    );
+    expect(document.querySelector(".ai-log b")).toBeNull(); // the model's markup is text, never HTML
+    expect(document.querySelector(".ai-cite")?.getAttribute("href")).toBe("/services"); // [1] → its source
+    expect(screen.queryByText(/services\.status/)).toBeNull(); // issue 171: tools are never named
     expect(screen.getByRole("link", { name: "Services" })).toBeTruthy();
     expect(await screen.findByText("Purge 3 old items")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
@@ -141,5 +147,103 @@ describe("AiPanel", () => {
       screen.getByText("The assistant is unavailable right now. Everything else keeps working."),
     ).toBeTruthy();
     expect(screen.queryByLabelText("Ask the assistant…")).toBeNull();
+  });
+});
+
+describe("the assistant's window (issue 171)", () => {
+  it("lays an answer out: bold, lists, the portal's pages as links — never another site's", () => {
+    const router = createMemoryRouter(
+      [
+        {
+          path: "/",
+          element: (
+            <AnswerText
+              text={
+                "**Heat** waits:\n- requested [1]\n- [see it](/media/m1) or [elsewhere](https://evil.example)\n\nDone."
+              }
+              sources={[
+                {
+                  n: 1,
+                  kind: "media",
+                  ref: "m",
+                  title: "Heat",
+                  class: "real",
+                  as_of: null,
+                  url: "/media/m1",
+                },
+              ]}
+            />
+          ),
+        },
+      ],
+      { initialEntries: ["/"] },
+    );
+    render(<RouterProvider router={router} />);
+    expect(screen.getByText("Heat").tagName).toBe("STRONG");
+    expect(document.querySelectorAll(".ai-answer li")).toHaveLength(2);
+    expect(screen.getByRole("link", { name: "see it" }).getAttribute("href")).toBe("/media/m1");
+    expect(screen.queryByRole("link", { name: "elsewhere" })).toBeNull();
+    expect(document.querySelectorAll(".ai-answer li")[1]?.textContent).toBe("see it or elsewhere");
+    expect(screen.getByText("Done.")).toBeTruthy();
+  });
+
+  it("asks the question it was opened with, with the page as context and nothing else", async () => {
+    const bodies: unknown[] = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (request.method === "GET") return json(200, []);
+      if (path === "/api/v1/ai/conversations") {
+        bodies.push(await request.json());
+        return json(201, CONVERSATION);
+      }
+      if (path.endsWith("/messages"))
+        return sse([
+          [
+            "done",
+            { content: "On its way.", sources: [], caveats: [], interpretation: true, pending_actions: [] },
+          ],
+        ]);
+      return json(404, {});
+    };
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const router = createMemoryRouter(
+      [
+        {
+          path: "/media/m1",
+          element: (
+            <AiPanel
+              open
+              onOpenChange={() => undefined}
+              available
+              autoNavigate={false}
+              context={{ route: "/media/m1", question: "Where is it?", asked: 1 }}
+            />
+          ),
+        },
+      ],
+      { initialEntries: ["/media/m1"] },
+    );
+    render(
+      <QueryClientProvider client={client}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    );
+    expect(await screen.findByText("On its way.")).toBeTruthy();
+    expect(screen.getByText("Where is it?")).toBeTruthy();
+    expect(bodies).toEqual([{ context: { route: "/media/m1" } }]); // never the question in the context
+  });
+
+  it("opens from its round button on any page", () => {
+    const open = vi.fn();
+    const router = createMemoryRouter([{ path: "/wiki", element: <AssistantFab hidden={false} /> }], {
+      initialEntries: ["/wiki"],
+    });
+    render(
+      <ShellSlotsProvider value={{ ai: { available: true, open } }}>
+        <RouterProvider router={router} />
+      </ShellSlotsProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Ask the assistant" }));
+    expect(open).toHaveBeenCalledWith({ route: "/wiki" });
   });
 });

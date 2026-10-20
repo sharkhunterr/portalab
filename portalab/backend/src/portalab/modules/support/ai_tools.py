@@ -9,6 +9,7 @@
 
 from collections.abc import Mapping
 from typing import Any
+from uuid import UUID
 
 from sqlalchemy import select
 
@@ -75,16 +76,23 @@ class SupportAiTools:
 
     async def ticket(self, principal: Principal, params: Mapping[str, Any]) -> ToolResult:
         number = _number(params.get("number"))
-        if number is None:
-            return ToolResult("error", {"error": "give the ticket's number"})
+        wanted = str(params.get("id") or "").strip()
+        if number is None and not wanted:
+            return ToolResult("error", {"error": "give the ticket's number or id"})
         async with self.module.database.session() as session:
-            found = await session.scalar(select(Ticket.id).where(Ticket.number == number))
+            if wanted:  # the page the member is on names it (« ticket id=… »)
+                try:
+                    found = await session.scalar(select(Ticket.id).where(Ticket.id == UUID(wanted)))
+                except ValueError:
+                    found = None
+            else:
+                found = await session.scalar(select(Ticket.id).where(Ticket.number == number))
         if found is None:
-            return ToolResult("ok", {"found": False, "number": number})
+            return ToolResult("ok", {"found": False, "number": number or wanted})
         try:
             view = await self.module.tickets.view(found, principal)  # its own rules: whose ticket it is
         except NotFound:
-            return ToolResult("ok", {"found": False, "number": number})
+            return ToolResult("ok", {"found": False, "number": number or wanted})
         ticket = view.ticket
         replies = [c for c in view.comments if not c.internal][-MAX_REPLIES:]
         return ToolResult(
@@ -133,7 +141,10 @@ class SupportAiTools:
                 "draft": str(draft.id),
                 "url": url,
                 "type": type_key,
-                "note": "Not sent: the member opens the form, reads the ticket and submits it.",
+                "created": False,
+                "sent": False,
+                "note": "Only a draft: no ticket exists yet. The user opens this link, reads the ticket and "
+                "sends it.",
             },
             [SourceRef("ticket_draft", f"ticket_draft:{draft.id}", title, "real", utc_now(self.clock), url)],
         )
@@ -160,8 +171,14 @@ class SupportAiTools:
             ),
             AITool(
                 "support.ticket",
-                "One support ticket by its number: state, description, fields and the last public replies.",
-                schema({"number": {"type": "integer", "minimum": 1}}, ["number"]),
+                "One support ticket by its number (or its id, when the user is on its page): state, "
+                "description, fields and the last public replies.",
+                schema(
+                    {
+                        "number": {"type": "integer", "minimum": 1},
+                        "id": {"type": "string", "format": "uuid"},
+                    }
+                ),
                 TICKETS_CREATE,
                 "read",
                 self.ticket,

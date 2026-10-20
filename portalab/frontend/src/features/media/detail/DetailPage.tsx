@@ -4,6 +4,7 @@ import { Button } from "../../../design-system/components/Button";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useAssistantPage } from "../../ai/pageContext";
 import {
   imageUrl,
   MediaError,
@@ -824,6 +825,8 @@ export function DetailPage() {
   );
   const requested = Boolean(useJourney(objectId).data?.request); // 027: asked already — no second request
   const info = useSection(objectId, "info").data?.data as Data | undefined;
+  // issue 171: « this title » for the assistant
+  useAssistantPage(known ? `media id=${known.id}` : null);
   if (detail.isPending) return <FunctionalState state="loading" />;
   if (detail.isError || !detail.data)
     return <FunctionalState state="unavailable" onRetry={() => detail.refetch()} />;

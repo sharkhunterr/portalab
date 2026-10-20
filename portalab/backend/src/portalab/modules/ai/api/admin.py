@@ -28,6 +28,7 @@ class AiConfigIn(BaseModel):
     provider_kind: Literal["openai_compatible"] | None = None
     provider_endpoint: str | None = Field(default=None, max_length=500, pattern=r"^(https?://\S+)?$")
     provider_model: str | None = Field(default=None, max_length=200)
+    provider_reasoning: Literal["", "none", "low", "medium", "high"] | None = None
     provider_secret: str | None = Field(default=None, max_length=500)  # write-only; "" clears
     max_tool_calls_per_turn: int | None = Field(default=None, ge=0, le=20)
     max_context_tokens: int | None = Field(default=None, ge=1000, le=1_000_000)

@@ -46,6 +46,8 @@ async def test_my_tickets_one_ticket_and_a_draft(
     assert one["found"] and one["state"] == "open" and one["fields"] == {"steps": "Press play"}
     assert [r["text"] for r in one["last_replies"]] == ["Can you try another browser?", "Same in Firefox."]
     assert [r["from_requester"] for r in one["last_replies"]] == [False, True]  # no internal note
+    by_id = await tools["support.ticket"].handler(ai(people["ursula"]), {"id": str(mine.id)})
+    assert by_id.data["number"] == mine.number  # the page the member is on names it
     other = await tools["support.ticket"].handler(ai(people["ulrich"]), {"number": mine.number})
     assert other.data == {"found": False, "number": mine.number}  # another member's ticket
     assert (await tools["support.ticket"].handler(ai(people["ursula"]), {"number": 99999})).data[

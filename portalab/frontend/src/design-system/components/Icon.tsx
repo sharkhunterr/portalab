@@ -187,6 +187,7 @@ import {
   Scan,
   ScrollText,
   Search,
+  SendHorizontal,
   Server,
   Settings,
   Share2,
@@ -514,6 +515,7 @@ export const ICONS: Record<string, LucideIcon> = {
   "list-music": ListMusic,
   "message-circle": MessageCircle,
   "message-square": MessageSquare,
+  send: SendHorizontal, // issue 171: the assistant's « send »
 };
 
 export interface IconProps {

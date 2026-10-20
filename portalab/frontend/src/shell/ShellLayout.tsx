@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { AiPanel } from "../features/ai/panel/AiPanel";
+import { AssistantFab } from "../features/ai/panel/AssistantFab";
 import { useAiAssistant } from "../features/ai/panel/useAiAssistant";
 import { useLogout, useMe } from "../features/auth/useAuth";
 import { NotificationPanel } from "../features/notifications/bell/NotificationPanel";
@@ -30,6 +31,7 @@ export function ShellLayout() {
       <ToastRegion />
       <NotificationPanel open={bell.open} onOpenChange={bell.setOpen} />
       <AiPanel {...assistant.panel} />
+      <AssistantFab hidden={assistant.panel.open} />
       <TermsViewer />
       <WelcomeFlow />
       <Tour />

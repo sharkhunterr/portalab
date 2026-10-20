@@ -10,9 +10,11 @@ step with the facts that explain it, and the step it is stuck at."""
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
 from typing import Any
+from uuid import UUID
 
 from portalab.capabilities.ai import AITool, AIToolRegistry, ResultState, SourceRef, ToolResult
 from portalab.core.authz_port import Principal
+from portalab.core.errors import NotFound
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.catalog import CatalogQuery
 from portalab.modules.media.discovery.shelves import Discovery
@@ -130,19 +132,27 @@ class MediaAiTools:
     # --- issue 171: offered to the assistant --------------------------------------------------------------
     async def status(self, principal: Principal, params: Mapping[str, Any]) -> ToolResult:
         title = str(params.get("title") or "").strip()[:200]
-        if not title:
-            return ToolResult("error", {"error": "give the title"})
+        wanted = str(params.get("id") or "").strip()
+        if not title and not wanted:
+            return ToolResult("error", {"error": "give the title or the id"})
         if not await self._allowed(principal):
             return ToolResult("ok", {"found": False, "title": title})
-        year = params.get("year")
-        rows, _ = await self.catalog.browse(
-            principal,
-            q=title,
-            kind=params.get("kind") or None,
-            year=int(year) if isinstance(year, int) else None,
-            limit=5,
-        )
-        found = [r for r, _ in rows]
+        found: list[Any] = []
+        if wanted:  # the page the member is on names it (« media id=… »)
+            try:
+                found = [await self.catalog.get(principal, UUID(wanted))]
+            except (ValueError, NotFound):
+                return ToolResult("ok", {"found": False, "id": wanted})
+        else:
+            year = params.get("year")
+            rows, _ = await self.catalog.browse(
+                principal,
+                q=title,
+                kind=params.get("kind") or None,
+                year=int(year) if isinstance(year, int) else None,
+                limit=5,
+            )
+            found = [r for r, _ in rows]
         if not found:
             return ToolResult(
                 "ok",
@@ -153,7 +163,7 @@ class MediaAiTools:
                     "It can be requested from the media page.",
                 },
             )
-        folded = title.casefold()
+        folded = (title or found[0].title).casefold()
         best = next((r for r in found if r.title.casefold() == folded), found[0])
         data: dict[str, Any] = {
             "found": True,
@@ -238,15 +248,15 @@ class MediaAiTools:
                 "Where a film, series, book or game stands for the portal: in the library or not, and if "
                 "it was requested, each step of its journey (requested, approved, released, searched by the "
                 "download manager, downloading, imported, available) with what explains it — use it to say "
-                "why a title is not available yet.",
+                "why a title is not available yet. Give its title, or its id when the user is on its page.",
                 {
                     "type": "object",
                     "properties": {
                         "title": {"type": "string", "minLength": 1, "maxLength": 200},
+                        "id": {"type": "string", "format": "uuid", "description": "the media id of the page"},
                         "kind": {"type": "string", "enum": ["movie", "series", "book", "audiobook", "game"]},
                         "year": {"type": "integer", "minimum": 1870, "maximum": 2100},
                     },
-                    "required": ["title"],
                     "additionalProperties": False,
                 },
                 MEDIA_READ,

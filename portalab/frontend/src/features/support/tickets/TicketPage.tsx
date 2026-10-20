@@ -8,6 +8,7 @@ import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useAssistantPage } from "../../ai/pageContext";
 import { useMe } from "../../auth/useAuth";
 import { useTicket, useTicketActions } from "./api";
 import { PriorityBadge, StateBadge, stateLabel } from "./TicketBadges";
@@ -28,6 +29,8 @@ export function TicketPage() {
   const [comment, setComment] = useState("");
   const [internal, setInternal] = useState(false);
   const file = useRef<HTMLInputElement>(null);
+  // issue 171: « this ticket » for the assistant
+  useAssistantPage(ticket.data ? `ticket id=${ticket.data.id}` : null);
   if (ticket.isPending) return <FunctionalState state="loading" />;
   if (ticket.isError || !ticket.data)
     return <FunctionalState state="unavailable" label={t("support:ticket.notFound")} />;

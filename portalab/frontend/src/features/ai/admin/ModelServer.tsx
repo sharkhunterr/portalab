@@ -52,6 +52,8 @@ export function ModelServer({ values, onChange }: { values: Values; onChange: (n
             const loaded = next.models.find((m) => m.loaded && !m.embedding && m.tools !== false);
             onChange({
               ...values,
+              // a thinking model answers at once (its thoughts would eat the answer's length)
+              provider_reasoning: values.provider_reasoning || "none",
               provider_endpoint: next.endpoint,
               provider_model: keep
                 ? model
@@ -98,6 +100,18 @@ export function ModelServer({ values, onChange }: { values: Values; onChange: (n
           />
         </>
       )}
+      <SelectField
+        label={t("ai:admin.server.reasoning")}
+        hint={t("ai:admin.server.reasoningHint")}
+        value={String(values.provider_reasoning ?? "")}
+        onChange={(event) => onChange({ ...values, provider_reasoning: event.target.value })}
+      >
+        {["", "none", "low", "medium", "high"].map((level) => (
+          <option key={level} value={level}>
+            {t(`ai:admin.server.reasoning.${level || "default"}`)}
+          </option>
+        ))}
+      </SelectField>
       {current?.models.some((m) => m.loaded) ? (
         <p className="admin-muted">
           {t("ai:admin.server.inMemory", {

@@ -41,6 +41,7 @@ export function AiSettings() {
       enabled: Boolean(values.enabled),
       provider_endpoint: String(values.provider_endpoint ?? ""),
       provider_model: String(values.provider_model ?? ""),
+      provider_reasoning: String(values.provider_reasoning ?? "") as "" | "none" | "low" | "medium" | "high",
       auto_navigate: Boolean(values.auto_navigate),
       tools_disabled: [...disabled],
       ...Object.fromEntries(NUMBERS.map(([key]) => [key, Number(values[key])])),
