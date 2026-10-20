@@ -28,20 +28,42 @@
   animation: ai-rise var(--motion-duration-base, 220ms) ease-out;
 }
 @media (max-width: 40rem) {
+  /* a sheet from the bottom on a phone: the page stays in sight above it */
   .ai-modal {
-    inset: 0;
+    inset: auto 0 0;
     translate: none;
     inline-size: auto;
     max-inline-size: 100%;
-    block-size: auto;
-    border: 0;
-    border-radius: 0;
+    block-size: min(80dvh, 40rem);
+    border-block-end: 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    animation-name: ai-sheet;
   }
-  .ai-modal__description {
+  .ai-modal .ai-modal__head {
+    padding-block-start: var(--space-4);
+  }
+  .ai-modal .ai-modal__head::before {
+    /* the sheet's handle */
+    position: absolute;
+    inset-block-start: 0.4rem;
+    inset-inline-start: 50%;
+    inline-size: 2.5rem;
+    block-size: 0.25rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-border);
+    translate: -50% 0;
+    content: "";
+  }
+  .ai-modal .ai-modal__description {
     display: none; /* the title says enough on a phone */
   }
-  .ai-bubble {
+  .ai-modal .ai-bubble {
     max-inline-size: 92%;
+  }
+}
+@keyframes ai-sheet {
+  from {
+    transform: translateY(100%);
   }
 }
 @keyframes ai-fade {

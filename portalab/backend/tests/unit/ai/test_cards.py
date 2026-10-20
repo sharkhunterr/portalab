@@ -27,7 +27,7 @@ def test_an_answer_citing_nothing_still_shows_what_the_portal_handed_it() -> Non
     attributor = Attributor()
     titles = [SourceRef("media", f"media:{i}", f"Film {i}", url=f"/media/{i}") for i in range(10)]
     attributor.add("media.search_catalog", ToolResult("ok", {}, titles))
-    text, sources, interpretation = attributor.finalize("Three films are here.")
+    _, sources, interpretation = attributor.finalize("Three films are here.")
     assert [s["title"] for s in sources] == [f"Film {i}" for i in range(UNCITED_CARDS)] and not interpretation
     _, cited, _ = attributor.finalize("Film 3 is here [4].")
     assert [s["n"] for s in cited] == [4]  # cited: only those

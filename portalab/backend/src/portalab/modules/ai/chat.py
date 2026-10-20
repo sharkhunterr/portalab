@@ -33,14 +33,17 @@ class ChatService:
         self.governor = governor
         self.orchestrator = orchestrator
 
-    async def prepare(self, principal: Principal, conversation_id: UUID, text: str) -> Turn:
+    async def prepare(
+        self, principal: Principal, conversation_id: UUID, text: str, *, page: dict[str, Any] | None = None
+    ) -> Turn:
         conversation = await self.conversations.owned(principal, conversation_id)
         user = subject_of(principal)
         await self.governor.admit(user)
         if self.orchestrator.provider() is None:
             raise AiUnavailable("The assistant is not configured.")
         await self.conversations.append(conversation_id, "user", text)
-        return Turn(principal, user, conversation_id, dict(conversation.context or {}))
+        # issue 171: the page this message is asked from, else the one the conversation started on
+        return Turn(principal, user, conversation_id, dict(page or conversation.context or {}))
 
     async def events(self, turn: Turn) -> AsyncIterator[Event]:
         outcome = TurnOutcome()
