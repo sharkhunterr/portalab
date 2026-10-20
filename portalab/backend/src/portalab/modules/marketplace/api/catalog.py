@@ -122,6 +122,7 @@ PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
     "streak_freeze": ("count",),  # #54/#55: the perk's effect, on its card
     "media_rescue": ("count",),  # #57: how many titles it saves
     "xp_boost": ("factor", "hours", "values"),
+    "ai_capacity": ("perk", "amount", "hours"),  # issue 173: the assistant's capacity, on its card
     "booster": PAYLOAD_FIELDS,  # #81: what it holds and its odds
 }
 
