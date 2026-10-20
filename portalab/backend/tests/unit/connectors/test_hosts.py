@@ -143,6 +143,14 @@ def test_unraid_parity_under_way_beats_the_last_check() -> None:
     paused = unraid_report(
         {"array": {"parityCheckStatus": last, "parities": disks}, "vars": {**resync, "mdResync": 0}}
     ).parity
+    # the API cannot tell mdResync past 2^31 (null): the kilobytes done in the last sample say it moves
+    moving = unraid_report(
+        {"array": {"parityCheckStatus": last, "parities": disks}, "vars": {**resync, "mdResync": None}}
+    ).parity
+    assert moving is not None and moving.running
+    still = {**resync, "mdResync": None, "mdResyncDb": "0"}
+    halted = unraid_report({"array": {"parityCheckStatus": last, "parities": disks}, "vars": still}).parity
+    assert halted is not None and halted.paused
     assert paused is not None and paused.paused and not paused.running and paused.status == "paused"
     idle = unraid_report(
         {"array": {"parityCheckStatus": last, "parities": disks}, "vars": {**resync, "mdResyncPos": 0}}

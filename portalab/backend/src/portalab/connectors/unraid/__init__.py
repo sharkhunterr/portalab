@@ -59,8 +59,9 @@ SECTIONS: dict[str, str] = {
       parityCheckStatus { status progress running errors speed date duration paused correcting }
     }""",
     # the check under way, as the array driver counts it (parityCheckStatus may still tell the last one)
-    # (not mdResyncSize: past 2^31 kilobytes the API cannot tell it — the parity disk's size says it)
-    "resync": "vars { mdResync mdResyncPos mdResyncAction mdResyncDt mdResyncDb }",
+    # (not mdResync nor mdResyncSize: past 2^31 kilobytes the API cannot tell them — the parity disk's size
+    # says how long the check is, the kilobytes done in the last sample whether it moves)
+    "resync": "vars { mdResyncPos mdResyncAction mdResyncDt mdResyncDb }",
     "docker": "docker { containers { names state status image isUpdateAvailable autoStart } }",
     "notifications": """notifications {
       list(filter: {type: UNREAD, offset: 0, limit: 20}) { title subject description importance timestamp }
@@ -217,10 +218,11 @@ def _resync(raw: Mapping[str, Any], resync: Mapping[str, Any]) -> Mapping[str, A
     position = _number(resync.get("mdResyncPos"))
     if not size or not position or position <= 0:
         return raw
-    active = bool(_number(resync.get("mdResync")))
+    seconds, done = _number(resync.get("mdResyncDt")), _number(resync.get("mdResyncDb"))
+    flag = _number(resync.get("mdResync"))  # an older API may still tell it (0: paused)
+    active = bool(flag) if flag is not None else bool(seconds and done)
     progress = round(min(100.0, 100 * position / size), 1)
     action = str(resync.get("mdResyncAction") or "").lower()
-    seconds, done = _number(resync.get("mdResyncDt")), _number(resync.get("mdResyncDb"))
     speed = f"{done / seconds / 1024:.1f} MB/s" if active and seconds and done else raw.get("speed")
     return {
         **raw,
