@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Button } from "../../../design-system/components/Button";
 import { Drawer } from "../../../design-system/components/Overlays";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
@@ -21,7 +21,7 @@ export interface AiPanelProps {
   onOpenChange: (open: boolean) => void;
   available: boolean;
   autoNavigate: boolean;
-  context?: { route?: string; title?: string } | undefined;
+  context?: { route?: string; title?: string; question?: string; asked?: number } | undefined;
 }
 
 export function AiPanel({ open, onOpenChange, available, autoNavigate, context }: AiPanelProps) {
@@ -29,6 +29,15 @@ export function AiPanel({ open, onOpenChange, available, autoNavigate, context }
   const chat = useAiChat(context);
   const conversations = useConversations(open && available);
   const [draft, setDraft] = useState("");
+  // issue 171: opened with a question (the search bar, a page's « ask the assistant »): asked at once
+  const asked = context?.asked;
+  const answered = useRef<number | undefined>(undefined);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once per question asked
+  useEffect(() => {
+    if (!open || !available || !asked || !context?.question || answered.current === asked) return;
+    answered.current = asked;
+    void chat.send(context.question, { fresh: true });
+  }, [asked, open, available]);
   const submit = (event: FormEvent) => {
     event.preventDefault();
     const text = draft;

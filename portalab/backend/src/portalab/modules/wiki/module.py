@@ -3,6 +3,7 @@
 from dataclasses import replace
 from typing import Any
 
+from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.content import HELP, KNOWLEDGE, LinkResolverRegistry, default_link_resolvers
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
@@ -24,6 +25,7 @@ from portalab.core.logging import get_logger
 from portalab.core.time import Clock
 from portalab.modules.wiki import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.wiki import settings as _settings  # noqa: F401 — declares settings
+from portalab.modules.wiki.ai_tools import WikiAiTools
 from portalab.modules.wiki.events import register_event_types
 from portalab.modules.wiki.knowledge import WikiKnowledge, WikiLinkResolver, WikiSearchProvider
 from portalab.modules.wiki.pages import PageService
@@ -48,7 +50,9 @@ class WikiModule:
         resolvers: LinkResolverRegistry = default_link_resolvers,
         search: SearchRegistry = default_search,
         observables: ObservableRegistry = default_observables,
+        ai_tools: AIToolRegistry = default_ai_tools,
     ) -> None:
+        self.ai_tools = ai_tools  # issue 171: the assistant's tools
         self.database = database
         self.audit = audit
         self.capabilities = capabilities
@@ -62,6 +66,7 @@ class WikiModule:
         self.knowledge = WikiKnowledge(self.pages)
 
     def register(self) -> None:
+        WikiAiTools(self.pages, self.clock).register(self.ai_tools)  # issue 171
         register_event_types(self.event_types)
         ports: tuple[tuple[str, Any], ...] = ((KNOWLEDGE, self.knowledge), (HELP, self.knowledge))
         for name, provider in ports:

@@ -7,14 +7,20 @@ import type { AiPanelProps } from "./AiPanel";
 export function useAiAssistant(): { slot: AiProvider; panel: AiPanelProps } {
   const status = useAiStatus();
   const [open, setOpen] = useState(false);
-  const [context, setContext] = useState<{ route?: string } | undefined>(undefined);
+  const [context, setContext] = useState<{ route?: string; question?: string; asked?: number } | undefined>(
+    undefined,
+  );
   const available = Boolean(status.data?.available);
   const autoNavigate = Boolean(status.data?.auto_navigate);
   const slot = useMemo<AiProvider>(
     () => ({
       available,
       open: (ctx) => {
-        setContext(ctx ? { route: ctx.route } : undefined);
+        setContext(
+          ctx
+            ? { route: ctx.route, ...(ctx.question ? { question: ctx.question, asked: Date.now() } : {}) }
+            : undefined,
+        );
         setOpen(true);
       },
     }),

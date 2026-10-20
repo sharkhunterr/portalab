@@ -48,16 +48,18 @@ export function useAiChat(context?: { route?: string; title?: string }) {
   }, []);
 
   const send = useCallback(
-    async (text: string) => {
+    async (text: string, options?: { fresh?: boolean }) => {
       const content = text.trim();
       if (!content || busy) return;
       setBusy(true);
       setError(null);
       try {
-        const id = conversationId ?? (await createConversation(context)).id;
+        // issue 171: a question asked from the search bar (or a page) starts a conversation of its own
+        const fresh = Boolean(options?.fresh);
+        const id = (fresh ? null : conversationId) ?? (await createConversation(context)).id;
         setConversationId(id);
         setMessages((current) => [
-          ...current,
+          ...(fresh ? [] : current),
           empty("user", content),
           { ...empty("assistant"), streaming: true },
         ]);

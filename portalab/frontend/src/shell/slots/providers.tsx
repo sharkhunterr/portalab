@@ -12,7 +12,8 @@ export interface SearchProvider {
 
 export interface AiProvider {
   available: boolean;
-  open: (context?: { route: string }) => void;
+  /** issue 171: ``question`` — asked at once, in a conversation of its own (the search bar, a page) */
+  open: (context?: { route: string; question?: string }) => void;
 }
 
 export interface NotificationSummary {

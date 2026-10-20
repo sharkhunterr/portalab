@@ -198,6 +198,25 @@ class DiagnosisOrchestrator:
             raise NotFound("This diagnosis does not exist.", code="diagnosis.not_found")
         return run
 
+    async def prepare(self, principal: Principal, payload: dict[str, Any]) -> TicketDraft:
+        """Issue 171: a draft the assistant prepares in a conversation — the member reviews it in the ticket
+        form and submits it (the assistant never submits a ticket)."""
+        user = principal.acting_for or principal.user_id
+        if user is None:
+            raise NotFound("No member to prepare a draft for.", code="diagnosis.no_member")
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            draft = TicketDraft(
+                user_id=user,
+                payload=payload,
+                source="ai",
+                expires_at=now + timedelta(minutes=max(1, self.config().draft_ttl_minutes)),
+                created_at=now,
+            )
+            uow.session.add(draft)
+            await uow.session.flush()
+        return draft
+
     async def get_draft(self, principal: Principal, draft_id: UUID) -> TicketDraft:
         async with self.database.session() as session:
             draft = await session.get(TicketDraft, draft_id)

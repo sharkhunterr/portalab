@@ -10,6 +10,7 @@ from uuid import UUID
 from sqlalchemy import func, select
 
 from portalab.capabilities.activity import CAPABILITY as ACTIVITY
+from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.content import CalendarSourceRegistry, default_calendar_sources
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
@@ -193,7 +194,9 @@ class MediaModule:
         categories: CategoryRegistry = default_categories,
         observables: ObservableRegistry = default_observables,
         player_key: bytes | None = None,
+        assistant_tools: AIToolRegistry = default_ai_tools,
     ) -> None:
+        self.assistant_tools = assistant_tools  # issue 171: the assistant's media tools
         self.database = database
         self.events = events
         self.audit = audit
@@ -272,7 +275,9 @@ class MediaModule:
         self.cleanup = CleanupService(database, capabilities, clock=clock)  # #57: Maintainerr's deletions
         self.requestable = RequestableCatalog(database, capabilities)  # #4: what one can ask for (Seerr)
         self.moderation = RequestModeration(self.requests)  # #4: administrators approve or decline
-        self.ai_tools = MediaAiTools(self.catalog, self.history_reader, self.discovery)
+        self.ai_tools = MediaAiTools(  # issue 171: offered to the assistant, with a title's journey
+            self.catalog, self.history_reader, self.discovery, self.journey, clock=clock
+        )
         # 027 (#2): the portal's player (its stream tickets are signed with a key of the portal's secret)
         self.player = PlayerService(
             database,
@@ -361,6 +366,7 @@ class MediaModule:
 
     # --- registration ----------------------------------------------------------------------------------
     def register(self) -> None:
+        self.ai_tools.register(self.assistant_tools)
         register_media_signals(default_signals)  # issue 122: the plays under way, for automations
         if not any(p.instance_ref == "media" for p in self.capabilities.system_providers(ATTENTION)):
             # #98: what waits for an administrator here — a badge on the navigation

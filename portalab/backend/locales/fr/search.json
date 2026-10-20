@@ -1,6 +1,7 @@
 {
   "allTypes": "Tous les types",
   "assist.ask": "Demander à l’assistant",
+  "assist.converse": "Continuer en conversation",
   "assist.error": "L’assistant n’a pas pu répondre.",
   "assist.note": "Analyse — une interprétation, vérifiez les sources.",
   "assist.retry": "Redemander",
