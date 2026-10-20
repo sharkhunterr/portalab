@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { useLocation } from "react-router";
 
 /**
- * Issue 171 — what the member is looking at, for the assistant: only what the content is and its id
- * (« media id=… », « ticket id=… ») the page declares — the assistant's tools read the rest when the
+ * Issue 171 — what the member is looking at, for the assistant: what the content is, its id and its name
+ * (« media id=… « Heat » (movie) ») the page declares — the name lets the model tell whether a question is
+ * about the page; the assistant's tools read the rest when the
  * question needs it — or else the page's heading; sent with a new conversation so « this title », « this
  * ticket » mean what the page shows. Small on purpose: the model's context stays for the answer.
  */
