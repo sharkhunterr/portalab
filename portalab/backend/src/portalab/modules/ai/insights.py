@@ -19,6 +19,7 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import NotFound
+from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.ai.models import Conversation, Feedback, Message
 
@@ -39,7 +40,15 @@ def _percentile(values: list[int], share: float) -> int | None:
 
 
 class Insights:
-    def __init__(self, database: Database, capabilities: CapabilityRegistry, *, clock: Clock | None = None):
+    def __init__(
+        self,
+        database: Database,
+        capabilities: CapabilityRegistry,
+        *,
+        clock: Clock | None = None,
+        events: EventPublisher | None = None,
+    ):
+        self.events = events  # issue 181: a first verdict is told (the achievements count them)
         self.database = database
         self.capabilities = capabilities
         self.clock = clock
@@ -68,6 +77,19 @@ class Insights:
                     await uow.session.delete(existing)
                 return {"rating": None, "comment": ""}
             text = " ".join(comment.split())[:1000]
+            if self.events is not None:
+                # told once per answer: its first verdict (commented: false), then its first word on what
+                # was expected (commented: true) — changing one's mind never counts twice
+                for commented in (False, True) if text else (False,):
+                    await self.events.publish(
+                        uow.session,
+                        "ai.answer_rated",
+                        {"rating": "up" if rating > 0 else "down", "commented": commented},
+                        occurred_at=now,
+                        actor=principal,
+                        subject=SubjectRef("ai_message", str(message_id)),
+                        dedup_key=f"ai.answer_rated:{message_id}:{'commented' if commented else 'rated'}",
+                    )
             await uow.session.execute(
                 insert(Feedback)
                 .values(

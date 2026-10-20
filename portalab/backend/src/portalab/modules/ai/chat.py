@@ -85,7 +85,7 @@ class ChatService:
                 turn.user, outcome.tokens_in, outcome.tokens_out, len(outcome.tool_calls)
             )
             if outcome.content or outcome.error or outcome.pending:
-                return await self.conversations.append(
+                message = await self.conversations.append(
                     turn.conversation_id,
                     "assistant",
                     outcome.content,
@@ -105,6 +105,17 @@ class ChatService:
                         "nudged": outcome.nudged,
                     },
                 )
+                if outcome.content and not outcome.error:
+                    try:
+                        await self.conversations.announce(
+                            turn.principal,
+                            message,
+                            sourced=bool(outcome.sources),
+                            tools=len(outcome.tool_calls),
+                        )
+                    except Exception:
+                        log.warning("ai answer not announced")
+                return message
         except Exception:
             log.warning("ai turn not stored")
         return None

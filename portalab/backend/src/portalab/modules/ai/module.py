@@ -123,10 +123,14 @@ class AiModule:
             provider_for=self.provider_for,
         )
         self.conversations = Conversations(database, events, clock=clock)
-        self.perks = Perks(database, lambda: self.config, clock=clock)  # issue 173: bought in the shop
+        self.perks = Perks(
+            database, lambda: self.config, clock=clock, events=events
+        )  # issue 173: bought in the shop
         self.governor = Governor(database, lambda: self.config, clock=clock, perks=self.perks)
         self.chat = ChatService(self.conversations, self.governor, self.orchestrator)
-        self.insights = Insights(database, capabilities, clock=clock)  # issue 176: verdicts and dashboard
+        self.insights = Insights(
+            database, capabilities, clock=clock, events=events
+        )  # issue 176: verdicts and dashboard
         self.baseline = BaselineTools(
             capabilities, authorizer, search=search, navigation=navigation, clock=clock
         )

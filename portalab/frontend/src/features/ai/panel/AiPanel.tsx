@@ -111,6 +111,10 @@ export function AiPanel({
             event.preventDefault();
             input.current?.focus();
           }}
+          // issue 181: a guided tour over the window leaves it open (its bubble sits outside)
+          onInteractOutside={(event) => {
+            if ((event.target as Element | null)?.closest?.(".tour")) event.preventDefault();
+          }}
         >
           <header className="ai-modal__head">
             <span className="ai-modal__mark" aria-hidden="true">
@@ -132,6 +136,7 @@ export function AiPanel({
                     type="button"
                     className="ai-icon-button"
                     aria-pressed={history}
+                    data-tour="ai-history"
                     aria-label={t("ai:panel.history")}
                     title={t("ai:panel.history")}
                     onClick={() => setHistory(!history)}

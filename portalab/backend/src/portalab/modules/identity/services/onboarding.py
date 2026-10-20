@@ -18,7 +18,20 @@ from portalab.modules.identity.services.common import publish
 from portalab.modules.identity.settings import ONBOARDING_ENABLED, ONBOARDING_MESSAGE
 
 #: #7 — the guided tours of the portal (the first steps each have one); others are refused.
-TOURS = frozenset({"portal", "profile", "dashboard", "request", "request_status", "shop", "ticket", "stats"})
+TOURS = frozenset(
+    {
+        "portal",
+        "profile",
+        "dashboard",
+        "request",
+        "request_status",
+        "shop",
+        "ticket",
+        "stats",
+        "assistant",  # issue 181: the assistant, and its capacities in the shop
+        "assistant_shop",
+    }
+)
 
 
 @dataclass(frozen=True, slots=True)
