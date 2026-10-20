@@ -30,6 +30,10 @@ class AiConfigIn(BaseModel):
     provider_model: str | None = Field(default=None, max_length=200)
     provider_reasoning: Literal["", "none", "low", "medium", "high"] | None = None
     provider_secret: str | None = Field(default=None, max_length=500)  # write-only; "" clears
+    # issue 171: who the assistant is, what it is for, what it does when it does not know
+    assistant_name: str | None = Field(default=None, max_length=40)
+    assistant_role: str | None = Field(default=None, max_length=800)
+    assistant_fallback: str | None = Field(default=None, max_length=800)
     max_tool_calls_per_turn: int | None = Field(default=None, ge=0, le=20)
     max_context_tokens: int | None = Field(default=None, ge=1000, le=1_000_000)
     request_timeout_seconds: int | None = Field(default=None, ge=5, le=600)

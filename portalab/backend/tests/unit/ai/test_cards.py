@@ -41,3 +41,27 @@ def test_the_language_a_question_is_written_in() -> None:
     assert language_of("Pourquoi ce film a un badge leaving soon") == "French"
     assert language_of("Are all the services working?") == "English"
     assert language_of("Heat") is None
+
+
+def test_the_assistant_says_who_it_is_what_it_is_for_and_what_to_do_without_an_answer() -> None:
+    from portalab.modules.ai.context import DEFAULT_FALLBACK, system_prompt
+
+    plain = system_prompt("fr", None)
+    assert plain.startswith(
+        "Your name is Assistant. You are the assistant of this portal: you help the members"
+    )
+    assert DEFAULT_FALLBACK in plain and "support ticket" in plain
+    told = system_prompt(
+        "fr",
+        None,
+        None,
+        {
+            "name": "Xeno",
+            "site": "Xenoportal",
+            "role": "guide the members of the Xeno family {through} their media.",
+            "fallback": "send them to the wiki's FAQ",
+        },
+    )
+    assert told.startswith('Your name is Xeno. You are the assistant of "Xenoportal": you guide the members')
+    assert "(through)" in told and "{through}" not in told  # an administrator's braces never break the prompt
+    assert "When your tools do not hold the answer: send them to the wiki's FAQ." in told

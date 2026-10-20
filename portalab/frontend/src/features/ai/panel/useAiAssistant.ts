@@ -26,5 +26,6 @@ export function useAiAssistant(): { slot: AiProvider; panel: AiPanelProps } {
     }),
     [available],
   );
-  return { slot, panel: { open, onOpenChange: setOpen, available, autoNavigate, context } };
+  const name = status.data?.name || undefined; // issue 171: the name the administrators gave it
+  return { slot, panel: { open, onOpenChange: setOpen, available, autoNavigate, context, name } };
 }

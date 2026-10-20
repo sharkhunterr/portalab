@@ -17,6 +17,9 @@ class AiConfig:
     provider_endpoint: str = ""
     provider_model: str = ""
     provider_reasoning: str = ""
+    assistant_name: str = ""
+    assistant_role: str = ""
+    assistant_fallback: str = ""
     max_tool_calls_per_turn: int = 8
     max_context_tokens: int = 6000
     request_timeout_seconds: int = 60
@@ -37,6 +40,9 @@ SETTINGS: dict[str, str] = {
     "provider_endpoint": "ai.provider.endpoint",
     "provider_model": "ai.provider.model",
     "provider_reasoning": "ai.provider.reasoning",
+    "assistant_name": "ai.persona.name",
+    "assistant_role": "ai.persona.role",
+    "assistant_fallback": "ai.persona.fallback",
     "max_tool_calls_per_turn": "ai.maxToolCallsPerTurn",
     "max_context_tokens": "ai.maxContextTokens",
     "request_timeout_seconds": "ai.requestTimeoutSeconds",
@@ -55,6 +61,10 @@ _DESCRIPTIONS = {
     "provider_kind": "Provider adapter: openai_compatible (hosted APIs or local servers).",
     "provider_endpoint": "Base URL of the provider (e.g. http://ollama:11434/v1).",
     "provider_model": "Model name sent to the provider.",
+    "assistant_name": "The assistant's name, told to the model and shown atop its window (empty: Assistant).",
+    "assistant_role": "What the assistant is for on this portal (empty: the portal's own description).",
+    "assistant_fallback": "What it does when its tools do not hold the answer (empty: a wiki page's link, "
+    "else a support ticket).",
     "provider_reasoning": "How much a thinking model reflects before answering (none: at once — faster, and "
     "its thoughts never eat the answer's length); empty: the model's default.",
     "max_tool_calls_per_turn": "Maximum tool calls in one answer.",

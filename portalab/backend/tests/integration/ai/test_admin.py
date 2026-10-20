@@ -130,3 +130,15 @@ async def test_model_servers(ai: AiHarness, client: httpx.AsyncClient, people: d
 
 async def _available(value: object) -> object:
     return value
+
+
+async def test_the_assistants_name(ai: AiHarness, client: httpx.AsyncClient, people: dict[str, UUID]) -> None:
+    """Issue 171: the administrators name the assistant; the members' window shows it."""
+    await login(client, "boss")
+    saved = await client.put(
+        "/api/v1/admin/ai/config",
+        json={"assistant_name": "Xeno", "assistant_fallback": "send them to the FAQ"},
+    )
+    assert saved.status_code == 200 and saved.json()["values"]["assistant_name"] == "Xeno"
+    await login(client, "ursula")
+    assert (await client.get("/api/v1/ai/status")).json()["name"] == "Xeno"

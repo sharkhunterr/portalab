@@ -41,6 +41,7 @@ class AiStatusOut(BaseModel):
     available: bool
     provider_state: str
     auto_navigate: bool
+    name: str = ""  # issue 171: the assistant's name (empty: « Assistant »)
 
 
 class AiPageContext(BaseModel):
@@ -133,7 +134,10 @@ async def status(_: User, module: Module) -> AiStatusOut:
     else:
         state = "ok"
     return AiStatusOut(
-        available=state == "ok", provider_state=state, auto_navigate=module.config.auto_navigate
+        available=state == "ok",
+        provider_state=state,
+        auto_navigate=module.config.auto_navigate,
+        name=module.config.assistant_name,
     )
 
 

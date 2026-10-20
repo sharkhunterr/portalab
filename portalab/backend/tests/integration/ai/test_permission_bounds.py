@@ -83,7 +83,7 @@ async def test_disabled_assistant_and_classic_api(
     await login(client, "ursula")
     conversation = await start(client)
     status = (await client.get("/api/v1/ai/status")).json()
-    assert status == {"available": True, "provider_state": "ok", "auto_navigate": False}
+    assert status == {"available": True, "provider_state": "ok", "auto_navigate": False, "name": ""}
     ai.module.config = type(ai.module.config)(enabled=False)
     assert (await client.get("/api/v1/ai/status")).json()["available"] is False
     refused = await client.post(f"/api/v1/ai/conversations/{conversation}/messages", json={"content": "hi"})

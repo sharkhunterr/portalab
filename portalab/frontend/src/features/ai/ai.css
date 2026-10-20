@@ -561,7 +561,8 @@ a.ai-card:hover {
   border-block-end: 1px solid var(--color-border);
 }
 
-/* issue 169: where the assistant thinks — a model server and one of its models */
+/* issue 169: where the assistant thinks — a model server and one of its models; issue 171: who it is */
+.ai-persona,
 .ai-server {
   grid-column: 1 / -1; /* the whole row of the settings' grid */
   display: grid;
@@ -576,6 +577,7 @@ a.ai-card:hover {
   grid-column: 1 / -1;
   margin: 0;
 }
+.ai-persona legend,
 .ai-server legend {
   display: inline-flex;
   align-items: center;
@@ -688,4 +690,7 @@ a.ai-card:hover {
   font-style: italic;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.ai-persona {
+  grid-template-columns: minmax(0, 1fr);
 }
