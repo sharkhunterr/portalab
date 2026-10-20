@@ -373,10 +373,12 @@ describe("today's allowance (issue 171)", () => {
       </QueryClientProvider>,
     );
     // issue 179: in the header, what was used — pressed, the details and where to get more
-    const meter = screen.getByRole("button", { name: "25 % of today's allowance used — details" });
+    // issue 180: the reserve counts — 250 used of 1,000 for the day + 5,000 in reserve
+    const meter = screen.getByRole("button", { name: "4 % of today's allowance used — details" });
     fireEvent.click(meter);
-    expect(await screen.findByText("250 of 1K (25 %)")).toBeTruthy();
-    expect(screen.getByText("5K left, spent past the day's")).toBeTruthy();
+    expect(await screen.findByText("250 of 6K (4 %)")).toBeTruthy();
+    expect(screen.getByText("750 left of 1K")).toBeTruthy();
+    expect(screen.getByText("5K left")).toBeTruthy();
     expect(screen.getByText(/Stronger model — for good/)).toBeTruthy();
     expect(screen.getByRole("link", { name: "Get more in the shop." }).getAttribute("href")).toBe(
       "/marketplace?type=ai_capacity",
