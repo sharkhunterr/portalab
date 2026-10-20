@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
 import { api } from "../../api/client";
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
@@ -126,7 +126,6 @@ export function AppHeader({
         <div className="shell-header__search">{phone ? <SearchField compact /> : <HeaderSearch />}</div>
       )}
       <div className="shell-header__end">
-        <AssistantButton />
         <IncidentsButton />
         <PluginSlot name="header.action" compact />
         {bottomBar ? null : <NotificationButton unread={data.unread} />}
@@ -178,25 +177,6 @@ function SearchField({ compact }: { compact: boolean }) {
       </span>
       <span className="visually-hidden">{strings.search}</span>
     </button>
-  );
-}
-
-/** The assistant, only when one is available (027: an inert button helped nobody). */
-function AssistantButton() {
-  const strings = useShellStrings();
-  const { ai } = useSlots();
-  const location = useLocation();
-  if (!ai?.available) return null;
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      aria-label={strings.assistant}
-      title={strings.assistant}
-      onClick={() => ai.open({ route: location.pathname })}
-    >
-      <Icon name="sparkles" />
-    </Button>
   );
 }
 

@@ -40,13 +40,11 @@ describe("AppShell", () => {
     expect(results.violations.map((v) => v.id)).toEqual([]);
   });
 
-  it("search works through the palette even without a search engine, AI available when provided", async () => {
+  it("search works through the palette even without a search engine", async () => {
+    // issue 171: the assistant is reached from its round button on every page (tests/unit/ai/panel)
     fake.handler = () => json(200, VIEW);
-    const open = vi.fn();
-    renderShell({ slots: { ai: { available: true, open } } });
+    renderShell({ slots: { ai: { available: true, open: vi.fn() } } });
     await screen.findByRole("link", { name: "Services" });
-    fireEvent.click(screen.getByRole("button", { name: "Assistant" }));
-    expect(open).toHaveBeenCalledWith({ route: "/" });
     // 027: the header's search answers while one types
     fireEvent.change(screen.getByRole("combobox", { name: /Search/ }), { target: { value: "acc" } });
     expect(await screen.findByRole("listbox")).toBeInTheDocument();

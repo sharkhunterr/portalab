@@ -611,6 +611,24 @@
             ],
             "title": "Provider Model"
           },
+          "provider_reasoning": {
+            "anyOf": [
+              {
+                "enum": [
+                  "",
+                  "none",
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Reasoning"
+          },
           "provider_secret": {
             "anyOf": [
               {

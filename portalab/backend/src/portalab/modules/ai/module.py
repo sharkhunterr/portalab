@@ -133,6 +133,7 @@ class AiModule:
             lambda: self.api_key,
             transport=self.transport,
             max_context=self.config.max_context_tokens,
+            reasoning=self.config.provider_reasoning,
         )
 
     def available(self) -> bool:

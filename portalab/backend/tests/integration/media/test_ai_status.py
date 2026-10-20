@@ -70,6 +70,10 @@ async def test_media_status_tells_the_journey(
     assert answer.sources[0].url.startswith("/media/") and answer.sources[0].title == "Heat"
     assert "link" not in (data["download_manager"] or {})  # no service internals for the assistant
 
+    heat_id = answer.sources[0].url.removeprefix("/media/")
+    by_id = await status.handler(zoe, {"id": heat_id})  # the page the member is on names it
+    assert by_id.data["title"] == "Heat" and by_id.data["steps"] == data["steps"]
+    assert (await status.handler(zoe, {"id": "not-an-id"})).data["found"] is False
     unknown = await status.handler(zoe, {"title": "Some film nobody asked for"})
     assert unknown.data["found"] is False and "requested" in unknown.data["hint"]
     found = await registry.get("media.search_catalog").handler(zoe, {"q": "heat"})  # type: ignore[union-attr]

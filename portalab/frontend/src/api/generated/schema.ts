@@ -10360,6 +10360,8 @@ export interface components {
             provider_kind?: "openai_compatible" | null;
             /** Provider Model */
             provider_model?: string | null;
+            /** Provider Reasoning */
+            provider_reasoning?: ("" | "none" | "low" | "medium" | "high") | null;
             /** Provider Secret */
             provider_secret?: string | null;
             /** Rate Limit Per Minute */

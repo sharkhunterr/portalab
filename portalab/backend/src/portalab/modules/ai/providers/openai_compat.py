@@ -47,7 +47,9 @@ class OpenAICompatibleProvider:
         *,
         transport: httpx.AsyncBaseTransport | None = None,
         max_context: int = 8192,
+        reasoning: str = "",
     ) -> None:
+        self.reasoning = reasoning  # issue 171: « none » — a thinking model (qwen3…) answers at once
         self.endpoint = endpoint.rstrip("/")
         egress.EGRESS.allow(urlsplit(self.endpoint).hostname, "ai provider")  # 030: a configured provider
         self.model = model
@@ -75,6 +77,8 @@ class OpenAICompatibleProvider:
             "max_tokens": max_tokens,
             "stream_options": {"include_usage": True},
         }
+        if self.reasoning:
+            body["reasoning_effort"] = self.reasoning
         if tools:
             body["tools"] = [
                 {

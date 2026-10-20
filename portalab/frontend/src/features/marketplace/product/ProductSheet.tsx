@@ -9,6 +9,7 @@ import { useNotify } from "../../../design-system/components/Notification";
 import { useCelebrate } from "../../../design-system/feedback/Celebration";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
+import { useAssistantPage } from "../../ai/pageContext";
 import { HdTag, isHdProduct } from "../../appearance/Rarity";
 import { useHasPermission } from "../../authz/useMyPermissions";
 import { showLevelUp } from "../../gamification/levelup/LevelUpMoment";
@@ -147,6 +148,7 @@ function Fact({ icon, label, children }: { icon: string; label: string; children
 
 export function ProductSheet({ product }: { product: Product }) {
   const t = useT();
+  useAssistantPage(`shop product key=${product.key}`); // issue 171: « this product » for the assistant
   const rarity = product.rarity ?? "common";
   const description = useDescribe()(product);
   const policy = product.refund_policy as { refundable?: boolean; window_days?: number; percent?: number };
