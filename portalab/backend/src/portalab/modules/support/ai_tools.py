@@ -9,17 +9,20 @@
   it never runs inline; the assistant alone still cannot submit one: ``ticket.ai_cannot_submit``)."""
 
 from collections.abc import Mapping
+from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
 
 from portalab.capabilities.ai import AITool, AIToolRegistry, SourceRef, ToolResult
+from portalab.capabilities.health import SERVICE_DIRECTORY
 from portalab.capabilities.support import TicketRequest
 from portalab.core.authz_port import Principal
 from portalab.core.errors import NotFound, ValidationFailed
 from portalab.core.time import Clock, utc_now
 from portalab.modules.support.models import Ticket
+from portalab.modules.support.permissions import INCIDENTS_READ
 from portalab.modules.support.tickets.service import TICKETS_CREATE
 
 OWNER = "module:support"
@@ -155,6 +158,62 @@ class SupportAiTools:
             [self._source(ticket)],
         )
 
+    # --- issue 171: the incidents (what is wrong, where it stands, what was fixed lately) ------------------
+    async def _service_names(self) -> dict[str, str]:
+        try:
+            providers = self.module.capabilities.system_providers(SERVICE_DIRECTORY)
+            if not providers:
+                return {}
+            return {s.id: s.name for s in await providers[0].provider.services()}
+        except Exception:
+            return {}
+
+    async def incidents(self, principal: Principal, params: Mapping[str, Any]) -> ToolResult:
+        if not await self.module.tickets.allowed(principal, INCIDENTS_READ):
+            return ToolResult("unavailable", {"incidents": []})
+        names = await self._service_names()
+        now = utc_now(self.clock)
+        opened = await self.module.incidents.list(state="open", limit=10)
+        ongoing = []
+        for view in opened:
+            full = await self.module.incidents.get(view.id)  # its timeline: the last word on it
+            last = full.updates[-1] if full.updates else None
+            ongoing.append(
+                {
+                    "reference": view.reference,
+                    "title": view.title,
+                    "severity": view.severity,
+                    "stage": view.state,
+                    "since": view.created_at.isoformat(),
+                    "services": [names.get(s, s) for s in view.service_ids][:8] or ["the whole portal"],
+                    "summary": view.summary[:300] or None,
+                    "last_update": (last or {}).get("message", "")[:300] or None,
+                }
+            )
+        recent = [
+            {"reference": v.reference, "title": v.title, "resolved_at": v.resolved_at.isoformat()}
+            for v in await self.module.incidents.list(state="resolved", limit=10)
+            if v.resolved_at is not None and now - v.resolved_at <= timedelta(days=7)
+        ][:5]
+        sources = [
+            SourceRef(
+                "incident",
+                f"incident:{v.id}",
+                f"{v.reference} {v.title}",
+                "real",
+                now,
+                f"/incidents/{v.id}",
+                detail=f"{v.severity} · {v.state}",
+            )
+            for v in opened
+        ]
+        summary = (f"{len(ongoing)} incident(s) in progress." if ongoing else "No incident in progress.") + (
+            f" {len(recent)} resolved in the last 7 days." if recent else ""
+        )
+        return ToolResult(
+            "ok", {"summary": summary, "in_progress": ongoing, "resolved_lately": recent}, sources
+        )
+
     def tools(self) -> list[AITool]:
         def schema(properties: dict[str, Any], required: list[str] | None = None) -> dict[str, Any]:
             return {
@@ -165,6 +224,16 @@ class SupportAiTools:
             }
 
         return [
+            AITool(
+                "incidents.current",
+                "The portal's incidents: those in progress (severity, stage, the services hit, the last "
+                "update) and those resolved in the last days — what is wrong now, beyond the probes.",
+                schema({}),
+                INCIDENTS_READ,
+                "read",
+                self.incidents,
+                owner=OWNER,
+            ),
             AITool(
                 "support.my_tickets",
                 "The user's own support tickets (number, title, state, last change); optionally only open or "

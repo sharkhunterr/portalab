@@ -29,7 +29,12 @@ async def test_my_tickets_one_ticket_and_a_draft(
     await tickets.comment(support.p("sam"), mine.id, "Probably the codec again", internal=True)
     await tickets.comment(support.p("ursula"), mine.id, "Same in Firefox.")
     tools = {t.name: t for t in SupportAiTools(support.module).tools()}
-    assert set(tools) == {"support.my_tickets", "support.ticket", "support.create_ticket"}
+    assert set(tools) == {
+        "support.my_tickets",
+        "support.ticket",
+        "support.create_ticket",
+        "incidents.current",
+    }
     create = tools["support.create_ticket"]
     assert create.sensitivity == "sensitive"  # never inline: the member confirms its exact content
 
@@ -69,3 +74,28 @@ async def test_my_tickets_one_ticket_and_a_draft(
     assert lacking.state == "error" and lacking.data["missing"] == ["steps"]
     with pytest.raises(Forbidden):  # the assistant never submits
         await tickets.create(ai(people["ursula"]), TicketRequest("bug", "x", "y", {"steps": "z"}))
+
+
+async def test_incidents_in_progress_and_lately_resolved(
+    support: SupportHarness, people: dict[str, UUID]
+) -> None:
+    """Issue 171: what is wrong right now — beyond the probes, the incidents the support declared."""
+    incidents = support.module.incidents
+    outage, _ = await incidents.create(
+        support.p("sam"),
+        title="Panne générale",
+        severity="critical",
+        summary="Ralentissement",
+        message="On it.",
+    )
+    [tool] = [t for t in SupportAiTools(support.module).tools() if t.name == "incidents.current"]
+    answer = await tool.handler(ai(people["ursula"]), {})
+    [current] = answer.data["in_progress"]
+    assert (current["reference"], current["title"], current["severity"]) == (
+        outage.reference,
+        "Panne générale",
+        "critical",
+    )
+    assert current["services"] == ["the whole portal"] and current["summary"] == "Ralentissement"
+    assert answer.data["summary"].startswith("1 incident(s) in progress.")
+    assert answer.sources[0].url == f"/incidents/{outage.id}"

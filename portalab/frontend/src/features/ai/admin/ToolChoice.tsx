@@ -6,6 +6,8 @@ import type { AiConfig } from "../api";
 type Tool = AiConfig["tools"][number];
 const ORDER = [
   "media",
+  "incidents",
+  "maintenance",
   "support",
   "news",
   "wiki",
@@ -19,6 +21,8 @@ const ORDER = [
 ];
 const DOMAIN_ICONS: Record<string, string> = {
   media: "film",
+  incidents: "alert",
+  maintenance: "wrench",
   support: "lifebuoy",
   news: "newspaper",
   wiki: "book-open",
