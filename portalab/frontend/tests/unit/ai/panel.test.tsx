@@ -159,7 +159,7 @@ describe("the assistant's window (issue 171)", () => {
           element: (
             <AnswerText
               text={
-                "**Heat** waits:\n- requested [1]\n- [see it](/media/m1) or [elsewhere](https://evil.example)\n\nDone."
+                "**Heat** waits:\n- requested [1]\n- [see it](/media/m1) or [elsewhere](https://evil.example)\n\n[made up](/media/7a07167c-b1b2-74a3) and [the shop](/marketplace). Done."
               }
               sources={[
                 {
@@ -184,7 +184,8 @@ describe("the assistant's window (issue 171)", () => {
     expect(screen.getByRole("link", { name: "see it" }).getAttribute("href")).toBe("/media/m1");
     expect(screen.queryByRole("link", { name: "elsewhere" })).toBeNull();
     expect(document.querySelectorAll(".ai-answer li")[1]?.textContent).toBe("see it or elsewhere");
-    expect(screen.getByText("Done.")).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "made up" })).toBeNull(); // an item no source names
+    expect(screen.getByRole("link", { name: "the shop" }).getAttribute("href")).toBe("/marketplace");
   });
 
   it("asks the question it was opened with, with the page as context and nothing else", async () => {

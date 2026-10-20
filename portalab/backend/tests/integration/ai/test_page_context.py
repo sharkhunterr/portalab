@@ -28,6 +28,7 @@ async def test_each_message_tells_its_page(
     assert second.status_code == 200
     system = ai.provider.calls[-1][0][0].content
     assert '"/media/m1"' in system and "media id=m1" in system and "look it up" in system
+    assert f'You speak with the member "ursula" (id {people["ursula"]})' in system  # who « me » is
     refused = await client.post(
         f"/api/v1/ai/conversations/{conversation}/messages",
         json={"content": "x", "context": {"route": "/x", "question": "not a page field"}},

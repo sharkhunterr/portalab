@@ -76,7 +76,8 @@ class MediaAiTools:
             ),
             ToolDefinition(
                 "media.my_history",
-                "What the current user recently watched, read, played or listened to.",
+                "What the current user recently watched, read, played or listened to, newest first "
+                "(optionally only one kind: movie, episode, book, audiobook…).",
                 MEDIA_READ,
                 {"limit": "integer?"},
                 self.my_history,
@@ -123,10 +124,17 @@ class MediaAiTools:
         if user is None or not await self._allowed(principal):
             return {"items": []}
         limit = int(params.get("limit") or 20)
-        items = await self.history.for_user(user, principal, limit=min(max(1, limit), 50))
+        kind = str(params.get("kind") or "").strip() or None  # issue 171: « my last film » is a movie
+        items = await self.history.for_user(user, principal, limit=min(max(1, limit), 50), kind=kind)
         return {
             "items": [
-                {"title": i.title, "kind": i.kind, "at": i.occurred_at.isoformat(), "finished": i.completed}
+                {
+                    "id": str(i.object_id),
+                    "title": i.title,
+                    "kind": i.kind,
+                    "at": i.occurred_at.isoformat(),
+                    "finished": i.completed,
+                }
                 for i in items
             ]
         }
@@ -309,7 +317,13 @@ class MediaAiTools:
                 history,
                 {
                     "type": "object",
-                    "properties": {"limit": {"type": "integer", "minimum": 1, "maximum": 50}},
+                    "properties": {
+                        "limit": {"type": "integer", "minimum": 1, "maximum": 50},
+                        "kind": {
+                            "type": "string",
+                            "enum": ["movie", "episode", "series", "book", "audiobook", "game", "music"],
+                        },
+                    },
                     "additionalProperties": False,
                 },
             ),
