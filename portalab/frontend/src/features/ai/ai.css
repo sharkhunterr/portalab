@@ -68,12 +68,18 @@
 
 /* issue 169: where the assistant thinks — a model server and one of its models */
 .ai-server {
+  grid-column: 1 / -1; /* the whole row of the settings' grid */
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   gap: var(--space-3);
   margin: 0;
   padding: var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+}
+.ai-server > p {
+  grid-column: 1 / -1;
+  margin: 0;
 }
 .ai-server legend {
   display: inline-flex;
