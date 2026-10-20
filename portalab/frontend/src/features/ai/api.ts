@@ -11,6 +11,8 @@ export type AiAction = components["schemas"]["AiActionOut"];
 export type AiConfig = components["schemas"]["AiConfigOut"];
 export type AiConfigUpdate = components["schemas"]["AiConfigIn"];
 export type McpServer = components["schemas"]["McpServerOut"];
+export type AiModelServer = components["schemas"]["AiServerOut"];
+export type AiModel = components["schemas"]["AiModelOut"];
 export type McpServersUpdate = components["schemas"]["McpServersIn"];
 
 export type SourceClass = "real" | "historical" | "knowledge";
@@ -173,6 +175,15 @@ export function useAiConfig() {
   return useQuery({
     queryKey: [...KEY, "admin", "config"],
     queryFn: async () => (await api.GET("/api/v1/admin/ai/config")).data as AiConfig,
+  });
+}
+
+/** Issue 169: the model servers of the connected services (Ollama) — where to point the assistant. */
+export function useAiServers() {
+  return useQuery({
+    queryKey: [...KEY, "admin", "servers"],
+    staleTime: 30_000,
+    queryFn: async () => ((await api.GET("/api/v1/admin/ai/servers")).data ?? []) as AiModelServer[],
   });
 }
 

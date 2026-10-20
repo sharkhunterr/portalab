@@ -1,6 +1,7 @@
 """018 T030/T031 — admin API behind ``ai.manage``: configuration (secrets write-only), provider test,
 usage aggregates without content, MCP allow-list; non-admins are refused."""
 
+from datetime import UTC, datetime
 from uuid import UUID
 
 import httpx
@@ -20,6 +21,7 @@ async def test_admin_only(ai: AiHarness, client: httpx.AsyncClient, people: dict
         ("POST", "/api/v1/admin/ai/provider/test"),
         ("GET", "/api/v1/admin/ai/usage"),
         ("GET", "/api/v1/admin/ai/mcp-servers"),
+        ("GET", "/api/v1/admin/ai/servers"),
     ):
         response = await client.request(method, path, json={} if method != "GET" else None)
         assert response.status_code == 403, path
@@ -81,3 +83,50 @@ async def test_config_usage_and_mcp(
         and server["state"] == "unavailable"
         and "tok-SECRET-1" not in saved.text
     )
+
+
+class FakeOllama:
+    """A model server as a connected service hands it (issue 169)."""
+
+    def __init__(self, models: list[object] | None = None, *, down: bool = False) -> None:
+        self._models = models or []
+        self.down = down
+
+    def endpoint(self) -> str:
+        return "http://ollama.lan:11434/v1"
+
+    async def models(self) -> list[object]:
+        if self.down:
+            raise ConnectionError("unreachable")
+        return self._models
+
+
+async def test_model_servers(ai: AiHarness, client: httpx.AsyncClient, people: dict[str, UUID]) -> None:
+    """Issue 169: the model servers of the connected services, their models and what is in memory; one
+    that does not answer is listed as unavailable — the assistant's settings choose from them."""
+    from portalab.capabilities.ai import MODELS, MODELS_SPEC, ModelInfo
+    from portalab.capabilities.results import Available
+
+    capabilities = ai.full.identity.capabilities
+    try:
+        capabilities.spec(MODELS)
+    except Exception:
+        capabilities.declare(MODELS_SPEC)
+    qwen = ModelInfo("qwen3:8b", family="qwen3", loaded=True, vram_bytes=6_000_000_000, tools=True)
+    embed = ModelInfo("nomic-embed-text:latest", embedding=True)
+    wrapped = FakeOllama()
+    wrapped.models = lambda: _available(Available([qwen, embed], as_of=datetime.now(UTC)))  # type: ignore[method-assign]
+    capabilities.provide(MODELS, wrapped, instance_ref="s1", metadata={"service_id": "s1", "name": "PC-IA"})
+    capabilities.provide(MODELS, FakeOllama(down=True), instance_ref="s2", metadata={"name": "Tower"})
+    await login(client, "boss")
+    servers = {s["name"]: s for s in (await client.get("/api/v1/admin/ai/servers")).json()}
+    assert servers["PC-IA"]["state"] == "ok" and servers["PC-IA"]["endpoint"] == "http://ollama.lan:11434/v1"
+    assert [(m["name"], m["loaded"], m["tools"], m["embedding"]) for m in servers["PC-IA"]["models"]] == [
+        ("qwen3:8b", True, True, False),
+        ("nomic-embed-text:latest", False, None, True),
+    ]
+    assert servers["Tower"]["state"] == "unavailable" and servers["Tower"]["models"] == []
+
+
+async def _available(value: object) -> object:
+    return value

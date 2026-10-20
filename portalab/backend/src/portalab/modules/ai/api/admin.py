@@ -176,6 +176,34 @@ async def test_provider(principal: Manager, module: Module) -> AiProviderTestOut
     return AiProviderTestOut(ok=code is None, latency_ms=latency, code=code)
 
 
+class AiModelOut(BaseModel):
+    name: str
+    family: str | None
+    parameters: str | None
+    quantization: str | None
+    size_bytes: int | None
+    loaded: bool
+    vram_bytes: int | None
+    embedding: bool
+    tools: bool | None
+
+
+class AiServerOut(BaseModel):
+    service_id: str
+    name: str
+    connector: str
+    endpoint: str
+    state: str
+    models: list[AiModelOut]
+
+
+@router.get("/admin/ai/servers", response_model=list[AiServerOut])
+async def model_servers(_: Manager, module: Module) -> list[dict[str, Any]]:
+    """Issue 169: the model servers of the connected services (Ollama) — where to point the assistant, which
+    model to choose, what is in memory."""
+    return await module.servers()
+
+
 @router.get("/admin/ai/usage", response_model=AiUsageOut)
 async def usage(_: Manager, module: Module) -> AiUsageOut:
     from portalab.modules.ai.observability import metrics

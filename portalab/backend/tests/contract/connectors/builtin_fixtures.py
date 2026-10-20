@@ -463,6 +463,34 @@ MAINTAINERR: Routes = {
     "/api/rules/exclusion": {"code": 1, "result": "Success", "message": "Success"},
 }
 
+# issue 169: Ollama — a chat model in memory, another on disk (an older server: no « capabilities »), an
+# embedding model
+OLLAMA: Routes = {
+    "/api/version": {"version": "0.34.3"},
+    "/api/tags": {
+        "models": [
+            {
+                "name": "qwen3:8b",
+                "size": 5225388164,
+                "details": {"family": "qwen3", "parameter_size": "8.2B", "quantization_level": "Q4_K_M"},
+                "capabilities": ["completion", "tools", "thinking"],
+            },
+            {
+                "name": "mistral:7b",
+                "size": 4372824384,
+                "details": {"family": "llama", "parameter_size": "7.2B"},
+            },
+            {
+                "name": "nomic-embed-text:latest",
+                "size": 274302450,
+                "details": {"family": "nomic-bert", "families": ["nomic-bert"]},
+            },
+            {"size": 1},  # no name: skipped
+        ]
+    },
+    "/api/ps": {"models": [{"name": "qwen3:8b", "size": 6295440588, "size_vram": 6295440588}]},
+}
+
 SECRETS = {
     "jellyfin": {"api_key": "jf-secret-key"},
     "plex": {"token": "plex-secret-token"},
@@ -475,6 +503,7 @@ SECRETS = {
     "tmdb": {"api_key": "tmdb-secret-key"},
     "authentik": {"api_token": "authentik-secret-token"},
     "maintainerr": {},
+    "ollama": {},
 }
 ROUTES = {
     "jellyfin": JELLYFIN,
@@ -488,6 +517,7 @@ ROUTES = {
     "tmdb": TMDB,
     "authentik": AUTHENTIK,
     "maintainerr": MAINTAINERR,
+    "ollama": OLLAMA,
 }
 
 

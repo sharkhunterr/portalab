@@ -4,6 +4,7 @@ import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, TextField } from "../../../design-system/components/Field";
 import { useT } from "../../../i18n/hooks/useT";
 import { type AiConfig, type AiConfigUpdate, useAiAdmin, useAiConfig, useAiUsage } from "../api";
+import { ModelServer } from "./ModelServer";
 
 /**
  * Assistant settings (spec 018 T031, ``ai.manage``): provider, limits and tools; the provider credential is
@@ -60,17 +61,7 @@ export function AiSettings() {
           checked={Boolean(values.enabled)}
           onChange={(event) => setValues({ ...values, enabled: event.target.checked })}
         />
-        <TextField
-          label={t("ai:admin.endpoint")}
-          type="url"
-          value={String(values.provider_endpoint ?? "")}
-          onChange={(event) => setValues({ ...values, provider_endpoint: event.target.value })}
-        />
-        <TextField
-          label={t("ai:admin.model")}
-          value={String(values.provider_model ?? "")}
-          onChange={(event) => setValues({ ...values, provider_model: event.target.value })}
-        />
+        <ModelServer values={values} onChange={setValues} />
         <TextField
           label={t("ai:admin.access")}
           type="password"
