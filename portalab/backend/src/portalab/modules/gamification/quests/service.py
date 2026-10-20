@@ -272,14 +272,15 @@ class Quests:
     async def _complete(
         self, session: AsyncSession, user: UUID, quest: QuestVersion, period: str, at: datetime
     ) -> list[Note]:
-        notes = [
-            Note(
-                "quest",
-                user,
-                f"quest:{user}:{quest.key}:{period}",
-                {"quest": quest.definition.label, "kind": quest.definition.kind},
-            )
-        ]
+        # issue 175: what the quest gives is said in its own notification (no second « you earned »)
+        said: dict[str, Any] = {
+            "quest": quest.definition.label,
+            "kind": quest.definition.kind,
+            "xp": 0,
+            "coins": 0,
+            "contribution": 0,
+        }
+        notes = [Note("quest", user, f"quest:{user}:{quest.key}:{period}", said)]
         for reward in quest.definition.rewards:
             recorded = await self.writer.record(
                 session,
@@ -295,6 +296,8 @@ class Quests:
                     base_amount=reward.amount,
                 ),
             )
+            if reward.value in ("xp", "coins", "contribution") and not recorded.duplicate:
+                said[reward.value] += int(recorded.transaction.delta)
             if recorded.level_up:
                 notes.append(
                     Note("level_up", user, f"level:{user}:{recorded.level_up}", {"level": recorded.level_up})

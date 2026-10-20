@@ -309,12 +309,20 @@ class Achievements:
         if inserted is None:
             return []
         shown = definition.definition  # 027: the member reads its name and what it rewards, not its key
+        # issue 175: what it gives, in its own notification (no second « you earned »)
+        said: dict[str, Any] = {
+            "achievement": shown.label,
+            "description": shown.description,
+            "xp": 0,
+            "coins": 0,
+            "contribution": 0,
+        }
         notes = [
             Note(
                 "achievement",
                 user,
                 f"achievement:{user}:{definition.key}",
-                {"achievement": shown.label, "description": shown.description},
+                said,
                 gifts=tuple(unlock.product for unlock in shown.unlocks),
             )
         ]
@@ -335,6 +343,8 @@ class Achievements:
                 ),
             )
             ids.append(str(recorded.transaction.id))
+            if reward.value in ("xp", "coins", "contribution") and not recorded.duplicate:
+                said[reward.value] += int(recorded.transaction.delta)
             if recorded.level_up:
                 notes.append(
                     Note("level_up", user, f"level:{user}:{recorded.level_up}", {"level": recorded.level_up})

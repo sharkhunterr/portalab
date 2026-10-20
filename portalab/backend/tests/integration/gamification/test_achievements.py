@@ -108,12 +108,19 @@ async def test_unlock_notification_names_the_achievement(gm: GamHarness) -> None
             "label": "First play",
             "description": "Play something once.",
             "criteria": [{"kind": "event_count", "event_type": "media.played", "count": 1}],
+            "rewards": [{"value": "coins", "amount": 25}],
         },
     )
     gm.clock.advance(timedelta(seconds=1))
     await gm.module.pipeline.process(gm.envelope(gm.people["ursula"], {"minutes": 1, "genre": "rock"}))
     [note] = [r for r in outbox.sent if r.category == "gamification.achievement"]
-    assert note.params == {"achievement": "First play", "description": "Play something once."}
+    assert note.params == {
+        "achievement": "First play",
+        "description": "Play something once.",
+        "xp": 0,  # issue 175: what it gives, in its own notification
+        "coins": 25,
+        "contribution": 0,
+    }
 
 
 async def test_some_achievements_unlock_cosmetics(gm: GamHarness) -> None:

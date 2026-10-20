@@ -226,6 +226,8 @@ class RewardPipeline:
                         "value": value,
                         "amount": verdict.amount,
                         "rule": rule.key,
+                        # issue 175: why — the rule's name (« Film watched to the end »)
+                        "reason": (rule.definition.label or "").strip()[:120] or "none",
                         # #55: a boost bought in the shop shows on each gain it multiplied
                         "boost": next(
                             (
