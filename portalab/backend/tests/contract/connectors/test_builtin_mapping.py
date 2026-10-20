@@ -8,6 +8,7 @@ from typing import Any
 import httpx
 import pytest
 
+from portalab.capabilities.ai import MODELS
 from portalab.capabilities.connector_sdk import SourceRecord
 from portalab.capabilities.media import (
     CLEANUP,
@@ -25,6 +26,7 @@ from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.http_base import parse_time, safe_id
 from portalab.connectors.jellyfin import JellyfinConnector
 from portalab.connectors.maintainerr import MaintainerrConnector
+from portalab.connectors.ollama import OllamaConnector
 from portalab.connectors.plex import PlexConnector
 from portalab.connectors.romm import RommConnector, cover_path, game_payload
 from portalab.connectors.seerr import SeerrConnector
@@ -179,6 +181,7 @@ def test_builtin_catalog_registers_once() -> None:
         "glances",  # #49: a server's processor, memory, disks, containers
         "unraid",  # #50: an Unraid server's array, disks, containers and updates
         "maintainerr",  # #57: the library's cleanup
+        "ollama",  # issue 169: the assistant's models
     }
 
 
@@ -289,3 +292,27 @@ async def test_maintainerr_leaving_and_keep() -> None:
     posted = seen[-1]
     assert posted.method == "POST" and posted.url.path == "/api/rules/exclusion"
     assert json.loads(posted.content) == {"mediaId": "101", "action": 0, "plexId": 101}
+
+
+async def test_ollama_models_and_endpoint() -> None:
+    """Issue 169: the models of an Ollama server — chat models first, the one in memory with its graphics
+    memory, what each can do (an older server does not say), embedding models apart; the assistant's
+    address is the server's OpenAI-compatible one."""
+    service = handle_for("ollama")
+    connector = OllamaConnector()
+    assert (await connector.test_connection(service)).detail == "Connected to Ollama 0.34.3."
+    server = connector.provider(MODELS, service)
+    assert server.endpoint() == f"{service.config['base_url']}/v1"
+    models = await server.models()
+    assert [m.name for m in models] == ["mistral:7b", "qwen3:8b", "nomic-embed-text:latest"]
+    qwen = models[1]
+    assert (qwen.loaded, qwen.vram_bytes, qwen.tools, qwen.parameters, qwen.quantization) == (
+        True,
+        6295440588,
+        True,
+        "8.2B",
+        "Q4_K_M",
+    )
+    assert (models[0].loaded, models[0].tools, models[0].embedding) == (False, None, False)
+    assert models[2].embedding
+    assert not connector.looks_like_us({"status": "ok"}) and connector.looks_like_us({"version": "0.1"})

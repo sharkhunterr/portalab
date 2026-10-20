@@ -863,6 +863,101 @@
         "title": "AiMessageOut",
         "type": "object"
       },
+      "AiModelOut": {
+        "properties": {
+          "embedding": {
+            "title": "Embedding",
+            "type": "boolean"
+          },
+          "family": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Family"
+          },
+          "loaded": {
+            "title": "Loaded",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "parameters": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parameters"
+          },
+          "quantization": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantization"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          },
+          "tools": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tools"
+          },
+          "vram_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vram Bytes"
+          }
+        },
+        "required": [
+          "name",
+          "family",
+          "parameters",
+          "quantization",
+          "size_bytes",
+          "loaded",
+          "vram_bytes",
+          "embedding",
+          "tools"
+        ],
+        "title": "AiModelOut",
+        "type": "object"
+      },
       "AiPageContext": {
         "additionalProperties": false,
         "properties": {
@@ -933,6 +1028,47 @@
           "latency_ms"
         ],
         "title": "AiProviderTestOut",
+        "type": "object"
+      },
+      "AiServerOut": {
+        "properties": {
+          "connector": {
+            "title": "Connector",
+            "type": "string"
+          },
+          "endpoint": {
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/AiModelOut"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "service_id": {
+            "title": "Service Id",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_id",
+          "name",
+          "connector",
+          "endpoint",
+          "state",
+          "models"
+        ],
+        "title": "AiServerOut",
         "type": "object"
       },
       "AiStatusOut": {
@@ -19991,6 +20127,32 @@
           }
         },
         "summary": "Test Provider",
+        "tags": [
+          "ai-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/ai/servers": {
+      "get": {
+        "description": "Issue 169: the model servers of the connected services (Ollama) \u2014 where to point the assistant, which\nmodel to choose, what is in memory.",
+        "operationId": "model_servers_api_v1_admin_ai_servers_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AiServerOut"
+                  },
+                  "title": "Response Model Servers Api V1 Admin Ai Servers Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Model Servers",
         "tags": [
           "ai-admin"
         ]

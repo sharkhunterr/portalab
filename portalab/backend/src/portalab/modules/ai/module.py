@@ -8,13 +8,13 @@ available** — the facades other specs consume: ``search.assistant`` (008), ``s
 unconfigured they are withdrawn, so every consumer falls back to its classic path."""
 
 from collections.abc import Mapping
-from dataclasses import replace
+from dataclasses import asdict, replace
 from datetime import timedelta
 from typing import Any
 
 import httpx
 
-from portalab.capabilities.ai import INVOKE, AIToolRegistry, LLMProvider, default_ai_tools
+from portalab.capabilities.ai import INVOKE, MODELS, AIToolRegistry, LLMProvider, ModelInfo, default_ai_tools
 from portalab.capabilities.automation_actions import ActionRegistry, ActionType, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
@@ -137,6 +137,36 @@ class AiModule:
 
     def available(self) -> bool:
         return self.provider() is not None
+
+    async def servers(self) -> list[dict[str, Any]]:
+        """Issue 169: the model servers the connected services offer (Ollama) — their address for the
+        assistant, their models and those in memory; a server that does not answer says so."""
+        try:
+            registrations = self.capabilities.system_providers(MODELS)
+        except Exception:
+            return []
+        found: list[dict[str, Any]] = []
+        for registration in registrations:
+            meta = registration.metadata
+            entry: dict[str, Any] = {
+                "service_id": str(meta.get("service_id") or registration.instance_ref),
+                "name": str(meta.get("name") or registration.instance_ref),
+                "connector": str(meta.get("connector") or ""),
+                "endpoint": "",
+                "models": [],
+                "state": "ok",
+            }
+            try:
+                entry["endpoint"] = str(registration.provider.endpoint())
+                answer = await registration.provider.models()
+                models: list[ModelInfo] = list(getattr(answer, "value", answer) or [])
+                if not getattr(answer, "has_data", True):
+                    entry["state"] = str(getattr(answer, "state", "unavailable"))
+                entry["models"] = [asdict(m) for m in models if isinstance(m, ModelInfo)]
+            except Exception:
+                entry["state"] = "unavailable"
+            found.append(entry)
+        return found
 
     async def _language(self, user: Any) -> str:
         providers = self.capabilities.system_providers(RESOLVER)

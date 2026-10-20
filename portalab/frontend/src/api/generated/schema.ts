@@ -74,6 +74,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/ai/servers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Model Servers
+         * @description Issue 169: the model servers of the connected services (Ollama) — where to point the assistant, which
+         *     model to choose, what is in memory.
+         */
+        get: operations["model_servers_api_v1_admin_ai_servers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/ai/usage": {
         parameters: {
             query?: never;
@@ -10440,6 +10461,27 @@ export interface components {
             /** Seq */
             seq: number;
         };
+        /** AiModelOut */
+        AiModelOut: {
+            /** Embedding */
+            embedding: boolean;
+            /** Family */
+            family: string | null;
+            /** Loaded */
+            loaded: boolean;
+            /** Name */
+            name: string;
+            /** Parameters */
+            parameters: string | null;
+            /** Quantization */
+            quantization: string | null;
+            /** Size Bytes */
+            size_bytes: number | null;
+            /** Tools */
+            tools: boolean | null;
+            /** Vram Bytes */
+            vram_bytes: number | null;
+        };
         /** AiPageContext */
         AiPageContext: {
             /** Help Key */
@@ -10457,6 +10499,21 @@ export interface components {
             latency_ms: number;
             /** Ok */
             ok: boolean;
+        };
+        /** AiServerOut */
+        AiServerOut: {
+            /** Connector */
+            connector: string;
+            /** Endpoint */
+            endpoint: string;
+            /** Models */
+            models: components["schemas"]["AiModelOut"][];
+            /** Name */
+            name: string;
+            /** Service Id */
+            service_id: string;
+            /** State */
+            state: string;
         };
         /** AiStatusOut */
         AiStatusOut: {
@@ -17318,6 +17375,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AiProviderTestOut"];
+                };
+            };
+        };
+    };
+    model_servers_api_v1_admin_ai_servers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiServerOut"][];
                 };
             };
         };

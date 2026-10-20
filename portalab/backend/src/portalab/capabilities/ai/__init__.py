@@ -7,6 +7,8 @@
 * ``LLMProvider`` — chat with tool calling and streaming; the portal chooses no model.
 * ``ExternalToolSource`` — MCP servers (e.g. MCParr), exposed only through an Admin allow-list.
 * ``ai.invoke`` — the read-only text facade for automations (019).
+* ``ai.models`` — a model server a connector reaches (issue 169: Ollama): its models, which are loaded, and
+  the OpenAI-compatible address the assistant talks to.
 The registry is owner-tagged: ``unregister(owner)`` removes a module's or plugin's tools.
 """
 
@@ -20,6 +22,7 @@ from portalab.capabilities.registry import CapabilitySpec
 from portalab.core.authz_port import Principal
 
 INVOKE = "ai.invoke"
+MODELS = "ai.models"
 Sensitivity = Literal["read", "write", "sensitive", "ai_forbidden"]
 ResultState = Literal["ok", "partial", "stale", "unavailable", "error", "pending"]
 SourceClass = Literal["real", "historical", "knowledge"]
@@ -200,4 +203,39 @@ INVOKE_SPEC = CapabilitySpec(
     multi_provider=False,
     description="Read-only AI text generation for automations (018)",
 )
-SPECS: tuple[CapabilitySpec, ...] = (INVOKE_SPEC,)
+
+
+@dataclass(frozen=True, slots=True)
+class ModelInfo:
+    """One model a server holds (issue 169) — what the administrators choose from."""
+
+    name: str
+    family: str | None = None
+    parameters: str | None = None  # « 8.2B »
+    quantization: str | None = None  # « Q4_K_M »
+    size_bytes: int | None = None
+    loaded: bool = False
+    vram_bytes: int | None = None
+    embedding: bool = False  # a model that turns text into vectors (semantic search), not a chat model
+    tools: bool | None = (
+        None  # whether it can call tools (the assistant needs it); None: the server does not say
+    )
+
+
+@runtime_checkable
+class ModelServer(Protocol):
+    def endpoint(self) -> str:
+        """The OpenAI-compatible address of the server (``…/v1``) — what the assistant is pointed at."""
+        ...
+
+    async def models(self) -> Sequence[ModelInfo]: ...
+
+
+MODELS_SPEC = CapabilitySpec(
+    name=MODELS,
+    version="1.0",
+    protocol=ModelServer,
+    multi_provider=True,
+    description="A model server's models and its OpenAI-compatible address (issue 169: Ollama)",
+)
+SPECS: tuple[CapabilitySpec, ...] = (INVOKE_SPEC, MODELS_SPEC)
