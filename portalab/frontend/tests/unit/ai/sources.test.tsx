@@ -57,8 +57,8 @@ describe("SourceList", () => {
     });
     expect(screen.getByText("Assistant interpretation — not backed by a cited source.")).toBeTruthy();
     const note = screen.getByRole("note");
-    expect(note.textContent).toContain("wiki.search was unavailable.");
-    expect(note.textContent).toContain("Data from statistics.get may be out of date.");
+    expect(note.textContent).toContain("Search the wiki was unavailable."); // issue 171: the tool in words
+    expect(note.textContent).toContain("Data from A statistic may be out of date.");
     expect(screen.queryByRole("list")).toBeNull();
   });
 });
