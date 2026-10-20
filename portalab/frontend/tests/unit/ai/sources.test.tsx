@@ -41,8 +41,8 @@ describe("SourceList", () => {
     expect(items[0]?.textContent).toContain("Live data");
     expect(items[0]?.textContent).toContain("as of");
     expect(items[1]?.textContent).toContain("Knowledge base");
-    expect(screen.getByRole("link", { name: "Media" }).getAttribute("href")).toBe("/services/s1");
-    expect(screen.queryByRole("link", { name: "Restart guide" })).toBeNull();
+    expect(screen.getByRole("link", { name: /Media/ }).getAttribute("href")).toBe("/services/s1");
+    expect(screen.queryByRole("link", { name: /Restart guide/ })).toBeNull();
     expect(screen.queryByText(/interpretation/)).toBeNull();
   });
 

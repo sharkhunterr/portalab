@@ -41,6 +41,10 @@ class SourceRef:
     source_class: SourceClass = "real"
     as_of: datetime | None = None
     url: str | None = None
+    # issue 171: what a card of the source shows beside the answer (never sent to the model): a picture of
+    # the portal's own (a poster: ``/api/v1/…`` only) and a short line (« 2027 · movie »)
+    image: str | None = None
+    detail: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

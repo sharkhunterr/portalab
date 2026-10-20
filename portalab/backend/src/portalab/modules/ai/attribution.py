@@ -22,6 +22,8 @@ def source_dict(number: int, source: SourceRef) -> dict[str, Any]:
         "class": source.source_class,
         "as_of": source.as_of.isoformat() if source.as_of else None,
         "url": source.url,
+        "image": source.image if source.image and source.image.startswith("/api/v1/") else None,
+        "detail": source.detail[:120] if source.detail else None,
     }
 
 

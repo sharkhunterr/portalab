@@ -116,7 +116,7 @@ describe("AiPanel", () => {
     expect(document.querySelector(".ai-log b")).toBeNull(); // the model's markup is text, never HTML
     expect(document.querySelector(".ai-cite")?.getAttribute("href")).toBe("/services"); // [1] → its source
     expect(screen.queryByText(/services\.status/)).toBeNull(); // issue 171: tools are never named
-    expect(screen.getByRole("link", { name: "Services" })).toBeTruthy();
+    expect(document.querySelector("a.ai-card")?.getAttribute("href")).toBe("/services"); // its card
     expect(await screen.findByText("Purge 3 old items")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
     const status = await screen.findByRole("status");

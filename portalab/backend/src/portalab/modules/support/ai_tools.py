@@ -43,6 +43,7 @@ class SupportAiTools:
             "real",
             utc_now(self.clock),
             f"/support/tickets/{ticket.id}",
+            detail=f"#{ticket.number} · {ticket.state}",
         )
 
     async def my_tickets(self, principal: Principal, params: Mapping[str, Any]) -> ToolResult:
