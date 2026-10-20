@@ -253,6 +253,8 @@
 }
 .ai-bubble {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* the cards' row scrolls inside, the text wraps */
+  min-inline-size: 0;
   gap: var(--space-2);
   max-inline-size: min(85%, 38rem);
   padding: var(--space-3) var(--space-4);
@@ -426,6 +428,11 @@
   border-inline-start: 4px solid var(--color-border);
   padding-inline-start: 0.5rem;
 }
+.ai-sources,
+.ai-sources section,
+.ai-answer {
+  min-inline-size: 0;
+}
 .ai-sources h4 {
   margin: 0 0 var(--space-1);
   color: var(--color-text-muted);
@@ -574,4 +581,94 @@ a.ai-card:hover {
   gap: var(--space-1);
   padding-inline: var(--space-1);
   font-weight: var(--font-weight-semibold);
+}
+
+/* issue 171: the assistant's tools, in words and by group */
+.ai-tools-section {
+  grid-column: 1 / -1;
+}
+.ai-tools-section h3 {
+  margin: 0 0 var(--space-1);
+}
+.ai-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-3);
+}
+.ai-tools > p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.ai-tools__group {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.ai-tools__group legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  inline-size: 100%;
+  padding-inline: var(--space-1);
+  font-weight: var(--font-weight-semibold);
+}
+.ai-tools__all {
+  margin-inline-start: auto;
+  padding: 0.1rem var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: normal;
+  cursor: pointer;
+}
+.ai-tool {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.ai-tool:hover {
+  background: var(--color-surface-raised);
+}
+.ai-tool[data-off] .ai-tool__text {
+  opacity: 0.55;
+}
+.ai-tool input {
+  margin-block-start: 0.2rem;
+}
+.ai-tool__text {
+  display: grid;
+  gap: 0.1rem;
+  min-inline-size: 0;
+}
+.ai-tool__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--font-weight-semibold);
+}
+.ai-tool__badge {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: normal;
+}
+.ai-tool__badge[data-sensitivity="sensitive"] {
+  color: var(--state-partial-fg);
+  background: var(--state-partial-bg);
+}
+.ai-tool__hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
