@@ -10,6 +10,7 @@ for the user). Events: ``delta``, ``tool_call``, ``tool_result``, ``source``, ``
 
 import asyncio
 import json
+import re
 import time
 from collections.abc import AsyncIterator, Awaitable, Callable, Iterable, Sequence
 from dataclasses import dataclass, field, replace
@@ -37,6 +38,22 @@ REMINDER = (
     "do I… » question, search the wiki and suggest the page; if nothing covers it, offer a support ticket.)"
 )
 THINKING_TOKENS = 3072
+NUDGE = (
+    "You answered without looking anything up. Use your tools now — the wiki for « how do I… », the portal's "
+    "data otherwise — then answer from what they return; if they hold nothing, follow your instruction for "
+    "missing information. Same language as my question."
+)
+SMALL_TALK = re.compile(
+    r"^\W*(bonjour|bonsoir|salut|coucou|merci|ok|d'accord|super|parfait|hello|hi|hey|thanks|thank you|bye)\b",
+    re.IGNORECASE,
+)
+
+
+def needs_lookup(conversation: Sequence[ChatMessage]) -> bool:
+    """A real question (not small talk): an answer to it should come from the portal's data."""
+    asked = next((m.content for m in reversed(conversation) if m.role == "user"), "")
+    asked = asked.split("\n\n(Answer from", 1)[0].strip()  # without the reminder riding on it
+    return len(asked.split()) >= 4 and not SMALL_TALK.match(asked)
 
 
 def event(name: str, /, **data: Any) -> Event:
@@ -150,8 +167,11 @@ class Orchestrator:
         calls_done = 0
         seen: set[str] = set()
         limit = max(0, config.max_tool_calls_per_turn)
+        nudged = False
         for round_no in range(limit + 1):
             tools = specs if round_no < limit and calls_done < limit else []
+            # issue 171: the first answer waits until we know it looked something up (see NUDGE)
+            hold = round_no == 0 and bool(tools)
             text: list[str] = []
             calls: list[ToolCall] = []
             try:
@@ -166,7 +186,8 @@ class Orchestrator:
                     ):
                         if item.kind == "delta" and item.text:
                             text.append(item.text)
-                            yield event("delta", text=mask_secrets(item.text, secrets))
+                            if not hold:
+                                yield event("delta", text=mask_secrets(item.text, secrets))
                         elif item.kind == "tool_call" and item.tool_call is not None:
                             calls.append(item.tool_call)
                         elif item.kind == "usage":
@@ -180,6 +201,15 @@ class Orchestrator:
                 self._report(config, started, "timeout" if code == "timeout" else "error", outcome)
                 yield event("error", code="ai.unavailable", reason=code)
                 return
+            if hold and not calls:
+                if not nudged and needs_lookup(conversation):
+                    # a small model answered a real question from thin air: once, it is asked to look first
+                    nudged = True
+                    metrics.increment("ai.nudged")
+                    conversation.append(ChatMessage("user", NUDGE))
+                    continue
+                if text:
+                    yield event("delta", text=mask_secrets("".join(text), secrets))
             parts.extend(text)
             if not calls or not tools:
                 break
