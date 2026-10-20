@@ -26,6 +26,8 @@
   "admin.pendingTtl": "Délai de confirmation (minutes)",
   "admin.persona.fallback": "Quand il ne sait pas",
   "admin.persona.fallbackHint": "Ce qu'il fait quand ses outils n'ont pas la réponse — par défaut : le dire, donner le lien de la page wiki, sinon proposer un ticket de support.",
+  "admin.persona.ideas": "Questions proposées au démarrage",
+  "admin.persona.ideasHint": "Une par ligne, huit au plus — en boutons au début d'une conversation. Vide : les questions affichées ici, dans la langue de chaque membre.",
   "admin.persona.name": "Son nom",
   "admin.persona.nameHint": "Dit au modèle et affiché en haut de sa fenêtre — « Nova » pour commencer, à changer librement.",
   "admin.persona.role": "À quoi il sert",

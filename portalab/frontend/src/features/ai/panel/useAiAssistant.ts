@@ -31,5 +31,9 @@ export function useAiAssistant(): { slot: AiProvider; panel: AiPanelProps } {
   const quota = status.data?.daily_budget
     ? { budget: status.data.daily_budget, used: status.data.used_today ?? 0 }
     : undefined;
-  return { slot, panel: { open, onOpenChange: setOpen, available, autoNavigate, context, name, quota } };
+  const ideas = status.data?.ideas?.length ? status.data.ideas : undefined; // issue 174
+  return {
+    slot,
+    panel: { open, onOpenChange: setOpen, available, autoNavigate, context, name, quota, ideas },
+  };
 }

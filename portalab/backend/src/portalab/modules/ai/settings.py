@@ -22,6 +22,8 @@ class AiConfig:
     assistant_name: str = "Nova"
     assistant_role: str = DEFAULT_ROLE
     assistant_fallback: str = DEFAULT_FALLBACK
+    # issue 174: the questions offered when a conversation starts (empty: the translated defaults)
+    assistant_ideas: list[str] = field(default_factory=list)
     max_tool_calls_per_turn: int = 8
     max_context_tokens: int = 6000
     request_timeout_seconds: int = 60
@@ -45,6 +47,7 @@ SETTINGS: dict[str, str] = {
     "assistant_name": "ai.persona.name",
     "assistant_role": "ai.persona.role",
     "assistant_fallback": "ai.persona.fallback",
+    "assistant_ideas": "ai.persona.ideas",
     "max_tool_calls_per_turn": "ai.maxToolCallsPerTurn",
     "max_context_tokens": "ai.maxContextTokens",
     "request_timeout_seconds": "ai.requestTimeoutSeconds",
@@ -66,6 +69,7 @@ _DESCRIPTIONS = {
     "assistant_name": "The assistant's name, told to the model and shown atop its window.",
     "assistant_role": "What the assistant is for on this portal (it begins « you… »).",
     "assistant_fallback": "What it does when its tools do not hold the answer.",
+    "assistant_ideas": "Questions offered when a conversation starts (empty: the translated defaults).",
     "provider_reasoning": "How much a thinking model reflects before answering (none: at once — faster, and "
     "its thoughts never eat the answer's length); empty: the model's default.",
     "max_tool_calls_per_turn": "Maximum tool calls in one answer.",
@@ -87,7 +91,11 @@ def declare_ai_settings(catalog: SettingCatalog = default_catalog) -> None:
     declare = declare_setting if catalog is default_catalog else catalog.declare
     known = {d.key for d in catalog.all()}
     defaults = AiConfig()
-    schemas: dict[str, Any] = {"tools_disabled": list[str], "mcp_servers": list[dict[str, Any]]}
+    schemas: dict[str, Any] = {
+        "tools_disabled": list[str],
+        "mcp_servers": list[dict[str, Any]],
+        "assistant_ideas": list[str],
+    }
     for name, key in SETTINGS.items():
         if key not in known:
             default = getattr(defaults, name)

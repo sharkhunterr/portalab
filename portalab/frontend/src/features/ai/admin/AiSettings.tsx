@@ -5,6 +5,7 @@ import { CheckboxField, TextAreaField, TextField } from "../../../design-system/
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import { type AiConfig, type AiConfigUpdate, useAiAdmin, useAiConfig, useAiUsage } from "../api";
+import { IDEAS } from "../panel/AiPanel";
 import { ModelServer } from "./ModelServer";
 import { ToolChoice } from "./ToolChoice";
 
@@ -22,6 +23,15 @@ const NUMBERS = [
 ] as const;
 
 type Values = Record<string, unknown>;
+
+/** issue 174: the questions offered to start with — one a line, eight at most */
+function ideasOf(value: unknown): string[] {
+  const lines = Array.isArray(value) ? value.map(String) : String(value ?? "").split("\n");
+  return lines
+    .map((line) => line.trim().slice(0, 120))
+    .filter(Boolean)
+    .slice(0, 8);
+}
 
 export function AiSettings() {
   const t = useT();
@@ -47,6 +57,7 @@ export function AiSettings() {
       assistant_name: String(values.assistant_name ?? "").trim(),
       assistant_role: String(values.assistant_role ?? "").trim(),
       assistant_fallback: String(values.assistant_fallback ?? "").trim(),
+      assistant_ideas: ideasOf(values.assistant_ideas),
       auto_navigate: Boolean(values.auto_navigate),
       tools_disabled: [...disabled],
       ...Object.fromEntries(NUMBERS.map(([key]) => [key, Number(values[key])])),
@@ -95,6 +106,18 @@ export function AiSettings() {
             maxLength={800}
             value={String(values.assistant_fallback ?? "")}
             onChange={(event) => setValues({ ...values, assistant_fallback: event.target.value })}
+          />
+          <TextAreaField
+            label={t("ai:admin.persona.ideas")}
+            hint={t("ai:admin.persona.ideasHint")}
+            rows={4}
+            placeholder={IDEAS.map((idea) => t(`ai:panel.idea.${idea}`)).join("\n")}
+            value={
+              Array.isArray(values.assistant_ideas)
+                ? values.assistant_ideas.join("\n")
+                : String(values.assistant_ideas ?? "")
+            }
+            onChange={(event) => setValues({ ...values, assistant_ideas: event.target.value })}
           />
         </fieldset>
         <TextField

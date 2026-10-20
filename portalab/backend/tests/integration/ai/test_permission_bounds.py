@@ -90,6 +90,7 @@ async def test_disabled_assistant_and_classic_api(
         "name": "Nova",  # issue 171: its friendly name until the administrators give theirs
         "daily_budget": 50000,
         "used_today": 0,
+        "ideas": [],  # issue 174: none set — the window shows the translated defaults
     }
     ai.module.config = type(ai.module.config)(enabled=False)
     assert (await client.get("/api/v1/ai/status")).json()["available"] is False

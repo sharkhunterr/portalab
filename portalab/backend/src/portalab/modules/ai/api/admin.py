@@ -34,6 +34,9 @@ class AiConfigIn(BaseModel):
     assistant_name: str | None = Field(default=None, max_length=40)
     assistant_role: str | None = Field(default=None, max_length=800)
     assistant_fallback: str | None = Field(default=None, max_length=800)
+    assistant_ideas: list[Annotated[str, Field(min_length=1, max_length=120)]] | None = Field(
+        default=None, max_length=8
+    )
     max_tool_calls_per_turn: int | None = Field(default=None, ge=0, le=20)
     max_context_tokens: int | None = Field(default=None, ge=1000, le=1_000_000)
     request_timeout_seconds: int | None = Field(default=None, ge=5, le=600)

@@ -31,11 +31,22 @@ export interface AiPanelProps {
   name?: string | undefined;
   /** issue 171: today's allowance and what the member used of it (tokens) */
   quota?: { budget: number; used: number } | undefined;
+  /** issue 174: the administrators' questions to start with (none: the translated defaults) */
+  ideas?: string[] | undefined;
 }
 
-const IDEAS = ["services", "tickets", "news", "media"] as const;
+export const IDEAS = ["services", "tickets", "news", "media"] as const;
 
-export function AiPanel({ open, onOpenChange, available, autoNavigate, context, name, quota }: AiPanelProps) {
+export function AiPanel({
+  open,
+  onOpenChange,
+  available,
+  autoNavigate,
+  context,
+  name,
+  quota,
+  ideas,
+}: AiPanelProps) {
   const t = useT();
   const format = useFormat();
   // issue 171: the page the member is on, in a few words (never more than the route and one line)
@@ -206,11 +217,13 @@ export function AiPanel({ open, onOpenChange, available, autoNavigate, context, 
                     </span>
                     <p className="ai-welcome__hello">{t("ai:panel.hello")}</p>
                     <div className="ai-ideas">
-                      {IDEAS.map((idea) => (
-                        <button key={idea} type="button" onClick={() => ask(t(`ai:panel.idea.${idea}`))}>
-                          {t(`ai:panel.idea.${idea}`)}
-                        </button>
-                      ))}
+                      {(ideas?.length ? ideas : IDEAS.map((idea) => t(`ai:panel.idea.${idea}`))).map(
+                        (idea) => (
+                          <button key={idea} type="button" onClick={() => ask(idea)}>
+                            {idea}
+                          </button>
+                        ),
+                      )}
                     </div>
                   </div>
                 ) : null}
