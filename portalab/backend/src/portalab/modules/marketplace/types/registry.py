@@ -5,7 +5,7 @@ user; 023 activation is a stub until step 27), ``access`` (a scoped grant limite
 never an Admin-reserved permission, removed on revoke) and ``quota`` (units credited by Media's
 ``RequestQuotaService``; Marketplace never measures nor consumes quota, never sells priority)."""
 
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Mapping
 from typing import Any
 from uuid import UUID
 
@@ -380,6 +380,22 @@ class AiCapacityHandler(Owned):
         perks = _port(self.capabilities, AI_PERKS)
         if perks is not None:
             await perks.revoke(f"marketplace:{ownership.id}")
+
+    def offered(self, payload: Mapping[str, Any]) -> bool:
+        """Sold only while the assistant offers it (a stronger model needs one chosen…)."""
+        perks = _port(self.capabilities, AI_PERKS)
+        try:
+            return perks is not None and bool(perks.offers(str(payload.get("perk", ""))))
+        except Exception:
+            return False
+
+
+def offered(types: ProductTypeRegistry, product_type: str, payload: Mapping[str, Any]) -> bool:
+    """Whether a product can be sold now: a type may say it cannot (issue 173: a capacity the assistant does
+    not offer) — the shop then neither shows it nor takes Coins for it."""
+    registered = types.get(product_type)
+    check = getattr(registered.handler, "offered", None) if registered is not None else None
+    return True if check is None else bool(check(payload))
 
 
 def register_builtin_types(

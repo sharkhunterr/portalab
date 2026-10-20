@@ -82,6 +82,9 @@ class Perks:
         self.clock = clock
 
     # --- ai.perks (the marketplace) -------------------------------------------------------------------
+    def offers(self, perk: str) -> bool:
+        return offerable(self.config(), perk)
+
     async def grant(self, user: UUID, perk: str, amount: int, hours: int, source_ref: str) -> bool:
         config = self.config()
         if not offerable(config, perk):

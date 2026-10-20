@@ -27,6 +27,7 @@ from portalab.modules.marketplace.notify import notify_owner
 from portalab.modules.marketplace.observability import metrics
 from portalab.modules.marketplace.pricing import active_discounts, price_now
 from portalab.modules.marketplace.resolution.service import Resolution
+from portalab.modules.marketplace.types.registry import offered
 
 
 class ConditionsUnmet(Conflict):
@@ -96,6 +97,8 @@ class Purchases:
             return existing
         if product is None or version is None or product.state != "available":
             raise NotAvailable("This product cannot be acquired now.")
+        if not offered(self.activation.types, product.type, version.payload or {}):
+            raise NotAvailable("This product cannot be acquired now.")  # issue 173: not offered now
         # 027: the price now — less the best reduction of an active campaign
         discounts = await active_discounts(self.capabilities, utc_now(self.clock))
         reduced, _ = price_now(

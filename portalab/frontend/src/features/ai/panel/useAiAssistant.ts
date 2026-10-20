@@ -34,6 +34,7 @@ export function useAiAssistant(): { slot: AiProvider; panel: AiPanelProps } {
         used: status.data.used_today ?? 0,
         recharge: status.data.recharge ?? 0, // issue 173: tokens bought, spent past the day's
         shop: status.data.shop ?? false,
+        perks: status.data.perks ?? {},
       }
     : undefined;
   const ideas = status.data?.ideas?.length ? status.data.ideas : undefined; // issue 174

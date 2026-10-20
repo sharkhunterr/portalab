@@ -39,6 +39,7 @@ COLLECTIONS: tuple[tuple[str, str, str, int], ...] = (
     ("badges", "Badges", "star", 22),
     ("titles", "Titles", "trophy", 24),
     ("essentials", "Essentials", "star", 30),
+    ("assistant", "Assistant", "brain", 32),  # issue 173: the assistant's capacities
     ("profile", "Profile", "user", 35),
     ("names", "Name styles", "feather", 36),
     ("backgrounds", "Animated backgrounds", "sparkles", 37),
