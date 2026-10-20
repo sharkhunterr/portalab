@@ -276,7 +276,13 @@ class MediaModule:
         self.requestable = RequestableCatalog(database, capabilities)  # #4: what one can ask for (Seerr)
         self.moderation = RequestModeration(self.requests)  # #4: administrators approve or decline
         self.ai_tools = MediaAiTools(  # issue 171: offered to the assistant, with a title's journey
-            self.catalog, self.history_reader, self.discovery, self.journey, clock=clock, cleanup=self.cleanup
+            self.catalog,
+            self.history_reader,
+            self.discovery,
+            self.journey,
+            clock=clock,
+            cleanup=self.cleanup,
+            sections=self.sections,
         )
         # 027 (#2): the portal's player (its stream tickets are signed with a key of the portal's secret)
         self.player = PlayerService(

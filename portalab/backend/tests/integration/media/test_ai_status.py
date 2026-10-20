@@ -75,6 +75,7 @@ async def test_media_status_tells_the_journey(
     assert by_id.data["title"] == "Heat" and by_id.data["steps"] == data["steps"]
     assert (await status.handler(zoe, {"id": "not-an-id"})).data["found"] is False
     assert "leaving_library" not in data  # no cleanup tool: nothing said
+    assert data["my_viewing"] == {"watched": False, "plays": 0}  # zoe never played it
 
     class _Cleanup:  # Maintainerr put it on its deletion list
         def configured(self) -> bool:
