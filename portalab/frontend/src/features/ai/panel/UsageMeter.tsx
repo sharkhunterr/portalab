@@ -35,7 +35,11 @@ function nextReset(): Date {
 export function UsageMeter({ usage }: { usage: Usage }) {
   const t = useT();
   const format = useFormat();
-  const share = usage.budget > 0 ? usage.used / usage.budget : 0;
+  // issue 180: what can be used today — the day's allowance (or what went past it, taken from the reserve)
+  // and the reserve still held; full only once both are spent
+  const reserve = Math.max(0, usage.recharge ?? 0);
+  const total = Math.max(usage.budget, usage.used) + reserve;
+  const share = total > 0 ? usage.used / total : 0;
   const percent = Math.min(100, Math.round(share * 100));
   const tone = share >= 1 ? "over" : share >= 0.85 ? "low" : "ok";
   const label = t("ai:usage.label", { percent });
@@ -69,14 +73,23 @@ export function UsageMeter({ usage }: { usage: Usage }) {
             <dd>
               {t("ai:usage.usedOf", {
                 used: format.compact(usage.used),
-                budget: format.compact(usage.budget),
+                budget: format.compact(total),
                 percent: Math.round(share * 100),
               })}
             </dd>
-            {usage.recharge ? (
+            <dt>{t("ai:usage.day")}</dt>
+            <dd>
+              {usage.used >= usage.budget
+                ? t("ai:usage.dayUsedUp", { budget: format.compact(usage.budget) })
+                : t("ai:usage.dayLeft", {
+                    left: format.compact(usage.budget - usage.used),
+                    budget: format.compact(usage.budget),
+                  })}
+            </dd>
+            {reserve ? (
               <>
                 <dt>{t("ai:usage.reserve")}</dt>
-                <dd>{t("ai:usage.reserveLeft", { amount: format.compact(usage.recharge) })}</dd>
+                <dd>{t("ai:usage.reserveLeft", { amount: format.compact(reserve) })}</dd>
               </>
             ) : null}
             <dt>{t("ai:usage.reset")}</dt>
