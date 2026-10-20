@@ -12,7 +12,7 @@ import asyncio
 import json
 import time
 from collections.abc import AsyncIterator, Awaitable, Callable, Iterable, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 from uuid import UUID
 
@@ -31,6 +31,10 @@ from portalab.modules.ai.tools.catalog import CHAT, ToolCatalog, ToolPolicy, too
 
 Event = dict[str, Any]
 MAX_ANSWER_TOKENS = 1024
+REMINDER = (
+    "(Answer from what your tools return now — look it up even if the conversation spoke of it before; never "
+    "invent a service, a title, a ticket or a date. In the language of this question.)"
+)
 THINKING_TOKENS = 3072
 
 
@@ -94,7 +98,12 @@ class Orchestrator:
         member = {"id": str(user), "name": await self.name_of(user)}
         system = ChatMessage("system", system_prompt(await self.language_for(user), page, member))
         budget = max(500, self.config().max_context_tokens - MAX_ANSWER_TOKENS - len(system.content) // 4)
-        return [system, *window(history, budget)]
+        kept = window(history, budget)
+        # issue 171: a small model forgets the system's rules as a conversation grows — the rule it needs
+        # most rides on the question it answers (sent to the model only, never stored)
+        if kept and kept[-1].role == "user":
+            kept[-1] = replace(kept[-1], content=f"{kept[-1].content}\n\n{REMINDER}")
+        return [system, *kept]
 
     async def run(
         self,

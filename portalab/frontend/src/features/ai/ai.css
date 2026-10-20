@@ -148,9 +148,9 @@
 }
 .ai-modal__body {
   position: relative;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
   min-block-size: 0;
 }
 
@@ -207,6 +207,7 @@
 /* the conversation */
 .ai-log {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: var(--space-3);
   min-block-size: 0;
@@ -671,4 +672,20 @@ a.ai-card:hover {
 .ai-tool__hint {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+}
+
+/* issue 171: the page the member asks from, quietly at the top */
+.ai-context {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-2) var(--space-4) 0;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

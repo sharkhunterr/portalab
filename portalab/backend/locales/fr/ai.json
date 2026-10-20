@@ -93,6 +93,7 @@
   "navigation.title": "Pages suggérées",
   "panel.assistant": "Assistant",
   "panel.close": "Fermer",
+  "panel.context": "Sur cette page : {page}",
   "panel.delete": "Supprimer la conversation",
   "panel.description": "Posez vos questions sur le portail. L'assistant ne voit et ne fait que ce que vous pouvez.",
   "panel.empty": "Aucune conversation pour l'instant.",

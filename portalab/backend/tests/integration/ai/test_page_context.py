@@ -29,6 +29,17 @@ async def test_each_message_tells_its_page(
     system = ai.provider.calls[-1][0][0].content
     assert '"/media/m1"' in system and "media id=m1" in system and "look it up" in system
     assert f'You speak with the member "ursula" (id {people["ursula"]})' in system  # who « me » is
+    asked = ai.provider.calls[-1][0][-1]
+    assert (
+        asked.role == "user"
+        and asked.content.startswith("Why is this leaving?")
+        and "look it up" in asked.content
+    )
+    stored = (await client.get(f"/api/v1/ai/conversations/{conversation}")).json()["messages"]
+    assert [m["content"] for m in stored if m["role"] == "user"] == [
+        "Hello",
+        "Why is this leaving?",
+    ]  # never stored
     refused = await client.post(
         f"/api/v1/ai/conversations/{conversation}/messages",
         json={"content": "x", "context": {"route": "/x", "question": "not a page field"}},
