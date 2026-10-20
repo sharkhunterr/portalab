@@ -33,7 +33,8 @@ from portalab.modules.ai.tools.catalog import CHAT, ToolCatalog, ToolPolicy, too
 Event = dict[str, Any]
 MAX_ANSWER_TOKENS = 1024
 REMINDER = (
-    "(Answer from what your tools return now — look it up even if the conversation spoke of it before; never "
+    "(Answer only from what your tools return now — nothing from your own knowledge; look it up even if the "
+    "conversation spoke of it before; never "
     "invent a service, a title, a ticket or a date. Never copy raw field names or timestamps. If this "
     "question names another title or subject than the page, ignore the page. For a « how do I… » question, "
     "search the wiki and suggest the page; if nothing covers it, offer a support ticket.)"

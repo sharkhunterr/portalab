@@ -52,8 +52,8 @@ export function ModelServer({ values, onChange }: { values: Values; onChange: (n
             const loaded = next.models.find((m) => m.loaded && !m.embedding && m.tools !== false);
             onChange({
               ...values,
-              // a thinking model answers at once (its thoughts would eat the answer's length)
-              provider_reasoning: values.provider_reasoning || "none",
+              // a little reflection: a small model then tells which question a page is about, and uses its tools
+              provider_reasoning: values.provider_reasoning || "low",
               provider_endpoint: next.endpoint,
               provider_model: keep
                 ? model
