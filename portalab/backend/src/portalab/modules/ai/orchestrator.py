@@ -116,7 +116,10 @@ class Orchestrator:
         self, user: UUID, history: list[ChatMessage], page: dict[str, Any] | None
     ) -> list[ChatMessage]:
         member = {"id": str(user), "name": await self.name_of(user)}
-        language = await self.language_for(user)
+        # issue 171: the language the question is written in, else the member's own — a model answers in the
+        # language of the data it read (English) unless the system says otherwise
+        asked = next((m.content for m in reversed(history) if m.role == "user"), "")
+        language = language_of(asked) or await self.language_for(user)
         config = self.config()
         try:
             site = self.site(language) if self.site is not None else None
