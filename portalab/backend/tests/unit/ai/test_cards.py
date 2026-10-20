@@ -45,11 +45,16 @@ def test_the_language_a_question_is_written_in() -> None:
 
 def test_the_assistant_says_who_it_is_what_it_is_for_and_what_to_do_without_an_answer() -> None:
     from portalab.modules.ai.context import DEFAULT_FALLBACK, system_prompt
+    from portalab.modules.ai.settings import AiConfig
 
-    plain = system_prompt("fr", None)
-    assert plain.startswith(
-        "Your name is Assistant. You are the assistant of this portal: you help the members"
+    config = AiConfig()  # the settings' own values: « Nova », its role, what to do without an answer
+    assert config.assistant_name == "Nova"
+    plain = system_prompt(
+        "fr", None, None, {"name": config.assistant_name, "role": config.assistant_role, "fallback": ""}
     )
+    assert plain.startswith("Your name is Nova, the friendly assistant of this portal: you help the members")
+    assert system_prompt("fr", None).startswith("Your name is Assistant,")  # a name emptied: a neutral one
+    assert "introduce yourself warmly" in plain  # « who are you? » needs no tool
     assert DEFAULT_FALLBACK in plain and "support ticket" in plain
     told = system_prompt(
         "fr",
@@ -62,6 +67,15 @@ def test_the_assistant_says_who_it_is_what_it_is_for_and_what_to_do_without_an_a
             "fallback": "send them to the wiki's FAQ",
         },
     )
-    assert told.startswith('Your name is Xeno. You are the assistant of "Xenoportal": you guide the members')
+    assert told.startswith('Your name is Xeno, the friendly assistant of "Xenoportal": you guide the members')
     assert "(through)" in told and "{through}" not in told  # an administrator's braces never break the prompt
     assert "When your tools do not hold the answer: send them to the wiki's FAQ." in told
+
+
+def test_questions_about_the_assistant_need_no_lookup() -> None:
+    from portalab.capabilities.ai import ChatMessage
+    from portalab.modules.ai.orchestrator import needs_lookup
+
+    assert not needs_lookup([ChatMessage("user", "Bonjour, qui es-tu exactement ?")])
+    assert not needs_lookup([ChatMessage("user", "Dis-moi ce que tu sers à quoi au juste")])
+    assert needs_lookup([ChatMessage("user", "Est-ce que Plex fonctionne en ce moment ?")])

@@ -33,7 +33,8 @@ from portalab.modules.ai.tools.catalog import CHAT, ToolCatalog, ToolPolicy, too
 Event = dict[str, Any]
 MAX_ANSWER_TOKENS = 1024
 REMINDER = (
-    "(Answer only from what your tools return now — nothing from your own knowledge; look it up even if the "
+    "(About yourself, greetings and thanks: no tool needed. Anything else: answer only from what your tools "
+    "return now — nothing from your own knowledge; look it up even if the "
     "conversation spoke of it before; never "
     "invent a service, a title, a ticket or a date. Never copy raw field names or timestamps. If this "
     "question names another title or subject than the page, ignore the page. For a « how do I… » question, "
@@ -46,7 +47,10 @@ NUDGE = (
     "missing information. Same language as my question."
 )
 SMALL_TALK = re.compile(
-    r"^\W*(bonjour|bonsoir|salut|coucou|merci|ok|d'accord|super|parfait|hello|hi|hey|thanks|thank you|bye)\b",
+    r"^\W*(bonjour|bonsoir|salut|coucou|merci|ok|d'accord|super|parfait|hello|hi|hey|thanks|thank you|bye)\b"
+    # issue 171: questions about the assistant itself — answered from its introduction
+    r"|qui es[- ]tu|tu es qui|t'es qui|comment tu t'appelles|que sais[- ]tu faire|tu sers à quoi|"
+    r"tu peux faire quoi|que peux[- ]tu faire|who are you|what can you do|what are you",
     re.IGNORECASE,
 )
 
@@ -55,7 +59,7 @@ def needs_lookup(conversation: Sequence[ChatMessage]) -> bool:
     """A real question (not small talk): an answer to it should come from the portal's data."""
     asked = next((m.content for m in reversed(conversation) if m.role == "user"), "")
     asked = asked.split("\n\n(Answer from", 1)[0].strip()  # without the reminder riding on it
-    return len(asked.split()) >= 4 and not SMALL_TALK.match(asked)
+    return len(asked.split()) >= 4 and not SMALL_TALK.search(asked)
 
 
 def event(name: str, /, **data: Any) -> Event:

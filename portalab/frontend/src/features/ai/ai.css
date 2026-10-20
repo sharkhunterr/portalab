@@ -730,3 +730,30 @@ a.ai-card:hover {
   outline: 2px solid var(--color-focus);
   outline-offset: 1px;
 }
+
+/* issue 171: what is left of today's allowance, quietly above the composer */
+.ai-quota {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 var(--space-4) var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.ai-quota__bar {
+  display: block;
+  inline-size: 4rem;
+  block-size: 0.3rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  overflow: hidden;
+}
+.ai-quota__bar span {
+  display: block;
+  block-size: 100%;
+  background: var(--color-accent);
+}
+.ai-quota[data-low] .ai-quota__bar span {
+  background: var(--state-partial-fg);
+}

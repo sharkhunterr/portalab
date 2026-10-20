@@ -27,5 +27,9 @@ export function useAiAssistant(): { slot: AiProvider; panel: AiPanelProps } {
     [available],
   );
   const name = status.data?.name || undefined; // issue 171: the name the administrators gave it
-  return { slot, panel: { open, onOpenChange: setOpen, available, autoNavigate, context, name } };
+  // issue 171: what is left of today's allowance
+  const quota = status.data?.daily_budget
+    ? { budget: status.data.daily_budget, used: status.data.used_today ?? 0 }
+    : undefined;
+  return { slot, panel: { open, onOpenChange: setOpen, available, autoNavigate, context, name, quota } };
 }

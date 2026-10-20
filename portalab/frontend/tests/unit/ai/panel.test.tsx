@@ -285,3 +285,35 @@ describe("a message's actions (issue 171)", () => {
     await waitFor(() => expect(asked).toEqual(["Is it all up?", "Is it all up?"]));
   });
 });
+
+describe("today's allowance (issue 171)", () => {
+  it("shows what is left of it", () => {
+    fake.handler = () => json(200, []);
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const router = createMemoryRouter(
+      [
+        {
+          path: "/",
+          element: (
+            <AiPanel
+              open
+              onOpenChange={() => undefined}
+              available
+              autoNavigate={false}
+              name="Nova"
+              quota={{ budget: 1000, used: 250 }}
+            />
+          ),
+        },
+      ],
+      { initialEntries: ["/"] },
+    );
+    render(
+      <QueryClientProvider client={client}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    );
+    expect(screen.getByText("75 % of today's allowance left")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Nova" })).toBeTruthy();
+  });
+});

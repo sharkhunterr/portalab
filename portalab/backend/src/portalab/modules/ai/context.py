@@ -10,7 +10,7 @@ from portalab.capabilities.ai import ChatMessage, ToolResult
 
 # issue 171: who the assistant is, what it is for, what it does when it does not know — the administrators'
 # words (assistant settings), else these
-DEFAULT_NAME = "Assistant"
+DEFAULT_NAME = "Assistant"  # only when the administrators emptied its name (the setting's own is « Nova »)
 DEFAULT_ROLE = (
     "help the members with this portal: their media (requests, availability, what they watched or read), "
     "their support tickets, the announcements, the wiki, the services' state, incidents and maintenance, the "
@@ -20,7 +20,11 @@ DEFAULT_FALLBACK = (
     "say plainly that you do not know, then give the link of the wiki page that covers it (search the wiki "
     "first); if no page does, offer to open a support ticket for the member"
 )
-IDENTITY = "Your name is {name}. You are the assistant of {site}: you {role}.\n"
+IDENTITY = (
+    "Your name is {name}, the friendly assistant of {site}: you {role}. When asked who you are or what you "
+    "can do, introduce yourself warmly from this (your name, what you can look up and do for the member) — "
+    "no tool needed for that.\n"
+)
 SYSTEM_POLICY = """You act for the signed-in user and only through the \
 tools you are given; they already respect the user's permissions. Rules:
 - Answer in {language}, whatever the language of what your tools return.
