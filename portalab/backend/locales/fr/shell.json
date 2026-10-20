@@ -67,6 +67,7 @@
   "retry": "Réessayer",
   "routeError": "Cette page n'a pas pu être chargée.",
   "search": "Rechercher",
+  "searchAsk": "Demander à l'assistant : « {query} »",
   "searchClear": "Effacer",
   "searchClose": "Fermer la recherche",
   "searchCount": "{count, plural, =0 {Aucun résultat} one {# résultat} other {# résultats}}",

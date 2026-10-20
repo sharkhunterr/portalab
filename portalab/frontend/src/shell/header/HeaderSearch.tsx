@@ -18,6 +18,7 @@ import {
 import { useT } from "../../i18n/hooks/useT";
 import { useNavigationView } from "../nav/NavigationProvider";
 import { fromNavigation, rank } from "../palette/CommandRegistry";
+import { useSlots } from "../slots/providers";
 import { useShellStrings } from "../strings";
 
 /**
@@ -51,7 +52,13 @@ interface Option {
   groupIcon?: string | undefined;
   /** #92: a person's portrait, drawn round */
   round?: true | undefined;
+  /** issue 171: a question for the assistant instead of a page */
+  ask?: string | undefined;
 }
+
+// issue 171: a query that reads as a question goes to the assistant first
+const QUESTION =
+  /\?\s*$|^(pourquoi|comment|quand|quel|quelle|quels|quelles|est-ce|où|ou en est|combien|why|how|when|what|which|where|is|are|can|does|do)\b/i;
 
 let focusHandler: ((query: string) => void) | null = null;
 let floatingHandler: ((query: string) => void) | null = null;
@@ -114,6 +121,7 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
   });
   const history = useHistory();
   const announce = useAnnounce();
+  const { ai } = useSlots();
   const pages = useMemo(
     () => fromNavigation(view.commands, strings.label, {}).filter((c) => c.route),
     [view.commands, strings.label],
@@ -214,8 +222,20 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
       title: t("search:palette.searchFor", { query: q }),
       route: `/search?q=${encodeURIComponent(q)}`,
     });
+    if (ai?.available && q.length >= 3) {
+      const ask: Option = {
+        id: "ask",
+        group: "",
+        icon: "sparkles",
+        title: t("shell:searchAsk", { query: q }),
+        route: "",
+        ask: q,
+      };
+      if (QUESTION.test(q)) out.unshift(ask);
+      else out.push(ask);
+    }
     return out;
-  }, [query, history.data, pages, results.data, resolution.data, t]);
+  }, [query, history.data, pages, results.data, resolution.data, t, ai?.available]);
 
   // while typing, the best match is ready for Enter; the count is announced
   const typed = query.trim().length > 0;
@@ -234,7 +254,8 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
     close();
     setQuery("");
     input.current?.blur();
-    navigate(option.route);
+    if (option.ask) ai?.open({ route: location.pathname, question: option.ask });
+    else navigate(option.route);
   };
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "ArrowDown") {

@@ -418,6 +418,8 @@
   "journey.approved.done": "The request was approved.",
   "journey.approved.failed": "The request failed on the service.",
   "journey.approved.pending": "Waiting for an administrator's approval.",
+  "journey.ask": "Where does « {title} » stand, and why is it not available yet?",
+  "journey.askButton": "Ask the assistant",
   "journey.available.done": "In the library since {date}",
   "journey.available.upcoming": "Not in the library yet",
   "journey.cinema": "Cinema: {date}",

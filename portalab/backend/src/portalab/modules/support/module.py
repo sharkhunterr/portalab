@@ -6,6 +6,7 @@ from typing import Any
 
 from sqlalchemy import func, select
 
+from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.automation_actions import ActionRegistry, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.content import default_calendar_sources
@@ -37,6 +38,7 @@ from portalab.core.time import Clock
 from portalab.modules.support import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.support import settings as _settings  # noqa: F401 — declares settings
 from portalab.modules.support.admin.definitions import Definitions
+from portalab.modules.support.ai_tools import SupportAiTools
 from portalab.modules.support.attachments.service import AttachmentService
 from portalab.modules.support.conversion.service import ConversionService
 from portalab.modules.support.diagnosis.orchestrator import DiagnosisOrchestrator
@@ -89,7 +91,9 @@ class SupportModule:
         observables: ObservableRegistry = default_observables,
         actions: ActionRegistry = default_actions,
         blobs: BlobStore | None = None,
+        ai_tools: AIToolRegistry = default_ai_tools,
     ) -> None:
+        self.ai_tools = ai_tools
         self.database = database
         self.capabilities = capabilities
         self.authorizer = authorizer
@@ -128,6 +132,7 @@ class SupportModule:
         )
 
     def register(self) -> None:
+        SupportAiTools(self, self.clock).register(self.ai_tools)  # issue 171: the assistant's support tools
         if not self.capabilities.system_providers(INCIDENTS):
             self.capabilities.provide(INCIDENTS, self.port, instance_ref="support", owner=OWNER)
         register_event_types(self.event_types)

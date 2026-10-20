@@ -1,10 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useId, useState } from "react";
+import { useLocation } from "react-router";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useSlots } from "../../../shell/slots/providers";
 import { useMeasures } from "../insights/api";
 
 interface Torrent {
@@ -298,9 +300,11 @@ function StepText({ step }: { step: Step }) {
  * what the download manager says, the transfers (torrent state, speed, peers, time left), a manual import
  * to confirm, errors; and, on demand, what the indexers offer.
  */
-export function RequestJourney({ objectId }: { objectId: string }) {
+export function RequestJourney({ objectId, title }: { objectId: string; title?: string | undefined }) {
   const size = useSize();
   const t = useT();
+  const { ai } = useSlots(); // issue 171: « where does it stand? » asked to the assistant
+  const location = useLocation();
   const format = useFormat();
   const headingId = useId();
   const client = useQueryClient();
@@ -367,6 +371,14 @@ export function RequestJourney({ objectId }: { objectId: string }) {
             onClick={() => setOpen(false)}
           >
             {t("media:journey.compact.hide")}
+          </button>
+        ) : ai?.available && title ? (
+          <button
+            type="button"
+            className="ds-button ds-button--quiet"
+            onClick={() => ai.open({ route: location.pathname, question: t("media:journey.ask", { title }) })}
+          >
+            <Icon name="sparkles" size={16} /> {t("media:journey.askButton")}
           </button>
         ) : null}
       </header>

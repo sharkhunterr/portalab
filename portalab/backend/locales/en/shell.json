@@ -67,6 +67,7 @@
   "retry": "Retry",
   "routeError": "This page could not be loaded.",
   "search": "Search",
+  "searchAsk": "Ask the assistant: “{query}”",
   "searchClear": "Clear",
   "searchClose": "Close the search",
   "searchCount": "{count, plural, =0 {No result} one {# result} other {# results}}",

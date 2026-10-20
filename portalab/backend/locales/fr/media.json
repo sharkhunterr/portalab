@@ -418,6 +418,8 @@
   "journey.approved.done": "La demande a été validée.",
   "journey.approved.failed": "La demande a échoué côté service.",
   "journey.approved.pending": "En attente de validation par un administrateur.",
+  "journey.ask": "Où en est « {title} », et pourquoi n'est-il pas encore disponible ?",
+  "journey.askButton": "Demander à l'assistant",
   "journey.available.done": "Dans la bibliothèque depuis le {date}",
   "journey.available.upcoming": "Pas encore dans la bibliothèque",
   "journey.cinema": "Cinéma : {date}",

@@ -1,6 +1,7 @@
 {
   "allTypes": "All types",
   "assist.ask": "Ask the assistant",
+  "assist.converse": "Continue as a conversation",
   "assist.error": "The assistant could not answer.",
   "assist.note": "Analysis — an interpretation, check the sources.",
   "assist.retry": "Ask again",

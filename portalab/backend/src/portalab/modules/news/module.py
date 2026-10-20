@@ -4,6 +4,7 @@ from dataclasses import replace
 from datetime import timedelta
 from typing import Any
 
+from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.automation_actions import ActionRegistry, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.content import (
@@ -35,6 +36,7 @@ from portalab.core.logging import get_logger
 from portalab.core.time import Clock
 from portalab.modules.news import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.news import settings as _settings  # noqa: F401 — declares settings
+from portalab.modules.news.ai_tools import NewsAiTools
 from portalab.modules.news.articles import PUBLISH_JOB, ArticleService
 from portalab.modules.news.events import register_event_types
 from portalab.modules.news.integrations import (
@@ -76,7 +78,9 @@ class NewsModule:
         categories: CategoryRegistry = default_categories,
         actions: ActionRegistry = default_actions,
         observables: ObservableRegistry = default_observables,
+        ai_tools: AIToolRegistry = default_ai_tools,
     ) -> None:
+        self.ai_tools = ai_tools  # issue 171: the assistant's tools
         self.database = database
         self.audit = audit
         self.capabilities = capabilities
@@ -97,6 +101,7 @@ class NewsModule:
         self.articles.newsletter = self.newsletters.email_article
 
     def register(self) -> None:
+        NewsAiTools(self.articles, self.clock).register(self.ai_tools)  # issue 171
         register_event_types(self.event_types)
         participant = NewsParticipant(self.database)
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):

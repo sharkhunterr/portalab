@@ -1,7 +1,9 @@
 import { useId } from "react";
+import { useLocation } from "react-router";
 import { Button } from "../../../design-system/components/Button";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
+import { useSlots } from "../../../shell/slots/providers";
 import type { ItemOut } from "../api";
 import { useSearchAssist } from "./useSearchAssist";
 
@@ -14,6 +16,8 @@ export function AssistPanel({ query, items }: { query: string; items: ItemOut[] 
   const t = useT();
   const headingId = useId();
   const assist = useSearchAssist();
+  const { ai } = useSlots(); // issue 171: the analysis goes on as a conversation
+  const location = useLocation();
   const titles = new Map(items.map((item) => [`${item.kind}:${item.id}`, item]));
   const ask = () =>
     assist.ask(
@@ -26,6 +30,11 @@ export function AssistPanel({ query, items }: { query: string; items: ItemOut[] 
       {assist.state === "idle" ? (
         <Button variant="secondary" onClick={ask} disabled={!query.trim()}>
           {t("search:assist.ask")}
+        </Button>
+      ) : null}
+      {ai?.available && query.trim() ? (
+        <Button variant="ghost" onClick={() => ai.open({ route: location.pathname, question: query.trim() })}>
+          {t("search:assist.converse")}
         </Button>
       ) : null}
       {assist.state === "streaming" ? <FunctionalState state="loading" /> : null}

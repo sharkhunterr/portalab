@@ -1,6 +1,6 @@
-import { type FormEvent, useId, useState } from "react";
+import { type FormEvent, useEffect, useId, useState } from "react";
 import "../support.css";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
@@ -59,6 +59,12 @@ export function NewTicketForm({
     setValues(payload.fields ?? {});
     setDraftId(id);
   };
+  // issue 171: a ticket the assistant prepared, opened from its link — read, then submitted by the member
+  const fromLink = useSearchParams()[0].get("draft");
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once, for the draft the link names
+  useEffect(() => {
+    if (fromLink && /^[0-9a-f-]{36}$/i.test(fromLink)) void loadDraft(fromLink).catch(() => undefined);
+  }, [fromLink]);
   const submit = (event: FormEvent) => {
     event.preventDefault();
     create.mutate(

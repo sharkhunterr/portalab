@@ -882,7 +882,7 @@ export function DetailPage() {
         <PluginSlot name="media.actions" params={{ item: media.id }} />
       </TitleHero>
       <LeavingNotice objectId={media.id} />
-      <RequestJourney objectId={media.id} />
+      <RequestJourney objectId={media.id} title={media.title} />
       {metadata.data ? (
         <Enrichment objectId={media.id} />
       ) : details ? (
