@@ -14,7 +14,15 @@ from typing import Any
 
 import httpx
 
-from portalab.capabilities.ai import INVOKE, MODELS, AIToolRegistry, LLMProvider, ModelInfo, default_ai_tools
+from portalab.capabilities.ai import (
+    INVOKE,
+    MODELS,
+    PERKS,
+    AIToolRegistry,
+    LLMProvider,
+    ModelInfo,
+    default_ai_tools,
+)
 from portalab.capabilities.automation_actions import ActionRegistry, ActionType, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
@@ -49,6 +57,7 @@ from portalab.modules.ai.observability import log
 from portalab.modules.ai.orchestrator import Orchestrator
 from portalab.modules.ai.participant import AiParticipant
 from portalab.modules.ai.pending import PendingActions
+from portalab.modules.ai.perks import Perks
 from portalab.modules.ai.providers.openai_compat import OpenAICompatibleProvider
 from portalab.modules.ai.settings import API_KEY, MCP_TOKENS, SETTINGS, AiConfig
 from portalab.modules.ai.tools.baseline import BaselineTools
@@ -94,6 +103,7 @@ class AiModule:
             disabled=lambda: self.config.tools_disabled,
             external=self.mcp.tools,
             refresh=self.mcp.refresh,
+            reserved=lambda: self.config.premium_tools,
         )
         self.pending = PendingActions(
             database, events, audit, capabilities, lambda: self.config.pending_action_ttl_minutes, clock=clock
@@ -110,9 +120,11 @@ class AiModule:
             who=self._who,
             site=self._site,
             secrets=lambda: (self.api_key, *self.mcp_tokens.values()),
+            provider_for=self.provider_for,
         )
         self.conversations = Conversations(database, events, clock=clock)
-        self.governor = Governor(database, lambda: self.config, clock=clock)
+        self.perks = Perks(database, lambda: self.config, clock=clock)  # issue 173: bought in the shop
+        self.governor = Governor(database, lambda: self.config, clock=clock, perks=self.perks)
         self.chat = ChatService(self.conversations, self.governor, self.orchestrator)
         self.insights = Insights(database, capabilities, clock=clock)  # issue 176: verdicts and dashboard
         self.baseline = BaselineTools(
@@ -126,19 +138,23 @@ class AiModule:
 
     # --- provider -------------------------------------------------------------------------------------
     def provider(self) -> LLMProvider | None:
-        if not self.config.enabled:
+        return self.provider_for(self.config)
+
+    def provider_for(self, config: AiConfig) -> LLMProvider | None:
+        """The provider for these settings — the portal's, or a turn's with what the member bought."""
+        if not config.enabled:
             return None
         if self.provider_override is not None:
             return self.provider_override
-        if not self.config.provider_endpoint or not self.config.provider_model:
+        if not config.provider_endpoint or not config.provider_model:
             return None
         return OpenAICompatibleProvider(
-            self.config.provider_endpoint,
-            self.config.provider_model,
+            config.provider_endpoint,
+            config.provider_model,
             lambda: self.api_key,
             transport=self.transport,
-            max_context=self.config.max_context_tokens,
-            reasoning=self.config.provider_reasoning,
+            max_context=config.max_context_tokens,
+            reasoning=config.provider_reasoning,
         )
 
     def available(self) -> bool:
@@ -197,6 +213,8 @@ class AiModule:
     def register(self) -> None:
         register_event_types(self.event_types)
         self.baseline.register(self.tools)
+        if not any(p.instance_ref == INSTANCE for p in self.capabilities.system_providers(PERKS)):
+            self.capabilities.provide(PERKS, self.perks, instance_ref=INSTANCE, owner=OWNER)
         participant = AiParticipant(self.database)
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
             if not any(p.instance_ref == INSTANCE for p in self.capabilities.system_providers(capability)):

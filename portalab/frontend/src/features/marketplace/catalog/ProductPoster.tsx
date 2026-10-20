@@ -29,6 +29,7 @@ export const TYPE_ICONS: Record<string, string> = {
   streak_freeze: "snowflake", // #54: a missed day of the play streak covered
   xp_boost: "rocket", // #55: gains multiplied for a while
   media_rescue: "shield", // #57: a title saved from the library's cleanup
+  ai_capacity: "brain", // issue 173: the assistant's capacities
 };
 
 export function ProductPoster({ product, size = "md" }: { product: Product; size?: "md" | "lg" }) {

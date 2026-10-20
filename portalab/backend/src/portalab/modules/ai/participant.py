@@ -9,7 +9,7 @@ from sqlalchemy import delete, select
 
 from portalab.capabilities.privacy_participants import ErasureMode, ExportRecord
 from portalab.core.db import Database
-from portalab.modules.ai.models import Conversation, Feedback, Message, PendingAction, UsageDaily
+from portalab.modules.ai.models import Conversation, Feedback, Message, PendingAction, Perk, UsageDaily
 
 
 class AiParticipant:
@@ -71,9 +71,23 @@ class AiParticipant:
                         },
                     )
                 )
+            # issue 173: the assistant's capacities bought in the shop
+            for perk in (await session.execute(select(Perk).where(Perk.user_id == user_id))).scalars():
+                records.append(
+                    ExportRecord(
+                        "ai.perk",
+                        {
+                            "perk": perk.perk,
+                            "amount": perk.amount,
+                            "remaining": perk.remaining,
+                            "created_at": perk.created_at.isoformat(),
+                            "expires_at": perk.expires_at.isoformat() if perk.expires_at else None,
+                        },
+                    )
+                )
         return records
 
     async def erase(self, user_id: UUID, mode: ErasureMode) -> None:
         async with self.database.unit_of_work() as uow:
-            for model in (PendingAction, Feedback, Conversation, UsageDaily):
+            for model in (PendingAction, Feedback, Conversation, UsageDaily, Perk):
                 await uow.session.execute(delete(model).where(model.user_id == user_id))

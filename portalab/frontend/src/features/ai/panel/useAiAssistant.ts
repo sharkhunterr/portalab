@@ -29,7 +29,12 @@ export function useAiAssistant(): { slot: AiProvider; panel: AiPanelProps } {
   const name = status.data?.name || undefined; // issue 171: the name the administrators gave it
   // issue 171: what is left of today's allowance
   const quota = status.data?.daily_budget
-    ? { budget: status.data.daily_budget, used: status.data.used_today ?? 0 }
+    ? {
+        budget: status.data.daily_budget,
+        used: status.data.used_today ?? 0,
+        recharge: status.data.recharge ?? 0, // issue 173: tokens bought, spent past the day's
+        shop: status.data.shop ?? false,
+      }
     : undefined;
   const ideas = status.data?.ideas?.length ? status.data.ideas : undefined; // issue 174
   return {

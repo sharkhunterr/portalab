@@ -26,6 +26,7 @@ from portalab.modules.ai.errors import AiUnavailable
 from portalab.modules.ai.executor import ToolExecutor
 from portalab.modules.ai.observability import log, metrics
 from portalab.modules.ai.output import sanitize_answer
+from portalab.modules.ai.perks import Upgrade
 from portalab.modules.ai.redaction import mask_secrets
 from portalab.modules.ai.settings import AiConfig
 from portalab.modules.ai.tools.catalog import CHAT, ToolCatalog, ToolPolicy, tool_spec, wire_name
@@ -94,7 +95,9 @@ class Orchestrator:
         secrets: Callable[[], Iterable[str | None]] = tuple,
         who: Callable[[UUID], Awaitable[str | None]] | None = None,
         site: Callable[[str], str | None] | None = None,
+        provider_for: Callable[[AiConfig], LLMProvider | None] | None = None,
     ) -> None:
+        self.provider_for = provider_for  # issue 173: the provider for a turn's own settings (a bought model)
         self.site = site  # issue 171: the site's name (its identity), for the assistant to say where it is
         self.who = who  # issue 171: the member the assistant speaks with (their display name)
         self.provider = provider
@@ -121,7 +124,11 @@ class Orchestrator:
             return None
 
     async def messages_for(
-        self, user: UUID, history: list[ChatMessage], page: dict[str, Any] | None
+        self,
+        user: UUID,
+        history: list[ChatMessage],
+        page: dict[str, Any] | None,
+        upgrade: Upgrade | None = None,
     ) -> list[ChatMessage]:
         member = {"id": str(user), "name": await self.name_of(user)}
         # issue 171: the language the question is written in, else the member's own — a model answers in the
@@ -140,7 +147,9 @@ class Orchestrator:
             "site": site,
         }
         system = ChatMessage("system", system_prompt(language, page, member, persona))
-        budget = max(500, self.config().max_context_tokens - MAX_ANSWER_TOKENS - len(system.content) // 4)
+        # issue 173: a longer memory bought keeps more of the conversation
+        context = (upgrade.apply(config) if upgrade is not None else config).max_context_tokens
+        budget = max(500, context - MAX_ANSWER_TOKENS - len(system.content) // 4)
         kept = window(history, budget)
         # issue 171: a small model forgets the system's rules as a conversation grows — the rule it needs
         # most rides on the question it answers (sent to the model only, never stored)
@@ -159,15 +168,24 @@ class Orchestrator:
         conversation_id: UUID | None = None,
         outcome: TurnOutcome | None = None,
         seed_sources: Sequence[SourceRef] = (),
+        upgrade: Upgrade | None = None,
     ) -> AsyncIterator[Event]:
         outcome = outcome if outcome is not None else TurnOutcome()
+        config = self.config()
         provider = self.provider()
+        if upgrade is not None and self.provider_for is not None and provider is not None:
+            # issue 173: what the member bought — a stronger model, more reflection, a longer memory
+            turn = upgrade.apply(config)
+            if turn is not config:
+                config = turn
+                provider = self.provider_for(config) or provider
         if provider is None:
             raise AiUnavailable("The assistant is not configured.")
-        config = self.config()
         outcome.model = config.provider_model
         started = time.monotonic()
-        offered = await self.catalog.for_principal(principal, policy)
+        offered = await self.catalog.for_principal(
+            principal, policy, reserved=upgrade is not None and upgrade.tools
+        )
         by_wire = {wire_name(name): tool for name, tool in offered.items()}
         specs = [tool_spec(tool) for tool in offered.values()]
         attributor = Attributor()

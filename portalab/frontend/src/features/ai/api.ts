@@ -74,6 +74,9 @@ export function useAiStatus() {
           name: "",
           daily_budget: 0,
           used_today: 0,
+          recharge: 0,
+          perks: {},
+          shop: false,
           ideas: [],
         };
       }

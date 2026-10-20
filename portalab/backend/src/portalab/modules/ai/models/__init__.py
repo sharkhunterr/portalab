@@ -104,3 +104,24 @@ class Feedback(AiBase):
     comment: Mapped[str] = mapped_column(Text, nullable=False, default="", info=pii("content", tombstone=""))
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class Perk(AiBase):
+    """Issue 173: a capacity of the assistant a member bought (or was given) in the shop — more tokens a day,
+    a recharge (``remaining`` spent past the day's allowance), a stronger model, more reflection, a longer
+    memory, reserved tools — until ``expires_at`` (none: for good). One per purchase (``source_ref``)."""
+
+    __tablename__ = "perks"
+    __table_args__ = (
+        UniqueConstraint("source_ref"),
+        Index("ix_perks_user_id", "user_id", "perk"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)  # FK identity.users (migration), CASCADE
+    perk: Mapped[str] = mapped_column(String(32), nullable=False)
+    amount: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    remaining: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    source_ref: Mapped[str] = mapped_column(String(200), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    expires_at: Mapped[datetime | None] = mapped_column(TZDateTime)

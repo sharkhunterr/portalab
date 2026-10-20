@@ -22,6 +22,21 @@ import { ProductPack } from "../boosters/Boosters";
 import "../product-art.css";
 import { productTypeLabel } from "../typeLabel";
 
+/** issue 173: a capacity's word in the catalogs (« daily », not the setting's own name) */
+export function aiPerkWord(perk: string): string {
+  return perk === "daily_tokens" ? "daily" : perk || "model";
+}
+
+/** issue 173: what each of the assistant's capacities looks like */
+export const AI_PERK_ICONS: Record<string, string> = {
+  daily_tokens: "zap",
+  recharge: "battery",
+  model: "brain",
+  reflection: "lightbulb",
+  context: "book-open",
+  tools: "wrench",
+};
+
 /** 027: a widget product shows the widget itself, in miniature, with the member's own data — a look for a
  * widget (#30) shows that widget wearing it. */
 function WidgetArt({
@@ -392,6 +407,27 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
           <span>{t("marketplace:art.requests")}</span>
         </span>
       );
+    case "ai_capacity": {
+      // issue 173: the assistant's capacity — its tokens, big, or what it unlocks
+      const perk = String(preview.perk ?? "");
+      const amount = Number(preview.amount ?? 0);
+      const hours = Number(preview.hours ?? 0);
+      return (
+        <span className="product-art__quota product-art__perk">
+          <Icon
+            name={AI_PERK_ICONS[perk] ?? "brain"}
+            size={size === "sheet" ? 40 : size === "mini" ? 14 : 24}
+          />
+          {perk === "daily_tokens" || perk === "recharge" ? (
+            <strong>+{new Intl.NumberFormat(undefined, { notation: "compact" }).format(amount)}</strong>
+          ) : null}
+          <span>
+            {t(`marketplace:art.ai.${aiPerkWord(perk)}`)}
+            {perk !== "recharge" ? ` · ${t("marketplace:art.ai.for", { hours })}` : null}
+          </span>
+        </span>
+      );
+    }
     case "xp_boost": // #55: the factor, big
       return (
         <span className="product-art__quota product-art__perk">

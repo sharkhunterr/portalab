@@ -9,6 +9,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 from uuid import UUID
 
+from portalab.capabilities.ai import PERKS as AI_PERKS
 from portalab.capabilities.dashboard import WidgetRegistry
 from portalab.capabilities.economy import PERKS
 from portalab.capabilities.marketplace import (
@@ -41,6 +42,7 @@ NOT_REFUNDABLE = frozenset(
         "media_rescue",
         "booster",
         "early_unlock",  # #131
+        "ai_capacity",  # issue 173: spent as soon as the assistant answers
     }
 )
 
@@ -353,6 +355,33 @@ class EarlyUnlockHandler(BoosterHandler):
     hold but may not wear yet for want of a level. Dear and limited (its copies, its purchase limit)."""
 
 
+class AiCapacityHandler(Owned):
+    """``ai_capacity`` (issue 173): a capacity of the assistant — more tokens a day, a recharge, the stronger
+    model, more reflection, a longer memory, reserved tools (``perk``, ``amount``, ``hours``). The assistant
+    keeps it; one the administrators do not offer is « incompatible ». Withdrawn on a revoke."""
+
+    def __init__(self, capabilities: CapabilityRegistry) -> None:
+        self.capabilities = capabilities
+
+    async def activate(self, ownership: OwnershipView) -> ActivationResult:
+        perks = _port(self.capabilities, AI_PERKS)
+        if perks is None:
+            return ActivationResult("failed", "assistant unavailable")
+        granted = await perks.grant(
+            ownership.user_id,
+            str(ownership.payload.get("perk", "")),
+            int(ownership.payload.get("amount", 0) or 0),
+            int(ownership.payload.get("hours", 0) or 0),
+            f"marketplace:{ownership.id}",
+        )
+        return ActivationResult("active") if granted else ActivationResult("incompatible", "not offered")
+
+    async def deactivate(self, ownership: OwnershipView) -> None:
+        perks = _port(self.capabilities, AI_PERKS)
+        if perks is not None:
+            await perks.revoke(f"marketplace:{ownership.id}")
+
+
 def register_builtin_types(
     registry: ProductTypeRegistry,
     capabilities: CapabilityRegistry,
@@ -403,6 +432,8 @@ def register_builtin_types(
         ("booster", BoosterHandler(booster_seal), PAYLOAD_FIELDS),
         # #131: a pass opening an item waiting for its level, kept in the reserve
         ("early_unlock", EarlyUnlockHandler(booster_seal), ()),
+        # issue 173: the assistant's capacities
+        ("ai_capacity", AiCapacityHandler(capabilities), ("perk", "amount", "hours")),
     ):
         if registry.get(key) is None:
             registry.register(

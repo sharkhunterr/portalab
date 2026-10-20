@@ -21,6 +21,7 @@ from portalab.modules.ai.errors import AiUnavailable
 from portalab.modules.ai.models import Conversation, Message
 from portalab.modules.ai.module import AiModule
 from portalab.modules.ai.pending import PendingView
+from portalab.modules.ai.perks import Upgrade
 from portalab.modules.ai.permissions import AI_USE
 
 router = APIRouter(prefix="/api/v1", tags=["ai"])
@@ -46,6 +47,11 @@ class AiStatusOut(BaseModel):
     daily_budget: int = 0
     used_today: int = 0
     ideas: list[str] = Field(default_factory=list)  # issue 174: the administrators' questions to start with
+    # issue 173: what the member bought — tokens held in recharges, the capacities and until when (an ISO
+    # time, « forever »), and whether the shop sells the assistant's capacities at all
+    recharge: int = 0
+    perks: dict[str, str] = Field(default_factory=dict)
+    shop: bool = False
 
 
 class AiPageContext(BaseModel):
@@ -156,14 +162,21 @@ async def status(principal: User, module: Module) -> AiStatusOut:
         state = "not_configured"
     else:
         state = "ok"
+    user = principal.acting_for or principal.user_id
+    budget, upgrade = module.config.daily_token_budget_per_user, Upgrade()
+    if user is not None:
+        budget, upgrade = await module.governor.allowance(user)
     return AiStatusOut(
         available=state == "ok",
         provider_state=state,
         auto_navigate=module.config.auto_navigate,
         name=module.config.assistant_name,
-        daily_budget=module.config.daily_token_budget_per_user,
+        daily_budget=budget,
         ideas=[i for i in module.config.assistant_ideas if isinstance(i, str) and i.strip()][:8],
         used_today=await _used(module, principal),
+        recharge=upgrade.recharge,
+        perks=dict(upgrade.until or {}),
+        shop=bool(module.config.perks_offered),
     )
 
 
@@ -179,7 +192,9 @@ async def _used(module: AiModule, principal: Principal) -> int:
 
 @router.get("/ai/tools", response_model=list[AiToolOut])
 async def tools(principal: User, module: Module) -> list[AiToolOut]:
-    offered = await module.catalog.for_principal(principal)
+    user = principal.acting_for or principal.user_id
+    upgrade = await module.governor.upgrade(user) if user is not None else Upgrade()
+    offered = await module.catalog.for_principal(principal, reserved=upgrade.tools)
     return [
         AiToolOut(name=t.name, description=t.description, sensitivity=t.sensitivity) for t in offered.values()
     ]
