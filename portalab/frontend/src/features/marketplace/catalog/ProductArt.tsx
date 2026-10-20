@@ -423,7 +423,13 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
           ) : null}
           <span>
             {t(`marketplace:art.ai.${aiPerkWord(perk)}`)}
-            {perk !== "recharge" ? ` · ${t("marketplace:art.ai.for", { hours })}` : null}
+            {perk !== "recharge"
+              ? ` · ${
+                  hours >= 24 && hours % 24 === 0
+                    ? t("marketplace:art.ai.forDays", { days: hours / 24 })
+                    : t("marketplace:art.ai.for", { hours })
+                }`
+              : null}
           </span>
         </span>
       );

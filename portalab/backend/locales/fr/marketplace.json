@@ -143,6 +143,7 @@
   "art.ai.context": "Mémoire plus longue",
   "art.ai.daily": "jetons par jour",
   "art.ai.for": "{hours, plural, =0 {pour toujours} one {# heure} other {# heures}}",
+  "art.ai.forDays": "{days, plural, one {# jour} other {# jours}}",
   "art.ai.model": "Modèle plus puissant",
   "art.ai.recharge": "jetons en réserve",
   "art.ai.reflection": "Plus de réflexion",
