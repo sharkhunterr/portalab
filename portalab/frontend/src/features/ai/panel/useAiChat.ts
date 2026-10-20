@@ -33,6 +33,8 @@ const empty = (role: ChatMessage["role"], content = ""): ChatMessage => ({
   streaming: false,
 });
 
+const WAIT_MS = 150_000; // longer than the provider's own timeout (120 s on the LAN)
+
 export function useAiChat(context?: { route?: string; title?: string }) {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -51,6 +53,8 @@ export function useAiChat(context?: { route?: string; title?: string }) {
     async (text: string, options?: { fresh?: boolean }) => {
       const content = text.trim();
       if (!content || busy) return;
+      let watchdog = 0;
+      let stalled = false;
       setBusy(true);
       setError(null);
       try {
@@ -64,6 +68,13 @@ export function useAiChat(context?: { route?: string; title?: string }) {
           { ...empty("assistant"), streaming: true },
         ]);
         abort.current = new AbortController();
+        // issue 171: a stream cut without an end (the server restarted, the network dropped) never
+        // leaves the window waiting: past WAIT_MS the turn stops and says so
+        const controller = abort.current;
+        watchdog = window.setTimeout(() => {
+          stalled = true;
+          controller.abort();
+        }, WAIT_MS);
         await streamTurn(
           id,
           content,
@@ -101,14 +112,19 @@ export function useAiChat(context?: { route?: string; title?: string }) {
           context,
         );
       } catch (caught) {
-        if ((caught as Error).name !== "AbortError") {
-          const code = caught instanceof ApiError ? (caught.code ?? "generic") : "generic";
+        if ((caught as Error).name !== "AbortError" || stalled) {
+          const code = stalled
+            ? "ai.unavailable"
+            : caught instanceof ApiError
+              ? (caught.code ?? "generic")
+              : "generic";
           setError(code);
           setMessages((current) =>
             current.filter((m) => !(m.role === "assistant" && m.streaming && !m.content)),
           );
         }
       } finally {
+        window.clearTimeout(watchdog);
         patchLast((m) => (m.streaming ? { ...m, streaming: false } : m));
         setBusy(false);
       }
