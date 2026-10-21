@@ -1,0 +1,261 @@
+/* « Heartbeat » for « Services »: the ring becomes a heart that beats — how many services work written in it,
+   filling it from the bottom. All up: a calm, steady beat (about 50 a minute). Fewer up: faster — and in
+   trouble it stumbles (an extra, uneven beat) and turns amber. With room, its details on its right: the
+   summary and each service; narrow, under it; low, beside it; on a single row, a small heart and its line.
+   Its hook: the widget's frame — or its preview in the shop — data-widget-option ~= « heartbeat ». Still,
+   for those who asked for less motion. */
+
+/* the layout: the heart on the left, its details on the right */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services {
+  --hb-color: #ff4f7b;
+  --hb-deep: #c81d4e;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "heart summary"
+    "heart list";
+  align-content: center; /* the details face the heart, centred with it */
+  align-items: center;
+  gap: 0.5rem 1rem;
+  block-size: 100%;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__head {
+  display: contents;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__all,
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .skin-pulse__trace {
+  display: none;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__summary {
+  grid-area: summary;
+  align-self: end;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__summary strong {
+  font-size: var(--font-size-md, 1rem);
+  line-height: 1.25;
+}
+
+/* the heart (the ring, its shape and its fill drawn by its ::before, its echo by its ::after) */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__ring {
+  --heart: clamp(3.2rem, min(58cqh, 34cqw), 8.5rem);
+  --beat: calc(0.42s + var(--ratio, 1) * var(--ratio, 1) * 0.8s);
+  grid-area: heart;
+  position: relative;
+  display: grid;
+  place-items: center;
+  place-self: center;
+  inline-size: var(--heart);
+  block-size: var(--heart);
+  border-radius: 0;
+  background: none;
+  animation: lubdub var(--beat) ease-in-out infinite;
+  transform-origin: 50% 55%;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__ring::before,
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__ring::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath d=%27M12 21.4l-1.5-1.3C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1C13.1 3.8 14.8 3 16.5 3 19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.5 11.5L12 21.4z%27/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath d=%27M12 21.4l-1.5-1.3C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1C13.1 3.8 14.8 3 16.5 3 19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.5 11.5L12 21.4z%27/%3E%3C/svg%3E") center / contain no-repeat;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__ring::before {
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(
+      to top,
+      var(--hb-deep) 0,
+      var(--hb-color) calc(var(--ratio, 1) * 100%),
+      rgba(255, 255, 255, 0.1) calc(var(--ratio, 1) * 100%)
+    );
+  filter: drop-shadow(0 0.3rem 0.6rem rgba(0, 0, 0, 0.35));
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__ring::after {
+  background: var(--hb-color);
+  opacity: 0;
+  animation: echo var(--beat) ease-out infinite;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__ring > span {
+  position: relative;
+  z-index: 1;
+  inline-size: auto;
+  block-size: auto;
+  padding-block-end: 12%;
+  border-radius: 0;
+  background: none;
+  color: #fff;
+  font-size: calc(var(--heart) * 0.19);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-shadow: 0 1px 6px rgba(80, 0, 20, 0.6);
+}
+
+/* in trouble: amber, and it stumbles */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__head[data-troubled] .widget-services__ring {
+  --hb-color: #ffb03b;
+  --hb-deep: #e0601f;
+  animation-name: stumble;
+}
+
+/* each service, a light line: its state's dot and its name */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__grid {
+  grid-area: list;
+  align-self: start;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.5rem), 1fr));
+  gap: 0.25rem 0.5rem;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-service {
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "icon text";
+  gap: 0.45rem;
+  padding: 0.2rem 0.45rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-service:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.09);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-service__icon {
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  background: var(--tone);
+  box-shadow: 0 0 0.5rem var(--tone);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-service__icon svg,
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-service__state,
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-service__uptime {
+  display: none;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-service__name {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+/* light lines keep their height: the list never stretches over the block */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__grid[data-filled] {
+  block-size: auto;
+  grid-template-rows: none;
+  grid-auto-rows: auto;
+  align-content: start;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__grid[data-filled] > li {
+  container-type: normal;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__grid[data-filled] .widget-service {
+  block-size: auto;
+}
+
+/* narrow (a quarter, half a phone): the heart on top, its details under it */
+@container (max-width: 20rem) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      "heart"
+      "summary"
+      "list";
+    align-content: start;
+    justify-items: center;
+    text-align: center;
+  }
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__ring {
+    --heart: clamp(3rem, min(40cqh, 50cqw), 7.5rem);
+  }
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__summary strong {
+    font-size: var(--font-size-sm);
+  }
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__grid {
+    inline-size: 100%;
+    text-align: start;
+  }
+}
+/* low (two rows or less): the heart beside its summary, the services left out */
+@container (max-height: 7.5rem) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: "heart summary";
+    justify-items: stretch;
+    text-align: start;
+  }
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__summary {
+    align-self: center;
+  }
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__ring {
+    --heart: clamp(1.2rem, 85cqh, 5rem);
+  }
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__grid {
+    display: none;
+  }
+}
+/* a single row: the heart and its line, side by side */
+@container (max-height: 3.2rem) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__summary strong {
+    display: block;
+    overflow: hidden;
+    font-size: var(--font-size-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__chips {
+    display: none;
+  }
+}
+
+/* the one-row form of the widget: a small heart and its line */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services[data-compact] {
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "heart summary";
+  align-items: center;
+  gap: 0.6rem;
+  block-size: 100%;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services[data-compact] .widget-services__summary {
+  align-self: center;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services[data-compact] .widget-services__summary strong {
+  font-size: var(--font-size-sm);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services[data-compact] .widget-services__ring {
+  --heart: clamp(1.3rem, 92cqh, 3rem);
+  inline-size: var(--heart);
+  block-size: var(--heart);
+}
+
+/* its preview in the shop (no block height there) */
+.widget-preview__scaled[data-widget-option~="heartbeat"] .widget-services__ring {
+  --heart: 7rem;
+}
+
+@keyframes lubdub {
+  0%, 100% { transform: scale(1); }
+  12% { transform: scale(1.16); }
+  24% { transform: scale(0.97); }
+  36% { transform: scale(1.1); }
+  55% { transform: scale(1); }
+}
+@keyframes stumble {
+  0%, 100% { transform: scale(1); }
+  8% { transform: scale(1.18); }
+  16% { transform: scale(0.95); }
+  22% { transform: scale(1.12); }
+  34% { transform: scale(1); }
+  52% { transform: scale(1.07) rotate(-2deg); }
+  60% { transform: scale(0.98); }
+  78% { transform: scale(1.05) rotate(1deg); }
+  88% { transform: scale(1); }
+}
+@keyframes echo {
+  0%, 10% { opacity: 0.45; transform: scale(1); }
+  70%, 100% { opacity: 0; transform: scale(1.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__ring,
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="heartbeat"] .widget-services__ring::after {
+    animation: none;
+  }
+}
