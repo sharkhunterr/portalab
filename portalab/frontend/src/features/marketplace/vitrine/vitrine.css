@@ -640,6 +640,28 @@
   justify-content: center;
 }
 
+/* the product's sheet on sale: the same red pill on its art (laid at the art's bottom, whose height is the
+   sheet art's own clamp), the percentage and new price in the same red */
+.vitrine-sheet {
+  --deal: color-mix(in srgb, var(--cal-incident) 60%, var(--state-error-fg));
+  position: relative;
+}
+.vitrine-sheet > .vitrine-deal {
+  inset-block: calc(clamp(11rem, 26vw, 16rem) - 1.6rem - var(--space-3)) auto;
+  inset-inline-start: var(--space-3);
+  padding: 0.2rem 0.6rem 0.2rem 0.45rem;
+  font-size: var(--font-size-sm);
+}
+.vitrine-sheet[data-deal] .price-deal__badge {
+  background: var(--deal);
+  color: var(--color-accent-contrast);
+  font-weight: var(--font-weight-bold, 700);
+}
+.vitrine-sheet[data-deal] .price-deal .ds-coins {
+  border-color: color-mix(in srgb, var(--deal) 60%, transparent);
+  background: color-mix(in srgb, var(--deal) 22%, var(--color-surface));
+}
+
 /* a product in the side panel: wider than a plain drawer */
 .ds-drawer:has(.vitrine-sheet) {
   inline-size: min(36rem, 100vw);
