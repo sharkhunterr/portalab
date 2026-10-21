@@ -6,6 +6,8 @@ import { useT } from "../../../i18n/hooks/useT";
 import { metadataImage } from "../../media/detail/Enrichment";
 import { useMeasures } from "../../media/insights/api";
 import { openBook } from "../../media/listen/store";
+import type { Radio } from "../../media/radio/api";
+import { RadioCard } from "../../media/radio/RadioCard";
 import type { SoonCard } from "../../media/requests/api";
 import { SoonList } from "../../media/requests/SoonList";
 import { CompactLine, PosterStrip } from "./compact";
@@ -572,6 +574,14 @@ function Shuffle({ payload, compact }: WidgetProps) {
   );
 }
 
+/** Issue 168: the homelab's radio on the dashboard — what plays, listen, ask (one line: what plays). */
+function RadioWidget({ payload, compact }: WidgetProps) {
+  const radio = payload.data as Radio | undefined;
+  if (!radio?.available) return null;
+  return <RadioCard radio={radio} compact={Boolean(compact)} />;
+}
+
 registerWidgetComponent("media.shuffle", Shuffle);
+registerWidgetComponent("media.radio", RadioWidget);
 registerWidgetComponent("media.continue", Continue);
 registerWidgetComponent("media.stats", Stats);

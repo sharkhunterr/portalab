@@ -54,6 +54,7 @@ ITEM_LINKS = "media.item_links"  # 027: where a title opens in its service (Plex
 STREAMING = "media.streaming"  # 027 (#2): the portal's own player, fed by the service's transcoder
 AUDIO = "media.audio"  # #20: audiobooks (then music) played in the portal, relayed with byte ranges
 READING = "media.reading"  # #21: books read in the portal (EPUB, PDF, comic book archives)
+RADIO = "media.radio"  # issue 168: a radio station of the homelab — listen, see what plays, ask for a song
 CLEANUP = "media.cleanup"  # #57: titles a cleanup tool will delete, and keeping one (Maintainerr)
 REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the request service (Seerr)
 REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
@@ -943,6 +944,61 @@ class MediaAudio(Protocol):
         ...
 
 
+# --- issue 168: the homelab's radio ------------------------------------------------------------------------
+@dataclass(frozen=True, slots=True)
+class RadioTrack:
+    title: str
+    artist: str | None = None
+    album: str | None = None
+    year: int | None = None
+    genre: str | None = None
+    cover_ref: str | None = None  # the station's own id of its cover, relayed by the portal
+    started_at: datetime | None = None
+    duration: float | None = None  # seconds
+    requested_by: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class RadioState:
+    station: str
+    on_air: bool
+    current: RadioTrack | None = None
+    upcoming: tuple[RadioTrack, ...] = ()
+    recent: tuple[RadioTrack, ...] = ()
+    host: str | None = None  # the DJ's name
+    tagline: str | None = None
+    listeners: int | None = None
+    mood: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class RadioRequest:
+    """A song asked for: ``pending`` while the DJ looks, then ``queued`` (with the track), ``failed``
+    (``detail`` says why), or ``unknown`` once the station forgot it."""
+
+    id: str | None
+    status: str
+    detail: str | None = None
+    track: RadioTrack | None = None
+
+
+@runtime_checkable
+class RadioStation(Protocol):
+    async def state(self) -> RadioState: ...
+
+    async def ask(self, text: str, name: str) -> RadioRequest:
+        """Ask the station's DJ for a song, a vibe or « more like this », credited to ``name``."""
+        ...
+
+    async def request_status(self, request_id: str) -> RadioRequest: ...
+
+    def listen(self) -> AbstractAsyncContextManager[StreamBody]:
+        """The live stream, relayed as it plays."""
+        ...
+
+    async def cover(self, cover_ref: str) -> bytes: ...
+
+
 # --- #21: reading in the portal --------------------------------------------------------------------------
 READING_FORMATS: tuple[str, ...] = ("epub", "pdf", "cbx")  # what the portal's reader opens
 
@@ -1049,6 +1105,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(STREAMING, MediaStreaming, "Play a title in the portal, transcoded by its service (027)"),
     _spec(AUDIO, MediaAudio, "Listen to an audiobook in the portal, relayed with byte ranges (#20)"),
     _spec(READING, MediaReading, "Read a book in the portal: EPUB, PDF, comic book archives (#21)"),
+    _spec(RADIO, RadioStation, "A radio station of the homelab: listen, what plays, ask for a song (168)"),
     _spec(CLEANUP, MediaCleanup, "Titles a cleanup tool will delete, and keeping one (#57)"),
     _spec(REQUEST_QUOTAS, RequestQuotas, "Each account's request limits on the request service (#3)"),
     _spec(REQUEST_DISCOVERY, RequestDiscovery, "Titles one can ask for: search, shelves, details (#4)"),

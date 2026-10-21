@@ -146,6 +146,7 @@ from portalab.modules.media.providers.widgets import (
 from portalab.modules.media.providers.widgets import (
     REQUESTS as REQUESTS_WIDGET,
 )
+from portalab.modules.media.radio import RADIO_WIDGET, RadioService, RadioWidget
 from portalab.modules.media.requests.discovery import RequestableCatalog
 from portalab.modules.media.requests.insights import RequestInsights
 from portalab.modules.media.requests.journey import RequestJourney
@@ -273,6 +274,7 @@ class MediaModule:
             database, capabilities, self.catalog, self.request_insights, clock=clock
         )
         self.cleanup = CleanupService(database, capabilities, clock=clock)  # #57: Maintainerr's deletions
+        self.radio = RadioService(capabilities)  # issue 168: the homelab's radio (SUB/WAVE)
         self.requestable = RequestableCatalog(database, capabilities)  # #4: what one can ask for (Seerr)
         self.moderation = RequestModeration(self.requests)  # #4: administrators approve or decline
         self.ai_tools = MediaAiTools(  # issue 171: offered to the assistant, with a title's journey
@@ -448,6 +450,7 @@ class MediaModule:
             (NEXT_RELEASES, NextReleasesWidget(self.database, self.upcoming, self.clock, self.enricher)),
             (POSTER_WALL, PosterWallWidget(self.database, self.insights, self.clock)),
             (SHUFFLE_WIDGET, ShuffleWidget(self.database, self.clock)),
+            (RADIO_WIDGET, RadioWidget(self.radio, self.clock)),
             (LIVING_WALL, LivingWallWidget(self.database, self.clock)),
             (SERVER_PLAYING, ServerPlayingWidget(self.database, self.clock, self.enricher)),
             (ON_THIS_DAY, OnThisDayWidget(self.database, self.clock, self.enricher)),

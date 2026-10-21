@@ -7926,6 +7926,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/radio": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Radio */
+        get: operations["radio_api_v1_media_radio_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/radio/covers/{cover_ref}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Radio Cover */
+        get: operations["radio_cover_api_v1_media_radio_covers__cover_ref__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/radio/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask Radio */
+        post: operations["ask_radio_api_v1_media_radio_requests_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/radio/requests/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Radio Request */
+        get: operations["radio_request_api_v1_media_radio_requests__request_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/read/{ticket}/pages/{file_ref}": {
         parameters: {
             query?: never;
@@ -15348,6 +15416,67 @@ export interface components {
         QuotaLimitsIn: {
             movie?: components["schemas"]["QuotaKindIn"];
             tv?: components["schemas"]["QuotaKindIn"];
+        };
+        /** RadioAskIn */
+        RadioAskIn: {
+            /** Text */
+            text: string;
+        };
+        /** RadioOut */
+        RadioOut: {
+            /** Available */
+            available: boolean;
+            current?: components["schemas"]["RadioTrackOut"] | null;
+            /** Host */
+            host?: string | null;
+            /** Listeners */
+            listeners?: number | null;
+            /** Mood */
+            mood?: string | null;
+            /**
+             * On Air
+             * @default false
+             */
+            on_air: boolean;
+            /** Recent */
+            recent?: components["schemas"]["RadioTrackOut"][];
+            /** Station */
+            station?: string | null;
+            /** Tagline */
+            tagline?: string | null;
+            /** Upcoming */
+            upcoming?: components["schemas"]["RadioTrackOut"][];
+        };
+        /** RadioRequestOut */
+        RadioRequestOut: {
+            /** Detail */
+            detail?: string | null;
+            /** Id */
+            id: string | null;
+            /** Status */
+            status: string;
+            track?: components["schemas"]["RadioTrackOut"] | null;
+        };
+        /** RadioTrackOut */
+        RadioTrackOut: {
+            /** Album */
+            album?: string | null;
+            /** Artist */
+            artist?: string | null;
+            /** Cover Ref */
+            cover_ref?: string | null;
+            /** Duration */
+            duration?: number | null;
+            /** Genre */
+            genre?: string | null;
+            /** Requested By */
+            requested_by?: string | null;
+            /** Started At */
+            started_at?: string | null;
+            /** Title */
+            title: string;
+            /** Year */
+            year?: number | null;
         };
         /** ReadOut */
         ReadOut: {
@@ -32487,6 +32616,119 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    radio_api_v1_media_radio_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RadioOut"];
+                };
+            };
+        };
+    };
+    radio_cover_api_v1_media_radio_covers__cover_ref__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cover_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ask_radio_api_v1_media_radio_requests_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RadioAskIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RadioRequestOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    radio_request_api_v1_media_radio_requests__request_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RadioRequestOut"];
+                };
             };
             /** @description Validation Error */
             422: {

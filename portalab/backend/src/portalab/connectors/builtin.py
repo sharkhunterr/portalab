@@ -11,6 +11,7 @@ from portalab.connectors.ollama import OllamaConnector
 from portalab.connectors.plex import PlexConnector
 from portalab.connectors.romm import RommConnector
 from portalab.connectors.seerr import SeerrConnector
+from portalab.connectors.subwave import SubwaveConnector
 from portalab.connectors.tautulli import TautulliConnector
 from portalab.connectors.tmdb import TmdbConnector
 from portalab.connectors.torrents import DelugeConnector, QBittorrentConnector
@@ -37,6 +38,7 @@ def builtin_connectors() -> list[Connector]:
         UnraidConnector(),  # #50: an Unraid server's array, disks, containers and updates
         MaintainerrConnector(),  # #57: the library's cleanup — what will be deleted, saving a title
         OllamaConnector(),  # issue 169: language models on the local network — the assistant's
+        SubwaveConnector(),  # issue 168: the homelab's radio — listen, what plays, ask for a song
     ]
 
 
