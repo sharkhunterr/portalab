@@ -1,15 +1,5 @@
 import { useId, useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { BarsChart, LinesChart } from "../../../design-system/charts/Charts";
 import { Button } from "../../../design-system/components/Button";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -44,31 +34,26 @@ export function StatChart({ result, viz, title }: { result: StatResult; viz: str
       </figcaption>
       {viz !== "number" && series.length ? (
         <div className="stat-chart__plot" aria-hidden="true">
-          <ResponsiveContainer width="100%" height={220}>
-            {viz === "bar" ? (
-              <BarChart data={series}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis dataKey="day" stroke="var(--color-text-muted)" />
-                <YAxis stroke="var(--color-text-muted)" />
-                <Tooltip />
-                <Bar dataKey="value" fill="var(--color-accent)" />
-              </BarChart>
-            ) : (
-              <LineChart data={series}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis dataKey="day" stroke="var(--color-text-muted)" />
-                <YAxis stroke="var(--color-text-muted)" />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke="var(--color-accent)"
-                  strokeDasharray="6 2"
-                  dot
-                />
-              </LineChart>
-            )}
-          </ResponsiveContainer>
+          {viz === "bar" ? (
+            <BarsChart
+              data={series}
+              x="day"
+              height={220}
+              legend={false}
+              format={(value) => format.number(value)}
+              series={[{ key: "value", label: title, color: "var(--color-accent)" }]}
+            />
+          ) : (
+            <LinesChart
+              data={series}
+              x="day"
+              area
+              height={220}
+              legend={false}
+              format={(value) => format.number(value)}
+              series={[{ key: "value", label: title, color: "var(--color-accent)" }]}
+            />
+          )}
         </div>
       ) : null}
       <Button

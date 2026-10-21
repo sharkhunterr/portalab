@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
 import { AdminTabs } from "../../../design-system/admin/AdminKit";
+import { BarsChart } from "../../../design-system/charts/Charts";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -177,24 +177,19 @@ export function PlaysByKind({
             <figure className="plays__chart">
               <figcaption>{t("gamification:plays.daily")}</figcaption>
               <div aria-hidden="true">
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={bars}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                    <XAxis dataKey="day" stroke="var(--color-text-muted)" fontSize={12} />
-                    <YAxis stroke="var(--color-text-muted)" fontSize={12} width={32} allowDecimals={false} />
-                    <Tooltip />
-                    {keys.map((key, index) => (
-                      <Bar
-                        key={key}
-                        dataKey={key}
-                        name={t(`gamification:sources.${key}`)}
-                        stackId="plays"
-                        fill={SOURCES[key]?.color ?? "var(--cal-other)"}
-                        radius={index === keys.length - 1 ? [3, 3, 0, 0] : 0}
-                      />
-                    ))}
-                  </BarChart>
-                </ResponsiveContainer>
+                <BarsChart
+                  data={bars}
+                  x="day"
+                  stacked
+                  height={220}
+                  legend={false}
+                  format={(value) => format.number(value)}
+                  series={keys.map((key) => ({
+                    key,
+                    label: t(`gamification:sources.${key}`),
+                    color: SOURCES[key]?.color ?? "var(--cal-other)",
+                  }))}
+                />
               </div>
             </figure>
           ) : null}

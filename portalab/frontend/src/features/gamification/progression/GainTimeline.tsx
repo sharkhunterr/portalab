@@ -94,38 +94,15 @@ export function GainTimeline({ days, cumulative = false }: { days: number; cumul
         <div aria-hidden="true">
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={shown} margin={{ top: 16, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-              <XAxis
-                dataKey="day"
-                tickFormatter={short}
-                stroke="var(--color-text-muted)"
-                fontSize={12}
-                minTickGap={24}
-              />
-              <YAxis
-                yAxisId="xp"
-                stroke="var(--color-text-muted)"
-                fontSize={12}
-                width={44}
-                tickFormatter={compact}
-              />
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="day" tickFormatter={short} fontSize={12} minTickGap={24} />
+              <YAxis yAxisId="xp" fontSize={12} width={44} tickFormatter={compact} />
               {cumulative ? null : (
-                <YAxis
-                  yAxisId="other"
-                  orientation="right"
-                  stroke="var(--color-text-muted)"
-                  fontSize={12}
-                  width={40}
-                  tickFormatter={compact}
-                />
+                <YAxis yAxisId="other" orientation="right" fontSize={12} width={40} tickFormatter={compact} />
               )}
               <Tooltip
                 labelFormatter={(value) => short(String(value))}
                 formatter={(value, name) => [format.number(Number(value)), name]}
-                contentStyle={{
-                  background: "var(--color-surface-raised)",
-                  border: "1px solid var(--color-border)",
-                }}
               />
               <Legend />
               {ups.map((up) => (

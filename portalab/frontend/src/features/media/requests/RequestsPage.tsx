@@ -88,12 +88,7 @@ function Funnel({ data }: { data: RequestInsights }) {
                 <Cell key={row.key} fill={`var(--req-${row.key})`} stroke="var(--color-surface)" />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{
-                background: "var(--color-surface-raised)",
-                border: "1px solid var(--color-border)",
-              }}
-            />
+            <Tooltip />
           </PieChart>
         </ResponsiveContainer>
         <span className="requests-funnel__center">
@@ -197,27 +192,14 @@ function OverTime({ data }: { data: RequestInsights }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={data.timeline.points} margin={{ top: 8, right: 8, bottom: 0, left: -20 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-        <XAxis
-          dataKey="date"
-          tickFormatter={label}
-          stroke="var(--color-text-muted)"
-          fontSize={12}
-          minTickGap={24}
-        />
-        <YAxis allowDecimals={false} stroke="var(--color-text-muted)" fontSize={12} />
-        <Tooltip
-          labelFormatter={(v) => label(String(v))}
-          contentStyle={{
-            background: "var(--color-surface-raised)",
-            border: "1px solid var(--color-border)",
-          }}
-        />
+        <CartesianGrid vertical={false} />
+        <XAxis dataKey="date" tickFormatter={label} fontSize={12} minTickGap={24} />
+        <YAxis allowDecimals={false} fontSize={12} />
+        <Tooltip labelFormatter={(v) => label(String(v))} />
         <Line
           type="monotone"
           dataKey="previous"
           name={t("media:myRequests.previous")}
-          stroke="var(--color-text-muted)"
           strokeDasharray="4 4"
           dot={false}
           isAnimationActive={false}
@@ -270,12 +252,7 @@ function Genres({ data }: { data: RequestInsights }) {
           fillOpacity={0.2}
           isAnimationActive={false}
         />
-        <Tooltip
-          contentStyle={{
-            background: "var(--color-surface-raised)",
-            border: "1px solid var(--color-border)",
-          }}
-        />
+        <Tooltip />
       </RadarChart>
     </ResponsiveContainer>
   );
