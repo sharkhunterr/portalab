@@ -76,7 +76,7 @@ export function StatusBanner({
     <section className="status-banner" data-tone={tone} role="status" aria-label={title}>
       <div className="status-banner__inner">
         <span className="status-banner__icon" aria-hidden="true">
-          <Icon name={icon} size={18} />
+          <Icon name={icon} size={14} />
         </span>
         <div className="status-banner__body">
           <p className="status-banner__head">
@@ -101,7 +101,7 @@ export function StatusBanner({
           aria-label={t("support:banner.close")}
           title={t("support:banner.close")}
         >
-          <Icon name="close" size={14} />
+          <Icon name="close" size={12} />
         </button>
       </div>
       {progress != null ? (
