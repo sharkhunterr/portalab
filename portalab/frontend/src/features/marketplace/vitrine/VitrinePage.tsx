@@ -3,10 +3,11 @@ import { Link, useNavigate, useSearchParams } from "react-router";
 import { CoinBadge } from "../../../design-system/components/Badges";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
-import { Drawer } from "../../../design-system/components/Overlays";
+import { Dialog, Drawer } from "../../../design-system/components/Overlays";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { EmptyState, Skeleton } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
+import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useProgression } from "../../gamification/api";
 import { type Product, useDescribe, useProduct, useProducts } from "../api";
@@ -84,7 +85,8 @@ function picks(coins: number): Record<Pick, (p: Product) => boolean> {
   };
 }
 
-/** A product as a tile: its art (which tells its kind, stock and level), rarity, kind, price or owned. */
+/** A product as a tile: its art (which tells its kind, stock and level), a ribbon when on sale, rarity, kind,
+ * price or owned. */
 function Tile({ product, onOpen }: { product: Product; onOpen: (p: Product) => void }) {
   const t = useT();
   const gear = useEquipment();
@@ -97,6 +99,7 @@ function Tile({ product, onOpen }: { product: Product; onOpen: (p: Product) => v
       data-rarity={rarity}
       data-owned={mine || undefined}
       data-soldout={soldOut(product) || undefined}
+      data-deal={product.discount && !mine ? "true" : undefined}
     >
       <Link
         to={`/marketplace/products/${product.key}`}
@@ -109,6 +112,12 @@ function Tile({ product, onOpen }: { product: Product; onOpen: (p: Product) => v
       >
         <span className="vitrine-tile__art">
           <LazyArt product={product} />
+          {product.discount && !mine && !soldOut(product) ? (
+            <span className="vitrine-deal" title={product.discount.name}>
+              <Icon name="flame" size={14} />
+              {t("marketplace:deal.percent", { percent: product.discount.percent })}
+            </span>
+          ) : null}
         </span>
         {soldOut(product) ? (
           <span className="vitrine-tile__flags">
@@ -222,12 +231,17 @@ function Spotlight({ items, onOpen }: { items: Product[]; onOpen: (p: Product) =
 function Rail({
   icon,
   title,
+  note,
+  tone,
   items,
   onAll,
   children,
 }: {
   icon: string;
   title: string;
+  /** a line under the title (the sale's campaigns and when they end) */
+  note?: string | undefined;
+  tone?: "deal" | undefined;
   items: Product[];
   onAll: () => void;
   children: (p: Product) => ReactNode;
@@ -238,13 +252,16 @@ function Rail({
     list.current?.scrollBy({ left: way * list.current.clientWidth * 0.85, behavior: "smooth" });
   if (!items.length) return null;
   return (
-    <section className="vitrine-rail" aria-label={title}>
+    <section className="vitrine-rail" data-tone={tone} aria-label={title}>
       <header className="vitrine-rail__head">
-        <h2>
-          <Icon name={icon} size={18} />
-          {title}
-          <span className="vitrine-count">{items.length}</span>
-        </h2>
+        <div className="vitrine-rail__title">
+          <h2>
+            <Icon name={icon} size={18} />
+            {title}
+            <span className="vitrine-count">{items.length}</span>
+          </h2>
+          {note ? <p>{note}</p> : null}
+        </div>
         <span className="vitrine-rail__nav">
           <button
             type="button"
@@ -274,18 +291,35 @@ function Rail({
   );
 }
 
-/** A product opened in a side panel: the same sheet and purchase as the classic shop, the browsing kept. */
+/** A phone's width: a product opens in a modal there, a side panel would be cramped. */
+function useNarrow(query = "(max-width: 40rem)"): boolean {
+  const [narrow, setNarrow] = useState(() => window.matchMedia?.(query).matches ?? false);
+  useEffect(() => {
+    const list = window.matchMedia?.(query);
+    if (!list) return;
+    const change = () => setNarrow(list.matches);
+    list.addEventListener("change", change);
+    return () => list.removeEventListener("change", change);
+  }, [query]);
+  return narrow;
+}
+
+/** A product opened in a side panel (a modal on a phone): the same sheet and purchase as the classic shop,
+ * the browsing kept. */
 function ProductPanel({ product, onClose }: { product: Product; onClose: () => void }) {
   const t = useT();
   const full = useProduct(product.key);
   const data = full.data ?? product;
+  const narrow = useNarrow();
   useEffect(() => {
     window.addEventListener(BOOSTER_EVENT, onClose);
     return () => window.removeEventListener(BOOSTER_EVENT, onClose);
   }, [onClose]);
+  const Panel = narrow ? Dialog : Drawer;
   return (
-    <Drawer
+    <Panel
       open
+      size="lg"
       onOpenChange={(open) => (open ? undefined : onClose())}
       title={data.name}
       closeLabel={t("marketplace:purchase.close")}
@@ -302,12 +336,13 @@ function ProductPanel({ product, onClose }: { product: Product; onClose: () => v
       <div className="vitrine-sheet">
         <ProductSheet product={data} />
       </div>
-    </Drawer>
+    </Panel>
   );
 }
 
 export default function VitrinePage() {
   const t = useT();
+  const format = useFormat();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const [q, setQ] = useState(params.get("q") ?? "");
@@ -391,6 +426,20 @@ export default function VitrinePage() {
     setParams(next, { replace: true });
   }, [wanted, products.data, params, setParams]);
 
+  // the sale: its campaigns and the soonest end
+  const discounts = all.filter(rule.deal).flatMap((p) => (p.discount ? [p.discount] : []));
+  const ends = discounts
+    .map((d) => (d.ends_at ? Date.parse(d.ends_at) : Number.NaN))
+    .filter((at) => !Number.isNaN(at))
+    .sort((a, b) => a - b)[0];
+  const sale = discounts.length
+    ? [
+        [...new Set(discounts.map((d) => d.name))].join(" · "),
+        ends ? t("marketplace:vitrine.dealEnds", { when: format.relative((ends - Date.now()) / 1000) }) : "",
+      ]
+        .filter(Boolean)
+        .join(" — ")
+    : undefined;
   const tile = (p: Product) => <Tile key={p.key} product={p} onOpen={setOpened} />;
   const spotlight = all
     .filter((p) => p.featured && !soldOut(p))
@@ -527,8 +576,8 @@ export default function VitrinePage() {
               <Spotlight items={spotlight} onOpen={setOpened} />
               {(
                 [
-                  ["afford", "wallet"],
                   ["deal", "flame"],
+                  ["afford", "wallet"],
                   ["soon", "hourglass"],
                   ["boosters", "sparkles"],
                   ["free", "gift"],
@@ -538,6 +587,8 @@ export default function VitrinePage() {
                   key={key}
                   icon={icon}
                   title={t(`marketplace:vitrine.pick.${key}`)}
+                  tone={key === "deal" ? "deal" : undefined}
+                  note={key === "deal" ? sale : undefined}
                   items={all.filter(rule[key]).sort(key === "afford" ? ORDER.priceDesc : ORDER.recommended)}
                   onAll={() => set({ pick: key })}
                 >
