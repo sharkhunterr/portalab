@@ -790,8 +790,10 @@
   display: grid;
   gap: var(--space-3);
 }
+/* the kinds of feedback: three compact tiles side by side, even on a phone */
 .feedback-kinds {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr));
+  gap: var(--space-2);
 }
 .feedback-request,
 .feedback-mine__item,
@@ -820,11 +822,13 @@
 }
 .feedback-kind {
   inline-size: 100%;
+  block-size: 100%;
   display: flex;
-  gap: var(--space-3);
+  flex-direction: column;
+  gap: var(--space-2);
   align-items: flex-start;
   text-align: start;
-  padding: var(--space-4);
+  padding: var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-surface-raised);
@@ -856,6 +860,10 @@
   display: grid;
   gap: 0.125rem;
 }
+.feedback-kind__text .admin-muted {
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
+}
 .feedback-answer {
   display: grid;
   gap: var(--space-2);
@@ -870,33 +878,197 @@
   justify-content: flex-end;
   gap: var(--space-2);
 }
-.feedback-mine__head,
 .feedback-card__who {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
 }
-.feedback-mine__text {
-  margin: var(--space-2) 0 0;
-  overflow-wrap: anywhere;
+/* my feedback: my words first, in the kind's colour; where it is; the team's reply as a message under it */
+.feedback-block__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
 }
-.feedback-reply {
-  margin: var(--space-3) 0 0;
-  padding: var(--space-3);
-  border-inline-start: 3px solid var(--color-accent);
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
-  display: grid;
-  gap: var(--space-1);
+.feedback-block__head > h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
 }
-.feedback-reply__who {
+.feedback-filter {
+  display: inline-flex;
+  margin: 0;
+  min-inline-size: 0;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+}
+.feedback-filter button {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
+  padding: 0.3rem 0.7rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.feedback-filter button[aria-pressed="true"] {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.feedback-filter button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.feedback-filter__count {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  opacity: 0.8;
+}
+.feedback-mine__item {
+  --kind: var(--color-accent);
+  display: grid;
+  gap: var(--space-3);
+  border-inline-start: 3px solid var(--kind);
+}
+.feedback-mine__item[data-kind="bug_report"] {
+  --kind: var(--cal-incident);
+}
+.feedback-mine__item[data-kind="feature_request"] {
+  --kind: var(--cal-event);
+}
+.feedback-mine__item[data-kind="survey"] {
+  --kind: var(--rarity-legendary);
+}
+.feedback-mine__mine {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+.feedback-mine__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--kind) 16%, transparent);
+  color: var(--kind);
+}
+.feedback-mine__body {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+.feedback-mine__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.feedback-mine__meta > span:first-child {
+  color: var(--kind);
+  font-weight: var(--font-weight-semibold);
+}
+.feedback-mine__text {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+.feedback-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+.feedback-steps li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.feedback-steps li + li::before {
+  content: "";
+  inline-size: 1rem;
+  block-size: 1px;
+  margin-inline-end: 0.2rem;
+  background: var(--color-border);
+}
+.feedback-steps__dot {
+  display: grid;
+  place-items: center;
+  inline-size: 0.95rem;
+  block-size: 0.95rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+.feedback-steps li[data-done] {
+  color: var(--color-text);
+}
+.feedback-steps li[data-done] .feedback-steps__dot {
+  border-color: var(--state-available-fg);
+  background: var(--state-available-fg);
+  color: var(--color-surface);
+}
+.feedback-steps[data-outcome="dismissed"] li[data-step="read"] .feedback-steps__dot {
+  border-color: var(--color-text-muted);
+  background: var(--color-text-muted);
+}
+.feedback-reply {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  margin-inline-start: calc(2.25rem + var(--space-3));
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border-start-start-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+}
+.feedback-reply__who {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   color: var(--color-accent);
+}
+.feedback-reply__who time {
+  color: var(--color-text-muted);
+  font-weight: normal;
+}
+.feedback-reply__who time::before {
+  content: "· ";
+}
+.feedback-reply__text {
+  margin: 0;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+@media (max-width: 40rem) {
+  .feedback-reply {
+    margin-inline-start: 0;
+  }
 }
 .feedback-card {
   padding: 0;
