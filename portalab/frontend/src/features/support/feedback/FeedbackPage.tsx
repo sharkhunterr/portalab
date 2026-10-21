@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useId, useState } from "react";
 import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
-import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
@@ -98,12 +97,131 @@ function Answer({ form, onDone }: { form: Form; onDone: () => void }) {
   );
 }
 
-const STATUS_TONE: Record<string, "ok" | "info" | "neutral" | "warn"> = {
-  new: "info",
-  reviewed: "ok",
-  converted: "ok",
-  dismissed: "neutral",
-};
+type Filter = "all" | "waiting" | "answered";
+const FILTERS: Filter[] = ["all", "waiting", "answered"];
+
+/** Where a feedback is: sent, read by the team (or taken up, or set aside), answered. */
+function Steps({ item }: { item: Mine }) {
+  const t = useT();
+  const read = item.status !== "new";
+  const outcome =
+    item.status === "converted" || item.status === "dismissed" ? item.status : read ? "reviewed" : null;
+  const steps = [
+    { key: "sent", done: true, label: t("support:feedback.step.sent") },
+    {
+      key: "read",
+      done: read,
+      label: outcome ? t(`support:feedback.status.${outcome}`) : t("support:feedback.step.read"),
+    },
+    { key: "answered", done: Boolean(item.reply), label: t("support:feedback.step.answered") },
+  ];
+  return (
+    <ol className="feedback-steps" aria-label={t("support:feedback.step.label")} data-outcome={outcome}>
+      {steps.map((step) => (
+        <li key={step.key} data-done={step.done || undefined} data-step={step.key}>
+          <span className="feedback-steps__dot" aria-hidden="true">
+            {step.done ? <Icon name="check" size={10} /> : null}
+          </span>
+          {step.label}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/**
+ * My feedback (027): what I sent, said in my own words first — the kind's icon and colour, when, where it
+ * is (sent → read → answered) and the team's reply as a message under mine; a filter keeps the ones still
+ * waiting or the answered ones.
+ */
+function MyFeedback({
+  items,
+  labels,
+  headingId,
+}: {
+  items: Mine[] | undefined;
+  labels: Map<string, string>;
+  headingId: string;
+}) {
+  const t = useT();
+  const format = useFormat();
+  const [filter, setFilter] = useState<Filter>("all");
+  const all = items ?? [];
+  const count: Record<Filter, number> = {
+    all: all.length,
+    waiting: all.filter((i) => !i.reply).length,
+    answered: all.filter((i) => i.reply).length,
+  };
+  const shown = all.filter((i) => (filter === "all" ? true : filter === "answered" ? i.reply : !i.reply));
+  const ago = (at: string) => format.relative((Date.parse(at) - Date.now()) / 1000);
+  return (
+    <section className="feedback-block" aria-labelledby={headingId}>
+      <div className="feedback-block__head">
+        <h3 id={headingId}>
+          <Icon name="inbox" size={18} /> {t("support:feedback.mine")}
+        </h3>
+        {all.length ? (
+          <fieldset className="feedback-filter" aria-label={t("support:feedback.filter.label")}>
+            {FILTERS.map((key) => (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={filter === key}
+                onClick={() => setFilter(key)}
+                disabled={key !== "all" && !count[key]}
+              >
+                {t(`support:feedback.filter.${key}`)}
+                <span className="feedback-filter__count">{count[key]}</span>
+              </button>
+            ))}
+          </fieldset>
+        ) : null}
+      </div>
+      {items && !items.length ? <p className="admin-muted">{t("support:feedback.mineEmpty")}</p> : null}
+      <ul className="feedback-mine">
+        {shown.map((item) => {
+          const first = Object.values(item.payload).find((v) => typeof v === "string" && v.trim()) as
+            | string
+            | undefined;
+          const label = item.form_label ?? labels.get(item.form_key) ?? item.form_key;
+          return (
+            <li key={item.id} className="feedback-mine__item" data-kind={item.kind}>
+              <div className="feedback-mine__mine">
+                <span className="feedback-mine__icon" aria-hidden="true">
+                  <Icon name={KIND_ICONS[item.kind] ?? "message"} size={18} />
+                </span>
+                <div className="feedback-mine__body">
+                  <p className="feedback-mine__meta">
+                    <span>{label}</span>
+                    <span aria-hidden="true">·</span>
+                    <time dateTime={item.created_at} title={format.dateTime(item.created_at)}>
+                      {ago(item.created_at)}
+                    </time>
+                  </p>
+                  <p className="feedback-mine__text">{first ?? label}</p>
+                  <Steps item={item} />
+                </div>
+              </div>
+              {item.reply ? (
+                <div className="feedback-reply">
+                  <p className="feedback-reply__who">
+                    <Icon name="message" size={14} /> {t("support:feedback.teamReply")}
+                    {item.replied_at ? (
+                      <time dateTime={item.replied_at} title={format.dateTime(item.replied_at)}>
+                        {ago(item.replied_at)}
+                      </time>
+                    ) : null}
+                  </p>
+                  <p className="feedback-reply__text">{item.reply}</p>
+                </div>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
 
 /**
  * Feedback (spec 016 T030; 027 redesign): first what the team **asks** (requests open now, answered once),
@@ -209,43 +327,7 @@ export function FeedbackPage() {
           ))}
       </section>
 
-      <section className="feedback-block" aria-labelledby={`${headingId}-mine`}>
-        <h3 id={`${headingId}-mine`}>
-          <Icon name="inbox" size={18} /> {t("support:feedback.mine")}
-        </h3>
-        {mine.data && !mine.data.length ? (
-          <p className="admin-muted">{t("support:feedback.mineEmpty")}</p>
-        ) : null}
-        <ul className="feedback-mine">
-          {(mine.data ?? []).map((item) => {
-            const first = Object.values(item.payload).find((v) => typeof v === "string") as
-              | string
-              | undefined;
-            return (
-              <li key={item.id} className="feedback-mine__item">
-                <div className="feedback-mine__head">
-                  <strong>{labels.get(item.form_key) ?? item.form_key}</strong>
-                  <StatusBadge tone={STATUS_TONE[item.status] ?? "neutral"}>
-                    {t(`support:feedback.status.${item.status}`)}
-                  </StatusBadge>
-                  <span className="admin-muted">
-                    {format.relative((Date.parse(item.created_at) - Date.now()) / 1000)}
-                  </span>
-                </div>
-                {first ? <p className="feedback-mine__text">{first}</p> : null}
-                {item.reply ? (
-                  <blockquote className="feedback-reply">
-                    <span className="feedback-reply__who">
-                      <Icon name="message" size={14} /> {t("support:feedback.teamReply")}
-                    </span>
-                    {item.reply}
-                  </blockquote>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+      <MyFeedback items={mine.data} labels={labels} headingId={`${headingId}-mine`} />
     </section>
   );
 }
