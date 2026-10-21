@@ -13,7 +13,15 @@ from uuid import UUID
 from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
 from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
-from portalab.capabilities.media import RADIO, RadioRequest, RadioStation, RadioTrack, StreamBody
+from portalab.capabilities.media import (
+    RADIO,
+    RadioRequest,
+    RadioState,
+    RadioStation,
+    RadioTrack,
+    StreamBody,
+    unwrap,
+)
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.errors import PortalError, Unavailable
@@ -74,7 +82,7 @@ class RadioService:
         if station is None:
             return {"available": False}
         try:
-            state = await station.state()
+            state: RadioState = unwrap(await station.state())  # wrapped by the capability layer
         except Exception as exc:
             raise RadioUnavailable("The radio does not answer right now.") from exc
         return {
@@ -109,14 +117,14 @@ class RadioService:
             )
         self._asked[user] = now
         try:
-            answer = await station.ask(text.strip()[:280], await self._name(user))
+            answer = unwrap(await station.ask(text.strip()[:280], await self._name(user)))
         except Exception as exc:
             raise RadioUnavailable("The radio does not answer right now.") from exc
         return request_out(answer)
 
     async def request_status(self, request_id: str) -> dict[str, Any]:
         try:
-            return request_out(await self._station().request_status(request_id))
+            return request_out(unwrap(await self._station().request_status(request_id)))
         except RadioUnavailable:
             raise
         except Exception as exc:
@@ -138,7 +146,8 @@ class RadioService:
 
     async def cover(self, cover_ref: str) -> bytes:
         try:
-            return await self._station().cover(cover_ref)
+            data: bytes = unwrap(await self._station().cover(cover_ref))
+            return data
         except RadioUnavailable:
             raise
         except Exception as exc:
