@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
@@ -248,6 +248,7 @@ function ShelfView({
 
 export default function CatalogPage() {
   const t = useT();
+  const navigate = useNavigate();
   const describe = useDescribe();
   const [params, setParams] = useSearchParams();
   const type = params.get("type") ?? ""; // « in the shop » links land on one type
@@ -294,6 +295,12 @@ export default function CatalogPage() {
         icon="shop"
         title={t("marketplace:catalog.title")}
         context={t("marketplace:catalog.intro")}
+        // trial: the showcase, another way through the shop (features/marketplace/vitrine)
+        primary={{
+          label: t("marketplace:vitrine.try"),
+          icon: "store",
+          onSelect: () => navigate("/marketplace/vitrine"),
+        }}
       />
 
       <nav className="shop-departments" aria-label={t("marketplace:shop.departments")}>

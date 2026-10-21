@@ -81,6 +81,7 @@ const Catalog = lazy(() => import("../../features/marketplace/catalog/CatalogPag
 const ProductRoute = lazy(() => import("../../features/marketplace/product/ProductRoute"));
 const Owned = lazy(() => import("../../features/marketplace/owned/OwnedPage"));
 const Reserve = lazy(() => import("../../features/marketplace/reserve/ReservePage"));
+const Vitrine = lazy(() => import("../../features/marketplace/vitrine/VitrinePage")); // trial: easy to remove
 const MarketplaceAdmin = lazy(() => import("../../features/marketplace/admin/MarketplaceAdmin"));
 const ThemeStudio = lazy(() => import("../../features/appearance/studio/ThemeStudio"));
 const ChartGallery = lazy(() => import("../../features/appearance/charts/ChartGallery")); // issue 117
@@ -134,6 +135,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { index: true, element: <Catalog /> },
             { path: "owned", element: <Owned />, handle: h({ crumb: "My products" }) },
             { path: "reserve", element: <Reserve />, handle: h({ crumb: "My reserve" }) },
+            { path: "vitrine", element: <Vitrine />, handle: h({ crumb: "Showcase" }) }, // trial
             {
               path: "products/:key",
               element: <ProductRoute />,
