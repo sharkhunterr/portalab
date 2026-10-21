@@ -483,6 +483,86 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* --- a sale: a ribbon on the tile, its new price in the sale's colour, the sale's row set apart ----------- */
+.vitrine-tile[data-deal] {
+  --deal: var(--cal-incident);
+}
+.vitrine-tile[data-deal] .vitrine-tile__open {
+  border-color: color-mix(in srgb, var(--deal) 55%, var(--color-border));
+}
+.vitrine-tile[data-deal] .vitrine-tile__open:hover,
+.vitrine-tile[data-deal] .vitrine-tile__open:focus-visible {
+  border-color: var(--deal);
+  box-shadow:
+    var(--shadow-3),
+    0 10px 30px -12px color-mix(in srgb, var(--deal) 80%, transparent);
+}
+.vitrine-deal {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.3rem 0.6rem 0.3rem 0.7rem;
+  border-end-start-radius: var(--radius-lg);
+  background: linear-gradient(
+    135deg,
+    var(--deal),
+    color-mix(in srgb, var(--deal) 70%, var(--rarity-legendary))
+  );
+  box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--deal) 90%, transparent);
+  color: var(--color-accent-contrast);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-bold, 700);
+  letter-spacing: 0.01em;
+}
+/* the ribbon tells the percentage: the price keeps the struck one and the new one, in the sale's colour */
+.vitrine-tile .price-deal__badge {
+  display: none;
+}
+.vitrine-tile[data-deal] .price-deal .ds-coins {
+  border-color: color-mix(in srgb, var(--deal) 60%, transparent);
+  background: color-mix(in srgb, var(--deal) 22%, var(--color-surface));
+}
+.vitrine-tile[data-deal] .price-deal__was {
+  color: var(--color-text-muted);
+}
+
+.vitrine-rail__title {
+  display: grid;
+  gap: 0.1rem;
+  min-inline-size: 0;
+}
+.vitrine-rail__title p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.vitrine-rail[data-tone="deal"] {
+  --deal: var(--cal-incident);
+  padding: var(--space-3) var(--space-3) var(--space-1);
+  border: 1px solid color-mix(in srgb, var(--deal) 45%, var(--color-border));
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(28rem 10rem at 0% 0%, color-mix(in srgb, var(--deal) 30%, transparent), transparent 70%),
+    radial-gradient(
+      20rem 10rem at 100% 0%,
+      color-mix(in srgb, var(--rarity-legendary) 18%, transparent),
+      transparent
+    ),
+    color-mix(in srgb, var(--color-surface-raised) 85%, transparent);
+}
+.vitrine-rail[data-tone="deal"] .vitrine-rail__head h2 > .ds-icon {
+  color: var(--deal);
+}
+.vitrine-rail[data-tone="deal"] .vitrine-rail__title p {
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+}
+
 /* --- browsing: shelves, sort and filters, the grid --------------------------------------------------------- */
 .vitrine-browse {
   display: grid;
