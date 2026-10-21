@@ -9,6 +9,7 @@ import { EmptyState, Skeleton } from "../../../design-system/components/Placehol
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { HdTag, isHdProduct } from "../../appearance/Rarity";
 import { useProgression } from "../../gamification/api";
 import { type Product, useDescribe, useProduct, useProducts } from "../api";
 import { BOOSTER_EVENT } from "../boosters/api";
@@ -44,6 +45,7 @@ const RARITIES = ["common", "rare", "epic", "legendary"] as const;
 const RANK: Record<string, number> = { legendary: 0, epic: 1, rare: 2, common: 3 };
 const SORTS = ["recommended", "priceAsc", "priceDesc", "rarity", "name"] as const;
 const ONLY = ["afford", "unowned", "deal"] as const;
+const RENDERS = ["hd", "standard"] as const; // drawn by the graphics chip (HD) or not
 const PAGE = 24;
 const RAIL = 12;
 
@@ -127,7 +129,10 @@ function Tile({ product, onOpen }: { product: Product; onOpen: (p: Product) => v
         <span className="vitrine-tile__meta">
           <span className="vitrine-tile__kind">
             <span className="vitrine-tile__gem" aria-hidden="true" />
-            {t(`marketplace:rarity.${rarity}`)} · {productTypeLabel(t, product.type)}
+            {isHdProduct(product) ? <HdTag /> : null}
+            <span className="vitrine-tile__kindtext">
+              {t(`marketplace:rarity.${rarity}`)} · {productTypeLabel(t, product.type)}
+            </span>
           </span>
           <strong className="vitrine-tile__name">{product.name}</strong>
           <span className="vitrine-tile__price">
@@ -407,7 +412,8 @@ export default function VitrinePage() {
   }, [all, departments]);
   const affordable = all.filter(rule.afford).length;
 
-  const listed = useMemo(
+  const render = params.get("hd") ?? "";
+  const scoped = useMemo(
     () =>
       all
         .filter((p) => !department || departmentOfProduct(p, departments) === department.key)
@@ -420,6 +426,8 @@ export default function VitrinePage() {
         .sort(ORDER[sort]),
     [all, department, departments, shelf, pick, rarity, only, sort, rule],
   );
+  const renders = { hd: scoped.filter(isHdProduct), standard: scoped.filter((p) => !isHdProduct(p)) };
+  const listed = render === "hd" || render === "standard" ? renders[render] : scoped;
 
   // a product sheet asked for from elsewhere (« ?product=key »)
   const wanted = params.get("product");
@@ -689,6 +697,21 @@ export default function VitrinePage() {
                     </button>
                   ))}
                 </fieldset>
+                <fieldset className="vitrine-chips" aria-label={t("marketplace:vitrine.render")}>
+                  {RENDERS.map((kind) => (
+                    <button
+                      key={kind}
+                      type="button"
+                      aria-pressed={render === kind}
+                      disabled={!renders[kind].length && render !== kind}
+                      onClick={() => set({ hd: render === kind ? null : kind })}
+                    >
+                      <Icon name={kind === "hd" ? "cpu" : "image"} size={14} />
+                      {t(`marketplace:vitrine.renders.${kind}`)}
+                      <span className="vitrine-count">{renders[kind].length}</span>
+                    </button>
+                  ))}
+                </fieldset>
                 <fieldset className="vitrine-chips" aria-label={t("marketplace:vitrine.filters")}>
                   {ONLY.map((flag) => (
                     <button
@@ -724,7 +747,7 @@ export default function VitrinePage() {
                       variant="secondary"
                       onClick={() => {
                         setQ("");
-                        set({ r: null, only: null, pick: null, sort: null });
+                        set({ r: null, only: null, pick: null, sort: null, hd: null });
                       }}
                     >
                       {t("marketplace:shop.reset")}

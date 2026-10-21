@@ -442,6 +442,14 @@
   gap: 0.2rem;
   padding: var(--space-2) var(--space-3) var(--space-3);
 }
+.vitrine-tile__kind .hd-tag {
+  flex: none;
+}
+.vitrine-tile__kindtext {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .vitrine-tile__kind {
   display: flex;
   align-items: center;
@@ -621,6 +629,10 @@
 }
 .vitrine-chips > button:hover {
   border-color: var(--color-accent);
+}
+.vitrine-chips > button:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 .vitrine-chips > button[aria-pressed="true"] {
   border-color: var(--color-accent);
