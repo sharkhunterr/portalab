@@ -94,6 +94,8 @@ interface Common {
   format?: ((value: number) => string) | undefined;
   /** the categories or days on the axis */
   xFormat?: ((value: string) => string) | undefined;
+  /** the values on the Y axis, kept short (« 1.5 h »); compact numbers by default */
+  yFormat?: ((value: number) => string) | undefined;
   legend?: boolean | undefined;
 }
 
@@ -120,6 +122,7 @@ export function BarsChart({
   height = 240,
   format = same,
   xFormat,
+  yFormat = compact,
   legend = series.length > 1,
   xAxis = true,
   yAxis = true,
@@ -167,7 +170,7 @@ export function BarsChart({
               hide={!xAxis}
               {...(xFormat ? { tickFormatter: xFormat } : {})}
             />
-            <YAxis width={44} tickFormatter={compact} hide={!yAxis} />
+            <YAxis width={44} tickFormatter={yFormat} hide={!yAxis} />
           </>
         )}
         {tooltip(format, xFormat)}
@@ -193,6 +196,7 @@ export function LinesChart({
   height = 240,
   format = same,
   xFormat,
+  yFormat = compact,
   legend = series.length > 1,
   xAxis = true,
   yAxis = true,
@@ -225,7 +229,7 @@ export function LinesChart({
         ) : null}
         {grid ? <CartesianGrid vertical={false} /> : null}
         <XAxis dataKey={x} minTickGap={24} hide={!xAxis} {...(xFormat ? { tickFormatter: xFormat } : {})} />
-        <YAxis width={44} tickFormatter={compact} hide={!yAxis} />
+        <YAxis width={44} tickFormatter={yFormat} hide={!yAxis} />
         {tooltip(format, xFormat)}
         {legend ? focusLegend(active, pick) : null}
         {children}

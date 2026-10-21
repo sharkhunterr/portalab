@@ -63,9 +63,8 @@ function MyTicketsWidget(props: WidgetProps) {
       ) : null}
       <WidgetHeaderLink to="/support" label={t("support:widget.my_tickets.all")} />
       {items.length ? (
-        <div className="widget-carousel">
-          <ListTemplate {...props} />
-        </div>
+        // a list, as « Latest news »: the tickets one under the other, as many as the block holds
+        <ListTemplate {...props} />
       ) : (
         <p className="widget-empty" data-state="no-data">
           <Icon name="lifebuoy" size={28} />

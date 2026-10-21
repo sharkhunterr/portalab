@@ -315,6 +315,7 @@
   font: inherit;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
   cursor: pointer;
   transition: transform var(--motion-duration-fast) var(--motion-easing);
 }
@@ -802,11 +803,6 @@
   min-block-size: 0;
   overflow: hidden;
 }
-@container (max-height: 9rem) {
-  .widget-media-stats__chart {
-    display: none;
-  }
-}
 /* issue 118: the figures as tiles across the whole width, their size following the block */
 .widget-media-stats__figures {
   display: grid;
@@ -893,6 +889,25 @@
 .widget-row > a:hover,
 .widget-row > a:focus-visible {
   background: color-mix(in srgb, var(--color-text) 6%, transparent);
+}
+/* a narrow block (a quarter tile): a row's state goes under its title, the title keeps the width */
+@container (max-width: 18rem) {
+  .widget-row > :is(a, span):has(> .status-badge) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    row-gap: 0.3rem;
+  }
+  .widget-row > :is(a, span) > .widget-row__thumb {
+    grid-row: 1 / 3;
+  }
+  .widget-row > :is(a, span) > .status-badge {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+  }
+  .widget-row > :is(a, span):has(> .status-badge) > .widget-row__chevron {
+    grid-column: 3;
+    grid-row: 1 / 3;
+  }
 }
 .widget-row__thumb {
   display: grid;
@@ -2424,28 +2439,8 @@ html[data-motion="none"] .widget-shuffle__track {
   cursor: pointer;
 }
 
-/* a widget on one column: its list becomes a carousel — one card at a time, the next one peeking, swiped */
+/* a widget on one column: « continue » becomes a carousel — one card at a time, the next one peeking */
 @container (max-width: 26rem) {
-  .widget-carousel > .widget-rows {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 86%;
-    gap: var(--space-2);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-block-end: var(--scroller-gap);
-  }
-  .widget-frame__body .widget-carousel > .widget-rows > li,
-  .widget-frame__body .widget-carousel > .widget-rows > li[data-overflow] {
-    visibility: visible;
-    scroll-snap-align: start;
-  }
-  .widget-carousel > .widget-rows .widget-row > a,
-  .widget-carousel > .widget-rows .widget-row > span {
-    block-size: 100%;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-  }
   .widget-continue {
     grid-auto-columns: 86%;
     scroll-snap-type: x mandatory;

@@ -31,24 +31,30 @@ export default function MediaStatsChart({
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
-  // issue 117: the chart follows its block — below 90 px high, the dates give way to the bars
+  // issue 117: the chart follows its block — its axes from 70 px high, its legend from 110 px (issue 185)
   const box = useRef<HTMLDivElement>(null);
-  const [tall, setTall] = useState(true);
+  const [height, setHeight] = useState(200);
   useEffect(() => {
     const element = box.current;
     if (!element || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(([entry]) => setTall((entry?.contentRect.height ?? 0) >= 90));
+    const observer = new ResizeObserver(([entry]) => setHeight(entry?.contentRect.height ?? 0));
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
+  const axes = height >= 70;
+  const legend = height >= 110;
   const value = (p: { seconds: number; plays: number }) =>
     metric === "time" ? Math.round((p.seconds / 3600) * 10) / 10 : p.plays;
+  // the axis says its unit: « 1.5 h » (the hours in the viewer's language), a count of plays as is
+  const tick = (n: number) => (metric === "time" ? format.hours(n) : format.number(n));
   const show = (n: number) =>
     metric === "time" ? measures.duration(n * 3600) : t("media:insights.plays", { count: n });
-  const label = (iso: string) =>
-    unit === "month"
-      ? new Date(iso).toLocaleDateString(undefined, { month: "short" })
-      : format.date(iso, "short");
+  // the axis keeps its dates short: the day and the month (the whole date in the tooltip)
+  const label = (iso: string) => {
+    if (unit === "month") return new Date(iso).toLocaleDateString(undefined, { month: "short" });
+    const { day, month } = format.dayMonth(iso);
+    return `${day} ${month}`;
+  };
   if (chart === "donut") {
     const items = byKind.map((k) => ({ label: t(`media:insights.kind.${k.kind}`), value: value(k) }));
     return (
@@ -61,7 +67,7 @@ export default function MediaStatsChart({
   const series = [
     {
       key: "value",
-      label: t(metric === "time" ? "media:insights.metric.time" : "media:insights.metric.plays"),
+      label: t(metric === "time" ? "media:widget.stats.hours" : "media:insights.metric.plays"),
     },
   ];
   return (
@@ -73,11 +79,12 @@ export default function MediaStatsChart({
           series={series}
           area
           height="100%"
-          yAxis={false}
-          grid={false}
-          legend={false}
-          xAxis={tall}
+          yAxis={axes}
+          grid={axes}
+          legend={legend}
+          xAxis={axes}
           xFormat={label}
+          yFormat={tick}
           format={show}
         />
       ) : (
@@ -86,11 +93,12 @@ export default function MediaStatsChart({
           x="date"
           series={series}
           height="100%"
-          yAxis={false}
-          grid={false}
-          legend={false}
-          xAxis={tall}
+          yAxis={axes}
+          grid={axes}
+          legend={legend}
+          xAxis={axes}
           xFormat={label}
+          yFormat={tick}
           format={show}
         />
       )}
