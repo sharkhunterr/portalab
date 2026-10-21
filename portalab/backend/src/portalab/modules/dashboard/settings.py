@@ -19,50 +19,118 @@ POLICY_CLASSES: tuple[str, ...] = (
     "disabled",
 )
 
-# 027: what matters to everyone sits pinned on the first row — incidents and the current campaign, one line
-# each
+# 027: what matters to everyone sits pinned on the first row — incidents and the current campaign; issue 186:
+# a quarter each, my level and today's objectives beside them
 DEFAULT_POLICIES: dict[str, dict[str, Any]] = {
     "support.open_incidents": {
         "class": "pinned",
         "x": 0,
         "y": 0,
-        "w": 6,
+        "w": 3,
         "h": 1,
         "move": True,
         "resize": True,
     },
-    "campaigns.active": {"class": "pinned", "x": 6, "y": 0, "w": 6, "h": 1},
+    "campaigns.active": {"class": "pinned", "x": 3, "y": 0, "w": 3, "h": 1},
 }
 
 # 027: a first visit — free widgets only (nothing to buy first), in rows of 12 columns that fit together
 # (each row's widgets share a height; widgets a member cannot use yet are skipped). Issue 12: what matters
 # first, then the rest; what can be empty for a newcomer hides until it fills up (« _hide_empty ») and its
-# neighbour takes its place; the small tiles take a quarter of a row on a computer — two side by side on a
-# phone (a phone halves what is a quarter or less), the lists keep half or all of it. Under the pinned line
-# (incidents · campaign):
+# neighbour takes its place. Issue 186: the administrator's own arrangement, kept as the default — on a
+# computer the rows below, on a tablet (8 columns) and a phone (4) each widget's place of its own
+# (``_on``: x, y, w, h), the pinned incidents and campaign derived on the first row of each.
+
+
+def _on(*, phone: tuple[int, int, int, int], tablet: tuple[int, int, int, int]) -> dict[str, Any]:
+    """A starter widget's places on a phone and a tablet (x, y, w, h)."""
+    return {
+        view: dict(zip(("x", "y", "w", "h"), at, strict=True))
+        for view, at in (("phone", phone), ("tablet", tablet))
+    }
+
+
 DEFAULT_STARTER: list[dict[str, Any]] = [
-    # a glance: shortcuts, my level, today's objectives
-    {"widget_key": "dashboard.welcome", "w": 6, "h": 1},
-    {"widget_key": "gamification.progress", "w": 3, "h": 1},
-    {"widget_key": "gamification.daily_objectives", "w": 3, "h": 1},
+    # a glance: my level, today's objectives (beside the pinned incidents and campaign), then the shortcuts
+    {"widget_key": "gamification.progress", "w": 3, "h": 1, **_on(phone=(0, 1, 2, 1), tablet=(0, 1, 4, 1))},
+    {
+        "widget_key": "gamification.daily_objectives",
+        "w": 3,
+        "h": 1,
+        **_on(phone=(2, 1, 2, 1), tablet=(4, 1, 4, 1)),
+    },
+    {"widget_key": "dashboard.welcome", "w": 12, "h": 1, **_on(phone=(0, 2, 4, 1), tablet=(0, 2, 8, 1))},
     # for me now: what I was watching, what is new for me, a title drawn at random
-    {"widget_key": "media.continue", "w": 12, "h": 3, "config": {"_hide_empty": True}},
-    {"widget_key": "dashboard.since_last_visit", "w": 8, "h": 3},
-    {"widget_key": "media.shuffle", "w": 4, "h": 3, "config": {"_hide_empty": True}},
-    # issue 185: the calendar high up and roomy — this week and what comes
-    {"widget_key": "calendar.month", "w": 12, "h": 6},  # the whole month
-    {"widget_key": "media.recently_added", "w": 12, "h": 3, "config": {"_hide_empty": True}},
+    {
+        "widget_key": "media.continue",
+        "w": 12,
+        "h": 3,
+        "config": {"_hide_empty": True},
+        **_on(phone=(0, 3, 4, 3), tablet=(0, 3, 8, 3)),
+    },
+    {
+        "widget_key": "dashboard.since_last_visit",
+        "w": 8,
+        "h": 3,
+        **_on(phone=(0, 6, 4, 3), tablet=(0, 6, 8, 3)),
+    },
+    {
+        "widget_key": "media.shuffle",
+        "w": 4,
+        "h": 3,
+        "config": {"_hide_empty": True},
+        **_on(phone=(0, 9, 4, 3), tablet=(0, 9, 4, 3)),
+    },
+    # issue 185: the calendar high up and roomy — the whole month
+    {"widget_key": "calendar.month", "w": 12, "h": 6, **_on(phone=(0, 12, 4, 6), tablet=(0, 12, 8, 6))},
+    {
+        "widget_key": "media.recently_added",
+        "w": 12,
+        "h": 3,
+        "config": {"_hide_empty": True},
+        **_on(phone=(0, 18, 4, 3), tablet=(0, 18, 8, 3)),
+    },
     # issue 168: the homelab's radio — when one is connected
-    {"widget_key": "media.radio", "w": 12, "h": 2, "config": {"_hide_empty": True}},
-    # four quarter tiles — two a row on a phone: the services and the shop window, my tickets and the news
-    {"widget_key": "health.services_summary", "w": 3, "h": 3},
-    {"widget_key": "marketplace.featured", "w": 3, "h": 3},
-    {"widget_key": "support.my_tickets", "w": 3, "h": 3},
-    {"widget_key": "news.latest", "w": 3, "h": 3},
+    {
+        "widget_key": "media.radio",
+        "w": 12,
+        "h": 2,
+        "config": {"_hide_empty": True},
+        **_on(phone=(2, 21, 2, 2), tablet=(0, 21, 8, 2)),
+    },
+    # four quarter tiles; on a phone the services down the left, the radio and the shop window beside them,
+    # then my tickets and the news
+    {
+        "widget_key": "health.services_summary",
+        "w": 3,
+        "h": 3,
+        **_on(phone=(0, 21, 2, 5), tablet=(0, 23, 4, 3)),
+    },
+    {"widget_key": "marketplace.featured", "w": 3, "h": 3, **_on(phone=(2, 23, 2, 3), tablet=(4, 23, 4, 3))},
+    {"widget_key": "support.my_tickets", "w": 3, "h": 3, **_on(phone=(0, 26, 2, 3), tablet=(0, 26, 4, 3))},
+    {"widget_key": "news.latest", "w": 3, "h": 3, **_on(phone=(2, 26, 2, 3), tablet=(4, 26, 4, 3))},
     # what fills up with time: the community, my statistics (a hidden one gives its place to the other)
-    {"widget_key": "community.activity", "w": 6, "h": 3, "config": {"_hide_empty": True}},
-    {"widget_key": "media.stats", "w": 6, "h": 3, "config": {"_hide_empty": True}},
-    {"widget_key": "health.service_links", "w": 12, "h": 1, "config": {"_hide_empty": True}},
+    {
+        "widget_key": "community.activity",
+        "w": 6,
+        "h": 3,
+        "config": {"_hide_empty": True},
+        **_on(phone=(0, 29, 4, 3), tablet=(0, 29, 4, 3)),
+    },
+    {
+        "widget_key": "media.stats",
+        "w": 6,
+        "h": 3,
+        "config": {"_hide_empty": True},
+        **_on(phone=(0, 32, 4, 2), tablet=(4, 29, 4, 3)),
+    },
+    {
+        "widget_key": "health.service_links",
+        "w": 12,
+        "h": 1,
+        "config": {"_hide_empty": True},
+        **_on(phone=(0, 35, 4, 1), tablet=(0, 32, 8, 1)),
+    },
 ]
 
 

@@ -199,8 +199,46 @@
     display: none;
   }
   .widget-services__ring {
-    inline-size: 2.4rem;
-    block-size: 2.4rem;
+    --ring-size: 2.5rem;
+  }
+}
+/* issue 186: a narrow tile (a quarter, half a phone): light rows — the ringed icon says the state, the
+   name beside it — as many services as the block holds */
+@container (max-width: 18rem) {
+  .widget-services {
+    gap: var(--space-2);
+  }
+  .widget-services__head {
+    gap: var(--space-2);
+  }
+  .widget-services__ring {
+    --ring-size: 2.5rem;
+  }
+  .widget-services__summary strong {
+    font-size: var(--font-size-sm);
+    line-height: 1.25;
+  }
+  .widget-services__grid {
+    gap: 0.3rem;
+  }
+  .widget-service {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "icon text";
+    gap: var(--space-2);
+    padding: 0.3rem 0.5rem;
+  }
+  .widget-service__icon {
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    box-shadow: 0 0 0 1.5px var(--tone);
+  }
+  .widget-service__icon svg {
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+  }
+  .widget-service__state,
+  .widget-service__uptime {
+    display: none;
   }
 }
 /* too low for even one short card: the summary line alone (as on a single row) */

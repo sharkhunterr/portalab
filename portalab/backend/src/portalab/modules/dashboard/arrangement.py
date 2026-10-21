@@ -151,14 +151,20 @@ def normalize(items: Iterable[Item], columns: int = COLUMNS) -> list[Item]:
     return reading_order(placed)
 
 
-def flow(items: Iterable[Item], columns: int = COLUMNS) -> list[Item]:
-    """Row packing in the given order (migration of ordered dashboards, derived views)."""
+def flow(items: Iterable[Item], columns: int = COLUMNS, around: Sequence[Item] = ()) -> list[Item]:
+    """Row packing in the given order (migration of ordered dashboards, derived views); issue 186: beside
+    the widgets ``around`` (pinned ones), never under them while their row has room."""
     x = y = row = 0
     out: list[Item] = []
     for item in items:
         w = min(item.w, columns)
-        if x + w > columns:
-            x, y, row = 0, y + row, 0
+        while True:
+            if x + w > columns:
+                x, y, row = 0, y + max(row, 1), 0
+            hits = _hits(replace(item, x=x, y=y, w=w), around)
+            if not hits:
+                break
+            x = max(h.x + h.w for h in hits)
         out.append(replace(item, x=x, y=y, w=w))
         x += w
         row = max(row, item.h)

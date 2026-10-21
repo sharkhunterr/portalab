@@ -3,6 +3,7 @@
 from typing import Any
 
 from portalab.capabilities.dashboard import CONDITION_TYPES, WidgetRegistry
+from portalab.modules.dashboard.arrangement import VIEW_COLUMNS
 from portalab.modules.dashboard.settings import POLICIES, POLICY_CLASSES, STARTER
 
 
@@ -55,9 +56,15 @@ class DashboardValidators:
             if not isinstance(entry, dict) or not self._known(str(entry.get("widget_key", ""))):
                 errors.append(f"entry {index}: unknown widget")
                 continue
-            extra = set(entry) - {"widget_key", "w", "h", "roles", "config"}
+            extra = set(entry) - {"widget_key", "w", "h", "roles", "config", "tablet", "phone"}
             if extra:
                 errors.append(f"entry {index}: unknown fields {sorted(extra)}")
+            # its own place on a tablet or a phone (else derived from the computer's)
+            for view in ("tablet", "phone"):
+                if view in entry and not _view_place(entry[view], VIEW_COLUMNS[view]):
+                    errors.append(
+                        f"entry {index}: « {view} » is {{x, y, w, h}} within {VIEW_COLUMNS[view]} columns"
+                    )
             # 027: frame settings only (hide its title, its box, while empty) — a widget's own settings
             # stay its defaults
             config = entry.get("config", {})
@@ -67,3 +74,13 @@ class DashboardValidators:
 
     def table(self) -> dict[str, Any]:
         return {POLICIES: self.policies, STARTER: self.starter}
+
+
+def _view_place(place: Any, columns: int) -> bool:
+    if not isinstance(place, dict) or set(place) != {"x", "y", "w", "h"}:
+        return False
+    values = {k: v for k, v in place.items() if isinstance(v, int) and not isinstance(v, bool)}
+    if len(values) != 4:
+        return False
+    x, y, w, h = values["x"], values["y"], values["w"], values["h"]
+    return x >= 0 and y >= 0 and w >= 1 and h >= 1 and x + w <= columns
