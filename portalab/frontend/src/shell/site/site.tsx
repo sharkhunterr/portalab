@@ -108,10 +108,13 @@ export function SiteRoot({ children }: { children: ReactNode }) {
   const site = useSite();
   useEffect(() => {
     document.title = site.name;
-    if (site.custom) rememberSite(site); // issue 16: the name the « unreachable » page shows
     headLink("icon", site.icon);
     headLink("manifest", `/api/v1/auth/site/manifest?v=${site.version}`);
   }, [site.name, site.icon, site.version]);
+  // issue 16: the name the « unreachable » page shows
+  useEffect(() => {
+    if (site.custom) rememberSite(site);
+  }, [site]);
   const look = useMemo(
     () => ({ currencyIcon: site.currency_icon, currencyShort: site.currency_short }),
     [site.currency_icon, site.currency_short],
