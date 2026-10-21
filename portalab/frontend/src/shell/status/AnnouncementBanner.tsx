@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { Link } from "react-router";
 import { api } from "../../api/client";
-import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
+import { useDismissed } from "./portalStatus";
+import { StatusBanner } from "./StatusBanner";
 
 interface Banner {
   id: string;
@@ -11,9 +10,11 @@ interface Banner {
   body: string;
   link: string | null;
   tone: string;
+  banner_until: string | null;
+  created_at: string;
 }
 
-const DISMISSED = "portalab.announcement.dismissed";
+const TONES = ["info", "success", "warning", "critical"] as const;
 const ICONS: Record<string, string> = {
   info: "megaphone",
   success: "sparkles",
@@ -21,22 +22,15 @@ const ICONS: Record<string, string> = {
   critical: "alert",
 };
 
-function dismissed(): string[] {
-  try {
-    return JSON.parse(window.localStorage.getItem(DISMISSED) ?? "[]") as string[];
-  } catch {
-    return [];
-  }
-}
-
 /**
  * Announcement banner (027): an announcement the administrator chose to show « as a banner » sits across
- * the portal until its date (or until it is ended) — its tone, title, text and link; each member may close
- * it (a critical one cannot be closed).
+ * the portal until its date (or until it is ended), drawn like the maintenance and incident banners — its
+ * tone, title, first line of text, how long it stays and its link; each member may close it (a critical
+ * one cannot be closed).
  */
 export function AnnouncementBanner() {
   const t = useT();
-  const [closed, setClosed] = useState<string[]>(dismissed);
+  const [closed, close] = useDismissed("portalab.announcement.dismissed");
   const banners = useQuery({
     queryKey: ["announcements", "banners"],
     retry: false,
@@ -49,33 +43,19 @@ export function AnnouncementBanner() {
   const shown = (banners.data ?? []).filter((b) => b.tone === "critical" || !closed.includes(b.id));
   const first = shown[0];
   if (!first) return null;
-  const close = () => {
-    const next = [...closed, first.id].slice(-30);
-    setClosed(next);
-    try {
-      window.localStorage.setItem(DISMISSED, JSON.stringify(next));
-    } catch {
-      // no storage: closed for this visit only
-    }
-  };
+  const tone = TONES.find((x) => x === first.tone) ?? "info";
   return (
-    <div className="announcement-banner" role="status" data-tone={first.tone}>
-      <Icon name={ICONS[first.tone] ?? "megaphone"} size={18} />
-      <span className="announcement-banner__text">
-        <strong>{first.title}</strong>
-        {first.body ? <span> · {first.body.split("\n")[0]}</span> : null}
-      </span>
-      {first.link ? <Link to={first.link}>{t("notifications:banner.more")}</Link> : null}
-      {first.tone !== "critical" ? (
-        <button
-          type="button"
-          className="maintenance-banner__close"
-          onClick={close}
-          aria-label={t("notifications:banner.close")}
-        >
-          <Icon name="close" size={16} />
-        </button>
-      ) : null}
-    </div>
+    <StatusBanner
+      tone={tone}
+      icon={ICONS[tone] ?? "megaphone"}
+      eyebrow={[t("notifications:banner.announcement")]}
+      title={first.title}
+      text={first.body ? first.body.split("\n")[0] : null}
+      starts={first.banner_until ? first.created_at : null}
+      ends={first.banner_until}
+      details={first.link}
+      detailsLabel={t("notifications:banner.more")}
+      onClose={tone === "critical" ? undefined : () => close(first.id)}
+    />
   );
 }

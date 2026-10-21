@@ -1200,7 +1200,8 @@
   cursor: pointer;
 }
 
-/* 027: a maintenance or an incident announced across the portal — a slim tinted strip, the dates apart */
+/* 027: a maintenance, an incident or an announcement told across the portal — a slim tinted strip, the dates
+   apart */
 .status-banner {
   --tone: var(--cal-series);
   container: status-banner / inline-size;
@@ -1223,6 +1224,19 @@
 .status-banner[data-tone="incident"] {
   --tone: var(--cal-incident);
 }
+/* an announcement, in its tone */
+.status-banner[data-tone="info"] {
+  --tone: var(--color-accent);
+}
+.status-banner[data-tone="success"] {
+  --tone: var(--state-available-fg);
+}
+.status-banner[data-tone="warning"] {
+  --tone: var(--rarity-legendary);
+}
+.status-banner[data-tone="critical"] {
+  --tone: var(--cal-incident);
+}
 .status-banner__inner {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto auto;
@@ -1243,6 +1257,7 @@
   color: var(--tone);
 }
 .status-banner[data-tone="incident"] .status-banner__icon::after,
+.status-banner[data-tone="critical"] .status-banner__icon::after,
 .status-banner[data-tone="running"] .status-banner__icon::after {
   content: "";
   position: absolute;
@@ -1389,42 +1404,6 @@
 }
 :root[data-motion="none"] .status-banner__icon::after {
   animation: none;
-}
-
-/* 027: an announcement shown as a banner, in its tone */
-.announcement-banner {
-  --tone: var(--color-accent);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2) var(--space-3);
-  margin-block-end: var(--space-3);
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid color-mix(in srgb, var(--tone) 45%, var(--color-border));
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--tone) 14%, var(--color-surface));
-  color: var(--color-text);
-  font-size: var(--font-size-sm);
-}
-.announcement-banner[data-tone="success"] {
-  --tone: var(--state-available-fg);
-}
-.announcement-banner[data-tone="warning"] {
-  --tone: var(--state-partial-fg);
-}
-.announcement-banner[data-tone="critical"] {
-  --tone: var(--state-error-fg);
-}
-.announcement-banner > .ds-icon {
-  color: var(--tone);
-}
-.announcement-banner__text {
-  flex: 1;
-  min-inline-size: 12rem;
-}
-.announcement-banner a {
-  color: var(--color-accent);
-  font-weight: var(--font-weight-semibold);
 }
 
 /* 027 — the portal's health in the header: an icon button like the bell (ok, degraded, incident), its
