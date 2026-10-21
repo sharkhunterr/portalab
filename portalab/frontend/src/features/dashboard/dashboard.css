@@ -35,6 +35,10 @@
   min-block-size: 0;
   overflow: hidden;
 }
+/* the header's actions follow the tile's width (the body has its own container) */
+.dashboard-grid__cell {
+  container: widget-cell / inline-size;
+}
 
 .dashboard-grid__cell[data-dragging] {
   transition: none;
@@ -318,6 +322,20 @@
   white-space: nowrap;
   cursor: pointer;
   transition: transform var(--motion-duration-fast) var(--motion-easing);
+}
+/* a narrow tile: the action says itself with its icon only (« + »), its words kept for screen readers */
+@container widget-cell (max-width: 20rem) {
+  .widget-frame__action {
+    padding-inline: 0.4rem;
+  }
+  .widget-frame__action-label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
 .widget-frame__action:hover {
   transform: scale(1.05);

@@ -38,9 +38,9 @@ function MyTicketsWidget(props: WidgetProps) {
             </Button>
           }
           trigger={
-            <button type="button" className="widget-frame__action">
+            <button type="button" className="widget-frame__action" title={t("support:widget.my_tickets.new")}>
               <Icon name="plus" size={12} />
-              {t("support:widget.my_tickets.new")}
+              <span className="widget-frame__action-label">{t("support:widget.my_tickets.new")}</span>
             </button>
           }
         >
