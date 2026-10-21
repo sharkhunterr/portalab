@@ -10,7 +10,7 @@ import pytest
 
 from portalab.capabilities.media import RADIO, SPECS, RadioRequest, RadioState, StreamBody
 from portalab.capabilities.registry import CapabilityRegistry
-from portalab.connectors.subwave import map_request, map_track
+from portalab.connectors.subwave import SubwaveConnector, map_request, map_track
 from portalab.modules.media.radio import RadioAskedTooSoon, RadioService
 
 
@@ -38,6 +38,9 @@ def test_tracks_and_requests_are_read() -> None:
     refused = map_request({"success": False, "message": "Empty request"})
     assert refused.status == "failed" and refused.detail == "Empty request"
     assert map_request({"status": "unknown"}, "r9") == RadioRequest(id="r9", status="unknown")
+    connector = SubwaveConnector()  # its health answer, whatever the release
+    assert connector.looks_like_us({"status": "on-air"}) and connector.looks_like_us({"onAir": True})
+    assert not connector.looks_like_us({"status": "ok"})
 
 
 class _Station:
