@@ -485,7 +485,7 @@ class DashboardService:
             pinned = [self._grid(r, policies) for r in ordered if pin_of(policies, r.widget_key)]
             others = [r for r in ordered if not pin_of(policies, r.widget_key)]
             # pinned widgets keep their place; the others flow in order and settle around them
-            items = normalize([*pinned, *flow([self._grid(r, policies) for r in others])])
+            items = normalize([*pinned, *flow([self._grid(r, policies) for r in others], around=pinned)])
         else:
             items = [self._grid(r, policies) for r in active]
         if move_to is not None:
@@ -906,6 +906,13 @@ class DashboardService:
         policies = self.config().widget_policies
         widgets = {w.definition.key: w for w in self.registry.widgets()}
         chosen: list[tuple[RegisteredWidget, int, int, dict[str, Any]]] = []
+        # issue 186: the starter may place a widget on a tablet and a phone too — the member's dashboard
+        # then starts arranged per screen
+        views = {
+            str(entry.get("widget_key", "")): {v: dict(entry[v]) for v in ("tablet", "phone") if v in entry}
+            for entry in layout
+            if isinstance(entry, dict) and ("tablet" in entry or "phone" in entry)
+        }
         roles_ok = await self._roles(principal)
         pinned = [
             {"widget_key": key, "w": pin[2], "h": pin[3]}
@@ -968,6 +975,7 @@ class DashboardService:
                         h=h,
                         config={**widget.definition.config_defaults, **frame},
                         config_schema_version=widget.definition.schema_version,
+                        views=views.get(widget.definition.key, {}),
                         origin="starter",
                         created_at=now,
                         updated_at=now,
@@ -975,6 +983,8 @@ class DashboardService:
                 )
                 position += 1
             board.starter_applied_at = now
+            if views:
+                board.layout_mode = "per_device"
             await self._rearrange(session, user, by_position=True)
             await self._bump(session, board, principal, starter=True)
             await self.events.publish(

@@ -69,3 +69,35 @@ async def test_starter_entries_carry_frame_settings(
         [{"widget_key": "health.services_summary", "config": {"limit": 3}}]
     )
     assert errors == ["entry 0: config holds frame settings only"]
+
+
+async def test_starter_places_widgets_per_screen(
+    app: FastAPI, client: httpx.AsyncClient, dash: DashboardHarness
+) -> None:
+    """Issue 186: a starter entry may hold its place on a tablet and a phone — the member's dashboard then
+    starts arranged per screen, each widget where the starter puts it; a place off the grid is refused."""
+    dash.module.config = replace(
+        dash.module.config,
+        widget_policies={},
+        starter_layout=[
+            {
+                "widget_key": "health.services_summary",
+                "w": 6,
+                "h": 3,
+                "phone": {"x": 0, "y": 0, "w": 2, "h": 5},
+                "tablet": {"x": 0, "y": 0, "w": 4, "h": 3},
+            },
+            {"widget_key": "dashboard.welcome", "w": 6, "h": 2, "phone": {"x": 2, "y": 0, "w": 2, "h": 2}},
+        ],
+    )
+    await create_user(module_of(app), "alex")
+    await login(client, "alex")
+    board = (await client.get("/api/v1/dashboard")).json()
+    assert board["layout_mode"] == "per_device"
+    views = {i["widget_key"]: i["views"] for i in board["instances"]}
+    assert views["health.services_summary"]["phone"] == {"x": 0, "y": 0, "w": 2, "h": 5}
+    assert views["dashboard.welcome"] == {"phone": {"x": 2, "y": 0, "w": 2, "h": 2}}
+    errors = await dash.module.validators.starter(
+        [{"widget_key": "dashboard.welcome", "phone": {"x": 3, "y": 0, "w": 2, "h": 1}}]
+    )
+    assert errors == ["entry 0: « phone » is {x, y, w, h} within 4 columns"]
