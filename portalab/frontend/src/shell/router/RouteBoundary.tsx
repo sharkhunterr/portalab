@@ -1,10 +1,11 @@
-import { Component, type ErrorInfo, type ReactNode, Suspense } from "react";
+import { Component, type ErrorInfo, type ReactNode, Suspense, useEffect, useState } from "react";
 import { isRouteErrorResponse, Link, useMatches, useRouteError } from "react-router";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { ApiError } from "../../state/regions";
 import { isStaleBuildError, reloadForNewBuild } from "../staleBuild";
 import { useShellStrings } from "../strings";
 import type { RouteHandle } from "./handle";
+import { PortalUnreachable, portalAnswers } from "./PortalUnreachable";
 
 /**
  * Route-level states (spec 004 T022; R12/R13, FR-026..028): loading, error, unavailable, unauthorized and
@@ -51,12 +52,26 @@ export function RouteStateView({ state, onRetry }: { state: RouteState; onRetry?
   );
 }
 
-/** ``errorElement`` of every route. */
+/** ``errorElement`` of every route — issue 16: when the portal itself does not answer, its own page. */
 export function RouteErrorElement() {
   const error = useRouteError();
   const matches = useMatches();
   const sensitive = matches.some((m) => (m.handle as RouteHandle | undefined)?.existenceSensitive);
-  return <RouteStateView state={stateFor(error, sensitive)} onRetry={() => window.location.reload()} />;
+  const state = stateFor(error, sensitive);
+  const [down, setDown] = useState<boolean | null>(
+    state === "unavailable" || state === "error" ? null : false,
+  );
+  useEffect(() => {
+    if (down !== null) return;
+    let live = true;
+    void portalAnswers().then((up) => live && setDown(!up));
+    return () => {
+      live = false;
+    };
+  }, [down]);
+  if (down === null) return null; // a moment, to know whether the portal is there
+  if (down) return <PortalUnreachable />;
+  return <RouteStateView state={state} onRetry={() => window.location.reload()} />;
 }
 
 interface BoundaryState {
