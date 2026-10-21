@@ -674,7 +674,6 @@ function ChartWidget({ payload, compact, config }: WidgetProps) {
               type="number"
               scale="time"
               domain={[since, "dataMax"]}
-              stroke="var(--color-text-muted)"
               fontSize={11}
               tickFormatter={(x: number) =>
                 data.range === "7d" ? format.date(new Date(x), "short") : format.time(new Date(x))
@@ -682,7 +681,6 @@ function ChartWidget({ payload, compact, config }: WidgetProps) {
               minTickGap={28}
             />
             <YAxis
-              stroke="var(--color-text-muted)"
               fontSize={11}
               width={42}
               domain={percentOnly ? [0, 100] : ["auto", "auto"]}

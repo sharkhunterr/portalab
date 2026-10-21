@@ -35,11 +35,6 @@ import { useMeasures } from "./api";
  * (grey or dashed), colors taken from the theme (``--chart-*``, ``--stream-*``, ``--quality-*``), a clock
  * and a week wheel for the viewing footprint, a world map of production countries.
  */
-export const TOOLTIP = {
-  background: "var(--color-surface-raised)",
-  border: "1px solid var(--color-border)",
-  borderRadius: "var(--radius-sm)",
-};
 const AXIS = { stroke: "var(--color-text-muted)", fontSize: 11 };
 const PREVIOUS = "var(--chart-previous)";
 const PALETTE = Array.from({ length: 8 }, (_, i) => `var(--chart-${i + 1})`);
@@ -110,7 +105,6 @@ export function ActivityCompare({ data, metric }: { data: Profile; metric: "play
           <XAxis dataKey="bucket" tickFormatter={label} {...AXIS} minTickGap={18} />
           <YAxis {...AXIS} allowDecimals={false} />
           <Tooltip
-            contentStyle={TOOLTIP}
             labelFormatter={(v) => label(String(v))}
             formatter={(value, name) => [
               value,
@@ -214,7 +208,6 @@ export function GenreRadar({ data }: { data: Profile }) {
             dot={{ r: 3, fill: "var(--chart-1)" }}
           />
           <Tooltip
-            contentStyle={TOOLTIP}
             formatter={(value, name) => [
               value,
               name === "now" ? t("media:deep.current") : t("media:deep.previous"),
@@ -257,7 +250,6 @@ export function GenreStack({ data }: { data: Profile }) {
           <XAxis dataKey="bucket" tickFormatter={label} {...AXIS} minTickGap={12} />
           <YAxis {...AXIS} allowDecimals={false} />
           <Tooltip
-            contentStyle={TOOLTIP}
             labelFormatter={(v) => label(String(v))}
             formatter={(value, name) => [value, name === "other" ? t("media:deep.others") : String(name)]}
           />
@@ -502,7 +494,6 @@ export function CompareBars({
           <XAxis dataKey="key" tickFormatter={label} {...AXIS} minTickGap={6} />
           <YAxis {...AXIS} allowDecimals={false} />
           <Tooltip
-            contentStyle={TOOLTIP}
             labelFormatter={(v) => label(String(v))}
             formatter={(value, name) => [
               value,
@@ -510,9 +501,9 @@ export function CompareBars({
             ]}
           />
           {hasPrevious ? (
-            <Bar dataKey="previous" fill={PREVIOUS} radius={[2, 2, 0, 0]} isAnimationActive={false} />
+            <Bar dataKey="previous" fill={PREVIOUS} radius={[6, 6, 0, 0]} isAnimationActive={false} />
           ) : null}
-          <Bar dataKey="count" fill="var(--chart-1)" radius={[2, 2, 0, 0]} />
+          <Bar dataKey="count" fill="var(--chart-1)" radius={[6, 6, 0, 0]} />
           {averages?.before && Math.round(averages.before) !== Math.round(averages.now ?? 0) ? (
             <ReferenceLine
               x={String(Math.round(averages.before))}
@@ -732,7 +723,7 @@ export function Donut({
                 <Cell key={slice.key} fill={shown.length ? colors(slice.key, i) : "var(--color-border)"} />
               ))}
             </Pie>
-            <Tooltip contentStyle={TOOLTIP} formatter={(value, name) => [value, label(String(name))]} />
+            <Tooltip formatter={(value, name) => [value, label(String(name))]} />
           </PieChart>
         </ResponsiveContainer>
         <span className="deep-donut__center">
@@ -791,7 +782,6 @@ export function BreakdownBars({
           <XAxis dataKey="bucket" tickFormatter={bucketLabel} {...AXIS} minTickGap={12} />
           <YAxis {...AXIS} allowDecimals={false} />
           <Tooltip
-            contentStyle={TOOLTIP}
             labelFormatter={(v) => bucketLabel(String(v))}
             formatter={(value, name) => [
               value,

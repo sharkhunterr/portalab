@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
   AdminEmpty,
   AdminGrid,
@@ -9,6 +8,7 @@ import {
   AdminTable,
   StatusBadge,
 } from "../../../design-system/admin/AdminKit";
+import { BarsChart } from "../../../design-system/charts/Charts";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -43,9 +43,6 @@ export function AiDashboard() {
   const seconds = (ms: number | null) =>
     ms === null ? "—" : t("ai:board.seconds", { s: format.number(Math.round(ms / 100) / 10) });
   const rated = totals.rated_up + totals.rated_down;
-  const tooltip = {
-    contentStyle: { background: "var(--color-surface-raised)", border: "1px solid var(--color-border)" },
-  };
   const series = data.per_day.map((day) => ({
     day: format.date(`${day.day}T12:00:00Z`, "short"),
     questions: day.questions - day.errors > 0 ? day.questions - day.errors : 0,
@@ -117,29 +114,17 @@ export function AiDashboard() {
         <AdminSection title={t("ai:board.perDay")} icon="chart" span="full">
           {series.length ? (
             <div className="ai-board__chart">
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={series} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                  <XAxis dataKey="day" tick={{ fontSize: 11 }} interval="preserveStartEnd" minTickGap={18} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                  <Tooltip {...tooltip} />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar
-                    dataKey="questions"
-                    name={t("ai:board.chart.answered")}
-                    stackId="a"
-                    fill="var(--color-accent)"
-                    isAnimationActive={false}
-                  />
-                  <Bar
-                    dataKey="errors"
-                    name={t("ai:board.chart.errors")}
-                    stackId="a"
-                    fill="var(--state-error-fg)"
-                    isAnimationActive={false}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+              <BarsChart
+                data={series}
+                x="day"
+                stacked
+                height={220}
+                format={(value) => format.number(value)}
+                series={[
+                  { key: "questions", label: t("ai:board.chart.answered"), color: "var(--color-accent)" },
+                  { key: "errors", label: t("ai:board.chart.errors"), color: "var(--state-error-fg)" },
+                ]}
+              />
             </div>
           ) : (
             <AdminEmpty icon="message" title={t("ai:board.none")} />

@@ -1,16 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ReferenceDot,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { ReferenceDot } from "recharts";
 import { AdminSection, FormActions } from "../../../design-system/admin/AdminKit";
+import { LinesChart } from "../../../design-system/charts/Charts";
 import { Button } from "../../../design-system/components/Button";
 import { SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
@@ -117,31 +109,25 @@ export function LevelsPanel({ detailed = true }: { detailed?: boolean }) {
             <figure className="gam-chart">
               <figcaption>{t("gamification:admin.curve.chart")}</figcaption>
               <div aria-hidden="true">
-                <ResponsiveContainer width="100%" height={260}>
-                  <LineChart data={points}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                    <XAxis dataKey="level" stroke="var(--color-text-muted)" fontSize={12} />
-                    <YAxis stroke="var(--color-text-muted)" fontSize={12} width={56} />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="xp"
-                      stroke="var(--color-accent)"
-                      strokeWidth={2}
-                      dot={false}
+                <LinesChart
+                  data={points}
+                  x="level"
+                  height={260}
+                  legend={false}
+                  format={(value) => `${format.number(value)} XP`}
+                  series={[{ key: "xp", label: "XP", color: "var(--color-accent)" }]}
+                >
+                  {sorted.map((tier) => (
+                    <ReferenceDot
+                      key={tier.level}
+                      x={tier.level}
+                      y={threshold(base, exponent, tier.level)}
+                      r={5}
+                      fill="var(--color-accent-alt)"
+                      stroke="var(--color-surface)"
                     />
-                    {sorted.map((tier) => (
-                      <ReferenceDot
-                        key={tier.level}
-                        x={tier.level}
-                        y={threshold(base, exponent, tier.level)}
-                        r={5}
-                        fill="var(--color-accent-alt)"
-                        stroke="var(--color-surface)"
-                      />
-                    ))}
-                  </LineChart>
-                </ResponsiveContainer>
+                  ))}
+                </LinesChart>
               </div>
             </figure>
           </div>

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
   AdminEmpty,
   AdminGrid,
@@ -10,6 +9,7 @@ import {
   AdminTable,
   AdminTabs,
 } from "../../../design-system/admin/AdminKit";
+import { BarsChart } from "../../../design-system/charts/Charts";
 import { SelectField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
@@ -116,42 +116,24 @@ function Timeline({ data }: { data: Insights }) {
   return (
     <figure className="insights-chart">
       {toggle}
-      <ResponsiveContainer width="100%" height={240}>
-        <BarChart data={rows} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-          <XAxis
-            dataKey="label"
-            tickFormatter={label}
-            stroke="var(--color-text-muted)"
-            fontSize={12}
-            minTickGap={24}
-          />
-          <YAxis stroke="var(--color-text-muted)" fontSize={12} allowDecimals={false} />
-          <Tooltip
-            labelFormatter={(value) => label(String(value))}
-            formatter={(value, name) => [
-              metric === "time"
-                ? measures.duration(Number(value) * 3600)
-                : t("media:insights.playsCount", { count: Number(value) }),
-              t(`media:insights.kind.${String(name)}`),
-            ]}
-            contentStyle={{
-              background: "var(--color-surface-raised)",
-              border: "1px solid var(--color-border)",
-            }}
-          />
-          {kinds.map((kind) => (
-            <Bar
-              key={kind}
-              dataKey={kind}
-              stackId="a"
-              fill={`var(--kind-${kind})`}
-              radius={[3, 3, 0, 0]}
-              isAnimationActive={false}
-            />
-          ))}
-        </BarChart>
-      </ResponsiveContainer>
+      <BarsChart
+        data={rows}
+        x="label"
+        stacked
+        height={240}
+        legend={false}
+        xFormat={label}
+        format={(value) =>
+          metric === "time"
+            ? measures.duration(value * 3600)
+            : t("media:insights.playsCount", { count: value })
+        }
+        series={kinds.map((kind) => ({
+          key: kind,
+          label: t(`media:insights.kind.${kind}`),
+          color: `var(--kind-${kind})`,
+        }))}
+      />
       <figcaption className="insights-legend">
         {kinds.map((kind) => (
           <span key={kind} className="insights-legend__item" data-kind={kind}>

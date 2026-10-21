@@ -21,7 +21,6 @@ import type { Acquisition } from "./api";
  * month, its first year, an older title) against how long it took; the median per moment.
  */
 const MOMENTS = ["before", "month", "year", "catalog"] as const;
-const TOOLTIP = { background: "var(--color-surface-raised)", border: "1px solid var(--color-border)" };
 
 export function AcquisitionView({ data }: { data: Acquisition }) {
   const t = useT();
@@ -71,9 +70,9 @@ export function AcquisitionView({ data }: { data: Acquisition }) {
             <BarChart
               data={data.buckets.map((b) => ({ ...b, label: t(`media:myRequests.bucket.${b.key}`) }))}
             >
-              <XAxis dataKey="label" stroke="var(--color-text-muted)" fontSize={12} />
-              <YAxis allowDecimals={false} stroke="var(--color-text-muted)" fontSize={12} width={28} />
-              <Tooltip contentStyle={TOOLTIP} />
+              <XAxis dataKey="label" fontSize={12} />
+              <YAxis allowDecimals={false} fontSize={12} width={28} />
+              <Tooltip />
               <Bar
                 dataKey="count"
                 name={t("media:myRequests.stat.total")}
@@ -89,12 +88,11 @@ export function AcquisitionView({ data }: { data: Acquisition }) {
             <figcaption>{t("media:myRequests.scatter")}</figcaption>
             <ResponsiveContainer width="100%" height={200}>
               <ScatterChart margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                <CartesianGrid />
                 <XAxis
                   type="number"
                   dataKey="x"
                   name={t("media:myRequests.askedAfter")}
-                  stroke="var(--color-text-muted)"
                   fontSize={12}
                   tickFormatter={(v) => t("media:myRequests.days", { count: Number(v) })}
                 />
@@ -104,14 +102,12 @@ export function AcquisitionView({ data }: { data: Acquisition }) {
                   scale="log"
                   domain={[0.05, "auto"]}
                   name={took}
-                  stroke="var(--color-text-muted)"
                   fontSize={12}
                   width={56}
                   tickFormatter={(v) => span(Number(v))}
                 />
                 <ZAxis range={[44, 44]} />
                 <Tooltip
-                  contentStyle={TOOLTIP}
                   formatter={(value, name) =>
                     name === took ? span(Number(value)) : t("media:myRequests.days", { count: Number(value) })
                   }

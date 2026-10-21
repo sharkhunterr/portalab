@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
   AdminEmpty,
   AdminGrid,
@@ -7,6 +6,7 @@ import {
   AdminTable,
   StatusBadge,
 } from "../../../../design-system/admin/AdminKit";
+import { BarsChart } from "../../../../design-system/charts/Charts";
 import { FunctionalState } from "../../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../../i18n/format/useFormat";
 import { useT } from "../../../../i18n/hooks/useT";
@@ -51,9 +51,6 @@ export function Overview({ onMember }: { onMember: (id: string) => void }) {
     spent: economy.data?.series[index]?.coins_spent ?? day.coins,
     earned: economy.data?.series[index]?.coins_earned ?? 0,
   }));
-  const tooltip = {
-    contentStyle: { background: "var(--color-surface-raised)", border: "1px solid var(--color-border)" },
-  };
   return (
     <div className="mk-console">
       <fieldset className="ds-subnav mk-console__period">
@@ -132,61 +129,52 @@ export function Overview({ onMember }: { onMember: (id: string) => void }) {
       <AdminGrid>
         <AdminSection title={t("marketplace:shopadmin.chart.activity")} icon="chart" span="full">
           <div className="mk-console__chart">
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={series} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis dataKey="day" tick={{ fontSize: 11 }} interval="preserveStartEnd" minTickGap={18} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                <Tooltip {...tooltip} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Bar
-                  dataKey="purchases"
-                  name={t("marketplace:shopadmin.chart.purchases")}
-                  stackId="a"
-                  fill="var(--color-accent)"
-                  isAnimationActive={false}
-                />
-                <Bar
-                  dataKey="boosters"
-                  name={t("marketplace:shopadmin.chart.boosters")}
-                  stackId="a"
-                  fill="var(--color-accent-alt)"
-                  isAnimationActive={false}
-                />
-                <Bar
-                  dataKey="grants"
-                  name={t("marketplace:shopadmin.chart.grants")}
-                  stackId="a"
-                  fill="var(--color-text-muted)"
-                  isAnimationActive={false}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+            <BarsChart
+              data={series}
+              x="day"
+              stacked
+              height={220}
+              format={(value) => format.number(value)}
+              series={[
+                {
+                  key: "purchases",
+                  label: t("marketplace:shopadmin.chart.purchases"),
+                  color: "var(--color-accent)",
+                },
+                {
+                  key: "boosters",
+                  label: t("marketplace:shopadmin.chart.boosters"),
+                  color: "var(--color-accent-alt)",
+                },
+                {
+                  key: "grants",
+                  label: t("marketplace:shopadmin.chart.grants"),
+                  color: "var(--color-text-muted)",
+                },
+              ]}
+            />
           </div>
         </AdminSection>
         <AdminSection title={t("marketplace:shopadmin.chart.coins")} icon="coins" span="full">
           <div className="mk-console__chart">
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={series} margin={{ top: 8, right: 8, bottom: 0, left: -6 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis dataKey="day" tick={{ fontSize: 11 }} interval="preserveStartEnd" minTickGap={18} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                <Tooltip {...tooltip} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Bar
-                  dataKey="earned"
-                  name={t("marketplace:shopadmin.chart.earned")}
-                  fill="var(--color-accent)"
-                  isAnimationActive={false}
-                />
-                <Bar
-                  dataKey="spent"
-                  name={t("marketplace:shopadmin.chart.spent")}
-                  fill="var(--color-accent-alt)"
-                  isAnimationActive={false}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+            <BarsChart
+              data={series}
+              x="day"
+              height={200}
+              format={(value) => format.number(value)}
+              series={[
+                {
+                  key: "earned",
+                  label: t("marketplace:shopadmin.chart.earned"),
+                  color: "var(--color-accent)",
+                },
+                {
+                  key: "spent",
+                  label: t("marketplace:shopadmin.chart.spent"),
+                  color: "var(--color-accent-alt)",
+                },
+              ]}
+            />
           </div>
         </AdminSection>
         <AdminSection title={t("marketplace:shopadmin.top")} icon="trending" flush>

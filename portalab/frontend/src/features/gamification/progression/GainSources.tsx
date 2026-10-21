@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
 import { AdminTabs } from "../../../design-system/admin/AdminKit";
+import { BarsChart } from "../../../design-system/charts/Charts";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -62,8 +62,6 @@ function useStreak() {
 }
 
 /** Axis ticks: 1.2k, 500k, 3M — never cut. */
-const compact = (value: number) =>
-  new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(value);
 
 /**
  * Where my gains come from (027, progression page): the share of each source — plays, quests, streak and
@@ -199,24 +197,19 @@ export function GainSources() {
           <figure className="gain-sources__bars">
             <figcaption>{t("gamification:sources.daily", { unit })}</figcaption>
             <div aria-hidden="true">
-              <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={bars}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                  <XAxis dataKey="day" stroke="var(--color-text-muted)" fontSize={12} />
-                  <YAxis stroke="var(--color-text-muted)" fontSize={12} width={44} tickFormatter={compact} />
-                  <Tooltip />
-                  {keys.map((key, index) => (
-                    <Bar
-                      key={key}
-                      dataKey={key}
-                      name={label(key)}
-                      stackId="gains"
-                      fill={SOURCES[key]?.color ?? "var(--cal-other)"}
-                      radius={index === keys.length - 1 ? [3, 3, 0, 0] : 0}
-                    />
-                  ))}
-                </BarChart>
-              </ResponsiveContainer>
+              <BarsChart
+                data={bars}
+                x="day"
+                stacked
+                height={240}
+                legend={false}
+                format={(value) => format.number(value)}
+                series={keys.map((key) => ({
+                  key,
+                  label: label(key),
+                  color: SOURCES[key]?.color ?? "var(--cal-other)",
+                }))}
+              />
             </div>
           </figure>
         </div>
