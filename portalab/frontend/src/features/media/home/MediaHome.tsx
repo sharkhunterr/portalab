@@ -251,11 +251,7 @@ function RadioRow() {
   const radio = useRadio();
   if (!radio.data?.available) return null;
   return (
-    <Row
-      icon="radio"
-      title={t("media:radio.title")}
-      more={{ to: "/media/radio", label: t("media:radio.open") }}
-    >
+    <Row icon="radio" title={t("media:radio.title")}>
       <div className="media-radio">
         <RadioCard radio={radio.data} />
       </div>

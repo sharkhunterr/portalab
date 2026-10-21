@@ -10,6 +10,7 @@ import type { Radio } from "../../media/radio/api";
 import { RadioCard } from "../../media/radio/RadioCard";
 import type { SoonCard } from "../../media/requests/api";
 import { SoonList } from "../../media/requests/SoonList";
+import { WidgetHeaderLink } from "../frame/actions";
 import { CompactLine, PosterStrip } from "./compact";
 import type { StatsPoint } from "./MediaStatsChart";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
@@ -57,7 +58,18 @@ function Posters({ payload, compact }: WidgetProps) {
   const measures = useMeasures();
   const data = (payload.data ?? {}) as { items?: Card[]; mode?: "added" | "released" };
   const items = data.items ?? [];
-  if (compact) return <PosterStrip cards={strip(items)} />; // 027 (#36): a strip of posters
+  // a way to the library: what came in, in the catalog
+  const more =
+    data.mode === "added" ? (
+      <WidgetHeaderLink to="/media/browse?sort=added" label={t("media:widget.recently_added.all")} />
+    ) : null;
+  if (compact)
+    return (
+      <>
+        {more}
+        <PosterStrip cards={strip(items)} />
+      </>
+    ); // 027 (#36): a strip of posters
   const caption = (card: Card) => {
     if (card.state) return t(`media:requests.state.${card.state}`);
     if (data.mode && card.at) {
@@ -84,28 +96,31 @@ function Posters({ payload, compact }: WidgetProps) {
     return card.meta ?? (card.kind ? t(`media:kind.${card.kind}`) : "");
   };
   return (
-    <ul className="widget-posters">
-      {items.map((card, index) => {
-        const src = poster(card.image_id) ?? metadataImage(card.poster_ref, "w342");
-        const body = (
-          <>
-            <span className="widget-posters__art">
-              {src ? <img src={src} alt="" loading="lazy" /> : <Icon name="film" size={24} />}
-              {card.state ? <span className="widget-posters__badge" data-request={card.state} /> : null}
-            </span>
-            <span className="widget-posters__title">{card.title}</span>
-            {card.subtitle ? <span className="widget-posters__meta">{card.subtitle}</span> : null}
-            <span className="widget-posters__meta">{caption(card)}</span>
-          </>
-        );
-        return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: releases of one title may share their id
-          <li key={`${card.id ?? card.title}-${index}`}>
-            {card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>}
-          </li>
-        );
-      })}
-    </ul>
+    <>
+      {more}
+      <ul className="widget-posters">
+        {items.map((card, index) => {
+          const src = poster(card.image_id) ?? metadataImage(card.poster_ref, "w342");
+          const body = (
+            <>
+              <span className="widget-posters__art">
+                {src ? <img src={src} alt="" loading="lazy" /> : <Icon name="film" size={24} />}
+                {card.state ? <span className="widget-posters__badge" data-request={card.state} /> : null}
+              </span>
+              <span className="widget-posters__title">{card.title}</span>
+              {card.subtitle ? <span className="widget-posters__meta">{card.subtitle}</span> : null}
+              <span className="widget-posters__meta">{caption(card)}</span>
+            </>
+          );
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: releases of one title may share their id
+            <li key={`${card.id ?? card.title}-${index}`}>
+              {card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>}
+            </li>
+          );
+        })}
+      </ul>
+    </>
   );
 }
 
@@ -208,64 +223,67 @@ function Continue({ payload, config, compact }: WidgetProps) {
   const ambient = (config ?? {}).style === "ambient";
   const resume = (config ?? {}).open === "resume"; // #92: by default a card opens its title's page
   return (
-    <ul
-      className="widget-continue"
-      data-ambient={(ambient && !compact) || undefined}
-      data-compact={compact || undefined}
-    >
-      {items.map((card, index) => {
-        const src = poster(card.image_id) ?? metadataImage(card.poster_ref, "w342");
-        const percent =
-          card.progress !== null && card.progress !== undefined ? Math.round(card.progress * 100) : null;
-        const body = (
-          <>
-            {ambient && !compact && src ? (
-              // behind the poster, in the same cell: its colours spill around it
-              <span
-                className="widget-continue__glow"
-                style={{ backgroundImage: `url("${src}")` }}
-                aria-hidden="true"
-              />
-            ) : null}
-            <span className="widget-continue__art">
-              {src ? (
-                <img src={src} alt="" loading="lazy" />
-              ) : (
-                <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={26} />
-              )}
-              <span className="widget-continue__kind" aria-hidden="true">
-                <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={12} />
-              </span>
-            </span>
-            <span className="widget-continue__text">
-              <span className="widget-continue__title">{card.title}</span>
-              {card.subtitle ? <span className="widget-continue__meta">{card.subtitle}</span> : null}
-              {percent !== null ? (
+    <>
+      <WidgetHeaderLink to="/media" label={t("media:widget.continue.all")} />
+      <ul
+        className="widget-continue"
+        data-ambient={(ambient && !compact) || undefined}
+        data-compact={compact || undefined}
+      >
+        {items.map((card, index) => {
+          const src = poster(card.image_id) ?? metadataImage(card.poster_ref, "w342");
+          const percent =
+            card.progress !== null && card.progress !== undefined ? Math.round(card.progress * 100) : null;
+          const body = (
+            <>
+              {ambient && !compact && src ? (
+                // behind the poster, in the same cell: its colours spill around it
                 <span
-                  className="widget-continue__bar"
-                  role="progressbar"
-                  aria-valuenow={percent}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={card.title}
-                >
-                  <span style={{ inlineSize: `${percent}%` }} />
+                  className="widget-continue__glow"
+                  style={{ backgroundImage: `url("${src}")` }}
+                  aria-hidden="true"
+                />
+              ) : null}
+              <span className="widget-continue__art">
+                {src ? (
+                  <img src={src} alt="" loading="lazy" />
+                ) : (
+                  <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={26} />
+                )}
+                <span className="widget-continue__kind" aria-hidden="true">
+                  <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={12} />
                 </span>
-              ) : card.subtitle ? null : (
-                // the kind only when nothing else says what it is (an episode has its « S02E11 »)
-                <span className="widget-continue__meta">{t(`media:kind.${card.kind ?? "movie"}`)}</span>
-              )}
-            </span>
-          </>
-        );
-        return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: two sessions may share a title
-          <li key={`${card.id ?? card.title}-${index}`}>
-            <Resume card={card} src={card.image_id ?? null} body={body} resume={resume} />
-          </li>
-        );
-      })}
-    </ul>
+              </span>
+              <span className="widget-continue__text">
+                <span className="widget-continue__title">{card.title}</span>
+                {card.subtitle ? <span className="widget-continue__meta">{card.subtitle}</span> : null}
+                {percent !== null ? (
+                  <span
+                    className="widget-continue__bar"
+                    role="progressbar"
+                    aria-valuenow={percent}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={card.title}
+                  >
+                    <span style={{ inlineSize: `${percent}%` }} />
+                  </span>
+                ) : card.subtitle ? null : (
+                  // the kind only when nothing else says what it is (an episode has its « S02E11 »)
+                  <span className="widget-continue__meta">{t(`media:kind.${card.kind ?? "movie"}`)}</span>
+                )}
+              </span>
+            </>
+          );
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: two sessions may share a title
+            <li key={`${card.id ?? card.title}-${index}`}>
+              <Resume card={card} src={card.image_id ?? null} body={body} resume={resume} />
+            </li>
+          );
+        })}
+      </ul>
+    </>
   );
 }
 

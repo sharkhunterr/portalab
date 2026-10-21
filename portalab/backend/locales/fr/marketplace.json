@@ -792,5 +792,6 @@
   "what.xp_boost": "Multiplie l'XP que vous gagnez pendant un temps, en plus des séries et des événements (dans la limite du portail). Acheté pendant qu'un autre est actif, il démarre à sa fin.",
   "widget.featured.all": "{count, plural, one {Voir le produit} other {Voir les # produits}} de la boutique",
   "widget.featured.description": "Quelques produits à obtenir avec vos Coins.",
+  "widget.featured.open": "Boutique",
   "widget.featured.title": "Boutique"
 }

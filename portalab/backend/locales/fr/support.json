@@ -318,6 +318,7 @@
   "types.workflow": "Workflow",
   "widget.incidents.description": "Les incidents actuellement en cours.",
   "widget.incidents.title": "Incidents en cours",
+  "widget.my_tickets.all": "Tous",
   "widget.my_tickets.close": "Fermer",
   "widget.my_tickets.created": "Votre ticket est ouvert.",
   "widget.my_tickets.description": "Vos tickets en cours.",

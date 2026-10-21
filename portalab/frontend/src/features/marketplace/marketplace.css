@@ -1630,3 +1630,23 @@ a.mk-kpi__link:hover {
     font-size: var(--font-size-lg);
   }
 }
+
+/* the shop window on one column: a carousel of products, the next one peeking */
+@container (max-width: 26rem) {
+  .shop-window__list {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 78%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-block-end: var(--scroller-gap);
+  }
+  .widget-frame__body .shop-window__list > li,
+  .widget-frame__body .shop-window__list > li[data-overflow] {
+    visibility: visible;
+    scroll-snap-align: start;
+  }
+  .shop-window__all {
+    display: none; /* the header's link opens the shop */
+  }
+}

@@ -3,7 +3,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
-// Issue 168 — the homelab's radio: what plays with its cover, listen, ask the DJ and follow the request.
+// Issue 168 — the homelab's radio: what plays with its cover on its card; « Ask the DJ » opens the portal's
+// audio player, whose bigger view holds the request (followed until queued) and what played.
 
 const fake = vi.hoisted(() => ({
   handler: (_: Request): Response | Promise<Response> => new Response(null),
@@ -17,6 +18,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 
 import type { Radio } from "../../../src/features/media/radio/api";
 import { RadioCard } from "../../../src/features/media/radio/RadioCard";
+import { RadioHost } from "../../../src/features/media/radio/RadioHost";
 import { json } from "../../support/fake-api";
 
 const RADIO: Radio = {
@@ -35,14 +37,15 @@ function show() {
   render(
     <QueryClientProvider client={client}>
       <MemoryRouter>
-        <RadioCard radio={RADIO} history />
+        <RadioCard radio={RADIO} />
+        <RadioHost />
       </MemoryRouter>
     </QueryClientProvider>,
   );
 }
 
 describe("RadioCard", () => {
-  it("shows what plays and asks the DJ, following the request until it is queued", async () => {
+  it("shows what plays, opens the player to ask the DJ and follows the request until it is queued", async () => {
     const asked: unknown[] = [];
     let polls = 0;
     fake.handler = async (request) => {
@@ -55,6 +58,7 @@ describe("RadioCard", () => {
         polls += 1;
         return json(200, { id: "r1", status: "queued", track: { title: "Midnight City" } });
       }
+      if (path === "/api/v1/media/radio") return json(200, RADIO);
       return json(404, {});
     };
     show();
@@ -64,7 +68,9 @@ describe("RadioCard", () => {
       "/api/v1/media/radio/covers/abc",
     );
     expect(screen.getByRole("button", { name: "Listen" })).toBeTruthy();
-    expect(screen.getByText("Walk of Life")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Ask the DJ" }));
+    expect(await screen.findByRole("dialog")).toBeTruthy(); // the player's bigger view
+    expect(await screen.findByText("Walk of Life")).toBeTruthy(); // what played
     fireEvent.change(screen.getByLabelText("Ask the DJ for a song"), {
       target: { value: "something by M83" },
     });
