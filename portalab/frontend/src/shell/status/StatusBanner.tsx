@@ -42,11 +42,11 @@ function When({ starts, ends }: { starts: string; ends?: string | null | undefin
 }
 
 /**
- * 027: a maintenance or an incident announced across the portal — a compact tinted card: its icon, what it
- * is and when (« Maintenance · ends in 2 hours ») with its title, a line of details under them, the start
- * and end apart in a chip, a link to
- * the details and a close button; a running window shows how far along it is along its bottom edge. On a
- * phone the dates go under the title.
+ * 027: a maintenance, an incident or an announcement told across the portal — a compact tinted card: its
+ * icon, what it is and when (« Maintenance · ends in 2 hours ») with its title, a line of details under
+ * them, the start and end apart in a chip, a link to the details and a close button; a running window shows
+ * how far along it is along its bottom edge. On a phone the dates go under the title. An announcement may
+ * have no dates nor link, and a critical one cannot be closed.
  */
 export function StatusBanner({
   tone,
@@ -58,18 +58,20 @@ export function StatusBanner({
   ends,
   progress,
   details,
+  detailsLabel,
   onClose,
 }: {
-  tone: "planned" | "running" | "incident";
+  tone: "planned" | "running" | "incident" | "info" | "success" | "warning" | "critical";
   icon: string;
   eyebrow: string[];
   title: string;
   text?: string | null | undefined;
-  starts: string;
+  starts?: string | null | undefined;
   ends?: string | null | undefined;
   progress?: number | null | undefined;
-  details: string;
-  onClose: () => void;
+  details?: string | null | undefined;
+  detailsLabel?: string;
+  onClose?: (() => void) | undefined;
 }) {
   const t = useT();
   return (
@@ -89,20 +91,24 @@ export function StatusBanner({
             </p>
           ) : null}
         </div>
-        <When starts={starts} ends={ends} />
-        <Link to={details} className="status-banner__details">
-          {t("support:banner.details")}
-          <Icon name="chevron-right" size={14} />
-        </Link>
-        <button
-          type="button"
-          className="status-banner__close"
-          onClick={onClose}
-          aria-label={t("support:banner.close")}
-          title={t("support:banner.close")}
-        >
-          <Icon name="close" size={12} />
-        </button>
+        {starts ? <When starts={starts} ends={ends} /> : null}
+        {details ? (
+          <Link to={details} className="status-banner__details">
+            {detailsLabel ?? t("support:banner.details")}
+            <Icon name="chevron-right" size={14} />
+          </Link>
+        ) : null}
+        {onClose ? (
+          <button
+            type="button"
+            className="status-banner__close"
+            onClick={onClose}
+            aria-label={t("support:banner.close")}
+            title={t("support:banner.close")}
+          >
+            <Icon name="close" size={12} />
+          </button>
+        ) : null}
       </div>
       {progress != null ? (
         <span
