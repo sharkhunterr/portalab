@@ -616,3 +616,161 @@
     grid-column: 2;
   }
 }
+
+/* issue 189: « Leaderboard » on the dashboard — the podium, the ranking under it, my place apart; the
+   podium follows the block's height (its steps, its faces), the ranking gives way when it is low */
+.widget-leaderboard {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  block-size: 100%;
+  min-block-size: 0;
+  transition: opacity var(--motion-duration-fast, 150ms) ease;
+}
+.widget-leaderboard[data-loading] {
+  opacity: 0.6;
+}
+.widget-leaderboard__podium .community-podium {
+  gap: var(--space-2);
+  max-inline-size: 28rem;
+  margin: 0 auto;
+}
+.widget-leaderboard__podium .community-podium__who {
+  gap: 0.1rem;
+}
+.widget-leaderboard__podium .community-podium .ds-avatar {
+  inline-size: clamp(1.8rem, 16cqh, 3.4rem);
+  block-size: clamp(1.8rem, 16cqh, 3.4rem);
+}
+.widget-leaderboard__podium .community-podium li[data-rank="1"] .ds-avatar {
+  inline-size: clamp(2.2rem, 20cqh, 4.2rem);
+  block-size: clamp(2.2rem, 20cqh, 4.2rem);
+}
+.widget-leaderboard__podium .community-podium__medal {
+  inline-size: 1.3rem;
+  block-size: 1.3rem;
+}
+.widget-leaderboard__podium .community-podium__step {
+  font-size: var(--font-size-sm);
+}
+.widget-leaderboard__podium .community-podium li[data-rank="1"] .community-podium__step {
+  block-size: clamp(1.3rem, 11cqh, 3.6rem);
+}
+.widget-leaderboard__podium .community-podium li[data-rank="2"] .community-podium__step {
+  block-size: clamp(1rem, 8cqh, 2.6rem);
+}
+.widget-leaderboard__podium .community-podium li[data-rank="3"] .community-podium__step {
+  block-size: clamp(0.8rem, 6cqh, 1.9rem);
+}
+.widget-leaderboard__rows {
+  display: grid;
+  align-content: start;
+  gap: 0.2rem;
+  min-block-size: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+.widget-leaderboard__rows > li {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.2rem var(--space-2);
+  border-radius: var(--radius-md);
+}
+.widget-leaderboard__rows > li:nth-child(odd) {
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+.widget-leaderboard__rows > li[data-me] {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+.widget-leaderboard__rank {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.widget-leaderboard__score {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+.widget-leaderboard__me {
+  margin: 0;
+  padding: 0.3rem var(--space-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+.widget-leaderboard__mine {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-inline-size: 0;
+  white-space: nowrap;
+}
+.widget-leaderboard__mine > svg {
+  flex: none;
+  color: var(--rarity-legendary);
+}
+.widget-leaderboard__mine strong {
+  font-variant-numeric: tabular-nums;
+}
+.widget-leaderboard__period {
+  max-inline-size: 9rem;
+  min-block-size: 1.6rem;
+  padding: 0.05rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+.widget-leaderboard__period option {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+/* a low block: the podium and my place, the ranking gives way */
+@container (max-height: 12rem) {
+  .widget-leaderboard__rows {
+    display: none;
+  }
+}
+/* lower still: the medals and the moves give way (the step says the place) */
+@container (max-height: 14rem) {
+  .widget-leaderboard__podium .community-podium__medal,
+  .widget-leaderboard__podium .rank-move {
+    display: none;
+  }
+  .widget-leaderboard__podium .community-podium li {
+    gap: 0.15rem;
+  }
+}
+/* very low: the faces and their scores, the names give way */
+@container (max-height: 8.5rem) {
+  .widget-leaderboard__podium .community-podium__who strong {
+    display: none;
+  }
+}
+
+/* the one-row form: my place, the period */
+.widget-leaderboard-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  block-size: 100%;
+  min-inline-size: 0;
+}
+.widget-leaderboard-line__place {
+  display: flex;
+  min-inline-size: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  text-decoration: none;
+}

@@ -61,8 +61,10 @@ from portalab.modules.community.feed.projector import CONSUMER, FeedProjector
 from portalab.modules.community.feed.service import FeedService
 from portalab.modules.community.integrations import (
     ACTIVITY_WIDGET,
+    LEADERBOARD_WIDGET,
     PROJECTS_WIDGET,
     ActivityWidget,
+    LeaderboardWidget,
     ProjectsWidget,
 )
 from portalab.modules.community.leaderboards.view import LeaderboardsView
@@ -180,6 +182,10 @@ class CommunityModule:
         if self.widgets.get(PROJECTS_WIDGET.key) is None:
             self.widgets.register(
                 PROJECTS_WIDGET, ProjectsWidget(self.proposals, self.votes, self.clock), owner=OWNER
+            )
+        if self.widgets.get(LEADERBOARD_WIDGET.key) is None:
+            self.widgets.register(
+                LEADERBOARD_WIDGET, LeaderboardWidget(self.leaderboards, self.clock), owner=OWNER
             )
         participant = CommunityParticipant(self.database)
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):

@@ -110,6 +110,33 @@ function ConfigDialog({
   useExternalRevision();
   const addons = addonsFor(instance.widget_key);
   const wornOptions = Array.isArray(draft._options) ? (draft._options as string[]) : [];
+  // issue 189: a pack's add-on aimed at this very widget is one of its looks — chosen in « Visual » with
+  // the widget's own, one at a time; an add-on for every widget (a decoration) stays a box to tick
+  const packLooks = addons.filter((addon) => addon.widget?.for === instance.widget_key && addon.look);
+  const decorations = addons.filter((addon) => addon.widget?.for !== instance.widget_key);
+  const wornLook = packLooks.find((addon) => wornOptions.includes(addon.look ?? ""))?.look ?? null;
+  const lookLocked = (look: string) => isLocked("_options", look) && wornLook !== look;
+  const styles = properties.style?.enum?.map(String) ?? null;
+  const pickVisual = (value: string) => {
+    const others = wornOptions.filter((x) => !packLooks.some((addon) => addon.look === x));
+    if (value.startsWith("pack:"))
+      setDraft({
+        ...draft,
+        ...(styles ? { style: styles[0] } : {}), // the widget's own look under it: its first (classic)
+        _options: [...others, value.slice("pack:".length)],
+      });
+    else setDraft({ ...draft, ...(styles ? { style: value } : {}), _options: others });
+  };
+  const packOptions = packLooks.map((addon) => {
+    const look = addon.look ?? "";
+    return (
+      <option key={`pack:${look}`} value={`pack:${look}`} disabled={lookLocked(look)}>
+        {lookLocked(look) ? "🔒 " : ""}
+        {t(`dashboard:packOption.${look}`)}
+        {lookLocked(look) ? ` · ${t("dashboard:inShop")}` : ""}
+      </option>
+    );
+  });
   const skins = externalLooks("widget_style").filter(
     (skin) => !skin.widget?.for || skin.widget.for === instance.widget_key,
   );
@@ -186,6 +213,24 @@ function ConfigDialog({
                 ))}
               </SelectField>
             );
+          if (name === "style" && schema.enum && packLooks.length)
+            return (
+              <SelectField
+                key={name}
+                label={label(`${base}.${name}`, name)}
+                value={wornLook ? `pack:${wornLook}` : String(value ?? "")}
+                onChange={(e) => pickVisual(e.target.value)}
+              >
+                {schema.enum.map((option) => (
+                  <option key={String(option)} value={String(option)} disabled={isLocked(name, option)}>
+                    {isLocked(name, option) ? "🔒 " : ""}
+                    {label(`${base}.${name}.${String(option)}`, String(option))}
+                    {isLocked(name, option) ? ` · ${t("dashboard:inShop")}` : ""}
+                  </option>
+                ))}
+                {packOptions}
+              </SelectField>
+            );
           if (schema.enum)
             return (
               <SelectField
@@ -246,6 +291,17 @@ function ConfigDialog({
             />
           );
         })}
+        {!styles && packLooks.length ? (
+          // a widget without looks of its own: « Visual » holds its classic one and the packs'
+          <SelectField
+            label={label(`${base}.style`, "style")}
+            value={wornLook ? `pack:${wornLook}` : ""}
+            onChange={(e) => pickVisual(e.target.value)}
+          >
+            <option value="">{label(`${base}.style.classic`, "classic")}</option>
+            {packOptions}
+          </SelectField>
+        ) : null}
         <fieldset className="widget-config__frame">
           <legend>{t("dashboard:frame.options")}</legend>
           <CheckboxField
@@ -277,7 +333,7 @@ function ConfigDialog({
               ))}
             </SelectField>
           ) : null}
-          {addons.map((addon) => {
+          {decorations.map((addon) => {
             const look = addon.look ?? "";
             const locked = isLocked("_options", look) && !wornOptions.includes(look);
             return (
