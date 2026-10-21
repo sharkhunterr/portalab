@@ -239,7 +239,7 @@
   "tours.services.description": "Ce qui marche, ce qui ne marche pas, et comment ça va.",
   "tours.services.done.text": "Ouvre un ticket depuis le support — l'état du service y est joint pour toi.",
   "tours.services.done.title": "Un souci ?",
-  "tours.services.header.text": "Ce cœur dans l'en-tête passe à l'orange ou au rouge quand quelque chose ne va pas.",
+  "tours.services.header.text": "Ce cœur dans l'en-tête, c'est le centre de contrôle : il passe à l'orange ou au rouge quand quelque chose ne va pas, et montre aussi les maintenances et les annonces en cours.",
   "tours.services.header.title": "Toujours en vue",
   "tours.services.status.text": "Tout va bien, dégradé ou incident : la santé du portail en une ligne.",
   "tours.services.status.title": "En résumé",

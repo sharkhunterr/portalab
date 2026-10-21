@@ -12,7 +12,7 @@ import { useSlots } from "../slots/providers";
 import { useShellStrings } from "../strings";
 import { HeaderSearch } from "./HeaderSearch";
 import { type PersonalEntry, PersonalMenu } from "./PersonalMenu";
-import { IncidentsButton } from "./PortalStatus";
+import { ControlCenterButton } from "./PortalStatus";
 import { ProgressChip } from "./ProgressChip";
 import type { useHeaderData } from "./useHeaderData";
 
@@ -64,7 +64,7 @@ export function AppHeader({
           <HeaderSearch phone />
         </div>
         <div className="shell-header__end">
-          <IncidentsButton />
+          <ControlCenterButton />
           <PluginSlot name="header.action" compact />
           {data.progression ? (
             <RegionBoundary resetKey="progression">
@@ -124,7 +124,7 @@ export function AppHeader({
         <div className="shell-header__search">{phone ? <SearchField compact /> : <HeaderSearch />}</div>
       )}
       <div className="shell-header__end">
-        <IncidentsButton />
+        <ControlCenterButton />
         <PluginSlot name="header.action" compact />
         {bottomBar ? null : <NotificationButton unread={data.unread} />}
         {data.progression ? (

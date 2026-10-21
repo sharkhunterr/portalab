@@ -42,6 +42,43 @@ export function useMaintenances() {
   });
 }
 
+/** An announcement the administrator chose to show « as a banner », while it lasts. */
+export interface AnnouncementBanner {
+  id: string;
+  title: string;
+  body: string;
+  link: string | null;
+  tone: string;
+  banner_until: string | null;
+  dismissible: boolean;
+  created_at: string;
+}
+
+export const ANNOUNCEMENT_TONES = ["info", "success", "warning", "critical"] as const;
+export type AnnouncementTone = (typeof ANNOUNCEMENT_TONES)[number];
+export const ANNOUNCEMENT_ICONS: Record<AnnouncementTone, string> = {
+  info: "megaphone",
+  success: "sparkles",
+  warning: "alert",
+  critical: "alert",
+};
+
+export function announcementTone(tone: string): AnnouncementTone {
+  return ANNOUNCEMENT_TONES.find((x) => x === tone) ?? "info";
+}
+
+export function useAnnouncementBanners() {
+  return useQuery({
+    queryKey: ["announcements", "banners"],
+    retry: false,
+    refetchInterval: 60_000, // issue 122: an automation's banner comes and goes with what it announces
+    queryFn: async () => {
+      const data = (await api.GET("/api/v1/announcements/banners")).data;
+      return (Array.isArray(data) ? data : []) as unknown as AnnouncementBanner[];
+    },
+  });
+}
+
 /** A maintenance still to come or running (not cancelled), and whether it runs now. */
 export function upcoming(items: Maintenance[] | undefined, within: number, now = Date.now()) {
   return (items ?? [])
