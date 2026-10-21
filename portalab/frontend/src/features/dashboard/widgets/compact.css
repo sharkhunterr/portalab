@@ -224,82 +224,24 @@
   white-space: nowrap;
 }
 
-/* « my statistics »: the figures grow with the block, the chart takes the height left */
+/* « my statistics » (issue 185): the figures as small tiles at the top right, the chart below them over
+   the whole width and all the height left */
 .widget-frame__body .widget-media-stats:has(> .widget-media-stats__chart) {
-  grid-template-rows: auto auto minmax(48px, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   block-size: 100cqh;
 }
-/* issue 118: the figures grow with the block — its width as much as its height */
-.widget-frame__body .widget-media-stats__figures strong {
-  font-size: clamp(var(--font-size-lg, 1.1rem), min(calc(0.4rem + 4.2cqw), calc(0.5rem + 7cqh)), 2.8rem);
-}
-.widget-frame__body .widget-media-stats__figures p[data-main] strong {
-  font-size: clamp(var(--font-size-xl), min(calc(0.6rem + 5cqw), calc(0.6rem + 9cqh)), 3.4rem);
-}
-/* wide and low: the figures on the left, the chart beside them over the whole height */
-@container (min-width: 40rem) and (max-height: 20rem) {
-  .widget-frame__body .widget-media-stats:has(> .widget-media-stats__chart) {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    grid-template-areas:
-      "context chart"
-      "figures chart"
-      "more chart";
-    column-gap: var(--space-4);
-  }
+/* narrow: the context gives way, the figures take the top row */
+@container (max-width: 26rem) {
   .widget-media-stats__context {
-    grid-area: context;
-  }
-  .widget-media-stats__figures {
-    grid-area: figures;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-content: center;
-  }
-  .widget-media-stats__chart {
-    grid-area: chart;
-  }
-  .widget-media-stats__more {
-    grid-area: more;
-  }
-  .widget-frame__body .widget-media-stats__figures strong {
-    font-size: clamp(var(--font-size-lg, 1.1rem), min(calc(0.3rem + 2.4cqw), calc(0.4rem + 8cqh)), 2.4rem);
-  }
-  .widget-frame__body .widget-media-stats__figures p[data-main] strong {
-    font-size: clamp(var(--font-size-xl), min(calc(0.4rem + 3cqw), calc(0.5rem + 10cqh)), 2.8rem);
-  }
-}
-/* one column: two tiles a row, the labels kept short */
-@container (max-width: 22rem) {
-  .widget-media-stats__figures {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .widget-media-stats__figures p {
-    padding: var(--space-1) var(--space-2);
-  }
-  .widget-frame__body .widget-media-stats__figures strong {
-    font-size: clamp(var(--font-size-md, 1rem), calc(0.4rem + 6cqw), 1.6rem);
-  }
-}
-
-/* narrow and low: the figures and the chart only (the context and the link give way) */
-@container (max-width: 22rem) and (max-height: 15rem) {
-  .widget-media-stats__context,
-  .widget-media-stats__more {
     display: none;
   }
-  .widget-frame__body .widget-media-stats:has(> .widget-media-stats__chart) {
-    grid-template-rows: auto minmax(40px, 1fr);
-    gap: var(--space-2);
-  }
-  .widget-media-stats__figures p {
-    padding: 0.15rem var(--space-2);
-  }
-  .widget-media-stats__figures span {
-    font-size: 0.65rem;
+  .widget-media-stats > .widget-media-stats__figures {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
   }
 }
 
-/* one row (issue 118): every figure in a line, as many as the width holds, a sparkline where there is room */
 .widget-media-stats-line {
   display: flex;
   align-items: center;
@@ -363,9 +305,6 @@
 }
 .widget-media-stats__chart .recharts-responsive-container {
   block-size: 100% !important;
-}
-.widget-frame__body .widget-media-stats__figures strong {
-  font-size: clamp(var(--font-size-xl), calc(0.5rem + 5cqh), 2.6rem);
 }
 .widget-media-stats__plot {
   block-size: 100%;
