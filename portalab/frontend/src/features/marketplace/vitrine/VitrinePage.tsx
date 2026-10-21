@@ -475,7 +475,11 @@ export default function VitrinePage() {
       />
 
       <div className="vitrine__layout">
-        <aside className="vitrine-side" aria-label={t("marketplace:vitrine.nav")}>
+        <aside
+          className="vitrine-side"
+          data-browsing={!home || undefined}
+          aria-label={t("marketplace:vitrine.nav")}
+        >
           <div className="vitrine-wallet">
             <span className="vitrine-wallet__label">
               <Icon name="wallet" size={14} />
@@ -506,6 +510,8 @@ export default function VitrinePage() {
             />
           </label>
 
+          {/* on a phone: the departments as a grid of tiles on the showcase's home */}
+          <h2 className="vitrine-nav__title">{t("marketplace:vitrine.browse")}</h2>
           <nav className="vitrine-nav">
             <button
               type="button"
@@ -607,6 +613,18 @@ export default function VitrinePage() {
           {products.data && !home ? (
             <section className="vitrine-browse" aria-label={heading}>
               <header className="vitrine-browse__head">
+                {/* on a phone: back to the departments' tiles */}
+                <button
+                  type="button"
+                  className="vitrine-back"
+                  onClick={() => {
+                    setQ("");
+                    setParams({});
+                  }}
+                >
+                  <Icon name="chevron-left" size={16} />
+                  {t("marketplace:vitrine.departments")}
+                </button>
                 <h2>
                   {heading}
                   <span className="vitrine-count">
@@ -614,9 +632,14 @@ export default function VitrinePage() {
                   </span>
                 </h2>
                 {department && department.shelves.length > 1 ? (
-                  <fieldset className="vitrine-chips" aria-label={t("marketplace:shop.byType")}>
+                  <fieldset
+                    className="vitrine-chips vitrine-shelves"
+                    aria-label={t("marketplace:shop.byType")}
+                  >
                     <button type="button" aria-pressed={!shelf} onClick={() => go(department.key)}>
-                      {t("marketplace:vitrine.all")}
+                      <Icon name={department.icon} size={14} />
+                      <span>{t("marketplace:vitrine.all")}</span>
+                      <span className="vitrine-count">{counts.byDepartment[department.key] ?? 0}</span>
                     </button>
                     {department.shelves.map((s) =>
                       counts.byShelf[`${department.key}/${s.key}`] ? (
@@ -627,7 +650,10 @@ export default function VitrinePage() {
                           onClick={() => go(department.key, s.key)}
                         >
                           <Icon name={s.icon} size={14} />
-                          {shelfLabel(t, s)}
+                          <span>{shelfLabel(t, s)}</span>
+                          <span className="vitrine-count">
+                            {counts.byShelf[`${department.key}/${s.key}`]}
+                          </span>
                         </button>
                       ) : null,
                     )}

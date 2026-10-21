@@ -668,6 +668,34 @@
   width: min(36rem, 100vw);
 }
 
+.vitrine-nav__title,
+.vitrine-back {
+  display: none;
+}
+.vitrine-back {
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.2rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.45rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+.vitrine-shelves > button > span:first-of-type {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vitrine-shelves > button > .vitrine-count {
+  margin-inline-start: auto;
+}
+
 /* --- a narrow page: the rail on top, the departments in a row that scrolls -------------------------------- */
 @media (max-width: 64rem) {
   .vitrine__layout {
@@ -693,22 +721,83 @@
   .vitrine-wallet__afford {
     grid-column: 1 / -1;
   }
+  /* the departments as tiles, three a row: an icon, the name, how many */
+  .vitrine-nav__title {
+    display: block;
+    grid-column: 1 / -1;
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.72rem;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
   .vitrine-nav {
     grid-column: 1 / -1;
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    overflow-x: auto;
-    scrollbar-width: none;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
   }
   .vitrine-nav__group {
     display: contents;
   }
-  .vitrine-nav__item {
+  .vitrine-nav > .vitrine-nav__item {
+    display: none; /* the spotlight: the home itself */
+  }
+  .vitrine-nav__group > .vitrine-nav__item {
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.35rem;
+    min-block-size: 4.6rem;
+    padding: var(--space-2) var(--space-1);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    text-align: center;
+  }
+  .vitrine-nav__group > .vitrine-nav__item > .ds-icon {
+    inline-size: 1.4rem;
+    block-size: 1.4rem;
+    color: var(--color-accent);
+  }
+  .vitrine-nav__group > .vitrine-nav__item > span:first-of-type {
+    flex: none;
+    inline-size: 100%;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.2;
+    white-space: normal;
+  }
+  .vitrine-nav__group > .vitrine-nav__item > .vitrine-count {
+    position: absolute;
+    inset-block-start: 0.3rem;
+    inset-inline-end: 0.3rem;
   }
   .vitrine-nav__shelves {
     display: none;
+  }
+  /* browsing a department or a search: the tiles step aside, « All departments » brings them back */
+  .vitrine-side[data-browsing] .vitrine-nav,
+  .vitrine-side[data-browsing] .vitrine-nav__title {
+    display: none;
+  }
+  .vitrine-back {
+    display: inline-flex;
+  }
+  .vitrine-browse__head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  /* a department's kinds as a grid of two, each with how many */
+  .vitrine-shelves {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .vitrine-shelves > button {
+    justify-content: flex-start;
+    padding: 0.45rem 0.6rem;
+    border-radius: var(--radius-md);
+    text-align: start;
   }
   .vitrine-side__links {
     display: none;
