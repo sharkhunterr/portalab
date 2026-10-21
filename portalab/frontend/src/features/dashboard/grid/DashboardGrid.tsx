@@ -68,6 +68,25 @@ export function closeEmptyRows(items: Item[]): Item[] {
   return items.map((item) => ({ ...item, y: shift(item.y) }));
 }
 
+/**
+ * Issue 12: outside editing, a widget hidden while empty gives its place to its neighbour in the same row
+ * (same top and height) — the one before it, else the one after — so no hole stays beside it. Display only.
+ */
+export function fillHoles(items: Item[], away: readonly Item[]): Item[] {
+  const out = items.map((item) => ({ ...item }));
+  for (const gone of away) {
+    const sameRow = out.filter((item) => item.y === gone.y && item.h === gone.h);
+    const before = sameRow.find((item) => item.x + item.w === gone.x);
+    const after = sameRow.find((item) => item.x === gone.x + gone.w);
+    if (before) before.w += gone.w;
+    else if (after) {
+      after.x = gone.x;
+      after.w += gone.w;
+    }
+  }
+  return out;
+}
+
 export function DashboardGrid({
   label,
   instances,
@@ -97,7 +116,16 @@ export function DashboardGrid({
   // 027: outside editing, rows no widget covers (left by a removed or an empty, hidden widget) close up
   const away = arranger ? [] : placed.filter((item) => collapsed.has(item.id));
   const shown = [
-    ...readingOrder(arranger ? placed : closeEmptyRows(placed.filter((item) => !collapsed.has(item.id)))),
+    ...readingOrder(
+      arranger
+        ? placed
+        : closeEmptyRows(
+            fillHoles(
+              placed.filter((item) => !collapsed.has(item.id)),
+              placed.filter((item) => collapsed.has(item.id)),
+            ),
+          ),
+    ),
     ...away,
   ];
   const bottom = Math.max(0, ...shown.filter((item) => !away.includes(item)).map((item) => item.y + item.h));
