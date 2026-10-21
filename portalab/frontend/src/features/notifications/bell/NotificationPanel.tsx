@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
+import { CurrencyShort } from "../../../design-system/site/SiteLook";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -254,6 +255,31 @@ export function NotificationPanel({
   );
 }
 
+const REWARD_ICONS: Record<string, string> = { xp: "sparkles", coins: "coins", contribution: "heart" };
+
+/** Issue 186: what a notification brought — XP, the site's currency, contribution, a boost — as badges. */
+export function Rewards({ item }: { item: NotificationItem }) {
+  const t = useT();
+  const format = useFormat();
+  const rewards = item.rewards ?? [];
+  if (!rewards.length && !item.boost) return null;
+  return (
+    <span className="notif-rewards">
+      {rewards.map((reward) => (
+        <span key={reward.value} className="notif-reward" data-value={reward.value}>
+          <Icon name={REWARD_ICONS[reward.value] ?? "gift"} size={12} />+{format.number(reward.amount)}{" "}
+          {reward.value === "coins" ? <CurrencyShort /> : t(`notifications:reward.${reward.value}`)}
+        </span>
+      ))}
+      {item.boost ? (
+        <span className="notif-reward" data-value="boost">
+          <Icon name="rocket" size={12} />×{item.boost}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
 function PanelItem({
   item,
   onDone,
@@ -300,74 +326,85 @@ function PanelItem({
           aria-label={`${t("notifications:panel.select")}: ${item.title}`}
         />
       ) : null}
-      <button type="button" className="notif-row__main" onClick={open} tabIndex={selecting ? -1 : undefined}>
-        <span className="notif-row__icon" aria-hidden="true">
-          <Icon name={look.icon} size={18} />
-        </span>
-        <span className="notif-row__text">
+      <span className="notif-row__icon" aria-hidden="true">
+        <Icon name={look.icon} size={18} />
+      </span>
+      <div className="notif-row__content">
+        <button
+          type="button"
+          className="notif-row__main"
+          onClick={open}
+          tabIndex={selecting ? -1 : undefined}
+        >
           <span className="notif-row__title">
             {item.kind === "alert" ? (
               <span className="notif-row__badge">{t("notifications:kind.alert")}</span>
             ) : null}
             <strong>{item.title}</strong>
             {item.count > 1 ? <span className="notif-row__repeat">×{item.count}</span> : null}
+            {item.read ? null : (
+              <span className="notif-row__dot">
+                <span className="visually-hidden">{t("notifications:center.filter.unread")}</span>
+              </span>
+            )}
           </span>
-          {item.body ? <span className="notif-row__body">{item.body}</span> : null}
+          {item.subtitle ? <span className="notif-row__subtitle">{item.subtitle}</span> : null}
+          {item.body && item.body !== item.subtitle ? (
+            <span className="notif-row__body">{item.body}</span>
+          ) : null}
+          <Rewards item={item} />
+        </button>
+        <div className="notif-row__foot">
           <time dateTime={item.updated_at} title={format.dateTime(item.updated_at)}>
             {format.relative((Date.parse(item.updated_at) - Date.now()) / 1000)}
           </time>
-        </span>
-        {item.read ? null : (
-          <span className="notif-row__dot">
-            <span className="visually-hidden">{t("notifications:center.filter.unread")}</span>
-          </span>
-        )}
-      </button>
-      {selecting ? null : (
-        <div className="notif-row__actions">
-          {item.read ? null : (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => actions.read.mutate(item.id)}
-              aria-label={`${t("notifications:center.read")}: ${item.title}`}
-              title={t("notifications:center.read")}
-            >
-              <Icon name="check" size={15} />
-            </Button>
+          {selecting ? null : (
+            <div className="notif-row__actions">
+              {item.read ? null : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => actions.read.mutate(item.id)}
+                  aria-label={`${t("notifications:center.read")}: ${item.title}`}
+                  title={t("notifications:center.read")}
+                >
+                  <Icon name="check" size={15} />
+                </Button>
+              )}
+              {item.archived ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => actions.bulk.mutate({ ids: [item.id], action: "unarchive" })}
+                  aria-label={`${t("notifications:panel.unarchive")}: ${item.title}`}
+                  title={t("notifications:panel.unarchive")}
+                >
+                  <Icon name="undo" size={15} />
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => actions.archive.mutate(item.id)}
+                  aria-label={`${t("notifications:center.archive")}: ${item.title}`}
+                  title={t("notifications:center.archive")}
+                >
+                  <Icon name="inbox" size={15} />
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => actions.remove.mutate(item.id)}
+                aria-label={`${t("notifications:center.delete")}: ${item.title}`}
+                title={t("notifications:center.delete")}
+              >
+                <Icon name="trash" size={15} />
+              </Button>
+            </div>
           )}
-          {item.archived ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => actions.bulk.mutate({ ids: [item.id], action: "unarchive" })}
-              aria-label={`${t("notifications:panel.unarchive")}: ${item.title}`}
-              title={t("notifications:panel.unarchive")}
-            >
-              <Icon name="undo" size={15} />
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => actions.archive.mutate(item.id)}
-              aria-label={`${t("notifications:center.archive")}: ${item.title}`}
-              title={t("notifications:center.archive")}
-            >
-              <Icon name="inbox" size={15} />
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => actions.remove.mutate(item.id)}
-            aria-label={`${t("notifications:center.delete")}: ${item.title}`}
-            title={t("notifications:center.delete")}
-          >
-            <Icon name="trash" size={15} />
-          </Button>
         </div>
-      )}
+      </div>
     </li>
   );
 }

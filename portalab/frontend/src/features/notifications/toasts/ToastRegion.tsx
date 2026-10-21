@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { connectStream, type LiveEvent } from "../../../api/stream";
 import { useNotify } from "../../../design-system/components/Notification";
 import { useT } from "../../../i18n/hooks/useT";
+import type { NotificationItem } from "../api";
 import { fetchLatest } from "../api";
 import { lookOf, severityOf } from "../presentation";
 
@@ -40,7 +41,8 @@ export function ToastRegion({ connect = connectStream }: ToastRegionProps) {
             tone: look.tone,
             icon: look.icon,
             title: item.title,
-            ...(item.body ? { body: item.body } : {}),
+            // issue 186: what it is about and what it brought, under the title
+            ...(toastBody(item, t) ? { body: toastBody(item, t) } : {}),
             ...(look.badge ? { badge: t(`notifications:badge.${look.badge}`) } : {}),
             ...(item.action_url ? { href: item.action_url, linkLabel: t("notifications:open") } : {}),
           });
@@ -50,4 +52,19 @@ export function ToastRegion({ connect = connectStream }: ToastRegionProps) {
     return () => handle.close();
   }, [connect, client, notify, t]);
   return null;
+}
+
+function toastBody(item: NotificationItem, t: (key: string) => string): string {
+  const rewards = (item.rewards ?? []).map(
+    (reward) =>
+      `+${reward.amount} ${reward.value === "coins" ? t("shell:coins") : t(`notifications:reward.${reward.value}`)}`,
+  );
+  if (item.boost) rewards.push(`×${item.boost}`);
+  return [
+    item.subtitle,
+    item.body && item.body !== item.subtitle ? item.body : null,
+    rewards.join(" · ") || null,
+  ]
+    .filter(Boolean)
+    .join(" — ");
 }
