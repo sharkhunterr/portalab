@@ -35,28 +35,32 @@ DEFAULT_POLICIES: dict[str, dict[str, Any]] = {
 }
 
 # 027: a first visit — free widgets only (nothing to buy first), in rows of 12 columns that fit together
-# (each row's widgets share a height; widgets a member cannot use yet are skipped). Under the pinned line
-# (incidents · campaign, one row each): a glance line (shortcuts, my level, today's objectives, compact),
-# what is new for me beside a title drawn at random, what I was watching, what came in, the services and
-# the news, the community and the calendar, my statistics and my tickets, the shop window and the links;
-# what a new member has nothing in yet (watching, statistics) stays out of sight until it fills up
+# (each row's widgets share a height; widgets a member cannot use yet are skipped). Issue 12: what matters
+# first, then the rest; what can be empty for a newcomer hides until it fills up (« _hide_empty ») and its
+# neighbour takes its place; the small tiles take a quarter of a row on a computer — two side by side on a
+# phone (a phone halves what is a quarter or less), the lists keep half or all of it. Under the pinned line
+# (incidents · campaign):
 DEFAULT_STARTER: list[dict[str, Any]] = [
+    # a glance: shortcuts, my level, today's objectives
     {"widget_key": "dashboard.welcome", "w": 6, "h": 1},
     {"widget_key": "gamification.progress", "w": 3, "h": 1},
     {"widget_key": "gamification.daily_objectives", "w": 3, "h": 1},
-    {"widget_key": "dashboard.since_last_visit", "w": 8, "h": 3},
-    {"widget_key": "media.shuffle", "w": 4, "h": 3},
+    # for me now: what I was watching, what is new for me, a title drawn at random
     {"widget_key": "media.continue", "w": 12, "h": 3, "config": {"_hide_empty": True}},
-    {"widget_key": "media.recently_added", "w": 12, "h": 3},
-    {"widget_key": "health.services_summary", "w": 6, "h": 3},
-    {"widget_key": "news.latest", "w": 6, "h": 3},
-    {"widget_key": "community.activity", "w": 6, "h": 3},
-    {"widget_key": "calendar.month", "w": 6, "h": 3},  # 3 rows: this week and what comes
+    {"widget_key": "dashboard.since_last_visit", "w": 8, "h": 3},
+    {"widget_key": "media.shuffle", "w": 4, "h": 3, "config": {"_hide_empty": True}},
+    {"widget_key": "media.recently_added", "w": 12, "h": 3, "config": {"_hide_empty": True}},
+    # tiles: the services and the shop window (side by side on a phone), my tickets
+    {"widget_key": "health.services_summary", "w": 3, "h": 3},
+    {"widget_key": "marketplace.featured", "w": 3, "h": 3},
     {"widget_key": "support.my_tickets", "w": 6, "h": 3},
-    {"widget_key": "marketplace.featured", "w": 6, "h": 3},
-    # alone on their rows: a widget waiting to fill up leaves no hole beside it
-    {"widget_key": "media.stats", "w": 12, "h": 3, "config": {"_hide_empty": True}},
-    {"widget_key": "health.service_links", "w": 12, "h": 2},
+    # to read: the news and the calendar
+    {"widget_key": "news.latest", "w": 6, "h": 3},
+    {"widget_key": "calendar.month", "w": 6, "h": 3},  # 3 rows: this week and what comes
+    # what fills up with time: the community, my statistics (a hidden one gives its place to the other)
+    {"widget_key": "community.activity", "w": 6, "h": 3, "config": {"_hide_empty": True}},
+    {"widget_key": "media.stats", "w": 6, "h": 3, "config": {"_hide_empty": True}},
+    {"widget_key": "health.service_links", "w": 12, "h": 1, "config": {"_hide_empty": True}},
 ]
 
 
