@@ -1427,6 +1427,41 @@
 .shell-health[data-state="planned"] {
   --health: var(--cal-series);
 }
+/* an announcement in its colour — the same fixed hues as its banner */
+.shell-health[data-state="announcement"],
+.shell-status[data-state-tone="announcement"] {
+  --health: var(--cal-event);
+  --tone: var(--cal-event);
+}
+.shell-health[data-tone="success"],
+.shell-status[data-tone="success"] {
+  --health: var(--chart-6);
+  --tone: var(--chart-6);
+}
+.shell-health[data-tone="warning"],
+.shell-status[data-tone="warning"] {
+  --health: var(--cal-campaign);
+  --tone: var(--cal-campaign);
+}
+.shell-health[data-tone="critical"],
+.shell-status[data-tone="critical"] {
+  --health: var(--cal-incident);
+  --tone: var(--cal-incident);
+}
+/* several things at once: the icon goes round them, each coming in softly */
+.shell-health__glyph {
+  display: inline-grid;
+  place-items: center;
+}
+.shell-health[data-turns="true"] .shell-health__glyph {
+  animation: health-swap 0.45s ease-out;
+}
+@keyframes health-swap {
+  from {
+    opacity: 0;
+    transform: translateY(0.35rem) scale(0.8);
+  }
+}
 .shell-health__count {
   position: absolute;
   inset-block-start: 0.15rem;
@@ -1459,6 +1494,9 @@
 }
 .shell-health[data-state="maintenance"] .ds-icon {
   animation: health-turn 2.6s ease-in-out infinite;
+}
+.shell-health[data-state="announcement"] .ds-icon {
+  animation: health-sway 3.2s ease-in-out infinite;
 }
 @keyframes health-turn {
   0%,
@@ -1517,6 +1555,10 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
+.shell-status__also {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
 .shell-status__badge {
   display: grid;
   place-items: center;
@@ -1572,6 +1614,21 @@
 }
 .shell-status__item[data-maintenance="running"] {
   --dot: var(--cal-campaign);
+}
+.shell-status__item[data-tone="info"] {
+  --dot: var(--cal-event);
+}
+.shell-status__item[data-tone="success"] {
+  --dot: var(--chart-6);
+}
+.shell-status__item[data-tone="warning"] {
+  --dot: var(--cal-campaign);
+}
+.shell-status__item[data-tone="critical"] {
+  --dot: var(--cal-incident);
+}
+div.shell-status__item {
+  grid-template-columns: auto minmax(0, 1fr);
 }
 .shell-status__item[data-services="ok"] {
   --dot: var(--state-available-fg);
@@ -1666,11 +1723,12 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .shell-health .ds-icon,
+  .shell-health__glyph,
   .shell-health__count {
     animation: none !important;
   }
 }
-:root[data-motion="none"] :is(.shell-health .ds-icon, .shell-health__count) {
+:root[data-motion="none"] :is(.shell-health .ds-icon, .shell-health__glyph, .shell-health__count) {
   animation: none;
 }
 

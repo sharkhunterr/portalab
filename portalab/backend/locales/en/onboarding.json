@@ -239,7 +239,7 @@
   "tours.services.description": "What works, what doesn't, and how it is going.",
   "tours.services.done.text": "Open a ticket from the support — the service's state is attached for you.",
   "tours.services.done.title": "Something wrong?",
-  "tours.services.header.text": "This heart in the header turns orange or red when something is wrong.",
+  "tours.services.header.text": "This heart in the header is the control center: it turns orange or red when something is wrong, and also shows the maintenances and announcements under way.",
   "tours.services.header.title": "Always in sight",
   "tours.services.status.text": "All good, degraded or incident: the portal's health in one line.",
   "tours.services.status.title": "Overall",
