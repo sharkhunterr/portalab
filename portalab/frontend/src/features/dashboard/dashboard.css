@@ -1850,16 +1850,27 @@
   text-transform: capitalize;
 }
 
+/* issue 19: a note of the theme — a light tint of its colour over the theme's surface, the theme's ink, a
+   coloured edge; never tilted (a transform lifted it over the header on a phone) nor shadowed */
 .widget-note {
   --note: var(--note-yellow);
+  position: relative;
   block-size: 100%;
   overflow: hidden;
   padding: var(--space-3);
-  border-radius: var(--radius-sm);
-  background: var(--note);
-  color: var(--note-ink);
-  box-shadow: var(--shadow-2);
-  transform: rotate(-0.4deg);
+  padding-inline-start: calc(var(--space-3) + 3px);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--note) 14%, var(--color-surface-raised));
+  color: var(--color-text);
+}
+.widget-note::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--space-2);
+  inset-inline-start: 0;
+  inline-size: 3px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--note) 70%, var(--color-text-muted));
 }
 .widget-note[data-color="pink"] {
   --note: var(--note-pink);
