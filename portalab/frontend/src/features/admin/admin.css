@@ -553,6 +553,97 @@
 }
 
 /* 027: where an announcement goes */
+/* 027: the announcement's type — four cards in their colour (the banner's own), the chosen one lit */
+.announce-types {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  border: 0;
+}
+.announce-types legend {
+  margin-block-end: var(--space-2);
+  padding: 0;
+  font-weight: var(--font-weight-semibold);
+}
+.announce-type {
+  --tone: var(--cal-event);
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.announce-type[data-tone="success"] {
+  --tone: var(--chart-6);
+}
+.announce-type[data-tone="warning"] {
+  --tone: var(--cal-campaign);
+}
+.announce-type[data-tone="critical"] {
+  --tone: var(--cal-incident);
+}
+.announce-type input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.announce-type:hover {
+  border-color: color-mix(in srgb, var(--tone) 55%, var(--color-border));
+}
+.announce-type:has(input:checked) {
+  border-color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 14%, var(--color-surface));
+  box-shadow: 0 0 0 1px var(--tone);
+}
+.announce-type:has(input:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.announce-type__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--tone) 22%, var(--color-surface));
+  color: var(--tone);
+}
+.announce-type__text {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+}
+.announce-type__text small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
+}
+.announce-preview {
+  display: grid;
+  gap: var(--space-1);
+  margin-block-start: var(--space-3);
+}
+.announce-preview__label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.announce-preview .status-banner {
+  margin: 0;
+}
+
 .announce-channels {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
