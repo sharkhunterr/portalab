@@ -353,58 +353,56 @@ function PanelItem({
             <span className="notif-row__body">{item.body}</span>
           ) : null}
           <Rewards item={item} />
-        </button>
-        <div className="notif-row__foot">
           <time dateTime={item.updated_at} title={format.dateTime(item.updated_at)}>
             {format.relative((Date.parse(item.updated_at) - Date.now()) / 1000)}
           </time>
-          {selecting ? null : (
-            <div className="notif-row__actions">
-              {item.read ? null : (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => actions.read.mutate(item.id)}
-                  aria-label={`${t("notifications:center.read")}: ${item.title}`}
-                  title={t("notifications:center.read")}
-                >
-                  <Icon name="check" size={15} />
-                </Button>
-              )}
-              {item.archived ? (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => actions.bulk.mutate({ ids: [item.id], action: "unarchive" })}
-                  aria-label={`${t("notifications:panel.unarchive")}: ${item.title}`}
-                  title={t("notifications:panel.unarchive")}
-                >
-                  <Icon name="undo" size={15} />
-                </Button>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => actions.archive.mutate(item.id)}
-                  aria-label={`${t("notifications:center.archive")}: ${item.title}`}
-                  title={t("notifications:center.archive")}
-                >
-                  <Icon name="inbox" size={15} />
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => actions.remove.mutate(item.id)}
-                aria-label={`${t("notifications:center.delete")}: ${item.title}`}
-                title={t("notifications:center.delete")}
-              >
-                <Icon name="trash" size={15} />
-              </Button>
-            </div>
-          )}
-        </div>
+        </button>
       </div>
+      {selecting ? null : (
+        <div className="notif-row__actions">
+          {item.read ? null : (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => actions.read.mutate(item.id)}
+              aria-label={`${t("notifications:center.read")}: ${item.title}`}
+              title={t("notifications:center.read")}
+            >
+              <Icon name="check" size={15} />
+            </Button>
+          )}
+          {item.archived ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => actions.bulk.mutate({ ids: [item.id], action: "unarchive" })}
+              aria-label={`${t("notifications:panel.unarchive")}: ${item.title}`}
+              title={t("notifications:panel.unarchive")}
+            >
+              <Icon name="undo" size={15} />
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => actions.archive.mutate(item.id)}
+              aria-label={`${t("notifications:center.archive")}: ${item.title}`}
+              title={t("notifications:center.archive")}
+            >
+              <Icon name="inbox" size={15} />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => actions.remove.mutate(item.id)}
+            aria-label={`${t("notifications:center.delete")}: ${item.title}`}
+            title={t("notifications:center.delete")}
+          >
+            <Icon name="trash" size={15} />
+          </Button>
+        </div>
+      )}
     </li>
   );
 }
