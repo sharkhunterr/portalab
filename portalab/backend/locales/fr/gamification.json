@@ -127,6 +127,7 @@
   "admin.operations.allValues": "XP, pièces et contribution",
   "admin.operations.amount": "Montant",
   "admin.operations.balance": "Solde après",
+  "admin.operations.bonus": "dont +{amount} · {source}",
   "admin.operations.hint": "Toutes les opérations des {days} derniers jours, la plus récente d'abord : ce qui a été gagné, dépensé ou corrigé, ce qui l'a rapporté, le solde juste après et, pour l'XP, le niveau atteint.",
   "admin.operations.levelUp": "Niveau {level} atteint",
   "admin.operations.next": "Suivantes",

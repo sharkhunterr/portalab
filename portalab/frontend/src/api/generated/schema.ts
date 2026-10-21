@@ -11175,6 +11175,13 @@ export interface components {
             /** Supply */
             supply?: number | null;
         };
+        /** BonusOut */
+        BonusOut: {
+            /** Amount */
+            amount: number;
+            /** Source */
+            source: string;
+        };
         /** BookFormatOut */
         BookFormatOut: {
             /** File Ref */
@@ -14647,6 +14654,8 @@ export interface components {
         OperationOut: {
             /** Balance */
             balance: number;
+            /** Bonuses */
+            bonuses?: components["schemas"]["BonusOut"][];
             /** Delta */
             delta: number;
             /**

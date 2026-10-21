@@ -206,3 +206,23 @@ async def test_my_sources(gm: GamHarness, client: AsyncClient) -> None:
     by_source = {s["source"]: s["amount"] for s in body["sources"]}
     assert body["total"] == 50 and by_source == {"media": 40, "streak": 10}  # media.played is a media action
     assert [d["amounts"] for d in body["days"]][-1] == {"media": 20, "streak": 10}
+
+
+async def test_operations_tell_their_bonuses(gm: GamHarness, client: AsyncClient) -> None:
+    """The journal names the bonuses inside a gain, as the charts split them (admin's and my own)."""
+    gm.module.config = replace(gm.module.config, streak=STREAK)
+    await gm.rule("played", RULE)
+    user = gm.people["ursula"]
+    start = gm.clock.now() + timedelta(hours=1)
+    for day in (0, 1):
+        await gm.emit(user, at=start + timedelta(days=day))
+    gm.clock.set(start + timedelta(days=1, hours=1))
+    await login(client, "ursula")
+    mine = (await client.get("/api/v1/me/progression/operations", params={"value": "xp"})).json()["items"]
+    assert [(o["delta"], o["source"], o["bonuses"]) for o in mine] == [
+        (30, "media", [{"source": "streak", "amount": 10.0}]),  # 20 · 1.5: the streak's 10 named
+        (20, "media", []),
+    ]
+    await login(client, "boss")
+    ops = (await client.get("/api/v1/admin/gamification/operations", params={"value": "xp"})).json()["items"]
+    assert ops[0]["bonuses"] == [{"source": "streak", "amount": 10.0}]

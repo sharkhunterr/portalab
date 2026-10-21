@@ -2710,6 +2710,24 @@
         "title": "AvailabilityIn",
         "type": "object"
       },
+      "BonusOut": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "amount"
+        ],
+        "title": "BonusOut",
+        "type": "object"
+      },
       "BookFormatOut": {
         "properties": {
           "file_ref": {
@@ -12175,6 +12193,13 @@
           "balance": {
             "title": "Balance",
             "type": "integer"
+          },
+          "bonuses": {
+            "items": {
+              "$ref": "#/components/schemas/BonusOut"
+            },
+            "title": "Bonuses",
+            "type": "array"
           },
           "delta": {
             "title": "Delta",

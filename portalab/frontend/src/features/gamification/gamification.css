@@ -1706,6 +1706,24 @@
   white-space: nowrap;
 }
 
+.gam-ops__bonuses {
+  display: grid;
+  gap: 0.15rem;
+  margin-block-start: 0.3rem;
+}
+.gam-ops__bonus {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+.gam-ops__bonus .gam-ops__dot {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
 .gam-ops__dot {
   display: inline-grid;
   place-items: center;
