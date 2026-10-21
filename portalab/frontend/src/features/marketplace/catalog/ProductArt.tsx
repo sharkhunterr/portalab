@@ -43,10 +43,12 @@ function WidgetArt({
   product,
   widget,
   config,
+  option,
 }: {
   product: Product;
   widget?: string | undefined;
   config?: Record<string, unknown> | undefined;
+  option?: string | undefined;
 }) {
   const catalog = useCatalog(true);
   const key = widget ?? text(product.preview as Preview, "widget");
@@ -60,6 +62,7 @@ function WidgetArt({
           template: entry?.widget.template,
           component_id: entry?.widget.component_id,
           config_defaults: config,
+          option,
         }}
       />
     </span>
@@ -372,6 +375,10 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
       // 027 (#30): a look for a widget — the widget itself, wearing it
       const look = setting?.startsWith("style=") ? setting.slice("style=".length) : null;
       if (look && widget) return <WidgetArt product={product} widget={widget} config={{ style: look }} />;
+      // a pack's add-on (``_options``) for one widget: that widget, wearing it (its pack's stylesheet)
+      const addon = setting?.startsWith("_options=") ? setting.slice("_options=".length) : null;
+      if (addon && widget && widget !== "*")
+        return <WidgetArt product={product} widget={widget} option={addon} />;
       return (
         <span className="product-art__widget product-art__option">
           <span className="product-art__widget-head">

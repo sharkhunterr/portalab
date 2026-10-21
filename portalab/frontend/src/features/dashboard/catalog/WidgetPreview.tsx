@@ -31,6 +31,8 @@ export interface PreviewWidget {
   template?: string | null | undefined;
   component_id?: string | null | undefined;
   config_defaults?: Record<string, unknown> | null | undefined;
+  /** a pack's add-on it wears (``_options``): its stylesheet's hook, as on the dashboard */
+  option?: string | null | undefined;
 }
 
 export function WidgetPreview({ widget, className }: { widget: PreviewWidget; className?: string }) {
@@ -75,7 +77,12 @@ export function WidgetPreview({ widget, className }: { widget: PreviewWidget; cl
       aria-hidden="true"
     >
       {live && Rendered && shown ? (
-        <span className="widget-preview__scaled" inert data-sample={shown.sample || undefined}>
+        <span
+          className="widget-preview__scaled"
+          inert
+          data-sample={shown.sample || undefined}
+          data-widget-option={widget.option || undefined}
+        >
           <Rendered payload={shown.payload} config={widget.config_defaults ?? {}} icon={widget.icon} />
         </span>
       ) : (

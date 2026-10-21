@@ -1,0 +1,28 @@
+{
+  "type": "widget_option",
+  "product": "opt_continue_bigscreen",
+  "names": {
+    "en": "Big screen for « Continue »",
+    "fr": "Grand écran pour « Continuer »"
+  },
+  "descriptions": {
+    "en": "Each title becomes its poster, edge to edge: its name and episode over it, the progress glowing along its bottom edge. Upright posters in a tall block, wide tiles in a low one, a strip on a single row. Its original look stays yours; chosen in its settings once bought.",
+    "fr": "Chaque titre devient son affiche, bord à bord : son nom et l'épisode par-dessus, la progression qui luit le long de son bord. Des affiches debout dans un grand bloc, des vignettes larges dans un bloc bas, un bandeau sur une seule rangée. Son visuel d'origine reste disponible ; à choisir dans ses réglages une fois acheté."
+  },
+  "payload": {
+    "widget": "media.continue"
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "economy": {
+    "price": 600,
+    "rarity": "rare",
+    "collection": "widgets",
+    "icon": "film"
+  },
+  "look": "bigscreen"
+}

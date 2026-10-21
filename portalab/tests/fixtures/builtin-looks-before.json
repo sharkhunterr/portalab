@@ -1899,6 +1899,7 @@
   "notif_warp": "notification_animation",
   "notif_water": "notification_animation",
   "notif_wipe": "notification_animation",
+  "opt_continue_bigscreen": "widget_option",
   "pack_ambiences": "bundle",
   "pack_animated_profile": "bundle",
   "pack_astro": "bundle",

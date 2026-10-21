@@ -1,0 +1,206 @@
+/* « Big screen » for « Continue »: the poster is the card, edge to edge — the title and the episode over a
+   dark veil at its foot, the progress glowing along its bottom edge, the kind on a glass chip in its corner.
+   The block decides the shape: upright posters when it is tall, wide tiles when it is low, a strip on a
+   single row (its hook: the widget's frame — or its preview in the shop — data-widget-option ~= « bigscreen »). */
+
+/* every card */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue {
+  gap: 0.7rem;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__glow {
+  display: none;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue li > :is(a, span, .widget-continue__resume) {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  block-size: 100%;
+  min-block-size: 5.5rem;
+  padding: 0;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 0.9rem;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--color-accent) 35%, #10121a), #07080d);
+  box-shadow:
+    0 0.5rem 1.2rem -0.6rem rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transition:
+    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 260ms ease;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue li > :is(a, span, .widget-continue__resume):hover,
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue li > :is(a, .widget-continue__resume):focus-visible {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--color-accent) 35%, #10121a), #07080d);
+  transform: translateY(-3px);
+  box-shadow:
+    0 0.9rem 1.6rem -0.6rem rgba(0, 0, 0, 0.8),
+    0 0 0 2px var(--color-accent);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue li > :is(a, .widget-continue__resume):focus-visible {
+  outline: none;
+}
+
+/* the poster fills the card */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  max-block-size: none;
+  aspect-ratio: auto;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__art img {
+  object-position: 50% 22%;
+  transform: scale(1.02);
+  transition: transform 900ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue li > :is(a, span, .widget-continue__resume):hover .widget-continue__art img {
+  transform: scale(1.09);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue li > :is(a, span, .widget-continue__resume):hover .widget-continue__art {
+  outline: none;
+}
+
+/* the kind, on a glass chip in the top corner */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__kind {
+  inset: 0.45rem 0.45rem auto auto;
+  inline-size: 1.55rem;
+  block-size: 1.55rem;
+  background: rgba(8, 9, 14, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
+  color: #fff;
+}
+
+/* the title and the episode over a veil at its foot */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__text {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  gap: 0.1rem;
+  padding: 2.2rem 0.75rem 0.75rem;
+  background: linear-gradient(to top, rgba(5, 6, 10, 0.94) 0%, rgba(5, 6, 10, 0.7) 45%, rgba(5, 6, 10, 0) 100%);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__title {
+  color: #fff;
+  font-size: var(--font-size-md, 1rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__meta {
+  color: rgba(255, 255, 255, 0.74);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.02em;
+}
+
+/* the progress, glowing along the bottom edge */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__bar {
+  position: absolute;
+  inset: auto 0 0;
+  block-size: 4px;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.16);
+  overflow: visible;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__bar span {
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 70%, #fff), var(--color-accent));
+  box-shadow:
+    0 0 10px var(--color-accent),
+    0 0 2px #fff;
+}
+
+/* a tall block: upright posters, as tall as the block (the title sits on them, not under) */
+@container (min-height: 11rem) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue {
+    grid-auto-columns: clamp(7rem, calc((100cqh - var(--scroller-gap, 0.5rem)) * 2 / 3), 16rem);
+    justify-content: start;
+  }
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: var(--font-size-md, 1rem);
+    white-space: normal;
+  }
+}
+/* a low block: wide tiles — the poster cropped across, the veil from the left */
+@container (max-height: 11rem) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue {
+    grid-auto-columns: minmax(14rem, 1fr);
+  }
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__text {
+    inset: 0 30% 0 0;
+    align-content: end;
+    padding: 0.75rem;
+    background: linear-gradient(90deg, rgba(5, 6, 10, 0.92) 0%, rgba(5, 6, 10, 0.6) 70%, rgba(5, 6, 10, 0) 100%);
+  }
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+  }
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__bar {
+    inset-inline-end: -42.86%; /* the whole card's width (the text spans 70 % of it) */
+  }
+}
+/* one column (a phone's width — its root font is often smaller, hence 30rem): a carousel, one tile at a
+   time, the next one peeking */
+@container (max-width: 30rem) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue {
+    grid-auto-columns: 86%;
+  }
+}
+
+/* a single row: a strip — the poster across the whole row, the title over it */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue[data-compact] li > :is(a, span, .widget-continue__resume) {
+  min-block-size: 0;
+  border-radius: 0.6rem;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue[data-compact] .widget-continue__art {
+  max-block-size: none;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue[data-compact] .widget-continue__text {
+  inset: 0;
+  align-content: center;
+  padding: 0.2rem 2.4rem 0.2rem 0.7rem;
+  background: linear-gradient(90deg, rgba(5, 6, 10, 0.9), rgba(5, 6, 10, 0.35));
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue[data-compact] .widget-continue__kind {
+  inset: 50% 0.5rem auto auto;
+  transform: translateY(-50%);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue[data-compact] .widget-continue__bar {
+  inset-inline-end: 0;
+}
+
+/* its preview in the shop (no block height there): a row of upright posters */
+.widget-preview__scaled[data-widget-option~="bigscreen"] .widget-continue {
+  grid-auto-columns: 10.5rem;
+  overflow: hidden;
+}
+.widget-preview__scaled[data-widget-option~="bigscreen"] .widget-continue li > :is(a, span, .widget-continue__resume) {
+  block-size: 15.5rem;
+}
+.widget-preview__scaled[data-widget-option~="bigscreen"] .widget-continue__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue li > :is(a, span, .widget-continue__resume),
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="bigscreen"] .widget-continue__art img {
+    transition: none;
+  }
+}
