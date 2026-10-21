@@ -20,6 +20,7 @@ from portalab.modules.media.models import (
     PlaybackSession,
     QuotaLedger,
     QuotaUnits,
+    RadioCreditLedger,
     RescueLedger,
     UserLink,
     UserProgress,
@@ -96,6 +97,19 @@ class MediaParticipant:
                         },
                     )
                 )
+            for credit in (
+                await session.execute(select(RadioCreditLedger).where(RadioCreditLedger.user_id == user_id))
+            ).scalars():
+                records.append(  # issue 184: radio request credits bought and requests made
+                    ExportRecord(
+                        "media.radio_credit",
+                        {
+                            "delta": credit.delta,
+                            "reason": credit.reason,
+                            "at": credit.created_at.isoformat(),
+                        },
+                    )
+                )
             for rescue in (
                 await session.execute(select(RescueLedger).where(RescueLedger.user_id == user_id))
             ).scalars():
@@ -144,6 +158,7 @@ class MediaParticipant:
                 QuotaUnits,
                 QuotaLedger,
                 RescueLedger,
+                RadioCreditLedger,
                 BookPosition,
             ):
                 await session.execute(delete(model).where(model.user_id == user_id))

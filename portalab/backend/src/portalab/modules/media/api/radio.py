@@ -31,6 +31,12 @@ class RadioTrackOut(BaseModel):
     requested_by: str | None = None
 
 
+class RadioAllowanceOut(BaseModel):
+    free_per_day: int
+    free_left: int
+    credits: int
+
+
 class RadioOut(BaseModel):
     available: bool
     station: str | None = None
@@ -42,6 +48,8 @@ class RadioOut(BaseModel):
     current: RadioTrackOut | None = None
     upcoming: list[RadioTrackOut] = Field(default_factory=list)
     recent: list[RadioTrackOut] = Field(default_factory=list)
+    # issue 184: what the member may still ask today — free requests left, credits held
+    allowance: RadioAllowanceOut | None = None
 
 
 class RadioAskIn(BaseModel):
@@ -53,11 +61,15 @@ class RadioRequestOut(BaseModel):
     status: str
     detail: str | None = None
     track: RadioTrackOut | None = None
+    allowance: RadioAllowanceOut | None = None
 
 
 @router.get("/media/radio", response_model=RadioOut)
 async def radio(principal: Listener, module: Module) -> dict[str, Any]:
-    return await module.radio.state()
+    state = await module.radio.state()
+    if state.get("available"):
+        state["allowance"] = await module.radio.allowance(_me(principal))
+    return state
 
 
 @router.post("/media/radio/requests", response_model=RadioRequestOut)

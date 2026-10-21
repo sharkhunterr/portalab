@@ -18,7 +18,7 @@ from portalab.capabilities.marketplace import (
     ProductType,
     ProductTypeRegistry,
 )
-from portalab.capabilities.media_core import QUOTA, RESCUES
+from portalab.capabilities.media_core import QUOTA, RADIO_CREDITS, RESCUES
 from portalab.capabilities.plugins import EXTENSION_ACTIVATION
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.themes import CAPABILITY as THEMES
@@ -43,6 +43,7 @@ NOT_REFUNDABLE = frozenset(
         "booster",
         "early_unlock",  # #131
         "ai_capacity",  # issue 173: spent as soon as the assistant answers
+        "radio_requests",  # issue 184: spent asking the radio's DJ
     }
 )
 
@@ -312,6 +313,24 @@ class RescueHandler(Owned):
         return ActivationResult("active")
 
 
+class RadioRequestsHandler(Owned):
+    """``radio_requests`` (issue 184): ``payload.count`` requests to the radio's DJ, spent once the day's free
+    ones are used (Media keeps them). Consumed, not refundable."""
+
+    def __init__(self, capabilities: CapabilityRegistry) -> None:
+        self.capabilities = capabilities
+
+    async def activate(self, ownership: OwnershipView) -> ActivationResult:
+        count = int(ownership.payload.get("count", 1) or 0)
+        if count <= 0:
+            return ActivationResult("incompatible", "no request")
+        credits = _port(self.capabilities, RADIO_CREDITS)
+        if credits is None:
+            return ActivationResult("failed", "media unavailable")
+        await credits.grant(ownership.user_id, min(count, 500), f"marketplace:{ownership.id}")
+        return ActivationResult("active")
+
+
 class BoostHandler(Owned):
     """``xp_boost`` (#55): multiplies the owner's gains (``payload.values``, XP by default) by
     ``payload.factor`` for ``payload.hours`` — after the boost already running, if any. Under the
@@ -446,6 +465,8 @@ def register_builtin_types(
         ("media_rescue", RescueHandler(capabilities), ("count",)),
         # #81: a sealed booster, to open from the reserve
         ("booster", BoosterHandler(booster_seal), PAYLOAD_FIELDS),
+        # issue 184: requests to the radio's DJ beyond the day's free ones
+        ("radio_requests", RadioRequestsHandler(capabilities), ("count",)),
         # #131: a pass opening an item waiting for its level, kept in the reserve
         ("early_unlock", EarlyUnlockHandler(booster_seal), ()),
         # issue 173: the assistant's capacities

@@ -364,6 +364,26 @@ class RescueLedger(MediaBase):
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
 
+class RadioCreditLedger(MediaBase):
+    """Issue 184: a member's requests to the radio's DJ — credits bought in the shop (``purchase``, +N), each
+    request (``ask``: 0 when free, -1 when a credit paid for it). The balance is the sum of ``delta``; the
+    free requests of the day are the day's ``ask`` rows at 0."""
+
+    __tablename__ = "radio_credits"
+    __table_args__ = (
+        UniqueConstraint("source_ref", name="uq_radio_credits_source_ref"),
+        CheckConstraint("reason IN ('purchase', 'ask', 'admin')", name="reason"),
+        Index("ix_radio_credits_user", "user_id", "created_at"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)
+    delta: Mapped[int] = mapped_column(Integer, nullable=False)
+    reason: Mapped[str] = mapped_column(String(12), nullable=False)
+    source_ref: Mapped[str] = mapped_column(String(200), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
 class MediaRequest(MediaBase):
     __tablename__ = "requests"
     __table_args__ = (

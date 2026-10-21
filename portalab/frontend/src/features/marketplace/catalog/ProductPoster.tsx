@@ -30,6 +30,7 @@ export const TYPE_ICONS: Record<string, string> = {
   xp_boost: "rocket", // #55: gains multiplied for a while
   media_rescue: "shield", // #57: a title saved from the library's cleanup
   ai_capacity: "brain", // issue 173: the assistant's capacities
+  radio_requests: "radio", // issue 184: requests to the radio's DJ
 };
 
 export function ProductPoster({ product, size = "md" }: { product: Product; size?: "md" | "lg" }) {

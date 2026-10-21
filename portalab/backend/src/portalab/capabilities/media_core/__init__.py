@@ -18,6 +18,7 @@ HISTORY = "media.history"
 QUOTA = "media.request_quota"
 RECOMMENDATIONS = "media.recommendations"
 RESCUES = "media.rescues"  # #57: rescues bought in the shop, spent saving a title from deletion
+RADIO_CREDITS = "media.radio_credits"  # issue 184: requests to the radio's DJ bought in the shop
 
 
 _KIND = re.compile(r"[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)?")
@@ -224,6 +225,15 @@ class RescueCredits(Protocol):
 
 
 @runtime_checkable
+class RadioCredits(Protocol):
+    """Issue 184: Media keeps the radio request credits; Marketplace credits those it sold (once each)."""
+
+    async def grant(self, user: UUID, count: int, source_ref: str) -> int:
+        """Credit ``count`` requests; the new balance."""
+        ...
+
+
+@runtime_checkable
 class RecommendationProvider(Protocol):
     async def recommend(self, viewer: Principal, *, limit: int) -> Sequence[UUID]: ...
 
@@ -240,6 +250,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(QUOTA, RequestQuotaService, False, "Media request quota and extra units (024)"),
     _spec(RECOMMENDATIONS, RecommendationProvider, True, "Media recommendations (024 baseline, 018 later)"),
     _spec(RESCUES, RescueCredits, False, "Rescues saving a title from the cleanup's deletion (#57)"),
+    _spec(RADIO_CREDITS, RadioCredits, False, "Requests to the radio's DJ bought in the shop (issue 184)"),
 )
 
 QuotaSummary = Mapping[str, int]
@@ -248,6 +259,7 @@ __all__ = [
     "CATALOG",
     "HISTORY",
     "QUOTA",
+    "RADIO_CREDITS",
     "RECOMMENDATIONS",
     "RESCUES",
     "SPECS",
@@ -262,6 +274,7 @@ __all__ = [
     "MediaTypeRegistry",
     "Progress",
     "QuotaSummary",
+    "RadioCredits",
     "RecommendationProvider",
     "RequestQuotaService",
     "RescueCredits",
