@@ -114,7 +114,7 @@ function Tile({ product, onOpen }: { product: Product; onOpen: (p: Product) => v
           <LazyArt product={product} />
           {product.discount && !mine && !soldOut(product) ? (
             <span className="vitrine-deal" title={product.discount.name}>
-              <Icon name="flame" size={14} />
+              <Icon name="flame" size={12} />
               {t("marketplace:deal.percent", { percent: product.discount.percent })}
             </span>
           ) : null}
