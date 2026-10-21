@@ -13,10 +13,11 @@ import {
   StatusBadge,
 } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
+import { CheckboxField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { StatusBanner } from "../../../shell/status/StatusBanner";
 import { ApiError } from "../../../state/regions";
 import { MaintenancePanel } from "./MaintenanceAdmin";
 import "../admin.css";
@@ -27,6 +28,19 @@ import "../admin.css";
  * sent to yourself). Delivery figures come from the notification status; titles and addresses are never
  * listed back.
  */
+/**
+ * 027: what kind of announcement — one choice, in its colour, that sets how it reaches members: the tone of
+ * its banner and notification, whether it is an alert, its priority (an urgent one reaches even those who
+ * muted announcements, is never held for a digest, and its banner cannot be closed).
+ */
+const TYPES = {
+  info: { icon: "megaphone", kind: "notification", priority: "normal" },
+  success: { icon: "sparkles", kind: "notification", priority: "normal" },
+  warning: { icon: "alert", kind: "alert", priority: "high" },
+  critical: { icon: "alert", kind: "alert", priority: "critical" },
+} as const;
+type AnnouncementType = keyof typeof TYPES;
+
 interface Status {
   email_enabled: boolean;
   deliveries: Array<{ channel: string; status: string; reason: string | null; count: number }>;
@@ -37,12 +51,10 @@ function Broadcast() {
   const client = useQueryClient();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [priority, setPriority] = useState("normal");
-  const [kind, setKind] = useState("notification");
+  const [type, setType] = useState<AnnouncementType>("info");
   const [link, setLink] = useState("");
   // 027: where it goes — any of a notification, an e-mail, a banner (until a date)
   const [channels, setChannels] = useState<string[]>(["notification"]);
-  const [tone, setTone] = useState("info");
   const [until, setUntil] = useState(() => {
     const date = new Date(Date.now() + 7 * 86_400_000);
     const pad = (n: number) => String(n).padStart(2, "0");
@@ -57,12 +69,12 @@ function Broadcast() {
           body: {
             title,
             body,
-            priority: priority as "normal",
-            kind: kind as "notification",
+            priority: TYPES[type].priority,
+            kind: TYPES[type].kind,
             dedup_key: `announcement:${Date.now()}`,
             action_url: link || null,
             channels: channels as Array<"notification" | "email" | "banner">,
-            tone: tone as "info",
+            tone: type,
             banner_until: channels.includes("banner") && until ? new Date(until).toISOString() : null,
           },
         })
@@ -86,6 +98,27 @@ function Broadcast() {
       span="full"
     >
       <form onSubmit={submit} className="admin-form">
+        <fieldset className="announce-types">
+          <legend>{t("admin:announce.type")}</legend>
+          {(Object.keys(TYPES) as AnnouncementType[]).map((value) => (
+            <label key={value} className="announce-type" data-tone={value}>
+              <input
+                type="radio"
+                name="announce-type"
+                value={value}
+                checked={type === value}
+                onChange={() => setType(value)}
+              />
+              <span className="announce-type__icon" aria-hidden="true">
+                <Icon name={TYPES[value].icon} size={16} />
+              </span>
+              <span className="announce-type__text">
+                <strong>{t(`admin:announce.types.${value}`)}</strong>
+                <small>{t(`admin:announce.types.${value}Hint`)}</small>
+              </span>
+            </label>
+          ))}
+        </fieldset>
         <FormGrid>
           <TextField
             label={t("admin:announce.title")}
@@ -95,28 +128,6 @@ function Broadcast() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <SelectField
-            label={t("admin:announce.kind")}
-            value={kind}
-            onChange={(e) => {
-              setKind(e.target.value);
-              if (e.target.value === "alert" && !["high", "critical"].includes(priority)) setPriority("high");
-            }}
-          >
-            <option value="notification">{t("admin:announce.kinds.notification")}</option>
-            <option value="alert">{t("admin:announce.kinds.alert")}</option>
-          </SelectField>
-          <SelectField
-            label={t("admin:announce.priority")}
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-          >
-            {["low", "normal", "high", "critical"].map((p) => (
-              <option key={p} value={p} disabled={kind === "alert" && (p === "low" || p === "normal")}>
-                {t(`admin:announce.priorities.${p}`)}
-              </option>
-            ))}
-          </SelectField>
           <TextField
             label={t("admin:announce.link")}
             hint={t("admin:announce.linkHint")}
@@ -124,17 +135,6 @@ function Broadcast() {
             value={link}
             onChange={(e) => setLink(e.target.value)}
           />
-          <SelectField
-            label={t("admin:announce.tone")}
-            value={tone}
-            onChange={(e) => setTone(e.target.value)}
-          >
-            {["info", "success", "warning", "critical"].map((value) => (
-              <option key={value} value={value}>
-                {t(`admin:announce.tones.${value}`)}
-              </option>
-            ))}
-          </SelectField>
           <div className="ds-field" data-span="full">
             <label htmlFor="announce-body">{t("admin:announce.body")}</label>
             <textarea
@@ -164,6 +164,22 @@ function Broadcast() {
               value={until}
               onChange={(e) => setUntil(e.target.value)}
             />
+          ) : null}
+          {/* what the banner will look like, in the chosen type's colour */}
+          {channels.includes("banner") ? (
+            <div className="announce-preview">
+              <span className="announce-preview__label">{t("admin:announce.preview")}</span>
+              <StatusBanner
+                tone={type}
+                icon={TYPES[type].icon}
+                eyebrow={[t("notifications:banner.announcement")]}
+                title={title || t("admin:announce.previewTitle")}
+                text={body ? body.split("\n")[0] : null}
+                details={link || null}
+                detailsLabel={t("notifications:banner.more")}
+                onClose={type === "critical" ? undefined : () => undefined}
+              />
+            </div>
           ) : null}
         </fieldset>
         {send.data ? (

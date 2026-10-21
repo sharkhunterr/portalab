@@ -1225,14 +1225,15 @@
   --tone: var(--cal-incident);
 }
 /* an announcement, in its tone */
+/* fixed hues, the same on every theme: blue, green, amber, red (the theme's accent could make two alike) */
 .status-banner[data-tone="info"] {
-  --tone: var(--color-accent);
+  --tone: var(--cal-event);
 }
 .status-banner[data-tone="success"] {
-  --tone: var(--state-available-fg);
+  --tone: var(--chart-6);
 }
 .status-banner[data-tone="warning"] {
-  --tone: var(--rarity-legendary);
+  --tone: var(--cal-campaign);
 }
 .status-banner[data-tone="critical"] {
   --tone: var(--cal-incident);
