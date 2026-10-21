@@ -269,3 +269,19 @@
     animation: none;
   }
 }
+
+/* on the dashboard (issue 185): the card fits its block — the cover follows its height, the buttons go
+   when there is no room for them */
+.widget-frame__body .radio-card {
+  align-content: center;
+  gap: var(--space-2);
+}
+.widget-frame__body .radio-card:not([data-compact]) .radio-card__cover {
+  inline-size: clamp(2.75rem, 52cqh, 6.5rem);
+  block-size: clamp(2.75rem, 52cqh, 6.5rem);
+}
+@container (max-height: 8.5rem) {
+  .widget-frame__body .radio-card__actions {
+    display: none;
+  }
+}

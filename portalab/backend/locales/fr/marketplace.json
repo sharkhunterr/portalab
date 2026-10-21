@@ -794,7 +794,9 @@
   "what.widget_option": "Une option de réglage en plus pour un widget du tableau de bord (un autre graphique, une période plus longue…).",
   "what.xp_boost": "Multiplie l'XP que vous gagnez pendant un temps, en plus des séries et des événements (dans la limite du portail). Acheté pendant qu'un autre est actif, il démarre à sa fin.",
   "widget.featured.all": "{count, plural, one {Voir le produit} other {Voir les # produits}} de la boutique",
+  "widget.featured.carousel": "La vitrine de la boutique",
   "widget.featured.description": "Quelques produits à obtenir avec vos Coins.",
   "widget.featured.open": "Boutique",
+  "widget.featured.slide": "Produit {n} sur {total}",
   "widget.featured.title": "Boutique"
 }

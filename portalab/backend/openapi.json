@@ -11890,6 +11890,17 @@
             "title": "Body",
             "type": "string"
           },
+          "boost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boost"
+          },
           "category": {
             "title": "Category",
             "type": "string"
@@ -11928,6 +11939,24 @@
           "read": {
             "title": "Read",
             "type": "boolean"
+          },
+          "rewards": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationRewardOut"
+            },
+            "title": "Rewards",
+            "type": "array"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
           },
           "title": {
             "title": "Title",
@@ -12045,6 +12074,24 @@
           "digest"
         ],
         "title": "NotificationPreferencesOut",
+        "type": "object"
+      },
+      "NotificationRewardOut": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "amount"
+        ],
+        "title": "NotificationRewardOut",
         "type": "object"
       },
       "OnboardingStep": {
