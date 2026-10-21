@@ -182,6 +182,7 @@ def test_builtin_catalog_registers_once() -> None:
         "unraid",  # #50: an Unraid server's array, disks, containers and updates
         "maintainerr",  # #57: the library's cleanup
         "ollama",  # issue 169: the assistant's models
+        "subwave",  # issue 168
     }
 
 

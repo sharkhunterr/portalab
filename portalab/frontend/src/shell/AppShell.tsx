@@ -9,6 +9,7 @@ import { LevelUpMoment } from "../features/gamification/levelup/LevelUpMoment";
 import { BoosterStageHost } from "../features/marketplace/boosters/StageHost";
 import { ListenHost } from "../features/media/listen/ListenHost";
 import { useListen } from "../features/media/listen/store";
+import { RadioHost } from "../features/media/radio/RadioHost";
 import { PluginCorners } from "../features/plugins/slots/PluginSlot";
 import { Breadcrumbs, RelatedLinks } from "./breadcrumbs/Breadcrumbs";
 import { AppHeader } from "./header/AppHeader";
@@ -199,6 +200,7 @@ export function AppShell({
         <LevelUpMoment />
         <BoosterStageHost />
         <ListenHost />
+        <RadioHost />
         <AnnouncementBanner />
         <MaintenanceBanner />
         {isSafeMode() ? <SafeModeBanner /> : null}

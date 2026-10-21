@@ -13,6 +13,8 @@ import { metadataImage } from "../detail/Enrichment";
 import { DiscoverShelves } from "../discover/DiscoverShelves";
 import { LeavingBadge } from "../discover/StatusBadge";
 import { KIND_ICONS, MediaGrid, Poster } from "../MediaGrid";
+import { useRadio } from "../radio/api";
+import { RadioCard } from "../radio/RadioCard";
 import "../media.css";
 
 /** A title from the services' history (027): in the library (``id``) or not (the provider's poster). */
@@ -243,6 +245,24 @@ function Hero() {
  * Plex/Tautulli, Grimmory…), the library's new arrivals, trends and recommendations, and a way in by
  * kind. A row with nothing to show is left out instead of saying so.
  */
+/** Issue 168: the homelab's radio, when one is connected — listen, ask its DJ, its own page. */
+function RadioRow() {
+  const t = useT();
+  const radio = useRadio();
+  if (!radio.data?.available) return null;
+  return (
+    <Row
+      icon="radio"
+      title={t("media:radio.title")}
+      more={{ to: "/media/radio", label: t("media:radio.open") }}
+    >
+      <div className="media-radio">
+        <RadioCard radio={radio.data} />
+      </div>
+    </Row>
+  );
+}
+
 export function MediaHome() {
   const t = useT();
   const journal = useJournal();
@@ -259,6 +279,7 @@ export function MediaHome() {
           <JournalRail items={going} label={t("media:shelf.continue")} progress />
         </Row>
       ) : null}
+      <RadioRow />
       <Shelf name="new" icon="sparkles" />
       <Shelf name="released" icon="clapperboard" />
       {/* issue 110: what the library's cleanup will delete — save one from its page */}
