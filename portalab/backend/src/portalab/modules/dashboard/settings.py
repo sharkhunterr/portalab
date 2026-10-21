@@ -50,15 +50,15 @@ DEFAULT_STARTER: list[dict[str, Any]] = [
     {"widget_key": "dashboard.since_last_visit", "w": 8, "h": 3},
     {"widget_key": "media.shuffle", "w": 4, "h": 3, "config": {"_hide_empty": True}},
     # issue 185: the calendar high up and roomy — this week and what comes
-    {"widget_key": "calendar.month", "w": 12, "h": 4},
+    {"widget_key": "calendar.month", "w": 12, "h": 6},  # the whole month
     {"widget_key": "media.recently_added", "w": 12, "h": 3, "config": {"_hide_empty": True}},
     # issue 168: the homelab's radio — when one is connected
     {"widget_key": "media.radio", "w": 12, "h": 2, "config": {"_hide_empty": True}},
-    # side by side: the services and the shop window, my tickets and the news
-    {"widget_key": "health.services_summary", "w": 6, "h": 3},
-    {"widget_key": "marketplace.featured", "w": 6, "h": 3},
-    {"widget_key": "support.my_tickets", "w": 6, "h": 3},
-    {"widget_key": "news.latest", "w": 6, "h": 3},
+    # four quarter tiles — two a row on a phone: the services and the shop window, my tickets and the news
+    {"widget_key": "health.services_summary", "w": 3, "h": 3},
+    {"widget_key": "marketplace.featured", "w": 3, "h": 3},
+    {"widget_key": "support.my_tickets", "w": 3, "h": 3},
+    {"widget_key": "news.latest", "w": 3, "h": 3},
     # what fills up with time: the community, my statistics (a hidden one gives its place to the other)
     {"widget_key": "community.activity", "w": 6, "h": 3, "config": {"_hide_empty": True}},
     {"widget_key": "media.stats", "w": 6, "h": 3, "config": {"_hide_empty": True}},

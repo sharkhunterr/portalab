@@ -162,13 +162,13 @@
    line — never a column of buttons making the row tall */
 .notif-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: start;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-2) var(--space-2) var(--space-3);
 }
 .notif-row:has(> .notif-row__check) {
-  grid-template-columns: auto auto minmax(0, 1fr);
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
 }
 .notif-row__icon {
   display: grid;
@@ -277,21 +277,16 @@
 .notif-reward[data-value="boost"] {
   --reward: var(--rarity-epic);
 }
-.notif-row__foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  min-block-size: 1.75rem;
-}
-.notif-row__foot time {
+.notif-row__main time {
   color: var(--color-text-muted);
   font-size: 0.75rem;
 }
+/* issue 186: the actions at the top right, beside the title — the row stays as tall as its text */
 .notif-row__actions {
   display: flex;
   align-items: center;
   gap: 0.1rem;
+  margin-block-start: -0.25rem;
   opacity: 0;
   transition: opacity var(--motion-fast, 120ms) ease;
 }
