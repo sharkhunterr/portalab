@@ -333,7 +333,13 @@ function ProductPanel({ product, onClose }: { product: Product; onClose: () => v
         </>
       }
     >
-      <div className="vitrine-sheet">
+      <div className="vitrine-sheet" data-deal={data.discount && !owned(data) ? "true" : undefined}>
+        {data.discount && !owned(data) && !soldOut(data) ? (
+          <span className="vitrine-deal" title={data.discount.name}>
+            <Icon name="flame" size={14} />
+            {t("marketplace:deal.percent", { percent: data.discount.percent })}
+          </span>
+        ) : null}
         <ProductSheet product={data} />
       </div>
     </Panel>
