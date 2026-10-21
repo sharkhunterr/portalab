@@ -63,6 +63,10 @@ export function UsageMeter({ usage }: { usage: Usage }) {
           sideOffset={6}
           align="end"
           data-tone={tone}
+          // issue 181: a guided tour showing these details leaves them open
+          onInteractOutside={(event) => {
+            if (document.querySelector(".tour")) event.preventDefault();
+          }}
         >
           <p className="ai-usage__title">{t("ai:usage.title")}</p>
           <span className="ai-usage__bar" aria-hidden="true">
