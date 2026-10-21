@@ -160,6 +160,8 @@ describe("AuthGate", () => {
   it("shows the unavailable state when the API is down", async () => {
     fake.handler = () => json(503, { code: "auth.unavailable" });
     render(withClient(<AuthGate location={{ pathname: "/", search: "" }}>{() => <p>portal</p>}</AuthGate>));
-    expect(await screen.findByText("Unavailable")).toBeInTheDocument();
+    // issue 16: the portal's own page — what happens, a countdown and « Retry »
+    expect(await screen.findByText("The portal is unavailable for a moment")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
   });
 });

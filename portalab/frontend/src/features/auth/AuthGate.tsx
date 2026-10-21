@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import { AuthLayout } from "../../design-system/components/AuthLayout";
 import { FunctionalState } from "../../design-system/FunctionalState";
+import { PortalUnreachable } from "../../shell/router/PortalUnreachable";
 import { inLanguage, useSite } from "../../shell/site/site";
-import { stateForError } from "../../state/regions";
+import { ApiError, stateForError } from "../../state/regions";
 import { FirstRunWizard } from "../admin/FirstRunWizard";
 import { LoginForm } from "./LoginForm";
 import { authStrings as t } from "./strings";
@@ -35,8 +36,12 @@ export function AuthGate({
     );
   }
   if (me.isPending) return <FunctionalState state="loading" detail={t.loginTitle} />;
-  if (me.isError)
+  if (me.isError) {
+    // issue 16: the portal does not answer (no reply, or a server error) — its own page, trying again
+    const status = me.error instanceof ApiError ? me.error.status : 0;
+    if (!status || status >= 500) return <PortalUnreachable />;
     return <FunctionalState state={stateForError(me.error)} onRetry={() => void me.refetch()} />;
+  }
   if (!me.data)
     return (
       <AuthLayout {...layout}>
