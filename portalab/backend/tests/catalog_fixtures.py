@@ -9,6 +9,7 @@ from typing import Any
 from portalab.app.demo_shop import SHOP
 from portalab.capabilities.visuals import builtin_root
 from portalab.modules.visuals.manifest import LOOK_FIELD
+from portalab.modules.visuals.service import VisualPacks
 
 ECONOMY_DEFAULTS: dict[str, Any] = {
     "price": None,
@@ -39,6 +40,11 @@ def pack_products() -> tuple[dict[str, Any], ...]:
         field = LOOK_FIELD.get(element["type"])
         if field and element.get("look") is not None:
             payload[field] = element["look"]
+        if element["type"] in ("widget", "widget_style", "widget_option"):
+            # what a widget's look, option or own widget is sold as (``<widget>:<setting>=<value>``…)
+            payload = VisualPacks.product_of({**element, "economy": element.get("economy") or {}}, {})[
+                "payload"
+            ]
         out.append(
             {
                 **ECONOMY_DEFAULTS,

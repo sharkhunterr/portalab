@@ -2,8 +2,8 @@
   "type": "widget_option",
   "product": "opt_services_heartbeat",
   "names": {
-    "en": "Heartbeat for « Services »",
-    "fr": "Battement de cœur pour « Services »"
+    "en": "Beating heart for « Services »",
+    "fr": "Cœur battant pour « Services »"
   },
   "descriptions": {
     "en": "The services become a beating heart, how many work written in it and filling it. All up: a calm, steady beat. One down: it beats faster, stumbles and turns amber. With room, its details on its right: the summary and each service. Its original look stays yours; chosen in its settings once bought.",
