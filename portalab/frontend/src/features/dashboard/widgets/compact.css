@@ -231,6 +231,27 @@
   grid-template-rows: auto minmax(0, 1fr);
   block-size: 100cqh;
 }
+/* a low block (two rows): the figures two by two on the left, the chart beside them over the whole height */
+@container (max-height: 9rem) {
+  .widget-frame__body .widget-media-stats:has(> .widget-media-stats__chart) {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .widget-frame__body .widget-media-stats > .widget-media-stats__context {
+    display: none;
+  }
+  .widget-frame__body .widget-media-stats > .widget-media-stats__figures {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-column: 1;
+    grid-row: 1;
+    align-content: center;
+  }
+  .widget-frame__body .widget-media-stats > .widget-media-stats__chart {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
 /* narrow: the context gives way, the figures take the top row */
 @container (max-width: 26rem) {
   .widget-media-stats__context {

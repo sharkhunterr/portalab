@@ -39,6 +39,14 @@ export function useFormat() {
         ...(hour12 === undefined ? {} : { hour12 }),
       }).format(new Date(value)),
     number: (value: number) => new Intl.NumberFormat(ctx.locale).format(value),
+    /** a short count of hours, for a chart's axis (« 1,5 h », « 1.5h ») */
+    hours: (value: number) =>
+      new Intl.NumberFormat(ctx.locale, {
+        style: "unit",
+        unit: "hour",
+        unitDisplay: "narrow",
+        maximumFractionDigits: 1,
+      }).format(value),
     /** 027: « 956.5K » — a large figure in a small place (dashboard chips) */
     compact: (value: number) =>
       new Intl.NumberFormat(ctx.locale, { notation: "compact", maximumFractionDigits: 1 }).format(value),

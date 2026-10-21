@@ -1148,6 +1148,7 @@
   "widget.stats.more": "Toutes mes statistiques",
   "widget.stats.title": "Mes statistiques",
   "widget.stats.trend": "vs période précédente",
+  "widget.stats.hours": "Temps passé (heures)",
   "widget.top.description": "Les titres les plus regardés sur le serveur ces 7 derniers jours.",
   "widget.top.title": "Top de la semaine",
   "widget.upcoming.description": "Les films et épisodes attendus dans les prochaines semaines.",

@@ -1674,10 +1674,14 @@ a.mk-kpi__link:hover {
 .shop-carousel__slide {
   --rarity: var(--rarity-common);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
   gap: var(--space-2);
   flex: 0 0 100%;
+  /* exactly the carousel's width, however long the name: the next slide never shows on the left */
+  min-inline-size: 0;
   min-block-size: 0;
+  overflow: hidden;
   padding: var(--space-2);
   border: 1px solid var(--color-border);
   border-block-start: 3px solid var(--rarity);
