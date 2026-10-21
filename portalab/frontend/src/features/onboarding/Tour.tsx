@@ -152,7 +152,8 @@ function TourRun({ tour, onClose }: { tour: TourDef; onClose: () => void }) {
         window.clearInterval(timer);
         setTarget(found);
         setReady(true);
-      } else if (Date.now() - started > TOUR_TIMING.patience) {
+      } else if (Date.now() - started > (route ? 3 : 1) * TOUR_TIMING.patience) {
+        // a step that opens a page waits longer: the page loads first (issue 181: the shop's shelves)
         window.clearInterval(timer);
         setIndex((i) => Math.min(Math.max(i + direction, 0), steps.length - 1));
       }

@@ -111,9 +111,10 @@ export function AiPanel({
             event.preventDefault();
             input.current?.focus();
           }}
-          // issue 181: a guided tour over the window leaves it open (its bubble sits outside)
+          // issue 181: a guided tour over the window leaves it open — its bubble sits outside, and is drawn
+          // anew on « Next » before the click is judged (the clicked button is then gone from the page)
           onInteractOutside={(event) => {
-            if ((event.target as Element | null)?.closest?.(".tour")) event.preventDefault();
+            if (document.querySelector(".tour")) event.preventDefault();
           }}
         >
           <header className="ai-modal__head">
