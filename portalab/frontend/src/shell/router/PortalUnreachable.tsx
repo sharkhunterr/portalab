@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
-import { useSite } from "../site/site";
+import { rememberedSite, useSite } from "../site/site";
 
 /**
  * Issue 16 — the portal cannot be reached (restarting, maintenance, a cut): a page of its own instead of a
@@ -30,7 +30,8 @@ export async function portalAnswers(): Promise<boolean> {
 
 export function PortalUnreachable({ onBack }: { onBack?: () => void }) {
   const t = useT();
-  const site = useSite();
+  const live = useSite();
+  const site = live.custom ? live : (rememberedSite() ?? live); // the portal is away: its last known name
   const say = (key: string, values?: Record<string, number>) => {
     const text = t(key, values);
     if (text !== key.split(":")[1] && text !== key) return text;
