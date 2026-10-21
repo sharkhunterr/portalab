@@ -31,7 +31,7 @@ import "../admin.css";
 /**
  * 027: what kind of announcement — one choice, in its colour, that sets how it reaches members: the tone of
  * its banner and notification, whether it is an alert, its priority (an urgent one reaches even those who
- * muted announcements, is never held for a digest, and its banner cannot be closed).
+ * muted announcements, is never held for a digest, and its banner is kept by default).
  */
 const TYPES = {
   info: { icon: "megaphone", kind: "notification", priority: "normal" },
@@ -52,6 +52,8 @@ function Broadcast() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [type, setType] = useState<AnnouncementType>("info");
+  // whether each member may close the banner — an urgent one is kept unless the administrator says otherwise
+  const [closable, setClosable] = useState(true);
   const [link, setLink] = useState("");
   // 027: where it goes — any of a notification, an e-mail, a banner (until a date)
   const [channels, setChannels] = useState<string[]>(["notification"]);
@@ -76,6 +78,7 @@ function Broadcast() {
             channels: channels as Array<"notification" | "email" | "banner">,
             tone: type,
             banner_until: channels.includes("banner") && until ? new Date(until).toISOString() : null,
+            banner_dismissible: closable,
           },
         })
       ).data as { recipients: number },
@@ -107,7 +110,10 @@ function Broadcast() {
                 name="announce-type"
                 value={value}
                 checked={type === value}
-                onChange={() => setType(value)}
+                onChange={() => {
+                  setType(value);
+                  setClosable(value !== "critical");
+                }}
               />
               <span className="announce-type__icon" aria-hidden="true">
                 <Icon name={TYPES[value].icon} size={16} />
@@ -158,12 +164,20 @@ function Broadcast() {
             />
           ))}
           {channels.includes("banner") ? (
-            <TextField
-              label={t("admin:announce.bannerUntil")}
-              type="datetime-local"
-              value={until}
-              onChange={(e) => setUntil(e.target.value)}
-            />
+            <>
+              <TextField
+                label={t("admin:announce.bannerUntil")}
+                type="datetime-local"
+                value={until}
+                onChange={(e) => setUntil(e.target.value)}
+              />
+              <CheckboxField
+                label={t("admin:announce.closable")}
+                hint={t("admin:announce.closableHint")}
+                checked={closable}
+                onChange={(e) => setClosable(e.target.checked)}
+              />
+            </>
           ) : null}
           {/* what the banner will look like, in the chosen type's colour */}
           {channels.includes("banner") ? (
@@ -177,7 +191,7 @@ function Broadcast() {
                 text={body ? body.split("\n")[0] : null}
                 details={link || null}
                 detailsLabel={t("notifications:banner.more")}
-                onClose={type === "critical" ? undefined : () => undefined}
+                onClose={closable ? () => undefined : undefined}
               />
             </div>
           ) : null}
@@ -210,6 +224,7 @@ interface AnnouncementRow {
   channels: string[];
   banner: boolean;
   banner_until: string | null;
+  dismissible: boolean;
   recipients: number;
   created_at: string;
   ended_at: string | null;
@@ -263,6 +278,9 @@ function History() {
                       ? t("admin:announce.bannerLiveUntil", { date: format.dateTime(row.banner_until) })
                       : t("admin:announce.bannerLive")}
                   </StatusBadge>
+                  {row.dismissible ? null : (
+                    <StatusBadge tone="neutral">{t("admin:announce.kept")}</StatusBadge>
+                  )}
                   <Button variant="secondary" disabled={end.isPending} onClick={() => end.mutate(row.id)}>
                     {t("admin:announce.endBanner")}
                   </Button>

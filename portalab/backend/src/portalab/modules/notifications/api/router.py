@@ -121,6 +121,7 @@ class BroadcastIn(BaseModel):
         default_factory=lambda: list(DEFAULT_CHANNELS), min_length=1, max_length=3
     )
     banner_until: datetime | None = None
+    banner_dismissible: bool = True  # whether each member may close the banner
     tone: Literal["info", "success", "warning", "critical"] = "info"
 
 
@@ -133,6 +134,7 @@ class AnnouncementOut(BaseModel):
     channels: list[str]
     banner: bool
     banner_until: datetime | None
+    dismissible: bool
     recipients: int
     created_at: datetime
     ended_at: datetime | None
@@ -148,6 +150,7 @@ def _announcement_out(row: Announcement) -> AnnouncementOut:
         channels=list(row.channels or []),
         banner=row.banner,
         banner_until=row.banner_until,
+        dismissible=row.dismissible,
         recipients=row.recipients,
         created_at=row.created_at,
         ended_at=row.ended_at,
@@ -551,6 +554,7 @@ async def broadcast(principal: Broadcaster, body: BroadcastIn, module: Module) -
             channels=channels,
             banner="banner" in channels,
             banner_until=body.banner_until if "banner" in channels else None,
+            dismissible=body.banner_dismissible,
             recipients=recipients,
             created_by=principal.acting_for or principal.user_id,
             created_at=now,
