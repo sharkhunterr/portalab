@@ -20,6 +20,13 @@ CATEGORIES = (
 )
 
 
+DEFAULTS: dict[str, dict[str, Any]] = {
+    "reward": {"reason": "none", "boost": "none"},
+    "quest": {"xp": 0, "coins": 0, "contribution": 0},
+    "achievement": {"xp": 0, "coins": 0, "contribution": 0},
+}
+
+
 @dataclass(frozen=True, slots=True)
 class Note:
     kind: str  # reward | level_up | achievement
@@ -50,7 +57,8 @@ class Notifier:
                         template_key=f"gamification:notify.{note.kind}",
                         audience=Users((note.user,)),
                         dedup_key=note.dedup,
-                        params=dict(note.params),
+                        # issue 186: every parameter its message names is there (« none » when it has none)
+                        params={**DEFAULTS.get(note.kind, {}), **dict(note.params)},
                         subject_ref=f"progression:{note.user}",
                         action_url="/progression",
                     )

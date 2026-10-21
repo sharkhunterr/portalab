@@ -455,6 +455,8 @@
   "priority.low": "Faible",
   "priority.normal": "Normale",
   "repeated": "{count, plural, other {×#}}",
+  "reward.contribution": "Contribution",
+  "reward.xp": "XP",
   "security.blocked": "Sécurité : {who} bloqué {minutes} min",
   "security.blocked.body": "Ses requêtes ressemblaient à une intrusion ({reason}) : sa session a été fermée. Le détail est dans le journal d'audit.",
   "service.back": "{service} est de nouveau disponible",

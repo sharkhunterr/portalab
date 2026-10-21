@@ -137,8 +137,6 @@
 .notif-row {
   --tone: var(--color-accent);
   position: relative;
-  display: flex;
-  align-items: flex-start;
   border-radius: var(--radius-md);
 }
 .notif-row[data-tone="success"] {
@@ -160,20 +158,17 @@
 .notif-row:not([data-read]) {
   background: color-mix(in srgb, var(--tone) 7%, transparent);
 }
-.notif-row__main {
+/* issue 186: icon · content (title, subtitle, description, rewards), then the time and the actions on one
+   line — never a column of buttons making the row tall */
+.notif-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: var(--space-3);
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
-  flex: 1;
-  min-inline-size: 0;
-  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2) var(--space-2) var(--space-3);
+}
+.notif-row:has(> .notif-row__check) {
+  grid-template-columns: auto auto minmax(0, 1fr);
 }
 .notif-row__icon {
   display: grid;
@@ -184,11 +179,27 @@
   background: color-mix(in srgb, var(--tone) 18%, transparent);
   color: var(--tone);
 }
-.notif-row__text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+.notif-row__content {
+  display: grid;
+  gap: 0.25rem;
   min-inline-size: 0;
+}
+.notif-row__main {
+  display: grid;
+  gap: 0.2rem;
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.notif-row__main:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 .notif-row__title {
   display: flex;
@@ -199,6 +210,18 @@
 }
 .notif-row[data-read] .notif-row__title strong {
   font-weight: 500;
+}
+.notif-row__subtitle {
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.notif-row[data-read] .notif-row__subtitle {
+  font-weight: 500;
+  color: var(--color-text-muted);
 }
 .notif-row__badge,
 .notif-row__repeat {
@@ -217,23 +240,64 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
-.notif-row time {
-  color: var(--color-text-muted);
-  font-size: 0.75rem;
-}
 .notif-row__dot {
-  inline-size: 0.6rem;
-  block-size: 0.6rem;
-  margin-block-start: 0.4rem;
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  margin-inline-start: auto;
   border-radius: 50%;
   background: var(--tone);
 }
+.notif-rewards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-block-start: 0.2rem;
+}
+.notif-reward {
+  --reward: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--reward) 40%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--reward) 14%, transparent);
+  color: var(--reward);
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.notif-reward[data-value="coins"] {
+  --reward: var(--rarity-legendary);
+}
+.notif-reward[data-value="contribution"] {
+  --reward: var(--state-available-fg);
+}
+.notif-reward[data-value="boost"] {
+  --reward: var(--rarity-epic);
+}
+.notif-row__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-block-size: 1.75rem;
+}
+.notif-row__foot time {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
 .notif-row__actions {
   display: flex;
-  flex-direction: column;
-  padding: var(--space-1);
+  align-items: center;
+  gap: 0.1rem;
   opacity: 0;
   transition: opacity var(--motion-fast, 120ms) ease;
+}
+.notif-row__actions .ds-button {
+  min-block-size: 1.75rem;
+  min-inline-size: 1.75rem;
 }
 .notif-row:hover .notif-row__actions,
 .notif-row:focus-within .notif-row__actions {
@@ -241,7 +305,7 @@
 }
 @media (hover: none) {
   .notif-row__actions {
-    opacity: 1;
+    opacity: 0.85;
   }
 }
 
@@ -250,7 +314,7 @@
   flex: none;
   inline-size: 1.15rem;
   block-size: 1.15rem;
-  margin: var(--space-3) 0 0 var(--space-3);
+  margin: 0.55rem 0 0;
   accent-color: var(--color-accent);
 }
 .notif-row[data-selected] {

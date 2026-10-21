@@ -2,6 +2,7 @@
 category list, and administration (broadcast, e-mail transport, category policy, delivery metadata)."""
 
 import html
+from collections.abc import Mapping
 from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
@@ -19,7 +20,7 @@ from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.errors import NotFound, Unavailable, ValidationFailed
 from portalab.core.time import utc_now
-from portalab.modules.notifications.models import Announcement, Delivery, Notification
+from portalab.modules.notifications.models import Announcement, Communication, Delivery, Notification
 from portalab.modules.notifications.module import NotificationsModule
 from portalab.modules.notifications.permissions import NOTIFICATIONS_BROADCAST, NOTIFICATIONS_MANAGE, SELF
 from portalab.modules.notifications.preferences.resolver import MandatoryChannel, decide, validate_update
@@ -48,6 +49,11 @@ Manager = Annotated[Principal, require(NOTIFICATIONS_MANAGE)]
 Broadcaster = Annotated[Principal, require(NOTIFICATIONS_BROADCAST)]
 
 
+class NotificationRewardOut(BaseModel):
+    value: str  # xp | coins | contribution
+    amount: int
+
+
 class NotificationOut(BaseModel):
     id: UUID
     kind: Literal["notification", "alert"]
@@ -61,6 +67,11 @@ class NotificationOut(BaseModel):
     archived: bool
     created_at: str
     updated_at: str
+    # issue 186: what the notification is about (a quest, an achievement, why a gain) and what it brought,
+    # apart from its title — shown as a subtitle and as badges
+    subtitle: str | None = None
+    rewards: list[NotificationRewardOut] = Field(default_factory=list)
+    boost: str | None = None
 
 
 class NotificationPage(BaseModel):
@@ -173,8 +184,44 @@ class CategoryPolicyIn(BaseModel):
     locked: bool = False
 
 
-def _out(row: Notification) -> NotificationOut:
+REWARD_VALUES = ("xp", "coins", "contribution")
+SUBJECTS = ("quest", "achievement", "product", "item", "reason")
+
+
+def _details(params: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Issue 186: the subtitle, the rewards and a boost, read from the communication's parameters."""
+    if not params:
+        return {}
+    subtitle = next(
+        (
+            str(params[key]).strip()[:160]
+            for key in SUBJECTS
+            if isinstance(params.get(key), str) and params[key].strip() and params[key] != "none"
+        ),
+        None,
+    )
+    rewards = [
+        NotificationRewardOut(value=value, amount=int(params[value]))
+        for value in REWARD_VALUES
+        if isinstance(params.get(value), int | float)
+        and not isinstance(params.get(value), bool)
+        and params[value] > 0
+    ]
+    if not rewards and params.get("value") in REWARD_VALUES and isinstance(params.get("amount"), int | float):
+        rewards = [NotificationRewardOut(value=str(params["value"]), amount=int(params["amount"]))]
+    boost = params.get("boost")
+    return {
+        "subtitle": subtitle,
+        "rewards": rewards,
+        "boost": str(boost)
+        if isinstance(boost, str | int | float) and str(boost) not in ("", "none")
+        else None,
+    }
+
+
+def _out(row: Notification, params: Mapping[str, Any] | None = None) -> NotificationOut:
     return NotificationOut(
+        **_details(params),
         id=row.id,
         kind=row.kind,
         category=row.category,
@@ -240,8 +287,15 @@ async def my_notifications(
     )
     async with module.database.session() as session:
         rows = (await session.execute(stmt)).scalars().all()
+        sources = {r.communication_id for r in rows[:PAGE]}
+        params: dict[UUID, Mapping[str, Any]] = {}
+        if sources:
+            found = await session.execute(
+                select(Communication.id, Communication.params).where(Communication.id.in_(sources))
+            )
+            params = {ident: values for ident, values in found.all()}
     return NotificationPage(
-        items=[_out(r) for r in rows[:PAGE]],
+        items=[_out(r, params.get(r.communication_id)) for r in rows[:PAGE]],
         next_cursor=encode_cursor(offset + PAGE) if len(rows) > PAGE else None,
         unread=await _unread(module, user),
     )
