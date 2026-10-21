@@ -1200,6 +1200,199 @@
   cursor: pointer;
 }
 
+/* 027: a maintenance or an incident announced across the portal — a slim tinted strip, the dates apart */
+.status-banner {
+  --tone: var(--cal-series);
+  container: status-banner / inline-size;
+  position: relative;
+  margin-block-end: var(--space-3);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--tone) 35%, var(--color-border));
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--tone) 18%, transparent), transparent 55%),
+    color-mix(in srgb, var(--tone) 6%, var(--color-surface));
+  color: var(--color-text);
+}
+.status-banner[data-tone="running"] {
+  --tone: var(--cal-campaign);
+}
+.status-banner[data-tone="incident"] {
+  --tone: var(--cal-incident);
+}
+.status-banner__inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto auto;
+  grid-template-areas: "icon body when details close";
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: 0.5rem var(--space-2) 0.5rem 0.6rem;
+}
+.status-banner__icon {
+  grid-area: icon;
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--tone) 22%, var(--color-surface));
+  color: var(--tone);
+}
+.status-banner[data-tone="incident"] .status-banner__icon::after,
+.status-banner[data-tone="running"] .status-banner__icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  animation: status-banner-ping 2.4s ease-out infinite;
+}
+@keyframes status-banner-ping {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--tone) 55%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 0.4rem color-mix(in srgb, var(--tone) 0%, transparent);
+  }
+}
+.status-banner__body {
+  grid-area: body;
+  display: grid;
+  gap: 0.1rem;
+  min-inline-size: 0;
+}
+.status-banner__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.status-banner__text {
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.status-banner__eyebrow {
+  flex: none;
+  color: var(--tone);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.status-banner__title {
+  min-inline-size: 0;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+}
+.status-banner__when {
+  grid-area: when;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--tone) 28%, var(--color-border));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+.status-banner__when > .ds-icon,
+.status-banner__when > span {
+  color: var(--tone);
+}
+.status-banner__details {
+  grid-area: details;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.status-banner__details:hover {
+  color: var(--tone);
+}
+.status-banner__close {
+  grid-area: close;
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.status-banner__close:hover {
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+  color: var(--color-text);
+}
+.status-banner__progress {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 2px;
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+}
+.status-banner__progress > span {
+  display: block;
+  inline-size: calc(var(--progress, 0) * 100%);
+  block-size: 100%;
+  background: var(--tone);
+  transition: inline-size 1s ease;
+}
+/* a narrow page: the label above the title, the dates and « Details » on a second line */
+@container status-banner (max-width: 44rem) {
+  .status-banner__inner {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "icon body body close"
+      "icon when details details";
+    row-gap: 0.3rem;
+    justify-items: start;
+  }
+  .status-banner__icon {
+    align-self: start;
+  }
+  .status-banner__head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .status-banner__text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+  }
+  .status-banner__close {
+    align-self: start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .status-banner__icon::after {
+    animation: none;
+  }
+}
+:root[data-motion="none"] .status-banner__icon::after {
+  animation: none;
+}
+
 /* 027: an announcement shown as a banner, in its tone */
 .announcement-banner {
   --tone: var(--color-accent);
@@ -1250,6 +1443,12 @@
 .shell-health[data-state="incident"] {
   --health: var(--cal-incident);
 }
+.shell-health[data-state="maintenance"] {
+  --health: var(--cal-campaign);
+}
+.shell-health[data-state="planned"] {
+  --health: var(--cal-series);
+}
 .shell-health__count {
   position: absolute;
   inset-block-start: 0.15rem;
@@ -1279,6 +1478,164 @@
 }
 .shell-health[data-state="incident"] .shell-health__count {
   animation: health-ripple 1.6s ease-out infinite;
+}
+.shell-health[data-state="maintenance"] .ds-icon {
+  animation: health-turn 2.6s ease-in-out infinite;
+}
+@keyframes health-turn {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0);
+  }
+  70% {
+    transform: rotate(-35deg);
+  }
+  85% {
+    transform: rotate(10deg);
+  }
+}
+
+/* 027: the window under the status button — incidents, maintenances, services */
+.shell-status {
+  --tone: var(--state-available-fg);
+  display: grid;
+  gap: var(--space-3);
+  inline-size: min(22rem, calc(100vw - 1.5rem));
+  max-block-size: min(70vh, 34rem);
+  overflow-y: auto;
+  padding: var(--space-3);
+}
+.shell-status[data-state-tone="incident"] {
+  --tone: var(--cal-incident);
+}
+.shell-status[data-state-tone="maintenance"] {
+  --tone: var(--cal-campaign);
+}
+.shell-status[data-state-tone="degraded"] {
+  --tone: var(--rarity-legendary);
+}
+.shell-status[data-state-tone="planned"] {
+  --tone: var(--cal-series);
+}
+.shell-status__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(120% 180% at 0% 0%, color-mix(in srgb, var(--tone) 26%, transparent), transparent 70%),
+    color-mix(in srgb, var(--tone) 8%, var(--color-surface));
+}
+.shell-status__head > span:last-child {
+  display: grid;
+  gap: 0.1rem;
+}
+.shell-status__head small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.shell-status__badge {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--tone) 20%, var(--color-surface));
+  color: var(--tone);
+}
+.shell-status__group {
+  display: grid;
+  gap: var(--space-1);
+}
+.shell-status__group h3 {
+  margin: 0;
+  padding-inline: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.shell-status__group ul {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.shell-status__item {
+  --dot: var(--cal-series);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.shell-status__item:hover,
+.shell-status__item:focus-visible {
+  background: color-mix(in srgb, var(--dot) 12%, transparent);
+}
+.shell-status__item > .ds-icon {
+  color: var(--color-text-muted);
+}
+.shell-status__item[data-severity] {
+  --dot: var(--cal-incident);
+}
+.shell-status__item[data-severity="minor"] {
+  --dot: var(--rarity-legendary);
+}
+.shell-status__item[data-maintenance="running"] {
+  --dot: var(--cal-campaign);
+}
+.shell-status__item[data-services="ok"] {
+  --dot: var(--state-available-fg);
+}
+.shell-status__item[data-services="trouble"] {
+  --dot: var(--rarity-legendary);
+}
+.shell-status__dot {
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--dot);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--dot) 22%, transparent);
+}
+.shell-status__text {
+  display: grid;
+  gap: 0.1rem;
+  min-inline-size: 0;
+}
+.shell-status__text strong {
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shell-status__text small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.shell-status__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2) 0;
+  border-block-start: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+}
+.shell-status__foot a {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
 }
 @keyframes health-beat {
   0%,

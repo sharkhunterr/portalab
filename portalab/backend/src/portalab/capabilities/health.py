@@ -254,6 +254,7 @@ class AlertRule:
     email_members: bool = False
     email_admins: bool = False
     degrades_portal: bool = True  # counts in the portal's health (header indicator, status page)
+    banner: bool = False  # the incident is also a banner across the portal while it is open
 
 
 ALERT_FLAGS: tuple[str, ...] = (
@@ -264,12 +265,13 @@ ALERT_FLAGS: tuple[str, ...] = (
     "email_members",
     "email_admins",
     "degrades_portal",
+    "banner",
 )
 ALERT_DELAYS: tuple[str, ...] = ("incident_after", "notify_after")
 MAX_ALERT_DELAY = 1440  # minutes (a day)
 
 DEFAULT_ALERT_RULES: dict[str, AlertRule] = {
-    "critical": AlertRule(incident_after=5, notify_after=0, email_admins=True),
+    "critical": AlertRule(incident_after=5, notify_after=0, email_admins=True, banner=True),
     "major": AlertRule(),
     "minor": AlertRule(incident_after=30, notify_after=15, notify_members=False),
     "internal": AlertRule(incident=False, notify_after=15, notify_members=False, degrades_portal=False),
@@ -382,9 +384,11 @@ class Incidents(Protocol):
         service_ids: Sequence[str] = (),
         dedup_key: str | None = None,
         summary: str | None = None,
+        banner: bool = False,
     ) -> IncidentRef:
         """Idempotent per ``(source, dedup_key)`` (016): a repeated escalation returns the same incident.
-        ``severity`` accepts ``minor|major|critical`` (or 025's ``info|warning|critical``)."""
+        ``severity`` accepts ``minor|major|critical`` (or 025's ``info|warning|critical``); ``banner`` also
+        shows it as a banner across the portal while it is open."""
         ...
 
     async def attach(self, incident_id: str, evidence: Mapping[str, Any]) -> IncidentRef | None:

@@ -31,6 +31,7 @@ class AlertRuleBody(BaseModel):
     email_members: bool
     email_admins: bool
     degrades_portal: bool
+    banner: bool = False
 
 
 class AlertRulesBody(BaseModel):

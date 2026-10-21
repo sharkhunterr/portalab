@@ -28,6 +28,7 @@ export interface AlertRule {
   email_members: boolean;
   email_admins: boolean;
   degrades_portal: boolean;
+  banner: boolean;
 }
 export type AlertOverrides = Partial<AlertRule>;
 type Rules = Record<Importance, AlertRule>;
@@ -65,6 +66,7 @@ export function useRuleSummary() {
     if ((rule.notify_members && rule.email_members) || (rule.notify_admins && rule.email_admins)) {
       parts.push(t("admin:alerting.summary.email"));
     }
+    if (rule.incident && rule.banner) parts.push(t("admin:alerting.summary.banner"));
     return parts.join(" · ");
   };
 }
@@ -106,6 +108,13 @@ function RuleFields({ rule, onChange }: { rule: AlertRule; onChange: (rule: Aler
             onChange={(e) => set({ auto_resolve: e.target.checked })}
           />
         </div>
+        <CheckboxField
+          label={t("admin:alerting.incident.banner")}
+          hint={t("admin:alerting.incident.bannerHint")}
+          disabled={!rule.incident}
+          checked={rule.banner}
+          onChange={(e) => set({ banner: e.target.checked })}
+        />
       </fieldset>
       <fieldset className="alert-rule__group">
         <legend>
@@ -261,6 +270,7 @@ export function AlertRulesDialog() {
 const FLAGS = [
   "incident",
   "auto_resolve",
+  "banner",
   "notify_members",
   "email_members",
   "notify_admins",

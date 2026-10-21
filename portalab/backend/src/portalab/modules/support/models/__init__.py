@@ -43,6 +43,8 @@ class Incident(SupportBase):
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     resolved_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    # also shown as a banner across the portal while it is open (like a maintenance's)
+    banner: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
 
 
 class IncidentServiceLink(SupportBase):

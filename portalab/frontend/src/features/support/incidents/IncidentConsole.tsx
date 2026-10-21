@@ -2,7 +2,7 @@ import { type FormEvent, useId, useState } from "react";
 import { useAnnounce } from "../../../design-system/a11y/Announce";
 import { AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { SelectField, TextField } from "../../../design-system/components/Field";
+import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
@@ -25,6 +25,7 @@ function Declare() {
   const [severity, setSeverity] = useState<Severity>("major");
   const [summary, setSummary] = useState("");
   const [services, setServices] = useState<string[]>([]);
+  const [banner, setBanner] = useState(false);
   function submit(event: FormEvent) {
     event.preventDefault();
     staff.mutate(
@@ -34,12 +35,14 @@ function Declare() {
         severity,
         summary,
         service_ids: services,
+        banner,
       },
       {
         onSuccess: () => {
           setTitle("");
           setSummary("");
           setServices([]);
+          setBanner(false);
         },
       },
     );
@@ -73,6 +76,12 @@ function Declare() {
           onChange={(e) => setSummary(e.target.value)}
         />
         <ServicePicker label={t("support:console.services")} value={services} onChange={setServices} />
+        <CheckboxField
+          label={t("support:console.banner")}
+          hint={t("support:console.bannerHint")}
+          checked={banner}
+          onChange={(e) => setBanner(e.target.checked)}
+        />
         <Button type="submit" disabled={staff.isPending}>
           {t("support:console.declare")}
         </Button>
@@ -113,6 +122,13 @@ function Manage({ incident }: { incident: Incident }) {
         label={t("support:console.services")}
         value={incident.services.map((s) => s.id)}
         onChange={(ids) => staff.mutate({ kind: "patch", ...base, service_ids: ids }, { onError })}
+      />
+      <CheckboxField
+        label={t("support:console.banner")}
+        hint={t("support:console.bannerHint")}
+        checked={incident.banner ?? false}
+        disabled={staff.isPending}
+        onChange={(e) => staff.mutate({ kind: "patch", ...base, banner: e.target.checked }, { onError })}
       />
       <TextField
         label={t("support:console.message")}

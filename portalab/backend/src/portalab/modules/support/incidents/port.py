@@ -47,6 +47,7 @@ class IncidentsPort:
         service_ids: Sequence[str] = (),
         dedup_key: str | None = None,
         summary: str | None = None,
+        banner: bool = False,
     ) -> IncidentRef:
         source = source if source in SOURCES else "automation"
         if dedup_key is None and evidence.get("anomaly_id"):
@@ -61,6 +62,7 @@ class IncidentsPort:
             summary=summary or "",
             dedup_key=dedup_key,
             evidence=[evidence_ref(evidence)] if evidence else [],
+            banner=banner,
         )
         return _ref(view)
 

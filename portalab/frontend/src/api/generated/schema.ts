@@ -10741,6 +10741,11 @@ export interface components {
         AlertRuleBody: {
             /** Auto Resolve */
             auto_resolve: boolean;
+            /**
+             * Banner
+             * @default false
+             */
+            banner: boolean;
             /** Degrades Portal */
             degrades_portal: boolean;
             /** Email Admins */
@@ -12742,6 +12747,11 @@ export interface components {
         };
         /** IncidentIn */
         IncidentIn: {
+            /**
+             * Banner
+             * @default false
+             */
+            banner: boolean;
             /** Service Ids */
             service_ids?: string[];
             /**
@@ -12759,6 +12769,11 @@ export interface components {
         };
         /** IncidentOut */
         IncidentOut: {
+            /**
+             * Banner
+             * @default false
+             */
+            banner: boolean;
             /** Created At */
             created_at: string;
             /** Evidence */
@@ -12799,6 +12814,8 @@ export interface components {
         };
         /** IncidentPatchIn */
         IncidentPatchIn: {
+            /** Banner */
+            banner?: boolean | null;
             /** Service Ids */
             service_ids?: string[] | null;
             /** Severity */

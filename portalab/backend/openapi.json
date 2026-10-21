@@ -1470,6 +1470,11 @@
             "title": "Auto Resolve",
             "type": "boolean"
           },
+          "banner": {
+            "default": false,
+            "title": "Banner",
+            "type": "boolean"
+          },
           "degrades_portal": {
             "title": "Degrades Portal",
             "type": "boolean"
@@ -7022,6 +7027,11 @@
       "IncidentIn": {
         "additionalProperties": false,
         "properties": {
+          "banner": {
+            "default": false,
+            "title": "Banner",
+            "type": "boolean"
+          },
           "service_ids": {
             "items": {
               "type": "string"
@@ -7061,6 +7071,11 @@
       },
       "IncidentOut": {
         "properties": {
+          "banner": {
+            "default": false,
+            "title": "Banner",
+            "type": "boolean"
+          },
           "created_at": {
             "title": "Created At",
             "type": "string"
@@ -7168,6 +7183,17 @@
       "IncidentPatchIn": {
         "additionalProperties": false,
         "properties": {
+          "banner": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Banner"
+          },
           "service_ids": {
             "anyOf": [
               {

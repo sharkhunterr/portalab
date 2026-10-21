@@ -140,3 +140,28 @@ async def test_duplicates_and_validation(
     await staff(app, client, support)
     bad = await client.post("/api/v1/admin/incidents", json={"title": "x", "severity": "apocalyptic"})
     assert bad.status_code == 422
+
+
+async def test_banner_chosen_at_declaration_and_changed_later(
+    app: FastAPI, client: httpx.AsyncClient, support: SupportHarness
+) -> None:
+    """027: an incident may also be announced by a banner across the portal — chosen when it is declared
+    (off by default), switched on or off later, and told to every reader."""
+    await staff(app, client, support)
+    plain = (
+        await client.post("/api/v1/admin/incidents", json={"title": "Slow search", "severity": "minor"})
+    ).json()
+    assert plain["banner"] is False
+    loud = (
+        await client.post(
+            "/api/v1/admin/incidents", json={"title": "Plex down", "severity": "major", "banner": True}
+        )
+    ).json()
+    assert loud["banner"] is True
+    patched = await client.patch(
+        f"/api/v1/admin/incidents/{loud['id']}", json={"banner": False}, headers={"If-Match": "1"}
+    )
+    assert patched.status_code == 200, patched.text
+    assert patched.json()["banner"] is False and patched.json()["version"] == 2
+    listed = {i["id"]: i["banner"] for i in (await client.get("/api/v1/incidents?state=open")).json()}
+    assert listed == {plain["id"]: False, loud["id"]: False}

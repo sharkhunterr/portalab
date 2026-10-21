@@ -41,6 +41,7 @@ class InMemoryIncidents:
         service_ids: Sequence[str] = (),
         dedup_key: str | None = None,
         summary: str | None = None,
+        banner: bool = False,
     ) -> IncidentRef:
         if dedup_key is not None and (source, dedup_key) in self.keys:
             record = self.records[self.keys[(source, dedup_key)]]

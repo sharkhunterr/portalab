@@ -72,6 +72,7 @@ class IncidentOut(BaseModel):
     services: list[ServiceOut]
     updates: list[IncidentUpdateOut]
     evidence: list[str]
+    banner: bool = False  # also a banner across the portal while it is open
 
 
 class IncidentIn(BaseModel):
@@ -80,6 +81,7 @@ class IncidentIn(BaseModel):
     severity: Severity
     summary: str = Field(default="", max_length=4000)
     service_ids: list[str] = Field(default_factory=list, max_length=50)
+    banner: bool = False
 
 
 class IncidentUpdateIn(BaseModel):
@@ -94,6 +96,7 @@ class IncidentPatchIn(BaseModel):
     service_ids: list[str] | None = Field(default=None, max_length=50)
     title: str | None = Field(default=None, min_length=3, max_length=200)
     summary: str | None = Field(default=None, max_length=4000)
+    banner: bool | None = None
 
 
 class IncidentResolveIn(BaseModel):
@@ -128,6 +131,7 @@ async def _out(module: SupportModule, principal: Principal, view: IncidentView) 
             for u in view.updates
         ],
         evidence=view.evidence if manager else [],
+        banner=view.banner,
     )
 
 
@@ -160,6 +164,7 @@ async def create_incident(principal: Manager, body: IncidentIn, module: Module) 
         severity=body.severity,
         summary=body.summary,
         service_ids=body.service_ids,
+        banner=body.banner,
     )
     return await _out(module, principal, view)
 
@@ -185,6 +190,7 @@ async def patch_incident(
         service_ids=body.service_ids,
         title=body.title,
         summary=body.summary,
+        banner=body.banner,
         if_match=version_of(if_match),
     )
     return await _out(module, principal, view)
