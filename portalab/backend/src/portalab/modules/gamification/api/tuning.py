@@ -30,6 +30,7 @@ from portalab.modules.gamification.progression.sources import (
     action_of,
     play_source,
     since_days,
+    split,
 )
 from portalab.modules.gamification.progression.sources import sources as gain_sources
 from portalab.modules.gamification.progression.timeline import timeline as gain_timeline
@@ -715,6 +716,11 @@ async def members_details(
     return MembersDetailOut(members=out)
 
 
+class BonusOut(BaseModel):
+    source: str  # streak, campaigns, pace, boost
+    amount: float  # its share of the operation's amount
+
+
 class OperationOut(BaseModel):
     id: UUID
     occurred_at: datetime
@@ -732,6 +738,8 @@ class OperationOut(BaseModel):
     level_up: bool  # for XP: a new level was reached
     play: str | None = None  # issue 160: for a play, what was played (episode, movie, book, audiobook…)
     title: str | None = None  # and its title, when the catalog still knows it
+    # the bonuses on top of the action's own amount (streak, campaign, pace, boost), as on the charts
+    bonuses: list[BonusOut] = Field(default_factory=list)
 
 
 class OperationsOut(BaseModel):
@@ -883,6 +891,14 @@ async def _operations(
     items: list[OperationOut] = []
     for t, running_after in rows:
         after_it = int(running_after or 0)
+        action = _source(
+            t.kind,
+            t.source_kind,
+            int(t.delta),
+            events.get(t.rule_key or ""),
+            played[0] if (played := plays.get(t.trigger_event_id)) else None,
+        )
+        shares = split(t.source_kind, int(t.delta), int(t.base_amount or 0), t.modifiers or {}, action)
         level = curve.level_for(max(0, after_it)) if t.value == "xp" else None
         before = curve.level_for(max(0, after_it - int(t.delta))) if t.value == "xp" else None
         items.append(
@@ -895,13 +911,7 @@ async def _operations(
                 delta=int(t.delta),
                 kind=t.kind,
                 source_kind=t.source_kind,
-                source=_source(
-                    t.kind,
-                    t.source_kind,
-                    int(t.delta),
-                    events.get(t.rule_key or ""),
-                    played[0] if (played := plays.get(t.trigger_event_id)) else None,
-                ),
+                source=action,
                 label=_label_of(labels, t.source_ref, t.rule_key),
                 reason=t.reason,
                 balance=after_it,
@@ -909,6 +919,11 @@ async def _operations(
                 level_up=level is not None and before is not None and level > before,
                 play=play_source(played[0]) if played else None,
                 title=titles.get(played[1] or "") if played else None,
+                bonuses=[
+                    BonusOut(source=source, amount=round(amount, 1))
+                    for source, amount in shares.items()
+                    if source != action and amount > 0
+                ],
             )
         )
     last = rows[-1][0] if more and rows else None

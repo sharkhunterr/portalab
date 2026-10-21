@@ -15,8 +15,8 @@ const PLAYS = ["episode", "movie", "live", "book", "audiobook", "music", "game"]
 
 /**
  * Issue 107 — the journal: every operation of every member over the period (or one member's, under the
- * overview's filter), the latest first — XP, Coins or Contribution gained, spent or corrected, what made it,
- * the balance right after and, for XP, the level reached. A real table on every screen (it scrolls sideways
+ * overview's filter), the latest first — XP, Coins or Contribution gained, spent or corrected, what made it
+ * (with the bonuses inside it: streak, campaign, pace, boost), the balance right after and, for XP, the level reached. A real table on every screen (it scrolls sideways
  * on a phone, the date staying in view), page by page.
  */
 export function Operations({
@@ -164,6 +164,26 @@ export function Operations({
                         </span>
                         {t(`gamification:sources.${row.source}`)}
                       </span>
+                      {/* the bonuses inside the amount (streak, campaign, pace, boost), as the charts split them */}
+                      {row.bonuses?.length ? (
+                        <span className="gam-ops__bonuses">
+                          {row.bonuses.map((bonus) => (
+                            <span key={bonus.source} className="gam-ops__bonus">
+                              <span
+                                className="gam-ops__dot"
+                                style={{ background: SOURCES[bonus.source]?.color ?? "var(--cal-other)" }}
+                                aria-hidden="true"
+                              >
+                                <Icon name={SOURCES[bonus.source]?.icon ?? "sparkles"} size={10} />
+                              </span>
+                              {t("gamification:admin.operations.bonus", {
+                                amount: format.number(bonus.amount),
+                                source: t(`gamification:sources.${bonus.source}`),
+                              })}
+                            </span>
+                          ))}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="gam-ops__what">
                       {row.title ? <strong>{row.title}</strong> : null}
