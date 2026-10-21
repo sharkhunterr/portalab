@@ -55,6 +55,31 @@ function siteOf(data: unknown): Site {
   };
 }
 
+const REMEMBERED = "portalab.site";
+
+/** Issue 16: the site's last known name and icon, kept in the browser — shown when the portal is away. */
+export function rememberSite(site: Site) {
+  try {
+    window.localStorage.setItem(REMEMBERED, JSON.stringify({ name: site.name, icon: site.icon }));
+  } catch {
+    // storage unavailable (private window): the default name is shown
+  }
+}
+
+export function rememberedSite(): { name: string; icon: string | null } | null {
+  try {
+    const raw = JSON.parse(window.localStorage.getItem(REMEMBERED) ?? "null") as {
+      name?: unknown;
+      icon?: unknown;
+    } | null;
+    return raw && typeof raw.name === "string"
+      ? { name: raw.name, icon: typeof raw.icon === "string" ? raw.icon : null }
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 /** A text written per language: the language's own, its base language's, English's, then the first one. */
 export function inLanguage(texts: Record<string, string>, language: string): string | undefined {
   const base = language.split("-")[0] ?? language;
@@ -83,6 +108,7 @@ export function SiteRoot({ children }: { children: ReactNode }) {
   const site = useSite();
   useEffect(() => {
     document.title = site.name;
+    if (site.custom) rememberSite(site); // issue 16: the name the « unreachable » page shows
     headLink("icon", site.icon);
     headLink("manifest", `/api/v1/auth/site/manifest?v=${site.version}`);
   }, [site.name, site.icon, site.version]);
