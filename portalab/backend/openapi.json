@@ -1712,6 +1712,10 @@
             "title": "Created At",
             "type": "string"
           },
+          "dismissible": {
+            "title": "Dismissible",
+            "type": "boolean"
+          },
           "ended_at": {
             "anyOf": [
               {
@@ -1762,6 +1766,7 @@
           "channels",
           "banner",
           "banner_until",
+          "dismissible",
           "recipients",
           "created_at",
           "ended_at"
@@ -2878,6 +2883,11 @@
               }
             ],
             "title": "Action Url"
+          },
+          "banner_dismissible": {
+            "default": true,
+            "title": "Banner Dismissible",
+            "type": "boolean"
           },
           "banner_until": {
             "anyOf": [

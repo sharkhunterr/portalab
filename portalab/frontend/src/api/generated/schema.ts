@@ -10814,6 +10814,8 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /** Dismissible */
+            dismissible: boolean;
             /** Ended At */
             ended_at: string | null;
             /**
@@ -11242,6 +11244,11 @@ export interface components {
         BroadcastIn: {
             /** Action Url */
             action_url?: string | null;
+            /**
+             * Banner Dismissible
+             * @default true
+             */
+            banner_dismissible: boolean;
             /** Banner Until */
             banner_until?: string | null;
             /**

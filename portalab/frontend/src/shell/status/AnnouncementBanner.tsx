@@ -11,6 +11,7 @@ interface Banner {
   link: string | null;
   tone: string;
   banner_until: string | null;
+  dismissible: boolean;
   created_at: string;
 }
 
@@ -25,8 +26,8 @@ const ICONS: Record<string, string> = {
 /**
  * Announcement banner (027): an announcement the administrator chose to show « as a banner » sits across
  * the portal until its date (or until it is ended), drawn like the maintenance and incident banners — its
- * tone, title, first line of text, how long it stays and its link; each member may close it (a critical
- * one cannot be closed).
+ * tone, title, first line of text, how long it stays and its link; each member may close it, unless the
+ * administrator chose to keep it.
  */
 export function AnnouncementBanner() {
   const t = useT();
@@ -40,7 +41,7 @@ export function AnnouncementBanner() {
       return (Array.isArray(data) ? data : []) as unknown as Banner[];
     },
   });
-  const shown = (banners.data ?? []).filter((b) => b.tone === "critical" || !closed.includes(b.id));
+  const shown = (banners.data ?? []).filter((b) => !b.dismissible || !closed.includes(b.id));
   const first = shown[0];
   if (!first) return null;
   const tone = TONES.find((x) => x === first.tone) ?? "info";
@@ -55,7 +56,7 @@ export function AnnouncementBanner() {
       ends={first.banner_until}
       details={first.link}
       detailsLabel={t("notifications:banner.more")}
-      onClose={tone === "critical" ? undefined : () => close(first.id)}
+      onClose={first.dismissible ? () => close(first.id) : undefined}
     />
   );
 }

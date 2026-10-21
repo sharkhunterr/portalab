@@ -66,3 +66,20 @@ async def test_channels_and_banner(
     ended = await client.post(f"/api/v1/admin/announcements/{again.json()['announcement']}/end")
     assert ended.status_code == 200 and ended.json()["ended_at"]
     assert (await client.get("/api/v1/announcements/banners")).json() == []
+
+
+async def test_a_banner_members_cannot_close(
+    app: FastAPI, client: httpx.AsyncClient, notify: NotifyHarness
+) -> None:
+    boss = await create_user(module_of(app), "boss")
+    await make_admin(notify.ev.full, boss)
+    await login(client, "boss")
+    for key, dismissible in (("s-1", None), ("s-2", False)):
+        sent = await client.post(
+            "/api/v1/admin/notifications/broadcast",
+            json={"title": f"Banner {key}", "dedup_key": key, "channels": ["banner"]}
+            | ({} if dismissible is None else {"banner_dismissible": dismissible}),
+        )
+        assert sent.status_code == 200, sent.text
+    shown = {b["title"]: b["dismissible"] for b in (await client.get("/api/v1/announcements/banners")).json()}
+    assert shown == {"Banner s-1": True, "Banner s-2": False}  # closable unless the administrator says not

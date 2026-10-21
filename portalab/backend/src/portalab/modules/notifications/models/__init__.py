@@ -172,6 +172,8 @@ class Announcement(NotifyBase):
     channels: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
     banner: Mapped[bool] = mapped_column(nullable=False, default=False)
     banner_until: Mapped[datetime | None] = mapped_column(TZDateTime)
+    # whether each member may close the banner (an urgent one usually stays until its date or its end)
+    dismissible: Mapped[bool] = mapped_column(nullable=False, default=True, server_default="true")
     recipients: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_by: Mapped[UUID | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
