@@ -3,6 +3,7 @@ import { Icon } from "../../design-system/components/Icon";
 import { CurrencyShort } from "../../design-system/site/SiteLook";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
+import { WidgetHeaderLink } from "../dashboard/frame/actions";
 import { CompactLine } from "../dashboard/widgets/compact";
 import { registerWidgetComponent, type WidgetProps } from "../dashboard/widgets/registry";
 import { TYPE_ICONS } from "./catalog/ProductPoster";
@@ -27,29 +28,34 @@ function FeaturedWidget({ payload, compact }: WidgetProps) {
   const data = (payload.data ?? {}) as { items?: Featured[]; total?: number };
   const items = data.items ?? [];
   const first = items[0];
+  const open = <WidgetHeaderLink to="/marketplace" label={t("marketplace:widget.featured.open")} />;
   if (compact && first)
     // 027 (#36): the shop window's first product, its price, and the way to the shop
     return (
-      <CompactLine
-        to={`/marketplace?product=${encodeURIComponent(first.key)}`}
-        icon={first.icon ?? TYPE_ICONS[first.type] ?? "shop"}
-        title={first.name}
-        detail={productTypeLabel(t, first.type)}
-        end={
-          first.price ? (
-            <>
-              <Icon name="coins" size={12} />
-              {format.number(first.price)}
-              <CurrencyShort />
-            </>
-          ) : (
-            t("marketplace:purchase.free")
-          )
-        }
-      />
+      <>
+        {open}
+        <CompactLine
+          to={`/marketplace?product=${encodeURIComponent(first.key)}`}
+          icon={first.icon ?? TYPE_ICONS[first.type] ?? "shop"}
+          title={first.name}
+          detail={productTypeLabel(t, first.type)}
+          end={
+            first.price ? (
+              <>
+                <Icon name="coins" size={12} />
+                {format.number(first.price)}
+                <CurrencyShort />
+              </>
+            ) : (
+              t("marketplace:purchase.free")
+            )
+          }
+        />
+      </>
     );
   return (
     <div className="shop-window">
+      {open}
       <ul className="shop-window__list">
         {items.map((item) => (
           <li key={item.key}>

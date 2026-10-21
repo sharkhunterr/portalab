@@ -45,7 +45,6 @@ const MediaDiscover = lazy(() => import("../../features/media/discover/DiscoverP
 const MediaDiscoverTitle = lazy(() => import("../../features/media/discover/DiscoverTitlePage"));
 const MediaPerson = lazy(() => import("../../features/media/people/PersonPage"));
 const MediaInsights = lazy(() => import("../../features/media/insights/InsightsPage"));
-const MediaRadio = lazy(() => import("../../features/media/radio/RadioPage")); // issue 168
 const MediaAccounts = lazy(() => import("../../features/media/links/LinksSettings"));
 const MediaAdmin = lazy(() => import("../../features/media/admin/MatchingScreen"));
 const MediaSourcesAdmin = lazy(() => import("../../features/admin/media/MediaSourcesAdmin"));
@@ -219,7 +218,6 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               handle: h({ crumb: "My requests", requiredPermission: "media.request" }),
             },
             { path: "insights", element: <MediaInsights />, handle: h({ crumb: "Statistics" }) },
-            { path: "radio", element: <MediaRadio />, handle: h({ crumb: "Radio" }) },
             {
               // #4: asking for a film or a series — the search and shelves, then a title's page
               path: "discover",

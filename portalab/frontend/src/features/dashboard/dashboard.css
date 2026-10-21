@@ -274,6 +274,34 @@
 .widget-frame__actions {
   display: contents;
 }
+/* a widget's way to its page, in its header: an outline pill */
+.widget-frame__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-block-size: 1.6rem;
+  padding: 0.1rem 0.5rem 0.1rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.widget-frame__link:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.widget-frame__link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+@container (max-width: 15rem) {
+  .widget-frame__link span {
+    display: none;
+  }
+}
 .widget-frame__action {
   display: inline-flex;
   align-items: center;
@@ -2355,4 +2383,35 @@ html[data-motion="none"] .widget-shuffle__track {
   font: inherit;
   text-align: start;
   cursor: pointer;
+}
+
+/* a widget on one column: its list becomes a carousel — one card at a time, the next one peeking, swiped */
+@container (max-width: 26rem) {
+  .widget-carousel > .widget-rows {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 86%;
+    gap: var(--space-2);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-block-end: var(--scroller-gap);
+  }
+  .widget-frame__body .widget-carousel > .widget-rows > li,
+  .widget-frame__body .widget-carousel > .widget-rows > li[data-overflow] {
+    visibility: visible;
+    scroll-snap-align: start;
+  }
+  .widget-carousel > .widget-rows .widget-row > a,
+  .widget-carousel > .widget-rows .widget-row > span {
+    block-size: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+  .widget-continue {
+    grid-auto-columns: 86%;
+    scroll-snap-type: x mandatory;
+  }
+  .widget-continue > li {
+    scroll-snap-align: start;
+  }
 }

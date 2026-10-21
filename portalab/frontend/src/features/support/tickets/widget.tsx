@@ -5,7 +5,7 @@ import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useT } from "../../../i18n/hooks/useT";
-import { WidgetHeaderAction } from "../../dashboard/frame/actions";
+import { WidgetHeaderAction, WidgetHeaderLink } from "../../dashboard/frame/actions";
 import { ListTemplate } from "../../dashboard/templates/Templates";
 import { registerWidgetComponent, type WidgetProps } from "../../dashboard/widgets/registry";
 import { NewTicketForm } from "./NewTicket";
@@ -61,8 +61,11 @@ function MyTicketsWidget(props: WidgetProps) {
           <Link to={`/support/tickets/${created}`}>{t("support:widget.my_tickets.open")}</Link>
         </p>
       ) : null}
+      <WidgetHeaderLink to="/support" label={t("support:widget.my_tickets.all")} />
       {items.length ? (
-        <ListTemplate {...props} />
+        <div className="widget-carousel">
+          <ListTemplate {...props} />
+        </div>
       ) : (
         <p className="widget-empty" data-state="no-data">
           <Icon name="lifebuoy" size={28} />
