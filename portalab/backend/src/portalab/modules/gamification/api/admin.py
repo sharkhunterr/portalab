@@ -429,7 +429,10 @@ async def verify_ledger(_: Economist, module: Module) -> dict[str, Any]:
 
 @router.get("/admin/economy/anomalies")
 async def anomalies(
-    _: Economist, module: Module, status: Literal["open", "dismissed", "confirmed"] = "open"
+    _: Economist,
+    module: Module,
+    status: Literal["open", "dismissed", "confirmed"] = "open",
+    user_id: UUID | None = None,  # one member's only (their admin card)
 ) -> list[dict[str, Any]]:
     return [
         {
@@ -452,7 +455,7 @@ async def anomalies(
                 for w in withheld
             ],
         }
-        for flag, withheld in await module.anomalies.queue(status)
+        for flag, withheld in await module.anomalies.queue(status, user_id)
     ]
 
 

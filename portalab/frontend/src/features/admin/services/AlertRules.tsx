@@ -5,7 +5,6 @@ import { FormActions } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
-import { Dialog } from "../../../design-system/components/Overlays";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 
@@ -174,96 +173,82 @@ function RuleFields({ rule, onChange }: { rule: AlertRule; onChange: (rule: Aler
 }
 
 /** The rules dialog at the top of the services administration: one tab per importance. */
-export function AlertRulesDialog() {
+/**
+ * The rules themselves, one per importance (admin reorganisation, trial: a tab of the Operations hub rather
+ * than a dialog of the services page) — what an outage does: an incident, who is told, a banner.
+ */
+export function AlertRulesPanel() {
   const t = useT();
   const queryClient = useQueryClient();
   const query = useAlertRules();
   const summary = useRuleSummary();
-  const [open, setOpen] = useState(false);
   const [level, setLevel] = useState<Importance>("critical");
   const [draft, setDraft] = useState<Rules | null>(null);
   const save = useMutation({
     mutationFn: async (rules: Rules) => (await api.PUT("/api/v1/health/alert-rules", { body: rules })).data,
     onSuccess: () => {
-      setOpen(false);
+      setDraft(null);
       void queryClient.invalidateQueries({ queryKey: RULES_KEY });
       void queryClient.invalidateQueries({ queryKey: ["admin", "services"] });
     },
   });
   const rules = draft ?? query.data?.rules ?? null;
   const defaults = query.data?.defaults;
+  const edit = (next: Rules) => {
+    save.reset();
+    setDraft(next);
+  };
+  if (!rules) return null;
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        setOpen(next);
-        if (next) {
-          setDraft(query.data?.rules ?? null);
-          save.reset();
-        }
+    <form
+      className="services-admin__form"
+      onSubmit={(event) => {
+        event.preventDefault();
+        save.mutate(rules);
       }}
-      size="lg"
-      title={t("admin:alerting.title")}
-      description={t("admin:alerting.description")}
-      closeLabel={t("admin:services.close")}
-      trigger={
-        <Button type="button" variant="secondary" disabled={!query.data}>
-          <Icon name="shield" size={18} />
-          {t("admin:alerting.open")}
-        </Button>
-      }
     >
-      {rules ? (
-        <form
-          className="services-admin__form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            save.mutate(rules);
-          }}
-        >
-          <div className="alert-levels" role="tablist" aria-label={t("admin:services.importance")}>
-            {IMPORTANCES.map((key) => (
-              <button
-                key={key}
-                type="button"
-                role="tab"
-                aria-selected={level === key}
-                className="alert-levels__tab"
-                data-importance={key}
-                onClick={() => setLevel(key)}
-              >
-                <strong>{t(`admin:services.importance.${key}`)}</strong>
-                <span>{summary(rules[key])}</span>
-              </button>
-            ))}
-          </div>
-          <div role="tabpanel" aria-label={t(`admin:services.importance.${level}`)}>
-            <RuleFields rule={rules[level]} onChange={(rule) => setDraft({ ...rules, [level]: rule })} />
-          </div>
-          {save.isError ? (
-            <p role="alert" className="services-admin__ko">
-              {save.error instanceof ApiError ? save.error.message : t("admin:services.refused")}
-            </p>
-          ) : null}
-          <FormActions>
-            {defaults ? (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setDraft({ ...rules, [level]: defaults[level] })}
-              >
-                <Icon name="sync" size={16} />
-                {t("admin:alerting.reset")}
-              </Button>
-            ) : null}
-            <Button type="submit" disabled={save.isPending}>
-              <Icon name="check" size={16} />
-              {t("admin:alerting.save")}
-            </Button>
-          </FormActions>
-        </form>
+      <div className="alert-levels" role="tablist" aria-label={t("admin:services.importance")}>
+        {IMPORTANCES.map((key) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={level === key}
+            className="alert-levels__tab"
+            data-importance={key}
+            onClick={() => setLevel(key)}
+          >
+            <strong>{t(`admin:services.importance.${key}`)}</strong>
+            <span>{summary(rules[key])}</span>
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel" aria-label={t(`admin:services.importance.${level}`)}>
+        <RuleFields rule={rules[level]} onChange={(rule) => edit({ ...rules, [level]: rule })} />
+      </div>
+      {save.isSuccess ? (
+        <p role="status" className="services-admin__ok">
+          {t("admin:alerting.saved")}
+        </p>
       ) : null}
-    </Dialog>
+      {save.isError ? (
+        <p role="alert" className="services-admin__ko">
+          {save.error instanceof ApiError ? save.error.message : t("admin:services.refused")}
+        </p>
+      ) : null}
+      <FormActions>
+        {defaults ? (
+          <Button type="button" variant="ghost" onClick={() => edit({ ...rules, [level]: defaults[level] })}>
+            <Icon name="sync" size={16} />
+            {t("admin:alerting.reset")}
+          </Button>
+        ) : null}
+        <Button type="submit" disabled={save.isPending || !draft}>
+          <Icon name="check" size={16} />
+          {t("admin:alerting.save")}
+        </Button>
+      </FormActions>
+    </form>
   );
 }
 

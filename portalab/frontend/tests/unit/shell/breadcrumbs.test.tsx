@@ -33,9 +33,7 @@ describe("orientation", () => {
   it("shows related links of the page", async () => {
     fake.handler = () => json(200, VIEW);
     renderShell({ path: "/services" });
-    expect(await screen.findByRole("complementary", { name: "Related" })).toHaveTextContent(
-      "Manage services",
-    );
+    expect(await screen.findByRole("complementary", { name: "Related" })).toHaveTextContent("Services");
   });
 
   it("empty states require a next action", () => {

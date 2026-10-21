@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
+import { useSearchParams } from "react-router";
 import { api } from "../../../api/client";
 import {
   AdminEmpty,
+  AdminPage,
   AdminSection,
   AdminTable,
   AdminTabs,
@@ -21,7 +23,7 @@ import { ApiError } from "../../../state/regions";
 import "../admin.css";
 
 /**
- * Maintenance windows (027 hubs, Communication; health 006 API): schedule a maintenance of one service or of the whole
+ * Maintenance windows (027; health 006 API; a page of the Operations hub — admin reorganisation, trial): schedule a maintenance of one service or of the whole
  * portal — members see it on the status page and in the banner while it runs — reschedule or cancel it,
  * and look back at past ones.
  */
@@ -53,14 +55,16 @@ function local(iso: string): string {
 function WindowForm({
   window: existing,
   services,
+  service: preset,
 }: {
   window?: Window | undefined;
   services: ServiceItem[];
+  service?: string | undefined;
 }) {
   const t = useT();
   const client = useQueryClient();
   const soon = new Date(Date.now() + 3600_000);
-  const [service, setService] = useState(existing?.service_id ?? "");
+  const [service, setService] = useState(existing?.service_id ?? preset ?? "");
   const [title, setTitle] = useState(existing?.title ?? "");
   const [description, setDescription] = useState(existing?.description ?? "");
   const [banner, setBanner] = useState(Boolean(existing?.banner));
@@ -169,11 +173,17 @@ function WindowForm({
   );
 }
 
-/** Maintenance windows, shown as a tab of the Announcements page (027: grouped, not a page of its own). */
+/**
+ * Maintenance windows, upcoming or past. ``?service=<id>`` (from a service's page) opens the form for that
+ * service straight away.
+ */
 export function MaintenancePanel() {
   const t = useT();
   const format = useFormat();
   const client = useQueryClient();
+  const [params, setParams] = useSearchParams();
+  const preset = params.get("service") ?? undefined;
+  const [creating, setCreating] = useState(Boolean(preset));
   const [view, setView] = useState("upcoming");
   const windows = useQuery({
     queryKey: [...KEY, view],
@@ -202,8 +212,7 @@ export function MaintenancePanel() {
   return (
     <>
       <AdminSection
-        title={t("admin:maintenance.pageTitle")}
-        description={t("admin:maintenance.subtitle")}
+        title={t("admin:maintenance.windows")}
         icon="wrench"
         flush
         actions={
@@ -221,6 +230,11 @@ export function MaintenancePanel() {
               size="lg"
               title={t("admin:maintenance.new")}
               closeLabel={t("admin:services.close")}
+              open={creating}
+              onOpenChange={(next) => {
+                setCreating(next);
+                if (!next && preset) setParams({}, { replace: true });
+              }}
               trigger={
                 <Button>
                   <Icon name="plus" size={16} />
@@ -228,7 +242,7 @@ export function MaintenancePanel() {
                 </Button>
               }
             >
-              <WindowForm services={services.data ?? []} />
+              <WindowForm services={services.data ?? []} service={preset} />
             </Dialog>
           </>
         }
@@ -295,5 +309,19 @@ export function MaintenancePanel() {
         />
       </AdminSection>
     </>
+  );
+}
+
+/** ``/admin/maintenance`` — the maintenances, a page of the Operations hub. */
+export default function MaintenanceAdmin() {
+  const t = useT();
+  return (
+    <AdminPage
+      icon="wrench"
+      title={t("admin:maintenance.pageTitle")}
+      description={t("admin:maintenance.subtitle")}
+    >
+      <MaintenancePanel />
+    </AdminPage>
   );
 }

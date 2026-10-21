@@ -1,4 +1,5 @@
 import { type FormEvent, useId, useState } from "react";
+import { useSearchParams } from "react-router";
 import { useAnnounce } from "../../../design-system/a11y/Announce";
 import { AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
@@ -21,10 +22,13 @@ const STATES = ["investigating", "identified", "monitoring"] as const;
 function Declare() {
   const t = useT();
   const staff = useIncidentStaff();
+  // ``?service=<id>``: declared from that service's page (admin reorganisation, trial)
+  const [params] = useSearchParams();
+  const preset = params.get("service");
   const [title, setTitle] = useState("");
   const [severity, setSeverity] = useState<Severity>("major");
   const [summary, setSummary] = useState("");
-  const [services, setServices] = useState<string[]>([]);
+  const [services, setServices] = useState<string[]>(preset ? [preset] : []);
   const [banner, setBanner] = useState(false);
   function submit(event: FormEvent) {
     event.preventDefault();

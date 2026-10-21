@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router";
+import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router";
 import { api } from "../../../api/client";
 import { AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
@@ -12,7 +12,6 @@ import { type Category, type Product, useCategories } from "../api";
 import { BoostersAdmin } from "./BoostersAdmin";
 import { type Season, useSeasons } from "./console/api";
 import { CatalogTab } from "./console/CatalogTab";
-import { Members } from "./console/Members";
 import { Overview } from "./console/Overview";
 import { NewProductDialog } from "./ProductEditor";
 import { RaritySupply } from "./RaritySupply";
@@ -38,7 +37,8 @@ export default function MarketplaceAdmin() {
   const last = location.pathname.split("/").filter(Boolean).at(-1) ?? "";
   const tab: View = VIEWS.includes(last as View) ? (last as View) : "overview";
   const member = params.get("member");
-  const toMember = (id: string) => navigate(`/admin/marketplace/members?member=${encodeURIComponent(id)}`);
+  // admin reorganisation (trial): a member's balances, items and history live on their card
+  const toMember = (id: string) => navigate(`/admin/members/${encodeURIComponent(id)}?tab=economy`);
   // the whole catalogue only where it is needed (a pack's contents, the boosters): never drawn at once
   const products = useQuery({
     queryKey: ["marketplace", "admin", "products"],
@@ -82,7 +82,12 @@ export default function MarketplaceAdmin() {
     >
       {message ? <p role="status">{message}</p> : null}
       {tab === "overview" ? <Overview onMember={toMember} /> : null}
-      {tab === "members" ? <Members selected={member} onSelect={toMember} /> : null}
+      {tab === "members" ? (
+        <Navigate
+          to={member ? `/admin/members/${encodeURIComponent(member)}?tab=economy` : "/admin/members"}
+          replace
+        />
+      ) : null}
       {tab === "requests" ? <RequestsQueue /> : null}
       {tab === "catalog" ? <CatalogTab categories={(categories.data ?? []) as Category[]} /> : null}
       {tab === "catalog" ? <RaritySupply /> : null}

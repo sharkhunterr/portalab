@@ -41,23 +41,32 @@ async def test_sections_for_users_and_admins(sh: ShellHarness) -> None:
     if "media" in order:
         assert order.index("media") == order.index("services") + 1
         assert {"media.requests_admin", "media.quotas", "media.admin", "media.sources"} <= topics["media"]
-    assert [key for key in order if key != "media"] == [
+    # the hubs in their order — those whose modules this harness runs (no assistant, projects or studio here)
+    expected = [
         "pilot",
         "members",
-        "services",
+        "services",  # admin reorganisation (trial): « Operations » — services, incidents, maintenance
         "support",
         "communication",
         "engagement",
+        "community",  # community projects and their moderation, apart from what is sold
         "shop",
+        "appearance",  # the theme studio, the members' dashboard, the site's identity
         "automations",  # 027: a hub of its own
         "extensions",  # 028: visual packs, widgets, plugins, modules
         "ai",  # issue 176: the assistant's dashboard, model, identity and tools
         "system",
     ]
-    assert {"ai.admin", "ai.model", "ai.identity", "ai.tools"} <= topics["ai"]
-    assert {"automations.admin", "automations.history"} <= topics["automations"]
+    assert [key for key in order if key != "media"] == [key for key in expected if key in order]
+    core = {"pilot", "members", "services", "support", "communication", "engagement", "shop", "system"}
+    assert core <= set(order)
+    assert "ai" not in topics or {"ai.admin", "ai.model", "ai.identity", "ai.tools"} <= topics["ai"]
+    # the overview and history need automation.read, which comes with the automations module (absent here)
+    assert {"automations.new", "automations.templates"} <= topics["automations"]
     assert {"authz.roles", "identity.members"} <= topics["members"] and "authz.audit" in topics["pilot"]
-    assert {"support.queue", "wiki.admin"} <= topics["support"]
+    assert "support.queue" in topics["support"] and "wiki.admin" in topics["communication"]
+    assert {"support.incident_console", "health.maintenance", "health.alert_rules"} <= topics["services"]
+    assert "news.newsletters" in topics["communication"]
     assert "plugins.modules" in topics["extensions"]  # 028: what extends Portalab, one hub
     hubs = {t["key"]: t for t in by_key["admin"]["topics"]}
     assert hubs["pilot"]["route"] == "/admin" and hubs["pilot"]["icon"] == "gauge"

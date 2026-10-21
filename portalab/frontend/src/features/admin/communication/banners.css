@@ -1,0 +1,28 @@
+/* « Banners showing » (admin reorganisation, trial): each banner as members see it, its origin under it */
+.banners-admin {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.banners-admin__item {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.banners-admin__item .status-banner {
+  margin: 0;
+}
+
+.banners-admin__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.banners-admin__meta > :last-child {
+  margin-inline-start: auto;
+}

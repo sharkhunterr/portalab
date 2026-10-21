@@ -188,12 +188,16 @@ export function useMyRequests() {
   });
 }
 
-export function useRequestsQueue(settled = false) {
+/** The requests to handle (or settled) — everyone's, or one member's (their admin card). */
+export function useRequestsQueue(settled = false, userId?: string) {
   return useQuery({
-    queryKey: [...REQUESTS, "queue", settled],
+    queryKey: [...REQUESTS, "queue", settled, userId ?? null],
     queryFn: async () =>
-      ((await api.GET("/api/v1/admin/marketplace/requests", { params: { query: { settled } } })).data ??
-        []) as MarketRequest[],
+      (
+        await api.GET("/api/v1/admin/marketplace/requests", {
+          params: { query: { settled, ...(userId ? { user_id: userId } : {}) } },
+        })
+      ).data ?? ([] as MarketRequest[]),
   });
 }
 

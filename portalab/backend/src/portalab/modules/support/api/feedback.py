@@ -165,9 +165,14 @@ async def queue(
     status_filter: Annotated[str | None, Query(alias="status", max_length=12)] = None,
     kind: Annotated[str | None, Query(max_length=30)] = None,
     form: Annotated[str | None, Query(max_length=60)] = None,
+    user_id: UUID | None = None,  # one member's only (their admin card)
 ) -> list[FeedbackOut]:
-    items = [i for i in await module.feedback.listing(principal, status=status_filter, kind=kind)]
-    return await _named(module, [out(i) for i in items if form is None or i.form_key == form])
+    items = [
+        i
+        for i in await module.feedback.listing(principal, status=status_filter, kind=kind)
+        if (form is None or i.form_key == form) and (user_id is None or i.submitter_id == user_id)
+    ]
+    return await _named(module, [out(i) for i in items])
 
 
 async def _named(module: Any, rows: list[FeedbackOut]) -> list[FeedbackOut]:

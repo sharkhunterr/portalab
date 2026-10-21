@@ -59,7 +59,7 @@ export function useTicket(id: string) {
   });
 }
 
-export function useQueue(filters: { state?: string; unassigned?: boolean; q?: string }) {
+export function useQueue(filters: { state?: string; unassigned?: boolean; q?: string; requester?: string }) {
   return useQuery({
     queryKey: [...KEY, "queue", filters],
     retry: false,
@@ -71,6 +71,7 @@ export function useQueue(filters: { state?: string; unassigned?: boolean; q?: st
               ...(filters.state ? { state: filters.state } : {}),
               ...(filters.unassigned ? { unassigned: true } : {}),
               ...(filters.q ? { q: filters.q } : {}),
+              ...(filters.requester ? { requester: filters.requester } : {}),
             },
           },
         })

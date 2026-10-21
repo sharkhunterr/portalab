@@ -373,6 +373,7 @@ class TicketService:
         *,
         state: str | None = None,
         assignee: UUID | None = None,
+        requester: UUID | None = None,
         unassigned: bool = False,
         type_key: str | None = None,
         tag: str | None = None,
@@ -389,6 +390,8 @@ class TicketService:
             filters.append(Ticket.state == state)
         if assignee:
             filters.append(Ticket.assignee_id == assignee)
+        if requester:
+            filters.append(Ticket.requester_id == requester)
         if unassigned:
             filters.append(Ticket.assignee_id.is_(None))
         if type_key:

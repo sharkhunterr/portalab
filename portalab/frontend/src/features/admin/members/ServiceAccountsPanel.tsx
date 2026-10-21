@@ -311,3 +311,113 @@ export function ServiceAccountsPanel() {
     </>
   );
 }
+
+/**
+ * One member's service accounts (their card): per connected service, the accounts linked to them (unlink),
+ * those suggested for them (accept) and any unlinked account to point at them — the same links as above.
+ */
+export function MemberServiceAccounts({ userId, name }: { userId: string; name: string }) {
+  const t = useT();
+  const overview = useServiceAccounts();
+  const link = useLink();
+  const services = overview.data?.services ?? [];
+  if (overview.isError) return <AdminEmpty icon="lock" title={t("admin:accounts.forbidden")} />;
+  if (overview.isSuccess && !services.length) {
+    return (
+      <AdminEmpty
+        icon="server"
+        title={t("admin:accounts.noService")}
+        action={<span className="admin-muted">{t("admin:accounts.noServiceHint")}</span>}
+      />
+    );
+  }
+  return (
+    <>
+      {link.isError ? (
+        <p role="alert" className="services-admin__ko">
+          {link.error instanceof ApiError ? link.error.message : t("admin:members.refused")}
+        </p>
+      ) : null}
+      {services.map((block) => {
+        const linked = block.accounts.filter((a) => a.linked_user_id === userId);
+        const suggested = block.accounts.filter((a) => !a.linked_user_id && a.suggestion?.user_id === userId);
+        const free = block.accounts.filter((a) => !a.linked_user_id && a.suggestion?.user_id !== userId);
+        const set = (account: ServiceAccount, user: string | null) =>
+          link.mutate({ service: block.service_id, account: account.external_id, user });
+        return (
+          <AdminSection key={block.service_id} title={block.name} icon="server" flush>
+            {!block.available ? (
+              <p className="services-admin__ko admin-pad" role="alert">
+                {t("admin:accounts.unavailable")}
+              </p>
+            ) : null}
+            {linked.length || suggested.length ? (
+              <ul className="admin-list">
+                {linked.map((account) => (
+                  <li key={account.external_id}>
+                    <span className="admin-list__main">
+                      <strong>{accountLabel(account)}</strong>
+                      <StatusBadge tone="ok">{t("admin:accounts.linked")}</StatusBadge>
+                    </span>
+                    <Button
+                      variant="ghost"
+                      disabled={link.isPending}
+                      onClick={() => set(account, null)}
+                      aria-label={`${t("admin:accounts.unlink")} ${block.name} — ${accountLabel(account)}`}
+                    >
+                      {t("admin:accounts.unlink")}
+                    </Button>
+                  </li>
+                ))}
+                {suggested.map((account) => (
+                  <li key={account.external_id}>
+                    <span className="admin-list__main">
+                      <strong>{accountLabel(account)}</strong>
+                      <StatusBadge tone="info">
+                        {t("admin:accounts.suggested")} ·{" "}
+                        {t(`admin:accounts.reason.${account.suggestion?.reason}`)}
+                      </StatusBadge>
+                    </span>
+                    <Button
+                      variant="secondary"
+                      disabled={link.isPending}
+                      onClick={() => set(account, userId)}
+                      aria-label={`${t("admin:accounts.accept")} ${name} — ${accountLabel(account)}`}
+                    >
+                      <Icon name="sparkles" size={16} />
+                      {t("admin:accounts.accept")} {name}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="admin-muted admin-pad">{t("admin:members.noLinked")}</p>
+            )}
+            {free.length ? (
+              <div className="admin-pad member-card__link-account">
+                <select
+                  className="accounts-picker__select"
+                  aria-label={`${t("admin:memberCard.linkAccount")} — ${block.name}`}
+                  value=""
+                  disabled={link.isPending}
+                  onChange={(e) => {
+                    const account = free.find((a) => a.external_id === e.target.value);
+                    if (account) set(account, userId);
+                  }}
+                >
+                  <option value="">{t("admin:memberCard.linkAccount")}</option>
+                  {free.map((account) => (
+                    <option key={account.external_id} value={account.external_id}>
+                      {accountLabel(account)}
+                      {account.email ? ` · ${account.email}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
+          </AdminSection>
+        );
+      })}
+    </>
+  );
+}

@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { createBrowserRouter, Navigate, type RouteObject } from "react-router";
+import { createBrowserRouter, type RouteObject } from "react-router";
 import type { RouteHandle } from "./handle";
 import { RouteErrorElement } from "./RouteBoundary";
 
@@ -87,6 +87,13 @@ const ThemeStudio = lazy(() => import("../../features/appearance/studio/ThemeStu
 const ChartGallery = lazy(() => import("../../features/appearance/charts/ChartGallery")); // issue 117
 const MembersAdmin = lazy(() => import("../../features/admin/members/MembersAdmin"));
 const AnnouncementsAdmin = lazy(() => import("../../features/admin/communication/AnnouncementsAdmin"));
+// admin reorganisation (trial): pages of their own for what was tucked in a tab or a dialog, a member's card
+const MaintenanceAdmin = lazy(() => import("../../features/admin/communication/MaintenanceAdmin"));
+const NewslettersAdmin = lazy(() => import("../../features/admin/communication/NewslettersAdmin"));
+const BannersAdmin = lazy(() => import("../../features/admin/communication/BannersAdmin"));
+const AlertRulesPage = lazy(() => import("../../features/admin/services/AlertRulesPage"));
+const AbuseAdmin = lazy(() => import("../../features/gamification/admin/AbuseAdmin"));
+const MemberCard = lazy(() => import("../../features/admin/members/MemberCard"));
 const WikiAdmin = lazy(() => import("../../features/wiki/WikiAdmin"));
 const PluginsAdmin = lazy(() => import("../../features/plugins/manager/PluginsAdmin"));
 const VisualsAdmin = lazy(() => import("../../features/visuals/VisualsAdmin")); // 028
@@ -392,7 +399,20 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "announcements", element: <AnnouncementsAdmin />, handle: h({ crumb: "Announcements" }) },
             { path: "terms", element: <TermsAdmin />, handle: h({ crumb: "Terms of use" }) },
             { path: "dashboard", element: <DashboardAdmin />, handle: h({ crumb: "Members' dashboard" }) },
-            { path: "maintenance", element: <Navigate to="/admin/announcements?tab=maintenance" replace /> },
+            { path: "maintenance", element: <MaintenanceAdmin />, handle: h({ crumb: "Maintenance" }) },
+            {
+              path: "newsletters",
+              element: <NewslettersAdmin />,
+              handle: h({ crumb: "Newsletters & e-mail" }),
+            },
+            { path: "banners", element: <BannersAdmin />, handle: h({ crumb: "Banners showing" }) },
+            { path: "services/alerts", element: <AlertRulesPage />, handle: h({ crumb: "Alert rules" }) },
+            { path: "gamification/abuse", element: <AbuseAdmin />, handle: h({ crumb: "Abuse control" }) },
+            {
+              path: "members/:userId",
+              element: <MemberCard />,
+              handle: h({ crumb: "Member", existenceSensitive: true }),
+            },
             { path: "wiki", element: <WikiAdmin />, handle: h({ crumb: "Wiki" }) },
             { path: "plugins", element: <PluginsAdmin />, handle: h({ crumb: "Plugins" }) },
             { path: "visuals", element: <VisualsAdmin />, handle: h({ crumb: "Visual packs" }) },

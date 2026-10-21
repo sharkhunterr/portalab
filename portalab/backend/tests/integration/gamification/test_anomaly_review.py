@@ -36,6 +36,10 @@ async def test_withhold_then_approve(gm: GamHarness, client: AsyncClient) -> Non
     await login(client, "boss")
     queue = (await client.get("/api/v1/admin/economy/anomalies")).json()
     assert len(queue) == 1 and queue[0]["kind"] == "grants_per_hour" and len(queue[0]["withheld"]) == 2
+    # one member's flags only (their admin card)
+    mine = (await client.get("/api/v1/admin/economy/anomalies", params={"user_id": str(user)})).json()
+    others = await client.get("/api/v1/admin/economy/anomalies", params={"user_id": str(gm.people["boss"])})
+    assert [f["id"] for f in mine] == [queue[0]["id"]] and others.json() == []
     approved = await client.post(
         f"/api/v1/admin/economy/anomalies/{queue[0]['id']}/approve", json={"reason": "Legit marathon"}
     )

@@ -74,6 +74,9 @@ async def test_service_access_opens_a_request_and_provisions_on_approval(mk: MkH
     assert ownership.state == "active"
     (pending,) = await mk.module.requests.queue(None)
     assert pending.kind == "service" and pending.details == {"service": "romm", "group": "romm"}
+    # one member's requests only (their admin card)
+    assert [r.id for r in await mk.module.requests.queue(None, user=mk.people["ursula"])] == [pending.id]
+    assert await mk.module.requests.queue(None, user=mk.people["boss"]) == []
     done = await mk.module.requests.decide(mk.p("boss"), pending.id, "done", "Welcome!", True)
     assert done.state == "done" and done.details["outcome"] == "account created"
     assert provisioned == [(mk.people["ursula"], {"service": "romm", "group": "romm"}, True)]

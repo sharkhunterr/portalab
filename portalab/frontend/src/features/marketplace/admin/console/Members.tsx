@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { api } from "../../../../api/client";
 import {
   AdminEmpty,
@@ -108,7 +109,19 @@ export function Members({ selected, onSelect }: { selected: string | null; onSel
   );
 }
 
-function MemberConsole({ userId, name }: { userId: string; name: string }) {
+/**
+ * One member's console — in the shop console under its member picker, and as the « Economy » tab of the
+ * member card (``inCard``: no link back to the card it is already in).
+ */
+export function MemberConsole({
+  userId,
+  name,
+  inCard = false,
+}: {
+  userId: string;
+  name: string;
+  inCard?: boolean;
+}) {
   const t = useT();
   const format = useFormat();
   const nameOf = useNameOf();
@@ -306,7 +319,18 @@ function MemberConsole({ userId, name }: { userId: string; name: string }) {
           onChange={(e) => setReason(e.target.value)}
         />
       </Dialog>
-      <AdminSection title={name} icon="user">
+      <AdminSection
+        title={name}
+        icon="user"
+        actions={
+          inCard ? null : (
+            <Link to={`/admin/members/${userId}`} className="ds-button ds-button--secondary">
+              <Icon name="user" size={16} />
+              {t("admin:memberCard.open")}
+            </Link>
+          )
+        }
+      >
         <Kpis
           label={name}
           items={[

@@ -201,10 +201,15 @@ class Requests:
             )
         return await self._views(rows, user)
 
-    async def queue(self, viewer: UUID | None, *, open_only: bool = True) -> list[RequestView]:
-        """For the administrators: the open requests, the most urgent first (or the last ones settled)."""
+    async def queue(
+        self, viewer: UUID | None, *, open_only: bool = True, user: UUID | None = None
+    ) -> list[RequestView]:
+        """For the administrators: the open requests, the most urgent first (or the last ones settled) —
+        everyone's, or one member's (their admin card)."""
         async with self.database.session() as session:
             query = select(MarketRequest)
+            if user is not None:
+                query = query.where(MarketRequest.user_id == user)
             if open_only:
                 query = query.where(MarketRequest.state.in_(OPEN)).order_by(MarketRequest.due_at)
             else:

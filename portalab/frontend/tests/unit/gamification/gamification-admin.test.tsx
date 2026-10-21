@@ -190,7 +190,8 @@ describe("gamification administration", () => {
     const slider = await screen.findByRole("slider", { name: /Overall multiplier/ });
     expect(screen.getByRole("img", { name: /Level reached over time/ })).toBeTruthy();
     fireEvent.change(slider, { target: { value: "1.5" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    // « gains » holds the pace first, then the streaks — each with its own Save
+    fireEvent.click(screen.getAllByRole("button", { name: "Save" })[0] as HTMLElement);
     await waitFor(() =>
       expect(sent).toEqual([
         { method: "PUT", path: "/api/v1/admin/gamification/pace", body: { factor: 1.5, values: ["xp"] } },
@@ -226,7 +227,7 @@ describe("gamification administration", () => {
     show("/admin/gamification?tab=streak");
     fireEvent.click(await screen.findByRole("checkbox", { name: "Enable streaks" }));
     fireEvent.click(screen.getByRole("button", { name: "Add a tier" }));
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Save" }).at(-1) as HTMLElement);
     await waitFor(() => expect(sent).toHaveLength(1));
     expect(sent[0]?.body).toMatchObject({
       enabled: true,

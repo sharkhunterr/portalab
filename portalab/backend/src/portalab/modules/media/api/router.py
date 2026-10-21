@@ -1058,10 +1058,11 @@ async def requests_queue(
     _: Manager,
     module: Module,
     state: Annotated[str, Query(pattern=r"^(pending|open|all)$")] = "pending",
+    user_id: UUID | None = None,
 ) -> dict[str, Any]:
     """#4: members' requests — the pending ones first — with who asked, the seasons and 4K, the poster,
-    and the decision taken (by whom, why)."""
-    items = await module.moderation.queue(state)
+    and the decision taken (by whom, why); or one member's only (their admin card)."""
+    items = await module.moderation.queue(state, user=user_id)
     return {"items": await with_posters(module.database, module.enricher, items, lookups=60)}
 
 

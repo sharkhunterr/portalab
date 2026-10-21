@@ -6,11 +6,14 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useAnomalies, useAnomalyDecision } from "../api";
 
-/** Anomaly review (spec 013 T022, ``economy.manage``): withheld rewards wait for an audited decision. */
-export function AnomalyQueue() {
+/**
+ * Anomaly review (spec 013 T022, ``economy.manage``): withheld rewards wait for an audited decision —
+ * everyone's, or one member's (``userId``, their admin card).
+ */
+export function AnomalyQueue({ userId }: { userId?: string } = {}) {
   const t = useT();
   const format = useFormat();
-  const anomalies = useAnomalies();
+  const anomalies = useAnomalies(userId);
   const decide = useAnomalyDecision();
   const [reasons, setReasons] = useState<Record<string, string>>({});
   return (

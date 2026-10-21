@@ -16,6 +16,8 @@ ADMIN_TOPICS: tuple[dict[str, object], ...] = (
         "order_hint": 20,
         "aliases": ("access",),
     },
+    # admin reorganisation (trial): « Exploitation » — something is wrong or will be down: services, their
+    # incidents, maintenances, alert rules, logs and events
     {"key": "services", "label_key": "nav.hub.services", "icon": "server", "order_hint": 30},
     # #4: everything about the media — members' requests to approve, their quotas, the titles' identity,
     # the history and the metadata
@@ -35,7 +37,11 @@ ADMIN_TOPICS: tuple[dict[str, object], ...] = (
         "order_hint": 60,
         "aliases": ("economy",),
     },
+    # community projects and their moderation, apart from what is sold
+    {"key": "community", "label_key": "nav.hub.community", "icon": "lightbulb", "order_hint": 65},
     {"key": "shop", "label_key": "nav.hub.shop", "icon": "shop", "order_hint": 70},
+    # how the portal looks for everyone: the theme studio, the members' dashboard, the site's identity
+    {"key": "appearance", "label_key": "nav.hub.appearance", "icon": "palette", "order_hint": 72},
     # 027: automations are a hub of their own — overview, builder, history, templates, approvals
     {"key": "automations", "label_key": "nav.hub.automations", "icon": "zap", "order_hint": 75},
     # 028: what extends Portalab, from outside — visual packs, widgets, plugins, modules — one hub, its tabs
@@ -510,18 +516,6 @@ BUILTIN: tuple[dict[str, object], ...] = (
     },
     # #98: the shop's console, one page each — a single level of tabs in the Shop hub
     {
-        "key": "marketplace.admin_members",
-        "owner": "module:marketplace",
-        "kind": "entry",
-        "label_key": "nav.admin.shop_members",
-        "icon": "users",
-        "route": "/admin/marketplace/members",
-        "group": "admin",
-        "topic": "shop",
-        "order_hint": 2,
-        "required_permission": "marketplace.manage",
-    },
-    {
         "key": "marketplace.admin_requests",
         "owner": "module:marketplace",
         "kind": "entry",
@@ -530,7 +524,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "route": "/admin/marketplace/requests",
         "group": "admin",
         "topic": "shop",
-        "order_hint": 3,
+        "order_hint": 2,
         "required_permission": "marketplace.manage",
     },
     {
@@ -542,7 +536,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "route": "/admin/marketplace/catalog",
         "group": "admin",
         "topic": "shop",
-        "order_hint": 4,
+        "order_hint": 3,
         "required_permission": "marketplace.manage",
     },
     {
@@ -554,7 +548,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "route": "/admin/marketplace/boosters",
         "group": "admin",
         "topic": "shop",
-        "order_hint": 5,
+        "order_hint": 4,
         "required_permission": "marketplace.manage",
     },
     {
@@ -600,8 +594,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "lightbulb",
         "route": "/admin/projects",
         "group": "admin",
-        "topic": "shop",
-        "order_hint": 6,
+        "topic": "community",
+        "order_hint": 1,
         "required_permission": "projects.manage",
     },
     {
@@ -612,8 +606,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "shield",
         "route": "/admin/community/moderation",
         "group": "admin",
-        "topic": "shop",
-        "order_hint": 7,
+        "topic": "community",
+        "order_hint": 2,
         "required_permission": "community.moderate",
     },
     {
@@ -708,7 +702,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "route": "/admin/news",
         "group": "admin",
         "topic": "communication",
-        "order_hint": 1,
+        "order_hint": 2,
         "required_permission": "news.create",
     },
     {
@@ -769,8 +763,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "palette",
         "route": "/admin/themes",
         "group": "admin",
-        "topic": "shop",
-        "order_hint": 8,
+        "topic": "appearance",
+        "order_hint": 1,
         "required_permission": "appearance.manage",
     },
     {  # issue 1 (POC): who the intrusion guard blocked
@@ -830,8 +824,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "sparkles",
         "route": "/admin/site",
         "group": "admin",
-        "topic": "system",
-        "order_hint": 0,
+        "topic": "appearance",
+        "order_hint": 3,
         "required_permission": "site.manage",
     },
     {
@@ -890,8 +884,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "bolt",
         "route": "/admin/events",
         "group": "admin",
-        "topic": "pilot",
-        "order_hint": 3,
+        "topic": "services",
+        "order_hint": 7,
         "required_permission": "events.manage",
     },
     {
@@ -902,8 +896,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "activity",
         "route": "/admin/observability",
         "group": "admin",
-        "topic": "pilot",
-        "order_hint": 2,
+        "topic": "services",
+        "order_hint": 5,
         "required_permission": "observability.read",
     },
     {
@@ -914,8 +908,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "terminal",
         "route": "/admin/observability/logs",
         "group": "admin",
-        "topic": "pilot",
-        "order_hint": 2,
+        "topic": "services",
+        "order_hint": 6,
         "required_permission": "observability.logs.read",
     },
     {
@@ -938,8 +932,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "alert",
         "route": "/admin/incidents",
         "group": "admin",
-        "topic": "communication",
-        "order_hint": 3,
+        "topic": "services",
+        "order_hint": 2,
         "required_permission": "incidents.manage",
     },
     {
@@ -990,8 +984,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "book",
         "route": "/admin/wiki",
         "group": "admin",
-        "topic": "support",
-        "order_hint": 4,
+        "topic": "communication",
+        "order_hint": 5,
         "required_permission": "wiki.publish",
     },
     {
@@ -1002,8 +996,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "dashboard",
         "route": "/admin/dashboard",
         "group": "admin",
-        "topic": "communication",
-        "order_hint": 3,
+        "topic": "appearance",
+        "order_hint": 2,
         "required_permission": "dashboard.manage",
     },
     {
@@ -1015,7 +1009,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "route": "/admin/announcements",
         "group": "admin",
         "topic": "communication",
-        "order_hint": 2,
+        "order_hint": 1,
         "required_permission": "notifications.broadcast",
     },
     {
@@ -1026,9 +1020,71 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "shield",
         "route": "/admin/terms",
         "group": "admin",
-        "topic": "communication",
+        "topic": "members",
         "order_hint": 4,
         "required_permission": "terms.manage",
+    },
+    # admin reorganisation (trial): one place per thing — maintenance and alert rules beside the services
+    # and incidents, newsletters and the banners showing now beside the announcements, abuse control apart
+    {
+        "key": "health.maintenance",
+        "owner": "module:health",
+        "kind": "entry",
+        "label_key": "nav.admin.maintenance",
+        "icon": "wrench",
+        "route": "/admin/maintenance",
+        "group": "admin",
+        "topic": "services",
+        "order_hint": 3,
+        "required_permission": "services.manage",
+    },
+    {
+        "key": "health.alert_rules",
+        "owner": "module:health",
+        "kind": "entry",
+        "label_key": "nav.admin.alert_rules",
+        "icon": "bell",
+        "route": "/admin/services/alerts",
+        "group": "admin",
+        "topic": "services",
+        "order_hint": 4,
+        "required_permission": "services.manage",
+    },
+    {
+        "key": "news.newsletters",
+        "owner": "module:news",
+        "kind": "entry",
+        "label_key": "nav.admin.newsletters",
+        "icon": "message",
+        "route": "/admin/newsletters",
+        "group": "admin",
+        "topic": "communication",
+        "order_hint": 3,
+        "required_permission": "news.publish",
+    },
+    {
+        "key": "notifications.banners",
+        "owner": "module:notifications",
+        "kind": "entry",
+        "label_key": "nav.admin.banners",
+        "icon": "megaphone",
+        "route": "/admin/banners",
+        "group": "admin",
+        "topic": "communication",
+        "order_hint": 4,
+        "required_permission": "notifications.broadcast",
+    },
+    {
+        "key": "gamification.abuse",
+        "owner": "module:gamification",
+        "kind": "entry",
+        "label_key": "nav.admin.abuse",
+        "icon": "shield",
+        "route": "/admin/gamification/abuse",
+        "group": "admin",
+        "topic": "engagement",
+        "order_hint": 3,
+        "required_permission": "gamification.manage",
     },
 )
 

@@ -11,9 +11,16 @@ import { StreakPanel } from "./StreakPanel";
 import "../gamification.css";
 
 const MODE_KEY = "portalab.gamification.mode";
-// issue 105: no « economy » tab — a member's balances are given and taken in the shop's console
-const SIMPLE = ["overview", "progression", "levels", "streak", "achievements", "quests"];
-const DETAILED = ["overview", "progression", "actions", "levels", "streak", "achievements", "quests"];
+// issue 105: no « economy » tab — a member's balances are given and taken on their card. Admin
+// reorganisation (trial): « gains » groups what earns (pace, XP per action, streaks), « achievements » the
+// goals (achievements and quests); the former tabs still lead to their group.
+const TABS = ["overview", "gains", "levels", "achievements"];
+const FORMER: Record<string, string> = {
+  progression: "gains",
+  actions: "gains",
+  streak: "gains",
+  quests: "achievements",
+};
 
 function storedMode(): "simple" | "detailed" {
   try {
@@ -35,8 +42,8 @@ export default function GamificationAdmin() {
     params.get("mode") === "detailed" || (!params.get("mode") && storedMode() === "detailed")
       ? "detailed"
       : "simple";
-  const tabs = mode === "detailed" ? DETAILED : SIMPLE;
-  const tab = tabs.includes(params.get("tab") ?? "") ? (params.get("tab") as string) : "overview";
+  const asked = params.get("tab") ?? "";
+  const tab = TABS.includes(asked) ? asked : (FORMER[asked] ?? "overview");
   const go = (next: { tab?: string; mode?: string }) => {
     const nextMode = next.mode ?? mode;
     const nextTab = next.tab ?? tab;
@@ -61,8 +68,7 @@ export default function GamificationAdmin() {
             } catch {
               // a convenience only
             }
-            const keep = (next === "detailed" ? DETAILED : SIMPLE).includes(tab) ? tab : "overview";
-            go({ mode: next, tab: keep });
+            go({ mode: next });
           }}
           tabs={[
             { key: "simple", label: t("gamification:admin.mode.simple") },
@@ -75,26 +81,31 @@ export default function GamificationAdmin() {
           label={t("gamification:admin.title")}
           current={tab}
           onChange={(next) => go({ tab: next })}
-          tabs={tabs.map((key) => ({ key, label: t(`gamification:admin.tabs.${key}`) }))}
+          tabs={TABS.map((key) => ({ key, label: t(`gamification:admin.tabs.${key}`) }))}
         />
       }
     >
       {tab === "overview" ? <Overview /> : null}
-      {tab === "progression" ? (
+      {tab === "gains" ? (
         <>
           <ProgressionTuner />
           {mode === "simple" ? (
             <p className="admin-muted">
               <Icon name="info" size={14} /> {t("gamification:admin.mode.simpleHint")}
             </p>
-          ) : null}
+          ) : (
+            <ActionRules />
+          )}
+          <StreakPanel />
         </>
       ) : null}
-      {tab === "actions" ? <ActionRules /> : null}
       {tab === "levels" ? <LevelsPanel detailed={mode === "detailed"} /> : null}
-      {tab === "streak" ? <StreakPanel /> : null}
-      {tab === "achievements" ? <AchievementsPanel /> : null}
-      {tab === "quests" ? <QuestsPanel /> : null}
+      {tab === "achievements" ? (
+        <>
+          <AchievementsPanel />
+          <QuestsPanel />
+        </>
+      ) : null}
     </AdminPage>
   );
 }

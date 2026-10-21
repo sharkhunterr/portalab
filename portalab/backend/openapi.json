@@ -22859,6 +22859,23 @@
               "title": "Status",
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
           }
         ],
         "responses": {
@@ -26298,6 +26315,23 @@
               "title": "Settled",
               "type": "boolean"
             }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
           }
         ],
         "responses": {
@@ -27129,7 +27163,7 @@
     },
     "/api/v1/admin/media/requests": {
       "get": {
-        "description": "#4: members' requests \u2014 the pending ones first \u2014 with who asked, the seasons and 4K, the poster,\nand the decision taken (by whom, why).",
+        "description": "#4: members' requests \u2014 the pending ones first \u2014 with who asked, the seasons and 4K, the poster,\nand the decision taken (by whom, why); or one member's only (their admin card).",
         "operationId": "requests_queue_api_v1_admin_media_requests_get",
         "parameters": [
           {
@@ -27141,6 +27175,23 @@
               "pattern": "^(pending|open|all)$",
               "title": "State",
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
             }
           }
         ],
@@ -46732,6 +46783,23 @@
               ],
               "title": "Form"
             }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
           }
         ],
         "responses": {
@@ -47053,6 +47121,23 @@
                 }
               ],
               "title": "Assignee"
+            }
+          },
+          {
+            "in": "query",
+            "name": "requester",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Requester"
             }
           },
           {
