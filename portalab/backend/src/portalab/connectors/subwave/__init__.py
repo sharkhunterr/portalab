@@ -6,7 +6,7 @@ asking its DJ for a song.
   plain words; the DJ resolves it in the background) then ``GET /api/request/{id}``, the live stream (the
   mount ``now-playing`` names, ``/stream.mp3`` by default) and a track's cover (``/api/cover/{id}``) — both
   relayed by the portal (a page served over HTTPS cannot play a plain-HTTP stream).
-* ``service.health_probe``: ``GET /api/health`` (``{"onAir": true}``).
+* ``service.health_probe``: ``GET /api/health`` (``{"status": "on-air"}``).
 
 The station's listener endpoints are public on the local network: the connector only needs its address.
 """
@@ -40,6 +40,14 @@ STATUSES = {
 
 def _text(value: Any, limit: int = 200) -> str | None:
     return str(value).strip()[:limit] or None if isinstance(value, str | int | float) else None
+
+
+def _is_health(status: Any) -> bool:
+    """``/api/health``: ``{"status": "on-air"}`` (or ``{"onAir": true}`` for some releases)."""
+    if not isinstance(status, Mapping):
+        return False
+    state = status.get("status")
+    return "onAir" in status or (isinstance(state, str) and state.endswith("-air"))
 
 
 def _mapping(value: Any) -> Mapping[str, Any]:
@@ -110,12 +118,12 @@ class SubwaveConnector(HttpConnector):
         return {}
 
     def describe(self, status: Any) -> str:
-        if not isinstance(status, Mapping) or "onAir" not in status:
+        if not _is_health(status):
             raise InvalidPayload("not a SUB/WAVE health answer")
         return self.name
 
     def looks_like_us(self, public: Any) -> bool:
-        return isinstance(public, Mapping) and "onAir" in public
+        return _is_health(public)
 
     def provider(self, capability: str, service: ServiceHandle) -> Any:
         if capability == RADIO:
