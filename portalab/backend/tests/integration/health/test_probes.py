@@ -170,6 +170,7 @@ async def test_outage_becomes_an_incident_after_its_delay_and_closes_when_back(
     [incident] = port.created.values()
     assert incident["severity"] == "major" and incident["service_ids"] == [service_id]
     assert incident["source"] == "health" and "Plex" in incident["title"]
+    assert incident["banner"] is False  # a « major » rule announces no banner unless the admin says so
 
     hl.cn.remote.mode = "ok"
     clock.advance(STEP)
@@ -236,6 +237,8 @@ async def test_alerting_rule_and_service_overrides(hl: HealthHarness, clock: Fix
     assert not effective.incident and effective.notify_after == 0 and effective.auto_resolve
     overridden = hl.module.state.rule(replace(info, alerting={"incident": True, "incident_after": 2}))
     assert overridden.incident and overridden.incident_after == 2 and overridden.email_admins
+    assert not overridden.banner and hl.module.state.rule(replace(info, alerting={"banner": True})).banner
+    assert hl.module.state.rule(replace(info, importance="critical", alerting={})).banner
 
     runner = hl.module.runner
     await runner.probe(service_id)

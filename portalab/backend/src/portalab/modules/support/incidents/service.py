@@ -70,6 +70,7 @@ class IncidentView:
     service_ids: list[str] = field(default_factory=list)
     updates: list[dict[str, Any]] = field(default_factory=list)
     evidence: list[str] = field(default_factory=list)
+    banner: bool = False
 
     @property
     def reference(self) -> str:
@@ -140,6 +141,7 @@ class IncidentService:
             row.resolved_at,
             row.version,
             services,
+            banner=row.banner,
         )
         if timeline:
             updates = (
@@ -211,6 +213,7 @@ class IncidentService:
         dedup_key: str | None = None,
         evidence: Iterable[str] = (),
         message: str | None = None,
+        banner: bool = False,
     ) -> tuple[IncidentView, bool]:
         """``(incident, created)`` — ``created`` is false when ``(source, dedup_key)`` already exists."""
         title = " ".join(title.split())[:200]
@@ -252,6 +255,7 @@ class IncidentService:
                 created_at=now,
                 updated_at=now,
                 version=1,
+                banner=banner,
             )
             session.add(row)
             await session.flush()
@@ -312,6 +316,7 @@ class IncidentService:
         service_ids: Sequence[str] | None = None,
         title: str | None = None,
         summary: str | None = None,
+        banner: bool | None = None,
         if_match: int | None = None,
     ) -> IncidentView:
         now = utc_now(self.clock)
@@ -333,6 +338,9 @@ class IncidentService:
             if summary is not None:
                 row.summary = summary.strip()[:4000]
                 changed["summary"] = True
+            if banner is not None and banner != row.banner:
+                row.banner = banner
+                changed["banner"] = banner
             if service_ids is not None:
                 wanted = sorted({str(s)[:64] for s in service_ids if str(s).strip()})
                 await session.execute(

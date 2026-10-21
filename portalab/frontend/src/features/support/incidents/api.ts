@@ -27,7 +27,14 @@ export function useIncident(id: string) {
 }
 
 export type StaffAction =
-  | { kind: "create"; title: string; severity: Severity; summary: string; service_ids: string[] }
+  | {
+      kind: "create";
+      title: string;
+      severity: Severity;
+      summary: string;
+      service_ids: string[];
+      banner: boolean;
+    }
   | {
       kind: "update";
       id: string;
@@ -35,7 +42,14 @@ export type StaffAction =
       message: string;
       state?: "investigating" | "identified" | "monitoring";
     }
-  | { kind: "patch"; id: string; version: number; severity?: Severity; service_ids?: string[] }
+  | {
+      kind: "patch";
+      id: string;
+      version: number;
+      severity?: Severity;
+      service_ids?: string[];
+      banner?: boolean;
+    }
   | { kind: "resolve"; id: string; version: number; message: string };
 
 export function useIncidentStaff() {
@@ -51,6 +65,7 @@ export function useIncidentStaff() {
                 severity: action.severity,
                 summary: action.summary,
                 service_ids: action.service_ids,
+                banner: action.banner,
               },
             })
           ).data as Incident;
@@ -67,7 +82,11 @@ export function useIncidentStaff() {
             await api.PATCH("/api/v1/admin/incidents/{incident_id}", {
               params: { path: { incident_id: action.id } },
               headers: { "If-Match": String(action.version) },
-              body: { severity: action.severity ?? null, service_ids: action.service_ids ?? null },
+              body: {
+                severity: action.severity ?? null,
+                service_ids: action.service_ids ?? null,
+                banner: action.banner ?? null,
+              },
             })
           ).data as Incident;
         case "resolve":

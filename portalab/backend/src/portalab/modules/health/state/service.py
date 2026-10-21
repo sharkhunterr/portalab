@@ -329,6 +329,7 @@ class StateService:
                 service_ids=[service_id],
                 dedup_key=key,
                 summary=summary,
+                banner=self.rule(info).banner,
             )
             self._declared.add(key)
             metrics.increment("health.incidents.declared")

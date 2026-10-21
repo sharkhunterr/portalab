@@ -51,6 +51,7 @@ import { isSafeMode } from "./safeMode";
 import { ShortcutManager } from "./shortcuts/ShortcutManager";
 import { AnnouncementBanner } from "./status/AnnouncementBanner";
 import { GlobalStatusBanner } from "./status/GlobalStatusBanner";
+import { IncidentBanner } from "./status/IncidentBanner";
 import { MaintenanceBanner } from "./status/MaintenanceBanner";
 import { SafeModeBanner } from "./status/SafeModeBanner";
 import { useShellStrings } from "./strings";
@@ -202,6 +203,7 @@ export function AppShell({
         <ListenHost />
         <RadioHost />
         <AnnouncementBanner />
+        <IncidentBanner />
         <MaintenanceBanner />
         {isSafeMode() ? <SafeModeBanner /> : null}
         {nav === "topbar" ? (
