@@ -235,6 +235,10 @@ async def test_administrators_approve_and_decline(
     by_title = {i["title"]: i for i in queue}
     assert set(by_title) == {"The Matrix", "Pulp Fiction"} and all(i["decidable"] for i in queue)
     assert by_title["The Matrix"]["requester"]["id"] == str(people["alex"])
+    # one member's requests only (their admin card)
+    alex = (await client.get(f"/api/v1/admin/media/requests?user_id={people['alex']}")).json()["items"]
+    boss = (await client.get(f"/api/v1/admin/media/requests?user_id={people['boss']}")).json()["items"]
+    assert len(alex) == 2 and boss == []
 
     approved = await client.post(
         f"/api/v1/admin/media/requests/{by_title['The Matrix']['id']}/approve", json={}

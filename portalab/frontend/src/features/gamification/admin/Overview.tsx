@@ -11,7 +11,6 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useRules, useVerify, type Value } from "../api";
 import { SOURCES } from "../progression/GainSources";
 import { PlaysByKind } from "../progression/PlaysByKind";
-import { AnomalyQueue } from "./AnomalyQueue";
 import { MemberDetails } from "./MemberDetails";
 import { Operations } from "./Operations";
 import { useLevelRewards, useMembersProgress, useProgress, useStreak, VALUES } from "./tuning";
@@ -341,10 +340,9 @@ export function Overview() {
             {" · "}
             <Link to="/admin/campaigns">{t("gamification:admin.overview.campaigns")}</Link>
             {" · "}
-            <Link to="/admin/marketplace/members">{t("gamification:admin.overview.balances")}</Link>
+            <Link to="/admin/members">{t("gamification:admin.overview.balances")}</Link>
           </p>
         </AdminSection>
-        <AnomalyQueue />
       </div>
     </>
   );

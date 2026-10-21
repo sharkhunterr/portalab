@@ -33,11 +33,15 @@ class RequestModeration:
     def __init__(self, requests: Requests) -> None:
         self.requests = requests
 
-    async def queue(self, state: str = "pending", limit: int = 200) -> list[dict[str, Any]]:
+    async def queue(
+        self, state: str = "pending", limit: int = 200, user: UUID | None = None
+    ) -> list[dict[str, Any]]:
         wanted = FILTERS.get(state, ("pending",))
         query = select(MediaRequest)
         if wanted is not None:
             query = query.where(MediaRequest.state.in_(wanted))
+        if user is not None:  # one member's only (their admin card)
+            query = query.where(MediaRequest.requester_user_id == user)
         pending_first = case((MediaRequest.state == "pending", 0), else_=1)
         async with self.requests.database.session() as session:
             rows = list(

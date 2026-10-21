@@ -2241,7 +2241,7 @@ export interface paths {
         /**
          * Requests Queue
          * @description #4: members' requests — the pending ones first — with who asked, the seasons and 4K, the poster,
-         *     and the decision taken (by whom, why).
+         *     and the decision taken (by whom, why); or one member's only (their admin card).
          */
         get: operations["requests_queue_api_v1_admin_media_requests_get"];
         put?: never;
@@ -19099,6 +19099,7 @@ export interface operations {
         parameters: {
             query?: {
                 status?: "open" | "dismissed" | "confirmed";
+                user_id?: string | null;
             };
             header?: never;
             path?: never;
@@ -21326,6 +21327,7 @@ export interface operations {
         parameters: {
             query?: {
                 settled?: boolean;
+                user_id?: string | null;
             };
             header?: never;
             path?: never;
@@ -21951,6 +21953,7 @@ export interface operations {
         parameters: {
             query?: {
                 state?: string;
+                user_id?: string | null;
             };
             header?: never;
             path?: never;
@@ -35045,6 +35048,7 @@ export interface operations {
                 status?: string | null;
                 kind?: string | null;
                 form?: string | null;
+                user_id?: string | null;
             };
             header?: never;
             path?: never;
@@ -35243,6 +35247,7 @@ export interface operations {
             query?: {
                 state?: string | null;
                 assignee?: string | null;
+                requester?: string | null;
                 unassigned?: boolean;
                 type?: string | null;
                 tag?: string | null;

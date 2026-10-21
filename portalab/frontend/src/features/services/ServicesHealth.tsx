@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useId } from "react";
 import { Link } from "react-router";
 import { api } from "../../api/client";
+import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { Dialog } from "../../design-system/components/Overlays";
 import { PageHeader } from "../../design-system/components/PageHeader";
@@ -9,6 +10,7 @@ import { FunctionalState } from "../../design-system/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { DataRegion } from "../../state/regions";
+import { useHasPermission } from "../authz/useMyPermissions";
 import { useIncidents } from "../support/incidents/api";
 import { SeverityBadge } from "../support/incidents/IncidentParts";
 import { useMaintenances } from "../support/incidents/maintenance";
@@ -133,6 +135,7 @@ function sectionData<T>(detail: Detail | undefined, name: string): T | null {
  */
 export function ServiceDetail({ serviceId, name }: { serviceId: string; name: string }) {
   const t = useT();
+  const manager = useHasPermission("services.manage");
   const format = useFormat();
   const headingId = useId();
   const query = useQuery({
@@ -192,6 +195,23 @@ export function ServiceDetail({ serviceId, name }: { serviceId: string; name: st
       <h3 id={headingId} className="visually-hidden">
         {servicesHealthStrings.detailTitle(name)}
       </h3>
+      {manager ? (
+        // admin reorganisation (trial): act on this service from its page — the forms come prefilled
+        <p className="svc-detail__admin">
+          <Button asChild variant="secondary">
+            <Link to={`/admin/incidents?service=${encodeURIComponent(serviceId)}`}>
+              <Icon name="alert" size={14} />
+              {t("support:status.detail.declare")}
+            </Link>
+          </Button>
+          <Button asChild variant="secondary">
+            <Link to={`/admin/maintenance?service=${encodeURIComponent(serviceId)}`}>
+              <Icon name="wrench" size={14} />
+              {t("support:status.detail.planMaintenance")}
+            </Link>
+          </Button>
+        </p>
+      ) : null}
       {query.isPending ? <FunctionalState state="loading" /> : null}
       {query.isError ? <FunctionalState state="error" onRetry={() => void query.refetch()} /> : null}
       {detail ? (

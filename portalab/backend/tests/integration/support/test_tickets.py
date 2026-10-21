@@ -50,6 +50,10 @@ async def test_lifecycle(client: httpx.AsyncClient, support: SupportHarness, peo
         and {t["key"] for t in ticket["transitions"]} == {"cancel"}
     )
     await login(client, "sam")
+    # one member's tickets only (their admin card)
+    theirs = (await client.get(f"/api/v1/support/tickets?requester={people['ursula']}")).json()["items"]
+    nobody = (await client.get(f"/api/v1/support/tickets?requester={people['sam']}")).json()["items"]
+    assert [t["id"] for t in theirs] == [tid] and nobody == []
     assigned = await client.post(
         f"/api/v1/tickets/{tid}/assign", json={"assignee_id": str(people["sam"])}, headers={"If-Match": "1"}
     )
@@ -195,6 +199,10 @@ async def test_feedback_and_conversion(
     assert (await client.get("/api/v1/me/tickets")).json() == []  # feedback never becomes a ticket by itself
     assert (await client.get("/api/v1/support/feedback")).status_code == 403
     await login(client, "sam")
+    # one member's feedback only (their admin card)
+    theirs = (await client.get(f"/api/v1/support/feedback?user_id={people['ursula']}")).json()
+    nobody = (await client.get(f"/api/v1/support/feedback?user_id={people['sam']}")).json()
+    assert [f["id"] for f in theirs] == [fid] and nobody == []
     detail = (await client.get(f"/api/v1/support/feedback/{fid}")).json()
     options = {c["target"]: (c["available"], c["reason"]) for c in detail["conversions"]}
     assert options["ticket"] == (True, None) and options["feature_proposal"] == (

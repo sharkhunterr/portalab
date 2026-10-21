@@ -1,13 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
-import { useSearchParams } from "react-router";
+import { Navigate, useSearchParams } from "react-router";
 import { api } from "../../../api/client";
 import {
-  AdminGrid,
   AdminPage,
   AdminSection,
-  AdminStats,
-  AdminTabs,
   FormActions,
   FormGrid,
   StatusBadge,
@@ -19,15 +16,8 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { StatusBanner } from "../../../shell/status/StatusBanner";
 import { ApiError } from "../../../state/regions";
-import { MaintenancePanel } from "./MaintenanceAdmin";
 import "../admin.css";
 
-/**
- * Announcements (027 hubs; notifications 010 admin API): send a message to every member — in their
- * notification centre and, for those who chose it, by e-mail — and set up the e-mail transport (with a test
- * sent to yourself). Delivery figures come from the notification status; titles and addresses are never
- * listed back.
- */
 /**
  * 027: what kind of announcement — one choice, in its colour, that sets how it reaches members: the tone of
  * its banner and notification, whether it is an alert, its priority (an urgent one reaches even those who
@@ -41,7 +31,7 @@ const TYPES = {
 } as const;
 type AnnouncementType = keyof typeof TYPES;
 
-interface Status {
+export interface Status {
   email_enabled: boolean;
   deliveries: Array<{ channel: string; status: string; reason: string | null; count: number }>;
 }
@@ -294,7 +284,7 @@ function History() {
   );
 }
 
-function Deliveries({ status }: { status: Status | undefined }) {
+export function Deliveries({ status }: { status: Status | undefined }) {
   const t = useT();
   const format = useFormat();
   const rows = status?.deliveries ?? [];
@@ -330,77 +320,19 @@ function Deliveries({ status }: { status: Status | undefined }) {
   );
 }
 
-const TABS = ["announce", "maintenance"] as const;
-
 /**
- * Announcements (027 hubs, Communication): tell everyone now (and see deliveries) and plan maintenances.
- * Newsletters live in the news desk; the e-mail transport in System. Grouped on purpose:
- * everything that reaches members' inboxes lives here.
+ * Announcements (027 hubs, Communication): tell everyone now — by notification, e-mail and/or banner — and
+ * see the latest. Admin reorganisation (trial): maintenances moved to the Operations hub, deliveries and
+ * the e-mail transport to « Newsletters & e-mail ».
  */
 export default function AnnouncementsAdmin() {
   const t = useT();
-  const format = useFormat();
-  const [params, setParams] = useSearchParams();
-  const tab = (TABS as readonly string[]).includes(params.get("tab") ?? "")
-    ? (params.get("tab") as string)
-    : "announce";
-  const status = useQuery({
-    queryKey: ["admin", "notifications", "status"],
-    retry: false,
-    queryFn: async () => (await api.GET("/api/v1/admin/notifications/status")).data as unknown as Status,
-  });
-  const total = (s: string) =>
-    (status.data?.deliveries ?? []).filter((d) => d.status === s).reduce((a, d) => a + d.count, 0);
+  const [params] = useSearchParams();
+  if (params.get("tab") === "maintenance") return <Navigate to="/admin/maintenance" replace />;
   return (
-    <AdminPage
-      icon="bell"
-      title={t("admin:announce.pageTitle")}
-      description={t("admin:announce.subtitle")}
-      tabs={
-        <AdminTabs
-          label={t("admin:announce.pageTitle")}
-          current={tab}
-          onChange={(next) => setParams(next === "announce" ? {} : { tab: next }, { replace: true })}
-          tabs={TABS.map((key) => ({ key, label: t(`admin:announce.tabs.${key}`) }))}
-        />
-      }
-    >
-      {tab === "announce" ? (
-        <>
-          <AdminStats
-            label={t("admin:announce.deliveries")}
-            stats={[
-              {
-                key: "email",
-                label: t("admin:announce.email"),
-                value: status.data?.email_enabled ? t("admin:announce.on") : t("admin:announce.off"),
-                icon: "message",
-                tone: status.data?.email_enabled ? "ok" : "neutral",
-              },
-              {
-                key: "sent",
-                label: t("admin:announce.sentCount"),
-                value: format.number(total("sent") + total("delivered")),
-                icon: "check",
-                tone: "ok",
-              },
-              {
-                key: "failed",
-                label: t("admin:announce.failedCount"),
-                value: format.number(total("failed")),
-                icon: "alert",
-                tone: total("failed") ? "bad" : "neutral",
-              },
-            ]}
-          />
-          <AdminGrid>
-            <Broadcast />
-            <Deliveries status={status.data} />
-          </AdminGrid>
-          <History />
-        </>
-      ) : null}
-      {tab === "maintenance" ? <MaintenancePanel /> : null}
+    <AdminPage icon="bell" title={t("admin:announce.pageTitle")} description={t("admin:announce.subtitle")}>
+      <Broadcast />
+      <History />
     </AdminPage>
   );
 }

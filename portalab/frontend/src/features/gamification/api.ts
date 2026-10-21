@@ -158,11 +158,16 @@ export function usePublishCurve() {
   });
 }
 
-export function useAnomalies() {
+/** The open flags — everyone's, or one member's (their admin card). */
+export function useAnomalies(userId?: string) {
   return useQuery({
-    queryKey: [...KEY, "anomalies"],
+    queryKey: [...KEY, "anomalies", userId ?? null],
     queryFn: async () =>
-      ((await api.GET("/api/v1/admin/economy/anomalies")).data ?? []) as unknown as AnomalyView[],
+      ((
+        await api.GET("/api/v1/admin/economy/anomalies", {
+          params: { query: userId ? { user_id: userId } : {} },
+        })
+      ).data ?? []) as unknown as AnomalyView[],
   });
 }
 

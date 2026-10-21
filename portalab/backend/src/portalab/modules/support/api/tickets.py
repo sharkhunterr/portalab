@@ -355,6 +355,7 @@ async def queue(
     module: Module,
     state: Annotated[str | None, Query(max_length=40)] = None,
     assignee: UUID | None = None,
+    requester: UUID | None = None,  # one member's tickets (their admin card)
     unassigned: bool = False,
     type_key: Annotated[str | None, Query(alias="type", max_length=60)] = None,
     tag: Annotated[str | None, Query(max_length=60)] = None,
@@ -367,6 +368,7 @@ async def queue(
         principal,
         state=state,
         assignee=assignee,
+        requester=requester,
         unassigned=unassigned,
         type_key=type_key,
         tag=tag,

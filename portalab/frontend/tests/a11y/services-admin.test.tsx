@@ -20,6 +20,7 @@ vi.mock("../../src/api/client", async (importOriginal) => {
 
 import { MemoryRouter } from "react-router";
 import { ServicesAdmin } from "../../src/features/admin";
+import { AlertRulesPanel } from "../../src/features/admin/services/AlertRules";
 import { json } from "../support/fake-api";
 
 function withClient(children: ReactNode) {
@@ -179,20 +180,21 @@ describe("services admin", () => {
       }
       return json(200, { items: [] });
     };
-    render(withClient(<ServicesAdmin />));
-    await screen.findByText("Media server");
-
-    const open = await screen.findByRole("button", { name: "Alert rules" });
-    await vi.waitFor(() => expect(open).toBeEnabled());
-    fireEvent.click(open);
-    const dialog = await screen.findByRole("dialog", { name: "Alert rules by importance" });
-    expect(within(dialog).getByRole("tab", { name: /Critical.*incident after 5 min/ })).toBeInTheDocument();
-    fireEvent.click(within(dialog).getByRole("tab", { name: /Major/ }));
-    fireEvent.click(within(dialog).getAllByRole("checkbox", { name: "By e-mail too" })[1] as HTMLElement);
-    fireEvent.click(within(dialog).getByRole("button", { name: "Save the rules" }));
+    // admin reorganisation (trial): the rules are a page of the Operations hub, no longer a dialog
+    const rulesPage = render(withClient(<AlertRulesPanel />));
+    const panel = rulesPage.container;
+    expect(
+      await within(panel).findByRole("tab", { name: /Critical.*incident after 5 min/ }),
+    ).toBeInTheDocument();
+    fireEvent.click(within(panel).getByRole("tab", { name: /Major/ }));
+    fireEvent.click(within(panel).getAllByRole("checkbox", { name: "By e-mail too" })[1] as HTMLElement);
+    fireEvent.click(within(panel).getByRole("button", { name: "Save the rules" }));
     await vi.waitFor(() => expect(putRules.major?.email_admins).toBe(true));
     expect(putRules.critical?.email_admins).toBe(false);
+    rulesPage.unmount();
 
+    render(withClient(<ServicesAdmin />));
+    await screen.findByText("Media server");
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
     const edit = await screen.findByRole("dialog", { name: /Media server/ });
     fireEvent.change(within(edit).getByLabelText("Declare an incident"), { target: { value: "no" } });

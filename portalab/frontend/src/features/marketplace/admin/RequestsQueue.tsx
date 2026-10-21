@@ -93,10 +93,11 @@ function RequestItem({ request }: { request: MarketRequest }) {
   );
 }
 
-export function RequestsQueue() {
+/** Everyone's requests, or one member's (``userId``, their admin card). */
+export function RequestsQueue({ userId }: { userId?: string } = {}) {
   const t = useT();
   const [settled, setSettled] = useState(false);
-  const queue = useRequestsQueue(settled);
+  const queue = useRequestsQueue(settled, userId);
   const items = queue.data ?? [];
   const overdue = items.filter((r) => r.overdue).length;
   return (

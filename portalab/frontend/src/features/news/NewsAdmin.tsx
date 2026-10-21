@@ -1,6 +1,6 @@
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { type FormEvent, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, Navigate, useSearchParams } from "react-router";
 import { AdminPage, AdminTabs } from "../../design-system/admin/AdminKit";
 import { Avatar } from "../../design-system/components/Avatar";
 import { Button } from "../../design-system/components/Button";
@@ -16,7 +16,7 @@ import { Switch } from "../account/SettingsKit";
 import { MarkdownEditor } from "../content/MarkdownEditor";
 import { type NewsEditor, useEditorial, useNewsActions, useReaders } from "./api";
 import { Cover } from "./cover";
-import { ChannelsPanel, NewslettersPanel, useChannels } from "./NewsChannels";
+import { ChannelsPanel, useChannels } from "./NewsChannels";
 import "./news.css";
 
 /**
@@ -434,7 +434,8 @@ function ArticleRow({ article, onEdit }: { article: NewsEditor; onEdit: () => vo
   );
 }
 
-const TABS = ["articles", "channels", "newsletters"] as const;
+// the newsletters moved to « Newsletters & e-mail » (admin reorganisation, trial)
+const TABS = ["articles", "channels"] as const;
 
 export function NewsAdmin() {
   const t = useT();
@@ -446,6 +447,7 @@ export function NewsAdmin() {
   const articles = editorial.data ?? [];
   const shown = articles.filter((a) => !status || a.status === status);
   const count = (s: string) => articles.filter((a) => a.status === s).length;
+  if (params.get("tab") === "newsletters") return <Navigate to="/admin/newsletters" replace />;
   return (
     <AdminPage
       icon="newspaper"
@@ -469,7 +471,6 @@ export function NewsAdmin() {
       }
     >
       {tab === "channels" ? <ChannelsPanel /> : null}
-      {tab === "newsletters" ? <NewslettersPanel /> : null}
       {tab === "articles" ? (
         <>
           {editing ? (

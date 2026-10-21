@@ -1,12 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, type ReactNode, useId, useMemo, useState } from "react";
 import { api } from "../../api/client";
-import { AdminGrid, AdminPage, SearchBox, StatusBadge } from "../../design-system/admin/AdminKit";
+import { AdminPage, SearchBox, StatusBadge } from "../../design-system/admin/AdminKit";
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../state/regions";
-import { DigestDefault, EmailSettings } from "./communication/EmailSettings";
 import { Toggles } from "./Toggles";
 
 interface SettingItem {
@@ -353,15 +352,14 @@ function SettingsExplorer({
   );
 }
 
-/** The routed Configuration page (« System »): e-mail first, then every setting, then extensions on/off. */
+/**
+ * The routed Configuration page (« System »): every setting, then extensions on/off — the e-mail transport
+ * moved to « Newsletters & e-mail » (admin reorganisation, trial).
+ */
 export function ConfigurationPage() {
   const t = useT();
   return (
     <AdminPage icon="settings" title={t("admin:config.title")} description={t("admin:config.subtitle")}>
-      <AdminGrid>
-        <EmailSettings />
-        <DigestDefault />
-      </AdminGrid>
       <ConfigEditor />
       <Toggles />
     </AdminPage>

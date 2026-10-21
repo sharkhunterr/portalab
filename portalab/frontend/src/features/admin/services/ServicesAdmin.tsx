@@ -21,7 +21,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { type Translate, useT } from "../../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../../state/regions";
 import { UptimeBars } from "../../services/ServicesHealth";
-import { AlertingOverrides, type AlertOverrides, AlertRulesDialog } from "./AlertRules";
+import { AlertingOverrides, type AlertOverrides } from "./AlertRules";
 import "../../services/services.css";
 import "../admin.css";
 
@@ -941,7 +941,6 @@ export function ServicesAdmin() {
       icon="plug"
       title={t("admin:services.title")}
       description={t("admin:services.subtitle")}
-      secondary={<AlertRulesDialog />}
       primary={
         <Dialog
           open={open}

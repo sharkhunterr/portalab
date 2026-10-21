@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { api } from "../../../api/client";
 import {
   AdminPage,
@@ -32,9 +32,10 @@ import { ServiceAccountsPanel } from "./ServiceAccountsPanel";
  * searchable and filtered by state; invite a member (a verification link to share), resend it, suspend or
  * reactivate, ask for deletion (with the legal delay) or cancel it; edit a member (name, e-mail, roles,
  * linked service accounts). A second tab maps the accounts of the connected services to members. The server
- * enforces every right and protects the sole administrator.
+ * enforces every right and protects the sole administrator. A member's name opens their card (``MemberCard``),
+ * which reuses the list, the state and the actions below.
  */
-interface Member {
+export interface Member {
   id: string;
   login: string | null;
   display_name: string | null;
@@ -44,8 +45,9 @@ interface Member {
   email?: string | null;
 }
 
-const KEY = ["admin", "members"] as const;
-const STATE_TONE: Record<string, Tone> = {
+export const MEMBERS_KEY = ["admin", "members"] as const;
+const KEY = MEMBERS_KEY;
+export const STATE_TONE: Record<string, Tone> = {
   active: "ok",
   pending_verification: "info",
   inactive: "neutral",
@@ -55,7 +57,7 @@ const STATE_TONE: Record<string, Tone> = {
 };
 const STATES = ["active", "pending_verification", "suspended", "inactive", "pending_deletion"] as const;
 
-async function allMembers(): Promise<Member[]> {
+export async function allMembers(): Promise<Member[]> {
   const out: Member[] = [];
   let cursor: string | null = null;
   for (let page = 0; page < 40; page += 1) {
@@ -126,7 +128,7 @@ function InviteForm() {
   );
 }
 
-function InviteLink({ token }: { token: string }) {
+export function InviteLink({ token }: { token: string }) {
   const t = useT();
   const [copied, setCopied] = useState(false);
   const link = verifyLink(token);
@@ -151,7 +153,19 @@ function InviteLink({ token }: { token: string }) {
 
 type Action = "suspend" | "reactivate" | "verification" | "deletion" | "cancel-deletion";
 
-function MemberActions({ member, onLink }: { member: Member; onLink: (token: string) => void }) {
+export function MemberActions({
+  member,
+  onLink,
+  edit = true,
+  suspensionOnly = false,
+}: {
+  member: Member;
+  onLink: (token: string) => void;
+  /** the « Edit » dialog — the member card edits inline instead */
+  edit?: boolean;
+  /** suspend / reactivate only (the card's « Vigilance » tab) */
+  suspensionOnly?: boolean;
+}) {
   const t = useT();
   const client = useQueryClient();
   const [confirming, setConfirming] = useState(false);
@@ -177,24 +191,26 @@ function MemberActions({ member, onLink }: { member: Member; onLink: (token: str
   const name = member.display_name ?? member.login ?? "";
   return (
     <>
-      <Dialog
-        size="lg"
-        title={t("admin:members.editTitle", { name })}
-        closeLabel={t("admin:services.close")}
-        trigger={
-          <Button variant="secondary" aria-label={`${t("admin:members.edit")} ${name}`}>
-            {t("admin:members.edit")}
-          </Button>
-        }
-      >
-        <MemberEdit member={member} />
-      </Dialog>
+      {edit ? (
+        <Dialog
+          size="lg"
+          title={t("admin:members.editTitle", { name })}
+          closeLabel={t("admin:services.close")}
+          trigger={
+            <Button variant="secondary" aria-label={`${t("admin:members.edit")} ${name}`}>
+              {t("admin:members.edit")}
+            </Button>
+          }
+        >
+          <MemberEdit member={member} />
+        </Dialog>
+      ) : null}
       {act.isError ? (
         <span role="alert" className="admin-muted">
           {act.error instanceof ApiError ? act.error.message : t("admin:members.refused")}
         </span>
       ) : null}
-      {member.state === "pending_verification" ? (
+      {member.state === "pending_verification" && !suspensionOnly ? (
         <Button
           variant="secondary"
           onClick={() => act.mutate("verification")}
@@ -222,7 +238,7 @@ function MemberActions({ member, onLink }: { member: Member; onLink: (token: str
           {t("admin:members.reactivate")}
         </Button>
       ) : null}
-      {member.state === "pending_deletion" ? (
+      {suspensionOnly ? null : member.state === "pending_deletion" ? (
         <Button variant="ghost" onClick={() => act.mutate("cancel-deletion")}>
           {t("admin:members.cancelDeletion")}
         </Button>
@@ -369,7 +385,9 @@ function MembersPanel() {
                 <span className="member-cell">
                   <Avatar name={m.display_name ?? m.login ?? "?"} userId={m.id} size="sm" decorative />
                   <span className="services-admin__name">
-                    <strong>{m.display_name ?? m.login}</strong>
+                    <Link to={`/admin/members/${m.id}`} className="member-card__open">
+                      <strong>{m.display_name ?? m.login}</strong>
+                    </Link>
                     <span className="admin-muted">
                       @{m.login}
                       {m.email ? ` · ${m.email}` : ""}

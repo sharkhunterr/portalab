@@ -40,12 +40,15 @@ const TONE: Record<string, "info" | "ok" | "neutral"> = {
   dismissed: "neutral",
 };
 
-function useQueue() {
+/** Everyone's feedback, or one member's (their admin card). */
+function useQueue(userId?: string) {
   return useQuery({
-    queryKey: [...QUEUE],
+    queryKey: [...QUEUE, userId ?? null],
     retry: false,
     queryFn: async () => {
-      const data = (await api.GET("/api/v1/support/feedback")).data;
+      const data = (
+        await api.GET("/api/v1/support/feedback", { params: { query: userId ? { user_id: userId } : {} } })
+      ).data;
       return (Array.isArray(data) ? data : []) as Item[];
     },
   });
@@ -258,6 +261,71 @@ function ResultsPanel({ form }: { form: FormRow }) {
   );
 }
 
+/** One card per feedback — who, which form, an excerpt, its status — opened to its detail. */
+function FeedbackCards({ items, fieldsOf }: { items: Item[]; fieldsOf: (key: string) => FieldDef[] }) {
+  const t = useT();
+  const format = useFormat();
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <ul className="feedback-queue">
+      {items.map((item) => {
+        const first = Object.values(item.payload).find((v) => typeof v === "string") as string | undefined;
+        const expanded = open === item.id;
+        return (
+          <li key={item.id} className="feedback-card" data-status={item.status}>
+            <button
+              type="button"
+              className="feedback-card__head"
+              aria-expanded={expanded}
+              onClick={() => setOpen(expanded ? null : item.id)}
+            >
+              <Avatar
+                name={item.submitter_name ?? "?"}
+                userId={item.submitter_id ?? undefined}
+                size="sm"
+                decorative
+              />
+              <span className="feedback-card__text">
+                <span className="feedback-card__who">
+                  <strong>{item.submitter_name ?? t("support:review.someone")}</strong>
+                  <span className="admin-muted">
+                    {item.form_label ?? item.form_key} ·{" "}
+                    {format.relative((Date.parse(item.created_at) - Date.now()) / 1000)}
+                  </span>
+                </span>
+                {first ? <span className="feedback-card__excerpt">{first}</span> : null}
+              </span>
+              <span className="feedback-card__badges">
+                {item.reply ? (
+                  <span className="admin-muted" title={t("support:review.replied")}>
+                    <Icon name="message" size={14} />
+                  </span>
+                ) : null}
+                <StatusBadge tone={TONE[item.status] ?? "neutral"}>
+                  {t(`support:feedback.status.${item.status}`)}
+                </StatusBadge>
+                <Icon name={expanded ? "chevron-down" : "chevron-right"} size={16} />
+              </span>
+            </button>
+            {expanded ? <Detail item={item} fields={fieldsOf(item.form_key)} /> : null}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/** One member's feedback (their admin card), the same cards as the review queue. */
+export function MemberFeedback({ userId }: { userId: string }) {
+  const t = useT();
+  const queue = useQueue(userId);
+  const forms = useForms();
+  const fieldsOf = (key: string) => (forms.data ?? []).find((f) => f.key === key)?.fields ?? [];
+  if (queue.isError) return <FunctionalState state="unauthorized" />;
+  if (queue.data && !queue.data.length) return <AdminEmpty icon="inbox" title={t("support:review.empty")} />;
+  return <FeedbackCards items={queue.data ?? []} fieldsOf={fieldsOf} />;
+}
+
 /**
  * Feedback review (spec 016 T030/T032; 027 redesign, staff): by status, one card per feedback — who, which
  * form, the answers in words — opened to reply (the member is notified), mark as read, dismiss or convert;
@@ -265,11 +333,9 @@ function ResultsPanel({ form }: { form: FormRow }) {
  */
 export function ReviewQueue() {
   const t = useT();
-  const format = useFormat();
   const queue = useQueue();
   const forms = useForms();
   const [status, setStatus] = useState<(typeof STATUSES)[number] | "requests">("new");
-  const [open, setOpen] = useState<string | null>(null);
   const items = queue.data ?? [];
   const fieldsOf = (key: string) => (forms.data ?? []).find((f) => f.key === key)?.fields ?? [];
   const shown = items.filter((i) => status === "all" || i.status === status);
@@ -309,53 +375,7 @@ export function ReviewQueue() {
       ) : (
         <>
           {queue.data && !shown.length ? <AdminEmpty icon="inbox" title={t("support:review.empty")} /> : null}
-          <ul className="feedback-queue">
-            {shown.map((item) => {
-              const first = Object.values(item.payload).find((v) => typeof v === "string") as
-                | string
-                | undefined;
-              const expanded = open === item.id;
-              return (
-                <li key={item.id} className="feedback-card" data-status={item.status}>
-                  <button
-                    type="button"
-                    className="feedback-card__head"
-                    aria-expanded={expanded}
-                    onClick={() => setOpen(expanded ? null : item.id)}
-                  >
-                    <Avatar
-                      name={item.submitter_name ?? "?"}
-                      userId={item.submitter_id ?? undefined}
-                      size="sm"
-                      decorative
-                    />
-                    <span className="feedback-card__text">
-                      <span className="feedback-card__who">
-                        <strong>{item.submitter_name ?? t("support:review.someone")}</strong>
-                        <span className="admin-muted">
-                          {item.form_label ?? item.form_key} ·{" "}
-                          {format.relative((Date.parse(item.created_at) - Date.now()) / 1000)}
-                        </span>
-                      </span>
-                      {first ? <span className="feedback-card__excerpt">{first}</span> : null}
-                    </span>
-                    <span className="feedback-card__badges">
-                      {item.reply ? (
-                        <span className="admin-muted" title={t("support:review.replied")}>
-                          <Icon name="message" size={14} />
-                        </span>
-                      ) : null}
-                      <StatusBadge tone={TONE[item.status] ?? "neutral"}>
-                        {t(`support:feedback.status.${item.status}`)}
-                      </StatusBadge>
-                      <Icon name={expanded ? "chevron-down" : "chevron-right"} size={16} />
-                    </span>
-                  </button>
-                  {expanded ? <Detail item={item} fields={fieldsOf(item.form_key)} /> : null}
-                </li>
-              );
-            })}
-          </ul>
+          <FeedbackCards items={shown} fieldsOf={fieldsOf} />
         </>
       )}
     </AdminPage>

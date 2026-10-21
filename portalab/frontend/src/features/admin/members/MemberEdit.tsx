@@ -12,7 +12,8 @@ import { ACCOUNTS_KEY, accountLabel, useServiceAccounts } from "./accounts";
 /**
  * Edit a member (027, Members & access): display name and e-mail, the roles they hold (the base User role
  * is implicit and the Admin role moves only by transfer), and the service accounts linked to them —
- * unlink one here, link more from the « Service accounts » tab.
+ * unlink one here, link more from the « Service accounts » tab. Each part is exported on its own so the
+ * member card (``MemberCard``) shows them inline, in a page rather than a dialog.
  */
 export interface EditableMember {
   id: string;
@@ -29,7 +30,7 @@ interface Role {
 
 const FIXED_ROLES = new Set(["user", "admin"]);
 
-function Profile({ member, onSaved }: { member: EditableMember; onSaved: () => void }) {
+export function MemberProfileForm({ member, onSaved }: { member: EditableMember; onSaved: () => void }) {
   const t = useT();
   const [name, setName] = useState(member.display_name ?? "");
   const [email, setEmail] = useState(member.email ?? "");
@@ -84,7 +85,7 @@ function Profile({ member, onSaved }: { member: EditableMember; onSaved: () => v
   );
 }
 
-function Roles({ member }: { member: EditableMember }) {
+export function MemberRoles({ member }: { member: EditableMember }) {
   const t = useT();
   const client = useQueryClient();
   const key = ["admin", "members", member.id, "roles"];
@@ -205,11 +206,11 @@ export function MemberEdit({ member }: { member: EditableMember }) {
   const client = useQueryClient();
   return (
     <div className="admin-dialog-body member-edit">
-      <Profile
+      <MemberProfileForm
         member={member}
         onSaved={() => void client.invalidateQueries({ queryKey: ["admin", "members"] })}
       />
-      <Roles member={member} />
+      <MemberRoles member={member} />
       <LinkedAccounts member={member} />
     </div>
   );

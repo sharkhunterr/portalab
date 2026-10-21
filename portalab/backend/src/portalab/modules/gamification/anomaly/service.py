@@ -112,17 +112,15 @@ class AnomalyService:
         except Exception:
             log.warning("economy anomaly not escalated")
 
-    async def queue(self, status: str = "open") -> list[tuple[AnomalyFlag, list[Withheld]]]:
+    async def queue(
+        self, status: str = "open", user: UUID | None = None
+    ) -> list[tuple[AnomalyFlag, list[Withheld]]]:
+        """The flags of one status, the oldest first — or one member's only (their admin card)."""
+        query = select(AnomalyFlag).where(AnomalyFlag.status == status)
+        if user is not None:
+            query = query.where(AnomalyFlag.user_id == user)
         async with self.database.session() as session:
-            flags = list(
-                (
-                    await session.execute(
-                        select(AnomalyFlag)
-                        .where(AnomalyFlag.status == status)
-                        .order_by(AnomalyFlag.created_at)
-                    )
-                ).scalars()
-            )
+            flags = list((await session.execute(query.order_by(AnomalyFlag.created_at))).scalars())
             withheld = list(
                 (
                     await session.execute(select(Withheld).where(Withheld.flag_id.in_([f.id for f in flags])))

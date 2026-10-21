@@ -75,9 +75,12 @@ async def my_requests(principal: Reader, module: Module) -> list[MarketplaceRequ
 
 @router.get("/admin/marketplace/requests", response_model=list[MarketplaceRequestOut])
 async def requests_queue(
-    principal: Manager, module: Module, settled: Annotated[bool, Query()] = False
+    principal: Manager,
+    module: Module,
+    settled: Annotated[bool, Query()] = False,
+    user_id: UUID | None = None,  # one member's only (their admin card)
 ) -> list[MarketplaceRequestOut]:
-    views = await module.requests.queue(principal.user_id, open_only=not settled)
+    views = await module.requests.queue(principal.user_id, open_only=not settled, user=user_id)
     return [request_out(v) for v in views]
 
 

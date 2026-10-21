@@ -95,14 +95,39 @@ function Decline({ item, onDecline }: { item: QueueItem; onDecline: (reason: str
  */
 export default function RequestsAdmin() {
   const t = useT();
+  const [tab, setTab] = useState<(typeof TABS)[number]>("pending");
+  return (
+    <AdminPage
+      icon="inbox"
+      title={t("media:moderation.title")}
+      description={t("media:moderation.pitch")}
+      tabs={
+        <AdminTabs
+          label={t("media:moderation.title")}
+          current={tab}
+          onChange={(next) => setTab(next as (typeof TABS)[number])}
+          tabs={TABS.map((key) => ({ key, label: t(`media:moderation.tab.${key}`) }))}
+        />
+      }
+    >
+      <MediaRequestsList tab={tab} />
+    </AdminPage>
+  );
+}
+
+/** The requests of one tab — everyone's, or one member's (``userId``, their admin card). */
+export function MediaRequestsList({ tab, userId }: { tab: (typeof TABS)[number]; userId?: string }) {
+  const t = useT();
   const format = useFormat();
   const client = useQueryClient();
-  const [tab, setTab] = useState<(typeof TABS)[number]>("pending");
   const queue = useQuery({
-    queryKey: ["admin", "media", "requests", tab],
+    queryKey: ["admin", "media", "requests", tab, userId ?? null],
     queryFn: async () =>
-      (await api.GET("/api/v1/admin/media/requests", { params: { query: { state: tab } } }))
-        .data as unknown as {
+      (
+        await api.GET("/api/v1/admin/media/requests", {
+          params: { query: { state: tab, ...(userId ? { user_id: userId } : {}) } },
+        })
+      ).data as unknown as {
         items: QueueItem[];
       },
   });
@@ -121,19 +146,7 @@ export default function RequestsAdmin() {
   });
   const items = queue.data?.items ?? [];
   return (
-    <AdminPage
-      icon="inbox"
-      title={t("media:moderation.title")}
-      description={t("media:moderation.pitch")}
-      tabs={
-        <AdminTabs
-          label={t("media:moderation.title")}
-          current={tab}
-          onChange={(next) => setTab(next as (typeof TABS)[number])}
-          tabs={TABS.map((key) => ({ key, label: t(`media:moderation.tab.${key}`) }))}
-        />
-      }
-    >
+    <>
       {decide.isError ? (
         <p role="alert" className="quota-admin__error">
           {t("media:moderation.failed")}
@@ -211,6 +224,6 @@ export default function RequestsAdmin() {
           </li>
         ))}
       </ul>
-    </AdminPage>
+    </>
   );
 }
