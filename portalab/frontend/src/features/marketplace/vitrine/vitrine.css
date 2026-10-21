@@ -485,7 +485,7 @@
 
 /* --- a sale: a ribbon on the tile, its new price in the sale's colour, the sale's row set apart ----------- */
 .vitrine-tile[data-deal] {
-  --deal: var(--cal-incident);
+  --deal: color-mix(in srgb, var(--cal-incident) 60%, var(--state-error-fg));
 }
 .vitrine-tile[data-deal] .vitrine-tile__open {
   border-color: color-mix(in srgb, var(--deal) 55%, var(--color-border));
@@ -499,25 +499,20 @@
 }
 .vitrine-deal {
   position: absolute;
-  inset-block-end: 0;
-  inset-inline-start: 0;
+  inset-block-end: var(--space-2);
+  inset-inline-start: var(--space-2);
   z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: 0.2rem;
-  padding: 0.3rem 0.6rem 0.3rem 0.7rem;
-  border-end-start-radius: var(--radius-lg);
-  background: linear-gradient(
-    135deg,
-    var(--deal),
-    color-mix(in srgb, var(--deal) 70%, var(--rarity-legendary))
-  );
-  box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--deal) 90%, transparent);
+  gap: 0.15rem;
+  padding: 0.15rem 0.5rem 0.15rem 0.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--deal);
+  box-shadow: 0 2px 8px -2px color-mix(in srgb, var(--deal) 80%, transparent);
   color: var(--color-accent-contrast);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-variant-numeric: tabular-nums;
   font-weight: var(--font-weight-bold, 700);
-  letter-spacing: 0.01em;
 }
 /* the ribbon tells the percentage: the price keeps the struck one and the new one, in the sale's colour */
 .vitrine-tile .price-deal__badge {
@@ -542,17 +537,12 @@
   font-size: var(--font-size-xs);
 }
 .vitrine-rail[data-tone="deal"] {
-  --deal: var(--cal-incident);
+  --deal: color-mix(in srgb, var(--cal-incident) 60%, var(--state-error-fg));
   padding: var(--space-3) var(--space-3) var(--space-1);
   border: 1px solid color-mix(in srgb, var(--deal) 45%, var(--color-border));
   border-radius: var(--radius-xl);
   background:
     radial-gradient(28rem 10rem at 0% 0%, color-mix(in srgb, var(--deal) 30%, transparent), transparent 70%),
-    radial-gradient(
-      20rem 10rem at 100% 0%,
-      color-mix(in srgb, var(--rarity-legendary) 18%, transparent),
-      transparent
-    ),
     color-mix(in srgb, var(--color-surface-raised) 85%, transparent);
 }
 .vitrine-rail[data-tone="deal"] .vitrine-rail__head h2 > .ds-icon {
