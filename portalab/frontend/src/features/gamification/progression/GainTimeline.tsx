@@ -155,7 +155,9 @@ export function GainTimeline({ days, cumulative = false }: { days: number; cumul
                       : t(`gamification:value.${line.key}`)
                   }
                   stroke={line.color}
-                  strokeWidth={line.key === "xp" ? 2.5 : 1.8}
+                  strokeWidth={line.key === "xp" ? 2.5 : line.key === "contribution" ? 2.2 : 1.8}
+                  // issue 86: Contribution, small beside the others, keeps a line of its own — dashed
+                  strokeDasharray={line.key === "contribution" ? "5 3" : ""}
                   dot={false}
                   isAnimationActive={false}
                 />
