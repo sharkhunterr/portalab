@@ -407,6 +407,14 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
           <span>{t("marketplace:art.requests")}</span>
         </span>
       );
+    case "radio_requests": // issue 184: how many requests to the radio's DJ
+      return (
+        <span className="product-art__quota product-art__perk">
+          <Icon name="radio" size={size === "sheet" ? 40 : size === "mini" ? 14 : 24} />
+          <strong>+{String(preview.count ?? 1)}</strong>
+          <span>{t("marketplace:art.radioRequests", { count: Number(preview.count ?? 1) })}</span>
+        </span>
+      );
     case "ai_capacity": {
       // issue 173: the assistant's capacity — its tokens, big, or what it unlocks
       const perk = String(preview.perk ?? "");

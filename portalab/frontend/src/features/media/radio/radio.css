@@ -207,6 +207,17 @@
   opacity: 0.5;
   cursor: default;
 }
+.radio-ask__allowance {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.radio-ask__allowance a,
+.radio-ask__note a {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+}
 .radio-ask__note {
   grid-column: 1 / -1;
   margin: 0;

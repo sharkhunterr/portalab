@@ -39,6 +39,8 @@ class MediaConfig:
     # #20, #21: listening to audiobooks and reading books in the portal
     listening_enabled: bool = True
     reading_enabled: bool = True
+    # issue 184: requests to the radio's DJ — free ones each day, then credits bought in the shop
+    radio_free_requests_per_day: int = 3
 
 
 SETTINGS: dict[str, str] = {
@@ -57,6 +59,7 @@ SETTINGS: dict[str, str] = {
     "player_cast_base_url": "media.player.castBaseUrl",
     "listening_enabled": "media.listening.enabled",
     "reading_enabled": "media.reading.enabled",
+    "radio_free_requests_per_day": "media.radio.freeRequestsPerDay",
 }
 
 _DESCRIPTIONS = {
@@ -82,6 +85,8 @@ _DESCRIPTIONS = {
     "Grimmory), the player carrying on while they browse.",
     "reading_enabled": "Members may read books in the portal: EPUB, PDF and comic book archives (relayed "
     "from the library, Grimmory).",
+    "radio_free_requests_per_day": "Requests each member may make to the radio's DJ each day for free; "
+    "beyond, a credit bought in the shop is spent per request.",
 }
 
 

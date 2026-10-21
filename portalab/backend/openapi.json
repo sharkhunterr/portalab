@@ -14440,6 +14440,29 @@
         "title": "QuotaLimitsIn",
         "type": "object"
       },
+      "RadioAllowanceOut": {
+        "properties": {
+          "credits": {
+            "title": "Credits",
+            "type": "integer"
+          },
+          "free_left": {
+            "title": "Free Left",
+            "type": "integer"
+          },
+          "free_per_day": {
+            "title": "Free Per Day",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "free_per_day",
+          "free_left",
+          "credits"
+        ],
+        "title": "RadioAllowanceOut",
+        "type": "object"
+      },
       "RadioAskIn": {
         "properties": {
           "text": {
@@ -14457,6 +14480,16 @@
       },
       "RadioOut": {
         "properties": {
+          "allowance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RadioAllowanceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "available": {
             "title": "Available",
             "type": "boolean"
@@ -14554,6 +14587,16 @@
       },
       "RadioRequestOut": {
         "properties": {
+          "allowance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RadioAllowanceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "detail": {
             "anyOf": [
               {

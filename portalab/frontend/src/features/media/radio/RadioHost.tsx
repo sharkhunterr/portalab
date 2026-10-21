@@ -1,10 +1,20 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { Link } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { useListen } from "../listen/store";
-import { askRadio, coverUrl, type RadioRequest, type RadioTrack, radioRequest, useRadio } from "./api";
+import {
+  askRadio,
+  coverUrl,
+  RADIO_KEY,
+  type RadioRequest,
+  type RadioTrack,
+  radioRequest,
+  useRadio,
+} from "./api";
 import {
   closeRadio,
   expandRadio,
@@ -260,6 +270,9 @@ const POLL_FOR_MS = 90_000;
 /** Ask the DJ for a song, a vibe or « more like this » — followed until it is queued (or why not). */
 export function AskForm({ autoFocus = false }: { autoFocus?: boolean }) {
   const t = useT();
+  const client = useQueryClient();
+  const allowance = useRadio().data?.allowance ?? null;
+  const [noCredits, setNoCredits] = useState(false);
   const [text, setText] = useState("");
   const [request, setRequest] = useState<RadioRequest | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -286,9 +299,17 @@ export function AskForm({ autoFocus = false }: { autoFocus?: boolean }) {
       const answer = await askRadio(asked);
       setRequest(answer);
       if (answer.status !== "failed") setText("");
+      void client.invalidateQueries({ queryKey: RADIO_KEY }); // what is left to ask today
     } catch (caught) {
       const code = caught instanceof ApiError ? caught.code : null;
-      setError(code === "media.radio_too_soon" ? t("media:radio.tooSoon") : t("media:radio.askFailed"));
+      setNoCredits(code === "media.radio_no_credits");
+      setError(
+        code === "media.radio_too_soon"
+          ? t("media:radio.tooSoon")
+          : code === "media.radio_no_credits"
+            ? t("media:radio.noCredits")
+            : t("media:radio.askFailed"),
+      );
     } finally {
       setBusy(false);
     }
@@ -317,9 +338,30 @@ export function AskForm({ autoFocus = false }: { autoFocus?: boolean }) {
       >
         <Icon name="send" size={16} />
       </button>
+      {allowance ? (
+        <p className="radio-ask__allowance">
+          {t("media:radio.allowance", { free: allowance.free_left, credits: allowance.credits })}
+          {allowance.free_left === 0 && allowance.credits === 0 ? (
+            <>
+              {" "}
+              <Link to="/marketplace?type=radio_requests" onClick={() => expandRadio(false)}>
+                {t("media:radio.buyCredits")}
+              </Link>
+            </>
+          ) : null}
+        </p>
+      ) : null}
       {error ? (
         <p className="radio-ask__note" role="alert">
           {error}
+          {noCredits ? (
+            <>
+              {" "}
+              <Link to="/marketplace?type=radio_requests" onClick={() => expandRadio(false)}>
+                {t("media:radio.buyCredits")}
+              </Link>
+            </>
+          ) : null}
         </p>
       ) : request ? (
         <p className="radio-ask__note" role="status" data-status={request.status}>

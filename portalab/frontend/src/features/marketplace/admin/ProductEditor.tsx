@@ -581,6 +581,7 @@ export function NewProductDialog({
         return { deadline_days: deadline, service, ...(group.trim() ? { group: group.trim() } : {}) };
       case "streak_freeze":
       case "media_rescue":
+      case "radio_requests":
         return { count: units };
       case "xp_boost":
         return { factor, hours, values: ["xp"] };
@@ -880,6 +881,16 @@ export function NewProductDialog({
               type="number"
               min={1}
               max={30}
+              value={String(units)}
+              onChange={(e) => setUnits(Number(e.target.value))}
+            />
+          ) : null}
+          {type === "radio_requests" ? (
+            <TextField
+              label={t("marketplace:admin.radioRequests")}
+              type="number"
+              min={1}
+              max={500}
               value={String(units)}
               onChange={(e) => setUnits(Number(e.target.value))}
             />

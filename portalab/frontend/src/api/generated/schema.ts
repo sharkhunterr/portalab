@@ -15417,6 +15417,15 @@ export interface components {
             movie?: components["schemas"]["QuotaKindIn"];
             tv?: components["schemas"]["QuotaKindIn"];
         };
+        /** RadioAllowanceOut */
+        RadioAllowanceOut: {
+            /** Credits */
+            credits: number;
+            /** Free Left */
+            free_left: number;
+            /** Free Per Day */
+            free_per_day: number;
+        };
         /** RadioAskIn */
         RadioAskIn: {
             /** Text */
@@ -15424,6 +15433,7 @@ export interface components {
         };
         /** RadioOut */
         RadioOut: {
+            allowance?: components["schemas"]["RadioAllowanceOut"] | null;
             /** Available */
             available: boolean;
             current?: components["schemas"]["RadioTrackOut"] | null;
@@ -15449,6 +15459,7 @@ export interface components {
         };
         /** RadioRequestOut */
         RadioRequestOut: {
+            allowance?: components["schemas"]["RadioAllowanceOut"] | null;
             /** Detail */
             detail?: string | null;
             /** Id */

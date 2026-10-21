@@ -27,6 +27,7 @@ from portalab.capabilities.media_core import (
     CATALOG,
     HISTORY,
     QUOTA,
+    RADIO_CREDITS,
     RECOMMENDATIONS,
     RESCUES,
     DetailBlockRegistry,
@@ -274,7 +275,8 @@ class MediaModule:
             database, capabilities, self.catalog, self.request_insights, clock=clock
         )
         self.cleanup = CleanupService(database, capabilities, clock=clock)  # #57: Maintainerr's deletions
-        self.radio = RadioService(capabilities)  # issue 168: the homelab's radio (SUB/WAVE)
+        # issue 168: the homelab's radio (SUB/WAVE); 184: free requests each day, then credits
+        self.radio = RadioService(capabilities, database, lambda: self.config, clock=clock)
         self.requestable = RequestableCatalog(database, capabilities)  # #4: what one can ask for (Seerr)
         self.moderation = RequestModeration(self.requests)  # #4: administrators approve or decline
         self.ai_tools = MediaAiTools(  # issue 171: offered to the assistant, with a title's journey
@@ -407,6 +409,7 @@ class MediaModule:
             (HISTORY, self.history_reader),
             (QUOTA, self.quota),
             (RESCUES, self.cleanup),
+            (RADIO_CREDITS, self.radio),
             (RECOMMENDATIONS, self.recommender),
             (ACTIVITY, MediaActivityAttributes(self.database)),
         )

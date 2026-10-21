@@ -86,7 +86,11 @@ export const DEPARTMENTS: Department[] = [
       { key: "services", icon: "server", types: ["service_access"] }, // 027: a homelab service's access
       { key: "requests", icon: "clapperboard", types: ["special_request"] }, // 027: a film in 4K…
       { key: "community", icon: "lightbulb", types: ["project_launch"] },
-      { key: "perks", icon: "rocket", types: ["xp_boost", "streak_freeze", "media_rescue"] }, // #54/#55/#57
+      {
+        key: "perks",
+        icon: "rocket",
+        types: ["xp_boost", "streak_freeze", "media_rescue", "radio_requests"], // #54/#55/#57, issue 184
+      },
       { key: "assistant", icon: "brain", types: ["ai_capacity"] }, // issue 173: the assistant's capacities
       { key: "bonus", icon: "inbox", types: ["quota", "feature", "plugin", "access"] },
     ],

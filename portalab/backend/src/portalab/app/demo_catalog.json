@@ -2485,6 +2485,176 @@
     1,
     30
    ]
+  },
+  {
+   "key": "request_radio_station",
+   "type": "special_request",
+   "price": 5000,
+   "rarity": "legendary",
+   "names": {
+    "en": "Your own radio station",
+    "fr": "Votre radio personnalisée"
+   },
+   "descriptions": {
+    "en": "A radio station built for you on the homelab's radio: its name, its style, its mood and its DJ, on air for everyone. An administrator sets it up within two weeks; declined, your Coins come back.",
+    "fr": "Une station créée pour vous sur la radio du homelab : son nom, son style, son ambiance et son DJ, à l'antenne pour tout le monde. Un administrateur la met en place sous deux semaines ; refusée, vos Coins vous sont rendus."
+   },
+   "payload": {
+    "deadline_days": 14,
+    "form": [
+     {
+      "key": "name",
+      "type": "text",
+      "labels": {
+       "en": "Station name",
+       "fr": "Nom de la station"
+      },
+      "options": [],
+      "required": true
+     },
+     {
+      "key": "style",
+      "type": "choice",
+      "labels": {
+       "en": "Style",
+       "fr": "Style"
+      },
+      "options": [
+       "Rock",
+       "Pop",
+       "Electro",
+       "Hip-hop",
+       "Jazz",
+       "Classical",
+       "Soundtracks",
+       "Mixed"
+      ],
+      "required": true
+     },
+     {
+      "key": "music",
+      "type": "textarea",
+      "labels": {
+       "en": "What it plays (artists, albums, eras…)",
+       "fr": "Ce qu'elle diffuse (artistes, albums, époques…)"
+      },
+      "options": [],
+      "required": true
+     },
+     {
+      "key": "mood",
+      "type": "choice",
+      "labels": {
+       "en": "Mood",
+       "fr": "Ambiance"
+      },
+      "options": [
+       "Calm",
+       "Upbeat",
+       "Party",
+       "Focus",
+       "Night"
+      ],
+      "required": false
+     },
+     {
+      "key": "dj",
+      "type": "textarea",
+      "labels": {
+       "en": "Its DJ (name, personality, how they talk)",
+       "fr": "Son DJ (nom, personnalité, façon de parler)"
+      },
+      "options": [],
+      "required": false
+     },
+     {
+      "key": "notes",
+      "type": "textarea",
+      "labels": {
+       "en": "Anything else",
+       "fr": "Autre chose"
+      },
+      "options": [],
+      "required": false
+     }
+    ]
+   },
+   "collection": "essentials",
+   "icon": "radio",
+   "featured": true,
+   "level": 20,
+   "supply": null,
+   "limit": [
+    1,
+    60
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": 30,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "radio_requests_5",
+   "type": "radio_requests",
+   "price": 100,
+   "rarity": "common",
+   "names": {
+    "en": "5 radio requests",
+    "fr": "5 demandes radio"
+   },
+   "descriptions": {
+    "en": "Five more requests to the radio's DJ, once the day's free ones are used — kept until spent.",
+    "fr": "Cinq demandes de plus au DJ de la radio, une fois les gratuites du jour utilisées — gardées jusqu'à épuisement."
+   },
+   "payload": {
+    "count": 5
+   },
+   "collection": "essentials",
+   "icon": "radio",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": [
+    5,
+    30
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "radio_requests_20",
+   "type": "radio_requests",
+   "price": 300,
+   "rarity": "rare",
+   "names": {
+    "en": "20 radio requests",
+    "fr": "20 demandes radio"
+   },
+   "descriptions": {
+    "en": "Twenty requests to the radio's DJ — for the evenings you run the playlist. Cheaper than four packs of five.",
+    "fr": "Vingt demandes au DJ de la radio — pour les soirées où vous menez la playlist. Moins cher que quatre paquets de cinq."
+   },
+   "payload": {
+    "count": 20
+   },
+   "collection": "essentials",
+   "icon": "radio",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": [
+    2,
+    30
+   ],
+   "repeatable": true,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
   }
  ],
  "retired": [
