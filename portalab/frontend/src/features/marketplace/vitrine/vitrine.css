@@ -1,0 +1,648 @@
+/* TRIAL — the showcase (« vitrine »): another way through the shop, beside the classic one. Delete with its
+   folder (see VitrinePage.tsx). */
+
+.vitrine__layout {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-5);
+}
+
+.vitrine-count {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.4rem;
+  padding: 0 0.35rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 9%, transparent);
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+}
+
+/* --- the side rail: balance, search, departments and their shelves ---------------------------------------- */
+.vitrine-side {
+  position: sticky;
+  inset-block-start: calc(var(--header-height, 3.5rem) + var(--space-3));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-block-size: calc(100dvh - var(--header-height, 3.5rem) - var(--space-6));
+  overflow: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--glass-border, var(--color-border));
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--color-surface-raised) 88%, transparent);
+  backdrop-filter: blur(14px);
+  scrollbar-width: thin;
+}
+
+.vitrine-wallet {
+  display: grid;
+  gap: 0.35rem;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(
+      12rem 6rem at 100% 0%,
+      color-mix(in srgb, var(--color-accent-alt) 28%, transparent),
+      transparent
+    ),
+    color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+}
+.vitrine-wallet__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.vitrine-wallet .ds-coins {
+  justify-self: start;
+  font-size: var(--font-size-lg);
+}
+.vitrine-wallet__afford {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+.vitrine-wallet__afford:hover {
+  text-decoration: underline;
+}
+
+.vitrine-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.35rem var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+.vitrine-search:focus-within {
+  border-color: var(--color-accent);
+}
+.vitrine-search input {
+  flex: 1;
+  min-inline-size: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+}
+
+.vitrine-nav {
+  display: grid;
+  gap: 0.15rem;
+}
+.vitrine-nav__item,
+.vitrine-nav__shelves button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  inline-size: 100%;
+  padding: 0.4rem var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  text-align: start;
+  cursor: pointer;
+}
+.vitrine-nav__item > span:first-of-type,
+.vitrine-nav__shelves button > span:first-child {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vitrine-nav__item > .ds-icon {
+  color: var(--color-text-muted);
+}
+.vitrine-nav__item:hover,
+.vitrine-nav__shelves button:hover {
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+}
+.vitrine-nav__item[aria-current="page"],
+.vitrine-nav__shelves button[aria-current="page"] {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+}
+.vitrine-nav__item[aria-current="page"] > .ds-icon,
+.vitrine-nav__group[data-open] > .vitrine-nav__item > .ds-icon {
+  color: var(--color-accent);
+}
+.vitrine-nav__shelves {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0.15rem 0 0.35rem 1.1rem;
+  padding: 0 0 0 0.6rem;
+  border-inline-start: 1px solid var(--color-border);
+  list-style: none;
+}
+.vitrine-nav__shelves button {
+  padding-block: 0.28rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.vitrine-side__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  padding-block-start: var(--space-2);
+  border-block-start: 1px solid var(--color-border);
+}
+.vitrine-side__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-decoration: none;
+}
+.vitrine-side__links a:hover {
+  color: var(--color-accent);
+}
+
+.vitrine__main {
+  display: grid;
+  gap: var(--space-5);
+  min-inline-size: 0;
+}
+
+/* --- the spotlight --------------------------------------------------------------------------------------- */
+.vitrine-spotlight {
+  --rarity: var(--rarity-common);
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--rarity) 45%, var(--color-border));
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(
+      36rem 20rem at 15% 40%,
+      color-mix(in srgb, var(--rarity) 30%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      24rem 16rem at 100% 100%,
+      color-mix(in srgb, var(--color-accent-alt) 16%, transparent),
+      transparent
+    ),
+    var(--color-surface-raised);
+  box-shadow: var(--shadow-2);
+  transition: border-color 0.6s ease;
+}
+.vitrine-spotlight__slide {
+  display: grid;
+  grid-template-columns: minmax(12rem, 22rem) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-5);
+  animation: vitrine-in 0.5s var(--motion-easing, ease) both;
+}
+@keyframes vitrine-in {
+  from {
+    opacity: 0;
+    transform: translateX(1.2rem);
+  }
+}
+.vitrine-spotlight__art {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  box-shadow:
+    var(--shadow-3),
+    0 0 40px color-mix(in srgb, var(--rarity) 40%, transparent);
+}
+.vitrine-spotlight__art .product-poster,
+.vitrine-spotlight__art .lazy-art {
+  display: block;
+}
+.vitrine-spotlight__text {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+.vitrine-spotlight__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--rarity);
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.vitrine-spotlight__text h2 {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+  line-height: 1.15;
+}
+.vitrine-spotlight__text p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.vitrine-spotlight__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block-start: var(--space-1);
+}
+.vitrine-spotlight__thumbs {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.vitrine-spotlight__thumb {
+  --rarity: var(--rarity-common);
+  flex: none;
+  inline-size: 4.5rem;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  opacity: 0.6;
+  cursor: pointer;
+  transition:
+    opacity 0.2s ease,
+    border-color 0.2s ease;
+}
+.vitrine-spotlight__thumb:hover,
+.vitrine-spotlight__thumb[aria-pressed="true"] {
+  border-color: var(--rarity);
+  opacity: 1;
+}
+.vitrine-spotlight__thumb .lazy-art,
+.vitrine-spotlight__thumb .product-poster {
+  display: block;
+  pointer-events: none;
+}
+
+/* --- rails of picks --------------------------------------------------------------------------------------- */
+.vitrine-rail {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+.vitrine-rail__head,
+.vitrine-browse__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.vitrine-rail__head h2,
+.vitrine-browse__head h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+.vitrine-rail__head h2 > .ds-icon {
+  color: var(--color-accent);
+}
+.vitrine-rail__nav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.vitrine-rail__arrow {
+  display: grid;
+  place-items: center;
+  inline-size: 1.9rem;
+  block-size: 1.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+.vitrine-rail__arrow:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.vitrine-rail__list {
+  display: grid;
+  grid-auto-columns: minmax(10.5rem, 12.5rem);
+  grid-auto-flow: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0.25rem 0.1rem var(--space-2);
+  overflow-x: auto;
+  list-style: none;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+.vitrine-rail__list > li {
+  scroll-snap-align: start;
+}
+
+/* --- a tile ------------------------------------------------------------------------------------------------ */
+.vitrine-tile {
+  --rarity: var(--rarity-common);
+  position: relative;
+  min-inline-size: 0;
+}
+.vitrine-tile__open {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--rarity) 35%, var(--color-border));
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  text-decoration: none;
+  transition:
+    transform var(--motion-duration-normal, 0.2s) var(--motion-easing, ease),
+    box-shadow var(--motion-duration-normal, 0.2s) var(--motion-easing, ease),
+    border-color var(--motion-duration-normal, 0.2s) var(--motion-easing, ease);
+}
+.vitrine-tile__open:hover,
+.vitrine-tile__open:focus-visible {
+  border-color: var(--rarity);
+  box-shadow:
+    var(--shadow-3),
+    0 10px 30px -12px color-mix(in srgb, var(--rarity) 70%, transparent);
+  transform: translateY(-3px);
+}
+.vitrine-tile[data-soldout] .vitrine-tile__open {
+  filter: grayscale(0.7);
+  opacity: 0.7;
+}
+.vitrine-tile__art {
+  position: relative;
+  display: block;
+}
+.vitrine-tile__art::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  block-size: 40%;
+  background: linear-gradient(transparent, color-mix(in srgb, var(--color-surface-raised) 80%, transparent));
+  pointer-events: none;
+}
+.vitrine-tile__art .lazy-art,
+.vitrine-tile__art .product-poster {
+  display: block;
+}
+.vitrine-tile__flags {
+  position: absolute;
+  inset: 35% var(--space-2) auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem;
+  pointer-events: none;
+}
+.vitrine-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+  backdrop-filter: blur(6px);
+  color: var(--color-text);
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-semibold);
+}
+.vitrine-tile__meta {
+  display: grid;
+  gap: 0.2rem;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+}
+.vitrine-tile__kind {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vitrine-tile__gem {
+  flex: none;
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 2px;
+  background: var(--rarity);
+  box-shadow: 0 0 6px var(--rarity);
+  transform: rotate(45deg);
+}
+.vitrine-tile__name {
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vitrine-tile__price {
+  display: flex;
+  align-items: center;
+  min-block-size: 1.7rem;
+  margin-block-start: 0.15rem;
+}
+.vitrine-tile__mine {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--state-available-fg);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* --- browsing: shelves, sort and filters, the grid --------------------------------------------------------- */
+.vitrine-browse {
+  display: grid;
+  gap: var(--space-4);
+}
+.vitrine-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface-raised) 80%, transparent);
+}
+.vitrine-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.vitrine-sort select {
+  padding: 0.25rem var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+}
+.vitrine-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.vitrine-chips > button {
+  --rarity: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+.vitrine-chips > button[data-rarity="common"] {
+  --rarity: var(--rarity-common);
+}
+.vitrine-chips > button[data-rarity="rare"] {
+  --rarity: var(--rarity-rare);
+}
+.vitrine-chips > button[data-rarity="epic"] {
+  --rarity: var(--rarity-epic);
+}
+.vitrine-chips > button[data-rarity="legendary"] {
+  --rarity: var(--rarity-legendary);
+}
+.vitrine-chips > button:hover {
+  border-color: var(--color-accent);
+}
+.vitrine-chips > button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface));
+  font-weight: var(--font-weight-semibold);
+}
+.vitrine-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.vitrine-more {
+  display: flex;
+  justify-content: center;
+}
+
+/* a product in the side panel: wider than a plain drawer */
+.ds-drawer:has(.vitrine-sheet) {
+  inline-size: min(36rem, 100vw);
+  width: min(36rem, 100vw);
+}
+
+/* --- a narrow page: the rail on top, the departments in a row that scrolls -------------------------------- */
+@media (max-width: 64rem) {
+  .vitrine__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .vitrine-side {
+    position: static;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    max-block-size: none;
+    overflow: visible;
+    padding: var(--space-2);
+  }
+  .vitrine-wallet {
+    grid-template-columns: auto auto;
+    align-items: center;
+    padding: var(--space-2) var(--space-3);
+  }
+  .vitrine-wallet__label {
+    display: none;
+  }
+  .vitrine-wallet__afford {
+    grid-column: 1 / -1;
+  }
+  .vitrine-nav {
+    grid-column: 1 / -1;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .vitrine-nav__group {
+    display: contents;
+  }
+  .vitrine-nav__item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+  }
+  .vitrine-nav__shelves {
+    display: none;
+  }
+  .vitrine-side__links {
+    display: none;
+  }
+}
+@media (max-width: 40rem) {
+  .vitrine-spotlight__slide {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+  .vitrine-grid {
+    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+    gap: var(--space-2);
+  }
+  .vitrine-rail__arrow {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vitrine-spotlight__slide {
+    animation: none;
+  }
+  .vitrine-tile__open:hover {
+    transform: none;
+  }
+}
+:root[data-motion="none"] .vitrine-spotlight__slide {
+  animation: none;
+}
