@@ -14539,6 +14539,8 @@ export interface components {
             archived: boolean;
             /** Body */
             body: string;
+            /** Boost */
+            boost?: string | null;
             /** Category */
             category: string;
             /** Count */
@@ -14562,6 +14564,10 @@ export interface components {
             priority: "low" | "normal" | "high" | "critical";
             /** Read */
             read: boolean;
+            /** Rewards */
+            rewards?: components["schemas"]["NotificationRewardOut"][];
+            /** Subtitle */
+            subtitle?: string | null;
             /** Title */
             title: string;
             /** Updated At */
@@ -14596,6 +14602,13 @@ export interface components {
              * @enum {string}
              */
             digest: "off" | "daily" | "weekly";
+        };
+        /** NotificationRewardOut */
+        NotificationRewardOut: {
+            /** Amount */
+            amount: number;
+            /** Value */
+            value: string;
         };
         /** OnboardingStep */
         OnboardingStep: {

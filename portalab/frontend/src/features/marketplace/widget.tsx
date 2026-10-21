@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { CurrencyShort } from "../../design-system/site/SiteLook";
@@ -54,25 +55,64 @@ function FeaturedWidget({ payload, compact }: WidgetProps) {
       </>
     );
   return (
-    <div className="shop-window">
+    <>
       {open}
-      <ul className="shop-window__list">
-        {items.map((item) => (
-          <li key={item.key}>
-            <Link
-              className="shop-window__item"
-              data-rarity={item.rarity ?? "common"}
-              to={`/marketplace?product=${encodeURIComponent(item.key)}`}
-            >
-              <span className="shop-window__art" aria-hidden="true">
-                <Icon name={item.icon ?? TYPE_ICONS[item.type] ?? "shop"} size={26} />
-                {item.featured ? (
-                  <span className="shop-window__star">
-                    <Icon name="star" size={11} />
-                  </span>
-                ) : null}
-              </span>
-              <span className="shop-window__name">{item.name}</span>
+      <ShopCarousel items={items} />
+    </>
+  );
+}
+
+const EVERY_MS = 5000;
+
+/**
+ * Issue 185: the shop window as a carousel — one product at a time, filling the block (its art grows with
+ * the height), dots to pick one, turning by itself every few seconds (paused while pointed at or focused,
+ * never with reduced motion).
+ */
+function ShopCarousel({ items }: { items: Featured[] }) {
+  const t = useT();
+  const format = useFormat();
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const count = items.length;
+  useEffect(() => {
+    if (paused || count < 2) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => setIndex((i) => (i + 1) % count), EVERY_MS);
+    return () => window.clearInterval(timer);
+  }, [paused, count]);
+  if (!count) return null;
+  const shown = Math.min(index, count - 1);
+  return (
+    <section
+      className="shop-carousel"
+      aria-roledescription="carousel"
+      aria-label={t("marketplace:widget.featured.carousel")}
+      onPointerEnter={() => setPaused(true)}
+      onPointerLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+    >
+      <div className="shop-carousel__track" style={{ transform: `translateX(-${shown * 100}%)` }}>
+        {items.map((item, at) => (
+          <Link
+            key={item.key}
+            className="shop-carousel__slide"
+            data-rarity={item.rarity ?? "common"}
+            to={`/marketplace?product=${encodeURIComponent(item.key)}`}
+            aria-hidden={at !== shown || undefined}
+            tabIndex={at === shown ? 0 : -1}
+          >
+            <span className="shop-carousel__art" aria-hidden="true">
+              <Icon name={item.icon ?? TYPE_ICONS[item.type] ?? "shop"} size={36} />
+              {item.featured ? (
+                <span className="shop-window__star">
+                  <Icon name="star" size={11} />
+                </span>
+              ) : null}
+            </span>
+            <span className="shop-carousel__text">
+              <span className="shop-carousel__name">{item.name}</span>
               <span className="shop-window__meta">
                 <span className="shop-window__type">{productTypeLabel(t, item.type)}</span>
                 <span className="shop-window__price">
@@ -87,16 +127,25 @@ function FeaturedWidget({ payload, compact }: WidgetProps) {
                   )}
                 </span>
               </span>
-            </Link>
-          </li>
+            </span>
+          </Link>
         ))}
-      </ul>
-      <Link className="shop-window__all" to="/marketplace">
-        <Icon name="shop" size={16} />
-        {t("marketplace:widget.featured.all", { count: data.total ?? items.length })}
-        <Icon name="chevron-right" size={14} />
-      </Link>
-    </div>
+      </div>
+      {count > 1 ? (
+        <div className="shop-carousel__dots">
+          {items.map((item, at) => (
+            <button
+              key={item.key}
+              type="button"
+              className="shop-carousel__dot"
+              aria-current={at === shown || undefined}
+              aria-label={t("marketplace:widget.featured.slide", { n: at + 1, total: count })}
+              onClick={() => setIndex(at)}
+            />
+          ))}
+        </div>
+      ) : null}
+    </section>
   );
 }
 

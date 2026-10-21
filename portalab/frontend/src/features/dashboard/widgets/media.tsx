@@ -374,6 +374,11 @@ function Stats({ payload, compact }: WidgetProps) {
   }
   return (
     <div className="widget-media-stats">
+      {/* the way to all of them, in the header: the chart keeps the block's height */}
+      <WidgetHeaderLink
+        to={`/media/insights${data.scope === "all" ? "?scope=all" : ""}`}
+        label={t("media:widget.stats.all")}
+      />
       <p className="widget-media-stats__context">{context}</p>
       <div className="widget-media-stats__figures">
         <p data-main>
@@ -438,12 +443,6 @@ function Stats({ payload, compact }: WidgetProps) {
           })}
         </ol>
       ) : null}
-      <Link
-        to={`/media/insights${data.scope === "all" ? "?scope=all" : ""}`}
-        className="widget-media-stats__more"
-      >
-        {t("media:widget.stats.more")}
-      </Link>
     </div>
   );
 }
