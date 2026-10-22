@@ -945,7 +945,7 @@ export function DetailPage() {
         {/* 030: what plugins add to a title's page (« + Playlist »…), drawn by Portalab */}
         <PluginSlot name="media.actions" params={{ item: media.id }} />
       </TitleHero>
-      <LeavingNotice objectId={media.id} />
+      <LeavingNotice objectId={media.id} title={media.title} />
       <RequestJourney objectId={media.id} title={media.title} />
       {metadata.data ? (
         <Enrichment objectId={media.id} />
