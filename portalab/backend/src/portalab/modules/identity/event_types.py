@@ -30,3 +30,6 @@ register_event_types(  # automations may welcome newly verified members (019)
 register_event_types(
     OWNER, "user.signed_in", "user.signed_out", retention_class="technical", visibility_class="private"
 )
+register_event_types(  # 027: came today (once a day, a session kept open included) — daily quests
+    OWNER, "user.visited", retention_class="technical", visibility_class="private"
+)

@@ -386,6 +386,7 @@
   "quests.completed": "Completed",
   "quests.empty": "No quest open right now.",
   "quests.endsAt": "Ends {date}",
+  "quests.gift": "🎁 {gift}",
   "quests.kind.challenge": "Challenge",
   "quests.kind.daily": "Daily objective",
   "quests.kind.daily_month": "Monthly objective",

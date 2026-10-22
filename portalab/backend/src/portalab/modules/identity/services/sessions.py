@@ -104,14 +104,19 @@ class SessionService:
         await session.flush()
         return IssuedSession(row.id, token, csrf_token_for(token), row.expires_at)
 
-    async def resolve(self, session: AsyncSession, token: str, now: datetime) -> UserSession | None:
-        """The live session for ``token`` (sliding idle expiry), or ``None``."""
+    async def resolve(
+        self, session: AsyncSession, token: str, now: datetime, *, seen: list[datetime] | None = None
+    ) -> UserSession | None:
+        """The live session for ``token`` (sliding idle expiry), or ``None``; ``seen`` receives the previous
+        activity when it moves (027: a new day's first request is a visit)."""
         row = (
             await session.execute(select(UserSession).where(UserSession.token_hash == hash_token(token)))
         ).scalar_one_or_none()
         if row is None or row.revoked_at is not None or row.expires_at <= now:
             return None
         if now - row.last_seen_at >= LAST_SEEN_GRANULARITY:
+            if seen is not None:
+                seen.append(row.last_seen_at)
             row.last_seen_at = now
             row.expires_at = self._expiry(row.created_at, now)
         return row

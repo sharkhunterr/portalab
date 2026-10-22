@@ -212,3 +212,59 @@ async def test_completions_count_for_other_quests_and_achievements(gm: GamHarnes
             text("SELECT count(*) FROM gamification.user_achievements WHERE achievement_key = 'runner'")
         )
     assert unlocked == 1
+
+
+async def test_a_quest_gives_a_booster_and_counts_only_who_wears_the_interface(gm: GamHarness) -> None:
+    """027: ``unlocks`` — shop products given once the quest completes (a sealed booster…); ``requires`` —
+    only members who chose one of the values themselves (a Christmas interface); the default never counts."""
+    from types import SimpleNamespace
+
+    from portalab.capabilities.config import CAPABILITY as CONFIG
+    from portalab.capabilities.config import EffectiveValue
+    from portalab.capabilities.marketplace import GIFTS
+
+    given: list[tuple[str, str]] = []
+    worn: dict[str, tuple[str, str]] = {}
+
+    class Gifts:
+        async def gift(self, user: Any, product_key: str, reason: str) -> bool:
+            given.append((str(user), product_key))
+            return True
+
+    class Settings:
+        async def get(self, key: str, *, user_id: Any = None, **_: Any) -> EffectiveValue:
+            value, source = worn.get(str(user_id), ("default_theme", "default"))
+            return EffectiveValue(key, value, source)  # type: ignore[arg-type]
+
+    caps = gm.module.quests.capabilities
+    original = caps.system_providers
+
+    def providers(name: str) -> Any:
+        if name == GIFTS:
+            return [SimpleNamespace(provider=Gifts())]
+        if name == CONFIG:
+            return [SimpleNamespace(provider=Settings())]
+        return original(name)
+
+    caps.system_providers = providers  # type: ignore[method-assign]
+    try:
+        await gm.module.quests.save(
+            SYSTEM,
+            "dressed",
+            quest(
+                "daily",
+                period="day",
+                requires=[{"kind": "setting_in", "setting": "ui.theme", "values": ["christmas"]}],
+                unlocks=[{"product": "booster_christmas", "kind": "booster", "label": "Christmas booster"}],
+            ),
+        )
+        gm.clock.advance(timedelta(minutes=1))
+        ursula, ulrich = gm.people["ursula"], gm.people["ulrich"]
+        worn[str(ursula)] = ("christmas", "user")
+        worn[str(ulrich)] = ("christmas", "default")  # the portal's default: not chosen, does not count
+        await gm.emit(ursula)
+        await gm.emit(ulrich)
+        assert [q for q, _ in await completions(gm)] == ["dressed"]
+        assert given == [(str(ursula), "booster_christmas")]
+    finally:
+        caps.system_providers = original  # type: ignore[method-assign]

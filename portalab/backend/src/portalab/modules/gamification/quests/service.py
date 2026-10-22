@@ -20,6 +20,7 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.economy import DEFINITION_SOURCES
 from portalab.capabilities.events import Envelope
 from portalab.capabilities.registry import CapabilityRegistry
@@ -227,9 +228,28 @@ class Quests:
             ]
             if not hits:
                 continue
+            if quest.definition.requires and not await self._meets(user, quest.definition):
+                continue
             period = period_key(quest.definition.period, at, timezone)
             notes.extend(await self._advance(session, user, quest, period, hits, at))
         return notes
+
+    async def _meets(self, user: UUID, definition: QuestDefinition) -> bool:
+        """027: every ``requires`` holds for this member — a value they chose themselves (the portal's default
+        does not count); unknown (no settings reader, slow, failing) means it does not."""
+        try:
+            providers = self.capabilities.system_providers(CONFIG)
+            if not providers:
+                return False
+            for need in definition.requires:
+                chosen = await asyncio.wait_for(
+                    providers[0].provider.get(need.setting, user_id=user), timeout=2
+                )
+                if chosen.source != "user" or str(chosen.value) not in need.values:
+                    return False
+        except Exception:
+            return False
+        return True
 
     async def _advance(
         self,
@@ -280,7 +300,19 @@ class Quests:
             "coins": 0,
             "contribution": 0,
         }
-        notes = [Note("quest", user, f"quest:{user}:{quest.key}:{period}", said)]
+        if (
+            quest.definition.unlocks
+        ):  # said in the notification; given (sealed, to the reserve) once committed
+            said["gifts"] = ", ".join(u.label for u in quest.definition.unlocks)
+        notes = [
+            Note(
+                "quest",
+                user,
+                f"quest:{user}:{quest.key}:{period}",
+                said,
+                gifts=tuple(u.product for u in quest.definition.unlocks),
+            )
+        ]
         for reward in quest.definition.rewards:
             recorded = await self.writer.record(
                 session,
@@ -372,6 +404,7 @@ class Quests:
                 else (quest.ends_at.isoformat() if quest.ends_at else None)
             ),
             "rewards": [r.model_dump() for r in definition.rewards],
+            "gifts": [u.label for u in definition.unlocks],  # 027: what it gives from the shop (a booster…)
         }
 
     async def catalog(self) -> list[dict[str, Any]]:

@@ -386,6 +386,7 @@
   "quests.completed": "Terminé",
   "quests.empty": "Aucune quête ouverte pour l'instant.",
   "quests.endsAt": "Se termine le {date}",
+  "quests.gift": "🎁 {gift}",
   "quests.kind.challenge": "Défi",
   "quests.kind.daily": "Objectif du jour",
   "quests.kind.daily_month": "Objectif du mois",
