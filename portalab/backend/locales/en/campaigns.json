@@ -19,6 +19,7 @@
   "admin.state": "State: {state} · version {version}",
   "admin.title": "Campaigns",
   "admin.verdict.audience": "outside the audience",
+  "admin.verdict.covered": "already rewarded by another bonus of the campaign",
   "admin.verdict.match": "applies",
   "admin.verdict.no_match": "does not apply",
   "admin.verdict.unknown": "unknown attributes (not applied)",

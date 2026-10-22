@@ -18,7 +18,7 @@ async def test_combined_and_capped(cm: CampHarness) -> None:
             "names": {"en": "Spooky week"},
             "timezone": "Europe/Paris",
             "schedule": {"start_at": "2026-10-24T00:00:00", "end_at": "2026-10-31T00:00:00"},
-            "modifiers": [{"id": "all_xp", "value": "xp", "factor": 1.5}],
+            "modifiers": [{"id": "all_xp", "value": "xp", "factor": 2.5}],
         },
     )
     rule = await cm.gamification.rules.save(
@@ -33,8 +33,9 @@ async def test_combined_and_capped(cm: CampHarness) -> None:
     await cm.gamification.rules.publish(SYSTEM, "watch", rule.version)
     await cm.at(later(paris(10, 24, 0), minutes=1))
     user = cm.people["ursula"]
-    await cm.play(user, "m1", paris(10, 25, 21))  # 1.2 · 2 · 2 · 1.5 = 7.2 → capped at 5
-    await cm.play(user, "m2", paris(10, 25, 22))  # comedy: 1.2 · 1.5 = 1.8
+    # issue 223: the horror genre and the title are Halloween's themed bonuses — the film earns one of them
+    await cm.play(user, "m1", paris(10, 25, 21))  # 1.2 · 2 · 2.5 = 6 → capped at 5
+    await cm.play(user, "m2", paris(10, 25, 22))  # comedy: 1.2 · 2.5 = 3
     async with cm.database.session() as session:
         rows = (
             await session.execute(
@@ -46,11 +47,10 @@ async def test_combined_and_capped(cm: CampHarness) -> None:
     assert {m["source_ref"] for m in xp.modifiers["applied"]} == {
         "rule",
         "campaign:halloween:1:horror_xp",
-        "campaign:halloween:1:title_xp",
         "campaign:spooky_week:1:all_xp",
     }
     assert (coins.delta, float(coins.multiplier)) == (18, 1.8)
-    assert (comedy_xp.delta, comedy_coins.delta) == (18, 12)
+    assert (comedy_xp.delta, comedy_coins.delta) == (30, 12)
     async with cm.database.session() as session:
         event = (
             (

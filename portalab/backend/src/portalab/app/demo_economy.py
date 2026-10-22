@@ -296,6 +296,27 @@ FORMER_LEVEL_REWARDS: list[dict[str, Any]] = [
 
 # --- seasonal campaigns ------------------------------------------------------------------------------------
 HORROR = ["horreur", "horror", "thriller", "épouvante", "épouvante-horreur", "horror fiction"]
+# films and series that say Halloween « and co » by their title or the metadata provider's keywords
+SPOOKY_TITLES = ["halloween", "sorcière", "citrouille", "fantôme"]
+SPOOKY_KEYWORDS = [
+    "halloween",
+    "trick or treat",
+    "jack-o'-lantern",
+    "pumpkin",
+    "witch",
+    "haunted house",
+    "ghost",
+    "zombie",
+    "vampire",
+    "werewolf",
+    "frankenstein",
+    "dracula",
+    "monster",
+    "skeleton",
+    "day of the dead",
+    "samhain",
+    "costume party",
+]
 WATCHED = ["media.playback_finished"]
 
 
@@ -313,7 +334,8 @@ def campaigns(today: date) -> dict[str, dict[str, Any]]:
         "halloween": {
             "names": {"fr": "Halloween", "en": "Halloween"},
             "description": "Frissons garantis : films, séries, livres et livres audio d'horreur ou thrillers "
-            "rapportent double XP et double Coins, et la boutique d'Halloween est à -20 %.",
+            "rapportent double XP et double Coins, tout comme les films et séries d'Halloween (sorcières, "
+            "fantômes, citrouilles…), et la boutique d'Halloween est à -20 %.",
             "timezone": "Europe/Paris",
             "schedule": {
                 "start_at": f"{halloween}-10-20T00:00:00",
@@ -339,6 +361,16 @@ def campaigns(today: date) -> dict[str, dict[str, Any]]:
                         "activity": WATCHED,
                         "media_kind": ["movie", "series", "episode", "book", "audiobook"],
                         "genre": HORROR,
+                    },
+                },
+                {  # or by its title or keywords: one bonus per title (issue 223), not on top of the genres
+                    "id": "halloween_themed",
+                    "gains": [{"value": "xp", "factor": 2}, {"value": "coins", "factor": 2}],
+                    "when": {
+                        "activity": WATCHED,
+                        "media_kind": ["movie", "series", "episode"],
+                        "title_contains": SPOOKY_TITLES,
+                        "keyword": SPOOKY_KEYWORDS,
                     },
                 },
             ],
