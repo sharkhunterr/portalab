@@ -11,6 +11,7 @@ import pytest
 from portalab.capabilities.ai import MODELS
 from portalab.capabilities.connector_sdk import SourceRecord
 from portalab.capabilities.media import (
+    ARTWORK,
     CLEANUP,
     ITEM_LINKS,
     LIBRARY,
@@ -22,6 +23,7 @@ from portalab.capabilities.media import (
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.arr import RadarrConnector, SonarrConnector
 from portalab.connectors.builtin import builtin_connectors, register_builtin
+from portalab.connectors.fanart import FanartConnector
 from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.http_base import parse_time, safe_id
 from portalab.connectors.jellyfin import JellyfinConnector
@@ -175,6 +177,7 @@ def test_builtin_catalog_registers_once() -> None:
         "tautulli",
         "grimmory",
         "tmdb",
+        "fanart",  # issue 229: films' and series' artwork
         "qbittorrent",  # 027: torrent clients behind the download managers
         "deluge",
         "authentik",  # 027: the single sign-on, for services' access
@@ -317,3 +320,25 @@ async def test_ollama_models_and_endpoint() -> None:
     assert (models[0].loaded, models[0].tools, models[0].embedding) == (False, None, False)
     assert models[2].embedding
     assert not connector.looks_like_us({"status": "ok"}) and connector.looks_like_us({"version": "0.1"})
+
+
+async def test_fanart_artwork() -> None:
+    """Issue 229: a film's artwork by its TMDB id, a series' by its TVDB id — the kind, no language when no
+    text is on it, the likes; an image on another host is never kept; unknown to fanart.tv: nothing."""
+    seen: list[httpx.Request] = []
+    service = handle_for("fanart", seen=seen)
+    connector = FanartConnector()
+    assert (await connector.test_connection(service)).ok
+    art = connector.provider(ARTWORK, service)
+    film = await art.artwork("movie", {"tmdb": "550", "imdb": "tt0137523"})
+    assert [(a.kind, a.lang, a.likes) for a in film] == [
+        ("background", None, 7),
+        ("background", "en", 2),
+        ("clearart", None, 4),
+    ]
+    assert film[0].image == "/fanart/movies/550/moviebackground/fc-1.jpg"
+    assert seen[-1].url.params["api_key"] == "fanart-secret-key"
+    series = await art.artwork("series", {"tmdb": "1399", "tvdb": "121361"})
+    assert [(a.kind, a.image) for a in series] == [("character", "/fanart/tv/121361/characterart/got-5.png")]
+    assert await art.artwork("movie", {"tmdb": "999999"}) == []
+    assert await art.artwork("series", {"tmdb": "1"}) == []  # a series without its TVDB id

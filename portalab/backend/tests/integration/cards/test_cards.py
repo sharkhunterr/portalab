@@ -11,8 +11,10 @@ from uuid import UUID, uuid4
 import pytest
 
 from portalab.capabilities.catalog import new_registry
+from portalab.capabilities.media import ARTWORK, Artwork
 from portalab.capabilities.media_core import CARD_SOURCES, CardImage, CardPerson, CardWork
 from portalab.core.db import Database
+from portalab.modules.cards.artwork import FanArt
 from portalab.modules.cards.generator import CardForge, plan, set_code
 from portalab.modules.cards.models import Card, CardSet, Copy
 from portalab.modules.cards.packs import Packs, variant_for
@@ -196,3 +198,39 @@ async def test_an_actor_shows_their_character(database: Database) -> None:
     # a poster shows the lead, whoever it is tagged with: never an actor's art
     assert best([CardImage("w", "/poster.jpg", "poster", 0.67, 9.0)]) == (None, None)
     assert await roles.run() == 0 and len(sources.asked) == 2  # kept: never looked for again
+
+
+class Art:
+    def __init__(self) -> None:
+        self.asked: list[tuple[str, dict[str, str]]] = []
+
+    async def artwork(self, kind: str, ids: Any) -> list[Artwork]:
+        self.asked.append((kind, dict(ids)))
+        return [
+            Artwork("background", "/fanart/movies/1/moviebackground/en.jpg", "en", 50),  # text on it
+            Artwork("thumb", "/fanart/movies/1/moviethumb/t.jpg", None, 90),
+            Artwork("background", "/fanart/movies/1/moviebackground/a.jpg", None, 3),
+            Artwork("background", "/fanart/movies/1/moviebackground/b.jpg", None, 8),
+            Artwork("poster", "/fanart/movies/1/movieposter/titled.jpg", "en", 99),  # its title on it
+        ]
+
+    async def fetch_artwork(self, ref: str, preview: bool = False) -> bytes:
+        return b""
+
+
+async def test_a_works_borderless_art_from_an_art_site(database: Database) -> None:
+    capabilities = new_registry()
+    film = work("Top Gun: Maverick", 11000, "US", ["Tom Cruise"])
+    film = replace(film, ids={"tmdb": "361743", "imdb": "tt1745960"})
+    capabilities.provide(CARD_SOURCES, Sources([film]), instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    fan = FanArt(database, capabilities)
+    assert await fan.run() == 0  # no art site connected: nothing marked
+    art = Art()
+    capabilities.provide(ARTWORK, art, instance_ref="fanart", owner="test")
+    assert await fan.run() == 1
+    assert art.asked == [("movie", {"imdb": "tt1745960", "tmdb": "361743"})]
+    async with database.session() as session:
+        title = (await session.execute(Card.__table__.select().where(Card.kind == "title"))).one()
+    assert title.fan_art == "/fanart/movies/1/moviebackground/b.jpg"  # textless background, the best liked
+    assert await fan.run() == 0 and len(art.asked) == 1  # kept: never asked again

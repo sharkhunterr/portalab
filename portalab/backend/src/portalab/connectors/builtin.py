@@ -3,6 +3,7 @@
 from portalab.capabilities.connector_sdk import Connector, ConnectorRegistry
 from portalab.connectors.arr import RadarrConnector, SonarrConnector
 from portalab.connectors.authentik import AuthentikConnector
+from portalab.connectors.fanart import FanartConnector
 from portalab.connectors.glances import GlancesConnector
 from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.jellyfin import JellyfinConnector
@@ -31,6 +32,7 @@ def builtin_connectors() -> list[Connector]:
         TautulliConnector(),
         GrimmoryConnector(),
         TmdbConnector(),
+        FanartConnector(),  # issue 229: films' and series' artwork (the cards' borderless alternatives)
         QBittorrentConnector(),
         DelugeConnector(),
         AuthentikConnector(),  # 027: the single sign-on — accounts and the groups opening each service

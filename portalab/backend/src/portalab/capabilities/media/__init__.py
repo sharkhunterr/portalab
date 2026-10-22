@@ -56,6 +56,7 @@ AUDIO = "media.audio"  # #20: audiobooks (then music) played in the portal, rela
 READING = "media.reading"  # #21: books read in the portal (EPUB, PDF, comic book archives)
 RADIO = "media.radio"  # issue 168: a radio station of the homelab — listen, see what plays, ask for a song
 CLEANUP = "media.cleanup"  # #57: titles a cleanup tool will delete, and keeping one (Maintainerr)
+ARTWORK = "media.artwork"  # issue 229: a work's artwork from an art site (fanart.tv): backgrounds, clearart…
 REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the request service (Seerr)
 REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
 PEOPLE = "media.people"  # #92: what a service knows of a person — biography, portrait, filmography
@@ -668,6 +669,27 @@ class RoleImage:
     votes: float
 
 
+@dataclass(frozen=True, slots=True)
+class Artwork:
+    """Issue 229: a work's artwork — its ``kind`` (background, thumb, clearart, character, logo, poster), a
+    reference served by its provider, its language (``None``: no text on it) and how liked it is."""
+
+    kind: str
+    image: str
+    lang: str | None
+    likes: int
+
+
+@runtime_checkable
+class ArtworkProvider(Protocol):
+    """Issue 229: a work's artwork from an art site, found by the ids the portal knows (a film by ``tmdb`` or
+    ``imdb``, a series by ``tvdb``); ``fetch_artwork`` returns one image's bytes."""
+
+    async def artwork(self, kind: str, ids: Mapping[str, str]) -> Sequence[Artwork]: ...
+
+    async def fetch_artwork(self, ref: str, preview: bool = False) -> bytes: ...
+
+
 @runtime_checkable
 class PeopleProvider(Protocol):
     """#92 — what a service knows of a person (TMDB, Seerr: biography and filmography; Jellyfin: biography
@@ -1123,6 +1145,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(READING, MediaReading, "Read a book in the portal: EPUB, PDF, comic book archives (#21)"),
     _spec(RADIO, RadioStation, "A radio station of the homelab: listen, what plays, ask for a song (168)"),
     _spec(CLEANUP, MediaCleanup, "Titles a cleanup tool will delete, and keeping one (#57)"),
+    _spec(ARTWORK, ArtworkProvider, "A work's artwork from an art site: backgrounds, clearart (229)"),
     _spec(REQUEST_QUOTAS, RequestQuotas, "Each account's request limits on the request service (#3)"),
     _spec(REQUEST_DISCOVERY, RequestDiscovery, "Titles one can ask for: search, shelves, details (#4)"),
     _spec(PEOPLE, PeopleProvider, "What a service knows of a person: biography, portrait, titles (#92)"),

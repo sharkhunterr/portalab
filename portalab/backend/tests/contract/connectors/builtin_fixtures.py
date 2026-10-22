@@ -491,6 +491,51 @@ OLLAMA: Routes = {
     "/api/ps": {"models": [{"name": "qwen3:8b", "size": 6295440588, "size_vram": 6295440588}]},
 }
 
+# issue 229: fanart.tv — a film's artwork (a textless background, an English one, clearart, an image on
+# another host: skipped), a series' characters
+FANART: Routes = {
+    "/v3/movies/550": {
+        "name": "Fight Club",
+        "tmdb_id": "550",
+        "moviebackground": [
+            {
+                "id": "1",
+                "url": "https://assets.fanart.tv/fanart/movies/550/moviebackground/fc-1.jpg",
+                "lang": "",
+                "likes": "7",
+            },
+            {
+                "id": "2",
+                "url": "https://assets.fanart.tv/fanart/movies/550/moviebackground/fc-2.jpg",
+                "lang": "en",
+                "likes": "2",
+            },
+        ],
+        "hdmovieclearart": [
+            {
+                "id": "3",
+                "url": "https://assets.fanart.tv/fanart/movies/550/hdmovieclearart/fc-3.png",
+                "lang": "00",
+                "likes": "4",
+            }
+        ],
+        "movieposter": [
+            {"id": "4", "url": "https://elsewhere.example/poster.jpg", "lang": "en", "likes": "9"}
+        ],
+    },
+    "/v3/tv/121361": {
+        "name": "Game of Thrones",
+        "characterart": [
+            {
+                "id": "5",
+                "url": "https://assets.fanart.tv/fanart/tv/121361/characterart/got-5.png",
+                "lang": "",
+                "likes": "3",
+            }
+        ],
+    },
+}
+
 SECRETS = {
     "jellyfin": {"api_key": "jf-secret-key"},
     "plex": {"token": "plex-secret-token"},
@@ -501,6 +546,7 @@ SECRETS = {
     "tautulli": {"api_key": "tautulli-secret-key"},
     "grimmory": {"password": "grimmory-secret-pass"},
     "tmdb": {"api_key": "tmdb-secret-key"},
+    "fanart": {"api_key": "fanart-secret-key"},
     "authentik": {"api_token": "authentik-secret-token"},
     "maintainerr": {},
     "ollama": {},
@@ -515,6 +561,7 @@ ROUTES = {
     "tautulli": TAUTULLI,
     "grimmory": GRIMMORY,
     "tmdb": TMDB,
+    "fanart": FANART,
     "authentik": AUTHENTIK,
     "maintainerr": MAINTAINERR,
     "ollama": OLLAMA,
