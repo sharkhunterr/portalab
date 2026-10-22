@@ -61,13 +61,13 @@ function AccountView({ me }: { me: Me }) {
 
 function passwordMessage(error: unknown, t: ReturnType<typeof useT>): string {
   if (error instanceof ApiError) {
-    if (error.code === "identity.password_current_wrong") return t("account:password.wrong");
-    if (error.code === "identity.password_unchanged") return t("account:password.unchanged");
-    if (error.code === "identity.password_not_local") return t("account:password.notLocal");
+    if (error.code === "identity.password_current_wrong") return t("account:signInPhrase.wrong");
+    if (error.code === "identity.password_unchanged") return t("account:signInPhrase.unchanged");
+    if (error.code === "identity.password_not_local") return t("account:signInPhrase.notLocal");
     if (error.code === "user.password_invalid")
-      return t("account:password.policy", { min: Number(error.extensions.min_length ?? 12) });
+      return t("account:signInPhrase.policy", { min: Number(error.extensions.min_length ?? 12) });
     if (error.code === "auth.throttled")
-      return t("account:password.throttled", {
+      return t("account:signInPhrase.throttled", {
         minutes: Math.max(1, Math.ceil(Number(error.extensions.retry_after_seconds ?? 60) / 60)),
       });
   }
@@ -96,7 +96,7 @@ function PasswordSection({ hasPassword }: { hasPassword: boolean }) {
   });
   if (!hasPassword) {
     return (
-      <SettingsCard icon="key" title={t("account:password.title")} hint={t("account:password.notLocal")}>
+      <SettingsCard icon="key" title={t("account:signInPhrase.title")} hint={t("account:signInPhrase.notLocal")}>
         {null}
       </SettingsCard>
     );
@@ -106,18 +106,18 @@ function PasswordSection({ hasPassword }: { hasPassword: boolean }) {
     if (!mismatch) mutation.mutate();
   };
   return (
-    <SettingsCard icon="key" title={t("account:password.title")} hint={t("account:password.hint")}>
+    <SettingsCard icon="key" title={t("account:signInPhrase.title")} hint={t("account:signInPhrase.hint")}>
       <form onSubmit={submit} className="account-password">
         {mutation.isError ? (
           <FormMessage kind="error">{passwordMessage(mutation.error, t)}</FormMessage>
         ) : null}
         {mutation.isSuccess ? (
           <FormMessage kind="success">
-            {t("account:password.changed", { count: mutation.data?.other_sessions_signed_out ?? 0 })}
+            {t("account:signInPhrase.changed", { count: mutation.data?.other_sessions_signed_out ?? 0 })}
           </FormMessage>
         ) : null}
         <TextField
-          label={t("account:password.current")}
+          label={t("account:signInPhrase.current")}
           type="password"
           autoComplete="current-password"
           required
@@ -125,7 +125,7 @@ function PasswordSection({ hasPassword }: { hasPassword: boolean }) {
           onChange={(event) => setCurrent(event.target.value)}
         />
         <TextField
-          label={t("account:password.new")}
+          label={t("account:signInPhrase.new")}
           type="password"
           autoComplete="new-password"
           required
@@ -133,12 +133,12 @@ function PasswordSection({ hasPassword }: { hasPassword: boolean }) {
           onChange={(event) => setNext(event.target.value)}
         />
         <TextField
-          label={t("account:password.again")}
+          label={t("account:signInPhrase.again")}
           type="password"
           autoComplete="new-password"
           required
           value={again}
-          error={mismatch ? t("account:password.mismatch") : undefined}
+          error={mismatch ? t("account:signInPhrase.mismatch") : undefined}
           onChange={(event) => setAgain(event.target.value)}
         />
         <div className="settings-actions">
@@ -148,7 +148,7 @@ function PasswordSection({ hasPassword }: { hasPassword: boolean }) {
             aria-busy={mutation.isPending}
           >
             <Icon name="key" size={16} />
-            {t("account:password.submit")}
+            {t("account:signInPhrase.submit")}
           </Button>
         </div>
       </form>
