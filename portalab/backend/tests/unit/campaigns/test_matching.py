@@ -112,3 +112,16 @@ def test_a_season_discount_covers_every_product_of_the_season() -> None:
     assert best_discount([christmas], "badge_elf", None, "christmas") is christmas
     assert best_discount([christmas], "badge_bat", None, "halloween") is None
     assert best_discount([christmas], "badge_elf", None) is None
+
+
+def test_one_bonus_multiplies_several_values() -> None:
+    from portalab.modules.campaigns.definitions.schema import ModifierDef
+
+    both = ModifierDef(id="xmas", gains=[{"value": "xp", "factor": 2}, {"value": "coins", "factor": 1.5}])
+    assert [(g.value, g.factor) for g in both.all_gains()] == [("xp", 2.0), ("coins", 1.5)]
+    older = ModifierDef(id="festive", value="xp", factor=1.5)  # one value, as before
+    assert [(g.value, g.factor) for g in older.all_gains()] == [("xp", 1.5)]
+    with pytest.raises(ValueError):
+        ModifierDef(id="none")
+    with pytest.raises(ValueError):
+        ModifierDef(id="twice", gains=[{"value": "xp", "factor": 2}, {"value": "xp", "factor": 3}])

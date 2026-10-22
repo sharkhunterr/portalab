@@ -74,11 +74,36 @@ class When(_Closed):
         return values
 
 
-class ModifierDef(_Closed):
-    id: str = Field(pattern=IDENT)
+class Gain(_Closed):
     value: Literal["xp", "contribution", "coins"]
     factor: float = Field(gt=0, le=10)
+
+
+class ModifierDef(_Closed):
+    """A bonus: for the actions its ``when`` describes, one value multiplied (``value`` x ``factor``) — or
+    several at once (``gains``: x2 XP and x2 Coins for the same films, one rule)."""
+
+    id: str = Field(pattern=IDENT)
+    value: Literal["xp", "contribution", "coins"] | None = None
+    factor: float | None = Field(default=None, gt=0, le=10)
+    gains: list[Gain] = Field(default_factory=list, max_length=3)
     when: When = When()
+
+    @model_validator(mode="after")
+    def _some_gain(self) -> "ModifierDef":
+        if not self.gains and (self.value is None or self.factor is None):
+            raise ValueError("a bonus multiplies a value: a value and a factor, or gains")
+        values = [g.value for g in self.all_gains()]
+        if len(values) != len(set(values)):
+            raise ValueError("a bonus multiplies each value once")
+        return self
+
+    def all_gains(self) -> list[Gain]:
+        """Every value it multiplies (the single ``value``/``factor`` of older bonuses included)."""
+        if self.gains:
+            return list(self.gains)
+        assert self.value is not None and self.factor is not None
+        return [Gain(value=self.value, factor=self.factor)]
 
 
 class DiscountDef(_Closed):
