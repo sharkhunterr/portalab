@@ -6131,6 +6131,13 @@
             ],
             "title": "Reply"
           },
+          "rewards": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Rewards",
+            "type": "array"
+          },
           "status": {
             "title": "Status",
             "type": "string"
@@ -6439,6 +6446,13 @@
               }
             ],
             "title": "Reply"
+          },
+          "rewards": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Rewards",
+            "type": "array"
           },
           "status": {
             "title": "Status",

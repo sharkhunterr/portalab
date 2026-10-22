@@ -59,16 +59,15 @@ export function FeedbackReward({
   const [amount, setAmount] = useState("100");
   const [search, setSearch] = useState("");
   const [product, setProduct] = useState<{ key: string; name: string } | null>(null);
-  const [message, setMessage] = useState<string | null>(null); // null: the suggested thank-you
+  const [message, setMessage] = useState<string | null>(null); // null: the reply already written, if any
   const found = useCatalogPage({ q: search.trim(), type: "", state: "available", limit: 6 });
   const quantity = Math.max(0, Math.floor(Number(amount) || 0));
   const what =
     kind === "product"
       ? (product?.name ?? "")
       : `${quantity} ${t(`marketplace:shopadmin.valueShort.${kind}`)}`;
-  // a reply already written comes first, the thank-you for the reward after it
-  const suggested = what ? t("support:reward.thanks", { what }) : "";
-  const thanks = message ?? (written?.trim() ? `${written.trim()}\n\n${suggested}`.trim() : suggested);
+  // no sentence about the reward: the member sees it as a badge on their feedback (and is notified)
+  const thanks = message ?? written?.trim() ?? "";
   const ready = kind === "product" ? Boolean(product) : quantity > 0;
   const give = useMutation({
     mutationFn: async () => {

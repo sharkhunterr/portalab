@@ -101,6 +101,23 @@ type Filter = "all" | "waiting" | "answered";
 const FILTERS: Filter[] = ["all", "waiting", "answered"];
 
 /** Where a feedback is: sent, read by the team (or taken up, or set aside), answered. */
+/** What the team gave for a feedback (« 100 Xenocoins », « 50 XP », a product), as small badges. */
+export function RewardBadges({ rewards }: { rewards: string[] }) {
+  const t = useT();
+  if (!rewards.length) return null;
+  return (
+    <ul className="reward-badges" aria-label={t("support:reward.received")}>
+      {rewards.map((label, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: the same reward may be given twice
+        <li key={index} className="reward-badge">
+          <Icon name="gift" size={13} />
+          {label}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function Steps({ item }: { item: Mine }) {
   const t = useT();
   const read = item.status !== "new";
@@ -200,6 +217,7 @@ function MyFeedback({
                   </p>
                   <p className="feedback-mine__text">{first ?? label}</p>
                   <Steps item={item} />
+                  <RewardBadges rewards={item.rewards ?? []} />
                 </div>
               </div>
               {item.reply ? (

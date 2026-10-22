@@ -44,5 +44,10 @@ async def test_history_of_a_feedback(
     rewarded = next(e for e in history if e["kind"] == "rewarded")
     assert rewarded["detail"] == {"value": "coins", "amount": 100, "label": "100 Coins"}
 
-    await login(client, "ursula")  # the member never sees the staff's history
+    listed = next(f for f in (await client.get("/api/v1/support/feedback")).json() if f["id"] == fid)
+    assert listed["rewards"] == ["100 Coins"]
+
+    await login(client, "ursula")  # the member never sees the staff's history, but sees the reward
     assert (await client.get(base)).status_code == 403
+    mine = next(f for f in (await client.get("/api/v1/me/feedback")).json() if f["id"] == fid)
+    assert mine["rewards"] == ["100 Coins"]

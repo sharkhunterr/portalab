@@ -271,8 +271,17 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
           ) : (
             // biome-ignore lint/suspicious/noArrayIndexKey: a history line has no identity of its own
             <li key={index} className="feedback-event" data-kind={event.kind}>
-              <Icon name={EVENT_ICON[event.kind] ?? "check"} size={14} />
-              <span>{eventText(event)}</span>
+              {event.kind === "rewarded" ? (
+                <span className="reward-badge">
+                  <Icon name="gift" size={13} />
+                  {String((event.detail as Record<string, unknown> | undefined)?.label ?? "")}
+                </span>
+              ) : (
+                <>
+                  <Icon name={EVENT_ICON[event.kind] ?? "check"} size={14} />
+                  <span>{eventText(event)}</span>
+                </>
+              )}
               <span className="feedback-event__when">{ago(event.at)}</span>
             </li>
           ),
@@ -364,7 +373,7 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
         </form>
       ) : (
         <div className="feedback-actions" role="toolbar" aria-label={t("support:review.tools")}>
-          <button type="button" className="feedback-reply" onClick={() => setComposing(true)}>
+          <button type="button" className="feedback-reply-field" onClick={() => setComposing(true)}>
             <Icon name="message" size={16} />
             {item.reply ? t("support:review.replyAgain") : t("support:review.replyTo", { name })}
           </button>
@@ -513,6 +522,12 @@ function FeedbackCards({ items, fieldsOf }: { items: Item[]; fieldsOf: (key: str
                 {first ? <span className="feedback-card__excerpt">{first}</span> : null}
               </span>
               <span className="feedback-card__badges">
+                {item.rewards?.length ? (
+                  <span className="reward-badge" title={item.rewards.join(" · ")}>
+                    <Icon name="gift" size={13} />
+                    {item.rewards.length > 1 ? item.rewards.length : item.rewards[0]}
+                  </span>
+                ) : null}
                 {item.reply ? (
                   <span className="admin-muted" title={t("support:review.replied")}>
                     <Icon name="message" size={14} />
