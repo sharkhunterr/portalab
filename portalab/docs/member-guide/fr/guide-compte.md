@@ -5,7 +5,7 @@ position: 15
 help_keys: [account, settings.appearance, settings.language, privacy, settings.media-accounts]
 tags: [guide, compte, apparence, confidentialité]
 ---
-Cette page explique comment gérer votre profil, choisir l'apparence du portail, régler la langue et la région, contrôler ce que les autres voient de vous et lier vos comptes médias.
+Gérer votre profil, choisir l'apparence du portail, régler la langue et la région, contrôler ce que les autres voient de vous et lier vos comptes médias.
 
 Tous ces réglages se trouvent dans la section **Mon compte** du menu : « Compte », « Apparence », « Langue et région », « Préférences de notification », « Comptes médias » et « Confidentialité ».
 

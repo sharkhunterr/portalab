@@ -11,6 +11,8 @@ export interface TreeNode {
   slug: string;
   title: string;
   status: string;
+  /** The page's first paragraph, without Markdown (what a card shows). */
+  summary?: string;
   children: TreeNode[];
 }
 export interface DiffSegment {

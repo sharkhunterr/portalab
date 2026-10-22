@@ -5,7 +5,7 @@ position: 14
 help_keys: [news, calendar, wiki]
 tags: [guide, actualités, calendrier, wiki]
 ---
-Cette page présente trois rubriques pour rester informé : les actualités du portail, le calendrier de ce qui arrive et le wiki, où se trouvent guides et réponses.
+Trois rubriques pour rester informé : les actualités du portail, le calendrier de ce qui arrive et le wiki, où se trouvent guides et réponses.
 
 Vous les trouvez dans la rubrique **Découvrir** du menu, si votre portail les propose.
 

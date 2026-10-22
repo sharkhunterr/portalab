@@ -5,7 +5,7 @@ position: 7
 help_keys: [marketplace, marketplace.products.detail, marketplace.owned, marketplace.reserve, marketplace.vitrine]
 tags: [guide, boutique, coins, boosters]
 ---
-Cette page explique comment dépenser la monnaie du portail (Coins) : choisir un produit, l'acheter, ouvrir des boosters et utiliser votre réserve.
+Dépenser la monnaie du portail (Coins) : choisir un produit, l'acheter, ouvrir des boosters et utiliser votre réserve.
 
 ## La monnaie du portail
 

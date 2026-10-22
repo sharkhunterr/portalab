@@ -5,7 +5,7 @@ position: 12
 help_keys: [notifications, settings.notifications]
 tags: [guide, notifications, e-mails, newsletters]
 ---
-Cette page explique comment le portail vous prévient : la cloche et ses notifications, les messages qui s'affichent à l'écran, les e-mails et les newsletters, et comment tout régler.
+Comment le portail vous prévient : la cloche et ses notifications, les messages à l'écran, les e-mails et les newsletters, et comment tout régler.
 
 ## La cloche
 

@@ -5,7 +5,7 @@ position: 13
 help_keys: [support, support.new, support.tickets.detail, feedback]
 tags: [guide, support, tickets, avis]
 ---
-Cette page explique comment demander de l'aide avec un ticket, suivre vos demandes, donner votre avis à l'équipe et savoir si un problème est déjà connu.
+Demander de l'aide avec un ticket, suivre vos demandes, donner votre avis à l'équipe et savoir si un problème est déjà connu.
 
 Dans le menu, tout se trouve dans la section **Support** : « Assistance » (vos tickets), « Avis », « Incidents » et « Visites guidées ».
 

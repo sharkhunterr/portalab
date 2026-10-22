@@ -26,3 +26,25 @@ export function WikiTree({ nodes, current }: { nodes: TreeNode[]; current?: stri
 export function flatten(nodes: TreeNode[]): TreeNode[] {
   return nodes.flatMap((node) => [node, ...flatten(node.children)]);
 }
+
+/** A group of the wiki: a top-level page and its sub-pages, or the top-level pages that have none. */
+export interface WikiGroup {
+  /** The section page, or ``null`` for the loose top-level pages. */
+  root: TreeNode | null;
+  /** The pages to read in order (the section page first). */
+  pages: TreeNode[];
+}
+
+export function groupsOf(tree: TreeNode[]): WikiGroup[] {
+  const sections = tree.filter((node) => node.children.length);
+  const loose = tree.filter((node) => !node.children.length);
+  return [
+    ...sections.map((root) => ({ root, pages: flatten([root]) })),
+    ...(loose.length ? [{ root: null, pages: loose }] : []),
+  ];
+}
+
+/** The group a page belongs to. */
+export function groupOf(tree: TreeNode[], slug: string): WikiGroup | undefined {
+  return groupsOf(tree).find((group) => group.pages.some((node) => node.slug === slug));
+}

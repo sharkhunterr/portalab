@@ -5,7 +5,7 @@ position: 5
 help_keys: [media.discover, media.discover.movie.detail, media.discover.series.detail, media.requests]
 tags: [guide, médias, demandes]
 ---
-Un film ou une série manque à la médiathèque ? Cette page vous explique comment le demander, ce que cela prend sur votre quota et comment suivre sa demande jusqu'à ce qu'il soit disponible.
+Un film ou une série manque à la médiathèque ? Le demander, savoir ce que cela prend sur votre quota et suivre la demande jusqu'à ce qu'il soit disponible.
 
 ## Trouver un titre à demander
 

@@ -5,7 +5,7 @@ position: 8
 help_keys: [progression, campaigns, campaigns.detail, community.quests, community.achievements]
 tags: [guide, progression, xp, quêtes]
 ---
-Cette page explique comment vous progressez sur le portail : l'XP et les niveaux, les Coins et la Contribution, les séries, les succès, les quêtes et les campagnes à bonus.
+Comment vous progressez sur le portail : l'XP et les niveaux, les Coins et la Contribution, les séries, les succès, les quêtes et les campagnes à bonus.
 
 ## Vos trois valeurs
 

@@ -5,7 +5,7 @@ position: 1
 help_keys: [guide, search]
 tags: [guide, démarrage, navigation, recherche]
 ---
-Cette page vous aide à faire vos premiers pas sur le portail : vous connecter, lire l'en-tête, trouver votre chemin dans le menu, chercher n'importe quoi et lancer les visites guidées.
+Vos premiers pas sur le portail : vous connecter, lire l'en-tête, trouver votre chemin dans le menu, chercher n'importe quoi et lancer les visites guidées.
 
 ## Se connecter
 
