@@ -16848,6 +16848,10 @@ export interface components {
             comments: components["schemas"]["TicketCommentOut"][];
             /** Description */
             description: string;
+            /** Feedback */
+            feedback?: {
+                [key: string]: unknown;
+            } | null;
             /** Field Defs */
             field_defs: {
                 [key: string]: unknown;

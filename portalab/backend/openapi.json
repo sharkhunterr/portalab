@@ -18580,6 +18580,18 @@
             "title": "Description",
             "type": "string"
           },
+          "feedback": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
           "field_defs": {
             "items": {
               "additionalProperties": true,

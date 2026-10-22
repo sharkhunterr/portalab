@@ -54,7 +54,12 @@ def _title(item: FeedbackItem) -> str:
 
 
 def _body(item: FeedbackItem) -> str:
-    return "\n\n".join(f"**{key}**: {value}" for key, value in item.payload.items())
+    """The member's words (the ticket shows the feedback's answers under their labels beside it)."""
+    return "\n\n".join(
+        ", ".join(map(str, value)) if isinstance(value, list) else str(value)
+        for value in item.payload.values()
+        if value not in (None, "", [])
+    )
 
 
 class ConversionService:

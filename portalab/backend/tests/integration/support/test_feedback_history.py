@@ -51,3 +51,27 @@ async def test_history_of_a_feedback(
     assert (await client.get(base)).status_code == 403
     mine = next(f for f in (await client.get("/api/v1/me/feedback")).json() if f["id"] == fid)
     assert mine["rewards"] == ["100 Coins"]
+
+
+async def test_closing_its_ticket_closes_the_feedback(
+    client: httpx.AsyncClient, support: SupportHarness, people: dict[str, UUID]
+) -> None:
+    await login(client, "ursula")
+    sent = await client.post(
+        "/api/v1/feedback",
+        json={"form_key": "bug_report", "values": {"what": "Clouds in triangles", "steps": "Open"}},
+    )
+    fid = sent.json()["id"]
+    await login(client, "boss")
+    made = await client.post(f"/api/v1/support/feedback/{fid}/convert", json={"target_kind": "ticket"})
+    tid = made.json()["ref"].rsplit("/", 1)[1]
+    ticket = (await client.get(f"/api/v1/tickets/{tid}")).json()
+    assert ticket["feedback"]["id"] == fid and ticket["description"] == "Clouds in triangles\n\nOpen"
+    assert ticket["feedback"]["answers"][0]["value"] == "Clouds in triangles"
+    for transition in ("start", "resolve", "close"):
+        moved = await client.post(f"/api/v1/tickets/{tid}/transition", json={"transition": transition})
+        assert moved.status_code == 200, moved.text
+    feedback = (await client.get(f"/api/v1/support/feedback/{fid}")).json()
+    assert feedback["status"] == "dismissed"
+    closed = [e for e in feedback["history"] if e["kind"] == "closed"]
+    assert closed and closed[0]["detail"]["ticket"].startswith("T-")
