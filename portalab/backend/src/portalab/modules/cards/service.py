@@ -31,6 +31,8 @@ def card_out(card: Card, card_set: CardSet, owned: dict[str, int] | None = None)
         "flavor": card.flavor,
         "art": card.art,
         "alt_art": card.alt_art,
+        "role_art": card.role_art,
+        "role_alt": card.role_alt,
         "rarity": card.rarity,
         "retired": card.retired,
         "owned": owned or {},
@@ -206,7 +208,7 @@ class CardService:
                     .join(Card, Card.id == Copy.card_id)
                     .join(CardSet, CardSet.key == Card.set_key)
                     .where(Copy.pack_id.in_([p.id for p in packs]))
-                    .order_by(Copy.acquired_at, Card.number)
+                    .order_by(Copy.acquired_at, Copy.id)  # as drawn (its ids grow with time)
                 )
             ).all()
             names = {

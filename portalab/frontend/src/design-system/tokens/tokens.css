@@ -390,3 +390,24 @@ h1 {
     hsl(calc(var(--avatar-hue, 220) + 40) 62% 22%)
   );
 }
+
+/* issue 229: the media cards, printed like a trading card game's whatever the interface — the frame's colour
+   by the card's kind (the work gold, a director red, the cast blue, a writer white, a composer green), the
+   set symbol by rarity (black, silver, gold, mythic orange), the card's ink and its outer border */
+:root {
+  --card-border: #111114;
+  --card-ink: #17130d;
+  --card-ink-light: #fbf7ee;
+  --card-paper: #efe6d2;
+  --card-frame-title: #c9a54a;
+  --card-frame-director: #b8442f;
+  --card-frame-creator: #a8432c;
+  --card-frame-cast: #2f6db3;
+  --card-frame-writer: #d9d2c0;
+  --card-frame-composer: #3c8a4f;
+  --card-symbol-common: #1d1d1f;
+  --card-symbol-rare: #a9b4c2;
+  --card-symbol-epic: #d4a72c;
+  --card-symbol-legendary: #e2541b;
+  --card-shadow: rgba(0, 0, 0, 0.45);
+}

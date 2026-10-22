@@ -97,5 +97,6 @@ async def open_pack(principal: Reader, module: Module, pack_id: UUID) -> dict[st
 
 @router.post("/admin/cards/sync")
 async def sync_cards(principal: Manager, module: Module) -> dict[str, Any]:
-    """Make the cards again from the works present now (those that changed), then rank them again."""
-    return asdict(await module.forge.sync())
+    """Make the cards again from the works present now (those that changed), then rank them again; and look
+    for the next actors' characters at once."""
+    return {**asdict(await module.forge.sync()), "characters": await module.roles.run()}

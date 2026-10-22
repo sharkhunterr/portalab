@@ -277,6 +277,19 @@ class CardWork:
     people: Sequence[CardPerson]
     updated_at: datetime
     available: bool
+    tmdb: str | None = None  # the work's TMDB id (its characters' images are tagged with it)
+
+
+@dataclass(frozen=True, slots=True)
+class CardImage:
+    """Issue 229: an image a person is tagged in — the work it comes from (its TMDB id), its kind (a still, a
+    backdrop, a poster), its shape and how liked it is."""
+
+    work: str
+    image: str
+    image_type: str
+    aspect: float
+    votes: float
 
 
 @runtime_checkable
@@ -289,6 +302,10 @@ class CardSources(Protocol):
     async def present(self) -> Sequence[UUID]: ...
 
     async def work_of(self, object_id: UUID) -> UUID | None: ...
+
+    async def role_images(self, person_ref: str) -> Sequence[CardImage] | None:
+        """The images ``tmdb:<id>`` is tagged in, from the provider that knows them (``None``: none can)."""
+        ...
 
 
 SPECS: tuple[CapabilitySpec, ...] = (

@@ -27,6 +27,7 @@ from portalab.capabilities.media import (
     MetadataPerson,
     MetadataRecord,
     PersonRecord,
+    RoleImage,
 )
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding
@@ -343,6 +344,35 @@ class _Metadata:
             if isinstance(english, Mapping) and english.get("biography"):
                 document = {**document, "biography": english["biography"]}
         return map_person(document)
+
+    async def role_images(self, person_id: str, pages: int = 2) -> list[RoleImage]:
+        """Issue 229: the images a person is tagged in (stills, backdrops, posters), each with the film or
+        series it comes from — their characters, for the cards."""
+        if not str(person_id).isdigit():
+            return []
+        out: list[RoleImage] = []
+        for page in range(1, pages + 1):
+            found = await self.connector.get_json(
+                self.service, f"/3/person/{int(person_id)}/tagged_images", page=page
+            )
+            for item in (found or {}).get("results") or []:
+                media = item.get("media") if isinstance(item, Mapping) else None
+                ref = image_ref(item.get("file_path")) if isinstance(item, Mapping) else None
+                if not isinstance(media, Mapping) or not media.get("id") or not ref:
+                    continue
+                out.append(
+                    RoleImage(
+                        media_type=str(item.get("media_type") or ""),
+                        media_id=str(media["id"]),
+                        image=ref,
+                        image_type=str(item.get("image_type") or ""),
+                        aspect=float(item.get("aspect_ratio") or 0),
+                        votes=float(item.get("vote_average") or 0),
+                    )
+                )
+            if page >= int((found or {}).get("total_pages") or 1):
+                break
+        return out
 
     async def portrait(self, ref: str, size: str) -> bytes:
         return await self.fetch_image(ref, size)

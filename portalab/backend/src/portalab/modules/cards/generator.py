@@ -13,7 +13,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import select, update
+from sqlalchemy import select, text, update
 
 from portalab.capabilities.media_core import CARD_SOURCES, CardPerson, CardWork
 from portalab.capabilities.registry import CapabilityRegistry
@@ -71,6 +71,8 @@ def fingerprint(work: CardWork) -> str:
         "people": [(p.ref, p.category, p.role, p.order, p.image) for p in work.people],
         "votes": work.vote_count // 50,  # a few more votes do not make it again
         "countries": list(work.countries)[:1],
+        "tmdb": work.tmdb,
+        "v": 2,  # how the cards are made (people's cards: no image of the work since v2)
     }
     return hashlib.sha256(json.dumps(data, sort_keys=True, default=str).encode()).hexdigest()[:64]
 
@@ -101,7 +103,7 @@ def plan(work: CardWork) -> list[Planned]:
                 person.role,
                 None,
                 person.image,
-                alt(len(out)),
+                None,  # never an image of the work: it shows someone else (their character's, once found)
                 person.order,
             )
         )
@@ -143,6 +145,8 @@ class CardForge:
         changed = False
         async with self.database.unit_of_work() as uow:
             session = uow.session
+            # one making at a time (the worker's job and an administrator's request)
+            await session.execute(text("SELECT pg_advisory_xact_lock(hashtext('cards.sync'))"))
             known = {s.key: s for s in (await session.execute(select(CardSet))).scalars()}
             seen: set[str] = set()
             for work in works:
@@ -184,6 +188,7 @@ class CardForge:
             if work.collection and work.collection.get("name")
             else None
         )
+        current.tmdb = work.tmdb
         current.present = True
         current.fingerprint = print_
         current.generated_at = now

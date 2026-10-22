@@ -628,6 +628,17 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "users.self.manage",
     },
     {
+        "key": "cards.collection",  # issue 229: the media cards
+        "owner": "module:cards",
+        "kind": "entry",
+        "label_key": "nav.cards",
+        "icon": "layers",
+        "route": "/cards",
+        "group": "community",
+        "order_hint": 61,
+        "required_permission": "cards.read",
+    },
+    {
         "key": "gamification.admin",
         "owner": "module:gamification",
         "kind": "entry",
