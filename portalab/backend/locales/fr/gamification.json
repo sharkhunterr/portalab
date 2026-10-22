@@ -37,6 +37,7 @@
   "action.media_playback_started": "Lecture démarrée",
   "action.media_request_available": "Demande disponible",
   "action.media_request_created": "Demande de média",
+  "action.media_request_watched": "Un titre que j’ai demandé est regardé par un autre membre",
   "action.project_funding_added": "Participation à un projet",
   "action.ticket_created": "Création d'un ticket support",
   "action.ticket_resolved": "Ticket résolu",

@@ -64,6 +64,15 @@ class RequestEvent(BaseModel):
     state: Literal["pending", "approved", "declined", "processing", "available", "failed", "cancelled"]
 
 
+class RequestWatched(BaseModel):
+    """A title a member asked for was watched by someone else (once per request and viewer): its asker's
+    share of the joy — a little XP and Coins if the economy rewards it."""
+
+    request: str
+    object: str
+    kind: str
+
+
 CATALOG_TYPES: dict[str, type[BaseModel]] = {
     "media.added": ObjectEvent,
     "media.updated": ObjectEvent,
@@ -140,6 +149,20 @@ def register_event_types(registry: EventTypeRegistry) -> None:
             open_payload=False,
             retention_class="technical",
             visibility_class="private",
+        )
+    )
+    add(
+        EventType(
+            name="media.request_watched",
+            owner=OWNER,
+            schema=RequestWatched,
+            open_payload=False,
+            dedup_fields=("request",),
+            retention_class="business",
+            visibility_class="private",
+            rewardable=frozenset({"kind"}),
+            aggregatable=frozenset({"kind"}),
+            automatable=True,
         )
     )
     for name in REQUEST_TYPES:
