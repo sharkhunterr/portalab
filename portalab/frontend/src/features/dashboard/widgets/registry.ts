@@ -17,9 +17,22 @@ export interface WidgetProps {
 }
 
 const components = new Map<string, ComponentType<WidgetProps>>();
+const stages = new Set<string>();
 
-export function registerWidgetComponent(id: string, component: ComponentType<WidgetProps>): void {
+/** ``stage``: the component keeps a region for an option's script (``place: stage``, issue 225) — the daily
+ * wheel's face —, drawn there while the component keeps its own texts and controls. */
+export function registerWidgetComponent(
+  id: string,
+  component: ComponentType<WidgetProps>,
+  options?: { stage?: boolean },
+): void {
   components.set(id, component);
+  if (options?.stage) stages.add(id);
+}
+
+/** Whether this component keeps a region for an option's script (else such a script is drawn over it). */
+export function offersStage(id: string | null | undefined): boolean {
+  return id ? stages.has(id) : false;
 }
 
 export function widgetComponent(id: string | null | undefined): ComponentType<WidgetProps> | undefined {

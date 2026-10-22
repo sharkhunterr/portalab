@@ -146,8 +146,9 @@ class Render(BaseModel):
     renderer: str | None = Field(default=None, max_length=40)  # ``renderer``: the portal renderer drawing it
     params: dict[str, Any] = Field(default_factory=dict)  # ``renderer``: its parameters
     rarity: Literal["common", "rare", "epic", "legendary"] | None = None  # scene parts: the rarity it is for
-    # a widget option's script: shown instead of the widget's content, or drawn over it (animations)
-    place: Literal["replace", "overlay"] | None = None
+    # a widget option's script: shown instead of the widget's content, drawn over it (animations), or in the
+    # region the widget keeps for it (``stage``: the daily wheel's face; the widget keeps its texts, controls)
+    place: Literal["replace", "overlay", "stage"] | None = None
 
     @field_validator("kind")
     @classmethod

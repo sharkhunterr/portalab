@@ -51,10 +51,12 @@ from portalab.modules.gamification.events import register_event_types
 from portalab.modules.gamification.integrations import (
     DAILY_WIDGET,
     PROGRESS_WIDGET,
+    WHEEL_WIDGET,
     CatalogFacade,
     DailyObjectivesWidget,
     ProgressionPreferences,
     ProgressWidget,
+    WheelWidget,
     register_actions,
     register_tools,
 )
@@ -80,6 +82,7 @@ from portalab.modules.gamification.streaks.level_rewards import LevelRewards
 from portalab.modules.gamification.streaks.perks import Perks
 from portalab.modules.gamification.streaks.service import Pace, Streaks
 from portalab.modules.gamification.verify.verifier import verify
+from portalab.modules.gamification.wheel.service import Wheel
 
 OWNER = "module:gamification"
 INSTANCE = "gamification"
@@ -166,6 +169,7 @@ class GamificationModule:
         self.pace = Pace(config)
         self.perks = Perks(database, self.streaks, clock=clock, writer=self.writer)
         self.level_rewards = LevelRewards(database, self.writer, capabilities, config)
+        self.wheel = Wheel(database, self.writer, capabilities, config, clock=clock)  # issue 225
         self.leaderboards = LeaderboardService(
             database, self.levels, self.visibility, capabilities, config, clock=clock
         )
@@ -228,6 +232,8 @@ class GamificationModule:
             self.widgets.register(PROGRESS_WIDGET, ProgressWidget(self.progression, self.clock), owner=OWNER)
         if self.widgets.get(DAILY_WIDGET.key) is None:
             self.widgets.register(DAILY_WIDGET, DailyObjectivesWidget(self.quests, self.clock), owner=OWNER)
+        if self.widgets.get(WHEEL_WIDGET.key) is None:
+            self.widgets.register(WHEEL_WIDGET, WheelWidget(self.wheel, self.clock), owner=OWNER)
         if not any(p.kind == "progression" for p in self.widgets.summaries()):  # 027: since last visit
             self.widgets.register_summary(ProgressionChanges(self.database, self.progression), owner=OWNER)
         register_tools(self.tools, self.progression, self.clock)

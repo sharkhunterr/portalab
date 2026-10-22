@@ -1,0 +1,64 @@
+/* « Cosmic wheel HD »: around the face its script draws — a rim of night with starry bulbs, a comet for a
+   pointer, a planet for a hub. In the shop's preview (no script there) its slices take the nebulae's colours.
+   Its hook: data-widget-option ~= « wheel-cosmos ». */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-cosmos"] .wheel {
+  --wheel-coins: #6a1fb5;
+  --wheel-coins-alt: #1438a8;
+  --wheel-lose: #7a0c22;
+  --wheel-xp: #087a6e;
+  --wheel-product: #d9a21f;
+  --wheel-nothing: #07070f;
+  --wheel-ink: #f4f0ff;
+  --wheel-rim: #0a0818;
+  --wheel-rim-edge: #6c4bd8;
+  --wheel-bulb: #e8e6ff;
+  --wheel-pointer: #8fe9ff;
+  --wheel-hub: #1a1440;
+  --wheel-hub-ink: #e8e6ff;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-cosmos"] .wheel__stage {
+  background: radial-gradient(circle, #120c2e 60%, #05040c 72%);
+  box-shadow:
+    0 0 1.2rem rgba(122, 86, 255, 0.55),
+    0 0 2.6rem rgba(64, 196, 255, 0.25),
+    inset 0 0 0 0.12rem #6c4bd8;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-cosmos"] .wheel__label {
+  text-shadow:
+    0 0 4px rgba(10, 6, 30, 0.95),
+    0 0 10px rgba(122, 86, 255, 0.8);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-cosmos"] .wheel__bulbs > span {
+  inline-size: 2.2cqi;
+  block-size: 2.2cqi;
+  box-shadow: 0 0 0.4rem #b9b2ff;
+  animation: cosmos-twinkle 2.6s ease-in-out infinite;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-cosmos"] .wheel__bulbs > span:nth-child(3n) {
+  animation-delay: -0.9s;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-cosmos"] .wheel__bulbs > span:nth-child(3n + 1) {
+  animation-delay: -1.7s;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-cosmos"] .wheel__pointer {
+  background: linear-gradient(180deg, #ffffff, #8fe9ff 45%, rgba(143, 233, 255, 0.1));
+  filter: drop-shadow(0 0 5px #8fe9ff);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-cosmos"] .wheel__hub {
+  border: 0.15rem solid #6c4bd8;
+  background: radial-gradient(circle at 35% 30%, #a99bff, #3a2a8f 45%, #120c2e 80%);
+  box-shadow:
+    0 0 0.8rem rgba(122, 86, 255, 0.7),
+    inset -0.3rem -0.3rem 0.6rem rgba(0, 0, 0, 0.5);
+}
+@keyframes cosmos-twinkle {
+  50% {
+    opacity: 0.2;
+    transform: translate(-50%, -50%) rotate(var(--wheel-at)) translateY(-47.5cqi) scale(0.6);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-cosmos"] .wheel__bulbs > span {
+    animation: none;
+  }
+}

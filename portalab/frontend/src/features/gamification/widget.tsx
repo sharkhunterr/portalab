@@ -313,3 +313,5 @@ function DailyObjectivesWidget({ payload, compact }: WidgetProps) {
 }
 
 registerWidgetComponent("gamification.daily_objectives", DailyObjectivesWidget);
+
+import "./wheel/WheelWidget"; // issue 225: the daily wheel

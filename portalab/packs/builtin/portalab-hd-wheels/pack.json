@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "portalab-hd-wheels",
+  "version": "1.0.0+e1252c544d",
+  "names": {
+    "en": "Wheels of fortune HD pack",
+    "fr": "Pack Roues de la fortune HD"
+  },
+  "descriptions": {
+    "en": "An HD collection for the daily wheel: faces drawn by the graphics chip, turned by Portalab.",
+    "fr": "Une collection HD pour la roue du jour : des faces dessinées par la carte graphique, tournées par Portalab."
+  },
+  "author": "Portalab",
+  "license": "AGPL-3.0-or-later"
+}

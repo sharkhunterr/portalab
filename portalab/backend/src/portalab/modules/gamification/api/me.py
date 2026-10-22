@@ -16,6 +16,7 @@ from portalab.capabilities.economy import (
     Progress,
     Transaction,
 )
+from portalab.capabilities.i18n import RESOLVER, LocaleContext
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
@@ -288,3 +289,65 @@ async def my_quests(principal: Me, module: Module) -> list[dict[str, Any]]:
 @router.get("/quests/catalog")
 async def quest_catalog(_: Reader, module: Module) -> list[dict[str, Any]]:
     return await module.quests.catalog()
+
+
+# --- issue 225: the daily wheel --------------------------------------------------------------------------
+class WheelSegmentOut(BaseModel):
+    key: str
+    kind: Literal["coins", "xp", "product", "nothing"]
+    amount: int
+    product: str | None = None
+    label: str | None = None
+
+
+class WheelSpinOut(BaseModel):
+    segment: str
+    index: int | None
+    kind: str
+    amount: int
+    delta: int
+    product: str | None = None
+    given: bool
+    spun_at: datetime
+
+
+class WheelOut(BaseModel):
+    enabled: bool
+    day: str
+    next_at: datetime
+    spin_ms: int
+    coins: int
+    segments: list[WheelSegmentOut]
+    today: WheelSpinOut | None = None
+
+
+async def _language(module: GamificationModule, user: UUID) -> str:
+    """The member's language (the segments' own labels: a product's name)."""
+    try:
+        providers = module.capabilities.system_providers(RESOLVER)
+        if providers:
+            ctx = await providers[0].provider.for_user(user)
+            if isinstance(ctx, LocaleContext):
+                return ctx.language
+    except Exception:  # noqa: S110 — English labels are fine
+        pass
+    return "en"
+
+
+@router.get("/me/wheel", response_model=WheelOut)
+async def my_wheel(principal: Reader, module: Module) -> Any:
+    """Today's daily wheel: its segments, the spin done today (if any) and when the next one comes."""
+    user = principal.acting_for or principal.user_id
+    if user is None:
+        raise NotFound("No member.", code="gamification.no_user")
+    return await module.wheel.state(user, await _language(module, user))
+
+
+@router.post("/me/wheel/spin", response_model=WheelOut)
+async def spin_my_wheel(principal: Reader, module: Module) -> Any:
+    """Spin the daily wheel (once a day): the server draws the segment and gives what it says before the
+    page turns the wheel to it."""
+    user = principal.acting_for or principal.user_id
+    if user is None:
+        raise NotFound("No member.", code="gamification.no_user")
+    return await module.wheel.spin(user, await _language(module, user))

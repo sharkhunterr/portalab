@@ -36,6 +36,8 @@ def pack_products() -> tuple[dict[str, Any], ...]:
         element = json.loads(file.read_text(encoding="utf-8"))
         if not element.get("product") or element.get("type") in ("navigation",):
             continue
+        if (element.get("economy") or {}).get("sold") is False:
+            continue  # offered to everyone: no shop product (issue 225: the candy wheel)
         payload = dict(element.get("payload") or {})
         field = LOOK_FIELD.get(element["type"])
         if field and element.get("look") is not None:

@@ -1,0 +1,29 @@
+{
+  "type": "widget_option",
+  "product": "opt_wheel_pastel",
+  "names": {
+    "en": "Candy wheel",
+    "fr": "Roue bonbon"
+  },
+  "descriptions": {
+    "en": "The wheel of fortune in candy colours: pastel slices, a rim striped like a lollipop, round bulbs that blink while it turns. Offered to everyone; chosen in the widget's settings.",
+    "fr": "La roue de la fortune aux couleurs des bonbons : des parts pastel, un bord rayé comme une sucette, des ampoules rondes qui clignotent pendant qu'elle tourne. Offerte à tous ; à choisir dans les réglages du widget."
+  },
+  "payload": {
+    "widget": "gamification.daily_wheel"
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "economy": {
+    "sold": false,
+    "price": 0,
+    "rarity": "common",
+    "collection": "widgets",
+    "icon": "candy"
+  },
+  "look": "wheel-pastel"
+}

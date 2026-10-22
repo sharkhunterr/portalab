@@ -1,0 +1,75 @@
+/* « Treasure wheel HD »: around the face its script draws — a rim of gold set with rubies, a gold pointer, a
+   gold coin for a hub, and a gloss that stays still while the wheel turns under it. In the shop's preview (no
+   script there) its slices take the treasure's colours. Its hook: data-widget-option ~= « wheel-treasure ». */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-treasure"] .wheel {
+  --wheel-coins: #d4a437;
+  --wheel-coins-alt: #7a0a16;
+  --wheel-lose: #121218;
+  --wheel-xp: #0f7a46;
+  --wheel-product: #dfe7f2;
+  --wheel-nothing: #4a2410;
+  --wheel-ink: #fff8e6;
+  --wheel-rim: #8a5a12;
+  --wheel-rim-edge: #ffd76a;
+  --wheel-bulb: #e0113a;
+  --wheel-pointer: #ffd76a;
+  --wheel-hub: #f2c14e;
+  --wheel-hub-ink: #4a2a05;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-treasure"] .wheel__stage {
+  background:
+    radial-gradient(circle, transparent 61%, rgba(60, 30, 0, 0.6) 62%, transparent 66%),
+    conic-gradient(from 0deg, #b8862a, #fff0b3, #a8741f, #f6d77a, #8a5a12, #ffe79a, #b8862a);
+  box-shadow:
+    0 0.7rem 1.8rem rgba(60, 30, 0, 0.55),
+    0 0 1.4rem rgba(255, 200, 80, 0.35),
+    inset 0 0 0 0.18rem #fff0b3;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-treasure"] .wheel__stage::after {
+  content: "";
+  position: absolute;
+  inset: 5%;
+  border-radius: 50%;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.06) 38%, transparent 55%);
+  pointer-events: none;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-treasure"] .wheel__label {
+  font-family: Georgia, "Times New Roman", serif;
+  text-shadow:
+    0 1px 0 rgba(60, 30, 0, 0.9),
+    0 0 6px rgba(0, 0, 0, 0.6);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-treasure"] .wheel__bulbs > span {
+  inline-size: 3.6cqi;
+  block-size: 3.6cqi;
+  background: radial-gradient(circle at 35% 30%, #ffd0da, #e0113a 45%, #5c0014);
+  box-shadow:
+    0 0 0 0.12rem #ffd76a,
+    0 0 0.35rem rgba(224, 17, 58, 0.7);
+  opacity: 1;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-treasure"] .wheel[data-phase="spinning"] .wheel__bulbs > span {
+  animation: treasure-sparkle 0.6s ease-in-out infinite;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-treasure"] .wheel__pointer {
+  background: linear-gradient(180deg, #fff8d6, #ffd76a 40%, #a8741f);
+  filter: drop-shadow(0 3px 2px rgba(60, 30, 0, 0.6));
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-treasure"] .wheel__hub {
+  border: 0.22rem double #a8741f;
+  background: radial-gradient(circle at 38% 30%, #fff4c2, #f2c14e 40%, #b07a1c 75%, #8a5a12);
+  font-family: Georgia, "Times New Roman", serif;
+  box-shadow:
+    0 0.3rem 0.8rem rgba(60, 30, 0, 0.5),
+    inset 0 0 0 0.3rem rgba(255, 240, 180, 0.35);
+}
+@keyframes treasure-sparkle {
+  50% {
+    filter: brightness(1.8);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-treasure"] .wheel[data-phase="spinning"] .wheel__bulbs > span {
+    animation: none;
+  }
+}

@@ -1,0 +1,286 @@
+/* issue 225: the daily wheel — Portalab's own look. A pack's look repaints it under
+   [data-widget-option~="<look>"] through these variables and parts (.wheel__slice[data-tone], __rim, __bulbs,
+   __pointer, __hub), or draws its face in the stage (a script turned with the wheel); the amounts, the
+   pointer, the button and the result stay Portalab's. */
+.wheel {
+  --wheel-coins: var(--color-accent);
+  --wheel-coins-alt: color-mix(in srgb, var(--color-accent) 72%, var(--color-surface));
+  --wheel-lose: color-mix(in srgb, var(--state-error-fg) 78%, var(--color-surface));
+  --wheel-xp: var(--color-accent-alt);
+  --wheel-product: var(--rarity-legendary, var(--color-accent-alt));
+  --wheel-nothing: var(--color-surface-raised);
+  --wheel-ink: var(--color-accent-contrast);
+  --wheel-rim: var(--color-surface-raised);
+  --wheel-rim-edge: var(--color-border);
+  --wheel-bulb: var(--rarity-legendary, var(--color-accent));
+  --wheel-pointer: var(--color-text);
+  --wheel-hub: var(--color-surface);
+  --wheel-hub-ink: var(--color-text);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+  block-size: 100%;
+  min-block-size: 0;
+}
+/* sized by the room it has: its height as much as its width (a block of one row: a small wheel) */
+.wheel-host {
+  container-type: size;
+  block-size: 100%;
+  min-block-size: 4.5rem;
+}
+.wheel[data-compact] {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.wheel__stage {
+  container-type: size;
+  position: relative;
+  aspect-ratio: 1;
+  inline-size: min(100cqh, 56cqw, 17rem);
+  justify-self: center;
+  border-radius: 50%;
+  padding: 5%;
+  background: radial-gradient(circle, var(--wheel-rim) 62%, var(--wheel-rim-edge) 100%);
+  box-shadow:
+    0 0.4rem 1.2rem color-mix(in srgb, var(--color-text) 18%, transparent),
+    inset 0 0 0 2px var(--wheel-rim-edge);
+}
+.wheel[data-compact] .wheel__stage {
+  inline-size: min(100cqh, 4.5rem);
+}
+
+.wheel__spinner {
+  container-type: size;
+  position: relative;
+  inline-size: 100%;
+  block-size: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  will-change: transform;
+}
+.wheel__face {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+.wheel__slice {
+  fill: var(--wheel-coins);
+  stroke: var(--wheel-rim);
+  stroke-width: 0.4;
+}
+.wheel__slice[data-odd][data-tone="coins"] {
+  fill: var(--wheel-coins-alt);
+}
+.wheel__slice[data-tone="lose"] {
+  fill: var(--wheel-lose);
+}
+.wheel__slice[data-tone="xp"] {
+  fill: var(--wheel-xp);
+}
+.wheel__slice[data-tone="product"] {
+  fill: var(--wheel-product);
+}
+.wheel__slice[data-tone="nothing"] {
+  fill: var(--wheel-nothing);
+}
+
+/* what each segment gives: Portalab's words, along its middle */
+.wheel__labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.wheel__label {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  color: var(--wheel-ink);
+  font-size: clamp(0.6rem, 9cqi, 1rem);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--color-text) 35%, transparent);
+  transform: translate(-50%, -50%) rotate(var(--wheel-at)) translateY(-34cqi);
+}
+.wheel__label small {
+  font-size: 0.65em;
+  letter-spacing: 0.04em;
+}
+.wheel__label[data-tone="nothing"] {
+  color: var(--color-text-muted);
+  text-shadow: none;
+}
+.wheel[data-compact] .wheel__label {
+  display: none;
+}
+
+/* the bulbs around the rim: they chase while it turns, all lit when it stops */
+.wheel__bulbs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.wheel__bulbs > span {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 3.2cqi;
+  block-size: 3.2cqi;
+  border-radius: 50%;
+  background: var(--wheel-bulb);
+  opacity: 0.45;
+  transform: translate(-50%, -50%) rotate(var(--wheel-at)) translateY(-47.5cqi);
+}
+.wheel[data-phase="spinning"] .wheel__bulbs > span {
+  animation: wheel-chase 0.5s steps(2) infinite;
+}
+.wheel[data-phase="spinning"] .wheel__bulbs > span:nth-child(odd) {
+  animation-delay: 0.25s;
+}
+.wheel[data-phase="done"] .wheel__bulbs > span {
+  opacity: 1;
+  box-shadow: 0 0 0.5rem var(--wheel-bulb);
+}
+@keyframes wheel-chase {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.3;
+  }
+}
+
+/* the pointer, at the top: the segment under it is what the spin gave */
+.wheel__pointer {
+  position: absolute;
+  inset-block-start: -1%;
+  inset-inline-start: 50%;
+  inline-size: 11cqi;
+  block-size: 13cqi;
+  background: var(--wheel-pointer);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform: translateX(-50%);
+  filter: drop-shadow(0 2px 2px color-mix(in srgb, var(--color-text) 40%, transparent));
+}
+
+/* the hub: the button that spins it */
+.wheel__hub {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  display: grid;
+  place-items: center;
+  inline-size: 24cqi;
+  block-size: 24cqi;
+  border: 3px solid var(--wheel-rim-edge);
+  border-radius: 50%;
+  background: var(--wheel-hub);
+  color: var(--wheel-hub-ink);
+  font: inherit;
+  font-size: clamp(0.65rem, 6cqi, 0.95rem);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0.2rem 0.6rem color-mix(in srgb, var(--color-text) 30%, transparent);
+}
+.wheel__hub:not(:disabled):hover {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+.wheel__hub:disabled {
+  cursor: default;
+}
+.wheel__hub:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.wheel[data-phase="idle"] .wheel__hub {
+  animation: wheel-call 2.4s ease-in-out infinite;
+}
+@keyframes wheel-call {
+  50% {
+    box-shadow: 0 0 0 0.45rem color-mix(in srgb, var(--wheel-coins) 30%, transparent);
+  }
+}
+
+.wheel__side {
+  display: grid;
+  gap: var(--space-2);
+  align-content: center;
+  min-inline-size: 0;
+}
+.wheel__status {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+}
+.wheel__hint,
+.wheel__next {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.wheel__next {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.wheel__go {
+  justify-self: start;
+}
+.wheel__outcome {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+  animation: wheel-reveal 0.45s ease-out;
+}
+.wheel__outcome > svg {
+  flex: none;
+  margin-block-start: 0.1em;
+}
+.wheel__outcome[data-tone="coins"] > svg,
+.wheel__outcome[data-tone="product"] > svg {
+  color: var(--wheel-product);
+}
+.wheel__outcome[data-tone="lose"] > svg {
+  color: var(--wheel-lose);
+}
+.wheel__outcome[data-tone="xp"] > svg {
+  color: var(--wheel-xp);
+}
+@keyframes wheel-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(0.4rem) scale(0.96);
+  }
+}
+
+/* narrow and tall (a phone): the wheel above, its words under it */
+@container (max-width: 20rem) and (min-height: 22rem) {
+  .wheel:not([data-compact]) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    align-content: center;
+    justify-items: center;
+    text-align: center;
+  }
+  .wheel:not([data-compact]) .wheel__stage {
+    inline-size: min(100cqw, 60cqh, 17rem);
+  }
+  .wheel:not([data-compact]) .wheel__go {
+    justify-self: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wheel__bulbs > span,
+  .wheel__hub,
+  .wheel__outcome {
+    animation: none;
+  }
+}

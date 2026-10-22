@@ -26,6 +26,7 @@ from portalab.modules.gamification.models import (
     StreakDay,
     UsageWindow,
     UserAchievement,
+    WheelSpin,
     Withheld,
 )
 
@@ -60,6 +61,9 @@ class GamificationParticipant:
                     await session.execute(select(UserAchievement).where(UserAchievement.user_id == user_id))
                 ).scalars()
             )
+            spins = list(
+                (await session.execute(select(WheelSpin).where(WheelSpin.user_id == user_id))).scalars()
+            )
         records = [
             ExportRecord(
                 "gamification.transaction",
@@ -79,6 +83,13 @@ class GamificationParticipant:
                 {"achievement": a.achievement_key, "unlocked_at": a.unlocked_at.isoformat()},
             )
             for a in achievements
+        ]
+        records += [  # issue 225: the daily wheel's spins
+            ExportRecord(
+                "gamification.wheel_spin",
+                {"day": w.day.isoformat(), "segment": w.segment, "kind": w.kind, "delta": w.delta},
+            )
+            for w in spins
         ]
         return records
 
@@ -143,6 +154,7 @@ class GamificationParticipant:
                 AppliedEvent,
                 StreakDay,
                 PlayKind,
+                WheelSpin,
             ):
                 await session.execute(delete(model).where(model.user_id == user_id))
         if self.leaderboards is not None:

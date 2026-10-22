@@ -16,6 +16,13 @@ from portalab.modules.gamification.models import LedgerTransaction, PlayKind, Re
 
 GAINS = ("grant", "manual", "refund", "correction")
 QUESTS = {"quest", "daily", "challenge", "discovery"}  # #104: discovery missions are quests too
+
+
+def is_wheel(source_kind: str, source_ref: str | None) -> bool:
+    """Issue 225: a gain or a loss of the daily wheel (its first spins were recorded as « daily »)."""
+    return source_kind == "wheel" or (source_ref or "").startswith("wheel:")
+
+
 ACTIONS = (
     ("media.request", "requests"),  # #129: asking for a title is not playing it
     ("media.", "media"),
@@ -111,6 +118,7 @@ async def sources(database: Database, user: UUID, value: str, since: datetime, z
                     LedgerTransaction.base_amount,
                     LedgerTransaction.modifiers,
                     PlayKind.kind,
+                    LedgerTransaction.source_ref,
                 )
                 .outerjoin(PlayKind, PlayKind.event_id == LedgerTransaction.trigger_event_id)
                 .where(
@@ -125,8 +133,10 @@ async def sources(database: Database, user: UUID, value: str, since: datetime, z
         ).all()
     per_day: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
     totals: dict[str, float] = defaultdict(float)
-    for when, kind, rule_key, delta, base, modifiers, played in rows:
-        if kind == "reward_rule":
+    for when, kind, rule_key, delta, base, modifiers, played, ref in rows:
+        if is_wheel(kind, ref):
+            action = "wheel"
+        elif kind == "reward_rule":
             action = action_of(events.get(rule_key or ""), played)
         elif kind in QUESTS:
             action = "quests"

@@ -35,6 +35,7 @@ from portalab.modules.gamification.progression.sources import (
     PLAY_SOURCES,
     QUESTS,
     action_of,
+    is_wheel,
     play_source,
     since_days,
     split,
@@ -761,8 +762,15 @@ OPERATIONS_PAGE = 100
 
 
 def _source(
-    kind: str, source_kind: str, delta: int, event_type: str | None, played: str | None = None
+    kind: str,
+    source_kind: str,
+    delta: int,
+    event_type: str | None,
+    played: str | None = None,
+    source_ref: str | None = None,
 ) -> str:
+    if is_wheel(source_kind, source_ref):
+        return "wheel"  # issue 225: the daily wheel, won or lost
     if source_kind == "reward_rule":
         return action_of(event_type, played)
     if source_kind in QUESTS:
@@ -921,6 +929,7 @@ async def _operations(
             int(t.delta),
             events.get(t.rule_key or ""),
             played[0] if (played := plays.get(t.trigger_event_id)) else None,
+            t.source_ref,
         )
         shares = split(t.source_kind, int(t.delta), int(t.base_amount or 0), t.modifiers or {}, action)
         level = curve.level_for(max(0, after_it)) if t.value == "xp" else None
@@ -937,7 +946,7 @@ async def _operations(
                 source_kind=t.source_kind,
                 source=action,
                 label=_label_of(labels, t.source_ref, t.rule_key),
-                reason=t.reason,
+                reason=None if action == "wheel" else t.reason,  # the interface says what the wheel gave
                 balance=after_it,
                 level=level,
                 level_up=level is not None and before is not None and level > before,

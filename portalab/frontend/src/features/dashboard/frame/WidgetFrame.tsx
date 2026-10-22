@@ -18,8 +18,8 @@ import { type Instance, useWidgetData } from "../api";
 import { keyOf } from "../edit/EditSession";
 import { TEMPLATES } from "../templates/Templates";
 import { useOffscreen } from "../widgets/motion";
-import { AddonFrame, wornAddons } from "../widgets/pack/WidgetAddons";
-import { widgetComponent } from "../widgets/registry";
+import { AddonFrame, StageContext, wornAddons } from "../widgets/pack/WidgetAddons";
+import { offersStage, widgetComponent } from "../widgets/registry";
 import { HeaderSlot, WidgetHeaderAction } from "./actions";
 import { useEmptyReport } from "./emptiness";
 
@@ -225,7 +225,12 @@ export function WidgetFrame({
   // 028: the options packs bring it, as the member put them on (a script one may show it otherwise)
   const addons = wornAddons(instance);
   const replacing = addons.find((a) => a.kind === "js" && a.widget?.place === "replace");
-  const overlays = addons.filter((a) => a.kind === "js" && a.widget?.place === "overlay");
+  // issue 225: a script for the region the widget keeps (its face): over it when it keeps none
+  const keepsStage = offersStage(instance.widget?.component_id);
+  const staged = keepsStage ? addons.find((a) => a.kind === "js" && a.widget?.place === "stage") : undefined;
+  const overlays = addons.filter(
+    (a) => a.kind === "js" && (a.widget?.place === "overlay" || (a.widget?.place === "stage" && !keepsStage)),
+  );
   const [fallback, setFallback] = useState(false);
   const worn = typeof frame._skin === "string" ? externalLook("widget_style", frame._skin) : undefined;
   const skin =
@@ -304,7 +309,9 @@ export function WidgetFrame({
                     onFailed={() => setFallback(true)}
                   />
                 ) : (
-                  <Body instance={instance} rows={height} />
+                  <StageContext.Provider value={staged ? { instance, element: staged } : null}>
+                    <Body instance={instance} rows={height} />
+                  </StageContext.Provider>
                 )}
                 {overlays.map((overlay) => (
                   <AddonFrame key={overlay.look} instance={instance} element={overlay} rows={height} />

@@ -1,0 +1,31 @@
+{
+  "type": "widget_option",
+  "product": "opt_wheel_treasure",
+  "names": {
+    "en": "Treasure wheel HD",
+    "fr": "Roue au trésor HD"
+  },
+  "descriptions": {
+    "en": "A wheel out of a treasure chest, drawn by the graphics chip: brushed gold, crimson lacquer inlaid with gold, emerald and obsidian, a diamond with rainbow fire for the gift, glints running over them; a gold rim set with rubies and a gold coin for a hub. Chosen in the widget's settings once bought.",
+    "fr": "Une roue sortie d'un coffre au trésor, dessinée par la carte graphique : or brossé, laque pourpre incrustée d'or, émeraude et obsidienne, un diamant aux feux arc-en-ciel pour le cadeau, des éclats qui courent dessus ; un bord d'or serti de rubis et une pièce d'or pour moyeu. À choisir dans les réglages du widget une fois achetée."
+  },
+  "payload": {
+    "widget": "gamification.daily_wheel"
+  },
+  "render": {
+    "kind": "js",
+    "file": "treasure.js",
+    "place": "stage",
+    "css": [
+      "look.css"
+    ]
+  },
+  "economy": {
+    "price": 2200,
+    "rarity": "legendary",
+    "collection": "widgets",
+    "icon": "crown",
+    "level": 20
+  },
+  "look": "wheel-treasure"
+}

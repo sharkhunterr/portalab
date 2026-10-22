@@ -535,8 +535,9 @@ def _widget_option(report: Report, key: str, element: Element, widgets: Mapping[
     """An option of a widget. A value of one of this pack's widgets' own settings (``setting``, ``value``:
     data only; its default is everyone's, never sold), or an add-on a widget wears — Portalab's (its key),
     this pack's, or any (``*``): a stylesheet under ``[data-widget-option~="<look>"]`` (animations, another
-    look) and/or a script in the sandbox, shown instead of the widget's content or drawn over it (``place``),
-    handed the widget's own data and the contracts it declares."""
+    look) and/or a script in the sandbox, shown instead of the widget's content, drawn over it or in the
+    region the widget keeps for it (``place``: ``stage``), handed the widget's own data and the contracts it
+    declares."""
     payload = element.payload
     if "setting" not in payload:
         target = payload.get("widget")

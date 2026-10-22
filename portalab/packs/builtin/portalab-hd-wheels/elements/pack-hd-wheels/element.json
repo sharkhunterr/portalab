@@ -1,0 +1,28 @@
+{
+  "type": "bundle",
+  "product": "pack_hd_wheels",
+  "names": {
+    "en": "Wheels of fortune HD pack",
+    "fr": "Pack Roues de la fortune HD"
+  },
+  "descriptions": {
+    "en": "Both HD wheels of fortune, drawn by the graphics chip: the cosmic one and the treasure one. — 500 Coins saved.",
+    "fr": "Les deux roues de la fortune HD, dessinées par la puce graphique : la cosmique et celle au trésor. — 500 Coins d'économie."
+  },
+  "render": {
+    "kind": "renderer",
+    "renderer": "builtin"
+  },
+  "economy": {
+    "price": 3100,
+    "rarity": "legendary",
+    "collection": "packs",
+    "icon": "shop"
+  },
+  "payload": {
+    "products": [
+      "opt_wheel_cosmos",
+      "opt_wheel_treasure"
+    ]
+  }
+}
