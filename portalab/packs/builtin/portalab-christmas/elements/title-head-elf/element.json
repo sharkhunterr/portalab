@@ -17,7 +17,8 @@
     "price": 300,
     "rarity": "common",
     "collection": "titles",
-    "icon": "trophy"
+    "icon": "trophy",
+    "season": "christmas"
   },
   "payload": {
     "label": "Head elf",

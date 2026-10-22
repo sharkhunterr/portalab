@@ -12,7 +12,7 @@ from portalab.capabilities.media_core import HistoryItem, Progress
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.visibility_port import OwnerOnlyVisibility, Redacted, VisibilityFilter
-from portalab.modules.media.models import HistoryEntry, MediaObject, UserProgress
+from portalab.modules.media.models import HistoryEntry, MediaObject, ObjectMetadata, UserProgress
 from portalab.modules.media.sections.service import HISTORY_CLASS
 
 
@@ -79,17 +79,28 @@ class MediaActivityAttributes:
                 return None
             effective = row.effective or {}
             genres = effective.get("genres") or ()
+            lineage = [row.id]
             parent_id, hops = row.parent_id, 0
             # 027: an episode or a season carries no genres of its own — its series does
-            while not genres and parent_id is not None and hops < 3:
+            while parent_id is not None and hops < 3:
                 parent = await session.get(MediaObject, parent_id)
                 if parent is None:
                     break
-                genres = (parent.effective or {}).get("genres") or ()
+                lineage.append(parent.id)
+                if not genres:
+                    genres = (parent.effective or {}).get("genres") or ()
                 parent_id, hops = parent.parent_id, hops + 1
+            keywords: list[str] = []
+            for object_id in lineage:  # the nearest that the metadata provider knows (a film, a series)
+                meta = await session.get(ObjectMetadata, object_id)
+                if meta is not None and meta.status == "found" and meta.data.get("keywords"):
+                    keywords = [str(k) for k in meta.data["keywords"]]
+                    break
         return ActivityAttributes(
             media_kind=row.kind,
             genres=tuple(sorted({str(g).strip().casefold() for g in genres})),
             title=row.title,
             original_title=effective.get("original_title"),
+            keywords=tuple(sorted({k.strip().casefold() for k in keywords if k.strip()})),
+            objects=tuple(str(i) for i in lineage),
         )

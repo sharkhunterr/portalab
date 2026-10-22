@@ -16,6 +16,10 @@ class ActivityAttributes:
     genres: tuple[str, ...] = ()
     title: str | None = None
     original_title: str | None = None
+    # the metadata provider's keywords (TMDB: « christmas », « santa claus »…), the series' for an episode
+    keywords: tuple[str, ...] = ()
+    # the object and its parents (season, series): a hand-picked series counts its episodes
+    objects: tuple[str, ...] = ()
     extra: dict[str, Any] = field(default_factory=dict)
 
 

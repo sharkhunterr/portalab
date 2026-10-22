@@ -446,3 +446,43 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
+/* hand-picked titles of a bonus: the picked ones as chips, the search results below */
+.campaign-picked,
+.campaign-found {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+.campaign-picked li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.15rem 0.3rem 0.15rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  font-size: var(--font-size-sm);
+}
+.campaign-picked button {
+  display: grid;
+  place-items: center;
+  inline-size: 1.4rem;
+  block-size: 1.4rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.campaign-found {
+  flex-direction: column;
+  margin-block-start: var(--space-2);
+}
+.campaign-found li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}

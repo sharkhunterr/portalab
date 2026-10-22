@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
 import { api } from "../../../api/client";
 import { FormActions, FormGrid, SearchBox } from "../../../design-system/admin/AdminKit";
@@ -12,7 +12,8 @@ import { type Campaign, useCampaignAdmin } from "../api";
 /**
  * Campaign editor (027): a form instead of raw JSON — names, dates (wall clock in the campaign's time zone,
  * once or every year), **bonuses** (a value multiplied for some actions, media kinds and genres, e.g. ×2 XP
- * for horror films and series) and **shop discounts** (a percentage off chosen products or categories).
+ * for horror films and series; or Christmas films — by title, by the provider's keywords or hand-picked) and
+ * **shop discounts** (a percentage off chosen products, categories or a whole season).
  * Parts the form does not edit (scoped achievements and quests, theme) are kept as they are.
  */
 type Value = "xp" | "coins" | "contribution";
@@ -26,6 +27,8 @@ export interface Bonus {
     media_kind?: string[];
     genre?: string[];
     title_contains?: string[];
+    keyword?: string[];
+    objects?: string[];
     audience?: unknown;
   };
 }
@@ -35,6 +38,7 @@ export interface Discount {
   percent: number;
   products: string[];
   categories: string[];
+  seasons?: string[];
 }
 
 export interface CampaignDef {
@@ -63,6 +67,8 @@ export const ACTIONS = [
 ];
 export const MEDIA_KINDS = ["movie", "series", "episode", "book", "audiobook", "game", "album"];
 const VALUES: Value[] = ["xp", "coins", "contribution"];
+/** The shop's seasons (a product of a season — its looks, its booster, its pack — carries its key). */
+export const SEASONS = ["valentine", "spring", "summer", "halloween", "christmas"];
 
 const list = (text: string) =>
   text
@@ -104,6 +110,83 @@ function useShop() {
     staleTime: 60_000,
   });
   return { products: products.data ?? [], categories: categories.data ?? [] };
+}
+
+interface MediaHit {
+  id: string;
+  title: string;
+  kind: string;
+  year?: number | null;
+}
+
+/** Hand-picked titles: found in the library by name; a series counts its episodes. */
+function PickedTitles({ ids, onChange }: { ids: string[]; onChange: (ids: string[]) => void }) {
+  const t = useT();
+  const [query, setQuery] = useState("");
+  const found = useQuery({
+    queryKey: ["campaigns", "admin", "media", query.trim()],
+    enabled: query.trim().length >= 2,
+    queryFn: async () =>
+      ((await api.GET("/api/v1/media", { params: { query: { q: query.trim() } } })).data?.items ?? [])
+        .filter((item) => ["movie", "series", "book", "audiobook", "game", "album"].includes(item.kind))
+        .slice(0, 8) as unknown as MediaHit[],
+  });
+  const picked = useQueries({
+    queries: ids.map((id) => ({
+      queryKey: ["campaigns", "admin", "media-item", id],
+      staleTime: 300_000,
+      queryFn: async () =>
+        (await api.GET("/api/v1/media/{object_id}", { params: { path: { object_id: id } } })).data as
+          | MediaHit
+          | undefined,
+    })),
+  });
+  return (
+    <fieldset className="campaign-bonus__group">
+      <legend>{t("campaigns:editor.picked", { count: ids.length })}</legend>
+      {ids.length ? (
+        <ul className="campaign-picked">
+          {ids.map((id, index) => (
+            <li key={id}>
+              <span>{picked[index]?.data?.title ?? id.slice(0, 8)}</span>
+              <button
+                type="button"
+                aria-label={t("campaigns:editor.unpick", { title: picked[index]?.data?.title ?? id })}
+                onClick={() => onChange(ids.filter((x) => x !== id))}
+              >
+                <Icon name="close" size={14} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <SearchBox label={t("campaigns:editor.findTitle")} value={query} onChange={setQuery} />
+      {found.data?.length ? (
+        <ul className="campaign-found">
+          {found.data.map((hit) => (
+            <li key={hit.id}>
+              <span>
+                {hit.title}
+                <span className="admin-muted">
+                  {" "}
+                  · {t(`media:kind.${hit.kind}`)}
+                  {hit.year ? ` · ${hit.year}` : ""}
+                </span>
+              </span>
+              <Button
+                variant="ghost"
+                disabled={ids.includes(hit.id)}
+                onClick={() => onChange([...ids, hit.id])}
+              >
+                <Icon name="plus" size={14} />
+                {t("campaigns:editor.pick")}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </fieldset>
+  );
 }
 
 function BonusEditor({
@@ -191,7 +274,18 @@ function BonusEditor({
           value={(when.title_contains ?? []).join(", ")}
           onChange={(e) => onChange({ ...bonus, when: { ...when, title_contains: list(e.target.value) } })}
         />
+        <TextField
+          label={t("campaigns:editor.keywords")}
+          hint={t("campaigns:editor.keywordsHint")}
+          value={(when.keyword ?? []).join(", ")}
+          onChange={(e) => onChange({ ...bonus, when: { ...when, keyword: list(e.target.value) } })}
+        />
       </FormGrid>
+      <PickedTitles
+        ids={when.objects ?? []}
+        onChange={(objects) => onChange({ ...bonus, when: { ...when, objects } })}
+      />
+      <p className="admin-muted">{t("campaigns:editor.themedHint")}</p>
     </div>
   );
 }
@@ -226,6 +320,27 @@ function DiscountEditor({
           <Icon name="trash" size={16} />
         </Button>
       </div>
+      <fieldset className="campaign-bonus__group">
+        <legend>{t("campaigns:editor.seasons")}</legend>
+        <div className="campaign-checks">
+          {SEASONS.map((season) => (
+            <CheckboxField
+              key={season}
+              label={t(`campaigns:editor.season.${season}`)}
+              checked={(discount.seasons ?? []).includes(season)}
+              onChange={(e) =>
+                onChange({
+                  ...discount,
+                  seasons: e.target.checked
+                    ? [...(discount.seasons ?? []), season]
+                    : (discount.seasons ?? []).filter((x) => x !== season),
+                })
+              }
+            />
+          ))}
+        </div>
+        <p className="admin-muted">{t("campaigns:editor.seasonsHint")}</p>
+      </fieldset>
       <fieldset className="campaign-bonus__group">
         <legend>{t("campaigns:editor.categories")}</legend>
         <div className="campaign-checks">

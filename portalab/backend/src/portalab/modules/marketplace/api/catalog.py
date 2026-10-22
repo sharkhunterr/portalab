@@ -171,7 +171,7 @@ def product_out(
 ) -> MarketplaceProductOut:
     supply, remaining = (stock or {}).get(product.id, (None, None))
     category = (categories or {}).get(product.category_id) if product.category_id else None
-    now, discount = price_now(discounts, product.key, category, version.price_coins)
+    now, discount = price_now(discounts, product.key, category, version.price_coins, product.season)
     levels = [int(c["level"]) for c in version.conditions if c.get("kind") == "min_level"]
     return MarketplaceProductOut(
         key=product.key,

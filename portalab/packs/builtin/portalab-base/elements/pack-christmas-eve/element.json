@@ -18,7 +18,8 @@
     "rarity": "epic",
     "level": 3,
     "collection": "packs",
-    "icon": "shop"
+    "icon": "shop",
+    "season": "christmas"
   },
   "payload": {
     "products": [
