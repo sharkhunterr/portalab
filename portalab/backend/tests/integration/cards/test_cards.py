@@ -307,12 +307,21 @@ class Web:
             ),
             ImageHit("https://a/other.jpg", "Miles Teller in Top Gun: Maverick", 1280, 720, "bing"),
             ImageHit("https://a/him.jpg", "Tom Cruise as Maverick in Top Gun: Maverick", 1280, 720, "bing"),
+            # a montage of him then and now, its page saying nothing of it: only his face twice betrays it
+            ImageHit(
+                "https://a/twice.jpg",
+                "Tom Cruise Maverick in Top Gun: Maverick, 1986 and 2022",
+                1280,
+                720,
+                "x",
+            ),
         ]
 
     async def fetch(self, url: str) -> bytes:
         return {
             "https://a/premiere.jpg": b"face:cruise",
             "https://a/other.jpg": b"face:teller",
+            "https://a/twice.jpg": b"face:cruise face:cruise",  # a montage: him twice
             "https://a/him.jpg": b"face:cruise jet",
         }[url]
 

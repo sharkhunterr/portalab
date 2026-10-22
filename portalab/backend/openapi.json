@@ -22727,6 +22727,52 @@
         ]
       }
     },
+    "/api/v1/admin/cards/sets/{key}/characters": {
+      "post": {
+        "description": "Look for this set's actors' characters on the web now (again for those found there before).",
+        "operationId": "look_for_characters_api_v1_admin_cards_sets__key__characters_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f-]{36}$",
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Look For Characters Api V1 Admin Cards Sets  Key  Characters Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Look For Characters",
+        "tags": [
+          "cards"
+        ]
+      }
+    },
     "/api/v1/admin/cards/sync": {
       "post": {
         "description": "Make the cards again from the works present now (those that changed), then rank them again; and look\nfor the next actors' characters at once.",

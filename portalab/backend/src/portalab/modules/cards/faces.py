@@ -118,10 +118,12 @@ class FaceMatcher:
         return float(self._recognizer.match(a.signature, b.signature, self._cv.FaceRecognizerSF_FR_COSINE))
 
 
-# what an image's page says when it is a premiere, a festival, an interview — the actor, not their character
+# what an image's page says when it is a premiere, a festival, an interview, a « then and now » — the actor,
+# not their character
 EVENT = re.compile(
     r"premi[eè]re|festival|red carpet|tapis rouge|cannes|gala|arrives|attends|award|oscars?|c[ée]sar|"
-    r"interview|photocall|press|conf[ée]rence|getty|wireimage",
+    r"interview|photocall|press|conf[ée]rence|getty|wireimage|"
+    r"then and now|now and then|today|aujourd|years later|ans apr[eè]s|avant.apr[eè]s|before and after",
     re.IGNORECASE,
 )
 SKIPPED_ENGINES = {"wikicommons.images"}  # public photographs of people: events, almost never a film's
