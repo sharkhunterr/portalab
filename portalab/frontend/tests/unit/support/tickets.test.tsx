@@ -125,14 +125,16 @@ describe("feedback review", () => {
     };
     renderAt("/", [{ path: "/", element: <ReviewQueue /> }]);
     fireEvent.click(await screen.findByRole("button", { name: /A member.*bug_report/ }));
-    const proposal = await screen.findByRole("button", { name: /Feature proposal/ });
-    expect((proposal as HTMLButtonElement).disabled).toBe(true);
-    expect(proposal.textContent).toContain("Community is not available");
+    // the ticket is a big action of its own; the other conversions wait in « More »
     await waitFor(() =>
-      expect((screen.getByRole("button", { name: /Make it a ticket/ }) as HTMLButtonElement).disabled).toBe(
+      expect((screen.getByRole("button", { name: /Make a ticket/ }) as HTMLButtonElement).disabled).toBe(
         false,
       ),
     );
+    fireEvent.keyDown(screen.getByRole("button", { name: /^More$/ }), { key: "Enter" });
+    const proposal = await screen.findByRole("menuitem", { name: /Feature proposal/ });
+    expect(proposal.getAttribute("aria-disabled")).toBe("true");
+    expect(proposal.textContent).toContain("Community is not available");
   });
 });
 

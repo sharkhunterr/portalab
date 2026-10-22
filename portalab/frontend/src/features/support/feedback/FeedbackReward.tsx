@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useId, useState } from "react";
+import { type ReactNode, useId, useState } from "react";
 import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
 import { Button } from "../../../design-system/components/Button";
@@ -15,12 +15,28 @@ type Kind = "coins" | "xp" | "product";
 
 const PRESETS = [50, 100, 250, 500] as const;
 
+/** Whether this viewer may reward this feedback (an author, and a right to give). */
+export function useCanReward(item: Item): boolean {
+  const canGrant = useHasPermission("rewards.grant");
+  const canGift = useHasPermission("marketplace.manage");
+  return Boolean(item.submitter_id) && (canGrant || canGift);
+}
+
 /**
  * A feedback (or a form's answer) that made a difference earns its author something, at the
  * administrator's will: some of the portal's currency, XP, or a product of the shop — given through the
  * same grants as the member's console, with a thank-you sent as the reply (the member is notified).
  */
-export function FeedbackReward({ item, onDone }: { item: Item; onDone: () => void }) {
+export function FeedbackReward({
+  item,
+  onDone,
+  trigger,
+}: {
+  item: Item;
+  onDone: () => void;
+  /** What opens the dialog (a tile of the feedback's toolbar); a button by default. */
+  trigger?: ReactNode;
+}) {
   const t = useT();
   const client = useQueryClient();
   const formId = useId();
@@ -112,10 +128,12 @@ export function FeedbackReward({ item, onDone }: { item: Item; onDone: () => voi
       description={t("support:reward.description")}
       closeLabel={t("support:reward.cancel")}
       trigger={
-        <Button variant="secondary">
-          <Icon name="gift" size={16} />
-          {t("support:reward.open")}
-        </Button>
+        trigger ?? (
+          <Button variant="secondary">
+            <Icon name="gift" size={16} />
+            {t("support:reward.open")}
+          </Button>
+        )
       }
     >
       <form
