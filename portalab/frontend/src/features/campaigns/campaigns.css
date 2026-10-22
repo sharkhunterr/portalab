@@ -486,3 +486,47 @@
   justify-content: space-between;
   gap: var(--space-2);
 }
+/* a bonus's gains: each value on its own line, ticked, with its multiplier on the right */
+.campaign-gains {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+.campaign-gains > legend {
+  margin-block-end: var(--space-1);
+  font-weight: var(--font-weight-semibold);
+}
+.campaign-gain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-block-size: 2.5rem;
+  max-inline-size: 20rem;
+}
+.campaign-gain__factor {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
+}
+.campaign-gain__factor input {
+  inline-size: 4.5rem;
+  min-block-size: 2.25rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+.campaign-gain__factor input:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}

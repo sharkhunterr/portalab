@@ -18,10 +18,17 @@ import { type Campaign, useCampaignAdmin } from "../api";
  */
 type Value = "xp" | "coins" | "contribution";
 
-export interface Bonus {
-  id: string;
+export interface Gain {
   value: Value;
   factor: number;
+}
+
+export interface Bonus {
+  id: string;
+  /** One value multiplied (older bonuses) — or several, in ``gains``. */
+  value?: Value;
+  factor?: number;
+  gains?: Gain[];
   when: {
     activity?: string[];
     media_kind?: string[];
@@ -79,10 +86,15 @@ const list = (text: string) =>
 function blankBonus(index: number): Bonus {
   return {
     id: `bonus_${index + 1}`,
-    value: "xp",
-    factor: 2,
+    gains: [{ value: "xp", factor: 2 }],
     when: { activity: ["media.playback_finished"] },
   };
+}
+
+/** Every value a bonus multiplies (its single ``value`` × ``factor`` for an older one). */
+export function gainsOf(bonus: Bonus): Gain[] {
+  if (bonus.gains?.length) return bonus.gains;
+  return bonus.value ? [{ value: bonus.value, factor: bonus.factor ?? 1 }] : [];
 }
 
 interface ShopProduct {
@@ -200,6 +212,12 @@ function BonusEditor({
 }) {
   const t = useT();
   const when = bonus.when;
+  const gains = gainsOf(bonus);
+  // the bonus keeps its gains only (an older one's single value moves into them)
+  const setGains = (next: Gain[]) => {
+    const { value: _value, factor: _factor, ...rest } = bonus;
+    onChange({ ...rest, gains: next });
+  };
   const toggle = (field: "activity" | "media_kind", item: string, on: boolean) => {
     const current = when[field] ?? [];
     onChange({
@@ -210,26 +228,46 @@ function BonusEditor({
   return (
     <div className="campaign-bonus">
       <div className="campaign-bonus__head">
-        <SelectField
-          label={t("campaigns:editor.value")}
-          value={bonus.value}
-          onChange={(e) => onChange({ ...bonus, value: e.target.value as Value })}
-        >
-          {VALUES.map((v) => (
-            <option key={v} value={v}>
-              {t(`gamification:value.${v}`)}
-            </option>
-          ))}
-        </SelectField>
-        <TextField
-          label={t("campaigns:editor.factor")}
-          type="number"
-          min={0.1}
-          max={10}
-          step="0.1"
-          value={String(bonus.factor)}
-          onChange={(e) => onChange({ ...bonus, factor: Number(e.target.value) })}
-        />
+        <fieldset className="campaign-gains">
+          <legend>{t("campaigns:editor.gains")}</legend>
+          {VALUES.map((v) => {
+            const gain = gains.find((g) => g.value === v);
+            return (
+              <div key={v} className="campaign-gain" data-on={gain ? "" : undefined}>
+                <CheckboxField
+                  label={t(`gamification:value.${v}`)}
+                  checked={Boolean(gain)}
+                  onChange={(e) =>
+                    setGains(
+                      e.target.checked
+                        ? [...gains, { value: v, factor: 2 }]
+                        : gains.filter((g) => g.value !== v),
+                    )
+                  }
+                />
+                {gain ? (
+                  <span className="campaign-gain__factor">
+                    ×
+                    <input
+                      type="number"
+                      min={0.1}
+                      max={10}
+                      step="0.1"
+                      aria-label={t("campaigns:editor.factorOf", { value: t(`gamification:value.${v}`) })}
+                      value={String(gain.factor)}
+                      onChange={(e) =>
+                        setGains(
+                          gains.map((g) => (g.value === v ? { ...g, factor: Number(e.target.value) } : g)),
+                        )
+                      }
+                    />
+                  </span>
+                ) : null}
+              </div>
+            );
+          })}
+          {!gains.length ? <p className="admin-muted">{t("campaigns:editor.noGain")}</p> : null}
+        </fieldset>
         <Button variant="ghost" size="icon" aria-label={t("campaigns:editor.remove")} onClick={onRemove}>
           <Icon name="trash" size={16} />
         </Button>

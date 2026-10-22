@@ -9,7 +9,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { type Campaign, type CampaignAction, useCampaignAdmin, useCampaignsAdmin } from "../api";
 import { Timeline } from "../history/Timeline";
-import { type CampaignDef, CampaignEditor } from "./CampaignEditor";
+import { type CampaignDef, CampaignEditor, gainsOf } from "./CampaignEditor";
 import { SimulationPanel } from "./SimulationPanel";
 import "../campaigns.css";
 import "../../gamification/gamification.css";
@@ -131,8 +131,10 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
       </p>
       <div className="gam-chips">
         {(def.modifiers ?? []).map((bonus) => (
-          <span key={bonus.id} className="gam-chip" data-value={bonus.value}>
-            ×{bonus.factor} {t(`gamification:value.${bonus.value}`)}
+          <span key={bonus.id} className="gam-chip" data-value={gainsOf(bonus)[0]?.value}>
+            {gainsOf(bonus)
+              .map((g) => `×${g.factor} ${t(`gamification:value.${g.value}`)}`)
+              .join(" + ")}
             {bonus.when.media_kind?.length
               ? ` · ${bonus.when.media_kind.map((k) => t(`media:kind.${k}`)).join(", ")}`
               : ""}

@@ -104,7 +104,9 @@ class Presentation:
         definition = CampaignDefinition.model_validate(version.definition)
         return {
             "description": definition.description,
-            "modifiers": [{"value": m.value, "factor": m.factor} for m in definition.modifiers],
+            "modifiers": [
+                {"value": g.value, "factor": g.factor} for m in definition.modifiers for g in m.all_gains()
+            ],
             "window": {"start_at": window.start_at.isoformat(), "end_at": window.end_at.isoformat()}
             if window
             else None,

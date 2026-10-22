@@ -45,11 +45,12 @@ class CampaignModifiers:
                     verdict = "audience"
                 else:
                     verdict = match_attributes(modifier.when, attributes)
-                out.append(
-                    Explanation(
-                        campaign.key, campaign.version, modifier.id, modifier.value, modifier.factor, verdict
+                for gain in modifier.all_gains():
+                    out.append(
+                        Explanation(
+                            campaign.key, campaign.version, modifier.id, gain.value, gain.factor, verdict
+                        )
                     )
-                )
         return out
 
     async def modifiers_for(
