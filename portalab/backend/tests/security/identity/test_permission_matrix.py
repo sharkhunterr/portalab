@@ -33,6 +33,7 @@ PUBLIC_ROUTES = {
 EXPECTED_PERMISSIONS = {
     ("GET", "/api/v1/me"): "users.self.manage",
     ("PATCH", "/api/v1/me/profile"): "users.self.manage",
+    ("POST", "/api/v1/me/password"): "users.self.manage",
     ("PUT", "/api/v1/me/avatar"): "users.self.manage",
     ("DELETE", "/api/v1/me/avatar"): "users.self.manage",
     ("GET", "/api/v1/me/onboarding"): "users.self.manage",
