@@ -12,10 +12,12 @@ import {
 import { Avatar } from "../../../design-system/components/Avatar";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
+import { Dialog } from "../../../design-system/components/Overlays";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
+import { type FormRow as DefinedForm, FormEditor } from "../admin/Definitions";
 import type { FieldDef } from "../tickets/api";
 import { useFeedbackActions, useFeedbackDetail } from "../tickets/api";
 import { optionLabel } from "../tickets/FieldInputs";
@@ -24,13 +26,7 @@ import "../support.css";
 
 type Item = components["schemas"]["FeedbackOut"];
 type Results = components["schemas"]["FeedbackResultsOut"];
-type FormRow = {
-  key: string;
-  label: string;
-  fields: FieldDef[];
-  requested?: boolean;
-  closes_at?: string | null;
-};
+type FormRow = DefinedForm;
 
 const QUEUE = ["support", "feedback"] as const;
 const STATUSES = ["new", "reviewed", "converted", "dismissed", "all"] as const;
@@ -325,12 +321,7 @@ function ResultsPanel({ form }: { form: FormRow }) {
   if (!results.data) return <FunctionalState state="loading" />;
   return (
     <div className="feedback-results">
-      <p className="feedback-results__total">
-        {t("support:review.answers", { count: results.data.total })}
-        {form.closes_at
-          ? ` · ${t("support:forms.until", { date: format.date(form.closes_at, "medium") })}`
-          : ""}
-      </p>
+      <p className="feedback-results__total">{t("support:review.answers", { count: results.data.total })}</p>
       {results.data.fields.map((field) => {
         const counts = field.counts ?? {};
         const most = Math.max(1, ...Object.values(counts));
@@ -436,6 +427,191 @@ export function MemberFeedback({ userId }: { userId: string }) {
   return <FeedbackCards items={queue.data ?? []} fieldsOf={fieldsOf} />;
 }
 
+type Phase = "open" | "planned" | "ended";
+const DAY = 86_400_000;
+
+function phaseOf(form: FormRow, now: number): Phase {
+  const opens = form.opens_at ? Date.parse(form.opens_at) : 0;
+  const closes = form.closes_at ? Date.parse(form.closes_at) : Number.POSITIVE_INFINITY;
+  if (!form.enabled || now >= closes) return "ended";
+  return now < opens ? "planned" : "open";
+}
+
+/** One request to the members: its period, how far it has gone, its answers summed up or one by one. */
+function RequestCard({ form, answers }: { form: FormRow; answers: Item[] }) {
+  const t = useT();
+  const format = useFormat();
+  const client = useQueryClient();
+  const [view, setView] = useState<"summary" | "answers">("summary");
+  const [editing, setEditing] = useState(false);
+  const now = Date.now();
+  const phase = phaseOf(form, now);
+  const opens = form.opens_at ? Date.parse(form.opens_at) : now;
+  const closes = form.closes_at ? Date.parse(form.closes_at) : null;
+  const elapsed = closes && closes > opens ? Math.min(1, Math.max(0, (now - opens) / (closes - opens))) : 0;
+  const waiting = answers.filter((a) => a.status === "new").length;
+  const latest = answers.reduce((max, a) => Math.max(max, Date.parse(a.created_at)), 0);
+  const when =
+    phase === "planned"
+      ? t("support:requests.startsIn", { days: Math.max(1, Math.ceil((opens - now) / DAY)) })
+      : phase === "open" && closes
+        ? t("support:requests.endsIn", { days: Math.max(1, Math.ceil((closes - now) / DAY)) })
+        : phase === "ended" && closes
+          ? t("support:requests.endedOn", { date: format.date(new Date(closes).toISOString(), "medium") })
+          : t("support:requests.noEnd");
+  const closeNow = useMutation({
+    mutationFn: async () =>
+      api.PUT("/api/v1/admin/support/forms/{key}", {
+        params: { path: { key: form.key } },
+        body: {
+          kind: form.kind,
+          label: form.label,
+          enabled: form.enabled,
+          description: form.description ?? "",
+          icon: form.icon ?? null,
+          requested: true,
+          fields: form.fields as unknown as Array<Record<string, unknown>>,
+          opens_at: form.opens_at ?? null,
+          closes_at: new Date().toISOString(),
+        },
+      }),
+    onSuccess: () => client.invalidateQueries({ queryKey: ["support"] }),
+  });
+  return (
+    <li className="request-card" data-phase={phase}>
+      <header className="request-card__head">
+        <span className="request-card__icon" aria-hidden="true">
+          <Icon name={form.icon ?? "message"} size={22} />
+        </span>
+        <span className="request-card__title">
+          <strong>{form.label}</strong>
+          <span className="admin-muted">{when}</span>
+        </span>
+        <StatusBadge tone={phase === "open" ? "ok" : phase === "planned" ? "info" : "neutral"}>
+          {t(`support:requests.phase.${phase}`)}
+        </StatusBadge>
+      </header>
+      {phase === "open" && closes ? (
+        <span className="request-card__time" aria-hidden="true">
+          <span style={{ inlineSize: `${Math.round(elapsed * 100)}%` }} />
+        </span>
+      ) : null}
+      <dl className="request-card__figures">
+        <div>
+          <dt>{t("support:requests.answers")}</dt>
+          <dd>{answers.length}</dd>
+        </div>
+        <div>
+          <dt>{t("support:requests.toReview")}</dt>
+          <dd>{waiting}</dd>
+        </div>
+        <div>
+          <dt>{t("support:requests.latest")}</dt>
+          <dd>{latest ? format.relative((latest - now) / 1000) : "—"}</dd>
+        </div>
+      </dl>
+      <div className="request-card__bar">
+        <fieldset className="request-card__views">
+          <legend className="visually-hidden">{form.label}</legend>
+          {(["summary", "answers"] as const).map((key) => (
+            <button key={key} type="button" aria-pressed={view === key} onClick={() => setView(key)}>
+              {key === "answers"
+                ? t("support:requests.view.answers", { count: answers.length })
+                : t("support:requests.view.summary")}
+            </button>
+          ))}
+        </fieldset>
+        <span className="request-card__actions">
+          <Dialog
+            open={editing}
+            onOpenChange={setEditing}
+            title={form.label}
+            closeLabel={t("support:admin.close")}
+            size="lg"
+            trigger={
+              <Button variant="ghost">
+                <Icon name="settings" size={16} />
+                {t("support:requests.edit")}
+              </Button>
+            }
+          >
+            <FormEditor form={form} onDone={() => setEditing(false)} />
+          </Dialog>
+          {phase === "open" ? (
+            <Button variant="ghost" disabled={closeNow.isPending} onClick={() => closeNow.mutate()}>
+              <Icon name="close" size={16} />
+              {t("support:requests.closeNow")}
+            </Button>
+          ) : null}
+        </span>
+      </div>
+      {view === "summary" ? (
+        <ResultsPanel form={form} />
+      ) : answers.length ? (
+        <FeedbackCards items={answers} fieldsOf={() => form.fields} />
+      ) : (
+        <p className="admin-muted">{t("support:review.answers", { count: 0 })}</p>
+      )}
+    </li>
+  );
+}
+
+/**
+ * The requests: forms the administrators send the members for a while (027) — created here, each one a
+ * card with its period and progress, its answers summed up or handled one by one (read, reward, convert).
+ */
+function RequestsPanel({ forms, items }: { forms: FormRow[]; items: Item[] }) {
+  const t = useT();
+  const [creating, setCreating] = useState(false);
+  const now = Date.now();
+  const [phase, setPhase] = useState<Phase>("open");
+  const shown = forms.filter((f) => phaseOf(f, now) === phase);
+  const count = (p: Phase) => forms.filter((f) => phaseOf(f, now) === p).length;
+  return (
+    <AdminSection
+      span="full"
+      icon="star"
+      title={t("support:requests.title")}
+      description={t("support:requests.hint")}
+      actions={
+        <Dialog
+          open={creating}
+          onOpenChange={setCreating}
+          title={t("support:forms.new")}
+          closeLabel={t("support:admin.close")}
+          size="lg"
+          trigger={
+            <Button>
+              <Icon name="plus" size={16} />
+              {t("support:requests.new")}
+            </Button>
+          }
+        >
+          <FormEditor onDone={() => setCreating(false)} />
+        </Dialog>
+      }
+    >
+      <fieldset className="request-phases">
+        <legend className="visually-hidden">{t("support:requests.title")}</legend>
+        {(["open", "planned", "ended"] as const).map((p) => (
+          <button key={p} type="button" aria-pressed={phase === p} onClick={() => setPhase(p)}>
+            {t(`support:requests.phase.${p}`)} <span className="request-phases__count">{count(p)}</span>
+          </button>
+        ))}
+      </fieldset>
+      {shown.length ? (
+        <ul className="request-cards">
+          {shown.map((form) => (
+            <RequestCard key={form.key} form={form} answers={items.filter((i) => i.form_key === form.key)} />
+          ))}
+        </ul>
+      ) : (
+        <AdminEmpty icon="star" title={t(`support:requests.none.${phase}`)} />
+      )}
+    </AdminSection>
+  );
+}
+
 /**
  * Feedback review (spec 016 T030/T032; 027 redesign, staff): by status, one card per feedback — who, which
  * form, the answers in words — opened to reply (the member is notified), mark as read, dismiss or convert;
@@ -466,22 +642,18 @@ export function ReviewQueue() {
               label: t(`support:review.tabs.${s}`),
               count: s === "all" ? items.length : items.filter((i) => i.status === s).length,
             })),
-            { key: "requests", label: t("support:review.tabs.requests"), count: requested.length },
+            {
+              key: "requests",
+              label: t("support:review.tabs.requests"),
+              count: requested.filter((f) => phaseOf(f, Date.now()) === "open").length,
+            },
           ]}
         />
       }
     >
       {queue.isError ? <FunctionalState state="unauthorized" /> : null}
       {status === "requests" ? (
-        requested.length ? (
-          requested.map((form) => (
-            <AdminSection key={form.key} span="full" icon="star" title={form.label}>
-              <ResultsPanel form={form} />
-            </AdminSection>
-          ))
-        ) : (
-          <AdminEmpty icon="star" title={t("support:review.noRequests")} />
-        )
+        <RequestsPanel forms={requested} items={items} />
       ) : (
         <>
           {queue.data && !shown.length ? <AdminEmpty icon="inbox" title={t("support:review.empty")} /> : null}
