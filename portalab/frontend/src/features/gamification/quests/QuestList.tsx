@@ -14,6 +14,8 @@ export interface QuestItem {
   completed: boolean;
   steps: Array<{ current: number; target: number }>;
   rewards: Array<{ value: string; amount: number }>;
+  /** 027: what it gives from the shop (a sealed booster…), by name. */
+  gifts?: string[];
 }
 
 /**
@@ -49,16 +51,17 @@ export function QuestList({ quests }: { quests: QuestItem[] }) {
               label={t("gamification:achievements.progress", step)}
             />
           ))}
-          {quest.rewards.length ? (
+          {quest.rewards.length || quest.gifts?.length ? (
             <p className="gamification-meta">
-              {quest.rewards
-                .map((reward) =>
+              {[
+                ...quest.rewards.map((reward) =>
                   t("gamification:quests.reward", {
                     amount: reward.amount,
                     value: t(`gamification:value.${reward.value}`),
                   }),
-                )
-                .join(" · ")}
+                ),
+                ...(quest.gifts ?? []).map((gift) => t("gamification:quests.gift", { gift })),
+              ].join(" · ")}
             </p>
           ) : null}
           {quest.ends_at ? (

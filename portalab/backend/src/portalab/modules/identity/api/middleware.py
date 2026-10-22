@@ -7,6 +7,8 @@
 * the database being unreachable fails **closed** with 503, never open (plan §9).
 """
 
+from datetime import datetime
+
 from fastapi import Request, Response
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
@@ -17,6 +19,7 @@ from portalab.modules.identity.domain.state_machine import AccountState
 from portalab.modules.identity.models import User
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.identity.services.sessions import IssuedSession, csrf_matches
+from portalab.modules.identity.services.visits import record_visit
 
 SESSION_COOKIE = "__Host-portalab_session"
 CSRF_COOKIE = "__Host-portalab_csrf"
@@ -50,10 +53,13 @@ class SessionPrincipalResolver:
         ctx = module.ctx
         try:
             async with ctx.database.unit_of_work() as uow:
-                row = await module.sessions.resolve(uow.session, token, ctx.now())
+                now, seen = ctx.now(), list[datetime]()
+                row = await module.sessions.resolve(uow.session, token, now, seen=seen)
                 state = None
                 if row is not None:
                     state = await uow.session.scalar(select(User.state).where(User.id == row.user_id))
+                if row is not None and seen and state == AccountState.ACTIVE.value:
+                    await record_visit(ctx, uow.session, row.user_id, now, since=seen[0])
         except (SQLAlchemyError, OSError) as exc:
             raise Unavailable("Authentication is temporarily unavailable.", code="auth.unavailable") from exc
         if row is None or state != AccountState.ACTIVE.value:

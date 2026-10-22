@@ -33,6 +33,7 @@ from portalab.modules.identity.services.common import (
 from portalab.modules.identity.services.credentials import CredentialHasher, set_password
 from portalab.modules.identity.services.sessions import IssuedSession, SessionService, ip_prefix
 from portalab.modules.identity.services.throttle import LoginThrottleService, throttle_key
+from portalab.modules.identity.services.visits import record_visit
 
 
 @dataclass(frozen=True, slots=True)
@@ -188,6 +189,7 @@ class AuthService:
                     metadata={"session_id": str(issued.session_id)},
                     dedup_key=f"session:{issued.session_id}:signed_in",
                 )
+                await record_visit(self.ctx, uow.session, user.id, now)  # 027: today's visit, once
                 display_name = user.display_name
         if unavailable is not None:
             metrics.increment("identity.login.unavailable")

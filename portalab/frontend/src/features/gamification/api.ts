@@ -225,6 +225,8 @@ interface QuestOut {
   completed_at?: string | null;
   steps?: Array<{ current: number; target: number }>;
   rewards?: Array<{ value: string; amount: number }>;
+  /** 027: what it gives from the shop (a sealed booster…), by name. */
+  gifts?: string[];
 }
 
 export function toQuestItem(quest: QuestOut): QuestItem {
@@ -238,6 +240,7 @@ export function toQuestItem(quest: QuestOut): QuestItem {
     completed: Boolean(quest.completed_at),
     steps: (quest.steps ?? []).map((s) => ({ current: s.current, target: s.target })),
     rewards: quest.rewards ?? [],
+    gifts: quest.gifts ?? [],
   };
 }
 

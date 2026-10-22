@@ -15,7 +15,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError, model_validator
 
 from portalab.core.errors import ValidationFailed
-from portalab.modules.gamification.achievements.definition import EventCount, Reward
+from portalab.modules.gamification.achievements.definition import EventCount, Reward, Unlock
 
 QuestKind = Literal["quest", "daily", "challenge", "discovery"]
 Period = Literal["none", "day", "week", "month"]
@@ -35,6 +35,16 @@ class Window(BaseModel):
         return self
 
 
+class SettingIn(BaseModel):
+    """027: a quest that counts only for members who **chose** one of these values themselves — the
+    interface they wear (``ui.theme``: « christmas »…) or their palette (``ui.palette``)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    kind: Literal["setting_in"] = "setting_in"
+    setting: Literal["ui.theme", "ui.palette"]
+    values: list[str] = Field(min_length=1, max_length=50)
+
+
 class QuestDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     kind: QuestKind
@@ -46,6 +56,10 @@ class QuestDefinition(BaseModel):
     steps: list[EventCount] = Field(min_length=1, max_length=5)
     complete_on: Literal["all", "any"] = "all"
     rewards: list[Reward] = Field(default_factory=list, max_length=3)
+    # 027: shop products the quest gives (a sealed booster to open from the reserve, a badge…)
+    unlocks: list[Unlock] = Field(default_factory=list, max_length=3)
+    # 027: who it counts for (all must hold when the event comes): e.g. members wearing a Christmas interface
+    requires: list[SettingIn] = Field(default_factory=list, max_length=3)
 
     @model_validator(mode="after")
     def _coherent(self) -> "QuestDefinition":
