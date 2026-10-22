@@ -206,7 +206,9 @@ function SupportTab({ userId }: { userId: string }) {
         {tickets.isPending ? <FunctionalState state="loading" /> : null}
         {tickets.isError ? <FunctionalState state="unauthorized" /> : null}
         {tickets.data && !items.length ? <p className="admin-muted">{t("support:queue.empty")}</p> : null}
-        {items.length ? <TicketList items={items} label={t("support:queue.title")} /> : null}
+        {items.length ? (
+          <TicketList items={items} label={t("support:queue.title")} base="/support/queue" />
+        ) : null}
       </AdminSection>
       <AdminSection title={t("support:review.title")} icon="message">
         <MemberFeedback userId={userId} />

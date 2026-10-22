@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { Link } from "react-router";
 import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
 import {
@@ -280,7 +281,15 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
               ) : (
                 <>
                   <Icon name={EVENT_ICON[event.kind] ?? "check"} size={14} />
-                  <span>{eventText(event)}</span>
+                  {(event.detail as Record<string, unknown> | undefined)?.id &&
+                  (event.kind === "converted" || event.kind === "closed") ? (
+                    // the ticket it became: its team page
+                    <Link to={`/support/queue/${String((event.detail as Record<string, unknown>).id)}`}>
+                      {eventText(event)}
+                    </Link>
+                  ) : (
+                    <span>{eventText(event)}</span>
+                  )}
                 </>
               )}
               <span className="feedback-event__when">{ago(event.at)}</span>

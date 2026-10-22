@@ -63,7 +63,9 @@ export function Queue() {
           action={{ label: t("support:queue.all"), onSelect: () => setState("") }}
         />
       ) : null}
-      {items.length ? <TicketList items={items} label={t("support:queue.title")} /> : null}
+      {items.length ? (
+        <TicketList items={items} label={t("support:queue.title")} base="/support/queue" />
+      ) : null}
     </AdminPage>
   );
 }
