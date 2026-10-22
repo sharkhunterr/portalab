@@ -8,9 +8,11 @@ from portalab.capabilities.administration import AdminSurface, default_admin_sur
 from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.content import default_calendar_sources
 from portalab.capabilities.health import INFRA_HISTORY, SERVICE_STATE
+from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.service_signals import default_signals
 from portalab.core.audit_port import AuditSink
+from portalab.core.authz_port import Authorizer
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.periodic import register_periodic
@@ -19,6 +21,7 @@ from portalab.core.time import Clock
 from portalab.modules.health import event_types as _event_types  # noqa: F401 — registers event types
 from portalab.modules.health import settings as _settings  # noqa: F401 — declares settings
 from portalab.modules.health.ai_tools import HealthAiTools
+from portalab.modules.health.attention import MaintenanceAttention
 from portalab.modules.health.calendar_source import MaintenanceCalendarSource
 from portalab.modules.health.detail.assembler import DetailAssembler
 from portalab.modules.health.detail.history import HistoryQuery
@@ -51,7 +54,9 @@ class HealthModule:
         config: HealthConfig | None = None,
         clock: Clock | None = None,
         ai_tools: AIToolRegistry = default_ai_tools,
+        authorizer: Authorizer | None = None,
     ) -> None:
+        self.authorizer = authorizer  # #98: who sees the maintenance badge
         self.ai_tools = ai_tools  # issue 171: the assistant's maintenance tool
         self.database = database
         self.capabilities = capabilities
@@ -84,6 +89,11 @@ class HealthModule:
         HealthAiTools(self, self.state.clock).register(self.ai_tools)
         self.capabilities.provide(SERVICE_STATE, self.reader, instance_ref="health", owner=OWNER)
         self.capabilities.provide(INFRA_HISTORY, self.infra_history, instance_ref="health", owner=OWNER)
+        if self.authorizer is not None and not any(
+            p.instance_ref == "health" for p in self.capabilities.system_providers(ATTENTION)
+        ):  # #98: the maintenance under way — a badge on the navigation
+            attention = MaintenanceAttention(self.database, self.authorizer)
+            self.capabilities.provide(ATTENTION, attention, instance_ref="health", owner=OWNER)
         default_admin_surfaces.register(
             AdminSurface("health", "admin.surface.health", "/services", SERVICES_READ, OWNER)
         )

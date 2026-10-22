@@ -223,6 +223,8 @@
   "cc.subtitle": "Tout ce qui demande votre attention, d'un coup d'œil.",
   "cc.title": "Centre de contrôle",
   "cc.unavailable": "Ce panneau ne peut pas être affiché pour le moment.",
+  "cc.waiting": "En attente de vous",
+  "cc.waiting.none": "Personne n’attend de réponse de votre part.",
   "charts.description": "Toutes les formes de graphiques du portail, dans le thème actuel avec des données d'exemple — et à quoi sert chacune.",
   "charts.kind.area.title": "Aire",
   "charts.kind.area.use": "Un total qui grandit : XP cumulée, stockage utilisé, taille de la bibliothèque.",

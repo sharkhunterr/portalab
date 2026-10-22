@@ -17,6 +17,7 @@ from portalab.capabilities.events import (
     default_consumers,
     default_event_types,
 )
+from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
     AUTOMATION_STATUS,
@@ -37,6 +38,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.automations import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.automations.actions import register_engine_actions
 from portalab.modules.automations.approvals.service import Approvals
+from portalab.modules.automations.attention import ApprovalsAttention
 from portalab.modules.automations.definitions.service import Definitions
 from portalab.modules.automations.evaluator.evaluator import Evaluator
 from portalab.modules.automations.events import SIGNAL_CHANGED, register_event_types
@@ -119,6 +121,14 @@ class AutomationsModule:
         self.history = History(database, clock=clock)
 
     def register(self) -> None:
+        if not any(p.instance_ref == "automations" for p in self.capabilities.system_providers(ATTENTION)):
+            # #98: what waits for an administrator here — a badge on the navigation
+            self.capabilities.provide(
+                ATTENTION,
+                ApprovalsAttention(self.database, self.authorizer),
+                instance_ref="automations",
+                owner=OWNER,
+            )
         register_event_types(self.event_types)
         register_builtin(self.conditions, self.capabilities, self.authorizer)
         register_engine_actions(self.actions, self.database, self.events, clock=self.clock)

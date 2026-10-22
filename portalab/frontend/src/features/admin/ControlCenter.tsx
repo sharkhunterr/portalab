@@ -11,9 +11,11 @@ import {
   StatusBadge,
   type Tone,
 } from "../../design-system/admin/AdminKit";
+import { CountBadge } from "../../design-system/components/CountBadge";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
 import { type Translate, useT } from "../../i18n/hooks/useT";
+import { useAttention } from "../../shell/nav/attention";
 import { useNavigationView } from "../../shell/nav/NavigationProvider";
 import { useShellStrings } from "../../shell/strings";
 import { DataRegion } from "../../state/regions";
@@ -113,6 +115,14 @@ function ControlCenterView({ overview }: { overview: Overview }) {
   const strings = useShellStrings();
   const { view } = useNavigationView();
   const hubs = view.sections.filter((s) => s.audience === "administration").flatMap((s) => s.topics);
+  // #98: what members and the portal wait for — one line per page with its count, the busiest first
+  const attention = useAttention();
+  const waiting = view.sections
+    .flatMap((section) => [...section.entries, ...section.topics.flatMap((topic) => topic.entries)])
+    .filter(
+      (entry, index, all) => attention.of(entry) > 0 && all.findIndex((e) => e.key === entry.key) === index,
+    )
+    .sort((a, b) => attention.of(b) - attention.of(a));
   const format = useFormat();
   const panel = (name: string) => overview.panels.find((p) => p.panel === name);
   const health = panel("observability");
@@ -223,6 +233,29 @@ function ControlCenterView({ overview }: { overview: Overview }) {
             </ol>
           )}
         </AdminSection>
+        <AdminSection title={t("admin:cc.waiting")} icon="inbox" flush>
+          {waiting.length === 0 ? (
+            <p className="control-center__calm">
+              <Icon name="check" size={18} />
+              {t("admin:cc.waiting.none")}
+            </p>
+          ) : (
+            <ul className="admin-list control-center__waiting">
+              {waiting.map((entry) => (
+                <li key={entry.key}>
+                  <Link to={entry.route ?? "/admin"} className="control-center__waiting-link">
+                    <Icon name={entry.icon ?? "inbox"} size={18} />
+                    <span className="admin-list__main">{strings.label(entry.label_key)}</span>
+                    <CountBadge
+                      count={attention.of(entry)}
+                      label={t("shell:attention", { count: attention.of(entry) })}
+                    />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </AdminSection>
         {others.map((p) => (
           <PanelSection key={p.panel} panel={p} />
         ))}
@@ -235,7 +268,13 @@ function ControlCenterView({ overview }: { overview: Overview }) {
                     <Icon name={hub.icon ?? "settings"} size={20} />
                   </span>
                   <span className="services-admin__name">
-                    <strong>{strings.label(hub.label_key)}</strong>
+                    <strong className="control-center__hub-title">
+                      {strings.label(hub.label_key)}
+                      <CountBadge
+                        count={attention.ofEntries(hub.entries)}
+                        label={t("shell:attention", { count: attention.ofEntries(hub.entries) })}
+                      />
+                    </strong>
                     <span className="admin-muted">
                       {hub.entries.map((entry) => strings.label(entry.label_key)).join(" · ")}
                     </span>

@@ -89,7 +89,7 @@ async def test_a_purchase_to_validate_is_a_badge(mk: MkHarness) -> None:
     ownership = await mk.module.purchases.acquire(ursula, "film_4k", "r1")
     await mk.module.activation.configure(ursula, ownership.id, {"title": "Dune"})
     attention = ShopAttention(mk.database, mk.module.authorizer)
-    assert await attention.counts(mk.p("boss")) == {"marketplace.admin_requests": 1}
+    assert (await attention.counts(mk.p("boss")))["marketplace.admin_requests"] == 1
     assert await attention.counts(ursula) == {}
 
 

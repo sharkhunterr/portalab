@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router";
@@ -28,8 +28,12 @@ import { applySafeModeFromAddress } from "./shell/safeMode";
  * Entry point: first paint from mirrored preferences, then the sign-in gate (anonymous visitors never see
  * the shell, CD-025), then the persistent shell with the lazily loaded routes (spec 004).
  */
-const queryClient = new QueryClient({
+const queryClient: QueryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: true } },
+  // #98: an action done (a feedback answered, a request handled…) updates the badges of the navigation now
+  mutationCache: new MutationCache({
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["shell", "attention"] }),
+  }),
 });
 
 const container = document.getElementById("root");

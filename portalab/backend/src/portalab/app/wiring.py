@@ -187,7 +187,7 @@ def wire_platform(
     )
     connectors.register_capabilities()
     register_builtin(connectors.manager.connectors)  # Jellyfin, Plex, Seerr, Radarr, Sonarr, RomM
-    health = HealthModule(database, events, authz.audit, capabilities)
+    health = HealthModule(database, events, authz.audit, capabilities, authorizer=authz.engine)
     health.register_capabilities()
     observability = ObservabilityModule(database, events, authz.audit, capabilities)
     observability.register_capabilities()

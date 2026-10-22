@@ -7,6 +7,7 @@ from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.content import HELP, KNOWLEDGE, LinkResolverRegistry, default_link_resolvers
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
+from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.observability import (
     Check,
     CheckResult,
@@ -26,6 +27,7 @@ from portalab.core.time import Clock
 from portalab.modules.wiki import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.wiki import settings as _settings  # noqa: F401 — declares settings
 from portalab.modules.wiki.ai_tools import WikiAiTools
+from portalab.modules.wiki.attention import DraftsAttention
 from portalab.modules.wiki.events import register_event_types
 from portalab.modules.wiki.knowledge import WikiKnowledge, WikiLinkResolver, WikiSearchProvider
 from portalab.modules.wiki.pages import PageService
@@ -66,6 +68,14 @@ class WikiModule:
         self.knowledge = WikiKnowledge(self.pages)
 
     def register(self) -> None:
+        if not any(p.instance_ref == "wiki" for p in self.capabilities.system_providers(ATTENTION)):
+            # #98: what waits for an administrator here — a badge on the navigation
+            self.capabilities.provide(
+                ATTENTION,
+                DraftsAttention(self.database, self.pages.authorizer),
+                instance_ref="wiki",
+                owner=OWNER,
+            )
         WikiAiTools(self.pages, self.clock).register(self.ai_tools)  # issue 171
         register_event_types(self.event_types)
         ports: tuple[tuple[str, Any], ...] = ((KNOWLEDGE, self.knowledge), (HELP, self.knowledge))
