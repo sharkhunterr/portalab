@@ -1,12 +1,12 @@
 ---
 slug: guide-membre
-title: Guide du membre
+title: Guide du membre Portalab
 parent: none
 position: 0
 help_keys: [wiki]
-tags: [guide]
+tags: [guide, portalab]
 ---
-Tout ce qu'il faut savoir pour profiter du portail : regarder et demander des titres, gagner et dépenser votre monnaie, suivre votre progression, échanger avec la communauté et obtenir de l'aide.
+Le guide de Portalab, le portail de vos services : regarder et demander des titres, gagner et dépenser votre monnaie, suivre votre progression, échanger avec la communauté et obtenir de l'aide. Les services eux-mêmes (lecteur, serveur de livres ou de jeux…) ont leurs propres guides.
 
 > [!TIP]
 > L'assistant connaît ce guide : posez-lui votre question, il vous répond et vous indique la bonne page.
