@@ -10,7 +10,7 @@ import re
 from collections.abc import Callable
 from typing import Any
 
-from sqlalchemy import case, select
+from sqlalchemy import case, or_, select
 
 from portalab.capabilities.media import IMAGE_SEARCH, unwrap
 from portalab.capabilities.media_core import CARD_SOURCES
@@ -19,7 +19,7 @@ from portalab.core.blobstore import BlobStore
 from portalab.core.db import Database
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
-from portalab.modules.cards.faces import EVENT, SKIPPED_ENGINES, Candidate, FaceMatcher, score
+from portalab.modules.cards.faces import EVENT, SAME_PERSON, SKIPPED_ENGINES, Candidate, FaceMatcher, score
 from portalab.modules.cards.models import Card, CardSet
 
 BATCH = 6  # cards looked for at a time
@@ -70,8 +70,9 @@ class RoleSearch:
             return None
         return search[0].provider, sources[0].provider
 
-    async def run(self, batch: int = BATCH) -> int:
-        """Look for the next cards' characters on the web: how many got one."""
+    async def run(self, batch: int = BATCH, *, set_key: str | None = None) -> int:
+        """Look for the next cards' characters on the web: how many got one. ``set_key``: that set's cards
+        now (an administrator's request) — looked for again, those found on the web too."""
         found = self._providers()
         if found is None:
             return 0  # nothing to search with: nothing marked, looked for once there is
@@ -88,10 +89,19 @@ class RoleSearch:
                     .where(
                         Card.kind == "cast",
                         Card.retired.is_(False),
-                        Card.role_art.is_(None),
-                        Card.role_checked_at.is_not(None),  # TMDB was asked first
-                        Card.search_checked_at.is_(None),
                         CardSet.present.is_(True),
+                        *(
+                            (
+                                CardSet.key == set_key,
+                                or_(Card.role_art.is_(None), Card.role_art.like("blob:%")),
+                            )
+                            if set_key
+                            else (
+                                Card.role_art.is_(None),
+                                Card.role_checked_at.is_not(None),  # TMDB was asked first
+                                Card.search_checked_at.is_(None),
+                            )
+                        ),
                     )
                     .order_by(rank, Card.score.desc())
                     .limit(batch)
@@ -138,7 +148,10 @@ class RoleSearch:
             looked = await self.matcher_look(data)
             if not looked.faces:
                 continue
-            similarity = max(self.matcher.similarity(portrait.faces[0], face) for face in looked.faces)
+            similarities = [self.matcher.similarity(portrait.faces[0], face) for face in looked.faces]
+            if sum(1 for s in similarities if s >= SAME_PERSON) > 1:
+                continue  # the actor twice: a « then and now » montage, not a scene
+            similarity = max(similarities)
             value = score(
                 Candidate(hit.url, hit.title, hit.engine, similarity, looked.width, looked.height), role, film
             )

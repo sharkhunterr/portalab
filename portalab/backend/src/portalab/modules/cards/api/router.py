@@ -125,6 +125,14 @@ async def sync_cards(principal: Manager, module: Module) -> dict[str, Any]:
     }
 
 
+@router.post("/admin/cards/sets/{key}/characters")
+async def look_for_characters(
+    principal: Manager, module: Module, key: Annotated[str, Path(pattern=r"^[0-9a-f-]{36}$")]
+) -> dict[str, Any]:
+    """Look for this set's actors' characters on the web now (again for those found there before)."""
+    return {"found": await module.search.run(20, set_key=key)}
+
+
 @router.get("/cards/images/{namespace}/{digest}")
 async def card_image(
     _: Reader,
