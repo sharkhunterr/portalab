@@ -2231,6 +2231,90 @@
    "season": null
   },
   {
+   "key": "stat_req_audience_titles",
+   "type": "statistic",
+   "price": 350,
+   "rarity": "common",
+   "names": {
+    "en": "Statistic: The audience of my requests",
+    "fr": "Statistique : L'audience de mes demandes"
+   },
+   "descriptions": {
+    "en": "In My requests: which of your requests the most members watched (a number, never who) and your rank among requesters by audience.",
+    "fr": "Dans Mes demandes : celles de vos demandes que le plus de membres ont regardées (un nombre, jamais qui) et votre rang parmi les demandeurs à l'audience."
+   },
+   "payload": {
+    "statistic": "media.requests.audience_titles"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_req_leaders",
+   "type": "statistic",
+   "price": 450,
+   "rarity": "rare",
+   "names": {
+    "en": "Statistic: The requesters' podiums",
+    "fr": "Statistique : Le palmarès des demandeurs"
+   },
+   "descriptions": {
+    "en": "In My requests: who asks the most, whose requests the most members watch, and whose requests draw the most viewers each.",
+    "fr": "Dans Mes demandes : qui demande le plus, dont les demandes sont regardées par le plus de membres, et dont chaque demande attire le plus de spectateurs."
+   },
+   "payload": {
+    "statistic": "media.requests.leaders"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": 5,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
+   "key": "stat_req_audience_depth",
+   "type": "statistic",
+   "price": 500,
+   "rarity": "rare",
+   "names": {
+    "en": "Statistic: The audience in depth",
+    "fr": "Statistique : L'audience en profondeur"
+   },
+   "descriptions": {
+    "en": "In My requests: how fast another member watches what you asked for once it arrives, the genres of your requests the members watch (and the server's), films against series, your requests against everyone's, the long tail and the audience over time.",
+    "fr": "Dans Mes demandes : en combien de temps un autre membre regarde ce que vous avez demandé une fois arrivé, les genres de vos demandes que les membres regardent (et ceux du serveur), films contre séries, vos demandes face à celles de tous, la longue traîne et l'audience dans le temps."
+   },
+   "payload": {
+    "statistic": "media.requests.audience_depth"
+   },
+   "collection": "statistics",
+   "icon": "chart",
+   "featured": false,
+   "level": null,
+   "supply": null,
+   "limit": null,
+   "repeatable": false,
+   "reward_only": false,
+   "contribution": null,
+   "config_required": false,
+   "season": null
+  },
+  {
    "key": "project_launch",
    "type": "project_launch",
    "price": 1500,

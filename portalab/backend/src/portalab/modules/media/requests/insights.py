@@ -2,7 +2,12 @@
 series, requests over time against the previous period, how many of them I actually watched, my rank among
 requesters (anonymous: a position, never names), the community's most watched requested titles, the genres
 I request against the genres I watch — and what is coming soon: my requests being downloaded or imported
-(the download managers' queues) and those with a release date (their calendars)."""
+(the download managers' queues) and those with a release date (their calendars).
+
+issue 222: the audience of what was asked — how many other members watched my requests (a number, never who),
+which of my requests drew the most of them, and the requesters' podiums: who asks the most, whose requests
+the most members watch, whose requests are watched by the most per title. A requester is named there as on
+the leaderboards (their ``progression`` visibility), else an anonymous member."""
 
 import asyncio
 import time
@@ -11,15 +16,18 @@ from collections.abc import Sequence
 from contextlib import suppress
 from datetime import UTC, date, datetime, timedelta
 from statistics import median
-from typing import Any
+from typing import Any, NamedTuple
 from uuid import UUID
 
 from sqlalchemy import String, and_, func, select
 
+from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.media import DOWNLOAD_CLIENTS, DOWNLOADS, SourceDownload, TorrentState, unwrap
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
+from portalab.core.visibility_port import Redacted, VisibilityFilter
 from portalab.modules.media.common import strong_ids
 from portalab.modules.media.insights.stats import Window, window
 from portalab.modules.media.models import (
@@ -39,6 +47,9 @@ GROUPS = {
 }
 OPEN = ("pending", "approved", "processing")
 QUEUE_TTL = 30
+PODIUM = 5
+PERTINENT_FROM = 3  # requests a requester needs to enter the « watched per title » podium
+NAMED = "progression"  # issue 222: named on the requesters' podiums as on the leaderboards
 
 
 def group_of(state: str) -> str:
@@ -59,6 +70,141 @@ def ids_of(row: MediaRequest) -> set[tuple[str, str]]:
     return set(strong_ids((row.external_ref or {}).get("ids") or {}).items())
 
 
+class Reach(NamedTuple):
+    """Issue 222: one request of the period and its audience among the other members."""
+
+    key: str  # the requester: a member's id, else ``ext:`` and the external requester
+    request: UUID
+    object: UUID | None
+    available: bool
+    viewers: int  # other members (or media-server accounts) who watched it since it was asked
+    plays: int
+
+
+def _viewer() -> Any:
+    """Who played: a member, else a media server's own account."""
+    return func.coalesce(
+        func.cast(Activity.user_id, String),
+        func.concat(func.cast(Activity.service_id, String), ":", Activity.external_user_id),
+    )
+
+
+def _watched_by_others() -> Any:
+    """A counted play of a request's title by someone else than its requester, after it was asked."""
+    return and_(
+        Activity.work_id == MediaRequest.object_id,
+        Activity.counted.is_(True),
+        Activity.started_at >= MediaRequest.requested_at,
+        Activity.user_id.is_distinct_from(MediaRequest.requester_user_id),
+    )
+
+
+def title_of(row: MediaRequest) -> str:
+    return str((row.external_ref or {}).get("title") or "?")
+
+
+def arrived_at(row: MediaRequest) -> datetime | None:
+    raw = (row.external_ref or {}).get("available_at")
+    with suppress(ValueError, TypeError):
+        return datetime.fromisoformat(str(raw)) if raw else None
+    return None
+
+
+BUCKETS = ("hour", "day", "week", "month", "more")
+
+
+def bucket_of(hours: float) -> str:
+    if hours <= 1:
+        return "hour"
+    if hours <= 24:
+        return "day"
+    if hours <= 168:
+        return "week"
+    return "month" if hours <= 720 else "more"
+
+
+def _depth(
+    win: Window,
+    own: Sequence[Reach],
+    everyone: Sequence[Reach],
+    titles: dict[UUID, MediaRequest],
+    plays: Sequence[tuple[UUID, datetime, str]],
+    tags: dict[UUID, list[str]],
+) -> dict[str, Any]:
+    """Issue 222 (sold): the audience in depth — how fast another member watched what arrived, the genres
+    of the requests the members watch (mine and the whole server's), films against series, my requests
+    against everyone's, the long tail (plays a month after the arrival), and the plays over time."""
+    first: dict[UUID, datetime] = {}
+    late = 0
+    for request, at, _ in plays:
+        first[request] = min(at, first.get(request, at))
+        row = titles.get(request)
+        since = (arrived_at(row) or row.requested_at) if row is not None else None
+        late += 1 if since is not None and at - since > timedelta(days=30) else 0
+    delays: list[tuple[float, str]] = []
+    waiting = 0
+    for reach in own:
+        row = titles.get(reach.request)
+        if row is None or not reach.available:
+            continue
+        arrived = arrived_at(row)
+        if reach.request not in first:
+            waiting += 1
+        elif arrived is not None:
+            hours = max(0.0, (first[reach.request] - arrived).total_seconds() / 3600)
+            delays.append((round(hours, 2), title_of(row)))
+    delays.sort()
+    buckets = Counter(bucket_of(h) for h, _ in delays)
+
+    def genres(reaches: Sequence[Reach]) -> list[dict[str, Any]]:
+        viewers: Counter[str] = Counter()
+        requests: Counter[str] = Counter()
+        for reach in reaches:
+            for genre in tags.get(reach.object, []) if reach.object else []:
+                viewers[genre] += reach.viewers
+                requests[genre] += 1
+        return [{"name": g, "viewers": v, "requests": requests[g]} for g, v in viewers.most_common(8) if v]
+
+    def rates(reaches: Sequence[Reach]) -> dict[str, Any]:
+        arrived = [r for r in reaches if r.available]
+        if not arrived:
+            return {"available": 0, "seen_rate": None, "viewers_per_request": None}
+        seen = sum(1 for r in arrived if r.viewers)
+        return {
+            "available": len(arrived),
+            "seen_rate": round(seen / len(arrived), 3),
+            "viewers_per_request": round(sum(r.viewers for r in arrived) / len(arrived), 2),
+        }
+
+    kinds: dict[str, dict[str, Any]] = {}
+    for kind in ("movie", "series"):
+        chosen = [r for r in own if (row := titles.get(r.request)) is not None and kind_of(row) == kind]
+        kinds[kind] = {"requests": len(chosen), "plays": sum(r.plays for r in chosen), **rates(chosen)}
+    weekly = win.start is not None and (win.end - win.start).days <= 62
+    over: Counter[str] = Counter()
+    for _, at, _ in plays:
+        day = at.astimezone(UTC).date()
+        key = day - timedelta(days=day.weekday()) if weekly else day.replace(day=1)
+        over[key.isoformat()] += 1
+    return {
+        "reactivity": {
+            "median_hours": round(median(h for h, _ in delays), 2) if delays else None,
+            "buckets": [{"key": k, "count": buckets.get(k, 0)} for k in BUCKETS],
+            "waiting": waiting,
+            "fastest": [{"title": t, "hours": h} for h, t in delays[:3]],
+            "slowest": [{"title": t, "hours": h} for h, t in reversed(delays[-3:])],
+        },
+        "genres": {"mine": genres(own), "server": genres(everyone)},
+        "kinds": kinds,
+        "versus": {"mine": rates(own), "server": rates(everyone)},
+        "late_share": round(late / len(plays), 3) if plays else None,
+        "over_time": {
+            "unit": "week" if weekly else "month",
+            "points": [{"date": k, "plays": v} for k, v in sorted(over.items())],
+        },
+    }
+
+
 class RequestInsights:
     def __init__(
         self,
@@ -68,16 +214,18 @@ class RequestInsights:
         *,
         clock: Clock | None = None,
         enricher: Any = None,
+        visibility: VisibilityFilter | None = None,
     ) -> None:
         self.database = database
         self.capabilities = capabilities
         self.upcoming = upcoming
         self.enricher = enricher
+        self.visibility = visibility
         self.clock = clock
         self._queue: tuple[float, list[SourceDownload]] | None = None
 
     # --- statistics --------------------------------------------------------------------------------
-    async def overview(self, user: UUID, period: str) -> dict[str, Any]:
+    async def overview(self, user: UUID, period: str, viewer: Principal | None = None) -> dict[str, Any]:
         win = window(period, utc_now(self.clock))
         async with self.database.session() as session:
             mine = await self._requests(session, win, user)
@@ -90,6 +238,7 @@ class RequestInsights:
             prev_rank = await self._ranking(session, before, user) if before else None
             top = await self._top_watched(session, win)
             genres = await self._genres(session, win, mine, user)
+            audiences = await self._audiences(session, win)
         timeline = self._timeline(win, mine, previous)
         acquisition = await self._acquisition(mine)
         delta = (
@@ -112,6 +261,7 @@ class RequestInsights:
             "top_watched": top,
             "genres": genres,
             "acquisition": acquisition,
+            **(await self._audience_sections(win, audiences, mine, user, viewer)),
         }
 
     async def _requests(self, session: Any, win: Window, user: UUID | None) -> list[MediaRequest]:
@@ -173,6 +323,162 @@ class RequestInsights:
             {"id": str(i), "title": t, "kind": k, "plays": int(p), "seconds": float(s or 0)}
             for i, t, k, p, s in rows
         ]
+
+    # --- issue 222: the audience of requests ---------------------------------------------------------------
+    async def _audiences(self, session: Any, win: Window) -> list[Reach]:
+        """Each request of the period: its requester's key (a member's id, else ``ext:`` and the external
+        requester), how many *other* members watched its title after it was asked, and their plays."""
+        who = func.coalesce(
+            func.cast(MediaRequest.requester_user_id, String),
+            func.concat("ext:", MediaRequest.external_ref["requester"].astext),
+        )
+        query = (
+            select(
+                who,
+                MediaRequest.id,
+                MediaRequest.object_id,
+                MediaRequest.state == "available",
+                func.count(func.distinct(_viewer())).filter(Activity.id.is_not(None)),
+                func.count(Activity.id),
+            )
+            .outerjoin(Activity, _watched_by_others())
+            .where(MediaRequest.requested_at < win.end, who.is_not(None))
+            .group_by(who, MediaRequest.id)
+        )
+        if win.start is not None:
+            query = query.where(MediaRequest.requested_at >= win.start)
+        return [
+            Reach(str(k), i, o, bool(a), int(v), int(p))
+            for k, i, o, a, v, p in (await session.execute(query)).all()
+            if k
+        ]
+
+    async def _audience_sections(
+        self, win: Window, audiences: Sequence[Reach], mine: Sequence[MediaRequest], user: UUID, viewer: Any
+    ) -> dict[str, Any]:
+        me = str(user)
+        own = [r for r in audiences if r.key == me]
+        titles = {r.id: r for r in mine}
+        async with self.database.session() as session:
+            plays = await self._plays_of(session, [r.request for r in own if r.viewers])
+            tags = await self._genres_of(session, {r.object for r in audiences if r.viewers and r.object})
+        ranked = sorted((r for r in own if r.viewers), key=lambda r: (-r.viewers, -r.plays))[:8]
+        per: dict[str, dict[str, int]] = {}
+        for reach in audiences:
+            entry = per.setdefault(reach.key, {"requests": 0, "viewers": 0, "plays": 0, "titles": 0})
+            entry["requests"] += 1
+            entry["viewers"] += reach.viewers
+            entry["plays"] += reach.plays
+            entry["titles"] += 1 if reach.viewers else 0
+        mine_total = per.get(me, {}).get("viewers", 0)
+        ahead = sum(1 for k, e in per.items() if k != me and e["viewers"] > mine_total)
+        return {
+            "audience": {
+                "requested": len(own),
+                "seen": sum(1 for r in own if r.viewers),
+                # the viewers of all my requests together: a member who watched two of them counts once
+                "viewers": len({who for _, _, who in plays}),
+                "plays": sum(r.plays for r in own),
+            },
+            "audience_titles": {
+                "items": [
+                    {
+                        "id": str(row.object_id) if row.object_id else None,
+                        "title": title_of(row),
+                        "kind": kind_of(row),
+                        "viewers": r.viewers,
+                        "plays": r.plays,
+                        "_lookup": lookup_of(row),
+                    }
+                    for r in ranked
+                    if (row := titles.get(r.request)) is not None
+                ],
+                "position": 1 + ahead if mine_total else None,
+                "total": sum(1 for e in per.values() if e["viewers"]),
+            },
+            "audience_depth": _depth(win, own, audiences, titles, plays, tags),
+            "leaders": await self._leaders(per, me, viewer),
+        }
+
+    async def _plays_of(self, session: Any, requests: Sequence[UUID]) -> list[tuple[UUID, datetime, str]]:
+        """Every play of another member on these requests' titles since they were asked: (request, when,
+        who — a key, never shown)."""
+        if not requests:
+            return []
+        query = (
+            select(MediaRequest.id, Activity.started_at, _viewer())
+            .join(Activity, _watched_by_others())
+            .where(MediaRequest.id.in_(requests))
+        )
+        return [(i, at, str(who)) for i, at, who in (await session.execute(query)).all()]
+
+    async def _genres_of(self, session: Any, objects: set[UUID]) -> dict[UUID, list[str]]:
+        if not objects:
+            return {}
+        out: dict[UUID, list[str]] = {}
+        rows = await session.execute(
+            select(ObjectTag.object_id, ObjectTag.value).where(
+                ObjectTag.object_id.in_(objects), ObjectTag.tag_kind == "genre"
+            )
+        )
+        for object_id, value in rows.all():
+            out.setdefault(object_id, []).append(str(value))
+        return out
+
+    async def _leaders(
+        self, per: dict[str, dict[str, int]], me: str, viewer: Principal | None
+    ) -> dict[str, list[dict[str, Any]]]:
+        """The requesters' podiums of the period: the most requests, the most viewers of their requests,
+        the most viewers per request (from ``PERTINENT_FROM`` requests). Ex aequo share a place."""
+        names: dict[str, str | None] = {}
+
+        async def name(key: str) -> str | None:
+            if key not in names:
+                names[key] = await self._name(key, viewer)
+            return names[key]
+
+        async def podium(score: Any, keys: Sequence[str]) -> list[dict[str, Any]]:
+            ordered = sorted(keys, key=lambda k: -score(per[k]))
+            out: list[dict[str, Any]] = []
+            for key in ordered[:PODIUM]:
+                value = score(per[key])
+                rank = 1 + sum(1 for k in keys if score(per[k]) > value)
+                out.append(
+                    {
+                        "rank": rank,
+                        "me": key == me,
+                        "name": None if key == me else await name(key),
+                        "value": round(value, 2) if isinstance(value, float) else value,
+                        "requests": per[key]["requests"],
+                    }
+                )
+            return out
+
+        everyone = list(per)
+        watched = [k for k in everyone if per[k]["viewers"]]
+        pertinent = [k for k in watched if per[k]["requests"] >= PERTINENT_FROM]
+        return {
+            "requests": await podium(lambda e: e["requests"], everyone),
+            "viewers": await podium(lambda e: e["viewers"], watched),
+            "per_request": await podium(lambda e: e["viewers"] / e["requests"], pertinent),
+        }
+
+    async def _name(self, key: str, viewer: Principal | None) -> str | None:
+        """A member's name when they show on the leaderboards; an external requester stays anonymous."""
+        if viewer is None or self.visibility is None or key.startswith("ext:"):
+            return None
+        with suppress(Exception):
+            user = UUID(key)
+            try:
+                shown = await self.visibility.filter(viewer, user, NAMED, None, True, surface="leaderboard")  # type: ignore[call-arg]
+            except TypeError:
+                shown = await self.visibility.filter(viewer, user, NAMED, None, True)
+            if isinstance(shown, Redacted):
+                return None
+            providers = self.capabilities.system_providers(DIRECTORY)
+            summary = await providers[0].provider.get_user_summary(user) if providers else None
+            return summary.display_name if summary else None
+        return None
 
     async def _genres(
         self, session: Any, win: Window, mine: Sequence[MediaRequest], user: UUID
@@ -242,7 +548,7 @@ class RequestInsights:
         """027: how long my requests took to become available, and when I asked compared with the release
         (before release, its first month, its first year, or an older title)."""
         released = await self._release_dates(mine)
-        buckets = {k: 0 for k in ("hour", "day", "week", "month", "more")}
+        buckets = dict.fromkeys(BUCKETS, 0)
         moments: dict[str, list[float]] = {k: [] for k in ("before", "month", "year", "catalog", "unknown")}
         points: list[dict[str, Any]] = []
         delays: list[float] = []
@@ -269,18 +575,7 @@ class RequestInsights:
             hours = max(0.0, (when - row.requested_at).total_seconds() / 3600)
             delays.append(hours)
             moments[moment].append(hours)
-            bucket = (
-                "hour"
-                if hours <= 1
-                else "day"
-                if hours <= 24
-                else "week"
-                if hours <= 168
-                else "month"
-                if hours <= 720
-                else "more"
-            )
-            buckets[bucket] += 1
+            buckets[bucket_of(hours)] += 1
             points.append(
                 {
                     "title": str((row.external_ref or {}).get("title") or "?"),

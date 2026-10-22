@@ -49,6 +49,8 @@ import "../insights/insights.css"; // 027: the poster rows are the statistics' o
 import "./requests.css";
 import { LockedStat } from "../insights/LockedStat";
 import { AcquisitionView } from "./Acquisition";
+import { AudienceSummary, AudienceTitles, Leaders } from "./Audience";
+import { AudienceDepth } from "./AudienceDepth";
 import { Poster, SoonList } from "./SoonList";
 
 /**
@@ -349,6 +351,53 @@ export function Overview({ data }: { data: RequestInsights }) {
           )}
         </AdminSection>
       )}
+      {data.audience ? (
+        <AdminSection
+          title={t("media:myRequests.audience.title")}
+          description={t("media:myRequests.audience.hint")}
+          icon="eye"
+          span="full"
+        >
+          <AudienceSummary data={data.audience} />
+        </AdminSection>
+      ) : null}
+      {data.audience_titles ? (
+        <AdminSection
+          title={t("media:myRequests.audience.titles")}
+          description={t("media:myRequests.audience.titlesHint")}
+          icon="users"
+          span="full"
+          flush
+        >
+          <AudienceTitles data={data.audience_titles} />
+        </AdminSection>
+      ) : locked("audience_titles") ? (
+        <LockedStat name="req_audience_titles" icon="users" span="full" />
+      ) : null}
+      {data.audience_depth ? (
+        <AdminSection
+          title={t("media:myRequests.depth.title")}
+          description={t("media:myRequests.depth.hint")}
+          icon="activity"
+          span="full"
+        >
+          <AudienceDepth data={data.audience_depth} />
+        </AdminSection>
+      ) : locked("audience_depth") ? (
+        <LockedStat name="req_audience_depth" icon="activity" span="full" />
+      ) : null}
+      {data.leaders ? (
+        <AdminSection
+          title={t("media:myRequests.leaders.title")}
+          description={t("media:myRequests.leaders.hint")}
+          icon="medal"
+          span="full"
+        >
+          <Leaders data={data.leaders} />
+        </AdminSection>
+      ) : locked("leaders") ? (
+        <LockedStat name="req_leaders" icon="medal" span="full" />
+      ) : null}
       {locked("genres") ? (
         <LockedStat name="req_genres" icon="palette" span="full" />
       ) : (
