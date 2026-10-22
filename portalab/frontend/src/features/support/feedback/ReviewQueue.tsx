@@ -135,6 +135,7 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
   const [rewarding, setRewarding] = useState<{ message: string } | null>(null);
   const [pending, setPending] = useState<{ target: string; token: string } | null>(null);
   const [done, setDone] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   // the contribution is left out: a reward says thank you better, in the currency or XP the admin picks
   const conversions = (detail.data?.conversions ?? []).filter((c) => c.target !== "contribution");
   const closed = item.status === "dismissed";
@@ -228,7 +229,13 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
       setRewarding({ message: text });
       return;
     }
-    await send.mutateAsync(text);
+    setFailed(false);
+    try {
+      await send.mutateAsync(text);
+    } catch {
+      setFailed(true); // the reply stays written, to send again
+      return;
+    }
     await run(chosen);
     setDone(t("support:review.replied"));
     reset();
@@ -271,6 +278,7 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
           ),
         )}
       </ol>
+      {detail.isError ? <p role="alert">{t("support:review.detailFailed")}</p> : null}
       {done ? (
         <p role="status" className="feedback-done">
           {done}
@@ -343,6 +351,7 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
               </label>
             ))}
           </fieldset>
+          {failed ? <p role="alert">{t("support:review.sendFailed")}</p> : null}
           <div className="feedback-composer__bar">
             <Button variant="ghost" onClick={reset}>
               {t("support:reward.cancel")}
