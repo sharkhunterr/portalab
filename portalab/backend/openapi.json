@@ -22727,6 +22727,30 @@
         ]
       }
     },
+    "/api/v1/admin/cards/sync": {
+      "post": {
+        "description": "Make the cards again from the works present now (those that changed), then rank them again.",
+        "operationId": "sync_cards_api_v1_admin_cards_sync_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Sync Cards Api V1 Admin Cards Sync Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Sync Cards",
+        "tags": [
+          "cards"
+        ]
+      }
+    },
     "/api/v1/admin/community/moderation": {
       "get": {
         "operationId": "moderation_queue_api_v1_admin_community_moderation_get",
@@ -35340,6 +35364,168 @@
         ]
       }
     },
+    "/api/v1/cards/people": {
+      "get": {
+        "description": "A person's cards across the sets (a card per work they are credited on).",
+        "operationId": "card_person_api_v1_cards_people_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 160,
+              "minLength": 3,
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Card Person Api V1 Cards People Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Card Person",
+        "tags": [
+          "cards"
+        ]
+      }
+    },
+    "/api/v1/cards/sets": {
+      "get": {
+        "description": "The sets (a work each), those I started first.",
+        "operationId": "card_sets_api_v1_cards_sets_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 80,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "started",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Started",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 500,
+              "minimum": 0,
+              "title": "Page",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Card Sets Api V1 Cards Sets Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Card Sets",
+        "tags": [
+          "cards"
+        ]
+      }
+    },
+    "/api/v1/cards/sets/{key}": {
+      "get": {
+        "description": "A set's cards, each with the versions I own.",
+        "operationId": "card_set_api_v1_cards_sets__key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f-]{36}$",
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Card Set Api V1 Cards Sets  Key  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Card Set",
+        "tags": [
+          "cards"
+        ]
+      }
+    },
     "/api/v1/community/achievements": {
       "get": {
         "operationId": "community_achievements_api_v1_community_achievements_get",
@@ -39708,6 +39894,125 @@
         "summary": "Remove Reminder",
         "tags": [
           "calendar"
+        ]
+      }
+    },
+    "/api/v1/me/cards": {
+      "get": {
+        "description": "My collection in numbers: cards and sets owned, packs waiting to be opened.",
+        "operationId": "my_cards_api_v1_me_cards_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Cards Api V1 Me Cards Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Cards",
+        "tags": [
+          "cards"
+        ]
+      }
+    },
+    "/api/v1/me/cards/packs": {
+      "get": {
+        "description": "My packs (those to open first): their cards shown once opened.",
+        "operationId": "my_packs_api_v1_me_cards_packs_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "unopened",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Unopened",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response My Packs Api V1 Me Cards Packs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Packs",
+        "tags": [
+          "cards"
+        ]
+      }
+    },
+    "/api/v1/me/cards/packs/{pack_id}/open": {
+      "post": {
+        "description": "Open one of my packs: its cards (drawn when it was given) revealed.",
+        "operationId": "open_pack_api_v1_me_cards_packs__pack_id__open_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pack_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Pack Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Open Pack Api V1 Me Cards Packs  Pack Id  Open Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Open Pack",
+        "tags": [
+          "cards"
         ]
       }
     },

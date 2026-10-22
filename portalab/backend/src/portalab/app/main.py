@@ -66,6 +66,8 @@ from portalab.modules.calendar.api import routers as calendar_routers
 from portalab.modules.calendar.module import CalendarModule
 from portalab.modules.campaigns.api import routers as campaigns_routers
 from portalab.modules.campaigns.module import CampaignsModule
+from portalab.modules.cards.api import routers as cards_routers
+from portalab.modules.cards.module import CardsModule
 from portalab.modules.community.api import routers as community_routers
 from portalab.modules.community.module import CommunityModule
 from portalab.modules.connectors.api import routers as connectors_routers
@@ -302,6 +304,7 @@ def create_app(
     marketplace: MarketplaceModule | None = None,
     visuals: VisualsModule | None = None,
     plugins: PluginsModule | None = None,
+    cards: CardsModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -344,6 +347,7 @@ def create_app(
         app.state.community_module = platform.community
         app.state.marketplace_module = platform.marketplace
         app.state.visuals_module = platform.visuals
+        app.state.cards_module = platform.cards
         app.state.plugins_module = platform.plugins
         platform.plugins.runtime.portal.app = app  # 030: portal data through the app itself
         app.state.authz_module = platform.authz
@@ -448,6 +452,7 @@ def create_app(
     app.state.community_module = community
     app.state.marketplace_module = marketplace
     app.state.visuals_module = visuals
+    app.state.cards_module = cards
     app.state.plugins_module = plugins
     if plugins is not None:
         plugins.runtime.portal.app = app  # 030: confined plugins read portal data through the app itself
@@ -578,6 +583,7 @@ def create_app(
         *community_routers(),
         *marketplace_routers(),
         *visuals_routers(),
+        *cards_routers(),
         *plugins_routers(),
     ]:
         app.include_router(router)
