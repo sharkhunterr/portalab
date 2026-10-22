@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useNotify } from "../../../design-system/components/Notification";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useSlots } from "../../../shell/slots/providers";
 
 interface LeavingEntry {
   kind: string;
@@ -29,10 +30,13 @@ const RESCUE_SHOP = "/marketplace?type=media_rescue";
 /**
  * « Leaving soon » (#57): when the library's cleanup (Maintainerr) will delete this title — or some of its
  * seasons — and, with a rescue bought in the shop, « Save this title » (for everyone). Once saved, a line
- * says so. Nothing when the cleanup tool is not connected or the title is not on its list.
+ * says so; « Ask the assistant » asks why it goes, when, and how to keep it. Nothing when the cleanup tool is
+ * not connected or the title is not on its list.
  */
-export function LeavingNotice({ objectId }: { objectId: string }) {
+export function LeavingNotice({ objectId, title }: { objectId: string; title?: string | undefined }) {
   const t = useT();
+  const { ai } = useSlots();
+  const location = useLocation();
   const format = useFormat();
   const notify = useNotify();
   const client = useQueryClient();
@@ -93,18 +97,29 @@ export function LeavingNotice({ objectId }: { objectId: string }) {
         ) : null}
       </div>
       <div className="media-leaving__actions">
-        {data.credits > 0 ? (
-          <Button variant="primary" onClick={() => keep.mutate()} disabled={keep.isPending}>
-            <Icon name="shield" size={16} />
-            {t("media:leaving.save")}
-          </Button>
-        ) : (
-          <Link className="ds-button ds-button--secondary" to={RESCUE_SHOP}>
-            <Icon name="shop" size={16} />
-            {t("media:leaving.buy")}
-          </Link>
-        )}
-        <small>{t("media:leaving.credits", { count: data.credits })}</small>
+        <div className="media-leaving__rescue">
+          {data.credits > 0 ? (
+            <Button variant="primary" onClick={() => keep.mutate()} disabled={keep.isPending}>
+              <Icon name="shield" size={16} />
+              {t("media:leaving.save")}
+            </Button>
+          ) : (
+            <Link className="ds-button ds-button--secondary" to={RESCUE_SHOP}>
+              <Icon name="shop" size={16} />
+              {t("media:leaving.buy")}
+            </Link>
+          )}
+          <small>{t("media:leaving.credits", { count: data.credits })}</small>
+        </div>
+        {ai?.available && title ? (
+          <button
+            type="button"
+            className="ds-button ds-button--quiet"
+            onClick={() => ai.open({ route: location.pathname, question: t("media:leaving.ask", { title }) })}
+          >
+            <Icon name="sparkles" size={16} /> {t("media:journey.askButton")}
+          </button>
+        ) : null}
       </div>
     </section>
   );
