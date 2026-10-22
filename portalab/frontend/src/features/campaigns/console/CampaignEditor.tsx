@@ -46,6 +46,8 @@ export interface Discount {
   products: string[];
   categories: string[];
   seasons?: string[];
+  /** The whole shop (a larger reduction on some products still wins for them). */
+  everything?: boolean;
 }
 
 export interface CampaignDef {
@@ -358,6 +360,12 @@ function DiscountEditor({
           <Icon name="trash" size={16} />
         </Button>
       </div>
+      <CheckboxField
+        label={t("campaigns:editor.everything")}
+        hint={t("campaigns:editor.everythingHint")}
+        checked={Boolean(discount.everything)}
+        onChange={(e) => onChange({ ...discount, everything: e.target.checked })}
+      />
       <fieldset className="campaign-bonus__group">
         <legend>{t("campaigns:editor.seasons")}</legend>
         <div className="campaign-checks">

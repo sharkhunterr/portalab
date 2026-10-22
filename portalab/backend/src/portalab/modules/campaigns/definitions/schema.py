@@ -115,11 +115,12 @@ class DiscountDef(_Closed):
     products: list[str] = Field(default_factory=list, max_length=200)
     categories: list[str] = Field(default_factory=list, max_length=20)
     seasons: list[str] = Field(default_factory=list, max_length=10)
+    everything: bool = False  # the whole shop (a larger reduction on some products still wins for them)
 
     @model_validator(mode="after")
     def _targets(self) -> "DiscountDef":
-        if not self.products and not self.categories and not self.seasons:
-            raise ValueError("a discount names products, categories or seasons")
+        if not (self.everything or self.products or self.categories or self.seasons):
+            raise ValueError("a discount covers the whole shop, or names products, categories or seasons")
         if any(not 1 <= len(v) <= 96 for v in [*self.products, *self.categories, *self.seasons]):
             raise ValueError("product, category and season keys are 1-96 characters")
         return self

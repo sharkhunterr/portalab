@@ -24,7 +24,13 @@ export interface CampaignView {
     everyone?: boolean;
   }>;
   /** 027: shop reductions while it runs, and its own achievements and quests. */
-  discounts?: Array<{ percent: number; products: number; categories: string[] }>;
+  discounts?: Array<{
+    percent: number;
+    products: number;
+    categories: string[];
+    seasons?: string[];
+    everything?: boolean;
+  }>;
   achievements?: Array<{ key: string; label: string }>;
   quests?: Array<{ key: string; label: string }>;
 }
@@ -186,4 +192,26 @@ export function useCampaignAdmin() {
       ).data ?? []) as unknown as SimulationRow[],
   });
   return { create, publish, act, archive, simulate };
+}
+
+/** What a shop reduction covers, in words: « the whole shop », « Christmas items », « 9 items »… */
+export function discountScope(
+  t: (key: string, values?: Record<string, string | number>) => string,
+  d: {
+    everything?: boolean | undefined;
+    seasons?: string[] | undefined;
+    categories: string[] | number;
+    products: number;
+  },
+): string {
+  if (d.everything) return t("campaigns:discount.everything");
+  const categories = typeof d.categories === "number" ? d.categories : d.categories.length;
+  const parts = [
+    ...(d.seasons ?? []).map((s) =>
+      t("campaigns:discount.season", { season: t(`campaigns:editor.season.${s}`) }),
+    ),
+    ...(categories ? [t("campaigns:discount.categories", { count: categories })] : []),
+    ...(d.products ? [t("campaigns:discount.products", { count: d.products })] : []),
+  ];
+  return parts.join(" + ") || t("campaigns:discount.products", { count: 0 });
 }

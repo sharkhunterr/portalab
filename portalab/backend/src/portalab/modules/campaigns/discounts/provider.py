@@ -25,6 +25,7 @@ class CampaignDiscounts:
                         products=tuple(discount.products),
                         categories=tuple(discount.categories),
                         seasons=tuple(discount.seasons),
+                        everything=discount.everything,
                         ends_at=campaign.ends_at,
                         names=dict(campaign.definition.names),
                     )

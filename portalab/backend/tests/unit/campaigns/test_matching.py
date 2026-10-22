@@ -125,3 +125,12 @@ def test_one_bonus_multiplies_several_values() -> None:
         ModifierDef(id="none")
     with pytest.raises(ValueError):
         ModifierDef(id="twice", gains=[{"value": "xp", "factor": 2}, {"value": "xp", "factor": 3}])
+
+
+def test_the_whole_shop_and_a_larger_reduction_on_a_season() -> None:
+    from portalab.capabilities.campaigns import ShopDiscount, best_discount
+
+    shop = ShopDiscount(campaign="xmas", name="Noël", ref="a", percent=10, everything=True)
+    christmas = ShopDiscount(campaign="xmas", name="Noël", ref="b", percent=20, seasons=("christmas",))
+    assert best_discount([shop, christmas], "theme_cozy", None) is shop
+    assert best_discount([shop, christmas], "badge_elf", None, "christmas") is christmas

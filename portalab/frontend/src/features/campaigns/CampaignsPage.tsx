@@ -4,7 +4,7 @@ import { PageHeader } from "../../design-system/components/PageHeader";
 import { EmptyState, Skeleton } from "../../design-system/components/Placeholders";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
-import { type CampaignView, useActiveCampaigns, useCampaign } from "./api";
+import { type CampaignView, discountScope, useActiveCampaigns, useCampaign } from "./api";
 import { WindowProgress } from "./WindowProgress";
 import "./campaigns.css";
 
@@ -152,7 +152,7 @@ function Brings({ view }: { view: CampaignView }) {
               <strong>−{d.percent} %</strong>
             </span>
             <span className="campaign-brings__what">
-              {t("campaigns:page.discount", { count: d.products })}{" "}
+              {t("campaigns:page.discountOn", { what: discountScope(t, d) })}{" "}
               <Link to="/marketplace">{t("campaigns:page.toShop")}</Link>
             </span>
           </li>
