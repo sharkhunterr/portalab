@@ -536,6 +536,30 @@ FANART: Routes = {
     },
 }
 
+# issue 229: SearXNG — images for a query (a resolution written two ways, a hit without an image skipped)
+SEARXNG: Routes = {
+    "/healthz": "OK",
+    "/search": {
+        "query": "x",
+        "results": [
+            {
+                "img_src": "https://images.example/maverick.jpg",
+                "title": "Tom Cruise as Capt Pete Mitchell in Top Gun: Maverick",
+                "resolution": "1600x900",
+                "engine": "brave.images",
+            },
+            {
+                "img_src": "https://images.example/b.jpg",
+                "title": "Maverick",
+                "resolution": "800 \u00d7 600",
+                "engine": "bing images",
+            },
+            {"title": "no image", "engine": "google"},
+            {"img_src": "ftp://images.example/c.jpg", "title": "not http", "engine": "x"},
+        ],
+    },
+}
+
 SECRETS = {
     "jellyfin": {"api_key": "jf-secret-key"},
     "plex": {"token": "plex-secret-token"},
@@ -547,6 +571,7 @@ SECRETS = {
     "grimmory": {"password": "grimmory-secret-pass"},
     "tmdb": {"api_key": "tmdb-secret-key"},
     "fanart": {"api_key": "fanart-secret-key"},
+    "searxng": {},
     "authentik": {"api_token": "authentik-secret-token"},
     "maintainerr": {},
     "ollama": {},
@@ -562,6 +587,7 @@ ROUTES = {
     "grimmory": GRIMMORY,
     "tmdb": TMDB,
     "fanart": FANART,
+    "searxng": SEARXNG,
     "authentik": AUTHENTIK,
     "maintainerr": MAINTAINERR,
     "ollama": OLLAMA,

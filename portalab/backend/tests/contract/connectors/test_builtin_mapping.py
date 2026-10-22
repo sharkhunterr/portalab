@@ -13,6 +13,7 @@ from portalab.capabilities.connector_sdk import SourceRecord
 from portalab.capabilities.media import (
     ARTWORK,
     CLEANUP,
+    IMAGE_SEARCH,
     ITEM_LINKS,
     LIBRARY,
     PLAYBACK,
@@ -31,6 +32,7 @@ from portalab.connectors.maintainerr import MaintainerrConnector
 from portalab.connectors.ollama import OllamaConnector
 from portalab.connectors.plex import PlexConnector
 from portalab.connectors.romm import RommConnector, cover_path, game_payload
+from portalab.connectors.searxng import SearxngConnector, UnsafeAddress, public
 from portalab.connectors.seerr import SeerrConnector
 from tests.contract.connectors.builtin_fixtures import ROUTES, SEERR, handle_for
 
@@ -178,6 +180,7 @@ def test_builtin_catalog_registers_once() -> None:
         "grimmory",
         "tmdb",
         "fanart",  # issue 229: films' and series' artwork
+        "searxng",  # issue 229: images on the web
         "qbittorrent",  # 027: torrent clients behind the download managers
         "deluge",
         "authentik",  # 027: the single sign-on, for services' access
@@ -342,3 +345,27 @@ async def test_fanart_artwork() -> None:
     assert [(a.kind, a.image) for a in series] == [("character", "/fanart/tv/121361/characterart/got-5.png")]
     assert await art.artwork("movie", {"tmdb": "999999"}) == []
     assert await art.artwork("series", {"tmdb": "1"}) == []  # a series without its TVDB id
+
+
+async def test_searxng_images_and_a_guarded_fetch() -> None:
+    """Issue 229: the images SearXNG finds (http/https only, their size read either way); fetching one never
+    reaches this network's addresses, the server's own or a non-http one."""
+    service = handle_for("searxng")
+    connector = SearxngConnector()
+    assert (await connector.test_connection(service)).ok
+    search = connector.provider(IMAGE_SEARCH, service)
+    hits = await search.images("Tom Cruise Maverick Top Gun Maverick")
+    assert [(h.url, h.width, h.height, h.engine) for h in hits] == [
+        ("https://images.example/maverick.jpg", 1600, 900, "brave.images"),
+        ("https://images.example/b.jpg", 800, 600, "bing images"),
+    ]
+    assert not public("127.0.0.1") and not public("192.168.1.24") and not public("169.254.169.254")
+    assert not public("localhost")
+    for url in (
+        "http://127.0.0.1/a.jpg",
+        "http://192.168.1.10/a.jpg",
+        "file:///etc/passwd",
+        "http://[::1]/a.jpg",
+    ):
+        with pytest.raises(UnsafeAddress):
+            await search.fetch(url)

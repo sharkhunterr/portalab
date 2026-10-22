@@ -78,7 +78,10 @@ const KEY = ["cards"] as const;
 
 /** A card's picture through the portal (browsers never call TMDB). */
 export function cardImage(ref: string | null | undefined, size = "w500"): string | null {
-  return ref ? `/api/v1/media/metadata-images?ref=${encodeURIComponent(ref)}&size=${size}` : null;
+  if (!ref) return null;
+  // an image the cards found and kept themselves (an actor's character, found on the web)
+  if (ref.startsWith("blob:")) return `/api/v1/cards/images/${ref.slice(5)}`;
+  return `/api/v1/media/metadata-images?ref=${encodeURIComponent(ref)}&size=${size}`;
 }
 
 /** An art site's image (fanart.tv) through the portal. */

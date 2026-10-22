@@ -56,6 +56,7 @@ AUDIO = "media.audio"  # #20: audiobooks (then music) played in the portal, rela
 READING = "media.reading"  # #21: books read in the portal (EPUB, PDF, comic book archives)
 RADIO = "media.radio"  # issue 168: a radio station of the homelab — listen, see what plays, ask for a song
 CLEANUP = "media.cleanup"  # #57: titles a cleanup tool will delete, and keeping one (Maintainerr)
+IMAGE_SEARCH = "media.image_search"  # issue 229: images found on the web (a self-hosted SearXNG)
 ARTWORK = "media.artwork"  # issue 229: a work's artwork from an art site (fanart.tv): backgrounds, clearart…
 REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the request service (Seerr)
 REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
@@ -690,6 +691,27 @@ class ArtworkProvider(Protocol):
     async def fetch_artwork(self, ref: str, preview: bool = False) -> bytes: ...
 
 
+@dataclass(frozen=True, slots=True)
+class ImageHit:
+    """Issue 229: an image a search found — where it is, what its page calls it, its size, who found it."""
+
+    url: str
+    title: str
+    width: int
+    height: int
+    engine: str
+
+
+@runtime_checkable
+class ImageSearch(Protocol):
+    """Issue 229: images on the web for a query (a self-hosted metasearch: SearXNG), and fetching one —
+    from public addresses only, an image, of a bounded size."""
+
+    async def images(self, query: str, limit: int = 30) -> Sequence[ImageHit]: ...
+
+    async def fetch(self, url: str) -> bytes: ...
+
+
 @runtime_checkable
 class PeopleProvider(Protocol):
     """#92 — what a service knows of a person (TMDB, Seerr: biography and filmography; Jellyfin: biography
@@ -1145,6 +1167,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(READING, MediaReading, "Read a book in the portal: EPUB, PDF, comic book archives (#21)"),
     _spec(RADIO, RadioStation, "A radio station of the homelab: listen, what plays, ask for a song (168)"),
     _spec(CLEANUP, MediaCleanup, "Titles a cleanup tool will delete, and keeping one (#57)"),
+    _spec(IMAGE_SEARCH, ImageSearch, "Images found on the web for a query, fetched safely (issue 229)"),
     _spec(ARTWORK, ArtworkProvider, "A work's artwork from an art site: backgrounds, clearart (229)"),
     _spec(REQUEST_QUOTAS, RequestQuotas, "Each account's request limits on the request service (#3)"),
     _spec(REQUEST_DISCOVERY, RequestDiscovery, "Titles one can ask for: search, shelves, details (#4)"),

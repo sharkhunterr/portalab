@@ -67,6 +67,9 @@ class Sources:
     async def work_of(self, object_id: UUID) -> UUID | None:
         return object_id if any(w.object_id == object_id for w in self.items) else None
 
+    async def image(self, ref: str, size: str) -> bytes:
+        return b"face:cruise"  # a portrait (the faces' fake reads it)
+
     async def role_images(self, person_ref: str) -> list[CardImage]:
         self.asked.append(person_ref)
         if person_ref != "tmdb:Tom Cruise":
@@ -234,3 +237,108 @@ async def test_a_works_borderless_art_from_an_art_site(database: Database) -> No
         title = (await session.execute(Card.__table__.select().where(Card.kind == "title"))).one()
     assert title.fan_art == "/fanart/movies/1/moviebackground/b.jpg"  # textless background, the best liked
     assert await fan.run() == 0 and len(art.asked) == 1  # kept: never asked again
+
+
+def test_a_characters_image_is_scored() -> None:
+    from portalab.modules.cards.faces import Candidate, score
+    from portalab.modules.cards.search import query_for
+
+    assert (
+        query_for("Tom Cruise", "Capt. Pete 'Maverick' Mitchell", "Top Gun : Maverick")
+        == "Tom Cruise Pete Maverick Mitchell Top Gun : Maverick"
+    )
+    film, role = "Interstellar", "Joseph Cooper"
+
+    def kept(
+        title: str, similarity: float = 0.7, size: tuple[int, int] = (1280, 720), engine: str = "bing images"
+    ):
+        return score(Candidate("u", title, engine, similarity, *size), role, film)
+
+    assert kept("McConaughey as Cooper in Interstellar") > kept(
+        "Interstellar wallpaper"
+    )  # the character named
+    assert kept("McConaughey as Cooper", similarity=0.3) is None  # not his face
+    assert kept("McConaughey at the Interstellar premiere") is None  # an event
+    assert kept("McConaughey smiling") is None  # nothing says it is this film
+    assert kept("Cooper", size=(300, 200)) is None  # too small
+    assert kept("Cooper", engine="wikicommons.images") is None
+
+
+class Matcher:
+    """Faces as their bytes say: ``face:<who>``; the same who, the same person."""
+
+    async def ready(self) -> bool:
+        return True
+
+    def look(self, data: bytes) -> Any:
+        from portalab.modules.cards.faces import Face, Looked
+
+        text = data.decode()
+        who = [part.removeprefix("face:") for part in text.split() if part.startswith("face:")]
+        return Looked(tuple(Face(w, 0.05) for w in who), 1280, 720)
+
+    def similarity(self, a: Any, b: Any) -> float:
+        return 0.9 if a.signature == b.signature else 0.1
+
+
+class Blobs:
+    def __init__(self) -> None:
+        self.kept: dict[str, bytes] = {}
+
+    async def put(self, namespace: str, data: bytes, *, content_type: str) -> Any:
+        from portalab.core.blobstore import StoredBlob
+
+        key = f"{namespace}/{len(self.kept):064d}"
+        self.kept[key] = data
+        return StoredBlob(key, len(data), content_type)
+
+
+class Web:
+    def __init__(self) -> None:
+        self.queries: list[str] = []
+
+    async def images(self, query: str, limit: int = 30) -> list[Any]:
+        from portalab.capabilities.media import ImageHit
+
+        self.queries.append(query)
+        return [
+            ImageHit(
+                "https://a/premiere.jpg", "Tom Cruise at the premiere of Top Gun: Maverick", 1280, 720, "bing"
+            ),
+            ImageHit("https://a/other.jpg", "Miles Teller in Top Gun: Maverick", 1280, 720, "bing"),
+            ImageHit("https://a/him.jpg", "Tom Cruise as Maverick in Top Gun: Maverick", 1280, 720, "bing"),
+        ]
+
+    async def fetch(self, url: str) -> bytes:
+        return {
+            "https://a/premiere.jpg": b"face:cruise",
+            "https://a/other.jpg": b"face:teller",
+            "https://a/him.jpg": b"face:cruise jet",
+        }[url]
+
+
+async def test_an_actors_character_found_on_the_web(database: Database) -> None:
+    from portalab.capabilities.media import IMAGE_SEARCH
+    from portalab.modules.cards.search import RoleSearch
+
+    capabilities = new_registry()
+    film = work("Top Gun: Maverick", 11000, "US", ["Tom Cruise"])
+    sources = Sources([film])
+
+    capabilities.provide(CARD_SOURCES, sources, instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    async with database.unit_of_work() as uow:  # TMDB was asked and had nothing; his portrait is known
+        await uow.session.execute(
+            Card.__table__.update().where(Card.kind == "cast").values(role_checked_at=NOW, art="/cruise.jpg")
+        )
+    web, blobs = Web(), Blobs()
+    search = RoleSearch(database, capabilities, Matcher(), blobs)  # type: ignore[arg-type]
+    assert await search.run() == 0  # no search connected: nothing marked
+    capabilities.provide(IMAGE_SEARCH, web, instance_ref="searxng", owner="test")
+    assert await search.run() == 1
+    assert web.queries == ["Tom Cruise as Tom Cruise Top Gun: Maverick"]
+    assert list(blobs.kept.values()) == [b"face:cruise jet"]  # his face, the film named, not the premiere
+    async with database.session() as session:
+        cruise = (await session.execute(Card.__table__.select().where(Card.kind == "cast"))).one()
+    assert cruise.role_art == f"blob:{next(iter(blobs.kept))}"
+    assert await search.run() == 0 and len(web.queries) == 1  # kept: never searched again

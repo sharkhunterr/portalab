@@ -11,6 +11,7 @@ from portalab.connectors.maintainerr import MaintainerrConnector
 from portalab.connectors.ollama import OllamaConnector
 from portalab.connectors.plex import PlexConnector
 from portalab.connectors.romm import RommConnector
+from portalab.connectors.searxng import SearxngConnector
 from portalab.connectors.seerr import SeerrConnector
 from portalab.connectors.subwave import SubwaveConnector
 from portalab.connectors.tautulli import TautulliConnector
@@ -33,6 +34,7 @@ def builtin_connectors() -> list[Connector]:
         GrimmoryConnector(),
         TmdbConnector(),
         FanartConnector(),  # issue 229: films' and series' artwork (the cards' borderless alternatives)
+        SearxngConnector(),  # issue 229: images on the web (an actor's character, for the cards)
         QBittorrentConnector(),
         DelugeConnector(),
         AuthentikConnector(),  # 027: the single sign-on — accounts and the groups opening each service
