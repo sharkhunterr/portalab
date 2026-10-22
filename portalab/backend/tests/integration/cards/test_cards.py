@@ -111,6 +111,8 @@ def test_borderless_only_at_high_rarities() -> None:
     commons = {variant_for("common", rng) for _ in range(2000)}
     legendaries = [variant_for("legendary", rng) for _ in range(2000)]
     assert commons <= {"normal", "foil"}
+    # the borderless alternative is a work's only: never a person's card
+    assert {variant_for("legendary", rng, "cast") for _ in range(2000)} <= {"normal", "foil"}
     assert 350 < sum(v.startswith("borderless") for v in legendaries) < 650
 
 
@@ -162,6 +164,9 @@ async def test_made_numbered_ranked_drawn_and_erased(database: Database) -> None
     assert opened["cards"][0]["set"] == str(first.object_id)  # the first card: of the work watched
     summary = await service.summary(user)
     assert summary["copies"] == 3 and summary["unopened"] == 0
+    pool = await service.pool(user, rarity=None, kind="cast")
+    assert pool["total"] == 3 and pool["countries"] == ["US", "FR"]
+    assert (await service.pool(user, q="dujardin"))["items"][0]["name"] == "Jean Dujardin"
     person = await service.person(user, "tmdb:Tom Cruise")
     assert person["size"] == 1 and person["name"] == "Tom Cruise"
 

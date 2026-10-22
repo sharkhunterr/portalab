@@ -26,7 +26,8 @@ function tilt(event: PointerEvent<HTMLElement>) {
  * type line with the set's symbol in its rarity's colour, a line of flavour, its collector number. The frame's
  * colour says its kind (the work gold, a director red, the cast blue…). ``borderless``: the alternative —
  * the art over the whole card, the texts on it; ``foil``: a light that moves with the pointer. A card not owned
- * yet is its silhouette.
+ * yet shows dimmed. A person's card shows their portrait over a scene of the work (until their character's
+ * image is found).
  */
 export function MediaCardView({
   card,
@@ -53,6 +54,11 @@ export function MediaCardView({
     : card.role_art
       ? cardImage(card.role_art, "w780")
       : cardImage(card.art, card.kind === "title" ? "w500" : "h632");
+  // a person's own portrait, over a scene of the work (their character's image, once found, replaces both)
+  const scene =
+    !borderless && card.kind !== "title" && !card.role_art && card.set_backdrop
+      ? cardImage(card.set_backdrop, "w780")
+      : null;
   const type =
     card.kind === "title"
       ? t(`gamification:cards.type.${card.set_kind === "series" ? "series" : "movie"}`, {
@@ -78,18 +84,27 @@ export function MediaCardView({
       aria-label={`${card.name} — ${type}`}
     >
       <div className="mcard__card">
-        <div className="mcard__art" data-art={!borderless && card.role_art ? "role" : undefined}>
-          {art && !missing ? <img src={art} alt="" loading="lazy" draggable={false} /> : null}
-          {!art || missing ? <Icon name={KIND_ICON[card.kind]} size={size === "sm" ? 24 : 40} /> : null}
+        <div
+          className="mcard__art"
+          data-art={!borderless && card.role_art ? "role" : scene ? "scene" : undefined}
+        >
+          {scene ? (
+            <img className="mcard__scene" src={scene} alt="" loading="lazy" draggable={false} />
+          ) : null}
+          {art ? (
+            <img className="mcard__picture" src={art} alt="" loading="lazy" draggable={false} />
+          ) : (
+            <Icon name={KIND_ICON[card.kind]} size={size === "sm" ? 24 : 40} />
+          )}
         </div>
         <header className="mcard__name">
-          <span>{missing ? "?" : card.name}</span>
+          <span>{card.name}</span>
           <span className="mcard__sign" aria-hidden="true">
             <Icon name={KIND_ICON[card.kind]} size={12} />
           </span>
         </header>
         <div className="mcard__type">
-          <span>{missing ? t(`gamification:cards.type.${card.kind}`) : type}</span>
+          <span>{type}</span>
           <span
             className="mcard__symbol"
             title={t(`gamification:cards.rarity.${card.rarity}`)}
@@ -98,7 +113,7 @@ export function MediaCardView({
             {card.set_code}
           </span>
         </div>
-        {size !== "sm" ? <p className="mcard__text">{missing ? null : flavor}</p> : null}
+        {size !== "sm" ? <p className="mcard__text">{flavor}</p> : null}
         <footer className="mcard__foot">
           <span>
             {String(card.number).padStart(3, "0")}/{String(card.set_size).padStart(3, "0")}{" "}

@@ -13,7 +13,8 @@ function best(card: MediaCard): Variant | null {
   return [...VARIANTS].reverse().find((v) => (card.owned[v] ?? 0) > 0) ?? null;
 }
 
-/** A card, big, with every version: the owned ones in colour, how many of each. */
+/** A card, big, with every version (the borderless alternative is a work's only): the owned ones in colour,
+ * how many of each. */
 function CardSheet({ card }: { card: MediaCard }) {
   const t = useT();
   const shown = best(card);
@@ -34,16 +35,16 @@ function CardSheet({ card }: { card: MediaCard }) {
       }
     >
       <div className="cards-sheet">
-        {VARIANTS.filter((v) => (v.startsWith("borderless") ? card.rarity !== "common" : true)).map(
-          (variant) => (
-            <figure key={variant} data-owned={(card.owned[variant] ?? 0) > 0 || undefined}>
-              <MediaCardView card={card} variant={variant} missing={!(card.owned[variant] ?? 0)} />
-              <figcaption>
-                {t(`gamification:cards.variant.${variant}`)} · ×{card.owned[variant] ?? 0}
-              </figcaption>
-            </figure>
-          ),
-        )}
+        {VARIANTS.filter((v) =>
+          v.startsWith("borderless") ? card.kind === "title" && card.rarity !== "common" : true,
+        ).map((variant) => (
+          <figure key={variant} data-owned={(card.owned[variant] ?? 0) > 0 || undefined}>
+            <MediaCardView card={card} variant={variant} missing={!(card.owned[variant] ?? 0)} />
+            <figcaption>
+              {t(`gamification:cards.variant.${variant}`)} · ×{card.owned[variant] ?? 0}
+            </figcaption>
+          </figure>
+        ))}
       </div>
       {card.person ? (
         <p>
@@ -56,7 +57,7 @@ function CardSheet({ card }: { card: MediaCard }) {
   );
 }
 
-function Binder({ cards }: { cards: MediaCard[] }) {
+export function Binder({ cards }: { cards: MediaCard[] }) {
   return (
     <ul className="cards-binder">
       {cards.map((card) => (

@@ -6,6 +6,7 @@ A = "/api/v1"
 LABELS = (
     read(f"{A}/me/cards", "My card collection", "Ma collection de cartes"),
     read(f"{A}/cards/sets", "The card sets", "Les extensions de cartes"),
+    read(f"{A}/cards/pool", "Every card there is", "Toutes les cartes existantes"),
     read(f"{A}/cards/sets/{{key}}", "A card set", "Une extension de cartes"),
     read(f"{A}/cards/people", "A person's cards", "Les cartes d'une personne"),
     read(f"{A}/me/cards/packs", "My card packs", "Mes paquets de cartes"),

@@ -22,6 +22,7 @@ def card_out(card: Card, card_set: CardSet, owned: dict[str, int] | None = None)
         "set_name": card_set.name,
         "set_size": card_set.size,
         "set_kind": card_set.kind,
+        "set_backdrop": card_set.backdrop,
         "year": card_set.year,
         "number": card.number,
         "kind": card.kind,
@@ -145,6 +146,68 @@ class CardService:
                 }
                 for s, n in rows
             ],
+        }
+
+    async def pool(
+        self,
+        user: UUID,
+        *,
+        q: str = "",
+        rarity: str | None = None,
+        kind: str | None = None,
+        country: str | None = None,
+        owned: bool = False,
+        page: int = 0,
+    ) -> dict[str, Any]:
+        """Every card of the sets present (the pool), the rarest first, filtered — each with the versions I
+        own."""
+        query = (
+            select(Card, CardSet)
+            .join(CardSet, CardSet.key == Card.set_key)
+            .where(Card.retired.is_(False), CardSet.present.is_(True))
+        )
+        if q.strip():
+            like = f"%{q.strip()}%"
+            query = query.where(or_(Card.name.ilike(like), CardSet.name.ilike(like), Card.role.ilike(like)))
+        if rarity:
+            query = query.where(Card.rarity == rarity)
+        if kind:
+            query = query.where(Card.kind == kind)
+        if country:
+            query = query.where(CardSet.country == country)
+        if owned:
+            mine = (
+                select(Copy.card_id)
+                .outerjoin(Pack, Pack.id == Copy.pack_id)
+                .where(Copy.user_id == user, self._seen())
+            )
+            query = query.where(Card.id.in_(mine))
+        async with self.database.session() as session:
+            total = await session.scalar(select(func.count()).select_from(query.subquery()))
+            rows = (
+                await session.execute(
+                    query.order_by(Card.score.desc(), CardSet.name, Card.number)
+                    .limit(PAGE)
+                    .offset(page * PAGE)
+                )
+            ).all()
+            have = await self._owned(session, user, [c.id for c, _ in rows])
+            countries = [
+                c
+                for (c,) in (
+                    await session.execute(
+                        select(CardSet.country)
+                        .where(CardSet.present.is_(True), CardSet.country.is_not(None))
+                        .group_by(CardSet.country)
+                        .order_by(func.count().desc())
+                        .limit(30)
+                    )
+                ).all()
+            ]
+        return {
+            "total": int(total or 0),
+            "countries": countries,
+            "items": [card_out(c, s, have.get(c.id)) for c, s in rows],
         }
 
     async def set_detail(self, user: UUID, key: str) -> dict[str, Any] | None:

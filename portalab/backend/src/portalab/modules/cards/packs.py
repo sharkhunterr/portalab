@@ -3,8 +3,8 @@ that work, two of the whole library present. Its cards are drawn when it is give
 that rarity), revealed when it is opened.
 
 A copy's version is drawn with it, like a trading card game's: foil at any rarity; the borderless versions
-(the full-art alternative) mostly at the high rarities — never a common, seldom a rare, often an epic or a
-legendary — and borderless foil rarer still."""
+(the full-art alternative: a work's scene over the whole card) for the works' cards only, mostly at the high
+rarities — never a common, seldom a rare, often an epic or a legendary — and borderless foil rarer still."""
 
 import random
 import secrets
@@ -33,8 +33,9 @@ FOIL = 1 / 8
 BORDERLESS = {"common": 0.0, "rare": 1 / 40, "epic": 1 / 10, "legendary": 1 / 4}
 
 
-def variant_for(rarity: str, rng: random.Random) -> str:
-    borderless = rng.random() < BORDERLESS.get(rarity, 0.0)
+def variant_for(rarity: str, rng: random.Random, kind: str = "title") -> str:
+    # the borderless alternative is a work's: its scene over the whole card (a person's card has none)
+    borderless = kind == "title" and rng.random() < BORDERLESS.get(rarity, 0.0)
     foil = rng.random() < FOIL
     if borderless:
         return "borderless_foil" if foil else "borderless"
@@ -104,7 +105,7 @@ class Packs:
                     Copy(
                         user_id=user,
                         card_id=card.id,
-                        variant=variant_for(card.rarity, self.rng),
+                        variant=variant_for(card.rarity, self.rng, card.kind),
                         pack_id=pack_id,
                         acquired_at=now,
                     )
