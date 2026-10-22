@@ -31,11 +31,18 @@ export function FeedbackReward({
   item,
   onDone,
   trigger,
+  open: shown,
+  onOpenChange,
+  message: written,
 }: {
   item: Item;
   onDone: () => void;
-  /** What opens the dialog (a tile of the feedback's toolbar); a button by default. */
-  trigger?: ReactNode;
+  /** What opens the dialog (a chip of the feedback's actions), a button by default; ``null``: opened by
+   * the owner (``open``), e.g. « send and reward » with the reply already written (``message``). */
+  trigger?: ReactNode | null;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  message?: string;
 }) {
   const t = useT();
   const client = useQueryClient();
@@ -43,7 +50,9 @@ export function FeedbackReward({
   const canGrant = useHasPermission("rewards.grant");
   const canGift = useHasPermission("marketplace.manage");
   const kinds = [...(canGrant ? (["coins", "xp"] as const) : []), ...(canGift ? (["product"] as const) : [])];
-  const [open, setOpen] = useState(false);
+  const [own, setOwn] = useState(false);
+  const open = shown ?? own;
+  const setOpen = (next: boolean) => (onOpenChange ? onOpenChange(next) : setOwn(next));
   const [chosen, setKind] = useState<Kind | null>(null);
   // the rights arrive after the first draw: until a choice is made, the currency when it may be given
   const kind: Kind = chosen ?? (canGrant ? "coins" : "product");
@@ -57,7 +66,9 @@ export function FeedbackReward({
     kind === "product"
       ? (product?.name ?? "")
       : `${quantity} ${t(`marketplace:shopadmin.valueShort.${kind}`)}`;
-  const thanks = message ?? (what ? t("support:reward.thanks", { what }) : "");
+  // a reply already written comes first, the thank-you for the reward after it
+  const suggested = what ? t("support:reward.thanks", { what }) : "";
+  const thanks = message ?? (written?.trim() ? `${written.trim()}\n\n${suggested}`.trim() : suggested);
   const ready = kind === "product" ? Boolean(product) : quantity > 0;
   const give = useMutation({
     mutationFn: async () => {
@@ -128,12 +139,14 @@ export function FeedbackReward({
       description={t("support:reward.description")}
       closeLabel={t("support:reward.cancel")}
       trigger={
-        trigger ?? (
-          <Button variant="secondary">
-            <Icon name="gift" size={16} />
-            {t("support:reward.open")}
-          </Button>
-        )
+        trigger === null
+          ? null
+          : (trigger ?? (
+              <Button variant="secondary">
+                <Icon name="gift" size={16} />
+                {t("support:reward.open")}
+              </Button>
+            ))
       }
     >
       <form
