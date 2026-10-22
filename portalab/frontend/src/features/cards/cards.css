@@ -516,21 +516,6 @@
   }
 }
 
-/* a person's portrait over a scene of their work: the scene behind, softened; the portrait in front, its
-   edges fading into it */
-.mcard__art[data-art="scene"] .mcard__scene {
-  filter: blur(1px) saturate(1.1) brightness(0.8);
-  transform: scale(1.06);
-}
-.mcard__art[data-art="scene"] .mcard__picture {
-  inset: auto 0 0;
-  block-size: 92%;
-  object-fit: contain;
-  object-position: center bottom;
-  -webkit-mask-image: radial-gradient(ellipse 62% 78% at 50% 52%, black 55%, transparent 98%);
-  mask-image: radial-gradient(ellipse 62% 78% at 50% 52%, black 55%, transparent 98%);
-}
-
 .cards-views {
   margin: 0;
   border: 0;
