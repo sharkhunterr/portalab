@@ -656,6 +656,18 @@ class PersonRecord:
     credits: Sequence[PersonCredit] = ()
 
 
+@dataclass(frozen=True, slots=True)
+class RoleImage:
+    """Issue 229: an image a person is tagged in, and the work it comes from (``media_id``: its TMDB id)."""
+
+    media_type: str  # movie, tv
+    media_id: str
+    image: str  # a metadata image's reference
+    image_type: str  # still, backdrop, poster
+    aspect: float
+    votes: float
+
+
 @runtime_checkable
 class PeopleProvider(Protocol):
     """#92 — what a service knows of a person (TMDB, Seerr: biography and filmography; Jellyfin: biography
@@ -674,6 +686,10 @@ class MetadataProvider(Protocol):
     ) -> MetadataRecord | None: ...
 
     async def fetch_image(self, ref: str, size: str) -> bytes: ...
+
+    async def role_images(self, person_id: str) -> Sequence[RoleImage]:
+        """Issue 229: the images a person (its provider's id) is tagged in, each with its work."""
+        ...
 
 
 # --- 027 (#2): the portal's player ---------------------------------------------------------------------

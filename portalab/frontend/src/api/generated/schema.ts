@@ -622,7 +622,8 @@ export interface paths {
         put?: never;
         /**
          * Sync Cards
-         * @description Make the cards again from the works present now (those that changed), then rank them again.
+         * @description Make the cards again from the works present now (those that changed), then rank them again; and look
+         *     for the next actors' characters at once.
          */
         post: operations["sync_cards_api_v1_admin_cards_sync_post"];
         delete?: never;

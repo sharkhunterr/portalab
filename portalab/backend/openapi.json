@@ -22729,7 +22729,7 @@
     },
     "/api/v1/admin/cards/sync": {
       "post": {
-        "description": "Make the cards again from the works present now (those that changed), then rank them again.",
+        "description": "Make the cards again from the works present now (those that changed), then rank them again; and look\nfor the next actors' characters at once.",
         "operationId": "sync_cards_api_v1_admin_cards_sync_post",
         "responses": {
           "200": {

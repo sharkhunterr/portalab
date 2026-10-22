@@ -292,6 +292,9 @@ class _Tmdb:
     async def fetch_image(self, ref: str, size: str) -> bytes:
         return b"\xff\xd8jpeg" + ref.encode()
 
+    async def role_images(self, person_id: str) -> list[Any]:
+        return []
+
 
 class _Calendar:
     async def upcoming(self, start: Any, end: Any) -> list[SourceRelease]:

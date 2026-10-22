@@ -72,6 +72,9 @@ const CampaignConsole = lazy(() => import("../../features/campaigns/console/Camp
 const Campaigns = lazy(() => import("../../features/campaigns/CampaignsPage"));
 const GamificationAdmin = lazy(() => import("../../features/gamification/admin/GamificationAdmin"));
 const Progression = lazy(() => import("../../features/gamification/progression/ProgressionPage"));
+const Cards = lazy(() => import("../../features/cards/CollectionPage")); // issue 229
+const CardSet = lazy(() => import("../../features/cards/SetPage"));
+const CardPerson = lazy(() => import("../../features/cards/PersonPage"));
 const Community = lazy(() => import("../../features/community/CommunityPage"));
 const ModerationQueue = lazy(() => import("../../features/community/projects/ModerationQueue"));
 const Projects = lazy(() => import("../../features/marketplace/projects/ProjectsPage"));
@@ -130,6 +133,9 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           ],
         },
         { path: "progression", element: <Progression />, handle: h({ crumb: "My progression" }) },
+        { path: "cards", element: <Cards />, handle: h({ crumb: "My cards" }) },
+        { path: "cards/sets/:key", element: <CardSet />, handle: h({ crumb: "A card set" }) },
+        { path: "cards/people", element: <CardPerson />, handle: h({ crumb: "A person's cards" }) },
         {
           path: "plugins/:pluginKey/:pageKey",
           element: <PluginPage />,

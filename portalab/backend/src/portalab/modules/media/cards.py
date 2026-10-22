@@ -9,7 +9,9 @@ from uuid import UUID
 
 from sqlalchemy import or_, select
 
-from portalab.capabilities.media_core import CardPerson, CardWork
+from portalab.capabilities.media import METADATA, unwrap
+from portalab.capabilities.media_core import CardImage, CardPerson, CardWork
+from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.modules.media.models import MediaObject, ObjectMetadata
 
@@ -52,8 +54,9 @@ def _strings(raw: Any) -> list[str]:
 
 
 class MediaCardSources:
-    def __init__(self, database: Database) -> None:
+    def __init__(self, database: Database, capabilities: CapabilityRegistry | None = None) -> None:
         self.database = database
+        self.capabilities = capabilities
 
     async def works(self, *, since: datetime | None = None) -> Sequence[CardWork]:
         query = (
@@ -93,6 +96,7 @@ class MediaCardSources:
                     people=_people(data.get("people")),
                     updated_at=max(item.updated_at, meta.fetched_at),
                     available=bool(item.available),
+                    tmdb=str(tmdb) if (tmdb := (data.get("ids") or {}).get("tmdb")) else None,
                 )
             )
         return out
@@ -121,4 +125,17 @@ class MediaCardSources:
                 if current.kind in KINDS:
                     return current.id
                 current = await session.get(MediaObject, current.parent_id) if current.parent_id else None
+        return None
+
+    async def role_images(self, person_ref: str) -> Sequence[CardImage] | None:
+        """Issue 229: the images a person is tagged in (their characters), from the metadata provider that
+        can tell (TMDB); ``None`` when none can."""
+        if self.capabilities is None or not person_ref.startswith("tmdb:"):
+            return None
+        for registration in self.capabilities.system_providers(METADATA):
+            tagged = getattr(registration.provider, "role_images", None)
+            if tagged is None:
+                continue
+            found = unwrap(await tagged(person_ref.removeprefix("tmdb:")))
+            return [CardImage(i.media_id, i.image, i.image_type, i.aspect, i.votes) for i in found or []]
         return None

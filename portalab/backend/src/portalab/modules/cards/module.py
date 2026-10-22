@@ -16,10 +16,12 @@ from portalab.modules.cards import permissions as _permissions  # noqa: F401 —
 from portalab.modules.cards.generator import CardForge
 from portalab.modules.cards.packs import CONSUMER, Packs
 from portalab.modules.cards.participant import CardsParticipant
+from portalab.modules.cards.roles import RoleArt
 from portalab.modules.cards.service import CardService
 
 OWNER = "module:cards"
 SYNC_JOB = "cards.sync"
+ROLES_JOB = "cards.role_art"
 log = get_logger("portalab.cards")
 
 
@@ -39,6 +41,7 @@ class CardsModule:
         self.forge = CardForge(database, capabilities, clock=clock)
         self.packs = Packs(database, capabilities, clock=clock)
         self.service = CardService(database)
+        self.roles = RoleArt(database, capabilities, clock=clock)
 
     def register(self) -> None:
         participant = CardsParticipant(self.database)
@@ -54,5 +57,12 @@ class CardsModule:
             if report.made or report.gone:
                 log.info("cards made again", extra={"fields": {"made": report.made, "gone": report.gone}})
 
-        # the works that changed are made again (their fingerprint), every half hour
-        return [register_periodic(jobs, self.database, SYNC_JOB, timedelta(minutes=30), sync, owner=OWNER)]
+        async def roles() -> None:
+            await self.roles.run()
+
+        return [
+            # the works that changed are made again (their fingerprint), every half hour
+            register_periodic(jobs, self.database, SYNC_JOB, timedelta(minutes=30), sync, owner=OWNER),
+            # the actors' characters, a few people every five minutes (the rarest cards first)
+            register_periodic(jobs, self.database, ROLES_JOB, timedelta(minutes=5), roles, owner=OWNER),
+        ]
