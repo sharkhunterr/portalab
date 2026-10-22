@@ -72,7 +72,7 @@ def fingerprint(work: CardWork) -> str:
         "votes": work.vote_count // 50,  # a few more votes do not make it again
         "countries": list(work.countries)[:1],
         "tmdb": work.tmdb,
-        "v": 2,  # how the cards are made (people's cards: no image of the work since v2)
+        "v": 3,  # how the cards are made (people's cards: no image of the work since v2; the set's scene, v3)
     }
     return hashlib.sha256(json.dumps(data, sort_keys=True, default=str).encode()).hexdigest()[:64]
 
@@ -183,6 +183,7 @@ class CardForge:
         current.year = work.year
         current.country = (work.countries[0] if work.countries else None) or None
         current.poster = work.poster
+        current.backdrop = work.backdrop or next(iter(work.backdrops), None)
         current.saga = (
             str(work.collection.get("name"))[:200]
             if work.collection and work.collection.get("name")

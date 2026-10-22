@@ -58,6 +58,23 @@ async def card_sets(
     return await module.service.sets(_me(principal), q=q, started=started, page=page)
 
 
+@router.get("/cards/pool")
+async def card_pool(
+    principal: Reader,
+    module: Module,
+    q: Annotated[str, Query(max_length=80)] = "",
+    rarity: Annotated[str | None, Query(pattern=r"^(common|rare|epic|legendary)$")] = None,
+    kind: Annotated[str | None, Query(pattern=r"^(title|cast|director|creator|writer|composer)$")] = None,
+    country: Annotated[str | None, Query(pattern=r"^[A-Z]{2}$")] = None,
+    owned: bool = False,
+    page: Annotated[int, Query(ge=0, le=2000)] = 0,
+) -> dict[str, Any]:
+    """Every card there is (the pool), the rarest first — by name, rarity, kind, country, or mine only."""
+    return await module.service.pool(
+        _me(principal), q=q, rarity=rarity, kind=kind, country=country, owned=owned, page=page
+    )
+
+
 @router.get("/cards/sets/{key}")
 async def card_set(
     principal: Reader, module: Module, key: Annotated[str, Path(pattern=r"^[0-9a-f-]{36}$")]

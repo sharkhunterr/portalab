@@ -13,6 +13,8 @@ export interface MediaCard {
   set_name: string;
   set_size: number;
   set_kind: string;
+  /** a scene of the work: behind its people's portraits */
+  set_backdrop?: string | null;
   year: number | null;
   number: number;
   kind: "title" | "cast" | "director" | "creator" | "writer" | "composer";
@@ -119,6 +121,31 @@ export function useCardPerson(ref: string | null) {
         owned: number;
         cards: MediaCard[];
       },
+  });
+}
+
+export function useCardPool(filters: {
+  q: string;
+  rarity: Rarity | "";
+  kind: MediaCard["kind"] | "";
+  country: string;
+  owned: boolean;
+  page: number;
+}) {
+  return useQuery({
+    queryKey: [...KEY, "pool", filters],
+    placeholderData: keepPreviousData,
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/cards/pool", {
+          params: {
+            // the filters set only (an empty one is no filter)
+            query: Object.fromEntries(
+              Object.entries(filters).filter(([, value]) => value !== "" && value !== false),
+            ) as never,
+          },
+        })
+      ).data as unknown as { total: number; countries: string[]; items: MediaCard[] },
   });
 }
 

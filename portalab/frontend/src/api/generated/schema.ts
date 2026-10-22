@@ -5004,6 +5004,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cards/pool": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Card Pool
+         * @description Every card there is (the pool), the rarest first — by name, rarity, kind, country, or mine only.
+         */
+        get: operations["card_pool_api_v1_cards_pool_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/cards/sets": {
         parameters: {
             query?: never;
@@ -27610,6 +27630,44 @@ export interface operations {
         parameters: {
             query: {
                 ref: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    card_pool_api_v1_cards_pool_get: {
+        parameters: {
+            query?: {
+                q?: string;
+                rarity?: string | null;
+                kind?: string | null;
+                country?: string | null;
+                owned?: boolean;
+                page?: number;
             };
             header?: never;
             path?: never;

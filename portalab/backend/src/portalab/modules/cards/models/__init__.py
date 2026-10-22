@@ -44,6 +44,8 @@ class CardSet(CardsBase):
     year: Mapped[int | None] = mapped_column(Integer)
     country: Mapped[str | None] = mapped_column(String(8))
     poster: Mapped[str | None] = mapped_column(String(120), info=not_personal("an artwork reference"))
+    # a scene of the work: behind its people's portraits on their cards
+    backdrop: Mapped[str | None] = mapped_column(String(120), info=not_personal("an artwork reference"))
     saga: Mapped[str | None] = mapped_column(String(200), info=not_personal("a saga's name"))
     tmdb: Mapped[str | None] = mapped_column(String(24))  # the work's TMDB id
     size: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
