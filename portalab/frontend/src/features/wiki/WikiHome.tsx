@@ -12,15 +12,15 @@ import "./wiki.css";
 
 /**
  * Wiki home (spec 011 T016, 027 T095): "New page" for those who may write, a title filter, and the wiki as
- * groups — each section (a top-level page with sub-pages) a coloured block of page cards that folds away,
+ * groups — each section (a top-level page with sub-pages) a coloured block of page cards that opens on a tap (folded at first),
  * the top-level pages without sub-pages gathered last. The viewer only receives the pages they may read.
  */
 const TONES = 5;
-const FOLDED = "portalab.wiki.folded";
+const OPENED = "portalab.wiki.opened"; // groups start folded: the home lists the books, one tap opens one
 
-function readFolded(): string[] {
+function readOpened(): string[] {
   try {
-    return JSON.parse(localStorage.getItem(FOLDED) ?? "[]") as string[];
+    return JSON.parse(localStorage.getItem(OPENED) ?? "[]") as string[];
   } catch {
     return [];
   }
@@ -64,7 +64,16 @@ function Group({
   const t = useT();
   const bodyId = useId();
   const title = group.root?.title ?? t("wiki:loose");
-  const cards = group.root ? group.root.children : group.pages;
+  const children = group.root ? group.root.children : group.pages;
+  const total = group.root ? flatten(group.root.children).length : group.pages.length;
+  // in a section, a page with sub-pages is a part: its own title and cards; the other pages share a grid
+  const runs: (TreeNode | TreeNode[])[] = [];
+  for (const node of children) {
+    const last = runs.at(-1);
+    if (group.root && node.children.length) runs.push(node);
+    else if (Array.isArray(last)) last.push(node);
+    else runs.push([node]);
+  }
   return (
     <section className="wiki-group" data-tone={tone} aria-label={title}>
       <header className="wiki-group__head">
@@ -85,15 +94,33 @@ function Group({
           aria-label={t("wiki:toggle", { title })}
           onClick={onToggle}
         >
-          <span className="wiki-meta">{t("wiki:pageCount", { count: cards.length })}</span>
+          <span className="wiki-meta">{t("wiki:pageCount", { count: total })}</span>
           <Icon name="chevron-down" size={18} />
         </button>
       </header>
-      <ul id={bodyId} className="wiki-cards" hidden={folded}>
-        {cards.map((node, index) => (
-          <PageCard key={node.id} node={node} index={index + 1} />
-        ))}
-      </ul>
+      <div id={bodyId} className="wiki-group__body" hidden={folded}>
+        {runs.map((run) =>
+          Array.isArray(run) ? (
+            <ul key={run[0]?.id} className="wiki-cards">
+              {run.map((node) => (
+                <PageCard key={node.id} node={node} index={children.indexOf(node) + 1} />
+              ))}
+            </ul>
+          ) : (
+            <section key={run.id} className="wiki-part" aria-label={run.title}>
+              <h4 className="wiki-part__title">
+                <Link to={`/wiki/${run.slug}`}>{run.title}</Link>
+              </h4>
+              {run.summary ? <p className="wiki-card__summary">{run.summary}</p> : null}
+              <ul className="wiki-cards">
+                {run.children.map((node, index) => (
+                  <PageCard key={node.id} node={node} index={index + 1} />
+                ))}
+              </ul>
+            </section>
+          ),
+        )}
+      </div>
     </section>
   );
 }
@@ -104,12 +131,12 @@ export function WikiHome() {
   const tree = useTree();
   const canWrite = useHasPermission("wiki.edit");
   const [query, setQuery] = useState("");
-  const [folded, setFolded] = useState<string[]>(readFolded);
+  const [opened, setOpened] = useState<string[]>(readOpened);
   const toggle = (key: string) =>
-    setFolded((current) => {
+    setOpened((current) => {
       const next = current.includes(key) ? current.filter((k) => k !== key) : [...current, key];
       try {
-        localStorage.setItem(FOLDED, JSON.stringify(next));
+        localStorage.setItem(OPENED, JSON.stringify(next));
       } catch {
         // a remembered fold is a convenience
       }
@@ -187,7 +214,7 @@ export function WikiHome() {
                     key={key}
                     group={group}
                     tone={index % TONES}
-                    folded={folded.includes(key)}
+                    folded={!opened.includes(key)}
                     onToggle={() => toggle(key)}
                   />
                 );

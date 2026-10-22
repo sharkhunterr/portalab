@@ -20,3 +20,17 @@ def test_cut_at_a_sentence_or_a_word() -> None:
 
 def test_no_prose() -> None:
     assert summary_of("## Only a heading\n\n- and a list") == ""
+
+
+def test_a_line_of_tags_is_not_a_summary() -> None:
+    assert (
+        summary_of("`Public : Utilisateur` · `MAJ : 08/2026`\n\n## En bref\n\nUne phrase.") == "Une phrase."
+    )
+
+
+def test_a_sentence_announcing_a_list_is_left_out() -> None:
+    assert summary_of("RomM est la ludothèque. Deux façons d'y jouer :\n\n- ici") == "RomM est la ludothèque."
+
+
+def test_a_caption_in_italics_is_not_a_summary() -> None:
+    assert summary_of("*Public : Utilisateur · MAJ : 08/2026*\n\nUne phrase.") == "Une phrase."

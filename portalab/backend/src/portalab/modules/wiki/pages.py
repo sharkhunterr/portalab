@@ -58,6 +58,7 @@ def slugify(text: str) -> str:
 
 
 _SUMMARY_SKIP = re.compile(r"^(#|>|[-*+] |\d+[.)] |\||```|~~~|<|!\[)")
+_SUMMARY_TAGS = re.compile(r"^((`[^`\n]*`[\s·•|]*)+|\*[^*\n]+\*|_[^_\n]+_)$")  # tags or a caption in italics
 _MD_LINK = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")
 _MD_MARK = re.compile(r"(\*\*|__|\*|`|~~)")
 
@@ -67,16 +68,20 @@ def summary_of(body_md: str, limit: int = 180) -> str:
     — what a card shows under the title."""
     for block in re.split(r"\n\s*\n", body_md.strip()):
         block = block.strip()
-        if not block or _SUMMARY_SKIP.match(block):
+        if not block or _SUMMARY_SKIP.match(block) or _SUMMARY_TAGS.match(block):
             continue
         text = re.sub(r"\s+", " ", _MD_MARK.sub("", _MD_LINK.sub(r"\1", block))).strip()
+        end = text.rfind(". ", 0, limit)
+        if text.endswith(":"):  # a sentence announcing a list: the sentences before it, if any
+            if end > 0:
+                return text[: end + 1]
+            continue
         if len(text) <= limit:
             return text
-        cut = text[:limit]
-        end = max(cut.rfind(". "), cut.rfind(" : "), cut.rfind("! "), cut.rfind("? "))
+        end = max(text.rfind(". ", 0, limit), text.rfind("! ", 0, limit), text.rfind("? ", 0, limit))
         if end >= limit // 2:
-            return cut[: end + 1].rstrip(" :")
-        return cut.rsplit(" ", 1)[0].rstrip(",;:") + "…"
+            return text[: end + 1]
+        return text[:limit].rsplit(" ", 1)[0].rstrip(",;:") + "…"
     return ""
 
 

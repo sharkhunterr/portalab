@@ -60,9 +60,13 @@ def main() -> int:
     args.add_argument("--currency", help="the site's currency name, written instead of « Coins »")
     args.add_argument("--dry-run", action="store_true")
     opts = args.parse_args()
-    pages = sorted(
-        (parse(p) for p in opts.folder.glob("*.md")), key=lambda p: (p["parent"] != "none", p["position"])
-    )
+    pages = [parse(p) for p in sorted(opts.folder.glob("*.md"))]
+    parents = {p["slug"]: p["parent"] for p in pages}
+
+    def depth(slug: str | None) -> int:  # a parent is always imported before its pages
+        return 0 if parents.get(slug or "") in (None, "none") else 1 + depth(parents[slug or ""])
+
+    pages.sort(key=lambda p: (depth(p["slug"]), p["position"]))
     if opts.currency:  # the guide says « Coins », the default name; a site may call it otherwise
         for page in pages:
             for key in ("title", "body_md"):
