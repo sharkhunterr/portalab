@@ -54,7 +54,105 @@ function AccountView({ me }: { me: Me }) {
           ))}
         </ul>
       </SettingsCard>
+      <PasswordSection hasPassword={me.has_password ?? true} />
     </SettingsPage>
+  );
+}
+
+function passwordMessage(error: unknown, t: ReturnType<typeof useT>): string {
+  if (error instanceof ApiError) {
+    if (error.code === "identity.password_current_wrong") return t("account:password.wrong");
+    if (error.code === "identity.password_unchanged") return t("account:password.unchanged");
+    if (error.code === "identity.password_not_local") return t("account:password.notLocal");
+    if (error.code === "user.password_invalid")
+      return t("account:password.policy", { min: Number(error.extensions.min_length ?? 12) });
+    if (error.code === "auth.throttled")
+      return t("account:password.throttled", {
+        minutes: Math.max(1, Math.ceil(Number(error.extensions.retry_after_seconds ?? 60) / 60)),
+      });
+  }
+  return t("account:error");
+}
+
+/** « Change my password »: the current one, then the new one twice; the other devices are signed out. */
+function PasswordSection({ hasPassword }: { hasPassword: boolean }) {
+  const t = useT();
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [again, setAgain] = useState("");
+  const mismatch = again !== "" && again !== next;
+  const mutation = useMutation({
+    mutationFn: async () =>
+      (
+        await api.POST("/api/v1/me/password", {
+          body: { current_password: current, new_password: next },
+        })
+      ).data,
+    onSuccess: () => {
+      setCurrent("");
+      setNext("");
+      setAgain("");
+    },
+  });
+  if (!hasPassword) {
+    return (
+      <SettingsCard icon="key" title={t("account:password.title")} hint={t("account:password.notLocal")}>
+        {null}
+      </SettingsCard>
+    );
+  }
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    if (!mismatch) mutation.mutate();
+  };
+  return (
+    <SettingsCard icon="key" title={t("account:password.title")} hint={t("account:password.hint")}>
+      <form onSubmit={submit} className="account-password">
+        {mutation.isError ? (
+          <FormMessage kind="error">{passwordMessage(mutation.error, t)}</FormMessage>
+        ) : null}
+        {mutation.isSuccess ? (
+          <FormMessage kind="success">
+            {t("account:password.changed", { count: mutation.data?.other_sessions_signed_out ?? 0 })}
+          </FormMessage>
+        ) : null}
+        <TextField
+          label={t("account:password.current")}
+          type="password"
+          autoComplete="current-password"
+          required
+          value={current}
+          onChange={(event) => setCurrent(event.target.value)}
+        />
+        <TextField
+          label={t("account:password.new")}
+          type="password"
+          autoComplete="new-password"
+          required
+          value={next}
+          onChange={(event) => setNext(event.target.value)}
+        />
+        <TextField
+          label={t("account:password.again")}
+          type="password"
+          autoComplete="new-password"
+          required
+          value={again}
+          error={mismatch ? t("account:password.mismatch") : undefined}
+          onChange={(event) => setAgain(event.target.value)}
+        />
+        <div className="settings-actions">
+          <Button
+            type="submit"
+            disabled={mutation.isPending || !current || !next || !again || mismatch}
+            aria-busy={mutation.isPending}
+          >
+            <Icon name="key" size={16} />
+            {t("account:password.submit")}
+          </Button>
+        </div>
+      </form>
+    </SettingsCard>
   );
 }
 

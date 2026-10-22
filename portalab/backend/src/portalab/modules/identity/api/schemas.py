@@ -63,6 +63,8 @@ class Me(BaseModel):
     has_avatar: bool
     onboarding: list[OnboardingStep]
     deletion_due_at: datetime | None = None
+    # a password of the portal's own (else the account signs in through the single sign-on)
+    has_password: bool = True
 
 
 class FieldUpdateBody(Strict):
