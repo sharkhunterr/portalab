@@ -99,18 +99,27 @@ export function Answers({ payload, fields }: { payload: Record<string, unknown>;
   );
 }
 
+const EVENT_ICON: Record<string, string> = {
+  read: "check",
+  closed: "inbox",
+  reopened: "undo",
+  rewarded: "gift",
+  converted: "ticket",
+};
 const TOOL_ICON: Record<string, string> = {
   ticket: "ticket",
   feature_proposal: "lightbulb",
   community_project: "users",
 };
-type Then = "none" | "close" | "reward" | "ticket" | "feature_proposal" | "community_project";
+type Then = "close" | "reward" | "ticket" | "feature_proposal" | "community_project";
+const CONVERSIONS: readonly Then[] = ["ticket", "feature_proposal", "community_project"];
 
 /**
  * One feedback (027): the conversation (the member's answers, the team's reply), then two ways to handle
  * it. Without writing, a slim row of actions does just that (read, close, reward, a ticket, a proposal, a
- * project). Touching « Reply » opens the composer: the reply, and what to do once it is sent — nothing,
- * close, reward, make a ticket… — on one button (« Send and close »).
+ * project). Touching « Reply » opens the composer: the reply, and what to do once it is sent — any of
+ * close, reward, make a ticket… (closing and a conversion exclude each other: a conversion files it
+ * already) — on one button (« Send, close and reward »).
  */
 function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
   const t = useT();
@@ -121,7 +130,8 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
   const canReward = useCanReward(item);
   const [reply, setReply] = useState("");
   const [composing, setComposing] = useState(false);
-  const [then, setThen] = useState<Then>("none");
+  const [chosen, setChosen] = useState<Then[]>([]);
+  const [after, setAfter] = useState<Then[]>([]); // what waits for the reward to be given
   const [rewarding, setRewarding] = useState<{ message: string } | null>(null);
   const [pending, setPending] = useState<{ target: string; token: string } | null>(null);
   const [done, setDone] = useState<string | null>(null);
@@ -129,7 +139,58 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
   const conversions = (detail.data?.conversions ?? []).filter((c) => c.target !== "contribution");
   const closed = item.status === "dismissed";
   const name = item.submitter_name ?? t("support:review.someone");
-  const refresh = () => client.invalidateQueries({ queryKey: [...QUEUE] });
+  const refresh = () =>
+    Promise.all([
+      client.invalidateQueries({ queryKey: [...QUEUE] }),
+      client.invalidateQueries({ queryKey: ["support", "feedback", item.id] }),
+    ]);
+  const ago = (at: string) => format.relative((Date.parse(at) - Date.now()) / 1000);
+  // the history; a reply written before it was kept (or its part not in it) shows first, as it was
+  const kept = detail.data?.history ?? [];
+  let earlier = item.reply ?? "";
+  for (const event of kept) if (event.kind === "replied") earlier = earlier.replace(event.text ?? "", "");
+  earlier = earlier.trim();
+  const history = [
+    ...(earlier
+      ? [{ kind: "replied", text: earlier, detail: {}, at: item.replied_at ?? item.created_at }]
+      : []),
+    ...kept,
+  ];
+  const eventText = (event: (typeof history)[number]) => {
+    const detail = (event.detail ?? {}) as Record<string, string | number | undefined>;
+    if (event.kind === "rewarded") return t("support:history.rewarded", { what: String(detail.label ?? "") });
+    if (event.kind === "converted")
+      return t(`support:history.converted.${String(detail.target ?? "ticket")}`, {
+        label: String(detail.label ?? ""),
+      });
+    return t(`support:history.${event.kind}`);
+  };
+  const toggle = (key: Then) =>
+    setChosen((current) => {
+      if (current.includes(key)) return current.filter((k) => k !== key);
+      const kept =
+        key === "close"
+          ? current.filter((k) => !CONVERSIONS.includes(k))
+          : CONVERSIONS.includes(key)
+            ? current.filter((k) => k !== "close")
+            : current;
+      return [...kept, key];
+    });
+  const run = async (actions: Then[]) => {
+    if (actions.includes("close")) review.mutate("dismiss");
+    for (const target of actions.filter((k) => CONVERSIONS.includes(k))) {
+      try {
+        await convert.mutateAsync({ target });
+      } catch (error) {
+        const token =
+          error instanceof ApiError ? (error.extensions.confirmation as string | undefined) : undefined;
+        if (token) {
+          setPending({ target, token }); // confirmed in place, the others wait for another time
+          return;
+        }
+      }
+    }
+  };
   const start = (target: string) =>
     convert.mutate(
       { target },
@@ -148,32 +209,39 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
         await api.POST("/api/v1/support/feedback/{feedback_id}/reply", {
           params: { path: { feedback_id: item.id } },
           // the earlier reply stays: the new one follows it (the member keeps the whole exchange)
-          body: { text: item.reply ? `${item.reply}\n\n${text}` : text },
+          body: { text, append: true },
         })
       ).data,
   });
   const reset = () => {
     setReply("");
-    setThen("none");
+    setChosen([]);
     setComposing(false);
   };
   const submit = async () => {
     const text = reply.trim();
     if (!text) return;
-    if (then === "reward") {
-      // the reward's dialog sends the reply with its thank-you: one message, one notification
+    if (chosen.includes("reward")) {
+      // the reward's dialog sends the reply with its thank-you: one message, one notification; the
+      // other actions follow once it is given
+      setAfter(chosen.filter((k) => k !== "reward"));
       setRewarding({ message: text });
       return;
     }
     await send.mutateAsync(text);
-    if (then === "close") review.mutate("dismiss");
-    else if (then !== "none") start(then);
+    await run(chosen);
     setDone(t("support:review.replied"));
     reset();
     void refresh();
   };
+  const label = (key: Then) => t(`support:review.thenAction.${key}`);
+  const sendLabel =
+    chosen.length === 0
+      ? t("support:review.send")
+      : chosen.length === 1
+        ? t("support:review.sendAnd", { action: label(chosen[0] as Then) })
+        : t("support:review.sendList", { actions: format.list(chosen.map(label)) });
   const thens: Then[] = [
-    "none",
     ...(closed ? [] : (["close"] as const)),
     ...(canReward ? (["reward"] as const) : []),
     ...conversions.filter((c) => c.available && !c.done).map((c) => c.target as Then),
@@ -184,17 +252,24 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
         <li className="feedback-bubble" data-from="member">
           <Answers payload={item.payload} fields={fields} />
         </li>
-        {item.reply ? (
-          <li className="feedback-bubble" data-from="team">
-            <p>{item.reply}</p>
-            <span className="feedback-bubble__who">
-              {t("support:review.team")}
-              {item.replied_at
-                ? ` · ${format.relative((Date.parse(item.replied_at) - Date.now()) / 1000)}`
-                : ""}
-            </span>
-          </li>
-        ) : null}
+        {history.map((event, index) =>
+          event.kind === "replied" ? (
+            // biome-ignore lint/suspicious/noArrayIndexKey: a history line has no identity of its own
+            <li key={index} className="feedback-bubble" data-from="team">
+              <p>{event.text}</p>
+              <span className="feedback-bubble__who">
+                {t("support:review.team")} · {ago(event.at)}
+              </span>
+            </li>
+          ) : (
+            // biome-ignore lint/suspicious/noArrayIndexKey: a history line has no identity of its own
+            <li key={index} className="feedback-event" data-kind={event.kind}>
+              <Icon name={EVENT_ICON[event.kind] ?? "check"} size={14} />
+              <span>{eventText(event)}</span>
+              <span className="feedback-event__when">{ago(event.at)}</span>
+            </li>
+          ),
+        )}
       </ol>
       {done ? (
         <p role="status" className="feedback-done">
@@ -230,6 +305,8 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
           message={rewarding?.message ?? ""}
           onDone={() => {
             setDone(t("support:reward.done"));
+            void run(after);
+            setAfter([]);
             reset();
             void refresh();
           }}
@@ -259,13 +336,9 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
           <fieldset className="feedback-then">
             <legend>{t("support:review.then")}</legend>
             {thens.map((key) => (
-              <label key={key} data-checked={then === key || undefined}>
-                <input
-                  type="radio"
-                  name={`then-${item.id}`}
-                  checked={then === key}
-                  onChange={() => setThen(key)}
-                />
+              <label key={key} data-checked={chosen.includes(key) || undefined}>
+                <input type="checkbox" checked={chosen.includes(key)} onChange={() => toggle(key)} />
+                {chosen.includes(key) ? <Icon name="check" size={14} /> : null}
                 {t(`support:review.thenOption.${key}`)}
               </label>
             ))}
@@ -276,7 +349,7 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
             </Button>
             <Button type="submit" disabled={!reply.trim() || send.isPending}>
               <Icon name="send" size={16} />
-              {t(`support:review.sendThen.${then}`)}
+              {sendLabel}
             </Button>
           </div>
         </form>
@@ -532,7 +605,9 @@ function RequestCard({ form, answers }: { form: FormRow; answers: Item[] }) {
       ) : null}
       <p className="request-card__figures">
         <span>{t("support:requests.answerCount", { count: answers.length })}</span>
-        {waiting ? <span data-tone="waiting">{t("support:requests.waiting", { count: waiting })}</span> : null}
+        {waiting ? (
+          <span data-tone="waiting">{t("support:requests.waiting", { count: waiting })}</span>
+        ) : null}
         {latest ? (
           <span>{t("support:requests.latestWhen", { when: format.relative((latest - now) / 1000) })}</span>
         ) : null}

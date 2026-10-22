@@ -110,11 +110,18 @@ export function FeedbackReward({
           always,
         );
       }
+      // kept in the feedback's history: what was given
+      await api.POST("/api/v1/support/feedback/{feedback_id}/rewarded", {
+        params: { path: { feedback_id: item.id } },
+        body:
+          kind === "product"
+            ? { value: "product", product: product?.key ?? null, label: what }
+            : { value: kind, amount: quantity, label: what },
+      });
       if (thanks.trim()) {
-        const text = item.reply ? `${item.reply}\n\n${thanks.trim()}` : thanks.trim();
         await api.POST("/api/v1/support/feedback/{feedback_id}/reply", {
           params: { path: { feedback_id: item.id } },
-          body: { text },
+          body: { text: thanks.trim(), append: true },
         });
       }
     },

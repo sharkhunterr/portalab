@@ -17,8 +17,8 @@ from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.errors import Forbidden, Unavailable
 from portalab.core.event_port import EventPublisher
 from portalab.core.time import Clock, utc_now
-from portalab.modules.support.feedback.service import FeedbackNotFound
-from portalab.modules.support.models import FeedbackConversion, FeedbackItem
+from portalab.modules.support.feedback.service import FeedbackNotFound, record
+from portalab.modules.support.models import FeedbackConversion, FeedbackItem, Ticket
 from portalab.modules.support.tickets.service import TicketService
 
 Target = Literal["ticket", "contribution", "feature_proposal", "community_project"]
@@ -142,6 +142,13 @@ class ConversionService:
             locked = await uow.session.get(FeedbackItem, feedback_id, with_for_update=True)
             if locked is not None:
                 locked.status, locked.updated_at = "converted", now
+            detail: dict[str, Any] = {"target": target, "ref": ref}
+            if ref.startswith("portalab://ticket/"):  # the ticket's reference, as the staff knows it
+                ticket = await uow.session.get(Ticket, UUID(ref.rsplit("/", 1)[1]))
+                if ticket is not None:
+                    detail["label"] = f"T-{ticket.number:06d}"
+                    detail["id"] = str(ticket.id)
+            record(uow.session, feedback_id, "converted", actor, now, detail=detail)
             await self.events.publish(
                 uow.session,
                 "feedback.converted",

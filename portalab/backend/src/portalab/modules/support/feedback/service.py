@@ -20,11 +20,34 @@ from portalab.core.errors import Conflict, Forbidden, NotFound
 from portalab.core.event_port import EventPublisher
 from portalab.core.time import Clock, utc_now
 from portalab.modules.support.admin.definitions import Definitions
-from portalab.modules.support.models import FeedbackConversion, FeedbackForm, FeedbackItem
+from portalab.modules.support.models import FeedbackConversion, FeedbackEvent, FeedbackForm, FeedbackItem
 from portalab.modules.support.workflow.types import parse_fields, validate_values
 
 FEEDBACK_SUBMIT = "feedback.submit"
 FEEDBACK_READ = "feedback.read"
+
+
+def record(
+    session: Any,
+    feedback_id: UUID,
+    kind: str,
+    actor: Principal | None,
+    at: datetime,
+    *,
+    text: str | None = None,
+    detail: dict[str, Any] | None = None,
+) -> None:
+    """027: one line of a feedback's history (written in the caller's unit of work)."""
+    session.add(
+        FeedbackEvent(
+            feedback_id=feedback_id,
+            kind=kind,
+            text=text,
+            detail=detail or {},
+            actor_id=(actor.acting_for or actor.user_id) if actor else None,
+            at=at,
+        )
+    )
 
 
 class FeedbackNotFound(NotFound):
@@ -162,7 +185,11 @@ class FeedbackService:
                 raise FeedbackNotFound("This feedback does not exist.")
             if item.status == "converted":
                 raise Conflict("This feedback was already converted.", code="feedback.already_converted")
-            item.status, item.updated_at = status, utc_now(self.clock)
+            now = utc_now(self.clock)
+            kind = "closed" if status == "dismissed" else "reopened" if item.status == "dismissed" else "read"
+            if item.status != status:
+                record(uow.session, item.id, kind, viewer, now)
+            item.status, item.updated_at = status, now
             item.reviewed_by = viewer.acting_for or viewer.user_id
             return item
 
@@ -203,7 +230,35 @@ class FeedbackService:
                 .all()
             )
 
-    async def reply(self, viewer: Principal, feedback_id: UUID, text: str) -> FeedbackItem:
+    async def history(self, viewer: Principal, feedback_id: UUID) -> list[FeedbackEvent]:
+        if not await self._allowed(viewer, FEEDBACK_READ):
+            raise Forbidden("You cannot review feedback.")
+        async with self.database.session() as session:
+            return list(
+                (
+                    await session.execute(
+                        select(FeedbackEvent)
+                        .where(FeedbackEvent.feedback_id == feedback_id)
+                        .order_by(FeedbackEvent.at, FeedbackEvent.id)
+                    )
+                ).scalars()
+            )
+
+    async def rewarded(self, viewer: Principal, feedback_id: UUID, detail: dict[str, Any]) -> None:
+        """027: a reward given for this feedback (through the economy's or the shop's own grants), kept in
+        its history."""
+        if not await self._allowed(viewer, FEEDBACK_READ):
+            raise Forbidden("You cannot review feedback.")
+        async with self.database.unit_of_work() as uow:
+            if await uow.session.get(FeedbackItem, feedback_id) is None:
+                raise FeedbackNotFound("This feedback does not exist.")
+            record(uow.session, feedback_id, "rewarded", viewer, utc_now(self.clock), detail=detail)
+
+    async def reply(
+        self, viewer: Principal, feedback_id: UUID, text: str, *, append: bool = False
+    ) -> FeedbackItem:
+        """``append``: the new words follow the earlier reply (the member keeps the whole exchange); the
+        history keeps each reply in its own words."""
         if not await self._allowed(viewer, FEEDBACK_READ):
             raise Forbidden("You cannot review feedback.")
         now = utc_now(self.clock)
@@ -211,7 +266,10 @@ class FeedbackService:
             item = await uow.session.get(FeedbackItem, feedback_id, with_for_update=True)
             if item is None:
                 raise FeedbackNotFound("This feedback does not exist.")
-            item.reply, item.replied_at, item.updated_at = text.strip(), now, now
+            words = text.strip()
+            item.reply = f"{item.reply}\n\n{words}" if append and item.reply else words
+            item.replied_at, item.updated_at = now, now
+            record(uow.session, item.id, "replied", viewer, now, text=words)
             if item.status == "new":
                 item.status = "reviewed"
             item.reviewed_by = viewer.acting_for or viewer.user_id

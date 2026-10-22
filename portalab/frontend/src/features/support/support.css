@@ -1492,6 +1492,25 @@
   display: flex;
   gap: var(--space-2);
 }
+/* what happened, between the messages: a reward, a ticket made, closed, reopened */
+.feedback-event {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+.feedback-event[data-kind="rewarded"] {
+  color: var(--rarity-legendary, var(--color-accent-alt));
+}
+.feedback-event[data-kind="converted"] {
+  color: var(--color-accent);
+}
+.feedback-event__when::before {
+  content: "· ";
+}
 /* handling it: a reply that looks like a field, slim chips for the actions alone */
 .feedback-actions {
   display: flex;
