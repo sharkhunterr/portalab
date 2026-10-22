@@ -26,8 +26,7 @@ function tilt(event: PointerEvent<HTMLElement>) {
  * type line with the set's symbol in its rarity's colour, a line of flavour, its collector number. The frame's
  * colour says its kind (the work gold, a director red, the cast blue…). ``borderless``: the alternative —
  * the art over the whole card, the texts on it; ``foil``: a light that moves with the pointer. A card not owned
- * yet shows dimmed. A person's card shows their portrait over a scene of the work (until their character's
- * image is found).
+ * yet shows dimmed. A person's card shows their portrait (until their character's image is found).
  */
 export function MediaCardView({
   card,
@@ -54,11 +53,6 @@ export function MediaCardView({
     : card.role_art
       ? cardImage(card.role_art, "w780")
       : cardImage(card.art, card.kind === "title" ? "w500" : "h632");
-  // a person's own portrait, over a scene of the work (their character's image, once found, replaces both)
-  const scene =
-    !borderless && card.kind !== "title" && !card.role_art && card.set_backdrop
-      ? cardImage(card.set_backdrop, "w780")
-      : null;
   const type =
     card.kind === "title"
       ? t(`gamification:cards.type.${card.set_kind === "series" ? "series" : "movie"}`, {
@@ -84,13 +78,7 @@ export function MediaCardView({
       aria-label={`${card.name} — ${type}`}
     >
       <div className="mcard__card">
-        <div
-          className="mcard__art"
-          data-art={!borderless && card.role_art ? "role" : scene ? "scene" : undefined}
-        >
-          {scene ? (
-            <img className="mcard__scene" src={scene} alt="" loading="lazy" draggable={false} />
-          ) : null}
+        <div className="mcard__art" data-art={!borderless && card.role_art ? "role" : undefined}>
           {art ? (
             <img className="mcard__picture" src={art} alt="" loading="lazy" draggable={false} />
           ) : (
