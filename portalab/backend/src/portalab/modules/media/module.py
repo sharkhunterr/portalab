@@ -270,7 +270,7 @@ class MediaModule:
         self.upcoming = Upcoming(database, capabilities, clock=clock)
         self.calendar = calendar
         self.request_insights = RequestInsights(
-            database, capabilities, self.upcoming, clock=clock, enricher=self.enricher
+            database, capabilities, self.upcoming, clock=clock, enricher=self.enricher, visibility=visibility
         )
         self.journey = RequestJourney(  # 027: a title's request journey (media page)
             database, capabilities, self.catalog, self.request_insights, clock=clock

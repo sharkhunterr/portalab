@@ -30,6 +30,12 @@ export interface SoonCard extends RequestCard {
   episode?: { season: number | null; episode: number | null; title: string };
 }
 
+export interface AudienceRates {
+  available: number;
+  seen_rate: number | null;
+  viewers_per_request: number | null;
+}
+
 export interface RequestInsights {
   period: { key: string; start: string | null };
   summary: { total: number; pending: number; approved: number; available: number; declined: number };
@@ -53,6 +59,42 @@ export interface RequestInsights {
   };
   quota: { base_remaining?: number; extra_units?: number; [key: string]: unknown };
   acquisition?: Acquisition;
+  /** issue 222: how many other members watched my requests (never who) */
+  audience?: { requested: number; seen: number; viewers: number; plays: number };
+  /** issue 222 (sold): my requests by audience, my rank by audience */
+  audience_titles?: {
+    items: Array<{
+      id: string | null;
+      title: string;
+      kind: string;
+      viewers: number;
+      plays: number;
+      image_id?: string | null;
+      route?: string | null;
+    }>;
+    position: number | null;
+    total: number;
+  } | null;
+  /** issue 222 (sold): the audience in depth */
+  audience_depth?: {
+    reactivity: {
+      median_hours: number | null;
+      buckets: Array<{ key: string; count: number }>;
+      waiting: number;
+      fastest: Array<{ title: string; hours: number }>;
+      slowest: Array<{ title: string; hours: number }>;
+    };
+    genres: Record<"mine" | "server", Array<{ name: string; viewers: number; requests: number }>>;
+    kinds: Record<"movie" | "series", AudienceRates & { requests: number; plays: number }>;
+    versus: Record<"mine" | "server", AudienceRates>;
+    late_share: number | null;
+    over_time: { unit: string; points: Array<{ date: string; plays: number }> };
+  } | null;
+  /** issue 222 (sold): the requesters' podiums of the period */
+  leaders?: Record<
+    "requests" | "viewers" | "per_request",
+    Array<{ rank: number; me: boolean; name: string | null; value: number; requests: number }>
+  > | null;
   /** 061: the statistics still to unlock in the shop (their data left out) */
   locked?: string[];
 }

@@ -533,6 +533,9 @@ LOCKABLE_REQUESTS: dict[str, tuple[str, Any]] = {
     "top_watched": ("top_watched", []),
     "genres": ("genres", None),
     "acquisition": ("acquisition", None),
+    "audience_titles": ("audience_titles", None),  # issue 222: my requests by their audience, my rank
+    "leaders": ("leaders", None),  # issue 222: the requesters' podiums
+    "audience_depth": ("audience_depth", None),  # issue 222: reactivity, genres, kinds, against the server
 }
 
 
@@ -872,13 +875,18 @@ async def my_requests_insights(
     """027: my requests over a period — funnel, kinds, over time, watched ratio, rank, top, genres."""
     user = _me(principal)
     locked_all = await _guard_filters(module, principal, period, "me")
-    data = await module.request_insights.overview(user, period)
+    data = await module.request_insights.overview(user, period, principal)
     locked = sorted(name for name in LOCKABLE_REQUESTS if f"media.requests.{name}" in locked_all)
     for name in locked:  # 061: the deeper statistics are sold; their data stays on the server
         key, empty = LOCKABLE_REQUESTS[name]
         data[key] = empty
     data["locked"] = locked
     data["top_watched"] = await with_posters(module.database, module.enricher, data["top_watched"])
+    if data["audience_titles"]:
+        items = data["audience_titles"]["items"]
+        data["audience_titles"]["items"] = await with_posters(
+            module.database, module.enricher, items, lookups=8
+        )
     data["quota"] = await _quota(module, user)
     return data
 

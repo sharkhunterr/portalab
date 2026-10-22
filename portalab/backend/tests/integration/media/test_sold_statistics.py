@@ -20,6 +20,9 @@ SOLD = frozenset(
         "media.insights.server",
         "media.requests.ranking",
         "media.requests.genres",
+        "media.requests.audience_titles",
+        "media.requests.leaders",
+        "media.requests.audience_depth",
     }
 )
 
@@ -65,7 +68,7 @@ async def test_sold_statistics_are_locked_until_bought(
     assert (await client.get("/api/v1/media/insights/production")).status_code == 200  # not on sale
 
     mine = (await client.get("/api/v1/me/media/requests/insights")).json()
-    assert mine["locked"] == ["genres", "ranking"]
+    assert mine["locked"] == ["audience_depth", "audience_titles", "genres", "leaders", "ranking"]
     assert mine["ranking"] is None and mine["genres"] is None and mine["summary"]["total"] == 0
 
     shop.owned_by[people["zoe"]] = frozenset({"media.insights.history", "media.insights.tab.casting"})
