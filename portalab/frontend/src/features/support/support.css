@@ -1795,3 +1795,63 @@
   font-weight: var(--font-weight-semibold);
   white-space: nowrap;
 }
+
+/* a ticket: the feedback it came from on top, then the same conversation and actions as a feedback */
+.ticket-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-inline-size: 52rem;
+}
+.ticket-origin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface));
+}
+.ticket-origin__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.ticket-origin__head > span {
+  flex: 1;
+  min-inline-size: 0;
+}
+.ticket-origin__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+.feedback-bubble[data-internal] p {
+  border: 1px dashed var(--state-partial-fg, var(--color-accent-alt));
+  background: color-mix(in srgb, var(--state-partial-fg, var(--color-accent-alt)) 10%, transparent);
+}
+.ticket-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ticket-files a {
+  text-decoration: none;
+}
+.feedback-bubble[data-from="member"] > p {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border-start-start-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+  white-space: pre-wrap;
+}

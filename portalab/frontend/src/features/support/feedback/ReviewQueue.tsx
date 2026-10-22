@@ -164,6 +164,7 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
       return t(`support:history.converted.${String(detail.target ?? "ticket")}`, {
         label: String(detail.label ?? ""),
       });
+    if (detail.ticket) return t(`support:history.${event.kind}ByTicket`, { ticket: String(detail.ticket) });
     return t(`support:history.${event.kind}`);
   };
   const toggle = (key: Then) =>

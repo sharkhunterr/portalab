@@ -7,7 +7,7 @@ closing or reassigning someone else's ticket is audited."""
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -24,8 +24,10 @@ from portalab.core.errors import Conflict, Forbidden, NotFound, ValidationFailed
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.support.admin.definitions import Definitions
+from portalab.modules.support.feedback.service import record
 from portalab.modules.support.models import (
     Attachment,
+    FeedbackItem,
     Incident,
     Ticket,
     TicketComment,
@@ -264,6 +266,41 @@ class TicketService:
             return ticket
 
     # --- reads -----------------------------------------------------------------------------------------
+    async def _follow(self, session: Any, ticket: Ticket, principal: Principal, now: datetime) -> None:
+        """027: a ticket made from a feedback closes it when it closes (closed is final: no way back)."""
+        item = await session.get(FeedbackItem, ticket.feedback_id, with_for_update=True)
+        if item is None:
+            return
+        label = {"ticket": f"T-{ticket.number:06d}", "id": str(ticket.id)}
+        if item.status != "dismissed":
+            item.status, item.updated_at = "dismissed", now
+            record(session, item.id, "closed", principal, now, detail=label)
+
+    async def _origin(self, item: FeedbackItem) -> dict[str, Any]:
+        """027: the feedback a ticket was made from — its form, when, and its answers under their labels."""
+        labels: dict[str, str] = {}
+        name = item.form_key
+        try:
+            form, defs = await self.definitions.form(item.form_key)
+            name, labels = form.label, {d.key: d.label for d in defs}
+        except Exception:  # noqa: S110 — a form since removed: the keys stand for its labels
+            pass
+        answers = [
+            {
+                "label": labels.get(key, key),
+                "value": ", ".join(map(str, v)) if isinstance(v, list) else str(v),
+            }
+            for key, v in item.payload.items()
+            if v not in (None, "", [])
+        ]
+        return {
+            "id": str(item.id),
+            "form": name,
+            "kind": item.kind,
+            "at": item.created_at.isoformat(),
+            "answers": answers,
+        }
+
     async def view(self, ticket_id: UUID, viewer: Principal) -> TicketView:
         async with self.database.session() as session:
             ticket, roles = await self._load(session, ticket_id, viewer)
@@ -315,6 +352,7 @@ class TicketService:
             ]
             incident = await session.get(Incident, ticket.incident_id) if ticket.incident_id else None
             incident_number = incident.number if incident is not None else None
+            origin = await session.get(FeedbackItem, ticket.feedback_id) if ticket.feedback_id else None
         if not staff:
             history = [h for h in history if not (h.kind == "comment_added" and h.data.get("internal"))]
         ticket_type, defs = await self._type_defs(ticket.type_key)
@@ -336,6 +374,7 @@ class TicketService:
             extra={
                 "state_label": getattr(workflow.state(ticket.state), "label", ticket.state),
                 "type_label": ticket_type,
+                **({"feedback": await self._origin(origin)} if origin is not None else {}),
             },
         )
 
@@ -525,6 +564,8 @@ class TicketService:
                 {"from": previous, "to": ticket.state, "transition": key},
             )
             await self._event(session, ticket, "ticket.state_changed", seq)
+            if ticket.feedback_id is not None and move.target.kind == "closed":  # 027: its feedback follows
+                await self._follow(session, ticket, principal, now)
             if move.transition.reopen:
                 await self._event(session, ticket, "ticket.reopened", seq)
             special = EVENT_FOR_KIND.get(move.target.kind)

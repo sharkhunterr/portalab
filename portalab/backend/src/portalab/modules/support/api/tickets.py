@@ -120,6 +120,8 @@ class TicketDetail(TicketCard):
     history: list[TicketHistoryOut]
     transitions: list[dict[str, Any]]
     staff: bool
+    # 027: the feedback it was made from — its form, when, its answers under their labels
+    feedback: dict[str, Any] | None = None
 
 
 class TicketQueueOut(BaseModel):
@@ -190,6 +192,7 @@ def detail(view: TicketView) -> TicketDetail:
         source=t.source,
         state_label=str(view.extra.get("state_label", t.state)),
         incident_reference=f"INC-{view.incident_number:04d}" if view.incident_number else None,
+        feedback=view.extra.get("feedback"),
         comments=[
             TicketCommentOut(
                 id=c.id, author_id=c.author_id, body=c.body, internal=c.internal, created_at=c.created_at
