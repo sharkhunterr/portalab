@@ -23,6 +23,7 @@
   "historyForbidden": "You cannot see the history of wiki pages.",
   "historyOf": "History of “{title}”",
   "home": "Wiki home",
+  "more": "{count, plural, one {See # more page} other {See # more pages}}",
   "new": "New page",
   "noMatch": "No page matches “{query}”.",
   "notFound": "This page is not available.",
