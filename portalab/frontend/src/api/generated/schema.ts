@@ -9235,6 +9235,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/support/feedback/{feedback_id}/rewarded": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rewarded
+         * @description 027: keep in the feedback's history the reward just given for it.
+         */
+        post: operations["rewarded_api_v1_support_feedback__feedback_id__rewarded_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/support/feedback/{feedback_id}/{action}": {
         parameters: {
             query?: never;
@@ -12455,6 +12475,8 @@ export interface components {
             form_label?: string | null;
             /** Form Version */
             form_version: number;
+            /** History */
+            history?: components["schemas"]["FeedbackEventOut"][];
             /**
              * Id
              * Format: uuid
@@ -12476,6 +12498,22 @@ export interface components {
             submitter_id: string | null;
             /** Submitter Name */
             submitter_name?: string | null;
+        };
+        /** FeedbackEventOut */
+        FeedbackEventOut: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Detail */
+            detail?: {
+                [key: string]: unknown;
+            };
+            /** Kind */
+            kind: string;
+            /** Text */
+            text?: string | null;
         };
         /** FeedbackFieldResultOut */
         FeedbackFieldResultOut: {
@@ -12573,6 +12611,11 @@ export interface components {
         };
         /** FeedbackReplyIn */
         FeedbackReplyIn: {
+            /**
+             * Append
+             * @default false
+             */
+            append: boolean;
             /** Text */
             text: string;
         };
@@ -12592,6 +12635,23 @@ export interface components {
             label: string;
             /** Total */
             total: number;
+        };
+        /**
+         * FeedbackRewardedIn
+         * @description A reward given for this feedback (through the economy's or the shop's grants), for its history.
+         */
+        FeedbackRewardedIn: {
+            /** Amount */
+            amount?: number | null;
+            /** Label */
+            label?: string | null;
+            /** Product */
+            product?: string | null;
+            /**
+             * Value
+             * @enum {string}
+             */
+            value: "coins" | "xp" | "product";
         };
         /** FieldUpdateBody */
         FieldUpdateBody: {
@@ -35280,6 +35340,39 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["FeedbackOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rewarded_api_v1_support_feedback__feedback_id__rewarded_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                feedback_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackRewardedIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

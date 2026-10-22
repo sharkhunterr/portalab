@@ -277,6 +277,29 @@ class FeedbackItem(SupportBase):
     replied_at: Mapped[datetime | None] = mapped_column(TZDateTime)
 
 
+class FeedbackEvent(SupportBase):
+    """027: what happened to a feedback, in order — each reply (its own words), read, closed, reopened,
+    converted (the ticket, proposal or project made), rewarded (what was given) — the staff's history."""
+
+    __tablename__ = "feedback_events"
+    __table_args__ = (
+        CheckConstraint(
+            "kind IN ('replied', 'read', 'closed', 'reopened', 'converted', 'rewarded')", name="kind"
+        ),
+        Index("ix_feedback_events_feedback", "feedback_id", "at"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    feedback_id: Mapped[UUID] = mapped_column(
+        ForeignKey("support.feedback_items.id", ondelete="CASCADE"), nullable=False
+    )
+    kind: Mapped[str] = mapped_column(String(10), nullable=False)
+    text: Mapped[str | None] = mapped_column(Text, info=pii("content"))
+    detail: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    actor_id: Mapped[UUID | None] = mapped_column()  # FK identity.users (migration), SET NULL
+    at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
 class FeedbackConversion(SupportBase):
     """Append-only provenance of a conversion (one per feedback and target kind)."""
 

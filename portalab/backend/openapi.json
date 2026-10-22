@@ -6087,6 +6087,13 @@
             "title": "Form Version",
             "type": "integer"
           },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/FeedbackEventOut"
+            },
+            "title": "History",
+            "type": "array"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
@@ -6164,6 +6171,41 @@
           "conversions"
         ],
         "title": "FeedbackDetail",
+        "type": "object"
+      },
+      "FeedbackEventOut": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "detail": {
+            "additionalProperties": true,
+            "title": "Detail",
+            "type": "object"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "kind",
+          "at"
+        ],
+        "title": "FeedbackEventOut",
         "type": "object"
       },
       "FeedbackFieldResultOut": {
@@ -6442,6 +6484,11 @@
       "FeedbackReplyIn": {
         "additionalProperties": false,
         "properties": {
+          "append": {
+            "default": false,
+            "title": "Append",
+            "type": "boolean"
+          },
           "text": {
             "maxLength": 4000,
             "minLength": 1,
@@ -6501,6 +6548,63 @@
           "fields"
         ],
         "title": "FeedbackResultsOut",
+        "type": "object"
+      },
+      "FeedbackRewardedIn": {
+        "additionalProperties": false,
+        "description": "A reward given for this feedback (through the economy's or the shop's grants), for its history.",
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "maximum": 1000000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "product": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product"
+          },
+          "value": {
+            "enum": [
+              "coins",
+              "xp",
+              "product"
+            ],
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "title": "FeedbackRewardedIn",
         "type": "object"
       },
       "FieldUpdateBody": {
@@ -47106,6 +47210,53 @@
           }
         },
         "summary": "Reply",
+        "tags": [
+          "support"
+        ]
+      }
+    },
+    "/api/v1/support/feedback/{feedback_id}/rewarded": {
+      "post": {
+        "description": "027: keep in the feedback's history the reward just given for it.",
+        "operationId": "rewarded_api_v1_support_feedback__feedback_id__rewarded_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "feedback_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Feedback Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackRewardedIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rewarded",
         "tags": [
           "support"
         ]

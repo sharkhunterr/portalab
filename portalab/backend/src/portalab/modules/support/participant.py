@@ -14,6 +14,7 @@ from portalab.core.db import Database
 from portalab.modules.support.models import (
     Attachment,
     DiagnosisRun,
+    FeedbackEvent,
     FeedbackItem,
     Ticket,
     TicketComment,
@@ -89,6 +90,9 @@ class SupportParticipant:
             )
             await session.execute(
                 update(FeedbackItem).where(FeedbackItem.submitter_id == user_id).values(submitter_id=None)
+            )
+            await session.execute(
+                update(FeedbackEvent).where(FeedbackEvent.actor_id == user_id).values(actor_id=None)
             )
             await session.execute(delete(TicketDraft).where(TicketDraft.user_id == user_id))
             await session.execute(delete(DiagnosisRun).where(DiagnosisRun.user_id == user_id))

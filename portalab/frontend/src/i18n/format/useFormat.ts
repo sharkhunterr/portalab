@@ -50,6 +50,9 @@ export function useFormat() {
     /** 027: « 956.5K » — a large figure in a small place (dashboard chips) */
     compact: (value: number) =>
       new Intl.NumberFormat(ctx.locale, { notation: "compact", maximumFractionDigits: 1 }).format(value),
+    /** « close and reward », « clore et récompenser » — words joined in the interface's language (not the
+     * region's: the words around them are in that language) */
+    list: (items: string[]) => new Intl.ListFormat(ctx.language, { type: "conjunction" }).format(items),
     percent: (ratio: number) => new Intl.NumberFormat(ctx.locale, { style: "percent" }).format(ratio),
     relative: (seconds: number) => {
       const rtf = new Intl.RelativeTimeFormat(ctx.locale, { numeric: "auto" });

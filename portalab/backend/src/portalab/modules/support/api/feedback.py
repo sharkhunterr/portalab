@@ -45,6 +45,25 @@ class FeedbackRequestOut(BaseModel):
 class FeedbackReplyIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     text: str = Field(min_length=1, max_length=4000)
+    # the new words follow the earlier reply instead of replacing it
+    append: bool = False
+
+
+class FeedbackEventOut(BaseModel):
+    kind: str
+    text: str | None = None
+    detail: dict[str, Any] = Field(default_factory=dict)
+    at: datetime
+
+
+class FeedbackRewardedIn(BaseModel):
+    """A reward given for this feedback (through the economy's or the shop's grants), for its history."""
+
+    model_config = ConfigDict(extra="forbid")
+    value: Literal["coins", "xp", "product"]
+    amount: int | None = Field(default=None, ge=1, le=1_000_000)
+    product: str | None = Field(default=None, max_length=80)
+    label: str | None = Field(default=None, max_length=200)
 
 
 class FeedbackFieldResultOut(BaseModel):
@@ -109,6 +128,7 @@ class FeedbackConversionOut(BaseModel):
 
 class FeedbackDetail(FeedbackOut):
     conversions: list[FeedbackConversionOut]
+    history: list[FeedbackEventOut] = Field(default_factory=list)
 
 
 class FeedbackConvertIn(BaseModel):
@@ -203,8 +223,10 @@ async def one(principal: Reader, feedback_id: UUID, module: Module) -> FeedbackD
     item, _ = await module.feedback.get(principal, feedback_id)
     options = await module.conversion.options(principal, feedback_id)
     [named] = await _named(module, [out(item)])
+    history = await module.feedback.history(principal, feedback_id)
     return FeedbackDetail(
         **named.model_dump(),
+        history=[FeedbackEventOut(kind=e.kind, text=e.text, detail=e.detail, at=e.at) for e in history],
         conversions=[
             FeedbackConversionOut(target=o.target, available=o.available, reason=o.reason, done=o.done)
             for o in options
@@ -254,8 +276,15 @@ async def convert(
 @router.post("/support/feedback/{feedback_id}/reply", response_model=FeedbackOut)
 async def reply(principal: Reader, feedback_id: UUID, body: FeedbackReplyIn, module: Module) -> FeedbackOut:
     """027: answer the member (shown in their feedback list, with a notification)."""
-    [named] = await _named(module, [out(await module.feedback.reply(principal, feedback_id, body.text))])
+    replied = await module.feedback.reply(principal, feedback_id, body.text, append=body.append)
+    [named] = await _named(module, [out(replied)])
     return named
+
+
+@router.post("/support/feedback/{feedback_id}/rewarded", status_code=204)
+async def rewarded(principal: Reader, feedback_id: UUID, body: FeedbackRewardedIn, module: Module) -> None:
+    """027: keep in the feedback's history the reward just given for it."""
+    await module.feedback.rewarded(principal, feedback_id, body.model_dump(exclude_none=True))
 
 
 @router.post("/support/feedback/{feedback_id}/{action}", response_model=FeedbackOut)
