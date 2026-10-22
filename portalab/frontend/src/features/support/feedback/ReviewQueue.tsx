@@ -12,7 +12,6 @@ import {
 import { Avatar } from "../../../design-system/components/Avatar";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
-import { Menu } from "../../../design-system/components/Overlays";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -105,8 +104,8 @@ export function Answers({ payload, fields }: { payload: Record<string, unknown>;
 }
 
 const STEP_OF: Record<string, number> = { new: 0, reviewed: 1, converted: 2, dismissed: 1 };
-const MORE_ICON: Record<string, string> = {
-  contribution: "award",
+const TOOL_ICON: Record<string, string> = {
+  ticket: "ticket",
   feature_proposal: "lightbulb",
   community_project: "users",
 };
@@ -136,8 +135,8 @@ function Flow({ item }: { item: Item }) {
 
 /**
  * One feedback, handled like a ticket (027): where it stands, the conversation (the member's answers, the
- * team's reply), a toolbar of big actions — reward, make a ticket, mark read or set aside, and « more » for
- * the other conversions — and a composer to answer, thumb-friendly on a phone.
+ * team's reply), a toolbar of big actions — read, read and close (or reopen), reward, make a ticket, a
+ * feature proposal or a community project — and a composer to answer, thumb-friendly on a phone.
  */
 function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
   const t = useT();
@@ -174,33 +173,10 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
         },
       },
     );
-  const conversions = detail.data?.conversions ?? [];
-  const ticket = conversions.find((c) => c.target === "ticket");
-  const others = conversions.filter((c) => c.target !== "ticket");
-  const open = item.status !== "dismissed" && item.status !== "converted";
+  // the contribution is left out: a reward says thank you better, in the currency or XP the admin picks
+  const conversions = (detail.data?.conversions ?? []).filter((c) => c.target !== "contribution");
+  const closed = item.status === "dismissed";
   const name = item.submitter_name ?? t("support:review.someone");
-  const more = [
-    ...others.map((c) => ({
-      key: c.target,
-      icon: MORE_ICON[c.target] ?? "sparkles",
-      label: `${t(`support:convert.${c.target}`)}${c.done ? " ✓" : ""}${
-        c.reason ? ` (${t(`support:convert.reason.${c.reason}`)})` : ""
-      }`,
-      disabled: !c.available || Boolean(c.done),
-      onSelect: () => start(c.target),
-    })),
-    ...(open && item.status === "new"
-      ? [
-          {
-            key: "dismiss",
-            icon: "close",
-            label: t("support:feedback.dismiss"),
-            separated: others.length > 0,
-            onSelect: () => review.mutate("dismiss"),
-          },
-        ]
-      : []),
-  ];
   return (
     <div className="feedback-detail">
       <Flow item={item} />
@@ -224,6 +200,32 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
         ) : null}
       </ol>
       <div className="feedback-tools" role="toolbar" aria-label={t("support:review.tools")}>
+        {closed ? (
+          <button type="button" className="feedback-tool" onClick={() => review.mutate("review")}>
+            <Icon name="undo" size={22} />
+            <span>{t("support:review.tool.reopen")}</span>
+          </button>
+        ) : (
+          <>
+            {item.status === "new" ? (
+              <button type="button" className="feedback-tool" onClick={() => review.mutate("review")}>
+                <Icon name="check" size={22} />
+                <span>{t("support:review.tool.read")}</span>
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className="feedback-tool"
+              data-tone="close"
+              onClick={() => review.mutate("dismiss")}
+            >
+              <Icon name="inbox" size={22} />
+              <span>
+                {t(item.status === "new" ? "support:review.tool.readClose" : "support:review.tool.close")}
+              </span>
+            </button>
+          </>
+        )}
         {canReward ? (
           <FeedbackReward
             item={item}
@@ -236,42 +238,25 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
             }
           />
         ) : null}
-        {ticket ? (
+        {conversions.map((c) => (
           <button
+            key={c.target}
             type="button"
             className="feedback-tool"
-            disabled={!ticket.available || Boolean(ticket.done)}
-            title={ticket.reason ? t(`support:convert.reason.${ticket.reason}`) : undefined}
-            onClick={() => start("ticket")}
+            disabled={!c.available || Boolean(c.done)}
+            title={c.reason ? t(`support:convert.reason.${c.reason}`) : undefined}
+            onClick={() => start(c.target)}
           >
-            <Icon name={ticket.done ? "check" : "ticket"} size={22} />
-            <span>{t(ticket.done ? "support:review.tool.ticketDone" : "support:review.tool.ticket")}</span>
+            <Icon name={c.done ? "check" : (TOOL_ICON[c.target] ?? "sparkles")} size={22} />
+            <span>
+              {t(`support:review.tool.${c.target}`)}
+              {c.done ? " ✓" : ""}
+            </span>
+            {c.reason ? (
+              <span className="visually-hidden"> ({t(`support:convert.reason.${c.reason}`)})</span>
+            ) : null}
           </button>
-        ) : null}
-        {item.status === "new" ? (
-          <button type="button" className="feedback-tool" onClick={() => review.mutate("review")}>
-            <Icon name="check" size={22} />
-            <span>{t("support:review.tool.read")}</span>
-          </button>
-        ) : open ? (
-          <button type="button" className="feedback-tool" onClick={() => review.mutate("dismiss")}>
-            <Icon name="close" size={22} />
-            <span>{t("support:feedback.dismiss")}</span>
-          </button>
-        ) : null}
-        {more.length ? (
-          <Menu
-            label={t("support:review.tool.more")}
-            align="end"
-            items={more}
-            trigger={
-              <button type="button" className="feedback-tool">
-                <Icon name="more" size={22} />
-                <span>{t("support:review.tool.more")}</span>
-              </button>
-            }
-          />
-        ) : null}
+        ))}
       </div>
       {rewarded ? <p role="status">{t("support:reward.done")}</p> : null}
       {send.isSuccess ? <p role="status">{t("support:review.replied")}</p> : null}
