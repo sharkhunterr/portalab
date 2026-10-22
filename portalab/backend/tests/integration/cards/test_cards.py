@@ -96,6 +96,9 @@ def test_plan_and_codes() -> None:
     assert set_code("Top Gun: Maverick") == "TGM"
     assert set_code("Le Voyage de Chihiro") == "VCH"
     assert set_code("Up") == "UPX"
+    assert set_code("120 battements par minute") == "BMI"  # numbers and little words left out
+    assert set_code("13 Hours") == "HOU"
+    assert set_code("1917") == "191"  # only a number: its digits
 
 
 def test_rarity_is_ranked_per_country() -> None:
