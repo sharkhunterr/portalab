@@ -304,12 +304,46 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
   gap: var(--space-3);
-  margin: var(--space-4) 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
-.wiki-cards[hidden] {
+.wiki-group__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-block-start: var(--space-4);
+}
+.wiki-group__body[hidden] {
   display: none;
+}
+.wiki-part {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.wiki-part__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--tone);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.wiki-part__title::after {
+  content: "";
+  flex: 1;
+  block-size: 1px;
+  background: color-mix(in srgb, var(--tone) 35%, transparent);
+}
+.wiki-part__title a {
+  color: inherit;
+  text-decoration: none;
+}
+.wiki-part__title a:hover {
+  text-decoration: underline;
 }
 .wiki-card {
   display: flex;
@@ -354,6 +388,7 @@
 }
 .wiki-card__summary {
   display: -webkit-box;
+  margin: 0;
   overflow: hidden;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);

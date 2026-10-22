@@ -2,7 +2,7 @@
 slug: guide-membre
 title: Guide du membre Portalab
 parent: none
-position: 0
+position: 1
 help_keys: [wiki]
 tags: [guide, portalab]
 ---

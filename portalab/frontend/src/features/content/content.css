@@ -71,7 +71,11 @@
 }
 
 .content-body table {
+  display: block; /* a wide table scrolls on its own instead of breaking words letter by letter */
+  max-inline-size: 100%;
+  overflow-x: auto;
   border-collapse: collapse;
+  overflow-wrap: normal;
 }
 
 .content-body th,
@@ -334,4 +338,49 @@
   border-block-start: 1px solid var(--color-border);
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
+}
+
+/* Mermaid diagrams: the portal's CSP keeps out the styles Mermaid writes into its SVG, so they are drawn here,
+   from the theme's tokens (light and dark alike) */
+.content-diagram {
+  margin-inline: 0;
+  overflow-x: auto;
+}
+.content-diagram svg {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+  margin-inline: auto;
+}
+/* all at the same weight: the later rule wins (markers over lines, start and end dots over shapes) */
+.content-diagram :where(text, tspan) {
+  fill: var(--color-text);
+  font-family: inherit;
+  font-size: 14px;
+}
+.content-diagram :where(path, line, polyline) {
+  fill: none;
+  stroke: var(--color-text-muted);
+  stroke-width: 1.5px;
+}
+.content-diagram :where(rect, polygon, circle, ellipse, .node path) {
+  fill: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+  stroke: var(--color-accent);
+  stroke-width: 1.5px;
+}
+.content-diagram :where(marker path, marker circle, .arrowheadPath) {
+  fill: var(--color-text-muted);
+  stroke: none;
+}
+.content-diagram :where(.edgeLabel rect, .labelBkg) {
+  fill: var(--color-surface);
+  stroke: none;
+}
+.content-diagram :where(.state-start, .state-end, .end-state-inner) {
+  fill: var(--color-text);
+  stroke: none;
+}
+.content-diagram :where(.end-state-outer) {
+  fill: none;
+  stroke: var(--color-text);
 }
