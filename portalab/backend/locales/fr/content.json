@@ -1,4 +1,9 @@
 {
+  "callout.caution": "Prudence",
+  "callout.important": "Important",
+  "callout.note": "À noter",
+  "callout.tip": "Astuce",
+  "callout.warning": "Attention",
   "diagram": "Diagramme",
   "editor.image": "Ajouter une image",
   "editor.markdown": "Markdown pris en charge",

@@ -40,6 +40,7 @@
 }
 .wiki-sections {
   display: grid;
+  align-items: start; /* a short section keeps its height next to a long one */
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
   gap: var(--space-4);
   margin: 0;
@@ -187,6 +188,36 @@
 .wiki-content {
   line-height: 1.7;
   overflow-wrap: anywhere;
+}
+/* the page title stays above its sections, also inside a hub where page headers get compact */
+.wiki-layout > article.wiki-page .ds-page-header__title {
+  font-size: var(--font-size-xl);
+}
+.wiki-content .content-body h2 {
+  margin-block-start: var(--space-6);
+  padding-block-start: var(--space-4);
+  border-block-start: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+  font-size: var(--font-size-lg);
+}
+.wiki-content .content-body > h2:first-child {
+  padding-block-start: 0;
+  border: 0;
+}
+.wiki-content .content-body h3 {
+  font-size: var(--font-size-md);
+}
+.wiki-content .content-body li > a:first-child {
+  font-weight: var(--font-weight-semibold);
+}
+.wiki-more {
+  align-self: flex-start;
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+}
+.wiki-more:hover {
+  text-decoration: underline;
 }
 .wiki-content img {
   max-inline-size: 100%;

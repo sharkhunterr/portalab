@@ -13,6 +13,9 @@ import "./wiki.css";
  * Wiki home (spec 011 T016, 027 T095): "New page" as the primary action, a title filter, and the top-level
  * pages as cards listing their sub-pages — the viewer only receives the pages they may read.
  */
+/** Sub-pages listed on a card; the others are one click away, on the section's page. */
+const SHOWN = 6;
+
 function Section({ node }: { node: TreeNode }) {
   const t = useT();
   return (
@@ -27,7 +30,12 @@ function Section({ node }: { node: TreeNode }) {
         ) : null}
       </h3>
       <p className="wiki-meta">{t("wiki:subpages", { count: flatten(node.children).length })}</p>
-      {node.children.length ? <WikiTree nodes={node.children} /> : null}
+      {node.children.length ? <WikiTree nodes={node.children.slice(0, SHOWN)} /> : null}
+      {node.children.length > SHOWN ? (
+        <Link className="wiki-more" to={`/wiki/${node.slug}`}>
+          {t("wiki:more", { count: node.children.length - SHOWN })}
+        </Link>
+      ) : null}
     </li>
   );
 }

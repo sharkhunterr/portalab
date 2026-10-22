@@ -92,6 +92,14 @@ export function SafeHtml({ html, diagrams = true }: { html: string; diagrams?: b
     if (ref.current && diagrams && ref.current.querySelector("pre[data-mermaid]"))
       void renderDiagrams(ref.current, t("content:diagram"));
   }, [html, diagrams, t]);
+  // callout titles come in English from the renderer: shown in the reader's language
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the DOM to scan changes with ``html``
+  useEffect(() => {
+    for (const title of ref.current?.querySelectorAll<HTMLElement>("[data-callout] > .callout-title") ?? []) {
+      const kind = title.parentElement?.dataset.callout;
+      if (kind) title.textContent = t(`content:callout.${kind}`);
+    }
+  }, [html, t]);
   const onClick = (event: MouseEvent<HTMLDivElement>) => {
     const anchor = (event.target as HTMLElement).closest<HTMLAnchorElement>("a[data-internal]");
     const href = anchor?.getAttribute("href");
