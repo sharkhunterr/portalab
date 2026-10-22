@@ -5,7 +5,7 @@ position: 4
 help_keys: [media, media.browse, media.detail, media.detail.watch, media.detail.read]
 tags: [guide, médias, lecteur]
 ---
-Cette page vous explique comment trouver un titre dans la médiathèque, lire sa fiche, et le regarder, le lire ou l'écouter sans quitter le portail.
+Trouver un titre dans la médiathèque, lire sa fiche, et le regarder, le lire ou l'écouter sans quitter le portail.
 
 ## La page Médias
 

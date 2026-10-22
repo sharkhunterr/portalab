@@ -5,7 +5,7 @@ position: 3
 help_keys: [incidents, incidents.detail, services, services.detail]
 tags: [guide, incidents, maintenances, services]
 ---
-Cette page explique comment savoir, d'un coup d'œil, si tout va bien sur le portail : le centre de contrôle de l'en-tête, les bannières, la page des incidents et l'état des services.
+Savoir d'un coup d'œil si tout va bien sur le portail : le centre de contrôle de l'en-tête, les bannières, la page des incidents et l'état des services.
 
 ## Le centre de contrôle dans l'en-tête
 

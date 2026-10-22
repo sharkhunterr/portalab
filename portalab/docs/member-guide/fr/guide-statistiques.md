@@ -5,7 +5,7 @@ position: 10
 help_keys: [statistics, statistics.wrapped, statistics.wrapped.detail, media.insights]
 tags: [guide, statistiques, récap]
 ---
-Cette page vous présente vos statistiques : ce que vous avez regardé, écouté et lu, vos habitudes, et le récap qui résume une période passée.
+Vos statistiques : ce que vous avez regardé, écouté et lu, vos habitudes, et le récap qui résume une période passée.
 
 Le portail a deux pages de statistiques, toutes deux appelées « Statistiques » dans le menu :
 

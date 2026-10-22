@@ -5,7 +5,7 @@ position: 11
 help_keys: []
 tags: [guide, assistant, aide]
 ---
-Cette page explique comment poser vos questions à l'assistant du portail, ce qu'il peut consulter et faire pour vous, et comment lire ses réponses.
+Poser vos questions à l'assistant du portail, savoir ce qu'il peut consulter et faire pour vous, et lire ses réponses.
 
 > [!NOTE]
 > L'assistant porte le nom que votre portail lui a donné (par exemple « Nova ») ; ce nom s'affiche en haut de sa fenêtre. Il n'existe que si l'administrateur l'a activé. S'il est indisponible, il vous le dit : « L'assistant est indisponible pour le moment. Le reste du portail fonctionne. »

@@ -5,7 +5,7 @@ position: 2
 help_keys: [home]
 tags: [guide, accueil, tableau de bord, widgets]
 ---
-Cette page explique votre accueil, le tableau de bord : ce qu'il montre, comment le personnaliser, ajouter des widgets et changer leur visuel.
+Votre accueil, le tableau de bord : ce qu'il montre, comment le personnaliser, ajouter des widgets et changer leur visuel.
 
 ## Ce que montre l'accueil
 

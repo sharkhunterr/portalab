@@ -5,7 +5,7 @@ position: 6
 help_keys: []
 tags: [guide, médias, sauvetage]
 ---
-Cette page vous explique pourquoi certains titres vont quitter la médiathèque, où les repérer, et comment en sauver un avec un sauvetage acheté dans la boutique.
+Pourquoi certains titres vont quitter la médiathèque, où les repérer, et comment en sauver un avec un sauvetage acheté dans la boutique.
 
 ## Pourquoi des titres sont supprimés
 

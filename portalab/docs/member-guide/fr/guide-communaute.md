@@ -5,7 +5,7 @@ position: 9
 help_keys: [community, community.members, community.members.detail, community.feed, community.leaderboards, community.events, community.proposals, community.proposals.detail, projects, projects.detail]
 tags: [guide, communauté, classements, projets]
 ---
-Cette page vous guide dans la communauté : découvrir les membres, personnaliser votre profil, suivre l'activité et les classements, participer aux événements, et proposer ou financer des projets.
+Découvrir les membres, personnaliser votre profil, suivre l'activité et les classements, participer aux événements, et proposer ou financer des projets.
 
 ## Se repérer dans la communauté
 

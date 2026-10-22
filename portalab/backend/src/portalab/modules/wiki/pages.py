@@ -57,6 +57,29 @@ def slugify(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", folded).strip("-")[:120] or "page"
 
 
+_SUMMARY_SKIP = re.compile(r"^(#|>|[-*+] |\d+[.)] |\||```|~~~|<|!\[)")
+_MD_LINK = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")
+_MD_MARK = re.compile(r"(\*\*|__|\*|`|~~)")
+
+
+def summary_of(body_md: str, limit: int = 180) -> str:
+    """The page's first paragraph of prose, without Markdown, cut at a sentence (or a word) within ``limit``
+    — what a card shows under the title."""
+    for block in re.split(r"\n\s*\n", body_md.strip()):
+        block = block.strip()
+        if not block or _SUMMARY_SKIP.match(block):
+            continue
+        text = re.sub(r"\s+", " ", _MD_MARK.sub("", _MD_LINK.sub(r"\1", block))).strip()
+        if len(text) <= limit:
+            return text
+        cut = text[:limit]
+        end = max(cut.rfind(". "), cut.rfind(" : "), cut.rfind("! "), cut.rfind("? "))
+        if end >= limit // 2:
+            return cut[: end + 1].rstrip(" :")
+        return cut.rsplit(" ", 1)[0].rstrip(",;:") + "…"
+    return ""
+
+
 @dataclass(frozen=True, slots=True)
 class PageView:
     id: UUID
@@ -473,16 +496,18 @@ class PageService:
 
     async def tree(self, viewer: Principal) -> list[dict[str, Any]]:
         async with self.database.session() as session:
-            pages = (
-                (
-                    await session.execute(
-                        select(Page).where(Page.status != "deleted").order_by(Page.position, Page.title)
+            rows = (
+                await session.execute(
+                    select(Page, Revision.body_md)
+                    .outerjoin(
+                        Revision, (Revision.page_id == Page.id) & (Revision.version == Page.current_version)
                     )
+                    .where(Page.status != "deleted")
+                    .order_by(Page.position, Page.title)
                 )
-                .scalars()
-                .all()
-            )
-        visible = [p for p in pages if await self.readable(p, viewer)]
+            ).all()
+        bodies = {page.id: body or "" for page, body in rows}
+        visible = [p for p, _ in rows if await self.readable(p, viewer)]
         ids = {p.id for p in visible}
         nodes: dict[UUID | None, list[dict[str, Any]]] = {}
         for page in visible:
@@ -493,6 +518,7 @@ class PageService:
                     "slug": page.slug,
                     "title": page.title,
                     "status": page.status,
+                    "summary": summary_of(bodies[page.id]),
                     "children": [],
                 }
             )
