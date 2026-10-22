@@ -1802,6 +1802,23 @@
   flex-direction: column;
   gap: var(--space-3);
   max-inline-size: 52rem;
+  /* a frosted panel: the portal's background stays visible without getting in the way of reading */
+  padding: var(--space-4);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  box-shadow: var(--shadow-1);
+}
+@media (max-width: 40rem) {
+  .ticket-page {
+    padding: var(--space-3);
+  }
+}
+.feedback-event a {
+  color: inherit;
+  text-underline-offset: 2px;
 }
 .ticket-origin {
   display: flex;

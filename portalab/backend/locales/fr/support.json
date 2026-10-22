@@ -399,6 +399,7 @@
   "ticket.fromMyFeedback": "Créé à partir de votre avis « {form} » · {when}",
   "ticket.history": "Historique",
   "ticket.internal": "Note interne",
+  "ticket.manage": "Gérer côté équipe",
   "ticket.member": "Le membre",
   "ticket.noComment": "Pas encore de message. Écrivez le premier ci-dessous.",
   "ticket.notFound": "Ce ticket n’est pas disponible.",

@@ -222,7 +222,7 @@ function ResultLinks({ result }: { result: Record<string, unknown> }) {
   const entries = Object.entries(result).filter(([, v]) => v !== null && v !== undefined && v !== "");
   if (!entries.length) return null;
   const route = (key: string, value: string) =>
-    key === "incident" ? `/incidents/${value}` : key === "ticket" ? `/support/tickets/${value}` : null;
+    key === "incident" ? `/incidents/${value}` : key === "ticket" ? `/support/queue/${value}` : null;
   return (
     <ul className="automation-results">
       {entries.map(([key, value]) => {

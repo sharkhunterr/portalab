@@ -320,6 +320,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               handle: h({ crumb: "Queue", requiredPermission: "tickets.manage" }),
             },
             {
+              // the team's page of a ticket, inside the administration's support hub
+              path: "queue/:ticketId",
+              element: <TicketPage team />,
+              handle: h({ crumb: "Ticket", requiredPermission: "tickets.manage", existenceSensitive: true }),
+            },
+            {
               path: "feedback",
               element: <FeedbackReview />,
               handle: h({ crumb: "Feedback", requiredPermission: "feedback.read" }),

@@ -14,7 +14,16 @@ import { isActive, PriorityBadge, StateBadge } from "./TicketBadges";
  * My tickets (spec 016 T025, 027 T095): one card per ticket — reference, title, state and priority badges,
  * last update — filtered between the ones still in progress and the finished ones.
  */
-export function TicketList({ items, label }: { items: TicketCard[]; label: string }) {
+export function TicketList({
+  items,
+  label,
+  base = "/support/tickets",
+}: {
+  items: TicketCard[];
+  label: string;
+  /** Where a ticket opens: the member's page, or the team's (``/support/queue``). */
+  base?: string;
+}) {
   const t = useT();
   const format = useFormat();
   return (
@@ -26,7 +35,7 @@ export function TicketList({ items, label }: { items: TicketCard[]; label: strin
           </span>
           <span className="support-card__main">
             <span className="support-card__ref">{ticket.reference}</span>
-            <Link to={`/support/tickets/${ticket.id}`} className="support-card__title">
+            <Link to={`${base}/${ticket.id}`} className="support-card__title">
               {ticket.title}
             </Link>
             <span className="support-meta">
