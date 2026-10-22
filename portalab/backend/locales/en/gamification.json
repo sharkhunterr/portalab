@@ -37,6 +37,7 @@
   "action.media_playback_started": "Playback started",
   "action.media_request_available": "Request available",
   "action.media_request_created": "Media request",
+  "action.media_request_watched": "A title I asked for is watched by another member",
   "action.project_funding_added": "Project contribution",
   "action.ticket_created": "Support ticket opened",
   "action.ticket_resolved": "Ticket resolved",

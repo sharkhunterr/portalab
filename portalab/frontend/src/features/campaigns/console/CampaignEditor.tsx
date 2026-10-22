@@ -69,6 +69,7 @@ export interface CampaignDef {
 export const ACTIONS = [
   "media.playback_finished",
   "media.request_created",
+  "media.request_watched",
   "marketplace.purchase",
   "ticket.created",
   "feedback.submitted",

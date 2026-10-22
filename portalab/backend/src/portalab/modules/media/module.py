@@ -154,6 +154,7 @@ from portalab.modules.media.requests.journey import RequestJourney
 from portalab.modules.media.requests.moderation import RequestModeration
 from portalab.modules.media.requests.quota import RequestQuota
 from portalab.modules.media.requests.service import Requests, RequestSink
+from portalab.modules.media.requests.watched import RequestWatched
 from portalab.modules.media.sections.service import Sections
 from portalab.modules.media.settings import (
     PRIORITY_FIELDS,
@@ -431,9 +432,9 @@ class MediaModule:
                 window=lambda: timedelta(days=90),
             )
         )
-        consumer = self.history.consumer()
-        if self.consumers.get(consumer.name) is None:
-            self.consumers.register(consumer)
+        for consumer in (self.history.consumer(), RequestWatched(self.database, self.events).consumer()):
+            if self.consumers.get(consumer.name) is None:
+                self.consumers.register(consumer)
         widgets: tuple[tuple[Any, Any], ...] = (
             (CONTINUE, ContinueWidget(self.history, self.clock, self.enricher, self.player)),
             (RECENT, RecentWidget(self.discovery, self.clock)),
