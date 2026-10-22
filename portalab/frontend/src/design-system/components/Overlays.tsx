@@ -20,6 +20,7 @@ import { Icon } from "./Icon";
  * title): Dialog, Drawer, Menu, Popover, Tooltip. A tooltip never holds the only copy of information.
  */
 export interface DialogProps {
+  /** What opens it; ``null`` for a dialog opened by its owner only (``open``/``onOpenChange``). */
   trigger: ReactNode;
   title: string;
   description?: string;
@@ -99,7 +100,7 @@ export function Dialog({
       {...(open !== undefined ? { open } : {})}
       {...(onOpenChange ? { onOpenChange } : {})}
     >
-      <DialogPrimitive.Trigger asChild>{trigger}</DialogPrimitive.Trigger>
+      {trigger === null ? null : <DialogPrimitive.Trigger asChild>{trigger}</DialogPrimitive.Trigger>}
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="ds-overlay" />
         <DialogPrimitive.Content

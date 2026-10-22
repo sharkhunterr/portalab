@@ -99,40 +99,18 @@ export function Answers({ payload, fields }: { payload: Record<string, unknown>;
   );
 }
 
-const STEP_OF: Record<string, number> = { new: 0, reviewed: 1, converted: 2, dismissed: 1 };
 const TOOL_ICON: Record<string, string> = {
   ticket: "ticket",
   feature_proposal: "lightbulb",
   community_project: "users",
 };
-
-/** Where the feedback stands, as the member sees it: sent, read, answered (or taken up). */
-function Flow({ item }: { item: Item }) {
-  const t = useT();
-  const reached = item.reply ? 2 : (STEP_OF[item.status] ?? 0);
-  const steps = ["sent", "read", "answered"] as const;
-  return (
-    <ol className="feedback-flow" aria-label={t("support:feedback.step.label")}>
-      {steps.map((step, index) => (
-        <li
-          key={step}
-          data-done={index <= reached || undefined}
-          data-current={index === reached || undefined}
-        >
-          <span className="feedback-flow__dot" aria-hidden="true">
-            {index < reached ? <Icon name="check" size={12} /> : null}
-          </span>
-          {t(`support:feedback.step.${step}`)}
-        </li>
-      ))}
-    </ol>
-  );
-}
+type Then = "none" | "close" | "reward" | "ticket" | "feature_proposal" | "community_project";
 
 /**
- * One feedback, handled like a ticket (027): where it stands, the conversation (the member's answers, the
- * team's reply), a toolbar of big actions — read, read and close (or reopen), reward, make a ticket, a
- * feature proposal or a community project — and a composer to answer, thumb-friendly on a phone.
+ * One feedback (027): the conversation (the member's answers, the team's reply), then two ways to handle
+ * it. Without writing, a slim row of actions does just that (read, close, reward, a ticket, a proposal, a
+ * project). Touching « Reply » opens the composer: the reply, and what to do once it is sent — nothing,
+ * close, reward, make a ticket… — on one button (« Send and close »).
  */
 function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
   const t = useT();
@@ -142,26 +120,21 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
   const { convert, review } = useFeedbackActions(item.id);
   const canReward = useCanReward(item);
   const [reply, setReply] = useState("");
+  const [composing, setComposing] = useState(false);
+  const [then, setThen] = useState<Then>("none");
+  const [rewarding, setRewarding] = useState<{ message: string } | null>(null);
   const [pending, setPending] = useState<{ target: string; token: string } | null>(null);
-  const [rewarded, setRewarded] = useState(false);
-  const send = useMutation({
-    mutationFn: async () =>
-      (
-        await api.POST("/api/v1/support/feedback/{feedback_id}/reply", {
-          params: { path: { feedback_id: item.id } },
-          // the earlier reply stays: the new one follows it (the member keeps the whole exchange)
-          body: { text: item.reply ? `${item.reply}\n\n${reply.trim()}` : reply.trim() },
-        })
-      ).data,
-    onSuccess: () => {
-      setReply("");
-      void client.invalidateQueries({ queryKey: [...QUEUE] });
-    },
-  });
+  const [done, setDone] = useState<string | null>(null);
+  // the contribution is left out: a reward says thank you better, in the currency or XP the admin picks
+  const conversions = (detail.data?.conversions ?? []).filter((c) => c.target !== "contribution");
+  const closed = item.status === "dismissed";
+  const name = item.submitter_name ?? t("support:review.someone");
+  const refresh = () => client.invalidateQueries({ queryKey: [...QUEUE] });
   const start = (target: string) =>
     convert.mutate(
       { target },
       {
+        onSuccess: () => setDone(t("support:review.converted")),
         onError: (error) => {
           const token =
             error instanceof ApiError ? (error.extensions.confirmation as string | undefined) : undefined;
@@ -169,93 +142,65 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
         },
       },
     );
-  // the contribution is left out: a reward says thank you better, in the currency or XP the admin picks
-  const conversions = (detail.data?.conversions ?? []).filter((c) => c.target !== "contribution");
-  const closed = item.status === "dismissed";
-  const name = item.submitter_name ?? t("support:review.someone");
+  const send = useMutation({
+    mutationFn: async (text: string) =>
+      (
+        await api.POST("/api/v1/support/feedback/{feedback_id}/reply", {
+          params: { path: { feedback_id: item.id } },
+          // the earlier reply stays: the new one follows it (the member keeps the whole exchange)
+          body: { text: item.reply ? `${item.reply}\n\n${text}` : text },
+        })
+      ).data,
+  });
+  const reset = () => {
+    setReply("");
+    setThen("none");
+    setComposing(false);
+  };
+  const submit = async () => {
+    const text = reply.trim();
+    if (!text) return;
+    if (then === "reward") {
+      // the reward's dialog sends the reply with its thank-you: one message, one notification
+      setRewarding({ message: text });
+      return;
+    }
+    await send.mutateAsync(text);
+    if (then === "close") review.mutate("dismiss");
+    else if (then !== "none") start(then);
+    setDone(t("support:review.replied"));
+    reset();
+    void refresh();
+  };
+  const thens: Then[] = [
+    "none",
+    ...(closed ? [] : (["close"] as const)),
+    ...(canReward ? (["reward"] as const) : []),
+    ...conversions.filter((c) => c.available && !c.done).map((c) => c.target as Then),
+  ];
   return (
     <div className="feedback-detail">
-      <Flow item={item} />
       <ol className="feedback-thread" aria-label={t("support:review.conversation")}>
         <li className="feedback-bubble" data-from="member">
-          <span className="feedback-bubble__who">
-            {name} · {format.relative((Date.parse(item.created_at) - Date.now()) / 1000)}
-          </span>
           <Answers payload={item.payload} fields={fields} />
         </li>
         {item.reply ? (
           <li className="feedback-bubble" data-from="team">
+            <p>{item.reply}</p>
             <span className="feedback-bubble__who">
               {t("support:review.team")}
               {item.replied_at
                 ? ` · ${format.relative((Date.parse(item.replied_at) - Date.now()) / 1000)}`
                 : ""}
             </span>
-            <p>{item.reply}</p>
           </li>
         ) : null}
       </ol>
-      <div className="feedback-tools" role="toolbar" aria-label={t("support:review.tools")}>
-        {closed ? (
-          <button type="button" className="feedback-tool" onClick={() => review.mutate("review")}>
-            <Icon name="undo" size={22} />
-            <span>{t("support:review.tool.reopen")}</span>
-          </button>
-        ) : (
-          <>
-            {item.status === "new" ? (
-              <button type="button" className="feedback-tool" onClick={() => review.mutate("review")}>
-                <Icon name="check" size={22} />
-                <span>{t("support:review.tool.read")}</span>
-              </button>
-            ) : null}
-            <button
-              type="button"
-              className="feedback-tool"
-              data-tone="close"
-              onClick={() => review.mutate("dismiss")}
-            >
-              <Icon name="inbox" size={22} />
-              <span>
-                {t(item.status === "new" ? "support:review.tool.readClose" : "support:review.tool.close")}
-              </span>
-            </button>
-          </>
-        )}
-        {canReward ? (
-          <FeedbackReward
-            item={item}
-            onDone={() => setRewarded(true)}
-            trigger={
-              <button type="button" className="feedback-tool" data-tone="reward">
-                <Icon name="gift" size={22} />
-                <span>{t("support:review.tool.reward")}</span>
-              </button>
-            }
-          />
-        ) : null}
-        {conversions.map((c) => (
-          <button
-            key={c.target}
-            type="button"
-            className="feedback-tool"
-            disabled={!c.available || Boolean(c.done)}
-            title={c.reason ? t(`support:convert.reason.${c.reason}`) : undefined}
-            onClick={() => start(c.target)}
-          >
-            <Icon name={c.done ? "check" : (TOOL_ICON[c.target] ?? "sparkles")} size={22} />
-            <span>
-              {t(`support:review.tool.${c.target}`)}
-              {c.done ? " ✓" : ""}
-            </span>
-            {c.reason ? (
-              <span className="visually-hidden"> ({t(`support:convert.reason.${c.reason}`)})</span>
-            ) : null}
-          </button>
-        ))}
-      </div>
-      {rewarded ? <p role="status">{t("support:reward.done")}</p> : null}
-      {send.isSuccess ? <p role="status">{t("support:review.replied")}</p> : null}
+      {done ? (
+        <p role="status" className="feedback-done">
+          {done}
+        </p>
+      ) : null}
       {pending ? (
         <div role="alertdialog" aria-label={t("support:convert.confirm")} className="feedback-confirm">
           <p>{t("support:convert.confirm")}</p>
@@ -276,32 +221,121 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
           </div>
         </div>
       ) : null}
-      <form
-        className="feedback-composer"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (reply.trim() && !send.isPending) send.mutate();
-        }}
-      >
-        <label htmlFor={`reply-${item.id}`} className="visually-hidden">
-          {t("support:review.replyTo", { name })}
-        </label>
-        <textarea
-          id={`reply-${item.id}`}
-          rows={2}
-          value={reply}
-          placeholder={item.reply ? t("support:review.replyAgain") : t("support:review.replyTo", { name })}
-          onChange={(e) => setReply(e.target.value)}
+      {canReward ? (
+        <FeedbackReward
+          item={item}
+          trigger={null}
+          open={rewarding !== null}
+          onOpenChange={(next) => setRewarding(next ? (rewarding ?? { message: "" }) : null)}
+          message={rewarding?.message ?? ""}
+          onDone={() => {
+            setDone(t("support:reward.done"));
+            reset();
+            void refresh();
+          }}
         />
-        <button
-          type="submit"
-          className="feedback-composer__send"
-          disabled={!reply.trim() || send.isPending}
-          aria-label={t("support:review.sendReply")}
+      ) : null}
+      {composing ? (
+        <form
+          className="feedback-composer"
+          data-open=""
+          onSubmit={(event) => {
+            event.preventDefault();
+            void submit();
+          }}
         >
-          <Icon name="send" size={20} />
-        </button>
-      </form>
+          <label htmlFor={`reply-${item.id}`} className="visually-hidden">
+            {t("support:review.replyTo", { name })}
+          </label>
+          <textarea
+            id={`reply-${item.id}`}
+            rows={3}
+            // biome-ignore lint/a11y/noAutofocus: opened on purpose by « Reply »
+            autoFocus
+            value={reply}
+            placeholder={t("support:review.replyTo", { name })}
+            onChange={(e) => setReply(e.target.value)}
+          />
+          <fieldset className="feedback-then">
+            <legend>{t("support:review.then")}</legend>
+            {thens.map((key) => (
+              <label key={key} data-checked={then === key || undefined}>
+                <input
+                  type="radio"
+                  name={`then-${item.id}`}
+                  checked={then === key}
+                  onChange={() => setThen(key)}
+                />
+                {t(`support:review.thenOption.${key}`)}
+              </label>
+            ))}
+          </fieldset>
+          <div className="feedback-composer__bar">
+            <Button variant="ghost" onClick={reset}>
+              {t("support:reward.cancel")}
+            </Button>
+            <Button type="submit" disabled={!reply.trim() || send.isPending}>
+              <Icon name="send" size={16} />
+              {t(`support:review.sendThen.${then}`)}
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <div className="feedback-actions" role="toolbar" aria-label={t("support:review.tools")}>
+          <button type="button" className="feedback-reply" onClick={() => setComposing(true)}>
+            <Icon name="message" size={16} />
+            {item.reply ? t("support:review.replyAgain") : t("support:review.replyTo", { name })}
+          </button>
+          <span className="feedback-chips">
+            {closed ? (
+              <button type="button" className="feedback-chip" onClick={() => review.mutate("review")}>
+                <Icon name="undo" size={14} />
+                {t("support:review.tool.reopen")}
+              </button>
+            ) : (
+              <>
+                {item.status === "new" ? (
+                  <button type="button" className="feedback-chip" onClick={() => review.mutate("review")}>
+                    <Icon name="check" size={14} />
+                    {t("support:review.tool.read")}
+                  </button>
+                ) : null}
+                <button type="button" className="feedback-chip" onClick={() => review.mutate("dismiss")}>
+                  <Icon name="inbox" size={14} />
+                  {t(item.status === "new" ? "support:review.tool.readClose" : "support:review.tool.close")}
+                </button>
+              </>
+            )}
+            {canReward ? (
+              <button
+                type="button"
+                className="feedback-chip"
+                data-tone="reward"
+                onClick={() => setRewarding({ message: "" })}
+              >
+                <Icon name="gift" size={14} />
+                {t("support:review.tool.reward")}
+              </button>
+            ) : null}
+            {conversions.map((c) => (
+              <button
+                key={c.target}
+                type="button"
+                className="feedback-chip"
+                disabled={!c.available || Boolean(c.done)}
+                title={c.reason ? t(`support:convert.reason.${c.reason}`) : undefined}
+                onClick={() => start(c.target)}
+              >
+                <Icon name={c.done ? "check" : (TOOL_ICON[c.target] ?? "sparkles")} size={14} />
+                {t(`support:review.tool.${c.target}`)}
+                {c.reason ? (
+                  <span className="visually-hidden"> ({t(`support:convert.reason.${c.reason}`)})</span>
+                ) : null}
+              </button>
+            ))}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -496,20 +530,13 @@ function RequestCard({ form, answers }: { form: FormRow; answers: Item[] }) {
           <span style={{ inlineSize: `${Math.round(elapsed * 100)}%` }} />
         </span>
       ) : null}
-      <dl className="request-card__figures">
-        <div>
-          <dt>{t("support:requests.answers")}</dt>
-          <dd>{answers.length}</dd>
-        </div>
-        <div>
-          <dt>{t("support:requests.toReview")}</dt>
-          <dd>{waiting}</dd>
-        </div>
-        <div>
-          <dt>{t("support:requests.latest")}</dt>
-          <dd>{latest ? format.relative((latest - now) / 1000) : "—"}</dd>
-        </div>
-      </dl>
+      <p className="request-card__figures">
+        <span>{t("support:requests.answerCount", { count: answers.length })}</span>
+        {waiting ? <span data-tone="waiting">{t("support:requests.waiting", { count: waiting })}</span> : null}
+        {latest ? (
+          <span>{t("support:requests.latestWhen", { when: format.relative((latest - now) / 1000) })}</span>
+        ) : null}
+      </p>
       <div className="request-card__bar">
         <fieldset className="request-card__views">
           <legend className="visually-hidden">{form.label}</legend>
