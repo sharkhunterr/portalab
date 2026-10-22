@@ -22,7 +22,15 @@ ADMIN_TOPICS: tuple[dict[str, object], ...] = (
     # #4: everything about the media — members' requests to approve, their quotas, the titles' identity,
     # the history and the metadata
     {"key": "media", "label_key": "nav.hub.media", "icon": "film", "order_hint": 35},
-    {"key": "support", "label_key": "nav.hub.support", "icon": "lifebuoy", "order_hint": 40},
+    # what members wait an answer for: tickets, feedback and the moderation of what they propose (the
+    # community hub, nearly empty, was folded in: its projects console went to the shop, which funds them)
+    {
+        "key": "support",
+        "label_key": "nav.hub.support",
+        "icon": "lifebuoy",
+        "order_hint": 40,
+        "aliases": ("community",),
+    },
     {
         "key": "communication",
         "label_key": "nav.hub.communication",
@@ -37,8 +45,6 @@ ADMIN_TOPICS: tuple[dict[str, object], ...] = (
         "order_hint": 60,
         "aliases": ("economy",),
     },
-    # community projects and their moderation, apart from what is sold
-    {"key": "community", "label_key": "nav.hub.community", "icon": "lightbulb", "order_hint": 65},
     {"key": "shop", "label_key": "nav.hub.shop", "icon": "shop", "order_hint": 70},
     # how the portal looks for everyone: the theme studio, the members' dashboard, the site's identity
     {"key": "appearance", "label_key": "nav.hub.appearance", "icon": "palette", "order_hint": 72},
@@ -370,7 +376,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "route": "/admin/support",
         "group": "admin",
         "topic": "support",
-        "order_hint": 3,
+        "order_hint": 4,
         "required_permission": "support.configure",
     },
     {
@@ -594,8 +600,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "lightbulb",
         "route": "/admin/projects",
         "group": "admin",
-        "topic": "community",
-        "order_hint": 1,
+        "topic": "shop",  # projects are funded with the portal's currency, like the shop's purchases
+        "order_hint": 5,
         "required_permission": "projects.manage",
     },
     {
@@ -606,8 +612,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "shield",
         "route": "/admin/community/moderation",
         "group": "admin",
-        "topic": "community",
-        "order_hint": 2,
+        "topic": "support",  # beside the tickets and the feedback: what members wait an answer for
+        "order_hint": 3,
         "required_permission": "community.moderate",
     },
     {

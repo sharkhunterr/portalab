@@ -13,6 +13,7 @@ from portalab.capabilities.content import default_calendar_sources
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
 from portalab.capabilities.health import INCIDENTS, SERVICE_DIRECTORY
+from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
@@ -40,6 +41,7 @@ from portalab.modules.support import settings as _settings  # noqa: F401 — dec
 from portalab.modules.support.admin.definitions import Definitions
 from portalab.modules.support.ai_tools import SupportAiTools
 from portalab.modules.support.attachments.service import AttachmentService
+from portalab.modules.support.attention import SupportAttention
 from portalab.modules.support.conversion.service import ConversionService
 from portalab.modules.support.diagnosis.orchestrator import DiagnosisOrchestrator
 from portalab.modules.support.events import register_event_types
@@ -133,6 +135,14 @@ class SupportModule:
 
     def register(self) -> None:
         SupportAiTools(self, self.clock).register(self.ai_tools)  # issue 171: the assistant's support tools
+        if not any(p.instance_ref == "support" for p in self.capabilities.system_providers(ATTENTION)):
+            # #98: what waits for an administrator here — a badge on the navigation
+            self.capabilities.provide(
+                ATTENTION,
+                SupportAttention(self.database, self.authorizer),
+                instance_ref="support",
+                owner=OWNER,
+            )
         if not self.capabilities.system_providers(INCIDENTS):
             self.capabilities.provide(INCIDENTS, self.port, instance_ref="support", owner=OWNER)
         register_event_types(self.event_types)

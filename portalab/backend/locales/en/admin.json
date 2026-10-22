@@ -223,6 +223,8 @@
   "cc.subtitle": "Everything that needs you, at a glance.",
   "cc.title": "Control Center",
   "cc.unavailable": "This panel cannot be shown right now.",
+  "cc.waiting": "Waiting for you",
+  "cc.waiting.none": "Nobody is waiting for an answer from you.",
   "charts.description": "Every shape of the portal's charts, in the current theme with sample data — what each one is for.",
   "charts.kind.area.title": "Area",
   "charts.kind.area.use": "A total that grows: XP in all, storage used, the library's size.",

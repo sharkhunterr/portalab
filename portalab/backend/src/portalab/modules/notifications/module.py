@@ -16,6 +16,7 @@ from portalab.capabilities.events import (
     default_event_types,
 )
 from portalab.capabilities.identity_directory import VERIFICATION_CHANNEL
+from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.notifications import (
     NOTIFY,
     CategoryRegistry,
@@ -46,6 +47,7 @@ from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.time import Clock, utc_now
 from portalab.modules.notifications import permissions as _permissions  # noqa: F401 — declares permissions
+from portalab.modules.notifications.attention import AnnouncementsAttention
 from portalab.modules.notifications.automation import register_action, register_banner_actions
 from portalab.modules.notifications.channels.email import EMAIL_JOB, EmailChannel, EmailVerificationChannel
 from portalab.modules.notifications.events import register_event_types
@@ -161,6 +163,14 @@ class NotificationsModule:
         return await self.producer.send(request, caller=caller)
 
     def register(self) -> None:
+        if not any(p.instance_ref == "notifications" for p in self.capabilities.system_providers(ATTENTION)):
+            # #98: what waits for an administrator here — a badge on the navigation
+            self.capabilities.provide(
+                ATTENTION,
+                AnnouncementsAttention(self.database, self.authorizer),
+                instance_ref="notifications",
+                owner=OWNER,
+            )
         for key, label, priority, channels, mandatory, mutable in BUILTIN:
             if self.categories.get(key) is None:
                 declare_category(
