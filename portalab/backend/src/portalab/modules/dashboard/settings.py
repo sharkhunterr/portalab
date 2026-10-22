@@ -63,32 +63,39 @@ DEFAULT_STARTER: list[dict[str, Any]] = [
     # for me now: what I was watching, what is new for me, a title drawn at random
     {
         "widget_key": "media.continue",
-        "w": 12,
+        "w": 8,
         "h": 3,
         "config": {"_hide_empty": True},
         **_on(phone=(0, 3, 4, 3), tablet=(0, 3, 8, 3)),
+    },
+    # issue 225: the daily wheel beside it (its own look; packs' looks chosen in its settings)
+    {
+        "widget_key": "gamification.daily_wheel",
+        "w": 4,
+        "h": 3,
+        **_on(phone=(0, 6, 4, 3), tablet=(0, 6, 8, 3)),
     },
     {
         "widget_key": "dashboard.since_last_visit",
         "w": 8,
         "h": 3,
-        **_on(phone=(0, 6, 4, 3), tablet=(0, 6, 8, 3)),
+        **_on(phone=(0, 9, 4, 3), tablet=(0, 9, 8, 3)),
     },
     {
         "widget_key": "media.shuffle",
         "w": 4,
         "h": 3,
         "config": {"_hide_empty": True},
-        **_on(phone=(0, 9, 4, 3), tablet=(0, 9, 4, 3)),
+        **_on(phone=(0, 12, 4, 3), tablet=(0, 12, 4, 3)),
     },
     # issue 185: the calendar high up and roomy — the whole month
-    {"widget_key": "calendar.month", "w": 12, "h": 6, **_on(phone=(0, 12, 4, 6), tablet=(0, 12, 8, 6))},
+    {"widget_key": "calendar.month", "w": 12, "h": 6, **_on(phone=(0, 15, 4, 6), tablet=(0, 15, 8, 6))},
     {
         "widget_key": "media.recently_added",
         "w": 12,
         "h": 3,
         "config": {"_hide_empty": True},
-        **_on(phone=(0, 18, 4, 3), tablet=(0, 18, 8, 3)),
+        **_on(phone=(0, 21, 4, 3), tablet=(0, 21, 8, 3)),
     },
     # issue 168: the homelab's radio — when one is connected
     {
@@ -96,7 +103,7 @@ DEFAULT_STARTER: list[dict[str, Any]] = [
         "w": 12,
         "h": 2,
         "config": {"_hide_empty": True},
-        **_on(phone=(2, 21, 2, 2), tablet=(0, 21, 8, 2)),
+        **_on(phone=(2, 24, 2, 2), tablet=(0, 24, 8, 2)),
     },
     # four quarter tiles; on a phone the services down the left, the radio and the shop window beside them,
     # then my tickets and the news
@@ -104,32 +111,32 @@ DEFAULT_STARTER: list[dict[str, Any]] = [
         "widget_key": "health.services_summary",
         "w": 3,
         "h": 3,
-        **_on(phone=(0, 21, 2, 5), tablet=(0, 23, 4, 3)),
+        **_on(phone=(0, 24, 2, 5), tablet=(0, 26, 4, 3)),
     },
-    {"widget_key": "marketplace.featured", "w": 3, "h": 3, **_on(phone=(2, 23, 2, 3), tablet=(4, 23, 4, 3))},
-    {"widget_key": "support.my_tickets", "w": 3, "h": 3, **_on(phone=(0, 26, 2, 3), tablet=(0, 26, 4, 3))},
-    {"widget_key": "news.latest", "w": 3, "h": 3, **_on(phone=(2, 26, 2, 3), tablet=(4, 26, 4, 3))},
+    {"widget_key": "marketplace.featured", "w": 3, "h": 3, **_on(phone=(2, 26, 2, 3), tablet=(4, 26, 4, 3))},
+    {"widget_key": "support.my_tickets", "w": 3, "h": 3, **_on(phone=(0, 29, 2, 3), tablet=(0, 29, 4, 3))},
+    {"widget_key": "news.latest", "w": 3, "h": 3, **_on(phone=(2, 29, 2, 3), tablet=(4, 29, 4, 3))},
     # what fills up with time: the community, my statistics (a hidden one gives its place to the other)
     {
         "widget_key": "community.activity",
         "w": 6,
         "h": 3,
         "config": {"_hide_empty": True},
-        **_on(phone=(0, 29, 4, 3), tablet=(0, 29, 4, 3)),
+        **_on(phone=(0, 32, 4, 3), tablet=(0, 32, 4, 3)),
     },
     {
         "widget_key": "media.stats",
         "w": 6,
         "h": 3,
         "config": {"_hide_empty": True},
-        **_on(phone=(0, 32, 4, 2), tablet=(4, 29, 4, 3)),
+        **_on(phone=(0, 35, 4, 2), tablet=(4, 32, 4, 3)),
     },
     {
         "widget_key": "health.service_links",
         "w": 12,
         "h": 1,
         "config": {"_hide_empty": True},
-        **_on(phone=(0, 35, 4, 1), tablet=(0, 32, 8, 1)),
+        **_on(phone=(0, 38, 4, 1), tablet=(0, 35, 8, 1)),
     },
 ]
 

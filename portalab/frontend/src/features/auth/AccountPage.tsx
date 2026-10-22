@@ -96,7 +96,11 @@ function PasswordSection({ hasPassword }: { hasPassword: boolean }) {
   });
   if (!hasPassword) {
     return (
-      <SettingsCard icon="key" title={t("account:signInPhrase.title")} hint={t("account:signInPhrase.notLocal")}>
+      <SettingsCard
+        icon="key"
+        title={t("account:signInPhrase.title")}
+        hint={t("account:signInPhrase.notLocal")}
+      >
         {null}
       </SettingsCard>
     );

@@ -1,0 +1,28 @@
+{
+  "type": "widget_option",
+  "product": "opt_wheel_casino",
+  "names": {
+    "en": "Casino wheel",
+    "fr": "Roue casino"
+  },
+  "descriptions": {
+    "en": "The wheel of a casino floor: red and black slices, green for the gift, a lacquered wood rim set with gold, warm bulbs chasing around it while it turns and all lit when it stops. Chosen in the widget's settings once bought.",
+    "fr": "La roue d'une salle de casino : des parts rouges et noires, du vert pour le cadeau, un bord de bois laqué serti d'or, des ampoules chaudes qui se courent après pendant qu'elle tourne et toutes allumées quand elle s'arrête. À choisir dans les réglages du widget une fois achetée."
+  },
+  "payload": {
+    "widget": "gamification.daily_wheel"
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "economy": {
+    "price": 350,
+    "rarity": "common",
+    "collection": "widgets",
+    "icon": "dices"
+  },
+  "look": "wheel-casino"
+}

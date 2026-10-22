@@ -35,6 +35,7 @@ export const SOURCES: Record<string, { color: string; icon: string }> = {
   support: { color: "var(--chart-4)", icon: "lifebuoy" },
   visits: { color: "var(--chart-10)", icon: "home" },
   levels: { color: "var(--chart-7)", icon: "gift" },
+  wheel: { color: "color-mix(in oklab, var(--chart-7) 55%, var(--chart-9))", icon: "ferris-wheel" }, // issue 225
   pace: { color: "var(--chart-1)", icon: "trending" },
   boost: { color: "color-mix(in oklab, var(--chart-5) 58%, white)", icon: "rocket" }, // #55: bought in the shop
   activity: { color: "color-mix(in oklab, var(--chart-8) 58%, white)", icon: "zap" },

@@ -28,6 +28,27 @@ export interface ProgressionChange {
   level_up: boolean;
 }
 
+/**
+ * issue 225: a moment that tells its own result (the daily wheel turning) holds the live gains back — the
+ * header's Coins and the celebration — until it is over, then plays them; never longer than ``ms``.
+ */
+let heldUntil = 0;
+const held: Array<() => void> = [];
+let releaser: number | undefined;
+
+export function holdGains(ms: number): () => void {
+  heldUntil = Date.now() + ms;
+  window.clearTimeout(releaser);
+  releaser = window.setTimeout(releaseGains, ms);
+  return releaseGains;
+}
+
+function releaseGains(): void {
+  heldUntil = 0;
+  window.clearTimeout(releaser);
+  for (const play of held.splice(0)) play();
+}
+
 function isChange(data: unknown): data is ProgressionChange {
   return typeof data === "object" && data !== null && "xp" in data && "coins" in data && "level" in data;
 }
@@ -69,21 +90,26 @@ function useLiveProgression(enabled: boolean) {
       onEvent: (event: LiveEvent) => {
         if (!isChange(event.data) || seen.current.has(event.id)) return;
         seen.current.add(event.id);
-        const before = client.getQueryData<Progression>(PROGRESSION_KEY)?.level;
-        applyChange(client, event.data);
         const change = event.data;
-        const { celebrate, t } = latest.current;
-        if (change.level_up) {
-          // 027: the level-up moment — the new level, what it brought and what it unlocked
-          showLevelUp({ level: change.level, from: before, xp: change.delta_xp || undefined });
-          celebrate({ kind: "level", text: t("shell:levelReached", { level: change.level }) });
-        } else if (change.delta_xp > 0) {
-          celebrate({ kind: "reward", text: t("shell:xpGained", { amount: change.delta_xp }) });
-        } else if (change.delta_coins > 0) {
-          celebrate({ kind: "reward", text: t("shell:coinsGained", { amount: change.delta_coins }) });
-        }
+        const play = () => shown(change);
+        if (Date.now() < heldUntil) held.push(play);
+        else play();
       },
     });
+    const shown = (change: ProgressionChange) => {
+      const before = client.getQueryData<Progression>(PROGRESSION_KEY)?.level;
+      applyChange(client, change);
+      const { celebrate, t } = latest.current;
+      if (change.level_up) {
+        // 027: the level-up moment — the new level, what it brought and what it unlocked
+        showLevelUp({ level: change.level, from: before, xp: change.delta_xp || undefined });
+        celebrate({ kind: "level", text: t("shell:levelReached", { level: change.level }) });
+      } else if (change.delta_xp > 0) {
+        celebrate({ kind: "reward", text: t("shell:xpGained", { amount: change.delta_xp }) });
+      } else if (change.delta_coins > 0) {
+        celebrate({ kind: "reward", text: t("shell:coinsGained", { amount: change.delta_coins }) });
+      }
+    };
     return () => handle.close();
   }, [enabled, client]);
 }

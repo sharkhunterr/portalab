@@ -7586,6 +7586,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/wheel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Wheel
+         * @description Today's daily wheel: its segments, the spin done today (if any) and when the next one comes.
+         */
+        get: operations["my_wheel_api_v1_me_wheel_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/wheel/spin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Spin My Wheel
+         * @description Spin the daily wheel (once a day): the server draws the segment and gives what it says before the
+         *     page turns the wheel to it.
+         */
+        post: operations["spin_my_wheel_api_v1_me_wheel_spin_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/wrapped": {
         parameters: {
             query?: never;
@@ -17178,6 +17219,63 @@ export interface components {
             enabled: boolean;
             /** Message */
             message: string;
+        };
+        /** WheelOut */
+        WheelOut: {
+            /** Coins */
+            coins: number;
+            /** Day */
+            day: string;
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Next At
+             * Format: date-time
+             */
+            next_at: string;
+            /** Segments */
+            segments: components["schemas"]["WheelSegmentOut"][];
+            /** Spin Ms */
+            spin_ms: number;
+            today?: components["schemas"]["WheelSpinOut"] | null;
+        };
+        /** WheelSegmentOut */
+        WheelSegmentOut: {
+            /** Amount */
+            amount: number;
+            /** Key */
+            key: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "coins" | "xp" | "product" | "nothing";
+            /** Label */
+            label?: string | null;
+            /** Product */
+            product?: string | null;
+        };
+        /** WheelSpinOut */
+        WheelSpinOut: {
+            /** Amount */
+            amount: number;
+            /** Delta */
+            delta: number;
+            /** Given */
+            given: boolean;
+            /** Index */
+            index: number | null;
+            /** Kind */
+            kind: string;
+            /** Product */
+            product?: string | null;
+            /** Segment */
+            segment: string;
+            /**
+             * Spun At
+             * Format: date-time
+             */
+            spun_at: string;
         };
         /** WidgetMeta */
         WidgetMeta: {
@@ -32209,6 +32307,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TicketCard"][];
+                };
+            };
+        };
+    };
+    my_wheel_api_v1_me_wheel_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WheelOut"];
+                };
+            };
+        };
+    };
+    spin_my_wheel_api_v1_me_wheel_spin_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WheelOut"];
                 };
             };
         };

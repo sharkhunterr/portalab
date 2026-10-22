@@ -22,3 +22,15 @@
   background: transparent;
   pointer-events: none;
 }
+/* issue 225: an option's script in the region its widget keeps for it (the daily wheel's face): it fills it,
+   under what the widget draws there itself, and never takes a click */
+.pack-addon--stage {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  pointer-events: none;
+  color-scheme: normal;
+}

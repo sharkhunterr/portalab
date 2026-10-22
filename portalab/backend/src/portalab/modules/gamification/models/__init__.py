@@ -377,3 +377,23 @@ class Boost(GamificationBase):
     gains: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
     starts_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     ends_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class WheelSpin(GamificationBase):
+    """Issue 225: a member's spin of the daily wheel — one per day of the economy's time zone; what it drew
+    and what it gave (``delta``: the Coins or XP recorded, a loss never more than the balance; ``given``:
+    whether the product was offered)."""
+
+    __tablename__ = "wheel_spins"
+    __table_args__ = (UniqueConstraint("user_id", "day", name="uq_wheel_spins_user_day"),)
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)  # FK identity.users (DB), CASCADE
+    day: Mapped[date] = mapped_column(Date, nullable=False)
+    segment: Mapped[str] = mapped_column(String(48), nullable=False)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    amount: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    delta: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    product: Mapped[str | None] = mapped_column(String(96))
+    given: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    spun_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

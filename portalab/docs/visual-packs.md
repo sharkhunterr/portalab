@@ -197,7 +197,10 @@ member picks it in the widget's settings (« Pack look »).
 - **An add-on** a widget wears — Portalab's or a pack's (`payload.widget`: its key, this pack's widget, or `*`
   for every widget): a stylesheet under `[data-widget-option~="<look>"]` (animations, another look) and/or a
   script with `render.place`: `replace` (shown instead of the widget's content — another way to show it, with
-  more data) or `overlay` (drawn over it, never taking a click). A script add-on is handed `widget {key, state,
+  more data), `overlay` (drawn over it, never taking a click) or `stage` (drawn in the region the widget keeps
+  for it — the daily wheel's face, turned with the wheel by Portalab, which keeps drawing the amounts, the
+  pointer, the button and the result over it; a widget keeping no region shows it as an overlay). A stage
+  script is also handed `stage {phase: idle|spinning|done, spin_ms}`. A script add-on is handed `widget {key, state,
   data}` — that widget's own data — its `config`, its form and the contracts it declares. The member ticks it
   in the widget's settings; several may be worn together.
 - **A value** of this pack's widget's own setting: `payload {widget, setting, value}`, `data` only (the widget's

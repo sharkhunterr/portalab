@@ -1,0 +1,30 @@
+{
+  "type": "widget_option",
+  "product": "opt_wheel_cosmos",
+  "names": {
+    "en": "Cosmic wheel HD",
+    "fr": "Roue cosmique HD"
+  },
+  "descriptions": {
+    "en": "Each slice is a nebula drawn by the graphics chip — violet, cyan, crimson, emerald, a golden supernova for the gift, the void for nothing — stars twinkling in them, light streaking while it turns and the winning slice glowing when it stops. Chosen in the widget's settings once bought.",
+    "fr": "Chaque part est une nébuleuse dessinée par la carte graphique — violette, cyan, pourpre, émeraude, une supernova dorée pour le cadeau, le vide pour rien — des étoiles qui scintillent dedans, la lumière qui file pendant qu'elle tourne et la part gagnante qui s'illumine quand elle s'arrête. À choisir dans les réglages du widget une fois achetée."
+  },
+  "payload": {
+    "widget": "gamification.daily_wheel"
+  },
+  "render": {
+    "kind": "js",
+    "file": "cosmos.js",
+    "place": "stage",
+    "css": [
+      "look.css"
+    ]
+  },
+  "economy": {
+    "price": 1400,
+    "rarity": "epic",
+    "collection": "widgets",
+    "icon": "sparkles"
+  },
+  "look": "wheel-cosmos"
+}

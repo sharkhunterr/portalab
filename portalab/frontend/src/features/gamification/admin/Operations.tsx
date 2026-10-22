@@ -59,7 +59,10 @@ export function Operations({
   const what = (row: Operation) =>
     row.source === "levels" && row.label
       ? t("gamification:admin.details.levelN", { level: row.label })
-      : (row.label ?? t(`gamification:kind.${row.kind}`));
+      : row.source === "wheel"
+        ? // issue 225: the day's spin — won, lost, or Coins instead of a gift
+          t(`gamification:wheel.history.${row.delta < 0 ? "lost" : "won"}`)
+        : (row.label ?? t(`gamification:kind.${row.kind}`));
   const nameOf = (row: Operation) => row.name ?? row.user_id.slice(0, 8);
   // while the next page loads, the previous one stays — and so does its place in the count
   const settled = useRef(0);

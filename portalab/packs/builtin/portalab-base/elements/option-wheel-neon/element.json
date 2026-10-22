@@ -1,0 +1,28 @@
+{
+  "type": "widget_option",
+  "product": "opt_wheel_neon",
+  "names": {
+    "en": "Neon wheel",
+    "fr": "Roue néon"
+  },
+  "descriptions": {
+    "en": "A synthwave wheel: dark slices outlined in magenta and cyan neon, glowing numbers, a rim of light that pulses faster while it turns and flashes when it stops. Chosen in the widget's settings once bought.",
+    "fr": "Une roue synthwave : des parts sombres soulignées de néons magenta et cyan, des chiffres qui luisent, un anneau de lumière qui pulse plus vite pendant qu'elle tourne et flashe quand elle s'arrête. À choisir dans les réglages du widget une fois achetée."
+  },
+  "payload": {
+    "widget": "gamification.daily_wheel"
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  },
+  "economy": {
+    "price": 550,
+    "rarity": "rare",
+    "collection": "widgets",
+    "icon": "zap"
+  },
+  "look": "wheel-neon"
+}

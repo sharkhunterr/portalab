@@ -1,0 +1,60 @@
+/* « Casino wheel » for the daily wheel: red and black slices, green for the gift, a lacquered wood rim set with
+   gold, warm bulbs. Its hook: data-widget-option ~= « wheel-casino ». */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-casino"] .wheel {
+  --wheel-coins: #c3122f;
+  --wheel-coins-alt: #17171b;
+  --wheel-lose: #4a0f1c;
+  --wheel-xp: #1d3f8f;
+  --wheel-product: #0d7a3f;
+  --wheel-nothing: #2b2b31;
+  --wheel-ink: #fff5e0;
+  --wheel-rim: #5b2a12;
+  --wheel-rim-edge: #d9a441;
+  --wheel-bulb: #ffe6a3;
+  --wheel-pointer: #f2c14e;
+  --wheel-hub: #f2c14e;
+  --wheel-hub-ink: #3b1c08;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-casino"] .wheel__stage {
+  background:
+    radial-gradient(circle, transparent 60%, rgba(0, 0, 0, 0.35) 61%, transparent 64%),
+    conic-gradient(from 20deg, #6e3416, #3d1a09, #7a3b19, #44200c, #6e3416);
+  box-shadow:
+    0 0.6rem 1.6rem rgba(0, 0, 0, 0.45),
+    inset 0 0 0 0.22rem #d9a441,
+    inset 0 0 0 0.4rem #8a5a1c;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-casino"] .wheel__slice {
+  stroke: #d9a441;
+  stroke-width: 0.6;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-casino"] .wheel__label {
+  font-family: Georgia, "Times New Roman", serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-casino"] .wheel__bulbs > span {
+  background: radial-gradient(circle at 40% 35%, #ffffff, #ffd36b 60%, #b7791f);
+  box-shadow: 0 0 0.35rem rgba(255, 214, 120, 0.8);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-casino"] .wheel[data-phase="done"] .wheel__bulbs > span {
+  animation: casino-blink 0.9s ease-in-out 3;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-casino"] .wheel__pointer {
+  background: linear-gradient(180deg, #fff1b8, #d9a441 55%, #8a5a1c);
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.55));
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-casino"] .wheel__hub {
+  border: 0.2rem solid #8a5a1c;
+  background: radial-gradient(circle at 40% 30%, #fff1b8, #f2c14e 45%, #a8741f);
+  font-family: Georgia, "Times New Roman", serif;
+}
+@keyframes casino-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-casino"] .wheel[data-phase="done"] .wheel__bulbs > span {
+    animation: none;
+  }
+}

@@ -75,7 +75,7 @@ export interface ExternalElement {
     for?: string | null;
     setting?: string;
     value?: string;
-    place?: "replace" | "overlay" | null;
+    place?: "replace" | "overlay" | "stage" | null;
   } | null;
 }
 

@@ -1,0 +1,56 @@
+/* « Candy wheel » for the daily wheel: pastel slices, a lollipop rim, round bulbs. Its hook: the widget's frame
+   — or its preview in the shop — data-widget-option ~= « wheel-pastel ». */
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-pastel"] .wheel {
+  --wheel-coins: #ffb3c7;
+  --wheel-coins-alt: #b5ead7;
+  --wheel-lose: #ff8fa3;
+  --wheel-xp: #c7ceea;
+  --wheel-product: #ffd166;
+  --wheel-nothing: #f6f1ff;
+  --wheel-ink: #4a3b63;
+  --wheel-rim: #ffffff;
+  --wheel-rim-edge: #ff9ebb;
+  --wheel-bulb: #ff6f91;
+  --wheel-pointer: #ff6f91;
+  --wheel-hub: #fff6fa;
+  --wheel-hub-ink: #d6336c;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-pastel"] .wheel__stage {
+  background: repeating-conic-gradient(#ff9ebb 0deg 11.25deg, #ffffff 11.25deg 22.5deg);
+  box-shadow:
+    0 0.5rem 1.4rem rgba(255, 111, 145, 0.35),
+    inset 0 0 0 0.35rem rgba(255, 255, 255, 0.85);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-pastel"] .wheel__slice {
+  stroke: #ffffff;
+  stroke-width: 1.2;
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-pastel"] .wheel__label {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-pastel"] .wheel__bulbs > span {
+  background: radial-gradient(circle at 35% 35%, #ffffff, #ff6f91 70%);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-pastel"] .wheel__pointer {
+  border-radius: 0.3rem;
+  filter: drop-shadow(0 2px 3px rgba(214, 51, 108, 0.45));
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-pastel"] .wheel__hub {
+  border: 0.25rem solid #ffb3c7;
+  box-shadow:
+    0 0.25rem 0.8rem rgba(255, 111, 145, 0.4),
+    inset 0 -0.2rem 0 rgba(255, 158, 187, 0.35);
+}
+:is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-pastel"] .wheel[data-phase="done"] .wheel__stage {
+  animation: wheel-pastel-pop 0.6s ease-out;
+}
+@keyframes wheel-pastel-pop {
+  40% {
+    transform: scale(1.04);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-pastel"] .wheel[data-phase="done"] .wheel__stage {
+    animation: none;
+  }
+}

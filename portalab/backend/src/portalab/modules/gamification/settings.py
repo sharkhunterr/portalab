@@ -7,6 +7,25 @@ from portalab.core.config_declaration import SettingCatalog, declare_setting, de
 
 OWNER = "module:gamification"
 
+# issue 225: Coins won or lost, some XP, a discovery booster (« labels »: a product's name, per language)
+DEFAULT_SEGMENTS: list[dict[str, Any]] = [
+    {"key": "coins_20", "kind": "coins", "amount": 20, "weight": 20},
+    {"key": "lose_10", "kind": "coins", "amount": -10, "weight": 14},
+    {"key": "coins_50", "kind": "coins", "amount": 50, "weight": 13},
+    {"key": "xp_100", "kind": "xp", "amount": 100, "weight": 10},
+    {"key": "coins_10", "kind": "coins", "amount": 10, "weight": 20},
+    {"key": "lose_25", "kind": "coins", "amount": -25, "weight": 8},
+    {
+        "key": "booster",
+        "kind": "product",
+        "product": "booster_discovery",
+        "labels": {"fr": "Booster Découverte", "en": "Discovery booster"},
+        "weight": 6,
+    },
+    {"key": "jackpot", "kind": "coins", "amount": 150, "weight": 4},
+    {"key": "nothing", "kind": "nothing", "weight": 5},
+]
+
 
 @dataclass(frozen=True, slots=True)
 class EconomyConfig:
@@ -37,6 +56,10 @@ class EconomyConfig:
     level_rewards: list[dict[str, Any]] = field(default_factory=list)
     # 027: the overall pace — one factor on every rule's gains, set from the progression curve
     pace: dict[str, Any] = field(default_factory=lambda: {"factor": 1.0, "values": ["xp"]})
+    # issue 225: the daily wheel — one spin a day (economy time zone), its segments drawn by their weight
+    wheel: dict[str, Any] = field(
+        default_factory=lambda: {"enabled": True, "segments": [dict(s) for s in DEFAULT_SEGMENTS]}
+    )
 
 
 SETTINGS: dict[str, str] = {
@@ -55,6 +78,7 @@ SETTINGS: dict[str, str] = {
     "streak": "economy.streak",
     "level_rewards": "economy.levelRewards",
     "pace": "economy.pace",
+    "wheel": "economy.wheel",
 }
 _DESCRIPTIONS = {
     "max_total_boost": "Maximum combined multiplier (rule x campaign modifiers).",
@@ -72,6 +96,8 @@ _DESCRIPTIONS = {
     "streak": "Play streaks: {enabled, event_types, values, tiers: [{days, multiplier}]}.",
     "level_rewards": "Level rewards: [{level, coins, contribution, product, label}].",
     "pace": "Overall pace: {factor, values} — multiplies every rule's gains of these values.",
+    "wheel": "Daily wheel: {enabled, segments: [{key, kind: coins|xp|product|nothing, amount, product, "
+    "labels, weight}]} — one spin a day; Coins may be negative (never below the balance).",
 }
 
 
@@ -84,6 +110,7 @@ def declare_economy_settings(catalog: SettingCatalog = default_catalog) -> None:
         "streak": dict[str, Any],
         "level_rewards": list[dict[str, Any]],
         "pace": dict[str, Any],
+        "wheel": dict[str, Any],
     }
     for name, key in SETTINGS.items():
         if key not in known:

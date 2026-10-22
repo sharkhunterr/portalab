@@ -144,6 +144,39 @@ class DailyObjectivesWidget:
         return WidgetPayload("available", as_of=utc_now(self.clock), data={"items": items})
 
 
+WHEEL_WIDGET = WidgetDefinition(
+    key="gamification.daily_wheel",
+    owner=OWNER,
+    title_key="gamification:widget.wheel.title",
+    description_key="gamification:widget.wheel.description",
+    icon="ferris-wheel",
+    required_permission=READ,
+    size=SizeLimits(default=Size(4, 3), min=Size(3, 2), max=Size(8, 5)),
+    refresh=Refresh(mode="event", events=("reward.granted",)),
+    stale_after_s=900,
+    component_id="gamification.daily_wheel",
+)
+
+
+class WheelWidget:
+    """Issue 225: the daily wheel — its segments, today's spin if done, when the next one comes."""
+
+    def __init__(self, wheel: Any, clock: Clock | None = None) -> None:
+        self.wheel = wheel
+        self.clock = clock
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        user = principal.acting_for or principal.user_id
+        if user is None:
+            return WidgetPayload("no-data", as_of=utc_now(self.clock))
+        state = await self.wheel.state(user, ctx.language)
+        if not state["enabled"]:
+            return WidgetPayload("unavailable", as_of=utc_now(self.clock))
+        return WidgetPayload("available", as_of=utc_now(self.clock), data=state)
+
+
 def progression_tool(progression: ProgressionService, clock: Clock | None = None) -> AITool:
     async def handler(principal: Principal, params: Mapping[str, Any]) -> ToolResult:
         user = principal.acting_for or principal.user_id

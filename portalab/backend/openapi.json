@@ -19595,6 +19595,171 @@
         "title": "WelcomeOut",
         "type": "object"
       },
+      "WheelOut": {
+        "properties": {
+          "coins": {
+            "title": "Coins",
+            "type": "integer"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "next_at": {
+            "format": "date-time",
+            "title": "Next At",
+            "type": "string"
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/WheelSegmentOut"
+            },
+            "title": "Segments",
+            "type": "array"
+          },
+          "spin_ms": {
+            "title": "Spin Ms",
+            "type": "integer"
+          },
+          "today": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WheelSpinOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "enabled",
+          "day",
+          "next_at",
+          "spin_ms",
+          "coins",
+          "segments"
+        ],
+        "title": "WheelOut",
+        "type": "object"
+      },
+      "WheelSegmentOut": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "coins",
+              "xp",
+              "product",
+              "nothing"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "product": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product"
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "amount"
+        ],
+        "title": "WheelSegmentOut",
+        "type": "object"
+      },
+      "WheelSpinOut": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "delta": {
+            "title": "Delta",
+            "type": "integer"
+          },
+          "given": {
+            "title": "Given",
+            "type": "boolean"
+          },
+          "index": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Index"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "product": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product"
+          },
+          "segment": {
+            "title": "Segment",
+            "type": "string"
+          },
+          "spun_at": {
+            "format": "date-time",
+            "title": "Spun At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "segment",
+          "index",
+          "kind",
+          "amount",
+          "delta",
+          "given",
+          "spun_at"
+        ],
+        "title": "WheelSpinOut",
+        "type": "object"
+      },
       "WidgetMeta": {
         "properties": {
           "component_id": {
@@ -42194,6 +42359,50 @@
         "summary": "My Tickets",
         "tags": [
           "support"
+        ]
+      }
+    },
+    "/api/v1/me/wheel": {
+      "get": {
+        "description": "Today's daily wheel: its segments, the spin done today (if any) and when the next one comes.",
+        "operationId": "my_wheel_api_v1_me_wheel_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WheelOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Wheel",
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
+    "/api/v1/me/wheel/spin": {
+      "post": {
+        "description": "Spin the daily wheel (once a day): the server draws the segment and gives what it says before the\npage turns the wheel to it.",
+        "operationId": "spin_my_wheel_api_v1_me_wheel_spin_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WheelOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Spin My Wheel",
+        "tags": [
+          "gamification"
         ]
       }
     },
