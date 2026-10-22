@@ -7,7 +7,13 @@ import { Dialog } from "../../../design-system/components/Overlays";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
-import { type Campaign, type CampaignAction, useCampaignAdmin, useCampaignsAdmin } from "../api";
+import {
+  type Campaign,
+  type CampaignAction,
+  discountScope,
+  useCampaignAdmin,
+  useCampaignsAdmin,
+} from "../api";
 import { Timeline } from "../history/Timeline";
 import { type CampaignDef, CampaignEditor, gainsOf } from "./CampaignEditor";
 import { SimulationPanel } from "./SimulationPanel";
@@ -143,10 +149,12 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
         ))}
         {(def.discounts ?? []).map((discount) => (
           <span key={discount.id} className="gam-chip" data-kind="shop">
-            <Icon name="shop" size={12} />{" "}
-            {t("campaigns:editor.discountChip", {
-              percent: discount.percent,
-              count: discount.products.length + discount.categories.length,
+            <Icon name="shop" size={12} /> −{discount.percent} % ·{" "}
+            {discountScope(t, {
+              everything: discount.everything,
+              seasons: discount.seasons,
+              categories: discount.categories,
+              products: discount.products.length,
             })}
           </span>
         ))}

@@ -106,7 +106,13 @@ async def campaign(_: Reader, key: str, module: Module) -> dict[str, Any]:
         "modifiers": [entry for m in definition.modifiers for entry in _modifier(m)],
         # 027: what else it brings — shop reductions, its own achievements and quests
         "discounts": [
-            {"percent": d.percent, "products": len(d.products), "categories": list(d.categories)}
+            {
+                "percent": d.percent,
+                "products": len(d.products),
+                "categories": list(d.categories),
+                "seasons": list(d.seasons),
+                "everything": d.everything,
+            }
             for d in definition.discounts
         ],
         "achievements": [_nested(n) for n in definition.achievements],

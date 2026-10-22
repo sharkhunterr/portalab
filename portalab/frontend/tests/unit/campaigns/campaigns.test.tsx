@@ -174,7 +174,7 @@ describe("a campaign's page", () => {
     expect(await screen.findByText("What it brings you")).toBeTruthy();
     expect(screen.getByText(/on Movie · genres: horror · when you finish a film or an episode/)).toBeTruthy();
     expect(screen.queryByText(/media\.playback_finished/)).toBeNull(); // never the technical name
-    expect(screen.getByText(/off 14 items in the shop/)).toBeTruthy();
+    expect(screen.getByText(/on 14 items during the campaign/)).toBeTruthy();
     expect(screen.getByText(/A special achievement to unlock/).textContent).toContain("Pumpkin hunter");
   });
 });
