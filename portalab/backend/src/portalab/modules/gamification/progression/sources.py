@@ -25,6 +25,8 @@ def is_wheel(source_kind: str, source_ref: str | None) -> bool:
 
 ACTIONS = (
     ("media.request", "requests"),  # #129: asking for a title is not playing it
+    ("media.radio", "radio"),  # issue 227: the radio listened to, a song asked for
+    ("media.leaving", "rescue"),  # issue 228: a title about to be deleted, watched
     ("media.", "media"),
     ("marketplace.", "shop"),
     ("project.", "shop"),

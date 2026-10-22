@@ -1,9 +1,11 @@
 """HTTP API of the homelab's radio (issue 168): what plays, the live stream and the covers (relayed — the
 portal is served over HTTPS, the station often not), and asking its DJ for a song."""
 
+import time
 from collections.abc import AsyncIterator
 from contextlib import AsyncExitStack
 from typing import Annotated, Any
+from uuid import uuid4
 
 from fastapi import APIRouter, Path
 from fastapi.responses import Response, StreamingResponse
@@ -13,6 +15,7 @@ from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.modules.media.api.router import Module, _me
 from portalab.modules.media.permissions import MEDIA_PLAY
+from portalab.modules.media.radio import LISTEN_MINUTES
 
 router = APIRouter(prefix="/api/v1", tags=["media"])
 Listener = Annotated[Principal, require(MEDIA_PLAY)]
@@ -86,14 +89,23 @@ async def radio_request(
 
 @router.get("/media/radio/stream", include_in_schema=False)
 async def radio_stream(principal: Listener, module: Module) -> StreamingResponse:
-    """The live stream, relayed as it plays (until the member stops listening)."""
+    """The live stream, relayed as it plays (until the member stops listening). Issue 227: every
+    ``LISTEN_MINUTES`` it was relayed counts as a slice of listening for this member (the server's count)."""
     stack = AsyncExitStack()
     body = await stack.enter_async_context(module.radio.listen())
+    user = principal.acting_for or principal.user_id
+    session = uuid4().hex
 
     async def relay() -> AsyncIterator[bytes]:
+        started = time.monotonic()
+        counted = 0
         try:
             async for chunk in body.chunks:
                 yield chunk
+                heard = int((time.monotonic() - started) // (LISTEN_MINUTES * 60))
+                while user is not None and counted < heard:
+                    counted += 1
+                    await module.radio.listened(user, session, counted)
         finally:
             await stack.aclose()
 

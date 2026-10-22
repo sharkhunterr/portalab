@@ -70,6 +70,9 @@ export const ACTIONS = [
   "media.playback_finished",
   "media.request_created",
   "media.request_watched",
+  "media.radio_listened", // issue 227
+  "media.radio_requested",
+  "media.leaving_watched", // issue 228
   "marketplace.purchase",
   "ticket.created",
   "feedback.submitted",

@@ -4,7 +4,9 @@ Catalog: ``media.added|updated|removed|availability_changed|merged|split``. Play
 user, private): ``media.playback_started|progressed|paused|finished|abandoned|error`` deduplicated by
 ``(session, state_seq)`` (``finished`` once per session; ``via`` the portal's own player or reader, #103),
 ``media.resume_available``, ``media.cast_started`` (#103: sent to a casting device). Requests:
-``media.request_created|updated|available`` deduplicated by ``(request, state)``."""
+``media.request_created|updated|available`` deduplicated by ``(request, state)``. The radio (issue 227):
+``media.radio_listened`` (slices of listening, counted by the server), ``media.radio_requested``; issue 228:
+``media.leaving_watched`` (a title about to be deleted, watched to the end)."""
 
 from typing import Literal
 
@@ -41,6 +43,30 @@ class Playback(BaseModel):
     occurred_at: str
     watched_s: float | None = None  # #94: the time actually watched, listened to or read in this sitting
     via: Literal["portal"] | None = None  # #103: played in the portal (its player, its reader)
+
+
+class RadioListened(BaseModel):
+    """Issue 227: a member listened to the radio in the portal's player — one per slice of ``minutes`` the
+    stream was relayed to them (counted by the server, never told by the page)."""
+
+    minutes: int
+    session: str
+    slice: int
+
+
+class RadioRequested(BaseModel):
+    """Issue 227: a member's song request taken by the radio's DJ."""
+
+    request: str
+
+
+class LeavingWatched(BaseModel):
+    """Issue 228: a member played to the end a title about to be deleted (Maintainerr) — once per member and
+    title: they rescued it."""
+
+    object: str
+    kind: str
+    delete_at: str | None = None
 
 
 class CastStarted(BaseModel):
@@ -142,6 +168,26 @@ def register_event_types(registry: EventTypeRegistry) -> None:
             aggregatable=frozenset({"kind"}),
         )
     )
+    # issue 227: the radio listened to and a song asked for; issue 228: a title rescued by watching it
+    for name, schema, dedup, fields in (
+        ("media.radio_listened", RadioListened, ("session", "slice"), frozenset({"minutes"})),
+        ("media.radio_requested", RadioRequested, ("request",), frozenset()),
+        ("media.leaving_watched", LeavingWatched, ("object",), frozenset({"kind"})),
+    ):
+        add(
+            EventType(
+                name=name,
+                owner=OWNER,
+                schema=schema,
+                open_payload=False,
+                dedup_fields=dedup,
+                retention_class="business",
+                visibility_class="private",
+                rewardable=fields | (frozenset({"kind"}) if "kind" in schema.model_fields else frozenset()),
+                aggregatable=frozenset({"kind"}) if "kind" in schema.model_fields else frozenset(),
+                automatable=True,
+            )
+        )
     add(
         EventType(
             name="media.resume_available",
