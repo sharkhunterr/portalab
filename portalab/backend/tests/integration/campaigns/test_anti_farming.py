@@ -43,6 +43,7 @@ async def test_guards_bound_boosts(cm: CampHarness) -> None:
         refs = await session.scalar(
             text("SELECT modifiers::text FROM gamification.transactions ORDER BY seq LIMIT 1")
         )
-    assert deltas == [40, 20]  # x4 boost, then the day cap trims; never beyond 60
+    # x2 boost (issue 223: the genre and the title count once), then the day cap; never beyond 60
+    assert deltas == [20, 20, 20]
     assert "cooldown" in withheld and "cap" in withheld
     assert "campaign:halloween:1:" in str(refs)

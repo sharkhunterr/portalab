@@ -19,6 +19,7 @@
   "admin.state": "État : {state} · version {version}",
   "admin.title": "Campagnes",
   "admin.verdict.audience": "hors audience",
+  "admin.verdict.covered": "déjà récompensé par un autre bonus de la campagne",
   "admin.verdict.match": "s'applique",
   "admin.verdict.no_match": "ne s'applique pas",
   "admin.verdict.unknown": "attributs inconnus (non appliqué)",
