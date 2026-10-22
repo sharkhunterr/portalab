@@ -23,6 +23,13 @@ from portalab.modules.cards.models import Card, CardSet
 from portalab.modules.cards.rarity import Ranked, card_score, rarities, work_fame
 
 CAST = 10  # the first names of the credits made into cards
+ANIMATION = {
+    "animation",
+    "animación",
+    "animazione",
+    "animatie",
+    "zeichentrick",
+}  # the genre, as providers name it
 WRITERS = 2
 ORDER = ("title", "director", "creator", "cast", "writer", "composer")
 STOP = {"the", "a", "an", "of", "and", "le", "la", "les", "un", "une", "des", "de", "du", "et", "l", "d"}
@@ -73,6 +80,7 @@ def fingerprint(work: CardWork) -> str:
         "countries": list(work.countries)[:1],
         "tmdb": work.tmdb,
         "ids": sorted(work.ids.items()),
+        "animated": any(g.strip().lower() in ANIMATION for g in work.genres),
         "v": 3,  # how the cards are made (people's cards: no image of the work since v2; the set's scene, v3)
     }
     return hashlib.sha256(json.dumps(data, sort_keys=True, default=str).encode()).hexdigest()[:64]
@@ -185,6 +193,7 @@ class CardForge:
         current.country = (work.countries[0] if work.countries else None) or None
         current.poster = work.poster
         current.backdrop = work.backdrop or next(iter(work.backdrops), None)
+        current.animated = any(g.strip().lower() in ANIMATION for g in work.genres)
         current.saga = (
             str(work.collection.get("name"))[:200]
             if work.collection and work.collection.get("name")

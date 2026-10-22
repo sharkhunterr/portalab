@@ -7,6 +7,7 @@ the card keeps the actor's portrait."""
 
 import asyncio
 import re
+from collections.abc import Callable
 from typing import Any
 
 from sqlalchemy import case, select
@@ -27,11 +28,13 @@ NAMESPACE = "cards"
 log = get_logger("portalab.cards")
 
 
-def query_for(name: str, character: str | None, film: str) -> str:
-    """« Tom Cruise Pete Maverick Mitchell Top Gun Maverick »: a character's ranks and quotes left out."""
+def query_for(name: str | None, character: str | None, film: str) -> str:
+    """« Tom Cruise Pete Maverick Mitchell Top Gun Maverick »: a character's ranks, quotes and « (voice) »
+    left out; an animated work's without the actor (« Woody Toy Story »)."""
     role = re.sub(r"\b(capt|lt|cmdr|adm|col|sgt|dr|mr|mrs|ms|wo-\d)\.?\s", " ", character or "", flags=re.I)
+    role = re.sub(r"\((voice|voix|uncredited)\)", " ", role, flags=re.I)
     role = re.sub(r"[\"'()\u2018\u2019\u201c\u201d]", " ", role)
-    return " ".join(f"{name} {role} {film}".split())[:200]
+    return " ".join(f"{name or ''} {role} {film}".split())[:200]
 
 
 def image_type(data: bytes) -> str:
@@ -51,7 +54,9 @@ class RoleSearch:
         blobs: BlobStore | None,
         *,
         clock: Clock | None = None,
+        face_check: Callable[[], bool] = lambda: True,
     ) -> None:
+        self.face_check = face_check
         self.database = database
         self.capabilities = capabilities
         self.matcher = matcher
@@ -68,8 +73,9 @@ class RoleSearch:
     async def run(self, batch: int = BATCH) -> int:
         """Look for the next cards' characters on the web: how many got one."""
         found = self._providers()
-        if found is None or not await self.matcher.ready():
+        if found is None:
             return 0  # nothing to search with: nothing marked, looked for once there is
+        check = self.face_check()
         search, sources = found
         rank = case(
             (Card.rarity == "legendary", 0), (Card.rarity == "epic", 1), (Card.rarity == "rare", 2), else_=3
@@ -77,7 +83,7 @@ class RoleSearch:
         async with self.database.session() as session:
             rows = (
                 await session.execute(
-                    select(Card.id, Card.name, Card.role, Card.art, CardSet.name)
+                    select(Card.id, Card.name, Card.role, Card.art, CardSet.name, CardSet.animated)
                     .join(CardSet, CardSet.key == Card.set_key)
                     .where(
                         Card.kind == "cast",
@@ -92,9 +98,14 @@ class RoleSearch:
                 )
             ).all()
         given = 0
-        for card_id, name, role, art, film in rows:
+        for card_id, name, role, art, film, animated in rows:
+            if check and not animated and not await self.matcher.ready():
+                continue  # the faces cannot be compared (no model): not marked, looked for again later
             try:
-                chosen = await self._one(search, sources, name, role, art, film)
+                if check and not animated:
+                    chosen = await self._one(search, sources, name, role, art, film)
+                else:  # a drawn character, or the check switched off: the page must name the character
+                    chosen = await self._named(search, None if animated else name, role, film)
             except Exception:  # a search or a portrait that fails: looked for again next time
                 log.warning("character not looked for", exc_info=True)
                 continue
@@ -137,6 +148,40 @@ class RoleSearch:
             return None
         stored = await self.blobs.put(NAMESPACE, best[1], content_type=image_type(best[1]))
         return stored.key
+
+    async def _named(self, search: Any, name: str | None, role: str | None, film: str) -> str | None:
+        """Without faces: the best image whose page names the character (and the work), the first that
+        can be fetched."""
+        if not role:
+            return None
+        hits = unwrap(await search.images(query_for(name, role, film), 30)) or []
+        ranked = sorted(
+            (
+                (value, hit)
+                for hit in hits
+                if (
+                    value := score(
+                        Candidate(hit.url, hit.title, hit.engine, 0.0, hit.width, hit.height),
+                        role,
+                        film,
+                        faces=False,
+                        actor=name,
+                    )
+                )
+                is not None
+            ),
+            key=lambda pair: -pair[0],
+        )
+        for _, hit in ranked[:FETCHED]:
+            try:
+                data = unwrap(await search.fetch(hit.url))
+            except Exception:  # noqa: S112 — an image that cannot be fetched is skipped
+                continue
+            if self.blobs is None:
+                return None
+            stored = await self.blobs.put(NAMESPACE, data, content_type=image_type(data))
+            return stored.key
+        return None
 
     async def matcher_look(self, data: bytes) -> Any:
         return await asyncio.to_thread(self.matcher.look, data)

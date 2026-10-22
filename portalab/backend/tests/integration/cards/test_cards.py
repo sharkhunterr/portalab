@@ -342,3 +342,86 @@ async def test_an_actors_character_found_on_the_web(database: Database) -> None:
         cruise = (await session.execute(Card.__table__.select().where(Card.kind == "cast"))).one()
     assert cruise.role_art == f"blob:{next(iter(blobs.kept))}"
     assert await search.run() == 0 and len(web.queries) == 1  # kept: never searched again
+
+
+def test_a_drawn_character_is_found_by_its_name() -> None:
+    from portalab.modules.cards.faces import Candidate, score
+    from portalab.modules.cards.search import query_for
+
+    assert query_for(None, "Woody (voice)", "Toy Story") == "Woody Toy Story"
+    unchecked = Candidate("u", "Woody in Toy Story 4K wallpaper", "bing", 0.0, 1920, 1080)
+    assert score(unchecked, "Woody (voice)", "Toy Story", faces=False) is not None
+    # without faces, the film named is not enough: the character must be
+    film_only = Candidate("u", "Toy Story wallpaper", "bing", 0.0, 1920, 1080)
+    assert score(film_only, "Woody (voice)", "Toy Story", faces=False) is None
+    voice_only = Candidate("u", "Tom Hanks voice actor", "bing", 0.0, 1920, 1080)  # « voice » is no name
+    assert score(voice_only, "Woody (voice)", "Toy Story", faces=False) is None
+
+
+class Drawn:
+    def __init__(self) -> None:
+        self.queries: list[str] = []
+        self.fetched: list[str] = []
+
+    async def images(self, query: str, limit: int = 30) -> list[Any]:
+        from portalab.capabilities.media import ImageHit
+
+        self.queries.append(query)
+        return [
+            ImageHit("https://a/poster.jpg", "Toy Story poster", 1000, 1500, "bing"),
+            ImageHit("https://a/small.jpg", "Woody Toy Story", 200, 150, "bing"),
+            ImageHit("https://a/woody.jpg", "Woody - Toy Story 4K wallpaper", 3840, 2160, "bing"),
+        ]
+
+    async def fetch(self, url: str) -> bytes:
+        self.fetched.append(url)
+        return b"woody"
+
+
+async def test_an_animated_works_character_and_the_check_switched_off(database: Database) -> None:
+    from portalab.capabilities.media import IMAGE_SEARCH
+    from portalab.modules.cards.search import RoleSearch
+
+    capabilities = new_registry()
+    cartoon = replace(work("Toy Story", 9000, "US", ["Tom Hanks"]), genres=["Animation", "Family"])
+    capabilities.provide(CARD_SOURCES, Sources([cartoon]), instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    async with database.unit_of_work() as uow:
+        await uow.session.execute(
+            Card.__table__.update()
+            .where(Card.kind == "cast")
+            .values(role_checked_at=NOW, role="Woody (voice)")
+        )
+        animated = (await uow.session.execute(CardSet.__table__.select())).one().animated
+    assert animated is True
+    drawn, blobs = Drawn(), Blobs()
+    capabilities.provide(IMAGE_SEARCH, drawn, instance_ref="searxng", owner="test")
+
+    class NoFaces(Matcher):
+        async def ready(self) -> bool:
+            raise AssertionError("an animated work's faces are never compared")
+
+    search = RoleSearch(database, capabilities, NoFaces(), blobs, face_check=lambda: True)  # type: ignore[arg-type]
+    assert await search.run() == 1
+    assert drawn.queries == ["Woody Toy Story"]  # the character and the work, not the actor
+    assert drawn.fetched == ["https://a/woody.jpg"]  # named, large enough
+
+
+async def test_the_face_check_switched_off(database: Database) -> None:
+    from portalab.capabilities.media import IMAGE_SEARCH
+    from portalab.modules.cards.search import RoleSearch
+
+    capabilities = new_registry()
+    film = work("Top Gun: Maverick", 11000, "US", ["Tom Cruise"])
+    capabilities.provide(CARD_SOURCES, Sources([film]), instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    async with database.unit_of_work() as uow:
+        await uow.session.execute(
+            Card.__table__.update().where(Card.kind == "cast").values(role_checked_at=NOW, role="Maverick")
+        )
+    web, blobs = Web(), Blobs()
+    capabilities.provide(IMAGE_SEARCH, web, instance_ref="searxng", owner="test")
+    search = RoleSearch(database, capabilities, Matcher(), blobs, face_check=lambda: False)  # type: ignore[arg-type]
+    assert await search.run() == 1
+    assert web.queries == ["Tom Cruise Maverick Top Gun: Maverick"]  # the actor still named
+    assert list(blobs.kept.values()) == [b"face:cruise jet"]  # the page naming Maverick, not the premiere
