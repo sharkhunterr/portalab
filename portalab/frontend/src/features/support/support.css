@@ -1517,7 +1517,7 @@
   flex-direction: column;
   gap: var(--space-2);
 }
-.feedback-reply {
+.feedback-reply-field {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -1532,7 +1532,7 @@
   text-align: start;
   cursor: text;
 }
-.feedback-reply:hover {
+.feedback-reply-field:hover {
   border-color: var(--color-accent);
 }
 .feedback-chips {
@@ -1565,7 +1565,7 @@
 .feedback-chip[data-tone="reward"] {
   color: var(--rarity-legendary, var(--color-accent-alt));
 }
-.feedback-reply:focus-visible,
+.feedback-reply-field:focus-visible,
 .feedback-chip:focus-visible,
 .feedback-then label:focus-within {
   outline: 2px solid var(--color-focus);
@@ -1771,4 +1771,27 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
+}
+
+/* a reward given for a feedback: a small golden badge, on the member's feedback and in the team's views */
+.reward-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reward-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--rarity-legendary, var(--color-accent-alt)) 45%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--rarity-legendary, var(--color-accent-alt)) 14%, transparent);
+  color: var(--rarity-legendary, var(--color-accent-alt));
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
 }

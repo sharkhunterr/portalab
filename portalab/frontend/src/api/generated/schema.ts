@@ -12492,6 +12492,8 @@ export interface components {
             replied_at?: string | null;
             /** Reply */
             reply?: string | null;
+            /** Rewards */
+            rewards?: string[];
             /** Status */
             status: string;
             /** Submitter Id */
@@ -12602,6 +12604,8 @@ export interface components {
             replied_at?: string | null;
             /** Reply */
             reply?: string | null;
+            /** Rewards */
+            rewards?: string[];
             /** Status */
             status: string;
             /** Submitter Id */

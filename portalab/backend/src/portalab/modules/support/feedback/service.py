@@ -244,15 +244,44 @@ class FeedbackService:
                 ).scalars()
             )
 
+    async def rewards(self, ids: list[UUID]) -> dict[UUID, list[str]]:
+        """027: the rewards given for these feedback, in order (their labels)."""
+        if not ids:
+            return {}
+        out: dict[UUID, list[str]] = {}
+        async with self.database.session() as session:
+            rows = await session.execute(
+                select(FeedbackEvent.feedback_id, FeedbackEvent.detail)
+                .where(FeedbackEvent.feedback_id.in_(ids), FeedbackEvent.kind == "rewarded")
+                .order_by(FeedbackEvent.at)
+            )
+            for feedback_id, detail in rows:
+                label = str((detail or {}).get("label") or "").strip()
+                if label:
+                    out.setdefault(feedback_id, []).append(label)
+        return out
+
     async def rewarded(self, viewer: Principal, feedback_id: UUID, detail: dict[str, Any]) -> None:
         """027: a reward given for this feedback (through the economy's or the shop's own grants), kept in
         its history."""
         if not await self._allowed(viewer, FEEDBACK_READ):
             raise Forbidden("You cannot review feedback.")
         async with self.database.unit_of_work() as uow:
-            if await uow.session.get(FeedbackItem, feedback_id) is None:
+            item = await uow.session.get(FeedbackItem, feedback_id)
+            if item is None:
                 raise FeedbackNotFound("This feedback does not exist.")
-            record(uow.session, feedback_id, "rewarded", viewer, utc_now(self.clock), detail=detail)
+            now = utc_now(self.clock)
+            record(uow.session, feedback_id, "rewarded", viewer, now, detail=detail)
+            member = item.submitter_id
+        if self.notifier is not None and member is not None:  # told even when no word goes with it
+            await self.notifier.send(
+                "support.feedback",
+                "support:notify.feedbackReward",
+                member,
+                f"feedback.reward:{feedback_id}:{int(now.timestamp())}",
+                {"what": str(detail.get("label") or "")},
+                "/feedback",
+            )
 
     async def reply(
         self, viewer: Principal, feedback_id: UUID, text: str, *, append: bool = False

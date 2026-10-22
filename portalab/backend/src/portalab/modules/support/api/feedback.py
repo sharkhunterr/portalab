@@ -117,6 +117,8 @@ class FeedbackOut(BaseModel):
     replied_at: datetime | None = None
     submitter_name: str | None = None  # staff views only (027)
     form_label: str | None = None
+    # 027: what was given for it (« 100 Coins », « 50 XP », a product's name), shown as badges
+    rewards: list[str] = Field(default_factory=list)
 
 
 class FeedbackConversionOut(BaseModel):
@@ -170,7 +172,7 @@ async def my_requests(principal: Submitter, module: Module) -> list[FeedbackRequ
 @router.get("/me/feedback", response_model=list[FeedbackOut])
 async def my_feedback(principal: Submitter, module: Module) -> list[FeedbackOut]:
     """027: what I sent, its status and the staff reply."""
-    return [out(i) for i in await module.feedback.mine(principal)]
+    return await _rewarded(module, [out(i) for i in await module.feedback.mine(principal)])
 
 
 @router.post("/feedback", response_model=FeedbackOut, status_code=status.HTTP_201_CREATED)
@@ -192,7 +194,15 @@ async def queue(
         for i in await module.feedback.listing(principal, status=status_filter, kind=kind)
         if (form is None or i.form_key == form) and (user_id is None or i.submitter_id == user_id)
     ]
-    return await _named(module, [out(i) for i in items])
+    return await _rewarded(module, await _named(module, [out(i) for i in items]))
+
+
+async def _rewarded(module: Any, rows: list[FeedbackOut]) -> list[FeedbackOut]:
+    """027: each feedback with the rewards given for it (from its history)."""
+    given = await module.feedback.rewards([row.id for row in rows])
+    for row in rows:
+        row.rewards = given.get(row.id, [])
+    return rows
 
 
 async def _named(module: Any, rows: list[FeedbackOut]) -> list[FeedbackOut]:
