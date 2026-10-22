@@ -45,7 +45,7 @@ const ICONS = [
   "users",
 ];
 
-interface FormRow {
+export interface FormRow {
   key: string;
   kind: string;
   label: string;
@@ -105,7 +105,7 @@ function errorText(error: unknown, fallback: string): string {
   return [error.message, ...(errors ?? [])].join(" — ");
 }
 
-function FormEditor({ form, onDone }: { form?: FormRow; onDone: () => void }) {
+export function FormEditor({ form, onDone }: { form?: FormRow; onDone: () => void }) {
   const t = useT();
   const client = useQueryClient();
   const [draft, setDraft] = useState<FormRow>(
