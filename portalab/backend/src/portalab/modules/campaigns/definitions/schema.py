@@ -59,10 +59,14 @@ class When(_Closed):
     media_kind: list[str] = Field(default_factory=list, max_length=20)
     genre: list[str] = Field(default_factory=list, max_length=50)
     title_contains: list[str] = Field(default_factory=list, max_length=20)
+    # the metadata provider's keywords, by fragment (« christmas » finds « christmas eve », « santa claus »…)
+    keyword: list[str] = Field(default_factory=list, max_length=20)
+    # hand-picked titles (media ids): a series counts its episodes
+    objects: list[str] = Field(default_factory=list, max_length=500)
     activity: list[str] = Field(default_factory=list, max_length=20)
     audience: Audience = Audience()
 
-    @field_validator("title_contains", "genre", "media_kind")
+    @field_validator("title_contains", "genre", "media_kind", "keyword", "objects")
     @classmethod
     def _short(cls, values: list[str]) -> list[str]:
         if any(not 1 <= len(v) <= 100 for v in values):
@@ -78,19 +82,21 @@ class ModifierDef(_Closed):
 
 
 class DiscountDef(_Closed):
-    """027: a shop reduction while the campaign is active — on named products and/or whole categories."""
+    """027: a shop reduction while the campaign is active — on named products, whole categories and/or every
+    product of a season (« christmas »: all its looks, its booster, its pack)."""
 
     id: str = Field(pattern=IDENT)
     percent: int = Field(ge=1, le=90)
     products: list[str] = Field(default_factory=list, max_length=200)
     categories: list[str] = Field(default_factory=list, max_length=20)
+    seasons: list[str] = Field(default_factory=list, max_length=10)
 
     @model_validator(mode="after")
     def _targets(self) -> "DiscountDef":
-        if not self.products and not self.categories:
-            raise ValueError("a discount names products or categories")
-        if any(not 1 <= len(v) <= 96 for v in [*self.products, *self.categories]):
-            raise ValueError("product and category keys are 1-96 characters")
+        if not self.products and not self.categories and not self.seasons:
+            raise ValueError("a discount names products, categories or seasons")
+        if any(not 1 <= len(v) <= 96 for v in [*self.products, *self.categories, *self.seasons]):
+            raise ValueError("product, category and season keys are 1-96 characters")
         return self
 
 

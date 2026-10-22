@@ -32,7 +32,32 @@ def norm(value: str) -> str:
 
 
 def needs_attributes(when: When) -> bool:
-    return bool(when.media_kind or when.genre or when.title_contains)
+    return bool(when.media_kind or when.genre or when.title_contains or when.keyword or when.objects)
+
+
+def _themed(when: When, attributes: ActivityAttributes) -> Verdict:
+    """« title contains », « keyword » and « hand-picked »: any one of them is enough (a Christmas film is
+    one whose title says so, or whose keywords do, or that was picked)."""
+    asked = [bool(when.title_contains), bool(when.keyword), bool(when.objects)]
+    if not any(asked):
+        return "match"
+    known = False
+    if when.objects:
+        known = True
+        if set(attributes.objects) & {o.strip() for o in when.objects}:
+            return "match"
+    if when.keyword and attributes.keywords:
+        known = True
+        keywords = [norm(k) for k in attributes.keywords]
+        if any(norm(fragment) in keyword for fragment in when.keyword for keyword in keywords):
+            return "match"
+    if when.title_contains:
+        titles = [norm(t) for t in (attributes.title, attributes.original_title) if t]
+        if titles:
+            known = True
+            if any(norm(fragment) in title for fragment in when.title_contains for title in titles):
+                return "match"
+    return "no_match" if known else "unknown"
 
 
 def match_attributes(when: When, attributes: ActivityAttributes | None) -> Verdict:
@@ -50,13 +75,7 @@ def match_attributes(when: When, attributes: ActivityAttributes | None) -> Verdi
             return "unknown"
         if not {norm(g) for g in attributes.genres} & {norm(g) for g in when.genre}:
             return "no_match"
-    if when.title_contains:
-        titles = [norm(t) for t in (attributes.title, attributes.original_title) if t]
-        if not titles:
-            return "unknown"
-        if not any(norm(fragment) in title for fragment in when.title_contains for title in titles):
-            return "no_match"
-    return "match"
+    return _themed(when, attributes)
 
 
 class Matcher:

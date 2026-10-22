@@ -69,9 +69,14 @@ class ShopDiscount:
     categories: tuple[str, ...] = ()
     ends_at: datetime | None = None
     names: dict[str, str] = field(default_factory=dict)
+    seasons: tuple[str, ...] = ()  # every product of these seasons (« christmas »)
 
-    def covers(self, product: str, category: str | None) -> bool:
-        return product in self.products or (category is not None and category in self.categories)
+    def covers(self, product: str, category: str | None, season: str | None = None) -> bool:
+        return (
+            product in self.products
+            or (category is not None and category in self.categories)
+            or (season is not None and season in self.seasons)
+        )
 
 
 @runtime_checkable
@@ -80,10 +85,10 @@ class ShopDiscounts(Protocol):
 
 
 def best_discount(
-    discounts: Sequence[ShopDiscount], product: str, category: str | None
+    discounts: Sequence[ShopDiscount], product: str, category: str | None, season: str | None = None
 ) -> ShopDiscount | None:
     """The largest reduction covering the product (discounts never add up)."""
-    covering = [d for d in discounts if d.covers(product, category)]
+    covering = [d for d in discounts if d.covers(product, category, season)]
     return max(covering, key=lambda d: (d.percent, d.ref)) if covering else None
 
 

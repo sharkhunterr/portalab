@@ -22,9 +22,13 @@ async def active_discounts(capabilities: CapabilityRegistry, at: datetime) -> Se
 
 
 def price_now(
-    discounts: Sequence[ShopDiscount], product: str, category: str | None, price: int | None
+    discounts: Sequence[ShopDiscount],
+    product: str,
+    category: str | None,
+    price: int | None,
+    season: str | None = None,
 ) -> tuple[int | None, ShopDiscount | None]:
     if not price:
         return price, None
-    discount = best_discount(discounts, product, category)
+    discount = best_discount(discounts, product, category, season)
     return (discounted(price, discount.percent), discount) if discount else (price, None)

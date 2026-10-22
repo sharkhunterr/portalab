@@ -102,7 +102,7 @@ class Purchases:
         # 027: the price now — less the best reduction of an active campaign
         discounts = await active_discounts(self.capabilities, utc_now(self.clock))
         reduced, _ = price_now(
-            discounts, product.key, category.key if category else None, version.price_coins
+            discounts, product.key, category.key if category else None, version.price_coins, product.season
         )
         checks = await self.eligibility.checks(user, list(version.conditions), None)
         unmet = [c for c in checks if not c.met]

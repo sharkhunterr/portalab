@@ -19,7 +19,8 @@
     "level": 23,
     "supply": 5,
     "collection": "ultimate",
-    "icon": "crown"
+    "icon": "crown",
+    "season": "christmas"
   },
   "payload": {
     "products": [

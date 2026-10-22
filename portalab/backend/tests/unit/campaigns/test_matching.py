@@ -73,3 +73,42 @@ async def test_audience() -> None:
     assert not await Matcher(new_registry(), None, record_failures=False).in_audience(  # type: ignore[arg-type]
         Audience(kind="roles", roles=["vip"]), user
     )
+
+
+def test_a_christmas_film_by_its_title_its_keywords_or_picked() -> None:
+    """Title, keyword or hand-picked: any one is enough; the kind still has to match."""
+    when = When(
+        media_kind=["movie"],
+        title_contains=["noël"],
+        keyword=["christmas"],
+        objects=["11111111-1111-1111-1111-111111111111"],
+    )
+    by_title = ActivityAttributes(media_kind="movie", title="Hyper Noël")
+    by_keyword = ActivityAttributes(media_kind="movie", title="Die Hard 2", keywords=("christmas eve",))
+    picked = ActivityAttributes(
+        media_kind="movie", title="Love Actually", objects=("11111111-1111-1111-1111-111111111111",)
+    )
+    other = ActivityAttributes(media_kind="movie", title="Alien", keywords=("space",))
+    series = ActivityAttributes(media_kind="episode", title="Hyper Noël")
+    assert match_attributes(when, by_title) == "match"
+    assert match_attributes(when, by_keyword) == "match"
+    assert match_attributes(when, picked) == "match"
+    assert match_attributes(when, other) == "no_match"
+    assert match_attributes(when, series) == "no_match"
+
+
+def test_a_picked_series_counts_its_episodes() -> None:
+    when = When(objects=["series-1"])
+    episode = ActivityAttributes(
+        media_kind="episode", title="Pilot", objects=("ep-9", "season-2", "series-1")
+    )
+    assert match_attributes(when, episode) == "match"
+
+
+def test_a_season_discount_covers_every_product_of_the_season() -> None:
+    from portalab.capabilities.campaigns import ShopDiscount, best_discount
+
+    christmas = ShopDiscount(campaign="xmas", name="Noël", ref="r", percent=20, seasons=("christmas",))
+    assert best_discount([christmas], "badge_elf", None, "christmas") is christmas
+    assert best_discount([christmas], "badge_bat", None, "halloween") is None
+    assert best_discount([christmas], "badge_elf", None) is None
