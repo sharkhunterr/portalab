@@ -19,6 +19,7 @@ import { ApiError } from "../../../state/regions";
 import type { FieldDef } from "../tickets/api";
 import { useFeedbackActions, useFeedbackDetail } from "../tickets/api";
 import { optionLabel } from "../tickets/FieldInputs";
+import { FeedbackReward } from "./FeedbackReward";
 import "../support.css";
 
 type Item = components["schemas"]["FeedbackOut"];
@@ -109,6 +110,7 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
   const { convert, review } = useFeedbackActions(item.id);
   const [reply, setReply] = useState(item.reply ?? "");
   const [pending, setPending] = useState<{ target: string; token: string } | null>(null);
+  const [rewarded, setRewarded] = useState(false);
   const send = useMutation({
     mutationFn: async () =>
       (
@@ -144,6 +146,7 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
         />
       </div>
       {send.isSuccess ? <p role="status">{t("support:review.replied")}</p> : null}
+      {rewarded ? <p role="status">{t("support:reward.done")}</p> : null}
       <div className="feedback-detail__actions">
         <Button disabled={!reply.trim() || send.isPending} onClick={() => send.mutate()}>
           <Icon name="message" size={16} />
@@ -160,6 +163,7 @@ function Detail({ item, fields }: { item: Item; fields: FieldDef[] }) {
             {t("support:feedback.dismiss")}
           </Button>
         ) : null}
+        <FeedbackReward item={item} onDone={() => setRewarded(true)} />
       </div>
       {detail.data?.conversions.length ? (
         <div className="feedback-detail__convert">
