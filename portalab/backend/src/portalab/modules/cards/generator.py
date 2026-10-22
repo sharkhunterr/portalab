@@ -32,7 +32,11 @@ ANIMATION = {
 }  # the genre, as providers name it
 WRITERS = 2
 ORDER = ("title", "director", "creator", "cast", "writer", "composer")
-STOP = {"the", "a", "an", "of", "and", "le", "la", "les", "un", "une", "des", "de", "du", "et", "l", "d"}
+STOP = {
+    "the", "a", "an", "of", "and", "in", "on", "to", "for",
+    "le", "la", "les", "un", "une", "des", "de", "du", "et", "l", "d",
+    "par", "pour", "sur", "dans", "en", "au", "aux",
+}  # fmt: skip
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,11 +62,11 @@ class SyncReport:
 
 
 def set_code(title: str) -> str:
-    """Three letters, like a set's symbol: the initials of its first words (else its first letters)."""
+    """Three letters, like a set's symbol: the initials of its first words — numbers and little words left
+    out (« 120 battements par minute »: BMI), unless the title is only that (« 1917 »: 191)."""
     plain = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode().upper()
-    words = [w for w in re.findall(r"[A-Z0-9]+", plain) if w.lower() not in STOP] or re.findall(
-        r"[A-Z0-9]+", plain
-    )
+    every = re.findall(r"[A-Z0-9]+", plain)
+    words = [w for w in every if w.lower() not in STOP and not w.isdigit()] or every
     initials = "".join(w[0] for w in words[:3])
     if len(initials) < 3:
         initials = (initials + words[-1][1:])[:3] if words else "SET"  # the last word's next letters
@@ -81,7 +85,8 @@ def fingerprint(work: CardWork) -> str:
         "tmdb": work.tmdb,
         "ids": sorted(work.ids.items()),
         "animated": any(g.strip().lower() in ANIMATION for g in work.genres),
-        "v": 3,  # how the cards are made (people's cards: no image of the work since v2; the set's scene, v3)
+        # how the cards are made: v2 no image of the work on a person's, v3 the set's scene, v4 codes
+        "v": 4,
     }
     return hashlib.sha256(json.dumps(data, sort_keys=True, default=str).encode()).hexdigest()[:64]
 
