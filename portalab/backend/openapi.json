@@ -35364,6 +35364,58 @@
         ]
       }
     },
+    "/api/v1/cards/images/{namespace}/{digest}": {
+      "get": {
+        "description": "An image the cards found and kept (an actor's character): only one a card shows.",
+        "operationId": "card_image_api_v1_cards_images__namespace___digest__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "pattern": "^cards$",
+              "title": "Namespace",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "digest",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f]{64}$",
+              "title": "Digest",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Card Image",
+        "tags": [
+          "cards"
+        ]
+      }
+    },
     "/api/v1/cards/people": {
       "get": {
         "description": "A person's cards across the sets (a card per work they are credited on).",

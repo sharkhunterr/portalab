@@ -5,13 +5,14 @@ from dataclasses import asdict
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Path, Query, Request
+from fastapi import APIRouter, Depends, Path, Query, Request, Response
 
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import NotFound, Unavailable
 from portalab.modules.cards.module import CardsModule
 from portalab.modules.cards.permissions import MANAGE, READ
+from portalab.modules.cards.search import image_type
 
 router = APIRouter(prefix="/api/v1", tags=["cards"])
 
@@ -120,4 +121,24 @@ async def sync_cards(principal: Manager, module: Module) -> dict[str, Any]:
         **asdict(await module.forge.sync()),
         "characters": await module.roles.run(),
         "fan_art": await module.fan_art.run(),
+        "searched": await module.search.run(),
     }
+
+
+@router.get("/cards/images/{namespace}/{digest}")
+async def card_image(
+    _: Reader,
+    module: Module,
+    namespace: Annotated[str, Path(pattern=r"^cards$")],
+    digest: Annotated[str, Path(pattern=r"^[0-9a-f]{64}$")],
+) -> Response:
+    """An image the cards found and kept (an actor's character): only one a card shows."""
+    key = f"{namespace}/{digest}"
+    if module.blobs is None or not await module.service.shows(f"blob:{key}"):
+        raise CardNotFound("No such image.")
+    data = await module.blobs.get(key)
+    return Response(
+        content=data,
+        media_type=image_type(data),
+        headers={"Cache-Control": "private, max-age=2592000, immutable", "X-Content-Type-Options": "nosniff"},
+    )

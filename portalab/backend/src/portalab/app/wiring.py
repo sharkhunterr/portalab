@@ -268,7 +268,7 @@ def wire_platform(
     visuals = VisualsModule(
         database, events, authz.audit, capabilities, root=data_dir / "visuals", authorizer=authz.engine
     )
-    cards = CardsModule(database, capabilities)  # issue 229
+    cards = CardsModule(database, capabilities, blobs=context.blobs, root=data_dir / "cards")  # issue 229
     cards.register()
     plugins = PluginsModule(
         database,

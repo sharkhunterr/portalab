@@ -86,6 +86,8 @@ class Card(CardsBase):
     # a work's card: its full art from an art site (fanart.tv), for the borderless alternative — the cache
     fan_art: Mapped[str | None] = mapped_column(String(240), info=not_personal("an artwork reference"))
     fan_checked_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    # an actor's character looked for on the web (when TMDB had none) — the cache
+    search_checked_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     billing: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     score: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     rarity: Mapped[str] = mapped_column(String(12), nullable=False, default="common")

@@ -69,6 +69,11 @@ class CardService:
     def _seen(self) -> Any:
         return or_(Pack.id.is_(None), Pack.opened_at.is_not(None))
 
+    async def shows(self, art: str) -> bool:
+        """Whether a card shows this image (the only ones the cards serve)."""
+        async with self.database.session() as session:
+            return bool(await session.scalar(select(Card.id).where(Card.role_art == art).limit(1)))
+
     async def summary(self, user: UUID) -> dict[str, Any]:
         async with self.database.session() as session:
             owned = (

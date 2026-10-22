@@ -54,9 +54,19 @@ def _strings(raw: Any) -> list[str]:
 
 
 class MediaCardSources:
-    def __init__(self, database: Database, capabilities: CapabilityRegistry | None = None) -> None:
+    def __init__(
+        self, database: Database, capabilities: CapabilityRegistry | None = None, enricher: Any = None
+    ) -> None:
         self.database = database
         self.capabilities = capabilities
+        self.enricher = enricher
+
+    async def image(self, ref: str, size: str) -> bytes:
+        """A metadata image (cached in the blob store by the enricher)."""
+        if self.enricher is None:
+            raise LookupError("no metadata images")
+        data: bytes = await self.enricher.image(ref, size)
+        return data
 
     async def works(self, *, since: datetime | None = None) -> Sequence[CardWork]:
         query = (

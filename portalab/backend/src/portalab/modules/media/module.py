@@ -413,7 +413,7 @@ class MediaModule:
             (QUOTA, self.quota),
             (RESCUES, self.cleanup),
             (RADIO_CREDITS, self.radio),
-            (CARD_SOURCES, MediaCardSources(self.database, self.capabilities)),  # issue 229
+            (CARD_SOURCES, MediaCardSources(self.database, self.capabilities, self.enricher)),  # issue 229
             (RECOMMENDATIONS, self.recommender),
             (ACTIVITY, MediaActivityAttributes(self.database)),
         )

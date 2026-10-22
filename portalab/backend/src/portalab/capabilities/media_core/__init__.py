@@ -304,6 +304,10 @@ class CardSources(Protocol):
 
     async def work_of(self, object_id: UUID) -> UUID | None: ...
 
+    async def image(self, ref: str, size: str) -> bytes:
+        """A metadata image's bytes (a person's portrait: what a face is compared with)."""
+        ...
+
     async def role_images(self, person_ref: str) -> Sequence[CardImage] | None:
         """The images ``tmdb:<id>`` is tagged in, from the provider that knows them (``None``: none can)."""
         ...
