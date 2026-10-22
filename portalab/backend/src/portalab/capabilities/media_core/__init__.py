@@ -278,6 +278,7 @@ class CardWork:
     updated_at: datetime
     available: bool
     tmdb: str | None = None  # the work's TMDB id (its characters' images are tagged with it)
+    ids: Mapping[str, str] = field(default_factory=dict)  # every id known (tvdb: a series' on art sites)
 
 
 @dataclass(frozen=True, slots=True)

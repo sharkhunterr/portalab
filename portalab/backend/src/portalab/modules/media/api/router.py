@@ -730,6 +730,31 @@ async def metadata_image(
     )
 
 
+@router.get("/media/artwork-images")
+async def artwork_image(
+    _: Reader,
+    module: Module,
+    ref: Annotated[str, Query(pattern=r"^/fanart/[A-Za-z0-9/_.-]{1,200}\.(jpg|jpeg|png)$")],
+    preview: bool = False,
+) -> Response:
+    """Issue 229: an art site's image (fanart.tv: a work's background, clearart…), served by the portal."""
+    try:
+        data = await module.enricher.artwork_image(ref, preview)
+    except LookupError as exc:
+        raise MediaNotFound("No art site is connected.") from exc
+    except Exception as exc:
+        raise Unavailable("The image cannot be fetched right now.", code="media.image_unavailable") from exc
+    return Response(
+        content=data,
+        media_type="image/png" if ref.endswith(".png") else "image/jpeg",
+        headers={
+            "Cache-Control": "private, max-age=2592000, immutable",
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'",
+        },
+    )
+
+
 @router.get("/media/{object_id}/metadata")
 async def object_metadata(_: Reader, object_id: UUID, module: Module) -> dict[str, Any]:
     """Enriched details of a film or a series (backdrop, cast, saga, budget, revenue…), when known."""

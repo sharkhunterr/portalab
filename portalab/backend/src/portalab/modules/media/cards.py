@@ -97,6 +97,7 @@ class MediaCardSources:
                     updated_at=max(item.updated_at, meta.fetched_at),
                     available=bool(item.available),
                     tmdb=str(tmdb) if (tmdb := (data.get("ids") or {}).get("tmdb")) else None,
+                    ids={str(k): str(v) for k, v in (data.get("ids") or {}).items() if v},
                 )
             )
         return out

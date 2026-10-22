@@ -1,7 +1,7 @@
 import type { CSSProperties, PointerEvent } from "react";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
-import { cardImage, type MediaCard, type Variant } from "./api";
+import { artworkImage, cardImage, type MediaCard, type Variant } from "./api";
 import "./cards.css";
 
 const KIND_ICON: Record<MediaCard["kind"], string> = {
@@ -46,7 +46,7 @@ export function MediaCardView({
   // alternative another image of the character, else one of the work
   const art = borderless
     ? card.kind === "title"
-      ? cardImage(card.alt_art ?? card.art, "w780")
+      ? (artworkImage(card.fan_art) ?? cardImage(card.alt_art ?? card.art, "w780"))
       : card.role_alt || card.role_art
         ? cardImage(card.role_alt ?? card.role_art, "w780")
         : cardImage(card.art, "h632") // never an image of the work: it shows someone else

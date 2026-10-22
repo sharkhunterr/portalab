@@ -14,7 +14,7 @@ from uuid import UUID
 from sqlalchemy import and_, exists, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 
-from portalab.capabilities.media import METADATA, PEOPLE, MetadataRecord, unwrap
+from portalab.capabilities.media import ARTWORK, METADATA, PEOPLE, MetadataRecord, unwrap
 from portalab.capabilities.record_sink import Report, ServiceRef, SinkResult
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.blobstore import BlobStore
@@ -300,6 +300,28 @@ class MetadataEnricher:
             if (registration.metadata or {}).get("connector") in ("tmdb", "seerr"):
                 return registration.instance_ref, registration.provider
         return None
+
+    async def artwork_image(self, ref: str, preview: bool = False) -> bytes:
+        """Issue 229: an art site's image (fanart.tv), fetched once then served from the blob store."""
+        providers = self.capabilities.system_providers(ARTWORK)
+        if not providers:
+            raise LookupError("no artwork provider")
+        key = (ref, "preview" if preview else "full")
+        if self.blobs is not None and key in self._images:
+            try:
+                return await self.blobs.get(self._images[key])
+            except Exception:
+                self._images.pop(key, None)
+        data: bytes = unwrap(
+            await asyncio.wait_for(providers[0].provider.fetch_artwork(ref, preview), timeout=TIMEOUT * 2)
+        )
+        if self.blobs is not None:
+            content = "image/png" if ref.endswith(".png") else "image/jpeg"
+            stored = await self.blobs.put("media-metadata", data, content_type=content)
+            if len(self._images) > 5000:
+                self._images.clear()
+            self._images[key] = stored.key
+        return data
 
     async def image(self, ref: str, size: str) -> bytes:
         """A provider image, fetched once then served from the blob store (or memory without one)."""

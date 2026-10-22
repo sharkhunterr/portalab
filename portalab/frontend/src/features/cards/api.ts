@@ -27,6 +27,8 @@ export interface MediaCard {
   /** an actor's character in this very work: the card's image, its borderless alternative's */
   role_art?: string | null;
   role_alt?: string | null;
+  /** a work's card: its full art from an art site (fanart.tv), for its borderless alternative */
+  fan_art?: string | null;
   rarity: Rarity;
   retired: boolean;
   owned: Partial<Record<Variant, number>>;
@@ -77,6 +79,11 @@ const KEY = ["cards"] as const;
 /** A card's picture through the portal (browsers never call TMDB). */
 export function cardImage(ref: string | null | undefined, size = "w500"): string | null {
   return ref ? `/api/v1/media/metadata-images?ref=${encodeURIComponent(ref)}&size=${size}` : null;
+}
+
+/** An art site's image (fanart.tv) through the portal. */
+export function artworkImage(ref: string | null | undefined): string | null {
+  return ref ? `/api/v1/media/artwork-images?ref=${encodeURIComponent(ref)}` : null;
 }
 
 export function useMyCards() {

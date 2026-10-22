@@ -72,6 +72,7 @@ def fingerprint(work: CardWork) -> str:
         "votes": work.vote_count // 50,  # a few more votes do not make it again
         "countries": list(work.countries)[:1],
         "tmdb": work.tmdb,
+        "ids": sorted(work.ids.items()),
         "v": 3,  # how the cards are made (people's cards: no image of the work since v2; the set's scene, v3)
     }
     return hashlib.sha256(json.dumps(data, sort_keys=True, default=str).encode()).hexdigest()[:64]
@@ -190,6 +191,7 @@ class CardForge:
             else None
         )
         current.tmdb = work.tmdb
+        current.ids = ",".join(f"{k}:{v}" for k, v in sorted(work.ids.items()))[:240] or None
         current.present = True
         current.fingerprint = print_
         current.generated_at = now

@@ -43233,6 +43233,58 @@
         ]
       }
     },
+    "/api/v1/media/artwork-images": {
+      "get": {
+        "description": "Issue 229: an art site's image (fanart.tv: a work's background, clearart\u2026), served by the portal.",
+        "operationId": "artwork_image_api_v1_media_artwork_images_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "pattern": "^/fanart/[A-Za-z0-9/_.-]{1,200}\\.(jpg|jpeg|png)$",
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "preview",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Preview",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Artwork Image",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/discover/search": {
       "get": {
         "description": "#4: films and series one can ask for (the request service's search, over TMDB), each with its\npage in the catalog when it is there and the open request for it (mine, or a member's).",
