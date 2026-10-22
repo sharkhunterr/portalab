@@ -51,6 +51,13 @@ UNDER_WAY = ("current", "waiting")
 MAX_TEXT = 200
 
 
+# #57: how a member keeps a title the cleanup will delete — told as is, so the answer points to the shop
+RESCUE_HOW = (
+    "Buy a « Rescue » in the shop (Marketplace, « Rescue » products), then press « Save this title » on the "
+    "title's page: it leaves the deletion list for everyone. One rescue saves one title; unused rescues wait."
+)
+
+
 def _compact(value: Any, depth: int = 0) -> Any:
     """A journey's facts, small enough for the assistant's context: short texts, short lists."""
     if isinstance(value, str):
@@ -331,13 +338,18 @@ class MediaAiTools:
             return None
         if not status.get("leaving"):
             return None
-        return {
-            "deletion_list": True,
-            "rules": sorted({str(e.get("collection") or "") for e in status["leaving"]} - {""})[:4],
-            "delete_at": status.get("delete_at"),
-            "saved": bool(status.get("saved")),
-            "can_be_rescued": not status.get("saved"),
+        saved = bool(status.get("saved"))
+        leaving: dict[str, Any] = {
+            "on_deletion_list": True,
+            "cleanup_rules": sorted({str(e.get("collection") or "") for e in status["leaving"]} - {""})[:4],
+            # no date yet: the cleanup tool deletes it on one of its next passes
+            "leaves_on": status.get("delete_at") or "not set yet: it can go at one of the next cleanups",
+            "already_saved_by_a_member": saved,
         }
+        if not saved:
+            leaving["how_to_save_it"] = RESCUE_HOW
+            leaving["my_rescues_left"] = int(status.get("credits") or 0)
+        return leaving
 
     async def _posters(self, ids: list[str]) -> dict[str, str]:
         """The posters of some titles, as the portal's own image addresses (the cards beside an answer)."""
@@ -438,9 +450,9 @@ class MediaAiTools:
                 "every kind and takes the closest title): in the library or not, and if "
                 "it was requested, each step of its journey (requested, approved, released, searched by the "
                 "download manager, downloading, imported, available) with what explains it, and whether "
-                "it is on the library's deletion list (« leaving soon »: the rule, the day) — use it to say "
-                "why a title is not available yet or why it will leave. Give its title, or its id when the "
-                "user is on its page.",
+                "it is on the library's deletion list (« leaving soon »: the rule, the day, how to save "
+                "it with a rescue from the shop) — use it to say why a title is not available yet or why "
+                "it will leave. Give its title, or its id when the user is on its page.",
                 {
                     "type": "object",
                     "properties": {
