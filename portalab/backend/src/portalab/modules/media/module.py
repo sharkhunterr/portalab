@@ -154,7 +154,7 @@ from portalab.modules.media.requests.journey import RequestJourney
 from portalab.modules.media.requests.moderation import RequestModeration
 from portalab.modules.media.requests.quota import RequestQuota
 from portalab.modules.media.requests.service import Requests, RequestSink
-from portalab.modules.media.requests.watched import RequestWatched
+from portalab.modules.media.requests.watched import LeavingWatched, RequestWatched
 from portalab.modules.media.sections.service import Sections
 from portalab.modules.media.settings import (
     PRIORITY_FIELDS,
@@ -277,7 +277,7 @@ class MediaModule:
         )
         self.cleanup = CleanupService(database, capabilities, clock=clock)  # #57: Maintainerr's deletions
         # issue 168: the homelab's radio (SUB/WAVE); 184: free requests each day, then credits
-        self.radio = RadioService(capabilities, database, lambda: self.config, clock=clock)
+        self.radio = RadioService(capabilities, database, lambda: self.config, clock=clock, events=events)
         self.requestable = RequestableCatalog(database, capabilities)  # #4: what one can ask for (Seerr)
         self.moderation = RequestModeration(self.requests)  # #4: administrators approve or decline
         self.ai_tools = MediaAiTools(  # issue 171: offered to the assistant, with a title's journey
@@ -432,7 +432,11 @@ class MediaModule:
                 window=lambda: timedelta(days=90),
             )
         )
-        for consumer in (self.history.consumer(), RequestWatched(self.database, self.events).consumer()):
+        for consumer in (
+            self.history.consumer(),
+            RequestWatched(self.database, self.events).consumer(),
+            LeavingWatched(self.database, self.events, self.cleanup).consumer(),  # issue 228
+        ):
             if self.consumers.get(consumer.name) is None:
                 self.consumers.register(consumer)
         widgets: tuple[tuple[Any, Any], ...] = (

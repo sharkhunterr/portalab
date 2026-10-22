@@ -70,6 +70,27 @@ RULES: dict[str, dict[str, Any]] = {
         "label": "Un titre demandé est regardé par un autre membre",
         "grants": [{"value": "xp", "amount": 5}, {"value": "coins", "amount": 2}],
     },
+    # issue 227: the radio listened to in the portal's player (a slice of 15 minutes counted by the server)
+    # and a song asked of its DJ
+    "radio_listening": {
+        "event_type": "media.radio_listened",
+        "label": "Un quart d'heure de radio",
+        "grants": [{"value": "xp", "amount": 5}, {"value": "coins", "amount": 1}],
+        "limits": {"caps": [{"period": "day", "max_amount": 40, "value": "xp"}]},
+    },
+    "radio_request": {
+        "event_type": "media.radio_requested",
+        "label": "Un titre demandé au DJ",
+        "grants": [{"value": "xp", "amount": 5}],
+        "limits": {"caps": [{"period": "day", "max_amount": 15, "value": "xp"}]},
+    },
+    # issue 228: the rescue bounty — a title about to be deleted, watched to the end (once per title)
+    "leaving_watched": {
+        "event_type": "media.leaving_watched",
+        "label": "Un titre bientôt supprimé sauvé",
+        "grants": [{"value": "xp", "amount": 30}, {"value": "coins", "amount": 15}],
+        "limits": {"caps": [{"period": "day", "max_amount": 150, "value": "xp"}]},
+    },
     "ticket_created": {
         "event_type": "ticket.created",
         "label": "Création d'un ticket support",

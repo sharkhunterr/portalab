@@ -32,13 +32,17 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import PortalError, Unavailable
+from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.ids import new_id
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.models import RadioCreditLedger
+from portalab.modules.media.observability import log
 from portalab.modules.media.permissions import MEDIA_PLAY
 from portalab.modules.media.settings import MediaConfig
 
 ASK_EVERY = 20
+# issue 227: the radio's listening counted in slices of this many minutes of stream relayed to a member
+LISTEN_MINUTES = 15
 
 
 class RadioUnavailable(Unavailable):
@@ -83,11 +87,13 @@ class RadioService:
         config: Callable[[], MediaConfig] = MediaConfig,
         *,
         clock: Clock | None = None,
+        events: EventPublisher | None = None,
     ) -> None:
         self.capabilities = capabilities
         self.database = database
         self.config = config
         self.clock = clock
+        self.events = events
         self._asked: dict[UUID, float] = {}
 
     # --- issue 184: free requests each day, then credits -----------------------------------------------
@@ -248,7 +254,37 @@ class RadioService:
             raise RadioUnavailable("The radio does not answer right now.") from exc
         if answer.status == "failed":
             await self._refund(user)  # refused by the station: it does not count
+        else:
+            await self._publish(user, "media.radio_requested", {"request": str(answer.id)}, str(answer.id))
         return {**request_out(answer), "allowance": await self.allowance(user)}
+
+    # --- issue 227: listening, counted by the server -------------------------------------------------------
+    async def listened(self, user: UUID, session: str, slice_: int) -> None:
+        """One more slice of ``LISTEN_MINUTES`` the stream was relayed to this member (the rules cap what it
+        earns in a day)."""
+        await self._publish(
+            user,
+            "media.radio_listened",
+            {"minutes": LISTEN_MINUTES, "session": session, "slice": slice_},
+            f"{session}:{slice_}",
+        )
+
+    async def _publish(self, user: UUID, name: str, payload: dict[str, Any], key: str) -> None:
+        if self.events is None or self.database is None:
+            return
+        try:
+            async with self.database.unit_of_work() as uow:
+                await self.events.publish(
+                    uow.session,
+                    name,
+                    payload,
+                    occurred_at=utc_now(self.clock),
+                    subject=SubjectRef("user", str(user)),
+                    source="media",
+                    dedup_key=f"{name}:{user}:{key}",
+                )
+        except Exception:  # the radio plays on whatever happens to its rewards
+            log.warning("radio event not published", exc_info=True)
 
     async def request_status(self, request_id: str) -> dict[str, Any]:
         try:
