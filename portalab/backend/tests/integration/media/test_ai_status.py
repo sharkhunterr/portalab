@@ -12,6 +12,7 @@ from portalab.capabilities.media.testkit import library_record
 from portalab.core.authz_port import Principal
 from portalab.core.time import FixedClock
 from portalab.modules.media.models import UserLink
+from portalab.modules.media.providers.ai_tools import RESCUE_HOW
 from tests.integration.media.conftest import MediaHarness, users
 from tests.integration.media.test_journey import HASH, _Client, _Queue, _Radarr
 from tests.integration.media.test_request_insights import _request
@@ -94,16 +95,18 @@ async def test_media_status_tells_the_journey(
                 "leaving": [{"collection": "Films demandés non vus"}],
                 "delete_at": "2026-11-01T00:00:00+00:00",
                 "saved": None,
+                "credits": 0,
             }
 
     media.module.ai_tools.cleanup = _Cleanup()
     leaving = (await status.handler(zoe, {"id": heat_id})).data["leaving_library"]
     assert leaving == {
-        "deletion_list": True,
-        "rules": ["Films demandés non vus"],
-        "delete_at": "2026-11-01T00:00:00+00:00",
-        "saved": False,
-        "can_be_rescued": True,
+        "on_deletion_list": True,
+        "cleanup_rules": ["Films demandés non vus"],
+        "leaves_on": "2026-11-01T00:00:00+00:00",
+        "already_saved_by_a_member": False,
+        "how_to_save_it": RESCUE_HOW,
+        "my_rescues_left": 0,
     }
     royal = (await status.handler(zoe, {"title": "L'Assassin royal", "kind": "book"})).data  # every kind
     assert royal["title"] == "Le prophete blanc_L_Assassin_royal_7" and royal["kind"] == "audiobook"

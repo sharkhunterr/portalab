@@ -37,7 +37,8 @@ REMINDER = (
     "(About yourself, greetings and thanks: no tool needed. Anything else: answer only from what your tools "
     "return now — nothing from your own knowledge; look it up even if the "
     "conversation spoke of it before; never "
-    "invent a service, a title, a ticket or a date. Never copy raw field names or timestamps. If this "
+    "invent a service, a title, a ticket or a date. Never copy raw field names, identifiers, timestamps "
+    "nor the names of your tools. If this "
     "question names another title or subject than the page, ignore the page. For a « how do I… » question, "
     "search the wiki and suggest the page; if nothing covers it, offer a support ticket.)"
 )
