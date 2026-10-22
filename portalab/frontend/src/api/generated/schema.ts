@@ -14774,6 +14774,8 @@ export interface components {
              * Format: date-time
              */
             occurred_at: string;
+            /** Other */
+            other?: string | null;
             /** Play */
             play?: string | null;
             /** Reason */

@@ -25,7 +25,7 @@ from portalab.modules.gamification.antiabuse.guards import Guards
 from portalab.modules.gamification.calculator.calculator import base_amounts
 from portalab.modules.gamification.events import OWN_TYPES
 from portalab.modules.gamification.ledger.writer import Entry, LedgerWriter, lock_user
-from portalab.modules.gamification.models import AppliedEvent, PlayKind, Withheld
+from portalab.modules.gamification.models import AppliedEvent, GainContext, PlayKind, Withheld
 from portalab.modules.gamification.modifiers.combiner import ModifierCombiner
 from portalab.modules.gamification.notify import Note, Notifier
 from portalab.modules.gamification.observability import metrics
@@ -45,6 +45,17 @@ def _seconds(raw: Any) -> int:
         return max(0, min(86_400, int(float(raw))))
     except (TypeError, ValueError):
         return 0
+
+
+# events whose gains keep what they were about (a title, another member) for the journals
+WITH_CONTEXT = frozenset({"media.request_watched"})
+
+
+def _uuid(value: object) -> UUID | None:
+    try:
+        return UUID(str(value)) if value else None
+    except ValueError:
+        return None
 
 
 @dataclass
@@ -141,6 +152,18 @@ class RewardPipeline:
                         object=str(envelope.payload.get("object") or "")[:64] or None,
                         finished=envelope.type == "media.playback_finished",
                         watched_s=_seconds(envelope.payload.get("watched_s")),
+                        occurred_at=envelope.occurred_at,
+                    )
+                    .on_conflict_do_nothing()
+                )
+            if envelope.type in WITH_CONTEXT:  # what it was about, for the journals
+                await session.execute(
+                    insert(GainContext)
+                    .values(
+                        event_id=envelope.event_id,
+                        user_id=user,
+                        object=str(envelope.payload.get("object") or "")[:64] or None,
+                        other_user=_uuid(envelope.payload.get("viewer")),
                         occurred_at=envelope.occurred_at,
                     )
                     .on_conflict_do_nothing()

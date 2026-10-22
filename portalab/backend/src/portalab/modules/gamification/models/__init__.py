@@ -238,6 +238,20 @@ class AppliedEvent(GamificationBase):
     applied_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, index=True)
 
 
+class GainContext(GamificationBase):
+    """What a gain was about, beyond its rule (the ledger is append-only and names only the triggering event):
+    the title, and the other member involved — e.g. a title someone asked for, watched by another member
+    (that member is shown to the administration only)."""
+
+    __tablename__ = "gain_contexts"
+
+    event_id: Mapped[UUID] = mapped_column(primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)  # FK identity.users (DB), CASCADE
+    object: Mapped[str | None] = mapped_column(String(64))  # the media object (its title, shown)
+    other_user: Mapped[UUID | None] = mapped_column()  # FK identity.users (DB), SET NULL
+    occurred_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
 class PlayKind(GamificationBase):
     """Issue 160: what a sitting the economy saw was (a play finished or interrupted) — an episode, a film, a
     book, an audiobook, live TV… — so its gains show by kind (the ledger itself is append-only and names only
