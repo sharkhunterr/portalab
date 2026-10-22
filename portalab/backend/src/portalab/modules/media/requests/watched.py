@@ -1,6 +1,7 @@
 """A title someone asked for, watched by another member: ``media.request_watched`` for the asker — once per
 request and viewer (a whole series watched counts once), never for their own plays, only for a request
-that brought the title in (``available``). The event says who asked (its subject), never who watched."""
+that brought the title in (``available``). Its subject is who asked; who watched is in it for the
+administration's journal only (members never see it)."""
 
 from uuid import UUID
 
@@ -56,6 +57,7 @@ class RequestWatched:
                         "request": str(request.id),
                         "object": str(request.object_id),
                         "kind": str(request.external_ref.get("kind", "")),
+                        "viewer": str(viewer),
                     },
                     occurred_at=envelope.occurred_at,
                     subject=SubjectRef("user", str(request.requester_user_id)),

@@ -63,17 +63,12 @@ RULES: dict[str, dict[str, Any]] = {
         "grants": [{"value": "xp", "amount": 15}],
         "limits": {"caps": [{"period": "day", "max_amount": 150, "value": "xp"}]},
     },
-    # a title someone asked for, watched by another member: a little for the one who asked
+    # a title someone asked for, watched by another member: a little for the one who asked, for each viewer
+    # (no cap: many viewers mean the request was worth it)
     "request_watched": {
         "event_type": "media.request_watched",
         "label": "Un titre demandé est regardé par un autre membre",
         "grants": [{"value": "xp", "amount": 5}, {"value": "coins", "amount": 2}],
-        "limits": {
-            "caps": [
-                {"period": "day", "max_amount": 25, "value": "xp"},
-                {"period": "day", "max_amount": 10, "value": "coins"},
-            ]
-        },
     },
     "ticket_created": {
         "event_type": "ticket.created",

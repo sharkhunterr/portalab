@@ -71,6 +71,7 @@ class RequestWatched(BaseModel):
     request: str
     object: str
     kind: str
+    viewer: str  # who watched — for the administration's journal; members are never shown it
 
 
 CATALOG_TYPES: dict[str, type[BaseModel]] = {

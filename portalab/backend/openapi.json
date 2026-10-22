@@ -12389,6 +12389,17 @@
             "title": "Occurred At",
             "type": "string"
           },
+          "other": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Other"
+          },
           "play": {
             "anyOf": [
               {

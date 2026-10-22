@@ -189,6 +189,11 @@ export function Operations({
                       {row.title ? <strong>{row.title}</strong> : null}
                       {row.title ? <span className="admin-muted">{what(row)}</span> : what(row)}
                       {row.reason ? <span className="admin-muted">{row.reason}</span> : null}
+                      {row.other ? (
+                        <span className="admin-muted">
+                          {t("gamification:admin.operations.by", { name: row.other })}
+                        </span>
+                      ) : null}
                     </td>
                     <td data-align="end" className="gam-ops__num">
                       {format.number(row.balance)}

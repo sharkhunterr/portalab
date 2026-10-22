@@ -21,7 +21,14 @@ from portalab.core.errors import Unavailable
 from portalab.core.time import utc_now
 from portalab.modules.gamification.api.me import Me, Module, _me
 from portalab.modules.gamification.events import OWN_TYPES
-from portalab.modules.gamification.models import Achievement, LedgerTransaction, PlayKind, Quest, RewardRule
+from portalab.modules.gamification.models import (
+    Achievement,
+    GainContext,
+    LedgerTransaction,
+    PlayKind,
+    Quest,
+    RewardRule,
+)
 from portalab.modules.gamification.permissions import MANAGE
 from portalab.modules.gamification.progression.plays import plays as plays_by_kind
 from portalab.modules.gamification.progression.sources import (
@@ -738,6 +745,8 @@ class OperationOut(BaseModel):
     level_up: bool  # for XP: a new level was reached
     play: str | None = None  # issue 160: for a play, what was played (episode, movie, book, audiobook…)
     title: str | None = None  # and its title, when the catalog still knows it
+    # the other member involved (e.g. who watched a title this member asked for) — the administration's only
+    other: str | None = None
     # the bonuses on top of the action's own amount (streak, campaign, pace, boost), as on the charts
     bonuses: list[BonusOut] = Field(default_factory=list)
 
@@ -807,7 +816,7 @@ async def operations(
     """#107: every operation of every member (or one member) over the period, the latest first (by the time
     it happened: a play rewarded late from a history sits on its day) — what was gained or spent, what made
     it, the balance after it in that order and, for XP, the level reached."""
-    return await _operations(module, principal, days, member, value, cursor, limit, play)
+    return await _operations(module, principal, days, member, value, cursor, limit, play, team=True)
 
 
 @router.get("/me/progression/operations", response_model=OperationsOut)
@@ -833,6 +842,8 @@ async def _operations(
     cursor: str | None,
     limit: int,
     play: str | None = None,
+    *,
+    team: bool = False,  # the administration's journal: the other member involved is named
 ) -> OperationsOut:
     since = since_days(utc_now(module.clock), days)
     curve = await module.levels.curve()
@@ -886,8 +897,21 @@ async def _operations(
                 )
             ).all()
         }
-    titles = await _titles(module, viewer, {o for _, o in plays.values() if o})
-    names = await _names(module, {t.user_id for t, _ in rows})
+        contexts: dict[UUID, tuple[str | None, UUID | None]] = {
+            event: (about, other)
+            for event, about, other in (
+                await session.execute(
+                    select(GainContext.event_id, GainContext.object, GainContext.other_user).where(
+                        GainContext.event_id.in_(triggers)
+                    )
+                )
+            ).all()
+        }
+    titles = await _titles(
+        module, viewer, {o for _, o in plays.values() if o} | {o for o, _ in contexts.values() if o}
+    )
+    others = {other for _, other in contexts.values() if other} if team else set()
+    names = await _names(module, {t.user_id for t, _ in rows} | others)
     items: list[OperationOut] = []
     for t, running_after in rows:
         after_it = int(running_after or 0)
@@ -918,7 +942,18 @@ async def _operations(
                 level=level,
                 level_up=level is not None and before is not None and level > before,
                 play=play_source(played[0]) if played else None,
-                title=titles.get(played[1] or "") if played else None,
+                title=(
+                    titles.get(played[1] or "")
+                    if played
+                    else titles.get(about[0] or "")
+                    if (about := contexts.get(t.trigger_event_id))
+                    else None
+                ),
+                other=(
+                    names.get(about[1])
+                    if team and (about := contexts.get(t.trigger_event_id)) and about[1]
+                    else None
+                ),
                 bonuses=[
                     BonusOut(source=source, amount=round(amount, 1))
                     for source, amount in shares.items()

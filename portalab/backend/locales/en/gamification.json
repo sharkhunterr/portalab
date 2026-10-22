@@ -131,6 +131,7 @@
   "admin.operations.amount": "Amount",
   "admin.operations.balance": "Balance after",
   "admin.operations.bonus": "incl. +{amount} · {source}",
+  "admin.operations.by": "watched by {name}",
   "admin.operations.hint": "Every operation of the last {days} days, the latest first: what was gained, spent or corrected, what made it, the balance right after and, for XP, the level reached.",
   "admin.operations.levelUp": "Level {level} reached",
   "admin.operations.next": "Next",
