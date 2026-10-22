@@ -6,7 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
@@ -137,3 +137,38 @@ async def complete_onboarding_step(
 ) -> list[OnboardingStep]:
     progress = await module.onboarding.complete(principal, step)
     return [OnboardingStep(step=item.step, completed_at=item.completed_at) for item in progress]
+
+
+class PasswordChange(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    current_password: str = Field(min_length=1, max_length=1024)
+    new_password: str = Field(min_length=1, max_length=1024)
+
+
+class PasswordChanged(BaseModel):
+    other_sessions_signed_out: int
+
+
+@router.post(
+    "/me/password",
+    response_model=PasswordChanged,
+    responses={
+        409: {"description": "identity.password_not_local (signs in through the single sign-on)"},
+        422: {"description": "identity.password_current_wrong, identity.password_unchanged, policy"},
+        429: {"description": "auth.throttled"},
+    },
+)
+async def change_password(
+    body: PasswordChange,
+    request: Request,
+    module: Module,
+    principal: Principal = require("users.self.manage"),
+) -> PasswordChanged:
+    """A member changes their own password; their other sessions are signed out, this one stays."""
+    signed_out = await module.passwords.change(
+        principal,
+        body.current_password,
+        body.new_password,
+        client_ip=request.client.host if request.client else None,
+    )
+    return PasswordChanged(other_sessions_signed_out=signed_out)

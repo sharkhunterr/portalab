@@ -26,7 +26,7 @@ from portalab.modules.identity.api.schemas import (
     SessionInfo,
     VerifyRequest,
 )
-from portalab.modules.identity.models import Profile, User
+from portalab.modules.identity.models import Credential, Profile, User
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.identity.services.common import UserNotFound, self_actor
 
@@ -171,6 +171,7 @@ async def me(module: Module, principal: Principal = require("users.self.manage")
             await session.scalar(select(Profile.avatar_blob_key).where(Profile.user_id == user.id))
         )
         progress = await module.onboarding.progress(session, user.id)
+        has_password = await session.get(Credential, user.id) is not None
     return Me(
         id=user.id,
         login=user.login_display,
@@ -181,5 +182,6 @@ async def me(module: Module, principal: Principal = require("users.self.manage")
         verified_at=user.verified_at,
         has_avatar=has_avatar,
         onboarding=[OnboardingStep(step=item.step, completed_at=item.completed_at) for item in progress],
+        has_password=has_password,
         deletion_due_at=user.deletion_due_at,
     )

@@ -25,6 +25,7 @@ from portalab.modules.identity.services.export import BUILD_JOB, EXPIRE_JOB, Exp
 from portalab.modules.identity.services.oidc import OidcService
 from portalab.modules.identity.services.onboarding import OnboardingService
 from portalab.modules.identity.services.participants import register_participants
+from portalab.modules.identity.services.password import PasswordChangeService
 from portalab.modules.identity.services.profile import AVATAR_GC_JOB, ProfileService, collect_avatar_blob
 from portalab.modules.identity.services.registration import RegistrationService, VerificationChannel
 from portalab.modules.identity.services.sessions import SessionService
@@ -47,6 +48,7 @@ class IdentityModule:
             ctx, LocalAuthProvider(self.hasher, ctx), self.sessions, self.throttle, self.accounts
         )
         self.oidc = OidcService(ctx, self.auth, self.accounts)  # 027: the single sign-on (Authentik)
+        self.passwords = PasswordChangeService(ctx, self.auth, self.hasher, self.sessions)
         self.registration = RegistrationService(ctx, self.accounts, self.hasher, self.onboarding, channel)
         self.bootstrap = IdentityBootstrap(ctx, self.accounts, self.hasher, self.onboarding)
         self.admin = AdminOperations(ctx, self.accounts, self.sessions)

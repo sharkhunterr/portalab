@@ -7220,6 +7220,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Change Password
+         * @description A member changes their own password; their other sessions are signed out, this one stays.
+         */
+        post: operations["change_password_api_v1_me_password_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/permissions": {
         parameters: {
             query?: never;
@@ -13626,6 +13646,11 @@ export interface components {
             /** Has Avatar */
             has_avatar: boolean;
             /**
+             * Has Password
+             * @default true
+             */
+            has_password: boolean;
+            /**
              * Id
              * Format: uuid
              */
@@ -14757,6 +14782,18 @@ export interface components {
         PagesOut: {
             /** Pages */
             pages: number[];
+        };
+        /** PasswordChange */
+        PasswordChange: {
+            /** Current Password */
+            current_password: string;
+            /** New Password */
+            new_password: string;
+        };
+        /** PasswordChanged */
+        PasswordChanged: {
+            /** Other Sessions Signed Out */
+            other_sessions_signed_out: number;
         };
         /** PasswordConfirmation */
         PasswordConfirmation: {
@@ -31425,6 +31462,51 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    change_password_api_v1_me_password_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasswordChanged"];
+                };
+            };
+            /** @description identity.password_not_local (signs in through the single sign-on) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description identity.password_current_wrong, identity.password_unchanged, policy */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description auth.throttled */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
