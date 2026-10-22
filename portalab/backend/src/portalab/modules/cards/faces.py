@@ -127,9 +127,14 @@ EVENT = re.compile(
 SKIPPED_ENGINES = {"wikicommons.images"}  # public photographs of people: events, almost never a film's
 
 
+# what a character's credit says besides their name
+NOT_A_NAME = {"voice", "voix", "uncredited", "self", "himself", "herself", "archive", "footage", "young"}
+
+
 def words(text: str | None) -> list[str]:
     """The words worth finding in a page's title (a character's or a film's name)."""
-    return [w for w in re.findall(r"[\w'\u2019]+", (text or "").lower()) if len(w) >= 4]
+    found = re.findall(r"[\w'\u2019]+", (text or "").lower())
+    return [w for w in found if len(w) >= 4 and w not in NOT_A_NAME]
 
 
 @dataclass(frozen=True, slots=True)
@@ -142,20 +147,26 @@ class Candidate:
     height: int
 
 
-def score(candidate: Candidate, character: str | None, film: str) -> float | None:
+def score(
+    candidate: Candidate, character: str | None, film: str, *, faces: bool = True, actor: str | None = None
+) -> float | None:
     """How good an image is for the card (``None``: not kept) — the actor's face first, then the page naming
-    the character or the film, then its size."""
-    if candidate.similarity < SAME_PERSON or candidate.engine in SKIPPED_ENGINES:
+    the character or the film, then its size. Without faces (an animated work, the check switched off): the
+    page must name the character — and the actor, for a work played by people (a character may share the
+    work's name)."""
+    if candidate.engine in SKIPPED_ENGINES or (faces and candidate.similarity < SAME_PERSON):
         return None
     if EVENT.search(candidate.title) or min(candidate.width, candidate.height) < 360:
         return None
     title = candidate.title.lower()
     named = any(w in title for w in words(character))
     in_film = any(w in title for w in words(film))
-    if not (named or in_film):
-        return None  # nothing says it is from this work
+    if not (named or in_film) or (not faces and not named):
+        return None  # nothing says it is from this work (or, unchecked, this character)
+    if not faces and actor and not any(w in title for w in words(actor)):
+        return None  # unchecked: the page must name the actor too
     return (
-        candidate.similarity
+        (candidate.similarity if faces else 0.5)
         + (0.25 if named else 0.0)
         + (0.15 if in_film else 0.0)
         + (0.1 if min(candidate.width, candidate.height) >= 700 else 0.0)

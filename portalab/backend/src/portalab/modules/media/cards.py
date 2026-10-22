@@ -108,6 +108,7 @@ class MediaCardSources:
                     available=bool(item.available),
                     tmdb=str(tmdb) if (tmdb := (data.get("ids") or {}).get("tmdb")) else None,
                     ids={str(k): str(v) for k, v in (data.get("ids") or {}).items() if v},
+                    genres=_strings(data.get("genres")),
                 )
             )
         return out

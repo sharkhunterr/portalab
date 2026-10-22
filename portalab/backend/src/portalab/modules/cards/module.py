@@ -1,10 +1,12 @@
 """Cards module facade (issue 229): the media trading cards — made in advance from the works present, given in
 packs when a work is watched to the end, collected per set and per person."""
 
+from dataclasses import replace
 from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
+from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.events import ConsumerRegistry, default_consumers
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
@@ -23,6 +25,7 @@ from portalab.modules.cards.participant import CardsParticipant
 from portalab.modules.cards.roles import RoleArt
 from portalab.modules.cards.search import RoleSearch
 from portalab.modules.cards.service import CardService
+from portalab.modules.cards.settings import SETTINGS, CardsConfig
 
 OWNER = "module:cards"
 SYNC_JOB = "cards.sync"
@@ -54,7 +57,15 @@ class CardsModule:
         self.fan_art = FanArt(database, capabilities, clock=clock)
         self.blobs = blobs
         self.matcher = FaceMatcher(root or Path("data/cards"))
-        self.search = RoleSearch(database, capabilities, self.matcher, blobs, clock=clock)
+        self.config = CardsConfig()
+        self.search = RoleSearch(
+            database,
+            capabilities,
+            self.matcher,
+            blobs,
+            clock=clock,
+            face_check=lambda: self.config.face_check,
+        )
 
     def register(self) -> None:
         participant = CardsParticipant(self.database)
@@ -63,6 +74,17 @@ class CardsModule:
                 self.capabilities.provide(capability, participant, instance_ref="cards", owner=OWNER)
         if self.consumers.get(CONSUMER) is None:
             self.consumers.register(self.packs.consumer())
+
+    async def refresh_config(self) -> None:
+        try:
+            providers = self.capabilities.system_providers(CONFIG)
+            if providers:
+                values = {
+                    name: (await providers[0].provider.get(key)).value for name, key in SETTINGS.items()
+                }
+                self.config = replace(self.config, **values)
+        except Exception:
+            log.warning("cards configuration not refreshed")
 
     def register_jobs(self, jobs: JobRegistry) -> list[Any]:
         async def sync() -> None:
@@ -80,6 +102,7 @@ class CardsModule:
             await self.search.run()
 
         return [
+            self.refresh_config,
             # the works that changed are made again (their fingerprint), every half hour
             register_periodic(jobs, self.database, SYNC_JOB, timedelta(minutes=30), sync, owner=OWNER),
             # the actors' characters, a few people every five minutes (the rarest cards first)

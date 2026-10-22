@@ -97,6 +97,7 @@ async def refresh(platform: Any) -> None:
         "community",
         "marketplace",
         "plugins",
+        "cards",
     ):
         module = getattr(platform, name, None)
         if module is not None:
@@ -158,5 +159,6 @@ def bind(platform: Any) -> None:
         "community.",
         "marketplace.",
         "plugins.",
+        "cards.",
     ):
         platform.administration.config.on_change(prefix, on_change)
