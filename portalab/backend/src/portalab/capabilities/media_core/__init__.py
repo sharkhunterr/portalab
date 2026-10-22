@@ -19,6 +19,7 @@ QUOTA = "media.request_quota"
 RECOMMENDATIONS = "media.recommendations"
 RESCUES = "media.rescues"  # #57: rescues bought in the shop, spent saving a title from deletion
 RADIO_CREDITS = "media.radio_credits"  # issue 184: requests to the radio's DJ bought in the shop
+CARD_SOURCES = "media.card_sources"  # issue 229: the works present, what the cards are made of
 
 
 _KIND = re.compile(r"[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)?")
@@ -244,6 +245,52 @@ def _spec(name: str, protocol: type[Any], multi: bool, description: str) -> Capa
     )
 
 
+@dataclass(frozen=True, slots=True)
+class CardPerson:
+    """Issue 229: someone credited on a work — ``order``: their place in the credits (0: the first)."""
+
+    ref: str  # ``tmdb:<id>`` when the provider knows them, else ``name:<name>``
+    name: str
+    category: str  # cast, director, creator, writer, composer
+    role: str | None  # a character or a job
+    order: int
+    image: str | None  # a metadata image's reference (``/media/metadata-images``)
+
+
+@dataclass(frozen=True, slots=True)
+class CardWork:
+    """Issue 229: a film or a series present in the catalog, with what its cards need."""
+
+    object_id: UUID
+    kind: str
+    title: str
+    year: int | None
+    countries: Sequence[str]
+    languages: Sequence[str]
+    vote_count: int
+    vote_average: float | None
+    tagline: str | None
+    poster: str | None
+    backdrop: str | None
+    backdrops: Sequence[str]
+    collection: Mapping[str, Any] | None
+    people: Sequence[CardPerson]
+    updated_at: datetime
+    available: bool
+
+
+@runtime_checkable
+class CardSources(Protocol):
+    """Issue 229: what the media catalog offers the cards — every work with metadata (or those changed since
+    ``since``), and the work a played object belongs to (an episode: its series)."""
+
+    async def works(self, *, since: datetime | None = None) -> Sequence[CardWork]: ...
+
+    async def present(self) -> Sequence[UUID]: ...
+
+    async def work_of(self, object_id: UUID) -> UUID | None: ...
+
+
 SPECS: tuple[CapabilitySpec, ...] = (
     _spec(CATALOG, MediaCatalog, False, "Media catalog lookups (024)"),
     _spec(HISTORY, MediaHistoryReader, False, "Privacy-bounded media history and progress (024)"),
@@ -251,6 +298,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(RECOMMENDATIONS, RecommendationProvider, True, "Media recommendations (024 baseline, 018 later)"),
     _spec(RESCUES, RescueCredits, False, "Rescues saving a title from the cleanup's deletion (#57)"),
     _spec(RADIO_CREDITS, RadioCredits, False, "Requests to the radio's DJ bought in the shop (issue 184)"),
+    _spec(CARD_SOURCES, CardSources, False, "The works present and their credits, for the cards (issue 229)"),
 )
 
 QuotaSummary = Mapping[str, int]

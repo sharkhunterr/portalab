@@ -28,6 +28,7 @@ from portalab.modules.authz.module import AuthzModule
 from portalab.modules.automations.module import AutomationsModule
 from portalab.modules.calendar.module import CalendarModule
 from portalab.modules.campaigns.module import CampaignsModule
+from portalab.modules.cards.module import CardsModule
 from portalab.modules.community.module import CommunityModule
 from portalab.modules.connectors.module import ConnectorsModule
 from portalab.modules.content.module import ContentModule
@@ -132,6 +133,7 @@ class Platform:
     plugins: PluginsModule
     seeds: list[Callable[[], Awaitable[None]]]
     visuals: VisualsModule | None = None  # 028: visual packs
+    cards: CardsModule | None = None  # issue 229: the media trading cards
 
     async def seed_periodic_jobs(self) -> None:
         for seed in self.seeds:
@@ -266,6 +268,8 @@ def wire_platform(
     visuals = VisualsModule(
         database, events, authz.audit, capabilities, root=data_dir / "visuals", authorizer=authz.engine
     )
+    cards = CardsModule(database, capabilities)  # issue 229
+    cards.register()
     plugins = PluginsModule(
         database,
         events,
@@ -319,6 +323,7 @@ def wire_platform(
         seeds.extend(community.register_jobs(jobs))
         seeds.extend(marketplace.register_jobs(jobs))
         seeds.extend(plugins.register_jobs(jobs))
+        seeds.extend(cards.register_jobs(jobs))
     platform = Platform(
         authz,
         privacy,
@@ -350,6 +355,7 @@ def wire_platform(
         plugins,
         seeds,
         visuals,
+        cards,
     )
     from portalab.app.config_bindings import bind
 

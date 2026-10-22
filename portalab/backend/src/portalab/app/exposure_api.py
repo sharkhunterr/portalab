@@ -13,6 +13,7 @@ from portalab.capabilities.exposure import ExposureRegistry, default_exposure
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.modules.calendar import exposure as calendar
+from portalab.modules.cards import exposure as cards
 from portalab.modules.community import exposure as community
 from portalab.modules.dashboard import exposure as dashboard
 from portalab.modules.gamification import exposure as gamification
@@ -25,7 +26,7 @@ from portalab.modules.statistics import exposure as statistics
 from portalab.modules.wiki import exposure as wiki
 
 TABLES = (
-    calendar, community, dashboard, gamification, marketplace, media,
+    calendar, cards, community, dashboard, gamification, marketplace, media,
     news, notifications, search, statistics, wiki,
 )  # fmt: skip
 

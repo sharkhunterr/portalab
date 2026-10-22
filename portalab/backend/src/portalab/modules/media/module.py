@@ -24,6 +24,7 @@ from portalab.capabilities.i18n import RESOLVER as I18N_RESOLVER
 from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.media import ACTIVITY_HISTORY, DIGEST, LIBRARY, METADATA, REQUESTS
 from portalab.capabilities.media_core import (
+    CARD_SOURCES,
     CATALOG,
     HISTORY,
     QUOTA,
@@ -66,6 +67,7 @@ from portalab.modules.media import settings as _settings  # noqa: F401 — decla
 from portalab.modules.media.attention import RequestsAttention
 from portalab.modules.media.availability.service import AvailabilityService
 from portalab.modules.media.books.service import BookService
+from portalab.modules.media.cards import MediaCardSources
 from portalab.modules.media.catalog import CatalogPort, CatalogQuery
 from portalab.modules.media.cleanup import CleanupService
 from portalab.modules.media.discovery.shelves import BaselineRecommender, Discovery
@@ -411,6 +413,7 @@ class MediaModule:
             (QUOTA, self.quota),
             (RESCUES, self.cleanup),
             (RADIO_CREDITS, self.radio),
+            (CARD_SOURCES, MediaCardSources(self.database)),  # issue 229
             (RECOMMENDATIONS, self.recommender),
             (ACTIVITY, MediaActivityAttributes(self.database)),
         )

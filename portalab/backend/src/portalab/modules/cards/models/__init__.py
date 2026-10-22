@@ -1,0 +1,118 @@
+"""Schema ``cards`` (issue 229): a set per work present (a film, a series), its cards — the work itself, who
+made it, who plays in it — numbered like a trading card game's, with a rarity; the copies members own, in
+their version (normal, foil, borderless, borderless foil); and the packs they were given, opened or not."""
+
+from datetime import datetime
+from typing import Any
+from uuid import UUID
+
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    UniqueConstraint,
+)
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+from portalab.core.db import TZDateTime, schema_metadata
+from portalab.core.ids import new_id
+from portalab.core.privacy_registry import not_personal
+
+RARITIES = ("common", "rare", "epic", "legendary")
+VARIANTS = ("normal", "foil", "borderless", "borderless_foil")
+
+
+class CardsBase(DeclarativeBase):
+    metadata = schema_metadata("cards")
+
+
+class CardSet(CardsBase):
+    """A work present in the catalog, as a set of cards: its code (three letters, like a set's symbol)."""
+
+    __tablename__ = "sets"
+
+    key: Mapped[str] = mapped_column(String(48), primary_key=True)  # the work's object id
+    object_id: Mapped[UUID] = mapped_column(nullable=False, unique=True)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    name: Mapped[str] = mapped_column(String(200), nullable=False, info=not_personal("a work's title"))
+    code: Mapped[str] = mapped_column(String(8), nullable=False)
+    year: Mapped[int | None] = mapped_column(Integer)
+    country: Mapped[str | None] = mapped_column(String(8))
+    poster: Mapped[str | None] = mapped_column(String(120), info=not_personal("an artwork reference"))
+    saga: Mapped[str | None] = mapped_column(String(200), info=not_personal("a saga's name"))
+    size: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    present: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
+    generated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class Card(CardsBase):
+    """One card of a set: ``ident`` keeps it the same card when its set is generated again (its number
+    too); ``retired`` when the work no longer credits it (owned copies stay)."""
+
+    __tablename__ = "cards"
+    __table_args__ = (
+        UniqueConstraint("set_key", "ident", name="uq_cards_set_ident"),
+        UniqueConstraint("set_key", "number", name="uq_cards_set_number"),
+        CheckConstraint(f"rarity IN {RARITIES}", name="rarity"),
+        Index("ix_cards_person", "person_ref"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    set_key: Mapped[str] = mapped_column(ForeignKey("cards.sets.key", ondelete="CASCADE"), nullable=False)
+    number: Mapped[int] = mapped_column(Integer, nullable=False)
+    ident: Mapped[str] = mapped_column(String(200), nullable=False, info=not_personal("a card's identity"))
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)  # title, cast, director, creator…
+    person_ref: Mapped[str | None] = mapped_column(String(160), info=not_personal("a credited person"))
+    name: Mapped[str] = mapped_column(String(200), nullable=False, info=not_personal("a card's name"))
+    role: Mapped[str | None] = mapped_column(String(200), info=not_personal("a character or a job"))
+    flavor: Mapped[str | None] = mapped_column(String(300), info=not_personal("a tagline"))
+    art: Mapped[str | None] = mapped_column(String(120), info=not_personal("an artwork reference"))
+    alt_art: Mapped[str | None] = mapped_column(String(120), info=not_personal("an artwork reference"))
+    billing: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    score: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    rarity: Mapped[str] = mapped_column(String(12), nullable=False, default="common")
+    retired: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class Copy(CardsBase):
+    """A copy a member owns, in its version (one row each: a trade will move it)."""
+
+    __tablename__ = "copies"
+    __table_args__ = (
+        CheckConstraint(f"variant IN {VARIANTS}", name="variant"),
+        Index("ix_copies_user_card", "user_id", "card_id"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)  # FK identity.users (DB), CASCADE: erased with them
+    card_id: Mapped[UUID] = mapped_column(ForeignKey("cards.cards.id", ondelete="CASCADE"), nullable=False)
+    variant: Mapped[str] = mapped_column(String(16), nullable=False)
+    pack_id: Mapped[UUID | None] = mapped_column(ForeignKey("cards.packs.id", ondelete="SET NULL"))
+    acquired_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class Pack(CardsBase):
+    """A pack given to a member (a work watched to the end…): its cards are drawn when given, revealed when
+    opened."""
+
+    __tablename__ = "packs"
+    __table_args__ = (
+        Index("ix_packs_user_opened", "user_id", "opened_at"),
+        UniqueConstraint("idempotency_key", name="uq_packs_idempotency"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)  # FK identity.users (DB), CASCADE: erased with them
+    source: Mapped[str] = mapped_column(String(32), nullable=False)  # watched, wheel, admin…
+    set_key: Mapped[str | None] = mapped_column(String(48))  # the work it came from
+    idempotency_key: Mapped[str] = mapped_column(String(200), nullable=False)
+    given_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    opened_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    detail: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
