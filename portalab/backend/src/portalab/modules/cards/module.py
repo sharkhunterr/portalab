@@ -21,6 +21,7 @@ from portalab.core.time import Clock
 from portalab.modules.cards import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.cards.artwork import FanArt
 from portalab.modules.cards.characters import CharacterSheets
+from portalab.modules.cards.cutouts import ArtCutouts, Cutter
 from portalab.modules.cards.faces import FaceMatcher
 from portalab.modules.cards.focus import ArtFocus
 from portalab.modules.cards.frames import FilmFrames
@@ -40,6 +41,7 @@ FAN_ART_JOB = "cards.fan_art"
 SEARCH_JOB = "cards.role_search"
 FRAMES_JOB = "cards.film_frames"
 FOCUS_JOB = "cards.focus"
+CUTOUTS_JOB = "cards.cutouts"
 CHARACTERS_JOB = "cards.characters"
 log = get_logger("portalab.cards")
 
@@ -78,6 +80,13 @@ class CardsModule:
             characters_first=self.characters.available,
         )
         self.focus = ArtFocus(database, capabilities, self.matcher, blobs)
+        self.cutouts = ArtCutouts(
+            database,
+            capabilities,
+            Cutter(root or Path("data/cards")),
+            blobs,
+            enabled=lambda: self.config.cutouts,
+        )
         self.search = RoleSearch(
             database,
             capabilities,
@@ -157,6 +166,9 @@ class CardsModule:
         async def focus() -> None:
             await self.focus.run()
 
+        async def cutouts() -> None:
+            await self.cutouts.run()
+
         return [
             self.refresh_config,
             # the works that changed are made again (their fingerprint), every half hour
@@ -190,5 +202,15 @@ class CardsModule:
                 focus,
                 owner=OWNER,
                 timeout_seconds=600,
+            ),
+            # the characters cut out of their images (the cards owned first), every two minutes
+            register_periodic(
+                jobs,
+                self.database,
+                CUTOUTS_JOB,
+                timedelta(minutes=2),
+                cutouts,
+                owner=OWNER,
+                timeout_seconds=900,
             ),
         ]

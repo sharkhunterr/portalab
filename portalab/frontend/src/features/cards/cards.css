@@ -217,6 +217,35 @@
     0 0 0 1.4cqi var(--mcard-accent),
     0 2cqi 4cqi var(--card-shadow);
 }
+/* its character cut out: over the genre's light, rays behind its head — or over the work's image, dimmed */
+.mcard:not([data-borderless]) .mcard__art[data-cutout] {
+  background:
+    repeating-conic-gradient(
+      from 0deg at 50% 32%,
+      color-mix(in srgb, var(--card-text) 14%, transparent) 0 5deg,
+      transparent 5deg 13deg
+    ),
+    radial-gradient(
+      circle at 50% 32%,
+      color-mix(in srgb, var(--mcard-accent) 35%, var(--card-text)) 0,
+      var(--mcard-accent) 48%,
+      color-mix(in srgb, var(--mcard-accent) 55%, var(--card-ink)) 100%
+    );
+}
+.mcard__art .mcard__scene {
+  filter: blur(0.8cqi) brightness(0.62) saturate(1.15);
+  transform: scale(1.06);
+}
+.mcard__art[data-cutout] .mcard__picture {
+  filter: drop-shadow(0 0.8cqi 1.4cqi var(--card-shadow));
+}
+.mcard[data-borderless] .mcard__art .mcard__scene {
+  z-index: -2;
+  border-radius: 3cqi;
+}
+.mcard[data-borderless] .mcard__art[data-cutout] .mcard__picture {
+  object-position: center 18%;
+}
 /* the character's image: framed on its upper middle (a face) */
 .mcard__art[data-art="role"] img {
   object-position: center 30%;

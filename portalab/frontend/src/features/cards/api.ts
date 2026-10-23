@@ -43,6 +43,8 @@ export interface MediaCard {
   set_edition?: Edition | null;
   /** where the face is in each image (its reference: [x, y] as fractions, null: none) */
   focus?: Record<string, [number, number] | null>;
+  /** its character cut out of each image (its reference: the cut-out's, null: none) */
+  cutout?: Record<string, string | null>;
   set_facts?: WorkFacts;
   set_animated?: boolean;
   /** an actor's place in the credits (0: the lead) */

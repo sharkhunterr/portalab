@@ -84,7 +84,7 @@ function measure(event: SyntheticEvent<HTMLImageElement>) {
   if (!art) return;
   art.dataset.shape = upright ? "upright" : "wide";
   frameFace(image);
-  if (!upright) return;
+  if (!upright || art.dataset.cutout !== undefined) return; // a cut-out's sides are its scene's
   try {
     const canvas = document.createElement("canvas");
     canvas.width = 4;
@@ -141,20 +141,39 @@ export function MediaCardView({
   // poster and their portrait in a round badge — clearly not the character. The borderless alternative:
   // another image of the character, else their portrait
   const stand_in = !borderless && card.kind === "cast" && !card.role_art && Boolean(card.set_poster);
-  const art = borderless
-    ? card.kind === "title"
-      ? (artworkImage(card.fan_art) ?? cardImage(card.alt_art ?? card.art, "w780"))
-      : card.role_alt || card.role_art
-        ? cardImage(card.role_alt ?? card.role_art, "w780")
-        : cardImage(card.art, "h632") // never an image of the work: it shows someone else
-    : card.role_art
-      ? cardImage(card.role_art, "w780")
+  // its character cut out of its image (its background removed by the server): shown over a scene of the
+  // card's own — the genre's light, the work's poster behind an actor without a character's image, the
+  // work's backdrop on the borderless version
+  const subject = card.kind === "title" ? null : (card.role_art ?? card.art);
+  const cut = subject ? (card.cutout?.[subject] ?? null) : null;
+  const scene = cut
+    ? borderless
+      ? cardImage(card.set_backdrop ?? card.set_poster ?? null, "w780")
       : stand_in
         ? cardImage(card.set_poster ?? null, "w500")
-        : cardImage(card.art, card.kind === "title" ? "w500" : "h632");
-  const portrait = stand_in ? cardImage(card.art, "w185") : null;
-  // where the face is in the image shown (its character's, or the person's portrait)
-  const shown = borderless ? null : (card.role_art ?? (stand_in || card.kind === "title" ? null : card.art));
+        : null
+    : null;
+  const drawn = cut
+    ? cardImage(cut)
+    : borderless
+      ? card.kind === "title"
+        ? (artworkImage(card.fan_art) ?? cardImage(card.alt_art ?? card.art, "w780"))
+        : card.role_alt || card.role_art
+          ? cardImage(card.role_alt ?? card.role_art, "w780")
+          : cardImage(card.art, "h632") // never an image of the work: it shows someone else
+      : card.role_art
+        ? cardImage(card.role_art, "w780")
+        : stand_in
+          ? cardImage(card.set_poster ?? null, "w500")
+          : cardImage(card.art, card.kind === "title" ? "w500" : "h632");
+  const art = drawn;
+  const portrait = stand_in && !cut ? cardImage(card.art, "w185") : null;
+  // where the face is in the image shown (its character's, or the person's portrait — or its cut-out)
+  const shown = borderless
+    ? null
+    : cut
+      ? subject
+      : (card.role_art ?? (stand_in || card.kind === "title" ? null : card.art));
   const face = shown ? (card.focus?.[shown] ?? null) : null;
   const facts = card.set_facts ?? {};
   const series = card.set_kind === "series";
@@ -221,8 +240,12 @@ export function MediaCardView({
           </header>
           <div
             className="mcard__art"
-            data-art={!borderless && card.role_art ? "role" : stand_in ? "poster" : undefined}
+            data-art={!borderless && card.role_art ? "role" : stand_in && !cut ? "poster" : undefined}
+            data-cutout={cut ? "" : undefined}
           >
+            {scene ? (
+              <img className="mcard__scene" src={scene} alt="" loading="lazy" draggable={false} />
+            ) : null}
             {art ? (
               <img
                 className="mcard__picture"

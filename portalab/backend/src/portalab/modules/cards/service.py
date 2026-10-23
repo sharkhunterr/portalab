@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import Text, cast, func, or_, select
 
 from portalab.core.db import Database
 from portalab.modules.cards.editions import edition_of
@@ -42,6 +42,7 @@ def card_out(card: Card, card_set: CardSet, owned: dict[str, int] | None = None)
         "role_alt": card.role_alt,
         "fan_art": card.fan_art,
         "focus": card.focus or {},
+        "cutout": card.cutout or {},
         "rarity": card.rarity,
         "billing": card.billing,
         "retired": card.retired,
@@ -80,7 +81,8 @@ class CardService:
     async def shows(self, art: str) -> bool:
         """Whether a card shows this image (the only ones the cards serve)."""
         async with self.database.session() as session:
-            return bool(await session.scalar(select(Card.id).where(Card.role_art == art).limit(1)))
+            shown = or_(Card.role_art == art, cast(Card.cutout, Text).contains(f'"{art}"'))
+            return bool(await session.scalar(select(Card.id).where(shown).limit(1)))
 
     async def summary(self, user: UUID) -> dict[str, Any]:
         async with self.database.session() as session:
