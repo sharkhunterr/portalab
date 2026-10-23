@@ -42,8 +42,10 @@ export function MediaCardView({
   const t = useT();
   const borderless = variant === "borderless" || variant === "borderless_foil";
   const foil = variant === "foil" || variant === "borderless_foil";
-  // an actor's card shows their character in this work (once found), else their portrait; the borderless
-  // alternative another image of the character, else one of the work
+  // an actor's card shows their character in this work (once found); without one (issue 231), the work's
+  // poster and their portrait in a round badge — clearly not the character. The borderless alternative:
+  // another image of the character, else their portrait
+  const stand_in = !borderless && card.kind === "cast" && !card.role_art && Boolean(card.set_poster);
   const art = borderless
     ? card.kind === "title"
       ? (artworkImage(card.fan_art) ?? cardImage(card.alt_art ?? card.art, "w780"))
@@ -52,7 +54,10 @@ export function MediaCardView({
         : cardImage(card.art, "h632") // never an image of the work: it shows someone else
     : card.role_art
       ? cardImage(card.role_art, "w780")
-      : cardImage(card.art, card.kind === "title" ? "w500" : "h632");
+      : stand_in
+        ? cardImage(card.set_poster ?? null, "w500")
+        : cardImage(card.art, card.kind === "title" ? "w500" : "h632");
+  const portrait = stand_in ? cardImage(card.art, "w185") : null;
   const type =
     card.kind === "title"
       ? t(`gamification:cards.type.${card.set_kind === "series" ? "series" : "movie"}`, {
@@ -78,12 +83,18 @@ export function MediaCardView({
       aria-label={`${card.name} — ${type}`}
     >
       <div className="mcard__card">
-        <div className="mcard__art" data-art={!borderless && card.role_art ? "role" : undefined}>
+        <div
+          className="mcard__art"
+          data-art={!borderless && card.role_art ? "role" : stand_in ? "poster" : undefined}
+        >
           {art ? (
             <img className="mcard__picture" src={art} alt="" loading="lazy" draggable={false} />
           ) : (
             <Icon name={KIND_ICON[card.kind]} size={size === "sm" ? 24 : 40} />
           )}
+          {portrait ? (
+            <img className="mcard__badge" src={portrait} alt="" loading="lazy" draggable={false} />
+          ) : null}
         </div>
         <header className="mcard__name">
           <span>{card.name}</span>

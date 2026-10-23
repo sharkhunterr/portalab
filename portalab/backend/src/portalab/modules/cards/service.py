@@ -23,6 +23,7 @@ def card_out(card: Card, card_set: CardSet, owned: dict[str, int] | None = None)
         "set_size": card_set.size,
         "set_kind": card_set.kind,
         "set_backdrop": card_set.backdrop,
+        "set_poster": card_set.poster,
         "year": card_set.year,
         "number": card.number,
         "kind": card.kind,

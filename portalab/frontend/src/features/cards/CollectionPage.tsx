@@ -6,6 +6,7 @@ import { PageHeader } from "../../design-system/components/PageHeader";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { cardImage, useCardSets, useMyCards, usePacks } from "./api";
+import { CardCredit } from "./CardCredit";
 import { CardSearch, CardSearchResults } from "./CardSearch";
 import { PackOpening } from "./PackOpening";
 import { PoolView } from "./PoolView";
@@ -151,6 +152,7 @@ export default function CollectionPage() {
           )}
         </>
       )}
+      <CardCredit />
     </div>
   );
 }

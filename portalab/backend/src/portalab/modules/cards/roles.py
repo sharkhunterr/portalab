@@ -97,7 +97,9 @@ class RoleArt:
                 )
             ).all()
             for card, tmdb in rows:
-                card.role_art, card.role_alt = best(by_work.get(tmdb or "", []))
+                art, card.role_alt = best(by_work.get(tmdb or "", []))
+                if not (card.role_art or "").startswith("blob:"):  # 231: a role's own image is kept
+                    card.role_art = art
                 card.role_checked_at = now
-                given += 1 if card.role_art else 0
+                given += 1 if art else 0
         return given

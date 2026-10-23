@@ -115,6 +115,27 @@
   object-fit: cover;
   object-position: center 22%;
 }
+/* issue 231: no image of the character — the work's poster, dimmed, and the actor's portrait in a round
+   badge ringed with the card's frame colour */
+.mcard__art[data-art="poster"] .mcard__picture {
+  object-position: center 25%;
+  filter: saturate(0.85) brightness(0.8);
+}
+.mcard__art .mcard__badge {
+  position: absolute;
+  inset: auto;
+  inset-block-start: 3cqi;
+  inset-inline-end: 3cqi;
+  inline-size: 26cqi;
+  block-size: 26cqi;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 20%;
+  box-shadow:
+    0 0 0 1cqi var(--mcard-frame),
+    0 0 0 1.4cqi color-mix(in srgb, var(--card-ink) 70%, transparent),
+    0 2cqi 4cqi color-mix(in srgb, var(--card-ink) 60%, transparent);
+}
 /* the character's image (a still, or a poster whose title is at its top): framed on its middle */
 .mcard__art[data-art="role"] img {
   object-position: center 40%;
@@ -605,4 +626,11 @@
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
+}
+
+/* issue 231: TheTVDB named and linked where its images are shown */
+.cards-credit {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
 }

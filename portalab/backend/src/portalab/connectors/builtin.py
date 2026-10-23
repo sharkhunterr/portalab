@@ -15,6 +15,7 @@ from portalab.connectors.searxng import SearxngConnector
 from portalab.connectors.seerr import SeerrConnector
 from portalab.connectors.subwave import SubwaveConnector
 from portalab.connectors.tautulli import TautulliConnector
+from portalab.connectors.thetvdb import TvdbConnector
 from portalab.connectors.tmdb import TmdbConnector
 from portalab.connectors.torrents import DelugeConnector, QBittorrentConnector
 from portalab.connectors.unraid import UnraidConnector
@@ -35,6 +36,7 @@ def builtin_connectors() -> list[Connector]:
         TmdbConnector(),
         FanartConnector(),  # issue 229: films' and series' artwork (the cards' borderless alternatives)
         SearxngConnector(),  # issue 229: images on the web (an actor's character, for the cards)
+        TvdbConnector(),  # issue 231: each role's own image (the cards' characters, drawn ones too)
         QBittorrentConnector(),
         DelugeConnector(),
         AuthentikConnector(),  # 027: the single sign-on — accounts and the groups opening each service

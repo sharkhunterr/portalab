@@ -59,6 +59,7 @@ CLEANUP = "media.cleanup"  # #57: titles a cleanup tool will delete, and keeping
 IMAGE_SEARCH = "media.image_search"  # issue 229: images found on the web (a self-hosted SearXNG)
 ARTWORK = "media.artwork"  # issue 229: a work's artwork from an art site (fanart.tv): backgrounds, clearart…
 VIDEO_FRAMES = "media.video_frames"  # issue 230: still images taken from a title's own video file
+CHARACTERS = "media.characters"  # issue 231: each role's own image, made by a community database (TheTVDB)
 REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the request service (Seerr)
 REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
 PEOPLE = "media.people"  # #92: what a service knows of a person — biography, portrait, filmography
@@ -693,6 +694,28 @@ class ArtworkProvider(Protocol):
 
 
 @dataclass(frozen=True, slots=True)
+class CharacterImage:
+    """Issue 231: a role's own image in a work — who plays it (as the database names them), the character,
+    the image (a reference its provider serves) and the role's place in the credits."""
+
+    person: str
+    character: str | None
+    image: str
+    sort: int
+
+
+@runtime_checkable
+class CharacterArt(Protocol):
+    """Issue 231: the images of a work's roles (the characters themselves, drawn ones too), found by the ids
+    the portal knows (``tmdb``, ``imdb``, ``tvdb``); only roles with an image of their own, never the
+    actor's portrait. ``fetch_character`` returns one image's bytes."""
+
+    async def characters(self, kind: str, ids: Mapping[str, str]) -> Sequence[CharacterImage]: ...
+
+    async def fetch_character(self, ref: str) -> bytes: ...
+
+
+@dataclass(frozen=True, slots=True)
 class ImageHit:
     """Issue 229: an image a search found — where it is, what its page calls it, its size, who found it."""
 
@@ -1181,6 +1204,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(IMAGE_SEARCH, ImageSearch, "Images found on the web for a query, fetched safely (issue 229)"),
     _spec(ARTWORK, ArtworkProvider, "A work's artwork from an art site: backgrounds, clearart (229)"),
     _spec(VIDEO_FRAMES, VideoFrames, "Still images taken from a title's own video file (issue 230)"),
+    _spec(CHARACTERS, CharacterArt, "Each role's own image in a work, from a community database (231)"),
     _spec(REQUEST_QUOTAS, RequestQuotas, "Each account's request limits on the request service (#3)"),
     _spec(REQUEST_DISCOVERY, RequestDiscovery, "Titles one can ask for: search, shelves, details (#4)"),
     _spec(PEOPLE, PeopleProvider, "What a service knows of a person: biography, portrait, titles (#92)"),

@@ -121,6 +121,7 @@ async def sync_cards(principal: Manager, module: Module) -> dict[str, Any]:
         **asdict(await module.forge.sync()),
         "characters": await module.roles.run(),
         "fan_art": await module.fan_art.run(),
+        "role_images": await module.characters.run(),
         "taken": await module.frames.run(),
         "searched": await module.search.run(),
     }
@@ -130,10 +131,11 @@ async def sync_cards(principal: Manager, module: Module) -> dict[str, Any]:
 async def look_for_characters(
     principal: Manager, module: Module, key: Annotated[str, Path(pattern=r"^[0-9a-f-]{36}$")]
 ) -> dict[str, Any]:
-    """Look for this set's actors' characters now (again for those found before): on the web, then in the
-    film itself — whose images, the actor's own face seen there, win over the web's."""
+    """Look for this set's actors' characters now (again for those found before): on the web (when it is
+    switched on), in the film itself, then in the community database — each winning over the one before."""
     found = await module.search.run(20, set_key=key)
-    return {"found": found, "taken": await module.frames.run(set_key=key)}
+    taken = await module.frames.run(set_key=key)
+    return {"found": found, "taken": taken, "characters": await module.characters.run(set_key=key)}
 
 
 @router.get("/cards/images/{namespace}/{digest}")

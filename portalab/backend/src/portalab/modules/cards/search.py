@@ -56,7 +56,9 @@ class RoleSearch:
         clock: Clock | None = None,
         face_check: Callable[[], bool] = lambda: True,
         frames_first: Callable[[], bool] = lambda: False,
+        enabled: Callable[[], bool] = lambda: True,
     ) -> None:
+        self.enabled = enabled
         self.face_check = face_check
         self.frames_first = frames_first
         self.database = database
@@ -76,7 +78,7 @@ class RoleSearch:
         """Look for the next cards' characters on the web: how many got one. ``set_key``: that set's cards
         now (an administrator's request) — looked for again, those found on the web too."""
         found = self._providers()
-        if found is None:
+        if found is None or not self.enabled():  # 231: the web is an option the administrator turns on
             return 0  # nothing to search with: nothing marked, looked for once there is
         check = self.face_check()
         search, sources = found
