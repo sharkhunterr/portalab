@@ -9,13 +9,19 @@ from typing import Any
 from sqlalchemy import update
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
-from portalab.capabilities.events import ConsumerRegistry, default_consumers
+from portalab.capabilities.events import (
+    ConsumerRegistry,
+    EventTypeRegistry,
+    default_consumers,
+    default_event_types,
+)
 from portalab.capabilities.marketplace import ProductType, ProductTypeRegistry, default_product_types
 from portalab.capabilities.media_core import CONTENT_BOOSTERS
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.blobstore import BlobStore
 from portalab.core.db import Database
+from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.logging import get_logger
@@ -24,6 +30,7 @@ from portalab.modules.cards import permissions as _permissions  # noqa: F401 —
 from portalab.modules.cards.artwork import FanArt
 from portalab.modules.cards.characters import CharacterSheets
 from portalab.modules.cards.cutouts import ArtCutouts, Cutter
+from portalab.modules.cards.events import register_event_types
 from portalab.modules.cards.faces import FaceMatcher
 from portalab.modules.cards.focus import ArtFocus
 from portalab.modules.cards.frames import FilmFrames
@@ -63,6 +70,8 @@ class CardsModule:
         clock: Clock | None = None,
         consumers: ConsumerRegistry = default_consumers,
         product_types: ProductTypeRegistry = default_product_types,
+        events: EventPublisher | None = None,
+        event_types: EventTypeRegistry = default_event_types,
         blobs: BlobStore | None = None,
         root: Path | None = None,
     ) -> None:
@@ -72,7 +81,8 @@ class CardsModule:
         self.consumers = consumers
         self.product_types = product_types
         self.forge = CardForge(database, capabilities, clock=clock)
-        self.packs = Packs(database, capabilities, clock=clock)
+        self.packs = Packs(database, capabilities, clock=clock, events=events)
+        self.event_types = event_types
         self.service = CardService(database)
         self.roles = RoleArt(database, capabilities, clock=clock)
         self.fan_art = FanArt(database, capabilities, clock=clock)
@@ -109,6 +119,7 @@ class CardsModule:
         )
 
     def register(self) -> None:
+        register_event_types(self.event_types)  # issue 234: what the achievements count
         participant = CardsParticipant(self.database)
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
             if not any(p.instance_ref == "cards" for p in self.capabilities.system_providers(capability)):

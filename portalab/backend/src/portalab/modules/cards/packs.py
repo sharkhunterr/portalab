@@ -16,15 +16,17 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.marketplace import ActivationResult, OwnershipView
 from portalab.capabilities.media_core import CARD_SOURCES
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
+from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.cards.editions import EDITIONS, edition_of
+from portalab.modules.cards.events import PACK_OPENED, SET_COMPLETED
 from portalab.modules.cards.family import FAMILIES
 from portalab.modules.cards.models import Card, CardSet, Copy, Pack
 
@@ -103,10 +105,12 @@ class Packs:
         *,
         clock: Clock | None = None,
         rng: random.Random | None = None,
+        events: EventPublisher | None = None,
     ) -> None:
         self.database = database
         self.capabilities = capabilities
         self.clock = clock
+        self.events = events
         self.rng = rng or secrets.SystemRandom()
 
     # --- drawing ------------------------------------------------------------------------------------------
@@ -275,7 +279,70 @@ class Packs:
                 return None
             if pack.opened_at is None:
                 pack.opened_at = now
+                await uow.session.flush()
+                await self._opened(uow.session, user, pack, now)
             return pack.opened_at
+
+    async def _opened(self, session: Any, user: UUID, pack: Pack, now: datetime) -> None:
+        """Issue 234: what the achievements count — the booster opened, and each collection it completed."""
+        if self.events is None:
+            return
+        drawn = (
+            await session.execute(
+                select(Card.set_key, Card.rarity, Copy.variant)
+                .join(Copy, Copy.card_id == Card.id)
+                .where(Copy.pack_id == pack.id)
+            )
+        ).all()
+        subject = SubjectRef("user", str(user))
+        rank = list(RARITY_WEIGHTS)
+        await self.events.publish(
+            session,
+            PACK_OPENED,
+            {
+                "pack": str(pack.id),
+                "source": pack.source,
+                "cards": len(drawn),
+                "best": max((r for _, r, _ in drawn), key=rank.index, default="common"),
+                "legendary": sum(1 for _, r, _ in drawn if r == "legendary"),
+                "foil": sum(1 for _, _, v in drawn if v == "foil" or v.endswith("_foil")),
+            },
+            occurred_at=now,
+            subject=subject,
+            source="cards",
+            dedup_key=f"{PACK_OPENED}:{pack.id}",
+        )
+        for set_key in sorted({s for s, _, _ in drawn}):
+            missing = await session.scalar(
+                select(func.count())
+                .select_from(Card)
+                .where(
+                    Card.set_key == set_key,
+                    Card.retired.is_(False),
+                    ~Card.id.in_(
+                        select(Copy.card_id)
+                        .outerjoin(Pack, Pack.id == Copy.pack_id)
+                        .where(Copy.user_id == user, or_(Pack.id.is_(None), Pack.opened_at.is_not(None)))
+                    ),
+                )
+            )
+            card_set = await session.get(CardSet, set_key)
+            if missing or card_set is None:
+                continue
+            await self.events.publish(
+                session,
+                SET_COMPLETED,
+                {
+                    "set": set_key,
+                    "object": str(card_set.object_id),
+                    "kind": card_set.kind,
+                    "size": card_set.size,
+                },
+                occurred_at=now,
+                subject=subject,
+                source="cards",
+                dedup_key=f"{SET_COMPLETED}:{set_key}:{user}",
+            )
 
     async def unopened(self, user: UUID) -> Sequence[Pack]:
         async with self.database.session() as session:

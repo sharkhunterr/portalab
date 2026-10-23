@@ -310,27 +310,30 @@ function useSubmitError() {
 
 function AchievementForm({
   item,
+  preset,
   types,
   onDone,
 }: {
   item?: Versioned<AchievementDefinition>;
+  preset?: { key: string; definition: AchievementDefinition } | null;
   types: EventTypeInfo[];
   onDone: () => void;
 }) {
   const t = useT();
   const { save } = useAchievementAdmin();
   const { error, setError, fail } = useSubmitError();
-  const [key, setKey] = useState(item?.key ?? "");
+  const [key, setKey] = useState(item?.key ?? preset?.key ?? "");
   const [def, setDef] = useState<AchievementDefinition>(
-    item?.definition ?? {
-      label: "",
-      description: "",
-      icon: "trophy",
-      category: "service_usage",
-      hidden: false,
-      criteria: [blankCriterion("event_count", types)],
-      rewards: [{ value: "xp", amount: 50 }],
-    },
+    item?.definition ??
+      preset?.definition ?? {
+        label: "",
+        description: "",
+        icon: "trophy",
+        category: "service_usage",
+        hidden: false,
+        criteria: [blankCriterion("event_count", types)],
+        rewards: [{ value: "xp", amount: 50 }],
+      },
   );
   const patch = (next: Partial<AchievementDefinition>) => setDef({ ...def, ...next });
   return (
@@ -628,16 +631,54 @@ function rewardsText(t: Translate, rewards: Reward[] | undefined): string {
   return (rewards ?? []).map((r) => `+${r.amount} ${t(`gamification:value.${r.value}`)}`).join(" · ");
 }
 
+/** Issue 234: ready-made achievements of the card collections — boosters opened, a legendary, collections
+ * completed (films, series). */
+function presets(t: Translate): Array<{ key: string; definition: AchievementDefinition }> {
+  const make = (
+    key: string,
+    icon: string,
+    event: string,
+    count: number,
+    xp: number,
+    filter: EventCount["filter"] = [],
+  ) => ({
+    key,
+    definition: {
+      label: t(`gamification:admin.cardAchievements.${key}.label`),
+      description: t(`gamification:admin.cardAchievements.${key}.description`),
+      icon,
+      category: "content",
+      hidden: false,
+      criteria: [{ kind: "event_count" as const, event_type: event, filter, count }],
+      rewards: [{ value: "xp" as const, amount: xp }],
+    },
+  });
+  return [
+    make("cards_first_booster", "gift", "cards.pack_opened", 1, 25),
+    make("cards_boosters_25", "layers", "cards.pack_opened", 25, 150),
+    make("cards_legendary", "crown", "cards.pack_opened", 1, 100, [
+      { field: "legendary", op: "gte", value: 1 },
+    ]),
+    make("cards_first_collection", "trophy", "cards.set_completed", 1, 150),
+    make("cards_series_collections", "tv", "cards.set_completed", 3, 250, [
+      { field: "kind", op: "eq", value: "series" },
+    ]),
+    make("cards_collections_10", "library", "cards.set_completed", 10, 500),
+  ];
+}
+
 /** Achievements (027): one card per achievement — icon, category, criteria in words, rewards — edited in a form. */
 export function AchievementsPanel() {
   const t = useT();
   const { query, retire } = useAchievementAdmin();
   const types = useEventTypes();
   const [open, setOpen] = useState<string | null>(null);
+  const [preset, setPreset] = useState<{ key: string; definition: AchievementDefinition } | null>(null);
   const [category, setCategory] = useState("all");
   const items = (query.data ?? []).filter((a) => category === "all" || a.definition.category === category);
   const typeList = types.data ?? [];
   const present = [...new Set((query.data ?? []).map((a) => a.definition.category ?? "other"))];
+  const available = presets(t).filter((p) => !(query.data ?? []).some((a) => a.key === p.key));
   return (
     <AdminSection
       span="full"
@@ -647,7 +688,10 @@ export function AchievementsPanel() {
       actions={
         <Dialog
           open={open === "new"}
-          onOpenChange={(next) => setOpen(next ? "new" : null)}
+          onOpenChange={(next) => {
+            setOpen(next ? "new" : null);
+            if (!next) setPreset(null);
+          }}
           title={t("gamification:admin.achievement.new")}
           closeLabel={t("gamification:admin.close")}
           size="lg"
@@ -658,10 +702,33 @@ export function AchievementsPanel() {
             </Button>
           }
         >
-          <AchievementForm types={typeList} onDone={() => setOpen(null)} />
+          <AchievementForm
+            key={preset?.key ?? "blank"}
+            preset={preset}
+            types={typeList}
+            onDone={() => setOpen(null)}
+          />
         </Dialog>
       }
     >
+      {available.length && typeList.some((type) => type.name === "cards.pack_opened") ? (
+        <div className="gam-presets">
+          <span className="admin-muted">{t("gamification:admin.cardAchievements.title")}</span>
+          {available.map((p) => (
+            <Button
+              key={p.key}
+              variant="secondary"
+              onClick={() => {
+                setPreset(p);
+                setOpen("new");
+              }}
+            >
+              <Icon name={p.definition.icon ?? "trophy"} size={16} />
+              {p.definition.label}
+            </Button>
+          ))}
+        </div>
+      ) : null}
       {present.length > 1 ? (
         <AdminTabs
           label={t("gamification:admin.category")}
