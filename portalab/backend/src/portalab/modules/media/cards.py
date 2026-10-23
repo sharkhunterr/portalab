@@ -9,11 +9,11 @@ from uuid import UUID
 
 from sqlalchemy import or_, select
 
-from portalab.capabilities.media import METADATA, unwrap
+from portalab.capabilities.media import METADATA, VIDEO_FRAMES, unwrap
 from portalab.capabilities.media_core import CardImage, CardPerson, CardWork
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
-from portalab.modules.media.models import MediaObject, ObjectMetadata
+from portalab.modules.media.models import MediaObject, ObjectMetadata, SourceItem
 
 KINDS = ("movie", "series")
 # the crew a card is made for, by their job
@@ -150,4 +150,30 @@ class MediaCardSources:
                 continue
             found = unwrap(await tagged(person_ref.removeprefix("tmdb:")))
             return [CardImage(i.media_id, i.image, i.image_type, i.aspect, i.votes) for i in found or []]
+        return None
+
+    async def frames(self, object_id: UUID, at: Sequence[float]) -> Sequence[bytes] | None:
+        """Issue 230: still images of a film's own video, from a media server holding its file that can take
+        them (Plex); ``None`` when none can, an empty list when the film's file gives none."""
+        if self.capabilities is None:
+            return None
+        providers = {r.instance_ref: r.provider for r in self.capabilities.system_providers(VIDEO_FRAMES)}
+        if not providers:
+            return None
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(SourceItem.service_id, SourceItem.external_id)
+                    .where(
+                        SourceItem.object_id == object_id,
+                        SourceItem.active.is_(True),
+                        SourceItem.kind == "movie",
+                    )
+                    .order_by(SourceItem.last_seen_at.desc())
+                )
+            ).all()
+        for service_id, external_id in rows:
+            provider = providers.get(str(service_id))
+            if provider is not None:
+                return [image async for image in provider.frames(external_id, list(at))]
         return None

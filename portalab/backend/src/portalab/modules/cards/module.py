@@ -19,6 +19,7 @@ from portalab.core.time import Clock
 from portalab.modules.cards import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.cards.artwork import FanArt
 from portalab.modules.cards.faces import FaceMatcher
+from portalab.modules.cards.frames import FilmFrames
 from portalab.modules.cards.generator import CardForge
 from portalab.modules.cards.packs import CONSUMER, Packs
 from portalab.modules.cards.participant import CardsParticipant
@@ -32,6 +33,7 @@ SYNC_JOB = "cards.sync"
 ROLES_JOB = "cards.role_art"
 FAN_ART_JOB = "cards.fan_art"
 SEARCH_JOB = "cards.role_search"
+FRAMES_JOB = "cards.film_frames"
 log = get_logger("portalab.cards")
 
 
@@ -58,6 +60,9 @@ class CardsModule:
         self.blobs = blobs
         self.matcher = FaceMatcher(root or Path("data/cards"))
         self.config = CardsConfig()
+        self.frames = FilmFrames(
+            database, capabilities, self.matcher, blobs, clock=clock, enabled=lambda: self.config.video_frames
+        )
         self.search = RoleSearch(
             database,
             capabilities,
@@ -65,6 +70,7 @@ class CardsModule:
             blobs,
             clock=clock,
             face_check=lambda: self.config.face_check,
+            frames_first=self.frames.available,
         )
 
     def register(self) -> None:
@@ -98,6 +104,9 @@ class CardsModule:
         async def fan_art() -> None:
             await self.fan_art.run()
 
+        async def frames() -> None:
+            await self.frames.run()
+
         async def search() -> None:
             await self.search.run()
 
@@ -109,6 +118,16 @@ class CardsModule:
             register_periodic(jobs, self.database, ROLES_JOB, timedelta(minutes=5), roles, owner=OWNER),
             # the works' full art from an art site (fanart.tv), a few works every five minutes
             register_periodic(jobs, self.database, FAN_ART_JOB, timedelta(minutes=5), fan_art, owner=OWNER),
+            # the actors' characters in the film itself (its images, their faces compared), a film at a time
+            register_periodic(
+                jobs,
+                self.database,
+                FRAMES_JOB,
+                timedelta(minutes=5),
+                frames,
+                owner=OWNER,
+                timeout_seconds=900,
+            ),
             # the actors' characters on the web (their faces compared), a few cards every five minutes
             register_periodic(jobs, self.database, SEARCH_JOB, timedelta(minutes=5), search, owner=OWNER),
         ]

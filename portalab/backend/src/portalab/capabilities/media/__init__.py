@@ -58,6 +58,7 @@ RADIO = "media.radio"  # issue 168: a radio station of the homelab — listen, s
 CLEANUP = "media.cleanup"  # #57: titles a cleanup tool will delete, and keeping one (Maintainerr)
 IMAGE_SEARCH = "media.image_search"  # issue 229: images found on the web (a self-hosted SearXNG)
 ARTWORK = "media.artwork"  # issue 229: a work's artwork from an art site (fanart.tv): backgrounds, clearart…
+VIDEO_FRAMES = "media.video_frames"  # issue 230: still images taken from a title's own video file
 REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the request service (Seerr)
 REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
 PEOPLE = "media.people"  # #92: what a service knows of a person — biography, portrait, filmography
@@ -713,6 +714,16 @@ class ImageSearch(Protocol):
 
 
 @runtime_checkable
+class VideoFrames(Protocol):
+    """Issue 230: still images of a title's own video, taken by its media server's files at given moments
+    (fractions of its length, 0 to 1): JPEG bytes, in that order, a moment that cannot be taken left out.
+    Nothing is copied: only the frames are read (byte ranges). A stream, one image at a time: each bounded
+    by the provider itself (not kept as last-known data, as a call's answer would be)."""
+
+    def frames(self, external_id: str, at: Sequence[float]) -> AsyncIterator[bytes]: ...
+
+
+@runtime_checkable
 class PeopleProvider(Protocol):
     """#92 — what a service knows of a person (TMDB, Seerr: biography and filmography; Jellyfin: biography
     and portrait; Grimmory: an author's description and photo). Found by the ids the portal knows of them
@@ -1169,6 +1180,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(CLEANUP, MediaCleanup, "Titles a cleanup tool will delete, and keeping one (#57)"),
     _spec(IMAGE_SEARCH, ImageSearch, "Images found on the web for a query, fetched safely (issue 229)"),
     _spec(ARTWORK, ArtworkProvider, "A work's artwork from an art site: backgrounds, clearart (229)"),
+    _spec(VIDEO_FRAMES, VideoFrames, "Still images taken from a title's own video file (issue 230)"),
     _spec(REQUEST_QUOTAS, RequestQuotas, "Each account's request limits on the request service (#3)"),
     _spec(REQUEST_DISCOVERY, RequestDiscovery, "Titles one can ask for: search, shelves, details (#4)"),
     _spec(PEOPLE, PeopleProvider, "What a service knows of a person: biography, portrait, titles (#92)"),

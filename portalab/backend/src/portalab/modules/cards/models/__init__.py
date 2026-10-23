@@ -90,6 +90,8 @@ class Card(CardsBase):
     fan_checked_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     # an actor's character looked for on the web (when TMDB had none) — the cache
     search_checked_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    # issue 230: an actor's character taken from the film's own video (its faces compared) — the cache
+    frame_checked_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     billing: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     score: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     rarity: Mapped[str] = mapped_column(String(12), nullable=False, default="common")

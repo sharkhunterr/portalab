@@ -313,6 +313,11 @@ class CardSources(Protocol):
         """The images ``tmdb:<id>`` is tagged in, from the provider that knows them (``None``: none can)."""
         ...
 
+    async def frames(self, object_id: UUID, at: Sequence[float]) -> Sequence[bytes] | None:
+        """Issue 230: still images of a work's own video at those moments (fractions of its length), from a
+        media server that holds it (``None``: none can)."""
+        ...
+
 
 SPECS: tuple[CapabilitySpec, ...] = (
     _spec(CATALOG, MediaCatalog, False, "Media catalog lookups (024)"),

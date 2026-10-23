@@ -10,14 +10,19 @@ OWNER = "module:cards"
 @dataclass(frozen=True, slots=True)
 class CardsConfig:
     face_check: bool = True
+    video_frames: bool = True
 
 
-SETTINGS = {"face_check": "cards.faceCheck"}
+SETTINGS = {"face_check": "cards.faceCheck", "video_frames": "cards.videoFrames"}
 _DESCRIPTIONS = {
     "face_check": (
         "An actor's character found on the web is kept only with the actor's own face (compared with their "
         "portrait, on the processor). Off: the image's page must name the character. Animated works are "
         "never compared."
+    ),
+    "video_frames": (
+        "An actor's character is looked for in the film itself first: still images of its file, taken by the "
+        "media server (Plex), where the actor's face is compared with their portrait. Off: the web only."
     ),
 }
 

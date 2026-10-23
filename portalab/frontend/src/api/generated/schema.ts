@@ -622,7 +622,8 @@ export interface paths {
         put?: never;
         /**
          * Look For Characters
-         * @description Look for this set's actors' characters on the web now (again for those found there before).
+         * @description Look for this set's actors' characters now (again for those found before): on the web, then in the
+         *     film itself — whose images, the actor's own face seen there, win over the web's.
          */
         post: operations["look_for_characters_api_v1_admin_cards_sets__key__characters_post"];
         delete?: never;
