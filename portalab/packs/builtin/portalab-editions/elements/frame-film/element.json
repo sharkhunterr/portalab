@@ -2,8 +2,8 @@
   "type": "card_frame",
   "look": "edition-film",
   "names": {
-    "en": "Film reel — Art deco",
-    "fr": "Pellicule — Art déco"
+    "en": "Film reel — picture house",
+    "fr": "Pellicule — salle de cinéma"
   },
   "descriptions": {
     "en": "The frame of the media cards' film edition (the cards' edition version wears it).",

@@ -188,3 +188,10 @@
   background: var(--mcard-rim);
   filter: drop-shadow(0 0 0.6cqi var(--edition-hue));
 }
+/* a work's own card holds more (three figures, its line): its box tighter */
+.mcard[data-frame="edition-disc"][data-kind="title"] .mcard__lower {
+  padding-block: 0.8cqi;
+}
+.mcard[data-frame="edition-disc"][data-kind="title"] .mcard__figures li {
+  padding-block: 0.3cqi;
+}

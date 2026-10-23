@@ -208,3 +208,30 @@
     inset 0 0 0 0.33cqi rgba(255, 255, 255, 0.6);
   text-shadow: none;
 }
+/* a work's own card holds more (three figures, its line): its box tighter */
+.mcard[data-frame="edition-vhs"][data-kind="title"] .mcard__lower {
+  padding-block: 0.8cqi;
+}
+.mcard[data-frame="edition-vhs"][data-kind="title"] .mcard__figures li {
+  padding-block: 0.3cqi;
+}
+.mcard[data-frame="edition-vhs"][data-kind="title"] .mcard__lower {
+  padding-inline: 2cqi;
+}
+.mcard[data-frame="edition-vhs"][data-kind="title"] .mcard__figures li,
+.mcard[data-frame="edition-vhs"][data-kind="title"] .mcard__meta {
+  font-size: 3.3cqi;
+  line-height: 1;
+}
+.mcard[data-frame="edition-vhs"][data-kind="title"] .mcard__meta {
+  padding-block-end: 0.6cqi;
+}
+.mcard[data-frame="edition-vhs"][data-kind="title"] .mcard__figures strong {
+  font-size: 2.8cqi;
+}
+.mcard[data-frame="edition-vhs"][data-kind="title"] .mcard__flavor {
+  padding-block: 0.6cqi;
+  font-size: 3.2cqi;
+  line-height: 1;
+  -webkit-line-clamp: 1;
+}
