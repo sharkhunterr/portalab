@@ -1,4 +1,4 @@
-import type { CSSProperties, PointerEvent } from "react";
+import type { CSSProperties, PointerEvent, SyntheticEvent } from "react";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import "@fontsource/barlow-condensed/latin-600.css";
@@ -44,6 +44,15 @@ function tilt(event: PointerEvent<HTMLElement>) {
   style.setProperty("--mcard-rx", `${(0.5 - y) * 22}deg`);
   style.setProperty("--mcard-ry", `${(x - 0.5) * 26}deg`);
   event.currentTarget.dataset.active = "";
+}
+
+/** An upright image (a portrait, a poster) in the art's wide window: shown whole from the head down, not zoomed
+ * on the middle of a face — its art says so once the image is known. */
+function measure(event: SyntheticEvent<HTMLImageElement>) {
+  const image = event.currentTarget;
+  const upright = image.naturalHeight > image.naturalWidth * 1.15;
+  const art = image.parentElement;
+  if (art) art.dataset.shape = upright ? "upright" : "wide";
 }
 
 /** The pointer gone: the card sways on its own again. */
@@ -160,8 +169,18 @@ export function MediaCardView({
             className="mcard__art"
             data-art={!borderless && card.role_art ? "role" : stand_in ? "poster" : undefined}
           >
+            {art && !borderless ? (
+              <img className="mcard__backdrop" src={art} alt="" loading="lazy" draggable={false} />
+            ) : null}
             {art ? (
-              <img className="mcard__picture" src={art} alt="" loading="lazy" draggable={false} />
+              <img
+                className="mcard__picture"
+                src={art}
+                alt=""
+                loading="lazy"
+                draggable={false}
+                onLoad={borderless ? undefined : measure}
+              />
             ) : (
               <Icon name={KIND_ICON[card.kind]} size={40} />
             )}
