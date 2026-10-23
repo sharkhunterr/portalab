@@ -1,14 +1,14 @@
 {
   "format": 1,
   "id": "portalab-editions",
-  "version": "1.0.0+bee5b3533b",
+  "version": "1.0.0+968a2c7790",
   "names": {
     "en": "Media card editions",
     "fr": "Éditions des cartes médias"
   },
   "descriptions": {
-    "en": "The frames of the media cards' editions: film reel (picture house), VHS (arcade screen), DVD (filigree) and streaming (holo-tech).",
-    "fr": "Les cadres des éditions des cartes médias : pellicule (salle de cinéma), VHS (écran d'arcade), DVD (filigrane) et streaming (holo-tech)."
+    "en": "The frames of the media cards' editions: VHS (arcade screen), DVD (filigree showcase) and streaming (holo-tech).",
+    "fr": "Les cadres des éditions des cartes médias : VHS (écran d'arcade), DVD (filigrane showcase) et streaming (holo-tech)."
   },
   "author": "Portalab",
   "license": "AGPL-3.0-or-later"

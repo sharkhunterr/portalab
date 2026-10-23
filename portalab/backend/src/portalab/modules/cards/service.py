@@ -41,6 +41,7 @@ def card_out(card: Card, card_set: CardSet, owned: dict[str, int] | None = None)
         "role_art": card.role_art,
         "role_alt": card.role_alt,
         "fan_art": card.fan_art,
+        "focus": card.focus or {},
         "rarity": card.rarity,
         "billing": card.billing,
         "retired": card.retired,

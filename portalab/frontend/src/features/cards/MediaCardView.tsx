@@ -57,6 +57,24 @@ function sideColour(context: CanvasRenderingContext2D, x: number): string | null
   return `#${sum.map((value) => value.toString(16).padStart(2, "0")).join("")}`;
 }
 
+/** The image framed on its face (found by the server: the centre of its largest face, as fractions of it): the
+ * face across the middle and two fifths down the window, as far as the image reaches. */
+function frameFace(image: HTMLImageElement) {
+  const at = [Number(image.dataset.fx), Number(image.dataset.fy)];
+  const width = image.clientWidth;
+  const height = image.clientHeight;
+  if (!image.dataset.fy || !width || !height || !image.naturalWidth || !image.naturalHeight) return;
+  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+  const place = (natural: number, box: number, centre: number, target: number) => {
+    const room = natural * scale - box;
+    if (room <= 1) return 50;
+    return (Math.min(room, Math.max(0, centre * natural * scale - target * box)) / room) * 100;
+  };
+  const x = place(image.naturalWidth, width, at[0] ?? 0.5, 0.5);
+  const y = place(image.naturalHeight, height, at[1] ?? 0.4, 0.4);
+  image.style.objectPosition = `${x.toFixed(1)}% ${y.toFixed(1)}%`;
+}
+
 /** An upright image (a portrait, a poster) in the art's wide window: zoomed out, from the head down, its sides
  * fading into its own edges' colours (a portrait's backdrop carried on) — its art says so once it is known. */
 function measure(event: SyntheticEvent<HTMLImageElement>) {
@@ -65,6 +83,7 @@ function measure(event: SyntheticEvent<HTMLImageElement>) {
   const art = image.parentElement;
   if (!art) return;
   art.dataset.shape = upright ? "upright" : "wide";
+  frameFace(image);
   if (!upright) return;
   try {
     const canvas = document.createElement("canvas");
@@ -93,9 +112,9 @@ function rest(event: PointerEvent<HTMLElement>) {
 /**
  * Issue 229: a media card, laid out like a trading card game's. Its rim is its rarity's metal; its body its
  * work's genre colour (the genre's emblem and name top right). On top its name, whole on one line; its art in a
- * metal frame; under it, in a band, what it is — simply (a character, a film, a director) — and who plays it;
- * then the work it belongs to: its poster the whole height on the left, its title, year and figures on the
- * right (the figures as a card's attacks: the work's rating, box office…); at the foot its collector number and
+ * metal frame; under it, in a band, what it is — simply (a character, a film, a director) — and its edition's
+ * symbol; then the work it belongs to: its poster the whole height on the left, who plays it, its title, year
+ * and figures on the right (the figures as a card's attacks: the work's rating, box office…); at the foot its collector number and
  * its rarity. The same card at every size. ``borderless``: the art over the whole card, only its name, the band
  * and its rarity over it;
  * ``foil``: a holographic light that follows the pointer. A card not owned yet shows dimmed. A role
@@ -134,6 +153,9 @@ export function MediaCardView({
         ? cardImage(card.set_poster ?? null, "w500")
         : cardImage(card.art, card.kind === "title" ? "w500" : "h632");
   const portrait = stand_in ? cardImage(card.art, "w185") : null;
+  // where the face is in the image shown (its character's, or the person's portrait)
+  const shown = borderless ? null : (card.role_art ?? (stand_in || card.kind === "title" ? null : card.art));
+  const face = shown ? (card.focus?.[shown] ?? null) : null;
   const facts = card.set_facts ?? {};
   const series = card.set_kind === "series";
   const family = card.set_family ?? "drama";
@@ -209,6 +231,8 @@ export function MediaCardView({
                 loading="lazy"
                 draggable={false}
                 onLoad={borderless ? undefined : measure}
+                data-fx={face ? face[0] : undefined}
+                data-fy={face ? face[1] : undefined}
               />
             ) : (
               <Icon name={KIND_ICON[card.kind]} size={40} />
@@ -219,7 +243,8 @@ export function MediaCardView({
           </div>
           <p className="mcard__strip">
             <span className="mcard__stage">{stage}</span>
-            <span className="mcard__by">{strip}</span>
+            {/* who plays it: in the box under it, or over the art on a borderless card */}
+            {borderless && strip ? <span className="mcard__by">{strip}</span> : null}
             {edition ? (
               <span
                 className="mcard__edition"
@@ -237,6 +262,7 @@ export function MediaCardView({
                 </span>
               ) : null}
               <div className="mcard__facts">
+                {strip ? <p className="mcard__by">{strip}</p> : null}
                 {card.kind === "title" ? (
                   meta ? (
                     <p className="mcard__meta">{meta}</p>

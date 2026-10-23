@@ -247,7 +247,7 @@
 .mcard__strip {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 1.6cqi;
   min-inline-size: 0;
   margin: 0;
@@ -262,12 +262,25 @@
   font-style: italic;
   font-weight: 600;
 }
-.mcard__by {
+.mcard[data-borderless] .mcard__by {
   flex: 1;
   min-inline-size: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* who plays it, first in the box under the art */
+.mcard__facts .mcard__by {
+  margin: 0;
+  font-size: 3.1cqi;
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.15;
+  opacity: 0.85;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 /* issue 233: the edition's symbol, like a set's symbol on a trading card: its silhouette in the rarity's metal */
 .mcard__edition {
