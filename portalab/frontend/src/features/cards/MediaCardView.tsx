@@ -46,8 +46,8 @@ function tilt(event: PointerEvent<HTMLElement>) {
   event.currentTarget.dataset.active = "";
 }
 
-/** An upright image (a portrait, a poster) in the art's wide window: shown whole from the head down, not zoomed
- * on the middle of a face — its art says so once the image is known. */
+/** An upright image (a portrait, a poster) in the art's wide window: framed from its top (a head), not on the
+ * middle of a face — its art says so once the image is known. */
 function measure(event: SyntheticEvent<HTMLImageElement>) {
   const image = event.currentTarget;
   const upright = image.naturalHeight > image.naturalWidth * 1.15;
@@ -169,9 +169,6 @@ export function MediaCardView({
             className="mcard__art"
             data-art={!borderless && card.role_art ? "role" : stand_in ? "poster" : undefined}
           >
-            {art && !borderless ? (
-              <img className="mcard__backdrop" src={art} alt="" loading="lazy" draggable={false} />
-            ) : null}
             {art ? (
               <img
                 className="mcard__picture"
