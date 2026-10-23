@@ -46,6 +46,35 @@ function tilt(event: PointerEvent<HTMLElement>) {
   event.currentTarget.dataset.active = "";
 }
 
+/** A cut-out character (over a scene of its own, nothing to hide around it): zoomed out — more of them shown,
+ * their face across the middle and two fifths down the window — but never above the window's foot: the image
+ * always reaches it (where the photograph ended, the character would be cut). */
+function placeCutout(image: HTMLImageElement) {
+  const box = image.parentElement;
+  const width = box?.clientWidth ?? 0;
+  const height = box?.clientHeight ?? 0;
+  const natural = [image.naturalWidth, image.naturalHeight] as const;
+  if (!image.dataset.fy || !width || !height || !natural[0] || !natural[1]) return;
+  const [fx, fy] = [Number(image.dataset.fx), Number(image.dataset.fy)];
+  const cover = Math.max(width / natural[0], height / natural[1]);
+  const reachFoot = (0.58 * height) / (Math.max(0.05, 1 - fy) * natural[1]);
+  const scale = Math.min(cover, Math.max(reachFoot, cover * 0.62));
+  const [drawnWidth, drawnHeight] = [natural[0] * scale, natural[1] * scale];
+  const left = Math.min(
+    Math.max(0.5 * width - fx * drawnWidth, Math.min(0, width - drawnWidth)),
+    Math.max(0, width - drawnWidth),
+  );
+  const top = Math.max(0.42 * height - fy * drawnHeight, height - drawnHeight);
+  Object.assign(image.style, {
+    inset: "auto",
+    left: `${((left / width) * 100).toFixed(2)}%`,
+    top: `${((top / height) * 100).toFixed(2)}%`,
+    width: `${((drawnWidth / width) * 100).toFixed(2)}%`,
+    height: `${((drawnHeight / height) * 100).toFixed(2)}%`,
+    objectFit: "fill",
+  });
+}
+
 /** The colour along one side of an image (its average), or null when it cannot be read. */
 function sideColour(context: CanvasRenderingContext2D, x: number): string | null {
   const data = context.getImageData(x, 0, 1, 8).data;
@@ -83,8 +112,12 @@ function measure(event: SyntheticEvent<HTMLImageElement>) {
   const art = image.parentElement;
   if (!art) return;
   art.dataset.shape = upright ? "upright" : "wide";
+  if (art.dataset.cutout !== undefined) {
+    placeCutout(image);
+    return; // a cut-out's sides are its scene's
+  }
   frameFace(image);
-  if (!upright || art.dataset.cutout !== undefined) return; // a cut-out's sides are its scene's
+  if (!upright) return;
   try {
     const canvas = document.createElement("canvas");
     canvas.width = 4;
@@ -245,6 +278,17 @@ export function MediaCardView({
           >
             {scene ? (
               <img className="mcard__scene" src={scene} alt="" loading="lazy" draggable={false} />
+            ) : cut && !borderless ? (
+              <span
+                className="mcard__sky"
+                aria-hidden="true"
+                style={
+                  {
+                    "--mcard-sky-x": `${(card.number * 37) % 100}%`,
+                    "--mcard-sky-y": `${(card.number * 61) % 100}%`,
+                  } as CSSProperties
+                }
+              />
             ) : null}
             {art ? (
               <img
