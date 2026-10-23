@@ -150,3 +150,23 @@ def test_fixed_plus_per_unit() -> None:
     assert base_amounts(rule, {"duration_s": 1500}) == [("xp", 35)]  # 10 + 25 min
     assert base_amounts(rule, {"duration_s": 3 * 3600 * 2}) == [("xp", 190)]  # capped part
     assert base_amounts(rule, {}) == [("xp", 10)]
+
+
+def test_a_rule_gives_a_contents_boosters() -> None:
+    """Issue 234: boosters alone are a rule's reward — only for an action about a content."""
+    from portalab.capabilities.events import EventType, EventTypeRegistry
+    from portalab.core.errors import ValidationFailed
+    from portalab.modules.gamification.rules.definition import parse_rule
+    from portalab.modules.media.events import register_event_types
+
+    types = EventTypeRegistry()
+    register_event_types(types)
+    rule = parse_rule({"event_type": "media.season_finished", "boosters": 1}, types)
+    assert rule.boosters == 1 and rule.grants == []
+    with pytest.raises(ValidationFailed):
+        parse_rule({"event_type": "media.season_finished"}, types)  # gives nothing
+    with pytest.raises(ValidationFailed):
+        parse_rule({"event_type": "media.season_finished", "boosters": 4}, types)
+    types.register(EventType(name="ticket.created", owner="t"))
+    with pytest.raises(ValidationFailed):
+        parse_rule({"event_type": "ticket.created", "boosters": 1}, types)  # about no content

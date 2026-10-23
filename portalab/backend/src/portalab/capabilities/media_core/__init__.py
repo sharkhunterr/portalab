@@ -20,6 +20,7 @@ RECOMMENDATIONS = "media.recommendations"
 RESCUES = "media.rescues"  # #57: rescues bought in the shop, spent saving a title from deletion
 RADIO_CREDITS = "media.radio_credits"  # issue 184: requests to the radio's DJ bought in the shop
 CARD_SOURCES = "media.card_sources"  # issue 229: the works present, what the cards are made of
+CONTENT_BOOSTERS = "media.content_boosters"  # issue 234: a content's booster, given by a reward rule
 
 
 _KIND = re.compile(r"[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)?")
@@ -308,6 +309,10 @@ class CardSources(Protocol):
 
     async def work_of(self, object_id: UUID) -> UUID | None: ...
 
+    async def season_of(self, object_id: UUID) -> int | None:
+        """Issue 234: a season's number (``None``: not a season)."""
+        ...
+
     async def image(self, ref: str, size: str) -> bytes:
         """A metadata image's bytes (a person's portrait: what a face is compared with)."""
         ...
@@ -322,6 +327,14 @@ class CardSources(Protocol):
         ...
 
 
+@runtime_checkable
+class ContentBoosters(Protocol):
+    """Issue 234: ``count`` boosters of a content (a film, a season: its work's cards) given to a member —
+    once per member and content, whatever asks; ``0`` when given already, or the content has no cards."""
+
+    async def give(self, user: UUID, object_id: UUID, count: int, reason: str) -> int: ...
+
+
 SPECS: tuple[CapabilitySpec, ...] = (
     _spec(CATALOG, MediaCatalog, False, "Media catalog lookups (024)"),
     _spec(HISTORY, MediaHistoryReader, False, "Privacy-bounded media history and progress (024)"),
@@ -330,6 +343,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(RESCUES, RescueCredits, False, "Rescues saving a title from the cleanup's deletion (#57)"),
     _spec(RADIO_CREDITS, RadioCredits, False, "Requests to the radio's DJ bought in the shop (issue 184)"),
     _spec(CARD_SOURCES, CardSources, False, "The works present and their credits, for the cards (issue 229)"),
+    _spec(CONTENT_BOOSTERS, ContentBoosters, False, "A content's booster given to a member (issue 234)"),
 )
 
 QuotaSummary = Mapping[str, int]

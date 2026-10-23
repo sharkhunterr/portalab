@@ -38,6 +38,8 @@ export interface RuleDefinition {
   label?: string;
   predicate?: Condition[];
   grants: RuleGrant[];
+  /** Issue 234: boosters of the event's content (a film, a season), once per member and content. */
+  boosters?: number;
   multiplier?: number;
   limits?: {
     cooldown_seconds?: number;

@@ -10,6 +10,7 @@ from sqlalchemy import update
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.events import ConsumerRegistry, default_consumers
+from portalab.capabilities.media_core import CONTENT_BOOSTERS
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.blobstore import BlobStore
@@ -27,7 +28,7 @@ from portalab.modules.cards.focus import ArtFocus
 from portalab.modules.cards.frames import FilmFrames
 from portalab.modules.cards.generator import CardForge
 from portalab.modules.cards.models import Card
-from portalab.modules.cards.packs import CONSUMER, Packs
+from portalab.modules.cards.packs import ContentBoosters, Packs
 from portalab.modules.cards.participant import CardsParticipant
 from portalab.modules.cards.roles import RoleArt
 from portalab.modules.cards.search import RoleSearch
@@ -103,8 +104,11 @@ class CardsModule:
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
             if not any(p.instance_ref == "cards" for p in self.capabilities.system_providers(capability)):
                 self.capabilities.provide(capability, participant, instance_ref="cards", owner=OWNER)
-        if self.consumers.get(CONSUMER) is None:
-            self.consumers.register(self.packs.consumer())
+        # issue 234: a content's boosters, given by the reward rules the administrators set
+        if not self.capabilities.system_providers(CONTENT_BOOSTERS):
+            self.capabilities.provide(
+                CONTENT_BOOSTERS, ContentBoosters(self.packs), instance_ref="cards", owner=OWNER
+            )
 
     async def refresh_config(self) -> None:
         try:

@@ -1,8 +1,9 @@
 """Issue 229: a work's card has its borderless alternative drawn from an art site (fanart.tv) — the work's
 art without any text on it, the best liked — a textless poster (upright, like the card), else a background,
-else a thumb. Looked for in the background, the rarest
-works first, a few at a time; kept once looked for (the cache), looked for again when the set is made again
-and its card new. Without one, the borderless card shows a backdrop of the work (TMDB)."""
+else a thumb — and (issue 234) its title drawn, its logos per language, for its boosters. Looked for in the
+background, the rarest works first, a few at a time; kept once looked for (the cache), looked for again when
+the set is made again and its card new. Without one, the borderless card shows a backdrop of the work
+(TMDB)."""
 
 from collections.abc import Mapping, Sequence
 from typing import Any
@@ -30,6 +31,18 @@ def best_art(found: Sequence[Artwork]) -> str | None:
     return ordered[0].image if ordered else None
 
 
+def best_logos(found: Sequence[Artwork]) -> dict[str, str]:
+    """Issue 234: the work's title drawn — its best liked logo per language (``""``: without one)."""
+    out: dict[str, tuple[int, str]] = {}
+    for art in found:
+        if art.kind != "logo":
+            continue
+        lang = (art.lang or "")[:2]
+        if lang not in out or art.likes > out[lang][0]:
+            out[lang] = (art.likes, art.image)
+    return {lang: image for lang, (_, image) in out.items()}
+
+
 def parse_ids(raw: str | None) -> Mapping[str, str]:
     pairs = (item.split(":", 1) for item in (raw or "").split(",") if ":" in item)
     return {scheme: value for scheme, value in pairs}
@@ -55,7 +68,7 @@ class FanArt:
         async with self.database.session() as session:
             rows = (
                 await session.execute(
-                    select(Card.id, CardSet.kind, CardSet.ids)
+                    select(Card.id, CardSet.key, CardSet.kind, CardSet.ids)
                     .join(CardSet, CardSet.key == Card.set_key)
                     .where(
                         Card.kind == "title",
@@ -69,7 +82,7 @@ class FanArt:
                 )
             ).all()
         given = 0
-        for card_id, kind, ids in rows:
+        for card_id, set_key, kind, ids in rows:
             try:
                 found = unwrap(await provider.artwork(kind, parse_ids(ids)))
             except Exception:  # the art site does not answer: looked for again next time
@@ -81,5 +94,8 @@ class FanArt:
                 if card is not None:
                     card.fan_art = art
                     card.fan_checked_at = utc_now(self.clock)
+                card_set = await uow.session.get(CardSet, set_key)
+                if card_set is not None:
+                    card_set.logos = best_logos(found or []) or None
             given += 1 if art else 0
         return given

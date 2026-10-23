@@ -4,14 +4,16 @@ derives ``history_entries`` (one per event id — replays and redeliveries are n
 * resume point and percent follow the event with the greatest ``occurred_at`` across **all** sources;
 * ``finished`` is sticky — older or later progress never turns a finished object back to in-progress;
 * an abandoned session past 5 % of a still-unfinished object emits ``media.resume_available`` (live only,
-  never during a replay).
+  never during a replay);
+* issue 234: the last episode of a season finished (every episode of it in the library finished) emits
+  ``media.season_finished`` — once per member and season, live only.
 Rebuilding from the event log reproduces the same rows."""
 
 from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, delete, or_, select
+from sqlalchemy import and_, delete, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -121,7 +123,10 @@ class HistoryProjection:
             ).scalar_one_or_none()
             if inserted is None:
                 return False  # already applied (replay, redelivery)
+            was_finished = await self._finished(session, user, object_id)
             progress = await self._progress(session, user, object_id, position, share, finished, occurred_at)
+            if live and finished and not was_finished:
+                await self._season(session, user, object_id, occurred_at)
             if (
                 live
                 and event_type == "media.playback_abandoned"
@@ -142,6 +147,58 @@ class HistoryProjection:
                     dedup_key=f"media.resume:{payload.get('session')}",
                 )
         return True
+
+    async def _finished(self, session: AsyncSession, user: UUID, object_id: UUID) -> bool:
+        state = await session.scalar(
+            select(UserProgress.state).where(
+                UserProgress.user_id == user, UserProgress.object_id == object_id
+            )
+        )
+        return state == "finished"
+
+    async def _season(self, session: AsyncSession, user: UUID, episode: UUID, occurred_at: datetime) -> None:
+        """Issue 234: an episode finished — its season too when every episode of it is."""
+        item = await session.get(MediaObject, episode)
+        if item is None or item.kind != "episode" or item.parent_id is None:
+            return
+        season = await session.get(MediaObject, item.parent_id)
+        if season is None or season.kind != "season":
+            return
+        await session.flush()
+        episodes = list(
+            (
+                await session.execute(
+                    select(MediaObject.id).where(
+                        MediaObject.parent_id == season.id, MediaObject.kind == "episode"
+                    )
+                )
+            ).scalars()
+        )
+        done = await session.scalar(
+            select(func.count())
+            .select_from(UserProgress)
+            .where(
+                UserProgress.user_id == user,
+                UserProgress.object_id.in_(episodes),
+                UserProgress.state == "finished",
+            )
+        )
+        if not episodes or int(done or 0) < len(episodes):
+            return
+        await self.events.publish(
+            session,
+            "media.season_finished",
+            {
+                "object": str(season.id),
+                "kind": "season",
+                "series": str(season.parent_id) if season.parent_id else None,
+                "episodes": len(episodes),
+            },
+            occurred_at=occurred_at,
+            subject=SubjectRef("user", str(user)),
+            source="media",
+            dedup_key=f"media.season_finished:{season.id}:{user}",
+        )
 
     async def _progress(
         self,

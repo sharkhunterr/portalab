@@ -74,6 +74,28 @@ function presets(t: Translate): Array<{ key: string; icon: string; definition: R
         limits: { caps: [{ period: "day", max_amount: 600, value: "xp" }] },
       },
     },
+    // issue 234: a content's booster — a film watched to the end, a season finished
+    {
+      key: "cards.film",
+      icon: "gift",
+      definition: {
+        event_type: "media.playback_finished",
+        label: t("gamification:admin.presets.filmBooster"),
+        predicate: [{ field: "kind", op: "in", value: ["movie"] }],
+        grants: [],
+        boosters: 1,
+      },
+    },
+    {
+      key: "cards.season",
+      icon: "gift",
+      definition: {
+        event_type: "media.season_finished",
+        label: t("gamification:admin.presets.seasonBooster"),
+        grants: [],
+        boosters: 1,
+      },
+    },
     {
       key: "marketplace.purchase",
       icon: "shop",
@@ -204,11 +226,13 @@ function RuleForm({
   const [capAmount, setCapAmount] = useState(firstCap ? String(firstCap.max_amount) : "");
   const [capValue, setCapValue] = useState<Value>(firstCap?.value ?? "xp");
   const [multiplier, setMultiplier] = useState(String(initial.multiplier ?? 1));
+  const [boosters, setBoosters] = useState(String(initial.boosters ?? 0));
   const [error, setError] = useState<string | null>(null);
   const info = types.find((type) => type.name === eventType);
   const fields = info?.fields ?? [];
   const numericFields = fields.filter((f) => f.numeric);
   // issue 160: the playback actions pick their kinds of play as chips (a « kind » condition underneath)
+  const aboutContent = eventType.startsWith("media.");
   const playKinds = eventType.startsWith("media.playback_") && fields.some((f) => f.name === "kind");
   const kindIndex = conditions.findIndex((c) => c.field === "kind" && (c.op === "in" || c.op === "eq"));
   const chosenKinds =
@@ -227,6 +251,7 @@ function RuleForm({
     event_type: eventType,
     label,
     grants: fromRows(rows),
+    ...(Number(boosters) > 0 ? { boosters: Math.min(3, Math.round(Number(boosters))) } : {}),
     predicate: conditions
       .filter((c) => c.field && c.value !== "")
       .map((c) => ({
@@ -375,6 +400,19 @@ function RuleForm({
             );
           })}
         </div>
+        {aboutContent ? (
+          // issue 234: the content's own boosters (its work's cards), once per member and content
+          <TextField
+            label={t("gamification:admin.rule.boosters")}
+            hint={t("gamification:admin.rule.boostersHint")}
+            type="number"
+            min={0}
+            max={3}
+            inputMode="numeric"
+            value={boosters}
+            onChange={(e) => setBoosters(e.target.value)}
+          />
+        ) : null}
       </fieldset>
 
       {playKinds ? (
@@ -540,7 +578,10 @@ function RuleForm({
         >
           {t("gamification:admin.rule.saveDraft")}
         </Button>
-        <Button type="submit" disabled={!key || !definition.grants.length || admin.save.isPending}>
+        <Button
+          type="submit"
+          disabled={!key || (!definition.grants.length && !definition.boosters) || admin.save.isPending}
+        >
           <Icon name="check" size={16} />
           {t("gamification:admin.rule.savePublish")}
         </Button>
@@ -583,6 +624,12 @@ function RuleCard({
               {grantText(t, grant)}
             </span>
           ))}
+          {definition.boosters ? (
+            <span className="gam-chip" data-value="booster">
+              <Icon name="gift" size={12} />{" "}
+              {t("gamification:admin.rule.boostersChip", { count: definition.boosters })}
+            </span>
+          ) : null}
           {(definition.predicate ?? []).map((c) =>
             c.field === "kind" && (c.op === "in" || c.op === "eq") ? (
               <span key={`${c.field}${c.op}`} className="gam-chip" data-kind="if">
@@ -671,8 +718,15 @@ export function ActionRules() {
   const list = (rules.data ?? []).filter((rule) => rule.status !== "retired");
   const retired = (rules.data ?? []).filter((rule) => rule.status === "retired");
   const typeList = types.data ?? [];
+  // a preset is offered while no rule does its part (issue 234: a booster preset, while no rule of its action
+  // gives boosters)
   const available = presets(t).filter(
-    (p) => !list.some((rule) => rule.event_type === p.definition.event_type),
+    (p) =>
+      !list.some(
+        (rule) =>
+          rule.event_type === p.definition.event_type &&
+          Boolean((rule.definition as unknown as RuleDefinition).boosters) === Boolean(p.definition.boosters),
+      ),
   );
   const blank: RuleDefinition = {
     event_type: typeList[0]?.name ?? "media.playback_finished",
@@ -706,7 +760,7 @@ export function ActionRules() {
             initial={preset ?? blank}
             types={typeList}
             onDone={() => setOpen(null)}
-            key={preset?.event_type ?? "blank"}
+            key={preset ? `${preset.event_type}:${preset.boosters ?? 0}` : "blank"}
           />
         </Dialog>
       }

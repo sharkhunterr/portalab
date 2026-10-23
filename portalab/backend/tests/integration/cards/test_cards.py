@@ -17,7 +17,7 @@ from portalab.core.db import Database
 from portalab.modules.cards.artwork import FanArt
 from portalab.modules.cards.generator import CardForge, plan, set_code
 from portalab.modules.cards.models import Card, CardSet, Copy
-from portalab.modules.cards.packs import Packs, variant_for
+from portalab.modules.cards.packs import ContentBoosters, Packs, variant_for
 from portalab.modules.cards.participant import CardsParticipant
 from portalab.modules.cards.rarity import Ranked, rarities
 from portalab.modules.cards.roles import RoleArt, best
@@ -66,6 +66,9 @@ class Sources:
 
     async def work_of(self, object_id: UUID) -> UUID | None:
         return object_id if any(w.object_id == object_id for w in self.items) else None
+
+    async def season_of(self, object_id: UUID) -> int | None:
+        return None
 
     async def image(self, ref: str, size: str) -> bytes:
         return b"face:cruise"  # a portrait (the faces' fake reads it)
@@ -653,3 +656,22 @@ async def test_a_trial_pack_among_the_works_whose_characters_were_looked_for(dat
         ).all()
     assert len(copies) == 6 and {c.set_key for c in copies} == {str(looked.object_id)}
     assert await packs.open(user, pack_id) is not None
+
+
+async def test_a_contents_boosters_given_once_per_member(database: Database) -> None:
+    """Issue 234: a reward rule's boosters of a content — its work's, once per member and content."""
+    capabilities = new_registry()
+    film = work("Top Gun: Maverick", 11000, "US", ["Tom Cruise"])
+    capabilities.provide(CARD_SOURCES, Sources([film]), instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    user = uuid4()
+    async with database.unit_of_work() as uow:
+        await uow.session.execute(INSERT_USER, {"id": user, "login": f"u{user.hex[:8]}"})
+    packs = Packs(database, capabilities, rng=random.Random(5))  # noqa: S311 — deterministic test data
+    boosters = ContentBoosters(packs)
+    assert await boosters.give(user, film.object_id, 2, "rule:films:1") == 2
+    assert await boosters.give(user, film.object_id, 2, "rule:films:2") == 0  # watched again: given already
+    assert await boosters.give(user, uuid4(), 1, "rule:films:3") == 0  # a content without cards
+    unopened = await packs.unopened(user)
+    assert len(unopened) == 2 and {p.set_key for p in unopened} == {str(film.object_id)}
+    assert unopened[0].source == "content" and unopened[0].detail["object"] == str(film.object_id)
