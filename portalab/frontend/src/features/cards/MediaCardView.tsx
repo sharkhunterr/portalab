@@ -1,4 +1,5 @@
 import type { CSSProperties, PointerEvent, SyntheticEvent } from "react";
+import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import "@fontsource/barlow-condensed/latin-600.css";
@@ -196,6 +197,7 @@ export function MediaCardView({
   size?: "sm" | "md" | "lg";
 }) {
   const t = useT();
+  const actorBadge = usePreferences().preferences.cardActorBadge;
   const borderless = variant === "borderless" || variant === "borderless_foil";
   const foil = variant === "foil" || variant.endsWith("_foil");
   // issue 233: its edition's version wears the edition's frame (a visual pack's ``card_frame``)
@@ -235,9 +237,9 @@ export function MediaCardView({
             : cardImage(card.art, "h632");
   const art = drawn;
   // the actor's own portrait in a round badge: by the work's poster (no image of the character), or by their
-  // character — never twice the same face
+  // character (when the member keeps it) — never twice the same face
   const portrait =
-    !borderless && card.kind === "cast" && card.art && ((stand_in && !cut) || card.role_art)
+    !borderless && card.kind === "cast" && card.art && ((stand_in && !cut) || (card.role_art && actorBadge))
       ? cardImage(card.art, "w185")
       : null;
   // where the face is in the image shown (its character's, or the person's portrait — or its cut-out)

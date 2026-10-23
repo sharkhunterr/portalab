@@ -307,6 +307,7 @@
   "admin.verify.drift": "{count, plural, one {# balance drifts} other {# balances drift}} from the ledger.",
   "admin.verify.ok": "Ledger and balances agree.",
   "boost.active": "Boost ×{factor} on your {gains} — ends {when}",
+  "cards.actorBadge": "Show the actor's portrait in a badge by their character, on the cards",
   "cards.allOf": "All of {name}’s cards",
   "cards.close": "Close",
   "cards.credit": "Character images provided in part by",
