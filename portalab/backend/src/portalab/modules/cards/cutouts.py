@@ -33,6 +33,9 @@ LONGEST = 900  # a cut-out kept at this size at most
 # the model's answer made a little firmer: what is surely the character opaque, its hair and soft edges kept
 FLOOR, SPAN = 0.02, 0.4
 BATCH = 60  # cards cut out a run (about a second each)
+# a cut-out kept only when the character stands on the image's foot (its shoulders, its body there): a head
+# the model kept alone, its body taken for background, would float — the card keeps its photograph
+GROUNDED = 0.2
 NAMESPACE = "cards"
 log = get_logger("portalab.cards")
 
@@ -75,7 +78,8 @@ class Cutter:
         return True
 
     def cut(self, data: bytes) -> bytes | None:
-        """The image with its background removed, as a WebP with transparency (``None``: unreadable)."""
+        """The image with its background removed, as a WebP with transparency (``None``: unreadable, or the
+        character not standing on the image's foot)."""
         import numpy as np  # with OpenCV
 
         cv = self._cv
@@ -93,6 +97,8 @@ class Cutter:
         found = (found - found.min()) / (found.max() - found.min() + 1e-8)
         alpha = np.clip((cv.resize(found, (width, height)) - FLOOR) / SPAN, 0, 1)
         alpha = cv.GaussianBlur(alpha, (3, 3), 0)  # an edge a little soft, never cut sharp
+        if float(alpha[int(height * 0.94) :].mean()) < GROUNDED:
+            return None
         rgba = cv.cvtColor(image, cv.COLOR_BGR2BGRA)
         rgba[:, :, 3] = (alpha * 255).astype(np.uint8)
         done, encoded = cv.imencode(".webp", rgba, [cv.IMWRITE_WEBP_QUALITY, 88])
