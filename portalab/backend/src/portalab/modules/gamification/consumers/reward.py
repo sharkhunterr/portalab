@@ -64,6 +64,8 @@ class Outcome:
     flags: list[UUID] = field(default_factory=list)
     granted: int = 0
     withheld: int = 0
+    # issue 234: the contents whose boosters the rules give (user, object, how many, reason)
+    boosters: list[tuple[UUID, UUID, int, str]] = field(default_factory=list)
 
 
 def recipient(envelope: Envelope) -> UUID | None:
@@ -171,12 +173,17 @@ class RewardPipeline:
             for rule in rules:
                 if matches(rule.definition.predicate, envelope.payload):
                     await self._apply(session, user, rule, envelope, outcome)
+                    content = _uuid(envelope.payload.get("object"))
+                    if rule.definition.boosters and content is not None:
+                        reason = f"rule:{rule.key}:{envelope.event_id}"
+                        outcome.boosters.append((user, content, rule.definition.boosters, reason))
             outcome.notes.extend(await self.achievements.on_event(session, user, envelope))
             if self.quests is not None:
                 outcome.notes.extend(await self.quests.on_event(session, user, envelope))
         for flag in outcome.flags:
             await self.anomalies.escalate(flag)
         await self.notifier.send(outcome.notes)
+        await self.notifier.boosters(outcome.boosters)
         return outcome
 
     async def _apply(

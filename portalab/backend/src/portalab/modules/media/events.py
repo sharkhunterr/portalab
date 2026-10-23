@@ -6,7 +6,8 @@ user, private): ``media.playback_started|progressed|paused|finished|abandoned|er
 ``media.resume_available``, ``media.cast_started`` (#103: sent to a casting device). Requests:
 ``media.request_created|updated|available`` deduplicated by ``(request, state)``. The radio (issue 227):
 ``media.radio_listened`` (slices of listening, counted by the server), ``media.radio_requested``; issue 228:
-``media.leaving_watched`` (a title about to be deleted, watched to the end)."""
+``media.leaving_watched`` (a title about to be deleted, watched to the end); issue 234:
+``media.season_finished`` (every episode of a season finished)."""
 
 from typing import Literal
 
@@ -58,6 +59,16 @@ class RadioRequested(BaseModel):
     """Issue 227: a member's song request taken by the radio's DJ."""
 
     request: str
+
+
+class SeasonFinished(BaseModel):
+    """Issue 234: a member finished every episode of a season the library holds (once per member and
+    season)."""
+
+    object: str
+    kind: str
+    series: str | None = None
+    episodes: int
 
 
 class LeavingWatched(BaseModel):
@@ -173,6 +184,7 @@ def register_event_types(registry: EventTypeRegistry) -> None:
         ("media.radio_listened", RadioListened, ("session", "slice"), frozenset({"minutes"})),
         ("media.radio_requested", RadioRequested, ("request",), frozenset()),
         ("media.leaving_watched", LeavingWatched, ("object",), frozenset({"kind"})),
+        ("media.season_finished", SeasonFinished, ("object",), frozenset({"episodes"})),
     ):
         add(
             EventType(

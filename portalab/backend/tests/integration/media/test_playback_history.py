@@ -235,3 +235,51 @@ async def _playback_envelopes(media: MediaHarness) -> list:
             )
             for r in rows
         ]
+
+
+async def test_season_finished(app: FastAPI, media: MediaHarness, clock: FixedClock) -> None:
+    """Issue 234: the last episode of a season finished — the season is, once per member."""
+    from uuid import uuid4
+
+    from sqlalchemy import select
+
+    from portalab.modules.media.models import MediaObject
+
+    people = await users(app, media, "alex")
+    svc = media.service(1)
+    await media.module.library.upsert(
+        [
+            library_record("s", kind="series", title="Dark"),
+            library_record("s1", kind="season", title="Season 1", parent="s", position=1),
+            library_record("e1", kind="episode", title="Secrets", parent="s1", position=1, duration_s=3000),
+            library_record("e2", kind="episode", title="Lies", parent="s1", position=2, duration_s=3000),
+        ],
+        svc,
+    )
+    async with media.database.session() as session:
+        objects = {
+            o.kind + (str(o.position) if o.kind == "episode" else ""): o
+            for o in (await session.execute(select(MediaObject))).scalars()
+        }
+
+    async def finish(episode: str) -> None:
+        await media.module.history.apply(
+            event_id=uuid4(),
+            event_type="media.playback_finished",
+            user=people["alex"],
+            object_id=objects[episode].id,
+            payload={"position_s": 2900, "duration_s": 3000, "session": str(uuid4()), "kind": "episode"},
+            occurred_at=clock.now(),
+            live=True,
+        )
+
+    await finish("episode1")
+    assert await media.events("media.season") == []
+    await finish("episode2")
+    await finish("episode2")  # watched again: the season is finished already
+    seasons = await media.events("media.season")
+    assert len(seasons) == 1
+    name, payload, subject = seasons[0]
+    assert name == "media.season_finished" and subject == str(people["alex"])
+    assert payload["object"] == str(objects["season"].id) and payload["episodes"] == 2
+    assert payload["series"] == str(objects["series"].id)

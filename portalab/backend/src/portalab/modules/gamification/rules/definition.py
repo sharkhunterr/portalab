@@ -3,7 +3,8 @@
 ``{event_type, predicate[], grants[], multiplier, limits{cooldown_seconds, caps[], diminishing}}``:
 predicates and per-unit fields may only use attributes the event type declares ``rewardable`` (007);
 grants are a fixed amount, ``per_unit(field, factor, max)`` or both (027: e.g. 10 XP per play
-plus 1 XP per minute watched); rules can only produce ledger grants."""
+plus 1 XP per minute watched); rules can only produce ledger grants — and (issue 234) boosters of the
+event's content (a film, a season), given once per member and content by the cards."""
 
 from collections.abc import Iterable, Mapping
 from typing import Any, Literal
@@ -77,10 +78,19 @@ class RuleDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     event_type: str = Field(pattern=r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$", max_length=128)
     predicate: list[Condition] = Field(default_factory=list, max_length=10)
-    grants: list[Grant] = Field(min_length=1, max_length=3)
+    grants: list[Grant] = Field(default_factory=list, max_length=3)
+    # issue 234: boosters of the event's content (its ``object``: a film, a season), once per member and
+    # content
+    boosters: int = Field(default=0, ge=0, le=3)
     multiplier: float = Field(default=1.0, gt=0, le=100)
     limits: Limits = Limits()
     label: str = Field(default="", max_length=120)
+
+    @model_validator(mode="after")
+    def _gives(self) -> "RuleDefinition":
+        if not self.grants and not self.boosters:
+            raise ValueError("a rule gives something: grants, boosters or both")
+        return self
 
     def fields(self) -> set[str]:
         used = {c.field for c in self.predicate}
@@ -111,6 +121,10 @@ def parse_rule(raw: Mapping[str, Any], types: EventTypeRegistry | None = None) -
                 "Rules may only use rewardable event attributes.",
                 code="economy.rule_invalid",
                 extensions={"fields": unknown},
+            )
+        if rule.boosters and (event_type.schema is None or "object" not in event_type.schema.model_fields):
+            raise ValidationFailed(
+                "Only an action about a content gives its boosters.", code="economy.rule_invalid"
             )
     return rule
 

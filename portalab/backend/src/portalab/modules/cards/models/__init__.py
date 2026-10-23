@@ -54,6 +54,8 @@ class CardSet(CardsBase):
     family: Mapped[str] = mapped_column(String(12), nullable=False, default="drama", server_default="drama")
     facts: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict, server_default="{}")
     saga: Mapped[str | None] = mapped_column(String(200), info=not_personal("a saga's name"))
+    # issue 234: the work's title drawn (an art site's HD logo), the best liked per language (``""``: none)
+    logos: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     tmdb: Mapped[str | None] = mapped_column(String(24))  # the work's TMDB id
     ids: Mapped[str | None] = mapped_column(String(240))  # every id known, ``scheme:value`` comma-separated
     size: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

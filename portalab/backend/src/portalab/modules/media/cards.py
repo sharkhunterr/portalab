@@ -165,6 +165,12 @@ class MediaCardSources:
                 current = await session.get(MediaObject, current.parent_id) if current.parent_id else None
         return None
 
+    async def season_of(self, object_id: UUID) -> int | None:
+        """Issue 234: a season's number (``None``: not a season)."""
+        async with self.database.session() as session:
+            item = await session.get(MediaObject, object_id)
+        return item.position if item is not None and item.kind == "season" else None
+
     async def role_images(self, person_ref: str) -> Sequence[CardImage] | None:
         """Issue 229: the images a person is tagged in (their characters), from the metadata provider that
         can tell (TMDB); ``None`` when none can."""

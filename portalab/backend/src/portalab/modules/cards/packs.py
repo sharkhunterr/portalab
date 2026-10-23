@@ -1,6 +1,7 @@
-"""Issue 229: packs of cards given to members — a work watched to the end gives a pack of three: one card of
-that work, two of the whole library present. Its cards are drawn when it is given (by rarity, then a card of
-that rarity), revealed when it is opened.
+"""Issue 229: packs of cards given to members — a content's booster holds three cards: one of its work, two
+of the whole library present. Issue 234: what gives one is the administrators' — a reward rule (« a film
+watched to the end », « a season finished ») gives its event's content's boosters, once per member and
+content. Its cards are drawn when it is given (by rarity, then a card of that rarity), revealed when opened.
 
 A copy's version is drawn with it, like a trading card game's: foil at any rarity; the borderless versions
 (the full-art alternative: a work's scene over the whole card) for the works' cards only, mostly at the high
@@ -18,7 +19,6 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 
-from portalab.capabilities.events import Consumer, ConsumerContext, Envelope
 from portalab.capabilities.media_core import CARD_SOURCES
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
@@ -27,9 +27,8 @@ from portalab.modules.cards.editions import edition_of
 from portalab.modules.cards.models import Card, CardSet, Copy, Pack
 
 OWNER = "module:cards"
-CONSUMER = "cards.watched_packs"
 SIZE = 3
-PER_DAY = 5  # packs a member may be given a day by watching
+PER_DAY = 10  # contents' boosters a member may be given a day
 RARITY_WEIGHTS = {"common": 60, "rare": 28, "epic": 9, "legendary": 3}
 TRIAL_SIZE = 6  # an administrator's trial pack: more cards, the special versions more often
 TRIAL_FOIL = 0.4
@@ -87,7 +86,9 @@ class Packs:
                 return found
         return None
 
-    async def give(self, user: UUID, source: str, set_key: str | None, key: str) -> UUID | None:
+    async def give(
+        self, user: UUID, source: str, set_key: str | None, key: str, detail: dict[str, Any] | None = None
+    ) -> UUID | None:
         """A pack for this member (once per ``key``): its cards drawn now, revealed when opened."""
         now = utc_now(self.clock)
         async with self.database.unit_of_work() as uow:
@@ -101,7 +102,7 @@ class Packs:
                         set_key=set_key,
                         idempotency_key=key[:200],
                         given_at=now,
-                        detail={},
+                        detail=detail or {},
                     )
                     .on_conflict_do_nothing(index_elements=["idempotency_key"])
                     .returning(Pack.id)
@@ -170,24 +171,16 @@ class Packs:
                 )
         return pack_id
 
-    # --- a work watched to the end ------------------------------------------------------------------------
-    def consumer(self) -> Consumer:
-        return Consumer(
-            CONSUMER, frozenset({"media.playback_finished"}), self.handle, OWNER, replay_safe=True
-        )
-
-    async def handle(self, envelope: Envelope, ctx: ConsumerContext) -> None:
-        raw = envelope.payload.get("object")
-        if ctx.replay or envelope.subject_type != "user" or not envelope.subject_id or not raw:
-            return
+    # --- a content's boosters (issue 234): given by a reward rule ---------------------------------------
+    async def give_content(self, user: UUID, object_id: UUID, count: int, reason: str) -> int:
+        """``count`` boosters of this content (a film, a season: its work's cards) — once per member and
+        content; none for a content without cards, nor past the day's share."""
         providers = self.capabilities.system_providers(CARD_SOURCES)
-        if not providers:
-            return
-        work = await providers[0].provider.work_of(UUID(str(raw)))
+        if not providers or count < 1:
+            return 0
+        work = await providers[0].provider.work_of(object_id)
         if work is None:
-            return
-        user = UUID(envelope.subject_id)
-        day = envelope.occurred_at.date().isoformat()
+            return 0
         async with self.database.session() as session:
             known = await session.get(CardSet, str(work))
             given = await session.scalar(
@@ -195,9 +188,18 @@ class Packs:
                 .select_from(Pack)
                 .where(Pack.user_id == user, Pack.given_at >= utc_now(self.clock) - timedelta(days=1))
             )
-        if known is None or int(given or 0) >= PER_DAY:
-            return
-        await self.give(user, "watched", str(work), f"watched:{user}:{work}:{day}")
+        if known is None or not known.present or int(given or 0) >= PER_DAY:
+            return 0
+        season = await providers[0].provider.season_of(object_id)
+        detail: dict[str, Any] = {"object": str(object_id), "reason": reason[:200]}
+        if season is not None:
+            detail["season"] = season  # its booster says which
+        out = 0
+        for index in range(min(count, 3)):
+            key = f"content:{user}:{object_id}:{index}"
+            if await self.give(user, "content", str(work), key, detail) is not None:
+                out += 1
+        return out
 
     # --- opening ------------------------------------------------------------------------------------------
     async def open(self, user: UUID, pack_id: UUID) -> datetime | None:
@@ -221,3 +223,13 @@ class Packs:
                     )
                 ).scalars()
             )
+
+
+class ContentBoosters:
+    """Issue 234: the ``media.content_boosters`` capability — a reward rule's content boosters, the cards'."""
+
+    def __init__(self, packs: Packs) -> None:
+        self.packs = packs
+
+    async def give(self, user: UUID, object_id: UUID, count: int, reason: str) -> int:
+        return await self.packs.give_content(user, object_id, count, reason)
