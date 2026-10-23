@@ -714,3 +714,48 @@ async def test_a_shops_booster_draws_among_the_works_it_names(database: Database
             .all()
         )
     assert len(sets) == 5 and set(sets) == {str(space.object_id)}  # science fiction since 2010 only
+
+
+class Published:
+    def __init__(self) -> None:
+        self.events: list[tuple[str, dict[str, Any], str | None]] = []
+
+    async def publish(self, session: Any, event_type: str, metadata: Any = None, **kwargs: Any) -> None:
+        self.events.append((event_type, dict(metadata or {}), kwargs.get("dedup_key")))
+
+
+async def test_a_booster_opened_and_a_collection_completed(database: Database) -> None:
+    """Issue 234: what the achievements count — a booster opened (its rarest card, its legendaries, its foils)
+    and every card of a work's set owned, once."""
+    capabilities = new_registry()
+    film = work("Top Gun: Maverick", 11000, "US", ["Tom Cruise"])
+    capabilities.provide(CARD_SOURCES, Sources([film]), instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    user = uuid4()
+    async with database.unit_of_work() as uow:
+        await uow.session.execute(INSERT_USER, {"id": user, "login": f"u{user.hex[:8]}"})
+    published = Published()
+    packs = Packs(database, capabilities, rng=random.Random(2), events=published)  # type: ignore[arg-type]  # noqa: S311
+    first = await packs.give(user, "content", str(film.object_id), "k1", size=1)
+    assert first is not None
+    await packs.open(user, first)
+    assert [e[0] for e in published.events] == ["cards.pack_opened"]
+    assert published.events[0][1]["cards"] == 1 and published.events[0][1]["source"] == "content"
+    # a second booster holding every card of the set: the collection is complete
+    second = await packs.give(user, "content", str(film.object_id), "k2", size=1)
+    assert second is not None
+    async with database.unit_of_work() as uow:
+        cards = (
+            await uow.session.execute(Card.__table__.select().where(Card.set_key == str(film.object_id)))
+        ).all()
+        for card in cards:
+            uow.session.add(
+                Copy(user_id=user, card_id=card.id, variant="foil", pack_id=second, acquired_at=NOW)
+            )
+    await packs.open(user, second)
+    await packs.open(user, second)  # opened already: nothing again
+    kinds = [e[0] for e in published.events]
+    assert kinds == ["cards.pack_opened", "cards.pack_opened", "cards.set_completed"]
+    done = published.events[2][1]
+    assert done["set"] == str(film.object_id) and done["size"] == len(cards) and done["kind"] == "movie"
+    assert published.events[1][1]["foil"] == len(cards)
