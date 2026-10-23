@@ -65,7 +65,7 @@ function rest(event: PointerEvent<HTMLElement>) {
  * director) — and its name, whole; its art in a metal frame; under it, who plays it; then the work it belongs
  * to, plain to see (its poster, title, year); its figures as a card's attacks (the work's rating, box office…);
  * at the foot its collector number and its rarity. The same card at every size. ``borderless``: the art over the
- * whole card, only its name, who plays it and its rarity over it, the work's poster pinned in a corner;
+ * whole card, only its name, who plays it and its rarity over it;
  * ``foil``: a holographic light that follows the pointer. A card not owned yet shows dimmed. A role
  * without an image of its character shows the work's poster and the actor's portrait in a round badge.
  */
@@ -127,9 +127,6 @@ export function MediaCardView({
     .filter(Boolean)
     .join(" · ");
   const poster = card.kind !== "title" && !stand_in ? cardImage(card.set_poster ?? null, "w185") : null;
-  const pinned = borderless
-    ? cardImage((card.kind === "title" ? card.art : card.set_poster) ?? null, "w185")
-    : null;
   const figures = figuresOf(card);
   return (
     <article
@@ -169,9 +166,6 @@ export function MediaCardView({
               <img className="mcard__badge" src={portrait} alt="" loading="lazy" draggable={false} />
             ) : null}
           </div>
-          {pinned ? (
-            <img className="mcard__poster" src={pinned} alt="" loading="lazy" draggable={false} />
-          ) : null}
           {strip ? <p className="mcard__strip">{strip}</p> : null}
           {borderless ? null : card.kind === "title" ? (
             meta ? (

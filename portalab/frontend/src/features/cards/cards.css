@@ -384,8 +384,7 @@
 }
 
 /* the borderless alternative: the art over the whole card inside its rim, nothing over it but its name on
-   top, who plays it and its rarity at the foot — light texts on soft shades; the work's poster pinned in a
-   corner, like a trading card's « evolves from » */
+   top, who plays it and its rarity at the foot — light texts on soft shades */
 .mcard[data-borderless] .mcard__body {
   background: none;
   box-shadow: none;
@@ -427,18 +426,6 @@
 }
 .mcard[data-borderless] .mcard__strip {
   background: none;
-}
-.mcard__poster {
-  position: absolute;
-  inset-block-start: 13cqi;
-  inset-inline-start: 3.5cqi;
-  inline-size: 17cqi;
-  aspect-ratio: 2 / 3;
-  border-radius: 1cqi;
-  object-fit: cover;
-  box-shadow:
-    0 0 0 0.6cqi var(--card-text),
-    0 1cqi 2.4cqi var(--card-shadow);
 }
 
 /* foil (after a Pokémon card holo effect): the card leans towards the pointer; holographic stripes in the
