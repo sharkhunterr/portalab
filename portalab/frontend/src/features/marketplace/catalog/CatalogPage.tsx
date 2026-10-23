@@ -101,7 +101,11 @@ export const DEPARTMENTS: Department[] = [
     shelves: [{ key: "packs", icon: "shop", types: ["bundle"], notCategory: "ultimate" }],
   },
   // #81: sealed packs drawn at random — products like the others (a tile, a sheet), the season's first
-  { key: "boosters", icon: "sparkles", shelves: [{ key: "boosters", icon: "sparkles", types: ["booster"] }] },
+  {
+    key: "boosters",
+    icon: "sparkles",
+    shelves: [{ key: "boosters", icon: "sparkles", types: ["booster", "card_booster"] }],
+  },
 ];
 const RARITIES = ["common", "rare", "epic", "legendary"] as const;
 const RANK: Record<string, number> = { legendary: 0, epic: 1, rare: 2, common: 3 };

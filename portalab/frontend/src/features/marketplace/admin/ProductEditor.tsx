@@ -68,6 +68,27 @@ interface PluginType {
   payload_fields: string[];
 }
 
+// issue 234: the settings of a module's kind of product picked from their values (a booster of cards: the works
+// it draws among)
+const CHOICES: Record<string, Array<[value: string, label: string]>> = {
+  "card_booster.family": ["sf", "action", "fantasy", "family", "drama", "dark"].map((f) => [
+    f,
+    `gamification:cards.family.${f}`,
+  ]),
+  "card_booster.edition": ["film", "vhs", "disc", "stream"].map((e) => [
+    e,
+    `gamification:cards.edition.${e}`,
+  ]),
+  "card_booster.kind": [
+    ["movie", "gamification:cards.pack.kind.movie"],
+    ["series", "gamification:cards.pack.kind.series"],
+  ],
+  "card_booster.cards": ["3", "5", "8", "10"].map((n) => [
+    n,
+    `marketplace:admin.field.card_booster.count.${n}`,
+  ]),
+};
+
 function usePluginTypes(enabled: boolean) {
   return useQuery({
     queryKey: ["marketplace", "plugin-types"],
@@ -75,8 +96,11 @@ function usePluginTypes(enabled: boolean) {
     queryFn: async () => {
       // biome-ignore lint/suspicious/noExplicitAny: an admin route added by spec 030
       const data = (await api.GET("/api/v1/admin/marketplace/types" as any, {})).data as unknown;
-      return (Array.isArray(data) ? data : []).filter((type: PluginType) =>
-        String(type.owner).startsWith("plugin:"),
+      // the kinds of products other parts declare: a plugin's (030), a module's (issue 234: a booster of cards)
+      return (Array.isArray(data) ? data : []).filter(
+        (type: PluginType) =>
+          String(type.owner).startsWith("plugin:") ||
+          (String(type.owner).startsWith("module:") && type.owner !== "module:marketplace"),
       ) as PluginType[];
     },
   });
@@ -712,14 +736,30 @@ export function NewProductDialog({
             ) : null}
           </SelectField>
           {pluginType
-            ? pluginType.payload_fields.map((field) => (
-                <TextField
-                  key={field}
-                  label={field}
-                  value={pluginValues[field] ?? ""}
-                  onChange={(e) => setPluginValues({ ...pluginValues, [field]: e.target.value })}
-                />
-              ))
+            ? pluginType.payload_fields.map((field) =>
+                CHOICES[`${type}.${field}`] ? (
+                  <SelectField
+                    key={field}
+                    label={t(`marketplace:admin.field.${type}.${field}`)}
+                    value={pluginValues[field] ?? ""}
+                    onChange={(e) => setPluginValues({ ...pluginValues, [field]: e.target.value })}
+                  >
+                    <option value="">{t("marketplace:admin.field.any")}</option>
+                    {CHOICES[`${type}.${field}`]?.map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {t(label)}
+                      </option>
+                    ))}
+                  </SelectField>
+                ) : (
+                  <TextField
+                    key={field}
+                    label={field}
+                    value={pluginValues[field] ?? ""}
+                    onChange={(e) => setPluginValues({ ...pluginValues, [field]: e.target.value })}
+                  />
+                ),
+              )
             : null}
           <TextField
             label={t("marketplace:admin.key")}

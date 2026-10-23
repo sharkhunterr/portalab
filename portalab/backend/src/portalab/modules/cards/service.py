@@ -52,7 +52,21 @@ def card_out(card: Card, card_set: CardSet, owned: dict[str, int] | None = None)
 
 def _pack_look(card_set: CardSet | None, detail: dict[str, Any]) -> dict[str, Any] | None:
     if card_set is None:
-        return None
+        if not detail.get("product"):
+            return None
+        # a shop's booster: the works it draws among (all of them when unsaid)
+        return {
+            "kind": detail.get("kind"),
+            "code": None,
+            "year": None,
+            "family": detail.get("family"),
+            "edition": detail.get("edition"),
+            "poster": None,
+            "backdrop": None,
+            "logos": {},
+            "season": None,
+            "product": detail.get("product"),
+        }
     return {
         "kind": card_set.kind,
         "code": card_set.code,

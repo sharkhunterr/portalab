@@ -82,7 +82,7 @@ function picks(coins: number): Record<Pick, (p: Product) => boolean> {
     afford: (p) => buyable(p) && price(p) > 0 && price(p) <= coins,
     deal: (p) => buyable(p) && Boolean(p.discount),
     soon: (p) => buyable(p) && p.remaining != null && p.remaining > 0 && p.remaining <= 5,
-    boosters: (p) => buyable(p) && p.type === "booster",
+    boosters: (p) => buyable(p) && (p.type === "booster" || p.type === "card_booster"),
     free: (p) => buyable(p) && !p.price_coins,
   };
 }

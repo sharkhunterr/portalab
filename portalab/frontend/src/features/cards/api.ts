@@ -90,8 +90,8 @@ export interface CardSetDetail extends Omit<CardSetItem, "owned"> {
 
 /** Issue 234: what a content's booster wears — its work's art, its title drawn (logos per language), the season. */
 export interface PackLook {
-  kind: string;
-  code: string;
+  kind: string | null;
+  code: string | null;
   year: number | null;
   family: string;
   edition: Edition | null;
@@ -99,6 +99,8 @@ export interface PackLook {
   backdrop: string | null;
   logos: Record<string, string>;
   season: number | null;
+  /** a shop's booster: its product (the works it draws among are its family, edition and kind) */
+  product?: string | null;
 }
 
 export interface CardPack {

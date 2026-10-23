@@ -11,13 +11,14 @@ from uuid import UUID, uuid4
 import pytest
 
 from portalab.capabilities.catalog import new_registry
+from portalab.capabilities.marketplace import OwnershipView
 from portalab.capabilities.media import ARTWORK, Artwork
 from portalab.capabilities.media_core import CARD_SOURCES, CardImage, CardPerson, CardWork
 from portalab.core.db import Database
 from portalab.modules.cards.artwork import FanArt
 from portalab.modules.cards.generator import CardForge, plan, set_code
 from portalab.modules.cards.models import Card, CardSet, Copy
-from portalab.modules.cards.packs import ContentBoosters, Packs, variant_for
+from portalab.modules.cards.packs import CardBoosterHandler, ContentBoosters, Packs, variant_for
 from portalab.modules.cards.participant import CardsParticipant
 from portalab.modules.cards.rarity import Ranked, rarities
 from portalab.modules.cards.roles import RoleArt, best
@@ -675,3 +676,41 @@ async def test_a_contents_boosters_given_once_per_member(database: Database) -> 
     unopened = await packs.unopened(user)
     assert len(unopened) == 2 and {p.set_key for p in unopened} == {str(film.object_id)}
     assert unopened[0].source == "content" and unopened[0].detail["object"] == str(film.object_id)
+
+
+async def test_a_shops_booster_draws_among_the_works_it_names(database: Database) -> None:
+    """Issue 234: a booster of cards bought in the shop — sealed in the inventory, its cards drawn among the
+    works of its genre and edition only; one naming no work is not sold."""
+    capabilities = new_registry()
+    space = replace(work("Interstellar", 9000, "US", ["Matthew"]), genres=("Science-Fiction",), year=2014)
+    old = replace(work("Alien", 8000, "US", ["Sigourney"]), genres=("Science-Fiction",), year=1979)
+    comedy = replace(work("OSS 117", 3000, "FR", ["Jean"]), genres=("Comédie",), year=2006)
+    capabilities.provide(CARD_SOURCES, Sources([space, old, comedy]), instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    user = uuid4()
+    async with database.unit_of_work() as uow:
+        await uow.session.execute(INSERT_USER, {"id": user, "login": f"u{user.hex[:8]}"})
+    packs = Packs(database, capabilities, rng=random.Random(7))  # noqa: S311 — deterministic test data
+    handler = CardBoosterHandler(packs)
+
+    def bought(**payload: Any) -> OwnershipView:
+        return OwnershipView(uuid4(), user, "sf_stream", "card_booster", payload)
+
+    assert (await handler.activate(bought(family="sf", edition="stream", cards="5"))).state == "active"
+    assert (await handler.activate(bought(family="family", edition="film"))).state == "incompatible"
+    unopened = await packs.unopened(user)
+    assert len(unopened) == 1 and unopened[0].source == "shop"
+    async with database.session() as session:
+        sets = (
+            (
+                await session.execute(
+                    Card.__table__.select()
+                    .with_only_columns(Card.set_key)
+                    .join(Copy, Copy.card_id == Card.id)
+                    .where(Copy.pack_id == unopened[0].id)
+                )
+            )
+            .scalars()
+            .all()
+        )
+    assert len(sets) == 5 and set(sets) == {str(space.object_id)}  # science fiction since 2010 only
