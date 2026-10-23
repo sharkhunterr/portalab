@@ -122,6 +122,8 @@
 
 /* its name, whole on one line (a long one smaller); the genre's emblem and name */
 .mcard__head {
+  position: relative;
+  z-index: 2; /* over a legendary's character coming out of its window */
   display: flex;
   align-items: center;
   gap: 2cqi;
@@ -264,6 +266,18 @@
   pointer-events: none;
   background: var(--card-text);
   mask: var(--card-starfield) var(--mcard-sky-x, 0%) var(--mcard-sky-y, 0%) / 110cqi 110cqi repeat;
+}
+/* a legendary's name stays readable over its character's head coming out of the window */
+.mcard[data-rarity="legendary"] .mcard__name {
+  text-shadow:
+    0 0 0.5cqi var(--card-text),
+    0 0 1.2cqi var(--card-text),
+    0 0 2cqi var(--card-text);
+}
+/* a legendary's cut-out character comes out over the window's top (its picture cuts the rest) */
+.mcard__art[data-outgrown] {
+  overflow: visible;
+  z-index: 1;
 }
 .mcard__art .mcard__scene {
   filter: blur(0.8cqi) brightness(0.62) saturate(1.15);
