@@ -261,6 +261,8 @@ class CardService:
             "kind": card_set.kind,
             "year": card_set.year,
             "poster": card_set.poster,
+            "backdrop": card_set.backdrop,
+            "logos": card_set.logos or {},
             "saga": card_set.saga,
             "present": card_set.present,
             "size": card_set.size,

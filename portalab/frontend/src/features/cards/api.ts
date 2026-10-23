@@ -88,11 +88,25 @@ export interface CardSetDetail extends Omit<CardSetItem, "owned"> {
   cards: MediaCard[];
 }
 
+/** Issue 234: what a content's booster wears — its work's art, its title drawn (logos per language), the season. */
+export interface PackLook {
+  kind: string;
+  code: string;
+  year: number | null;
+  family: string;
+  edition: Edition | null;
+  poster: string | null;
+  backdrop: string | null;
+  logos: Record<string, string>;
+  season: number | null;
+}
+
 export interface CardPack {
   id: string;
   source: string;
   set: string | null;
   set_name: string | null;
+  look?: PackLook | null;
   given_at: string;
   opened_at: string | null;
   cards: MediaCard[];
@@ -142,10 +156,12 @@ export function useCardSets(q: string, started: boolean, page: number) {
   });
 }
 
-export function useCardSet(key: string | undefined) {
+export function useCardSet(key: string | undefined, { quiet = false }: { quiet?: boolean } = {}) {
   return useQuery({
     queryKey: [...KEY, "set", key],
     enabled: Boolean(key),
+    // issue 234: on a work's page, a work without cards is no error
+    ...(quiet ? { retry: false } : {}),
     queryFn: async () =>
       (await api.GET("/api/v1/cards/sets/{key}", { params: { path: { key: key ?? "" } } }))
         .data as unknown as CardSetDetail,

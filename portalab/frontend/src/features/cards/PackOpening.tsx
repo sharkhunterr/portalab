@@ -4,13 +4,14 @@ import { Icon } from "../../design-system/components/Icon";
 import { Dialog, DialogActions } from "../../design-system/components/Overlays";
 import { useT } from "../../i18n/hooks/useT";
 import { type CardPack, useOpenPack } from "./api";
+import { CardBooster } from "./CardBooster";
 import { MediaCardView } from "./MediaCardView";
 
 /**
  * Issue 229: opening a pack — its cards were drawn when it was given; here they turn over one by one (a click
- * on the next), the rarest last, each in its version.
+ * on the next), the rarest last, each in its version. Issue 234: shown as its booster, opened by a click on it.
  */
-export function PackOpening({ pack }: { pack: CardPack }) {
+export function PackOpening({ pack, booster = false }: { pack: CardPack; booster?: boolean }) {
   const t = useT();
   const open = useOpenPack();
   const [shown, setShown] = useState(0);
@@ -29,10 +30,20 @@ export function PackOpening({ pack }: { pack: CardPack }) {
       title={t("gamification:cards.pack.title", { name: pack.set_name ?? "" })}
       closeLabel={t("gamification:cards.close")}
       trigger={
-        <Button>
-          <Icon name="gift" size={16} />
-          {t("gamification:cards.pack.open")}
-        </Button>
+        booster ? (
+          <button
+            type="button"
+            className="cbooster-trigger"
+            aria-label={`${t("gamification:cards.pack.open")} — ${pack.set_name ?? t("gamification:cards.pack.any")}`}
+          >
+            <CardBooster pack={pack} />
+          </button>
+        ) : (
+          <Button>
+            <Icon name="gift" size={16} />
+            {t("gamification:cards.pack.open")}
+          </Button>
+        )
       }
     >
       <div className="cards-reveal">
