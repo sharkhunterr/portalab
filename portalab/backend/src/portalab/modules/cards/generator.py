@@ -89,8 +89,8 @@ def fingerprint(work: CardWork) -> str:
         "genres": list(work.genres),
         "facts": sorted(work.facts.items()),
         # how the cards are made: v2 no image of the work on a person's, v3 the set's scene, v4 codes, v5 the
-        # genre's colour and the work's figures
-        "v": 5,
+        # genre's colour and the work's figures, v6 its genres printed
+        "v": 6,
     }
     return hashlib.sha256(json.dumps(data, sort_keys=True, default=str).encode()).hexdigest()[:64]
 
@@ -208,6 +208,7 @@ class CardForge:
             **dict(work.facts),
             **({"rating": round(work.vote_average, 1)} if work.vote_average else {}),
             **({"votes": work.vote_count} if work.vote_count else {}),
+            **({"genres": list(work.genres)[:3]} if work.genres else {}),
         }
         current.saga = (
             str(work.collection.get("name"))[:200]
