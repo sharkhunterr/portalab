@@ -48,7 +48,8 @@ function tilt(event: PointerEvent<HTMLElement>) {
 
 /** A cut-out character (over a scene of its own, nothing to hide around it): zoomed out — more of them shown,
  * their face across the middle and two fifths down the window — but never above the window's foot: the image
- * always reaches it (where the photograph ended, the character would be cut). */
+ * always reaches it (where the photograph ended, the character would be cut). Kept within the window; a
+ * legendary's character set higher, its head coming out over the window's top. */
 function placeCutout(image: HTMLImageElement) {
   const box = image.parentElement;
   const width = box?.clientWidth ?? 0;
@@ -58,13 +59,22 @@ function placeCutout(image: HTMLImageElement) {
   const [fx, fy] = [Number(image.dataset.fx), Number(image.dataset.fy)];
   const cover = Math.max(width / natural[0], height / natural[1]);
   const reachFoot = (0.58 * height) / (Math.max(0.05, 1 - fy) * natural[1]);
-  const scale = Math.min(cover, Math.max(reachFoot, cover * 0.62));
+  const scale = Math.min(cover, Math.max(reachFoot, cover * 0.85)); // a little of the shoulders, no more
   const [drawnWidth, drawnHeight] = [natural[0] * scale, natural[1] * scale];
   const left = Math.min(
     Math.max(0.5 * width - fx * drawnWidth, Math.min(0, width - drawnWidth)),
     Math.max(0, width - drawnWidth),
   );
-  const top = Math.max(0.42 * height - fy * drawnHeight, height - drawnHeight);
+  const legendary = image.closest<HTMLElement>(".mcard")?.dataset.rarity === "legendary";
+  const top = Math.max((legendary ? 0.3 : 0.42) * height - fy * drawnHeight, height - drawnHeight);
+  // what lies outside the window cut away (a legendary's head let out at the top)
+  const cut = (outside: number, size: number) => `${((Math.max(0, outside) / size) * 100).toFixed(2)}%`;
+  const clip = [
+    legendary ? "-50%" : cut(-top, drawnHeight),
+    cut(left + drawnWidth - width, drawnWidth),
+    cut(top + drawnHeight - height, drawnHeight),
+    cut(-left, drawnWidth),
+  ];
   Object.assign(image.style, {
     inset: "auto",
     left: `${((left / width) * 100).toFixed(2)}%`,
@@ -72,7 +82,9 @@ function placeCutout(image: HTMLImageElement) {
     width: `${((drawnWidth / width) * 100).toFixed(2)}%`,
     height: `${((drawnHeight / height) * 100).toFixed(2)}%`,
     objectFit: "fill",
+    clipPath: `inset(${clip.join(" ")})`,
   });
+  if (legendary && box) box.dataset.outgrown = "";
 }
 
 /** The colour along one side of an image (its average), or null when it cannot be read. */
