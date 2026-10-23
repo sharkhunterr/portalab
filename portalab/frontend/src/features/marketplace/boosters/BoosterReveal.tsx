@@ -116,6 +116,7 @@ function Card({
   total,
   state,
   onReveal,
+  onZoom,
   scene,
   reduced = false,
 }: {
@@ -124,6 +125,8 @@ function Card({
   total: number;
   state: CardState;
   onReveal: () => void;
+  /** issue 234: a card of its own face (a media card), turned: seen big on a tap */
+  onZoom?: (() => void) | undefined;
   /** 028: a pack's scene — its faces, backs and reveal effects per rarity (Portalab's own where it brings none) */
   scene?: Scene | null;
   reduced?: boolean;
@@ -177,8 +180,8 @@ function Card({
       <button
         type="button"
         className="booster-card__button"
-        onClick={onReveal}
-        disabled={state !== "hidden"}
+        onClick={state === "revealed" && card.face && onZoom ? onZoom : onReveal}
+        disabled={state !== "hidden" && !(state === "revealed" && card.face && onZoom)}
         aria-label={label}
       >
         <span className="booster-card__inner">
@@ -330,6 +333,15 @@ export function BoosterReveal({
   const [phase, setPhase] = useState<Phase>("sealed");
   const [states, setStates] = useState<CardState[]>([]);
   const [moment, setMoment] = useState<string | null>(null);
+  const [zoom, setZoom] = useState<number | null>(null);
+  // issue 234: on a phone, cards of their own faces are swiped one at a time — the row follows the turning one
+  const row = useRef<HTMLUListElement>(null);
+  const follow = useCallback((index: number) => {
+    const list = row.current;
+    const item = list?.children[index] as HTMLElement | undefined;
+    if (!list || !item || list.scrollWidth <= list.clientWidth) return;
+    list.scrollTo({ left: item.offsetLeft - (list.clientWidth - item.offsetWidth) / 2, behavior: "smooth" });
+  }, []);
   const timers = useRef<number[]>([]);
   const dialog = useRef<HTMLDivElement>(null);
   const cards = demo
@@ -417,6 +429,7 @@ export function BoosterReveal({
       if (!card) return;
       const rank = RANK[card.product.rarity ?? "common"] ?? 0;
       const charge = reduced ? 0 : (CHARGE_MS[rank] ?? 0);
+      follow(index);
       setStates((now) => now.map((s, i) => (i === index && s === "hidden" ? "charging" : s)));
       if (rank >= 2 && !reduced) setMoment(RARITIES[rank] ?? null);
       later(() => {
@@ -425,7 +438,7 @@ export function BoosterReveal({
         later(() => setMoment((m) => (m === RARITIES[rank] ? null : m)), AFTER_MS[rank] ?? 400);
       }, charge);
     },
-    [cards, later, reduced],
+    [cards, later, reduced, follow],
   );
 
   const revealAll = () => {
@@ -437,6 +450,11 @@ export function BoosterReveal({
       wait += reduced ? 150 : (CHARGE_MS[rank] ?? 0) + (AFTER_MS[rank] ?? 400) + 150;
     });
   };
+
+  // the cards once spread: the row from its first
+  useEffect(() => {
+    if (phase === "spread") later(() => row.current?.scrollTo({ left: 0 }), 950);
+  }, [phase, later]);
 
   const all = states.length > 0 && states.every((s) => s === "revealed");
   useEffect(() => {
@@ -552,7 +570,12 @@ export function BoosterReveal({
         </div>
       ) : (
         <>
-          <ul className="booster-cards" aria-label={name}>
+          <ul
+            ref={row}
+            className="booster-cards"
+            aria-label={name}
+            data-own={cards.some((card) => card.face) ? "" : undefined}
+          >
             {cards.map((card, index) => (
               <Card
                 key={card.product.key}
@@ -565,9 +588,24 @@ export function BoosterReveal({
                 onReveal={() => {
                   if (!busy) revealOne(index);
                 }}
+                onZoom={() => setZoom(index)}
               />
             ))}
           </ul>
+          {zoom !== null && cards[zoom]?.face
+            ? // issue 234: a turned card seen big, over the stage — a tap anywhere puts it back
+              createPortal(
+                <button
+                  type="button"
+                  className="booster-zoom"
+                  onClick={() => setZoom(null)}
+                  aria-label={t("marketplace:booster.close")}
+                >
+                  <span className="booster-zoom__card">{cards[zoom]?.face}</span>
+                </button>,
+                document.body,
+              )
+            : null}
           {phase === "spread" && !all ? (
             <div className="booster-stage__actions">
               <p className="booster-stage__hint">{t("marketplace:booster.tapCards")}</p>

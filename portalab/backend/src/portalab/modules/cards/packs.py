@@ -1,5 +1,5 @@
-"""Issue 229: packs of cards given to members — a content's booster holds three cards: one of its work, two
-of the whole library present. Issue 234: what gives one is the administrators' — a reward rule (« a film
+"""Issue 229: packs of cards given to members — a content's booster holds three cards of its work, never twice
+the same while others are left. Issue 234: what gives one is the administrators' — a reward rule (« a film
 watched to the end », « a season finished ») gives its event's content's boosters, once per member and
 content. Its cards are drawn when it is given (by rarity, then a card of that rarity), revealed when opened.
 
@@ -115,7 +115,11 @@ class Packs:
 
     # --- drawing ------------------------------------------------------------------------------------------
     async def _draw(
-        self, session: Any, set_key: str | None, among: Mapping[str, Any] | None = None
+        self,
+        session: Any,
+        set_key: str | None,
+        among: Mapping[str, Any] | None = None,
+        drawn: Sequence[UUID] = (),
     ) -> Card | None:
         rarity = self.rng.choices(list(RARITY_WEIGHTS), weights=list(RARITY_WEIGHTS.values()), k=1)[0]
         base = (
@@ -127,8 +131,10 @@ class Packs:
             base = base.where(Card.set_key == set_key)
         for condition in _among(among or {}):
             base = base.where(condition)
-        for wanted in (rarity, None):  # that rarity, else any (a set may hold none of it)
-            query = base.where(Card.rarity == wanted) if wanted else base
+        # never twice the same card in a pack while others are left (a small set: again, then)
+        fresh = base.where(Card.id.not_in(drawn)) if drawn else base
+        for wanted, pool in ((rarity, fresh), (None, fresh), (None, base)):  # that rarity, else any
+            query = pool.where(Card.rarity == wanted) if wanted else pool
             found: Card | None = (
                 await session.execute(query.order_by(func.random()).limit(1))
             ).scalar_one_or_none()
@@ -157,8 +163,8 @@ class Packs:
         among: Mapping[str, Any] | None = None,
         size: int = SIZE,
     ) -> UUID | None:
-        """A pack for this member (once per ``key``): its cards drawn now, revealed when opened — the first of
-        ``set_key`` (a content's), the others ``among`` the works it names (issue 234: a shop's booster)."""
+        """A pack for this member (once per ``key``): its cards drawn now, revealed when opened — all of
+        ``set_key`` (a content's) or ``among`` the works it names (issue 234: a shop's booster)."""
         now = utc_now(self.clock)
         async with self.database.unit_of_work() as uow:
             session = uow.session
@@ -179,10 +185,13 @@ class Packs:
             ).scalar_one_or_none()
             if pack_id is None:
                 return None  # given already
-            for index in range(size):
-                card = await self._draw(session, set_key if index == 0 else None, among)
+            drawn: list[UUID] = []
+            for _ in range(size):
+                # issue 234: a content's booster holds its work's cards only
+                card = await self._draw(session, set_key, among, drawn)
                 if card is None:
                     continue
+                drawn.append(card.id)
                 card_set = await session.get(CardSet, card.set_key)
                 edition = edition_of(card_set.year if card_set else None)
                 session.add(

@@ -176,7 +176,9 @@ async def test_made_numbered_ranked_drawn_and_erased(database: Database) -> None
     await packs.open(user, pack)
     opened = await service.pack(user, pack)
     assert opened is not None and len(opened["cards"]) == 3
-    assert opened["cards"][0]["set"] == str(first.object_id)  # the first card: of the work watched
+    # every card of the work watched, never twice the same
+    assert {c["set"] for c in opened["cards"]} == {str(first.object_id)}
+    assert len({c["id"] for c in opened["cards"]}) == 3
     assert opened["cards"][0]["new"] is True  # the member's first copy of it
     summary = await service.summary(user)
     assert summary["copies"] == 3 and summary["unopened"] == 0
