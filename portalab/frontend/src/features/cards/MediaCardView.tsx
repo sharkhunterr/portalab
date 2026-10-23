@@ -26,7 +26,7 @@ const FAMILY_ICON: Record<string, string> = {
 };
 const VOICE = /\((voice|voix)\)/i;
 
-/** The size of a name so that it fits its plate whole (container units), wrapping on two lines at the least. */
+/** The size of a name so that it fits its room whole on one line (container units): only a long one is smaller. */
 function fit(text: string, room: number, largest: number, smallest: number, width = 0.46): string {
   const size = room / (Math.max(text.length, 1) * width);
   return `${Math.max(smallest, Math.min(largest, size)).toFixed(2)}cqi`;
@@ -61,11 +61,12 @@ function rest(event: PointerEvent<HTMLElement>) {
 
 /**
  * Issue 229: a media card, laid out like a trading card game's. Its rim is its rarity's metal; its body its
- * work's genre colour (with the genre's emblem top right). On top what it is — simply (a character, a film, a
- * director) — and its name, whole; its art in a metal frame; under it, who plays it; then the work it belongs
- * to, plain to see (its poster, title, year); its figures as a card's attacks (the work's rating, box office…);
- * at the foot its collector number and its rarity. The same card at every size. ``borderless``: the art over the
- * whole card, only its name, who plays it and its rarity over it;
+ * work's genre colour (the genre's emblem and name top right). On top its name, whole on one line; its art in a
+ * metal frame; under it, in a band, what it is — simply (a character, a film, a director) — and who plays it;
+ * then the work it belongs to: its poster the whole height on the left, its title, year and figures on the
+ * right (the figures as a card's attacks: the work's rating, box office…); at the foot its collector number and
+ * its rarity. The same card at every size. ``borderless``: the art over the whole card, only its name, the band
+ * and its rarity over it;
  * ``foil``: a holographic light that follows the pointer. A card not owned yet shows dimmed. A role
  * without an image of its character shows the work's poster and the actor's portrait in a round badge.
  */
@@ -128,6 +129,9 @@ export function MediaCardView({
     .join(" · ");
   const poster = card.kind !== "title" && !stand_in ? cardImage(card.set_poster ?? null, "w185") : null;
   const figures = figuresOf(card);
+  const genre = t(`gamification:cards.family.${family}`);
+  // the name's room: the card's inner width, less the genre's chip (its emblem and its name)
+  const room = 84 - 9 - genre.length * 2.1;
   return (
     <article
       className="mcard"
@@ -145,12 +149,14 @@ export function MediaCardView({
       <div className="mcard__card">
         <div className="mcard__body">
           <header className="mcard__head">
-            <span className="mcard__stage">{stage}</span>
-            <span className="mcard__name" style={{ fontSize: fit(title, 62, 8.6, 4.8) }}>
+            <span className="mcard__name" style={{ fontSize: fit(title, room, 8.6, 3.6) }}>
               {title}
             </span>
-            <span className="mcard__emblem" aria-hidden="true">
-              <Icon name={FAMILY_ICON[family] ?? "star"} size={14} />
+            <span className="mcard__genre">
+              <span className="mcard__emblem" aria-hidden="true">
+                <Icon name={FAMILY_ICON[family] ?? "star"} size={14} />
+              </span>
+              {genre}
             </span>
           </header>
           <div
@@ -166,42 +172,55 @@ export function MediaCardView({
               <img className="mcard__badge" src={portrait} alt="" loading="lazy" draggable={false} />
             ) : null}
           </div>
-          {strip ? <p className="mcard__strip">{strip}</p> : null}
-          {borderless ? null : card.kind === "title" ? (
-            meta ? (
-              <p className="mcard__meta">{meta}</p>
-            ) : null
-          ) : (
-            <div className="mcard__work">
-              {poster ? <img src={poster} alt="" loading="lazy" draggable={false} /> : null}
-              <span>
-                <strong style={{ fontSize: fit(card.set_name, 150, 5, 3.4, 0.5) }}>{card.set_name}</strong>
-                {meta ? <small>{meta}</small> : null}
-              </span>
+          <p className="mcard__strip">
+            <span className="mcard__stage">{stage}</span>
+            {strip ? <span>{strip}</span> : null}
+          </p>
+          {borderless ? null : (
+            <div className="mcard__lower">
+              {poster ? (
+                <span className="mcard__poster">
+                  <img src={poster} alt="" loading="lazy" draggable={false} />
+                </span>
+              ) : null}
+              <div className="mcard__facts">
+                {card.kind === "title" ? (
+                  meta ? (
+                    <p className="mcard__meta">{meta}</p>
+                  ) : null
+                ) : (
+                  <div className="mcard__work">
+                    <strong style={{ fontSize: fit(card.set_name, poster ? 100 : 150, 5, 3.4, 0.5) }}>
+                      {card.set_name}
+                    </strong>
+                    {meta ? <small>{meta}</small> : null}
+                  </div>
+                )}
+                {figures.length ? (
+                  <ul className="mcard__figures">
+                    {figures.map((figure) => (
+                      <li key={figure.key}>
+                        <span className="mcard__cost" aria-hidden="true">
+                          <Icon name={figure.icon} size={10} />
+                        </span>
+                        <span>
+                          {t(
+                            figure.key === "rating" && card.kind !== "title"
+                              ? `gamification:cards.figure.workRating.${series ? "series" : "movie"}`
+                              : `gamification:cards.figure.${figure.key}`,
+                          )}
+                        </span>
+                        <strong>
+                          {t(figure.big.id, figure.big.values)}
+                          {figure.small ? <small>{figure.small}</small> : null}
+                        </strong>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
             </div>
           )}
-          {!borderless && figures.length ? (
-            <ul className="mcard__figures">
-              {figures.map((figure) => (
-                <li key={figure.key}>
-                  <span className="mcard__cost" aria-hidden="true">
-                    <Icon name={figure.icon} size={10} />
-                  </span>
-                  <span>
-                    {t(
-                      figure.key === "rating" && card.kind !== "title"
-                        ? `gamification:cards.figure.workRating.${series ? "series" : "movie"}`
-                        : `gamification:cards.figure.${figure.key}`,
-                    )}
-                  </span>
-                  <strong>
-                    {t(figure.big.id, figure.big.values)}
-                    {figure.small ? <small>{figure.small}</small> : null}
-                  </strong>
-                </li>
-              ))}
-            </ul>
-          ) : null}
           {!borderless && card.kind === "title" && card.flavor ? (
             <p className="mcard__flavor">{card.flavor}</p>
           ) : null}
