@@ -28,6 +28,9 @@ CONSUMER = "cards.watched_packs"
 SIZE = 3
 PER_DAY = 5  # packs a member may be given a day by watching
 RARITY_WEIGHTS = {"common": 60, "rare": 28, "epic": 9, "legendary": 3}
+TRIAL_SIZE = 6  # an administrator's trial pack: more cards, the special versions more often
+TRIAL_FOIL = 0.4
+TRIAL_BORDERLESS = 0.5
 FOIL = 1 / 8
 # the chance a copy is borderless (the full-art alternative), by the card's rarity
 BORDERLESS = {"common": 0.0, "rare": 1 / 40, "epic": 1 / 10, "legendary": 1 / 4}
@@ -109,6 +112,47 @@ class Packs:
                         pack_id=pack_id,
                         acquired_at=now,
                     )
+                )
+        return pack_id
+
+    # --- a trial pack (issue 229): to see the cards as they are drawn ------------------------------------
+    async def trial(self, user: UUID, size: int = TRIAL_SIZE) -> UUID:
+        """An administrator's trial pack: ``size`` cards drawn among the works whose characters were looked
+        for (their images known), the special versions more often — every rendering seen in a few packs."""
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            looked = list(
+                (
+                    await session.execute(
+                        select(Card.set_key).where(Card.character_checked_at.is_not(None)).distinct()
+                    )
+                ).scalars()
+            )
+            pack_id = (
+                await session.execute(
+                    insert(Pack)
+                    .values(
+                        user_id=user,
+                        source="trial",
+                        set_key=None,
+                        idempotency_key=f"trial:{user}:{now.isoformat()}:{self.rng.random()}"[:200],
+                        given_at=now,
+                        detail={},
+                    )
+                    .returning(Pack.id)
+                )
+            ).scalar_one()
+            for _ in range(size):
+                card = await self._draw(session, self.rng.choice(looked) if looked else None)
+                if card is None:
+                    continue
+                borderless = card.kind == "title" and self.rng.random() < TRIAL_BORDERLESS
+                foil = self.rng.random() < TRIAL_FOIL
+                variant = "borderless" if borderless else "normal"
+                variant = f"{variant}_foil" if foil and borderless else ("foil" if foil else variant)
+                session.add(
+                    Copy(user_id=user, card_id=card.id, variant=variant, pack_id=pack_id, acquired_at=now)
                 )
         return pack_id
 

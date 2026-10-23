@@ -127,15 +127,20 @@ async def sync_cards(principal: Manager, module: Module) -> dict[str, Any]:
     }
 
 
+@router.post("/admin/cards/packs/trial")
+async def trial_pack(principal: Manager, module: Module) -> dict[str, Any]:
+    """A trial pack for me (an administrator): six cards among the works whose characters were looked for,
+    foil and borderless more often — to see the cards as members will. Opened like any pack."""
+    return {"id": str(await module.packs.trial(_me(principal)))}
+
+
 @router.post("/admin/cards/sets/{key}/characters")
 async def look_for_characters(
     principal: Manager, module: Module, key: Annotated[str, Path(pattern=r"^[0-9a-f-]{36}$")]
 ) -> dict[str, Any]:
-    """Look for this set's actors' characters now (again for those found before): on the web (when it is
-    switched on), in the film itself, then in the community database — each winning over the one before."""
-    found = await module.search.run(20, set_key=key)
-    taken = await module.frames.run(set_key=key)
-    return {"found": found, "taken": taken, "characters": await module.characters.run(set_key=key)}
+    """Look for this set's actors' characters again from the start, by every source in its order (TheTVDB,
+    TMDB, the film itself, the web when switched on): how many each gave."""
+    return await module.look_again(key)
 
 
 @router.get("/cards/images/{namespace}/{digest}")

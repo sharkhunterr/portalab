@@ -1,83 +1,116 @@
-/* issue 229: a media card, printed like a trading card game's. Its size follows its width (container units):
-   the same card on a binder page and in a pack's reveal. */
+/* issue 229: a media card, printed like a modern trading card game's. Its size follows its width (container
+   units): the same card on a binder page and in a pack's reveal. Its body takes its work's genre colour, its
+   rim its rarity's metal (with a gem of its own shape) — the same for films, series, books and games. */
 .mcard {
-  --mcard-frame: var(--card-frame-cast);
+  --mcard-body: var(--card-family-drama);
+  --mcard-accent: var(--card-family-drama-accent);
+  --mcard-rim: var(--card-rim-common);
+  --mcard-rarity: var(--card-rarity-ink-common);
+  --mcard-gem: circle(50% at 50% 50%);
+  --mcard-title: "Barlow Condensed", var(--font-family-sans, sans-serif);
   container-type: inline-size;
   display: block;
   inline-size: 100%;
+  text-align: start;
   user-select: none;
 }
+.mcard[data-family="sf"] {
+  --mcard-body: var(--card-family-sf);
+  --mcard-accent: var(--card-family-sf-accent);
+}
+.mcard[data-family="action"] {
+  --mcard-body: var(--card-family-action);
+  --mcard-accent: var(--card-family-action-accent);
+}
+.mcard[data-family="fantasy"] {
+  --mcard-body: var(--card-family-fantasy);
+  --mcard-accent: var(--card-family-fantasy-accent);
+}
+.mcard[data-family="family"] {
+  --mcard-body: var(--card-family-family);
+  --mcard-accent: var(--card-family-family-accent);
+}
+.mcard[data-family="drama"] {
+  --mcard-body: var(--card-family-drama);
+  --mcard-accent: var(--card-family-drama-accent);
+}
+.mcard[data-family="dark"] {
+  --mcard-body: var(--card-family-dark);
+  --mcard-accent: var(--card-family-dark-accent);
+}
+.mcard[data-family="multi"] {
+  --mcard-body: var(--card-family-multi);
+  --mcard-accent: var(--card-family-multi-accent);
+}
+.mcard[data-rarity="rare"] {
+  --mcard-rim: var(--card-rim-rare);
+  --mcard-rarity: var(--card-rarity-ink-rare);
+  --mcard-gem: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+.mcard[data-rarity="epic"] {
+  --mcard-rim: var(--card-rim-epic);
+  --mcard-rarity: var(--card-rarity-ink-epic);
+  --mcard-gem: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%);
+}
+.mcard[data-rarity="legendary"] {
+  --mcard-rim: var(--card-rim-legendary);
+  --mcard-rarity: var(--card-rarity-ink-legendary);
+  --mcard-gem: polygon(50% 0, 62% 35%, 98% 36%, 69% 58%, 79% 94%, 50% 72%, 21% 94%, 31% 58%, 2% 36%, 38% 35%);
+}
+
 .mcard__card {
   position: relative;
-  display: grid;
-  grid-template-rows: auto 1fr auto auto auto;
   aspect-ratio: 63 / 88;
-  padding: 3.6cqi;
-  border-radius: 4.6cqi;
-  background: var(--card-border);
-  color: var(--card-ink);
+  padding: 2cqi;
+  border-radius: 5.4cqi;
+  background: var(--mcard-rim);
   overflow: hidden;
   isolation: isolate;
-  box-shadow: 0 0.35rem 1rem var(--card-shadow);
+  box-shadow:
+    0 0 0 0.33cqi var(--card-border),
+    0 0.35rem 1rem var(--card-shadow);
 }
-.mcard[data-kind="title"] {
-  --mcard-frame: var(--card-frame-title);
-}
-.mcard[data-kind="director"] {
-  --mcard-frame: var(--card-frame-director);
-}
-.mcard[data-kind="creator"] {
-  --mcard-frame: var(--card-frame-creator);
-}
-.mcard[data-kind="writer"] {
-  --mcard-frame: var(--card-frame-writer);
-}
-.mcard[data-kind="composer"] {
-  --mcard-frame: var(--card-frame-composer);
-}
-
-/* the frame: the card's colour around its parts */
-.mcard__card::before {
-  content: "";
-  position: absolute;
-  inset: 3.6cqi;
-  z-index: -1;
-  border-radius: 2.2cqi;
+.mcard__body {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 2cqi;
+  block-size: 100%;
+  box-sizing: border-box;
+  padding: 2.7cqi;
+  border-radius: 3.8cqi;
   background:
-    linear-gradient(160deg, color-mix(in srgb, var(--card-ink-light) 22%, transparent), transparent 45%),
-    var(--mcard-frame);
+    radial-gradient(var(--card-weave) 0.33cqi, transparent 0.5cqi) 0 0 / 3cqi 3cqi,
+    var(--mcard-body);
+  box-shadow:
+    inset 0 0 0 0.33cqi var(--card-glass-edge),
+    inset 0 0.33cqi 0 var(--card-glass-light);
+  color: var(--card-text);
 }
 
-.mcard__name,
-.mcard__type {
+/* the name, whole: its size follows its length, two lines at the most */
+.mcard__name {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 2cqi;
-  margin: 1.6cqi 1.6cqi 0;
-  padding: 1.2cqi 2.4cqi;
-  border-radius: 1.6cqi / 50%;
-  background: linear-gradient(
-    180deg,
-    var(--card-paper),
-    color-mix(in srgb, var(--card-paper) 80%, var(--mcard-frame))
-  );
+  gap: 2.7cqi;
+  min-block-size: 12cqi;
+  box-sizing: border-box;
+  padding: 1.3cqi 2.7cqi 1.3cqi 4cqi;
+  border-radius: 3.3cqi;
+  background: linear-gradient(180deg, var(--card-glass-light), transparent), var(--card-glass);
   box-shadow:
-    inset 0 0 0 0.35cqi color-mix(in srgb, var(--card-ink) 45%, transparent),
-    0 0.4cqi 0.6cqi var(--card-shadow);
-  font-weight: 700;
-  line-height: 1.1;
-  white-space: nowrap;
+    inset 0 0 0 0.33cqi var(--card-glass-edge),
+    0 0.7cqi 2cqi var(--card-shadow);
+}
+.mcard__name > span:first-child {
+  flex: 1;
   min-inline-size: 0;
-}
-.mcard__name {
-  grid-row: 1;
-  font-size: 6.2cqi;
-}
-.mcard__name > span:first-child,
-.mcard__type > span:first-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-family: var(--mcard-title);
+  font-weight: 700;
+  line-height: 1.04;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 .mcard__sign {
   display: grid;
@@ -86,26 +119,28 @@
   inline-size: 6.4cqi;
   block-size: 6.4cqi;
   border-radius: 50%;
-  background: var(--mcard-frame);
-  color: var(--card-ink-light);
-  box-shadow: inset 0 0 0 0.3cqi color-mix(in srgb, var(--card-ink) 50%, transparent);
+  background: radial-gradient(circle at 35% 30%, var(--card-text), var(--mcard-accent) 45%);
+  color: var(--card-ink);
+  box-shadow: 0 0.33cqi 0.7cqi var(--card-shadow);
 }
 .mcard__sign svg {
-  inline-size: 4.2cqi;
-  block-size: 4.2cqi;
+  inline-size: 4cqi;
+  block-size: 4cqi;
 }
 
+/* the art, its type and rarity over its foot */
 .mcard__art {
-  grid-row: 2;
   position: relative;
   display: grid;
   place-items: center;
-  margin: 1.4cqi 3.2cqi 0;
   min-block-size: 0;
   overflow: hidden;
-  background: color-mix(in srgb, var(--card-ink) 85%, var(--mcard-frame));
-  color: color-mix(in srgb, var(--card-ink-light) 50%, transparent);
-  box-shadow: inset 0 0 0 0.4cqi color-mix(in srgb, var(--card-ink) 70%, transparent);
+  border-radius: 3cqi;
+  background: var(--card-border);
+  color: var(--card-text-soft);
+  box-shadow:
+    0 0 0 0.33cqi var(--card-border),
+    0 0 0 0.8cqi color-mix(in srgb, var(--mcard-accent) 45%, transparent);
 }
 .mcard__art img {
   position: absolute;
@@ -116,7 +151,7 @@
   object-position: center 22%;
 }
 /* issue 231: no image of the character — the work's poster, dimmed, and the actor's portrait in a round
-   badge ringed with the card's frame colour */
+   badge ringed with the card's colour */
 .mcard__art[data-art="poster"] .mcard__picture {
   object-position: center 25%;
   filter: saturate(0.85) brightness(0.8);
@@ -132,115 +167,206 @@
   object-fit: cover;
   object-position: center 20%;
   box-shadow:
-    0 0 0 1cqi var(--mcard-frame),
-    0 0 0 1.4cqi color-mix(in srgb, var(--card-ink) 70%, transparent),
-    0 2cqi 4cqi color-mix(in srgb, var(--card-ink) 60%, transparent);
+    0 0 0 1cqi var(--mcard-accent),
+    0 0 0 1.4cqi var(--card-border),
+    0 2cqi 4cqi var(--card-shadow);
 }
-/* the character's image (a still, or a poster whose title is at its top): framed on its middle */
+/* the character's image: framed on its upper middle (a face) */
 .mcard__art[data-art="role"] img {
-  object-position: center 40%;
+  object-position: center 30%;
 }
-
 .mcard__type {
-  grid-row: 3;
-  font-size: 4.6cqi;
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2.7cqi;
+  padding: 7cqi 2.7cqi 2cqi 3.3cqi;
+  background: linear-gradient(180deg, transparent, var(--card-strip));
 }
-.mcard__symbol {
+.mcard__type > span:first-child {
+  min-inline-size: 0;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.mcard__rarity {
   flex: none;
-  padding: 0.4cqi 1.4cqi;
-  border-radius: 1cqi;
-  background: var(--mcard-rarity);
-  color: var(--card-ink-light);
-  font-size: 3.6cqi;
-  letter-spacing: 0.04em;
-  box-shadow: inset 0 0 0 0.3cqi color-mix(in srgb, var(--card-ink) 60%, transparent);
+  display: inline-flex;
+  align-items: center;
+  gap: 1.6cqi;
+  padding: 1cqi 2.3cqi 1cqi 1.6cqi;
+  border-radius: 999px;
+  background: var(--card-glass);
+  box-shadow: inset 0 0 0 0.33cqi var(--mcard-rarity);
+  color: var(--mcard-rarity);
+  font-size: 3.3cqi;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
-.mcard[data-rarity="rare"] .mcard__symbol {
-  color: var(--card-ink);
+.mcard__gem {
+  inline-size: 4.3cqi;
+  block-size: 4.3cqi;
+  clip-path: var(--mcard-gem);
+  background: var(--mcard-rim);
 }
 
-.mcard__text {
-  grid-row: 4;
-  margin: 1.4cqi 3.2cqi 0;
-  padding: 2cqi 2.6cqi;
-  min-block-size: 15cqi;
-  background: color-mix(in srgb, var(--card-paper) 92%, var(--card-ink-light));
-  box-shadow: inset 0 0 0 0.3cqi color-mix(in srgb, var(--card-ink) 35%, transparent);
-  font-family: Georgia, "Times New Roman", serif;
+/* three gauges of the work's own figures, a line of flavour */
+.mcard__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6cqi;
+  padding: 2.7cqi 3.3cqi;
+  border-radius: 3cqi;
+  background: var(--card-glass);
+  box-shadow: inset 0 0 0 0.33cqi var(--card-glass-edge);
+}
+.mcard__gauge {
+  display: grid;
+  grid-template-columns: 22cqi 1fr 25cqi;
+  align-items: center;
+  gap: 2.7cqi;
+  font-size: 3.3cqi;
+}
+.mcard__gauge > span:first-child {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--card-text-soft);
+}
+.mcard__segments {
+  display: flex;
+  gap: 0.66cqi;
+  block-size: 2.3cqi;
+}
+.mcard__segments > span {
+  flex: 1;
+  border-radius: 0.66cqi;
+  background: var(--card-segment-off);
+}
+.mcard__segments > span[data-on] {
+  background: var(--mcard-accent);
+}
+.mcard__gauge > span:last-child {
+  font-family: var(--mcard-title);
+  font-size: 4.5cqi;
+  font-weight: 700;
+  text-align: end;
+  white-space: nowrap;
+}
+.mcard__gauge > span[data-unknown] {
+  color: var(--card-text-soft);
+}
+.mcard__flavor {
+  margin: 0;
+  padding-block-start: 1.6cqi;
+  border-block-start: 0.33cqi solid var(--card-glass-edge);
+  font-family: "EB Garamond", Georgia, serif;
   font-size: 4.3cqi;
   font-style: italic;
   line-height: 1.25;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
-.mcard__foot {
-  grid-row: 5;
+/* who: the actor (a role's card), the director (a work's), the work (a crew's); the collector number */
+.mcard__credit {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 1.2cqi 3.6cqi 0.2cqi;
-  color: var(--card-ink-light);
-  font-size: 3.2cqi;
+  gap: 3.3cqi;
+  padding: 1.6cqi 3.3cqi;
+  border-radius: 3cqi;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--card-text) 20%, transparent),
+    color-mix(in srgb, var(--card-text) 7%, transparent)
+  );
+  box-shadow: inset 0 0 0 0.33cqi color-mix(in srgb, var(--card-text) 25%, transparent);
+}
+.mcard__credit > span:first-child {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+.mcard__credit small {
+  font-size: 3cqi;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--card-text-soft);
+}
+.mcard__credit strong {
+  font-family: var(--mcard-title);
+  font-weight: 700;
+  line-height: 1.1;
+}
+.mcard__collector {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 3cqi;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.05em;
+  color: var(--card-text-soft);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.03em;
 }
-
-/* the borderless alternative: the art over the whole card, the texts on it */
-.mcard[data-borderless] .mcard__card {
-  padding: 0;
-  background: var(--card-border);
-  color: var(--card-ink-light);
-}
-.mcard[data-borderless] .mcard__card::before {
+.mcard[data-size="sm"] .mcard__collector {
   display: none;
 }
-.mcard[data-borderless] .mcard__art {
-  position: absolute;
-  inset: 0;
-  margin: 0;
+
+/* the borderless alternative: the art over the whole card inside its rim, the plates in frosted glass */
+.mcard[data-borderless] .mcard__body {
+  background: none;
   box-shadow: none;
 }
-.mcard[data-borderless] .mcard__art img {
+.mcard[data-borderless] .mcard__art {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: visible;
+  background: none;
+  box-shadow: none;
+}
+.mcard[data-borderless] .mcard__art .mcard__picture {
+  z-index: -1;
+  border-radius: 3.8cqi;
   object-position: center;
 }
-.mcard[data-borderless] .mcard__art::after {
+.mcard[data-borderless] .mcard__body::after {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: -1;
+  border-radius: inherit;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--card-border) 55%, transparent) 0%,
-    transparent 22%,
-    transparent 55%,
-    color-mix(in srgb, var(--card-border) 85%, transparent) 100%
+    color-mix(in srgb, var(--card-border) 35%, transparent) 0%,
+    transparent 20%,
+    transparent 45%,
+    var(--card-strip) 100%
   );
 }
-.mcard[data-borderless] .mcard__name,
 .mcard[data-borderless] .mcard__type {
-  position: relative;
-  margin-inline: 4cqi;
-  background: color-mix(in srgb, var(--card-border) 45%, transparent);
-  color: var(--card-ink-light);
-  box-shadow: inset 0 0 0 0.3cqi color-mix(in srgb, var(--card-ink-light) 40%, transparent);
-  backdrop-filter: blur(2px);
-  text-shadow: 0 0.3cqi 0.8cqi var(--card-shadow);
+  position: static;
+  padding: 0 1cqi;
+  background: none;
 }
-.mcard[data-borderless] .mcard__name {
-  margin-block-start: 4cqi;
-}
-.mcard[data-borderless] .mcard__text {
-  position: relative;
-  margin-inline: 4cqi;
-  background: transparent;
-  box-shadow: none;
-  color: var(--card-ink-light);
-  text-shadow: 0 0.3cqi 0.8cqi var(--card-shadow);
-}
-.mcard[data-borderless] .mcard__foot {
-  position: relative;
-  padding-block-end: 3cqi;
+.mcard[data-borderless] .mcard__name,
+.mcard[data-borderless] .mcard__stats,
+.mcard[data-borderless] .mcard__credit {
+  background: var(--card-glass-soft);
+  box-shadow: inset 0 0 0 0.33cqi var(--card-glass-edge);
+  backdrop-filter: blur(6px);
 }
 
 /* foil (after a Pokémon card holo effect): the card leans towards the pointer; holographic stripes in the
@@ -248,8 +374,8 @@
    rest, the light drifts slowly on its own. color-dodge, screen on Firefox (its color-dodge glitches with
    transforms). */
 .mcard[data-foil] {
-  --mcard-holo-1: color-mix(in srgb, var(--mcard-frame) 45%, var(--card-holo-1));
-  --mcard-holo-2: color-mix(in srgb, var(--mcard-frame) 25%, var(--card-holo-2));
+  --mcard-holo-1: color-mix(in srgb, var(--mcard-accent) 45%, var(--card-holo-1));
+  --mcard-holo-2: color-mix(in srgb, var(--mcard-accent) 25%, var(--card-holo-2));
   perspective: 160cqi;
 }
 .mcard[data-foil] .mcard__card {
@@ -363,10 +489,6 @@
 .mcard[data-missing] {
   filter: grayscale(0.85) brightness(0.7);
   opacity: 0.7;
-}
-
-.mcard[data-size="sm"] .mcard__name {
-  font-size: 7cqi;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -715,4 +837,12 @@
   margin: 0;
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
+}
+
+/* an administrator's trial pack */
+.cards-trial {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
 }

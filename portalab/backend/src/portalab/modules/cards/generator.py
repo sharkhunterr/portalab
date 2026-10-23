@@ -19,6 +19,7 @@ from portalab.capabilities.media_core import CARD_SOURCES, CardPerson, CardWork
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
+from portalab.modules.cards.family import family_of
 from portalab.modules.cards.models import Card, CardSet
 from portalab.modules.cards.rarity import Ranked, card_score, rarities, work_fame
 
@@ -85,8 +86,11 @@ def fingerprint(work: CardWork) -> str:
         "tmdb": work.tmdb,
         "ids": sorted(work.ids.items()),
         "animated": any(g.strip().lower() in ANIMATION for g in work.genres),
-        # how the cards are made: v2 no image of the work on a person's, v3 the set's scene, v4 codes
-        "v": 4,
+        "genres": list(work.genres),
+        "facts": sorted(work.facts.items()),
+        # how the cards are made: v2 no image of the work on a person's, v3 the set's scene, v4 codes, v5 the
+        # genre's colour and the work's figures
+        "v": 5,
     }
     return hashlib.sha256(json.dumps(data, sort_keys=True, default=str).encode()).hexdigest()[:64]
 
@@ -199,6 +203,12 @@ class CardForge:
         current.poster = work.poster
         current.backdrop = work.backdrop or next(iter(work.backdrops), None)
         current.animated = any(g.strip().lower() in ANIMATION for g in work.genres)
+        current.family = family_of(work.genres)
+        current.facts = {
+            **dict(work.facts),
+            **({"rating": round(work.vote_average, 1)} if work.vote_average else {}),
+            **({"votes": work.vote_count} if work.vote_count else {}),
+        }
         current.saga = (
             str(work.collection.get("name"))[:200]
             if work.collection and work.collection.get("name")

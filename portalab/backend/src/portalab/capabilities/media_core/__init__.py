@@ -280,6 +280,9 @@ class CardWork:
     tmdb: str | None = None  # the work's TMDB id (its characters' images are tagged with it)
     ids: Mapping[str, str] = field(default_factory=dict)  # every id known (tvdb: a series' on art sites)
     genres: Sequence[str] = ()
+    # issue 229: the work's own figures, printed on its cards (frozen when its set is made): budget, revenue,
+    # runtime (minutes), seasons, its director's name
+    facts: Mapping[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True, slots=True)

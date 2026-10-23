@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { AdminEmpty } from "../../design-system/admin/AdminKit";
+import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
-import { cardImage, useCardSets, useMyCards, usePacks } from "./api";
+import { useHasPermission } from "../authz/useMyPermissions";
+import { cardImage, useCardSets, useMyCards, usePacks, useTrialPack } from "./api";
 import { CardCredit } from "./CardCredit";
 import { CardSearch, CardSearchResults } from "./CardSearch";
 import { PackOpening } from "./PackOpening";
@@ -24,10 +26,21 @@ export default function CollectionPage() {
   const mine = useMyCards().data;
   const packs = usePacks().data ?? [];
   const sets = useCardSets(q, started, page);
+  const canManage = useHasPermission("cards.manage");
+  const trial = useTrialPack();
   const pages = Math.max(1, Math.ceil((sets.data?.total ?? 0) / 48));
   return (
     <div className="ds-stack">
       <PageHeader icon="layers" title={t("gamification:cards.title")} />
+      {canManage ? (
+        <div className="cards-trial">
+          <Button variant="secondary" onClick={() => trial.mutate()} disabled={trial.isPending}>
+            <Icon name="gift" size={16} />
+            {t("gamification:cards.trial.button")}
+          </Button>
+          {trial.isError ? <span role="alert">{t("gamification:cards.trial.failed")}</span> : null}
+        </div>
+      ) : null}
       <CardSearch value={find} onChange={setFind} />
       {find.trim() ? (
         <CardSearchResults query={find} />

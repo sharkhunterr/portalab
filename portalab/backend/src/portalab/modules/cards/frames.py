@@ -10,7 +10,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import case, func, or_, select, update
+from sqlalchemy import case, func, select, update
 
 from portalab.capabilities.media import VIDEO_FRAMES, unwrap
 from portalab.capabilities.media_core import CARD_SOURCES
@@ -117,7 +117,7 @@ class FilmFrames:
 
     async def run(self, films: int = 1, *, set_key: str | None = None) -> int:
         """Take the images of the next film(s) and give its actors theirs: how many cards got one.
-        ``set_key``: that set now (an administrator's request) — its cards found on the web too."""
+        ``set_key``: that set now (its characters looked for again), its cards still without one."""
         sources = self.capabilities.system_providers(CARD_SOURCES)
         if not sources or not self.available() or not await self.matcher.ready():
             return 0  # nothing to take them with: nothing marked, looked for once there is
@@ -125,7 +125,7 @@ class FilmFrames:
             (Card.rarity == "legendary", 0), (Card.rarity == "epic", 1), (Card.rarity == "rare", 2), else_=3
         )
         wanted = (
-            (or_(Card.role_art.is_(None), Card.role_art.like("blob:%")),)
+            (Card.role_art.is_(None),)
             if set_key
             else (
                 Card.role_art.is_(None),

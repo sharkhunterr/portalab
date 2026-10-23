@@ -76,7 +76,7 @@ class RoleSearch:
 
     async def run(self, batch: int = BATCH, *, set_key: str | None = None) -> int:
         """Look for the next cards' characters on the web: how many got one. ``set_key``: that set's cards
-        now (an administrator's request) — looked for again, those found on the web too."""
+        still without one, now (its characters looked for again)."""
         found = self._providers()
         if found is None or not self.enabled():  # 231: the web is an option the administrator turns on
             return 0  # nothing to search with: nothing marked, looked for once there is
@@ -95,10 +95,7 @@ class RoleSearch:
                         Card.retired.is_(False),
                         CardSet.present.is_(True),
                         *(
-                            (
-                                CardSet.key == set_key,
-                                or_(Card.role_art.is_(None), Card.role_art.like("blob:%")),
-                            )
+                            (CardSet.key == set_key, Card.role_art.is_(None))
                             if set_key
                             else (
                                 Card.role_art.is_(None),
