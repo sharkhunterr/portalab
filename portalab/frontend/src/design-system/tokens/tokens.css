@@ -443,34 +443,23 @@ h1 {
   --card-family-dark: linear-gradient(160deg, #565c68 0%, #33373f 55%, #191b20 100%);
   --card-family-dark-accent: #e06a6a;
   --card-family-dark-ink: #f4f1ec;
-  --card-family-multi: linear-gradient(160deg, #fff5d8 0%, #f2d78f 55%, #ddb55a 100%);
-  --card-family-multi-accent: #a77a1c;
-  --card-family-multi-ink: #3a2a08;
-  /* the rarity at a glance: the rim around the card, its gem and its name — steel, silver, gold, holographic */
-  --card-rim-common: linear-gradient(145deg, #9aa0a8, #4a4f57 40%, #24282e 70%, #6b7079);
-  --card-rim-rare: linear-gradient(145deg, #ffffff, #b8c3d1 30%, #6e7b8c 60%, #e3e9f0);
-  --card-rim-epic: linear-gradient(145deg, #fff3c4, #e3b341 35%, #8f620c 65%, #f5d77a);
-  --card-rim-legendary: conic-gradient(
-    from 200deg at 50% 50%,
-    #ff8a5b,
-    #ffd36e,
-    #8cf0c8,
-    #78a8ff,
-    #c792ff,
-    #ff8a5b
-  );
+  /* the rarity at a glance, in the colours games use: the rim around the card, its glow, its gem and its
+     name — graphite, sapphire, amethyst, gold */
+  --card-rim-common: linear-gradient(145deg, #a3a8b0, #575c64 40%, #2c3036 70%, #7a7f87);
+  --card-rim-rare: linear-gradient(145deg, #e3f3ff, #4fa3ea 32%, #174a8c 64%, #a6d6fb);
+  --card-rim-epic: linear-gradient(145deg, #f6e3ff, #b46cf0 32%, #561a95 64%, #e4bcff);
+  --card-rim-legendary: linear-gradient(145deg, #fff8d6, #f5c443 30%, #a8700a 58%, #ffe58f 80%, #c98a12);
+  --card-glow-rare: rgba(79, 163, 234, 0.55);
+  --card-glow-epic: rgba(180, 108, 240, 0.6);
+  --card-glow-legendary: rgba(245, 196, 67, 0.75);
   --card-rarity-ink-common: #c9ced6;
-  --card-rarity-ink-rare: #e6ecf3;
-  --card-rarity-ink-epic: #f4cf62;
-  --card-rarity-ink-legendary: #ffc27a;
-  /* the plates over the body: dark glass, its edge, its light; the texts on them */
-  --card-glass: rgba(5, 8, 15, 0.55);
-  --card-glass-soft: rgba(5, 8, 15, 0.42);
-  --card-glass-edge: rgba(255, 255, 255, 0.22);
-  --card-glass-light: rgba(255, 255, 255, 0.16);
-  --card-strip: rgba(4, 6, 12, 0.86);
+  --card-rarity-ink-rare: #8fcbff;
+  --card-rarity-ink-epic: #dcb0ff;
+  --card-rarity-ink-legendary: #ffd668;
+  /* the borderless card's shades over its art, under its texts */
+  --card-scrim: rgba(3, 5, 10, 0.78);
+  --card-scrim-soft: rgba(3, 5, 10, 0.35);
+  /* the texts over a borderless card's art */
   --card-text: #ffffff;
   --card-text-soft: rgba(255, 255, 255, 0.72);
-  --card-segment-off: rgba(255, 255, 255, 0.14);
-  --card-frost: rgba(255, 255, 255, 0.7);
 }

@@ -6,7 +6,7 @@ export type Rarity = "common" | "rare" | "epic" | "legendary";
 export type Variant = "normal" | "foil" | "borderless" | "borderless_foil";
 export const VARIANTS: Variant[] = ["normal", "foil", "borderless", "borderless_foil"];
 
-export type Family = "sf" | "action" | "fantasy" | "family" | "drama" | "dark" | "multi";
+export type Family = "sf" | "action" | "fantasy" | "family" | "drama" | "dark";
 export interface WorkFacts {
   rating?: number;
   votes?: number;
