@@ -8,9 +8,9 @@ import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { useHasPermission } from "../authz/useMyPermissions";
 import { cardImage, useCardSets, useMyCards, usePacks, useTrialPack } from "./api";
+import { CardBoosters } from "./CardBoosters";
 import { CardCredit } from "./CardCredit";
 import { CardSearch, CardSearchResults } from "./CardSearch";
-import { PackOpening } from "./PackOpening";
 import { PoolView } from "./PoolView";
 import "./cards.css";
 
@@ -61,27 +61,8 @@ export default function CollectionPage() {
               </span>
             </div>
           ) : null}
-          {packs.length ? (
-            <section className="cards-packs" aria-labelledby="cards-packs">
-              <h2 id="cards-packs">
-                <Icon name="gift" size={18} /> {t("gamification:cards.packs", { count: packs.length })}
-              </h2>
-              <ul>
-                {packs.map((pack) => (
-                  <li key={pack.id}>
-                    <span>
-                      {pack.set_name
-                        ? t("gamification:cards.pack.from", { name: pack.set_name })
-                        : t("gamification:cards.pack.any")}
-                    </span>
-                    <PackOpening pack={pack} />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : (
-            <p className="admin-muted">{t("gamification:cards.how")}</p>
-          )}
+          <CardBoosters />
+          {packs.length ? null : <p className="admin-muted">{t("gamification:cards.how")}</p>}
           <fieldset className="cards-views">
             <legend className="visually-hidden">{t("gamification:cards.view")}</legend>
             {(["sets", "pool"] as const).map((key) => (

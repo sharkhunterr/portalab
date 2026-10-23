@@ -16,6 +16,7 @@ import {
 import "../media.css";
 import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
+import { WorkCollection } from "../../cards/WorkCollection";
 import { PluginSlot } from "../../plugins/slots/PluginSlot";
 import { useListenInfo, useReadInfo } from "../books/api";
 import { useDiscoverTitle } from "../discover/api";
@@ -954,6 +955,7 @@ export function DetailPage() {
       ) : BOOKS.includes(media.kind) ? (
         <BookView objectId={media.id} genres={media.genres} />
       ) : null}
+      {media.kind === "movie" || media.kind === "series" ? <WorkCollection objectId={media.id} /> : null}
       <div className="media-sections">
         {SECTIONS.filter(
           (name) =>

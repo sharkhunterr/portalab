@@ -7,6 +7,8 @@ import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
+import { usePacks } from "../../cards/api";
+import { CardBoosters } from "../../cards/CardBoosters";
 import { type OwnershipRow, usePurchases } from "../api";
 import {
   localized,
@@ -224,6 +226,7 @@ export default function ReservePage() {
   const reserve = useReserve();
   const [done, setDone] = useState<{ name: string; ticket: boolean; unlocked?: boolean } | null>(null);
   const items = reserve.data ?? [];
+  const cardPacks = usePacks().data ?? []; // issue 234: my card boosters wait here too
   return (
     <div className="reserve ds-stack">
       <PageHeader
@@ -242,7 +245,8 @@ export default function ReservePage() {
       ) : null}
       {reserve.isPending ? <FunctionalState state="loading" /> : null}
       {reserve.isError ? <FunctionalState state="unavailable" onRetry={() => reserve.refetch()} /> : null}
-      {reserve.data && !items.length ? (
+      <CardBoosters inventory />
+      {reserve.data && !items.length && !cardPacks.length ? (
         <div className="reserve__empty">
           <Icon name="potion" size={32} />
           <strong>{t("marketplace:reserve.empty")}</strong>
