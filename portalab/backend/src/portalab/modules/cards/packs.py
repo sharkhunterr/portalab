@@ -255,7 +255,11 @@ class Packs:
             given = await session.scalar(
                 select(func.count())
                 .select_from(Pack)
-                .where(Pack.user_id == user, Pack.given_at >= utc_now(self.clock) - timedelta(days=1))
+                .where(
+                    Pack.user_id == user,
+                    Pack.source == "content",  # a trial or a bought booster is not a reward
+                    Pack.given_at >= utc_now(self.clock) - timedelta(days=1),
+                )
             )
         if known is None or not known.present or int(given or 0) >= PER_DAY:
             return 0

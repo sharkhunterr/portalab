@@ -670,12 +670,14 @@ async def test_a_contents_boosters_given_once_per_member(database: Database) -> 
         await uow.session.execute(INSERT_USER, {"id": user, "login": f"u{user.hex[:8]}"})
     packs = Packs(database, capabilities, rng=random.Random(5))  # noqa: S311 — deterministic test data
     boosters = ContentBoosters(packs)
+    for index in range(12):  # an administrator's trial packs are no reward: they leave the day's share whole
+        await packs.give(user, "trial", None, f"trial:{index}")
     assert await boosters.give(user, film.object_id, 2, "rule:films:1") == 2
     assert await boosters.give(user, film.object_id, 2, "rule:films:2") == 0  # watched again: given already
     assert await boosters.give(user, uuid4(), 1, "rule:films:3") == 0  # a content without cards
-    unopened = await packs.unopened(user)
+    unopened = [p for p in await packs.unopened(user) if p.source == "content"]
     assert len(unopened) == 2 and {p.set_key for p in unopened} == {str(film.object_id)}
-    assert unopened[0].source == "content" and unopened[0].detail["object"] == str(film.object_id)
+    assert unopened[0].detail["object"] == str(film.object_id)
 
 
 async def test_a_shops_booster_draws_among_the_works_it_names(database: Database) -> None:
