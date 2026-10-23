@@ -1151,3 +1151,29 @@
   font-size: var(--font-size-sm);
   font-weight: 500;
 }
+/* issue 234: my sealed card boosters, as the shop's packs — a tap opens one */
+.cards-packs .cards-boosters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cards-boosters__pack {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform var(--motion-duration-fast, 150ms) ease;
+}
+.cards-boosters__pack:hover,
+.cards-boosters__pack:focus-visible {
+  transform: translateY(-0.35rem) rotate(-1.5deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cards-boosters__pack {
+    transition: none;
+  }
+}

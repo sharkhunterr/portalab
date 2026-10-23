@@ -41,8 +41,11 @@ export interface PackLook {
   names: Record<string, string>;
   look: string;
   cards: number;
-  /** issue 234: a content's booster — its title drawn (an art site's logo) in place of its name */
+  /** issue 234: a content's booster — its title drawn (an art site's logo) in place of its name… */
   logo?: string | null;
+  /** …its work's art printed on the pack, and a line under its name (a season) */
+  art?: string | null;
+  subtitle?: string | null;
 }
 
 /** The sealed pack itself — foil, a tear line, the booster's name; ``stage`` for the opening, ``card``
@@ -63,19 +66,26 @@ export function BoosterPack({
       data-theme-pack={booster.look}
       data-stage={stage || undefined}
       data-size={size}
+      data-art={booster.art ? "" : undefined}
       aria-hidden="true"
     >
+      {booster.art ? <img className="booster-pack__art" src={booster.art} alt="" draggable={false} /> : null}
       <span className="booster-pack__foil" />
       <span className="booster-pack__flap" />
       <span className="booster-pack__stars" />
-      <span className="booster-pack__emblem">
-        <Icon name={EMBLEM[booster.look] ?? "sparkles"} size={stage ? 46 : size === "mini" ? 18 : 34} />
-      </span>
+      {booster.art ? null : (
+        <span className="booster-pack__emblem">
+          <Icon name={EMBLEM[booster.look] ?? "sparkles"} size={stage ? 46 : size === "mini" ? 18 : 34} />
+        </span>
+      )}
       {size === "mini" ? null : booster.logo ? (
         <img className="booster-pack__logo" src={booster.logo} alt="" draggable={false} />
       ) : (
         <span className="booster-pack__name">{localized(booster.names, locale)}</span>
       )}
+      {size !== "mini" && booster.subtitle ? (
+        <span className="booster-pack__subtitle">{booster.subtitle}</span>
+      ) : null}
       <span className="booster-pack__count">×{booster.cards}</span>
     </span>
   );

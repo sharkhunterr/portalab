@@ -50,7 +50,9 @@ def card_out(card: Card, card_set: CardSet, owned: dict[str, int] | None = None)
     }
 
 
-def _pack_look(card_set: CardSet | None, detail: dict[str, Any]) -> dict[str, Any] | None:
+def _pack_look(
+    card_set: CardSet | None, detail: dict[str, Any], art: str | None = None
+) -> dict[str, Any] | None:
     if card_set is None:
         if not detail.get("product"):
             return None
@@ -76,6 +78,7 @@ def _pack_look(card_set: CardSet | None, detail: dict[str, Any]) -> dict[str, An
         "poster": card_set.poster,
         "backdrop": card_set.backdrop,
         "logos": card_set.logos or {},
+        "art": art,
         "season": detail.get("season"),
     }
 
@@ -322,6 +325,15 @@ class CardService:
                     .order_by(Copy.acquired_at, Copy.id)  # as drawn (its ids grow with time)
                 )
             ).all()
+            # issue 234: a content's booster wears its work's textless art (the art site's, its title card's)
+            arts: dict[str, str | None] = {
+                key: art
+                for key, art in await session.execute(
+                    select(Card.set_key, Card.fan_art).where(
+                        Card.kind == "title", Card.set_key.in_([p.set_key for p in packs if p.set_key])
+                    )
+                )
+            }
             sets = {
                 s.key: s
                 for s in (
@@ -356,7 +368,7 @@ class CardService:
                 "set": p.set_key,
                 "set_name": sets[p.set_key].name if p.set_key in sets else None,
                 # issue 234: its content's booster wears it — the work's art, its title drawn, the season
-                "look": _pack_look(sets.get(p.set_key or ""), p.detail or {}),
+                "look": _pack_look(sets.get(p.set_key or ""), p.detail or {}, arts.get(p.set_key or "")),
                 "given_at": p.given_at.isoformat(),
                 "opened_at": p.opened_at.isoformat() if p.opened_at else None,
                 # the cards stay hidden until it is opened

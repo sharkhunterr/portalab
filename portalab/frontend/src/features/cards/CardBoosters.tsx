@@ -1,6 +1,5 @@
 import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
-import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
@@ -10,7 +9,7 @@ import { BoosterPack } from "../marketplace/boosters/Boosters";
 import { type CardPack, type MediaCard, useOpenPack, usePacks } from "./api";
 import { MediaCardView } from "./MediaCardView";
 import { packBooster, packName } from "./packBooster";
-import "../marketplace/reserve/reserve.css";
+import "../marketplace/boosters/boosters.css";
 
 const BoosterReveal = lazy(() =>
   import("../marketplace/boosters/BoosterReveal").then((m) => ({ default: m.BoosterReveal })),
@@ -45,25 +44,19 @@ export function CardBoosters({ inventory = false }: { inventory?: boolean }) {
             <Icon name="gift" size={18} /> {t("gamification:cards.packs", { count: packs.length })}
             {inventory ? <Link to="/cards">{t("gamification:cards.toCollection")}</Link> : null}
           </h2>
-          <ul className="reserve__list">
-            {packs.map((pack) => {
-              const booster = packBooster(t, pack, locale);
-              return (
-                <li key={pack.id} className="reserve-item" data-rarity="rare">
-                  <span className="reserve-item__art">
-                    <BoosterPack booster={booster} size="mini" />
-                  </span>
-                  <div className="reserve-item__text">
-                    <strong>{packName(t, pack)}</strong>
-                    <p>{t("gamification:cards.pack.cards", { count: pack.count })}</p>
-                  </div>
-                  <Button onClick={() => setOpening(pack)}>
-                    <Icon name="gift" size={16} />
-                    {t("gamification:cards.pack.open")}
-                  </Button>
-                </li>
-              );
-            })}
+          <ul className="cards-boosters">
+            {packs.map((pack) => (
+              <li key={pack.id}>
+                <button
+                  type="button"
+                  className="cards-boosters__pack"
+                  onClick={() => setOpening(pack)}
+                  aria-label={`${t("gamification:cards.pack.open")} — ${packName(t, pack)}`}
+                >
+                  <BoosterPack booster={packBooster(t, pack, locale)} />
+                </button>
+              </li>
+            ))}
           </ul>
         </section>
       ) : null}

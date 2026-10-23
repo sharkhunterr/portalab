@@ -100,6 +100,8 @@ export interface PackLook {
   poster: string | null;
   backdrop: string | null;
   logos: Record<string, string>;
+  /** the art site's textless art of the work (its title card's) */
+  art?: string | null;
   season: number | null;
   /** a shop's booster: its product (the works it draws among are its family, edition and kind) */
   product?: string | null;

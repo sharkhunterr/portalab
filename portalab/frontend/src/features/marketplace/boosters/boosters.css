@@ -171,6 +171,31 @@
 .booster-pack[data-stage] .booster-pack__name {
   font-size: clamp(1rem, 4vw, 1.4rem);
 }
+/* issue 234: a content's booster — its work's art printed on the pack under the foil and the stars, fading
+   into the pack's ink at its foot where its title stands */
+.booster-pack__art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  mask: linear-gradient(180deg, black 55%, transparent 96%);
+}
+.booster-pack[data-art] .booster-pack__stars {
+  opacity: 0.45;
+}
+.booster-pack__subtitle {
+  position: absolute;
+  inset: auto 0 7%;
+  z-index: 2;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0.4rem var(--booster-ink);
+}
 /* issue 234: a content's booster — its title drawn (the art site's logo) where a name goes */
 .booster-pack__logo {
   position: absolute;
