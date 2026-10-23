@@ -1,4 +1,2 @@
-Ornaments used by these frames (all public domain, CC0 1.0):
-
-- assets/ornate-frame.png — "Art Deco Frame" series, Openclipart (https://openclipart.org/detail/247039), CC0 1.0
-- assets/flourish-*.png — "Corner Flourish 2", Openclipart (https://openclipart.org/detail/285791), CC0 1.0
+The ornaments of these frames (assets/corner-*.svg, mini-*.svg, scroll-*.svg) were drawn for Portalab
+(AGPL-3.0-or-later, like the pack).

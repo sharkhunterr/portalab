@@ -22,6 +22,7 @@ from portalab.modules.cards import permissions as _permissions  # noqa: F401 —
 from portalab.modules.cards.artwork import FanArt
 from portalab.modules.cards.characters import CharacterSheets
 from portalab.modules.cards.faces import FaceMatcher
+from portalab.modules.cards.focus import ArtFocus
 from portalab.modules.cards.frames import FilmFrames
 from portalab.modules.cards.generator import CardForge
 from portalab.modules.cards.models import Card
@@ -38,6 +39,7 @@ ROLES_JOB = "cards.role_art"
 FAN_ART_JOB = "cards.fan_art"
 SEARCH_JOB = "cards.role_search"
 FRAMES_JOB = "cards.film_frames"
+FOCUS_JOB = "cards.focus"
 CHARACTERS_JOB = "cards.characters"
 log = get_logger("portalab.cards")
 
@@ -75,6 +77,7 @@ class CardsModule:
             enabled=lambda: self.config.video_frames,
             characters_first=self.characters.available,
         )
+        self.focus = ArtFocus(database, capabilities, self.matcher, blobs)
         self.search = RoleSearch(
             database,
             capabilities,
@@ -151,6 +154,9 @@ class CardsModule:
         async def search() -> None:
             await self.search.run()
 
+        async def focus() -> None:
+            await self.focus.run()
+
         return [
             self.refresh_config,
             # the works that changed are made again (their fingerprint), every half hour
@@ -175,4 +181,14 @@ class CardsModule:
             ),
             # the actors' characters on the web (their faces compared), a few cards every five minutes
             register_periodic(jobs, self.database, SEARCH_JOB, timedelta(minutes=5), search, owner=OWNER),
+            # where the faces are on the cards' images (the cards owned first), every two minutes
+            register_periodic(
+                jobs,
+                self.database,
+                FOCUS_JOB,
+                timedelta(minutes=2),
+                focus,
+                owner=OWNER,
+                timeout_seconds=600,
+            ),
         ]
