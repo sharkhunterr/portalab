@@ -31,12 +31,15 @@ MODELS = {
 }
 SAME_PERSON = 0.42  # SFace's cosine similarity: 0.363 is its own threshold, a little stricter here
 LONGEST = 1280  # images are looked at this size at most
+BLACK = 20  # a row darker than this on average is a black bar
 
 
 @dataclass(frozen=True, slots=True)
 class Face:
     signature: Any  # SFace's feature vector
     share: float  # the part of the image it takes
+    box: tuple[int, int, int, int] = (0, 0, 0, 0)  # where it is: x, y, width, height (the image's pixels)
+    sharpness: float = 0.0  # the variance of its Laplacian: low, it is blurred
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,6 +47,8 @@ class Looked:
     faces: Sequence[Face]
     width: int
     height: int
+    top: int = 0  # the picture between black bars (a film in a wider format): its first row…
+    bottom: int = 0  # …and the row after its last (0: the image's height)
 
 
 class FaceMatcher:
@@ -105,14 +110,36 @@ class FaceMatcher:
         h, w = image.shape[:2]
         self._detector.setInputSize((w, h))
         _, found = self._detector.detect(image)
-        faces = [
-            Face(
-                self._recognizer.feature(self._recognizer.alignCrop(image, row)),
-                float(row[2] * row[3]) / (w * h),
+        back = 1 / scale if scale < 1 else 1.0
+        gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+        faces = []
+        for row in found if found is not None else []:
+            x, y, fw, fh = (max(0, int(v)) for v in row[:4])
+            patch = gray[y : y + fh, x : x + fw]
+            faces.append(
+                Face(
+                    self._recognizer.feature(self._recognizer.alignCrop(image, row)),
+                    float(row[2] * row[3]) / (w * h),
+                    (int(x * back), int(y * back), int(fw * back), int(fh * back)),
+                    float(cv.Laplacian(patch, cv.CV_64F).var()) if patch.size else 0.0,
+                )
             )
-            for row in (found if found is not None else [])
-        ]
-        return Looked(tuple(faces), width, height)
+        lit = np.flatnonzero(gray.mean(axis=1) > BLACK)
+        top = int(lit[0] * back) if lit.size and lit[0] > h * 0.02 else 0
+        bottom = int((lit[-1] + 1) * back) if lit.size and lit[-1] + 1 < h * 0.98 else height
+        return Looked(tuple(faces), width, height, top, bottom)
+
+    def crop(self, data: bytes, box: tuple[int, int, int, int]) -> bytes | None:
+        """That part of an image, as a JPEG (CPU: run it in a thread)."""
+        import numpy as np  # with OpenCV
+
+        cv = self._cv
+        image = cv.imdecode(np.frombuffer(data, np.uint8), cv.IMREAD_COLOR)
+        if image is None:
+            return None
+        x, y, w, h = box
+        done, encoded = cv.imencode(".jpg", image[y : y + h, x : x + w], [cv.IMWRITE_JPEG_QUALITY, 90])
+        return bytes(encoded) if done else None
 
     def similarity(self, a: Face, b: Face) -> float:
         return float(self._recognizer.match(a.signature, b.signature, self._cv.FaceRecognizerSF_FR_COSINE))
@@ -125,6 +152,10 @@ EVENT = re.compile(
     r"interview|photocall|press|conf[ée]rence|getty|wireimage|"
     r"then and now|now and then|today|aujourd|years later|ans apr[eè]s|avant.apr[eè]s|before and after",
     re.IGNORECASE,
+)
+# stock photographs carry their site's watermark
+STOCK = re.compile(
+    r"alamy|shutterstock|dreamstime|depositphotos|istockphoto|123rf|agefotostock|bigstock", re.I
 )
 SKIPPED_ENGINES = {"wikicommons.images"}  # public photographs of people: events, almost never a film's
 
@@ -157,6 +188,8 @@ def score(
     page must name the character — and the actor, for a work played by people (a character may share the
     work's name)."""
     if candidate.engine in SKIPPED_ENGINES or (faces and candidate.similarity < SAME_PERSON):
+        return None
+    if STOCK.search(candidate.url):  # a stock photograph: watermarked
         return None
     if EVENT.search(candidate.title) or min(candidate.width, candidate.height) < 360:
         return None

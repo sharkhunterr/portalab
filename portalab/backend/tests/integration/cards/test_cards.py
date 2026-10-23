@@ -82,6 +82,9 @@ class Sources:
             CardImage("other", "/elsewhere.jpg", "still", 1.78, 9.0),  # another work of theirs
         ]
 
+    async def frames(self, object_id: UUID, at: list[float]) -> list[bytes] | None:
+        return None  # no media server can show the film
+
 
 def test_plan_and_codes() -> None:
     made = plan(work("Top Gun: Maverick", 11000, "US", ["Tom Cruise", "Miles Teller", "Tom Cruise"]))
@@ -437,3 +440,85 @@ async def test_the_face_check_switched_off(database: Database) -> None:
     assert await search.run() == 1
     assert web.queries == ["Tom Cruise Maverick Top Gun: Maverick"]  # the actor still named
     assert list(blobs.kept.values()) == [b"face:cruise jet"]  # the page naming Maverick, not the premiere
+
+
+class FilmMatcher(Matcher):
+    """Faces as their bytes say, each large and sharp enough; a crop keeps the image, marked."""
+
+    def look(self, data: bytes) -> Any:
+        from portalab.modules.cards.faces import Face, Looked
+
+        who = [p.removeprefix("face:") for p in data.decode().split() if p.startswith("face:")]
+        return Looked(tuple(Face(w, 0.05, (600, 200, 120, 150), 120.0) for w in who), 1280, 720)
+
+    def crop(self, data: bytes, box: tuple[int, int, int, int]) -> bytes:
+        return data + f" crop:{box[2]}x{box[3]}".encode()
+
+
+class FilmSources(Sources):
+    def __init__(self, works: list[CardWork], frames: list[bytes] | None) -> None:
+        super().__init__(works)
+        self.shots = frames
+        self.taken = 0
+
+    async def image(self, ref: str, size: str) -> bytes:
+        return f"face:{ref.strip('/').removesuffix('.jpg')}".encode()  # each actor's portrait
+
+    async def frames(self, object_id: UUID, at: list[float]) -> list[bytes] | None:
+        self.taken += 1
+        assert len(at) == 96 and 0 < at[0] < at[-1] < 1  # spread over the film, credits left out
+        return self.shots
+
+
+class Plex:
+    async def frames(self, external_id: str, at: list[float]) -> Any:  # never asked: the sources are
+        raise AssertionError
+
+
+async def test_an_actors_character_taken_from_the_film_itself(database: Database) -> None:
+    """Issue 230: the film's own images, each actor's face found on them, framed — one pass for the whole
+    cast; an actor not seen is left to the web search, and the film is never taken again."""
+    from portalab.capabilities.media import IMAGE_SEARCH, VIDEO_FRAMES
+    from portalab.modules.cards.frames import FilmFrames
+    from portalab.modules.cards.search import RoleSearch
+
+    capabilities = new_registry()
+    film = work("Top Gun: Maverick", 11000, "US", ["Tom Cruise", "Miles Teller", "Jennifer Connelly"])
+    sources = FilmSources([film], [b"face:teller", b"face:cruise face:teller", b"a sky"])
+    capabilities.provide(CARD_SOURCES, sources, instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    async with database.unit_of_work() as uow:  # TMDB was asked and had nothing; their portraits are known
+        for name, art in (("Tom Cruise", "/cruise.jpg"), ("Miles Teller", "/teller.jpg")):
+            await uow.session.execute(
+                Card.__table__.update().where(Card.name == name).values(role_checked_at=NOW, art=art)
+            )
+        await uow.session.execute(
+            Card.__table__.update()
+            .where(Card.name == "Jennifer Connelly")
+            .values(role_checked_at=NOW, art="/connelly.jpg")
+        )
+    blobs = Blobs()
+    frames = FilmFrames(database, capabilities, FilmMatcher(), blobs)  # type: ignore[arg-type]
+    web = Web()
+    capabilities.provide(IMAGE_SEARCH, web, instance_ref="searxng", owner="test")
+    search = RoleSearch(
+        database,
+        capabilities,
+        FilmMatcher(),
+        blobs,
+        frames_first=frames.available,  # type: ignore[arg-type]
+    )
+    assert await frames.run() == 0 and sources.taken == 0  # no media server can show the film yet
+    capabilities.provide(VIDEO_FRAMES, Plex(), instance_ref="plex", owner="test")
+    assert await search.run() == 0 and web.queries == []  # the film itself comes first
+    assert await frames.run() == 2 and sources.taken == 1
+    async with database.session() as session:
+        rows = (await session.execute(Card.__table__.select().where(Card.kind == "cast"))).all()
+    cards = {r.name: r for r in rows}
+    assert blobs.kept[cards["Tom Cruise"].role_art.removeprefix("blob:")].startswith(b"face:cruise face:")
+    assert blobs.kept[cards["Miles Teller"].role_art.removeprefix("blob:")] == b"face:teller crop:640x480"
+    assert cards["Jennifer Connelly"].role_art is None  # not seen in the film
+    assert all(c.frame_checked_at is not None for c in cards.values())
+    assert await frames.run() == 0 and sources.taken == 1  # taken once: the cache
+    await search.run()
+    assert web.queries == ["Jennifer Connelly as Jennifer Connelly Top Gun: Maverick"]  # only her, on the web

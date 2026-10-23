@@ -9,6 +9,7 @@
   Tautulli watches the same server its richer rows win (same ``plex`` family, higher priority).
 * ``service.health_probe``: an authenticated ``/`` round trip.
 * ``media.streaming`` (027, #2): the portal's own player, fed by the universal transcoder (``streaming``).
+* ``media.video_frames`` (issue 230): still images of a film's own file, for the cards (``frames``).
 
 Authentication uses the server's ``X-Plex-Token`` (Plex Web → any item → *Get Info* → *View XML*: the
 ``X-Plex-Token`` parameter of the address, or ``Preferences.xml`` → ``PlexOnlineToken``).
@@ -33,6 +34,7 @@ from portalab.capabilities.media import (
     LIBRARY,
     PLAYBACK,
     STREAMING,
+    VIDEO_FRAMES,
     ActivityPage,
     ServiceAccount,
     SourceActivity,
@@ -101,6 +103,7 @@ class PlexConnector(HttpConnector):
         binding(ACTIVITY_HISTORY, driven=True),
         binding(ITEM_LINKS),
         binding(STREAMING),
+        binding(VIDEO_FRAMES),
     )
     status_path = "/"
     public_path = "/identity"
@@ -212,6 +215,10 @@ class PlexConnector(HttpConnector):
             from portalab.connectors.plex.streaming import PlexStreaming
 
             return PlexStreaming(self, service)
+        if capability == VIDEO_FRAMES:
+            from portalab.connectors.plex.frames import PlexFrames
+
+            return PlexFrames(self, service)
         return None
 
 

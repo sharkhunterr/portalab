@@ -55,8 +55,10 @@ class RoleSearch:
         *,
         clock: Clock | None = None,
         face_check: Callable[[], bool] = lambda: True,
+        frames_first: Callable[[], bool] = lambda: False,
     ) -> None:
         self.face_check = face_check
+        self.frames_first = frames_first
         self.database = database
         self.capabilities = capabilities
         self.matcher = matcher
@@ -100,6 +102,18 @@ class RoleSearch:
                                 Card.role_art.is_(None),
                                 Card.role_checked_at.is_not(None),  # TMDB was asked first
                                 Card.search_checked_at.is_(None),
+                                # issue 230: the film itself next, when a media server can show it
+                                *(
+                                    (
+                                        or_(
+                                            Card.frame_checked_at.is_not(None),
+                                            CardSet.animated.is_(True),
+                                            CardSet.kind != "movie",
+                                        ),
+                                    )
+                                    if self.frames_first()
+                                    else ()
+                                ),
                             )
                         ),
                     )
