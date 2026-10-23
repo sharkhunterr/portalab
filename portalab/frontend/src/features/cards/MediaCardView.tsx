@@ -24,8 +24,9 @@ const FAMILY_ICON: Record<string, string> = {
   drama: "drama",
   dark: "skull",
 };
-// a cut-out character's face: its share of the window's height, from the least to the most
-const FACE = [0.26, 0.34] as const;
+// a cut-out character's face (its detected box, forehead to chin): its share of the window's height, from the
+// least to the most
+const FACE = [0.45, 0.6] as const;
 const VOICE = /\((voice|voix)\)/i;
 
 /** The size of a name so that it fits its room whole on one line (container units): only a long one is smaller. */
@@ -62,12 +63,13 @@ function placeCutout(image: HTMLImageElement) {
   const [fx, fy, fh] = [Number(image.dataset.fx), Number(image.dataset.fy), Number(image.dataset.fh)];
   const cover = Math.max(width / natural[0], height / natural[1]);
   const reachFoot = (0.58 * height) / (Math.max(0.05, 1 - fy) * natural[1]);
-  // the face between a quarter and a third of the window's height (unknown: as large as the window allows)
+  // the face about half the window's height (unknown: as large as the window allows); a group's small faces
+  // never zoomed in further than half again over the window
   const [least, most] =
     fh > 0 ? [(FACE[0] * height) / (fh * natural[1]), (FACE[1] * height) / (fh * natural[1])] : [];
   const scale =
     least !== undefined && most !== undefined
-      ? Math.min(most, Math.max(least, reachFoot))
+      ? Math.min(cover * 1.5, most, Math.max(least, reachFoot))
       : Math.min(cover, Math.max(reachFoot, cover * 0.62));
   const [drawnWidth, drawnHeight] = [natural[0] * scale, natural[1] * scale];
   const left = Math.min(
@@ -136,7 +138,10 @@ function frameFace(image: HTMLImageElement) {
  * fading into its own edges' colours (a portrait's backdrop carried on) — its art says so once it is known. */
 function measure(event: SyntheticEvent<HTMLImageElement>) {
   const image = event.currentTarget;
-  const upright = image.naturalHeight > image.naturalWidth * 1.15;
+  // a portrait zoomed out, its sides carried on — never a poster, which fills the window
+  const upright =
+    image.naturalHeight > image.naturalWidth * 1.15 &&
+    image.closest<HTMLElement>(".mcard")?.dataset.kind !== "title";
   const art = image.parentElement;
   if (!art) return;
   art.dataset.shape = upright ? "upright" : "wide";
@@ -226,7 +231,10 @@ export function MediaCardView({
         ? cardImage(card.role_art, "w780")
         : stand_in
           ? cardImage(card.set_poster ?? null, "w500")
-          : cardImage(card.art, card.kind === "title" ? "w500" : "h632");
+          : card.kind === "title"
+            ? // a work's card: one of its scenes fills the window, its poster goes in the box under it
+              (cardImage(card.set_backdrop ?? null, "w780") ?? cardImage(card.art, "w500"))
+            : cardImage(card.art, "h632");
   const art = drawn;
   const portrait = stand_in && !cut ? cardImage(card.art, "w185") : null;
   // where the face is in the image shown (its character's, or the person's portrait — or its cut-out)
@@ -263,7 +271,14 @@ export function MediaCardView({
   ]
     .filter(Boolean)
     .join(" · ");
-  const poster = card.kind !== "title" && !stand_in ? cardImage(card.set_poster ?? null, "w185") : null;
+  const poster =
+    card.kind === "title"
+      ? !borderless && card.set_backdrop
+        ? cardImage(card.set_poster ?? card.art, "w185")
+        : null
+      : !stand_in
+        ? cardImage(card.set_poster ?? null, "w185")
+        : null;
   const figures = figuresOf(card);
   const genre = t(`gamification:cards.family.${family}`);
   // the name's room: the card's inner width, less the genre's chip (its emblem and its name)
