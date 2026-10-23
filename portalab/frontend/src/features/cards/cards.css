@@ -243,40 +243,118 @@
   padding-block-end: 3cqi;
 }
 
-/* foil: a rainbow light that follows the pointer */
-.mcard__foil {
+/* foil (after a Pokémon card holo effect): the card leans towards the pointer; holographic stripes in the
+   kind's two colours slide across it the other way, sparkles and a rainbow sheen glitter over the art; at
+   rest, the light drifts slowly on its own. color-dodge, screen on Firefox (its color-dodge glitches with
+   transforms). */
+.mcard[data-foil] {
+  --mcard-holo-1: color-mix(in srgb, var(--mcard-frame) 45%, var(--card-holo-1));
+  --mcard-holo-2: color-mix(in srgb, var(--mcard-frame) 25%, var(--card-holo-2));
+  perspective: 160cqi;
+}
+.mcard[data-foil] .mcard__card {
+  transform: rotateX(var(--mcard-rx, 0deg)) rotateY(var(--mcard-ry, 0deg));
+  transition:
+    transform 0.6s ease,
+    box-shadow 0.6s ease;
+  will-change: transform;
+}
+.mcard[data-foil][data-active] .mcard__card {
+  transition: box-shadow 0.2s ease;
+  box-shadow:
+    -3cqi -3cqi 4cqi -4cqi var(--mcard-holo-1),
+    3cqi 3cqi 4cqi -4cqi var(--mcard-holo-2),
+    0 0 1.2cqi 0.6cqi color-mix(in srgb, var(--card-ink-light) 50%, transparent),
+    0 0.35rem 1rem var(--card-shadow);
+}
+.mcard__foil,
+.mcard__sparkle {
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
   border-radius: inherit;
-  background:
-    radial-gradient(
-      circle at var(--mcard-x, 30%) var(--mcard-y, 20%),
-      color-mix(in srgb, var(--card-ink-light) 55%, transparent),
-      transparent 40%
-    ),
+  background-repeat: no-repeat;
+  mix-blend-mode: color-dodge;
+}
+.mcard__foil {
+  background-image: linear-gradient(
+    115deg,
+    transparent 0%,
+    var(--mcard-holo-1) 25%,
+    transparent 47%,
+    transparent 53%,
+    var(--mcard-holo-2) 75%,
+    transparent 100%
+  );
+  background-size: 300% 300%;
+  background-position: var(--mcard-bx, 50%) var(--mcard-by, 50%);
+  opacity: 0.45;
+  animation: mcard-holo 12s ease infinite;
+}
+.mcard__sparkle {
+  background-image:
+    radial-gradient(circle at 12% 18%, var(--card-holo-spark) 0 0.35cqi, transparent 0.7cqi),
+    radial-gradient(circle at 74% 9%, var(--card-holo-spark) 0 0.25cqi, transparent 0.6cqi),
+    radial-gradient(circle at 38% 46%, var(--card-holo-spark) 0 0.3cqi, transparent 0.65cqi),
+    radial-gradient(circle at 86% 57%, var(--card-holo-spark) 0 0.4cqi, transparent 0.8cqi),
+    radial-gradient(circle at 21% 77%, var(--card-holo-spark) 0 0.25cqi, transparent 0.6cqi),
+    radial-gradient(circle at 63% 88%, var(--card-holo-spark) 0 0.35cqi, transparent 0.7cqi),
+    radial-gradient(circle at 52% 23%, var(--card-holo-spark) 0 0.2cqi, transparent 0.5cqi),
     linear-gradient(
-      115deg,
-      transparent 20%,
-      color-mix(in srgb, var(--card-symbol-legendary) 35%, transparent) 35%,
-      color-mix(in srgb, var(--card-symbol-epic) 35%, transparent) 45%,
-      color-mix(in srgb, var(--card-frame-composer) 35%, transparent) 55%,
-      color-mix(in srgb, var(--card-frame-cast) 35%, transparent) 65%,
-      transparent 80%
+      125deg,
+      var(--card-holo-red) 15%,
+      var(--card-holo-orange) 30%,
+      var(--card-holo-yellow) 40%,
+      var(--card-holo-green) 60%,
+      var(--card-holo-cyan) 70%,
+      var(--card-holo-violet) 85%
     );
   background-size:
     100% 100%,
-    250% 250%;
-  background-position:
-    0 0,
-    var(--mcard-x, 30%) var(--mcard-y, 20%);
-  mix-blend-mode: color-dodge;
-  opacity: 0.75;
-  animation: mcard-shine 6s ease-in-out infinite alternate;
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    160% 160%;
+  background-position: var(--mcard-sx, 50%) var(--mcard-sy, 50%);
+  opacity: 0.25;
+  animation: mcard-sparkle 12s ease infinite;
 }
-@keyframes mcard-shine {
-  to {
+.mcard[data-foil][data-active] .mcard__foil {
+  animation: none;
+  opacity: 0.85;
+}
+.mcard[data-foil][data-active] .mcard__sparkle {
+  animation: none;
+  opacity: var(--mcard-glare, 0.6);
+}
+@supports (-moz-appearance: none) {
+  .mcard__foil,
+  .mcard__sparkle {
+    mix-blend-mode: screen;
+  }
+}
+@keyframes mcard-holo {
+  0%,
+  100% {
+    background-position: 50% 50%;
+    opacity: 0.35;
+  }
+  50% {
+    background-position: 100% 100%;
+    opacity: 0.6;
+  }
+}
+@keyframes mcard-sparkle {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.45;
     filter: hue-rotate(60deg);
   }
 }
@@ -292,8 +370,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mcard__foil {
+  .mcard__foil,
+  .mcard__sparkle {
     animation: none;
+  }
+  .mcard[data-foil] .mcard__card {
+    transform: none;
   }
 }
 

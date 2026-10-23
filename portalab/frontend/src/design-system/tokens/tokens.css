@@ -410,4 +410,15 @@ h1 {
   --card-symbol-epic: #d4a72c;
   --card-symbol-legendary: #e2541b;
   --card-shadow: rgba(0, 0, 0, 0.45);
+  /* the foil's holographic light: its two colours (the kind's frame tints them), the rainbow of its sheen
+     and its sparkles */
+  --card-holo-1: rgb(0, 231, 255);
+  --card-holo-2: rgb(255, 0, 231);
+  --card-holo-red: rgba(255, 0, 132, 0.31);
+  --card-holo-orange: rgba(252, 164, 0, 0.25);
+  --card-holo-yellow: rgba(255, 255, 0, 0.19);
+  --card-holo-green: rgba(0, 255, 138, 0.13);
+  --card-holo-cyan: rgba(0, 207, 255, 0.25);
+  --card-holo-violet: rgba(204, 76, 250, 0.31);
+  --card-holo-spark: rgba(255, 255, 255, 0.9);
 }

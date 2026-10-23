@@ -14,11 +14,31 @@ const KIND_ICON: Record<MediaCard["kind"], string> = {
 };
 const RARITY_LETTER = { common: "C", rare: "R", epic: "E", legendary: "L" } as const;
 
-/** Where the light falls on a foil card: it follows the pointer. */
+/** Issue 229: where the light falls on a foil card, and how it leans — it follows the pointer: the card turns
+ * towards it, the holographic stripes slide the other way, the sparkles a little, brighter off the centre. */
 function tilt(event: PointerEvent<HTMLElement>) {
   const box = event.currentTarget.getBoundingClientRect();
-  event.currentTarget.style.setProperty("--mcard-x", `${((event.clientX - box.left) / box.width) * 100}%`);
-  event.currentTarget.style.setProperty("--mcard-y", `${((event.clientY - box.top) / box.height) * 100}%`);
+  const x = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width));
+  const y = Math.min(1, Math.max(0, (event.clientY - box.top) / box.height));
+  const style = event.currentTarget.style;
+  style.setProperty("--mcard-x", `${x * 100}%`);
+  style.setProperty("--mcard-y", `${y * 100}%`);
+  style.setProperty("--mcard-rx", `${(0.5 - y) * 20}deg`);
+  style.setProperty("--mcard-ry", `${(x - 0.5) * 24}deg`);
+  style.setProperty("--mcard-bx", `${(1 - x) * 100}%`);
+  style.setProperty("--mcard-by", `${(1 - y) * 100}%`);
+  style.setProperty("--mcard-sx", `${50 + (0.5 - x) * 10}%`);
+  style.setProperty("--mcard-sy", `${50 + (0.5 - y) * 10}%`);
+  style.setProperty("--mcard-glare", String(0.35 + Math.hypot(x - 0.5, y - 0.5) * 1.1));
+  event.currentTarget.dataset.active = "";
+}
+
+/** The pointer gone: the card settles back, its light idles. */
+function rest(event: PointerEvent<HTMLElement>) {
+  delete event.currentTarget.dataset.active;
+  for (const name of ["--mcard-rx", "--mcard-ry", "--mcard-bx", "--mcard-by", "--mcard-sx", "--mcard-sy"]) {
+    event.currentTarget.style.removeProperty(name);
+  }
 }
 
 /**
@@ -80,6 +100,7 @@ export function MediaCardView({
       data-foil={foil || undefined}
       data-missing={missing || undefined}
       onPointerMove={foil ? tilt : undefined}
+      onPointerLeave={foil ? rest : undefined}
       aria-label={`${card.name} — ${type}`}
     >
       <div className="mcard__card">
@@ -123,7 +144,12 @@ export function MediaCardView({
             {foil ? " ★" : ""} · TMDB
           </span>
         </footer>
-        {foil ? <span className="mcard__foil" aria-hidden="true" /> : null}
+        {foil ? (
+          <>
+            <span className="mcard__foil" aria-hidden="true" />
+            <span className="mcard__sparkle" aria-hidden="true" />
+          </>
+        ) : null}
       </div>
     </article>
   );
