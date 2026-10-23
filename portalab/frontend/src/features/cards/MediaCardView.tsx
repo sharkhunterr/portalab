@@ -51,8 +51,8 @@ function tilt(event: PointerEvent<HTMLElement>) {
 
 /** A cut-out character (over a scene of its own, nothing to hide around it), sized by its face: the face the
  * same share of the window on every card, whatever the photograph (a close-up, a wide shot), its centre across
- * the middle and two fifths down. Within that share it reaches the window's foot when it can; where the
- * photograph ends above it, the character fades out rather than being cut. Kept within the window — but a
+ * the middle and two fifths down — and always standing on the window's foot: larger, or a little lower, when
+ * its photograph ends early. Kept within the window — but a
  * legendary's, whose head may come out over the window's top. */
 function placeCutout(image: HTMLImageElement) {
   const box = image.parentElement;
@@ -69,7 +69,7 @@ function placeCutout(image: HTMLImageElement) {
     fh > 0 ? [(FACE[0] * height) / (fh * natural[1]), (FACE[1] * height) / (fh * natural[1])] : [];
   const scale =
     least !== undefined && most !== undefined
-      ? Math.min(cover * 1.5, most, Math.max(least, reachFoot))
+      ? Math.min(Math.max(cover * 1.5, least), most * 1.35, Math.max(least, reachFoot))
       : Math.min(cover, Math.max(reachFoot, cover * 0.62));
   const [drawnWidth, drawnHeight] = [natural[0] * scale, natural[1] * scale];
   const left = Math.min(
@@ -78,10 +78,8 @@ function placeCutout(image: HTMLImageElement) {
   );
   const legendary = image.closest<HTMLElement>(".mcard")?.dataset.rarity === "legendary";
   let top = 0.42 * height - fy * drawnHeight;
-  // set down on the window's foot when its face stays in the upper half or so
-  if (top + drawnHeight < height && height - drawnHeight + fy * drawnHeight <= 0.55 * height) {
-    top = height - drawnHeight;
-  }
+  // always standing on the window's foot (its face a little lower then): never a head floating
+  if (top + drawnHeight < height) top = height - drawnHeight;
   const short = top + drawnHeight < height - 1; // the photograph ends above the window's foot
   // what lies outside the window cut away (a legendary's head let out at the top)
   const cut = (outside: number, size: number) => `${((Math.max(0, outside) / size) * 100).toFixed(2)}%`;
