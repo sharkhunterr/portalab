@@ -1,9 +1,10 @@
-"""Issue 229: a card's character cut out of its image — its background removed on the processor (IS-Net,
-« general use », run by OpenCV), kept as a WebP with its transparency in the blob store. A card then shows
-it over a scene of its own (the genre's light, the work's backdrop on the borderless version) rather than
-the photograph's background. The model is fetched once from rembg's releases into the cards' folder and
-checked against its known fingerprint. The image a card shows first (its character's, else the person's
-portrait), the cards members own first; an administrator's setting turns it off (``cards.cutouts``)."""
+"""Issue 229: a card's character cut out of its image — its background removed on the processor (MODNet, a
+portrait matting model made for people, their hair and clothes, run by OpenCV), kept as a WebP with its
+transparency in the blob store. A card then shows it over a scene of its own (the genre's light, the work's
+backdrop on the borderless version) rather than the photograph's background. The model is fetched once
+(Hugging Face, Apache 2.0) into the cards' folder and checked against its known fingerprint. The image a card
+shows first (its character's, else the person's portrait), the cards members own first; an administrator's
+setting turns it off (``cards.cutouts``)."""
 
 import asyncio
 import hashlib
@@ -25,14 +26,14 @@ from portalab.core.logging import get_logger
 from portalab.modules.cards.models import Card, Copy
 
 MODEL = (
-    "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx",
-    "60920e99c45464f2ba57bee2ad08c919a52bbf852739e96947fbb4358c0d964a",
+    "https://huggingface.co/Xenova/modnet/resolve/main/onnx/model.onnx",
+    "07c308cf0fc7e6e8b2065a12ed7fc07e1de8febb7dc7839d7b7f15dd66584df9",
 )
-SIZE = 1024  # the model's input
+SIZE = 512  # the model's input, its longer side (a multiple of 32)
 LONGEST = 900  # a cut-out kept at this size at most
-# the model's answer made a little firmer: what is surely the character opaque, its hair and soft edges kept
-FLOOR, SPAN = 0.02, 0.4
-BATCH = 60  # cards cut out a run (about a second each)
+# the model's matte made a little firmer: its faint haze dropped, its hair and soft edges kept
+FLOOR, SPAN = 0.04, 0.9
+BATCH = 120  # cards cut out a run (a fraction of a second each)
 # a cut-out kept only when the character stands on the image's foot (its shoulders, its body there): a head
 # the model kept alone, its body taken for background, would float — the card keeps its photograph
 GROUNDED = 0.2
@@ -60,7 +61,7 @@ class Cutter:
             self._broken = True
             return False
         url, digest = MODEL
-        path = self.root / "models" / url.rsplit("/", 1)[-1]
+        path = self.root / "models" / "modnet.onnx"
         if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest:
             async with httpx.AsyncClient(
                 timeout=600.0, follow_redirects=True, event_hooks=egress.hooks()
@@ -91,10 +92,11 @@ class Cutter:
         if scale < 1:
             image = cv.resize(image, (int(width * scale), int(height * scale)), interpolation=cv.INTER_AREA)
             height, width = image.shape[:2]
-        blob = cv.dnn.blobFromImage(image, 1 / 255.0, (SIZE, SIZE), (0, 0, 0), swapRB=True) - 0.5
+        ratio = SIZE / max(height, width)
+        size = (max(32, int(width * ratio) // 32 * 32), max(32, int(height * ratio) // 32 * 32))
+        blob = cv.dnn.blobFromImage(image, 1 / 127.5, size, (127.5, 127.5, 127.5), swapRB=True)
         self._net.setInput(blob)
         found = self._net.forward()[0, 0]
-        found = (found - found.min()) / (found.max() - found.min() + 1e-8)
         alpha = np.clip((cv.resize(found, (width, height)) - FLOOR) / SPAN, 0, 1)
         alpha = cv.GaussianBlur(alpha, (3, 3), 0)  # an edge a little soft, never cut sharp
         if float(alpha[int(height * 0.94) :].mean()) < GROUNDED:

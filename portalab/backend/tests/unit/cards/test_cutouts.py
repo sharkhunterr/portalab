@@ -16,8 +16,8 @@ class HeadOnly:
         pass
 
     def forward(self) -> Any:
-        found = np.zeros((1, 1, SIZE, SIZE), np.float32)
-        found[..., : SIZE // 2, SIZE // 3 : 2 * SIZE // 3] = 1.0
+        found = np.zeros((1, 1, 512, 384), np.float32)
+        found[..., :256, 128:256] = 1.0
         return found
 
 
@@ -25,11 +25,11 @@ class Halves:
     """A model seeing the character in the left half only."""
 
     def setInput(self, blob: Any) -> None:
-        assert blob.shape == (1, 3, SIZE, SIZE)
+        assert blob.shape[:2] == (1, 3) and max(blob.shape[2:]) <= SIZE
 
     def forward(self) -> Any:
-        found = np.zeros((1, 1, SIZE, SIZE), np.float32)
-        found[..., : SIZE // 2] = 1.0
+        found = np.zeros((1, 1, 512, 384), np.float32)
+        found[..., :192] = 1.0
         return found
 
 
