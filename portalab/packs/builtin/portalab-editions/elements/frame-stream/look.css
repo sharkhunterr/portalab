@@ -159,3 +159,10 @@
   clip-path: polygon(1.6cqi 0, 100% 0, calc(100% - 1.6cqi) 100%, 0 100%);
   padding-inline: 2.4cqi 3cqi;
 }
+/* a work's own card holds more (three figures, its line): its box tighter */
+.mcard[data-frame="edition-stream"][data-kind="title"] .mcard__lower {
+  padding-block: 0.8cqi;
+}
+.mcard[data-frame="edition-stream"][data-kind="title"] .mcard__figures li {
+  padding-block: 0.3cqi;
+}
