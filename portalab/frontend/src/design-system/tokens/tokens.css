@@ -421,16 +421,16 @@ h1 {
   --card-holo-cyan: rgba(0, 207, 255, 0.25);
   --card-holo-violet: rgba(204, 76, 250, 0.31);
   --card-holo-spark: rgba(255, 255, 255, 0.9);
-  /* the card's body: its work's genre, printed light like a trading card's type (crime and horror dark), a
+  /* the card's body: its work's genre, printed light like a trading card's type, a
      fine diagonal grain over it; each family's accent (its emblem, its icons) and its ink (the texts) */
   --card-grain: rgba(255, 255, 255, 0.22);
   --card-rule: rgba(0, 0, 0, 0.16);
   --card-family-sf: linear-gradient(160deg, #e3f0ff 0%, #b9d6f7 55%, #8fb8ea 100%);
   --card-family-sf-accent: #2f6db3;
   --card-family-sf-ink: #0e2442;
-  --card-family-action: linear-gradient(160deg, #ffe9dc 0%, #f7bea3 55%, #e8916b 100%);
-  --card-family-action-accent: #c2401f;
-  --card-family-action-ink: #3a1206;
+  --card-family-action: linear-gradient(160deg, #ffe6e1 0%, #f7a99c 55%, #e5685a 100%);
+  --card-family-action-accent: #b8231b;
+  --card-family-action-ink: #3d0b07;
   --card-family-fantasy: linear-gradient(160deg, #f1e8ff 0%, #d5c1f6 55%, #b79ae9 100%);
   --card-family-fantasy-accent: #6b3fc0;
   --card-family-fantasy-ink: #22104a;
@@ -440,9 +440,9 @@ h1 {
   --card-family-drama: linear-gradient(160deg, #fcf7ee 0%, #eee3ce 55%, #d9c8a7 100%);
   --card-family-drama-accent: #8a6d3b;
   --card-family-drama-ink: #2b2216;
-  --card-family-dark: linear-gradient(160deg, #565c68 0%, #33373f 55%, #191b20 100%);
-  --card-family-dark-accent: #e06a6a;
-  --card-family-dark-ink: #f4f1ec;
+  --card-family-dark: linear-gradient(160deg, #f6e4f1 0%, #dda5cb 55%, #b8679f 100%);
+  --card-family-dark-accent: #7d1a5c;
+  --card-family-dark-ink: #33071f;
   /* the rarity at a glance, in the colours games use: the rim around the card, its glow, its gem and its
      name — graphite, sapphire, amethyst, gold */
   --card-rim-common: linear-gradient(145deg, #a3a8b0, #575c64 40%, #2c3036 70%, #7a7f87);
@@ -452,10 +452,10 @@ h1 {
   --card-glow-rare: rgba(79, 163, 234, 0.55);
   --card-glow-epic: rgba(180, 108, 240, 0.6);
   --card-glow-legendary: rgba(245, 196, 67, 0.75);
-  --card-rarity-ink-common: #c9ced6;
-  --card-rarity-ink-rare: #8fcbff;
-  --card-rarity-ink-epic: #dcb0ff;
-  --card-rarity-ink-legendary: #ffd668;
+  --card-rarity-fill-common: #5d626b;
+  --card-rarity-fill-rare: #2b78c8;
+  --card-rarity-fill-epic: #8136cc;
+  --card-rarity-fill-legendary: #c48a12;
   /* the borderless card's shades over its art, under its texts */
   --card-scrim: rgba(3, 5, 10, 0.78);
   --card-scrim-soft: rgba(3, 5, 10, 0.35);

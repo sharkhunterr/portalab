@@ -1,13 +1,13 @@
 /* issue 229: a media card, laid out like a trading card game's. Its size follows its width (container units):
    the very same card on a binder page, in a pack's reveal and opened big. Its rim is its rarity's metal, its
-   body its work's genre colour printed light (crime and horror dark), the genre's emblem top right — the same
+   body its work's genre colour printed light, the genre's emblem top right — the same
    for films, series, books and games. */
 .mcard {
   --mcard-body: var(--card-family-drama);
   --mcard-accent: var(--card-family-drama-accent);
   --mcard-ink: var(--card-family-drama-ink);
   --mcard-rim: var(--card-rim-common);
-  --mcard-rarity: var(--card-rarity-ink-common);
+  --mcard-rarity: var(--card-rarity-fill-common);
   --mcard-glow: transparent;
   --mcard-gem: circle(50% at 50% 50%);
   --mcard-title: "Barlow Condensed", var(--font-family-sans, sans-serif);
@@ -49,19 +49,19 @@
 }
 .mcard[data-rarity="rare"] {
   --mcard-rim: var(--card-rim-rare);
-  --mcard-rarity: var(--card-rarity-ink-rare);
+  --mcard-rarity: var(--card-rarity-fill-rare);
   --mcard-glow: var(--card-glow-rare);
   --mcard-gem: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
 }
 .mcard[data-rarity="epic"] {
   --mcard-rim: var(--card-rim-epic);
-  --mcard-rarity: var(--card-rarity-ink-epic);
+  --mcard-rarity: var(--card-rarity-fill-epic);
   --mcard-glow: var(--card-glow-epic);
   --mcard-gem: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%);
 }
 .mcard[data-rarity="legendary"] {
   --mcard-rim: var(--card-rim-legendary);
-  --mcard-rarity: var(--card-rarity-ink-legendary);
+  --mcard-rarity: var(--card-rarity-fill-legendary);
   --mcard-glow: var(--card-glow-legendary);
   --mcard-gem: polygon(50% 0, 62% 35%, 98% 36%, 69% 58%, 79% 94%, 50% 72%, 21% 94%, 31% 58%, 2% 36%, 38% 35%);
 }
@@ -69,7 +69,7 @@
 .mcard__card {
   position: relative;
   aspect-ratio: 63 / 88;
-  padding: 2.4cqi;
+  padding: 3.2cqi;
   border-radius: 5cqi;
   background: var(--mcard-rim);
   overflow: hidden;
@@ -368,8 +368,9 @@
   gap: 1.2cqi;
   padding: 0.5cqi 1.8cqi 0.5cqi 1cqi;
   border-radius: 999px;
-  background: var(--card-border);
-  color: var(--mcard-rarity);
+  background: var(--mcard-rarity);
+  color: var(--card-text);
+  box-shadow: 0 0 0 0.33cqi color-mix(in srgb, var(--card-text) 60%, transparent);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -377,10 +378,7 @@
   inline-size: 3.6cqi;
   block-size: 3.6cqi;
   clip-path: var(--mcard-gem);
-  background: var(--mcard-rim);
-}
-.mcard:not([data-rarity="common"]) .mcard__rarity {
-  box-shadow: inset 0 0 0 0.33cqi var(--mcard-rarity);
+  background: var(--card-text);
 }
 
 /* the borderless alternative: the art over the whole card inside its rim, nothing over it but its name on
@@ -475,7 +473,7 @@
   background-size: 300% 300%;
   background-position: var(--mcard-bx, 50%) var(--mcard-by, 50%);
   opacity: 0.45;
-  animation: mcard-holo 12s ease infinite;
+  animation: mcard-holo 8s ease-in-out infinite;
 }
 .mcard__sparkle {
   background-image:
@@ -506,7 +504,7 @@
     160% 160%;
   background-position: var(--mcard-sx, 50%) var(--mcard-sy, 50%);
   opacity: 0.25;
-  animation: mcard-sparkle 12s ease infinite;
+  animation: mcard-sparkle 8s ease-in-out infinite;
 }
 .mcard[data-foil][data-active] .mcard__foil {
   animation: none;
@@ -522,25 +520,29 @@
     mix-blend-mode: screen;
   }
 }
+/* at rest, no tint: now and then the holographic light sweeps across the card and is gone */
 @keyframes mcard-holo {
-  0%,
-  100% {
-    background-position: 50% 50%;
-    opacity: 0.2;
+  0% {
+    background-position: 0% 0%;
+    opacity: 0;
   }
-  50% {
+  12% {
+    opacity: 0.35;
+  }
+  25%,
+  100% {
     background-position: 100% 100%;
-    opacity: 0.4;
+    opacity: 0;
   }
 }
 @keyframes mcard-sparkle {
   0%,
+  25%,
   100% {
-    opacity: 0.2;
+    opacity: 0;
   }
-  50% {
-    opacity: 0.45;
-    filter: hue-rotate(60deg);
+  12% {
+    opacity: 0.3;
   }
 }
 

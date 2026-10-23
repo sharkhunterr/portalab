@@ -13,9 +13,7 @@ STRONG = {
     "science-fiction & fantastique": "sf",
     "fantastique": "fantasy",
     "horreur": "dark",
-    "thriller": "dark",
     "crime": "dark",
-    "mystère": "dark",
     "action": "action",
     "action & adventure": "action",
     "guerre": "action",
@@ -23,7 +21,13 @@ STRONG = {
     "western": "action",
 }
 DRAWN = {"animation", "kids"}
-GENTLE = {"aventure": "action", "comédie": "family", "familial": "family"}
+GENTLE = {  # a thriller or a mystery is dark only when nothing stronger marks it (an action thriller: action)
+    "aventure": "action",
+    "thriller": "dark",
+    "mystère": "dark",
+    "comédie": "family",
+    "familial": "family",
+}
 
 
 def family_of(genres: Sequence[str]) -> str:
