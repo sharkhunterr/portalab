@@ -48,6 +48,10 @@ class CardSet(CardsBase):
     backdrop: Mapped[str | None] = mapped_column(String(120), info=not_personal("an artwork reference"))
     # an animated work: its characters are drawn (no face to compare)
     animated: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    # the cards' colour by the work's genre (``family.py``) and its figures printed on them, frozen when the
+    # set is made: rating, votes, budget, revenue, runtime, seasons, director
+    family: Mapped[str] = mapped_column(String(12), nullable=False, default="drama", server_default="drama")
+    facts: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict, server_default="{}")
     saga: Mapped[str | None] = mapped_column(String(200), info=not_personal("a saga's name"))
     tmdb: Mapped[str | None] = mapped_column(String(24))  # the work's TMDB id
     ids: Mapped[str | None] = mapped_column(String(240))  # every id known, ``scheme:value`` comma-separated

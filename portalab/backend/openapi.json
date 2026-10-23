@@ -22727,9 +22727,33 @@
         ]
       }
     },
+    "/api/v1/admin/cards/packs/trial": {
+      "post": {
+        "description": "A trial pack for me (an administrator): six cards among the works whose characters were looked for,\nfoil and borderless more often \u2014 to see the cards as members will. Opened like any pack.",
+        "operationId": "trial_pack_api_v1_admin_cards_packs_trial_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Trial Pack Api V1 Admin Cards Packs Trial Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Trial Pack",
+        "tags": [
+          "cards"
+        ]
+      }
+    },
     "/api/v1/admin/cards/sets/{key}/characters": {
       "post": {
-        "description": "Look for this set's actors' characters now (again for those found before): on the web (when it is\nswitched on), in the film itself, then in the community database \u2014 each winning over the one before.",
+        "description": "Look for this set's actors' characters again from the start, by every source in its order (TheTVDB,\nTMDB, the film itself, the web when switched on): how many each gave.",
         "operationId": "look_for_characters_api_v1_admin_cards_sets__key__characters_post",
         "parameters": [
           {

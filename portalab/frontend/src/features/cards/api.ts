@@ -6,6 +6,17 @@ export type Rarity = "common" | "rare" | "epic" | "legendary";
 export type Variant = "normal" | "foil" | "borderless" | "borderless_foil";
 export const VARIANTS: Variant[] = ["normal", "foil", "borderless", "borderless_foil"];
 
+export type Family = "sf" | "action" | "fantasy" | "family" | "drama" | "dark" | "multi";
+export interface WorkFacts {
+  rating?: number;
+  votes?: number;
+  budget?: number;
+  revenue?: number;
+  runtime?: number;
+  seasons?: number;
+  director?: string;
+}
+
 export interface MediaCard {
   id: string;
   set: string;
@@ -16,6 +27,12 @@ export interface MediaCard {
   /** a scene of the work: behind its people's portraits */
   set_backdrop?: string | null;
   set_poster?: string | null;
+  /** the work's genre as the card's colour, and its figures printed on the card (frozen with its set) */
+  set_family?: Family;
+  set_facts?: WorkFacts;
+  set_animated?: boolean;
+  /** an actor's place in the credits (0: the lead) */
+  billing?: number;
   year: number | null;
   number: number;
   kind: "title" | "cast" | "director" | "creator" | "writer" | "composer";
@@ -178,6 +195,19 @@ export function useOpenPack() {
       });
       if (error || !data) throw error ?? new Error("open");
       return data as unknown as CardPack;
+    },
+    onSettled: () => void client.invalidateQueries({ queryKey: KEY }),
+  });
+}
+
+/** Issue 229: an administrator's trial pack — six cards among the works whose characters were looked for. */
+export function useTrialPack() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await api.POST("/api/v1/admin/cards/packs/trial");
+      if (error || !data) throw error ?? new Error("trial");
+      return data;
     },
     onSettled: () => void client.invalidateQueries({ queryKey: KEY }),
   });

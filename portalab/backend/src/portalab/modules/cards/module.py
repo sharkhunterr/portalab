@@ -6,6 +6,8 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
+from sqlalchemy import update
+
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.events import ConsumerRegistry, default_consumers
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
@@ -22,6 +24,7 @@ from portalab.modules.cards.characters import CharacterSheets
 from portalab.modules.cards.faces import FaceMatcher
 from portalab.modules.cards.frames import FilmFrames
 from portalab.modules.cards.generator import CardForge
+from portalab.modules.cards.models import Card
 from portalab.modules.cards.packs import CONSUMER, Packs
 from portalab.modules.cards.participant import CardsParticipant
 from portalab.modules.cards.roles import RoleArt
@@ -101,6 +104,31 @@ class CardsModule:
                 self.config = replace(self.config, **values)
         except Exception:
             log.warning("cards configuration not refreshed")
+
+    async def look_again(self, set_key: str) -> dict[str, int]:
+        """A set's characters looked for again from the start, by its sources in their order — each giving
+        only the cards still without an image: TheTVDB (the role's own image), TMDB (a still the actor is
+        tagged in), the film itself (its images, their faces compared), the web (when switched on)."""
+        async with self.database.unit_of_work() as uow:
+            await uow.session.execute(
+                update(Card)
+                .where(Card.set_key == set_key, Card.kind == "cast")
+                .values(
+                    role_art=None,
+                    role_alt=None,
+                    role_checked_at=None,
+                    character_checked_at=None,
+                    frame_checked_at=None,
+                    search_checked_at=None,
+                )
+                .execution_options(synchronize_session=False)
+            )
+        return {
+            "tvdb": await self.characters.run(set_key=set_key),
+            "tmdb": await self.roles.run(set_key=set_key),
+            "film": await self.frames.run(set_key=set_key),
+            "web": await self.search.run(20, set_key=set_key),
+        }
 
     def register_jobs(self, jobs: JobRegistry) -> list[Any]:
         async def sync() -> None:

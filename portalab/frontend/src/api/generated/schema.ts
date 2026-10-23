@@ -611,6 +611,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/cards/packs/trial": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Trial Pack
+         * @description A trial pack for me (an administrator): six cards among the works whose characters were looked for,
+         *     foil and borderless more often — to see the cards as members will. Opened like any pack.
+         */
+        post: operations["trial_pack_api_v1_admin_cards_packs_trial_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/cards/sets/{key}/characters": {
         parameters: {
             query?: never;
@@ -622,8 +643,8 @@ export interface paths {
         put?: never;
         /**
          * Look For Characters
-         * @description Look for this set's actors' characters now (again for those found before): on the web (when it is
-         *     switched on), in the film itself, then in the community database — each winning over the one before.
+         * @description Look for this set's actors' characters again from the start, by every source in its order (TheTVDB,
+         *     TMDB, the film itself, the web when switched on): how many each gave.
          */
         post: operations["look_for_characters_api_v1_admin_cards_sets__key__characters_post"];
         delete?: never;
@@ -19157,6 +19178,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trial_pack_api_v1_admin_cards_packs_trial_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };

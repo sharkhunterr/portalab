@@ -41,8 +41,9 @@ class RoleArt:
         self.capabilities = capabilities
         self.clock = clock
 
-    async def run(self, batch: int = BATCH) -> int:
-        """Look for the characters of the next people (the rarest cards first): how many cards got one."""
+    async def run(self, batch: int = BATCH, *, set_key: str | None = None) -> int:
+        """Look for the characters of the next people (the rarest cards first): how many cards got one.
+        ``set_key``: that set's people only (its characters looked for again)."""
         providers = self.capabilities.system_providers(CARD_SOURCES)
         if not providers:
             return 0
@@ -60,6 +61,7 @@ class RoleArt:
                             Card.kind == "cast",
                             Card.retired.is_(False),
                             Card.role_checked_at.is_(None),
+                            *((Card.set_key == set_key,) if set_key else ()),
                             Card.person_ref.like("tmdb:%"),
                             CardSet.present.is_(True),
                             CardSet.tmdb.is_not(None),
@@ -100,6 +102,6 @@ class RoleArt:
                 art, card.role_alt = best(by_work.get(tmdb or "", []))
                 if not (card.role_art or "").startswith("blob:"):  # 231: a role's own image is kept
                     card.role_art = art
+                    given += 1 if art else 0
                 card.role_checked_at = now
-                given += 1 if art else 0
         return given

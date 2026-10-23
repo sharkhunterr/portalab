@@ -24,6 +24,9 @@ def card_out(card: Card, card_set: CardSet, owned: dict[str, int] | None = None)
         "set_kind": card_set.kind,
         "set_backdrop": card_set.backdrop,
         "set_poster": card_set.poster,
+        "set_family": card_set.family,
+        "set_facts": card_set.facts or {},
+        "set_animated": card_set.animated,
         "year": card_set.year,
         "number": card.number,
         "kind": card.kind,
@@ -37,6 +40,7 @@ def card_out(card: Card, card_set: CardSet, owned: dict[str, int] | None = None)
         "role_alt": card.role_alt,
         "fan_art": card.fan_art,
         "rarity": card.rarity,
+        "billing": card.billing,
         "retired": card.retired,
         "owned": owned or {},
     }

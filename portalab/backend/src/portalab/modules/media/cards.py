@@ -53,6 +53,31 @@ def _strings(raw: Any) -> list[str]:
     return [str(v) for v in raw if isinstance(v, str)] if isinstance(raw, list) else []
 
 
+def _facts(data: Mapping[str, Any]) -> dict[str, Any]:
+    """The figures a work's cards print: budget, revenue (dollars), runtime (minutes), seasons, director."""
+    out: dict[str, Any] = {}
+    for key, name in (
+        ("budget", "budget"),
+        ("revenue", "revenue"),
+        ("runtime_min", "runtime"),
+        ("seasons", "seasons"),
+    ):
+        value = data.get(key)
+        if isinstance(value, int | float) and not isinstance(value, bool) and value > 0:
+            out[name] = int(value)
+    director = next(
+        (
+            str(p["name"])[:120]
+            for p in data.get("people") or []
+            if isinstance(p, Mapping) and p.get("role") in ("Director", "Creator") and p.get("name")
+        ),
+        None,
+    )
+    if director:
+        out["director"] = director
+    return out
+
+
 class MediaCardSources:
     def __init__(
         self, database: Database, capabilities: CapabilityRegistry | None = None, enricher: Any = None
@@ -109,6 +134,7 @@ class MediaCardSources:
                     tmdb=str(tmdb) if (tmdb := (data.get("ids") or {}).get("tmdb")) else None,
                     ids={str(k): str(v) for k, v in (data.get("ids") or {}).items() if v},
                     genres=_strings(data.get("genres")),
+                    facts=_facts(data),
                 )
             )
         return out

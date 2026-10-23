@@ -596,3 +596,60 @@ async def test_a_roles_own_image_from_the_community_database(database: Database)
 
 
 IMAGE_SEARCH_KEY = "media.image_search"
+
+
+async def test_a_sets_characters_looked_for_again_by_every_source_in_order(
+    database: Database, tmp_path: Any
+) -> None:
+    """Issue 231: an administrator's « look again »: the set's images forgotten, then each source in its
+    order fills only the cards still without one — TheTVDB, TMDB, the film, the web (off by default)."""
+    from portalab.capabilities.media import CHARACTERS
+    from portalab.modules.cards.module import CardsModule
+
+    capabilities = new_registry()
+    film = work("Top Gun: Maverick", 11000, "US", ["Tom Cruise", "Miles Teller", "Jennifer Connelly"])
+    capabilities.provide(CARD_SOURCES, Sources([film]), instance_ref="t", owner="test")
+    capabilities.provide(CHARACTERS, Tvdb(), instance_ref="tvdb", owner="test")
+    module = CardsModule(database, capabilities, blobs=Blobs(), root=tmp_path)  # type: ignore[arg-type]
+    await module.forge.sync()
+    async with database.unit_of_work() as uow:  # an image found before for Jennifer Connelly
+        await uow.session.execute(
+            Card.__table__.update().where(Card.name == "Jennifer Connelly").values(role_art="blob:cards/old")
+        )
+    key = str(film.object_id)
+    # TheTVDB has Tom Cruise's and Miles Teller's roles; TMDB a still of Tom Cruise (TheTVDB's stays: none
+    # given); the
+    # film cannot be shown, the web is off: Jennifer Connelly's old image is forgotten
+    assert await module.look_again(key) == {"tvdb": 2, "tmdb": 0, "film": 0, "web": 0}
+    async with database.session() as session:
+        rows = (await session.execute(Card.__table__.select().where(Card.kind == "cast"))).all()
+    cards = {r.name: r for r in rows}
+    assert cards["Tom Cruise"].role_art.startswith("blob:")  # TheTVDB's, not TMDB's still
+    assert cards["Jennifer Connelly"].role_art is None
+
+
+async def test_a_trial_pack_among_the_works_whose_characters_were_looked_for(database: Database) -> None:
+    """Issue 229: an administrator's trial pack — six cards, drawn among the works whose characters were
+    looked for only, opened like any pack."""
+    capabilities = new_registry()
+    looked, other = work("Looked For", 9000, "US", ["A", "B"]), work("Not Yet", 9000, "US", ["C", "D"])
+    capabilities.provide(CARD_SOURCES, Sources([looked, other]), instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    async with database.unit_of_work() as uow:
+        await uow.session.execute(
+            Card.__table__.update()
+            .where(Card.set_key == str(looked.object_id))
+            .values(character_checked_at=NOW)
+        )
+        user = uuid4()
+        await uow.session.execute(INSERT_USER, {"id": user, "login": f"u{user.hex[:8]}"})
+    packs = Packs(database, capabilities, rng=random.Random(4))  # noqa: S311 — a fixed draw for the test
+    pack_id = await packs.trial(user)
+    async with database.session() as session:
+        copies = (
+            await session.execute(
+                Card.__table__.select().join(Copy, Copy.card_id == Card.id).where(Copy.pack_id == pack_id)
+            )
+        ).all()
+    assert len(copies) == 6 and {c.set_key for c in copies} == {str(looked.object_id)}
+    assert await packs.open(user, pack_id) is not None
