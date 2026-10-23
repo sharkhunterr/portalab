@@ -4,7 +4,7 @@ import { useT } from "../../i18n/hooks/useT";
 import "@fontsource/barlow-condensed/latin-600.css";
 import "@fontsource/barlow-condensed/latin-700.css";
 import { artworkImage, cardImage, type MediaCard, type Variant } from "./api";
-import { gaugesOf } from "./gauges";
+import { figuresOf, runtimeParts } from "./figures";
 import "./cards.css";
 
 const KIND_ICON: Record<MediaCard["kind"], string> = {
@@ -15,7 +15,16 @@ const KIND_ICON: Record<MediaCard["kind"], string> = {
   writer: "feather",
   composer: "music",
 };
-const SEGMENTS = Array.from({ length: 10 }, (_, i) => i);
+// the genre's emblem, like a trading card's type symbol
+const FAMILY_ICON: Record<string, string> = {
+  sf: "rocket",
+  action: "swords",
+  fantasy: "sparkles",
+  family: "smile",
+  drama: "drama",
+  dark: "skull",
+  multi: "star",
+};
 const VOICE = /\((voice|voix)\)/i;
 
 /** The size of a name so that it fits its plate whole (container units), wrapping on two lines at the least. */
@@ -52,14 +61,13 @@ function rest(event: PointerEvent<HTMLElement>) {
 }
 
 /**
- * Issue 229: a media card, printed like a modern trading card game's. Its body takes its work's genre colour
- * (science fiction blue, action red, fantasy violet, family green, drama ivory, crime charcoal, several strong
- * genres gold); a metallic rim, a gem and a written name say its rarity (steel, silver, gold, holographic).
- * On top its name, whole — a role's card is the character's, its actor in the plate at the bottom; then its
- * art with its type and rarity over it; three gauges of the work's own figures, frozen with the set; a line
- * of flavour when the work has one. ``borderless``: the art over the whole card, the plates in glass;
- * ``foil``: a holographic light that follows the pointer. A card not owned yet shows dimmed. A role without
- * an image of its character shows the work's poster and the actor's portrait in a round badge.
+ * Issue 229: a media card, laid out like a trading card game's. Its rim is its rarity's metal; its body its
+ * work's genre colour (with the genre's emblem top right). On top what it is — simply (a character, a film, a
+ * director) — and its name, whole; its art in a metal frame; under it, who plays it; then the work it belongs
+ * to, plain to see (its poster, title, year); its figures as a card's attacks (the work's rating, box office…);
+ * at the foot its collector number and its rarity. The same card at every size. ``borderless``: the art over the
+ * whole card; ``foil``: a holographic light that follows the pointer. A card not owned yet shows dimmed. A role
+ * without an image of its character shows the work's poster and the actor's portrait in a round badge.
  */
 export function MediaCardView({
   card,
@@ -91,51 +99,58 @@ export function MediaCardView({
         ? cardImage(card.set_poster ?? null, "w500")
         : cardImage(card.art, card.kind === "title" ? "w500" : "h632");
   const portrait = stand_in ? cardImage(card.art, "w185") : null;
+  const facts = card.set_facts ?? {};
   const series = card.set_kind === "series";
+  const family = card.set_family ?? "drama";
   const voice = card.kind === "cast" && (VOICE.test(card.role ?? "") || Boolean(card.set_animated));
-  // a role's card is its character's: the actor goes to the plate at the bottom
+  // a role's card is its character's: the actor is named under the art
   const character = card.kind === "cast" ? (card.role ?? "").replace(VOICE, "").trim() : "";
   const title = character || card.name;
-  const type =
-    card.kind === "title"
-      ? t(`gamification:cards.type.${series ? "series" : "movie"}`, { year: card.year ?? "" })
-      : t("gamification:cards.type.of", {
-          kind: t(`gamification:cards.type.${character ? "character" : card.kind}`),
-          title: card.set_name,
-        });
-  const credit =
-    card.kind === "title"
-      ? card.set_facts?.director
-        ? {
-            label: t(`gamification:cards.credit.${series ? "series" : "movie"}`),
-            name: card.set_facts.director,
-          }
-        : null
-      : card.kind === "cast"
-        ? { label: t(`gamification:cards.credit.${voice ? "voice" : "cast"}`), name: card.name }
-        : { label: t(`gamification:cards.credit.${card.kind}`), name: card.set_name };
-  const gauges = size === "sm" ? [] : gaugesOf(card);
-  const collector = `${String(card.number).padStart(3, "0")}/${String(card.set_size).padStart(3, "0")} · ${card.set_code}`;
+  const stage = t(
+    `gamification:cards.stage.${card.kind === "title" ? (series ? "series" : "movie") : card.kind}`,
+  );
+  const strip =
+    card.kind === "cast"
+      ? t(`gamification:cards.strip.${voice ? "voice" : "cast"}`, {
+          name: card.name,
+          place: (card.billing ?? 0) + 1,
+        })
+      : card.kind === "title" && facts.director
+        ? t(`gamification:cards.strip.${series ? "series" : "movie"}`, { name: facts.director })
+        : null;
+  const runtime = runtimeParts(facts.runtime);
+  const meta = [
+    card.year ? String(card.year) : null,
+    runtime ? t("gamification:cards.runtime", runtime) : null,
+    ...(facts.genres ?? []).slice(0, 2),
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const poster = card.kind !== "title" && !stand_in ? cardImage(card.set_poster ?? null, "w185") : null;
+  const figures = figuresOf(card);
   return (
     <article
       className="mcard"
       data-size={size}
       data-kind={card.kind}
-      data-family={card.set_family ?? "drama"}
+      data-family={family}
       data-rarity={card.rarity}
       data-borderless={borderless || undefined}
       data-foil={foil || undefined}
       data-missing={missing || undefined}
       onPointerMove={foil ? tilt : undefined}
       onPointerLeave={foil ? rest : undefined}
-      aria-label={`${title} — ${type}`}
+      aria-label={`${title} — ${stage}`}
     >
       <div className="mcard__card">
         <div className="mcard__body">
-          <header className="mcard__name">
-            <span style={{ fontSize: fit(title, 74, 8.4, 4.6) }}>{title}</span>
-            <span className="mcard__sign" aria-hidden="true">
-              <Icon name={KIND_ICON[card.kind]} size={12} />
+          <header className="mcard__head">
+            <span className="mcard__stage">{stage}</span>
+            <span className="mcard__name" style={{ fontSize: fit(title, 62, 8.6, 4.8) }}>
+              {title}
+            </span>
+            <span className="mcard__emblem" aria-hidden="true">
+              <Icon name={FAMILY_ICON[family] ?? "star"} size={14} />
             </span>
           </header>
           <div
@@ -145,57 +160,58 @@ export function MediaCardView({
             {art ? (
               <img className="mcard__picture" src={art} alt="" loading="lazy" draggable={false} />
             ) : (
-              <Icon name={KIND_ICON[card.kind]} size={size === "sm" ? 24 : 40} />
+              <Icon name={KIND_ICON[card.kind]} size={40} />
             )}
             {portrait ? (
               <img className="mcard__badge" src={portrait} alt="" loading="lazy" draggable={false} />
             ) : null}
-            <div className="mcard__type">
-              <span style={{ fontSize: fit(type, 46, 4, 3, 0.62) }}>{type}</span>
-              <span className="mcard__rarity">
-                <span className="mcard__gem" aria-hidden="true" />
-                {t(`gamification:cards.rarity.${card.rarity}`)}
+          </div>
+          {strip ? <p className="mcard__strip">{strip}</p> : null}
+          {card.kind === "title" ? (
+            meta ? (
+              <p className="mcard__meta">{meta}</p>
+            ) : null
+          ) : (
+            <div className="mcard__work">
+              {poster ? <img src={poster} alt="" loading="lazy" draggable={false} /> : null}
+              <span>
+                <strong style={{ fontSize: fit(card.set_name, 150, 5, 3.4, 0.5) }}>{card.set_name}</strong>
+                {meta ? <small>{meta}</small> : null}
               </span>
             </div>
-          </div>
-          {gauges.length || card.flavor ? (
-            <div className="mcard__stats">
-              {gauges.map((gauge) => (
-                <div className="mcard__gauge" key={gauge.key}>
+          )}
+          {figures.length ? (
+            <ul className="mcard__figures">
+              {figures.map((figure) => (
+                <li key={figure.key}>
+                  <span className="mcard__cost" aria-hidden="true">
+                    <Icon name={figure.icon} size={10} />
+                  </span>
                   <span>
                     {t(
-                      gauge.key === "work"
-                        ? `gamification:cards.gauge.work.${series ? "series" : "movie"}`
-                        : `gamification:cards.gauge.${gauge.key}`,
+                      figure.key === "rating" && card.kind !== "title"
+                        ? `gamification:cards.figure.workRating.${series ? "series" : "movie"}`
+                        : `gamification:cards.figure.${figure.key}`,
                     )}
                   </span>
-                  <span className="mcard__segments" aria-hidden="true">
-                    {SEGMENTS.map((i) => (
-                      <span key={i} data-on={gauge.filled !== null && i < gauge.filled ? "" : undefined} />
-                    ))}
-                  </span>
-                  <span data-unknown={gauge.value ? undefined : ""}>
-                    {gauge.value ? t(gauge.value.id, gauge.value.values) : "—"}
-                  </span>
-                </div>
+                  <strong>
+                    {t(figure.big.id, figure.big.values)}
+                    {figure.small ? <small>{figure.small}</small> : null}
+                  </strong>
+                </li>
               ))}
-              {card.flavor && size !== "sm" ? <p className="mcard__flavor">{card.flavor}</p> : null}
-            </div>
+            </ul>
           ) : null}
-          <footer className="mcard__credit">
+          {card.kind === "title" && card.flavor ? <p className="mcard__flavor">{card.flavor}</p> : null}
+          <footer className="mcard__foot">
             <span>
-              {credit ? (
-                <>
-                  <small>{credit.label}</small>
-                  <strong style={{ fontSize: fit(credit.name, 52, 4.8, 3.4) }}>{credit.name}</strong>
-                </>
-              ) : (
-                <strong>{card.year ?? ""}</strong>
-              )}
+              {String(card.number).padStart(3, "0")}/{String(card.set_size).padStart(3, "0")} ·{" "}
+              {card.set_code}
+              {foil ? " ★" : ""}
             </span>
-            <span className="mcard__collector">
-              <span>{collector}</span>
-              <span>{foil ? "★ TMDB" : "TMDB"}</span>
+            <span className="mcard__rarity">
+              <span className="mcard__gem" aria-hidden="true" />
+              {t(`gamification:cards.rarity.${card.rarity}`)}
             </span>
           </footer>
         </div>

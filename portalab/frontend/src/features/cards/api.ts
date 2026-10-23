@@ -15,6 +15,7 @@ export interface WorkFacts {
   runtime?: number;
   seasons?: number;
   director?: string;
+  genres?: string[];
 }
 
 export interface MediaCard {

@@ -421,23 +421,31 @@ h1 {
   --card-holo-cyan: rgba(0, 207, 255, 0.25);
   --card-holo-violet: rgba(204, 76, 250, 0.31);
   --card-holo-spark: rgba(255, 255, 255, 0.9);
-  /* the card's body: its work's genre (a colour per family, gold for several strong genres), a fine dotted
-     weave over it; each family's accent tints its gauges and the rim of its art */
-  --card-weave: rgba(255, 255, 255, 0.07);
-  --card-family-sf: linear-gradient(160deg, #3d78d0 0%, #1d4488 45%, #0d2147 100%);
-  --card-family-sf-accent: #8ec1ff;
-  --card-family-action: linear-gradient(160deg, #d2563a 0%, #8e2416 45%, #3f0d07 100%);
-  --card-family-action-accent: #ffa585;
-  --card-family-fantasy: linear-gradient(160deg, #8456d6 0%, #4a2690 45%, #22104a 100%);
-  --card-family-fantasy-accent: #cda8ff;
-  --card-family-family: linear-gradient(160deg, #4fa65a 0%, #24702f 45%, #0f3a16 100%);
-  --card-family-family-accent: #a8ee9e;
-  --card-family-drama: linear-gradient(160deg, #b9b3a8 0%, #6f6a62 45%, #302d29 100%);
-  --card-family-drama-accent: #f1ece2;
-  --card-family-dark: linear-gradient(160deg, #4a4f5a 0%, #23262d 45%, #0b0c0f 100%);
+  /* the card's body: its work's genre, printed light like a trading card's type (crime and horror dark), a
+     fine diagonal grain over it; each family's accent (its emblem, its icons) and its ink (the texts) */
+  --card-grain: rgba(255, 255, 255, 0.22);
+  --card-rule: rgba(0, 0, 0, 0.16);
+  --card-family-sf: linear-gradient(160deg, #e3f0ff 0%, #b9d6f7 55%, #8fb8ea 100%);
+  --card-family-sf-accent: #2f6db3;
+  --card-family-sf-ink: #0e2442;
+  --card-family-action: linear-gradient(160deg, #ffe9dc 0%, #f7bea3 55%, #e8916b 100%);
+  --card-family-action-accent: #c2401f;
+  --card-family-action-ink: #3a1206;
+  --card-family-fantasy: linear-gradient(160deg, #f1e8ff 0%, #d5c1f6 55%, #b79ae9 100%);
+  --card-family-fantasy-accent: #6b3fc0;
+  --card-family-fantasy-ink: #22104a;
+  --card-family-family: linear-gradient(160deg, #ebf8e2 0%, #c3e7b1 55%, #9bd186 100%);
+  --card-family-family-accent: #2f8a3a;
+  --card-family-family-ink: #0f3a16;
+  --card-family-drama: linear-gradient(160deg, #fcf7ee 0%, #eee3ce 55%, #d9c8a7 100%);
+  --card-family-drama-accent: #8a6d3b;
+  --card-family-drama-ink: #2b2216;
+  --card-family-dark: linear-gradient(160deg, #565c68 0%, #33373f 55%, #191b20 100%);
   --card-family-dark-accent: #e06a6a;
-  --card-family-multi: linear-gradient(160deg, #d8ae52 0%, #9a7128 45%, #4f360d 100%);
-  --card-family-multi-accent: #ffe19a;
+  --card-family-dark-ink: #f4f1ec;
+  --card-family-multi: linear-gradient(160deg, #fff5d8 0%, #f2d78f 55%, #ddb55a 100%);
+  --card-family-multi-accent: #a77a1c;
+  --card-family-multi-ink: #3a2a08;
   /* the rarity at a glance: the rim around the card, its gem and its name — steel, silver, gold, holographic */
   --card-rim-common: linear-gradient(145deg, #9aa0a8, #4a4f57 40%, #24282e 70%, #6b7079);
   --card-rim-rare: linear-gradient(145deg, #ffffff, #b8c3d1 30%, #6e7b8c 60%, #e3e9f0);
@@ -464,4 +472,5 @@ h1 {
   --card-text: #ffffff;
   --card-text-soft: rgba(255, 255, 255, 0.72);
   --card-segment-off: rgba(255, 255, 255, 0.14);
+  --card-frost: rgba(255, 255, 255, 0.7);
 }
