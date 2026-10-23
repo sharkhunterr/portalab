@@ -2,7 +2,7 @@ import type { Translate } from "../../i18n/hooks/useT";
 import type { Booster } from "../marketplace/boosters/api";
 import { demoBooster } from "../marketplace/boosters/BoosterReveal";
 import type { PackLook as SealedLook } from "../marketplace/boosters/Boosters";
-import { artworkImage, type CardPack } from "./api";
+import { artworkImage, type CardPack, cardImage } from "./api";
 
 /** The work's title drawn for the member's language: theirs, else English, else one without a language. */
 export function logoFor(logos: Record<string, string>, locale: string): string | null {
@@ -30,12 +30,15 @@ export function packName(t: Translate, pack: CardPack): string {
 /** A card booster as the shop's boosters are: the same sealed pack and stage — its content's title drawn on it
  * (the art site's logo) when there is one. */
 export function packBooster(t: Translate, pack: CardPack, locale: string): Booster & SealedLook {
-  const name = packName(t, pack);
-  const logo = pack.look?.season == null ? artworkImage(logoFor(pack.look?.logos ?? {}, locale)) : null;
+  const look = pack.look;
+  const name = pack.set_name ?? packName(t, pack);
   return {
     ...demoBooster({ [locale]: name, en: name }, pack.count),
     key: `cards:${pack.id}`,
     sealed: 1,
-    logo,
+    logo: artworkImage(logoFor(look?.logos ?? {}, locale)),
+    // the art site's textless art of the work, else its poster
+    art: artworkImage(look?.art) ?? cardImage(look?.poster, "w342"),
+    subtitle: look?.season != null ? t("gamification:cards.pack.season", { season: look.season }) : null,
   };
 }
