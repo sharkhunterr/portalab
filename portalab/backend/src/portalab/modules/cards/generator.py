@@ -89,8 +89,9 @@ def fingerprint(work: CardWork) -> str:
         "genres": list(work.genres),
         "facts": sorted(work.facts.items()),
         # how the cards are made: v2 no image of the work on a person's, v3 the set's scene, v4 codes, v5 the
-        # genre's colour and the work's figures, v6 its genres printed, v7 no gold body
-        "v": 7,
+        # genre's colour and the work's figures, v6 its genres printed, v7 no gold body,
+        # v8 a thriller dark on its own only
+        "v": 8,
     }
     return hashlib.sha256(json.dumps(data, sort_keys=True, default=str).encode()).hexdigest()[:64]
 
