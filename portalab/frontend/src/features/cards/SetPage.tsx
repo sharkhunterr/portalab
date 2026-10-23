@@ -5,6 +5,7 @@ import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useT } from "../../i18n/hooks/useT";
 import { type MediaCard, useCardPerson, useCardSet, VARIANTS, type Variant } from "./api";
+import { CardCredit } from "./CardCredit";
 import { MediaCardView } from "./MediaCardView";
 import "./cards.css";
 
@@ -85,6 +86,7 @@ export default function SetPage() {
         context={t("gamification:cards.setLine", { code: data.code, owned: data.owned, size: data.size })}
       />
       <Binder cards={data.cards} />
+      <CardCredit />
     </div>
   );
 }
@@ -104,6 +106,7 @@ export function PersonPage() {
         context={t("gamification:cards.personLine", { owned: person.data.owned, size: person.data.size })}
       />
       <Binder cards={person.data.cards} />
+      <CardCredit />
     </div>
   );
 }

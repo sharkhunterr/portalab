@@ -560,6 +560,50 @@ SEARXNG: Routes = {
     },
 }
 
+# issue 231: TheTVDB — a sign-in, a film found by its TMDB id (the same number is also a series'), its roles:
+# one with its own image, one showing only its actor (left out), one image on another host, a director
+_TVDB_ROLE = "https://artworks.thetvdb.com/banners/person/310297/5ed088225ea2c.jpg"
+THETVDB: Routes = {
+    "/login": {"status": "success", "data": {"token": "tvdb-token"}},
+    "/search/remoteid/157336": {
+        "status": "success",
+        "data": [{"series": {"id": 999}}, {"movie": {"id": 131079, "name": "Interstellar"}}],
+    },
+    "/movies/131079": {"status": "success", "data": {"id": 131079, "name": "Interstellar"}},
+    "/movies/131079/extended": {
+        "status": "success",
+        "data": {
+            "id": 131079,
+            "characters": [
+                {
+                    "peopleType": "Actor",
+                    "sort": 2,
+                    "personName": "Anne Hathaway",
+                    "name": "Brand",
+                    "image": "",
+                    "personImgURL": "https://artworks.thetvdb.com/banners/person/1/primary.jpg",
+                },
+                {
+                    "peopleType": "Actor",
+                    "sort": 1,
+                    "personName": "Matthew McConaughey",
+                    "name": "Cooper",
+                    "image": _TVDB_ROLE,
+                    "personImgURL": "https://artworks.thetvdb.com/banners/person/310297/6401d1e051e7d.jpg",
+                },
+                {
+                    "peopleType": "Actor",
+                    "sort": 3,
+                    "personName": "Jessica Chastain",
+                    "name": "Murph",
+                    "image": "https://elsewhere.example/murph.jpg",
+                },
+                {"peopleType": "Director", "sort": 0, "personName": "Christopher Nolan", "image": _TVDB_ROLE},
+            ],
+        },
+    },
+}
+
 SECRETS = {
     "jellyfin": {"api_key": "jf-secret-key"},
     "plex": {"token": "plex-secret-token"},
@@ -571,6 +615,7 @@ SECRETS = {
     "grimmory": {"password": "grimmory-secret-pass"},
     "tmdb": {"api_key": "tmdb-secret-key"},
     "fanart": {"api_key": "fanart-secret-key"},
+    "thetvdb": {"api_key": "tvdb-secret-key"},
     "searxng": {},
     "authentik": {"api_token": "authentik-secret-token"},
     "maintainerr": {},
@@ -587,6 +632,7 @@ ROUTES = {
     "grimmory": GRIMMORY,
     "tmdb": TMDB,
     "fanart": FANART,
+    "thetvdb": THETVDB,
     "searxng": SEARXNG,
     "authentik": AUTHENTIK,
     "maintainerr": MAINTAINERR,

@@ -15,6 +15,7 @@ export interface MediaCard {
   set_kind: string;
   /** a scene of the work: behind its people's portraits */
   set_backdrop?: string | null;
+  set_poster?: string | null;
   year: number | null;
   number: number;
   kind: "title" | "cast" | "director" | "creator" | "writer" | "composer";

@@ -522,3 +522,77 @@ async def test_an_actors_character_taken_from_the_film_itself(database: Database
     assert await frames.run() == 0 and sources.taken == 1  # taken once: the cache
     await search.run()
     assert web.queries == ["Jennifer Connelly as Jennifer Connelly Top Gun: Maverick"]  # only her, on the web
+
+
+class Tvdb:
+    """TheTVDB's roles: by actor's name (accents and « (voice) » aside), else by character."""
+
+    def __init__(self) -> None:
+        self.asked: list[tuple[str, dict[str, str]]] = []
+
+    async def characters(self, kind: str, ids: dict[str, str]) -> list[Any]:
+        from portalab.capabilities.media import CharacterImage
+
+        self.asked.append((kind, dict(ids)))
+        return [
+            CharacterImage("Tom Cruise", "Maverick", "/banners/person/1/maverick.jpg", 1),
+            CharacterImage("Someone Else", "as Miles Teller", "/banners/person/2/rooster.jpg", 2),
+        ]
+
+    async def fetch_character(self, ref: str) -> bytes:
+        return f"role:{ref}".encode()
+
+
+async def test_a_roles_own_image_from_the_community_database(database: Database) -> None:
+    """Issue 231: each role's own image (TheTVDB), matched by its actor's name else by its character — it wins
+    over any image found before and is never replaced by TMDB's; the web is an option, off by default."""
+    from portalab.capabilities.media import CHARACTERS
+    from portalab.modules.cards.characters import CharacterSheets, match, norm
+    from portalab.modules.cards.search import RoleSearch
+    from portalab.modules.cards.settings import CardsConfig
+
+    assert norm("Zoë Saldaña (voice)") == "zoe saldana"
+    capabilities = new_registry()
+    film = work("Top Gun: Maverick", 11000, "US", ["Tom Cruise", "Miles Teller", "Jennifer Connelly"])
+    sources = Sources([film])
+    capabilities.provide(CARD_SOURCES, sources, instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    async with database.unit_of_work() as uow:  # a web image found before for him
+        await uow.session.execute(
+            Card.__table__.update().where(Card.name == "Tom Cruise").values(role_art="blob:cards/" + "0" * 64)
+        )
+    blobs = Blobs()
+    sheets = CharacterSheets(database, capabilities, blobs)  # type: ignore[arg-type]
+    assert await sheets.run() == 0 and not sheets.available()  # no database connected: nothing marked
+    tvdb = Tvdb()
+    capabilities.provide(CHARACTERS, tvdb, instance_ref="tvdb", owner="test")
+    assert await sheets.run() == 2
+    assert tvdb.asked[0][0] == "movie" and tvdb.asked[0][1]["tmdb"] == film.tmdb
+    async with database.session() as session:
+        rows = (await session.execute(Card.__table__.select().where(Card.kind == "cast"))).all()
+    cards = {r.name: r for r in rows}
+    assert (
+        blobs.kept[cards["Tom Cruise"].role_art.removeprefix("blob:")]
+        == b"role:/banners/person/1/maverick.jpg"
+    )
+    assert blobs.kept[cards["Miles Teller"].role_art.removeprefix("blob:")].endswith(
+        b"rooster.jpg"
+    )  # by role
+    assert cards["Jennifer Connelly"].role_art is None
+    assert all(c.character_checked_at is not None for c in cards.values())
+    assert await sheets.run() == 0 and len(tvdb.asked) == 1  # kept: the cache
+    # TMDB's stills come later: the role's own image stays
+    await RoleArt(database, capabilities).run()
+    async with database.session() as session:
+        cruise = (await session.execute(Card.__table__.select().where(Card.name == "Tom Cruise"))).one()
+    assert cruise.role_art == cards["Tom Cruise"].role_art
+    assert match([("a", "X", None)], []) == {}
+    # the web: off by default, nothing asked
+    assert CardsConfig().web_search is False
+    web = Web()
+    capabilities.provide(IMAGE_SEARCH_KEY, web, instance_ref="searxng", owner="test")
+    off = RoleSearch(database, capabilities, Matcher(), blobs, enabled=lambda: False)  # type: ignore[arg-type]
+    assert await off.run() == 0 and web.queries == []
+
+
+IMAGE_SEARCH_KEY = "media.image_search"

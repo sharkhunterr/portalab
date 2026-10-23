@@ -11,9 +11,14 @@ OWNER = "module:cards"
 class CardsConfig:
     face_check: bool = True
     video_frames: bool = True
+    web_search: bool = False
 
 
-SETTINGS = {"face_check": "cards.faceCheck", "video_frames": "cards.videoFrames"}
+SETTINGS = {
+    "face_check": "cards.faceCheck",
+    "video_frames": "cards.videoFrames",
+    "web_search": "cards.webSearch",
+}
 _DESCRIPTIONS = {
     "face_check": (
         "An actor's character found on the web is kept only with the actor's own face (compared with their "
@@ -23,6 +28,10 @@ _DESCRIPTIONS = {
     "video_frames": (
         "An actor's character is looked for in the film itself first: still images of its file, taken by the "
         "media server (Plex), where the actor's face is compared with their portrait. Off: the web only."
+    ),
+    "web_search": (
+        "Last resort for an actor's character: images found on the web (a self-hosted SearXNG). Off (the "
+        "default): a character without an image of its own shows the work's poster and the actor's portrait."
     ),
 }
 

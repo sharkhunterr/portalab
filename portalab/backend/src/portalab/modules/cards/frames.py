@@ -99,7 +99,9 @@ class FilmFrames:
         *,
         clock: Clock | None = None,
         enabled: Callable[[], bool] = lambda: True,
+        characters_first: Callable[[], bool] = lambda: False,
     ) -> None:
+        self.characters_first = characters_first
         self.database = database
         self.capabilities = capabilities
         self.matcher = matcher
@@ -125,7 +127,13 @@ class FilmFrames:
         wanted = (
             (or_(Card.role_art.is_(None), Card.role_art.like("blob:%")),)
             if set_key
-            else (Card.role_art.is_(None), Card.role_checked_at.is_not(None), Card.frame_checked_at.is_(None))
+            else (
+                Card.role_art.is_(None),
+                Card.role_checked_at.is_not(None),
+                Card.frame_checked_at.is_(None),
+                # issue 231: the community database first, when there is one
+                *((Card.character_checked_at.is_not(None),) if self.characters_first() else ()),
+            )
         )
         async with self.database.session() as session:
             sets = (

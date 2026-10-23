@@ -18,6 +18,7 @@ from portalab.core.logging import get_logger
 from portalab.core.time import Clock
 from portalab.modules.cards import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.cards.artwork import FanArt
+from portalab.modules.cards.characters import CharacterSheets
 from portalab.modules.cards.faces import FaceMatcher
 from portalab.modules.cards.frames import FilmFrames
 from portalab.modules.cards.generator import CardForge
@@ -34,6 +35,7 @@ ROLES_JOB = "cards.role_art"
 FAN_ART_JOB = "cards.fan_art"
 SEARCH_JOB = "cards.role_search"
 FRAMES_JOB = "cards.film_frames"
+CHARACTERS_JOB = "cards.characters"
 log = get_logger("portalab.cards")
 
 
@@ -60,8 +62,15 @@ class CardsModule:
         self.blobs = blobs
         self.matcher = FaceMatcher(root or Path("data/cards"))
         self.config = CardsConfig()
+        self.characters = CharacterSheets(database, capabilities, blobs, clock=clock)
         self.frames = FilmFrames(
-            database, capabilities, self.matcher, blobs, clock=clock, enabled=lambda: self.config.video_frames
+            database,
+            capabilities,
+            self.matcher,
+            blobs,
+            clock=clock,
+            enabled=lambda: self.config.video_frames,
+            characters_first=self.characters.available,
         )
         self.search = RoleSearch(
             database,
@@ -71,6 +80,7 @@ class CardsModule:
             clock=clock,
             face_check=lambda: self.config.face_check,
             frames_first=self.frames.available,
+            enabled=lambda: self.config.web_search,
         )
 
     def register(self) -> None:
@@ -104,6 +114,9 @@ class CardsModule:
         async def fan_art() -> None:
             await self.fan_art.run()
 
+        async def characters() -> None:
+            await self.characters.run()
+
         async def frames() -> None:
             await self.frames.run()
 
@@ -118,6 +131,10 @@ class CardsModule:
             register_periodic(jobs, self.database, ROLES_JOB, timedelta(minutes=5), roles, owner=OWNER),
             # the works' full art from an art site (fanart.tv), a few works every five minutes
             register_periodic(jobs, self.database, FAN_ART_JOB, timedelta(minutes=5), fan_art, owner=OWNER),
+            # the roles' own images from a community database (TheTVDB), a few works every five minutes
+            register_periodic(
+                jobs, self.database, CHARACTERS_JOB, timedelta(minutes=5), characters, owner=OWNER
+            ),
             # the actors' characters in the film itself (its images, their faces compared), a film at a time
             register_periodic(
                 jobs,

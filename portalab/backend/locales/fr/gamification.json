@@ -309,6 +309,7 @@
   "boost.active": "Boost ×{factor} sur votre {gains} — se termine {when}",
   "cards.allOf": "Toutes les cartes de {name}",
   "cards.close": "Fermer",
+  "cards.credit": "Images de personnages fournies en partie par",
   "cards.find.cards": "Cartes ({count})",
   "cards.find.label": "Chercher dans les cartes",
   "cards.find.nothing": "Rien ne correspond à « {query} ».",

@@ -114,7 +114,8 @@ class ProviderGuard:
                     return self._fallback(cache_key, InvalidResponse(detail=redact_text(str(exc))))
                 now = self._clock.now()
                 provenance = Provenance(self.source_system, external_id, now)
-                if cache_key is not None:
+                # an image's bytes are never kept as last-known data: memory would grow with every image
+                if cache_key is not None and not isinstance(value, bytes | bytearray):
                     self._last_known[cache_key] = (value, now, provenance)
                 return Available(value=value, as_of=now, provenance=provenance)
             if attempt < self.policy.max_retries:

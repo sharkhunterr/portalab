@@ -181,6 +181,7 @@ def test_builtin_catalog_registers_once() -> None:
         "tmdb",
         "fanart",  # issue 229: films' and series' artwork
         "searxng",  # issue 229: images on the web
+        "thetvdb",  # issue 231: each role's own image
         "qbittorrent",  # 027: torrent clients behind the download managers
         "deluge",
         "authentik",  # 027: the single sign-on, for services' access
@@ -345,6 +346,30 @@ async def test_fanart_artwork() -> None:
     assert [(a.kind, a.image) for a in series] == [("character", "/fanart/tv/121361/characterart/got-5.png")]
     assert await art.artwork("movie", {"tmdb": "999999"}) == []
     assert await art.artwork("series", {"tmdb": "1"}) == []  # a series without its TVDB id
+
+
+async def test_thetvdb_characters() -> None:
+    """Issue 231: a film found by its TMDB id (its own record, not the series sharing the number), its actors'
+    roles with an image of their own, in the credits' order — a role showing only its actor, an image on
+    another host, a director: left out; signed in once, the key never sent again."""
+    from portalab.capabilities.media import CHARACTERS
+    from portalab.connectors.thetvdb import TvdbConnector
+
+    seen: list[httpx.Request] = []
+    service = handle_for("thetvdb", seen=seen)
+    connector = TvdbConnector()
+    assert (await connector.test_connection(service)).ok
+    art = connector.provider(CHARACTERS, service)
+    roles = await art.characters("movie", {"tmdb": "157336", "imdb": "tt0816692"})
+    assert [(r.person, r.character, r.image) for r in roles] == [
+        ("Matthew McConaughey", "Cooper", "/banners/person/310297/5ed088225ea2c.jpg")
+    ]
+    assert seen[-1].url.path == "/movies/131079/extended"
+    assert seen[-1].headers["Authorization"] == "Bearer tvdb-token"
+    assert [r.url.path for r in seen].count("/login") == 1  # the token kept
+    assert await art.characters("movie", {"tmdb": "1"}) == []  # unknown to TheTVDB
+    assert await art.characters("title", {"tmdb": "157336"}) == []
+    assert not (await TvdbConnector().test_connection(handle_for("thetvdb", "auth_error"))).ok
 
 
 async def test_searxng_images_and_a_guarded_fetch() -> None:
