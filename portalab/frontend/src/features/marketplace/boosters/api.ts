@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 import { api } from "../../../api/client";
 import type { Product } from "../api";
 
@@ -59,6 +60,8 @@ export interface BoosterCard {
   refund: number;
   /** won before its level or Contribution: held, usable once they are reached */
   locked: boolean;
+  /** issue 234: a card drawn its own way (a media card), its face in place of the product's art and words */
+  face?: ReactNode;
 }
 
 export interface Opened {

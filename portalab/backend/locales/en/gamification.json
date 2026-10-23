@@ -374,6 +374,7 @@
   "cards.pack.cards": "{count, plural, one {# card} other {# cards}}",
   "cards.pack.kind.movie": "Films",
   "cards.pack.kind.series": "Series",
+  "cards.pack.fresh": "{count, plural, =0 {No new card} one {# new card in your collection} other {# new cards in your collection}}",
   "cards.pack.from": "Pack from “{name}”",
   "cards.pack.open": "Open",
   "cards.pack.opening": "Opening…",

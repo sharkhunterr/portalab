@@ -171,6 +171,16 @@
 .booster-pack[data-stage] .booster-pack__name {
   font-size: clamp(1rem, 4vw, 1.4rem);
 }
+/* issue 234: a content's booster — its title drawn (the art site's logo) where a name goes */
+.booster-pack__logo {
+  position: absolute;
+  inset: auto 10% 14%;
+  z-index: 2;
+  inline-size: 80%;
+  max-block-size: 26%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 0.6rem var(--booster-ink));
+}
 .booster-pack__count {
   position: absolute;
   inset: auto 0.6rem 0.6rem auto;
@@ -2118,4 +2128,20 @@
   min-block-size: 0;
   block-size: 3.9rem;
   padding: 0;
+}
+/* issue 234: a card drawn its own way (a media card) fills its face */
+.booster-card__face[data-own] {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.booster-card__own {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.booster-card__own > * {
+  inline-size: 100%;
 }

@@ -605,18 +605,3 @@
 .ds-notifications.product-art__notify {
   z-index: auto;
 }
-/* issue 234: a booster of cards, standing in its tile */
-/* the booster peeks out of its tile, its title up */
-.product-art__cards {
-  display: block;
-  align-self: start;
-  inline-size: min(62%, 9rem);
-  margin-block-start: 8%;
-}
-.product-art[data-size="sheet"] .product-art__cards {
-  align-self: center;
-  block-size: 92%;
-  inline-size: auto;
-  aspect-ratio: 5 / 8.4;
-  margin: 0;
-}
