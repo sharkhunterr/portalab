@@ -27,7 +27,14 @@ export function CardBooster({ pack }: { pack: CardPack }) {
   const look = pack.look ?? null;
   const scene = look ? (cardImage(look.backdrop, "w780") ?? cardImage(look.poster, "w500")) : null;
   const logo = look ? artworkImage(logoFor(look.logos, locale)) : null;
-  const name = pack.set_name ?? t("gamification:cards.pack.any");
+  // a shop's booster: the works it draws among (a genre, films or series), else the whole library
+  const among = look?.product
+    ? [
+        look.family ? t(`gamification:cards.family.${look.family}`) : null,
+        look.kind ? t(`gamification:cards.pack.kind.${look.kind}`) : null,
+      ].filter(Boolean)
+    : [];
+  const name = pack.set_name ?? (among.length ? among.join(" · ") : t("gamification:cards.pack.any"));
   return (
     <span
       className="cbooster"
@@ -48,6 +55,9 @@ export function CardBooster({ pack }: { pack: CardPack }) {
             <span className="cbooster__name">{name}</span>
           )}
         </span>
+        {look?.product && look.edition ? (
+          <span className="cbooster__season">{t(`gamification:cards.edition.${look.edition}`)}</span>
+        ) : null}
         {look?.season != null ? (
           <span className="cbooster__season">
             {t("gamification:cards.pack.season", { season: look.season })}

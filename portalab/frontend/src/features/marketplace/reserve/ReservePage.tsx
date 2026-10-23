@@ -88,7 +88,8 @@ function PassItem({ entry, onUsed }: { entry: ReserveEntry; onUsed: (name: strin
   const [open, setOpen] = useState(false);
   const waiting = (purchases.data ?? []).filter(
     (row) =>
-      row.state === "locked" && !["theme", "bundle", "booster", "early_unlock"].includes(row.product_type),
+      row.state === "locked" &&
+      !["theme", "bundle", "booster", "card_booster", "early_unlock"].includes(row.product_type),
   );
   return (
     <Dialog

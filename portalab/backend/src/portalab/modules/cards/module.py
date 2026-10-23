@@ -10,6 +10,7 @@ from sqlalchemy import update
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.events import ConsumerRegistry, default_consumers
+from portalab.capabilities.marketplace import ProductType, ProductTypeRegistry, default_product_types
 from portalab.capabilities.media_core import CONTENT_BOOSTERS
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
@@ -28,7 +29,13 @@ from portalab.modules.cards.focus import ArtFocus
 from portalab.modules.cards.frames import FilmFrames
 from portalab.modules.cards.generator import CardForge
 from portalab.modules.cards.models import Card
-from portalab.modules.cards.packs import ContentBoosters, Packs
+from portalab.modules.cards.packs import (
+    BOOSTER_FIELDS,
+    CARD_BOOSTER,
+    CardBoosterHandler,
+    ContentBoosters,
+    Packs,
+)
 from portalab.modules.cards.participant import CardsParticipant
 from portalab.modules.cards.roles import RoleArt
 from portalab.modules.cards.search import RoleSearch
@@ -55,6 +62,7 @@ class CardsModule:
         *,
         clock: Clock | None = None,
         consumers: ConsumerRegistry = default_consumers,
+        product_types: ProductTypeRegistry = default_product_types,
         blobs: BlobStore | None = None,
         root: Path | None = None,
     ) -> None:
@@ -62,6 +70,7 @@ class CardsModule:
         self.capabilities = capabilities
         self.clock = clock
         self.consumers = consumers
+        self.product_types = product_types
         self.forge = CardForge(database, capabilities, clock=clock)
         self.packs = Packs(database, capabilities, clock=clock)
         self.service = CardService(database)
@@ -104,6 +113,18 @@ class CardsModule:
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
             if not any(p.instance_ref == "cards" for p in self.capabilities.system_providers(capability)):
                 self.capabilities.provide(capability, participant, instance_ref="cards", owner=OWNER)
+        # issue 234: the shop's boosters of cards (a genre, an edition…), sealed in the member's inventory
+        if self.product_types.get(CARD_BOOSTER) is None:
+            self.product_types.register(
+                ProductType(
+                    CARD_BOOSTER,
+                    OWNER,
+                    CardBoosterHandler(self.packs),
+                    refundable_by_default=False,
+                    payload_fields=BOOSTER_FIELDS,
+                    label_key="marketplace:type.card_booster",
+                )
+            )
         # issue 234: a content's boosters, given by the reward rules the administrators set
         if not self.capabilities.system_providers(CONTENT_BOOSTERS):
             self.capabilities.provide(

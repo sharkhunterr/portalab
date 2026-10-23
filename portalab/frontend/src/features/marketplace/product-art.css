@@ -605,3 +605,11 @@
 .ds-notifications.product-art__notify {
   z-index: auto;
 }
+/* issue 234: a booster of cards, standing in its tile */
+.product-art__cards {
+  display: block;
+  inline-size: min(100%, 7.5rem);
+}
+.product-art[data-size="sheet"] .product-art__cards {
+  inline-size: min(100%, 12rem);
+}

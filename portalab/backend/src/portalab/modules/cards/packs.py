@@ -11,7 +11,7 @@ the more often the rarer, foil or not."""
 
 import random
 import secrets
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
@@ -19,11 +19,13 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 
+from portalab.capabilities.marketplace import ActivationResult, OwnershipView
 from portalab.capabilities.media_core import CARD_SOURCES
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
-from portalab.modules.cards.editions import edition_of
+from portalab.modules.cards.editions import EDITIONS, edition_of
+from portalab.modules.cards.family import FAMILIES
 from portalab.modules.cards.models import Card, CardSet, Copy, Pack
 
 OWNER = "module:cards"
@@ -39,6 +41,46 @@ FOIL = 1 / 8
 BORDERLESS = {"common": 0.0, "rare": 1 / 40, "epic": 1 / 10, "legendary": 1 / 4}
 # the chance a copy is in its edition's version (issue 233), by the card's rarity
 SHOWCASE = {"common": 1 / 30, "rare": 1 / 15, "epic": 1 / 8, "legendary": 1 / 5}
+
+
+# issue 234: what a shop's booster may draw among — the works' genre, edition, kind (all of them when unsaid)
+WORK_KINDS = ("movie", "series")
+
+
+def _among(among: Mapping[str, Any]) -> list[Any]:
+    out: list[Any] = []
+    family = among.get("family")
+    if family in FAMILIES:
+        out.append(CardSet.family == family)
+    kind = among.get("kind")
+    if kind in WORK_KINDS:
+        out.append(CardSet.kind == kind)
+    edition = among.get("edition")
+    first = None
+    for key, last in EDITIONS:
+        if key == edition:
+            out.append(CardSet.year.is_not(None))
+            if first is not None:
+                out.append(CardSet.year > first)
+            if last is not None:
+                out.append(CardSet.year <= last)
+            break
+        first = last
+    return out
+
+
+BOOSTER_FIELDS = ("family", "edition", "kind", "cards")
+CARD_BOOSTER = "card_booster"
+
+
+def booster_of(payload: Mapping[str, Any]) -> dict[str, Any]:
+    """A shop's booster's own: what it draws among and how many cards (3 to 10)."""
+    out: dict[str, Any] = {k: payload[k] for k in ("family", "edition", "kind") if payload.get(k)}
+    try:
+        out["cards"] = max(3, min(10, int(payload.get("cards") or SIZE)))
+    except (TypeError, ValueError):
+        out["cards"] = SIZE
+    return out
 
 
 def variant_for(rarity: str, rng: random.Random, kind: str = "title", edition: str | None = None) -> str:
@@ -68,7 +110,9 @@ class Packs:
         self.rng = rng or secrets.SystemRandom()
 
     # --- drawing ------------------------------------------------------------------------------------------
-    async def _draw(self, session: Any, set_key: str | None) -> Card | None:
+    async def _draw(
+        self, session: Any, set_key: str | None, among: Mapping[str, Any] | None = None
+    ) -> Card | None:
         rarity = self.rng.choices(list(RARITY_WEIGHTS), weights=list(RARITY_WEIGHTS.values()), k=1)[0]
         base = (
             select(Card)
@@ -77,6 +121,8 @@ class Packs:
         )
         if set_key is not None:
             base = base.where(Card.set_key == set_key)
+        for condition in _among(among or {}):
+            base = base.where(condition)
         for wanted in (rarity, None):  # that rarity, else any (a set may hold none of it)
             query = base.where(Card.rarity == wanted) if wanted else base
             found: Card | None = (
@@ -86,10 +132,29 @@ class Packs:
                 return found
         return None
 
+    async def drawable(self, among: Mapping[str, Any]) -> bool:
+        """Issue 234: whether a shop's booster has cards to draw among the works it names."""
+        query = (
+            select(Card.id)
+            .join(CardSet, CardSet.key == Card.set_key)
+            .where(Card.retired.is_(False), CardSet.present.is_(True), *_among(among))
+            .limit(1)
+        )
+        async with self.database.session() as session:
+            return (await session.execute(query)).first() is not None
+
     async def give(
-        self, user: UUID, source: str, set_key: str | None, key: str, detail: dict[str, Any] | None = None
+        self,
+        user: UUID,
+        source: str,
+        set_key: str | None,
+        key: str,
+        detail: dict[str, Any] | None = None,
+        among: Mapping[str, Any] | None = None,
+        size: int = SIZE,
     ) -> UUID | None:
-        """A pack for this member (once per ``key``): its cards drawn now, revealed when opened."""
+        """A pack for this member (once per ``key``): its cards drawn now, revealed when opened — the first of
+        ``set_key`` (a content's), the others ``among`` the works it names (issue 234: a shop's booster)."""
         now = utc_now(self.clock)
         async with self.database.unit_of_work() as uow:
             session = uow.session
@@ -110,8 +175,8 @@ class Packs:
             ).scalar_one_or_none()
             if pack_id is None:
                 return None  # given already
-            for index in range(SIZE):
-                card = await self._draw(session, set_key if index == 0 else None)
+            for index in range(size):
+                card = await self._draw(session, set_key if index == 0 else None, among)
                 if card is None:
                     continue
                 card_set = await session.get(CardSet, card.set_key)
@@ -233,3 +298,31 @@ class ContentBoosters:
 
     async def give(self, user: UUID, object_id: UUID, count: int, reason: str) -> int:
         return await self.packs.give_content(user, object_id, count, reason)
+
+
+class CardBoosterHandler:
+    """Issue 234: ``card_booster`` — a shop's booster of cards (``payload``: ``family``, ``edition``, ``kind``
+    it draws among, how many ``cards``), sealed in the member's inventory when bought or offered; opened
+    there. Consumed, not refundable."""
+
+    def __init__(self, packs: Packs) -> None:
+        self.packs = packs
+
+    async def activate(self, ownership: OwnershipView) -> ActivationResult:
+        booster = booster_of(ownership.payload)
+        if not await self.packs.drawable(booster):
+            return ActivationResult("incompatible", "no card among those works")
+        # once per ownership: activated again, it is sealed already
+        await self.packs.give(
+            ownership.user_id,
+            "shop",
+            None,
+            f"shop:{ownership.id}",
+            {**booster, "product": ownership.product_key},
+            among=booster,
+            size=booster["cards"],
+        )
+        return ActivationResult("active")
+
+    async def deactivate(self, ownership: OwnershipView) -> None:
+        return None

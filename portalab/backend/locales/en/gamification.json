@@ -357,6 +357,8 @@
   "cards.pack.failed": "This pack could not be opened.",
   "cards.pack.season": "Season {season}",
   "cards.pack.cards": "{count, plural, one {# card} other {# cards}}",
+  "cards.pack.kind.movie": "Films",
+  "cards.pack.kind.series": "Series",
   "cards.pack.from": "Pack from “{name}”",
   "cards.pack.open": "Open",
   "cards.pack.opening": "Opening…",

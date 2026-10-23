@@ -123,6 +123,12 @@ PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
     "media_rescue": ("count",),  # #57: how many titles it saves
     "xp_boost": ("factor", "hours", "values"),
     "ai_capacity": ("perk", "amount", "hours"),  # issue 173: the assistant's capacity, on its card
+    "card_booster": (
+        "family",
+        "edition",
+        "kind",
+        "cards",
+    ),  # issue 234: the works a booster of cards draws among
     "radio_requests": ("count",),  # issue 184: how many requests to the radio's DJ
     "booster": PAYLOAD_FIELDS,  # #81: what it holds and its odds
 }
