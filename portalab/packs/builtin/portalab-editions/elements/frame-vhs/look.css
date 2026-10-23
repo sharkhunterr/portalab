@@ -1,0 +1,210 @@
+/* Portalab — card_frame/edition-vhs: the VHS edition (1980–1996), the arcade — a plastic cabinet of the genre's
+   colour with pixel-stepped corners, a lit marquee, the art on a curved cathode screen, the texts in a role-
+   playing game's blue dialog box. */
+
+.mcard[data-frame="edition-vhs"] {
+  --edition-step: 1.6cqi;
+  --edition-dark: color-mix(in srgb, var(--mcard-accent) 25%, #07070d);
+  --edition-neon: color-mix(in srgb, var(--mcard-accent) 35%, #ffffff);
+}
+.mcard[data-frame="edition-vhs"] .mcard__card {
+  padding: 2.2cqi;
+  border-radius: 0;
+  clip-path: polygon(
+    0 calc(var(--edition-step) * 2),
+    var(--edition-step) calc(var(--edition-step) * 2),
+    var(--edition-step) var(--edition-step),
+    calc(var(--edition-step) * 2) var(--edition-step),
+    calc(var(--edition-step) * 2) 0,
+    calc(100% - var(--edition-step) * 2) 0,
+    calc(100% - var(--edition-step) * 2) var(--edition-step),
+    calc(100% - var(--edition-step)) var(--edition-step),
+    calc(100% - var(--edition-step)) calc(var(--edition-step) * 2),
+    100% calc(var(--edition-step) * 2),
+    100% calc(100% - var(--edition-step) * 2),
+    calc(100% - var(--edition-step)) calc(100% - var(--edition-step) * 2),
+    calc(100% - var(--edition-step)) calc(100% - var(--edition-step)),
+    calc(100% - var(--edition-step) * 2) calc(100% - var(--edition-step)),
+    calc(100% - var(--edition-step) * 2) 100%,
+    calc(var(--edition-step) * 2) 100%,
+    calc(var(--edition-step) * 2) calc(100% - var(--edition-step)),
+    var(--edition-step) calc(100% - var(--edition-step)),
+    var(--edition-step) calc(100% - var(--edition-step) * 2),
+    0 calc(100% - var(--edition-step) * 2)
+  );
+}
+.mcard[data-frame="edition-vhs"] .mcard__body {
+  padding: 2.6cqi 3.2cqi 2.4cqi;
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 3cqi),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0 0.33cqi, transparent 0.33cqi 1.6cqi),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mcard-accent) 70%, #ffffff),
+      var(--mcard-accent) 55%,
+      color-mix(in srgb, var(--mcard-accent) 65%, #000000)
+    );
+  box-shadow:
+    inset 0 0 0 0.66cqi rgba(0, 0, 0, 0.35),
+    inset 0 0.66cqi 0 0.66cqi rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+/* the marquee: lit, the name in a pixel face */
+.mcard[data-frame="edition-vhs"] .mcard__head {
+  padding: 0 1.4cqi 0 2.6cqi;
+  background: linear-gradient(180deg, #16161f, #07070c);
+  box-shadow:
+    0 0 0 0.66cqi #000000,
+    0 0 0 1.2cqi var(--edition-neon),
+    0 0 3cqi 1cqi color-mix(in srgb, var(--edition-neon) 60%, transparent);
+  margin: 0.8cqi 0.8cqi 0.6cqi;
+}
+.mcard[data-frame="edition-vhs"] .mcard__name {
+  font-family: "VT323", monospace;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #fff6d0;
+  text-shadow:
+    0 0 1.4cqi var(--edition-neon),
+    0.33cqi 0.33cqi 0 color-mix(in srgb, var(--mcard-accent) 60%, #000000);
+}
+.mcard[data-frame="edition-vhs"] .mcard__genre {
+  border-radius: 0;
+  background: var(--edition-neon);
+  box-shadow: 0.33cqi 0.33cqi 0 #000000;
+  color: var(--edition-dark);
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.9cqi;
+  letter-spacing: 0;
+}
+.mcard[data-frame="edition-vhs"] .mcard__emblem {
+  border-radius: 0;
+  background: none;
+}
+/* a curved cathode screen: scanlines, the phosphor's triads, a vignette, its glass's reflection */
+.mcard[data-frame="edition-vhs"] .mcard__art {
+  margin: 0.6cqi 0.4cqi 0.2cqi;
+  border-radius: 4cqi / 3cqi;
+  background: #050507;
+  box-shadow:
+    0 0 0 1cqi #111117,
+    0 0 0 1.6cqi rgba(255, 255, 255, 0.25),
+    inset 0 0 4cqi #000000;
+}
+.mcard[data-frame="edition-vhs"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.16), transparent 30%),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0 0.33cqi, transparent 0.33cqi 0.9cqi),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.06) 0 0.33cqi,
+      rgba(0, 255, 0, 0.06) 0.33cqi 0.66cqi,
+      rgba(0, 0, 255, 0.06) 0.66cqi 1cqi
+    );
+}
+.mcard[data-frame="edition-vhs"] .mcard__strip {
+  padding: 0.6cqi 1.4cqi 0.6cqi 0.6cqi;
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.55);
+  box-shadow: 0.33cqi 0.33cqi 0 #000000;
+  font-family: "VT323", monospace;
+  font-size: 3.8cqi;
+  font-style: normal;
+  font-weight: 400;
+  color: #e8ecff;
+}
+.mcard[data-frame="edition-vhs"] .mcard__stage {
+  border-radius: 0;
+  background: #ffd23f;
+  color: #1a1206;
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.8cqi;
+  font-style: normal;
+  letter-spacing: 0;
+}
+/* the dialog box: blue, a white double border, rounded */
+.mcard[data-frame="edition-vhs"] .mcard__lower {
+  padding: 2cqi 2.2cqi;
+  border-radius: 1.6cqi;
+  background: linear-gradient(180deg, #2f48d0, #1b2788);
+  box-shadow:
+    inset 0 0 0 0.66cqi #ffffff,
+    inset 0 0 0 1.1cqi #1b2788,
+    inset 0 0 0 1.45cqi #ffffff,
+    0.6cqi 0.6cqi 0 rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  font-family: "VT323", monospace;
+}
+.mcard[data-frame="edition-vhs"] .mcard__poster {
+  margin: 0;
+  border-radius: 0;
+  box-shadow:
+    0 0 0 0.5cqi #000000,
+    0 0 0 0.9cqi #ffffff;
+}
+.mcard[data-frame="edition-vhs"] .mcard__work {
+  border-block-end: 0.33cqi dashed rgba(255, 255, 255, 0.4);
+}
+.mcard[data-frame="edition-vhs"] .mcard__work strong {
+  font-family: "VT323", monospace;
+  font-weight: 400;
+  color: #ffd23f;
+}
+.mcard[data-frame="edition-vhs"] .mcard__work small,
+.mcard[data-frame="edition-vhs"] .mcard__meta {
+  font-size: 3.4cqi;
+  font-weight: 400;
+  opacity: 0.85;
+}
+.mcard[data-frame="edition-vhs"] .mcard__figures li {
+  font-size: 4cqi;
+  font-weight: 400;
+}
+.mcard[data-frame="edition-vhs"] .mcard__figures li:not(:first-child) {
+  border-block-start: 0.33cqi dashed rgba(255, 255, 255, 0.3);
+}
+.mcard[data-frame="edition-vhs"] .mcard__cost {
+  border-radius: 0;
+  background: #ffd23f;
+  color: #1a1206;
+  box-shadow: 0.33cqi 0.33cqi 0 #000000;
+}
+.mcard[data-frame="edition-vhs"] .mcard__figures strong {
+  font-family: "Press Start 2P", monospace;
+  font-size: 3.4cqi;
+}
+.mcard[data-frame="edition-vhs"] .mcard__figures strong small {
+  font-family: "VT323", monospace;
+  font-size: 3cqi;
+}
+.mcard[data-frame="edition-vhs"] .mcard__flavor {
+  border-radius: 1cqi;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: #1b2788;
+  color: #ffffff;
+  font-family: "VT323", monospace;
+  font-style: normal;
+  font-size: 3.6cqi;
+}
+.mcard[data-frame="edition-vhs"] .mcard__foot {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.7cqi;
+  letter-spacing: 0;
+  color: #ffffff;
+  text-shadow: 0.33cqi 0.33cqi 0 #000000;
+}
+.mcard[data-frame="edition-vhs"] .mcard__rarity {
+  border-radius: 0;
+  box-shadow:
+    0.33cqi 0.33cqi 0 #000000,
+    inset 0 0 0 0.33cqi rgba(255, 255, 255, 0.6);
+  text-shadow: none;
+}

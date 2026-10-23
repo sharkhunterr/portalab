@@ -1,0 +1,5 @@
+Ornaments used by these frames (all public domain, CC0 1.0):
+
+- assets/ornate-frame.png — "Art Deco Frame" series, Openclipart (https://openclipart.org/detail/247039), CC0 1.0
+- assets/flourish-*.png — "Corner Flourish 2", Openclipart (https://openclipart.org/detail/285791), CC0 1.0
+- assets/kenney-014.png — "Fantasy UI Borders" by Kenney (https://kenney.nl/assets/fantasy-ui-borders), CC0 1.0

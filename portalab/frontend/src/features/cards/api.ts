@@ -3,8 +3,18 @@ import { api } from "../../api/client";
 
 /** Issue 229: the media cards — my collection, the sets, a set, a person's cards, my packs. */
 export type Rarity = "common" | "rare" | "epic" | "legendary";
-export type Variant = "normal" | "foil" | "borderless" | "borderless_foil";
-export const VARIANTS: Variant[] = ["normal", "foil", "borderless", "borderless_foil"];
+export type Variant = "normal" | "foil" | "showcase" | "showcase_foil" | "borderless" | "borderless_foil";
+// from the most common version to the rarest
+export const VARIANTS: Variant[] = [
+  "normal",
+  "foil",
+  "showcase",
+  "showcase_foil",
+  "borderless",
+  "borderless_foil",
+];
+/** Issue 233: a card's edition — the medium of its work's era of release. */
+export type Edition = "film" | "vhs" | "disc" | "stream";
 
 export type Family = "sf" | "action" | "fantasy" | "family" | "drama" | "dark";
 export interface WorkFacts {
@@ -30,6 +40,7 @@ export interface MediaCard {
   set_poster?: string | null;
   /** the work's genre as the card's colour, and its figures printed on the card (frozen with its set) */
   set_family?: Family;
+  set_edition?: Edition | null;
   set_facts?: WorkFacts;
   set_animated?: boolean;
   /** an actor's place in the credits (0: the lead) */

@@ -37,12 +37,19 @@ function CardSheet({ card }: { card: MediaCard }) {
     >
       <div className="cards-sheet">
         {VARIANTS.filter((v) =>
-          v.startsWith("borderless") ? card.kind === "title" && card.rarity !== "common" : true,
+          v.startsWith("borderless")
+            ? card.kind === "title" && card.rarity !== "common"
+            : v.startsWith("showcase")
+              ? Boolean(card.set_edition)
+              : true,
         ).map((variant) => (
           <figure key={variant} data-owned={(card.owned[variant] ?? 0) > 0 || undefined}>
             <MediaCardView card={card} variant={variant} missing={!(card.owned[variant] ?? 0)} />
             <figcaption>
-              {t(`gamification:cards.variant.${variant}`)} · ×{card.owned[variant] ?? 0}
+              {t(`gamification:cards.variant.${variant}`, {
+                edition: card.set_edition ? t(`gamification:cards.edition.${card.set_edition}`) : "",
+              })}{" "}
+              · ×{card.owned[variant] ?? 0}
             </figcaption>
           </figure>
         ))}

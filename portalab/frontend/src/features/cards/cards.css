@@ -221,9 +221,26 @@
 .mcard__art[data-art="role"] img {
   object-position: center 30%;
 }
-/* an upright image (a portrait, a poster): framed from its top — the head whole */
+/* an upright image (a portrait, a poster) zoomed out, from the head down: its sides fade into its own edges'
+   colours, as if its backdrop went on */
+.mcard:not([data-borderless]) .mcard__art[data-shape="upright"] {
+  background: linear-gradient(
+    90deg,
+    var(--mcard-art-start, var(--card-border)),
+    var(--mcard-art-end, var(--card-border))
+  );
+}
 .mcard:not([data-borderless]) .mcard__art[data-shape="upright"] .mcard__picture {
-  object-position: center 8%;
+  inset-inline: 9%;
+  inline-size: 82%;
+  object-position: center 6%;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    var(--card-foil-mask) 12%,
+    var(--card-foil-mask) 88%,
+    transparent
+  );
 }
 
 /* under the art, in a band: what it is, simply, and who plays it (a work: who made it) — like a card's type line */
@@ -245,12 +262,33 @@
   font-style: italic;
   font-weight: 600;
 }
-.mcard__strip > span:last-child:not(.mcard__stage) {
+.mcard__by {
   flex: 1;
   min-inline-size: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* issue 233: the edition's symbol, like a set's symbol on a trading card: its silhouette in the rarity's metal */
+.mcard__edition {
+  flex: none;
+  inline-size: 4.6cqi;
+  block-size: 4.6cqi;
+  background: var(--mcard-rim);
+  mask: var(--mcard-edition-symbol) center / contain no-repeat;
+  filter: drop-shadow(0 0 0.15cqi var(--card-shadow)) drop-shadow(0 0 0.15cqi var(--card-shadow));
+}
+.mcard[data-edition="film"] {
+  --mcard-edition-symbol: var(--card-edition-film);
+}
+.mcard[data-edition="vhs"] {
+  --mcard-edition-symbol: var(--card-edition-vhs);
+}
+.mcard[data-edition="disc"] {
+  --mcard-edition-symbol: var(--card-edition-disc);
+}
+.mcard[data-edition="stream"] {
+  --mcard-edition-symbol: var(--card-edition-stream);
 }
 .mcard__stage {
   flex: none;

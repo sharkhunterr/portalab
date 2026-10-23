@@ -46,6 +46,9 @@ TYPES: dict[str, tuple[frozenset[str], str]] = {
     "card_reveal": (frozenset({"css", "glsl", "js"}), "card_reveal"),
     "card_face": (frozenset({"css", "glsl"}), "card_face"),
     "card_back": (frozenset({"css", "glsl"}), "card_back"),
+    # issue 233: an edition's frame for the media cards (its look ``edition-<edition>``: the cards of that
+    # edition's version wear it, Portalab drawing the card and its texts)
+    "card_frame": (frozenset({"css"}), "card_frame"),
     # widgets: a style for the existing ones, or a widget of its own (a script fed by data contracts)
     "widget_style": (frozenset({"css"}), "widget_style"),
     "widget": (frozenset({"js"}), "widget"),
@@ -69,6 +72,7 @@ NOT_SOLD = frozenset(
         "card_reveal",
         "card_face",
         "card_back",
+        "card_frame",
     }
 )
 # the parts of a booster scene, and the rarities a part may be bound to

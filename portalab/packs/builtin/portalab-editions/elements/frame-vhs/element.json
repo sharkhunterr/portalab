@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "edition-vhs",
+  "names": {
+    "en": "VHS — arcade screen",
+    "fr": "VHS — écran d'arcade"
+  },
+  "descriptions": {
+    "en": "The frame of the media cards' vhs edition (the cards' edition version wears it).",
+    "fr": "Le cadre de cette édition des cartes médias : leur version édition le porte."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

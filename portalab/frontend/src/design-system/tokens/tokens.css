@@ -434,6 +434,11 @@ h1 {
   --card-foil-glare: rgba(255, 255, 255, 0.85);
   --card-foil-shade: rgba(10, 12, 24, 0.55);
   --card-foil-spark: rgba(255, 255, 255, 0.95);
+  /* issue 233: the editions' symbols (silhouettes: only their shape counts) — reel, cassette, disc, stream */
+  --card-edition-film: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 1a11 11 0 1 0 0 22 11 11 0 0 0 0-22zm0 3.1a2.7 2.7 0 1 1 0 5.4 2.7 2.7 0 0 1 0-5.4zm0 10.4a2.7 2.7 0 1 1 0 5.4 2.7 2.7 0 0 1 0-5.4zM6.8 9.3a2.7 2.7 0 1 1 0 5.4 2.7 2.7 0 0 1 0-5.4zm10.4 0a2.7 2.7 0 1 1 0 5.4 2.7 2.7 0 0 1 0-5.4zM12 10.9a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2z'/%3E%3C/svg%3E");
+  --card-edition-vhs: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M1 4.5h22v15H1zM3.5 7v7.5h17V7zm4 1.4a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8zm9 0a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8zM6 16.2h12V18H6z'/%3E%3C/svg%3E");
+  --card-edition-disc: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 1a11 11 0 1 0 0 22 11 11 0 0 0 0-22zm0 7.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zm0 1.9a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6zM12 3.4a8.6 8.6 0 0 1 8.6 8.6h-1.8A6.8 6.8 0 0 0 12 5.2z'/%3E%3C/svg%3E");
+  --card-edition-stream: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 .8l10 5.7v11L12 23.2 2 17.5v-11zM9.4 7.3v9.4l7.9-4.7z'/%3E%3C/svg%3E");
   /* where the foil shows (a mask: only its opacity counts) */
   --card-foil-mask: #000;
   --card-foil-mask-half: rgba(0, 0, 0, 0.6);

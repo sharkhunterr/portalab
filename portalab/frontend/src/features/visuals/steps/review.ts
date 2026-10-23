@@ -38,4 +38,5 @@ export const NOT_SOLD = new Set([
   "card_reveal",
   "card_face",
   "card_back",
+  "card_frame",
 ]);
