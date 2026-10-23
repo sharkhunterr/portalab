@@ -1,8 +1,9 @@
 """Issue 229: where a card's face is. A portrait or a character's image is framed by a window of its own shape
 on each card — wider than the image, or taller: without knowing where the face is, some are cut at the
 forehead or the chin. Each image a card shows (its portrait, its character's) is looked at once on the
-processor (YuNet, the faces' detector the cards already hold): the centre of its largest face is kept, as
-fractions of the image (``None``: no face — a poster, a scene), and the card frames it there. The cards
+processor (YuNet, the faces' detector the cards already hold): the centre of its largest face and its height
+are kept, as fractions of the image (``None``: no face — a poster, a scene), and the card frames it there, a
+cut-out character sized by its face (the same size on every card). The cards
 members own first, then the rarest."""
 
 import asyncio
@@ -25,11 +26,15 @@ log = get_logger("portalab.cards")
 
 
 def centre(looked: Looked) -> list[float] | None:
-    """The centre of the image's largest face, as fractions of its width and height."""
+    """The centre of the image's largest face and its height, as fractions of the image's width and height."""
     if not looked.faces or not looked.width or not looked.height:
         return None
     x, y, w, h = max(looked.faces, key=lambda face: face.share).box
-    return [round((x + w / 2) / looked.width, 3), round((y + h / 2) / looked.height, 3)]
+    return [
+        round((x + w / 2) / looked.width, 3),
+        round((y + h / 2) / looked.height, 3),
+        round(h / looked.height, 3),
+    ]
 
 
 def _unknown(column: Any) -> Any:

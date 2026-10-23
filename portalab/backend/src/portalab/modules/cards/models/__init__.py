@@ -99,7 +99,7 @@ class Card(CardsBase):
     frame_checked_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     # issue 231: the role's own image from a community database (TheTVDB) — the cache
     character_checked_at: Mapped[datetime | None] = mapped_column(TZDateTime)
-    # where the face is in each image it shows: {its reference: [x, y] as fractions, or null (none)}
+    # where the face is in each image it shows: {its reference: [x, y, height] as fractions, or null}
     focus: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     # its character cut out of the image it shows: {its reference: the cut-out's (``blob:``), or null}
     cutout: Mapped[dict[str, Any] | None] = mapped_column(JSONB)

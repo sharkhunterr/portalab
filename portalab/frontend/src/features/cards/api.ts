@@ -41,8 +41,8 @@ export interface MediaCard {
   /** the work's genre as the card's colour, and its figures printed on the card (frozen with its set) */
   set_family?: Family;
   set_edition?: Edition | null;
-  /** where the face is in each image (its reference: [x, y] as fractions, null: none) */
-  focus?: Record<string, [number, number] | null>;
+  /** where the face is in each image (its reference: [x, y, its height] as fractions, null: none) */
+  focus?: Record<string, [number, number, number?] | null>;
   /** its character cut out of each image (its reference: the cut-out's, null: none) */
   cutout?: Record<string, string | null>;
   set_facts?: WorkFacts;
