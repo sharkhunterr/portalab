@@ -30,9 +30,9 @@ MODEL = (
 )
 SIZE = 1024  # the model's input
 LONGEST = 900  # a cut-out kept at this size at most
-# the model's answer made firmer: what is surely the character opaque, a soft edge kept
-FLOOR, SPAN = 0.12, 0.4
-BATCH = 40  # cards cut out a run (about a second each)
+# the model's answer made a little firmer: what is surely the character opaque, its hair and soft edges kept
+FLOOR, SPAN = 0.02, 0.4
+BATCH = 60  # cards cut out a run (about a second each)
 NAMESPACE = "cards"
 log = get_logger("portalab.cards")
 
@@ -92,6 +92,7 @@ class Cutter:
         found = self._net.forward()[0, 0]
         found = (found - found.min()) / (found.max() - found.min() + 1e-8)
         alpha = np.clip((cv.resize(found, (width, height)) - FLOOR) / SPAN, 0, 1)
+        alpha = cv.GaussianBlur(alpha, (3, 3), 0)  # an edge a little soft, never cut sharp
         rgba = cv.cvtColor(image, cv.COLOR_BGR2BGRA)
         rgba[:, :, 3] = (alpha * 255).astype(np.uint8)
         done, encoded = cv.imencode(".webp", rgba, [cv.IMWRITE_WEBP_QUALITY, 88])
