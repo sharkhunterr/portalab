@@ -410,17 +410,33 @@ h1 {
   --card-symbol-epic: #d4a72c;
   --card-symbol-legendary: #e2541b;
   --card-shadow: rgba(0, 0, 0, 0.45);
-  /* the foil's holographic light: its two colours (the kind's frame tints them), the rainbow of its sheen
-     and its sparkles */
-  --card-holo-1: rgb(0, 231, 255);
-  --card-holo-2: rgb(255, 0, 231);
-  --card-holo-red: rgba(255, 0, 132, 0.31);
-  --card-holo-orange: rgba(252, 164, 0, 0.25);
-  --card-holo-yellow: rgba(255, 255, 0, 0.19);
-  --card-holo-green: rgba(0, 255, 138, 0.13);
-  --card-holo-cyan: rgba(0, 207, 255, 0.25);
-  --card-holo-violet: rgba(204, 76, 250, 0.31);
-  --card-holo-spark: rgba(255, 255, 255, 0.9);
+  /* the foil: a rainbow film that slides as the card turns, an etched grain that catches it, the glare of the
+     light and its glitter */
+  --card-foil-rainbow: repeating-linear-gradient(
+    110deg,
+    #ff7a9a 0%,
+    #ffd36e 4%,
+    #8dffa0 8%,
+    #6fe6ff 12%,
+    #9f8bff 16%,
+    #ff7ae0 20%,
+    #ff7a9a 24%
+  );
+  --card-foil-etch: repeating-linear-gradient(
+    -45deg,
+    #2a2f45 0%,
+    #9fb2b8 1.6%,
+    #c8dcdf 2%,
+    #9fb2b8 2.4%,
+    #2a2f45 4%,
+    #2a2f45 5%
+  );
+  --card-foil-glare: rgba(255, 255, 255, 0.85);
+  --card-foil-shade: rgba(10, 12, 24, 0.55);
+  --card-foil-spark: rgba(255, 255, 255, 0.95);
+  /* where the foil shows (a mask: only its opacity counts) */
+  --card-foil-mask: #000;
+  --card-foil-mask-half: rgba(0, 0, 0, 0.6);
   /* the card's body: its work's genre, printed light like a trading card's type, a
      fine diagonal grain over it; each family's accent (its emblem, its icons) and its ink (the texts) */
   --card-grain: rgba(255, 255, 255, 0.22);
