@@ -6,9 +6,9 @@ import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import type { Value } from "../api";
+import type { LedgerValue } from "../api";
 import { SOURCES } from "../progression/GainSources";
-import { type Operation, useOperations, VALUES } from "./tuning";
+import { LEDGER_VALUES, type Operation, useOperations } from "./tuning";
 
 const SIZES = [25, 50, 100];
 const PLAYS = ["episode", "movie", "live", "book", "audiobook", "music", "game"];
@@ -35,7 +35,7 @@ export function Operations({
 }) {
   const t = useT();
   const format = useFormat();
-  const [value, setValue] = useState<Value | "">("");
+  const [value, setValue] = useState<LedgerValue | "">("");
   const [play, setPlay] = useState(""); // issue 160: one kind of play only
   const [size, setSize] = useState(SIZES[0] ?? 25);
   // where each page starts (the first at the top); a change of filter starts over
@@ -82,10 +82,10 @@ export function Operations({
           <SelectField
             label={t("gamification:sources.value")}
             value={value}
-            onChange={(event) => setValue(event.target.value as Value | "")}
+            onChange={(event) => setValue(event.target.value as LedgerValue | "")}
           >
             <option value="">{t("gamification:admin.operations.allValues")}</option>
-            {VALUES.map((v) => (
+            {LEDGER_VALUES.map((v) => (
               <option key={v} value={v}>
                 {t(`gamification:value.${v}`)}
               </option>

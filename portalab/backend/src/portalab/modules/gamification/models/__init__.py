@@ -29,7 +29,8 @@ from portalab.core.db import TZDateTime, schema_metadata
 from portalab.core.ids import new_id
 from portalab.core.privacy_registry import not_personal
 
-VALUE_CHECK = "value IN ('xp', 'contribution', 'coins')"
+# issue 234: ``booster`` — the boosters a reward rule gave (their count), journaled beside the values
+VALUE_CHECK = "value IN ('xp', 'contribution', 'coins', 'booster')"
 
 
 class GamificationBase(DeclarativeBase):

@@ -98,7 +98,7 @@ class LedgerWriter:
         self.clock = clock
 
     async def record(self, session: AsyncSession, entry: Entry) -> Recorded:
-        if entry.value not in ("xp", "contribution", "coins"):
+        if entry.value not in ("xp", "contribution", "coins", "booster"):
             raise ValueError("unknown value")
         now = utc_now(self.clock)
         values = {

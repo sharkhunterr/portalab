@@ -20413,7 +20413,7 @@ export interface operations {
     members_progress_api_v1_admin_gamification_members_get: {
         parameters: {
             query?: {
-                value?: "xp" | "coins" | "contribution";
+                value?: "xp" | "coins" | "contribution" | "booster";
                 days?: number;
                 member?: string | null;
             };
@@ -20480,7 +20480,7 @@ export interface operations {
             query?: {
                 days?: number;
                 member?: string | null;
-                value?: ("xp" | "contribution" | "coins") | null;
+                value?: ("xp" | "coins" | "contribution" | "booster") | null;
                 cursor?: string | null;
                 limit?: number;
                 play?: string | null;
@@ -20630,7 +20630,7 @@ export interface operations {
     progress_api_v1_admin_gamification_progress_get: {
         parameters: {
             query?: {
-                value?: "xp" | "coins" | "contribution";
+                value?: "xp" | "coins" | "contribution" | "booster";
                 days?: number;
                 top?: number;
             };
@@ -32519,7 +32519,7 @@ export interface operations {
         parameters: {
             query?: {
                 days?: number;
-                value?: ("xp" | "contribution" | "coins") | null;
+                value?: ("xp" | "coins" | "contribution" | "booster") | null;
                 cursor?: string | null;
                 limit?: number;
                 play?: string | null;
@@ -32584,7 +32584,7 @@ export interface operations {
     my_sources_api_v1_me_progression_sources_get: {
         parameters: {
             query?: {
-                value?: "xp" | "coins" | "contribution";
+                value?: "xp" | "coins" | "contribution" | "booster";
                 days?: number;
             };
             header?: never;

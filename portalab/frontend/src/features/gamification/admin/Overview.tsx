@@ -8,12 +8,12 @@ import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import { useRules, useVerify, type Value } from "../api";
+import { type LedgerValue, useRules, useVerify } from "../api";
 import { SOURCES } from "../progression/GainSources";
 import { PlaysByKind } from "../progression/PlaysByKind";
 import { MemberDetails } from "./MemberDetails";
 import { Operations } from "./Operations";
-import { useLevelRewards, useMembersProgress, useProgress, useStreak, VALUES } from "./tuning";
+import { LEDGER_VALUES, useLevelRewards, useMembersProgress, useProgress, useStreak } from "./tuning";
 
 const PERIODS = [7, 30, 90, 365];
 
@@ -31,7 +31,7 @@ export function Overview() {
   const t = useT();
   const format = useFormat();
   const tableId = useId();
-  const [value, setValue] = useState<Value>("xp");
+  const [value, setValue] = useState<LedgerValue>("xp");
   const [days, setDays] = useState(30);
   const [member, setMember] = useState(""); // issue 104: every member, or one of them
   const [table, setTable] = useState(false);
@@ -150,8 +150,8 @@ export function Overview() {
           <AdminTabs
             label={t("gamification:admin.grant.value")}
             current={value}
-            onChange={(next) => setValue(next as Value)}
-            tabs={VALUES.map((v) => ({ key: v, label: t(`gamification:value.${v}`) }))}
+            onChange={(next) => setValue(next as LedgerValue)}
+            tabs={LEDGER_VALUES.map((v) => ({ key: v, label: t(`gamification:value.${v}`) }))}
           />
           <AdminTabs
             label={t("gamification:admin.overview.period")}
