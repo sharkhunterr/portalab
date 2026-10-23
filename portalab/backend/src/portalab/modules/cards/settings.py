@@ -12,12 +12,14 @@ class CardsConfig:
     face_check: bool = True
     video_frames: bool = True
     web_search: bool = False
+    cutouts: bool = True
 
 
 SETTINGS = {
     "face_check": "cards.faceCheck",
     "video_frames": "cards.videoFrames",
     "web_search": "cards.webSearch",
+    "cutouts": "cards.cutouts",
 }
 _DESCRIPTIONS = {
     "face_check": (
@@ -32,6 +34,11 @@ _DESCRIPTIONS = {
     "web_search": (
         "Last resort for an actor's character: images found on the web (a self-hosted SearXNG). Off (the "
         "default): a character without an image of its own shows the work's poster and the actor's portrait."
+    ),
+    "cutouts": (
+        "The characters are cut out of their images (their background removed on the processor) and shown "
+        "over a scene of the card's own: the genre's light, the work's backdrop on the borderless version. "
+        "Off: the photographs as they are."
     ),
 }
 
