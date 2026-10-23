@@ -234,7 +234,12 @@ export function MediaCardView({
               (cardImage(card.set_backdrop ?? null, "w780") ?? cardImage(card.art, "w500"))
             : cardImage(card.art, "h632");
   const art = drawn;
-  const portrait = stand_in && !cut ? cardImage(card.art, "w185") : null;
+  // the actor's own portrait in a round badge: by the work's poster (no image of the character), or by their
+  // character — never twice the same face
+  const portrait =
+    !borderless && card.kind === "cast" && card.art && ((stand_in && !cut) || card.role_art)
+      ? cardImage(card.art, "w185")
+      : null;
   // where the face is in the image shown (its character's, or the person's portrait — or its cut-out)
   const shown = borderless
     ? null

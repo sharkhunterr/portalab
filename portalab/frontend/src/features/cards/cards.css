@@ -219,6 +219,19 @@
     0 0 0 1.4cqi var(--mcard-accent),
     0 2cqi 4cqi var(--card-shadow);
 }
+/* by their character, the actor's badge smaller, in the corner */
+.mcard__art[data-art="role"] .mcard__badge {
+  z-index: 2;
+  inset-block-end: 2.4cqi;
+  inset-inline-end: 2.4cqi;
+  inline-size: 15cqi;
+  block-size: 15cqi;
+  object-position: center 20%;
+  box-shadow:
+    0 0 0 0.7cqi var(--card-text),
+    0 0 0 1cqi var(--mcard-accent),
+    0 1.4cqi 3cqi var(--card-shadow);
+}
 /* the character's image: framed on its upper middle (a face) */
 .mcard__art[data-art="role"] img {
   object-position: center 30%;
