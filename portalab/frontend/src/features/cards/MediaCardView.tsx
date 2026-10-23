@@ -24,6 +24,8 @@ const FAMILY_ICON: Record<string, string> = {
   drama: "drama",
   dark: "skull",
 };
+// a cut-out character's face: its share of the window's height, from the least to the most
+const FACE = [0.26, 0.34] as const;
 const VOICE = /\((voice|voix)\)/i;
 
 /** The size of a name so that it fits its room whole on one line (container units): only a long one is smaller. */
@@ -46,9 +48,10 @@ function tilt(event: PointerEvent<HTMLElement>) {
   event.currentTarget.dataset.active = "";
 }
 
-/** A cut-out character (over a scene of its own, nothing to hide around it): zoomed out — more of them shown,
- * their face across the middle and two fifths down the window — but never above the window's foot: the image
- * always reaches it (where the photograph ended, the character would be cut). Kept within the window — but a
+/** A cut-out character (over a scene of its own, nothing to hide around it), sized by its face: the face the
+ * same share of the window on every card, whatever the photograph (a close-up, a wide shot), its centre across
+ * the middle and two fifths down. Within that share it reaches the window's foot when it can; where the
+ * photograph ends above it, the character fades out rather than being cut. Kept within the window — but a
  * legendary's, whose head may come out over the window's top. */
 function placeCutout(image: HTMLImageElement) {
   const box = image.parentElement;
@@ -56,17 +59,28 @@ function placeCutout(image: HTMLImageElement) {
   const height = box?.clientHeight ?? 0;
   const natural = [image.naturalWidth, image.naturalHeight] as const;
   if (!image.dataset.fy || !width || !height || !natural[0] || !natural[1]) return;
-  const [fx, fy] = [Number(image.dataset.fx), Number(image.dataset.fy)];
+  const [fx, fy, fh] = [Number(image.dataset.fx), Number(image.dataset.fy), Number(image.dataset.fh)];
   const cover = Math.max(width / natural[0], height / natural[1]);
   const reachFoot = (0.58 * height) / (Math.max(0.05, 1 - fy) * natural[1]);
-  const scale = Math.min(cover, Math.max(reachFoot, cover * 0.62));
+  // the face between a quarter and a third of the window's height (unknown: as large as the window allows)
+  const [least, most] =
+    fh > 0 ? [(FACE[0] * height) / (fh * natural[1]), (FACE[1] * height) / (fh * natural[1])] : [];
+  const scale =
+    least !== undefined && most !== undefined
+      ? Math.min(most, Math.max(least, reachFoot))
+      : Math.min(cover, Math.max(reachFoot, cover * 0.62));
   const [drawnWidth, drawnHeight] = [natural[0] * scale, natural[1] * scale];
   const left = Math.min(
     Math.max(0.5 * width - fx * drawnWidth, Math.min(0, width - drawnWidth)),
     Math.max(0, width - drawnWidth),
   );
   const legendary = image.closest<HTMLElement>(".mcard")?.dataset.rarity === "legendary";
-  const top = Math.max(0.42 * height - fy * drawnHeight, height - drawnHeight);
+  let top = 0.42 * height - fy * drawnHeight;
+  // set down on the window's foot when its face stays in the upper half or so
+  if (top + drawnHeight < height && height - drawnHeight + fy * drawnHeight <= 0.55 * height) {
+    top = height - drawnHeight;
+  }
+  const short = top + drawnHeight < height - 1; // the photograph ends above the window's foot
   // what lies outside the window cut away (a legendary's head let out at the top)
   const cut = (outside: number, size: number) => `${((Math.max(0, outside) / size) * 100).toFixed(2)}%`;
   const clip = [
@@ -84,6 +98,8 @@ function placeCutout(image: HTMLImageElement) {
     objectFit: "fill",
     clipPath: `inset(${clip.join(" ")})`,
   });
+  if (short) image.dataset.short = "";
+  else delete image.dataset.short;
   if (legendary && box) box.dataset.outgrown = "";
 }
 
@@ -312,6 +328,7 @@ export function MediaCardView({
                 onLoad={borderless ? undefined : measure}
                 data-fx={face ? face[0] : undefined}
                 data-fy={face ? face[1] : undefined}
+                data-fh={face?.[2] ?? undefined}
               />
             ) : (
               <Icon name={KIND_ICON[card.kind]} size={40} />

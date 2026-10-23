@@ -267,6 +267,13 @@
   background: var(--card-text);
   mask: var(--card-starfield) var(--mcard-sky-x, 0%) var(--mcard-sky-y, 0%) / 110cqi 110cqi repeat;
 }
+/* a cut-out character whose photograph ends above the window's foot: it fades out there */
+.mcard__art[data-cutout] .mcard__picture[data-short] {
+  mask-image:
+    linear-gradient(90deg, transparent, var(--card-foil-mask) 7%, var(--card-foil-mask) 93%, transparent),
+    linear-gradient(180deg, var(--card-foil-mask) 80%, transparent);
+  mask-composite: intersect;
+}
 /* a legendary's name stays readable over its character's head coming out of the window */
 .mcard[data-rarity="legendary"] .mcard__name {
   text-shadow:
