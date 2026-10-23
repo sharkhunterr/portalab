@@ -8,7 +8,7 @@ import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import type { Value } from "../api";
+import type { LedgerValue, Value } from "../api";
 import { GainTimeline } from "./GainTimeline";
 
 type Sources = components["schemas"]["MySourcesOut"];
@@ -45,9 +45,9 @@ export const SOURCES: Record<string, { color: string; icon: string }> = {
   admin: { color: "color-mix(in oklab, var(--cal-maintenance) 60%, black)", icon: "shield" }, // issue 107
 };
 const PERIODS = [7, 30, 90, 365];
-const VALUES: Value[] = ["xp", "coins"];
+const VALUES: LedgerValue[] = ["xp", "coins", "booster"]; // issue 234: the boosters the rules gave me
 
-function useSources(value: Value, days: number) {
+function useSources(value: LedgerValue, days: number) {
   return useQuery({
     queryKey: ["gamification", "sources", value, days],
     queryFn: async () =>
@@ -76,7 +76,7 @@ export function GainSources() {
   const format = useFormat();
   const headingId = useId();
   const tableId = useId();
-  const [value, setValue] = useState<Value>("xp");
+  const [value, setValue] = useState<LedgerValue>("xp");
   const [days, setDays] = useState(30);
   const [table, setTable] = useState(false);
   // #62: by source, or over time; issue 114: or my XP in all, day after day

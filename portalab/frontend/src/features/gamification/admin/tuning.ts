@@ -2,7 +2,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
 import type { Translate } from "../../../i18n/hooks/useT";
-import type { Value } from "../api";
+import type { LedgerValue, Value } from "../api";
 
 /**
  * Gamification tuning (027): the data behind the administration tabs — rewardable actions, play streaks,
@@ -19,6 +19,8 @@ export type Operation = components["schemas"]["OperationOut"];
 type Operations = components["schemas"]["OperationsOut"];
 
 export const VALUES: Value[] = ["xp", "coins", "contribution"];
+// issue 234: the journal and the charts follow the boosters the rules give too
+export const LEDGER_VALUES: LedgerValue[] = [...VALUES, "booster"];
 const KEY = ["gamification", "admin"] as const;
 
 export interface Condition {
@@ -158,7 +160,7 @@ export function useLevelRewards() {
   return { query, save };
 }
 
-export function useProgress(value: Value, days: number) {
+export function useProgress(value: LedgerValue, days: number) {
   return useQuery({
     queryKey: [...KEY, "progress", value, days],
     queryFn: async () =>
@@ -171,7 +173,7 @@ export function useProgress(value: Value, days: number) {
 }
 
 /** Issue 104: every member's progression over the period — gains by kind, day by day, running balance. */
-export function useMembersProgress(value: Value, days: number) {
+export function useMembersProgress(value: LedgerValue, days: number) {
   return useQuery({
     queryKey: [...KEY, "members", value, days],
     queryFn: async () =>
@@ -200,7 +202,7 @@ export function useMembersDetails(days: number) {
 export function useOperations(
   days: number,
   member: string,
-  value: Value | "",
+  value: LedgerValue | "",
   cursor: string | null,
   limit: number,
   mine = false,

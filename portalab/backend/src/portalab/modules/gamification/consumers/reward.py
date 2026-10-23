@@ -58,14 +58,27 @@ def _uuid(value: object) -> UUID | None:
         return None
 
 
+@dataclass(frozen=True)
+class Boosters:
+    """Issue 234: a rule's boosters of its event's content, for its member."""
+
+    user: UUID
+    content: UUID
+    count: int
+    rule: str
+    version: int
+    label: str
+    envelope: Envelope
+
+
 @dataclass
 class Outcome:
     notes: list[Note] = field(default_factory=list)
     flags: list[UUID] = field(default_factory=list)
     granted: int = 0
     withheld: int = 0
-    # issue 234: the contents whose boosters the rules give (user, object, how many, reason)
-    boosters: list[tuple[UUID, UUID, int, str]] = field(default_factory=list)
+    # issue 234: the contents whose boosters the rules give
+    boosters: list["Boosters"] = field(default_factory=list)
 
 
 def recipient(envelope: Envelope) -> UUID | None:
@@ -175,16 +188,73 @@ class RewardPipeline:
                     await self._apply(session, user, rule, envelope, outcome)
                     content = _uuid(envelope.payload.get("object"))
                     if rule.definition.boosters and content is not None:
-                        reason = f"rule:{rule.key}:{envelope.event_id}"
-                        outcome.boosters.append((user, content, rule.definition.boosters, reason))
+                        outcome.boosters.append(
+                            Boosters(
+                                user,
+                                content,
+                                rule.definition.boosters,
+                                rule.key,
+                                rule.version,
+                                (rule.definition.label or "").strip()[:120] or "none",
+                                envelope,
+                            )
+                        )
             outcome.notes.extend(await self.achievements.on_event(session, user, envelope))
             if self.quests is not None:
                 outcome.notes.extend(await self.quests.on_event(session, user, envelope))
         for flag in outcome.flags:
             await self.anomalies.escalate(flag)
         await self.notifier.send(outcome.notes)
-        await self.notifier.boosters(outcome.boosters)
+        await self._boosters(outcome.boosters)
         return outcome
+
+    async def _boosters(self, wanted: list[Boosters]) -> None:
+        """Issue 234: the boosters a rule gives (the cards', once per member and content) — given after the
+        reward is committed, then journaled as a value of their own and told to the member."""
+        for item in wanted:
+            reason = f"rule:{item.rule}:{item.envelope.event_id}"
+            given = await self.notifier.boosters(item.user, item.content, item.count, reason)
+            if not given:
+                continue  # given already for that content, or none to give
+            key = f"rule:{item.envelope.event_id}:{item.rule}:booster"
+            async with self.database.unit_of_work() as uow:
+                await lock_user(uow.session, item.user)
+                recorded = await self.writer.record(
+                    uow.session,
+                    Entry(
+                        user_id=item.user,
+                        value="booster",
+                        delta=given,
+                        kind="grant",
+                        base_amount=given,
+                        source_kind="reward_rule",
+                        source_ref=f"event:{item.envelope.event_id}",
+                        rule_key=item.rule,
+                        rule_version=item.version,
+                        trigger_event_id=item.envelope.event_id,
+                        idempotency_key=key,
+                        occurred_at=item.envelope.occurred_at,
+                    ),
+                )
+            if recorded.duplicate:
+                continue
+            metrics.increment("gamification.grants.booster")
+            await self.notifier.send(
+                [
+                    Note(
+                        "reward",
+                        item.user,
+                        f"reward:{key}",
+                        {
+                            "value": "booster",
+                            "amount": given,
+                            "rule": item.rule,
+                            "reason": item.label,
+                            "boost": "none",
+                        },
+                    )
+                ]
+            )
 
     async def _apply(
         self, session: AsyncSession, user: UUID, rule: RuleVersion, envelope: Envelope, outcome: Outcome

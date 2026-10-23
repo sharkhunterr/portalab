@@ -24447,7 +24447,8 @@
               "enum": [
                 "xp",
                 "coins",
-                "contribution"
+                "contribution",
+                "booster"
               ],
               "title": "Value",
               "type": "string"
@@ -24617,8 +24618,9 @@
                 {
                   "enum": [
                     "xp",
+                    "coins",
                     "contribution",
-                    "coins"
+                    "booster"
                   ],
                   "type": "string"
                 },
@@ -24886,7 +24888,8 @@
               "enum": [
                 "xp",
                 "coins",
-                "contribution"
+                "contribution",
+                "booster"
               ],
               "title": "Value",
               "type": "string"
@@ -42385,8 +42388,9 @@
                 {
                   "enum": [
                     "xp",
+                    "coins",
                     "contribution",
-                    "coins"
+                    "booster"
                   ],
                   "type": "string"
                 },
@@ -42531,7 +42535,8 @@
               "enum": [
                 "xp",
                 "coins",
-                "contribution"
+                "contribution",
+                "booster"
               ],
               "title": "Value",
               "type": "string"

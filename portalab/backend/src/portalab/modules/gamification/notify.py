@@ -67,22 +67,17 @@ class Notifier:
             except Exception:
                 log.warning("reward notification not sent", extra={"fields": {"kind": note.kind}})
 
-    async def boosters(self, wanted: list[tuple[UUID, UUID, int, str]]) -> None:
-        """Issue 234: a content's boosters a rule gives (the cards' own) — after the reward is committed; a
-        failure never affects it."""
-        if not wanted:
-            return
+    async def boosters(self, user: UUID, content: UUID, count: int, reason: str) -> int:
+        """Issue 234: a content's boosters a rule gives (the cards') — how many were given; a failure never
+        affects the reward."""
         try:
             providers = self.capabilities.system_providers(CONTENT_BOOSTERS)
+            if not providers:
+                return 0
+            return int(await providers[0].provider.give(user, content, count, reason[:200]))
         except Exception:
-            return
-        if not providers:
-            return
-        for user, content, count, reason in wanted:
-            try:
-                await providers[0].provider.give(user, content, count, reason[:200])
-            except Exception:
-                log.warning("content booster not given", extra={"fields": {"content": str(content)}})
+            log.warning("content booster not given", extra={"fields": {"content": str(content)}})
+            return 0
 
     async def _gift(self, notes: list[Note]) -> None:
         """027: what an unlocked achievement gives (badge, title, frame…) — never twice (a product owned

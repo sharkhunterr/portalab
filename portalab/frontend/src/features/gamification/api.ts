@@ -10,6 +10,8 @@ export type EconomyTransaction = components["schemas"]["EconomyTransactionOut"];
 export type EconomyTransactionPage = components["schemas"]["EconomyTransactionPage"];
 export type RewardRule = components["schemas"]["RewardRuleOut"];
 export type Value = "xp" | "contribution" | "coins";
+/** Issue 234: what the journal and the charts follow — the values, and the boosters a rule gave */
+export type LedgerValue = Value | "booster";
 
 export interface AchievementView {
   key: string;

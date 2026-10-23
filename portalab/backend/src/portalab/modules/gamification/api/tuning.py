@@ -194,7 +194,7 @@ class ProgressOut(BaseModel):
 async def progress(
     _: Manager,
     module: Module,
-    value: Literal["xp", "coins", "contribution"] = "xp",
+    value: Literal["xp", "coins", "contribution", "booster"] = "xp",
     days: Annotated[int, Query(ge=7, le=365)] = 30,
     top: Annotated[int, Query(ge=1, le=10)] = 5,
 ) -> ProgressOut:
@@ -412,7 +412,7 @@ class MySourcesOut(BaseModel):
 async def my_sources(
     principal: Me,
     module: Module,
-    value: Literal["xp", "coins", "contribution"] = "xp",
+    value: Literal["xp", "coins", "contribution", "booster"] = "xp",
     days: Annotated[int, Query(ge=7, le=365)] = 30,
 ) -> MySourcesOut:
     """027: where my gains came from — actions by kind, quests, achievements, levels and the bonuses
@@ -491,7 +491,7 @@ MEMBERS_SHOWN = 50
 async def members_progress(
     _: Manager,
     module: Module,
-    value: Literal["xp", "coins", "contribution"] = "xp",
+    value: Literal["xp", "coins", "contribution", "booster"] = "xp",
     days: Annotated[int, Query(ge=7, le=365)] = 30,
     member: UUID | None = None,
 ) -> MembersProgressOut:
@@ -816,7 +816,7 @@ async def operations(
     module: Module,
     days: Annotated[int, Query(ge=7, le=365)] = 30,
     member: UUID | None = None,
-    value: Literal["xp", "coins", "contribution"] | None = None,
+    value: Literal["xp", "coins", "contribution", "booster"] | None = None,
     cursor: str | None = None,
     limit: Annotated[int, Query(ge=5, le=OPERATIONS_PAGE)] = OPERATIONS_PAGE,
     play: Annotated[str | None, Query(max_length=24)] = None,
@@ -832,7 +832,7 @@ async def my_operations(
     principal: Me,
     module: Module,
     days: Annotated[int, Query(ge=7, le=365)] = 30,
-    value: Literal["xp", "coins", "contribution"] | None = None,
+    value: Literal["xp", "coins", "contribution", "booster"] | None = None,
     cursor: str | None = None,
     limit: Annotated[int, Query(ge=5, le=OPERATIONS_PAGE)] = OPERATIONS_PAGE,
     play: Annotated[str | None, Query(max_length=24)] = None,
