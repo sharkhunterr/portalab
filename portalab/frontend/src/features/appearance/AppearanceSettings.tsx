@@ -385,6 +385,14 @@ export function AppearanceSettings() {
             ))}
           </SelectField>
         ))}
+        {field("ui.cardActorBadge", (disabled) => (
+          <CheckboxField
+            label={t("gamification:cards.actorBadge")}
+            checked={preferences.cardActorBadge}
+            disabled={disabled}
+            onChange={(event) => set("cardActorBadge")(event.target.checked)}
+          />
+        ))}
         {field("ui.textScale", (disabled) => (
           <div className="ds-field appearance-scale">
             <label htmlFor="ui-text-scale">{appearanceStrings.textScale}</label>

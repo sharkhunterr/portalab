@@ -98,6 +98,8 @@ USER_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
     ("ui.pluginLooks", dict[str, LOOK], {}, "Looks chosen for the kinds of visuals plugins add (030)."),
     ("ui.campaignThemes", Literal["allow", "ignore"], "allow", "Apply campaign theme overlays."),
     ("ui.colorMode", Literal["dark", "light", "system"], "dark", "Light or dark variant of a theme family."),
+    # #229: the actor's own portrait in a round badge by their character's image, on the media cards
+    ("ui.cardActorBadge", bool, True, "The actor's portrait in a badge by their character, on the cards."),
     # #68, #70: where the « live weather » ambience looks at the sky — each member's own place, the value
     # the administrators set as everyone's default (empty: no weather asked)
     (
