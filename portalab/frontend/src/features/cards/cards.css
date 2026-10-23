@@ -221,6 +221,24 @@
 .mcard__art[data-art="role"] img {
   object-position: center 30%;
 }
+/* an upright image (a portrait, a poster) zoomed out: whole from the head down in the middle, the same image
+   blurred on either side */
+.mcard__art .mcard__backdrop {
+  display: none;
+}
+.mcard:not([data-borderless]) .mcard__art[data-shape="upright"] .mcard__backdrop {
+  display: block;
+  inset: -4cqi;
+  inline-size: calc(100% + 8cqi);
+  block-size: calc(100% + 8cqi);
+  filter: blur(3cqi) saturate(1.2) brightness(0.75);
+}
+.mcard:not([data-borderless]) .mcard__art[data-shape="upright"] .mcard__picture {
+  inset-inline: 16%;
+  inline-size: 68%;
+  object-position: center 12%;
+  box-shadow: 0 0 3cqi var(--card-shadow);
+}
 
 /* under the art, in a band: what it is, simply, and who plays it (a work: who made it) — like a card's type line */
 .mcard__strip {
