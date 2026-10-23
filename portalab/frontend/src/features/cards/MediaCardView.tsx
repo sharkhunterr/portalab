@@ -1,4 +1,4 @@
-import type { PointerEvent } from "react";
+import type { CSSProperties, PointerEvent } from "react";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import "@fontsource/barlow-condensed/latin-600.css";
@@ -33,28 +33,23 @@ function fit(text: string, room: number, largest: number, smallest: number, widt
 }
 
 /** Issue 229: where the light falls on a foil card, and how it leans — it follows the pointer: the card turns
- * towards it, the holographic stripes slide the other way, the sparkles a little, brighter off the centre. */
+ * towards it, the rainbow film and the glare follow it. */
 function tilt(event: PointerEvent<HTMLElement>) {
   const box = event.currentTarget.getBoundingClientRect();
   const x = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width));
   const y = Math.min(1, Math.max(0, (event.clientY - box.top) / box.height));
   const style = event.currentTarget.style;
-  style.setProperty("--mcard-x", `${x * 100}%`);
-  style.setProperty("--mcard-y", `${y * 100}%`);
-  style.setProperty("--mcard-rx", `${(0.5 - y) * 20}deg`);
-  style.setProperty("--mcard-ry", `${(x - 0.5) * 24}deg`);
-  style.setProperty("--mcard-bx", `${(1 - x) * 100}%`);
-  style.setProperty("--mcard-by", `${(1 - y) * 100}%`);
-  style.setProperty("--mcard-sx", `${50 + (0.5 - x) * 10}%`);
-  style.setProperty("--mcard-sy", `${50 + (0.5 - y) * 10}%`);
-  style.setProperty("--mcard-glare", String(0.35 + Math.hypot(x - 0.5, y - 0.5) * 1.1));
+  style.setProperty("--mcard-px", `${x * 100}%`);
+  style.setProperty("--mcard-py", `${y * 100}%`);
+  style.setProperty("--mcard-rx", `${(0.5 - y) * 22}deg`);
+  style.setProperty("--mcard-ry", `${(x - 0.5) * 26}deg`);
   event.currentTarget.dataset.active = "";
 }
 
-/** The pointer gone: the card settles back, its light idles. */
+/** The pointer gone: the card sways on its own again. */
 function rest(event: PointerEvent<HTMLElement>) {
   delete event.currentTarget.dataset.active;
-  for (const name of ["--mcard-rx", "--mcard-ry", "--mcard-bx", "--mcard-by", "--mcard-sx", "--mcard-sy"]) {
+  for (const name of ["--mcard-px", "--mcard-py", "--mcard-rx", "--mcard-ry"]) {
     event.currentTarget.style.removeProperty(name);
   }
 }
@@ -144,6 +139,8 @@ export function MediaCardView({
       data-missing={missing || undefined}
       onPointerMove={foil ? tilt : undefined}
       onPointerLeave={foil ? rest : undefined}
+      // foil cards side by side don't sway together
+      style={foil ? ({ "--mcard-phase": `${-((card.number * 2.3) % 9)}s` } as CSSProperties) : undefined}
       aria-label={`${title} — ${stage}`}
     >
       <div className="mcard__card">

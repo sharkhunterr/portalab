@@ -171,10 +171,11 @@
   block-size: 3.6cqi;
 }
 
-/* the art, in a metal frame */
+/* the art, in a metal frame — the same height on every card, whatever is written under it */
 .mcard__art {
   position: relative;
-  flex: 1;
+  flex: none;
+  block-size: 58cqi;
   display: grid;
   place-items: center;
   min-block-size: 0;
@@ -262,8 +263,10 @@
 /* the work it belongs to: its poster the whole height on the left; its title, year, runtime and genres, and
    its figures on the right */
 .mcard__lower {
+  flex: 1;
   display: flex;
   gap: 2.6cqi;
+  min-block-size: 0;
 }
 .mcard__poster {
   position: relative;
@@ -444,6 +447,8 @@
 }
 .mcard[data-borderless] .mcard__art {
   position: static;
+  flex: 1;
+  block-size: auto;
   overflow: visible;
   background: none;
   box-shadow: none;
@@ -463,29 +468,45 @@
   background: none;
 }
 
-/* foil (after a Pokémon card holo effect): the card leans towards the pointer; holographic stripes in the
-   kind's two colours slide across it the other way, sparkles and a rainbow sheen glitter over the art; at
-   rest, the light drifts slowly on its own. color-dodge, screen on Firefox (its color-dodge glitches with
-   transforms). */
+/* foil: the card leans towards the light; a rainbow film slides across it through an etched grain, the glare
+   follows the light and glitter sparkles near it. At rest (and on a phone, where nothing hovers) the card sways
+   slowly on its own and the light travels round it; under the pointer, the light is the pointer. The light's
+   place and the lean are registered properties, so they animate. */
+@property --mcard-px {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 50%;
+}
+@property --mcard-py {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 50%;
+}
+@property --mcard-rx {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+@property --mcard-ry {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
 .mcard[data-foil] {
-  --mcard-holo-1: color-mix(in srgb, var(--mcard-accent) 45%, var(--card-holo-1));
-  --mcard-holo-2: color-mix(in srgb, var(--mcard-accent) 25%, var(--card-holo-2));
   perspective: 160cqi;
 }
 .mcard[data-foil] .mcard__card {
-  transform: rotateX(var(--mcard-rx, 0deg)) rotateY(var(--mcard-ry, 0deg));
-  transition:
-    transform 0.6s ease,
-    box-shadow 0.6s ease;
+  transform: rotateX(var(--mcard-rx)) rotateY(var(--mcard-ry));
+  animation: mcard-sway 9s ease-in-out infinite;
+  animation-delay: var(--mcard-phase, 0s);
   will-change: transform;
 }
 .mcard[data-foil][data-active] .mcard__card {
-  transition: box-shadow 0.2s ease;
+  animation: none;
   box-shadow:
-    -3cqi -3cqi 4cqi -4cqi var(--mcard-holo-1),
-    3cqi 3cqi 4cqi -4cqi var(--mcard-holo-2),
-    0 0 1.2cqi 0.6cqi color-mix(in srgb, var(--card-ink-light) 50%, transparent),
-    0 0.35rem 1rem var(--card-shadow);
+    0 0 0 0.33cqi var(--card-border),
+    0 0 2.4cqi 0.6cqi var(--mcard-glow),
+    calc((50% - var(--mcard-px)) * 0.06) calc((50% - var(--mcard-py)) * 0.06 + 1.5cqi) 4cqi var(--card-shadow);
 }
 .mcard__foil,
 .mcard__sparkle {
@@ -494,92 +515,102 @@
   z-index: 2;
   pointer-events: none;
   border-radius: inherit;
-  background-repeat: no-repeat;
-  mix-blend-mode: color-dodge;
 }
+/* the rainbow film through the etched grain: bright where the grain catches it, nothing elsewhere */
 .mcard__foil {
-  background-image: linear-gradient(
-    115deg,
-    transparent 0%,
-    var(--mcard-holo-1) 25%,
-    transparent 47%,
-    transparent 53%,
-    var(--mcard-holo-2) 75%,
-    transparent 100%
-  );
-  background-size: 300% 300%;
-  background-position: var(--mcard-bx, 50%) var(--mcard-by, 50%);
-  opacity: 0.45;
-  animation: mcard-holo 8s ease-in-out infinite;
-}
-.mcard__sparkle {
-  background-image:
-    radial-gradient(circle at 12% 18%, var(--card-holo-spark) 0 0.35cqi, transparent 0.7cqi),
-    radial-gradient(circle at 74% 9%, var(--card-holo-spark) 0 0.25cqi, transparent 0.6cqi),
-    radial-gradient(circle at 38% 46%, var(--card-holo-spark) 0 0.3cqi, transparent 0.65cqi),
-    radial-gradient(circle at 86% 57%, var(--card-holo-spark) 0 0.4cqi, transparent 0.8cqi),
-    radial-gradient(circle at 21% 77%, var(--card-holo-spark) 0 0.25cqi, transparent 0.6cqi),
-    radial-gradient(circle at 63% 88%, var(--card-holo-spark) 0 0.35cqi, transparent 0.7cqi),
-    radial-gradient(circle at 52% 23%, var(--card-holo-spark) 0 0.2cqi, transparent 0.5cqi),
-    linear-gradient(
-      125deg,
-      var(--card-holo-red) 15%,
-      var(--card-holo-orange) 30%,
-      var(--card-holo-yellow) 40%,
-      var(--card-holo-green) 60%,
-      var(--card-holo-cyan) 70%,
-      var(--card-holo-violet) 85%
-    );
+  background-image: var(--card-foil-rainbow), var(--card-foil-etch);
   background-size:
-    100% 100%,
-    100% 100%,
-    100% 100%,
-    100% 100%,
-    100% 100%,
-    100% 100%,
-    100% 100%,
-    160% 160%;
-  background-position: var(--mcard-sx, 50%) var(--mcard-sy, 50%);
-  opacity: 0.25;
-  animation: mcard-sparkle 8s ease-in-out infinite;
+    400% 400%,
+    220% 220%;
+  background-position:
+    calc(var(--mcard-px) * 1.4) calc(var(--mcard-py) * 1.4),
+    calc(100% - var(--mcard-px)) calc(100% - var(--mcard-py));
+  background-blend-mode: hard-light;
+  mix-blend-mode: color-dodge;
+  filter: brightness(0.55) contrast(1.8) saturate(1.5);
+  opacity: 0.6;
+  /* only where the light is: a band of colour travelling over the card, never a wash over all of it */
+  mask-image: radial-gradient(
+    farthest-corner circle at var(--mcard-px) var(--mcard-py),
+    var(--card-foil-mask) 0%,
+    var(--card-foil-mask-half) 25%,
+    transparent 55%
+  );
+}
+/* the glare where the light falls, the far side a little darker; glitter around it */
+.mcard__sparkle {
+  background-image: radial-gradient(
+    farthest-corner circle at var(--mcard-px) var(--mcard-py),
+    var(--card-foil-glare) 0%,
+    transparent 30%,
+    transparent 60%,
+    var(--card-foil-shade) 100%
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.45;
+}
+.mcard__sparkle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image:
+    radial-gradient(circle, var(--card-foil-spark) 0 0.22cqi, transparent 0.5cqi),
+    radial-gradient(circle, var(--card-foil-spark) 0 0.16cqi, transparent 0.4cqi),
+    radial-gradient(circle, var(--card-foil-spark) 0 0.28cqi, transparent 0.6cqi);
+  background-size:
+    7.3cqi 6.1cqi,
+    5.3cqi 8.9cqi,
+    11.7cqi 9.4cqi;
+  background-position:
+    calc(var(--mcard-px) * 0.1) calc(var(--mcard-py) * 0.07),
+    calc(var(--mcard-px) * -0.08) calc(var(--mcard-py) * 0.12),
+    calc(var(--mcard-py) * 0.06) calc(var(--mcard-px) * -0.09);
+  mix-blend-mode: color-dodge;
+  mask-image: radial-gradient(
+    circle at var(--mcard-px) var(--mcard-py),
+    var(--card-foil-mask) 0%,
+    transparent 32%
+  );
 }
 .mcard[data-foil][data-active] .mcard__foil {
-  animation: none;
-  opacity: 0.85;
+  opacity: 0.8;
 }
 .mcard[data-foil][data-active] .mcard__sparkle {
-  animation: none;
-  opacity: var(--mcard-glare, 0.6);
+  opacity: 0.75;
 }
 @supports (-moz-appearance: none) {
   .mcard__foil,
-  .mcard__sparkle {
+  .mcard__sparkle::after {
     mix-blend-mode: screen;
   }
 }
-/* at rest, no tint: now and then the holographic light sweeps across the card and is gone */
-@keyframes mcard-holo {
-  0% {
-    background-position: 0% 0%;
-    opacity: 0;
-  }
-  12% {
-    opacity: 0.35;
-  }
-  25%,
-  100% {
-    background-position: 100% 100%;
-    opacity: 0;
-  }
-}
-@keyframes mcard-sparkle {
+/* at rest: a slow sway, the light going round the card */
+@keyframes mcard-sway {
   0%,
-  25%,
   100% {
-    opacity: 0;
+    --mcard-px: 18%;
+    --mcard-py: 14%;
+    --mcard-rx: 3deg;
+    --mcard-ry: -5deg;
   }
-  12% {
-    opacity: 0.3;
+  25% {
+    --mcard-px: 84%;
+    --mcard-py: 28%;
+    --mcard-rx: 2deg;
+    --mcard-ry: 5deg;
+  }
+  50% {
+    --mcard-px: 78%;
+    --mcard-py: 88%;
+    --mcard-rx: -3deg;
+    --mcard-ry: 4deg;
+  }
+  75% {
+    --mcard-px: 22%;
+    --mcard-py: 72%;
+    --mcard-rx: -2deg;
+    --mcard-ry: -5deg;
   }
 }
 
@@ -592,11 +623,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mcard__foil,
-  .mcard__sparkle {
-    animation: none;
-  }
   .mcard[data-foil] .mcard__card {
+    animation: none;
     transform: none;
   }
   .mcard[data-rarity="legendary"] .mcard__card::before {
