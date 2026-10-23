@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router";
@@ -204,7 +205,7 @@ function Card({
               ))}
             </svg>
           </span>
-          <span className="booster-card__face" aria-hidden="true">
+          <span className="booster-card__face" aria-hidden="true" data-own={card.face ? "" : undefined}>
             {/* a face drawn by the GPU (HD), under the art and the words — only once it turns */}
             {state === "hidden" ? null : (
               <ScenePart
@@ -213,14 +214,21 @@ function Card({
                 context={{ reducedMotion: reduced, phase: "face", rarity, index, count: total }}
               />
             )}
-            <span className="booster-card__shine" />
-            <span className="booster-card__art">
-              {/* the card says itself whether it is new or a duplicate */}
-              <ProductArt product={{ ...card.product, owned: false }} size="card" />
-            </span>
-            <span className="booster-card__rarity">{t(`marketplace:rarity.${rarity}`)}</span>
-            <strong className="booster-card__name">{card.product.name}</strong>
-            <span className="booster-card__type">{productTypeLabel(t, card.product.type)}</span>
+            {card.face ? (
+              // issue 234: a card drawn its own way (a media card) fills its face
+              <span className="booster-card__own">{state === "hidden" ? null : card.face}</span>
+            ) : (
+              <>
+                <span className="booster-card__shine" />
+                <span className="booster-card__art">
+                  {/* the card says itself whether it is new or a duplicate */}
+                  <ProductArt product={{ ...card.product, owned: false }} size="card" />
+                </span>
+                <span className="booster-card__rarity">{t(`marketplace:rarity.${rarity}`)}</span>
+                <strong className="booster-card__name">{card.product.name}</strong>
+                <span className="booster-card__type">{productTypeLabel(t, card.product.type)}</span>
+              </>
+            )}
             {card.outcome === "duplicate" ? (
               <span className="booster-card__stamp">{t("marketplace:booster.duplicate")}</span>
             ) : card.outcome === "reserve" ? (
@@ -285,6 +293,7 @@ export function BoosterReveal({
   sealed = false,
   onClose,
   demo,
+  opener,
 }: {
   booster: Booster;
   /** one of the sealed ones I keep (offered, or bought earlier): opened for free */
@@ -292,13 +301,22 @@ export function BoosterReveal({
   onClose: () => void;
   /** issue 154: a try of a scene (the Test step) — these cards, this scene; nothing drawn, nothing charged */
   demo?: { cards: BoosterCard[]; scene: Scene | null };
+  /** issue 234: a booster opened elsewhere (a pack of media cards, sealed in the inventory): its own opening,
+   * the same stage — and what its summary links to */
+  opener?: {
+    open: () => Promise<BoosterCard[]>;
+    link?: { to: string; label: string };
+    /** its summary's line: what is new in the collection */
+    fresh?: (count: number) => string;
+  };
 }) {
   const t = useT();
   const format = useFormat();
   const { locale } = useLocaleContext();
   const reduced = useTheme().effective.reducedMotion;
   const opening = useOpenBooster();
-  const live = useBoosterScene(demo ? null : booster.key); // 028: a pack's scene, Portalab's own otherwise
+  const elsewhere = useMutation({ mutationFn: async () => (opener ? await opener.open() : []) });
+  const live = useBoosterScene(demo || opener ? null : booster.key); // 028: a pack's scene, Portalab's own otherwise
   const scene = demo ? demo.scene : live;
   const [tried, setTried] = useState(false); // issue 154: the demo's pack opened
   // one key per opening: a replayed request is answered without charging twice
@@ -307,14 +325,20 @@ export function BoosterReveal({
   const shown = opening.data?.booster ?? booster;
   const can = useCanOpen(shown);
   // this opening: a sealed one I keep, or one bought now
-  const [gift, setGift] = useState(sealed && booster.sealed > 0);
+  const [gift, setGift] = useState((sealed && booster.sealed > 0) || Boolean(opener));
   const ready = Boolean(demo) || gift || can.ok;
   const [phase, setPhase] = useState<Phase>("sealed");
   const [states, setStates] = useState<CardState[]>([]);
   const [moment, setMoment] = useState<string | null>(null);
   const timers = useRef<number[]>([]);
   const dialog = useRef<HTMLDivElement>(null);
-  const cards = demo ? (tried ? demo.cards : []) : (opening.data?.cards ?? []);
+  const cards = demo
+    ? tried
+      ? demo.cards
+      : []
+    : opener
+      ? (elsewhere.data ?? [])
+      : (opening.data?.cards ?? []);
   const later = useCallback((fn: () => void, ms: number) => {
     timers.current.push(window.setTimeout(fn, ms));
   }, []);
@@ -342,6 +366,9 @@ export function BoosterReveal({
   useEffect(() => {
     if (opening.data) setStates(opening.data.cards.map(() => "hidden"));
   }, [opening.data]);
+  useEffect(() => {
+    if (elsewhere.data) setStates(elsewhere.data.map(() => "hidden"));
+  }, [elsewhere.data]);
 
   useEffect(() => {
     const close = (event: KeyboardEvent) => {
@@ -366,11 +393,15 @@ export function BoosterReveal({
   };
   // a tap opens it for real: charged and drawn on the server, then it tears
   const open = () => {
-    if (phase !== "sealed" || opening.isPending || !ready) return;
+    if (phase !== "sealed" || opening.isPending || elsewhere.isPending || !ready) return;
     if (demo) {
       setTried(true);
       setStates(demo.cards.map(() => "hidden"));
       tear();
+      return;
+    }
+    if (opener) {
+      elsewhere.mutate(undefined, { onSuccess: tear });
       return;
     }
     opening.mutate({ key: booster.key, requestKey: attempt.current, sealed: gift }, { onSuccess: tear });
@@ -460,7 +491,7 @@ export function BoosterReveal({
       >
         <Icon name="close" size={20} />
       </button>
-      {coins !== undefined && !demo ? (
+      {coins !== undefined && !demo && !opener ? (
         <p className="booster-stage__preview" data-protected="">
           <Icon name="coins" size={14} />
           {t("marketplace:booster.balance", { coins: format.number(coins) })}
@@ -489,8 +520,8 @@ export function BoosterReveal({
             type="button"
             className="booster-stage__tear"
             onClick={open}
-            disabled={phase !== "sealed" || opening.isPending || !ready}
-            aria-busy={opening.isPending || undefined}
+            disabled={phase !== "sealed" || opening.isPending || elsewhere.isPending || !ready}
+            aria-busy={opening.isPending || elsewhere.isPending || undefined}
             aria-label={t("marketplace:booster.tear", { name })}
           >
             <BoosterPack booster={booster} stage />
@@ -504,9 +535,9 @@ export function BoosterReveal({
           </button>
           {/* 028 (R16): the price it charges is Portalab's, never restyled by a pack */}
           <p className="booster-stage__hint" aria-live="polite" data-protected="">
-            {opening.isError
+            {opening.isError || elsewhere.isError
               ? failure
-              : opening.isPending
+              : opening.isPending || elsewhere.isPending
                 ? t("marketplace:booster.sealing")
                 : phase !== "sealed"
                   ? t("marketplace:booster.tearing")
@@ -556,7 +587,9 @@ export function BoosterReveal({
                     <span className="booster-summary__name">{card.product.name}</span>
                     <span className="booster-summary__state">
                       {card.outcome === "duplicate"
-                        ? t("marketplace:booster.refundLine", { coins: format.number(card.refund) })
+                        ? card.refund
+                          ? t("marketplace:booster.refundLine", { coins: format.number(card.refund) })
+                          : t("marketplace:booster.duplicate")
                         : card.outcome === "reserve"
                           ? t("marketplace:booster.reserveLine")
                           : t("marketplace:booster.new")}
@@ -572,7 +605,11 @@ export function BoosterReveal({
               ) : null}
               <p className="booster-summary__note">
                 {[
-                  shown.kind === "looks" ? t("marketplace:booster.newTotal", { count: fresh }) : null,
+                  opener?.fresh
+                    ? opener.fresh(fresh)
+                    : shown.kind === "looks"
+                      ? t("marketplace:booster.newTotal", { count: fresh })
+                      : null,
                   kept ? t("marketplace:booster.reserveTotal", { count: kept }) : null,
                 ]
                   .filter(Boolean)
@@ -588,18 +625,26 @@ export function BoosterReveal({
                     {t("marketplace:booster.seeReserve")}
                   </Link>
                 ) : null}
-                <Button
-                  onClick={again}
-                  disabled={!(demo || shown.sealed > 0 || can.ok)}
-                  title={shown.sealed > 0 ? undefined : (can.reason ?? undefined)}
-                >
-                  <Icon name="sparkles" size={16} />
-                  {demo
-                    ? t("marketplace:booster.tryAgain")
-                    : shown.sealed > 0
-                      ? t("marketplace:booster.againGift", { count: shown.sealed })
-                      : t("marketplace:booster.again", { price: format.number(shown.price) })}
-                </Button>
+                {opener?.link ? (
+                  <Link className="booster-summary__link" to={opener.link.to} onClick={onClose}>
+                    <Icon name="layers" size={16} />
+                    {opener.link.label}
+                  </Link>
+                ) : null}
+                {opener ? null : (
+                  <Button
+                    onClick={again}
+                    disabled={!(demo || shown.sealed > 0 || can.ok)}
+                    title={shown.sealed > 0 ? undefined : (can.reason ?? undefined)}
+                  >
+                    <Icon name="sparkles" size={16} />
+                    {demo
+                      ? t("marketplace:booster.tryAgain")
+                      : shown.sealed > 0
+                        ? t("marketplace:booster.againGift", { count: shown.sealed })
+                        : t("marketplace:booster.again", { price: format.number(shown.price) })}
+                  </Button>
+                )}
               </div>
             </section>
           ) : null}

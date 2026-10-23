@@ -330,10 +330,24 @@ class CardService:
                     )
                 ).scalars()
             }
+            # issue 234: a card is new when this copy is the member's first of it (their ids follow time)
+            firsts: dict[UUID, str] = {
+                card_id: first
+                for card_id, first in await session.execute(
+                    select(Copy.card_id, func.min(cast(Copy.id, Text)))
+                    .where(Copy.user_id == user, Copy.card_id.in_({c.card_id for c, _, _ in rows}))
+                    .group_by(Copy.card_id)
+                )
+            }
         by_pack: dict[UUID, list[dict[str, Any]]] = defaultdict(list)
         for copy, card, card_set in rows:
             by_pack[copy.pack_id].append(
-                {**card_out(card, card_set), "variant": copy.variant, "copy": str(copy.id)}
+                {
+                    **card_out(card, card_set),
+                    "variant": copy.variant,
+                    "copy": str(copy.id),
+                    "new": firsts.get(card.id) == str(copy.id),
+                }
             )
         return [
             {

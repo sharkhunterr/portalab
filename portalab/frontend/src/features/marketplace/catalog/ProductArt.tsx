@@ -18,10 +18,8 @@ import { LevelUpPreview } from "../../gamification/levelup/LevelUpMoment";
 import { type Product, useProducts } from "../api";
 import { TYPE_ICONS } from "./ProductPoster";
 import "../../appearance/notification-looks.css";
-import { ProductPack } from "../boosters/Boosters";
+import { BoosterPack, ProductPack } from "../boosters/Boosters";
 import "../product-art.css";
-import type { Edition } from "../../cards/api";
-import { CardBooster } from "../../cards/CardBooster";
 import { productTypeLabel } from "../typeLabel";
 
 /** issue 173: a capacity's word in the catalogs (« daily », not the setting's own name) */
@@ -302,34 +300,12 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
       return <ThemeArt theme={text(preview, "theme") ?? product.theme ?? undefined} fallback={fallback} />;
     case "booster": // #81: its sealed pack
       return <ProductPack product={product} size={size === "mini" ? "mini" : "card"} />;
-    case "card_booster": // issue 234: a booster of cards, as it will be in the inventory
+    case "card_booster": // issue 234: a booster of cards — the same sealed pack as the shop's boosters
       return (
-        <span className="product-art__cards">
-          <CardBooster
-            pack={{
-              id: product.key,
-              source: "shop",
-              set: null,
-              set_name: null,
-              given_at: "",
-              opened_at: null,
-              cards: [],
-              count: Number(preview.cards) || 3,
-              look: {
-                kind: text(preview, "kind") ?? null,
-                code: null,
-                year: null,
-                family: text(preview, "family") ?? "drama",
-                edition: (text(preview, "edition") ?? null) as Edition | null,
-                poster: null,
-                backdrop: null,
-                logos: {},
-                season: null,
-                product: product.key,
-              },
-            }}
-          />
-        </span>
+        <BoosterPack
+          booster={{ names: product.names, look: "cosmos", cards: Number(preview.cards) || 3 }}
+          size={size === "mini" ? "mini" : "card"}
+        />
       );
     case "bundle":
       return Array.isArray(preview.products) ? (

@@ -68,6 +68,8 @@ export interface MediaCard {
   owned: Partial<Record<Variant, number>>;
   variant?: Variant;
   copy?: string;
+  /** issue 234: drawn in a booster — the member's first copy of it */
+  new?: boolean;
 }
 
 export interface CardSetItem {

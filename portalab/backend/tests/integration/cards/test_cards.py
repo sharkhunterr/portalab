@@ -177,6 +177,7 @@ async def test_made_numbered_ranked_drawn_and_erased(database: Database) -> None
     opened = await service.pack(user, pack)
     assert opened is not None and len(opened["cards"]) == 3
     assert opened["cards"][0]["set"] == str(first.object_id)  # the first card: of the work watched
+    assert opened["cards"][0]["new"] is True  # the member's first copy of it
     summary = await service.summary(user)
     assert summary["copies"] == 3 and summary["unopened"] == 0
     pool = await service.pool(user, rarity=None, kind="cast")

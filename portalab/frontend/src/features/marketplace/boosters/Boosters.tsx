@@ -41,6 +41,8 @@ export interface PackLook {
   names: Record<string, string>;
   look: string;
   cards: number;
+  /** issue 234: a content's booster — its title drawn (an art site's logo) in place of its name */
+  logo?: string | null;
 }
 
 /** The sealed pack itself — foil, a tear line, the booster's name; ``stage`` for the opening, ``card``
@@ -69,7 +71,9 @@ export function BoosterPack({
       <span className="booster-pack__emblem">
         <Icon name={EMBLEM[booster.look] ?? "sparkles"} size={stage ? 46 : size === "mini" ? 18 : 34} />
       </span>
-      {size === "mini" ? null : (
+      {size === "mini" ? null : booster.logo ? (
+        <img className="booster-pack__logo" src={booster.logo} alt="" draggable={false} />
+      ) : (
         <span className="booster-pack__name">{localized(booster.names, locale)}</span>
       )}
       <span className="booster-pack__count">×{booster.cards}</span>
