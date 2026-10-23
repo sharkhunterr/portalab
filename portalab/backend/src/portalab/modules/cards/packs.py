@@ -4,7 +4,9 @@ that rarity), revealed when it is opened.
 
 A copy's version is drawn with it, like a trading card game's: foil at any rarity; the borderless versions
 (the full-art alternative: a work's scene over the whole card) for the works' cards only, mostly at the high
-rarities — never a common, seldom a rare, often an epic or a legendary — and borderless foil rarer still."""
+rarities — never a common, seldom a rare, often an epic or a legendary — and borderless foil rarer still.
+Issue 233: any card of a work with a year of release may come in its edition's version (its edition's frame),
+the more often the rarer, foil or not."""
 
 import random
 import secrets
@@ -21,6 +23,7 @@ from portalab.capabilities.media_core import CARD_SOURCES
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
+from portalab.modules.cards.editions import edition_of
 from portalab.modules.cards.models import Card, CardSet, Copy, Pack
 
 OWNER = "module:cards"
@@ -31,17 +34,23 @@ RARITY_WEIGHTS = {"common": 60, "rare": 28, "epic": 9, "legendary": 3}
 TRIAL_SIZE = 6  # an administrator's trial pack: more cards, the special versions more often
 TRIAL_FOIL = 0.4
 TRIAL_BORDERLESS = 0.5
+TRIAL_SHOWCASE = 0.5
 FOIL = 1 / 8
 # the chance a copy is borderless (the full-art alternative), by the card's rarity
 BORDERLESS = {"common": 0.0, "rare": 1 / 40, "epic": 1 / 10, "legendary": 1 / 4}
+# the chance a copy is in its edition's version (issue 233), by the card's rarity
+SHOWCASE = {"common": 1 / 30, "rare": 1 / 15, "epic": 1 / 8, "legendary": 1 / 5}
 
 
-def variant_for(rarity: str, rng: random.Random, kind: str = "title") -> str:
+def variant_for(rarity: str, rng: random.Random, kind: str = "title", edition: str | None = None) -> str:
     # the borderless alternative is a work's: its scene over the whole card (a person's card has none)
     borderless = kind == "title" and rng.random() < BORDERLESS.get(rarity, 0.0)
+    # its edition's version: a work released some year (its edition known)
+    showcase = not borderless and edition is not None and rng.random() < SHOWCASE.get(rarity, 0.0)
     foil = rng.random() < FOIL
-    if borderless:
-        return "borderless_foil" if foil else "borderless"
+    base = "borderless" if borderless else "showcase" if showcase else None
+    if base:
+        return f"{base}_foil" if foil else base
     return "foil" if foil else "normal"
 
 
@@ -104,11 +113,13 @@ class Packs:
                 card = await self._draw(session, set_key if index == 0 else None)
                 if card is None:
                     continue
+                card_set = await session.get(CardSet, card.set_key)
+                edition = edition_of(card_set.year if card_set else None)
                 session.add(
                     Copy(
                         user_id=user,
                         card_id=card.id,
-                        variant=variant_for(card.rarity, self.rng, card.kind),
+                        variant=variant_for(card.rarity, self.rng, card.kind, edition),
                         pack_id=pack_id,
                         acquired_at=now,
                     )
@@ -147,10 +158,13 @@ class Packs:
                 card = await self._draw(session, self.rng.choice(looked) if looked else None)
                 if card is None:
                     continue
+                card_set = await session.get(CardSet, card.set_key)
+                edition = edition_of(card_set.year if card_set else None)
                 borderless = card.kind == "title" and self.rng.random() < TRIAL_BORDERLESS
+                showcase = not borderless and edition is not None and self.rng.random() < TRIAL_SHOWCASE
                 foil = self.rng.random() < TRIAL_FOIL
-                variant = "borderless" if borderless else "normal"
-                variant = f"{variant}_foil" if foil and borderless else ("foil" if foil else variant)
+                base = "borderless" if borderless else "showcase" if showcase else None
+                variant = (f"{base}_foil" if foil else base) if base else ("foil" if foil else "normal")
                 session.add(
                     Copy(user_id=user, card_id=card.id, variant=variant, pack_id=pack_id, acquired_at=now)
                 )

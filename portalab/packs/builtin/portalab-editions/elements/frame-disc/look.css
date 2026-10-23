@@ -1,0 +1,190 @@
+/* Portalab — card_frame/edition-disc: the DVD edition (1997–2009), filigree — a deep body of the genre's colour
+   under a damask, flourishes in the rarity's metal in its corners, the name on an engraved plate, the art in an
+   ornate frame, the work on parchment. Ornaments: Openclipart and Kenney, CC0 (CREDITS.txt). */
+
+.mcard[data-frame="edition-disc"] {
+  --edition-deep: color-mix(in srgb, var(--mcard-accent) 42%, #07040c);
+  --edition-hue: color-mix(in srgb, var(--mcard-rarity) 55%, #fff4d8);
+  --edition-text: #f8efd8;
+}
+.mcard[data-frame="edition-disc"] .mcard__card {
+  padding: 2.4cqi;
+}
+.mcard[data-frame="edition-disc"] .mcard__body {
+  padding: 3cqi 4.2cqi 2.6cqi;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--edition-hue) 30%, transparent) 0.3cqi, transparent 0.55cqi) 0 0 /
+      4cqi 4cqi,
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--edition-hue) 9%, transparent) 0 0.2cqi, transparent 0.2cqi 2.8cqi),
+    repeating-linear-gradient(-45deg, color-mix(in srgb, var(--edition-hue) 9%, transparent) 0 0.2cqi, transparent 0.2cqi 2.8cqi),
+    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--edition-deep) 75%, var(--mcard-accent)), var(--edition-deep) 75%);
+  box-shadow: inset 0 0 0 0.33cqi rgba(0, 0, 0, 0.6);
+  color: var(--edition-text);
+}
+/* the flourishes in the four corners, in the rarity's metal, under the plates */
+.mcard[data-frame="edition-disc"] .mcard__body::before {
+  content: "";
+  position: absolute;
+  inset: 0.8cqi;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--mcard-rim);
+  mask:
+    url("../../assets/flourish-tl.png") left top / 16cqi no-repeat,
+    url("../../assets/flourish-tr.png") right top / 16cqi no-repeat,
+    url("../../assets/flourish-bl.png") left bottom / 16cqi no-repeat,
+    url("../../assets/flourish-br.png") right bottom / 16cqi no-repeat;
+}
+.mcard[data-frame="edition-disc"] .mcard__head {
+  padding: 0 1.4cqi 0 3.6cqi;
+  border-radius: 1cqi;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--edition-deep) 62%, #ffffff),
+    var(--edition-deep) 48%,
+    color-mix(in srgb, var(--edition-deep) 75%, #000000)
+  );
+  box-shadow:
+    inset 0 0 0 0.5cqi var(--edition-hue),
+    inset 0 0 0 1.1cqi var(--edition-deep),
+    inset 0 0 0 1.4cqi color-mix(in srgb, var(--edition-hue) 45%, transparent),
+    0 1cqi 2.6cqi rgba(0, 0, 0, 0.6);
+}
+.mcard[data-frame="edition-disc"] .mcard__name {
+  font-family: "Cinzel", serif;
+  text-shadow: 0 0.3cqi 0.6cqi rgba(0, 0, 0, 0.8);
+}
+.mcard[data-frame="edition-disc"] .mcard__genre {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  font-family: "EB Garamond", serif;
+  font-variant: small-caps;
+  text-transform: none;
+  font-size: 3.6cqi;
+  flex-direction: row-reverse;
+}
+.mcard[data-frame="edition-disc"] .mcard__emblem {
+  inline-size: 6.6cqi;
+  block-size: 6.6cqi;
+  background: radial-gradient(
+    circle at 35% 30%,
+    #ffffff,
+    color-mix(in srgb, var(--mcard-accent) 45%, #ffffff) 55%,
+    var(--mcard-accent)
+  );
+  color: var(--edition-deep);
+  box-shadow:
+    0 0 0 0.33cqi rgba(0, 0, 0, 0.6),
+    0 0.3cqi 0.6cqi rgba(0, 0, 0, 0.6);
+}
+.mcard[data-frame="edition-disc"] .mcard__art {
+  margin: 0.4cqi 1.6cqi 0;
+  background: var(--edition-deep);
+  box-shadow:
+    0 0 0 0.33cqi rgba(0, 0, 0, 0.6),
+    0 1cqi 2.4cqi rgba(0, 0, 0, 0.6);
+}
+.mcard[data-frame="edition-disc"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 0.6cqi var(--edition-hue);
+}
+/* the ornate frame (where the browser can cut a nine-part mask; a plain gilt line elsewhere) */
+@supports (-webkit-mask-box-image: none) {
+  .mcard[data-frame="edition-disc"] .mcard__art::after {
+    background: var(--mcard-rim);
+    box-shadow: none;
+    -webkit-mask-box-image: url("../../assets/ornate-frame.png") 150 / 9cqi round;
+  }
+}
+.mcard[data-frame="edition-disc"] .mcard__strip {
+  justify-content: flex-start;
+  padding: 0.5cqi 1.4cqi 0.5cqi 3cqi;
+  border-radius: 0.8cqi;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--edition-deep) 70%, #ffffff), var(--edition-deep) 55%);
+  box-shadow:
+    inset 0 0 0 0.45cqi var(--edition-hue),
+    0 0.8cqi 1.8cqi rgba(0, 0, 0, 0.55);
+  font-family: "EB Garamond", serif;
+  font-size: 3.6cqi;
+  font-style: normal;
+}
+.mcard[data-frame="edition-disc"] .mcard__stage {
+  padding: 0;
+  background: none;
+  color: var(--edition-hue);
+  font-family: "EB Garamond", serif;
+  font-size: 3.6cqi;
+  font-variant: small-caps;
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+.mcard[data-frame="edition-disc"] .mcard__by {
+  font-style: italic;
+}
+.mcard[data-frame="edition-disc"] .mcard__lower {
+  padding: 2.2cqi 2.4cqi;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.55), transparent 45%),
+    var(--mcard-body);
+  box-shadow:
+    inset 0 0 0 0.33cqi var(--mcard-rarity),
+    inset 0 0 0 1cqi rgba(255, 255, 255, 0.5),
+    inset 0 0 0 1.33cqi color-mix(in srgb, var(--mcard-rarity) 60%, transparent),
+    0 1cqi 2.4cqi rgba(0, 0, 0, 0.55);
+  color: var(--mcard-ink);
+  font-family: "EB Garamond", serif;
+}
+.mcard[data-frame="edition-disc"] .mcard__poster {
+  margin: 0;
+  border-radius: 0;
+  box-shadow:
+    0 0 0 0.33cqi var(--mcard-rarity),
+    0 0 0 1cqi rgba(255, 255, 255, 0.6),
+    0 0 0 1.33cqi color-mix(in srgb, var(--mcard-rarity) 60%, transparent);
+}
+.mcard[data-frame="edition-disc"] .mcard__work strong,
+.mcard[data-frame="edition-disc"] .mcard__figures strong {
+  font-family: "EB Garamond", serif;
+}
+.mcard[data-frame="edition-disc"] .mcard__work small {
+  font-style: italic;
+}
+.mcard[data-frame="edition-disc"] .mcard__figures li {
+  font-size: 3.7cqi;
+  font-weight: 600;
+}
+.mcard[data-frame="edition-disc"] .mcard__cost {
+  background: radial-gradient(
+    circle at 35% 30%,
+    #ffffff,
+    color-mix(in srgb, var(--mcard-accent) 45%, #ffffff) 55%,
+    var(--mcard-accent)
+  );
+  color: var(--edition-deep);
+}
+.mcard[data-frame="edition-disc"] .mcard__flavor {
+  border: 0;
+  border-block: 0.33cqi solid color-mix(in srgb, var(--mcard-rarity) 60%, transparent);
+  border-radius: 0;
+  background: var(--mcard-body);
+  color: var(--mcard-ink);
+}
+.mcard[data-frame="edition-disc"] .mcard__foot {
+  padding-inline: 9cqi;
+  color: var(--edition-text);
+  letter-spacing: 0.12em;
+}
+.mcard[data-frame="edition-disc"] .mcard__rarity {
+  background: none;
+  box-shadow: none;
+  color: var(--edition-hue);
+}
+.mcard[data-frame="edition-disc"] .mcard__gem {
+  background: var(--mcard-rim);
+  filter: drop-shadow(0 0 0.6cqi var(--edition-hue));
+}

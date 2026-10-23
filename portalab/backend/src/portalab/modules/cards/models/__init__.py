@@ -1,6 +1,7 @@
 """Schema ``cards`` (issue 229): a set per work present (a film, a series), its cards — the work itself, who
 made it, who plays in it — numbered like a trading card game's, with a rarity; the copies members own, in
-their version (normal, foil, borderless, borderless foil); and the packs they were given, opened or not."""
+their version (normal, foil, borderless, borderless foil, their edition's, foil or not); and the packs they
+were given, opened or not."""
 
 from datetime import datetime
 from typing import Any
@@ -24,7 +25,7 @@ from portalab.core.ids import new_id
 from portalab.core.privacy_registry import not_personal
 
 RARITIES = ("common", "rare", "epic", "legendary")
-VARIANTS = ("normal", "foil", "borderless", "borderless_foil")
+VARIANTS = ("normal", "foil", "borderless", "borderless_foil", "showcase", "showcase_foil")
 
 
 class CardsBase(DeclarativeBase):

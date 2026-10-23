@@ -46,13 +46,40 @@ function tilt(event: PointerEvent<HTMLElement>) {
   event.currentTarget.dataset.active = "";
 }
 
-/** An upright image (a portrait, a poster) in the art's wide window: framed from its top (a head), not on the
- * middle of a face — its art says so once the image is known. */
+/** The colour along one side of an image (its average), or null when it cannot be read. */
+function sideColour(context: CanvasRenderingContext2D, x: number): string | null {
+  const data = context.getImageData(x, 0, 1, 8).data;
+  const sum = [0, 1, 2].map((channel) => {
+    let total = 0;
+    for (let index = channel; index < data.length; index += 4) total += data[index] ?? 0;
+    return Math.round(total / 8);
+  });
+  return `#${sum.map((value) => value.toString(16).padStart(2, "0")).join("")}`;
+}
+
+/** An upright image (a portrait, a poster) in the art's wide window: zoomed out, from the head down, its sides
+ * fading into its own edges' colours (a portrait's backdrop carried on) — its art says so once it is known. */
 function measure(event: SyntheticEvent<HTMLImageElement>) {
   const image = event.currentTarget;
   const upright = image.naturalHeight > image.naturalWidth * 1.15;
   const art = image.parentElement;
-  if (art) art.dataset.shape = upright ? "upright" : "wide";
+  if (!art) return;
+  art.dataset.shape = upright ? "upright" : "wide";
+  if (!upright) return;
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = 4;
+    canvas.height = 8;
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) return;
+    context.drawImage(image, 0, 0, 4, 8);
+    const start = sideColour(context, 0);
+    const end = sideColour(context, 3);
+    if (start) art.style.setProperty("--mcard-art-start", start);
+    if (end) art.style.setProperty("--mcard-art-end", end);
+  } catch {
+    // an image that cannot be read: the window's own colour on its sides
+  }
 }
 
 /** The pointer gone: the card sways on its own again. */
@@ -87,7 +114,10 @@ export function MediaCardView({
 }) {
   const t = useT();
   const borderless = variant === "borderless" || variant === "borderless_foil";
-  const foil = variant === "foil" || variant === "borderless_foil";
+  const foil = variant === "foil" || variant.endsWith("_foil");
+  // issue 233: its edition's version wears the edition's frame (a visual pack's ``card_frame``)
+  const edition = card.set_edition ?? null;
+  const showcase = (variant === "showcase" || variant === "showcase_foil") && Boolean(edition);
   // an actor's card shows their character in this work (once found); without one (issue 231), the work's
   // poster and their portrait in a round badge — clearly not the character. The borderless alternative:
   // another image of the character, else their portrait
@@ -144,6 +174,8 @@ export function MediaCardView({
       data-family={family}
       data-rarity={card.rarity}
       data-borderless={borderless || undefined}
+      data-edition={edition ?? undefined}
+      data-frame={showcase ? `edition-${edition}` : undefined}
       data-foil={foil || undefined}
       data-missing={missing || undefined}
       onPointerMove={foil ? tilt : undefined}
@@ -187,7 +219,15 @@ export function MediaCardView({
           </div>
           <p className="mcard__strip">
             <span className="mcard__stage">{stage}</span>
-            {strip ? <span>{strip}</span> : null}
+            <span className="mcard__by">{strip}</span>
+            {edition ? (
+              <span
+                className="mcard__edition"
+                role="img"
+                aria-label={t(`gamification:cards.edition.${edition}`)}
+                title={t(`gamification:cards.edition.${edition}`)}
+              />
+            ) : null}
           </p>
           {borderless ? null : (
             <div className="mcard__lower">
