@@ -217,6 +217,31 @@
     0 0 0 1.4cqi var(--mcard-accent),
     0 2cqi 4cqi var(--card-shadow);
 }
+/* the character's image: framed on its upper middle (a face) */
+.mcard__art[data-art="role"] img {
+  object-position: center 30%;
+}
+/* an upright image (a portrait, a poster) zoomed out, from the head down: its sides fade into its own edges'
+   colours, as if its backdrop went on */
+.mcard:not([data-borderless]) .mcard__art[data-shape="upright"] {
+  background: linear-gradient(
+    90deg,
+    var(--mcard-art-start, var(--card-border)),
+    var(--mcard-art-end, var(--card-border))
+  );
+}
+.mcard:not([data-borderless]) .mcard__art[data-shape="upright"] .mcard__picture {
+  inset-inline: 9%;
+  inline-size: 82%;
+  object-position: center 6%;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    var(--card-foil-mask) 12%,
+    var(--card-foil-mask) 88%,
+    transparent
+  );
+}
 /* its character cut out: over the genre's light, rays behind its head — or over the work's image, dimmed */
 .mcard:not([data-borderless]) .mcard__art[data-cutout] {
   background:
@@ -245,31 +270,6 @@
 }
 .mcard[data-borderless] .mcard__art[data-cutout] .mcard__picture {
   object-position: center 18%;
-}
-/* the character's image: framed on its upper middle (a face) */
-.mcard__art[data-art="role"] img {
-  object-position: center 30%;
-}
-/* an upright image (a portrait, a poster) zoomed out, from the head down: its sides fade into its own edges'
-   colours, as if its backdrop went on */
-.mcard:not([data-borderless]) .mcard__art[data-shape="upright"] {
-  background: linear-gradient(
-    90deg,
-    var(--mcard-art-start, var(--card-border)),
-    var(--mcard-art-end, var(--card-border))
-  );
-}
-.mcard:not([data-borderless]) .mcard__art[data-shape="upright"] .mcard__picture {
-  inset-inline: 9%;
-  inline-size: 82%;
-  object-position: center 6%;
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    var(--card-foil-mask) 12%,
-    var(--card-foil-mask) 88%,
-    transparent
-  );
 }
 
 /* under the art, in a band: what it is, simply, and who plays it (a work: who made it) — like a card's type line */
