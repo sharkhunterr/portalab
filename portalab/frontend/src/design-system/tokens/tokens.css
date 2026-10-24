@@ -289,7 +289,7 @@ body {
   --sidebar-width: 16.5rem;
   --rail-width: 4.75rem;
   --bottom-bar-height: 4.25rem;
-  --content-max: 80rem;
+  --content-max: 160rem; /* "wide" (issue 236): the page follows the screen, leaving nothing empty on a wide one */
   --target-touch: 44px;
 
   --z-header: 40;
