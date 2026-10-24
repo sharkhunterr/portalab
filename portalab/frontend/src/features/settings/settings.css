@@ -1,0 +1,184 @@
+/* issue 14 — « My settings »: the pages by intent beside the page shown, a search through every setting; on a
+   phone the list is the page and each setting page has its way back. Theme tokens only. */
+.settings-hub {
+  display: grid;
+  gap: var(--space-6);
+  align-items: start;
+}
+@media (min-width: 60rem) {
+  .settings-hub {
+    grid-template-columns: minmax(14rem, 17rem) minmax(0, 1fr);
+  }
+  .settings-hub__side {
+    position: sticky;
+    inset-block-start: var(--space-4);
+  }
+  .settings-hub .settings-hub__back {
+    display: none;
+  }
+}
+/* a phone or a narrow window: the list on /settings, the page elsewhere */
+@media (max-width: 59.99rem) {
+  .settings-hub:not([data-home]) .settings-hub__side,
+  .settings-hub[data-home] .settings-home {
+    display: none;
+  }
+}
+
+.settings-hub__side {
+  display: grid;
+  gap: var(--space-3);
+}
+.settings-hub__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  text-decoration: none;
+}
+.settings-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+.settings-search:focus-within {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+.settings-search input {
+  flex: 1;
+  min-inline-size: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  outline: none;
+}
+
+.settings-hub__pages,
+.settings-hub__results {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.settings-hub__pages a,
+.settings-hub__results a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.settings-hub__pages a:hover,
+.settings-hub__results a:hover {
+  background: var(--color-surface-raised);
+}
+.settings-hub__pages a[aria-current="page"] {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-text);
+}
+.settings-hub__pages a[aria-current="page"] > svg:first-child {
+  color: var(--color-accent);
+}
+.settings-hub__page,
+.settings-hub__results a > span {
+  display: grid;
+  flex: 1;
+  min-inline-size: 0;
+}
+.settings-hub__page > span,
+.settings-hub__results a > span > span {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* on a wide screen the list is a menu: the hints are for the phone's list */
+@media (min-width: 60rem) {
+  .settings-hub__page > span,
+  .settings-hub__pages a > svg:last-child {
+    display: none;
+  }
+}
+.settings-hub__none {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.settings-hub__main {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.settings-hub__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  justify-self: start;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.settings-home {
+  display: grid;
+  gap: var(--space-4);
+}
+.settings-home__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.settings-home__card {
+  display: grid;
+  gap: var(--space-2);
+  block-size: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-1);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.settings-home__card:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+}
+.settings-home__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+}
+.settings-home__card > span:not(.settings-home__icon) {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.settings-home__items {
+  opacity: 0.85;
+}
+
+.settings-play__problem {
+  margin: 0;
+  color: var(--state-error-fg);
+}
+.settings-play__more {
+  margin: 0;
+}

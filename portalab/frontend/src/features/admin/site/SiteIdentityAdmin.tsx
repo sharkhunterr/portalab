@@ -211,7 +211,7 @@ function Preview({
  * result before saving; « Restore Portalab's » empties it all. The administration's technical texts keep
  * the software's name.
  */
-export function SiteIdentityAdmin() {
+export function SiteIdentityAdmin({ embedded = false }: { embedded?: boolean } = {}) {
   const t = useT();
   const client = useQueryClient();
   const current = useQuery({
@@ -302,168 +302,174 @@ export function SiteIdentityAdmin() {
   const defaultName = current.data?.default_name ?? "Portalab";
   const error = save.error ?? reset.error;
 
-  return (
-    <AdminPage icon="sparkles" title={t("admin:site.title")} description={t("admin:site.description")}>
-      <form className="site-admin" onSubmit={submit}>
-        <AdminGrid>
-          <AdminSection icon="sparkles" title={t("admin:site.name.title")}>
+  // issue 6: the same form inside the setup assistant's first step
+  const content = (
+    <form className="site-admin" onSubmit={submit}>
+      <AdminGrid>
+        <AdminSection icon="sparkles" title={t("admin:site.name.title")}>
+          <TextField
+            label={t("admin:site.name.label")}
+            hint={t("admin:site.name.hint", { name: defaultName })}
+            placeholder={defaultName}
+            maxLength={40}
+            value={form.name}
+            onChange={(event) => change({ name: event.target.value })}
+          />
+          <TextField
+            label={t("admin:site.shortName.label")}
+            hint={t("admin:site.shortName.hint")}
+            maxLength={12}
+            value={form.short_name}
+            onChange={(event) => change({ short_name: event.target.value })}
+          />
+          {codes.map((code) => (
             <TextField
-              label={t("admin:site.name.label")}
-              hint={t("admin:site.name.hint", { name: defaultName })}
-              placeholder={defaultName}
-              maxLength={40}
-              value={form.name}
-              onChange={(event) => change({ name: event.target.value })}
+              key={code}
+              label={t("admin:site.tagline.label", { language: nameOf(code) })}
+              hint={code === codes[0] ? t("admin:site.tagline.hint") : undefined}
+              maxLength={160}
+              value={form.tagline[code] ?? ""}
+              onChange={(event) => change({ tagline: { ...form.tagline, [code]: event.target.value } })}
             />
-            <TextField
-              label={t("admin:site.shortName.label")}
-              hint={t("admin:site.shortName.hint")}
-              maxLength={12}
-              value={form.short_name}
-              onChange={(event) => change({ short_name: event.target.value })}
-            />
-            {codes.map((code) => (
-              <TextField
-                key={code}
-                label={t("admin:site.tagline.label", { language: nameOf(code) })}
-                hint={code === codes[0] ? t("admin:site.tagline.hint") : undefined}
-                maxLength={160}
-                value={form.tagline[code] ?? ""}
-                onChange={(event) => change({ tagline: { ...form.tagline, [code]: event.target.value } })}
+          ))}
+        </AdminSection>
+
+        <AdminSection icon="camera" title={t("admin:site.images.title")}>
+          {(["logo", "icon"] as const).map((which) => (
+            <div key={which}>
+              <h4 className="site-admin__subtitle">{t(`admin:site.${which}.title`)}</h4>
+              <ImageField
+                which={which}
+                current={current.data?.[which] ?? null}
+                file={files[which]}
+                removed={removed[which]}
+                onFile={(file) => {
+                  setSaved(false);
+                  setFiles((previous) => ({ ...previous, [which]: file }));
+                  setRemoved((previous) => ({ ...previous, [which]: false }));
+                }}
+                onRemove={() => {
+                  setSaved(false);
+                  setFiles((previous) => ({ ...previous, [which]: null }));
+                  setRemoved((previous) => ({ ...previous, [which]: true }));
+                }}
               />
-            ))}
-          </AdminSection>
+            </div>
+          ))}
+        </AdminSection>
 
-          <AdminSection icon="camera" title={t("admin:site.images.title")}>
-            {(["logo", "icon"] as const).map((which) => (
-              <div key={which}>
-                <h4 className="site-admin__subtitle">{t(`admin:site.${which}.title`)}</h4>
-                <ImageField
-                  which={which}
-                  current={current.data?.[which] ?? null}
-                  file={files[which]}
-                  removed={removed[which]}
-                  onFile={(file) => {
-                    setSaved(false);
-                    setFiles((previous) => ({ ...previous, [which]: file }));
-                    setRemoved((previous) => ({ ...previous, [which]: false }));
-                  }}
-                  onRemove={() => {
-                    setSaved(false);
-                    setFiles((previous) => ({ ...previous, [which]: null }));
-                    setRemoved((previous) => ({ ...previous, [which]: true }));
-                  }}
-                />
-              </div>
-            ))}
-          </AdminSection>
-
-          <AdminSection
-            icon="coins"
-            title={t("admin:site.currency.title")}
-            description={t("admin:site.currency.description")}
+        <AdminSection
+          icon="coins"
+          title={t("admin:site.currency.title")}
+          description={t("admin:site.currency.description")}
+        >
+          {codes.map((code) => (
+            <fieldset key={code} className="site-admin__currency">
+              <legend>{nameOf(code)}</legend>
+              <TextField
+                label={t("admin:site.currency.one")}
+                placeholder="Coin"
+                maxLength={30}
+                value={names(code).one}
+                onChange={(event) => setNames(code, { one: event.target.value })}
+              />
+              <TextField
+                label={t("admin:site.currency.other")}
+                placeholder="Coins"
+                maxLength={30}
+                value={names(code).other}
+                onChange={(event) => setNames(code, { other: event.target.value })}
+              />
+            </fieldset>
+          ))}
+          <TextField
+            label={t("admin:site.currency.short")}
+            hint={t("admin:site.currency.shortHint")}
+            maxLength={8}
+            value={form.currency_short}
+            onChange={(event) => change({ currency_short: event.target.value })}
+          />
+          <SelectField
+            label={t("admin:site.currency.icon")}
+            hint={t("admin:site.currency.iconHint")}
+            value={form.currency_icon}
+            onChange={(event) => change({ currency_icon: event.target.value })}
           >
-            {codes.map((code) => (
-              <fieldset key={code} className="site-admin__currency">
-                <legend>{nameOf(code)}</legend>
-                <TextField
-                  label={t("admin:site.currency.one")}
-                  placeholder="Coin"
-                  maxLength={30}
-                  value={names(code).one}
-                  onChange={(event) => setNames(code, { one: event.target.value })}
-                />
-                <TextField
-                  label={t("admin:site.currency.other")}
-                  placeholder="Coins"
-                  maxLength={30}
-                  value={names(code).other}
-                  onChange={(event) => setNames(code, { other: event.target.value })}
-                />
-              </fieldset>
+            <option value="">{t("admin:site.currency.iconDefault")}</option>
+            {CURRENCY_ICONS.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
             ))}
-            <TextField
-              label={t("admin:site.currency.short")}
-              hint={t("admin:site.currency.shortHint")}
-              maxLength={8}
-              value={form.currency_short}
-              onChange={(event) => change({ currency_short: event.target.value })}
-            />
-            <SelectField
-              label={t("admin:site.currency.icon")}
-              hint={t("admin:site.currency.iconHint")}
-              value={form.currency_icon}
-              onChange={(event) => change({ currency_icon: event.target.value })}
-            >
-              <option value="">{t("admin:site.currency.iconDefault")}</option>
-              {CURRENCY_ICONS.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </SelectField>
-          </AdminSection>
+          </SelectField>
+        </AdminSection>
 
-          <AdminSection
-            icon="eye"
-            title={t("admin:site.preview.title")}
-            description={t("admin:site.preview.description")}
-            actions={
-              codes.length > 1 ? (
-                <SelectField
-                  label={t("admin:site.preview.language")}
-                  value={language}
-                  onChange={(event) => setPreviewLanguage(event.target.value)}
-                >
-                  {codes.map((code) => (
-                    <option key={code} value={code}>
-                      {nameOf(code)}
-                    </option>
-                  ))}
-                </SelectField>
-              ) : null
-            }
-          >
-            <Preview form={form} logo={logo} language={language} defaultName={defaultName} />
-          </AdminSection>
-        </AdminGrid>
+        <AdminSection
+          icon="eye"
+          title={t("admin:site.preview.title")}
+          description={t("admin:site.preview.description")}
+          actions={
+            codes.length > 1 ? (
+              <SelectField
+                label={t("admin:site.preview.language")}
+                value={language}
+                onChange={(event) => setPreviewLanguage(event.target.value)}
+              >
+                {codes.map((code) => (
+                  <option key={code} value={code}>
+                    {nameOf(code)}
+                  </option>
+                ))}
+              </SelectField>
+            ) : null
+          }
+        >
+          <Preview form={form} logo={logo} language={language} defaultName={defaultName} />
+        </AdminSection>
+      </AdminGrid>
 
-        {error ? (
-          <p className="ds-field__error" role="alert">
-            {error instanceof ApiError ? error.message : t("admin:site.failed")}
-          </p>
-        ) : null}
-        {saved && !save.isPending ? (
-          <p className="admin-muted" role="status">
-            <Icon name="check" size={14} /> {t("admin:site.saved")}
-          </p>
-        ) : null}
-        <FormActions>
-          <Dialog
-            open={confirmReset}
-            onOpenChange={setConfirmReset}
-            title={t("admin:site.reset")}
-            closeLabel={t("admin:site.cancel")}
-            trigger={
-              <Button variant="secondary" disabled={!current.data?.custom && !current.data?.version}>
-                <Icon name="sync" size={16} />
-                {t("admin:site.reset")}
-              </Button>
-            }
-            footer={
-              <Button onClick={() => reset.mutate()} disabled={reset.isPending}>
-                {t("admin:site.reset")}
-              </Button>
-            }
-          >
-            <p>{t("admin:site.resetConfirm", { name: defaultName })}</p>
-          </Dialog>
-          <Button type="submit" disabled={save.isPending || !current.data}>
-            <Icon name="check" size={16} />
-            {t("admin:site.save")}
-          </Button>
-        </FormActions>
-      </form>
+      {error ? (
+        <p className="ds-field__error" role="alert">
+          {error instanceof ApiError ? error.message : t("admin:site.failed")}
+        </p>
+      ) : null}
+      {saved && !save.isPending ? (
+        <p className="admin-muted" role="status">
+          <Icon name="check" size={14} /> {t("admin:site.saved")}
+        </p>
+      ) : null}
+      <FormActions>
+        <Dialog
+          open={confirmReset}
+          onOpenChange={setConfirmReset}
+          title={t("admin:site.reset")}
+          closeLabel={t("admin:site.cancel")}
+          trigger={
+            <Button variant="secondary" disabled={!current.data?.custom && !current.data?.version}>
+              <Icon name="sync" size={16} />
+              {t("admin:site.reset")}
+            </Button>
+          }
+          footer={
+            <Button onClick={() => reset.mutate()} disabled={reset.isPending}>
+              {t("admin:site.reset")}
+            </Button>
+          }
+        >
+          <p>{t("admin:site.resetConfirm", { name: defaultName })}</p>
+        </Dialog>
+        <Button type="submit" disabled={save.isPending || !current.data}>
+          <Icon name="check" size={16} />
+          {t("admin:site.save")}
+        </Button>
+      </FormActions>
+    </form>
+  );
+  return embedded ? (
+    content
+  ) : (
+    <AdminPage icon="sparkles" title={t("admin:site.title")} description={t("admin:site.description")}>
+      {content}
     </AdminPage>
   );
 }

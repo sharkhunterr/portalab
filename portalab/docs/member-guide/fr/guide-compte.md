@@ -2,12 +2,16 @@
 slug: guide-compte
 title: Mon compte et mes réglages
 position: 16
-help_keys: [account, settings.appearance, settings.language, privacy, settings.media-accounts]
+help_keys: [settings, account, settings.appearance, settings.language, privacy, settings.media-accounts, settings.play]
 tags: [guide, compte, apparence, confidentialité]
 ---
 Gérer votre profil, choisir l'apparence du portail, régler la langue et la région, contrôler ce que les autres voient de vous et lier vos comptes médias.
 
-Tous ces réglages se trouvent dans la section **Mon compte** du menu : « Compte », « Apparence », « Langue et région », « Préférences de notification », « Comptes médias » et « Confidentialité ».
+Tous ces réglages sont réunis dans [Mes paramètres](/settings), en tête de la section **Mon compte** du menu. La page est rangée par intention : « Profil », « Apparence », « Langue et région », « Notifications », « Comptes liés », « Confidentialité » et « Jeu ».
+
+- Sur ordinateur, la liste des pages reste à gauche de la page ouverte.
+- Sur téléphone, la liste est la page : touchez un thème pour l'ouvrir, puis « Mes paramètres » pour revenir.
+- « Chercher un réglage » trouve un réglage par son nom ou un mot qui s'en approche (« mot de passe », « sombre », « fuseau », « e-mail »…).
 
 ## Mon profil
 
@@ -131,3 +135,11 @@ Sur [Comptes médias](/settings/media-accounts), liez vos comptes des services d
 Le lien apparaît dans « Comptes liés » avec l'état « En attente de vérification ». **Rien ne vous est attribué tant que le lien n'est pas vérifié.** Si le service le permet, saisissez le « Code de vérification » puis touchez « Vérifier ». Sinon, un administrateur valide le lien. Une fois validé, il passe à « Vérifié ».
 
 Pour retirer un lien, touchez la corbeille (« Supprimer »). Voir aussi [Regarder, lire, écouter](portalab://wiki/guide-medias).
+
+## Jeu
+
+La page [Jeu](/settings/play) reprend la question « Tu veux jouer ? » de l'accueil ; changez d'avis quand vous voulez :
+
+- « Oui, à tout » : la progression, la boutique et les Mediacards ; votre profil est public, seulement pour les membres du portail.
+- « Oui, sans les cartes » : la progression et la boutique, sans les Mediacards. Elles disparaissent du menu, des fiches des titres, de la boutique et de la réserve, et regarder ne donne plus de booster Mediacards. Les boosters de looks restent.
+- « Non » : votre profil est anonyme et les Mediacards sont cachées.

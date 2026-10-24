@@ -118,7 +118,10 @@ describe("admin screens", () => {
       });
     };
     const { container } = render(withClient(<ConfigEditor />));
+    // issue 14: a setting without a title of its own is an advanced one — shown with its technical key
+    fireEvent.click(await screen.findByRole("checkbox", { name: /advanced settings/ }));
     expect(await screen.findByText("Hidden (write-only)")).toBeInTheDocument();
+    expect(screen.getByText("demo.pageSize")).toBeInTheDocument();
     expect(screen.getByRole("switch", { name: "Enabled" })).toBeChecked();
     await expectAccessible(container);
     fireEvent.change(screen.getByLabelText("Rows"), { target: { value: "50" } });

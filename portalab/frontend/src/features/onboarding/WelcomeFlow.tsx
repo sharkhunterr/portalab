@@ -11,13 +11,12 @@ import { SelectField, TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
-import { NAVIGATION_KEY } from "../../shell/nav/NavigationProvider";
 import { useShellPreference } from "../../shell/preferences";
 import { ApiError } from "../../state/regions";
 import { PalettePicker } from "../appearance/PalettePicker";
-import { setPresence } from "../auth/CommunityPresence";
 import { ME_KEY, type Me, useMe } from "../auth/useAuth";
 import { completeStep, MISSIONS_KEY, startTour, useWelcome, WELCOME_EVENT } from "./api";
+import { PLAY, type Play, usePlay } from "./play";
 import "../appearance/notification-looks.css";
 import "./onboarding.css";
 
@@ -51,15 +50,6 @@ export const INTERESTS = [
   { key: "comics", icon: "message-square" },
   { key: "retro_games", icon: "joystick" },
 ] as const;
-
-/** Whether the member plays (``shell.onboarding.play``): a player is public, within the portal only; the
- * others are anonymous, seen by no other member. */
-const PLAY = [
-  { key: "full", icon: "layers", level: "community" },
-  { key: "progression", icon: "trophy", level: "community" },
-  { key: "none", icon: "hide", level: "private" },
-] as const;
-type Play = (typeof PLAY)[number]["key"];
 
 export function WelcomeFlow() {
   const t = useT();
@@ -466,21 +456,8 @@ function PlayChoice({
   onNext: () => void;
 }) {
   const t = useT();
-  const client = useQueryClient();
-  const [saved, setSaved] = useShellPreference<Play | null>("shell.onboarding.play", null);
+  const { saved, save } = usePlay(onNext);
   const [chosen, setChosen] = useState<Play | null>(saved);
-  const save = useMutation({
-    mutationFn: async (play: Play) => {
-      await setPresence(PLAY.find((choice) => choice.key === play)?.level ?? "community");
-    },
-    onSuccess: async (_, play) => {
-      setSaved(play);
-      await client.invalidateQueries({ queryKey: NAVIGATION_KEY }); // issue 243: the cards, or not, in the menu
-      await client.invalidateQueries({ queryKey: ["privacy", "me"] });
-      await client.invalidateQueries({ queryKey: ["community"] });
-      onNext();
-    },
-  });
   const player = chosen === "full" || chosen === "progression";
   return (
     <>

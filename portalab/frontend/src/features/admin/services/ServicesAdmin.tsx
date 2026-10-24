@@ -324,7 +324,8 @@ function ConfigureService({ connector, onBack }: { connector: ConnectorItem; onB
   );
 }
 
-function AddServiceWizard() {
+/** Adding a service — also the setup assistant's « Services » step (issue 6). */
+export function AddServiceWizard() {
   const t = useT();
   const connectors = useConnectors();
   const [chosen, setChosen] = useState<ConnectorItem | null>(null);

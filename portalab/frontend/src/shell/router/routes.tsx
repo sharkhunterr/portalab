@@ -26,6 +26,7 @@ const Events = lazy(() => import("../../pages/admin/EventsRoute"));
 const Observability = lazy(() => import("../../pages/admin/ObservabilityRoute"));
 const Logs = lazy(() => import("../../pages/admin/LogsRoute"));
 const Site = lazy(() => import("../../pages/admin/SiteRoute")); // issue 159
+const SetupAssistant = lazy(() => import("../../features/admin/setup/SetupAssistant"));
 const Incidents = lazy(() => import("../../features/support/incidents/IncidentsPage"));
 const IncidentConsole = lazy(() => import("../../features/support/incidents/IncidentConsole"));
 const Statistics = lazy(() => import("../../features/statistics/StatisticsPage"));
@@ -106,6 +107,11 @@ const ModulesAdmin = lazy(() => import("../../features/plugins/manager/ModulesAd
 const PluginPage = lazy(() => import("../../features/plugins/pages/PageRenderer"));
 const Search = lazy(() => import("../../features/search/SearchPage"));
 const Language = lazy(() => import("../../features/settings/LanguageSettings"));
+const SettingsLayout = lazy(() => import("../../features/settings/SettingsLayout"));
+const SettingsHome = lazy(() =>
+  import("../../features/settings/SettingsLayout").then((m) => ({ default: m.SettingsHome })),
+);
+const PlaySettings = lazy(() => import("../../features/settings/PlaySettings"));
 const NotAvailable = lazy(() => import("../../pages/NotAvailablePage"));
 
 const h = (handle: RouteHandle) => handle;
@@ -352,21 +358,33 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           handle: h({ crumb: "Search", requiredPermission: "search.use" }),
         },
         { path: "notifications", element: <Notifications />, handle: h({ crumb: "Notifications" }) },
-        { path: "account", element: <Account />, handle: h({ crumb: "Account" }) },
         { path: "guide", element: <Guide />, handle: h({ crumb: "Guided tours" }) },
-        { path: "settings/appearance", element: <Appearance />, handle: h({ crumb: "Appearance" }) },
-        { path: "settings/language", element: <Language />, handle: h({ crumb: "Language & region" }) },
+        // issue 14: « My settings » — every page a member sets things in, around one list and one search
         {
-          path: "settings/notifications",
-          element: <NotificationSettings />,
-          handle: h({ crumb: "Notification preferences" }),
+          element: <SettingsLayout />,
+          children: [
+            { path: "settings", element: <SettingsHome />, handle: h({ crumb: "My settings" }) },
+            { path: "account", element: <Account />, handle: h({ crumb: "Account" }) },
+            { path: "settings/appearance", element: <Appearance />, handle: h({ crumb: "Appearance" }) },
+            {
+              path: "settings/language",
+              element: <Language />,
+              handle: h({ crumb: "Language & region" }),
+            },
+            {
+              path: "settings/notifications",
+              element: <NotificationSettings />,
+              handle: h({ crumb: "Notification preferences" }),
+            },
+            {
+              path: "settings/media-accounts",
+              element: <MediaAccounts />,
+              handle: h({ crumb: "Media accounts" }),
+            },
+            { path: "settings/play", element: <PlaySettings />, handle: h({ crumb: "Play" }) },
+            { path: "privacy", element: <Privacy />, handle: h({ crumb: "Privacy" }) },
+          ],
         },
-        {
-          path: "settings/media-accounts",
-          element: <MediaAccounts />,
-          handle: h({ crumb: "Media accounts" }),
-        },
-        { path: "privacy", element: <Privacy />, handle: h({ crumb: "Privacy" }) },
         {
           path: "services",
           handle: h({ crumb: "Services", requiredPermission: "services.read" }),
@@ -384,6 +402,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           handle: h({ crumb: "Administration" }),
           children: [
             { index: true, element: <ControlCenter /> },
+            { path: "setup", element: <SetupAssistant />, handle: h({ crumb: "Setup assistant" }) }, // issue 6
             {
               path: "statistics",
               element: <StatisticsAdmin />,
