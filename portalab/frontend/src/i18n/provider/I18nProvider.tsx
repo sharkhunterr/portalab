@@ -142,8 +142,10 @@ export function I18nProvider({
   }, [locale.language, locale.direction]);
   return (
     <LocaleCtx.Provider value={locale}>
+      {/* issue 232: the messages' plural and ordinal rules are their language's (« 2nd role », not « 2th »
+          with French formats); dates and numbers go through useFormat, in the formatting locale */}
       <IntlProvider
-        locale={locale.locale}
+        locale={locale.language}
         messages={messages}
         defaultLocale="en"
         timeZone={locale.time_zone}
