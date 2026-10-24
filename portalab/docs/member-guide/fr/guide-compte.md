@@ -35,10 +35,10 @@ Sur votre profil, « Personnaliser » ouvre « Personnaliser mon profil » : « 
 
 ### Ma présence dans la communauté
 
-Cette carte règle ce que les autres voient de vous dans les classements et l'activité récente :
+Cette carte règle ce que les autres membres voient de vous : les classements, l'activité récente et l'annuaire des membres. C'est le même choix que l'écran de bienvenue « Tu veux jouer ? ».
 
-- « Public » : votre nom et votre avatar accompagnent votre place dans les classements et votre activité.
-- « Anonyme » : vous restez compté dans les classements et l'activité, mais sans nom, sans avatar et sans lien vers votre profil.
+- « Public » : les membres du portail, et eux seuls, voient votre nom et votre avatar dans les classements, l'activité et l'annuaire.
+- « Anonyme » : les autres membres ne vous voient nulle part, ni dans l'annuaire, ni dans l'activité. Dans les classements, vous restez compté, sans nom, sans avatar et sans lien vers votre profil.
 
 « Réglages fins » ouvre le centre de confidentialité. Si « Un administrateur a fixé ce réglage. » s'affiche, vous ne pouvez pas le changer.
 

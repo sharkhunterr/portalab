@@ -52,11 +52,17 @@ function backend({
 }: Backend) {
   const puts: Array<Record<string, unknown>> = [];
   const posts: string[] = [];
+  const visibility: Array<[string, unknown]> = [];
   fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
     if (request.method === "PUT" && path === "/api/v1/me/preferences") {
       puts.push(await request.json());
       return json(200, { preferences: [] });
+    }
+    if (request.method === "PUT" && path.startsWith("/api/v1/me/privacy/visibility/")) {
+      const { level } = (await request.json()) as { level: string };
+      visibility.push([path.split("/").pop() ?? "", level]);
+      return json(200, { effective: true });
     }
     if (request.method === "POST") {
       posts.push(path);
@@ -74,7 +80,7 @@ function backend({
       });
     return json(404, {});
   };
-  return { puts, posts };
+  return { puts, posts, visibility };
 }
 
 const mission = (key: string, done = false) => ({
@@ -126,14 +132,49 @@ describe("welcome", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Let's go" }));
     await screen.findByRole("heading", { name: "A face and a name" });
     fireEvent.click(screen.getByRole("button", { name: "Next" })); // profile unchanged
-    await screen.findByRole("heading", { name: "Your look" });
-    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(await screen.findByRole("checkbox", { name: "Films" }));
-    fireEvent.click(screen.getByRole("checkbox", { name: "Games" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Retro video games" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(await screen.findByRole("heading", { name: "Do you want to play?" })).toBeInTheDocument();
+    await waitFor(() =>
+      expect(puts).toContainEqual({ "shell.onboarding.interests": ["movies", "retro_games"] }),
+    );
+    expect(posts).toContain("/api/v1/me/onboarding/interests/complete");
+  });
+
+  // issue 243: a player is public within the portal; one who does not play is anonymous to the other members
+  it.each([
+    ["Yes, without the cards", "progression", "community"],
+    ["No, I am here for the media", "none", "private"],
+  ])("« %s » keeps the choice and sets who sees the member", async (answer, play, level) => {
+    window.localStorage.clear();
+    const { puts, visibility } = backend({});
+    show(<WelcomeFlow />);
+    fireEvent.click(await screen.findByRole("button", { name: "Let's go" }));
+    await screen.findByRole("heading", { name: "A face and a name" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "What are you here for?" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(await screen.findByRole("radio", { name: new RegExp(answer) }));
+    expect(
+      screen.getByText(level === "private" ? /will be anonymous/ : /will be public/),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(await screen.findByRole("heading", { name: "Your look" })).toBeInTheDocument();
+    expect(visibility).toEqual(
+      expect.arrayContaining([
+        ["progression", level],
+        ["member_listing", level],
+        ["community_activity", level],
+      ]),
+    );
+    await waitFor(() => expect(puts).toContainEqual({ "shell.onboarding.play": play }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(await screen.findByRole("heading", { name: "All set, Alice!" })).toBeInTheDocument();
-    await waitFor(() => expect(puts).toContainEqual({ "shell.onboarding.interests": ["movies", "games"] }));
-    expect(posts).toContain("/api/v1/me/onboarding/interests/complete");
+    expect(screen.getByRole("link", { name: /Notifications and e-mails/ })).toHaveAttribute(
+      "href",
+      "/settings/notifications",
+    );
   });
 });
 
