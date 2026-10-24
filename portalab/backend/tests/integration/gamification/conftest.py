@@ -18,6 +18,7 @@ from portalab.capabilities.automation_actions import ActionRegistry
 from portalab.capabilities.dashboard import WidgetRegistry
 from portalab.capabilities.events import Envelope, EventType
 from portalab.capabilities.observability import ObservableRegistry
+from portalab.capabilities.search import SearchRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.time import FixedClock
@@ -41,6 +42,7 @@ class GamHarness:
     actions: ActionRegistry
     tools: AIToolRegistry
     widgets: WidgetRegistry
+    search: SearchRegistry = field(default_factory=SearchRegistry)
     people: dict[str, UUID] = field(default_factory=dict)
 
     @property
@@ -131,7 +133,7 @@ async def harness(database: Database, tmp_path: Path, clock: FixedClock) -> GamH
         )
     )
     ev.types.register(EventType("wiki.page_published", "test:wiki"))
-    actions, tools, widgets = ActionRegistry(), AIToolRegistry(), WidgetRegistry()
+    actions, tools, widgets, search = ActionRegistry(), AIToolRegistry(), WidgetRegistry(), SearchRegistry()
     module = GamificationModule(
         database,
         ev.publisher,
@@ -146,10 +148,11 @@ async def harness(database: Database, tmp_path: Path, clock: FixedClock) -> GamH
         observables=ObservableRegistry(),
         actions=actions,
         tools=tools,
+        search=search,
     )
     module.register()
     await module.levels.ensure_default()
-    return GamHarness(ev, module, clock, actions, tools, widgets)
+    return GamHarness(ev, module, clock, actions, tools, widgets, search)
 
 
 @pytest.fixture

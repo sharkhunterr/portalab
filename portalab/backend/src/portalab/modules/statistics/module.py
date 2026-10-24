@@ -30,6 +30,7 @@ from portalab.capabilities.observability import (
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.retention import RetentionTarget, default_retention_targets
+from portalab.capabilities.search import SearchRegistry, default_search
 from portalab.capabilities.statistics import PROVIDER, PackRegistry, default_packs
 from portalab.core.audit_port import AuditSink
 from portalab.core.authz_port import Authorizer, Principal
@@ -49,6 +50,7 @@ from portalab.modules.statistics.participant import StatisticsParticipant
 from portalab.modules.statistics.privacy.guard import PrivacyGuard
 from portalab.modules.statistics.projection.consumers import Projection, sync_consumers
 from portalab.modules.statistics.provider.provider import Provider
+from portalab.modules.statistics.search import StatisticsSearchProvider
 from portalab.modules.statistics.settings import SETTINGS, StatisticsConfig
 from portalab.modules.statistics.unlock.evaluator import UnlockEvaluator
 from portalab.modules.statistics.widgets import CARD, StatisticCard
@@ -76,6 +78,7 @@ class StatisticsModule:
         packs: PackRegistry = default_packs,
         widgets: WidgetRegistry = default_widgets,
         observables: ObservableRegistry = default_observables,
+        search: SearchRegistry = default_search,
     ) -> None:
         self.database = database
         self.events = events
@@ -90,6 +93,7 @@ class StatisticsModule:
         self.packs = packs
         self.widgets = widgets
         self.observables = observables
+        self.search = search
         self.definitions = DefinitionService(
             database, events, audit, event_types, lambda: self.config, head_seq=self.head_seq, clock=clock
         )
@@ -138,6 +142,9 @@ class StatisticsModule:
             self.capabilities.provide(PROVIDER, self.provider, instance_ref="statistics", owner=OWNER)
         if self.widgets.get(CARD.key) is None:
             self.widgets.register(CARD, StatisticCard(self.provider), owner=OWNER)
+        if self.search.provider("statistics") is None:  # #84: a statistic found by what it tells
+            provider = StatisticsSearchProvider(self.provider, self.authorizer, self.capabilities)
+            self.search.register(provider, owner=OWNER)
         participant = StatisticsParticipant(self.database)
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
             if not any(

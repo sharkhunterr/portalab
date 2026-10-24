@@ -8,7 +8,12 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
-from portalab.capabilities.content import CalendarItem, CalendarSourceRegistry
+from portalab.capabilities.content import (
+    CalendarItem,
+    CalendarSource,
+    CalendarSourceRegistry,
+    CalendarSourceResult,
+)
 from portalab.capabilities.i18n import LocaleContext
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.errors import ValidationFailed
@@ -50,6 +55,17 @@ class CalendarAggregator:
         except Exception:
             return False
 
+    @staticmethod
+    async def _items(
+        source: CalendarSource,
+        start: datetime,
+        end: datetime,
+        viewer: Principal,
+        ctx: LocaleContext,
+        budget: float,
+    ) -> CalendarSourceResult:
+        return await asyncio.wait_for(source.items(start, end, viewer, ctx), budget)
+
     async def view(
         self,
         viewer: Principal,
@@ -73,18 +89,21 @@ class CalendarAggregator:
                 continue
             if not await self._allowed(viewer, getattr(source, "required_permission", None)):
                 continue  # the viewer may not see this source at all: it is simply absent
-            tasks[source.kind] = asyncio.create_task(
-                asyncio.wait_for(source.items(start, end, viewer, ctx), timeout)
-            )
+            tasks[source.kind] = asyncio.create_task(self._items(source, start, end, viewer, ctx, timeout))
         items: list[CalendarItem] = []
-        for kind, task in tasks.items():
-            try:
-                result = await task
-            except Exception:
-                states[kind] = "unavailable"
-                continue
-            states[kind] = result.state
-            items.extend(i for i in result.items if not types or i.type in types)
+        try:
+            for kind, task in tasks.items():
+                try:
+                    result = await task
+                except Exception:
+                    states[kind] = "unavailable"
+                    continue
+                states[kind] = result.state
+                items.extend(i for i in result.items if not types or i.type in types)
+        except asyncio.CancelledError:  # #84: a search given up (time budget) leaves no source running
+            for task in tasks.values():
+                task.cancel()
+            raise
         items.sort(key=lambda item: (when(item, start), item.title))
         return CalendarView(items, states, utc_now(self.clock))
 

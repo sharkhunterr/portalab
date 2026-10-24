@@ -1,0 +1,113 @@
+{
+  "domain": "community",
+  "definitions": [
+    {
+      "key": "community.projects_proposed",
+      "title_key": "community:stat.projects_proposed.title",
+      "description_key": "community:stat.projects_proposed.description",
+      "domain": "community",
+      "scope": "community",
+      "event_types": [
+        "project.created"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "community.read",
+      "hideable": true
+    },
+    {
+      "key": "community.votes_cast",
+      "title_key": "community:stat.votes_cast.title",
+      "description_key": "community:stat.votes_cast.description",
+      "domain": "community",
+      "scope": "community",
+      "event_types": [
+        "project.vote_added"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "line"
+      },
+      "required_permission": "community.read",
+      "hideable": true
+    },
+    {
+      "key": "community.my_votes",
+      "title_key": "community:stat.my_votes.title",
+      "description_key": "community:stat.my_votes.description",
+      "domain": "community",
+      "scope": "personal",
+      "event_types": [
+        "project.vote_added"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "community.read",
+      "hideable": true
+    },
+    {
+      "key": "community.participations",
+      "title_key": "community:stat.participations.title",
+      "description_key": "community:stat.participations.description",
+      "domain": "community",
+      "scope": "community",
+      "event_types": [
+        "project.participation_added"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "community.read",
+      "hideable": true
+    },
+    {
+      "key": "community.help_recognized",
+      "title_key": "community:stat.help_recognized.title",
+      "description_key": "community:stat.help_recognized.description",
+      "domain": "community",
+      "scope": "community",
+      "event_types": [
+        "community.contribution_recognized"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "community.read",
+      "hideable": true
+    },
+    {
+      "key": "community.my_help_recognized",
+      "title_key": "community:stat.my_help_recognized.title",
+      "description_key": "community:stat.my_help_recognized.description",
+      "domain": "community",
+      "scope": "personal",
+      "event_types": [
+        "community.contribution_recognized"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "community.read",
+      "hideable": true
+    }
+  ]
+}

@@ -114,7 +114,7 @@ async def ct(database: Database, tmp_path: Path, clock: FixedClock) -> ContentHa
     news.register()
     calendar = CalendarModule(
         database, ev.publisher, caps, engine, clock=clock, sources=sources, event_types=ev.types,
-        widgets=widgets, categories=categories, observables=ObservableRegistry(),
+        widgets=widgets, categories=categories, observables=ObservableRegistry(), search=search,
     )  # fmt: skip
     calendar.register()
     return ContentHarness(ev, content, wiki, news, calendar, resolvers, sources, search, actions, outbox)

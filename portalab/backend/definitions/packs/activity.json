@@ -1,0 +1,92 @@
+{
+  "domain": "activity",
+  "definitions": [
+    {
+      "key": "activity.visits",
+      "title_key": "statistics:stat.activity_visits.title",
+      "description_key": "statistics:stat.activity_visits.description",
+      "domain": "activity",
+      "scope": "community",
+      "event_types": [
+        "user.visited"
+      ],
+      "measure": {
+        "kind": "distinct_count",
+        "field": "actor"
+      },
+      "viz": {
+        "type": "line"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true
+    },
+    {
+      "key": "activity.my_visits",
+      "title_key": "statistics:stat.activity_my_visits.title",
+      "description_key": "statistics:stat.activity_my_visits.description",
+      "domain": "activity",
+      "scope": "personal",
+      "event_types": [
+        "user.visited"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true
+    },
+    {
+      "key": "activity.member_actions",
+      "title_key": "statistics:stat.activity_member_actions.title",
+      "description_key": "statistics:stat.activity_member_actions.description",
+      "domain": "activity",
+      "scope": "community",
+      "event_types": [
+        "media.playback_finished",
+        "project.created",
+        "project.vote_added",
+        "project.participation_added",
+        "quest.completed",
+        "achievement.unlocked",
+        "marketplace.purchase",
+        "ticket.created"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "line"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true
+    },
+    {
+      "key": "activity.my_actions",
+      "title_key": "statistics:stat.activity_my_actions.title",
+      "description_key": "statistics:stat.activity_my_actions.description",
+      "domain": "activity",
+      "scope": "personal",
+      "event_types": [
+        "media.playback_finished",
+        "project.created",
+        "project.vote_added",
+        "project.participation_added",
+        "quest.completed",
+        "achievement.unlocked",
+        "marketplace.purchase",
+        "ticket.created"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true
+    }
+  ]
+}
