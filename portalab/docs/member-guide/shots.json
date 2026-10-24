@@ -1,0 +1,235 @@
+[
+  {
+    "name": "cartes-mes-cartes",
+    "page": "guide-cartes",
+    "route": "/cards",
+    "height": 900,
+    "maxHeight": 640,
+    "marks": [
+      {
+        "target": ".cards-search",
+        "pad": 3
+      },
+      {
+        "target": ".cards-stats",
+        "pad": 3
+      },
+      {
+        "target": ".cards-views",
+        "pad": 3
+      },
+      {
+        "target": ".cards-filters label",
+        "pad": 3
+      },
+      {
+        "target": ".cards-sets li[data-started]",
+        "label": "Une extension : son code et votre avancée",
+        "side": "right",
+        "gap": 60
+      }
+    ],
+    "before": [
+      {
+        "css": ".cards-trial{display:none!important}",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "cartes-anatomie",
+    "page": "guide-cartes",
+    "route": "/cards",
+    "height": 1200,
+    "before": [
+      {
+        "click": ".cards-sets li[data-started] a",
+        "waitFor": ".cards-binder"
+      },
+      {
+        "click": ".cards-binder__slot:has(.mcard[data-kind='cast']:not([data-missing]))",
+        "waitFor": ".cards-sheet"
+      },
+      {
+        "css": ".cards-sheet{grid-template-columns:27rem!important;justify-content:center}.cards-sheet figure:not(:first-of-type),.cards-sheet figcaption,.cards-sheet~*{display:none!important}",
+        "wait": 2500
+      }
+    ],
+    "clip": ".cards-sheet figure:first-of-type .mcard",
+    "margin": [
+      24,
+      330,
+      24,
+      330
+    ],
+    "marks": [
+      {
+        "target": ".cards-sheet figure:first-of-type .mcard__name",
+        "label": "Son nom",
+        "side": "left",
+        "pad": 3
+      },
+      {
+        "target": ".cards-sheet figure:first-of-type .mcard__genre",
+        "label": "Le genre du titre, qui donne sa couleur",
+        "side": "right",
+        "pad": 3
+      },
+      {
+        "target": ".cards-sheet figure:first-of-type .mcard__art",
+        "label": "L'illustration : le personnage sur une scène du titre",
+        "side": "left",
+        "pad": 2
+      },
+      {
+        "target": ".cards-sheet figure:first-of-type .mcard__strip",
+        "label": "Ce qu'est la carte, et le symbole de son édition",
+        "side": "right",
+        "pad": 2
+      },
+      {
+        "target": ".cards-sheet figure:first-of-type .mcard__lower",
+        "label": "Le titre : son affiche, qui joue le rôle, ses chiffres",
+        "side": "left",
+        "pad": 2
+      },
+      {
+        "target": ".cards-sheet figure:first-of-type .mcard__foot",
+        "label": "Son numéro et sa rareté",
+        "side": "right",
+        "pad": 2
+      }
+    ]
+  },
+  {
+    "name": "cartes-classeur",
+    "page": "guide-cartes",
+    "route": "/cards",
+    "height": 900,
+    "maxHeight": 660,
+    "before": [
+      {
+        "click": ".cards-sets li[data-started] a",
+        "waitFor": ".cards-binder",
+        "wait": 3000
+      }
+    ],
+    "marks": [
+      {
+        "target": "main h1"
+      },
+      {
+        "target": ".cards-binder li:has(.mcard:not([data-missing]))",
+        "label": "À vous : en couleur",
+        "side": "bottom",
+        "gap": 30
+      },
+      {
+        "target": ".cards-binder li:has(.mcard[data-missing])",
+        "pick": "last",
+        "label": "Pas encore à vous : grisée",
+        "side": "bottom",
+        "gap": 30
+      }
+    ]
+  },
+  {
+    "name": "cartes-versions",
+    "page": "guide-cartes",
+    "route": "/cards",
+    "height": 1200,
+    "before": [
+      {
+        "click": ".cards-sets li[data-started] a",
+        "waitFor": ".cards-binder"
+      },
+      {
+        "click": ".cards-binder__slot:has(.mcard:not([data-missing]))",
+        "waitFor": ".cards-sheet",
+        "wait": 2500
+      }
+    ],
+    "clip": "[role='dialog']",
+    "marks": [
+      {
+        "target": ".cards-sheet figure[data-owned]",
+        "label": "Une version que vous avez, et combien",
+        "side": "bottom",
+        "gap": 24
+      },
+      {
+        "target": ".cards-sheet figure:not([data-owned])",
+        "label": "Une version à trouver",
+        "side": "bottom",
+        "gap": 24
+      }
+    ]
+  },
+  {
+    "name": "cartes-fiche-titre",
+    "page": "guide-cartes",
+    "route": "/cards",
+    "height": 1000,
+    "before": [
+      {
+        "follow": ".cards-sets li[data-started] a",
+        "rewrite": [
+          [
+            "/cards/sets/",
+            "/media/"
+          ]
+        ]
+      },
+      {
+        "waitFor": ".cards-work",
+        "scroll": ".cards-work",
+        "wait": 3000
+      }
+    ],
+    "clip": ".cards-work",
+    "margin": [
+      6,
+      24,
+      24,
+      24
+    ],
+    "marks": [
+      {
+        "target": ".cards-hand > ul",
+        "pad": 2
+      },
+      {
+        "target": ".cards-hand__turn"
+      },
+      {
+        "target": ".cards-work__progress"
+      },
+      {
+        "target": ".cards-work__rarities"
+      },
+      {
+        "target": ".cards-work__copies"
+      },
+      {
+        "target": ".cards-work__facts a"
+      }
+    ]
+  },
+  {
+    "name": "cartes-boutique",
+    "page": "guide-cartes",
+    "route": "/marketplace?type=card_booster",
+    "height": 1000,
+    "settle": 6000,
+    "clip": "main",
+    "marks": [
+      {
+        "target": ".product-card",
+        "label": "Un booster de cartes : son genre, son nombre de cartes (×3), son prix",
+        "side": "top",
+        "shift": 220,
+        "gap": 50
+      }
+    ]
+  }
+]

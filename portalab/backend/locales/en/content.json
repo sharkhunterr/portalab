@@ -31,6 +31,7 @@
   "editor.uploadFailed": "The image could not be uploaded.",
   "editor.words": "{count, plural, one {# word} other {# words}}",
   "editor.write": "Write",
+  "image.open": "Open the image full size: {alt}",
   "link.archived": "archived",
   "link.deleted": "deleted",
   "link.forbidden": "not available",

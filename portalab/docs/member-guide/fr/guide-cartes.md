@@ -22,12 +22,16 @@ Chaque extension a un code de trois lettres (les initiales de son titre) et chaq
 
 ## Lire une carte
 
-- **En haut** : son nom. **Au centre** : son illustration (le personnage détouré sur une scène du titre, le titre ou la personne).
-- **Le bandeau** sous l'image dit ce qu'est la carte (« Personnage », « Film », « Réalisateur »…) et porte le symbole de son édition.
-- **En dessous** : l'affiche du titre, qui joue le rôle, le titre et son année, et ses chiffres comme les attaques d'une carte : « Note du public », « Votes », « Box-office » ou « Saisons ».
-- **En bas** : son numéro et sa rareté.
-- **Sa couleur** est celle du genre du titre : « SF », « Action », « Fantastique », « Familial », « Drame » ou « Sombre ».
-- **Son contour** est le métal de sa rareté.
+![Une carte de personnage et ses six parties, numérotées](shot:cartes-anatomie)
+
+1. **Son nom**, en haut.
+2. **Le genre du titre**, qui donne aussi la couleur de la carte : « SF », « Action », « Fantastique », « Familial », « Drame » ou « Sombre ».
+3. **L'illustration** : le personnage détouré sur une scène du titre (ou le titre, ou la personne).
+4. **Le bandeau** : ce qu'est la carte (« Personnage », « Film », « Réalisateur »…) et, à droite, le symbole de son édition.
+5. **Le titre** : son affiche, qui joue le rôle, son année, et ses chiffres comme les attaques d'une carte : « Note du public », « Votes », « Box-office » ou « Saisons ».
+6. **Son numéro** dans l'extension et **sa rareté**.
+
+Le contour de la carte est le métal de sa rareté.
 
 > [!NOTE]
 > Dans [Apparence](/settings/appearance), « Montrer le portrait de l'acteur en pastille à côté de son personnage » ajoute la photo de l'acteur dans un petit rond sur les cartes des personnages.
@@ -48,6 +52,8 @@ Un même exemplaire peut sortir dans une version spéciale :
 - **Édition …** : la carte dans le cadre de l'époque de son titre, d'autant plus fréquente que la carte est rare.
 - **Sans bord foil** et **Édition … foil** : les plus recherchées.
 
+![Les versions d'une carte : celles que vous avez en couleur, les autres grisées](shot:cartes-versions)
+
 L'édition dépend de l'année de sortie du titre :
 
 | Édition | Titres sortis |
@@ -64,6 +70,8 @@ Les cartes viennent dans des **boosters** : des paquets scellés dont les cartes
 - **En regardant** : selon les règles de votre portail, un film vu jusqu'au bout ou une saison terminée vous donne un booster de ce titre. Il ne contient que des cartes de ce titre (trois cartes, jamais deux fois la même tant qu'il en reste d'autres). Un film, ou une saison d'une série, ne vous en donne qu'une fois, et le nombre de boosters reçus par jour est limité.
 - **Dans la boutique** : le rayon « Boosters » propose des « Boosters de cartes » d'un genre, d'une édition, de films ou de séries (de 3 à 10 cartes). Une fois acheté, le booster scellé vous attend. Il n'est pas remboursable. Voir [La boutique](portalab://wiki/guide-boutique).
 
+![Les boosters de cartes dans le rayon « Boosters » de la boutique](shot:cartes-boutique)
+
 Vos boosters à ouvrir sont en haut de [Mes cartes](/cards) (« … paquets à ouvrir ») et dans [Ma réserve](/marketplace/reserve).
 
 ## Ouvrir un booster
@@ -79,24 +87,34 @@ Vos boosters à ouvrir sont en haut de [Mes cartes](/cards) (« … paquets à o
 
 [Mes cartes](/cards), dans la section Communauté du menu, réunit votre collection.
 
-- **Vos chiffres** : les cartes différentes que vous avez sur toutes celles du portail, les extensions commencées et vos exemplaires.
-- **La recherche** « Chercher un film, une série, un acteur, un personnage… » trouve des extensions, des cartes et des personnes.
-- **« Extensions »** : une vignette par film ou série, avec son code et votre avancée. « Commencées seulement » ne garde que celles où vous avez au moins une carte.
-- **« Toutes les cartes »** : toutes les cartes du portail, à filtrer par type, rareté et pays, ou avec « Mes cartes seulement ».
+![La page Mes cartes, ses cinq repères numérotés](shot:cartes-mes-cartes)
+
+1. **La recherche** « Chercher un film, une série, un acteur, un personnage… » trouve des extensions, des cartes et des personnes.
+2. **Vos chiffres** : les cartes différentes que vous avez sur toutes celles du portail, les extensions commencées et vos exemplaires.
+3. **Les deux vues** : « Extensions » range les cartes par film et par série ; « Toutes les cartes » les montre toutes, à filtrer par type, rareté et pays, ou avec « Mes cartes seulement ».
+4. **« Commencées seulement »** ne garde que les extensions où vous avez au moins une carte.
+5. **Une extension** : l'affiche du titre, son code et votre avancée. Touchez-la pour ouvrir son classeur.
 
 ## Le classeur d'une extension
 
 Touchez une extension pour ouvrir son classeur : les cartes que vous avez sont en couleur, les autres grisées. Un « ×2 », « ×3 »… indique vos exemplaires.
 
+![Le classeur d'une extension : son titre et son avancée (1), une carte à vous (2), une carte à trouver (3)](shot:cartes-classeur)
+
 Touchez une carte pour la voir en grand avec **toutes ses versions**, celles que vous avez en couleur et leur nombre. Pour une personne, « Toutes les cartes de … » montre ses cartes de tous les titres où elle apparaît.
 
 ## La collection sur la fiche d'un titre
 
-Sur la fiche d'un film ou d'une série, la section « Collection de cartes » présente ses cartes en éventail :
+Sur la fiche d'un film ou d'une série, la section « Collection de cartes » présente ses cartes en éventail.
 
-- l'éventail tourne seul ; faites-le glisser du doigt, ou utilisez les flèches. Touchez la carte de devant pour l'ouvrir ;
-- à côté : votre pourcentage, vos cartes par rareté, vos exemplaires, doublons et brillantes ;
-- « Voir toute la collection » ouvre le classeur de l'extension.
+![La collection de cartes sur la fiche d'un titre, ses six repères numérotés](shot:cartes-fiche-titre)
+
+1. **L'éventail** tourne seul. Faites-le glisser du doigt ; touchez la carte de devant pour l'ouvrir.
+2. **Les flèches** passent à la carte précédente ou suivante.
+3. **Votre avancée** : le pourcentage de l'extension que vous avez.
+4. **Par rareté** : vos cartes de chaque rareté, sur toutes celles de l'extension.
+5. **Vos exemplaires**, vos doublons et vos cartes brillantes.
+6. **« Voir toute la collection »** ouvre le classeur de l'extension.
 
 ## Les succès des cartes
 
