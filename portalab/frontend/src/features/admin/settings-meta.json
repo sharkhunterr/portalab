@@ -1,0 +1,1442 @@
+{
+  "admin.configHistoryRetentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "admin.firstRunLocked": {
+    "advanced": true,
+    "group": "general"
+  },
+  "admin.overviewPanelTimeoutMs": {
+    "advanced": true,
+    "group": "general"
+  },
+  "ai.autoNavigate": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.dailyTokenBudgetPerUser": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.embeddings.dimension": {
+    "advanced": true,
+    "group": "ai"
+  },
+  "ai.embeddings.model": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.enabled": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.maxContextTokens": {
+    "advanced": true,
+    "group": "ai"
+  },
+  "ai.maxToolCallsPerTurn": {
+    "advanced": true,
+    "group": "ai"
+  },
+  "ai.mcp.servers": {
+    "advanced": true,
+    "group": "ai"
+  },
+  "ai.mcp.tokens": {
+    "advanced": true,
+    "group": "ai"
+  },
+  "ai.pendingActionTtlMinutes": {
+    "advanced": true,
+    "group": "ai"
+  },
+  "ai.perks.maxDailyTokensPerUser": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.perks.maxRechargeTokens": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.perks.offered": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.perks.premiumContextTokens": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.perks.premiumModel": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.perks.premiumReasoning": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.perks.premiumToolCalls": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.perks.premiumTools": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.persona.fallback": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.persona.ideas": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.persona.name": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.persona.role": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.provider.apiKey": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.provider.endpoint": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.provider.kind": {
+    "advanced": true,
+    "group": "ai"
+  },
+  "ai.provider.model": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.provider.reasoning": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.rateLimitPerMinute": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "ai.requestTimeoutSeconds": {
+    "advanced": true,
+    "group": "ai"
+  },
+  "ai.retentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "ai.tools.disabled": {
+    "advanced": false,
+    "group": "ai"
+  },
+  "authz.auditContextMaxBytes": {
+    "advanced": true,
+    "group": "security"
+  },
+  "authz.confirmationTtlSeconds": {
+    "advanced": true,
+    "group": "security"
+  },
+  "automations.actionTimeoutSeconds": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "automations.allowUserAuthoring": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "automations.approvalTtlHours": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "automations.defaultRatePerMinute": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "automations.enabled": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "automations.executionRetentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "automations.executionTimeoutSeconds": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "automations.globalConcurrency": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "automations.maxChainDepth": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "automations.maxSteps": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "automations.minScheduleIntervalMinutes": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "automations.suspendAfterFailures": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "automations.suspendFailureRate": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "calendar.maxRangeDays": {
+    "advanced": true,
+    "group": "media"
+  },
+  "calendar.reminderLeadOptions": {
+    "advanced": false,
+    "group": "media"
+  },
+  "calendar.sourceTimeoutMs": {
+    "advanced": true,
+    "group": "media"
+  },
+  "campaigns.defaultTimezone": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "campaigns.endingSoonHours": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "campaigns.maxActiveCampaigns": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "campaigns.reconcileSeconds": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "cards.cutouts": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "cards.faceCheck": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "cards.videoFrames": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "cards.webSearch": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "community.discovery.shelfSize": {
+    "advanced": false,
+    "group": "members"
+  },
+  "community.feed.eventTypes": {
+    "advanced": false,
+    "group": "members"
+  },
+  "community.feed.retentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "community.members.listingDefault": {
+    "advanced": false,
+    "group": "members"
+  },
+  "community.proposals.allowedRoles": {
+    "advanced": false,
+    "group": "members"
+  },
+  "community.proposals.moderation": {
+    "advanced": false,
+    "group": "members"
+  },
+  "community.recognition.maxPerDay": {
+    "advanced": false,
+    "group": "members"
+  },
+  "community.recognition.pairCooldownDays": {
+    "advanced": false,
+    "group": "members"
+  },
+  "connectors.circuit.failureThreshold": {
+    "advanced": true,
+    "group": "services"
+  },
+  "connectors.circuit.openSeconds": {
+    "advanced": true,
+    "group": "services"
+  },
+  "connectors.defaultSyncIntervalSeconds": {
+    "advanced": true,
+    "group": "services"
+  },
+  "connectors.http.maxResponseBytes": {
+    "advanced": true,
+    "group": "services"
+  },
+  "connectors.http.retries": {
+    "advanced": true,
+    "group": "services"
+  },
+  "connectors.http.timeoutSeconds": {
+    "advanced": true,
+    "group": "services"
+  },
+  "connectors.resync.confirmDeleteRatio": {
+    "advanced": true,
+    "group": "services"
+  },
+  "content.allowExternalImages": {
+    "advanced": false,
+    "group": "media"
+  },
+  "content.mermaid.enabled": {
+    "advanced": false,
+    "group": "media"
+  },
+  "dashboard.sinceLastLogin.inactivityGapMinutes": {
+    "advanced": true,
+    "group": "general"
+  },
+  "dashboard.sinceLastLogin.lookbackDays": {
+    "advanced": false,
+    "group": "general"
+  },
+  "dashboard.sinceLastLogin.maxItems": {
+    "advanced": false,
+    "group": "general"
+  },
+  "dashboard.sinceLastLogin.types": {
+    "advanced": false,
+    "group": "general"
+  },
+  "dashboard.starterLayout": {
+    "advanced": true,
+    "group": "general"
+  },
+  "dashboard.widgetPolicies": {
+    "advanced": true,
+    "group": "general"
+  },
+  "dashboard.widgetTimeoutMs": {
+    "advanced": true,
+    "group": "general"
+  },
+  "economy.anomaly.escalateToIncident": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "economy.anomaly.maxCoinsPerDay": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "economy.anomaly.maxGrantsPerHour": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "economy.contribution.amount": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "economy.leaderboards.includeCoins": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "economy.leaderboards.metrics": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "economy.leaderboards.refreshMinutes": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "economy.levelCurve.active": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "economy.levelRewards": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "economy.manualGrantConfirmThreshold": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "economy.maxTotalBoost": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "economy.pace": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "economy.streak": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "economy.timezone": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "economy.wheel": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "economy.withheldRetentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "events.deadLetterAlertThreshold": {
+    "advanced": true,
+    "group": "services"
+  },
+  "events.dedupKeyRetention": {
+    "advanced": true,
+    "group": "services"
+  },
+  "events.dispatchBatchSize": {
+    "advanced": true,
+    "group": "services"
+  },
+  "events.maxDeliveryAttempts": {
+    "advanced": true,
+    "group": "services"
+  },
+  "events.retention.business.months": {
+    "advanced": true,
+    "group": "security"
+  },
+  "events.retention.technical.days": {
+    "advanced": true,
+    "group": "security"
+  },
+  "events.retryBackoff": {
+    "advanced": true,
+    "group": "services"
+  },
+  "health.alertRules": {
+    "advanced": false,
+    "group": "services"
+  },
+  "health.degradedLatencyMs": {
+    "advanced": true,
+    "group": "services"
+  },
+  "health.infraRetentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "health.probeIntervalSeconds": {
+    "advanced": true,
+    "group": "services"
+  },
+  "health.rollupRetentionMonths": {
+    "advanced": true,
+    "group": "security"
+  },
+  "health.sampleRetentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "health.staleAfterSeconds": {
+    "advanced": true,
+    "group": "services"
+  },
+  "health.unavailableAfterFailures": {
+    "advanced": true,
+    "group": "services"
+  },
+  "i18n.ambiguousTimePolicy": {
+    "advanced": true,
+    "group": "general"
+  },
+  "i18n.defaultLanguage": {
+    "advanced": false,
+    "group": "general"
+  },
+  "i18n.defaultLocale": {
+    "advanced": false,
+    "group": "general"
+  },
+  "i18n.defaultTimeZone": {
+    "advanced": false,
+    "group": "general"
+  },
+  "i18n.enabledLanguages": {
+    "advanced": false,
+    "group": "general"
+  },
+  "i18n.fallbackChain": {
+    "advanced": true,
+    "group": "general"
+  },
+  "i18n.firstDayOfWeek": {
+    "advanced": false,
+    "group": "general"
+  },
+  "i18n.hourCycle": {
+    "advanced": false,
+    "group": "general"
+  },
+  "i18n.language": {
+    "advanced": false,
+    "group": "general"
+  },
+  "i18n.locale": {
+    "advanced": false,
+    "group": "general"
+  },
+  "i18n.schedulingDefault": {
+    "advanced": true,
+    "group": "general"
+  },
+  "i18n.timeZone": {
+    "advanced": false,
+    "group": "general"
+  },
+  "i18n.unknownLanguagePolicy": {
+    "advanced": false,
+    "group": "general"
+  },
+  "identity.argon2Params": {
+    "advanced": true,
+    "group": "security"
+  },
+  "identity.deletionGraceDays": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.dormancyDays": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.exportTtlHours": {
+    "advanced": true,
+    "group": "security"
+  },
+  "identity.oidc.clientId": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.oidc.clientSecret": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.oidc.createAccounts": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.oidc.enabled": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.oidc.issuer": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.oidc.label": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.onboarding.enabled": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.onboarding.welcomeMessage": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.passwordPolicy": {
+    "advanced": false,
+    "group": "security"
+  },
+  "identity.registrationMode": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.sessionAbsoluteHours": {
+    "advanced": false,
+    "group": "security"
+  },
+  "identity.sessionIdleMinutes": {
+    "advanced": false,
+    "group": "security"
+  },
+  "identity.verificationTtlHours": {
+    "advanced": true,
+    "group": "security"
+  },
+  "marketplace.access.allowedPermissions": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "marketplace.activationRetryMinutes": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "marketplace.funding.defaultRules": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "marketplace.funding.maxPerUser": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "marketplace.funding.minAmount": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "marketplace.quota.kinds": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "marketplace.refundDefaults": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "media.discovery.newDays": {
+    "advanced": false,
+    "group": "media"
+  },
+  "media.discovery.shelfSize": {
+    "advanced": false,
+    "group": "media"
+  },
+  "media.fieldPriority.album.genres": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.album.image": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.album.overview": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.album.title": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.album.year": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.audiobook.genres": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.audiobook.image": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.audiobook.overview": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.audiobook.title": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.audiobook.year": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.book.genres": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.book.image": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.book.overview": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.book.title": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.book.year": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.episode.genres": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.episode.image": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.episode.overview": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.episode.title": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.episode.year": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.game.genres": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.game.image": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.game.overview": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.game.title": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.game.year": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.movie.genres": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.movie.image": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.movie.overview": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.movie.title": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.movie.year": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.season.genres": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.season.image": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.season.overview": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.season.title": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.season.year": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.series.genres": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.series.image": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.series.overview": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.series.title": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.series.year": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.track.genres": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.track.image": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.track.overview": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.track.title": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.fieldPriority.track.year": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.finishedThreshold.audiobook": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.finishedThreshold.book": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.finishedThreshold.episode": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.finishedThreshold.movie": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.finishedThreshold.track": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.listening.enabled": {
+    "advanced": false,
+    "group": "media"
+  },
+  "media.match.autoThreshold": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.playback.pollActiveSeconds": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.playback.pollIdleSeconds": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.playback.progressEventSeconds": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.playback.staleTimeoutSeconds": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.player.castBaseUrl": {
+    "advanced": true,
+    "group": "media"
+  },
+  "media.player.enabled": {
+    "advanced": false,
+    "group": "media"
+  },
+  "media.player.maxQuality": {
+    "advanced": false,
+    "group": "media"
+  },
+  "media.player.ownerFallback": {
+    "advanced": false,
+    "group": "media"
+  },
+  "media.radio.freeRequestsPerDay": {
+    "advanced": false,
+    "group": "media"
+  },
+  "media.reading.enabled": {
+    "advanced": false,
+    "group": "media"
+  },
+  "media.requests.period": {
+    "advanced": false,
+    "group": "media"
+  },
+  "media.requests.quotaPerPeriod": {
+    "advanced": false,
+    "group": "media"
+  },
+  "news.defaultAudience": {
+    "advanced": false,
+    "group": "media"
+  },
+  "news.maxFeatured": {
+    "advanced": false,
+    "group": "media"
+  },
+  "news.newsletter.optOut": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.categoryPolicy": {
+    "advanced": true,
+    "group": "communication"
+  },
+  "notifications.coalesceWindowSeconds": {
+    "advanced": true,
+    "group": "communication"
+  },
+  "notifications.digest.defaultMode": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.email.digest": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.email.enabled": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.email.from": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.email.maxAttempts": {
+    "advanced": true,
+    "group": "communication"
+  },
+  "notifications.email.portalUrl": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.email.smtp.host": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.email.smtp.password": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.email.smtp.port": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.email.smtp.tls": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.email.smtp.username": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.preferences": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "notifications.retentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "observability.detectors.errorSpike.factor": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.detectors.errorSpike.minCount": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.detectors.latencySpike.factor": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.detectors.longSync.factor": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.detectors.repeatedAutomation.threshold": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.detectors.repeatedFailure.count": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.detectors.stuckConsumer.minutes": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.errorRetentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "observability.escalation.autoSeverity": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.escalation.requireValidation": {
+    "advanced": false,
+    "group": "services"
+  },
+  "observability.logMaxLines": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.logRetentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "observability.metricsEndpointEnabled": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.metricsToken": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.rollupRetentionMonths": {
+    "advanced": true,
+    "group": "security"
+  },
+  "observability.sampleRetentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "observability.thresholds.ai.failureRate": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.thresholds.db.latencyMs": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.thresholds.events.lagDegraded": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.thresholds.events.lagFailing": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.thresholds.jobs.failedDegraded": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.thresholds.jobs.queuedAgeMinutes": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.thresholds.performance.slowMs": {
+    "advanced": true,
+    "group": "services"
+  },
+  "observability.thresholds.sync.staleHours": {
+    "advanced": true,
+    "group": "services"
+  },
+  "plugins.allowWeakConfinement": {
+    "advanced": true,
+    "group": "services"
+  },
+  "plugins.concurrentCalls": {
+    "advanced": true,
+    "group": "services"
+  },
+  "plugins.contributionPriority": {
+    "advanced": true,
+    "group": "services"
+  },
+  "plugins.directory": {
+    "advanced": true,
+    "group": "services"
+  },
+  "plugins.enabled": {
+    "advanced": false,
+    "group": "services"
+  },
+  "plugins.errorThreshold": {
+    "advanced": true,
+    "group": "services"
+  },
+  "plugins.hookTimeoutSeconds": {
+    "advanced": true,
+    "group": "services"
+  },
+  "plugins.jobTimeoutSeconds": {
+    "advanced": true,
+    "group": "services"
+  },
+  "plugins.memoryMb": {
+    "advanced": true,
+    "group": "services"
+  },
+  "plugins.requireReview": {
+    "advanced": false,
+    "group": "services"
+  },
+  "plugins.statementTimeoutMs": {
+    "advanced": true,
+    "group": "services"
+  },
+  "plugins.storageQuotaMb": {
+    "advanced": true,
+    "group": "services"
+  },
+  "plugins.unconfined": {
+    "advanced": false,
+    "group": "services"
+  },
+  "plugins.updateProbationMinutes": {
+    "advanced": true,
+    "group": "services"
+  },
+  "privacy.exportTtlDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "privacy.minAggregateSize": {
+    "advanced": true,
+    "group": "security"
+  },
+  "privacy.retention.activity.days": {
+    "advanced": true,
+    "group": "security"
+  },
+  "privacy.retention.aggregate.days": {
+    "advanced": true,
+    "group": "security"
+  },
+  "privacy.retention.audit.days": {
+    "advanced": true,
+    "group": "security"
+  },
+  "privacy.retention.auditMonths": {
+    "advanced": true,
+    "group": "security"
+  },
+  "privacy.retention.history.days": {
+    "advanced": true,
+    "group": "security"
+  },
+  "privacy.retention.personal.days": {
+    "advanced": true,
+    "group": "security"
+  },
+  "privacy.retention.technical.days": {
+    "advanced": true,
+    "group": "security"
+  },
+  "search.historyEnabled": {
+    "advanced": false,
+    "group": "general"
+  },
+  "search.historyMaxEntries": {
+    "advanced": true,
+    "group": "general"
+  },
+  "search.historyRetentionDays": {
+    "advanced": true,
+    "group": "security"
+  },
+  "search.maxQueryLength": {
+    "advanced": true,
+    "group": "general"
+  },
+  "search.maxResultsPerGroup": {
+    "advanced": false,
+    "group": "general"
+  },
+  "search.providerTimeoutMs": {
+    "advanced": true,
+    "group": "general"
+  },
+  "search.rateLimitPerMinute": {
+    "advanced": true,
+    "group": "security"
+  },
+  "search.semantic.embeddingProvider": {
+    "advanced": false,
+    "group": "general"
+  },
+  "search.semantic.enabled": {
+    "advanced": false,
+    "group": "general"
+  },
+  "search.semantic.topK": {
+    "advanced": true,
+    "group": "general"
+  },
+  "security.egress.enabled": {
+    "advanced": false,
+    "group": "security"
+  },
+  "security.egress.hosts": {
+    "advanced": false,
+    "group": "security"
+  },
+  "security.guard.addressLimit": {
+    "advanced": true,
+    "group": "security"
+  },
+  "security.guard.blockSeconds": {
+    "advanced": true,
+    "group": "security"
+  },
+  "security.guard.sessionLimit": {
+    "advanced": true,
+    "group": "security"
+  },
+  "security.guard.windowSeconds": {
+    "advanced": true,
+    "group": "security"
+  },
+  "security.maxBodyBytes": {
+    "advanced": true,
+    "group": "security"
+  },
+  "security.rateLimit.perIpPerMinute": {
+    "advanced": true,
+    "group": "security"
+  },
+  "security.rateLimit.perUserPerMinute": {
+    "advanced": true,
+    "group": "security"
+  },
+  "shell.navigation.allowUserOrdering": {
+    "advanced": false,
+    "group": "general"
+  },
+  "shell.navigation.expanded": {
+    "advanced": true,
+    "group": "general"
+  },
+  "shell.navigation.layout": {
+    "advanced": false,
+    "group": "general"
+  },
+  "shell.navigation.userOrder": {
+    "advanced": true,
+    "group": "general"
+  },
+  "shell.onboarding.interests": {
+    "advanced": false,
+    "group": "members"
+  },
+  "shell.onboarding.play": {
+    "advanced": false,
+    "group": "members"
+  },
+  "shell.onboarding.stepsHiddenAt": {
+    "advanced": true,
+    "group": "members"
+  },
+  "shell.onboarding.toursSeen": {
+    "advanced": true,
+    "group": "members"
+  },
+  "shell.onboarding.welcomedAt": {
+    "advanced": true,
+    "group": "members"
+  },
+  "shell.shortcuts": {
+    "advanced": false,
+    "group": "general"
+  },
+  "shell.shortcuts.defaults": {
+    "advanced": true,
+    "group": "general"
+  },
+  "shell.sidebarCollapsed": {
+    "advanced": false,
+    "group": "general"
+  },
+  "shell.welcome.dismissedAt": {
+    "advanced": true,
+    "group": "general"
+  },
+  "statistics.bucketRetentionMonths": {
+    "advanced": true,
+    "group": "security"
+  },
+  "statistics.defaultMinCohortSize": {
+    "advanced": true,
+    "group": "security"
+  },
+  "statistics.firstDayOfWeek": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "statistics.hiddenSections": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "statistics.maxBucketsPerRequest": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "statistics.staleAfterSeconds": {
+    "advanced": true,
+    "group": "engagement"
+  },
+  "statistics.timezone": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "statistics.wrapped.enabled": {
+    "advanced": false,
+    "group": "engagement"
+  },
+  "support.attachments.allowedTypes": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "support.attachments.maxBytes": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "support.attachments.maxPerPost": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "support.draftTtlMinutes": {
+    "advanced": true,
+    "group": "communication"
+  },
+  "support.incident.precheckMatchMode": {
+    "advanced": true,
+    "group": "communication"
+  },
+  "support.reopenWindowDays": {
+    "advanced": false,
+    "group": "communication"
+  },
+  "support.ticketRetentionMonths": {
+    "advanced": true,
+    "group": "security"
+  },
+  "ui.allowedThemes": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.ambient": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.animations": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.campaignThemes": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.cardActorBadge": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.celebration": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.colorMode": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.contrast": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.defaultTheme": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.density": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.forceReducedMotion": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.layoutPresets": {
+    "advanced": true,
+    "group": "general"
+  },
+  "ui.levelUp": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.notificationAnimation": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.notificationDurationSeconds": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.notificationPosition": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.notificationStyle": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.palette": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.pluginLooks": {
+    "advanced": true,
+    "group": "general"
+  },
+  "ui.reducedMotion": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.soundEnabled": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.textScale": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.textScale.max": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.textScale.min": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.theme": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.weather.latitude": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.weather.longitude": {
+    "advanced": false,
+    "group": "general"
+  },
+  "ui.weather.place": {
+    "advanced": false,
+    "group": "general"
+  },
+  "wiki.history.visibility": {
+    "advanced": false,
+    "group": "media"
+  },
+  "wiki.maxPageBytes": {
+    "advanced": true,
+    "group": "media"
+  }
+}

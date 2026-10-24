@@ -2,6 +2,7 @@
 no secrets; content of an unregistered kind (or unreadable item) is indistinguishable from missing."""
 
 import json
+import re
 from pathlib import Path
 
 import httpx
@@ -72,12 +73,16 @@ async def test_admin_health(app: FastAPI, client: httpx.AsyncClient, i18n: I18nH
     assert bad.status_code == 422 and bad.json()["code"] == "i18n.invalid_message"
 
 
-def test_catalog_files_hold_no_secrets() -> None:
-    from portalab.core.logging import is_secret_key
+# what a secret looks like in a text: a long run of letters and digits (an API key, a token), a private key
+SECRET_VALUE = re.compile(r"(?=[A-Za-z0-9_\-]*\d)(?=[A-Za-z0-9_\-]*[A-Za-z])[A-Za-z0-9_\-]{24,}|-----BEGIN")
 
+
+def test_catalog_files_hold_no_secrets() -> None:
     for path in Path(LOCALES_DIR).glob("*/*.json"):
         messages = json.loads(path.read_text(encoding="utf-8"))
-        assert not [k for k in messages if is_secret_key(k)], path
+        # the messages hold no secret value; their keys are only names — « auth.passwordField » labels a
+        # field, « setting.notifications.email.smtp.password.label » a setting: they hold no password
+        assert not [k for k, v in messages.items() if SECRET_VALUE.search(v)], path
         assert not any("@" in v and "." in v.split("@")[-1] for v in messages.values()), (
             path
         )  # no e-mail addresses

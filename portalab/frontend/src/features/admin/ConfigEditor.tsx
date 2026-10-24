@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, type ReactNode, useId, useMemo, useState } from "react";
 import { api } from "../../api/client";
 import { AdminPage, SearchBox, StatusBadge } from "../../design-system/admin/AdminKit";
@@ -6,6 +6,7 @@ import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../state/regions";
+import META from "./settings-meta.json";
 import { Toggles } from "./Toggles";
 
 interface SettingItem {
@@ -18,6 +19,8 @@ interface SettingItem {
   /** 027: how it is edited — boolean, integer, number, string or json — and the allowed values. */
   kind?: "boolean" | "integer" | "number" | "string" | "json";
   choices?: unknown[];
+  /** where it may be set: ``global`` (the portal), ``user`` (each member's own preference)… */
+  scopes?: string[];
 }
 
 interface PreviewResult {
@@ -47,39 +50,74 @@ function display(value: unknown): string {
   return JSON.stringify(value);
 }
 
-function area(key: string): string {
-  return key.split(".")[0] ?? key;
+/**
+ * Issue 14: the settings by what the administrator wants to do, not by module — each with a human title and
+ * a sentence (``admin:setting.<key>.label|hint``); the ones rarely touched (timeouts, caches, raw structures)
+ * and the technical keys only in the advanced mode.
+ */
+export const GROUPS = [
+  ["general", "settings"],
+  ["members", "users"],
+  ["services", "server"],
+  ["media", "film"],
+  ["communication", "mail"],
+  ["engagement", "trophy"],
+  ["ai", "bot"],
+  ["security", "shield"],
+] as const;
+type Group = (typeof GROUPS)[number][0];
+const meta = META as Record<string, { group: Group; advanced: boolean }>;
+
+export function groupOf(key: string): Group {
+  return meta[key]?.group ?? "general";
 }
 
-const AREA_ICONS: Record<string, string> = {
-  admin: "shield",
-  ai: "bot",
-  authz: "key",
-  automations: "zap",
-  calendar: "calendar",
-  campaigns: "star",
-  community: "users",
-  connectors: "plug",
-  content: "newspaper",
-  dashboard: "dashboard",
-  events: "activity",
-  gamification: "trophy",
-  health: "activity",
-  i18n: "globe",
-  identity: "user",
-  marketplace: "shop",
-  media: "film",
-  news: "newspaper",
-  notifications: "bell",
-  observability: "gauge",
-  plugins: "plug",
-  privacy: "lock",
-  search: "search",
-  statistics: "chart",
-  support: "lifebuoy",
-  ui: "palette",
-  wiki: "book",
-};
+/** Rarely touched — and a setting no title was written for yet. */
+export function isAdvanced(key: string): boolean {
+  return meta[key]?.advanced ?? true;
+}
+
+/** A setting's title, sentence and choices in the administrator's language (its description otherwise). */
+export function useSettingText() {
+  const t = useT();
+  return useMemo(() => {
+    const read = (id: string, fallback: string) => {
+      const text = t(`admin:${id}`);
+      return text === id ? fallback : text;
+    };
+    return {
+      label: (item: Pick<SettingItem, "key" | "description">) =>
+        read(`setting.${item.key}.label`, item.description || item.key),
+      hint: (item: Pick<SettingItem, "key">) => read(`setting.${item.key}.hint`, ""),
+      choice: (key: string, value: unknown) => read(`setting.${key}.choice.${String(value)}`, String(value)),
+    };
+  }, [t]);
+}
+
+const ADVANCED_KEY = "portalab.admin.settings.advanced";
+
+function useAdvancedMode(): [boolean, (on: boolean) => void] {
+  const [on, setOn] = useState(() => {
+    try {
+      return window.localStorage.getItem(ADVANCED_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  return [
+    on,
+    (next: boolean) => {
+      setOn(next);
+      try {
+        window.localStorage.setItem(ADVANCED_KEY, next ? "1" : "0");
+      } catch {
+        // storage unavailable: the mode lasts for the page
+      }
+    },
+  ];
+}
+
+export type { SettingItem };
 
 function useApply(item: SettingItem) {
   const queryClient = useQueryClient();
@@ -126,9 +164,11 @@ function useApply(item: SettingItem) {
   return { mutation, message, clear: () => setMessage(null) };
 }
 
-/** One setting, edited in place with the control its type calls for. */
-function SettingCard({ item }: { item: SettingItem }) {
+/** One setting, edited in place with the control its type calls for — its title and sentence in the
+ * administrator's language, its technical key in the advanced mode only. */
+export function SettingCard({ item, advanced = false }: { item: SettingItem; advanced?: boolean }) {
   const t = useT();
+  const text = useSettingText();
   const fieldId = useId();
   const { mutation, message, clear } = useApply(item);
   const initial = item.sensitive
@@ -169,7 +209,7 @@ function SettingCard({ item }: { item: SettingItem }) {
       >
         {item.choices.map((choice) => (
           <option key={String(choice)} value={String(choice)}>
-            {String(choice)}
+            {text.choice(item.key, choice)}
           </option>
         ))}
       </select>
@@ -223,9 +263,20 @@ function SettingCard({ item }: { item: SettingItem }) {
     <li className="setting-card" data-changed={item.source !== "default" || undefined}>
       <div className="setting-card__text">
         <label htmlFor={fieldId} className="setting-card__label">
-          {item.description || item.key}
+          {text.label(item)}
         </label>
-        <code className="setting-card__key">{item.key}</code>
+        {text.hint(item) ? <span className="setting-card__hint">{text.hint(item)}</span> : null}
+        {advanced ? <code className="setting-card__key">{item.key}</code> : null}
+        {item.source !== "default" && !item.sensitive && item.default !== undefined ? (
+          <span className="setting-card__default">
+            {t("admin:config.defaultIs", {
+              value:
+                item.choices?.length && typeof item.default !== "object"
+                  ? text.choice(item.key, item.default)
+                  : display(item.default),
+            })}
+          </span>
+        ) : null}
       </div>
       <div className="setting-card__control">
         {control}
@@ -262,10 +313,18 @@ function SettingCard({ item }: { item: SettingItem }) {
   );
 }
 
+export function useSettings() {
+  return useQuery({
+    queryKey: ["admin", "config"],
+    queryFn: async () =>
+      ((await api.GET("/api/v1/admin/config")).data as unknown as { settings: SettingItem[] }).settings,
+  });
+}
+
 export function ConfigEditor() {
   const t = useT();
   const [query, setQuery] = useState("");
-  const [tab, setTab] = useState("all");
+  const [tab, setTab] = useState<string>("general");
   return (
     <DataRegion<SettingItem[]>
       label={t("admin:config.settings")}
@@ -295,37 +354,53 @@ function SettingsExplorer({
   setTab: (value: string) => void;
 }) {
   const t = useT();
-  const areas = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const item of settings) counts.set(area(item.key), (counts.get(area(item.key)) ?? 0) + 1);
-    return [...counts.entries()].sort(([a], [b]) => a.localeCompare(b));
-  }, [settings]);
-  const needle = query.trim().toLowerCase();
-  const shown = settings.filter(
-    (item) =>
-      (tab === "all" || needle || area(item.key) === tab) &&
-      (!needle || item.key.toLowerCase().includes(needle) || item.description.toLowerCase().includes(needle)),
+  const text = useSettingText();
+  const [advanced, setAdvanced] = useAdvancedMode();
+  // the portal's settings: a member's own preferences are set by each member, in « My settings »
+  const portal = useMemo(
+    () => settings.filter((item) => !item.scopes || item.scopes.includes("global")),
+    [settings],
   );
-  const changed = settings.filter((s) => s.source !== "default").length;
-  const label = (key: string) => {
-    const text = t(`admin:config.area.${key}`);
-    return text === `config.area.${key}` ? key.charAt(0).toUpperCase() + key.slice(1) : text;
-  };
+  const visible = portal.filter((item) => advanced || !isAdvanced(item.key));
+  const counts = useMemo(() => {
+    const out = new Map<string, number>();
+    for (const item of visible) out.set(groupOf(item.key), (out.get(groupOf(item.key)) ?? 0) + 1);
+    return out;
+  }, [visible]);
+  const needle = query.trim().toLowerCase();
+  const found = (item: SettingItem) =>
+    [text.label(item), text.hint(item), item.description, advanced ? item.key : ""]
+      .join(" ")
+      .toLowerCase()
+      .includes(needle);
+  const shown = visible.filter((item) => (needle ? found(item) : tab === "all" || groupOf(item.key) === tab));
+  const changed = portal.filter((s) => s.source !== "default").length;
   return (
     <div className="settings-explorer">
       <nav className="settings-explorer__areas" aria-label={t("admin:config.areas")}>
         <SearchBox label={t("admin:config.search")} value={query} onChange={setQuery} />
         <ul>
-          {[["all", settings.length] as const, ...areas].map(([key, count]) => (
+          {GROUPS.map(([key, icon]) => (
             <li key={key}>
               <button type="button" aria-pressed={!needle && tab === key} onClick={() => setTab(key)}>
-                <Icon name={key === "all" ? "list" : (AREA_ICONS[key] ?? "settings")} size={16} />
-                <span>{key === "all" ? t("admin:config.all") : label(key)}</span>
-                <span className="settings-explorer__count">{count}</span>
+                <Icon name={icon} size={16} />
+                <span>{t(`admin:config.group.${key}`)}</span>
+                <span className="settings-explorer__count">{counts.get(key) ?? 0}</span>
               </button>
             </li>
           ))}
+          <li>
+            <button type="button" aria-pressed={!needle && tab === "all"} onClick={() => setTab("all")}>
+              <Icon name="list" size={16} />
+              <span>{t("admin:config.all")}</span>
+              <span className="settings-explorer__count">{visible.length}</span>
+            </button>
+          </li>
         </ul>
+        <label className="settings-explorer__advanced">
+          <input type="checkbox" checked={advanced} onChange={(event) => setAdvanced(event.target.checked)} />
+          <span>{t("admin:config.advanced")}</span>
+        </label>
         <p className="admin-muted settings-explorer__changed">
           {t("admin:config.changed", { count: changed })}
         </p>
@@ -336,16 +411,25 @@ function SettingsExplorer({
             ? t("admin:config.results", { count: shown.length })
             : tab === "all"
               ? t("admin:config.all")
-              : label(tab)}
+              : t(`admin:config.group.${tab}`)}
         </h2>
+        {!needle && tab !== "all" ? (
+          <p className="admin-muted settings-explorer__lead">{t(`admin:config.groupHint.${tab}`)}</p>
+        ) : null}
         {shown.length ? (
           <ul className="setting-cards">
             {shown.map((item) => (
-              <SettingCard key={`${item.key}:${JSON.stringify(item.value)}`} item={item} />
+              <SettingCard
+                key={`${item.key}:${JSON.stringify(item.value)}`}
+                item={item}
+                advanced={advanced}
+              />
             ))}
           </ul>
         ) : (
-          <p className="admin-muted config-empty">{t("admin:config.none")}</p>
+          <p className="admin-muted config-empty">
+            {advanced ? t("admin:config.none") : t("admin:config.noneSimple")}
+          </p>
         )}
       </div>
     </div>

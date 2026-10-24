@@ -99,6 +99,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "users.self.manage",
     },
     {
+        "key": "shell.settings",  # issue 14: « My settings », every page a member sets things in
+        "owner": "module:shell",
+        "kind": "entry",
+        "label_key": "nav.settings",
+        "icon": "settings",
+        "route": "/settings",
+        "group": "me",
+        "order_hint": 5,
+        "required_permission": "users.self.manage",
+        "keywords": ("settings", "preferences", "paramètres", "réglages"),
+    },
+    {
         "key": "identity.account",
         "owner": "module:identity",
         "kind": "entry",
@@ -831,6 +843,20 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "topic": "system",
         "order_hint": 1,
         "required_permission": "configuration.manage",
+    },
+    {
+        # issue 6: the setup assistant — the portal set up step by step, opened again at any time
+        "key": "administration.setup",
+        "owner": "module:administration",
+        "kind": "entry",
+        "label_key": "nav.admin.setup",
+        "icon": "rocket",
+        "route": "/admin/setup",
+        "group": "admin",
+        "topic": "system",
+        "order_hint": 0,
+        "required_permission": "configuration.manage",
+        "keywords": ("setup", "wizard", "assistant", "configuration"),
     },
     {
         # issue 159: the site's name, slogan, logo, icon and currency

@@ -3,16 +3,20 @@ import { type FormEvent, useId, useState } from "react";
 import { api } from "../../api/client";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { ApiError } from "../../state/regions";
-import { adminStrings as t } from "./strings";
+import { useAdminStrings } from "./strings";
 
 interface Status {
   completed: boolean;
   steps: { step: string; skippable: boolean }[];
 }
 
-/** First-run wizard (spec 020 US4): creates the sole Admin; optional steps can be skipped. */
+/**
+ * First-run (spec 020 US4): creates the sole Admin — everything else is the setup assistant's (issue 6), which
+ * the administrator finds in the Control Center once signed in.
+ */
 export function FirstRunWizard() {
-  const ids = { login: useId(), password: useId(), name: useId(), title: useId() };
+  const t = useAdminStrings();
+  const ids = { login: useId(), password: useId(), hint: useId(), name: useId(), title: useId() };
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -35,7 +39,16 @@ export function FirstRunWizard() {
   if (status.data?.completed || status.isError || closed) {
     return <p role="status">{t.closed}</p>;
   }
-  if (mutation.isSuccess) return <p role="status">{t.finished}</p>;
+  if (mutation.isSuccess) {
+    return (
+      <div className="auth-form" role="status">
+        <p>{t.finished}</p>
+        <a className="ds-button ds-button--primary" href="/">
+          {t.signIn}
+        </a>
+      </div>
+    );
+  }
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -62,17 +75,17 @@ export function FirstRunWizard() {
         id={ids.password}
         type="password"
         required
+        minLength={12}
+        aria-describedby={ids.hint}
         autoComplete="new-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+      <p id={ids.hint} className="field-hint">
+        {t.passwordHint}
+      </p>
       <label htmlFor={ids.name}>{t.displayNameField}</label>
       <input id={ids.name} value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-      {status.data?.steps.map((step) => (
-        <p key={step.step} className="field-hint">
-          {t.skipStep(step.step)}
-        </p>
-      ))}
       <button type="submit" disabled={mutation.isPending} aria-busy={mutation.isPending}>
         {t.finish}
       </button>

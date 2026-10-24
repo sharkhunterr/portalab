@@ -19,6 +19,7 @@ import { useAttention } from "../../shell/nav/attention";
 import { useNavigationView } from "../../shell/nav/NavigationProvider";
 import { useShellStrings } from "../../shell/strings";
 import { DataRegion } from "../../state/regions";
+import { SetupCard } from "./setup/progress";
 import "./admin.css";
 
 type Data = Record<string, unknown>;
@@ -194,6 +195,7 @@ function ControlCenterView({ overview }: { overview: Overview }) {
         <StatusBadge tone={STATUS_TONE[known] ?? "neutral"}>{t(`admin:cc.status.${known}`)}</StatusBadge>
       }
     >
+      <SetupCard />
       <AdminStats stats={stats} label={t("admin:cc.figures")} />
       <AdminGrid>
         <AdminSection

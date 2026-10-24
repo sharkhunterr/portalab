@@ -483,6 +483,24 @@
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-sm);
 }
+/* issue 14: what the setting changes, in a sentence; the default, once changed */
+.setting-card__hint,
+.setting-card__default {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.setting-card__default {
+  font-style: italic;
+}
+.settings-explorer__advanced {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+.settings-explorer__lead {
+  margin: 0 0 var(--space-3);
+}
 .setting-card__key {
   overflow: hidden;
   color: var(--color-text-muted);

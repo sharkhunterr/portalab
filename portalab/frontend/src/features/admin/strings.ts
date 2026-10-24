@@ -1,43 +1,21 @@
-/** Administration screens strings (spec 020 T030), externalized for the i18n module (spec 026). */
+import { useStrings } from "../../i18n/hooks/useStrings";
+
+/** The first-run screen's strings (spec 020 T030) — issue 201: read from the catalogs (``admin:firstRun.*``). */
 export const adminStrings = {
-  overviewTitle: "Control Center",
-  panelStates: {
-    available: "Available",
-    partial: "Partially available",
-    stale: "Out of date",
-    unavailable: "Unavailable",
-    "no-data": "No data yet",
-  } as Record<string, string>,
-  requiredActions: "Required actions",
-  noActions: "Nothing requires your attention.",
-  configTitle: "Configuration",
-  setting: "Setting",
-  value: "Value",
-  source: "Comes from",
-  sensitiveValue: "Hidden (write-only)",
-  newValue: (key: string) => `New value for ${key}`,
-  preview: "Preview the change",
-  apply: "Apply",
-  previewTitle: "Preview",
-  before: "Before",
-  after: "After",
-  applied: "Configuration updated.",
-  invalid: "The value is not valid for this setting.",
-  togglesTitle: "Extensions",
-  kindField: "Kind",
-  refField: "Name",
-  enable: "Enable",
-  disable: "Disable",
-  toggled: (ref: string, enabled: boolean) => `${ref} is now ${enabled ? "enabled" : "disabled"}.`,
-  refused: "This extension cannot be enabled.",
   wizardTitle: "Set up your portal",
-  wizardIntro: "Create the administrator account. You can connect your services now or later.",
+  wizardIntro:
+    "Create the administrator account. Once signed in, the setup assistant takes you through the rest, step by step.",
   loginField: "Administrator login",
   passwordField: "Password",
+  passwordHint: "At least 12 characters.",
   displayNameField: "Display name",
-  skipStep: (step: string) => `Skip "${step}" for now`,
-  finish: "Finish setup",
-  finished: "Your portal is ready. Sign in with the administrator account.",
+  finish: "Create the account",
+  finished: "Your portal is ready. Sign in with the administrator account: the setup assistant will guide you.",
+  signIn: "Sign in",
   closed: "The portal is already set up.",
   genericError: "Something went wrong. Try again.",
 } as const;
+
+export function useAdminStrings() {
+  return useStrings(adminStrings, "admin:firstRun");
+}
