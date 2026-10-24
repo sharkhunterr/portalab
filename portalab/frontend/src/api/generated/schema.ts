@@ -36797,6 +36797,7 @@ export interface operations {
                 limit?: number;
                 cursor?: string | null;
                 state?: string | null;
+                q?: string | null;
             };
             header?: never;
             path?: never;

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { api } from "../../../api/client";
+import { useHasPermission } from "../../../features/authz/useMyPermissions";
 import { resolvePalette, suggest } from "../../../features/search/api";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Command } from "../CommandRegistry";
@@ -11,6 +13,7 @@ import type { Command } from "../CommandRegistry";
  */
 export function useSearchCommands(query: string, route: string, enabled: boolean): Command[] {
   const t = useT();
+  const manager = useHasPermission("users.manage"); // issue 195: a member's card, straight from Ctrl K
   const [commands, setCommands] = useState<Command[]>([]);
   useEffect(() => {
     const text = query.trim();
@@ -20,9 +23,10 @@ export function useSearchCommands(query: string, route: string, enabled: boolean
     }
     let cancelled = false;
     const timer = window.setTimeout(async () => {
-      const [resolution, results] = await Promise.all([
+      const [resolution, results, members] = await Promise.all([
         resolvePalette(text, route).catch(() => null),
         text ? suggest(text).catch(() => []) : Promise.resolve([]),
+        manager && text.length >= 2 ? memberCards(text).catch(() => []) : Promise.resolve([]),
       ]);
       if (cancelled) return;
       const out: Command[] = [];
@@ -67,6 +71,14 @@ export function useSearchCommands(query: string, route: string, enabled: boolean
           route: item.url_ref,
         });
       }
+      for (const member of members) {
+        out.push({
+          id: `member-card:${member.id}`,
+          label: t("search:palette.memberCard", { name: member.display_name || member.login }),
+          keywords: [member.login, "member", "membre"],
+          route: `/admin/members/${member.id}`,
+        });
+      }
       if (text) {
         const q = intent?.type === "search" && intent.query ? intent.query : text;
         out.push({
@@ -91,6 +103,17 @@ export function useSearchCommands(query: string, route: string, enabled: boolean
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [query, route, enabled, t]);
+  }, [query, route, enabled, t, manager]);
   return commands;
+}
+
+/** Issue 195: the members whose login or name holds the text, for an administrator — any member, anonymous
+ * ones too (their card is the administration's own). */
+async function memberCards(
+  text: string,
+): Promise<Array<{ id: string; login: string; display_name: string | null }>> {
+  const data = (await api.GET("/api/v1/users", { params: { query: { q: text, limit: 5 } } })).data as
+    | { items: Array<{ id: string; login: string; display_name: string | null }> }
+    | undefined;
+  return data?.items ?? [];
 }

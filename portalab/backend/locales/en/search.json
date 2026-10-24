@@ -91,6 +91,7 @@
   "mode.semantic": "By meaning",
   "more": "More results",
   "palette.confirm": "This action needs confirmation. Continue?",
+  "palette.memberCard": "{name}'s member card",
   "palette.open": "Open {title}",
   "palette.searchFor": "Search for “{query}”",
   "palette.suggested": "Suggested by the assistant",
