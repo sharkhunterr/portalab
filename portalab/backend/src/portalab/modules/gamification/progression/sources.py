@@ -81,8 +81,9 @@ def bonus_of(source_ref: str) -> str | None:
 
 
 def split(row_kind: str, delta: int, base: int, modifiers: dict[str, Any], action: str) -> dict[str, float]:
-    """One movement's amount by source: the action's own part, the bonuses in proportion to their boost."""
-    if row_kind != "reward_rule":
+    """One movement's amount by source: the action's own part, the bonuses in proportion to their boost —
+    an action's, or (issue 226) a quest's, an achievement's or a level's reward boosted the same way."""
+    if row_kind != "reward_rule" and not (modifiers or {}).get("applied"):
         return {action: float(delta)}
     own = float(min(max(base, 0), delta)) if base else float(delta)
     out: dict[str, float] = {action: own}

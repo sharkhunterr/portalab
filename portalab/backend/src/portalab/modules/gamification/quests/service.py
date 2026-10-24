@@ -32,6 +32,7 @@ from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.gamification.ledger.writer import Entry, LedgerWriter
 from portalab.modules.gamification.models import Quest, QuestProgress
+from portalab.modules.gamification.modifiers.rewards import RewardBonuses, boosted
 from portalab.modules.gamification.notify import Note
 from portalab.modules.gamification.observability import log, metrics
 from portalab.modules.gamification.quests.definition import QuestDefinition, parse_quest
@@ -77,6 +78,7 @@ class Quests:
     ) -> None:
         self.database = database
         self.writer = writer
+        self.bonuses: RewardBonuses | None = None  # issue 226: set by the module
         self.events = events
         self.audit = audit
         self.capabilities = capabilities
@@ -319,13 +321,16 @@ class Quests:
                 Entry(
                     user_id=user,
                     value=reward.value,
-                    delta=reward.amount,
                     kind="grant",
                     source_kind=quest.definition.kind,
                     source_ref=f"quest:{quest.key}:{period}",
                     idempotency_key=f"quest:{user}:{quest.key}:{period}:{reward.value}",
                     occurred_at=at,
                     base_amount=reward.amount,
+                    # issue 226: the streak, the campaigns, a boost — like an action's gains
+                    **await boosted(
+                        self.bonuses, user, quest.definition.kind, reward.value, reward.amount, at
+                    ),
                 ),
             )
             if reward.value in ("xp", "coins", "contribution") and not recorded.duplicate:

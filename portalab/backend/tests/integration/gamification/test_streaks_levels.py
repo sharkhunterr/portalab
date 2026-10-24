@@ -6,7 +6,9 @@ from datetime import timedelta
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy import text
 
+from portalab.modules.gamification.progression.sources import split
 from portalab.modules.gamification.streaks.service import multiplier_for, parse_streak
 from tests.integration.gamification.conftest import RULE, GamHarness
 from tests.integration.identity.helpers import login
@@ -226,3 +228,40 @@ async def test_operations_tell_their_bonuses(gm: GamHarness, client: AsyncClient
     await login(client, "boss")
     ops = (await client.get("/api/v1/admin/gamification/operations", params={"value": "xp"})).json()["items"]
     assert ops[0]["bonuses"] == [{"source": "streak", "amount": 10.0}]
+
+
+async def test_rewards_follow_the_streak(gm: GamHarness) -> None:
+    """Issue 226: a level's reward (like a quest's, an achievement's) follows the streak alive — read, never
+    counted — with its detail in the ledger; left out of ``reward_bonuses``, it keeps its amount."""
+    gm.module.config = replace(gm.module.config, streak=STREAK, level_rewards=[{"level": 2, "xp": 10}])
+    await gm.rule("played", RULE)
+    user = gm.people["ursula"]
+    start = gm.clock.now() + timedelta(hours=1)
+    for day in (0, 1):
+        await gm.emit(user, at=start + timedelta(days=day))  # a 2-day streak: x1.5
+    before = await gm.balance(user)
+    assert await gm.module.level_rewards.give(user, 2, start + timedelta(days=1, hours=2)) == 1
+    assert await gm.balance(user) == before + 15
+    async with gm.database.session() as session:
+        row = (
+            await session.execute(
+                text(
+                    "SELECT base_amount, delta, modifiers FROM gamification.transactions "
+                    "WHERE source_kind = 'level_reward'"
+                )
+            )
+        ).one()
+    assert row.base_amount == 10 and row.delta == 15
+    assert any(m["source_ref"].startswith("streak:") for m in row.modifiers["applied"])
+    assert split("level_reward", 15, 10, row.modifiers, "levels") == {"levels": 10.0, "streak": 5.0}
+    # a streak is never kept alive by a reward: the next day, nothing counted, it is still yesterday's
+    state = await gm.module.streaks.current(user, start + timedelta(days=1, hours=3))
+    assert state["days"] == 2
+
+    other = gm.people["boss"]
+    gm.module.config = replace(gm.module.config, reward_bonuses=[])
+    for day in (0, 1):
+        await gm.emit(other, at=start + timedelta(days=day))
+    before = await gm.balance(other)
+    await gm.module.level_rewards.give(other, 2, start + timedelta(days=1, hours=2))
+    assert await gm.balance(other) == before + 10

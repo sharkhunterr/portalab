@@ -27,6 +27,7 @@ from portalab.modules.gamification.anomaly.service import AnomalyService
 from portalab.modules.gamification.antiabuse.guards import Guards
 from portalab.modules.gamification.ledger.writer import Entry, LedgerWriter, lock_user
 from portalab.modules.gamification.models import Balance, LedgerTransaction, Withheld
+from portalab.modules.gamification.modifiers.rewards import RewardBonuses, boosted
 from portalab.modules.gamification.notify import Note, Notifier
 from portalab.modules.gamification.permissions import GRANT
 
@@ -50,6 +51,7 @@ class RewardServiceImpl:
     ) -> None:
         self.database = database
         self.writer = writer
+        self.bonuses: RewardBonuses | None = None  # issue 226: set by the module
         self.guards = guards
         self.anomalies = anomalies
         self.achievements = achievements
@@ -307,13 +309,14 @@ class RewardServiceImpl:
             Entry(
                 user_id=user,
                 value=value,
-                delta=amount,
                 kind="grant",
                 source_kind="automation",
                 source_ref=automation_ref[:200],
                 idempotency_key=f"automation:{idempotency_key}",
                 occurred_at=utc_now(self.clock),
                 base_amount=amount,
+                # issue 226: the streak, the campaigns, a boost — like an action's gains
+                **await boosted(self.bonuses, user, "automation", value, amount, utc_now(self.clock)),
                 actor_user_id=principal.acting_for or principal.user_id,
             ),
             guarded=True,
@@ -326,13 +329,16 @@ class RewardServiceImpl:
             Entry(
                 user_id=user,
                 value="contribution",
-                delta=amount,
                 kind="grant",
                 source_kind="contribution",
                 source_ref=f"{kind}:{source_ref}"[:200],
                 idempotency_key=f"contribution:{source_ref}",
                 occurred_at=utc_now(self.clock),
                 base_amount=amount,
+                # issue 226: the streak, the campaigns, a boost — like an action's gains
+                **await boosted(
+                    self.bonuses, user, "contribution", "contribution", amount, utc_now(self.clock)
+                ),
                 actor_user_id=actor.acting_for or actor.user_id,
             ),
             guarded=True,
