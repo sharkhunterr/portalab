@@ -33,7 +33,7 @@ describe("protected surfaces", () => {
   });
 
   it("marks the purchase sheet and the booster's prices, balance and refunds", () => {
-    expect(source("features/marketplace/catalog/ProductModal.tsx")).toContain('data-protected=""');
+    expect(source("features/marketplace/vitrine/VitrinePage.tsx")).toContain('data-protected=""');
     expect(source("features/marketplace/product/ProductDetail.tsx")).toContain('data-protected=""');
     const booster = source("features/marketplace/boosters/BoosterReveal.tsx");
     for (const surface of [

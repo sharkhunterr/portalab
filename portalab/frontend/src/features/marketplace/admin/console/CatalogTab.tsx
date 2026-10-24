@@ -14,7 +14,7 @@ import {
   shelfLabel,
   usePluginShelves,
   withPluginShelves,
-} from "../../catalog/CatalogPage";
+} from "../../catalog/departments";
 import { ProductArt } from "../../catalog/ProductArt";
 import { productTypeLabel } from "../../typeLabel";
 import { withConfirmation } from "../confirm";

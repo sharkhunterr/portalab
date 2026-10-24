@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { createBrowserRouter, type RouteObject } from "react-router";
+import { createBrowserRouter, type RouteObject, redirect } from "react-router";
 import type { RouteHandle } from "./handle";
 import { RouteErrorElement } from "./RouteBoundary";
 
@@ -80,11 +80,10 @@ const ModerationQueue = lazy(() => import("../../features/community/projects/Mod
 const Projects = lazy(() => import("../../features/marketplace/projects/ProjectsPage"));
 const Project = lazy(() => import("../../features/marketplace/projects/ProjectRoute"));
 const ProjectConsole = lazy(() => import("../../features/marketplace/admin/ProjectConsole"));
-const Catalog = lazy(() => import("../../features/marketplace/catalog/CatalogPage"));
 const ProductRoute = lazy(() => import("../../features/marketplace/product/ProductRoute"));
 const Owned = lazy(() => import("../../features/marketplace/owned/OwnedPage"));
 const Reserve = lazy(() => import("../../features/marketplace/reserve/ReservePage"));
-const Vitrine = lazy(() => import("../../features/marketplace/vitrine/VitrinePage")); // trial: easy to remove
+const Shop = lazy(() => import("../../features/marketplace/vitrine/VitrinePage")); // issue 244: the showcase is the shop
 const MarketplaceAdmin = lazy(() => import("../../features/marketplace/admin/MarketplaceAdmin"));
 const ThemeStudio = lazy(() => import("../../features/appearance/studio/ThemeStudio"));
 const ChartGallery = lazy(() => import("../../features/appearance/charts/ChartGallery")); // issue 117
@@ -145,10 +144,14 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           path: "marketplace",
           handle: h({ crumb: "Marketplace", requiredPermission: "marketplace.read" }),
           children: [
-            { index: true, element: <Catalog /> },
+            { index: true, element: <Shop /> },
             { path: "owned", element: <Owned />, handle: h({ crumb: "My products" }) },
             { path: "reserve", element: <Reserve />, handle: h({ crumb: "My reserve" }) },
-            { path: "vitrine", element: <Vitrine />, handle: h({ crumb: "Showcase" }) }, // trial
+            // issue 244: the trial's address, kept for the links already shared
+            {
+              path: "vitrine",
+              loader: ({ request }) => redirect(`/marketplace${new URL(request.url).search}`),
+            },
             {
               path: "products/:key",
               element: <ProductRoute />,

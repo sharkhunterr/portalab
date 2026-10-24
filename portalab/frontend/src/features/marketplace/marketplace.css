@@ -25,21 +25,6 @@
 }
 
 /* 027 US8: game-style shop ------------------------------------------------------------------------- */
-.shop {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-}
-
-.shop .ds-page-header {
-  margin-block-end: 0;
-}
-
-.product-card,
-.shop-hero {
-  --rarity: var(--rarity-common);
-}
-
 /* 027: an item of a pack shows its own rarity, never the pack's (common included) */
 [data-rarity="common"] {
   --rarity: var(--rarity-common);
@@ -57,76 +42,7 @@
   --rarity: var(--rarity-legendary);
 }
 
-/* shelves */
-.shop-shelf__title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0 0 var(--space-3);
-  font-size: var(--font-size-lg);
-}
-
-.shop-shelf__title .ds-icon {
-  color: var(--color-accent);
-}
-
-.shop-shelf__count {
-  margin-inline-start: var(--space-1);
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--color-text) 9%, transparent);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-}
-
-.shop-shelf__list {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(11.5rem, 13rem);
-  gap: var(--space-4);
-  margin: 0;
-  padding: var(--space-2) var(--space-1) var(--space-4);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  list-style: none;
-  padding-block-end: var(--scroller-gap); /* the scrollbar keeps its distance */
-}
-
-.shop-shelf__list > * {
-  scroll-snap-align: start;
-}
-
-/* card */
-.product-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 2px solid color-mix(in srgb, var(--rarity) 55%, transparent);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-raised);
-  box-shadow:
-    var(--shadow-1),
-    0 0 0 0 transparent;
-  transition:
-    transform var(--motion-duration-normal) var(--motion-easing),
-    box-shadow var(--motion-duration-normal) var(--motion-easing);
-}
-
-.product-card:hover,
-.product-card:focus-within {
-  transform: translateY(calc(var(--motion-hover-lift) * 2));
-  box-shadow:
-    var(--shadow-3),
-    0 0 24px color-mix(in srgb, var(--rarity) 45%, transparent);
-}
-
-.product-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding: var(--space-3);
-}
+/* rarity and owned marks (the product sheet) */
 
 .product-card__rarity {
   color: var(--rarity);
@@ -134,31 +50,6 @@
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.product-card__name {
-  margin: 0;
-  font-size: var(--font-size-md);
-}
-
-.product-card__name a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.product-card__name a::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
-
-.product-card__type {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-}
-
-.product-card__footer {
-  margin-block-start: var(--space-2);
 }
 
 .product-card__owned {
@@ -169,56 +60,7 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* 027: what the member wears now — a « Equipped » ribbon and a frame of its own; owned looks offer to equip */
-.product-card[data-equipped] {
-  border-color: var(--state-available-fg);
-  box-shadow:
-    0 0 0 2px color-mix(in srgb, var(--state-available-fg) 45%, transparent),
-    0 0 22px color-mix(in srgb, var(--state-available-fg) 30%, transparent);
-}
-
-.product-card__equipped {
-  position: absolute;
-  z-index: 3;
-  inset-block-start: var(--space-2);
-  inset-inline-end: var(--space-2);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.2rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-pill);
-  background: var(--state-available-fg);
-  color: var(--color-surface);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  box-shadow: var(--shadow-sm);
-}
-
-.product-card__equip {
-  position: relative;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.3rem 0.7rem;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 60%, transparent);
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
-  color: var(--color-accent);
-  font: inherit;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-}
-
-.product-card__equip:hover,
-.product-card__equip:focus-visible {
-  background: var(--color-accent);
-  color: var(--color-accent-contrast);
-}
-
+/* 027: what the member wears now; owned looks offer to equip */
 .purchase-bar__blocked[data-equipped] {
   color: var(--state-available-fg);
   font-weight: var(--font-weight-semibold);
@@ -258,104 +100,7 @@
 
 /* 027: poster effects (shine, neon, spin, blink, glitch) removed — to be rethought */
 
-/* featured banner */
-.shop-featured__list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
-  gap: var(--space-4);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.shop-hero {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--space-5);
-  padding: var(--space-4);
-  border: 2px solid color-mix(in srgb, var(--rarity) 60%, transparent);
-  border-radius: var(--radius-xl);
-  background:
-    radial-gradient(
-      30rem 14rem at 0% 50%,
-      color-mix(in srgb, var(--rarity) 22%, transparent),
-      transparent 70%
-    ),
-    var(--color-surface-raised);
-  box-shadow:
-    var(--shadow-2),
-    0 0 30px color-mix(in srgb, var(--rarity) 25%, transparent);
-}
-
-.shop-hero .product-poster {
-  flex: none;
-  inline-size: 9rem;
-}
-
-.shop-hero__text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  min-inline-size: 0;
-}
-
-.shop-hero__text h3 {
-  margin: 0;
-  font-size: var(--font-size-xl);
-}
-
-.shop-hero__text h3 a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.shop-hero__text h3 a::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
-
-.shop-hero__text p {
-  margin: 0;
-  color: var(--color-text-muted);
-}
-
-/* toolbar */
-.shop-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.shop-rarities {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  min-inline-size: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-}
-
-.shop-rarities button {
-  min-block-size: max(var(--target-min), 2.25rem);
-  padding: 0 var(--space-3);
-  border: 1px solid color-mix(in srgb, var(--rarity, var(--color-text)) 45%, transparent);
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--color-text);
-  font: inherit;
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-}
-
-.shop-rarities button[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--rarity, var(--color-accent)) 25%, transparent);
-  border-color: var(--rarity, var(--color-accent));
-  font-weight: var(--font-weight-semibold);
-}
+/* search (my purchases) */
 
 .shop-search {
   display: flex;
@@ -503,14 +248,6 @@
   }
 }
 
-.shop-type-filter {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0;
-  font-weight: 600;
-}
-
 /* 027: product sheet (modal and page) */
 .product-sheet {
   display: grid;
@@ -540,16 +277,6 @@
 .product-chip[data-tone="ok"] {
   color: var(--state-available-fg);
   border-color: currentColor;
-}
-.product-card__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  margin-block-start: 0.2rem;
-}
-.product-card__chips .product-chip {
-  font-size: var(--font-size-xs);
-  padding: 0.05rem 0.45rem;
 }
 .product-sheet__grid {
   display: grid;
@@ -772,23 +499,6 @@
 .product-page__actions:empty {
   display: none;
 }
-.shop-hero {
-  flex-wrap: wrap;
-}
-.shop-hero > .product-art {
-  flex: 1 1 12rem;
-  inline-size: auto;
-  max-inline-size: 18rem;
-}
-.shop-hero__text {
-  flex: 1 1 13rem;
-  min-inline-size: 0;
-}
-.shop-hero__text h3 {
-  overflow-wrap: normal;
-  word-break: normal;
-  hyphens: none;
-}
 .rarity-supply {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
@@ -800,88 +510,7 @@
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--rarity) 8%, transparent);
 }
-/* 027: sold-out products stay in the shop, clearly marked */
-.product-card[data-soldout] .product-art {
-  filter: grayscale(0.85) brightness(0.75);
-}
-.product-card[data-soldout] .product-card__name {
-  opacity: 0.8;
-}
-.product-card__soldout {
-  position: absolute;
-  z-index: 3;
-  inset-block-start: 1.4rem;
-  inset-inline-end: -2.4rem;
-  padding: 0.25rem 2.6rem;
-  transform: rotate(35deg);
-  background: var(--state-error-bg);
-  color: var(--state-error-fg);
-  border-block: 1px solid var(--state-error-fg);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  pointer-events: none;
-}
-
-/* 027: departments, shelves with « see all », lazy art */
-.shop-departments {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
-  gap: var(--space-3);
-}
-.shop-department {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-raised);
-  color: var(--color-text);
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
-  transition: border-color var(--motion-duration-fast) var(--motion-easing);
-}
-.shop-department[aria-pressed="true"] {
-  border-color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-raised));
-  box-shadow: 0 0 0 1px var(--color-accent);
-}
-.shop-department > .ds-icon {
-  flex: none;
-  color: var(--color-accent);
-}
-.shop-department__text {
-  display: grid;
-  flex: 1;
-  gap: 0.1rem;
-}
-.shop-department__text span {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-}
-.shop-department__count {
-  padding: 0.1rem 0.55rem;
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--color-text) 8%, transparent);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-}
-.shop-shelf__more {
-  margin-inline-start: auto;
-  font-size: var(--font-size-sm);
-}
-.shop-shelf__list[data-all] {
-  grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
-  overflow-x: visible;
-}
-.shop-shelf {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 22rem;
-}
+/* 027: lazy art — drawn when it comes near the screen */
 .lazy-art {
   display: block;
 }

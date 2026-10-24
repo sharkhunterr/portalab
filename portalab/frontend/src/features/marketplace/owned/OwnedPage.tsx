@@ -16,7 +16,7 @@ import {
   departmentOfProduct,
   usePluginShelves,
   withPluginShelves,
-} from "../catalog/CatalogPage";
+} from "../catalog/departments";
 import { ProductArt } from "../catalog/ProductArt";
 import "../marketplace.css";
 import { PageHeader } from "../../../design-system/components/PageHeader";

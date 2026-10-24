@@ -199,6 +199,10 @@ async function take(shot, last) {
     timeout: 120000,
   });
   const page = await context.newPage();
+  // nothing is changed on the portal: what the page would write (a view, a mission, a setting) is refused
+  await page.route("**/api/v1/**", (route) =>
+    route.request().method() === "GET" ? route.fallback() : route.fulfill({ status: 204, body: "" }),
+  );
   // the guide's language, whatever the account's — only in this browser
   await page.route("**/api/v1/i18n/context", async (route) => {
     const response = await route.fetch();

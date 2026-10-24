@@ -1,32 +1,72 @@
 [
   {
-    "name": "boutique-rayons",
+    "name": "boutique-accueil",
     "page": "guide-boutique",
     "route": "/marketplace",
     "height": 1100,
     "settle": 3000,
     "before": [
       {
-        "waitFor": ".shop-shelf .product-card",
+        "waitFor": ".vitrine-spotlight",
         "wait": 2500
       }
     ],
     "maxHeight": 1000,
     "marks": [
       {
-        "target": ".shop-departments",
+        "target": ".vitrine-wallet",
         "pad": 4
       },
       {
-        "target": ".shop-rarities",
+        "target": ".vitrine-search",
         "pad": 4
       },
       {
-        "target": ".shop-search",
+        "target": ".vitrine-nav",
         "pad": 4
       },
       {
-        "target": ".shop-shelf .product-card",
+        "target": ".vitrine-spotlight",
+        "pad": 4
+      },
+      {
+        "target": ".vitrine-rail",
+        "pad": 4
+      }
+    ]
+  },
+  {
+    "name": "boutique-rayon",
+    "page": "guide-boutique",
+    "route": "/marketplace?d=themes&s=interfaces",
+    "height": 1100,
+    "settle": 3000,
+    "before": [
+      {
+        "waitFor": ".vitrine-grid .vitrine-tile",
+        "wait": 2500
+      }
+    ],
+    "maxHeight": 1000,
+    "marks": [
+      {
+        "target": ".vitrine-shelves",
+        "pad": 4
+      },
+      {
+        "target": ".vitrine-sort",
+        "pad": 4
+      },
+      {
+        "target": ".vitrine-tools > fieldset:nth-of-type(1)",
+        "pad": 4
+      },
+      {
+        "target": ".vitrine-tools > fieldset:nth-of-type(3)",
+        "pad": 4
+      },
+      {
+        "target": ".vitrine-grid .vitrine-tile",
         "pad": 4
       }
     ]
@@ -34,16 +74,16 @@
   {
     "name": "boutique-fiche",
     "page": "guide-boutique",
-    "route": "/marketplace",
+    "route": "/marketplace?d=themes&s=interfaces",
     "height": 1100,
     "settle": 3000,
     "before": [
       {
-        "waitFor": ".shop-shelf .product-card",
+        "waitFor": ".vitrine-grid .vitrine-tile",
         "wait": 1500
       },
       {
-        "click": ".shop-shelf .product-card:has-text('Minimal interface') .product-card__name",
+        "click": ".vitrine-tile:has-text('Minimal interface') .vitrine-tile__open",
         "waitFor": ".product-sheet",
         "wait": 2500
       }

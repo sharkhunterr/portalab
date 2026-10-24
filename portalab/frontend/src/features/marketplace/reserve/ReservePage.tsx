@@ -252,7 +252,7 @@ export default function ReservePage() {
           <Icon name="potion" size={32} />
           <strong>{t("marketplace:reserve.empty")}</strong>
           <p>{t("marketplace:reserve.emptyHint")}</p>
-          <Link to="/marketplace?department=boosters">{t("marketplace:reserve.toBoosters")}</Link>
+          <Link to="/marketplace?d=boosters">{t("marketplace:reserve.toBoosters")}</Link>
         </div>
       ) : null}
       <Waiting

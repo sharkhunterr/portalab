@@ -224,7 +224,7 @@
     "clip": "main",
     "marks": [
       {
-        "target": ".product-card",
+        "target": ".vitrine-grid .vitrine-tile",
         "label": "Un booster de cartes : son genre, son nombre de cartes (×3), son prix",
         "side": "top",
         "shift": 220,

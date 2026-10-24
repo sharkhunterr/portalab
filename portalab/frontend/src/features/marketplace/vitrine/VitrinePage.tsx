@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { CoinBadge } from "../../../design-system/components/Badges";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
@@ -11,17 +11,20 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { HdTag, isHdProduct } from "../../appearance/Rarity";
 import { useProgression } from "../../gamification/api";
+import { BoostTag } from "../../gamification/boost";
 import { type Product, useDescribe, useProduct, useProducts } from "../api";
 import { BOOSTER_EVENT } from "../boosters/api";
+import { BoosterHistory } from "../boosters/Boosters";
 import {
   DEPARTMENTS,
   type Department,
+  departmentOf,
   departmentOfProduct,
-  type Shelf,
+  onShelf,
   shelfLabel,
   usePluginShelves,
   withPluginShelves,
-} from "../catalog/CatalogPage";
+} from "../catalog/departments";
 import { LazyArt } from "../catalog/LazyArt";
 import { Price, priceOf } from "../catalog/Price";
 import { useEquipment } from "../equip";
@@ -31,14 +34,14 @@ import "../marketplace.css";
 import "./vitrine.css";
 
 /**
- * ``/marketplace/vitrine`` — a TRIAL of another way through the shop, beside the classic one (which stays as
- * it is): a rail of departments and their shelves with the member's balance, a spotlight of the featured
+ * ``/marketplace`` — the shop, as a showcase (issue 244: the trial became the shop, the classic one is
+ * gone): a rail of departments and their shelves with the member's balance, a spotlight of the featured
  * products, picks made for the member (within reach, on sale, nearly sold out, boosters, free), a grid that
- * sorts and filters, and a product opened in a side panel so the browsing stays in view.
+ * sorts and filters, and a product opened in a side panel so the browsing stays in view. Bought with Coins
+ * earned on the portal, never real money.
  *
- * To remove the trial: delete this folder, the « vitrine » route in ``shell/router/routes.tsx``, the
- * « Try the showcase » button in ``catalog/CatalogPage.tsx`` and the ``vitrine.*`` keys of the
- * ``marketplace`` locales.
+ * Links from elsewhere land on a department (``?d=``, or ``?department=`` as before), one kind of product
+ * (``?type=``, an « in the shop » link) or a product's sheet (``?product=``).
  */
 
 const RARITIES = ["common", "rare", "epic", "legendary"] as const;
@@ -54,14 +57,6 @@ type Pick = "afford" | "deal" | "soon" | "boosters" | "free";
 const owned = (p: Product) => Boolean(p.owned && !p.repeatable);
 const soldOut = (p: Product) => p.remaining === 0 && !owned(p);
 const price = (p: Product) => priceOf(p) ?? 0;
-
-function onShelf(shelf: Shelf, product: Product): boolean {
-  return (
-    shelf.types.includes(product.type) &&
-    (!shelf.category || product.category === shelf.category) &&
-    (!shelf.notCategory || product.category !== shelf.notCategory)
-  );
-}
 
 const ORDER: Record<(typeof SORTS)[number], (a: Product, b: Product) => number> = {
   recommended: (a, b) =>
@@ -309,8 +304,7 @@ function useNarrow(query = "(max-width: 40rem)"): boolean {
   return narrow;
 }
 
-/** A product opened in a side panel (a modal on a phone): the same sheet and purchase as the classic shop,
- * the browsing kept. */
+/** A product opened in a side panel (a modal on a phone): its sheet and purchase, the browsing kept. */
 function ProductPanel({ product, onClose }: { product: Product; onClose: () => void }) {
   const t = useT();
   const full = useProduct(product.key);
@@ -354,7 +348,6 @@ function ProductPanel({ product, onClose }: { product: Product; onClose: () => v
 export default function VitrinePage() {
   const t = useT();
   const format = useFormat();
-  const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const [q, setQ] = useState(params.get("q") ?? "");
   const [shown, setShown] = useState(PAGE);
@@ -373,7 +366,12 @@ export default function VitrinePage() {
     [pluginShelves, products.data],
   );
 
-  const department = departments.find((d) => d.key === params.get("d"));
+  const type = params.get("type") ?? ""; // an « in the shop » link: one kind of product
+  const department = departments.find(
+    (d) =>
+      d.key ===
+      (params.get("d") ?? params.get("department") ?? (type ? departmentOf(type, departments) : null)),
+  );
   const shelf = department?.shelves.find((s) => s.key === params.get("s"));
   const pick = params.get("pick") as Pick | null;
   const sort = (SORTS as readonly string[]).includes(params.get("sort") ?? "")
@@ -392,7 +390,8 @@ export default function VitrinePage() {
     setShown(PAGE);
     setParams(next);
   };
-  const go = (d: string | null, s: string | null = null) => set({ d, s, pick: null });
+  const go = (d: string | null, s: string | null = null) =>
+    set({ d, s, pick: null, type: null, department: null });
   const toggle = (flag: string) =>
     set({ only: (only.includes(flag) ? only.filter((f) => f !== flag) : [...only, flag]).join(",") || null });
 
@@ -418,13 +417,14 @@ export default function VitrinePage() {
       all
         .filter((p) => !department || departmentOfProduct(p, departments) === department.key)
         .filter((p) => !shelf || onShelf(shelf, p))
+        .filter((p) => !type || p.type === type)
         .filter((p) => !pick || rule[pick]?.(p))
         .filter((p) => !rarity || p.rarity === rarity)
         .filter((p) => !only.includes("afford") || rule.afford(p))
         .filter((p) => !only.includes("unowned") || !owned(p))
         .filter((p) => !only.includes("deal") || Boolean(p.discount))
         .sort(ORDER[sort]),
-    [all, department, departments, shelf, pick, rarity, only, sort, rule],
+    [all, department, departments, shelf, type, pick, rarity, only, sort, rule],
   );
   const renders = { hd: scoped.filter(isHdProduct), standard: scoped.filter((p) => !isHdProduct(p)) };
   const listed = render === "hd" || render === "standard" ? renders[render] : scoped;
@@ -459,27 +459,24 @@ export default function VitrinePage() {
     .filter((p) => p.featured && !soldOut(p))
     .sort(ORDER.rarity)
     .slice(0, 6);
-  const heading = shelf
-    ? shelfLabel(t, shelf)
-    : department
-      ? t(`marketplace:department.${department.key}`)
-      : pick
-        ? t(`marketplace:vitrine.pick.${pick}`)
-        : q.trim()
-          ? t("marketplace:vitrine.searchResults", { q: q.trim() })
-          : t("marketplace:vitrine.everything");
+  const heading = type
+    ? productTypeLabel(t, type)
+    : shelf
+      ? shelfLabel(t, shelf)
+      : department
+        ? t(`marketplace:department.${department.key}`)
+        : pick
+          ? t(`marketplace:vitrine.pick.${pick}`)
+          : q.trim()
+            ? t("marketplace:vitrine.searchResults", { q: q.trim() })
+            : t("marketplace:vitrine.everything");
 
   return (
     <div className="vitrine">
       <PageHeader
         icon="store"
-        title={t("marketplace:vitrine.title")}
+        title={t("marketplace:catalog.title")}
         context={t("marketplace:vitrine.intro")}
-        primary={{
-          label: t("marketplace:vitrine.classic"),
-          icon: "shop",
-          onSelect: () => navigate("/marketplace"),
-        }}
       />
 
       <div className="vitrine__layout">
@@ -585,7 +582,7 @@ export default function VitrinePage() {
 
         <main className="vitrine__main">
           {products.isPending ? (
-            <Skeleton shape="tile" count={6} label={t("marketplace:vitrine.title")} />
+            <Skeleton shape="tile" count={6} label={t("marketplace:catalog.title")} />
           ) : null}
           {products.isError ? (
             <FunctionalState state="unavailable" onRetry={() => products.refetch()} />
@@ -638,7 +635,23 @@ export default function VitrinePage() {
                   <span className="vitrine-count">
                     {t("marketplace:vitrine.results", { count: listed.length })}
                   </span>
+                  {/* #54/#55: the boost in progress (bought now, the next one starts after it) */}
+                  {shelf?.key === "perks" && progression?.boost ? (
+                    <BoostTag boost={progression.boost} />
+                  ) : null}
                 </h2>
+                {type ? (
+                  <fieldset className="vitrine-chips" aria-label={t("marketplace:vitrine.filters")}>
+                    <button
+                      type="button"
+                      aria-pressed
+                      onClick={() => set({ type: null, d: department?.key ?? null })}
+                    >
+                      <Icon name="close" size={14} />
+                      {t("marketplace:shop.allTypes")}
+                    </button>
+                  </fieldset>
+                ) : null}
                 {department && department.shelves.length > 1 ? (
                   <fieldset
                     className="vitrine-chips vitrine-shelves"
@@ -755,6 +768,7 @@ export default function VitrinePage() {
                   }
                 />
               )}
+              {department?.key === "boosters" ? <BoosterHistory /> : null}
             </section>
           ) : null}
         </main>
