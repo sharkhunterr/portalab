@@ -10,10 +10,27 @@ import { SettingsCard } from "../account/SettingsKit";
 type Inventory = components["schemas"]["PrivacyInventory"];
 
 const DATUM = "progression";
+/** issue 243: what makes a member seen by the others — their progression, their place in the members'
+ * directory and their activity; public or anonymous sets the three at once (within the portal only). */
+const PRESENCE = [DATUM, "member_listing", "community_activity"] as const;
 const CHOICES = [
   { key: "public", level: "community", icon: "users" },
   { key: "anonymous", level: "private", icon: "hide" },
 ] as const;
+
+/** Public (``community``) or anonymous (``private``); only the progression's answer counts (the others may
+ * be off, or set by an administrator). */
+export async function setPresence(level: "community" | "private"): Promise<void> {
+  const results = await Promise.all(
+    PRESENCE.map((datum) =>
+      api.PUT("/api/v1/me/privacy/visibility/{datum_class}", {
+        params: { path: { datum_class: datum } },
+        body: { level },
+      }),
+    ),
+  );
+  if (results[0]?.error) throw new Error("presence");
+}
 
 /**
  * « My presence in the community » (issue 120): public — my name and avatar beside my place in the
@@ -31,13 +48,7 @@ export function CommunityPresence() {
   const items = Array.isArray(inventory.data?.data) ? inventory.data.data : [];
   const datum = items.find((item) => item.datum_class === DATUM); // none (privacy off): no card
   const change = useMutation({
-    mutationFn: async (level: "community" | "private") => {
-      const result = await api.PUT("/api/v1/me/privacy/visibility/{datum_class}", {
-        params: { path: { datum_class: DATUM } },
-        body: { level },
-      });
-      if (result.error) throw new Error("presence");
-    },
+    mutationFn: setPresence,
     onSuccess: () => {
       notify({ severity: "success", title: t("account:presence.saved") });
       void queryClient.invalidateQueries({ queryKey: ["privacy", "me"] });

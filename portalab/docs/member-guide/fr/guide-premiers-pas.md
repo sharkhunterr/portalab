@@ -25,14 +25,17 @@ Si votre portail en a publié, il vous demande de lire et d'accepter ses **condi
 
 ## L'accueil des nouveaux membres
 
-À votre première visite, quelques écrans de bienvenue s'ouvrent (« Étape 1 sur 4 », etc.) :
+À votre première visite, quelques écrans de bienvenue s'ouvrent (« Étape 1 sur 5 », etc.) :
 
 - **Une photo et un nom** : c'est comme ça que les autres membres vous verront.
+- **Vos centres d'intérêt** : films, séries, livres, livres audio, magazines, mangas, BD & comics, jeux vidéo rétro. Le portail s'en servira pour mettre en avant ce qui vous plaît.
+- **Tu veux jouer ?** : c'est le cœur du portail. On y gagne de l'XP et des niveaux, des Coins à dépenser dans la boutique, et des cartes de collection. Trois réponses :
+  - « Oui, à tout » ou « Oui, sans les cartes » : votre profil est **public**, mais seulement pour les membres du portail. Ils voient votre nom, votre niveau et votre place dans les classements.
+  - « Non, je viens pour les médias » : votre profil est **anonyme**. Les autres membres ne vous voient ni dans l'annuaire, ni dans l'activité ; dans les classements, vous restez compté, sans nom.
 - **Votre style** : clair, sombre ou « Comme mon appareil », et une couleur.
-- **Vos centres d'intérêt** : films, séries, animés, documentaires, livres, BD & comics, jeux, musique. Le portail s'en sert pour mieux vous montrer ce qui vous plaît.
-- **Tout est prêt** : « Faire la visite » lance une visite d'une minute, « Explorer seul » vous laisse découvrir.
+- **Tout est prêt** : tout reste personnalisable (l'interface, le tableau de bord, les notifications et les e-mails, la confidentialité), chaque réglage à un geste. « Faire la visite » lance une visite d'une minute, « Explorer seul » vous laisse découvrir.
 
-Chaque écran peut être passé avec « Passer », et tout se change plus tard. Vous pouvez revoir ces écrans depuis la page [Visites guidées](/guide), bouton « Écrans de bienvenue ».
+Chaque écran peut être passé avec « Passer », et tout se change plus tard : public ou anonyme dans votre compte, carte « Ma présence dans la communauté ». Vous pouvez revoir ces écrans depuis la page [Visites guidées](/guide), bouton « Écrans de bienvenue ».
 
 ## L'en-tête
 

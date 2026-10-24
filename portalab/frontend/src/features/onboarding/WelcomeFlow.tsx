@@ -1,7 +1,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type ChangeEvent, useEffect, useId, useRef, useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
 import type { UiPreferences } from "../../design-system/a11y/preferences";
@@ -14,38 +14,51 @@ import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { useShellPreference } from "../../shell/preferences";
 import { ApiError } from "../../state/regions";
 import { PalettePicker } from "../appearance/PalettePicker";
+import { setPresence } from "../auth/CommunityPresence";
 import { ME_KEY, type Me, useMe } from "../auth/useAuth";
 import { completeStep, MISSIONS_KEY, startTour, useWelcome, WELCOME_EVENT } from "./api";
 import "../appearance/notification-looks.css";
 import "./onboarding.css";
 
 /**
- * The welcome (#7): a member's first visit opens four short screens — hello (with the portal's own words),
- * a face and a name, a look, what they came for — then offers the one-minute tour. Every screen can be
- * skipped and nothing is required; once seen (``shell.onboarding.welcomedAt``) it never opens by itself
- * again, on any device, and the personal menu brings it back. An administrator can turn it off.
+ * The welcome (#7; new version, issue 243): a member's first visit opens five short screens — hello (with the
+ * portal's own words), a face and a name, what they came for, whether they play, a look — then everything
+ * they can set later and the one-minute tour. Every screen can be skipped and nothing is required; once
+ * seen (``shell.onboarding.welcomedAt``) it never opens by itself again, on any device, and the guided tours
+ * page brings it back. An administrator can turn it off.
  */
-const STEPS = ["hello", "profile", "style", "interests", "ready"] as const;
+const STEPS = ["hello", "profile", "interests", "play", "style", "ready"] as const;
 type Step = (typeof STEPS)[number];
 
 const ART: Record<Step, string> = {
   hello: "sparkles",
   profile: "user",
-  style: "palette",
   interests: "heart",
+  play: "gamepad",
+  style: "palette",
   ready: "rocket",
 };
 
+/** What the member came for: kept (``shell.onboarding.interests``) for the portal to use later. */
 export const INTERESTS = [
   { key: "movies", icon: "film" },
   { key: "series", icon: "tv" },
-  { key: "anime", icon: "sparkle" },
-  { key: "documentaries", icon: "clapperboard" },
   { key: "books", icon: "book" },
-  { key: "comics", icon: "library" },
-  { key: "games", icon: "game" },
-  { key: "music", icon: "music" },
+  { key: "audiobooks", icon: "headphones" },
+  { key: "magazines", icon: "newspaper" },
+  { key: "manga", icon: "book-open" },
+  { key: "comics", icon: "message-square" },
+  { key: "retro_games", icon: "joystick" },
 ] as const;
+
+/** Whether the member plays (``shell.onboarding.play``): a player is public, within the portal only; the
+ * others are anonymous, seen by no other member. */
+const PLAY = [
+  { key: "full", icon: "layers", level: "community" },
+  { key: "progression", icon: "trophy", level: "community" },
+  { key: "none", icon: "hide", level: "private" },
+] as const;
+type Play = (typeof PLAY)[number]["key"];
 
 export function WelcomeFlow() {
   const t = useT();
@@ -113,7 +126,10 @@ export function WelcomeFlow() {
               {step === "ready" ? (
                 <span />
               ) : (
-                <ol className="onboarding-dots" aria-label={t("onboarding:progress", { step: index + 1 })}>
+                <ol
+                  className="onboarding-dots"
+                  aria-label={t("onboarding:progress", { step: index + 1, total: STEPS.length - 1 })}
+                >
                   {STEPS.slice(0, -1).map((s, i) => (
                     <li key={s} data-state={i < index ? "done" : i === index ? "current" : undefined} />
                   ))}
@@ -130,12 +146,14 @@ export function WelcomeFlow() {
               {step === "profile" && me.data ? (
                 <Profile titleId={titleId} me={me.data} onBack={back} onNext={next} />
               ) : null}
-              {step === "style" ? <Style titleId={titleId} onBack={back} onNext={next} /> : null}
               {step === "interests" ? <Interests titleId={titleId} onBack={back} onNext={next} /> : null}
+              {step === "play" ? <PlayChoice titleId={titleId} onBack={back} onNext={next} /> : null}
+              {step === "style" ? <Style titleId={titleId} onBack={back} onNext={next} /> : null}
               {step === "ready" ? (
                 <Ready
                   titleId={titleId}
                   name={name}
+                  onLeave={close}
                   onTour={() => {
                     close();
                     navigate("/");
@@ -195,11 +213,11 @@ function Hello({
           <span>{t("onboarding:hello.watch")}</span>
         </li>
         <li>
-          <Icon name="trophy" size={20} />
-          <span>{t("onboarding:hello.earn")}</span>
+          <Icon name="gamepad" size={20} />
+          <span>{t("onboarding:hello.play")}</span>
         </li>
         <li>
-          <Icon name="wand" size={20} />
+          <Icon name="sliders" size={20} />
           <span>{t("onboarding:hello.make")}</span>
         </li>
       </ul>
@@ -397,7 +415,9 @@ function Style({ titleId, onBack, onNext }: { titleId: string; onBack: () => voi
 function Interests({ titleId, onBack, onNext }: { titleId: string; onBack: () => void; onNext: () => void }) {
   const t = useT();
   const [saved, setSaved] = useShellPreference<string[]>("shell.onboarding.interests", []);
-  const [chosen, setChosen] = useState<string[]>(saved);
+  const [chosen, setChosen] = useState<string[]>(() =>
+    saved.filter((key) => INTERESTS.some((interest) => interest.key === key)),
+  );
   const toggle = (key: string) =>
     setChosen((current) => (current.includes(key) ? current.filter((k) => k !== key) : [...current, key]));
   return (
@@ -422,6 +442,7 @@ function Interests({ titleId, onBack, onNext }: { titleId: string; onBack: () =>
           </label>
         ))}
       </fieldset>
+      <p className="onboarding-welcome__hint">{t("onboarding:interests.later")}</p>
       <Nav
         onBack={onBack}
         onNext={() => {
@@ -434,32 +455,130 @@ function Interests({ titleId, onBack, onNext }: { titleId: string; onBack: () =>
   );
 }
 
+function PlayChoice({
+  titleId,
+  onBack,
+  onNext,
+}: {
+  titleId: string;
+  onBack: () => void;
+  onNext: () => void;
+}) {
+  const t = useT();
+  const client = useQueryClient();
+  const [saved, setSaved] = useShellPreference<Play | null>("shell.onboarding.play", null);
+  const [chosen, setChosen] = useState<Play | null>(saved);
+  const save = useMutation({
+    mutationFn: async (play: Play) => {
+      await setPresence(PLAY.find((choice) => choice.key === play)?.level ?? "community");
+    },
+    onSuccess: async (_, play) => {
+      setSaved(play);
+      await client.invalidateQueries({ queryKey: ["privacy", "me"] });
+      await client.invalidateQueries({ queryKey: ["community"] });
+      onNext();
+    },
+  });
+  const player = chosen === "full" || chosen === "progression";
+  return (
+    <>
+      <DialogPrimitive.Title id={titleId}>{t("onboarding:play.title")}</DialogPrimitive.Title>
+      <p className="onboarding-welcome__lead">{t("onboarding:play.lead")}</p>
+      <ul className="onboarding-highlights onboarding-highlights--compact">
+        <li>
+          <Icon name="trophy" size={18} />
+          <span>{t("onboarding:play.level")}</span>
+        </li>
+        <li>
+          <Icon name="shop" size={18} />
+          <span>{t("onboarding:play.shop")}</span>
+        </li>
+        <li>
+          <Icon name="layers" size={18} />
+          <span>{t("onboarding:play.cards")}</span>
+        </li>
+      </ul>
+      <fieldset className="onboarding-play">
+        <legend className="visually-hidden">{t("onboarding:play.title")}</legend>
+        {PLAY.map((choice) => (
+          <label
+            key={choice.key}
+            className="onboarding-play__choice"
+            data-current={chosen === choice.key || undefined}
+          >
+            <input
+              type="radio"
+              name="onboarding-play"
+              value={choice.key}
+              checked={chosen === choice.key}
+              onChange={() => setChosen(choice.key)}
+            />
+            <span className="onboarding-play__icon" aria-hidden="true">
+              <Icon name={choice.icon} size={20} />
+            </span>
+            <span className="onboarding-play__text">
+              <strong>{t(`onboarding:play.${choice.key}`)}</strong>
+              <span>{t(`onboarding:play.${choice.key}Hint`)}</span>
+            </span>
+          </label>
+        ))}
+      </fieldset>
+      {chosen ? (
+        <p className="onboarding-welcome__hint" data-tone={player ? "public" : "anonymous"}>
+          <Icon name={player ? "users" : "hide"} size={16} />
+          {t(player ? "onboarding:play.public" : "onboarding:play.anonymous")}
+        </p>
+      ) : null}
+      {save.error ? (
+        <p className="onboarding-welcome__problem" role="alert">
+          {t("onboarding:play.error")}
+        </p>
+      ) : null}
+      <Nav onBack={onBack} onNext={() => (chosen && chosen !== saved ? save.mutate(chosen) : onNext())} />
+    </>
+  );
+}
+
+/** Everything the member can set later, each where it is set. */
+const SETTINGS = [
+  { key: "look", icon: "palette", to: "/settings/appearance" },
+  { key: "dashboard", icon: "dashboard", to: "/" },
+  { key: "notifications", icon: "mail", to: "/settings/notifications" },
+  { key: "privacy", icon: "shield", to: "/privacy" },
+] as const;
+
 function Ready({
   titleId,
   name,
   onTour,
   onDone,
+  onLeave,
 }: {
   titleId: string;
   name: string;
   onTour: () => void;
   onDone: () => void;
+  onLeave: () => void;
 }) {
   const t = useT();
   return (
     <>
       <DialogPrimitive.Title id={titleId}>{t("onboarding:ready.title", { name })}</DialogPrimitive.Title>
       <p className="onboarding-welcome__lead">{t("onboarding:ready.lead")}</p>
-      <ul className="onboarding-highlights">
-        <li>
-          <Icon name="compass" size={20} />
-          <span>{t("onboarding:ready.tour")}</span>
-        </li>
-        <li>
-          <Icon name="target" size={20} />
-          <span>{t("onboarding:ready.missions")}</span>
-        </li>
+      <ul className="onboarding-settings">
+        {SETTINGS.map((setting) => (
+          <li key={setting.key}>
+            <Link to={setting.to} onClick={onLeave}>
+              <Icon name={setting.icon} size={20} />
+              <span>
+                <strong>{t(`onboarding:ready.${setting.key}`)}</strong>
+                <span>{t(`onboarding:ready.${setting.key}Hint`)}</span>
+              </span>
+            </Link>
+          </li>
+        ))}
       </ul>
+      <p className="onboarding-welcome__hint">{t("onboarding:ready.tour")}</p>
       <div className="onboarding-welcome__nav">
         <Button variant="ghost" onClick={onDone}>
           {t("onboarding:ready.later")}
