@@ -531,7 +531,7 @@
   "shelf.badges": "Badges",
   "shelf.banners": "Bannières de profil",
   "shelf.bonus": "Bonus et extensions",
-  "shelf.boosters": "Boosters",
+  "shelf.boosters": "Boosters de looks",
   "shelf.celebrations": "Célébrations",
   "shelf.community": "Projets communautaires",
   "shelf.frames": "Contours de profil",
@@ -715,7 +715,7 @@
   "type.ambient": "Animation d'ambiance",
   "type.avatar_frame": "Cadre d'avatar",
   "type.badge": "Badge",
-  "type.card_booster": "Booster de cartes",
+  "type.card_booster": "Booster Mediacards",
   "admin.field.any": "Tous",
   "admin.field.card_booster.family": "Genre",
   "admin.field.card_booster.edition": "Édition (période)",
@@ -779,7 +779,7 @@
   "vitrine.only.deal": "En promo",
   "vitrine.only.unowned": "Pas encore à moi",
   "vitrine.pick.afford": "À ta portée",
-  "vitrine.pick.boosters": "Boosters à ouvrir",
+  "vitrine.pick.boosters": "Boosters de looks à ouvrir",
   "vitrine.pick.deal": "En promotion",
   "vitrine.pick.free": "Gratuits",
   "vitrine.pick.soon": "Bientôt épuisés",
@@ -837,5 +837,10 @@
   "widget.featured.description": "Quelques produits à obtenir avec vos Coins.",
   "widget.featured.open": "Boutique",
   "widget.featured.slide": "Produit {n} sur {total}",
-  "widget.featured.title": "Boutique"
+  "widget.featured.title": "Boutique",
+  "shelf.cardBoosters": "Boosters Mediacards",
+  "vitrine.pick.mediacards": "Boosters Mediacards",
+  "admin.boosters.cardScene": "Scène des boosters Mediacards",
+  "admin.boosters.cardSceneHint": "L'emballage et l'ouverture de tous les boosters Mediacards, achetés ou gagnés en regardant ; ils ne prennent jamais la scène des boosters de looks.",
+  "admin.boosters.cardScenePortalab": "Celle de Portalab"
 }

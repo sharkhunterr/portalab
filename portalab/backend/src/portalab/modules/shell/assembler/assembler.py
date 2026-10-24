@@ -34,6 +34,9 @@ from portalab.modules.shell.assembler.layout import UNRANKED, arrange
 from portalab.modules.shell.observability import log, metrics
 
 CACHE_SIZE = 512
+# issue 243: the welcome's « do you want to play? » answers without the cards, and what they hide
+WITHOUT_CARDS = ("progression", "none")
+CARDS_OWNER = "module:cards"
 
 
 class NavigationAssembler:
@@ -94,9 +97,11 @@ class NavigationAssembler:
         layout = await self._setting("shell.navigation.layout", principal, {})
         allow_user = bool(await self._setting("shell.navigation.allowUserOrdering", principal, True))
         user_order = list(await self._setting("shell.navigation.userOrder", principal, []))
+        # issue 243: a member who plays without the cards (or does not play) has no cards in the menu
+        cardless = await self._setting("shell.onboarding.play", principal, None) in WITHOUT_CARDS
         epochs = await self.epochs.current()
         fingerprint = hashlib.sha256(
-            json.dumps([layout, allow_user, user_order], sort_keys=True, default=str).encode()
+            json.dumps([layout, allow_user, user_order, cardless], sort_keys=True, default=str).encode()
         ).hexdigest()
         key = (
             principal.user_id,
@@ -113,7 +118,7 @@ class NavigationAssembler:
             return cached
         metrics.increment("shell.cache_misses")
         try:
-            view = await self._assemble(principal, layout, user_order, allow_user)
+            view = await self._assemble(principal, layout, user_order, allow_user, cardless=cardless)
         except Exception:
             log.warning("navigation assembly failed; minimal navigation served")
             metrics.increment("shell.assembly_failures")
@@ -139,12 +144,20 @@ class NavigationAssembler:
         return {**view, "version": _version(view), "generated_at": utc_now(self.clock).isoformat()}
 
     async def _assemble(
-        self, principal: Principal, layout: Mapping[str, Any], user_order: list[str], allow_user: bool
+        self,
+        principal: Principal,
+        layout: Mapping[str, Any],
+        user_order: list[str],
+        allow_user: bool,
+        *,
+        cardless: bool = False,
     ) -> dict[str, Any]:
         enabled_memo: dict[tuple[str, str], bool] = {}
         allowed_memo: dict[str, bool] = {}
         usable: list[NavigationContribution] = []
         for contribution in self.registry.all():
+            if cardless and contribution.owner == CARDS_OWNER:
+                continue
             try:
                 if not await self._enabled(contribution, enabled_memo):
                     continue

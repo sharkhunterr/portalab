@@ -10282,7 +10282,8 @@ export interface paths {
         };
         /**
          * Scene
-         * @description The scene a booster opens with (``null``: Portalab's own).
+         * @description The scene a booster opens with (``null``: Portalab's own) — ``kind``: the scene of its kind of
+         *     booster when it has none of its own (``card_booster``, issue 243).
          */
         get: operations["scene_api_v1_visuals_scenes__booster_key__get"];
         put?: never;
@@ -31915,6 +31916,7 @@ export interface operations {
                 kind?: ("notification" | "alert") | null;
                 unread?: boolean;
                 archived?: boolean;
+                lang?: string | null;
             };
             header?: never;
             path?: never;
@@ -37558,7 +37560,9 @@ export interface operations {
     };
     scene_api_v1_visuals_scenes__booster_key__get: {
         parameters: {
-            query?: never;
+            query?: {
+                kind?: string | null;
+            };
             header?: never;
             path: {
                 booster_key: string;

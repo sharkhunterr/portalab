@@ -1,14 +1,17 @@
 ---
 slug: guide-cartes
-title: Les cartes de collection
+title: Les Mediacards
 position: 9
 help_keys: [cards, cards.sets.detail, cards.people]
 tags: [guide, cartes, collection, boosters]
 ---
-Collectionner les cartes des films et des séries du portail : ce qu'est une carte, comment en obtenir, ouvrir un booster et compléter vos collections.
+Les Mediacards, les cartes de collection des films et des séries du portail : ce qu'est une carte, comment en obtenir, ouvrir un booster et compléter vos collections.
 
 > [!TIP]
-> La visite guidée « Mes cartes », sur la page [Visites guidées](/guide), vous montre tout cela en une minute.
+> La visite guidée « Mediacards », sur la page [Visites guidées](/guide), vous montre tout cela en une minute.
+
+> [!NOTE]
+> Vous ne collectionnez pas ? Si vous avez répondu « Oui, sans les cartes » ou « Non » à « Tu veux jouer ? », les Mediacards sont cachées : le menu, la fiche des titres, la boutique et la réserve ne les montrent plus, et regarder ne donne plus de booster Mediacards. Les boosters de looks, la progression et la boutique restent.
 
 ## Le principe
 
@@ -68,11 +71,11 @@ L'édition dépend de l'année de sortie du titre :
 Les cartes viennent dans des **boosters** : des paquets scellés dont les cartes sont tirées au hasard, selon leur rareté.
 
 - **En regardant** : selon les règles de votre portail, un film vu jusqu'au bout ou une saison terminée vous donne un booster de ce titre. Il ne contient que des cartes de ce titre (trois cartes, jamais deux fois la même tant qu'il en reste d'autres). Un film, ou une saison d'une série, ne vous en donne qu'une fois, et le nombre de boosters reçus par jour est limité.
-- **Dans la boutique** : le rayon « Boosters » propose des « Boosters de cartes » d'un genre, d'une édition, de films ou de séries (de 3 à 10 cartes). Une fois acheté, le booster scellé vous attend. Il n'est pas remboursable. Voir [La boutique](portalab://wiki/guide-boutique).
+- **Dans la boutique** : le rayon « Boosters », étagère « Boosters Mediacards », propose des boosters d'un genre, d'une édition, de films ou de séries (de 3 à 10 cartes). Une fois acheté, le booster scellé vous attend. Il n'est pas remboursable. Voir [La boutique](portalab://wiki/guide-boutique).
 
-![Les boosters de cartes dans le rayon « Boosters » de la boutique](shot:cartes-boutique)
+![Les boosters Mediacards dans le rayon « Boosters » de la boutique](shot:cartes-boutique)
 
-Vos boosters à ouvrir sont en haut de [Mes cartes](/cards) (« … paquets à ouvrir ») et dans [Ma réserve](/marketplace/reserve).
+Vos boosters à ouvrir sont en haut de [Mediacards](/cards) (« … paquets à ouvrir ») et dans [Ma réserve](/marketplace/reserve).
 
 ## Ouvrir un booster
 
@@ -83,11 +86,11 @@ Vos boosters à ouvrir sont en haut de [Mes cartes](/cards) (« … paquets à o
 > [!NOTE]
 > Une carte que vous avez déjà n'est pas perdue : c'est un exemplaire de plus, compté dans vos doublons. Les cartes ne se revendent pas contre des Coins.
 
-## Mes cartes
+## Mes Mediacards
 
-[Mes cartes](/cards), dans la section Communauté du menu, réunit votre collection.
+[Mediacards](/cards), dans la section Communauté du menu, réunit votre collection.
 
-![La page Mes cartes, ses cinq repères numérotés](shot:cartes-mes-cartes)
+![La page Mes Mediacards, ses cinq repères numérotés](shot:cartes-mes-cartes)
 
 1. **La recherche** « Chercher un film, une série, un acteur, un personnage… » trouve des extensions, des cartes et des personnes.
 2. **Vos chiffres** : les cartes différentes que vous avez sur toutes celles du portail, les extensions commencées et vos exemplaires.

@@ -13,7 +13,7 @@ import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import type { Product } from "../api";
 import { type BoosterInfo, boosterOf, localized } from "../boosters/api";
 import { ProductPack } from "../boosters/Boosters";
-import type { SceneBinding } from "../boosters/scene/scene";
+import { CARD_BOOSTER, type SceneBinding } from "../boosters/scene/scene";
 import { PoolPicker, PoolSummary, poolNamed, poolPacks, usePoolPreview } from "./BoosterPool";
 import { withConfirmation } from "./confirm";
 import type { Season } from "./console/api";
@@ -605,6 +605,46 @@ function SeasonState({ season }: { season: Season | undefined }) {
  * reward (Engagement › Levels) or an achievement (Engagement › Achievements) gives it sealed. Issue 153: a
  * new one is made here of the visuals there are — its pack's look, its scene, the visual packs it draws from.
  */
+/** Issue 243: the scene every Mediacards booster wears (bought or given by watching) — apart from the looks
+ * boosters', which they never take. */
+function CardBoostersScene({
+  options,
+  onSaved,
+}: {
+  options: BoosterOptions | undefined;
+  onSaved: () => void;
+}) {
+  const t = useT();
+  const { locale } = useLocaleContext();
+  const bound = options?.bindings[CARD_BOOSTER];
+  const current = bound ? `${bound.pack}:${bound.look}` : "";
+  const [saving, setSaving] = useState(false);
+  return (
+    <SelectField
+      label={t("marketplace:admin.boosters.cardScene")}
+      hint={t("marketplace:admin.boosters.cardSceneHint")}
+      value={current}
+      disabled={saving || !options}
+      onChange={async (event) => {
+        setSaving(true);
+        try {
+          await bindScene(CARD_BOOSTER, event.target.value);
+          onSaved();
+        } finally {
+          setSaving(false);
+        }
+      }}
+    >
+      <option value="">{t("marketplace:admin.boosters.cardScenePortalab")}</option>
+      {(options?.scenes ?? []).map((scene) => (
+        <option key={`${scene.pack}:${scene.look}`} value={`${scene.pack}:${scene.look}`}>
+          {localized(scene.names, locale) || scene.look}
+        </option>
+      ))}
+    </SelectField>
+  );
+}
+
 export function BoostersAdmin({
   products,
   onSaved,
@@ -638,6 +678,7 @@ export function BoostersAdmin({
         {t("marketplace:admin.boosters.pitch")}{" "}
         <Link to="/admin/gamification">{t("marketplace:admin.boosters.gifts")}</Link>
       </p>
+      <CardBoostersScene options={options.data} onSaved={saved} />
       {boosters.length ? (
         <ul className="admin-boosters">
           {boosters.map((product) => (

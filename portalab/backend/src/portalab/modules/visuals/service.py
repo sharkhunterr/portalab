@@ -933,9 +933,12 @@ class VisualPacks:
             else:
                 binding.element_id = target
 
-    async def scene_for(self, booster_key: str) -> dict[str, Any] | None:
+    async def scene_for(self, booster_key: str, kind: str | None = None) -> dict[str, Any] | None:
         """The scene a booster opens with — its own, else the default one bound to every booster, else none
-        (Portalab's own scene). Only a live pack's scene counts; its parts are drawn by their own kind."""
+        (Portalab's own scene). Only a live pack's scene counts; its parts are drawn by their own kind.
+        Issue 243: a booster of a ``kind`` (``card_booster``: every Mediacards booster, bought or given) falls
+        back on the scene bound to its kind instead — never on the looks' boosters' one."""
+        keys = (booster_key, kind) if kind else (booster_key, "*")
         async with self.database.session() as session:
             rows = (
                 await session.execute(
@@ -943,12 +946,12 @@ class VisualPacks:
                     .join(Element, Element.id == SceneBinding.element_id)
                     .join(PackVersion, PackVersion.id == Element.version_id)
                     .join(Pack, Pack.current_version_id == PackVersion.id)
-                    .where(SceneBinding.booster_key.in_((booster_key, "*")), Pack.state == "enabled")
+                    .where(SceneBinding.booster_key.in_(keys), Pack.state == "enabled")
                 )
             ).all()
             if not rows:
                 return None
-            _, pack_id, version, scene = sorted(rows, key=lambda r: r[0] == "*")[0]
+            _, pack_id, version, scene = sorted(rows, key=lambda r: keys.index(r[0]))[0]
             by_folder = {
                 e.folder.removeprefix("elements/"): e for e in await self._elements(session, version.id)
             }

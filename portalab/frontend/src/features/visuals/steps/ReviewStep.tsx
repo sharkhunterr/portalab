@@ -16,6 +16,9 @@ import {
 import { nameOf, RARITIES } from "../parts";
 import { confirmationsNeeded, GIVEABLE, NOT_SOLD } from "./review";
 
+/** Issue 243: the scene of every Mediacards booster (its kind), apart from the looks' boosters' one. */
+const CARD_BOOSTERS = "card_booster";
+
 /** Review: the economy each element proposes — price, rarity, level, copies — changed if wanted, and the
  * confirmations the version needs (its scripts, a look it takes over, the data a widget asks for). Saved
  * with the version (another administrator sees the same review). */
@@ -37,7 +40,7 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
   // 028: the booster scenes, bound to every booster (« * »), one booster (its key) or none — issue 153: none
   // unless the administrators say so (a booster is given its scene in Shop › Boosters)
   const scenes = detail.report.elements.filter((e) => e.type === "booster_scene" && e.look);
-  const [modes, setModes] = useState<Record<string, "all" | "one" | "none">>({});
+  const [modes, setModes] = useState<Record<string, "all" | "cards" | "one" | "none">>({});
   const [bindings, setBindings] = useState<Record<string, string>>(
     () => (detail.draft as { bindings?: Record<string, string> } | null)?.bindings ?? {},
   );
@@ -173,7 +176,9 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
             {scenes.map((scene) => {
               const look = scene.look as string;
               const value = bindings[look] ?? "";
-              const mode = modes[look] ?? (value === "*" ? "all" : value ? "one" : "none");
+              const mode =
+                modes[look] ??
+                (value === "*" ? "all" : value === CARD_BOOSTERS ? "cards" : value ? "one" : "none");
               return (
                 <label key={look}>
                   {nameOf(scene.names, look)}
@@ -181,12 +186,16 @@ export function ReviewStep({ detail, onSaved }: { detail: VersionDetail; onSaved
                     disabled={closed}
                     value={mode}
                     onChange={(event) => {
-                      const next = event.target.value as "all" | "one" | "none";
+                      const next = event.target.value as "all" | "cards" | "one" | "none";
                       setModes((all) => ({ ...all, [look]: next }));
-                      setBindings((all) => ({ ...all, [look]: next === "all" ? "*" : "" }));
+                      setBindings((all) => ({
+                        ...all,
+                        [look]: next === "all" ? "*" : next === "cards" ? CARD_BOOSTERS : "",
+                      }));
                     }}
                   >
                     <option value="all">{t("admin:visuals.review.sceneAll")}</option>
+                    <option value="cards">{t("admin:visuals.review.sceneCards")}</option>
                     <option value="one">{t("admin:visuals.review.sceneOne")}</option>
                     <option value="none">{t("admin:visuals.review.sceneNone")}</option>
                   </select>

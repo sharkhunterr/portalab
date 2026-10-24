@@ -17,7 +17,7 @@ import {
   useBoosters,
   useOpenings,
 } from "./api";
-import { useSceneBindings } from "./scene/scene";
+import { bindingOf, CARD_BOOSTER, useSceneBindings } from "./scene/scene";
 import "./boosters.css";
 
 const RARITIES = ["common", "rare", "epic", "legendary"] as const;
@@ -46,6 +46,11 @@ export interface PackLook {
   /** …its work's art printed on the pack, and a line under its name (a season) */
   art?: string | null;
   subtitle?: string | null;
+  /** issue 243: its work's backdrop, its genre's family and its edition — for a scene's wrapper to use (a
+   * look's stylesheet: ``.booster-pack__backdrop``, ``data-family``, ``data-edition``); unseen otherwise */
+  backdrop?: string | null;
+  family?: string | null;
+  edition?: string | null;
 }
 
 /** The sealed pack itself — foil, a tear line, the booster's name; ``stage`` for the opening, ``card``
@@ -67,8 +72,13 @@ export function BoosterPack({
       data-stage={stage || undefined}
       data-size={size}
       data-art={booster.art ? "" : undefined}
+      data-family={booster.family ?? undefined}
+      data-edition={booster.edition ?? undefined}
       aria-hidden="true"
     >
+      {booster.backdrop ? (
+        <img className="booster-pack__backdrop" src={booster.backdrop} alt="" draggable={false} />
+      ) : null}
       {booster.art ? <img className="booster-pack__art" src={booster.art} alt="" draggable={false} /> : null}
       <span className="booster-pack__foil" />
       <span className="booster-pack__flap" />
@@ -128,6 +138,29 @@ export function ProductPack({ product, size }: { product: Product; size?: "card"
     </span>
   ) : (
     <BoosterPack booster={booster} size={size} />
+  );
+}
+
+/** Issue 243: a Mediacards booster in the shop — in the wrapper of the scene bound to their kind (never the
+ * looks boosters' one), else Portalab's sealed pack. */
+export function CardBoosterPack({
+  product,
+  cards,
+  size,
+}: {
+  product: Product;
+  cards: number;
+  size?: string | undefined;
+}) {
+  const scene = bindingOf(useSceneBindings(), product.key, CARD_BOOSTER);
+  const booster = { names: product.names, look: "cosmos", cards };
+  const small = size === "mini" ? "mini" : "card";
+  return scene?.booster_look ? (
+    <span className="booster-scene-pack" data-booster-look={scene.booster_look} data-size={small}>
+      <BoosterPack booster={booster} />
+    </span>
+  ) : (
+    <BoosterPack booster={booster} size={small} />
   );
 }
 

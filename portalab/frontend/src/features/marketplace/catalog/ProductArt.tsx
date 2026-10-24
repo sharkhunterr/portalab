@@ -18,7 +18,7 @@ import { LevelUpPreview } from "../../gamification/levelup/LevelUpMoment";
 import { type Product, useProducts } from "../api";
 import { TYPE_ICONS } from "./ProductPoster";
 import "../../appearance/notification-looks.css";
-import { BoosterPack, ProductPack } from "../boosters/Boosters";
+import { CardBoosterPack, ProductPack } from "../boosters/Boosters";
 import "../product-art.css";
 import { productTypeLabel } from "../typeLabel";
 
@@ -300,13 +300,8 @@ function ArtBody({ product, size, fallback }: { product: Product; size: ArtSize;
       return <ThemeArt theme={text(preview, "theme") ?? product.theme ?? undefined} fallback={fallback} />;
     case "booster": // #81: its sealed pack
       return <ProductPack product={product} size={size === "mini" ? "mini" : "card"} />;
-    case "card_booster": // issue 234: a booster of cards — the same sealed pack as the shop's boosters
-      return (
-        <BoosterPack
-          booster={{ names: product.names, look: "cosmos", cards: Number(preview.cards) || 3 }}
-          size={size === "mini" ? "mini" : "card"}
-        />
-      );
+    case "card_booster": // issue 234: a booster of cards — issue 243: in the Mediacards boosters' wrapper
+      return <CardBoosterPack product={product} cards={Number(preview.cards) || 3} size={size} />;
     case "bundle":
       return Array.isArray(preview.products) ? (
         <PackArt keys={preview.products as string[]} fallback={fallback} />

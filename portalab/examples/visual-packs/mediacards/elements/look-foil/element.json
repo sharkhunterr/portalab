@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "mediacards",
+  "names": {
+    "fr": "Paquet métallisé",
+    "en": "Metallised pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet de cartes à collectionner réaliste : alu brossé et froissé teinté par le genre, soudures crantées en haut et en bas, encoche de déchirure, l’image du titre imprimée sur l’alu et fondue dedans, son fond sous son titre en bas, une pastille dorée du nombre de cartes, un reflet holographique.",
+    "en": "A realistic trading-card pack: brushed, crinkled foil tinted by the genre, crimped seals top and bottom, a tear notch, the work’s art printed on it and melting into the foil, its backdrop under its title at the foot, a gold sticker with the number of cards, a holographic gleam."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "foil.css"
+    ]
+  }
+}

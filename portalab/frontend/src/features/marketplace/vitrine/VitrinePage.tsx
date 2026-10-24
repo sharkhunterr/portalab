@@ -10,6 +10,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { HdTag, isHdProduct } from "../../appearance/Rarity";
+import { useCollectsCards } from "../../cards/collects";
 import { useProgression } from "../../gamification/api";
 import { BoostTag } from "../../gamification/boost";
 import { type Product, useDescribe, useProduct, useProducts } from "../api";
@@ -52,7 +53,7 @@ const RENDERS = ["hd", "standard"] as const; // drawn by the graphics chip (HD) 
 const PAGE = 24;
 const RAIL = 12;
 
-type Pick = "afford" | "deal" | "soon" | "boosters" | "free";
+type Pick = "afford" | "deal" | "soon" | "boosters" | "mediacards" | "free";
 
 const owned = (p: Product) => Boolean(p.owned && !p.repeatable);
 const soldOut = (p: Product) => p.remaining === 0 && !owned(p);
@@ -77,7 +78,8 @@ function picks(coins: number): Record<Pick, (p: Product) => boolean> {
     afford: (p) => buyable(p) && price(p) > 0 && price(p) <= coins,
     deal: (p) => buyable(p) && Boolean(p.discount),
     soon: (p) => buyable(p) && p.remaining != null && p.remaining > 0 && p.remaining <= 5,
-    boosters: (p) => buyable(p) && (p.type === "booster" || p.type === "card_booster"),
+    boosters: (p) => buyable(p) && p.type === "booster",
+    mediacards: (p) => buyable(p) && p.type === "card_booster", // issue 243: apart from the looks' boosters
     free: (p) => buyable(p) && !p.price_coins,
   };
 }
@@ -395,7 +397,12 @@ export default function VitrinePage() {
   const toggle = (flag: string) =>
     set({ only: (only.includes(flag) ? only.filter((f) => f !== flag) : [...only, flag]).join(",") || null });
 
-  const all = products.data ?? [];
+  // issue 243: a member who plays without the cards is not offered their boosters
+  const collects = useCollectsCards();
+  const all = useMemo(
+    () => (products.data ?? []).filter((p) => collects || p.type !== "card_booster"),
+    [products.data, collects],
+  );
   const rule = picks(coins);
   const counts = useMemo(() => {
     const byDepartment: Record<string, number> = {};
@@ -597,6 +604,7 @@ export default function VitrinePage() {
                   ["afford", "wallet"],
                   ["soon", "hourglass"],
                   ["boosters", "sparkles"],
+                  ["mediacards", "layers"],
                   ["free", "gift"],
                 ] as const
               ).map(([key, icon]) => (
