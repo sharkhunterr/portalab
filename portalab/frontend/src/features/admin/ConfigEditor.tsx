@@ -21,6 +21,8 @@ interface SettingItem {
   choices?: unknown[];
   /** where it may be set: ``global`` (the portal), ``user`` (each member's own preference)… */
   scopes?: string[];
+  /** each member sets their own: the portal's value is only their default */
+  user_overridable?: boolean;
 }
 
 interface PreviewResult {
@@ -171,11 +173,12 @@ export function SettingCard({ item, advanced = false }: { item: SettingItem; adv
   const text = useSettingText();
   const fieldId = useId();
   const { mutation, message, clear } = useApply(item);
-  const initial = item.sensitive
-    ? ""
-    : typeof item.value === "string"
-      ? item.value
-      : JSON.stringify(item.value);
+  const initial =
+    item.sensitive || item.value === null || item.value === undefined
+      ? ""
+      : typeof item.value === "string"
+        ? item.value
+        : JSON.stringify(item.value);
   const [raw, setRaw] = useState(initial);
   const kind = item.kind ?? "json";
   const dirty = raw !== initial;
@@ -361,7 +364,8 @@ function SettingsExplorer({
     () => settings.filter((item) => !item.scopes || item.scopes.includes("global")),
     [settings],
   );
-  const visible = portal.filter((item) => advanced || !isAdvanced(item.key));
+  // a member's own preference (the portal's value only their default) is for the advanced mode too
+  const visible = portal.filter((item) => advanced || (!isAdvanced(item.key) && !item.user_overridable));
   const counts = useMemo(() => {
     const out = new Map<string, number>();
     for (const item of visible) out.set(groupOf(item.key), (out.get(groupOf(item.key)) ?? 0) + 1);
