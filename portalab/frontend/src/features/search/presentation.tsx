@@ -27,6 +27,8 @@ export const KIND_ICONS: Record<string, string> = {
   campaign: "star",
   request: "plus", // #4: titles to ask for
   person: "user", // #92: actors, directors, authors, narrators
+  gamification: "trophy", // #84: achievements and open quests
+  statistics: "chart", // #84: the statistics I may see
 };
 
 /** #92: a person's roles in words and how many titles — « Réalisation · Interprétation · 12 titres ». */
