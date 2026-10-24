@@ -24,58 +24,76 @@ import { UniverseLooks } from "./UniverseLooks";
 /**
  * Appearance & accessibility settings (spec 022): theme, density, text size, contrast, motion, sound and
  * notification appearance. Policy-locked settings explain why; the user's own choice is kept. Changing a
- * setting never changes data — only presentation. Strings externalized for i18n (026).
+ * setting never changes data — only presentation. Its texts come from the catalogs (issue 240).
  */
-export const appearanceStrings = {
-  title: "Appearance & accessibility",
-  gallery: "Interfaces",
-  galleryHint:
-    "An interface changes colours and fonts, but also the layout, the navigation, the animations and the sounds.",
-  current: "Current",
-  colorMode: "Light or dark",
-  colorModes: { dark: "Dark", light: "Light", system: "Follow my device" },
-  layouts: {
-    sidebar: "Side menu",
-    topbar: "Top bar",
-    rail: "Icon rail",
-    orbit: "Orbit bubble",
-    "bottom-bar": "Bottom bar",
-    drawer: "Drawer",
-    dock: "Dock",
-    tabs: "Book tabs",
-    launcher: "Launcher screen",
-    terminal: "Command line",
-    reel: "Film reel",
-    lights: "String of lights",
-    vcr: "Video recorder",
-    sheet: "Phone sheet",
-  } as Record<string, string>,
-  footerHeader: "header at the bottom",
-  theme: "Interface",
-  themeDefault: "Portalab (default)",
-  themeFallback: "Your interface is not available right now; Portalab's default is used.",
-  density: "Density",
-  densities: { compact: "Compact", comfortable: "Comfortable", spacious: "Spacious" },
-  textScale: "Text size",
-  contrast: "High contrast",
-  reducedMotion: "Reduce motion",
-  motions: { system: "Follow my device", on: "On", off: "Off" },
-  sound: "Play sounds",
-  notificationPosition: "Notification position",
-  positions: {
-    "top-end": "Top end",
-    "top-start": "Top start",
-    "bottom-end": "Bottom end",
-    "bottom-start": "Bottom start",
-  },
-  notificationStyle: "Notification style",
-  styles: { toast: "Toast", banner: "Banner" },
-  campaignThemes: "Show seasonal campaign interfaces",
-  forcedMotion: "Your administrator reduces motion for everyone.",
-  display: "Display",
-  displayHint: "Light or dark, density, text size and motion: how the portal reads for you.",
-  notifications: "Notifications",
-} as const;
+/** Issue 240: the page's texts, in the member's language (they were written in English for everyone). */
+export function useAppearanceStrings() {
+  const t = useT();
+  return {
+    title: t("notifications:appearance.title"),
+    gallery: t("notifications:appearance.gallery"),
+    galleryHint: t("notifications:appearance.galleryHint"),
+    current: t("notifications:appearance.current"),
+    colorMode: t("notifications:appearance.colorMode"),
+    colorModes: {
+      dark: t("notifications:appearance.colorModes.dark"),
+      light: t("notifications:appearance.colorModes.light"),
+      system: t("notifications:appearance.colorModes.system"),
+    },
+    layouts: {
+      sidebar: t("notifications:appearance.layouts.sidebar"),
+      topbar: t("notifications:appearance.layouts.topbar"),
+      rail: t("notifications:appearance.layouts.rail"),
+      orbit: t("notifications:appearance.layouts.orbit"),
+      "bottom-bar": t("notifications:appearance.layouts.bottom-bar"),
+      drawer: t("notifications:appearance.layouts.drawer"),
+      dock: t("notifications:appearance.layouts.dock"),
+      tabs: t("notifications:appearance.layouts.tabs"),
+      launcher: t("notifications:appearance.layouts.launcher"),
+      terminal: t("notifications:appearance.layouts.terminal"),
+      reel: t("notifications:appearance.layouts.reel"),
+      lights: t("notifications:appearance.layouts.lights"),
+      vcr: t("notifications:appearance.layouts.vcr"),
+      sheet: t("notifications:appearance.layouts.sheet"),
+    } as Record<string, string>,
+    footerHeader: t("notifications:appearance.footerHeader"),
+    theme: t("notifications:appearance.theme"),
+    themeDefault: t("notifications:appearance.themeDefault"),
+    themeFallback: t("notifications:appearance.themeFallback"),
+    density: t("notifications:appearance.density"),
+    densities: {
+      compact: t("notifications:appearance.densities.compact"),
+      comfortable: t("notifications:appearance.densities.comfortable"),
+      spacious: t("notifications:appearance.densities.spacious"),
+    },
+    textScale: t("notifications:appearance.textScale"),
+    contrast: t("notifications:appearance.contrast"),
+    reducedMotion: t("notifications:appearance.reducedMotion"),
+    motions: {
+      system: t("notifications:appearance.motions.system"),
+      on: t("notifications:appearance.motions.on"),
+      off: t("notifications:appearance.motions.off"),
+    },
+    sound: t("notifications:appearance.sound"),
+    notificationPosition: t("notifications:appearance.notificationPosition"),
+    positions: {
+      "top-end": t("notifications:appearance.positions.top-end"),
+      "top-start": t("notifications:appearance.positions.top-start"),
+      "bottom-end": t("notifications:appearance.positions.bottom-end"),
+      "bottom-start": t("notifications:appearance.positions.bottom-start"),
+    },
+    notificationStyle: t("notifications:appearance.notificationStyle"),
+    styles: {
+      toast: t("notifications:appearance.styles.toast"),
+      banner: t("notifications:appearance.styles.banner"),
+    },
+    campaignThemes: t("notifications:appearance.campaignThemes"),
+    forcedMotion: t("notifications:appearance.forcedMotion"),
+    display: t("notifications:appearance.display"),
+    displayHint: t("notifications:appearance.displayHint"),
+    notifications: t("notifications:appearance.notifications"),
+  };
+}
 
 interface View {
   key: string;
@@ -145,6 +163,7 @@ function ThemeGallery({
     (theme, index) => !theme.family || themes.findIndex((t) => t.family === theme.family) === index,
   );
   const currentTheme = themes.find((t) => t.key === current);
+  const strings = useAppearanceStrings();
   const rarities = useThemeRarities();
   return (
     <>
@@ -154,8 +173,8 @@ function ThemeGallery({
           const active = theme.key === current || (theme.family && theme.family === currentTheme?.family);
           const name =
             theme.family === DEFAULT_FAMILY ? "Portalab" : theme.family ? theme.family : theme.name;
-          const layout = `${appearanceStrings.layouts[p.nav.desktop] ?? p.nav.desktop}${
-            p.headerPosition === "bottom" ? ` · ${appearanceStrings.footerHeader}` : ""
+          const layout = `${strings.layouts[p.nav.desktop] ?? p.nav.desktop}${
+            p.headerPosition === "bottom" ? ` · ${strings.footerHeader}` : ""
           }`;
           return (
             <li key={theme.key} className="theme-gallery__item">
@@ -178,7 +197,7 @@ function ThemeGallery({
                   {active ? (
                     <span className="theme-card__current">
                       <Icon name="check" size={12} />
-                      {appearanceStrings.current}
+                      {strings.current}
                     </span>
                   ) : null}
                 </span>
@@ -257,6 +276,7 @@ export function ThemeMiniature({ theme }: { theme: ThemeDefinition }) {
 
 export function AppearanceSettings() {
   const t = useT();
+  const strings = useAppearanceStrings();
   const headingId = useId();
   const { preferences, policy, setPreference } = usePreferences();
   const { themes, effective } = useTheme();
@@ -276,11 +296,11 @@ export function AppearanceSettings() {
   };
   return (
     <section aria-labelledby={headingId} className="account-page appearance-page">
-      <PageHeader titleId={headingId} level={2} icon="palette" title={appearanceStrings.title} />
-      {effective.fallback ? <p role="status">{appearanceStrings.themeFallback}</p> : null}
+      <PageHeader titleId={headingId} level={2} icon="palette" title={strings.title} />
+      {effective.fallback ? <p role="status">{strings.themeFallback}</p> : null}
       <section className="appearance-card" aria-labelledby="theme-gallery">
-        <h3 id="theme-gallery">{appearanceStrings.gallery}</h3>
-        <p className="ds-page-header__context">{appearanceStrings.galleryHint}</p>
+        <h3 id="theme-gallery">{strings.gallery}</h3>
+        <p className="ds-page-header__context">{strings.galleryHint}</p>
         <ThemeGallery
           themes={themes}
           current={effective.theme.key}
@@ -292,13 +312,13 @@ export function AppearanceSettings() {
         <div className="appearance-row">
           {field("ui.theme", (disabled, describedBy) => (
             <SelectField
-              label={appearanceStrings.theme}
+              label={strings.theme}
               value={preferences.theme ?? ""}
               disabled={disabled}
               aria-describedby={describedBy}
               onChange={(event) => set("theme")(event.target.value || null)}
             >
-              <option value="">{appearanceStrings.themeDefault}</option>
+              <option value="">{strings.themeDefault}</option>
               {themes.map((theme) => (
                 <option key={theme.key} value={theme.key}>
                   {theme.name}
@@ -308,12 +328,12 @@ export function AppearanceSettings() {
           ))}
           {field("ui.colorMode", (disabled) => (
             <SelectField
-              label={appearanceStrings.colorMode}
+              label={strings.colorMode}
               value={preferences.colorMode}
               disabled={disabled}
               onChange={(event) => set("colorMode")(event.target.value as UiPreferences["colorMode"])}
             >
-              {Object.entries(appearanceStrings.colorModes).map(([value, label]) => (
+              {Object.entries(strings.colorModes).map(([value, label]) => (
                 <option key={value} value={value}>
                   {label}
                 </option>
@@ -324,7 +344,7 @@ export function AppearanceSettings() {
         <InShop count={shopThemes} type="theme" />
         {field("ui.campaignThemes", (disabled) => (
           <CheckboxField
-            label={appearanceStrings.campaignThemes}
+            label={strings.campaignThemes}
             checked={preferences.campaignThemes === "allow"}
             disabled={disabled}
             onChange={(event) => set("campaignThemes")(event.target.checked ? "allow" : "ignore")}
@@ -336,17 +356,17 @@ export function AppearanceSettings() {
       <LevelUpPicker />
       <PluginLooks />
       <section className="appearance-card" aria-labelledby="appearance-display">
-        <h3 id="appearance-display">{appearanceStrings.display}</h3>
-        <p className="ds-page-header__context">{appearanceStrings.displayHint}</p>
+        <h3 id="appearance-display">{strings.display}</h3>
+        <p className="ds-page-header__context">{strings.displayHint}</p>
         <div className="appearance-row">
           {field("ui.density", (disabled) => (
             <SelectField
-              label={appearanceStrings.density}
+              label={strings.density}
               value={preferences.density}
               disabled={disabled}
               onChange={(event) => set("density")(event.target.value as UiPreferences["density"])}
             >
-              {Object.entries(appearanceStrings.densities).map(([value, label]) => (
+              {Object.entries(strings.densities).map(([value, label]) => (
                 <option key={value} value={value}>
                   {label}
                 </option>
@@ -355,13 +375,13 @@ export function AppearanceSettings() {
           ))}
           {field("ui.reducedMotion", (disabled) => (
             <SelectField
-              label={appearanceStrings.reducedMotion}
+              label={strings.reducedMotion}
               value={preferences.reducedMotion}
               disabled={disabled || policy.forceReducedMotion}
-              hint={policy.forceReducedMotion ? appearanceStrings.forcedMotion : undefined}
+              hint={policy.forceReducedMotion ? strings.forcedMotion : undefined}
               onChange={(event) => set("reducedMotion")(event.target.value as UiPreferences["reducedMotion"])}
             >
-              {Object.entries(appearanceStrings.motions).map(([value, label]) => (
+              {Object.entries(strings.motions).map(([value, label]) => (
                 <option key={value} value={value}>
                   {label}
                 </option>
@@ -395,7 +415,7 @@ export function AppearanceSettings() {
         ))}
         {field("ui.textScale", (disabled) => (
           <div className="ds-field appearance-scale">
-            <label htmlFor="ui-text-scale">{appearanceStrings.textScale}</label>
+            <label htmlFor="ui-text-scale">{strings.textScale}</label>
             <span className="appearance-scale__row">
               <span aria-hidden="true">A</span>
               <input
@@ -419,7 +439,7 @@ export function AppearanceSettings() {
         <div className="appearance-toggles">
           {field("ui.contrast", (disabled) => (
             <CheckboxField
-              label={appearanceStrings.contrast}
+              label={strings.contrast}
               checked={preferences.contrast === "high"}
               disabled={disabled}
               onChange={(event) => set("contrast")(event.target.checked ? "high" : "default")}
@@ -427,7 +447,7 @@ export function AppearanceSettings() {
           ))}
           {field("ui.soundEnabled", (disabled) => (
             <CheckboxField
-              label={appearanceStrings.sound}
+              label={strings.sound}
               checked={preferences.soundEnabled}
               disabled={disabled}
               onChange={(event) => set("soundEnabled")(event.target.checked)}
@@ -440,14 +460,14 @@ export function AppearanceSettings() {
       <NotificationLooks
         position={field("ui.notificationPosition", (disabled) => (
           <SelectField
-            label={appearanceStrings.notificationPosition}
+            label={strings.notificationPosition}
             value={preferences.notificationPosition}
             disabled={disabled}
             onChange={(event) =>
               set("notificationPosition")(event.target.value as UiPreferences["notificationPosition"])
             }
           >
-            {Object.entries(appearanceStrings.positions).map(([value, label]) => (
+            {Object.entries(strings.positions).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
               </option>
