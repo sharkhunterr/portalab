@@ -100,6 +100,21 @@ export function SafeHtml({ html, diagrams = true }: { html: string; diagrams?: b
       if (kind) title.textContent = t(`content:callout.${kind}`);
     }
   }, [html, t]);
+  // issue 239: a page's image (a guide's annotated screenshot) opens full size — on a phone it is shown small
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the DOM to scan changes with ``html``
+  useEffect(() => {
+    for (const image of ref.current?.querySelectorAll<HTMLImageElement>("img[data-asset]") ?? []) {
+      if (image.closest("a")) continue;
+      const link = document.createElement("a");
+      link.className = "content-image";
+      link.href = image.getAttribute("src") ?? "";
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.setAttribute("aria-label", t("content:image.open", { alt: image.alt }));
+      image.replaceWith(link);
+      link.append(image);
+    }
+  }, [html, t]);
   const onClick = (event: MouseEvent<HTMLDivElement>) => {
     const anchor = (event.target as HTMLElement).closest<HTMLAnchorElement>("a[data-internal]");
     const href = anchor?.getAttribute("href");

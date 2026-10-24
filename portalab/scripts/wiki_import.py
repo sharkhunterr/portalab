@@ -2,13 +2,16 @@
 
 Each file starts with a header between two ``---`` lines (``slug``, ``title``, ``position``, optional
 ``parent`` — a slug, or ``none`` for a top page —, ``help_keys`` and ``tags`` as ``[a, b]``), then the
-page's markdown. A page is found by its slug: created when missing, updated when its title, text, tags or
-help keys changed, left alone otherwise; then published and put in its place under its parent. Pages are
-readable by everyone who may read the wiki and by the assistant.
+page's markdown. An image ``![text](shot:<name>)`` is a screenshot taken by ``guide_shots.mjs``
+(issue 239): uploaded from ``--shots <folder>/<name>.jpg`` as a file of its page, then kept from one import
+to the next (``--refresh-shots`` uploads them again); without one, the image is left out. A page is found
+by its slug: created when missing, updated when its title, text, tags or help keys changed, left alone
+otherwise; then published and put in its place under its parent. Pages are readable by everyone who may
+read the wiki and by the assistant.
 
     cd backend && uv run python ../scripts/wiki_import.py ../docs/member-guide/fr \\
         --base https://127.0.0.1:8443 --login admin --password-file <file> [--currency Xenocoins] \\
-        [--insecure] [--dry-run]
+        [--shots <folder> [--refresh-shots]] [--insecure] [--dry-run]
 
 The password is read from a file, never from the command line.
 """
@@ -24,6 +27,8 @@ from typing import Any
 import httpx
 
 API = "/api/v1"
+SHOT = re.compile(r"!\[([^\]]*)\]\(shot:([a-z0-9-]+)\)")
+PLACED = re.compile(r'\(portalab-asset:([0-9a-f-]{36}) "shot:([a-z0-9-]+)"\)')
 
 
 def parse(path: pathlib.Path) -> dict[str, Any]:
@@ -58,6 +63,8 @@ def main() -> int:
     args.add_argument("--language", default="fr")
     args.add_argument("--insecure", action="store_true", help="accept a self-signed certificate")
     args.add_argument("--currency", help="the site's currency name, written instead of « Coins »")
+    args.add_argument("--shots", type=pathlib.Path, help="the folder of guide_shots.mjs's screenshots")
+    args.add_argument("--refresh-shots", action="store_true", help="upload the screenshots again")
     args.add_argument("--dry-run", action="store_true")
     opts = args.parse_args()
     pages = [parse(p) for p in sorted(opts.folder.glob("*.md"))]
@@ -79,6 +86,31 @@ def main() -> int:
     if token:
         client.headers["X-CSRF-Token"] = token
     ids: dict[str, str] = {}
+
+    def place(markdown: str, page_id: str, current: str) -> str:
+        """The page's screenshots as its own files: those placed already kept, the others uploaded."""
+        placed = {name: asset for asset, name in PLACED.findall(current)}
+
+        def one(match: re.Match[str]) -> str:
+            alt, name = match.groups()
+            asset = None if opts.refresh_shots else placed.get(name)
+            shot = opts.shots / f"{name}.jpg" if opts.shots else None
+            if asset is None and shot is not None and shot.exists() and not opts.dry_run:
+                sent = client.post(
+                    "/content/assets",
+                    params={"owner_ref": f"portalab://wiki/{page_id}", "filename": f"{name}.jpg"},
+                    content=shot.read_bytes(),
+                    headers={"Content-Type": "image/jpeg"},
+                )
+                sent.raise_for_status()
+                asset = sent.json()["id"]
+            if asset is None:
+                print(f"         no screenshot {name}: left out")
+                return ""
+            return f'![{alt}](portalab-asset:{asset} "shot:{name}")'
+
+        return SHOT.sub(one, markdown)
+
     for page in pages:
         # no parent named: under the top page of the folder (the one whose parent is « none »)
         parent_slug = page["parent"] or next((p["slug"] for p in pages if p["parent"] == "none"), None)
@@ -97,22 +129,28 @@ def main() -> int:
             "publish": True,
         }
         found = client.get(f"/wiki/pages/{page['slug']}")
+        action = "update"
         if found.status_code == 404:
             action = "create"
             if not opts.dry_run:
-                found = client.post("/wiki/pages", json={**body, "change_note": "Guide du membre"})
+                # created without its screenshots: they are uploaded as files of the page, then placed
+                bare = {**body, "body_md": SHOT.sub("", body["body_md"])}
+                found = client.post("/wiki/pages", json={**bare, "change_note": "Guide du membre"})
                 found.raise_for_status()
         else:
             found.raise_for_status()
+        if found.status_code < 400:
             current = found.json()
+            body["body_md"] = place(body["body_md"], current["id"], current["body_md"])
             same = (
                 current["title"] == body["title"]
                 and current["body_md"].strip() == body["body_md"].strip()
                 and sorted(current["tags"]) == sorted(body["tags"])
                 and sorted(current["help_keys"]) == sorted(body["help_keys"])
             )
-            action = "same" if same else "update"
-            if action == "update" and not opts.dry_run:
+            if action != "create":
+                action = "same" if same else "update"
+            if not same and not opts.dry_run:
                 found = client.put(
                     f"/wiki/pages/{current['id']}",
                     json={**body, "base_version": current["version"], "change_note": "Guide du membre"},

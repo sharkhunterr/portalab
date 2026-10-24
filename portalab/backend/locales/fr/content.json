@@ -31,6 +31,7 @@
   "editor.uploadFailed": "L’image n’a pas pu être envoyée.",
   "editor.words": "{count, plural, one {# mot} other {# mots}}",
   "editor.write": "Écrire",
+  "image.open": "Ouvrir l'image en grand : {alt}",
   "link.archived": "archivé",
   "link.deleted": "supprimé",
   "link.forbidden": "non disponible",
