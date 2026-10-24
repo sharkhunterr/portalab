@@ -321,7 +321,8 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
           onChange={(e) => {
             setQuery(e.target.value);
             setOpen(true);
-            setActive(-1);
+            // issue 136: each keystroke makes the best match ready for Enter (not only when the count changes)
+            setActive(e.target.value.trim() ? 0 : -1);
           }}
           onKeyDown={onKeyDown}
           onBlur={(event) => {

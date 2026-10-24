@@ -1,8 +1,9 @@
 import { expect, type Page, test } from "@playwright/test";
-import { stubApi } from "../../a11y/support";
+import { headerSearch, stubApi } from "../../a11y/support";
 
-// 008 T028 — Mod+K on a service page shows its context actions; search results appear inside the palette;
-// a destructive action asks for confirmation; the whole flow works with the keyboard and focus returns.
+// 008 T028 — the palette (Mod+Shift+K since 027) on a service page shows its context actions; search results
+// appear inside the palette; a destructive action asks for confirmation; the whole flow works with the
+// keyboard and focus returns. The header's search (Mod+K) leads to the full results.
 
 async function signIn(page: Page) {
   await stubApi(page);
@@ -23,10 +24,13 @@ test("palette: context actions, inline results, confirmation, keyboard only", as
     .getByRole("link", { name: "Services" })
     .click();
   await page.goto("/services/s1");
-  const trigger = page.getByRole("button", { name: /Search/ });
+  const trigger = page
+    .getByRole("navigation", { name: "Main navigation" })
+    .getByRole("link", { name: "Services" });
   await trigger.focus();
-  await page.keyboard.press("Control+k");
-  const input = page.getByRole("combobox");
+  await page.keyboard.press("Control+Shift+K");
+  const palette = page.getByRole("dialog");
+  const input = palette.getByRole("combobox");
   await expect(input).toBeFocused();
   await input.fill("restart");
   const list = page.getByRole("listbox");
@@ -35,7 +39,6 @@ test("palette: context actions, inline results, confirmation, keyboard only", as
   const options = await list.getByRole("option").allTextContents();
   for (let i = 0; i < options.indexOf("Restart service"); i++) await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Enter");
-  const palette = page.getByRole("dialog");
   await expect(palette.getByRole("alert")).toContainText("needs confirmation");
   await expect(page).toHaveURL(/\/services\/s1$/); // nothing ran yet
   await page.keyboard.press("Escape"); // cancel the confirmation, palette stays
@@ -44,11 +47,12 @@ test("palette: context actions, inline results, confirmation, keyboard only", as
   await input.fill("media");
   await expect(list.getByRole("option", { name: "Media server" })).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(page.getByRole("combobox")).toHaveCount(0);
+  await expect(palette).toHaveCount(0);
   await expect(trigger).toBeFocused(); // focus restored
 
   await page.keyboard.press("Control+k");
-  await page.getByRole("combobox").fill("media");
+  await expect(headerSearch(page)).toBeFocused();
+  await headerSearch(page).fill("media");
   const full = page.getByRole("option", { name: "Search for “media”" });
   await expect(full).toBeVisible();
   await full.click();

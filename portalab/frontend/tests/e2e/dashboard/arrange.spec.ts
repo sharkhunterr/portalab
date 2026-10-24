@@ -3,7 +3,8 @@ import { newDashboard, stubApi } from "../../a11y/support";
 
 // 027 T079 — desktop: Customize, drag a widget with the mouse, resize it by its corner, Save — the stored
 // arrangement is what the preview showed; the keyboard path (Enter, arrows, Shift+arrows) does the same;
-// Cancel restores; phones show the derived view (one or two columns, same reading order).
+// Cancel restores; phones show the derived view (one or two columns, same reading order) and arrange their
+// own screen.
 
 async function signIn(page: Page, width: number) {
   const dashboard = newDashboard();
@@ -39,8 +40,11 @@ test("drag and save with the mouse", async ({ page }) => {
   await page.mouse.down();
   await page.mouse.move(from.x - (from.x - target.x) + 10, from.y + 5, { steps: 12 });
   await page.mouse.up();
+  // the dropped widget settles into its cell (the grid re-renders after the drop)
+  await expect
+    .poll(async () => Math.abs(((await services.boundingBox())?.x ?? 0) - target.x))
+    .toBeLessThan(20);
   const box = (await services.boundingBox()) ?? { x: 0, y: 0 };
-  expect(Math.abs(box.x - target.x)).toBeLessThan(20);
   expect((await welcome.boundingBox())?.y ?? 0).toBeGreaterThan(box.y + 20);
   await page.getByRole("button", { name: "Save" }).click();
   await expect(page.getByRole("button", { name: "Customize" })).toBeVisible();
@@ -84,6 +88,13 @@ test("phones show the derived view in reading order", async ({ page }) => {
   const [first, second] = [await cells.nth(0).boundingBox(), await cells.nth(1).boundingBox()];
   expect((second?.y ?? 0) > (first?.y ?? 0)).toBe(true); // stacked, same order
   await page.getByRole("button", { name: "Customize" }).click();
-  await expect(page.getByRole("button", { name: /Move or resize/ })).toHaveCount(0); // no drag on phones
-  await expect(page.getByRole("button", { name: "Move down" }).first()).toBeVisible();
+  // 027: a phone arranges its own screen — the phone view is the one being edited, by drag or keyboard,
+  // still one column in the same reading order
+  await expect(
+    page.getByRole("group", { name: "Screen to arrange" }).getByRole("button", { name: "Phone" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: /Move or resize/ })).toHaveCount(2);
+  const [welcome, services] = [await cells.nth(0).boundingBox(), await cells.nth(1).boundingBox()];
+  expect((services?.y ?? 0) > (welcome?.y ?? 0)).toBe(true);
+  await expect(cells.nth(0).getByRole("heading", { name: "Welcome" })).toBeVisible();
 });

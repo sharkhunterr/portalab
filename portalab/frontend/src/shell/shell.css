@@ -1740,6 +1740,15 @@ div.shell-status__item {
 .shell-header[data-compact="true"] {
   justify-content: space-between;
 }
+/* issue 136: on the narrowest phones (320 px) its seven controls fit without scrolling sideways */
+@media (max-width: 359.98px) {
+  .shell-header[data-compact="true"] {
+    padding-inline: var(--space-2);
+  }
+  .shell-header[data-compact="true"] .ds-button--icon {
+    inline-size: max(var(--target-min), 2.125rem);
+  }
+}
 
 /* 027 — the member at the top of the navigation: profile, level and progress, Coins, contribution */
 .shell-profile {

@@ -16,7 +16,15 @@ const ALLOWED = new Set([
   "/api/v1/auth/verify",
   "/api/v1/auth/deletion/cancel",
   "/api/v1/admin/first-run",
+  // issue 159: the site's name, slogan, images and manifest — the sign-in page shows them
+  "/api/v1/auth/site",
+  "/api/v1/auth/site/logo",
+  "/api/v1/auth/site/icon",
+  "/api/v1/auth/site/manifest",
 ]);
+// issue 157: the terms of use, asked by the sign-in page — answered only while the administrators offer
+// them there (off by default: the very same 401 as any other address, as here)
+const SIGN_IN_TERMS = "/api/v1/auth/terms";
 const CATALOGS = new Set(["auth", "common", "errors"]);
 const GENERIC = { status: 401, title: "Unauthorized", code: "auth.required" };
 
@@ -55,7 +63,8 @@ test("the sign-in page works on the allow-list alone", async ({ page }) => {
   await page.keyboard.press("Enter");
   await expect(page.getByRole("alert").first()).toBeVisible();
   await expect(login).toBeVisible();
-  // what it asked besides the allow-list: only whether a session exists (the generic 401 says no)
-  expect([...new Set(refused)]).toEqual(["/api/v1/me"]);
+  // what it asked besides the allow-list: only whether a session exists (the generic 401 says no) and the
+  // sign-in page's own terms of use
+  expect([...new Set(refused)].sort()).toEqual(["/api/v1/me", SIGN_IN_TERMS].sort());
   expect(asked).toContain("/api/v1/auth/login");
 });

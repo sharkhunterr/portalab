@@ -533,6 +533,16 @@ a.ai-card:hover {
   cursor: pointer;
   transition: transform var(--motion-duration-fast, 160ms) ease-out;
 }
+/* issue 136: the orbit navigation's bubble holds the same corner — the assistant sits above it, never over it */
+.shell[data-nav="orbit"] .ai-fab {
+  inset-block-end: calc(
+    var(--frame-bottom, 0px) +
+    var(--space-5) +
+    3.75rem +
+    var(--space-3) +
+    env(safe-area-inset-bottom, 0px)
+  );
+}
 .ai-fab:hover {
   transform: translateY(-2px) scale(1.04);
 }

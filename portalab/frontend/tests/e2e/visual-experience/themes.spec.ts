@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
-import { stubApi } from "../../a11y/support";
+import { ASSISTANT, expectPersonalMenu, stubApi, themeCatalog } from "../../a11y/support";
 
 // 027 T062/T064 — themes change the arrangement principle, not only colors: Orbit puts the header at the
 // bottom and the navigation in an orbit bubble, Studio uses a top bar; switching keeps the page and typed
@@ -15,7 +15,7 @@ async function signIn(page: Page) {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
-        themes: [],
+        themes: themeCatalog(ALL), // 028: the packs' interfaces, as the server serves them
         policy: {
           allowedThemes: ALL,
           defaultTheme: "portalab",
@@ -65,9 +65,13 @@ test("switching themes changes the layout principle without reload", async ({ pa
   await expect.poll(() => nav(page)).toBe("sidebar");
   // same document all along: no reload happened
   expect(await page.evaluate(() => (window as unknown as { __stay?: number }).__stay)).toBe(42);
-  for (const critical of [/Search/, /Notifications/, /Assistant/, /Personal menu/]) {
-    await expect(page.getByRole("banner").getByRole("button", { name: critical })).toBeVisible();
+  const banner = page.getByRole("banner");
+  await expect(banner.getByRole("combobox", { name: "Search" })).toBeVisible(); // 027: search in the header
+  for (const critical of [/Notifications/, /Personal menu/]) {
+    await expect(banner.getByRole("button", { name: critical })).toBeVisible();
   }
+  // issue 171: the assistant's round button, in the corner of every page
+  await expect(page.getByRole("button", { name: ASSISTANT })).toBeVisible();
 });
 
 for (const theme of ["Orbit", "Studio", "Portalab"]) {
@@ -82,8 +86,8 @@ for (const theme of ["Orbit", "Studio", "Portalab"]) {
       await page.getByRole("button", { name: new RegExp(`^${theme}`) }).click();
       await page.setViewportSize({ width, height: 860 });
       await page.goto("/");
-      await expect(page.getByRole("banner").getByRole("button", { name: /Personal menu/ })).toBeVisible();
-      await expect(page.getByRole("button", { name: /Assistant/ })).toBeVisible();
+      await expectPersonalMenu(page);
+      await expect(page.getByRole("button", { name: ASSISTANT })).toBeVisible();
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow).toBeLessThanOrEqual(1);
       const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).analyze();

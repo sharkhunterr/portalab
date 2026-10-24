@@ -1,10 +1,11 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
-import { stubApi } from "../../a11y/support";
+import { ASSISTANT, stubApi } from "../../a11y/support";
 
-// 027 T029/T041/T047 — the personal header (avatar, level + XP, Coins, notifications, search, assistant,
-// personal menu) at phone, tablet and desktop widths; sections in the navigation and personal pages in the
-// avatar menu; no horizontal scroll from 320 px; axe clean on the frame.
+// 027 T029/T041/T047 — the personal header (avatar, level + XP, Coins, notifications, search, personal
+// menu) and the assistant's button at phone, tablet and desktop widths; sections in the navigation and
+// personal pages in the avatar menu (on a phone, in the menu's panel); no horizontal scroll from 320 px; axe
+// clean on the frame.
 
 async function signIn(page: Page) {
   await stubApi(page);
@@ -29,15 +30,23 @@ for (const [device, width, height] of [
     const banner = page.getByRole("banner");
     await expect(banner.getByRole("img", { name: "Level 3" })).toBeVisible();
     await expect(banner.getByRole("img", { name: /Coins: 120/ })).toBeVisible();
-    await expect(banner.getByRole("button", { name: /Assistant/ })).toBeVisible();
-    await expect(banner.getByRole("button", { name: "Personal menu: Alex" })).toBeVisible();
+    // issue 171: the assistant is a round button in the corner of every page
+    await expect(page.getByRole("button", { name: ASSISTANT })).toBeVisible();
+    await expect(banner.getByRole("button", { name: /Notifications: 2 unread/ })).toBeVisible();
     if (device === "phone") {
-      const bar = page.getByRole("navigation", { name: "Sections" });
-      await expect(bar.getByRole("button", { name: /Notifications/ })).toBeVisible();
-      await expect(bar.getByRole("button", { name: /Search/ })).toBeVisible();
+      // 027: the phone header keeps the essentials — search behind its magnifier, the menu in a panel
+      // holding the sections and the profile (personal pages, sign out)
+      await expect(banner.getByRole("button", { name: "Search" })).toBeVisible();
+      await banner.getByRole("button", { name: "Open navigation" }).click();
+      const drawer = page.getByRole("dialog", { name: "Main navigation" });
+      await expect(drawer.getByRole("link", { name: "Services" })).toBeVisible();
+      await expect(drawer.getByRole("link", { name: "Appearance" })).toBeVisible();
+      await expect(drawer.getByRole("button", { name: "Sign out" })).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(drawer).toHaveCount(0);
     } else {
-      await expect(banner.getByRole("button", { name: /Notifications: 2 unread/ })).toBeVisible();
-      await expect(banner.getByRole("button", { name: /Search/ })).toBeVisible();
+      await expect(banner.getByRole("button", { name: "Personal menu: Alex" })).toBeVisible();
+      await expect(banner.getByRole("combobox", { name: "Search" })).toBeVisible();
       const nav = page.getByRole("navigation", { name: "Main navigation" });
       await expect(nav.getByRole("link", { name: "Services" })).toBeVisible();
     }
