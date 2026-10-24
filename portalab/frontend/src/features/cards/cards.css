@@ -748,12 +748,9 @@
   }
 }
 
-/* not owned yet: shown dimmed — its rim keeps its rarity's colour */
+/* not owned yet: shown dimmed, opaque (never the page through it) — its rim keeps its rarity's colour */
 .mcard[data-missing] .mcard__body {
-  filter: grayscale(0.85) brightness(0.7);
-}
-.mcard[data-missing] .mcard__card {
-  opacity: 0.75;
+  filter: grayscale(1) brightness(0.62) contrast(1.05);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1114,37 +1111,169 @@
 }
 
 /* issue 234: a work's collection on its page */
+/* issue 234: a work's collection on its page — a panel like the page's others: a hand of cards, fanned
+   out and turning one at a time, and beside it what the set holds and what I have of it */
 .cards-work {
   display: grid;
-  gap: var(--space-3);
-}
-.cards-work__head {
-  display: flex;
-  flex-wrap: wrap;
+  grid-template-columns: minmax(0, 1.6fr) minmax(15rem, 1fr);
   align-items: center;
-  gap: var(--space-2) var(--space-4);
+  gap: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 0.75rem);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-1);
 }
-.cards-work__head h2 {
+@media (max-width: 48rem) {
+  .cards-work {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.cards-hand {
+  --hand-card: clamp(12.5rem, 54vw, 15rem);
+  --hand-step: calc(var(--hand-card) * 0.26);
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  overflow-x: clip;
+}
+.cards-hand > ul {
+  position: relative;
+  block-size: calc(var(--hand-card) * 88 / 63 + 4rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cards-hand > ul > li {
+  position: absolute;
+  inset-block-start: 2rem;
+  inset-inline-start: 50%;
+  inline-size: var(--hand-card);
+  margin-inline-start: calc(var(--hand-card) / -2);
+  transform-origin: 50% 140%;
+  transform: translateX(calc(var(--d) * var(--hand-step))) translateY(calc(var(--far) * var(--far) * 0.3rem))
+    rotate(calc(var(--d) * 7deg));
+  transition:
+    transform 0.6s cubic-bezier(0.3, 0.7, 0.3, 1),
+    opacity 0.4s ease,
+    filter 0.4s ease;
+  cursor: pointer;
+}
+.cards-hand > ul > li:not([data-front]) {
+  filter: brightness(calc(1 - var(--far) * 0.12));
+}
+.cards-hand > ul > li[data-front] {
+  transform: translateY(-0.75rem) scale(1.06);
+  cursor: auto;
+}
+.cards-hand > ul > li[data-away] {
+  opacity: 0;
+  pointer-events: none;
+}
+.cards-hand__turn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cards-hand > ul > li {
+    transition: none;
+  }
+}
+.cards-work__facts {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+}
+.cards-work__facts h2 {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   margin: 0;
   font-size: var(--font-size-lg);
 }
-.cards-work__progress {
+.cards-work__facts h2 .ds-icon {
+  color: var(--color-accent);
+}
+.cards-work__facts h3 {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
-.cards-work__head progress {
-  flex: 1 1 8rem;
-  max-inline-size: 14rem;
+.cards-work__set,
+.cards-work__copies {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.cards-work__progress {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+}
+.cards-work__progress strong {
+  font-size: var(--font-size-xl, 1.5rem);
+}
+.cards-work__progress progress {
+  grid-column: 1 / -1;
+  inline-size: 100%;
   block-size: 0.5rem;
-  accent-color: var(--color-accent);
+  appearance: none;
+  border: 0;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  background: var(--color-border);
 }
-.cards-work__head a {
-  margin-inline-start: auto;
+.cards-work__progress progress::-webkit-progress-bar {
+  background: var(--color-border);
 }
-.cards-work > button {
-  justify-self: center;
+.cards-work__progress progress::-webkit-progress-value {
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+}
+.cards-work__progress progress::-moz-progress-bar {
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+}
+.cards-work__rarities {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+}
+.cards-work__rarities div {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.cards-work__rarities dt::before {
+  content: "";
+  display: inline-block;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  margin-inline-end: var(--space-2);
+  border-radius: 50%;
+  background: var(--card-rarity-fill-common);
+}
+.cards-work__rarities [data-rarity="rare"] dt::before {
+  background: var(--card-rarity-fill-rare);
+}
+.cards-work__rarities [data-rarity="epic"] dt::before {
+  background: var(--card-rarity-fill-epic);
+}
+.cards-work__rarities [data-rarity="legendary"] dt::before {
+  background: var(--card-rarity-fill-legendary);
+}
+.cards-work__rarities dd {
+  margin: 0 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+.cards-work__facts > a {
+  justify-self: start;
+  margin-block-start: var(--space-2);
 }
 .cards-packs h2 a {
   margin-inline-start: auto;

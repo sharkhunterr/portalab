@@ -10,6 +10,7 @@ import { type CardPack, type MediaCard, useOpenPack, usePacks } from "./api";
 import { MediaCardView } from "./MediaCardView";
 import { packBooster, packName } from "./packBooster";
 import "../marketplace/boosters/boosters.css";
+import "./cardStage.css";
 
 const BoosterReveal = lazy(() =>
   import("../marketplace/boosters/BoosterReveal").then((m) => ({ default: m.BoosterReveal })),

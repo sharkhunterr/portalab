@@ -10,13 +10,13 @@ import { MediaCardView } from "./MediaCardView";
 import "./cards.css";
 
 /** The best version owned of a card (the one shown in the binder). */
-function best(card: MediaCard): Variant | null {
+export function best(card: MediaCard): Variant | null {
   return [...VARIANTS].reverse().find((v) => (card.owned[v] ?? 0) > 0) ?? null;
 }
 
 /** A card, big, with every version (the borderless alternative is a work's only): the owned ones in colour,
  * how many of each. */
-function CardSheet({ card }: { card: MediaCard }) {
+export function CardSheet({ card }: { card: MediaCard }) {
   const t = useT();
   const shown = best(card);
   return (
