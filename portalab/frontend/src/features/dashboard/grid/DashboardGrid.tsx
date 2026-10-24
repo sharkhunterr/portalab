@@ -4,7 +4,7 @@ import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import type { Instance } from "../api";
 import { type Cell, itemsOf, keyOf } from "../edit/EditSession";
-import { type Item, readingOrder } from "./engine";
+import { bands, COLUMNS, type Item, readingOrder, spread } from "./engine";
 
 /**
  * Dashboard grid (spec 027 T074/T076/T077): widgets at explicit grid coordinates — 12 columns on desktop,
@@ -30,6 +30,8 @@ interface DashboardGridProps {
   render: (instance: Instance, handles: ReactNode, cell: { w: number; h: number }) => ReactNode;
   /** 027: widgets with nothing to show that asked to be hidden (kept mounted, out of the layout). */
   collapsed?: ReadonlySet<string>;
+  /** Issue 235: on a wide screen, how many desktop grids fit side by side (outside editing). */
+  lanes?: number;
 }
 
 type Mode = "move" | "east" | "south" | "corner";
@@ -95,6 +97,7 @@ export function DashboardGrid({
   arranger,
   render,
   collapsed = new Set<string>(),
+  lanes = 1,
 }: DashboardGridProps) {
   const t = useT();
   const announce = useAnnounce();
@@ -115,19 +118,17 @@ export function DashboardGrid({
   }
   // 027: outside editing, rows no widget covers (left by a removed or an empty, hidden widget) close up
   const away = arranger ? [] : placed.filter((item) => collapsed.has(item.id));
-  const shown = [
-    ...readingOrder(
-      arranger
-        ? placed
-        : closeEmptyRows(
-            fillHoles(
-              placed.filter((item) => !collapsed.has(item.id)),
-              placed.filter((item) => collapsed.has(item.id)),
-            ),
-          ),
-    ),
-    ...away,
-  ];
+  const kept = arranger
+    ? placed
+    : closeEmptyRows(
+        fillHoles(
+          placed.filter((item) => !collapsed.has(item.id)),
+          placed.filter((item) => collapsed.has(item.id)),
+        ),
+      );
+  // issue 235: on a wide screen the bands of the desktop arrangement go side by side, each as arranged
+  const across = arranger || columns !== COLUMNS ? 1 : Math.max(1, Math.min(lanes, bands(kept).length));
+  const shown = [...(across > 1 ? spread(kept, across, columns) : readingOrder(kept)), ...away];
   const bottom = Math.max(0, ...shown.filter((item) => !away.includes(item)).map((item) => item.y + item.h));
   const rows = bottom + (arranger ? SPARE_ROWS : 0);
   const ghost = drag ? shown.find((item) => item.id === drag.key) : undefined;
@@ -245,8 +246,9 @@ export function DashboardGrid({
         className="dashboard-grid"
         aria-label={label}
         data-columns={columns}
+        data-lanes={across > 1 ? across : undefined}
         data-editing={arranger ? "true" : undefined}
-        style={{ "--columns": columns, "--rows": rows } as React.CSSProperties}
+        style={{ "--columns": columns * across, "--rows": rows } as React.CSSProperties}
       >
         {ghost ? (
           <li

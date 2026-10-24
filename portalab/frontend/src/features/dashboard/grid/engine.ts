@@ -197,3 +197,38 @@ export function derive(items: readonly Item[], columns: number): Item[] {
     columns,
   );
 }
+
+/** Issue 235: the arrangement cut into bands — runs of rows no widget crosses — in reading order. */
+export function bands(items: readonly Item[]): Item[][] {
+  const out: Item[][] = [];
+  let band: Item[] = [];
+  let bottom = 0;
+  for (const item of readingOrder(items)) {
+    if (band.length && item.y >= bottom) {
+      out.push(band);
+      band = [];
+    }
+    band.push(item);
+    bottom = Math.max(bottom, item.y + item.h);
+  }
+  if (band.length) out.push(band);
+  return out;
+}
+
+/**
+ * Issue 235: on a wide screen, the desktop arrangement side by side in ``lanes`` columns of ``columns`` each —
+ * every band keeps its widgets exactly as arranged and goes, in reading order, under the shortest lane.
+ * Display only; the order returned is the bands' (one after the other), so reading order stays the member's.
+ */
+export function spread(items: readonly Item[], lanes: number, columns = COLUMNS): Item[] {
+  const heights = Array.from({ length: Math.max(1, lanes) }, () => 0);
+  const out: Item[] = [];
+  for (const band of bands(items)) {
+    const top = Math.min(...band.map((item) => item.y));
+    const lane = heights.indexOf(Math.min(...heights));
+    const start = heights[lane] ?? 0;
+    for (const item of band) out.push({ ...item, x: item.x + lane * columns, y: item.y - top + start });
+    heights[lane] = start + Math.max(...band.map((item) => item.y + item.h)) - top;
+  }
+  return out;
+}
