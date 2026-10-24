@@ -53,6 +53,7 @@ import {
   ChevronUp,
   Circle,
   CircleDashed,
+  CircleHelp,
   Clapperboard,
   Clock,
   Cloud,
@@ -331,6 +332,7 @@ export const ICONS: Record<string, LucideIcon> = {
   key: KeyRound,
   dashboard: LayoutDashboard,
   apps: LayoutGrid,
+  help: CircleHelp, // issue 202: the contextual help in the header
   lifebuoy: LifeBuoy,
   "life-buoy": LifeBuoy,
   lightbulb: Lightbulb,
