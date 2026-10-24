@@ -35,6 +35,7 @@ from portalab.capabilities.privacy_participants import (
     ExportRecord,
 )
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.search import SearchRegistry, default_search
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
@@ -47,6 +48,7 @@ from portalab.modules.calendar.aggregator import CalendarAggregator
 from portalab.modules.calendar.events import register_event_types
 from portalab.modules.calendar.permissions import CALENDAR_READ
 from portalab.modules.calendar.reminders import JOB, ReminderService
+from portalab.modules.calendar.search import CalendarSearchProvider
 from portalab.modules.calendar.settings import SETTINGS, CalendarConfig
 
 OWNER = "module:calendar"
@@ -200,9 +202,11 @@ class CalendarModule:
         widgets: WidgetRegistry = default_widgets,
         categories: CategoryRegistry = default_categories,
         observables: ObservableRegistry = default_observables,
+        search: SearchRegistry = default_search,
     ) -> None:
         self.database = database
         self.capabilities = capabilities
+        self.authorizer = authorizer
         self.clock = clock
         self.config = CalendarConfig()
         self.sources = sources
@@ -210,6 +214,7 @@ class CalendarModule:
         self.widgets = widgets
         self.categories = categories
         self.observables = observables
+        self.search = search
         self.aggregator = CalendarAggregator(sources, authorizer, lambda: self.config, clock=clock)
         self.reminders = ReminderService(
             database, events, capabilities, sources, lambda: self.config, clock=clock
@@ -225,6 +230,11 @@ class CalendarModule:
             self.widgets.register(UPCOMING, UpcomingWidget(self.aggregator, self.clock), owner=OWNER)
         if self.widgets.get(MONTH.key) is None:
             self.widgets.register(MONTH, MonthWidget(self.aggregator, self.clock), owner=OWNER)
+        if self.search.provider("calendar") is None:  # #84: what is on the calendar, in the search
+            provider = CalendarSearchProvider(
+                self.aggregator, self.authorizer, lambda: self.config, clock=self.clock
+            )
+            self.search.register(provider, owner=OWNER)
         if self.categories.get("calendar.reminder") is None:
             declare_category(
                 "calendar.reminder", OWNER, "calendar:category.reminder", registry=self.categories

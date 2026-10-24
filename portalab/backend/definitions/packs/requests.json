@@ -1,0 +1,68 @@
+{
+  "domain": "requests",
+  "definitions": [
+    {
+      "key": "requests.created",
+      "title_key": "media:stat.requests_created.title",
+      "description_key": "media:stat.requests_created.description",
+      "domain": "requests",
+      "scope": "community",
+      "event_types": [
+        "media.request_created"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "media.request",
+      "hideable": true,
+      "dimensions": [
+        "kind"
+      ]
+    },
+    {
+      "key": "requests.state_changes",
+      "title_key": "media:stat.requests_state_changes.title",
+      "description_key": "media:stat.requests_state_changes.description",
+      "domain": "requests",
+      "scope": "community",
+      "event_types": [
+        "media.request_updated"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "media.request",
+      "hideable": true,
+      "dimensions": [
+        "state"
+      ]
+    },
+    {
+      "key": "requests.fulfilled",
+      "title_key": "media:stat.requests_fulfilled.title",
+      "description_key": "media:stat.requests_fulfilled.description",
+      "domain": "requests",
+      "scope": "community",
+      "event_types": [
+        "media.request_available"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "bar"
+      },
+      "required_permission": "media.request",
+      "hideable": true,
+      "dimensions": [
+        "kind"
+      ]
+    }
+  ]
+}

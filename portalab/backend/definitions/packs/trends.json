@@ -1,0 +1,134 @@
+{
+  "domain": "trends",
+  "definitions": [
+    {
+      "key": "trends.active_members",
+      "title_key": "statistics:stat.trends_active_members.title",
+      "description_key": "statistics:stat.trends_active_members.description",
+      "domain": "trends",
+      "scope": "community",
+      "event_types": [
+        "user.visited"
+      ],
+      "measure": {
+        "kind": "distinct_count",
+        "field": "actor"
+      },
+      "viz": {
+        "type": "number"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true,
+      "period_options": [
+        "week",
+        "month",
+        "quarter",
+        "year"
+      ]
+    },
+    {
+      "key": "trends.titles_finished",
+      "title_key": "statistics:stat.trends_titles_finished.title",
+      "description_key": "statistics:stat.trends_titles_finished.description",
+      "domain": "trends",
+      "scope": "community",
+      "event_types": [
+        "media.playback_finished"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "number"
+      },
+      "required_permission": "media.read",
+      "hideable": true,
+      "period_options": [
+        "week",
+        "month",
+        "quarter",
+        "year"
+      ]
+    },
+    {
+      "key": "trends.requests",
+      "title_key": "statistics:stat.trends_requests.title",
+      "description_key": "statistics:stat.trends_requests.description",
+      "domain": "trends",
+      "scope": "community",
+      "event_types": [
+        "media.request_created"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "number"
+      },
+      "required_permission": "media.request",
+      "hideable": true,
+      "period_options": [
+        "week",
+        "month",
+        "quarter",
+        "year"
+      ]
+    },
+    {
+      "key": "trends.xp_earned",
+      "title_key": "statistics:stat.trends_xp_earned.title",
+      "description_key": "statistics:stat.trends_xp_earned.description",
+      "domain": "trends",
+      "scope": "community",
+      "event_types": [
+        "reward.granted"
+      ],
+      "measure": {
+        "kind": "sum",
+        "field": "amount"
+      },
+      "viz": {
+        "type": "number"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true,
+      "filter": [
+        {
+          "field": "value",
+          "op": "eq",
+          "value": "xp"
+        }
+      ],
+      "period_options": [
+        "week",
+        "month",
+        "quarter",
+        "year"
+      ]
+    },
+    {
+      "key": "trends.achievements_unlocked",
+      "title_key": "statistics:stat.trends_achievements_unlocked.title",
+      "description_key": "statistics:stat.trends_achievements_unlocked.description",
+      "domain": "trends",
+      "scope": "community",
+      "event_types": [
+        "achievement.unlocked"
+      ],
+      "measure": {
+        "kind": "count"
+      },
+      "viz": {
+        "type": "number"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true,
+      "period_options": [
+        "week",
+        "month",
+        "quarter",
+        "year"
+      ]
+    }
+  ]
+}

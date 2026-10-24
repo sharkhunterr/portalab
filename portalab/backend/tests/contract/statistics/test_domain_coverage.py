@@ -1,5 +1,5 @@
-"""017 T023 — domain coverage checklist (FR-009): every listed domain eventually ships a definition pack.
-Domains whose owning spec has not landed are reported pending (xfail with the owner)."""
+"""017 T023 — domain coverage checklist (FR-009): every listed domain ships a definition pack (the owning
+spec in comment); #84 delivered the last ones — activity, community, requests and trends."""
 
 import pytest
 
@@ -7,8 +7,8 @@ from portalab.capabilities.statistics import PackRegistry
 from portalab.modules.statistics.packs.registry import register_builtin
 
 EXPECTED = {
-    "users": None,
-    "services": None,
+    "users": "002",
+    "services": "006",
     "activity": "007",
     "media": "024",
     "playback": "024",
@@ -26,8 +26,4 @@ def test_domain_ships_a_pack(domain: str) -> None:
     packs = PackRegistry()
     register_builtin(packs)
     domains = {d for _, d, _, _ in packs.packs()}
-    if domain not in domains:
-        owner = EXPECTED[domain]
-        if owner is None:
-            pytest.fail(f"{domain!r} must ship already")
-        pytest.xfail(f"pending: pack delivered by spec {owner}")
+    assert domain in domains, f"{domain!r} ships no statistics pack (spec {EXPECTED[domain]})"

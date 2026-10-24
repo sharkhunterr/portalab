@@ -16,6 +16,7 @@ from pydantic import BaseModel
 from portalab.capabilities.dashboard import WidgetRegistry
 from portalab.capabilities.events import EventType
 from portalab.capabilities.observability import ObservableRegistry
+from portalab.capabilities.search import SearchRegistry
 from portalab.capabilities.service_events import STATUS_CHANGED_TYPE
 from portalab.capabilities.statistics import PackRegistry
 from portalab.core.authz_port import Principal
@@ -40,6 +41,7 @@ class StatsHarness:
     module: StatisticsModule
     packs: PackRegistry
     widgets: WidgetRegistry
+    search: SearchRegistry
 
     @property
     def database(self) -> Database:
@@ -91,7 +93,7 @@ async def stats(database: Database, tmp_path: Path, clock: FixedClock) -> StatsH
     )
     ev.types.register(EventType("user.signed_in", "module:identity", retention_class="technical"))
     ev.types.register(STATUS_CHANGED_TYPE)
-    packs, widgets = PackRegistry(), WidgetRegistry()
+    packs, widgets, search = PackRegistry(), WidgetRegistry(), SearchRegistry()
     module = StatisticsModule(
         database,
         ev.publisher,
@@ -106,9 +108,10 @@ async def stats(database: Database, tmp_path: Path, clock: FixedClock) -> StatsH
         packs=packs,
         widgets=widgets,
         observables=ObservableRegistry(),
+        search=search,
     )
     module.register()
-    return StatsHarness(ev, module, packs, widgets)
+    return StatsHarness(ev, module, packs, widgets, search)
 
 
 @pytest.fixture

@@ -30,6 +30,7 @@ from portalab.capabilities.observability import (
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.retention import RetentionTarget, default_retention_targets
+from portalab.capabilities.search import SearchRegistry, default_search
 from portalab.capabilities.statistics import PROGRESSION
 from portalab.capabilities.support import CONTRIBUTIONS
 from portalab.capabilities.visibility import PREFERENCE_CAPABILITY
@@ -77,6 +78,7 @@ from portalab.modules.gamification.progression.service import ProgressionService
 from portalab.modules.gamification.progression.summary import ProgressionChanges
 from portalab.modules.gamification.quests.service import Quests
 from portalab.modules.gamification.rules.store import RuleStore
+from portalab.modules.gamification.search import GamificationSearchProvider
 from portalab.modules.gamification.settings import SETTINGS, EconomyConfig
 from portalab.modules.gamification.streaks.level_rewards import CONSUMER as LEVEL_REWARDS
 from portalab.modules.gamification.streaks.level_rewards import LevelRewards
@@ -112,6 +114,7 @@ class GamificationModule:
         observables: ObservableRegistry = default_observables,
         actions: ActionRegistry = default_actions,
         tools: AIToolRegistry = default_ai_tools,
+        search: SearchRegistry = default_search,
     ) -> None:
         self.database = database
         self.events = events
@@ -126,6 +129,7 @@ class GamificationModule:
         self.observables = observables
         self.actions = actions
         self.tools = tools
+        self.search = search
         self.config = EconomyConfig()
         config = lambda: self.config  # noqa: E731
         self.levels = LevelService(database, lambda: self.config.level_curve_active, clock=clock)
@@ -241,6 +245,11 @@ class GamificationModule:
             self.widgets.register(WHEEL_WIDGET, WheelWidget(self.wheel, self.clock), owner=OWNER)
         if not any(p.kind == "progression" for p in self.widgets.summaries()):  # 027: since last visit
             self.widgets.register_summary(ProgressionChanges(self.database, self.progression), owner=OWNER)
+        if self.search.provider("gamification") is None:  # #84: achievements and quests in the search
+            searched = GamificationSearchProvider(
+                self.achievements, self.quests, self.authorizer, clock=self.clock
+            )
+            self.search.register(searched, owner=OWNER)
         register_tools(self.tools, self.progression, self.clock)
         register_actions(self.rewards, self.actions)
         self.observables.declare(
