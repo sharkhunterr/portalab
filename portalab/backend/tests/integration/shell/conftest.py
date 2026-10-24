@@ -1,4 +1,8 @@
-"""Shell integration fixtures: the shell module on the full platform with an isolated registry."""
+"""Shell integration fixtures: the shell module on the full platform with an isolated registry.
+
+The navigation is gated by the permission catalog, which modules fill when they are imported; the composition
+root is imported here so the catalog is the production one whatever ran before in the process (#139) —
+otherwise a hub (automations, assistant, media) showed or not depending on which test imported it first."""
 
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
@@ -8,6 +12,7 @@ import httpx
 import pytest
 from fastapi import FastAPI
 
+from portalab.app.main import create_app
 from portalab.capabilities.events import ConsumerRegistry, EventTypeRegistry
 from portalab.capabilities.navigation import NavigationRegistry
 from portalab.capabilities.observability import ObservableRegistry
@@ -53,8 +58,6 @@ async def sh(database: Database, tmp_path: Path, clock: FixedClock) -> ShellHarn
 
 @pytest.fixture
 def app(sh: ShellHarness, heads: set[str]) -> FastAPI:
-    from portalab.app.main import create_app
-
     full = sh.full
     return create_app(
         database=full.database,

@@ -36,12 +36,11 @@ async def test_sections_for_users_and_admins(sh: ShellHarness) -> None:
     assert "support.tickets" in entries(by_key["support"])
     topics = {t["key"]: {e["key"] for e in t["entries"]} for t in by_key["admin"]["topics"]}
     # 027 hubs: Administration in a few hubs, each opening on its first page
-    # #4: « media » (requests to decide, quotas, identity, history) shows when the media module is there
+    # #4: « media » (requests to decide, quotas, identity, history) right after the services
     order = list(topics)
-    if "media" in order:
-        assert order.index("media") == order.index("services") + 1
-        assert {"media.requests_admin", "media.quotas", "media.admin", "media.sources"} <= topics["media"]
-    # the hubs in their order — those whose modules this harness runs (no assistant, projects or studio here)
+    assert order.index("media") == order.index("services") + 1
+    assert {"media.requests_admin", "media.quotas", "media.admin", "media.sources"} <= topics["media"]
+    # the hubs in their order — all of them: the harness runs on the production permission catalog (#139)
     expected = [
         "pilot",
         "members",
@@ -49,7 +48,6 @@ async def test_sections_for_users_and_admins(sh: ShellHarness) -> None:
         "support",
         "communication",
         "engagement",
-        "community",  # community projects and their moderation, apart from what is sold
         "shop",
         "appearance",  # the theme studio, the members' dashboard, the site's identity
         "automations",  # 027: a hub of its own
@@ -57,12 +55,10 @@ async def test_sections_for_users_and_admins(sh: ShellHarness) -> None:
         "ai",  # issue 176: the assistant's dashboard, model, identity and tools
         "system",
     ]
-    assert [key for key in order if key != "media"] == [key for key in expected if key in order]
-    core = {"pilot", "members", "services", "support", "communication", "engagement", "shop", "system"}
-    assert core <= set(order)
-    assert "ai" not in topics or {"ai.admin", "ai.model", "ai.identity", "ai.tools"} <= topics["ai"]
-    # the overview and history need automation.read, which comes with the automations module (absent here)
-    assert {"automations.new", "automations.templates"} <= topics["automations"]
+    assert [key for key in order if key != "media"] == expected
+    assert {"ai.admin", "ai.model", "ai.identity", "ai.tools"} <= topics["ai"]
+    automations = {"automations.admin", "automations.new", "automations.history", "automations.templates"}
+    assert automations <= topics["automations"]  # the whole hub, whatever ran before in the process
     assert {"authz.roles", "identity.members"} <= topics["members"] and "authz.audit" in topics["pilot"]
     assert "support.queue" in topics["support"] and "wiki.admin" in topics["communication"]
     assert {"support.incident_console", "health.maintenance", "health.alert_rules"} <= topics["services"]
