@@ -482,6 +482,7 @@ export function BoosterReveal({
       data-reduced={reduced || undefined}
       data-scene={scene?.look}
       data-own-opening={scene?.parts.opening ? "" : undefined}
+      data-cards={opener ? "" : undefined}
     >
       {scene?.parts.backdrop ? (
         // 028: the scene's own animated background in place of the mist, the beams and the glow
