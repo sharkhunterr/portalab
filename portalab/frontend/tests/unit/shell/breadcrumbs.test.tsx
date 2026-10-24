@@ -16,7 +16,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 
 import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { EmptyState } from "../../../src/shell/breadcrumbs/Breadcrumbs";
+import { crumbKey, EmptyState } from "../../../src/shell/breadcrumbs/Breadcrumbs";
 import { json } from "../../support/fake-api";
 import { renderShell, VIEW } from "./harness";
 
@@ -28,6 +28,13 @@ describe("orientation", () => {
     expect(trail).toHaveTextContent("HomeServicesService plex-1"); // separators are CSS-only
     expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/");
     expect(screen.getByText("Service plex-1")).toHaveAttribute("aria-current", "page");
+  });
+
+  it("names each route's label by its catalog key (issue 241)", () => {
+    expect(crumbKey("My cards")).toBe("myCards");
+    expect(crumbKey("A person's cards")).toBe("aPersonSCards");
+    expect(crumbKey("Newsletters & e-mail")).toBe("newslettersEMail");
+    expect(crumbKey("Home")).toBe("home");
   });
 
   it("shows related links of the page", async () => {

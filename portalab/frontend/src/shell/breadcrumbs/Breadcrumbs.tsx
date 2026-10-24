@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, useLocation, useMatches } from "react-router";
+import { useT } from "../../i18n/hooks/useT";
 import { useNavigationView } from "../nav/NavigationProvider";
 import { currentEntry, sectionEntries } from "../nav/SectionNav";
 import { crumbOf } from "../router/handle";
@@ -10,6 +11,12 @@ import { useShellStrings } from "../strings";
  * params), ancestors navigable, the current page marked. Long trails collapse the middle items behind an
  * accessible "…" while keeping the first and the last two.
  */
+/** Issue 241: a route's label (written in English in the routes) as its catalog key — « My cards »: ``myCards``. */
+export function crumbKey(text: string): string {
+  const [first = "", ...rest] = text.match(/[A-Za-z0-9]+/g) ?? [];
+  return first.toLowerCase() + rest.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("");
+}
+
 interface Crumb {
   path: string;
   text: string;
@@ -18,11 +25,21 @@ interface Crumb {
 
 export function Breadcrumbs({ max = 4 }: { max?: number }) {
   const shellStrings = useShellStrings();
+  const t = useT();
+  // in the member's language; a label made from the page's own data (a key, a name) has no entry: kept
+  const translate = (text: string) => {
+    const key = `crumb.${crumbKey(text)}`;
+    const shown = t(`shell:${key}`);
+    return shown === key ? text : shown;
+  };
   const matches = useMatches();
   const { view } = useNavigationView();
   const location = useLocation();
   let items: Crumb[] = matches
-    .map((match) => ({ path: match.pathname, text: crumbOf(match.handle, match.params) }))
+    .map((match) => {
+      const text = crumbOf(match.handle, match.params);
+      return { path: match.pathname, text: text && translate(text) };
+    })
     .filter((item): item is { path: string; text: string } => Boolean(item.text));
   const parent = view.crumbs[location.pathname.replace(/\/[^/]+$/, "") || "/"];
   if (parent?.route && !items.some((i) => i.path === parent.route)) {
