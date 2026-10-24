@@ -81,7 +81,11 @@ export function PageView() {
   const contents = group ? (group.root ? [group.root] : group.pages) : [];
   return (
     <div className="wiki-layout">
-      <article aria-labelledby={headingId} className="wiki-page">
+      <article
+        aria-labelledby={headingId}
+        className="wiki-page"
+        data-outline={data.outline.length > 1 || undefined}
+      >
         <div className="wiki-page__top">
           <nav aria-label={t("wiki:breadcrumbs")}>
             <ol className="wiki-breadcrumbs">

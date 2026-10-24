@@ -109,7 +109,7 @@ export const DEPARTMENTS: Department[] = [
 ];
 const RARITIES = ["common", "rare", "epic", "legendary"] as const;
 const RANK: Record<string, number> = { legendary: 0, epic: 1, rare: 2, common: 3 };
-const FIRST = 8; // shown per shelf before « see all »
+const FIRST = 16; // shown per shelf before « see all » — enough to fill a wide screen's row (issue 236), the rest scrolls
 
 function onShelf(shelf: Shelf, product: Product): boolean {
   return (

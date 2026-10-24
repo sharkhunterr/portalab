@@ -472,3 +472,37 @@
   padding: var(--space-2);
   font-size: var(--font-size-md);
 }
+
+/* Issue 236: on a wide screen the page takes the room — its outline stands in a column of its own on the
+   right and stays in sight; running text keeps a readable measure, tables and diagrams use the width */
+.wiki-layout {
+  container: wiki-layout / inline-size;
+}
+@container wiki-layout (min-width: 72rem) {
+  .wiki-page {
+    max-inline-size: none;
+  }
+  .wiki-page[data-outline] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    align-items: start;
+    column-gap: var(--space-6);
+    row-gap: 0;
+  }
+  .wiki-page[data-outline] > * {
+    grid-column: 1;
+  }
+  .wiki-page[data-outline] > * + * {
+    margin-block-start: var(--space-3);
+  }
+  .wiki-page[data-outline] > .wiki-outline {
+    grid-column: 2;
+    grid-row: 1 / span 12; /* beside every part of the page: there are never that many */
+    position: sticky;
+    inset-block-start: calc(var(--header-height, 4rem) + var(--space-4));
+    margin: 0;
+  }
+  .wiki-content .content-body > :is(p, ul, ol, blockquote, h2, h3, h4) {
+    max-inline-size: 80ch;
+  }
+}
