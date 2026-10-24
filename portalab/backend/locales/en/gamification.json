@@ -358,7 +358,7 @@
   "cards.find.people": "People",
   "cards.find.placeholder": "Find a film, a series, an actor, a character…",
   "cards.find.sets": "{count, plural, one {Set (#)} other {Sets (#)}}",
-  "cards.how": "Watch a film or an episode to the end: a pack of 3 cards waits for you here, one of them from that title.",
+  "cards.how": "Watch a film or a season to the end: depending on the portal’s rules, a booster of its cards waits for you here.",
   "cards.in": "In “{title}” ({year})",
   "cards.kind.cast": "Actors",
   "cards.kind.composer": "Composers",

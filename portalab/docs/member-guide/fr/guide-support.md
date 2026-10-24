@@ -1,7 +1,7 @@
 ---
 slug: guide-support
 title: Support et avis
-position: 13
+position: 14
 help_keys: [support, support.new, support.tickets.detail, feedback]
 tags: [guide, support, tickets, avis]
 ---
