@@ -90,6 +90,8 @@ async def test_user_listing_is_paginated(app: FastAPI) -> None:
             await admin.get("/api/v1/users", params={"limit": 4, "cursor": first["next_cursor"]})
         ).json()
         suspended_only = (await admin.get("/api/v1/users", params={"state": "suspended"})).json()
+        found = (await admin.get("/api/v1/users", params={"q": "MBER3"})).json()  # issue 195: by name
+    assert [u["login"] for u in found["items"]] == ["member3"]
     assert len(first["items"]) == 4 and first["next_cursor"]
     assert len(second["items"]) == 2 and second["next_cursor"] is None
     assert suspended_only["items"] == []

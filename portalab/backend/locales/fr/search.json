@@ -91,6 +91,7 @@
   "mode.semantic": "Par le sens",
   "more": "Plus de résultats",
   "palette.confirm": "Cette action demande une confirmation. Continuer ?",
+  "palette.memberCard": "Fiche membre de {name}",
   "palette.open": "Ouvrir {title}",
   "palette.searchFor": "Rechercher « {query} »",
   "palette.suggested": "Suggéré par l’assistant",

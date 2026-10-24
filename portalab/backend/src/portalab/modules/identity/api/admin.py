@@ -34,9 +34,10 @@ async def list_users(
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
     cursor: str | None = None,
     state: Annotated[str | None, Query(pattern="^(" + "|".join(STATES) + ")$")] = None,
+    q: Annotated[str | None, Query(max_length=64)] = None,
     principal: Principal = require("users.manage"),
 ) -> UserList:
-    page = await module.admin.list_users(limit=limit, cursor=cursor, state=state)
+    page = await module.admin.list_users(limit=limit, cursor=cursor, state=state, query=q)
     return UserList(
         items=[
             UserListItem(

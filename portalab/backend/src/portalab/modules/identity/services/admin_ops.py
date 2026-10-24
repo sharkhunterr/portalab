@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 
 from portalab.capabilities.admin_authority import AdminAuthorityError
@@ -76,7 +76,9 @@ class AdminOperations:
                 uow.session, user, AccountState.ACTIVE, admin_actor(principal), reason=reason
             )
 
-    async def list_users(self, *, limit: int, cursor: str | None, state: str | None) -> UserPage:
+    async def list_users(
+        self, *, limit: int, cursor: str | None, state: str | None, query: str | None = None
+    ) -> UserPage:
         limit = max(1, min(limit, MAX_PAGE))
         statement = select(User).order_by(User.id).limit(limit + 1)
         if cursor:
@@ -86,6 +88,9 @@ class AdminOperations:
                 raise BadRequest("Invalid cursor.", code="pagination.invalid_cursor") from exc
         if state:
             statement = statement.where(User.state == state)
+        if query and query.strip():  # issue 195: a member found by their login or name (Ctrl K)
+            like = f"%{query.strip().replace('%', '').replace('_', '')}%"
+            statement = statement.where(or_(User.login_display.ilike(like), User.display_name.ilike(like)))
         async with self.ctx.database.session() as session:
             users = list((await session.execute(statement)).scalars())
         page = users[:limit]
