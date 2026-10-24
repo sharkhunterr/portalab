@@ -11,6 +11,7 @@ import { SelectField, TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
+import { NAVIGATION_KEY } from "../../shell/nav/NavigationProvider";
 import { useShellPreference } from "../../shell/preferences";
 import { ApiError } from "../../state/regions";
 import { PalettePicker } from "../appearance/PalettePicker";
@@ -474,6 +475,7 @@ function PlayChoice({
     },
     onSuccess: async (_, play) => {
       setSaved(play);
+      await client.invalidateQueries({ queryKey: NAVIGATION_KEY }); // issue 243: the cards, or not, in the menu
       await client.invalidateQueries({ queryKey: ["privacy", "me"] });
       await client.invalidateQueries({ queryKey: ["community"] });
       onNext();

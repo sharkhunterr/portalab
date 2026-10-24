@@ -1,0 +1,53 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity: a night
+   blue, a strip of film down each side with its sprocket holes, a medallion in the middle, a holographic
+   gleam. */
+[data-card-back="mediacards"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.8rem;
+  background:
+    /* the film strips, left and right: sprocket holes on a dark band */
+    radial-gradient(circle, rgba(255, 255, 255, 0.55) 0 0.12rem, transparent 0.14rem) 0.35rem 0 / 0.7rem 0.9rem
+      repeat-y,
+    radial-gradient(circle, rgba(255, 255, 255, 0.55) 0 0.12rem, transparent 0.14rem) calc(100% - 0.35rem) 0 /
+      0.7rem 0.9rem repeat-y,
+    linear-gradient(90deg, #05070c 0 1.05rem, transparent 1.05rem calc(100% - 1.05rem), #05070c 0) 0 0 / 100%
+      100% no-repeat,
+    /* the medallion's light */
+    radial-gradient(circle at 50% 48%, rgba(90, 170, 255, 0.5), transparent 42%),
+    /* fine engraved lines */
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 6px),
+    linear-gradient(165deg, #142447, #0a1328 55%, #050912);
+  box-shadow:
+    inset 0 0 0 2px rgba(200, 220, 255, 0.55),
+    inset 0 0 1.2rem rgba(0, 0, 10, 0.8);
+}
+[data-card-back="mediacards"] .booster-card__back-pattern {
+  inset: 0;
+  margin: auto;
+  inline-size: 56%;
+  block-size: auto;
+  aspect-ratio: 1;
+  border: 2px solid rgba(220, 232, 255, 0.75);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 54%, rgba(220, 232, 255, 0.35) 55% 57%, transparent 58%),
+    radial-gradient(circle at 40% 35%, rgba(255, 255, 255, 0.25), transparent 60%),
+    linear-gradient(160deg, #1d3a73, #0b1630);
+  box-shadow: 0 0 1rem rgba(90, 170, 255, 0.45);
+}
+[data-card-back="mediacards"] .booster-card__back-sigil {
+  color: #e8f0ff;
+  filter: drop-shadow(0 0 0.4rem rgba(120, 190, 255, 0.9));
+}
+/* the holographic gleam, slow */
+[data-card-back="mediacards"] .booster-card__back::after {
+  background: linear-gradient(
+    115deg,
+    transparent 34%,
+    rgba(120, 220, 255, 0.28) 46%,
+    rgba(255, 140, 220, 0.24) 54%,
+    transparent 66%
+  );
+  mix-blend-mode: screen;
+}

@@ -1,0 +1,23 @@
+{
+  "type": "booster_scene",
+  "look": "mediacards",
+  "names": {
+    "fr": "Scène Mediacards",
+    "en": "Mediacards scene"
+  },
+  "descriptions": {
+    "fr": "Pour les boosters Mediacards (tous, achetés ou gagnés en regardant) : leur emballage métallisé et le dos de leurs cartes. Les cartes tirées, leurs faces et leurs raretés restent celles de Portalab.",
+    "en": "For the Mediacards boosters (all of them, bought or earned by watching): their metallised wrapper and their cards' back. The cards drawn, their faces and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-foil",
+      "back": {
+        "common": "back-mediacards"
+      }
+    }
+  }
+}

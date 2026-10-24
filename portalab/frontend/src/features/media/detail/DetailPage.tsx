@@ -16,6 +16,7 @@ import {
 import "../media.css";
 import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
+import { useCollectsCards } from "../../cards/collects";
 import { WorkCollection } from "../../cards/WorkCollection";
 import { PluginSlot } from "../../plugins/slots/PluginSlot";
 import { useListenInfo, useReadInfo } from "../books/api";
@@ -867,6 +868,7 @@ function DirectRequest({
 export function DetailPage() {
   const t = useT();
   const format = useFormat();
+  const collects = useCollectsCards(); // issue 243: its cards, for a member who collects them
   const measures = useMeasures();
   const { objectId = "" } = useParams();
   const headingId = useId();
@@ -955,7 +957,9 @@ export function DetailPage() {
       ) : BOOKS.includes(media.kind) ? (
         <BookView objectId={media.id} genres={media.genres} />
       ) : null}
-      {media.kind === "movie" || media.kind === "series" ? <WorkCollection objectId={media.id} /> : null}
+      {collects && (media.kind === "movie" || media.kind === "series") ? (
+        <WorkCollection objectId={media.id} />
+      ) : null}
       <div className="media-sections">
         {SECTIONS.filter(
           (name) =>

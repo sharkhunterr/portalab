@@ -28,7 +28,7 @@ Le guide de Portalab, le portail de vos services : regarder et demander des titr
 
 - [La boutique](portalab://wiki/guide-boutique) — la monnaie du portail, les produits et les boosters.
 - [Progression](portalab://wiki/guide-progression) — XP, niveaux, séries, succès, quêtes et événements.
-- [Les cartes de collection](portalab://wiki/guide-cartes) — les cartes des films et des séries, les boosters et vos collections.
+- [Les Mediacards](portalab://wiki/guide-cartes) — les cartes de collection des films et des séries, les boosters et vos collections.
 - [La communauté](portalab://wiki/guide-communaute) — membres, classements, propositions et projets.
 
 ## Aide et réglages

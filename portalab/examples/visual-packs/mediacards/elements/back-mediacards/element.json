@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "mediacards",
+  "names": {
+    "fr": "Dos Mediacards",
+    "en": "Mediacards back"
+  },
+  "descriptions": {
+    "fr": "Face cachée, chaque carte a le dos des Mediacards : un bleu nuit, une bande de pellicule de chaque côté, un médaillon au centre et un reflet holographique — le même pour toutes, un dos ne dit jamais la rareté.",
+    "en": "Face down, every card wears the Mediacards back: a night blue, a strip of film down each side, a medallion in the middle and a holographic gleam — the same for all, a back never tells the rarity."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

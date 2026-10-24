@@ -9,6 +9,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import { usePacks } from "../../cards/api";
 import { CardBoosters } from "../../cards/CardBoosters";
+import { useCollectsCards } from "../../cards/collects";
 import { type OwnershipRow, usePurchases } from "../api";
 import {
   localized,
@@ -227,7 +228,9 @@ export default function ReservePage() {
   const reserve = useReserve();
   const [done, setDone] = useState<{ name: string; ticket: boolean; unlocked?: boolean } | null>(null);
   const items = reserve.data ?? [];
-  const cardPacks = usePacks().data ?? []; // issue 234: my card boosters wait here too
+  const collects = useCollectsCards(); // issue 243: not for a member who plays without the cards
+  const packs = usePacks().data ?? []; // issue 234: my card boosters wait here too
+  const cardPacks = collects ? packs : [];
   return (
     <div className="reserve ds-stack">
       <PageHeader
@@ -246,7 +249,7 @@ export default function ReservePage() {
       ) : null}
       {reserve.isPending ? <FunctionalState state="loading" /> : null}
       {reserve.isError ? <FunctionalState state="unavailable" onRetry={() => reserve.refetch()} /> : null}
-      <CardBoosters inventory />
+      {collects ? <CardBoosters inventory /> : null}
       {reserve.data && !items.length && !cardPacks.length ? (
         <div className="reserve__empty">
           <Icon name="potion" size={32} />

@@ -40,5 +40,9 @@ export function packBooster(t: Translate, pack: CardPack, locale: string): Boost
     // the art site's textless art of the work, else its poster
     art: artworkImage(look?.art) ?? cardImage(look?.poster, "w342"),
     subtitle: look?.season != null ? t("gamification:cards.pack.season", { season: look.season }) : null,
+    // issue 243: for a scene's wrapper — the work's backdrop, its genre's family, its edition
+    backdrop: cardImage(look?.backdrop, "w780"),
+    family: look?.family ?? null,
+    edition: look?.edition ?? null,
   };
 }

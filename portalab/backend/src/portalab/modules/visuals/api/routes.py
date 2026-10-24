@@ -159,9 +159,15 @@ async def scenes(_: Member, packs: Packs) -> dict[str, Any]:
 
 
 @members.get("/visuals/scenes/{booster_key}")
-async def scene(_: Member, packs: Packs, booster_key: str) -> dict[str, Any]:
-    """The scene a booster opens with (``null``: Portalab's own)."""
-    return {"scene": await packs.scene_for(booster_key)}
+async def scene(
+    _: Member,
+    packs: Packs,
+    booster_key: str,
+    kind: Annotated[str | None, Query(max_length=32, pattern=r"^[a-z_]+$")] = None,
+) -> dict[str, Any]:
+    """The scene a booster opens with (``null``: Portalab's own) — ``kind``: the scene of its kind of
+    booster when it has none of its own (``card_booster``, issue 243)."""
+    return {"scene": await packs.scene_for(booster_key, kind)}
 
 
 @members.get("/visuals/files/{pack}/{sha}/{name:path}")

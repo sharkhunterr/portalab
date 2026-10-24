@@ -531,7 +531,7 @@
   "shelf.badges": "Badges",
   "shelf.banners": "Profile banners",
   "shelf.bonus": "Bonuses and extensions",
-  "shelf.boosters": "Boosters",
+  "shelf.boosters": "Looks boosters",
   "shelf.celebrations": "Celebrations",
   "shelf.community": "Community projects",
   "shelf.frames": "Avatar frames",
@@ -715,7 +715,7 @@
   "type.ambient": "Ambient animation",
   "type.avatar_frame": "Avatar frame",
   "type.badge": "Badge",
-  "type.card_booster": "Card booster",
+  "type.card_booster": "Mediacards booster",
   "admin.field.any": "Any",
   "admin.field.card_booster.family": "Genre",
   "admin.field.card_booster.edition": "Edition (period)",
@@ -779,7 +779,7 @@
   "vitrine.only.deal": "On sale",
   "vitrine.only.unowned": "Not mine yet",
   "vitrine.pick.afford": "Within reach",
-  "vitrine.pick.boosters": "Boosters to open",
+  "vitrine.pick.boosters": "Looks boosters to open",
   "vitrine.pick.deal": "On sale",
   "vitrine.pick.free": "Free",
   "vitrine.pick.soon": "Nearly sold out",
@@ -837,5 +837,10 @@
   "widget.featured.description": "A few products you can acquire with Coins.",
   "widget.featured.open": "Shop",
   "widget.featured.slide": "Product {n} of {total}",
-  "widget.featured.title": "Marketplace"
+  "widget.featured.title": "Marketplace",
+  "shelf.cardBoosters": "Mediacards boosters",
+  "vitrine.pick.mediacards": "Mediacards boosters",
+  "admin.boosters.cardScene": "Mediacards boosters' scene",
+  "admin.boosters.cardSceneHint": "The wrapper and the opening of every Mediacards booster, bought or earned by watching; they never take the looks boosters' scene.",
+  "admin.boosters.cardScenePortalab": "Portalab's own"
 }

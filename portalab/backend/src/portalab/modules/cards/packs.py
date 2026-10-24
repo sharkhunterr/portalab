@@ -19,6 +19,7 @@ from uuid import UUID
 from sqlalchemy import func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 
+from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.marketplace import ActivationResult, OwnershipView
 from portalab.capabilities.media_core import CARD_SOURCES
 from portalab.capabilities.registry import CapabilityRegistry
@@ -29,6 +30,8 @@ from portalab.modules.cards.editions import EDITIONS, edition_of
 from portalab.modules.cards.events import PACK_OPENED, SET_COMPLETED
 from portalab.modules.cards.family import FAMILIES
 from portalab.modules.cards.models import Card, CardSet, Copy, Pack
+
+WITHOUT_CARDS = ("progression", "none")  # issue 243: the welcome's answers without the cards
 
 OWNER = "module:cards"
 SIZE = 3
@@ -250,11 +253,24 @@ class Packs:
         return pack_id
 
     # --- a content's boosters (issue 234): given by a reward rule ---------------------------------------
+    async def collects(self, user: UUID) -> bool:
+        """Issue 243: whether the member collects the cards — not when they answered the welcome's « do you
+        want to play? » without the cards (or not at all); the other boosters are not concerned."""
+        try:
+            providers = self.capabilities.system_providers(CONFIG)
+            if not providers:
+                return True
+            play = (await providers[0].provider.get("shell.onboarding.play", user_id=user)).value
+        except Exception:
+            return True
+        return play not in WITHOUT_CARDS
+
     async def give_content(self, user: UUID, object_id: UUID, count: int, reason: str) -> int:
         """``count`` boosters of this content (a film, a season: its work's cards) — once per member and
-        content; none for a content without cards, nor past the day's share."""
+        content; none for a content without cards, nor past the day's share, nor to a member who does not
+        collect the cards."""
         providers = self.capabilities.system_providers(CARD_SOURCES)
-        if not providers or count < 1:
+        if not providers or count < 1 or not await self.collects(user):
             return 0
         work = await providers[0].provider.work_of(object_id)
         if work is None:

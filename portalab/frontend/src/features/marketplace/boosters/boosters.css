@@ -182,6 +182,10 @@
   object-fit: cover;
   mask: linear-gradient(180deg, black 55%, transparent 96%);
 }
+/* issue 243: the work's backdrop, for a scene's wrapper to print — Portalab's own pack does not show it */
+.booster-pack__backdrop {
+  display: none;
+}
 .booster-pack[data-art] .booster-pack__stars {
   opacity: 0.45;
 }

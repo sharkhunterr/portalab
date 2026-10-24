@@ -19,6 +19,9 @@ import {
  */
 
 export type Rarity = "common" | "rare" | "epic" | "legendary";
+
+/** Issue 243: the kind of booster every Mediacards booster is (bought in the shop or given by watching). */
+export const CARD_BOOSTER = "card_booster";
 type PerRarity = Partial<Record<Rarity, ExternalElement>>;
 
 export interface Scene {
@@ -46,17 +49,18 @@ function elementsOf(scene: Scene): ExternalElement[] {
   ].filter((e): e is ExternalElement => Boolean(e));
 }
 
-/** The scene this booster opens with — its parts' files loaded while it is open (``null``: Portalab's). */
-export function useBoosterScene(boosterKey: string | null | undefined): Scene | null {
+/** The scene this booster opens with — its parts' files loaded while it is open (``null``: Portalab's).
+ * ``kind``: the scene of its kind of booster when it has none of its own (``card_booster``, issue 243). */
+export function useBoosterScene(boosterKey: string | null | undefined, kind?: string): Scene | null {
   const query = useQuery({
-    queryKey: ["visuals", "scene", boosterKey],
+    queryKey: ["visuals", "scene", boosterKey, kind ?? null],
     enabled: Boolean(boosterKey),
     retry: false,
     staleTime: 60_000,
     queryFn: async () =>
       (
         await api.GET("/api/v1/visuals/scenes/{booster_key}", {
-          params: { path: { booster_key: boosterKey as string } },
+          params: { path: { booster_key: boosterKey as string }, query: kind ? { kind } : {} },
         })
       ).data as unknown as { scene: Scene | null },
   });
@@ -92,12 +96,14 @@ export function useSceneBindings(): Record<string, SceneBinding> {
   return query.data?.bindings ?? {};
 }
 
-/** The scene a booster wears: its own, else the one every booster wears. */
+/** The scene a booster wears: its own, else the one every booster wears — or, for a booster of a ``kind``
+ * (``card_booster``: the Mediacards'), the one its kind wears (issue 243). */
 export function bindingOf(
   bindings: Record<string, SceneBinding>,
   boosterKey: string,
+  kind?: string,
 ): SceneBinding | undefined {
-  return bindings[boosterKey] ?? bindings["*"];
+  return bindings[boosterKey] ?? (kind ? bindings[kind] : bindings["*"]);
 }
 
 /**

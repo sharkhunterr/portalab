@@ -41651,6 +41651,23 @@
               "title": "Archived",
               "type": "boolean"
             }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 35,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lang"
+            }
           }
         ],
         "responses": {
@@ -50284,7 +50301,7 @@
     },
     "/api/v1/visuals/scenes/{booster_key}": {
       "get": {
-        "description": "The scene a booster opens with (``null``: Portalab's own).",
+        "description": "The scene a booster opens with (``null``: Portalab's own) \u2014 ``kind``: the scene of its kind of\nbooster when it has none of its own (``card_booster``, issue 243).",
         "operationId": "scene_api_v1_visuals_scenes__booster_key__get",
         "parameters": [
           {
@@ -50294,6 +50311,24 @@
             "schema": {
               "title": "Booster Key",
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 32,
+                  "pattern": "^[a-z_]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
             }
           }
         ],

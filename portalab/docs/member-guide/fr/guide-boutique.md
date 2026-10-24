@@ -72,7 +72,7 @@ En plus des looks, la boutique propose (selon votre portail) :
 
 Un booster est un paquet scellé de cartes tirées au hasard.
 
-1. Dans le rayon « Boosters », ouvrez la fiche d'un booster. Regardez le nombre de cartes, la rareté garantie et les « Chances par rareté ».
+1. Dans le rayon « Boosters », étagère « Boosters de looks », ouvrez la fiche d'un booster. Regardez le nombre de cartes, la rareté garantie et les « Chances par rareté ».
 2. Touchez « Ouvrir — … ». Le prix est payé à l'ouverture.
 3. Touchez le paquet, puis chaque carte pour la retourner. « Tout révéler » les montre toutes.
 
@@ -85,7 +85,7 @@ Ce que vous tirez :
 - Certains boosters ont un nombre d'ouvertures limité. Les boosters de saison ne sont en vente que pendant leur période.
 - Un look au-dessus de votre niveau est à vous, mais « Verrouillé » jusqu'à ce que vous atteigniez le niveau ou la Contribution demandés.
 - « Mes dernières ouvertures », en bas du rayon « Boosters », liste vos tirages récents.
-- Les « Boosters de cartes » du même rayon donnent des cartes de films et de séries pour votre collection. Voir [Les cartes de collection](portalab://wiki/guide-cartes).
+- Les « Boosters Mediacards », sur leur propre étagère du même rayon, donnent des cartes de films et de séries pour votre collection, dans leur emballage à eux. Voir [Les Mediacards](portalab://wiki/guide-cartes).
 
 ## Ma réserve
 

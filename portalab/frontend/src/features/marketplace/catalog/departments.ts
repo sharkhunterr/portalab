@@ -82,11 +82,15 @@ export const DEPARTMENTS: Department[] = [
     icon: "shop",
     shelves: [{ key: "packs", icon: "shop", types: ["bundle"], notCategory: "ultimate" }],
   },
-  // #81: sealed packs drawn at random — products like the others (a tile, a sheet), the season's first
+  // #81: sealed packs drawn at random — products like the others (a tile, a sheet), the season's first; the
+  // looks' boosters and the Mediacards' apart (issue 243)
   {
     key: "boosters",
     icon: "sparkles",
-    shelves: [{ key: "boosters", icon: "sparkles", types: ["booster", "card_booster"] }],
+    shelves: [
+      { key: "boosters", icon: "sparkles", types: ["booster"] },
+      { key: "cardBoosters", icon: "layers", types: ["card_booster"] },
+    ],
   },
 ];
 /** Whether a product is on a shelf: its kind, and its collection when the shelf asks for one. */

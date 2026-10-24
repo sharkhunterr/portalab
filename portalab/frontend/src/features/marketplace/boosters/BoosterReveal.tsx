@@ -297,6 +297,7 @@ export function BoosterReveal({
   onClose,
   demo,
   opener,
+  sceneKind,
 }: {
   booster: Booster;
   /** one of the sealed ones I keep (offered, or bought earlier): opened for free */
@@ -312,6 +313,8 @@ export function BoosterReveal({
     /** its summary's line: what is new in the collection */
     fresh?: (count: number) => string;
   };
+  /** issue 243: its kind of booster (``card_booster``) — the scene bound to its kind, when none is its own */
+  sceneKind?: string;
 }) {
   const t = useT();
   const format = useFormat();
@@ -319,7 +322,9 @@ export function BoosterReveal({
   const reduced = useTheme().effective.reducedMotion;
   const opening = useOpenBooster();
   const elsewhere = useMutation({ mutationFn: async () => (opener ? await opener.open() : []) });
-  const live = useBoosterScene(demo || opener ? null : booster.key); // 028: a pack's scene, Portalab's own otherwise
+  // 028: a pack's scene, Portalab's own otherwise — issue 243: an opener's booster (a Mediacards one) takes
+  // the scene of its kind
+  const live = useBoosterScene(demo || (opener && !sceneKind) ? null : booster.key, sceneKind);
   const scene = demo ? demo.scene : live;
   const [tried, setTried] = useState(false); // issue 154: the demo's pack opened
   // one key per opening: a replayed request is answered without charging twice

@@ -6,6 +6,7 @@ import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import type { Product } from "../marketplace/api";
 import type { BoosterCard } from "../marketplace/boosters/api";
 import { BoosterPack } from "../marketplace/boosters/Boosters";
+import { bindingOf, CARD_BOOSTER, useSceneBindings } from "../marketplace/boosters/scene/scene";
 import { type CardPack, type MediaCard, useOpenPack, usePacks } from "./api";
 import { MediaCardView } from "./MediaCardView";
 import { packBooster, packName } from "./packBooster";
@@ -35,6 +36,8 @@ export function CardBoosters({ inventory = false }: { inventory?: boolean }) {
   const { locale } = useLocaleContext();
   const packs = usePacks().data ?? [];
   const open = useOpenPack();
+  // issue 243: the Mediacards boosters' own wrapper (the scene bound to their kind), apart from the looks'
+  const look = bindingOf(useSceneBindings(), "", CARD_BOOSTER)?.booster_look ?? undefined;
   // kept while it is opened: the list loses it as soon as it is
   const [opening, setOpening] = useState<CardPack | null>(null);
   return (
@@ -51,6 +54,7 @@ export function CardBoosters({ inventory = false }: { inventory?: boolean }) {
                 <button
                   type="button"
                   className="cards-boosters__pack"
+                  data-booster-look={look}
                   onClick={() => setOpening(pack)}
                   aria-label={`${t("gamification:cards.pack.open")} — ${packName(t, pack)}`}
                 >
@@ -65,6 +69,7 @@ export function CardBoosters({ inventory = false }: { inventory?: boolean }) {
         <Suspense fallback={null}>
           <BoosterReveal
             booster={packBooster(t, opening, locale)}
+            sceneKind={CARD_BOOSTER}
             sealed
             onClose={() => setOpening(null)}
             opener={{

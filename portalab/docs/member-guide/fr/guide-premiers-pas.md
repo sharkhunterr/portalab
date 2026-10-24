@@ -29,8 +29,9 @@ Si votre portail en a publié, il vous demande de lire et d'accepter ses **condi
 
 - **Une photo et un nom** : c'est comme ça que les autres membres vous verront.
 - **Vos centres d'intérêt** : films, séries, livres, livres audio, magazines, mangas, BD & comics, jeux vidéo rétro. Le portail s'en servira pour mettre en avant ce qui vous plaît.
-- **Tu veux jouer ?** : c'est le cœur du portail. On y gagne de l'XP et des niveaux, des Coins à dépenser dans la boutique, et des cartes de collection. Trois réponses :
+- **Tu veux jouer ?** : c'est le cœur du portail. On y gagne de l'XP et des niveaux, des Coins à dépenser dans la boutique, et les Mediacards, des cartes de collection. Trois réponses :
   - « Oui, à tout » ou « Oui, sans les cartes » : votre profil est **public**, mais seulement pour les membres du portail. Ils voient votre nom, votre niveau et votre place dans les classements.
+  - « Oui, sans les cartes » et « Non » cachent aussi les Mediacards : ni dans le menu, ni sur la fiche des titres, ni dans la boutique, et plus de booster Mediacards en regardant. Les autres boosters restent.
   - « Non, je viens pour les médias » : votre profil est **anonyme**. Les autres membres ne vous voient ni dans l'annuaire, ni dans l'activité ; dans les classements, vous restez compté, sans nom.
 - **Votre style** : clair, sombre ou « Comme mon appareil », et une couleur.
 - **Tout est prêt** : tout reste personnalisable (l'interface, le tableau de bord, les notifications et les e-mails, la confidentialité), chaque réglage à un geste. « Faire la visite » lance une visite d'une minute, « Explorer seul » vous laisse découvrir.
