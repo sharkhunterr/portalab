@@ -156,10 +156,19 @@ export function CalendarPage() {
   const calendar = useCalendar(from, to);
   const reminders = useReminders();
   const [picked, setPicked] = useState<string | null>(null);
-  const entries = useMemo(
+  // issue 237: the legend filters the kinds shown
+  const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
+  const toggle = (category: string) =>
+    setHidden((current) => {
+      const next = new Set(current);
+      if (!next.delete(category)) next.add(category);
+      return next;
+    });
+  const all = useMemo(
     () => (calendar.data?.items ?? []).map((item) => ({ item, entry: entryOf(item, timeZone) })),
     [calendar.data, timeZone],
   );
+  const entries = useMemo(() => all.filter(({ entry }) => !hidden.has(categoryOf(entry))), [all, hidden]);
   const byDay = useMemo(() => {
     const map = new Map<string, CalendarItem[]>();
     for (const { item, entry } of entries) {
@@ -179,87 +188,102 @@ export function CalendarPage() {
   return (
     <section aria-labelledby={headingId} className="calendar-page">
       <PageHeader titleId={headingId} level={2} icon="calendar" title={t("calendar:title")} />
-      <div className="ds-stack ds-stack--row" role="toolbar" aria-label={t("calendar:navigation")}>
-        {(["month", "week", "list"] as View[]).map((v) => (
-          <Button
-            key={v}
-            variant={v === view ? "primary" : "secondary"}
-            aria-pressed={v === view}
-            onClick={() => setView(v)}
-          >
-            {t(`calendar:view.${v}`)}
-          </Button>
+      <div className="calendar-panel">
+        <div className="calendar-bar" role="toolbar" aria-label={t("calendar:navigation")}>
+          <div className="calendar-bar__move">
+            <Button variant="ghost" size="icon" aria-label={t("calendar:previous")} onClick={() => move(-1)}>
+              <Icon name="chevron-left" size={18} />
+            </Button>
+            <Button variant="ghost" size="icon" aria-label={t("calendar:next")} onClick={() => move(1)}>
+              <Icon name="chevron-right" size={18} />
+            </Button>
+            <Button variant="secondary" onClick={() => setAnchor(dayKey(new Date(), timeZone))}>
+              {t("calendar:today")}
+            </Button>
+          </div>
+          <h3 className="calendar-page__period" aria-live="polite">
+            {new Date(`${anchor}T12:00:00Z`).toLocaleDateString(undefined, {
+              month: "long",
+              year: "numeric",
+              timeZone: "UTC",
+            })}
+          </h3>
+          <fieldset className="ds-subnav calendar-bar__views" aria-label={t("calendar:views")}>
+            {(["month", "week", "list"] as View[]).map((v) => (
+              <button key={v} type="button" aria-pressed={v === view} onClick={() => setView(v)}>
+                <Icon
+                  name={v === "month" ? "calendar-month" : v === "week" ? "calendar-week" : "list"}
+                  size={16}
+                />
+                {t(`calendar:view.${v}`)}
+              </button>
+            ))}
+          </fieldset>
+        </div>
+        {failing.map(([kind]) => (
+          <p key={kind} role="status" className="calendar-banner">
+            {t("calendar:sourceUnavailable", { source: t(calendar.data?.sources[kind] ?? kind) })}
+          </p>
         ))}
-        <Button variant="secondary" onClick={() => move(-1)}>
-          {t("calendar:previous")}
-        </Button>
-        <Button variant="secondary" onClick={() => setAnchor(dayKey(new Date(), timeZone))}>
-          {t("calendar:today")}
-        </Button>
-        <Button variant="secondary" onClick={() => move(1)}>
-          {t("calendar:next")}
-        </Button>
+        <div className="calendar-filters">
+          <CalendarLegend entries={all.map((e) => e.entry)} hidden={hidden} onToggle={toggle} />
+          {hidden.size ? (
+            <Button variant="ghost" onClick={() => setHidden(new Set())}>
+              {t("calendar:showAll")}
+            </Button>
+          ) : null}
+        </div>
+        {calendar.isPending ? <FunctionalState state="loading" /> : null}
+        {calendar.isError ? <FunctionalState state="unavailable" onRetry={() => calendar.refetch()} /> : null}
+        {calendar.data ? (
+          view === "list" ? (
+            <ol className="calendar-list">
+              {days
+                .filter((day) => byDay.has(day))
+                .map((day) => (
+                  <li key={day}>
+                    <h3>{format.date(`${day}T12:00:00Z`, "long")}</h3>
+                    <ul>
+                      {(byDay.get(day) ?? []).map((item) => (
+                        <ItemLine key={`${item.source_kind}-${item.source_id}`} item={item} leads={leads} />
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              {days.every((day) => !byDay.has(day)) ? <li>{t("calendar:empty")}</li> : null}
+            </ol>
+          ) : (
+            <>
+              <MonthGrid
+                days={days}
+                month={view === "month" ? anchor : undefined}
+                today={today}
+                entries={entries.map((e) => e.entry)}
+                maxLanes={view === "week" ? 6 : 3}
+                picked={picked}
+                onPick={setPicked}
+              />
+              {picked ? (
+                <section
+                  className="calendar-page__day"
+                  aria-label={format.date(`${picked}T12:00:00Z`, "long")}
+                >
+                  <h3>{format.date(`${picked}T12:00:00Z`, "long")}</h3>
+                  {(byDay.get(picked) ?? []).length ? (
+                    <ul>
+                      {(byDay.get(picked) ?? []).map((item) => (
+                        <ItemLine key={`${item.source_kind}-${item.source_id}`} item={item} leads={leads} />
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="calendar-page__none">{t("calendar:empty")}</p>
+                  )}
+                </section>
+              ) : null}
+            </>
+          )
+        ) : null}
       </div>
-      {failing.map(([kind]) => (
-        <p key={kind} role="status" className="calendar-banner">
-          {t("calendar:sourceUnavailable", { source: t(calendar.data?.sources[kind] ?? kind) })}
-        </p>
-      ))}
-      <CalendarLegend entries={entries.map((e) => e.entry)} />
-      {calendar.isPending ? <FunctionalState state="loading" /> : null}
-      {calendar.isError ? <FunctionalState state="unavailable" onRetry={() => calendar.refetch()} /> : null}
-      {calendar.data ? (
-        view === "list" ? (
-          <ol className="calendar-list">
-            {days
-              .filter((day) => byDay.has(day))
-              .map((day) => (
-                <li key={day}>
-                  <h3>{format.date(`${day}T12:00:00Z`, "long")}</h3>
-                  <ul>
-                    {(byDay.get(day) ?? []).map((item) => (
-                      <ItemLine key={`${item.source_kind}-${item.source_id}`} item={item} leads={leads} />
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            {days.every((day) => !byDay.has(day)) ? <li>{t("calendar:empty")}</li> : null}
-          </ol>
-        ) : (
-          <>
-            <h3 className="calendar-page__period">
-              {new Date(`${anchor}T12:00:00Z`).toLocaleDateString(undefined, {
-                month: "long",
-                year: "numeric",
-                timeZone: "UTC",
-              })}
-            </h3>
-            <MonthGrid
-              days={days}
-              month={view === "month" ? anchor : undefined}
-              today={today}
-              entries={entries.map((e) => e.entry)}
-              maxLanes={view === "week" ? 6 : 3}
-              picked={picked}
-              onPick={setPicked}
-            />
-            {picked ? (
-              <section className="calendar-page__day" aria-label={format.date(`${picked}T12:00:00Z`, "long")}>
-                <h3>{format.date(`${picked}T12:00:00Z`, "long")}</h3>
-                {(byDay.get(picked) ?? []).length ? (
-                  <ul>
-                    {(byDay.get(picked) ?? []).map((item) => (
-                      <ItemLine key={`${item.source_kind}-${item.source_id}`} item={item} leads={leads} />
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="calendar-page__none">{t("calendar:empty")}</p>
-                )}
-              </section>
-            ) : null}
-          </>
-        )
-      ) : null}
       {reminders.data?.length ? (
         <section aria-label={t("calendar:myReminders")}>
           <h3>{t("calendar:myReminders")}</h3>

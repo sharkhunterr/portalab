@@ -276,19 +276,47 @@ export function MonthGrid({
   );
 }
 
-/** The kinds present, each with its colour and icon (never colour alone). */
-export function CalendarLegend({ entries }: { entries: CalEntry[] }) {
+/**
+ * The kinds present, each with its colour and icon (never colour alone). Given ``onToggle`` (issue 237),
+ * each kind is a filter: pressed while shown, a press hides or shows it again.
+ */
+export function CalendarLegend({
+  entries,
+  hidden,
+  onToggle,
+}: {
+  entries: CalEntry[];
+  hidden?: ReadonlySet<string>;
+  onToggle?: (category: string) => void;
+}) {
   const t = useT();
   const present = [...new Set(entries.map(categoryOf))];
   if (!present.length) return null;
   return (
-    <ul className="month-grid__legend" aria-label={t("calendar:legend")}>
-      {present.map((category) => (
-        <li key={category} data-category={category}>
-          <Icon name={CATEGORY_ICONS[category] ?? "calendar"} size={12} />
-          {t(`calendar:category.${category}`)}
-        </li>
-      ))}
+    <ul
+      className="month-grid__legend"
+      data-filters={onToggle ? true : undefined}
+      aria-label={t(onToggle ? "calendar:filters" : "calendar:legend")}
+    >
+      {present.map((category) => {
+        const body = (
+          <>
+            <Icon name={CATEGORY_ICONS[category] ?? "calendar"} size={onToggle ? 14 : 12} />
+            {t(`calendar:category.${category}`)}
+          </>
+        );
+        return (
+          <li key={category} data-category={category}>
+            {onToggle ? (
+              <button type="button" aria-pressed={!hidden?.has(category)} onClick={() => onToggle(category)}>
+                {body}
+              </button>
+            ) : (
+              body
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }

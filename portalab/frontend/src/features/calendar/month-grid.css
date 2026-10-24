@@ -258,3 +258,97 @@
 .month-grid__legend [data-category="news"] {
   --cal-color: var(--cal-news);
 }
+
+/* Issue 237: the full grid read at a glance — cells that stand out from any background, bars and chips
+   tinted with their kind's colour but written in the theme's text colour, the kind marked on their edge */
+.month-grid:not([data-compact]) {
+  gap: 4px;
+}
+.month-grid:not([data-compact]) .month-grid__weekdays {
+  padding-block: var(--space-1);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+}
+.month-grid:not([data-compact]) .month-grid__week {
+  grid-template-rows: 1.9rem repeat(var(--lanes, 0), 1.45rem) minmax(1.3rem, auto);
+  row-gap: 3px;
+  column-gap: 4px;
+  min-block-size: 6.5rem;
+}
+.month-grid:not([data-compact]) .month-grid__day {
+  padding: 0.3rem 0.45rem;
+  border-color: color-mix(in srgb, var(--color-border) 60%, transparent);
+  background: color-mix(in srgb, var(--color-text) 5%, var(--color-surface));
+  font-weight: var(--font-weight-semibold);
+}
+.month-grid:not([data-compact]) .month-grid__day[data-outside] {
+  background: transparent;
+  opacity: 0.5;
+}
+.month-grid:not([data-compact]) .month-grid__bar {
+  margin-inline: 4px;
+  padding-inline: 0.45rem;
+  border-inline-start: 3px solid var(--cal-color);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--cal-color) 30%, var(--color-surface));
+  color: var(--color-text);
+  font-size: 0.78rem;
+}
+.month-grid:not([data-compact]) .month-grid__bar .ds-icon {
+  flex: none;
+  color: var(--cal-color);
+}
+.month-grid:not([data-compact]) .month-grid__bar[data-before] {
+  margin-inline-start: 0;
+  border-inline-start-width: 0;
+}
+.month-grid:not([data-compact]) .month-grid__bar[data-after] {
+  margin-inline-end: 0;
+}
+.month-grid:not([data-compact]) .month-grid__bar[data-status="resolved"] {
+  opacity: 0.75;
+}
+.month-grid:not([data-compact]) .month-grid__singles {
+  gap: 3px;
+  padding: 0 4px 4px;
+}
+.month-grid:not([data-compact]) .month-grid__chip {
+  padding: 0.15rem 0.4rem;
+  background: color-mix(in srgb, var(--cal-color) 18%, var(--color-surface));
+  font-size: 0.78rem;
+}
+.month-grid:not([data-compact]) .month-grid__more {
+  padding-inline-start: 0.2rem;
+  font-weight: var(--font-weight-semibold);
+}
+
+/* the kinds as filters (the calendar page): pressed while shown */
+.month-grid__legend[data-filters] {
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+.month-grid__legend[data-filters] button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--cal-color) 50%, var(--color-border));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--cal-color) 16%, transparent);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.month-grid__legend[data-filters] button:hover {
+  background: color-mix(in srgb, var(--cal-color) 26%, transparent);
+}
+.month-grid__legend[data-filters] button[aria-pressed="false"] {
+  border-style: dashed;
+  border-color: var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+}
+.month-grid__legend[data-filters] button[aria-pressed="false"] .ds-icon {
+  color: var(--color-text-muted);
+}
