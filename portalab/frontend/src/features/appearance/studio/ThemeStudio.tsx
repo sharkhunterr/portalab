@@ -36,7 +36,7 @@ import { looksOf, useLooks } from "../../../design-system/visuals/vocabulary";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { withConfirmation } from "../../marketplace/admin/confirm";
-import { appearanceStrings, ThemeMiniature } from "../AppearanceSettings";
+import { ThemeMiniature, useAppearanceStrings } from "../AppearanceSettings";
 import "./studio.css";
 
 /**
@@ -435,7 +435,7 @@ function ThemeEditor({
     event.preventDefault();
     save.mutate();
   };
-  const layouts = appearanceStrings.layouts;
+  const layouts = useAppearanceStrings().layouts;
   return (
     <Card
       className="theme-studio__editor"

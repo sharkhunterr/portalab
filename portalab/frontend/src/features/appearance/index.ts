@@ -1,2 +1,2 @@
 export { AppearanceRoot } from "./AppearanceRoot";
-export { AppearanceSettings, appearanceStrings } from "./AppearanceSettings";
+export { AppearanceSettings, useAppearanceStrings } from "./AppearanceSettings";
