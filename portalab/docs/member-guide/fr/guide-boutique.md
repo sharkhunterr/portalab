@@ -2,7 +2,7 @@
 slug: guide-boutique
 title: La boutique
 position: 7
-help_keys: [marketplace, marketplace.products.detail, marketplace.owned, marketplace.reserve, marketplace.vitrine]
+help_keys: [marketplace, marketplace.products.detail, marketplace.owned, marketplace.reserve]
 tags: [guide, boutique, coins, boosters]
 ---
 Dépenser la monnaie du portail (Coins) : choisir un produit, l'acheter, ouvrir des boosters et utiliser votre réserve.
@@ -15,19 +15,28 @@ Dépenser la monnaie du portail (Coins) : choisir un produit, l'acheter, ouvrir 
 
 ## Trouver un produit
 
-Ouvrez [la boutique](/marketplace).
+Ouvrez [la boutique](/marketplace). Son accueil met en avant ce qui peut vous intéresser.
 
-![La boutique : ses rayons, le filtre de rareté, la recherche et un produit, numérotés](shot:boutique-rayons)
+![L'accueil de la boutique : le solde, la recherche, les rayons, la une et les sélections, numérotés](shot:boutique-accueil)
 
-1. **Les rayons** : **Interfaces**, **Profil**, **Notifications et effets**, **Fonctionnalités**, **Packs** et **Boosters**.
-2. **La rareté** : filtrez par « Commun », « Rare », « Épique » ou « Légendaire ».
-3. **La recherche** : « Rechercher un produit ».
-4. **Un produit** : son prix, et le niveau demandé s'il y en a un. Sur une étagère, « Tout voir » affiche tous ses produits.
+1. **Votre solde** et le nombre d'articles « à votre portée ». Touchez ce nombre pour les voir.
+2. **La recherche** : « Rechercher un produit ».
+3. **Les rayons** : **Interfaces**, **Profil**, **Notifications et effets**, **Fonctionnalités**, **Packs** et **Boosters**. Un rayon ouvert montre ses étagères.
+4. **À la une** : les produits mis en avant, un à la fois.
+5. **Les sélections** : « En promotion », « À ta portée », « Bientôt épuisés », « Boosters à ouvrir » et « Gratuits ». « Tout voir » montre toute la sélection.
 
-Touchez un produit pour ouvrir sa fiche. Elle indique ce que vous obtenez, le prix, les exemplaires restants, le niveau ou la Contribution minimum, la limite d'achat, le remboursement possible et les conditions (« remplie » ou « non remplie »). Pendant une campagne, certains produits sont en promotion : le « Prix habituel » reste affiché.
+![Un rayon de la boutique : ses étagères, le tri, les filtres et un produit, numérotés](shot:boutique-rayon)
 
-> [!NOTE]
-> « Essayer la vitrine » ouvre une autre présentation de la boutique, en essai. Les produits sont les mêmes.
+1. **Les étagères** du rayon, avec leur nombre de produits. « Tout le rayon » les réunit.
+2. **Le tri** : « Recommandé », par prix, par rareté ou par nom.
+3. **La rareté** : « Commun », « Rare », « Épique » ou « Légendaire ».
+4. **Les filtres** : « À ma portée », « Pas encore à moi », « En promo ».
+5. **Un produit** : sa rareté, son type, son prix, ou « Possédé ».
+
+Touchez un produit pour ouvrir sa fiche sur le côté (en plein écran sur un téléphone) : vous gardez votre place dans le rayon. La fiche indique ce que vous obtenez, le prix, les exemplaires restants, le niveau ou la Contribution minimum, la limite d'achat, le remboursement possible et les conditions (« remplie » ou « non remplie »). Pendant une campagne, certains produits sont en promotion : le pourcentage s'affiche sur le produit et le « Prix habituel » reste indiqué.
+
+> [!TIP]
+> Les liens « Voir dans la boutique » des autres pages (Apparence, profil, assistant…) ouvrent directement le bon type de produit. « Tous les types » montre ensuite tout le rayon.
 
 ## Acheter un produit
 
@@ -75,7 +84,7 @@ Ce que vous tirez :
 À savoir :
 - Certains boosters ont un nombre d'ouvertures limité. Les boosters de saison ne sont en vente que pendant leur période.
 - Un look au-dessus de votre niveau est à vous, mais « Verrouillé » jusqu'à ce que vous atteigniez le niveau ou la Contribution demandés.
-- « Mes dernières ouvertures », en bas du rayon, liste vos tirages récents.
+- « Mes dernières ouvertures », en bas du rayon « Boosters », liste vos tirages récents.
 - Les « Boosters de cartes » du même rayon donnent des cartes de films et de séries pour votre collection. Voir [Les cartes de collection](portalab://wiki/guide-cartes).
 
 ## Ma réserve

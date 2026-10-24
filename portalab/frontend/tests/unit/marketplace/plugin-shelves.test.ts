@@ -5,7 +5,7 @@ import {
   departmentOf,
   shelfLabel,
   withPluginShelves,
-} from "../../../src/features/marketplace/catalog/CatalogPage";
+} from "../../../src/features/marketplace/catalog/departments";
 
 // 030 — a plugin's kinds of products sit on the shelf its manifest names, in the department it names; a kind
 // no shelf holds still shows (among the features); the looks chosen for plugins' kinds of visuals are kept.

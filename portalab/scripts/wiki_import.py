@@ -4,10 +4,10 @@ Each file starts with a header between two ``---`` lines (``slug``, ``title``, `
 ``parent`` — a slug, or ``none`` for a top page —, ``help_keys`` and ``tags`` as ``[a, b]``), then the
 page's markdown. An image ``![text](shot:<name>)`` is a screenshot taken by ``guide_shots.mjs``
 (issue 239): uploaded from ``--shots <folder>/<name>.jpg`` as a file of its page, then kept from one import
-to the next (``--refresh-shots`` uploads them again); without one, the image is left out. A page is found
-by its slug: created when missing, updated when its title, text, tags or help keys changed, left alone
-otherwise; then published and put in its place under its parent. Pages are readable by everyone who may
-read the wiki and by the assistant.
+to the next (``--refresh-shots`` uploads again those in the folder, the others stay); without one, the image
+is left out. A page is found by its slug: created when missing, updated when its title, text, tags or help
+keys changed, left alone otherwise; then published and put in its place under its parent. Pages are
+readable by everyone who may read the wiki and by the assistant.
 
     cd backend && uv run python ../scripts/wiki_import.py ../docs/member-guide/fr \\
         --base https://127.0.0.1:8443 --login admin --password-file <file> [--currency Xenocoins] \\
@@ -64,7 +64,7 @@ def main() -> int:
     args.add_argument("--insecure", action="store_true", help="accept a self-signed certificate")
     args.add_argument("--currency", help="the site's currency name, written instead of « Coins »")
     args.add_argument("--shots", type=pathlib.Path, help="the folder of guide_shots.mjs's screenshots")
-    args.add_argument("--refresh-shots", action="store_true", help="upload the screenshots again")
+    args.add_argument("--refresh-shots", action="store_true", help="upload again the screenshots in --shots")
     args.add_argument("--dry-run", action="store_true")
     opts = args.parse_args()
     pages = [parse(p) for p in sorted(opts.folder.glob("*.md"))]
@@ -93,8 +93,9 @@ def main() -> int:
 
         def one(match: re.Match[str]) -> str:
             alt, name = match.groups()
-            asset = None if opts.refresh_shots else placed.get(name)
             shot = opts.shots / f"{name}.jpg" if opts.shots else None
+            fresh = opts.refresh_shots and shot is not None and shot.exists()
+            asset = None if fresh else placed.get(name)
             if asset is None and shot is not None and shot.exists() and not opts.dry_run:
                 sent = client.post(
                     "/content/assets",
