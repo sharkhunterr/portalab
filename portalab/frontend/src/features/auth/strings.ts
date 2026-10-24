@@ -1,3 +1,5 @@
+import { useStrings } from "../../i18n/hooks/useStrings";
+
 /**
  * Auth screen strings (spec 002 T049). Externalized so the i18n module (spec 026) can replace this English
  * catalog with localized ones without touching the components.
@@ -63,5 +65,16 @@ export const authStrings = {
   soleAdmin: "The Admin account cannot be deleted. Transfer the Admin role first.",
   genericError: "Something went wrong. Try again.",
 } as const;
+
+/** Issue 201: the sign-in, activation and account texts in the member's language (``account:auth.*``). */
+export function useAuthStrings() {
+  return useStrings(authStrings, "account:auth", {
+    throttled: ["seconds"],
+    pendingDeletion: ["until"],
+    ssoSignIn: ["provider"],
+    exportStatus: ["status"],
+    deletionRequested: ["until"],
+  });
+}
 
 export type VisibilityPreference = keyof typeof authStrings.visibility;

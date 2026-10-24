@@ -11,5 +11,20 @@
   "safe.hint": "Portalab's own interface, without anything brought by a pack (no look, palette, scene, navigation or interface of a pack), in this browser until you leave it. Also reachable from any address with ?safe=1.",
   "safe.switch": "Use safe mode",
   "safe.on": "Safe mode: nothing brought by a pack is shown.",
-  "safe.leave": "Leave safe mode"
+  "safe.leave": "Leave safe mode",
+  "policy.locked": "Set by your administrator.",
+  "policy.mandatory": "Required by your administrator.",
+  "policy.disabled": "Not available on this portal.",
+  "policy.conditional": "Only available under some conditions.",
+  "policy.retained": "Your choice ({value}) is kept and will apply again if the policy changes.",
+  "state.loading": "Loading",
+  "state.available": "Available",
+  "state.partial": "Partially available",
+  "state.stale": "Out of date",
+  "state.error": "Error",
+  "state.unavailable": "Unavailable",
+  "state.maintenance": "Under maintenance",
+  "state.unauthorized": "Not allowed",
+  "state.no-data": "No data yet",
+  "state.syncing": "Syncing"
 }

@@ -17,7 +17,7 @@ import { Icon } from "../../design-system/components/Icon";
 import { Dialog } from "../../design-system/components/Overlays";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { ApiError, DataRegion, stateForError } from "../../state/regions";
-import { type ScopeKind, authzStrings as t } from "./strings";
+import { authzStrings, type ScopeKind, useAuthzStrings } from "./strings";
 
 type Role = components["schemas"]["RoleOut"];
 type Group = components["schemas"]["GroupOut"];
@@ -28,7 +28,7 @@ const ROLES_KEY = ["authz", "roles"] as const;
 const GROUPS_KEY = ["authz", "groups"] as const;
 const PERMISSIONS_KEY = ["authz", "permissions"] as const;
 
-function errorText(error: unknown): string {
+function errorText(error: unknown, t = authzStrings): string {
   if (error instanceof ApiError && error.code === "authz.reserved_permission") return t.reservedRefused;
   return t.genericError;
 }
@@ -40,6 +40,7 @@ function GrantForm({
   holder: { kind: "role" | "group"; id: string };
   permissions: Permission[];
 }) {
+  const t = useAuthzStrings();
   const ids = { permission: useId(), effect: useId(), scope: useId(), ref: useId() };
   const queryClient = useQueryClient();
   const [permission, setPermission] = useState(permissions[0]?.key ?? "");
@@ -69,7 +70,7 @@ function GrantForm({
 
   return (
     <form onSubmit={submit} className="admin-form">
-      {mutation.isError ? <p role="alert">{errorText(mutation.error)}</p> : null}
+      {mutation.isError ? <p role="alert">{errorText(mutation.error, t)}</p> : null}
       <FormGrid>
         <SelectField
           id={ids.permission}
@@ -127,6 +128,7 @@ function GrantForm({
 }
 
 function GrantList({ holder, name }: { holder: { kind: "role" | "group"; id: string }; name: string }) {
+  const t = useAuthzStrings();
   const queryClient = useQueryClient();
   const permissions = useQuery({
     queryKey: PERMISSIONS_KEY,
@@ -199,6 +201,7 @@ function GrantList({ holder, name }: { holder: { kind: "role" | "group"; id: str
 }
 
 function CreateForm({ kind }: { kind: "role" | "group" }) {
+  const t = useAuthzStrings();
   const ids = { key: useId(), name: useId(), title: useId() };
   const queryClient = useQueryClient();
   const [key, setKey] = useState("");
@@ -218,7 +221,7 @@ function CreateForm({ kind }: { kind: "role" | "group" }) {
 
   return (
     <form onSubmit={submit} className="admin-form">
-      {mutation.isError ? <p role="alert">{errorText(mutation.error)}</p> : null}
+      {mutation.isError ? <p role="alert">{errorText(mutation.error, t)}</p> : null}
       {mutation.isSuccess ? <p role="status">✓</p> : null}
       <FormGrid>
         <TextField
@@ -247,6 +250,7 @@ function CreateForm({ kind }: { kind: "role" | "group" }) {
 }
 
 function CreateButton({ kind }: { kind: "role" | "group" }) {
+  const t = useAuthzStrings();
   return (
     <Dialog
       title={kind === "role" ? t.newRoleTitle : t.newGroupTitle}
@@ -276,6 +280,7 @@ function HolderList({
   selected: Holder | null;
   onSelect: (holder: Holder) => void;
 }) {
+  const t = useAuthzStrings();
   return (
     <ul className="admin-list" aria-label={label}>
       {items.map((item) => (
@@ -298,6 +303,7 @@ function HolderList({
 }
 
 export function AuthzAdminPage() {
+  const t = useAuthzStrings();
   const [selected, setSelected] = useState<Holder | null>(null);
   return (
     <AdminPage icon="key" title={t.title} description={t.description} primary={<CreateButton kind="role" />}>

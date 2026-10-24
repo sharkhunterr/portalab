@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useStrings } from "../../i18n/hooks/useStrings";
 
 /**
  * Policy-bounded preference display (spec 022 T033, FR-006/023): a setting may be locked, mandatory,
@@ -24,6 +25,7 @@ export interface PolicyFieldProps {
 }
 
 export function PolicyField({ state, reason, retainedValue, children, id }: PolicyFieldProps) {
+  const strings = useStrings(policyStrings, "core:policy", { retained: ["value"] }); // issue 201
   const noteId = state === "free" ? undefined : `${id}-policy`;
   const disabled = state === "locked" || state === "disabled";
   return (
@@ -31,8 +33,8 @@ export function PolicyField({ state, reason, retainedValue, children, id }: Poli
       {children({ disabled, describedBy: noteId })}
       {noteId ? (
         <p id={noteId} className="ds-policy">
-          {reason ?? policyStrings[state as Exclude<PolicyState, "free">]}
-          {retainedValue ? ` ${policyStrings.retained(retainedValue)}` : null}
+          {reason ?? strings[state as Exclude<PolicyState, "free">]}
+          {retainedValue ? ` ${strings.retained(retainedValue)}` : null}
         </p>
       ) : null}
     </div>

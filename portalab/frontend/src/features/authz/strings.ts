@@ -1,3 +1,5 @@
+import { useStrings } from "../../i18n/hooks/useStrings";
+
 /**
  * Authorization admin strings (spec 003 T035). Externalized for the i18n module (spec 026). The screens are
  * UI hints only: every action is authorized again by the server.
@@ -39,5 +41,14 @@ export const authzStrings = {
   reservedRefused: "This permission is reserved to the Admin and cannot be granted.",
   genericError: "The change was refused. Check the values and try again.",
 } as const;
+
+/** Issue 201: the roles and permissions texts in the administrator's language (``admin:authz.*``). */
+export function useAuthzStrings() {
+  return useStrings(authzStrings, "admin:authz", {
+    grantsTitle: ["name"],
+    removeGrant: ["key"],
+    manage: ["name"],
+  });
+}
 
 export type ScopeKind = keyof typeof authzStrings.scopes;

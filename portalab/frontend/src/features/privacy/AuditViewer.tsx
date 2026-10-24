@@ -6,7 +6,7 @@ import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { stateForError } from "../../state/regions";
-import { privacyStrings as t } from "./strings";
+import { privacyStrings, usePrivacyStrings } from "./strings";
 
 interface AuditItem {
   seq: number;
@@ -19,7 +19,7 @@ interface AuditItem {
   context: Record<string, unknown>;
 }
 
-function contextText(context: Record<string, unknown>): string {
+function contextText(context: Record<string, unknown>, t = privacyStrings): string {
   if (context.redacted === true)
     return t.auditRedacted(String((context.keys as string[] | undefined)?.join(", ")));
   return JSON.stringify(context);
@@ -27,6 +27,7 @@ function contextText(context: Record<string, unknown>): string {
 
 /** Read-only audit viewer (spec 021 T021/T036); every read is audited server-side. */
 export function AuditViewer() {
+  const t = usePrivacyStrings();
   const fieldId = useId();
   const [draft, setDraft] = useState("");
   const [action, setAction] = useState("");
@@ -118,7 +119,7 @@ export function AuditViewer() {
                 render: (item) => (
                   <span className="admin-mono">
                     {item.resource_type ? `${item.resource_type} — ` : ""}
-                    {contextText(item.context)}
+                    {contextText(item.context, t)}
                   </span>
                 ),
               },

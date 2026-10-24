@@ -11,6 +11,7 @@ import {
 } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
+import { useStrings } from "../../../i18n/hooks/useStrings";
 import { ApiError, DataRegion } from "../../../state/regions";
 
 /** Event operations (spec 007 T031): deliveries and dead letters, quarantine, replay. Strings for i18n (026). */
@@ -38,6 +39,11 @@ export const eventsStrings = {
   genericError: "The operation was refused.",
 } as const;
 
+/** Issue 201: the page's texts in the administrator's language (``admin:events.*``). */
+export function useEventsStrings() {
+  return useStrings(eventsStrings, "admin:events", { replayDone: ["count"] });
+}
+
 interface Delivery {
   consumer: string;
   event_id: string;
@@ -54,9 +60,10 @@ interface QuarantineItem {
 }
 
 function DeadLetters() {
+  const s = useEventsStrings();
   return (
     <DataRegion<Delivery[]>
-      label={eventsStrings.deadLetters}
+      label={s.deadLetters}
       queryKey={["admin", "events", "dead"]}
       queryFn={async () =>
         (
@@ -67,26 +74,26 @@ function DeadLetters() {
     >
       {(items) => (
         <AdminTable<Delivery>
-          label={eventsStrings.deadLetters}
+          label={s.deadLetters}
           rows={items}
           rowKey={(item) => `${item.consumer}-${item.event_id}`}
-          empty={<p className="admin-muted admin-pad">{eventsStrings.noDeadLetters}</p>}
+          empty={<p className="admin-muted admin-pad">{s.noDeadLetters}</p>}
           columns={[
             {
               key: "consumer",
-              header: eventsStrings.consumer,
+              header: s.consumer,
               primary: true,
               render: (i) => <code>{i.consumer}</code>,
             },
             {
               key: "event",
-              header: eventsStrings.event,
+              header: s.event,
               render: (i) => <span className="admin-mono">{i.event_id}</span>,
             },
-            { key: "attempts", header: eventsStrings.attempts, align: "end", render: (i) => i.attempts },
+            { key: "attempts", header: s.attempts, align: "end", render: (i) => i.attempts },
             {
               key: "error",
-              header: eventsStrings.error,
+              header: s.error,
               render: (i) => <span className="admin-mono">{i.last_error ?? "—"}</span>,
             },
           ]}
@@ -97,6 +104,7 @@ function DeadLetters() {
 }
 
 function QuarantineList() {
+  const s = useEventsStrings();
   const queryClient = useQueryClient();
   const resolve = useMutation({
     mutationFn: async ({ id, action }: { id: string; action: "release" | "discard" }) => {
@@ -108,7 +116,7 @@ function QuarantineList() {
   });
   return (
     <DataRegion<QuarantineItem[]>
-      label={eventsStrings.quarantine}
+      label={s.quarantine}
       queryKey={["admin", "events", "quarantine"]}
       queryFn={async () =>
         ((await api.GET("/api/v1/admin/events/quarantine")).data as unknown as { items: QuarantineItem[] })
@@ -117,35 +125,35 @@ function QuarantineList() {
     >
       {(items) => (
         <AdminTable<QuarantineItem>
-          label={eventsStrings.quarantine}
+          label={s.quarantine}
           rows={items}
           rowKey={(item) => item.id}
-          empty={<p className="admin-muted admin-pad">{eventsStrings.noQuarantine}</p>}
+          empty={<p className="admin-muted admin-pad">{s.noQuarantine}</p>}
           columns={[
             {
               key: "type",
-              header: eventsStrings.type,
+              header: s.type,
               primary: true,
               render: (i) => <code>{i.event_type}</code>,
             },
             {
               key: "reason",
-              header: eventsStrings.reason,
+              header: s.reason,
               render: (i) => <StatusBadge tone="warn">{i.reason}</StatusBadge>,
             },
             {
               key: "detail",
-              header: eventsStrings.error,
+              header: s.error,
               render: (i) => <span className="admin-mono">{i.detail}</span>,
             },
           ]}
           actions={(item) => (
             <>
               <Button variant="secondary" onClick={() => resolve.mutate({ id: item.id, action: "release" })}>
-                {eventsStrings.release}
+                {s.release}
               </Button>
               <Button variant="ghost" onClick={() => resolve.mutate({ id: item.id, action: "discard" })}>
-                {eventsStrings.discard}
+                {s.discard}
               </Button>
             </>
           )}
@@ -156,6 +164,7 @@ function QuarantineList() {
 }
 
 function Replay() {
+  const s = useEventsStrings();
   const ids = { field: useId(), title: useId() };
   const [projection, setProjection] = useState("");
   const [confirmation, setConfirmation] = useState<string | null>(null);
@@ -180,12 +189,12 @@ function Replay() {
   const awaitingConfirmation = confirmation !== null && !mutation.isSuccess;
   return (
     <form onSubmit={submit} className="admin-form">
-      {mutation.isError && !awaitingConfirmation ? <p role="alert">{eventsStrings.genericError}</p> : null}
-      {mutation.isSuccess ? <p role="status">{eventsStrings.replayDone(mutation.data.processed)}</p> : null}
+      {mutation.isError && !awaitingConfirmation ? <p role="alert">{s.genericError}</p> : null}
+      {mutation.isSuccess ? <p role="status">{s.replayDone(mutation.data.processed)}</p> : null}
       <FormGrid>
         <TextField
           id={ids.field}
-          label={eventsStrings.projectionField}
+          label={s.projectionField}
           required
           value={projection}
           onChange={(event) => setProjection(event.target.value)}
@@ -197,7 +206,7 @@ function Replay() {
           variant={awaitingConfirmation ? "danger" : "primary"}
           disabled={mutation.isPending}
         >
-          {awaitingConfirmation ? eventsStrings.replayConfirm : eventsStrings.replayStart}
+          {awaitingConfirmation ? s.replayConfirm : s.replayStart}
         </Button>
       </FormActions>
     </form>
@@ -205,15 +214,16 @@ function Replay() {
 }
 
 export function EventsAdmin() {
+  const s = useEventsStrings();
   return (
-    <AdminPage icon="zap" title={eventsStrings.title} description={eventsStrings.description}>
-      <AdminSection title={eventsStrings.deadLetters} icon="alert" flush>
+    <AdminPage icon="zap" title={s.title} description={s.description}>
+      <AdminSection title={s.deadLetters} icon="alert" flush>
         <DeadLetters />
       </AdminSection>
-      <AdminSection title={eventsStrings.quarantine} icon="lock" flush>
+      <AdminSection title={s.quarantine} icon="lock" flush>
         <QuarantineList />
       </AdminSection>
-      <AdminSection title={eventsStrings.replayTitle} icon="sync">
+      <AdminSection title={s.replayTitle} icon="sync">
         <Replay />
       </AdminSection>
     </AdminPage>

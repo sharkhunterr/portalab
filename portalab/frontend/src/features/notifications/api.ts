@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
+import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 
 /** Notifications API hooks (spec 010): the center, the unread count and the per-category preferences. */
 export type NotificationItem = components["schemas"]["NotificationOut"];
@@ -18,8 +19,9 @@ const KEY = ["notifications"] as const;
 export type BulkAction = "read" | "archive" | "unarchive" | "delete";
 
 export function useNotifications(filter: CenterFilter, enabled = true) {
+  const { language } = useLocaleContext(); // issue 242: the texts in the interface's language
   return useInfiniteQuery({
-    queryKey: [...KEY, "list", filter],
+    queryKey: [...KEY, "list", filter, language],
     enabled,
     initialPageParam: null as string | null,
     getNextPageParam: (last: NotificationPage) => last.next_cursor,
@@ -32,6 +34,7 @@ export function useNotifications(filter: CenterFilter, enabled = true) {
               ...(filter.kind ? { kind: filter.kind } : {}),
               unread: filter.unread ?? false,
               archived: filter.archived ?? false,
+              lang: language,
             },
           },
         })
@@ -49,8 +52,10 @@ export function useUnreadCount(enabled = true) {
 }
 
 /** The newest unread items (for toasts after a live ping). */
-export async function fetchLatest(): Promise<NotificationItem[]> {
-  const { data } = await api.GET("/api/v1/me/notifications", { params: { query: { unread: true } } });
+export async function fetchLatest(language?: string): Promise<NotificationItem[]> {
+  const { data } = await api.GET("/api/v1/me/notifications", {
+    params: { query: { unread: true, ...(language ? { lang: language } : {}) } },
+  });
   return data?.items ?? [];
 }
 

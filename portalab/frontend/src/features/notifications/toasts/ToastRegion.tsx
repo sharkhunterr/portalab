@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { connectStream, type LiveEvent } from "../../../api/stream";
 import { useNotify } from "../../../design-system/components/Notification";
 import { useT } from "../../../i18n/hooks/useT";
+import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import type { NotificationItem } from "../api";
 import { fetchLatest } from "../api";
 import { lookOf, severityOf } from "../presentation";
@@ -21,6 +22,7 @@ export interface ToastRegionProps {
 export function ToastRegion({ connect = connectStream }: ToastRegionProps) {
   const notify = useNotify();
   const t = useT();
+  const { language } = useLocaleContext();
   const client = useQueryClient();
   const shown = useRef(new Set<string>());
   useEffect(() => {
@@ -31,7 +33,7 @@ export function ToastRegion({ connect = connectStream }: ToastRegionProps) {
         void client.invalidateQueries({ queryKey: ["notifications"] });
         const id = (event.data as { id?: string } | null)?.id;
         if (!id || shown.current.has(id)) return;
-        void fetchLatest().then((items) => {
+        void fetchLatest(language).then((items) => {
           const item = items.find((candidate) => candidate.id === id);
           if (!item || shown.current.has(id)) return;
           shown.current.add(id);
@@ -50,7 +52,7 @@ export function ToastRegion({ connect = connectStream }: ToastRegionProps) {
       },
     });
     return () => handle.close();
-  }, [connect, client, notify, t]);
+  }, [connect, client, notify, t, language]);
   return null;
 }
 

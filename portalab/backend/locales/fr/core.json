@@ -11,5 +11,20 @@
   "safe.hint": "L'interface de Portalab seule, sans rien de ce qu'apporte un pack (ni look, ni palette, ni scène, ni navigation, ni interface), dans ce navigateur jusqu'à ce que vous le quittiez. Aussi accessible depuis n'importe quelle adresse avec ?safe=1.",
   "safe.switch": "Utiliser le mode sûr",
   "safe.on": "Mode sûr : rien de ce qu'apporte un pack n'est affiché.",
-  "safe.leave": "Quitter le mode sûr"
+  "safe.leave": "Quitter le mode sûr",
+  "policy.locked": "Fixé par votre administrateur.",
+  "policy.mandatory": "Imposé par votre administrateur.",
+  "policy.disabled": "Indisponible sur ce portail.",
+  "policy.conditional": "Disponible seulement sous certaines conditions.",
+  "policy.retained": "Votre choix ({value}) est gardé et s'appliquera de nouveau si la règle change.",
+  "state.loading": "Chargement",
+  "state.available": "Disponible",
+  "state.partial": "Partiellement disponible",
+  "state.stale": "Pas à jour",
+  "state.error": "Erreur",
+  "state.unavailable": "Indisponible",
+  "state.maintenance": "En maintenance",
+  "state.unauthorized": "Non autorisé",
+  "state.no-data": "Pas encore de données",
+  "state.syncing": "Synchronisation"
 }

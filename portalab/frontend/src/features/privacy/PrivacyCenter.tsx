@@ -8,7 +8,7 @@ import { DataRegion } from "../../state/regions";
 import { SettingsCard, SettingsGrid } from "../account/SettingsKit";
 import { DeletionSection, ExportSection } from "../auth/AccountPage";
 import { TermsCard } from "../terms/TermsViewer";
-import { type LevelKey, privacyStrings as t } from "./strings";
+import { type LevelKey, usePrivacyStrings } from "./strings";
 import "./privacy.css";
 
 type Inventory = components["schemas"]["PrivacyInventory"];
@@ -37,6 +37,7 @@ const ownerOf = (item: Datum) => item.owner.replace(/^module:/, "");
 
 /** One datum: what it is, how long it is kept, and who sees it — chosen here when the member may. */
 function DatumRow({ item }: { item: Datum }) {
+  const t = usePrivacyStrings();
   const queryClient = useQueryClient();
   const [message, setMessage] = useState<string | null>(null);
   const change = useMutation({
@@ -102,6 +103,7 @@ function DatumRow({ item }: { item: Datum }) {
  * of the portal that keeps it — visibility chosen in place when allowed, admin locks explained — then a
  * copy of my data and the account deletion. */
 export function PrivacyCenter() {
+  const t = usePrivacyStrings();
   return (
     <DataRegion<Inventory>
       label={t.centerTitle}
