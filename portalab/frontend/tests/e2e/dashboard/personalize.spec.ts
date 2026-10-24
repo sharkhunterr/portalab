@@ -1,9 +1,9 @@
 import { type BrowserContext, expect, type Page, test } from "@playwright/test";
 import { newDashboard, stubApi } from "../../a11y/support";
 
-// 009 T017 / 027 FR-040 — keyboard-only add / move / resize / hide with explicit buttons (no drag-only
-// path); moves and resizes go into the edit session and persist on Save, then show in a second browser
-// context; edit controls are at least 24 px targets.
+// 009 T017 / 027 FR-040 — keyboard-only add / move / resize / remove (no drag-only path: the grip takes
+// Enter, then the arrow keys, Shift to resize); moves and resizes go into the edit session and persist on
+// Save, then show in a second browser context; edit controls are at least 24 px targets.
 
 async function signIn(page: Page, dashboard: ReturnType<typeof newDashboard>) {
   await stubApi(page, { dashboard });
@@ -31,22 +31,31 @@ test("personalize with the keyboard, persisted across devices", async ({ page, b
   const drawer = page.getByRole("dialog", { name: "Widget catalog" });
   await drawer.getByRole("button", { name: "Add Notes" }).focus();
   await page.keyboard.press("Enter");
-  await expect(drawer.getByRole("button", { name: "Add Notes" })).toHaveText("Added");
+  // 027: an added widget goes to « Already on your dashboard », marked « Added »
+  const placed = drawer.getByRole("region", { name: "Already on your dashboard" });
+  await expect(placed.getByRole("listitem").filter({ hasText: "Notes" })).toContainText("Added");
+  await expect(drawer.getByRole("button", { name: "Add Notes" })).toHaveCount(0);
   await page.keyboard.press("Escape");
   await expect.poll(() => titles(page)).toEqual(["Welcome", "Services status", "Notes"]);
 
-  const notes = page.getByRole("toolbar", { name: "Notes" });
-  await notes.getByRole("button", { name: "Move up" }).focus();
+  // Notes (first free row) takes Services' place: grab, right to its column, up to the top row, drop
+  const grip = page.getByRole("button", { name: "Move or resize Notes" });
+  await grip.focus();
   await page.keyboard.press("Enter");
+  await expect(grip).toHaveAttribute("aria-pressed", "true");
+  for (let step = 0; step < 6; step++) await page.keyboard.press("ArrowRight");
+  for (let step = 0; step < 2; step++) await page.keyboard.press("ArrowUp");
+  await page.keyboard.press("Shift+ArrowRight"); // and one column wider
+  await page.keyboard.press("Enter");
+  await expect(grip).toHaveAttribute("aria-pressed", "false");
   await expect.poll(() => titles(page)).toEqual(["Welcome", "Notes", "Services status"]);
-  const welcome = page.getByRole("toolbar", { name: "Welcome" });
-  await welcome.getByRole("button", { name: "Wider" }).focus();
-  await page.keyboard.press("Enter");
-  await welcome.getByRole("button", { name: "Hide" }).focus();
+
+  await page.getByRole("toolbar", { name: "Welcome" }).getByRole("button", { name: "Remove" }).focus();
   await page.keyboard.press("Enter");
   await expect.poll(() => titles(page)).toEqual(["Notes", "Services status"]);
 
-  for (const button of await page.getByRole("toolbar", { name: "Notes" }).getByRole("button").all()) {
+  const tools = page.getByRole("toolbar", { name: "Notes" }).getByRole("button");
+  for (const button of [...(await tools.all()), grip]) {
     const box = await button.boundingBox();
     expect(Math.min(box?.width ?? 0, box?.height ?? 0)).toBeGreaterThanOrEqual(24);
   }
@@ -58,9 +67,10 @@ test("personalize with the keyboard, persisted across devices", async ({ page, b
   const second = await other.newPage();
   await signIn(second, dashboard);
   await expect.poll(() => titles(second)).toEqual(["Notes", "Services status"]);
-  expect(dashboard.instances.find((i) => i.widget_key === "t.welcome")).toMatchObject({ status: "hidden" });
+  expect(dashboard.instances.find((i) => i.widget_key === "t.welcome")).toBeUndefined(); // removed
   const storedNotes = dashboard.instances.find((i) => i.widget_key === "t.notes");
   const services = dashboard.instances.find((i) => i.widget_key === "t.services");
-  expect(Number(storedNotes?.y) <= Number(services?.y)).toBe(true); // Notes took Services' place
+  expect(storedNotes).toMatchObject({ x: 6, y: 0, w: 5 }); // Notes took Services' place, one column wider
+  expect(Number(services?.y)).toBeGreaterThanOrEqual(2); // Services made room below
   await other.close();
 });

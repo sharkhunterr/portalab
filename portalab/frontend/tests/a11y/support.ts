@@ -1,4 +1,54 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
+import { builtinTheme } from "../support/themes";
+
+/**
+ * The header's search (027): a field that answers while one types — on a phone, the magnifier that opens it.
+ */
+export function headerSearch(page: Page) {
+  const banner = page.getByRole("banner");
+  return banner
+    .getByRole("combobox", { name: "Search" })
+    .or(banner.getByRole("button", { name: "Search" }))
+    .first();
+}
+
+/** Issue 171: the assistant's round button, on every page (« Ask the assistant »). */
+export const ASSISTANT = /assistant/i;
+
+/**
+ * The personal menu (027): the avatar in the header — or, on a phone whose header keeps the essentials and
+ * puts the menu in a panel, the profile card of that panel with the personal pages and « Sign out ».
+ */
+export async function expectPersonalMenu(page: Page) {
+  const banner = page.getByRole("banner");
+  const avatar = banner.getByRole("button", { name: /Personal menu/ });
+  const panel = banner.getByRole("button", { name: "Open navigation" });
+  await expect(avatar.or(panel).first()).toBeVisible();
+  if (await avatar.isVisible()) return;
+  await panel.click();
+  const drawer = page.getByRole("dialog", { name: "Main navigation" });
+  await expect(drawer.getByRole("button", { name: "Sign out" })).toBeVisible();
+  await expect(drawer.getByRole("link", { name: "Appearance" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(drawer).toHaveCount(0);
+}
+
+/**
+ * 028: the interfaces beyond the socle's five are their packs' — the server's catalog serves them, as here
+ * (``GET /api/v1/ui/themes`` items: key, name, family, definition).
+ */
+export function themeCatalog(keys: readonly string[]) {
+  return keys.flatMap((key) => {
+    const definition = builtinTheme(key);
+    if (!definition) return [];
+    const { name, family, colorScheme } = definition as unknown as {
+      name: string;
+      family?: string;
+      colorScheme?: string;
+    };
+    return [{ key, name, family: family ?? null, colorScheme, definition, version: 1 }];
+  });
+}
 
 /** Minimal API stub for journeys: an account that can sign in, with its permissions and preferences. */
 export const NAVIGATION = {
@@ -177,6 +227,20 @@ export async function stubApi(
         achievements: 1,
       });
     if (url.pathname === "/api/v1/me/notifications/unread-count") return json(200, { unread: 2 });
+    // issue 171: an assistant answers — its round button is on every page
+    if (url.pathname === "/api/v1/ai/status")
+      return json(200, {
+        available: true,
+        provider_state: "ok",
+        auto_navigate: false,
+        name: "",
+        daily_budget: 0,
+        used_today: 0,
+        recharge: 0,
+        perks: {},
+        shop: false,
+        ideas: [],
+      });
     if (url.pathname === "/api/v1/services/health") {
       const failing = options.failing ?? [];
       return json(200, {
@@ -232,6 +296,12 @@ export async function stubApi(
       return json(200, { layout_version: dashboard.version });
     }
     const instanceMatch = /^\/api\/v1\/dashboard\/widgets\/([^/]+)$/.exec(url.pathname);
+    if (instanceMatch && method === "DELETE") {
+      // 027: « Remove » takes the widget off the dashboard (its configuration goes with it)
+      dashboard.instances = dashboard.instances.filter((i) => i.id !== instanceMatch[1]);
+      dashboard.version += 1;
+      return json(200, { layout_version: dashboard.version });
+    }
     if (instanceMatch && method === "PATCH") {
       const body = route.request().postDataJSON() as Record<string, unknown>;
       const item = dashboard.instances.find((i) => i.id === instanceMatch[1]);
@@ -321,7 +391,8 @@ export async function stubApi(
     if (url.pathname === "/api/v1/me/search-history") return json(200, []);
     if (url.pathname === "/api/v1/me/preferences") {
       if (method === "PUT") Object.assign(saved, route.request().postDataJSON());
-      return json(200, { preferences: [] });
+      // what was saved comes back, as the server keeps it (a reload keeps the chosen theme)
+      return json(200, { preferences: Object.entries(saved).map(([key, value]) => ({ key, value })) });
     }
     if (url.pathname === "/api/v1/ui/themes") {
       return json(200, {

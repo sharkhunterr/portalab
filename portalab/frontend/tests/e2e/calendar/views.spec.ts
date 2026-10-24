@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { stubApi } from "../../a11y/support";
+import { headerSearch, stubApi } from "../../a11y/support";
 
 // 011 T024 — calendar month/week/list views, keyboard navigation, type legend with icon + text (never
 // color alone), a banner for the one failing source, usable on a phone; no axe violations.
@@ -13,7 +13,7 @@ async function signIn(page: import("@playwright/test").Page) {
     .first()
     .fill("correct horse battery");
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("button", { name: /Search/ })).toBeVisible();
+  await expect(headerSearch(page)).toBeVisible();
 }
 
 async function stubCalendar(page: import("@playwright/test").Page) {
@@ -75,9 +75,10 @@ test("calendar views, legend and source banner, keyboard only", async ({ page })
   await signIn(page);
   await page.goto("/calendar");
   await expect(page.getByRole("heading", { name: "Calendar" })).toBeVisible();
-  const legend = page.getByRole("list", { name: "Legend" });
-  await expect(legend).toContainText("Maintenance");
-  await expect(legend).toContainText("Publication");
+  // #237: the legend is the kinds' filters — one per source, each pressed while it is shown
+  const legend = page.getByRole("list", { name: "Filter by kind" });
+  await expect(legend.getByRole("button", { name: "Maintenance" })).toHaveAttribute("aria-pressed", "true");
+  await expect(legend.getByRole("button", { name: "News" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("status").filter({ hasText: "Campaigns" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Database upgrade" })).toBeVisible();
   const week = page.getByRole("button", { name: "Week" });

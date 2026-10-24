@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
-import { stubApi } from "../../a11y/support";
+import { headerSearch, stubApi } from "../../a11y/support";
 
 // 012 T028 — propose → vote → participate → recognize, keyboard only; the lifecycle section degrades alone
 // when Marketplace is stopped; the page fits a phone. No follow/friend/message/like control anywhere.
@@ -23,7 +23,7 @@ async function signIn(page: Page) {
     .first()
     .fill("correct horse battery");
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("button", { name: /Search/ })).toBeVisible();
+  await expect(headerSearch(page)).toBeVisible();
 }
 
 async function stubCommunity(page: Page) {
@@ -117,6 +117,8 @@ test("propose, vote, participate and recognize — keyboard only", async ({ page
   await signIn(page);
   await page.goto("/community/proposals");
   await expect(page.getByRole("heading", { name: "Open proposals" })).toBeVisible();
+  await press(page, "Propose a project or feature"); // the form opens in a window of its own
+  await expect(page.getByRole("dialog", { name: "Propose a project or feature" })).toBeVisible();
   await page.getByLabel("Title").focus();
   await page.keyboard.type("Dark mode");
   await press(page, "Submit the proposal");

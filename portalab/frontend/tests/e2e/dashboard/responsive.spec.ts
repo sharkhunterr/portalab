@@ -44,8 +44,12 @@ for (const width of [360, 320]) {
     );
     expect(overflow).toBeLessThanOrEqual(0);
     await page.getByRole("button", { name: "Customize" }).click();
-    await expect(
-      page.getByRole("toolbar", { name: "Welcome" }).getByRole("button", { name: "Move down" }),
-    ).toBeVisible();
+    // 027: on a phone too, a widget is moved by its grip (Enter, then the arrow keys) beside its tools
+    await expect(page.getByRole("button", { name: "Move or resize Welcome" })).toBeVisible();
+    await expect(page.getByRole("toolbar", { name: "Welcome" })).toBeVisible();
+    const editing = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(editing).toBeLessThanOrEqual(0);
   });
 }

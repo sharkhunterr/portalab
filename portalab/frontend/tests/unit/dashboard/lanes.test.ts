@@ -29,7 +29,12 @@ describe("bands", () => {
   });
 
   it("keeps widgets that overlap rows in one band", () => {
-    const tall = [item("a", 0, 0, 6, 4), item("b", 6, 0, 6, 1), item("c", 6, 1, 6, 1), item("d", 0, 4, 12, 1)];
+    const tall = [
+      item("a", 0, 0, 6, 4),
+      item("b", 6, 0, 6, 1),
+      item("c", 6, 1, 6, 1),
+      item("d", 0, 4, 12, 1),
+    ];
     expect(bands(tall).map((band) => band.map((i) => i.id))).toEqual([["a", "b", "c"], ["d"]]);
   });
 });

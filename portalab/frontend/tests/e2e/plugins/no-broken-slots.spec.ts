@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { stubApi } from "../../a11y/support";
+import { headerSearch, stubApi } from "../../a11y/support";
 
 // 023 T017 (frontend) — with no plugin, a plugin URL shows an explicit state instead of a broken slot and the
 // shell keeps working; with a plugin enabled, its declarative page renders from design-system blocks.
@@ -12,7 +12,7 @@ async function signIn(page: Page) {
     .first()
     .fill("correct horse battery");
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("button", { name: /Search/ })).toBeVisible();
+  await expect(headerSearch(page)).toBeVisible();
 }
 
 test("a disabled plugin leaves no broken slot", async ({ page }) => {
@@ -27,7 +27,7 @@ test("a disabled plugin leaves no broken slot", async ({ page }) => {
   await signIn(page);
   await page.goto("/plugins/hello/main");
   await expect(page.getByText("This page is not available.")).toBeVisible();
-  await expect(page.getByRole("button", { name: /Search/ })).toBeVisible();
+  await expect(headerSearch(page)).toBeVisible();
 });
 
 test("an enabled plugin page renders its blocks", async ({ page }) => {

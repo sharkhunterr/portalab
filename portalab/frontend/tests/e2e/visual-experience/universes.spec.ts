@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
-import { stubApi } from "../../a11y/support";
+import { ASSISTANT, expectPersonalMenu, stubApi, themeCatalog } from "../../a11y/support";
 
 // 027 — the universe themes on phones, tablets and desktops: each keeps every critical element of the
 // header, never scrolls sideways, stays axe-clean, and uses the navigation principle it chose for the device.
@@ -33,7 +33,7 @@ async function signIn(page: Page) {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
-        themes: [],
+        themes: themeCatalog(["portalab-dark", "portalab-light", ...UNIVERSES.map(([key]) => key)]), // 028: the packs' interfaces, as the server serves them
         policy: {
           allowedThemes: ["portalab-dark", "portalab-light", ...UNIVERSES.map(([key]) => key)],
           defaultTheme: "portalab",
@@ -65,9 +65,11 @@ for (const [key, name] of UNIVERSES) {
     for (const width of [390, 820, 1440]) {
       await page.setViewportSize({ width, height: 860 });
       await page.goto("/");
-      await expect(page.getByRole("banner").getByRole("button", { name: /Personal menu/ })).toBeVisible();
-      await expect(page.getByRole("button", { name: /Assistant/ })).toBeVisible();
-      await expect(page.getByRole("navigation").first()).toBeAttached();
+      await expectPersonalMenu(page);
+      await expect(page.getByRole("button", { name: ASSISTANT })).toBeVisible();
+      // its navigation on the page — or, for a menu in a panel or a sheet, the button opening it
+      const opener = page.getByRole("button", { name: /^(Open navigation|Menu\b)/ });
+      await expect(page.getByRole("navigation").or(opener).first()).toBeAttached();
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow, `${name} at ${width}px`).toBeLessThanOrEqual(1);
       const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).analyze();
