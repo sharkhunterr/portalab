@@ -6,11 +6,11 @@ import { ApiError } from "../../state/regions";
 import { useSignInTerms } from "../terms/api";
 import "../content/content.css";
 import { FormMessage } from "./FormMessage";
-import { authStrings as t } from "./strings";
+import { authStrings, useAuthStrings } from "./strings";
 import { useLogin } from "./useAuth";
 
 /** Message for a failed sign-in; the server answers identically for unknown logins and wrong passwords. */
-export function loginErrorMessage(error: unknown): string {
+export function loginErrorMessage(error: unknown, t = authStrings): string {
   if (!(error instanceof ApiError)) return t.genericError;
   if (error.code === "auth.throttled") {
     return t.throttled(Number(error.extensions.retry_after_seconds ?? 60));
@@ -27,6 +27,7 @@ export function loginErrorMessage(error: unknown): string {
 
 /** 027: « Sign in with Authentik » when the single sign-on is set up; it comes back with the session. */
 function SingleSignOn() {
+  const t = useAuthStrings();
   const sso = useQuery({
     queryKey: ["auth", "oidc"],
     retry: false,
@@ -52,6 +53,7 @@ function SingleSignOn() {
 /** Issue 157: the terms of use in force, readable before signing in — only when the administrators offer
  * them on the sign-in page (off by default: the server then answers nothing). */
 function TermsLink() {
+  const t = useAuthStrings();
   const terms = useSignInTerms();
   if (!terms.data) return null;
   return (
@@ -77,6 +79,7 @@ function TermsLink() {
 }
 
 export function LoginForm() {
+  const t = useAuthStrings();
   const loginId = useId();
   const passwordId = useId();
   const [login, setLogin] = useState("");
@@ -114,7 +117,7 @@ export function LoginForm() {
       <SingleSignOn />
       {error ? (
         <FormMessage ref={messageRef} kind="error">
-          {loginErrorMessage(error)}
+          {loginErrorMessage(error, t)}
         </FormMessage>
       ) : null}
       {cancelled ? (

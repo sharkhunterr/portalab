@@ -1,3 +1,5 @@
+import { useStrings } from "../../i18n/hooks/useStrings";
+
 /** Privacy screens strings (spec 021 T036/T038), externalized for the i18n module (spec 026). */
 export const privacyStrings = {
   centerTitle: "Privacy center",
@@ -77,5 +79,15 @@ export const privacyStrings = {
   auditRedacted: (keys: string) => `Details hidden (${keys})`,
   genericError: "The change was refused. Check the values and try again.",
 } as const;
+
+/** Issue 201: the privacy texts in the member's language (``account:privacy.*``). */
+export function usePrivacyStrings() {
+  return useStrings(privacyStrings, "account:privacy", {
+    retentionDays: ["days"],
+    chooseVisibility: ["datum"],
+    policyFor: ["who", "datum"],
+    auditRedacted: ["keys"],
+  });
+}
 
 export type LevelKey = keyof typeof privacyStrings.levels;

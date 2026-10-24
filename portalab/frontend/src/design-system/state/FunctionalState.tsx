@@ -1,12 +1,7 @@
 import type { ReactNode } from "react";
+import { useT } from "../../i18n/hooks/useT";
 import { useTheme } from "../themes/ThemeProvider";
-import {
-  DEFAULT_ICONS,
-  type FunctionalStateName,
-  ICON_PATHS,
-  isFunctionalState,
-  STATE_LABELS,
-} from "./stateMap";
+import { DEFAULT_ICONS, type FunctionalStateName, ICON_PATHS, isFunctionalState } from "./stateMap";
 
 /**
  * ``FunctionalState`` (spec 022 T012, retrofitting the 001 seed): icon + text + color, never color alone.
@@ -44,20 +39,14 @@ function relative(at: Date): string {
   return format.format(Math.round(seconds / (size[unit] ?? 1)), unit);
 }
 
-export function FunctionalState({
-  state,
-  label,
-  detail,
-  asOf,
-  onRetry,
-  retryLabel = "Retry",
-}: FunctionalStateProps) {
+export function FunctionalState({ state, label, detail, asOf, onRetry, retryLabel }: FunctionalStateProps) {
+  const t = useT();
   if (!isFunctionalState(state)) {
     throw new Error(`unknown functional state: ${String(state)}`);
   }
   const { stateStyle } = useTheme();
   const icon = stateStyle(state)?.icon ?? DEFAULT_ICONS[state];
-  const text = label ?? STATE_LABELS[state];
+  const text = label ?? t(`core:state.${state}`); // issue 201: in the member's language
   return (
     <div
       className={`functional-state functional-state--${state}`}
@@ -86,7 +75,7 @@ export function FunctionalState({
       ) : null}
       {onRetry ? (
         <button type="button" className="functional-state__retry" onClick={onRetry}>
-          {retryLabel}
+          {retryLabel ?? t("core:retry")}
         </button>
       ) : null}
     </div>

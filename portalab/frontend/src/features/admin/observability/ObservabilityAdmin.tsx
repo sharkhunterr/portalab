@@ -13,6 +13,7 @@ import {
 } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
+import { useStrings } from "../../../i18n/hooks/useStrings";
 import { DataRegion } from "../../../state/regions";
 import { useHasPermission } from "../../authz/useMyPermissions";
 
@@ -67,6 +68,11 @@ export const observabilityStrings = {
     unknown: "Unknown",
   } as Record<string, string>,
 } as const;
+
+/** Issue 201: the page's texts in the administrator's language (``admin:observability.*``). */
+export function useObservabilityStrings() {
+  return useStrings(observabilityStrings, "admin:observability", { portal: ["status"] });
+}
 
 interface Diagnostic {
   key: string;
@@ -126,9 +132,10 @@ const TONE: Record<string, Tone> = {
 };
 
 function StatusLabel({ state }: { state: string }) {
+  const s = useObservabilityStrings();
   return (
     <StatusBadge tone={TONE[state] ?? "neutral"}>
-      {observabilityStrings.states[state] ?? observabilityStrings.errorStates[state] ?? state}
+      {s.states[state] ?? s.errorStates[state] ?? state}
     </StatusBadge>
   );
 }
@@ -143,6 +150,7 @@ const DIAGNOSTIC_PAGES: Array<[string, string]> = [
 ];
 
 function DiagnosticAction({ diagnostic }: { diagnostic: Diagnostic }) {
+  const s = useObservabilityStrings();
   const queryClient = useQueryClient();
   const run = useMutation({
     mutationFn: () => api.POST(diagnostic.path as never, {} as never),
@@ -161,50 +169,48 @@ function DiagnosticAction({ diagnostic }: { diagnostic: Diagnostic }) {
       <Button variant="secondary" onClick={() => run.mutate()} disabled={run.isPending || run.isSuccess}>
         {diagnostic.label}
       </Button>
-      {run.isSuccess ? <span role="status">{observabilityStrings.done}</span> : null}
-      {run.isError ? <span role="alert">{observabilityStrings.failedAction}</span> : null}
+      {run.isSuccess ? <span role="status">{s.done}</span> : null}
+      {run.isError ? <span role="alert">{s.failedAction}</span> : null}
     </>
   );
 }
 
 function Overview() {
+  const s = useObservabilityStrings();
   return (
     <DataRegion<{ portal: { status: string }; problems: Problem[]; components: ComponentHealth[] }>
-      label={observabilityStrings.overview}
+      label={s.overview}
       queryKey={["admin", "observability", "overview"]}
       queryFn={() => unwrap(api.GET("/api/v1/admin/observability/overview"))}
     >
       {(data) => (
         <AdminGrid>
           <AdminSection
-            title={observabilityStrings.overview}
+            title={s.overview}
             icon="bell"
             flush
             actions={
               <span className="obs-portal">
-                {observabilityStrings.portal("")}
+                {s.portal("")}
                 <StatusLabel state={data.portal.status} />
               </span>
             }
           >
             {data.problems.length === 0 ? (
-              <p className="admin-muted admin-pad">{observabilityStrings.noProblems}</p>
+              <p className="admin-muted admin-pad">{s.noProblems}</p>
             ) : (
-              <ol className="admin-list" aria-label={observabilityStrings.overview}>
+              <ol className="admin-list" aria-label={s.overview}>
                 {data.problems.map((problem) => (
                   <li key={`${problem.kind}-${problem.id}`}>
                     <StatusBadge tone={problem.action_needed ? "bad" : "neutral"}>
-                      {problem.action_needed ? observabilityStrings.actionNeeded : observabilityStrings.info}
+                      {problem.action_needed ? s.actionNeeded : s.info}
                     </StatusBadge>
                     <span className="admin-list__main">
                       <strong>{problem.title}</strong>
                       <span className="admin-muted">{new Date(problem.since).toLocaleString()}</span>
                     </span>
                     {problem.diagnostics.length > 0 ? (
-                      <fieldset
-                        className="admin-list__actions obs-diagnostics"
-                        aria-label={observabilityStrings.diagnostics}
-                      >
+                      <fieldset className="admin-list__actions obs-diagnostics" aria-label={s.diagnostics}>
                         {problem.diagnostics.map((d) => (
                           <DiagnosticAction key={d.key} diagnostic={d} />
                         ))}
@@ -215,26 +221,26 @@ function Overview() {
               </ol>
             )}
           </AdminSection>
-          <AdminSection title={observabilityStrings.components} icon="server" flush>
+          <AdminSection title={s.components} icon="server" flush>
             <AdminTable<ComponentHealth>
-              label={observabilityStrings.components}
+              label={s.components}
               rows={data.components}
               rowKey={(c) => c.component}
               columns={[
                 {
                   key: "component",
-                  header: observabilityStrings.component,
+                  header: s.component,
                   primary: true,
                   render: (c) => c.component,
                 },
                 {
                   key: "technical",
-                  header: observabilityStrings.technical,
+                  header: s.technical,
                   render: (c) => <StatusLabel state={c.technical} />,
                 },
                 {
                   key: "functional",
-                  header: observabilityStrings.functional,
+                  header: s.functional,
                   render: (c) => <StatusLabel state={c.functional} />,
                 },
               ]}
@@ -247,6 +253,7 @@ function Overview() {
 }
 
 function ResolveForm({ id }: { id: string }) {
+  const s = useObservabilityStrings();
   const [note, setNote] = useState("");
   const queryClient = useQueryClient();
   const mutation = useMutation({
@@ -263,20 +270,16 @@ function ResolveForm({ id }: { id: string }) {
   }
   return (
     <form onSubmit={submit} className="admin-form obs-resolve">
-      <TextField
-        label={observabilityStrings.resolutionField}
-        required
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-      />
+      <TextField label={s.resolutionField} required value={note} onChange={(e) => setNote(e.target.value)} />
       <FormActions>
-        <Button type="submit">{observabilityStrings.resolve}</Button>
+        <Button type="submit">{s.resolve}</Button>
       </FormActions>
     </form>
   );
 }
 
 function Errors() {
+  const s = useObservabilityStrings();
   const queryClient = useQueryClient();
   const ack = useMutation({
     mutationFn: (id: string) =>
@@ -285,7 +288,7 @@ function Errors() {
   });
   return (
     <DataRegion<ErrorItem[]>
-      label={observabilityStrings.errors}
+      label={s.errors}
       queryKey={["admin", "observability", "errors"]}
       queryFn={async () =>
         (await unwrap<{ items: ErrorItem[] }>(api.GET("/api/v1/admin/observability/errors"))).items
@@ -293,14 +296,14 @@ function Errors() {
     >
       {(items) => (
         <AdminTable<ErrorItem>
-          label={observabilityStrings.errors}
+          label={s.errors}
           rows={items}
           rowKey={(item) => item.id}
-          empty={<p className="admin-muted admin-pad">{observabilityStrings.noErrors}</p>}
+          empty={<p className="admin-muted admin-pad">{s.noErrors}</p>}
           columns={[
             {
               key: "what",
-              header: observabilityStrings.component,
+              header: s.component,
               primary: true,
               render: (item) => (
                 <span className="services-admin__name">
@@ -311,18 +314,18 @@ function Errors() {
             },
             {
               key: "count",
-              header: observabilityStrings.count,
+              header: s.count,
               align: "end",
               render: (item) => `×${item.count}`,
             },
             {
               key: "message",
-              header: observabilityStrings.message,
+              header: s.message,
               render: (item) => <span className="admin-mono obs-message">{item.message}</span>,
             },
             {
               key: "state",
-              header: observabilityStrings.state,
+              header: s.state,
               render: (item) => <StatusLabel state={item.state} />,
             },
           ]}
@@ -330,7 +333,7 @@ function Errors() {
             <>
               {item.state === "open" ? (
                 <Button variant="secondary" onClick={() => ack.mutate(item.id)}>
-                  {observabilityStrings.acknowledge}
+                  {s.acknowledge}
                 </Button>
               ) : null}
               {item.state !== "resolved" ? <ResolveForm id={item.id} /> : null}
@@ -343,6 +346,7 @@ function Errors() {
 }
 
 function Anomalies() {
+  const s = useObservabilityStrings();
   const queryClient = useQueryClient();
   const decide = useMutation({
     mutationFn: ({ id, decision }: { id: string; decision: "validate" | "dismiss" }) =>
@@ -353,7 +357,7 @@ function Anomalies() {
   });
   return (
     <DataRegion<AnomalyItem[]>
-      label={observabilityStrings.anomalies}
+      label={s.anomalies}
       queryKey={["admin", "observability", "anomalies"]}
       queryFn={async () =>
         (await unwrap<{ items: AnomalyItem[] }>(api.GET("/api/v1/admin/observability/anomalies"))).items
@@ -361,14 +365,14 @@ function Anomalies() {
     >
       {(items) => (
         <AdminTable<AnomalyItem>
-          label={observabilityStrings.anomalies}
+          label={s.anomalies}
           rows={items}
           rowKey={(item) => item.id}
-          empty={<p className="admin-muted admin-pad">{observabilityStrings.noAnomalies}</p>}
+          empty={<p className="admin-muted admin-pad">{s.noAnomalies}</p>}
           columns={[
             {
               key: "what",
-              header: observabilityStrings.component,
+              header: s.component,
               primary: true,
               render: (item) => (
                 <span className="services-admin__name">
@@ -377,10 +381,10 @@ function Anomalies() {
                 </span>
               ),
             },
-            { key: "severity", header: observabilityStrings.severity, render: (item) => item.severity },
+            { key: "severity", header: s.severity, render: (item) => item.severity },
             {
               key: "status",
-              header: observabilityStrings.state,
+              header: s.state,
               render: (item) => <StatusLabel state={item.status} />,
             },
           ]}
@@ -391,10 +395,10 @@ function Anomalies() {
                   variant="secondary"
                   onClick={() => decide.mutate({ id: item.id, decision: "validate" })}
                 >
-                  {observabilityStrings.validate}
+                  {s.validate}
                 </Button>
                 <Button variant="ghost" onClick={() => decide.mutate({ id: item.id, decision: "dismiss" })}>
-                  {observabilityStrings.dismiss}
+                  {s.dismiss}
                 </Button>
               </>
             ) : null
@@ -406,9 +410,10 @@ function Anomalies() {
 }
 
 function Trends() {
+  const s = useObservabilityStrings();
   return (
     <DataRegion<{ points: Array<{ bucket: string; count: number }> }>
-      label={observabilityStrings.trends}
+      label={s.trends}
       queryKey={["admin", "observability", "trends"]}
       queryFn={() =>
         unwrap(
@@ -419,10 +424,10 @@ function Trends() {
       }
     >
       {(data) => {
-        if (data.points.length === 0) return <p className="admin-muted">{observabilityStrings.noTrend}</p>;
+        if (data.points.length === 0) return <p className="admin-muted">{s.noTrend}</p>;
         const top = Math.max(1, ...data.points.map((p) => p.count));
         return (
-          <ul className="obs-trend" aria-label={observabilityStrings.trends}>
+          <ul className="obs-trend" aria-label={s.trends}>
             {data.points.map((p) => (
               <li key={p.bucket} title={`${p.bucket}: ${p.count}`}>
                 <span
@@ -442,29 +447,30 @@ function Trends() {
 }
 
 export function ObservabilityAdmin() {
+  const s = useObservabilityStrings();
   const logs = useHasPermission("observability.logs.read"); // issue 158
   return (
     <AdminPage
       icon="activity"
-      title={observabilityStrings.title}
-      description={observabilityStrings.description}
+      title={s.title}
+      description={s.description}
       wide
       secondary={
         logs ? (
           <Link className="ds-button ds-button--secondary" to="/admin/observability/logs">
-            {observabilityStrings.logs}
+            {s.logs}
           </Link>
         ) : undefined
       }
     >
       <Overview />
-      <AdminSection title={observabilityStrings.errors} icon="alert" flush>
+      <AdminSection title={s.errors} icon="alert" flush>
         <Errors />
       </AdminSection>
-      <AdminSection title={observabilityStrings.anomalies} icon="gauge" flush>
+      <AdminSection title={s.anomalies} icon="gauge" flush>
         <Anomalies />
       </AdminSection>
-      <AdminSection title={observabilityStrings.trends} icon="chart">
+      <AdminSection title={s.trends} icon="chart">
         <Trends />
       </AdminSection>
     </AdminPage>

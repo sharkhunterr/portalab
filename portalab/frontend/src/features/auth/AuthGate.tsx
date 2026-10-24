@@ -6,7 +6,7 @@ import { inLanguage, useSite } from "../../shell/site/site";
 import { ApiError, stateForError } from "../../state/regions";
 import { FirstRunWizard } from "../admin/FirstRunWizard";
 import { LoginForm } from "./LoginForm";
-import { authStrings as t } from "./strings";
+import { useAuthStrings } from "./strings";
 import { type Me, useLogout, useMe } from "./useAuth";
 import { VerifyForm } from "./VerifyForm";
 
@@ -21,6 +21,7 @@ export function AuthGate({
   children: (me: Me) => ReactNode;
   location?: Pick<Location, "pathname" | "search">;
 }) {
+  const t = useAuthStrings();
   const me = useMe();
   // issue 159: the site's name, logo and slogan (in the browser's language, else the default one)
   const site = useSite();
@@ -52,6 +53,7 @@ export function AuthGate({
 }
 
 export function SignOutButton() {
+  const t = useAuthStrings();
   const logout = useLogout();
   return (
     <button type="button" onClick={() => logout.mutate()} disabled={logout.isPending}>

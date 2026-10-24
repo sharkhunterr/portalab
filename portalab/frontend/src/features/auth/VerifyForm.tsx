@@ -3,9 +3,9 @@ import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { api } from "../../api/client";
 import { ApiError } from "../../state/regions";
 import { FormMessage } from "./FormMessage";
-import { authStrings as t } from "./strings";
+import { authStrings, useAuthStrings } from "./strings";
 
-function verifyErrorMessage(error: unknown): string {
+function verifyErrorMessage(error: unknown, t = authStrings): string {
   if (error instanceof ApiError) {
     if (error.code === "auth.invalid_token") return t.invalidToken;
     if (error.status === 422) return error.message;
@@ -15,6 +15,7 @@ function verifyErrorMessage(error: unknown): string {
 
 /** Account activation with the one-time code handed over by the Admin (CD-036) or delivered by e-mail. */
 export function VerifyForm({ initialToken = "" }: { initialToken?: string }) {
+  const t = useAuthStrings();
   const tokenId = useId();
   const passwordId = useId();
   const hintId = useId();
@@ -41,7 +42,7 @@ export function VerifyForm({ initialToken = "" }: { initialToken?: string }) {
       <h1 id={`${tokenId}-title`}>{t.verifyTitle}</h1>
       {mutation.isError ? (
         <FormMessage ref={messageRef} kind="error">
-          {verifyErrorMessage(mutation.error)}
+          {verifyErrorMessage(mutation.error, t)}
         </FormMessage>
       ) : null}
       {mutation.isSuccess ? (

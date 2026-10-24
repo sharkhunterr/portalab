@@ -2,7 +2,8 @@
 category list, and administration (broadcast, e-mail transport, category policy, delivery metadata)."""
 
 import html
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
+from dataclasses import replace
 from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
@@ -222,15 +223,18 @@ def _details(params: Mapping[str, Any] | None) -> dict[str, Any]:
     }
 
 
-def _out(row: Notification, params: Mapping[str, Any] | None = None) -> NotificationOut:
+def _out(
+    row: Notification, params: Mapping[str, Any] | None = None, text: tuple[str, str] | None = None
+) -> NotificationOut:
+    title, body = text or (row.title, row.body)
     return NotificationOut(
         **_details(params),
         id=row.id,
         kind=row.kind,
         category=row.category,
         priority=row.priority,
-        title=row.title,
-        body=row.body,
+        title=title,
+        body=body,
         count=row.count,
         action_url=row.action_url,
         read=row.read_at is not None,
@@ -238,6 +242,24 @@ def _out(row: Notification, params: Mapping[str, Any] | None = None) -> Notifica
         created_at=row.created_at.isoformat(),
         updated_at=row.updated_at.isoformat(),
     )
+
+
+async def _texts(
+    module: NotificationsModule, user: UUID, lang: str | None, sources: Sequence[tuple[UUID, str, Any]]
+) -> dict[UUID, tuple[str, str]]:
+    """Issue 242: a notification's title and text in the reader's language of now — written once at its
+    delivery, they stayed in the language of then (or the portal's default, English, for everyone)."""
+    if not sources:
+        return {}
+    ctx = await module.fanout.locale(user)
+    if lang:  # the interface's language, when it is not the account's (the guide's screenshots)
+        ctx = replace(ctx, language=lang)
+    texts: dict[UUID, tuple[str, str]] = {}
+    for ident, template, params in sources:
+        title, body = module.fanout.render(template, params or {}, ctx)
+        if title and title != template.partition(":")[2]:  # rendered (else the stored text stays)
+            texts[ident] = (title, body)
+    return texts
 
 
 async def _unread(module: NotificationsModule, user: UUID) -> int:
@@ -265,6 +287,7 @@ async def my_notifications(
     kind: Annotated[Literal["notification", "alert"] | None, Query()] = None,
     unread: bool = False,
     archived: bool = False,
+    lang: Annotated[str | None, Query(max_length=35)] = None,
 ) -> NotificationPage:
     assert principal.user_id is not None
     user = principal.user_id
@@ -291,14 +314,22 @@ async def my_notifications(
     async with module.database.session() as session:
         rows = (await session.execute(stmt)).scalars().all()
         sources = {r.communication_id for r in rows[:PAGE]}
-        params: dict[UUID, Mapping[str, Any]] = {}
+        found: list[tuple[UUID, str, Any]] = []
         if sources:
-            found = await session.execute(
-                select(Communication.id, Communication.params).where(Communication.id.in_(sources))
-            )
-            params = {ident: values for ident, values in found.all()}
+            found = [
+                (ident, template, values)
+                for ident, template, values in (
+                    await session.execute(
+                        select(Communication.id, Communication.template_key, Communication.params).where(
+                            Communication.id.in_(sources)
+                        )
+                    )
+                ).all()
+            ]
+    params: dict[UUID, Mapping[str, Any]] = {ident: values for ident, _, values in found}
+    texts = await _texts(module, user, lang, found)
     return NotificationPage(
-        items=[_out(r, params.get(r.communication_id)) for r in rows[:PAGE]],
+        items=[_out(r, params.get(r.communication_id), texts.get(r.communication_id)) for r in rows[:PAGE]],
         next_cursor=encode_cursor(offset + PAGE) if len(rows) > PAGE else None,
         unread=await _unread(module, user),
     )

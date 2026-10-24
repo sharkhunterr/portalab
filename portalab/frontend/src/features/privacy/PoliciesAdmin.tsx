@@ -13,18 +13,19 @@ import {
 import { Button } from "../../design-system/components/Button";
 import { SelectField, TextField } from "../../design-system/components/Field";
 import { ApiError, DataRegion } from "../../state/regions";
-import { type LevelKey, privacyStrings as t } from "./strings";
+import { type LevelKey, privacyStrings, usePrivacyStrings } from "./strings";
 
 type Policy = components["schemas"]["PolicyOut"];
-type Mode = keyof typeof t.modes;
+type Mode = keyof typeof privacyStrings.modes;
 const POLICIES_KEY = ["privacy", "policies"] as const;
 
-function errorText(error: unknown): string {
+function errorText(error: unknown, t = privacyStrings): string {
   if (error instanceof ApiError && error.code === "privacy.policy_exists") return t.alreadyActive;
   return t.genericError;
 }
 
 function NewPolicy() {
+  const t = usePrivacyStrings();
   const ids = {
     datum: useId(),
     mode: useId(),
@@ -62,7 +63,7 @@ function NewPolicy() {
   return (
     <AdminSection title={t.newPolicyTitle} icon="plus">
       <form onSubmit={submit} className="admin-form">
-        {mutation.isError ? <p role="alert">{errorText(mutation.error)}</p> : null}
+        {mutation.isError ? <p role="alert">{errorText(mutation.error, t)}</p> : null}
         <FormGrid>
           <TextField
             id={ids.datum}
@@ -123,6 +124,7 @@ function NewPolicy() {
 
 /** Admin visibility overrides (spec 021 US2): preference preserved, restored on removal. */
 export function PoliciesAdmin() {
+  const t = usePrivacyStrings();
   const queryClient = useQueryClient();
   const remove = useMutation({
     mutationFn: async (id: string) => {

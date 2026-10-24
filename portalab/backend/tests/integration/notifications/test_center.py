@@ -60,6 +60,9 @@ async def test_center(app: FastAPI, client: httpx.AsyncClient, notify: NotifyHar
     assert page["items"][0]["priority"] == "critical"  # important first
     assert page["items"][0]["title"] == "Media est indisponible"  # rendered in French for alex
     assert sorted(i["count"] for i in page["items"]) == [1, 1, 2]
+    # issue 242: read in the language of now (the interface's, when it says so), not the delivery's
+    shown = (await client.get("/api/v1/me/notifications", params={"lang": "en"})).json()
+    assert shown["items"][0]["title"] == "Media is unavailable"
     one = page["items"][-1]["id"]
     assert (await client.post(f"/api/v1/me/notifications/{one}/read")).json()["read"] is True
     assert (await client.get("/api/v1/me/notifications/unread-count")).json() == {"unread": 2}

@@ -13,7 +13,6 @@ import { SettingsCard, SettingsPage } from "../account/SettingsKit";
 import { MemberProfile } from "../community/profile/ProfilePage";
 import { CommunityPresence } from "./CommunityPresence";
 import { FormMessage } from "./FormMessage";
-import { authStrings } from "./strings";
 import { ME_KEY, type Me } from "./useAuth";
 import "../community/profile/profile.css";
 
@@ -23,7 +22,7 @@ function messageFor(error: unknown, t: ReturnType<typeof useT>): string {
   if (error instanceof ApiError) {
     if (error.code === "user.display_name_taken") return t("account:profile.nameTaken");
     if (error.code === "user.avatar_invalid") return t("account:photo.invalid");
-    if (error.code === "admin.sole_admin_protected") return authStrings.soleAdmin;
+    if (error.code === "admin.sole_admin_protected") return t("account:auth.soleAdmin");
     if (error.status === 422 || error.status === 401) return error.message;
   }
   return t("account:error");

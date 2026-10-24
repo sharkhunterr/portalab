@@ -8,7 +8,9 @@ import { Dialog } from "../../design-system/components/Overlays";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
+import { useStrings } from "../../i18n/hooks/useStrings";
 import { useT } from "../../i18n/hooks/useT";
+import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { DataRegion } from "../../state/regions";
 import { useHasPermission } from "../authz/useMyPermissions";
 import { useIncidents } from "../support/incidents/api";
@@ -20,30 +22,16 @@ import { HostPanel } from "./HostWidgets";
 /**
  * Services overview and detail page (spec 006 T024). Each detail section is independent and shows its own
  * state (available, no data, unavailable); the server decides which sections a user may see (permission
- * tiers). Health states carry an icon and a text label, never color alone. Strings externalized for 026.
+ * tiers). Health states carry an icon and a text label, never color alone. Its texts come from the catalogs.
  */
 export const servicesHealthStrings = {
-  title: "Services",
   overview: "Service status",
   empty: "No service is monitored yet.",
   details: (name: string) => `Details of ${name}`,
   detailTitle: (name: string) => `${name} — health`,
-  availability: (ratio: number | null) =>
-    ratio === null ? "availability unknown" : `${(ratio * 100).toFixed(1)}% available (24 h)`,
-  noData: "No data yet",
+  availability: (percent: string) => `${percent}% available (24 h)`,
+  availabilityUnknown: "availability unknown",
   sectionUnavailable: "This section is unavailable right now.",
-  sections: {
-    state: "Current state",
-    availability: "Availability",
-    maintenance: "Maintenance",
-    incidents: "Incidents",
-    sync: "Synchronization",
-    history: "Recent changes",
-    errors: "Recent errors",
-    tickets: "Tickets",
-    infrastructure: "Infrastructure",
-    operations: "Operations",
-  } as Record<string, string>,
   states: {
     operational: "Operational",
     degraded: "Degraded",
@@ -51,15 +39,16 @@ export const servicesHealthStrings = {
     maintenance: "Under maintenance",
     unknown: "Unknown",
   } as Record<string, string>,
-  since: (at: string) => `since ${at}`,
-  notAvailable: "not available",
-  downtime: (seconds: number) => `${Math.round(seconds / 60)} min of downtime`,
-  gaps: (hours: number) => `${hours} h without monitoring`,
-  window: (title: string, starts: string, ends: string) => `${title}: ${starts} → ${ends}`,
-  syncStatus: (status: string, at: string | null) => `${status}${at ? ` · last success ${at}` : ""}`,
-  transition: (from: string | null, to: string, at: string) => `${from ?? "—"} → ${to} (${at})`,
-  error: (code: string, count: number, message: string) => `${code} ×${count}: ${message}`,
 } as const;
+
+/** Issue 242: the page's states and labels in the member's language (``support:health.*``). */
+export function useServicesHealthStrings() {
+  return useStrings(servicesHealthStrings, "support:health", {
+    details: ["name"],
+    detailTitle: ["name"],
+    availability: ["percent"],
+  });
+}
 
 type HealthState = "operational" | "degraded" | "unavailable" | "maintenance" | "unknown";
 
@@ -95,12 +84,13 @@ const ICONS: Record<HealthState, string> = {
 };
 
 export function HealthBadge({ state }: { state: HealthState }) {
+  const s = useServicesHealthStrings();
   return (
     <span className={`health-badge health-badge--${state}`} data-state={state}>
       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
         <path d={ICONS[state] ?? ICONS.unknown} fill="none" stroke="currentColor" strokeWidth="2" />
       </svg>{" "}
-      {servicesHealthStrings.states[state] ?? state}
+      {s.states[state] ?? state}
     </span>
   );
 }
@@ -134,6 +124,7 @@ function sectionData<T>(detail: Detail | undefined, name: string): T | null {
  * viewer may see.
  */
 export function ServiceDetail({ serviceId, name }: { serviceId: string; name: string }) {
+  const s = useServicesHealthStrings();
   const t = useT();
   const manager = useHasPermission("services.manage");
   const format = useFormat();
@@ -193,7 +184,7 @@ export function ServiceDetail({ serviceId, name }: { serviceId: string; name: st
   return (
     <article aria-labelledby={headingId} className="svc-detail">
       <h3 id={headingId} className="visually-hidden">
-        {servicesHealthStrings.detailTitle(name)}
+        {s.detailTitle(name)}
       </h3>
       {manager ? (
         // admin reorganisation (trial): act on this service from its page — the forms come prefilled
@@ -273,7 +264,7 @@ export function ServiceDetail({ serviceId, name }: { serviceId: string; name: st
                   <li key={period.start} data-tone={STATE_TONES[period.state] ?? "none"}>
                     <span className="svc-timeline__dot" aria-hidden="true" />
                     <span className="svc-timeline__text">
-                      <strong>{servicesHealthStrings.states[period.state] ?? period.state}</strong>
+                      <strong>{s.states[period.state] ?? period.state}</strong>
                       <span className="services-page__meta">
                         {format.dateTime(period.start)} ·{" "}
                         {period.current
@@ -345,7 +336,7 @@ export function ServiceDetail({ serviceId, name }: { serviceId: string; name: st
           {unavailable.length ? (
             <p className="services-page__meta svc-detail__missing">
               <Icon name="info" size={14} />{" "}
-              {unavailable.map((u) => u.detail ?? servicesHealthStrings.sectionUnavailable).join(" · ")}
+              {unavailable.map((u) => u.detail ?? s.sectionUnavailable).join(" · ")}
             </p>
           ) : null}
         </>
@@ -385,6 +376,7 @@ const RANK: Record<HealthState, number> = {
  * here: services are added and managed in the administration.
  */
 export function ServicesHealth() {
+  const s = useServicesHealthStrings();
   const t = useT();
   const format = useFormat();
   const incidents = useIncidents("open");
@@ -400,7 +392,7 @@ export function ServicesHealth() {
         context={t("support:status.subtitle")}
       />
       <DataRegion<OverviewItem[]>
-        label={servicesHealthStrings.overview}
+        label={s.overview}
         queryKey={["services", "health"]}
         queryFn={async () =>
           ((await api.GET("/api/v1/services/health")).data as unknown as { items: OverviewItem[] }).items
@@ -424,7 +416,7 @@ export function ServicesHealth() {
                 <span className="services-status__text">
                   <strong>
                     {items.length === 0
-                      ? servicesHealthStrings.empty
+                      ? s.empty
                       : troubled
                         ? t("support:status.troubled", { count: troubled })
                         : open.length
@@ -475,7 +467,7 @@ export function ServicesHealth() {
                 </section>
               ) : null}
               {items.length ? (
-                <ul aria-label={servicesHealthStrings.overview} className="services-page__grid">
+                <ul aria-label={s.overview} className="services-page__grid">
                   {sorted.map((item) => (
                     <ServiceCard key={item.id} item={item} />
                   ))}
@@ -557,7 +549,9 @@ export function UptimeBars({ serviceId }: { serviceId: string }) {
 }
 
 export function ServiceCard({ item }: { item: OverviewItem }) {
+  const s = useServicesHealthStrings();
   const t = useT();
+  const locale = useLocaleContext();
   const ratio = item.availability;
   return (
     <li className="ds-card services-page__card" data-state={item.state}>
@@ -570,7 +564,16 @@ export function ServiceCard({ item }: { item: OverviewItem }) {
       <HealthBadge state={item.state} />
       <span className="services-page__uptime">
         <UptimeBars serviceId={item.id} />
-        <span className="services-page__meta">{servicesHealthStrings.availability(ratio)}</span>
+        <span className="services-page__meta">
+          {ratio === null
+            ? s.availabilityUnknown
+            : s.availability(
+                new Intl.NumberFormat(locale.locale, {
+                  minimumFractionDigits: 1,
+                  maximumFractionDigits: 1,
+                }).format(ratio * 100),
+              )}
+        </span>
       </span>
       <span className="services-page__actions">
         {item.link ? (
@@ -587,7 +590,7 @@ export function ServiceCard({ item }: { item: OverviewItem }) {
             <button
               type="button"
               className="ds-button ds-button--secondary"
-              aria-label={servicesHealthStrings.details(item.name)}
+              aria-label={s.details(item.name)}
             >
               <Icon name="info" size={16} />
               {t("support:status.details")}
