@@ -15,6 +15,7 @@ from portalab.capabilities.marketplace import GIFTS
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.modules.gamification.ledger.writer import Entry, LedgerWriter
+from portalab.modules.gamification.modifiers.rewards import RewardBonuses, boosted
 from portalab.modules.gamification.observability import log
 
 CONSUMER = "gamification.level_rewards"
@@ -51,6 +52,7 @@ class LevelRewards:
     ) -> None:
         self.database = database
         self.writer = writer
+        self.bonuses: RewardBonuses | None = None  # issue 226: set by the module
         self.capabilities = capabilities
         self.config = config
 
@@ -81,12 +83,14 @@ class LevelRewards:
                         Entry(
                             user_id=user,
                             value=value,
-                            delta=amount,
                             kind="grant",
                             source_kind="level_reward",
                             source_ref=f"level:{tier.level}",
                             idempotency_key=f"level_reward:{user}:{tier.level}:{value}",
                             occurred_at=at,
+                            base_amount=amount,
+                            # issue 226: the streak, the campaigns, a boost — like an action's gains
+                            **await boosted(self.bonuses, user, "level_reward", value, amount, at),
                         ),
                     )
                 given += 0 if recorded.duplicate else 1

@@ -128,6 +128,17 @@ class Streaks:
             "next": {"days": nxt.days, "multiplier": nxt.multiplier} if nxt else None,
         }
 
+    async def bonus(self, user: UUID, value: Value, at: datetime) -> list[Modifier]:
+        """Issue 226: the streak's multiplier for a reward (a quest, an achievement…) — read, never counted:
+        today's streak, or yesterday's still alive."""
+        config = self.settings()
+        if not config.enabled or value not in config.values:
+            return []
+        today = self._day(at)
+        days = await self.length(user, today) or await self.length(user, today - timedelta(days=1))
+        factor = multiplier_for(config, days)
+        return [Modifier(f"streak:{days}d", factor)] if factor > 1 else []
+
     async def modifiers_for(
         self, user: UUID, event: Envelope, value: Value, at: datetime
     ) -> Sequence[Modifier]:

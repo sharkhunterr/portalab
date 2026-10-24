@@ -37,6 +37,7 @@ from portalab.modules.gamification.achievements.definition import (
 )
 from portalab.modules.gamification.ledger.writer import Entry, LedgerWriter
 from portalab.modules.gamification.models import Achievement, Balance, Counter, UserAchievement
+from portalab.modules.gamification.modifiers.rewards import RewardBonuses, boosted
 from portalab.modules.gamification.notify import Note
 from portalab.modules.gamification.observability import log, metrics
 from portalab.modules.gamification.rules.definition import matches
@@ -86,6 +87,7 @@ class Achievements:
     ) -> None:
         self.database = database
         self.writer = writer
+        self.bonuses: RewardBonuses | None = None  # issue 226: set by the module
         self.events = events
         self.audit = audit
         self.capabilities = capabilities
@@ -333,13 +335,14 @@ class Achievements:
                 Entry(
                     user_id=user,
                     value=reward.value,
-                    delta=reward.amount,
                     kind="grant",
                     source_kind="achievement",
                     source_ref=f"achievement:{definition.key}",
                     idempotency_key=f"achievement:{user}:{definition.key}:{reward.value}",
                     occurred_at=at,
                     base_amount=reward.amount,
+                    # issue 226: the streak, the campaigns, a boost — like an action's gains
+                    **await boosted(self.bonuses, user, "achievement", reward.value, reward.amount, at),
                 ),
             )
             ids.append(str(recorded.transaction.id))

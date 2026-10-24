@@ -69,6 +69,7 @@ from portalab.modules.gamification.levels.service import LevelService
 from portalab.modules.gamification.manual.service import RewardServiceImpl
 from portalab.modules.gamification.models import AppliedEvent, Withheld
 from portalab.modules.gamification.modifiers.combiner import ModifierCombiner
+from portalab.modules.gamification.modifiers.rewards import RewardBonuses
 from portalab.modules.gamification.notify import CATEGORIES, Notifier
 from portalab.modules.gamification.observability import log
 from portalab.modules.gamification.privacy.participant import GamificationParticipant
@@ -169,6 +170,10 @@ class GamificationModule:
         self.pace = Pace(config)
         self.perks = Perks(database, self.streaks, clock=clock, writer=self.writer)
         self.level_rewards = LevelRewards(database, self.writer, capabilities, config)
+        # issue 226: the objectives', quests', achievements' and levels' rewards follow the bonuses too
+        self.bonuses = RewardBonuses(self.combiner, self.streaks, config)
+        self.quests.bonuses = self.achievements.bonuses = self.level_rewards.bonuses = self.bonuses
+        self.rewards.bonuses = self.bonuses  # contributions and automations' gains
         self.wheel = Wheel(database, self.writer, capabilities, config, clock=clock)  # issue 225
         self.leaderboards = LeaderboardService(
             database, self.levels, self.visibility, capabilities, config, clock=clock

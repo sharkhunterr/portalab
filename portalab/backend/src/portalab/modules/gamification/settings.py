@@ -54,6 +54,19 @@ class EconomyConfig:
     )
     # 027: what reaching a level gives — Coins, Contribution, a shop product offered — per tier
     level_rewards: list[dict[str, Any]] = field(default_factory=list)
+    # issue 226: the rewards that follow the streak, the campaigns, the boosts and the pace like an action's
+    reward_bonuses: list[str] = field(
+        default_factory=lambda: [
+            "daily",
+            "quest",
+            "challenge",
+            "discovery",
+            "achievement",
+            "level_reward",
+            "contribution",
+            "automation",
+        ]
+    )
     # 027: the overall pace — one factor on every rule's gains, set from the progression curve
     pace: dict[str, Any] = field(default_factory=lambda: {"factor": 1.0, "values": ["xp"]})
     # issue 225: the daily wheel — one spin a day (economy time zone), its segments drawn by their weight
@@ -77,6 +90,7 @@ SETTINGS: dict[str, str] = {
     "contribution_amount": "economy.contribution.amount",
     "streak": "economy.streak",
     "level_rewards": "economy.levelRewards",
+    "reward_bonuses": "economy.rewardBonuses",
     "pace": "economy.pace",
     "wheel": "economy.wheel",
 }
@@ -95,6 +109,8 @@ _DESCRIPTIONS = {
     "contribution_amount": "Contribution granted for a recognised contribution (e.g. a converted report).",
     "streak": "Play streaks: {enabled, event_types, values, tiers: [{days, multiplier}]}.",
     "level_rewards": "Level rewards: [{level, coins, contribution, product, label}].",
+    "reward_bonuses": "Rewards that follow the streak, campaigns, boosts and pace like an action's gains: "
+    "daily, quest, challenge, discovery, achievement, level_reward, contribution, automation.",
     "pace": "Overall pace: {factor, values} — multiplies every rule's gains of these values.",
     "wheel": "Daily wheel: {enabled, segments: [{key, kind: coins|xp|product|nothing, amount, product, "
     "labels, weight}]} — one spin a day; Coins may be negative (never below the balance).",
@@ -109,6 +125,7 @@ def declare_economy_settings(catalog: SettingCatalog = default_catalog) -> None:
         "leaderboard_metrics": list[str],
         "streak": dict[str, Any],
         "level_rewards": list[dict[str, Any]],
+        "reward_bonuses": list[str],
         "pace": dict[str, Any],
         "wheel": dict[str, Any],
     }
