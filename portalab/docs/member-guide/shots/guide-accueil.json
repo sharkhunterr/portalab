@@ -1,0 +1,162 @@
+[
+  {
+    "name": "accueil-personnaliser",
+    "page": "guide-accueil",
+    "route": "/",
+    "height": 1000,
+    "settle": 25000,
+    "before": [
+      {
+        "click": "[data-tour='customize']",
+        "waitFor": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .widget-frame__body img",
+        "wait": 2500
+      },
+      {
+        "css": ".dashboard-toolbar a.ds-button{display:none!important}",
+        "wait": 800
+      }
+    ],
+    "clip": "main",
+    "maxHeight": 640,
+    "marks": [
+      {
+        "target": "[data-tour='add-widget']",
+        "pad": 3
+      },
+      {
+        "target": "[data-tour='dashboard-save']",
+        "pad": 3
+      },
+      {
+        "target": ".dashboard-toolbar fieldset",
+        "pad": 3
+      },
+      {
+        "target": ".dashboard-toolbar__mode",
+        "pad": 3
+      },
+      {
+        "target": ".dashboard-toolbar > button",
+        "pad": 3
+      },
+      {
+        "target": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .widget-frame__controls",
+        "pad": 3
+      },
+      {
+        "target": ".dash-grip[aria-label$='Reprendre']",
+        "pad": 3
+      },
+      {
+        "target": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .dash-resize--corner",
+        "pad": 6
+      }
+    ]
+  },
+  {
+    "name": "accueil-catalogue",
+    "page": "guide-accueil",
+    "route": "/",
+    "height": 1000,
+    "settle": 25000,
+    "before": [
+      {
+        "click": "[data-tour='customize']",
+        "waitFor": ".dashboard-toolbar",
+        "wait": 2000
+      },
+      {
+        "click": "[data-tour='add-widget']",
+        "waitFor": ".widget-gallery__item",
+        "wait": 3000
+      }
+    ],
+    "clip": "[role='dialog']",
+    "maxHeight": 390,
+    "marks": [
+      {
+        "target": ".widget-catalog__search",
+        "label": "Chercher un widget",
+        "side": "right",
+        "gap": 40
+      },
+      {
+        "target": ".widget-catalog .in-shop",
+        "label": "D'autres widgets dans la boutique",
+        "side": "right",
+        "gap": 40
+      },
+      {
+        "target": ".widget-gallery__item:nth-child(3) .widget-gallery__preview",
+        "label": "Son aperçu",
+        "side": "right",
+        "gap": 40
+      },
+      {
+        "target": ".widget-gallery__item:nth-child(3) .widget-gallery__text",
+        "label": "Ce qu'il fait, et ses tailles possibles",
+        "side": "right",
+        "gap": 40
+      },
+      {
+        "target": ".widget-gallery__item:nth-child(3) button",
+        "label": "L'ajouter au tableau de bord",
+        "side": "right",
+        "gap": 40
+      }
+    ],
+    "margin": [
+      0,
+      330,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "accueil-reglages",
+    "page": "guide-accueil",
+    "route": "/",
+    "height": 1000,
+    "settle": 25000,
+    "before": [
+      {
+        "click": "[data-tour='customize']",
+        "waitFor": ".dashboard-toolbar",
+        "wait": 2000
+      },
+      {
+        "click": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .dash-tool",
+        "waitFor": "[role='dialog']",
+        "wait": 2500
+      }
+    ],
+    "clip": "[role='dialog']",
+    "marks": [
+      {
+        "target": "[role='dialog'] select",
+        "label": "Une option propre à ce widget",
+        "side": "left",
+        "gap": 40
+      },
+      {
+        "target": "[role='dialog'] select",
+        "pick": "last",
+        "label": "Le « Visuel » du widget",
+        "side": "right",
+        "gap": 40
+      },
+      {
+        "target": "[role='dialog'] fieldset",
+        "label": "L'« Affichage », pour tous les widgets",
+        "side": "left",
+        "gap": 40
+      }
+    ],
+    "margin": [
+      10,
+      320,
+      10,
+      320
+    ]
+  }
+]

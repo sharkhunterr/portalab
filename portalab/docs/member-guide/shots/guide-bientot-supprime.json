@@ -1,0 +1,72 @@
+[
+  {
+    "name": "supprime-rangee",
+    "page": "guide-bientot-supprime",
+    "route": "/media",
+    "height": 900,
+    "settle": 9000,
+    "before": [
+      {
+        "scroll": ".media-row:has([data-status='leaving'])",
+        "wait": 5000
+      }
+    ],
+    "clip": ".media-row:has([data-status='leaving'])",
+    "margin": [
+      16,
+      0,
+      16,
+      0
+    ],
+    "marks": [
+      {
+        "target": "[data-status='leaving']",
+        "label": "« bientôt supprimé », et quand il part si c'est connu",
+        "side": "right",
+        "gap": 70,
+        "shift": -6,
+        "pad": 3
+      }
+    ]
+  },
+  {
+    "name": "supprime-encadre",
+    "page": "guide-bientot-supprime",
+    "route": "/media",
+    "height": 900,
+    "settle": 9000,
+    "before": [
+      {
+        "follow": "a.media-card__link:has([data-status='leaving'])"
+      },
+      {
+        "waitFor": ".media-leaving",
+        "wait": 4000
+      }
+    ],
+    "clip": "article.media-detail",
+    "maxHeight": 440,
+    "marks": [
+      {
+        "target": ".media-leaving__text",
+        "label": "Quand le titre part, et la règle qui l'a choisi",
+        "side": "top",
+        "gap": 40,
+        "shift": 300
+      },
+      {
+        "target": ".media-leaving__rescue",
+        "label": "Vos sauvetages, ou en acheter un",
+        "side": "bottom",
+        "gap": 30
+      },
+      {
+        "target": ".media-leaving__actions > button",
+        "label": "Demander à l'assistant",
+        "side": "bottom",
+        "gap": 30,
+        "shift": 60
+      }
+    ]
+  }
+]

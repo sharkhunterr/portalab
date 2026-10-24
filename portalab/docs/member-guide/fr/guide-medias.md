@@ -17,11 +17,15 @@ Ouvrez **Médias** dans le menu (section « Médias »). La page d'accueil des m
 - des rangées qui défilent sur le côté : **« Reprendre »**, **« Derniers ajouts »**, **« Sorties récentes »**, **« Bientôt retirés »**, **« Lus récemment »**, **« Tendances »**, **« Recommandé pour vous »** ;
 - **« Parcourir par type »** : films, séries, livres, livres audio, musique, jeux…
 
+![La page Médias : « Parcourir le catalogue », « Demander un média » et une rangée de titres](shot:medias-accueil)
+
 Une rangée qui n'a rien à montrer n'est pas affichée. Si votre portail a une radio, elle apparaît aussi ici : **« Écouter »** pour l'écouter en direct, et **« Demander au DJ »** pour proposer un morceau.
 
 ## Trouver un titre dans le catalogue
 
 Ouvrez [le catalogue](/media/browse), puis :
+
+![Le catalogue : la recherche (1), le type (2), les filtres (3) et le tri (4)](shot:medias-catalogue)
 
 1. Tapez dans **« Rechercher un titre »** : un titre, un auteur, un acteur…
 2. Choisissez un **« Type »** : « Tout », « Films », « Séries », « Livres », « Livres audio », « Musique » ou « Jeux ».
@@ -37,6 +41,8 @@ Cliquez sur une affiche pour ouvrir la fiche du titre. En haut, vous trouvez l'a
 - **« Disponible »** quand le titre est dans la médiathèque. Sinon, l'étape où en est sa demande (par exemple « En attente de validation » ou « Téléchargement 40 % »), ou **« Indisponible »** ;
 - **« En cours · 35 % »** si vous l'avez commencé (ou l'épisode en cours pour une série) ;
 - **« Déjà vu »**, **« Déjà lu »**, **« Déjà écouté »** ou **« Déjà joué »** si vous l'avez terminé.
+
+![Le haut de la fiche d'un film : ses badges, et les boutons pour le regarder](shot:medias-fiche)
 
 Plus bas, selon le titre :
 

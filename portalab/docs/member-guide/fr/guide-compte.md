@@ -59,6 +59,8 @@ Seules les interfaces que vous possédez sont proposées. Une ligne indique comb
 
 ### Couleurs, badges et effets
 
+![Le bloc « Palette de couleurs » : les palettes (1) et la ligne vers la boutique (2)](shot:compte-couleurs)
+
 - « Palette de couleurs » : les couleurs d'accent posées sur votre thème. « Celle du thème » garde les couleurs d'origine.
 - « Badge de niveau » : l'allure du badge de niveau que tout le monde voit. « Classique » change avec votre niveau.
 - « Passage de niveau » : comment un nouveau niveau est fêté. « Essayer » le montre.

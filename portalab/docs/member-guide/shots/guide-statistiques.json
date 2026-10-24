@@ -1,0 +1,67 @@
+[
+  {
+    "name": "statistiques-medias",
+    "page": "guide-statistiques",
+    "route": "/media/insights",
+    "height": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "waitFor": ".admin-stats",
+        "wait": 1500
+      }
+    ],
+    "maxHeight": 520,
+    "marks": [
+      {
+        "target": ".admin-page .ds-page-header__actions .ds-field",
+        "pad": 3
+      },
+      {
+        "target": ".admin-page__tabs fieldset",
+        "pad": 3
+      },
+      {
+        "target": ".admin-page__body > fieldset.ds-subnav",
+        "pad": 3
+      },
+      {
+        "target": ".deep-tabs fieldset",
+        "pad": 3
+      },
+      {
+        "target": ".admin-stats",
+        "pad": 3
+      }
+    ]
+  },
+  {
+    "name": "statistiques-verrou",
+    "page": "guide-statistiques",
+    "route": "/media/requests",
+    "height": 900,
+    "settle": 14000,
+    "before": [
+      {
+        "scroll": ".admin-section:has(.insights-locked)",
+        "wait": 1500
+      }
+    ],
+    "clip": ".admin-section:has(.insights-locked)",
+    "margin": [
+      16,
+      330,
+      16,
+      16
+    ],
+    "marks": [
+      {
+        "target": ".insights-locked .ds-button",
+        "label": "Une statistique verrouillée : la débloquer dans la boutique",
+        "side": "right",
+        "gap": 50,
+        "pad": 4
+      }
+    ]
+  }
+]

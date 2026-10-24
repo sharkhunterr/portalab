@@ -13,11 +13,13 @@ Vous les trouvez dans la rubrique **Découvrir** du menu, si votre portail les p
 
 La page [Actualités](/news) rassemble « Les nouveautés du portail, directement par l'équipe ».
 
-- En haut, les articles **« À la une »** : le premier en grand, les suivants à côté.
-- En dessous, les derniers articles, chacun sous forme de carte avec sa catégorie et sa date.
-- Un point signale un article « Pas encore lue ». Il disparaît dès que vous ouvrez l'article.
+![La page Actualités et ses trois repères numérotés](shot:actualites-liste)
 
-Pour ne voir qu'un sujet, cliquez sur une catégorie dans la barre au-dessus des articles. « Toutes les catégories » revient à la liste complète.
+1. En haut, les articles **« À la une »** : le premier en grand, les suivants à côté.
+2. La barre des **catégories** : cliquez sur une catégorie pour ne voir qu'un sujet. « Toutes les catégories » revient à la liste complète.
+3. En dessous, les **derniers articles**, chacun sous forme de carte avec sa catégorie et sa date.
+
+Un point signale un article « Pas encore lue ». Il disparaît dès que vous ouvrez l'article.
 
 Ouvrez un article pour le lire en entier : sa catégorie, sa date et son temps de lecture (« 3 min de lecture », par exemple) sont indiqués en haut. « Toutes les actualités » vous ramène à la liste.
 
@@ -43,10 +45,13 @@ Chaque élément a une icône et le nom de sa catégorie, par exemple « Films �
 
 ### Changer d'affichage
 
-1. Choisissez une vue : « Mois », « Semaine » ou « Liste ».
-2. Avancez ou reculez avec « Précédent » et « Suivant ».
-3. « Aujourd'hui » revient au jour même.
-4. Dans les vues « Mois » et « Semaine », cliquez sur un jour pour voir son détail.
+![Le calendrier et ses cinq repères numérotés](shot:actualites-calendrier)
+
+1. Avancez ou reculez avec les flèches « Précédent » et « Suivant ». « Aujourd'hui » revient au jour même.
+2. Le mois ou la semaine affichés.
+3. Choisissez une vue : « Mois », « Semaine » ou « Liste ».
+4. Les catégories servent aussi de filtres : cliquez sur l'une d'elles pour la masquer ou la réafficher. « Tout afficher » les remet toutes.
+5. Dans les vues « Mois » et « Semaine », cliquez sur un jour pour voir son détail.
 
 Les heures suivent votre fuseau horaire et le premier jour de la semaine choisi dans « Langue et région ».
 
@@ -81,9 +86,14 @@ Le [wiki](/wiki) contient des « Guides, tutoriels et réponses, écrits par la 
 
 Une page du wiki affiche :
 
-- l'emplacement de la page (son chemin dans le wiki) en haut ;
-- l'arbre « Pages du wiki » sur le côté, pour passer d'une page à l'autre (sous le contenu sur un téléphone) ;
-- « Sur cette page », le sommaire de ses titres, pour sauter directement à une partie.
+![Une page du wiki et ses quatre repères numérotés](shot:actualites-wiki-page)
+
+1. l'arbre « Parcourir le wiki » sur le côté, pour passer d'une page à l'autre (sous le contenu sur un téléphone) ;
+2. l'emplacement de la page (son chemin dans le wiki) en haut ;
+3. « Sommaire », qui ouvre la liste des pages du même guide ;
+4. « Sur cette page », le sommaire de ses titres, pour sauter directement à une partie.
+
+En bas de la page, « Précédente » et « Suivante » mènent aux pages voisines.
 
 Vous ne voyez que les pages que vous avez le droit de lire.
 

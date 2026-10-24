@@ -1,0 +1,108 @@
+[
+  {
+    "name": "medias-accueil",
+    "page": "guide-medias",
+    "route": "/media",
+    "height": 900,
+    "settle": 9000,
+    "maxHeight": 640,
+    "marks": [
+      {
+        "target": ".media-hero .ds-page-header__actions a:last-of-type",
+        "label": "Chercher dans le catalogue",
+        "side": "top",
+        "gap": 26,
+        "shift": 0
+      },
+      {
+        "target": ".media-hero .ds-page-header__actions a:first-of-type",
+        "label": "Demander un titre qui manque",
+        "side": "right",
+        "gap": 40
+      },
+      {
+        "target": ".media-home > .media-row:nth-of-type(2) .media-rail",
+        "label": "Une rangée : faites-la défiler sur le côté",
+        "side": "top",
+        "gap": 26,
+        "shift": 380
+      }
+    ]
+  },
+  {
+    "name": "medias-catalogue",
+    "page": "guide-medias",
+    "route": "/media/browse",
+    "height": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "waitFor": ".media-card",
+        "wait": 2000
+      }
+    ],
+    "maxHeight": 560,
+    "marks": [
+      {
+        "target": ".catalog__bar .ds-field:first-child",
+        "pad": 4
+      },
+      {
+        "target": ".catalog__kinds",
+        "pad": 4
+      },
+      {
+        "target": ".catalog__filters",
+        "pad": 4
+      },
+      {
+        "target": ".catalog__bar .ds-field:nth-child(2)",
+        "pad": 4
+      }
+    ]
+  },
+  {
+    "name": "medias-fiche",
+    "page": "guide-medias",
+    "route": "/media",
+    "height": 900,
+    "settle": 9000,
+    "before": [
+      {
+        "follow": ".media-home > .media-row:nth-of-type(2) a.media-card__link"
+      },
+      {
+        "waitFor": ".discover-title__hero",
+        "wait": 5000
+      },
+      {
+        "css": ".media-detail .media-journey{display:none!important}",
+        "wait": 4000
+      }
+    ],
+    "clip": ".discover-title__hero",
+    "margin": [
+      12,
+      0,
+      70,
+      0
+    ],
+    "marks": [
+      {
+        "target": ".discover-title__state .media-badges",
+        "label": "Où en est le titre : disponible, en cours, déjà vu…",
+        "side": "bottom",
+        "gap": 30,
+        "shift": 160,
+        "pad": 3
+      },
+      {
+        "target": ".discover-title__hero .ds-page-header__actions",
+        "label": "Regarder, reprendre, recommencer, ou l'ouvrir dans son application",
+        "side": "top",
+        "gap": 40,
+        "pad": 4
+      }
+    ]
+  }
+]

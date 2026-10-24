@@ -1,0 +1,62 @@
+[
+  {
+    "name": "communaute-classements",
+    "page": "guide-communaute",
+    "route": "/community/leaderboards",
+    "height": 1100,
+    "settle": 3000,
+    "before": [
+      {
+        "waitFor": ".community-filters",
+        "wait": 5000
+      }
+    ],
+    "maxHeight": 304,
+    "marks": [
+      {
+        "target": ".community-tabs",
+        "pad": 4
+      },
+      {
+        "target": ".community-filters .ds-subnav",
+        "pad": 4
+      },
+      {
+        "target": ".community-filters .ds-subnav + .ds-subnav",
+        "pad": 4
+      }
+    ]
+  },
+  {
+    "name": "communaute-projets",
+    "page": "guide-communaute",
+    "route": "/projects",
+    "height": 1000,
+    "settle": 3000,
+    "before": [
+      {
+        "waitFor": ".project-launch-cta",
+        "wait": 2500
+      }
+    ],
+    "maxHeight": 980,
+    "marks": [
+      {
+        "target": ".admin-stats",
+        "pad": 4
+      },
+      {
+        "target": ".project-launch-cta .ds-button",
+        "pad": 4
+      },
+      {
+        "target": ".ds-subnav",
+        "pad": 4
+      },
+      {
+        "target": ".project-card",
+        "pad": 4
+      }
+    ]
+  }
+]

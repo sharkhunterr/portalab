@@ -22,6 +22,15 @@ Vous pouvez l'ouvrir de plusieurs façons :
 
 Sur un ordinateur, la fenêtre s'ouvre au centre de l'écran. Sur un téléphone, elle prend tout l'écran.
 
+![La fenêtre de l'assistant et ses six repères numérotés](shot:assistant-fenetre)
+
+1. **La jauge** de votre consommation du jour (voir « Votre consommation du jour »).
+2. **« Conversations »** : vos conversations passées.
+3. **« Nouvelle conversation »**.
+4. **« Sur cette page : … »** : la page d'où vous posez la question.
+5. **Des idées de questions**, à toucher.
+6. **Le champ « Demandez à l'assistant… »** et le bouton « Envoyer ».
+
 ## Poser une question
 
 1. Écrivez votre question dans le champ « Demandez à l'assistant… ».

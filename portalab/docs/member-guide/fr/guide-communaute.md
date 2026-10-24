@@ -51,10 +51,11 @@ Un succès secret s'affiche comme « un succès secret ». Un membre qui a chois
 
 ## Consulter les classements
 
-Ouvrez l'onglet [Classements](/community/leaderboards).
+![Les onglets de la communauté (1), « Classer par » (2) et la période (3)](shot:communaute-classements)
 
-1. Choisissez quoi classer dans « Classer par » : « XP », « Niveau », « Contribution », « Succès » et, si votre portail le propose, « Coins ».
-2. Choisissez la « Période » : « Cette semaine », « Ce mois-ci », « 6 derniers mois », « Cette année », « 3 dernières années » ou « Depuis le début ».
+1. Ouvrez l'onglet [Classements](/community/leaderboards).
+2. Choisissez quoi classer dans « Classer par » : « XP », « Niveau », « Contribution », « Succès » et, si votre portail le propose, « Coins ».
+3. Choisissez la « Période » : « Cette semaine », « Ce mois-ci », « 6 derniers mois », « Cette année », « 3 dernières années » ou « Depuis le début ».
 
 Le classement affiche le podium, votre position et les places gagnées ou perdues « Depuis hier ». Sur une période, seul ce que vous avez gagné pendant cette période compte. Le niveau se classe toujours depuis le début.
 
@@ -88,6 +89,13 @@ Si vous êtes l'auteur, vous pouvez « Demander de l'aide », « Retirer la prop
 ## Financer un projet communautaire
 
 La page [Projets de la communauté](/projects) réunit les idées des membres, financées ensemble en Coins.
+
+![Les projets de la communauté : les chiffres, « Lancer un projet », les étapes et un projet, numérotés](shot:communaute-projets)
+
+1. **Les chiffres** : les projets ouverts au financement, en construction et publiés, les Coins rassemblés et vos contributions.
+2. **« Lancer un projet »** : votre propre idée (voir plus bas).
+3. **Les étapes** pour filtrer les projets.
+4. **Un projet** : son état, les Coins rassemblés, ses contributeurs et, s'il est ouvert, « Contribuer ».
 
 - Filtrez par étape : « Proposés », « À financer », « En construction », « Publiés » ou « Clos ».
 - Un projet passe par plusieurs états : « Idée », « Proposition », « Ouvert aux votes et au financement », « En validation », « En développement », « En bêta », puis « Publié ».

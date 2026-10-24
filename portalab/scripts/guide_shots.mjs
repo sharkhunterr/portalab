@@ -1,17 +1,18 @@
 /**
  * Issue 239: the member guide's screenshots, taken from a running portal and annotated — each element framed,
  * numbered, and when it says so a bubble with an arrow pointing at it. The shots are described in a JSON file
- * (``docs/member-guide/shots.json``): the page, the screen, what is done first, the part kept and the marks.
+ * (``docs/member-guide/shots/<page>.json``, one per page): the page, the screen, what is done first, the part
+ * kept and the marks.
  * The interface is shown in the guide's language whatever the account's; nothing is changed on the portal.
- * Only the content is kept (never the header nor the member's own panel).
+ * By default only the content is kept (``main``), never the header nor the member's own panel.
  *
- *     node scripts/guide_shots.mjs docs/member-guide/shots.json --base https://127.0.0.1:8443 --login admin \
+ *     node scripts/guide_shots.mjs docs/member-guide/shots --base https://127.0.0.1:8443 --login admin \
  *         --password-file <file> --out <folder> [--language fr] [--only name,name]
  *
  * The password is read from a file, never from the command line. Then ``wiki_import.py --shots <folder>``.
  */
 
-import { mkdirSync, readFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -32,12 +33,20 @@ const { values, positionals } = parseArgs({
   },
 });
 if (!positionals[0] || !values.base || !values.login || !values["password-file"] || !values.out) {
-  console.error("usage: guide_shots.mjs <shots.json> --base … --login … --password-file … --out …");
+  console.error("usage: guide_shots.mjs <shots.json | folder> --base … --login … --password-file … --out …");
   process.exit(2);
 }
 const base = values.base.replace(/\/$/, "");
 const password = readFileSync(values["password-file"], "utf8").trim();
-const shots = JSON.parse(readFileSync(positionals[0], "utf8"));
+// a file of shots, or a folder of them (one per page of the guide)
+const source = positionals[0];
+const files = statSync(source).isDirectory()
+  ? readdirSync(source)
+      .filter((name) => name.endsWith(".json"))
+      .sort()
+      .map((name) => join(source, name))
+  : [source];
+const shots = files.flatMap((file) => JSON.parse(readFileSync(file, "utf8")));
 const only = values.only ? new Set(values.only.split(",")) : null;
 const out = resolve(values.out);
 mkdirSync(out, { recursive: true });

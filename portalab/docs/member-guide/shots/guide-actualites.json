@@ -1,0 +1,114 @@
+[
+  {
+    "name": "actualites-liste",
+    "page": "guide-actualites",
+    "route": "/news",
+    "height": 1100,
+    "before": [
+      {
+        "waitFor": ".news-grid",
+        "wait": 1500
+      }
+    ],
+    "marks": [
+      {
+        "target": ".news-featured",
+        "pad": 4
+      },
+      {
+        "target": ".news-page .ds-subnav",
+        "pad": 4
+      },
+      {
+        "target": ".news-grid > li",
+        "pad": 4
+      }
+    ]
+  },
+  {
+    "name": "actualites-calendrier",
+    "page": "guide-actualites",
+    "route": "/calendar",
+    "height": 1100,
+    "before": [
+      {
+        "waitFor": ".month-grid",
+        "wait": 2000
+      }
+    ],
+    "clip": ".calendar-panel",
+    "margin": [
+      16,
+      16,
+      16,
+      16
+    ],
+    "maxHeight": 760,
+    "marks": [
+      {
+        "target": ".calendar-bar__move",
+        "pad": 4
+      },
+      {
+        "target": ".calendar-page__period",
+        "pad": 4
+      },
+      {
+        "target": ".calendar-bar__views",
+        "pad": 4
+      },
+      {
+        "target": ".calendar-filters",
+        "pad": 4
+      },
+      {
+        "target": ".month-grid__day[data-today]",
+        "label": "Touchez un jour pour son détail",
+        "side": "top",
+        "pad": 3,
+        "gap": 34
+      }
+    ]
+  },
+  {
+    "name": "actualites-wiki-page",
+    "page": "guide-actualites",
+    "route": "/wiki/guide-premiers-pas",
+    "height": 1000,
+    "before": [
+      {
+        "waitFor": ".wiki-outline"
+      },
+      {
+        "css": ".wiki-page .ds-page-header__actions{display:none!important}",
+        "wait": 1200
+      }
+    ],
+    "clip": ".wiki-layout",
+    "margin": [
+      16,
+      0,
+      0,
+      16
+    ],
+    "maxHeight": 640,
+    "marks": [
+      {
+        "target": ".wiki-sidebar",
+        "pad": 4
+      },
+      {
+        "target": ".wiki-breadcrumbs",
+        "pad": 4
+      },
+      {
+        "target": ".wiki-page__top .ds-button",
+        "pad": 4
+      },
+      {
+        "target": ".wiki-outline",
+        "pad": 4
+      }
+    ]
+  }
+]

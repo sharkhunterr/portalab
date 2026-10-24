@@ -1,0 +1,32 @@
+[
+  {
+    "name": "compte-couleurs",
+    "page": "guide-compte",
+    "route": "/settings/appearance",
+    "height": 1400,
+    "before": [
+      {
+        "waitFor": ".palettes",
+        "scroll": ".looks",
+        "wait": 2000
+      }
+    ],
+    "clip": ".looks",
+    "margin": [
+      16,
+      16,
+      16,
+      16
+    ],
+    "marks": [
+      {
+        "target": ".looks .palettes",
+        "pad": 4
+      },
+      {
+        "target": ".looks .in-shop",
+        "pad": 3
+      }
+    ]
+  }
+]

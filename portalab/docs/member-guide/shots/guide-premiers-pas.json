@@ -1,0 +1,121 @@
+[
+  {
+    "name": "premiers-entete",
+    "page": "guide-premiers-pas",
+    "route": "/news",
+    "height": 600,
+    "settle": 9000,
+    "before": [
+      {
+        "css": "body{padding-top:18px!important}",
+        "wait": 800
+      }
+    ],
+    "clip": "header.shell-header",
+    "margin": [
+      18,
+      0,
+      10,
+      0
+    ],
+    "marks": [
+      {
+        "target": ".shell-brand",
+        "pad": 4
+      },
+      {
+        "target": ".header-search",
+        "pad": 4
+      },
+      {
+        "target": ".shell-health",
+        "pad": 3
+      },
+      {
+        "target": ".shell-bell",
+        "pad": 3
+      },
+      {
+        "target": ".shell-progress",
+        "pad": 3
+      },
+      {
+        "target": ".shell-avatar-button",
+        "pad": 3
+      }
+    ]
+  },
+  {
+    "name": "premiers-menu",
+    "page": "guide-premiers-pas",
+    "route": "/news",
+    "height": 800,
+    "settle": 9000,
+    "before": [
+      {
+        "css": ".shell-sections>li:has(>.shell-section),.shell-sections>li:has(a[href^='/admin']),.shell-profile{display:none!important}",
+        "wait": 800
+      }
+    ],
+    "clip": "nav.shell-side",
+    "margin": [
+      14,
+      760,
+      0,
+      0
+    ],
+    "maxHeight": 300,
+    "marks": [
+      {
+        "target": ".shell-sections",
+        "label": "Le menu et ses rubriques",
+        "side": "right",
+        "gap": 50,
+        "shift": 90
+      },
+      {
+        "target": ".shell-breadcrumbs",
+        "label": "Le fil d'Ariane : où vous êtes",
+        "side": "right",
+        "gap": 40
+      },
+      {
+        "target": ".hub-tabs ul",
+        "label": "Les onglets de la rubrique",
+        "side": "right",
+        "gap": 40
+      }
+    ]
+  },
+  {
+    "name": "premiers-visites",
+    "page": "guide-premiers-pas",
+    "route": "/guide",
+    "height": 1000,
+    "settle": 8000,
+    "clip": "main",
+    "maxHeight": 560,
+    "marks": [
+      {
+        "target": ".guide-page .ds-page-header button",
+        "label": "Revoir les écrans de bienvenue",
+        "side": "left",
+        "gap": 40
+      },
+      {
+        "target": ".guide-hero .ds-button",
+        "label": "La première visite : le portail en une minute",
+        "side": "bottom",
+        "gap": 26,
+        "shift": -260
+      },
+      {
+        "target": ".guide-group .guide-card:nth-child(2)",
+        "label": "Une visite : ses étapes, « Vue » quand vous l'avez faite, puis « Lancer » ou « Revoir »",
+        "side": "right",
+        "gap": 44,
+        "width": 300
+      }
+    ]
+  }
+]

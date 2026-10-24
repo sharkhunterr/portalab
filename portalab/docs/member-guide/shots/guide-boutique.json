@@ -1,0 +1,67 @@
+[
+  {
+    "name": "boutique-rayons",
+    "page": "guide-boutique",
+    "route": "/marketplace",
+    "height": 1100,
+    "settle": 3000,
+    "before": [
+      {
+        "waitFor": ".shop-shelf .product-card",
+        "wait": 2500
+      }
+    ],
+    "maxHeight": 1000,
+    "marks": [
+      {
+        "target": ".shop-departments",
+        "pad": 4
+      },
+      {
+        "target": ".shop-rarities",
+        "pad": 4
+      },
+      {
+        "target": ".shop-search",
+        "pad": 4
+      },
+      {
+        "target": ".shop-shelf .product-card",
+        "pad": 4
+      }
+    ]
+  },
+  {
+    "name": "boutique-fiche",
+    "page": "guide-boutique",
+    "route": "/marketplace",
+    "height": 1100,
+    "settle": 3000,
+    "before": [
+      {
+        "waitFor": ".shop-shelf .product-card",
+        "wait": 1500
+      },
+      {
+        "click": ".shop-shelf .product-card:has-text('Minimal interface') .product-card__name",
+        "waitFor": ".product-sheet",
+        "wait": 2500
+      }
+    ],
+    "clip": "[role='dialog']",
+    "marks": [
+      {
+        "target": ".product-sheet__facts",
+        "pad": 4
+      },
+      {
+        "target": ".ds-dialog__footer > .ds-button[aria-pressed]",
+        "pad": 4
+      },
+      {
+        "target": ".ds-dialog__footer .ds-button--primary",
+        "pad": 4
+      }
+    ]
+  }
+]

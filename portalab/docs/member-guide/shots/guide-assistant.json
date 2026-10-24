@@ -1,0 +1,52 @@
+[
+  {
+    "name": "assistant-fenetre",
+    "page": "guide-assistant",
+    "route": "/media",
+    "height": 1000,
+    "settle": 3000,
+    "before": [
+      {
+        "waitFor": ".ai-fab"
+      },
+      {
+        "click": ".ai-fab",
+        "waitFor": ".ai-composer",
+        "wait": 2500
+      }
+    ],
+    "clip": "[role='dialog']",
+    "margin": [
+      12,
+      12,
+      12,
+      12
+    ],
+    "marks": [
+      {
+        "target": ".ai-usage",
+        "pad": 3
+      },
+      {
+        "target": "[data-tour='ai-history']",
+        "pad": 3
+      },
+      {
+        "target": "[data-tour='ai-history'] + .ai-icon-button",
+        "pad": 3
+      },
+      {
+        "target": ".ai-context",
+        "pad": 3
+      },
+      {
+        "target": ".ai-ideas",
+        "pad": 4
+      },
+      {
+        "target": ".ai-composer",
+        "pad": 4
+      }
+    ]
+  }
+]

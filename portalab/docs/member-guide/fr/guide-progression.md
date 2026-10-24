@@ -9,6 +9,14 @@ Comment vous progressez sur le portail : l'XP et les niveaux, les Coins et la Co
 
 ## Vos trois valeurs
 
+![Ma progression : le niveau, les trois valeurs, d'où vient l'XP, la série et les gains, numérotés](shot:progression-apercu)
+
+1. **Votre niveau** et sa barre ; en dessous, l'XP qu'il vous manque pour le suivant.
+2. **Vos trois valeurs** : XP, Contribution et Coins.
+3. **« D'où vient mon XP »** : la vue (« Par source », « Dans le temps », « XP cumulée »), la valeur suivie et la période.
+4. **Votre série en cours**, si elle est activée.
+5. **Vos gains** par source et par jour.
+
 Sur [Ma progression](/progression), vous voyez trois valeurs séparées :
 
 | Valeur | À quoi elle sert |
@@ -59,6 +67,14 @@ Un **boost d'XP** de la boutique multiplie vos gains pendant un temps. Le boost 
 Un succès se débloque une seule fois, quand toutes ses conditions sont remplies : regarder un certain nombre de films, atteindre un niveau…
 
 Retrouvez-les sur [Ma progression](/progression) ou dans l'onglet [Succès](/community/achievements) de la Communauté :
+
+![Les succès : votre avancée (1), les catégories et le tri (2), un succès (3)](shot:progression-succes)
+
+1. Votre avancée : combien de succès vous avez débloqués sur tous ceux du portail.
+2. Les catégories et « Trier par ».
+3. Un succès : ce qu'il demande, ce qu'il rapporte, sa rareté et la part des membres qui l'ont obtenu.
+
+En détail :
 - groupés en « Débloqués », « En cours » et « Les autres », avec votre avancée (par exemple 3 / 10) ;
 - filtrables par catégorie et triables par « Rareté », « Récemment débloqués » ou « Nom » ;
 - avec la part des membres qui l'ont obtenu. Moins il y en a, plus le succès est rare.

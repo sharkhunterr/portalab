@@ -38,14 +38,16 @@ Chaque écran peut être passé avec « Passer », et tout se change plus tard. 
 
 L'en-tête reste en haut de chaque page (ou en bas, selon votre thème). De gauche à droite, vous y trouvez en général :
 
-| Élément | À quoi il sert |
-|---|---|
-| Le nom ou le logo du portail | Revenir à l'accueil |
-| La barre de recherche | « Rechercher ou aller à… » : titres, pages, membres, articles… |
-| Le centre de contrôle | L'état du portail d'un coup d'œil (incidents, maintenances, annonces) |
-| La cloche | Vos notifications, avec le nombre de non lues |
-| Le niveau et les Coins | Votre niveau, votre barre d'XP et votre solde dans la monnaie du portail (Coins) ; un clic ouvre « Ma progression » |
-| Votre photo | Le **menu personnel** |
+![L'en-tête du portail et ses six éléments, numérotés de gauche à droite](shot:premiers-entete)
+
+| N° | Élément | À quoi il sert |
+|---|---|---|
+| 1 | Le nom ou le logo du portail | Revenir à l'accueil |
+| 2 | La barre de recherche | « Rechercher ou aller à… » : titres, pages, membres, articles… |
+| 3 | Le centre de contrôle | L'état du portail d'un coup d'œil (incidents, maintenances, annonces) |
+| 4 | La cloche | Vos notifications, avec le nombre de non lues |
+| 5 | Le niveau et les Coins | Votre niveau, votre barre d'XP et votre solde dans la monnaie du portail (Coins) ; un clic ouvre « Ma progression » |
+| 6 | Votre photo | Le **menu personnel** |
 
 Le centre de contrôle a sa propre page d'aide : [Centre de contrôle](portalab://wiki/guide-centre-de-controle). Les notifications aussi : [Notifications](portalab://wiki/guide-notifications).
 
@@ -76,6 +78,8 @@ Le menu regroupe tout le portail par rubriques. Selon votre portail et vos droit
 - **Mon compte** : vos réglages personnels.
 
 Vous ne voyez que les pages auxquelles vous avez accès. Quand une rubrique contient plusieurs pages, des **onglets** apparaissent en haut du contenu pour passer de l'une à l'autre. Le fil d'Ariane, au-dessus, rappelle où vous êtes ; en bas de certaines pages, « Voir aussi » propose des pages proches.
+
+![Le menu et ses rubriques (1), le fil d'Ariane (2) et les onglets de la rubrique Découvrir (3)](shot:premiers-menu)
 
 > [!TIP]
 > La place du menu dépend de votre thème : colonne sur le côté, barre en haut, panneau qui s'ouvre… Si vous ne le trouvez pas, cherchez le bouton « Ouvrir la navigation » (trois traits).
@@ -116,6 +120,8 @@ Une visite guidée éclaire un élément de l'écran à la fois, sur les vraies 
 - Les flèches du clavier avancent ou reculent, **Échap** quitte la visite.
 
 Toutes les visites sont sur la page [Visites guidées](/guide), rangées par thème : « Pour commencer », « Médias », « Jouer et partager », « Aide ». Pour chacune, vous voyez son nombre d'étapes, si vous l'avez déjà vue (« Vue ») et la récompense qu'elle rapporte encore. « Lancer » démarre une visite, « Revoir » la relance. La première, « Le portail en une minute », montre le niveau, la recherche, les notifications, la navigation et le tableau de bord.
+
+![La page Visites guidées : les écrans de bienvenue (1), la première visite (2) et une visite d'un thème (3)](shot:premiers-visites)
 
 ### Les premiers pas du tableau de bord
 

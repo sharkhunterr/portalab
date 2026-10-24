@@ -16,6 +16,8 @@ Ouvrez [Faire une demande](/media/discover) dans la section « Médias » du men
 
 Chaque affiche porte un badge : **« À demander »**, **« Demandé »**, **« Vous l'avez demandé »**, **« Déjà demandé »**, **« En cours »**, **« En partie disponible »** ou **« Disponible »**.
 
+![La page Faire une demande : la recherche, et le badge de chaque affiche](shot:demandes-chercher)
+
 Cliquez sur une affiche pour voir sa fiche : synopsis, genres, durée, note, distribution, **« Bande-annonce »** et, pour une série, ses saisons. Si le titre est déjà là, **« Voir dans la médiathèque »** vous y emmène.
 
 > [!TIP]
@@ -28,6 +30,8 @@ Cliquez sur une affiche pour voir sa fiche : synopsis, genres, durée, note, dis
 3. Si votre portail le propose, cochez **« En 4K »**.
 4. Lisez la ligne de quota sous le formulaire : elle dit combien de demandes il vous reste, ou si cette demande utilisera une demande achetée.
 5. Cliquez sur **« Demander »**. Le message « C'est demandé ! » confirme l'envoi. **« Voir mes demandes »** ouvre la liste de vos demandes.
+
+![Le formulaire de demande d'une série : ses saisons, la ligne de quota et le bouton « Demander »](shot:demandes-formulaire)
 
 Vous pouvez aussi demander depuis la fiche d'un titre de la médiathèque qui n'est pas encore disponible : le bouton **« Demander »** y remplace le bouton « Regarder ».
 
@@ -52,6 +56,10 @@ Votre quota s'affiche dans **« Mon quota de demandes »** sur la page Faire une
 
 Ouvrez [Mes demandes](/media/requests). La page a trois onglets.
 
+![Mes demandes : les onglets (1), la période (2) et le résumé de vos demandes (3)](shot:demandes-mes-demandes)
+
+Sur l'image : les trois onglets (1), la **« Période »** (2) et le résumé de vos demandes sur cette période (3).
+
 - **« Aperçu »** : vos chiffres sur la **« Période »** choisie, **« Statut de mes demandes »**, **« Ce qu'elles sont devenues »**, **« Mon rang de demandeur »** (anonyme), **« Demandes dans le temps »**, **« Temps de mise à disposition »**, les titres les plus regardés parmi les demandés, et vos genres demandés face à vos genres regardés. Certaines de ces cartes se débloquent dans la boutique, selon votre portail.
 - **« Liste »** : toutes vos demandes, avec une recherche et des filtres **« En attente »**, **« En cours »**, **« Disponibles »** et **« Refusées »**. Chaque ligne indique son étape : « En attente de validation », « Sortie le… », « Recherche d'une version », « Téléchargement 60 % », « Importation », « Disponible »…
 - **« Bientôt disponible »** : ce qui se télécharge, s'importe ou a une date de sortie.
@@ -73,6 +81,10 @@ Sur la fiche d'un titre demandé, l'encadré **« Où en est ce titre »** montr
 7. **« Disponible »** : le titre est prêt.
 
 Chaque étape est « fait », « en cours », « en attente », « bloqué » (quelqu'un doit intervenir), « en échec » ou « à venir ». L'étape en cours est expliquée juste sous la frise. Dépliez **« Toutes les étapes »** pour lire le détail de chacune.
+
+![L'encadré « Où en est ce titre » d'un film qui attend sa sortie](shot:demandes-parcours)
+
+Sur l'image : la frise des étapes (1), l'étape en cours expliquée (2), **« Toutes les étapes »** (3) et **« Demander à l'assistant »** (4).
 
 Une question ? Si l'assistant est disponible sur votre portail, cliquez sur **« Demander à l'assistant »** : il vous explique où en est le titre et pourquoi il n'est pas encore disponible.
 

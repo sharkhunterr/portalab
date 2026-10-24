@@ -20,13 +20,16 @@ Si l'équipe travaille déjà sur le problème, inutile d'ouvrir un ticket. Voir
 
 ## Ouvrir un ticket
 
-1. Ouvrez [Mes tickets](/support), puis touchez « Ouvrir un ticket ». Vous arrivez sur [le formulaire](/support/new).
-2. Remplissez le « Titre ».
-3. Choisissez le « Type de demande ». Les types proposés dépendent de votre portail (un problème, une question, une demande d'accès…).
-4. Si cela concerne un service précis, choisissez-le dans « Service (facultatif) ».
-5. Écrivez votre message dans « Décrivez le problème ».
-6. Répondez aux questions propres au type choisi. Les questions obligatoires doivent être remplies.
-7. Touchez « Ouvrir le ticket ».
+Ouvrez [Mes tickets](/support), puis touchez « Ouvrir un ticket ». Vous arrivez sur [le formulaire](/support/new).
+
+![Le formulaire d'un nouveau ticket, ses six repères numérotés](shot:support-nouveau)
+
+1. Remplissez le « Titre ».
+2. Choisissez le « Type de demande ». Les types proposés dépendent de votre portail (un problème, une question, une demande d'accès…). Répondez ensuite aux questions propres au type choisi : les questions obligatoires doivent être remplies.
+3. Si cela concerne un service précis, choisissez-le dans « Service (facultatif) ».
+4. Écrivez votre message dans « Décrivez le problème ».
+5. Si vous le souhaitez, touchez « Vérifier d'abord » ou « Demander à l'assistant » (voir ci-dessous).
+6. Touchez « Ouvrir le ticket ».
 
 Le ticket s'ouvre alors sur sa propre page. S'il manque quelque chose, le formulaire l'indique : « À remplir : … ».
 
@@ -80,6 +83,12 @@ Vous êtes prévenu par une notification quand l'équipe répond (« Nouvelle r�
 ## Donner votre avis
 
 La page [Vos avis](/feedback) (« Avis » dans le menu, ou « Donner votre avis » depuis Mes tickets) sert à dire à l'équipe ce qui vous plaît, ce qui manque ou ce qui coince.
+
+![La page Vos avis : une demande de l'équipe (1), les sortes d'avis (2) et le suivi de vos avis (3)](shot:support-avis)
+
+1. **« Votre avis est demandé »** : les questions que l'équipe pose à tous les membres.
+2. **« Donner mon avis »** : choisissez de quoi il s'agit pour écrire à l'équipe.
+3. **« Mes avis »** : ce que vous avez envoyé et où il en est.
 
 ### Votre avis est demandé
 

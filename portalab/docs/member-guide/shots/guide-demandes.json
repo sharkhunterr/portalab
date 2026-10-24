@@ -1,0 +1,167 @@
+[
+  {
+    "name": "demandes-chercher",
+    "page": "guide-demandes",
+    "route": "/media/discover",
+    "height": 1000,
+    "settle": 9000,
+    "maxHeight": 640,
+    "marks": [
+      {
+        "target": ".discover-page__search",
+        "label": "Un film ou une série, même absent de la médiathèque",
+        "side": "bottom",
+        "gap": 30,
+        "shift": 200,
+        "pad": 4
+      },
+      {
+        "target": ".discover-page .media-row .discover-card__badge",
+        "label": "Son badge : à demander, demandé, disponible…",
+        "side": "right",
+        "gap": 60,
+        "shift": 40,
+        "pad": 3
+      }
+    ],
+    "before": [
+      {
+        "css": ".discover-page .request-quota{display:none!important}",
+        "wait": 600
+      }
+    ]
+  },
+  {
+    "name": "demandes-formulaire",
+    "page": "guide-demandes",
+    "route": "/media/discover",
+    "height": 1000,
+    "settle": 8000,
+    "before": [
+      {
+        "follow": "a.media-card__link[href*='/media/discover/series/']"
+      },
+      {
+        "waitFor": ".discover-title .ds-page-header__actions button",
+        "wait": 4000
+      },
+      {
+        "click": ".discover-title .ds-page-header__actions button",
+        "waitFor": ".request-dialog",
+        "wait": 2000
+      }
+    ],
+    "clip": "[role='dialog']",
+    "margin": [
+      14,
+      280,
+      0,
+      0
+    ],
+    "marks": [
+      {
+        "target": ".request-dialog__seasons",
+        "label": "Les saisons qui manquent : toutes cochées",
+        "side": "right",
+        "gap": 40
+      },
+      {
+        "target": ".request-dialog .request-quota__line",
+        "label": "Ce que la demande prend sur votre quota",
+        "side": "right",
+        "gap": 40
+      },
+      {
+        "target": "[role='dialog'] .ds-dialog__footer button:last-of-type",
+        "label": "Envoyer la demande",
+        "side": "right",
+        "gap": 40
+      }
+    ]
+  },
+  {
+    "name": "demandes-mes-demandes",
+    "page": "guide-demandes",
+    "route": "/media/requests",
+    "height": 900,
+    "settle": 14000,
+    "before": [
+      {
+        "waitFor": ".requests-summary",
+        "wait": 1500
+      },
+      {
+        "css": ".requests-summary__quota{display:none!important}",
+        "wait": 600
+      }
+    ],
+    "maxHeight": 440,
+    "marks": [
+      {
+        "target": ".admin-page__tabs fieldset",
+        "pad": 4
+      },
+      {
+        "target": ".requests-toolbar__period",
+        "pad": 4
+      },
+      {
+        "target": ".requests-summary",
+        "pad": 4
+      }
+    ]
+  },
+  {
+    "name": "demandes-parcours",
+    "page": "guide-demandes",
+    "route": "/media/requests",
+    "height": 1000,
+    "settle": 14000,
+    "before": [
+      {
+        "click": ".admin-page__tabs button:nth-of-type(2)",
+        "waitFor": ".requests-row a",
+        "wait": 2000
+      },
+      {
+        "follow": ".requests-row a"
+      },
+      {
+        "waitFor": ".media-journey",
+        "wait": 5000
+      },
+      {
+        "css": ".journey-search{display:none!important}",
+        "wait": 600
+      }
+    ],
+    "clip": ".media-journey",
+    "margin": [
+      16,
+      16,
+      16,
+      16
+    ],
+    "marks": [
+      {
+        "target": ".journey-steps",
+        "label": "Chaque étape et son état",
+        "side": "top",
+        "gap": 16
+      },
+      {
+        "target": ".journey-now"
+      },
+      {
+        "target": ".journey-details summary",
+        "pad": 3
+      },
+      {
+        "target": ".media-journey__head button",
+        "label": "Demander à l'assistant",
+        "side": "left",
+        "gap": 40
+      }
+    ]
+  }
+]
