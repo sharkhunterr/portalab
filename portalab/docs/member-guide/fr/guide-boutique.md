@@ -71,6 +71,7 @@ Ce que vous tirez :
 - Certains boosters ont un nombre d'ouvertures limité. Les boosters de saison ne sont en vente que pendant leur période.
 - Un look au-dessus de votre niveau est à vous, mais « Verrouillé » jusqu'à ce que vous atteigniez le niveau ou la Contribution demandés.
 - « Mes dernières ouvertures », en bas du rayon, liste vos tirages récents.
+- Les « Boosters de cartes » du même rayon donnent des cartes de films et de séries pour votre collection. Voir [Les cartes de collection](portalab://wiki/guide-cartes).
 
 ## Ma réserve
 

@@ -1,7 +1,7 @@
 ---
 slug: guide-compte
 title: Mon compte et mes réglages
-position: 15
+position: 16
 help_keys: [account, settings.appearance, settings.language, privacy, settings.media-accounts]
 tags: [guide, compte, apparence, confidentialité]
 ---

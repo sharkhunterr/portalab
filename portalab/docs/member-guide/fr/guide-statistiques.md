@@ -1,7 +1,7 @@
 ---
 slug: guide-statistiques
 title: Mes statistiques et mon récap
-position: 10
+position: 11
 help_keys: [statistics, statistics.wrapped, statistics.wrapped.detail, media.insights]
 tags: [guide, statistiques, récap]
 ---

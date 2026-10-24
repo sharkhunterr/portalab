@@ -165,6 +165,28 @@ export const TOURS: readonly TourDef[] = [
     ],
   },
   {
+    // issue 238: the media cards — my collection, my boosters, a set's binder, the shop's card boosters
+    key: "cards",
+    icon: "layers",
+    group: "play",
+    route: "/cards",
+    steps: [
+      { key: "stats", icon: "chart", targets: [".cards-stats"] },
+      { key: "packs", icon: "gift", targets: [".cards-packs"] },
+      { key: "search", icon: "search", targets: [".cards-search"] },
+      { key: "views", icon: "library", targets: [".cards-views"] },
+      { key: "sets", icon: "layers", targets: [".cards-sets a"], click: true },
+      { key: "binder", icon: "star", targets: [".cards-binder"] },
+      {
+        key: "shop",
+        icon: "shop",
+        route: "/marketplace?type=card_booster",
+        targets: [".product-card", ".shop-shelf"],
+      },
+      done,
+    ],
+  },
+  {
     key: "shop",
     icon: "shop",
     group: "play",

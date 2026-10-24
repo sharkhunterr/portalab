@@ -358,7 +358,7 @@
   "cards.find.people": "Personnes",
   "cards.find.placeholder": "Chercher un film, une série, un acteur, un personnage…",
   "cards.find.sets": "{count, plural, one {Extension (#)} other {Extensions (#)}}",
-  "cards.how": "Regardez un film ou un épisode jusqu’au bout : un paquet de 3 cartes vous attend ici, dont une de ce titre.",
+  "cards.how": "Regardez un film ou une saison jusqu’au bout : selon les règles du portail, un booster de ses cartes vous attend ici.",
   "cards.in": "Dans « {title} » ({year})",
   "cards.kind.cast": "Acteurs",
   "cards.kind.composer": "Musique",

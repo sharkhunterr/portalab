@@ -1,7 +1,7 @@
 ---
 slug: guide-faq
 title: Questions fréquentes
-position: 16
+position: 17
 help_keys: []
 tags: [guide, faq]
 ---

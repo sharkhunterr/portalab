@@ -1,7 +1,7 @@
 ---
 slug: guide-communaute
 title: La communauté
-position: 9
+position: 10
 help_keys: [community, community.members, community.members.detail, community.feed, community.leaderboards, community.events, community.proposals, community.proposals.detail, projects, projects.detail]
 tags: [guide, communauté, classements, projets]
 ---

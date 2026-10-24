@@ -145,6 +145,7 @@ function TourRun({ tour, onClose }: { tour: TourDef; onClose: () => void }) {
       setReady(true);
       return;
     }
+    const opened = direction > 0 && Boolean(steps[index - 1]?.click);
     const started = Date.now();
     const timer = window.setInterval(() => {
       const found = findTarget(step);
@@ -152,14 +153,15 @@ function TourRun({ tour, onClose }: { tour: TourDef; onClose: () => void }) {
         window.clearInterval(timer);
         setTarget(found);
         setReady(true);
-      } else if (Date.now() - started > (route ? 3 : 1) * TOUR_TIMING.patience) {
-        // a step that opens a page waits longer: the page loads first (issue 181: the shop's shelves)
+      } else if (Date.now() - started > (route || opened ? 3 : 1) * TOUR_TIMING.patience) {
+        // a step that opens a page waits longer: the page loads first (issue 181: the shop's shelves) — and so
+        // does one after an action that opened one (issue 238: a set's binder)
         window.clearInterval(timer);
         setIndex((i) => Math.min(Math.max(i + direction, 0), steps.length - 1));
       }
     }, 120);
     return () => window.clearInterval(timer);
-  }, [step, index, direction, tour.route, navigate, steps.length]);
+  }, [step, index, direction, tour.route, navigate, steps]);
 
   const measure = useCallback(() => {
     const element = target?.isConnected ? target : step.targets.length ? findTarget(step) : null;

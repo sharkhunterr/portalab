@@ -1,7 +1,7 @@
 ---
 slug: guide-notifications
 title: Notifications
-position: 12
+position: 13
 help_keys: [notifications, settings.notifications]
 tags: [guide, notifications, e-mails, newsletters]
 ---

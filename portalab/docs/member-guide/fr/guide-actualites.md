@@ -1,7 +1,7 @@
 ---
 slug: guide-actualites
 title: Actualités, calendrier et wiki
-position: 14
+position: 15
 help_keys: [news, calendar, wiki]
 tags: [guide, actualités, calendrier, wiki]
 ---
