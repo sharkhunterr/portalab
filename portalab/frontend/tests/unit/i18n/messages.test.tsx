@@ -75,6 +75,21 @@ describe("catalog lookup", () => {
     expect(document.documentElement.lang).toBe("fr");
   });
 
+  it("counts and ordinals follow the messages' language, not the formats' region (issue 232)", async () => {
+    fake.handler = (request) => {
+      const url = new URL(request.url);
+      if (url.pathname.endsWith("/i18n/context"))
+        return json(200, { language: "en", locale: "fr-FR", time_zone: "Europe/Paris", direction: "ltr" });
+      return json(200, {
+        namespace: "shell",
+        language: "en",
+        messages: { role: "{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} role" },
+      });
+    };
+    withProvider(<Probe id="shell:role" values={{ place: 2 }} />);
+    expect(await screen.findByText("2nd role")).toBeTruthy();
+  });
+
   it("keeps the last good catalog, then English, when loading fails", async () => {
     window.localStorage.setItem("portalab.i18n.de.shell", JSON.stringify({ skip: "Zum Inhalt springen" }));
     fake.handler = (request) => {
