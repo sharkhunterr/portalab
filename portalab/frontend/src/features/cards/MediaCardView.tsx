@@ -183,7 +183,8 @@ function rest(event: PointerEvent<HTMLElement>) {
  * its rarity. The same card at every size. ``borderless``: the art over the whole card, only its name, the band
  * and its rarity over it;
  * ``foil``: a holographic light that follows the pointer. A card not owned yet shows dimmed. A role
- * without an image of its character shows the work's poster and the actor's portrait in a round badge.
+ * without an image of its character shows the actor's portrait, the work's poster in its box below; the poster
+ * fills the window only when there is no portrait at all.
  */
 export function MediaCardView({
   card,
@@ -203,10 +204,11 @@ export function MediaCardView({
   // issue 233: its edition's version wears the edition's frame (a visual pack's ``card_frame``)
   const edition = card.set_edition ?? null;
   const showcase = (variant === "showcase" || variant === "showcase_foil") && Boolean(edition);
-  // an actor's card shows their character in this work (once found); without one (issue 231), the work's
-  // poster and their portrait in a round badge — clearly not the character. The borderless alternative:
-  // another image of the character, else their portrait
-  const stand_in = !borderless && card.kind === "cast" && !card.role_art && Boolean(card.set_poster);
+  // an actor's card shows their character in this work (once found); without one (issue 231), their portrait
+  // with the work's poster in its box below — the poster stands in the window only when there is no portrait
+  // either. The borderless alternative: another image of the character, else their portrait
+  const stand_in =
+    !borderless && card.kind === "cast" && !card.role_art && !card.art && Boolean(card.set_poster);
   // its character cut out of its image (its background removed by the server): shown over a scene of the
   // card's own — the genre's light, the work's poster behind an actor without a character's image, the
   // work's backdrop on the borderless version
