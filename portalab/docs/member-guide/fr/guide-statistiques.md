@@ -18,9 +18,13 @@ Ouvrez [Statistiques](/media/insights) dans la section « Médias ». Vous y arr
 
 ### Choisir ce que vous regardez
 
-- **« Moi »** ou **« Tout le serveur »** : vos chiffres, ou l'activité de toute la communauté. La vue du serveur est anonyme : aucun membre n'y est nommé.
-- **« Période »** : « 7 derniers jours », « 30 derniers jours », « 3 derniers mois », « Cette année », « 12 derniers mois », « Depuis toujours », ou une année précise.
-- **La catégorie** : « Tout », « Films », « Séries », « TV en direct », « Musique », « Livres », « Livres audio » ou « Demandes ».
+![Les statistiques des médias : la période (1), Moi ou Tout le serveur (2), la catégorie (3), les onglets (4) et les quatre chiffres (5)](shot:statistiques-medias)
+
+1. **« Période »** : « 7 derniers jours », « 30 derniers jours », « 3 derniers mois », « Cette année », « 12 derniers mois », « Depuis toujours », ou une année précise.
+2. **« Moi »** ou **« Tout le serveur »** : vos chiffres, ou l'activité de toute la communauté. La vue du serveur est anonyme : aucun membre n'y est nommé.
+3. **La catégorie** : « Tout », « Films », « Séries », « TV en direct », « Musique », « Livres », « Livres audio » ou « Demandes ».
+4. **Les onglets** : « Aperçu », puis ceux de la catégorie (voir ci-dessous).
+5. **Les quatre chiffres** de l'aperçu.
 
 ### Ce que vous y trouvez
 
@@ -42,6 +46,8 @@ La catégorie **« Demandes »** reprend les chiffres de vos demandes (voir [Dem
 ### Les statistiques à débloquer
 
 Selon votre portail, certaines cartes, certains onglets, les longues périodes ou la vue « Tout le serveur » se débloquent dans la boutique, avec la monnaie du portail (Coins). Une carte verrouillée affiche un cadenas, le message « Cette statistique se débloque dans la boutique. » et le bouton **« Voir dans la boutique »**. Dans le menu des périodes, une période à débloquer porte la mention « en boutique ».
+
+![Une statistique verrouillée et son bouton « Voir dans la boutique »](shot:statistiques-verrou)
 
 > [!NOTE]
 > Rien ne s'affiche ? Vos statistiques apparaissent dès qu'un service de la médiathèque remonte vos lectures **et** que vos comptes sont liés. Vérifiez vos [comptes médias](/settings/media-accounts) (voir [Regarder, lire, écouter](portalab://wiki/guide-medias)).

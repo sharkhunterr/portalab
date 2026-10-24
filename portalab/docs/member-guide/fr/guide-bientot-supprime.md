@@ -22,6 +22,8 @@ Pour une série, il arrive que seules quelques saisons partent, et pas la série
 - Sur votre accueil, ajoutez le widget **« Bientôt supprimés »** : il liste les titres que le nettoyage va supprimer, les premiers à partir d'abord (voir [L'accueil et ses widgets](portalab://wiki/guide-accueil)).
 - Sur la **fiche d'un titre**, l'encadré **« Bientôt supprimé »** donne tous les détails.
 
+![La rangée « Bientôt retirés » de la page Médias, chaque affiche marquée « bientôt supprimé »](shot:supprime-rangee)
+
 ## Lire l'encadré « Bientôt supprimé »
 
 Sur la fiche du titre, l'encadré vous dit :
@@ -31,6 +33,8 @@ Sur la fiche du titre, l'encadré vous dit :
 - parfois aucune date n'est encore connue : « Ce titre est sur la liste de suppression de la médiathèque. » ;
 - **pourquoi** : la règle qui l'a choisi, sous la forme « Règle : … » ;
 - **combien de sauvetages** vous avez : « Aucun sauvetage », « 1 sauvetage disponible »…
+
+![L'encadré « Bientôt supprimé » sur la fiche d'un film, sans sauvetage : « Acheter un sauvetage »](shot:supprime-encadre)
 
 ## Sauver un titre
 

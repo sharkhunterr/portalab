@@ -1,0 +1,77 @@
+[
+  {
+    "name": "progression-apercu",
+    "page": "guide-progression",
+    "route": "/progression",
+    "height": 1100,
+    "settle": 3000,
+    "before": [
+      {
+        "waitFor": ".gamification-hero",
+        "wait": 3500
+      }
+    ],
+    "maxHeight": 820,
+    "marks": [
+      {
+        "target": ".gamification-hero",
+        "pad": 4
+      },
+      {
+        "target": ".gamification-values",
+        "pad": 4
+      },
+      {
+        "target": ".gain-sources__filters",
+        "pad": 4
+      },
+      {
+        "target": ".gain-sources__streak",
+        "pad": 3
+      },
+      {
+        "target": ".gain-sources__charts",
+        "pad": 4
+      }
+    ]
+  },
+  {
+    "name": "progression-succes",
+    "page": "guide-progression",
+    "route": "/progression",
+    "height": 1000,
+    "settle": 3000,
+    "before": [
+      {
+        "css": ".ai-fab{display:none!important}"
+      },
+      {
+        "waitFor": ".achievements__toolbar",
+        "scroll": ".achievements__toolbar",
+        "wait": 2500
+      }
+    ],
+    "clip": ".achievements",
+    "margin": [
+      18,
+      8,
+      0,
+      8
+    ],
+    "maxHeight": 640,
+    "marks": [
+      {
+        "target": ".achievements__summary",
+        "pad": 4
+      },
+      {
+        "target": ".achievements__toolbar",
+        "pad": 4
+      },
+      {
+        "target": ".achievements .gamification-grid > li",
+        "pad": 4
+      }
+    ]
+  }
+]

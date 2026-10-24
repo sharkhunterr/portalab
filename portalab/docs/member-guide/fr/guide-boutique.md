@@ -15,11 +15,14 @@ Dépenser la monnaie du portail (Coins) : choisir un produit, l'acheter, ouvrir 
 
 ## Trouver un produit
 
-Ouvrez [la boutique](/marketplace). Elle est rangée en rayons : **Interfaces**, **Profil**, **Notifications et effets**, **Fonctionnalités**, **Packs** et **Boosters**.
+Ouvrez [la boutique](/marketplace).
 
-- Filtrez par rareté : « Commun », « Rare », « Épique », « Légendaire ».
-- Cherchez avec « Rechercher un produit ».
-- Sur une étagère, « Tout voir » affiche tous ses produits.
+![La boutique : ses rayons, le filtre de rareté, la recherche et un produit, numérotés](shot:boutique-rayons)
+
+1. **Les rayons** : **Interfaces**, **Profil**, **Notifications et effets**, **Fonctionnalités**, **Packs** et **Boosters**.
+2. **La rareté** : filtrez par « Commun », « Rare », « Épique » ou « Légendaire ».
+3. **La recherche** : « Rechercher un produit ».
+4. **Un produit** : son prix, et le niveau demandé s'il y en a un. Sur une étagère, « Tout voir » affiche tous ses produits.
 
 Touchez un produit pour ouvrir sa fiche. Elle indique ce que vous obtenez, le prix, les exemplaires restants, le niveau ou la Contribution minimum, la limite d'achat, le remboursement possible et les conditions (« remplie » ou « non remplie »). Pendant une campagne, certains produits sont en promotion : le « Prix habituel » reste affiché.
 
@@ -28,9 +31,11 @@ Touchez un produit pour ouvrir sa fiche. Elle indique ce que vous obtenez, le pr
 
 ## Acheter un produit
 
-1. Ouvrez la fiche du produit.
-2. Pour un thème, une palette, une ambiance, une célébration ou un style de notification, touchez « Essayer » : il s'applique au portail sans rien payer. « Arrêter l'essai » l'enlève.
-3. Touchez « Acheter · … Coins » (ou « Obtenir gratuitement »).
+![La fiche d'un produit : ce qu'elle indique (1), « Essayer » (2) et « Acheter » (3)](shot:boutique-fiche)
+
+1. Ouvrez la fiche du produit. Son encadré (1) indique le prix, les exemplaires, le remboursement et les conditions.
+2. Pour un thème, une palette, une ambiance, une célébration ou un style de notification, touchez « Essayer » (2) : il s'applique au portail sans rien payer. « Arrêter l'essai » l'enlève.
+3. Touchez « Acheter · … Coins » (3) (ou « Obtenir gratuitement »).
 4. Vérifiez le prix et le remboursement, puis touchez « Confirmer l'achat ».
 
 Si l'achat est impossible, le bouton le dit : « Déjà dans votre collection », « Épuisé : plus aucun exemplaire » ou « Conditions non remplies ».

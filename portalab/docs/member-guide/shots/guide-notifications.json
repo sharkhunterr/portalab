@@ -1,0 +1,108 @@
+[
+  {
+    "name": "notifications-panneau",
+    "page": "guide-notifications",
+    "route": "/news",
+    "height": 900,
+    "settle": 9000,
+    "before": [
+      {
+        "click": ".shell-bell",
+        "waitFor": ".notif-row",
+        "wait": 1500
+      },
+      {
+        "css": ".notif-row:first-child .notif-row__actions{opacity:1!important;visibility:visible!important}",
+        "wait": 600
+      }
+    ],
+    "clip": ".notif-panel",
+    "margin": [
+      0,
+      0,
+      0,
+      380
+    ],
+    "maxHeight": 420,
+    "marks": [
+      {
+        "target": ".notif-panel__tools",
+        "pad": 3
+      },
+      {
+        "target": ".notif-panel__tabs",
+        "label": "Les onglets",
+        "side": "left",
+        "gap": 40,
+        "shift": 10
+      },
+      {
+        "target": ".notif-row",
+        "label": "Une notification : touchez-la pour l'ouvrir",
+        "side": "left",
+        "gap": 40
+      },
+      {
+        "target": ".notif-row .notif-row__actions",
+        "pad": 3
+      }
+    ]
+  },
+  {
+    "name": "notifications-preferences",
+    "page": "guide-notifications",
+    "route": "/settings/notifications",
+    "height": 900,
+    "settle": 9000,
+    "clip": ".settings-grid",
+    "margin": [
+      14,
+      0,
+      0,
+      14
+    ],
+    "maxHeight": 470,
+    "marks": [
+      {
+        "target": ".settings-card__title",
+        "pad": 3
+      },
+      {
+        "target": ".settings-card__aside",
+        "pad": 3
+      },
+      {
+        "target": ".settings-list li",
+        "pad": 3
+      }
+    ]
+  },
+  {
+    "name": "notifications-resume",
+    "page": "guide-notifications",
+    "route": "/settings/notifications",
+    "height": 1100,
+    "settle": 9000,
+    "before": [
+      {
+        "scroll": ".settings-card:has(select)",
+        "wait": 800
+      }
+    ],
+    "clip": ".settings-card:has(select)",
+    "margin": [
+      12,
+      12,
+      90,
+      12
+    ],
+    "marks": [
+      {
+        "target": ".settings-card:has(select) select",
+        "label": "Chaque e-mail, un résumé par jour ou par semaine",
+        "side": "bottom",
+        "gap": 30
+      }
+    ]
+  }
+]

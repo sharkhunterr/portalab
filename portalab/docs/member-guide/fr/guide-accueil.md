@@ -27,6 +27,17 @@ Le widget « Depuis votre dernière visite » résume ce qui a changé pour vous
    - au clavier : **Entrée** saisit le widget, les **flèches** le déplacent, **Maj + flèches** le redimensionnent, **Entrée** le pose.
 3. Cliquez sur « Enregistrer » quand ça vous plaît, ou sur « Annuler » pour tout remettre comme avant.
 
+![Le tableau de bord en mode « Personnaliser », ses huit repères numérotés](shot:accueil-personnaliser)
+
+1. « Ajouter un widget » ouvre le catalogue.
+2. « Enregistrer » garde vos changements ; « Annuler », juste à côté, les oublie.
+3. Les écrans « Ordinateur », « Tablette » et « Mobile » : celui que vous arrangez.
+4. « Une disposition par écran » (voir plus bas).
+5. « Ajuster automatiquement » ; « Par défaut » est juste à côté.
+6. Les boutons « Réglages » (roue crantée) et « Retirer » (corbeille) d'un widget.
+7. La **poignée** du widget, pour le déplacer.
+8. Le **coin** du widget, pour l'agrandir ou le réduire.
+
 Pendant la personnalisation, la barre « Disposition » propose aussi :
 
 - « Ajuster automatiquement » : comble les trous entre les widgets ;
@@ -48,6 +59,8 @@ Si vous arrangez votre tableau de bord depuis un téléphone ou une tablette alo
 3. Chaque widget montre un aperçu, ce qu'il fait, les tailles possibles et ce qu'il lit de vos données (par exemple « Lit : votre progression »).
 4. Cliquez sur « Ajouter ». Un widget déjà placé affiche « Ajouté » ; certains peuvent être ajoutés plusieurs fois (« Ajouter encore »).
 5. Cliquez sur « Terminé », puis sur « Enregistrer ».
+
+![Le catalogue de widgets : la recherche, les widgets de la boutique, puis pour chaque widget son aperçu, ce qu'il fait et le bouton « Ajouter »](shot:accueil-catalogue)
 
 Le catalogue sépare les widgets « À ajouter » de ceux « Déjà sur votre tableau de bord ». Il indique aussi combien d'autres widgets sont disponibles dans la boutique.
 
@@ -75,6 +88,8 @@ Les options dépendent du widget : la période, le type de médias, « De qui »
 - « Masquer le titre » : le contenu seul, sans son en-tête ;
 - « Sans cadre » : ni fond ni bordure ;
 - « Masquer quand il n'y a rien à afficher » : le bloc disparaît tant qu'il est vide et revient dès qu'il a du contenu.
+
+![Les réglages d'un widget : une option qui lui est propre (1), son « Visuel » (2) et l'« Affichage » commun à tous les widgets (3)](shot:accueil-reglages)
 
 Quand un widget a plus d'éléments qu'il ne peut en montrer, il propose « Tout voir », ou vous invite à l'agrandir.
 

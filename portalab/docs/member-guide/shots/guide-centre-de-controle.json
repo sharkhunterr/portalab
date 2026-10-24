@@ -1,0 +1,139 @@
+[
+  {
+    "name": "controle-fenetre",
+    "page": "guide-centre-de-controle",
+    "route": "/news",
+    "height": 800,
+    "settle": 9000,
+    "before": [
+      {
+        "click": ".shell-health",
+        "waitFor": ".shell-status",
+        "wait": 1500
+      }
+    ],
+    "clip": ".shell-status",
+    "margin": [
+      52,
+      16,
+      16,
+      360
+    ],
+    "marks": [
+      {
+        "target": ".shell-health",
+        "label": "L'icône du centre de contrôle",
+        "side": "left",
+        "gap": 40
+      },
+      {
+        "target": ".shell-status__head",
+        "label": "Le résumé",
+        "side": "left",
+        "gap": 40
+      },
+      {
+        "target": ".shell-status__group",
+        "label": "Chaque incident ouvert",
+        "side": "left",
+        "gap": 40
+      },
+      {
+        "target": ".shell-status__group",
+        "pick": "last",
+        "label": "L'état des services",
+        "side": "left",
+        "gap": 40
+      },
+      {
+        "target": ".shell-status__foot",
+        "label": "Les pages des services et des incidents",
+        "side": "left",
+        "gap": 40
+      }
+    ]
+  },
+  {
+    "name": "controle-incidents",
+    "page": "guide-centre-de-controle",
+    "route": "/incidents",
+    "height": 900,
+    "settle": 9000,
+    "clip": ".incidents-status",
+    "margin": [
+      12,
+      12,
+      262,
+      12
+    ],
+    "marks": [
+      {
+        "target": ".incidents-status",
+        "pad": 4
+      },
+      {
+        "target": ".incidents-page fieldset",
+        "label": "« En cours », « Résolus » ou « Tous »",
+        "side": "right",
+        "gap": 40
+      },
+      {
+        "target": ".incident-card .incident-severity",
+        "pad": 3
+      },
+      {
+        "target": ".incident-card .incident-card__lasting",
+        "pad": 3
+      },
+      {
+        "target": ".incident-card .incident-steps",
+        "pad": 3
+      },
+      {
+        "target": ".incident-card .incident-card__latest",
+        "pad": 3
+      },
+      {
+        "target": ".incident-card .incident-card__services",
+        "pad": 3
+      }
+    ]
+  },
+  {
+    "name": "controle-services",
+    "page": "guide-centre-de-controle",
+    "route": "/services",
+    "height": 900,
+    "settle": 9000,
+    "clip": "section.data-region",
+    "margin": [
+      12,
+      12,
+      0,
+      12
+    ],
+    "maxHeight": 400,
+    "marks": [
+      {
+        "target": ".services-status",
+        "pad": 4
+      },
+      {
+        "target": ".services-block",
+        "pad": 4
+      },
+      {
+        "target": ".services-page__card .health-badge",
+        "pad": 3
+      },
+      {
+        "target": ".services-page__card .services-page__uptime",
+        "pad": 3
+      },
+      {
+        "target": ".services-page__card:has(.ds-button--primary) .services-page__actions",
+        "pad": 3
+      }
+    ]
+  }
+]

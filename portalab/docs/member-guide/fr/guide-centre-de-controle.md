@@ -32,6 +32,8 @@ Cliquez sur l'icône : la fenêtre « Centre de contrôle » s'ouvre. Elle peut 
 
 En bas, deux liens mènent à « Statut des services » et à « Tous les incidents ». Cliquez sur un élément pour ouvrir son détail.
 
+![La fenêtre « Centre de contrôle », ouverte depuis son icône dans l'en-tête](shot:controle-fenetre)
+
 > [!NOTE]
 > Selon votre portail, la partie « Services » peut ne pas s'afficher pour vous. Les incidents, maintenances et annonces restent visibles.
 
@@ -71,6 +73,16 @@ La page [Incidents](/incidents) dit ce qui ne va pas, où on en est et ce qui a 
 - Chaque incident est une carte : sa gravité, son étape, depuis quand il dure (ou combien de temps il a duré), les « Services touchés » et sa dernière nouvelle.
 - Ouvrez un incident pour lire sa « Chronologie » : chaque étape, de sa déclaration à sa résolution.
 
+![La page Incidents, ses sept repères numérotés](shot:controle-incidents)
+
+1. Le résumé : incidents en cours et résolus ces 30 derniers jours.
+2. Les filtres « En cours », « Résolus » et « Tous ».
+3. La gravité de l'incident.
+4. Depuis quand il dure.
+5. Son étape.
+6. Sa dernière nouvelle.
+7. Les « Services touchés ».
+
 Les étapes d'un incident sont : « En analyse », « Identifié », « Sous surveillance », puis « Résolu ».
 
 En bas de la page, la partie « Maintenances prévues » liste les maintenances à venir : quand, combien de temps et ce qu'elles touchent.
@@ -82,6 +94,14 @@ La page [Services](/services) (« État des services ») montre comment vont les
 - En haut, un résumé : « Tout fonctionne », ou le nombre de services en difficulté, d'incidents en cours ou de services en maintenance.
 - Les « Incidents en cours » et les « Maintenances prévues » sont rappelés juste en dessous.
 - Chaque service a sa carte : son état (disponible, dégradé, indisponible…), une barre de ses **48 dernières heures** et sa disponibilité.
+
+![La page des services, ses cinq repères numérotés](shot:controle-services)
+
+1. Le résumé de l'état des services.
+2. Les « Incidents en cours ».
+3. L'état d'un service.
+4. Sa barre des dernières heures et sa disponibilité.
+5. « Ouvrir » et « Détails ».
 
 Dans la barre des 48 heures, chaque trait est une heure : vert quand tout a marché, orange quand il y a eu des ratés, rouge quand le service était surtout coupé, gris sans vérification. Survolez un trait pour voir son heure.
 

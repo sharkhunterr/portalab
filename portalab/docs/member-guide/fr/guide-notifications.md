@@ -19,6 +19,13 @@ Une notification vous dit, par exemple, qu'un titre demandé est arrivé, que qu
 2. Les notifications sont rangées de la plus récente à la plus ancienne, par jour : « Aujourd'hui », « Hier », « Cette semaine », « Plus tôt ». Les non lues sont marquées.
 3. Cliquez sur une notification pour ouvrir ce dont elle parle. Elle est alors marquée comme lue.
 
+![Le panneau « Notifications », ses quatre repères numérotés](shot:notifications-panneau)
+
+1. Les outils du panneau : « Sélectionner », « Tout marquer comme lu », les « Préférences de notification » et « Fermer ».
+2. Les onglets (voir ci-dessous).
+3. Une notification : touchez-la pour l'ouvrir.
+4. Ses boutons « Marquer comme lu », « Archiver » et « Supprimer ».
+
 Certaines notifications portent un badge : « Alerte » pour ce qui est important, et les gains qu'elles vous ont apportés (XP, Coins…).
 
 ### Les onglets
@@ -67,6 +74,12 @@ Les sortes de notifications sont rangées par thème, une carte chacun : « Comp
 
 Chaque changement est enregistré tout de suite (« Préférences enregistrées. »).
 
+![Les préférences de notification, une carte par thème](shot:notifications-preferences)
+
+1. Le thème de la carte.
+2. Les deux colonnes « Dans le portail » et « Par e-mail ».
+3. Une ligne fixée : son cadenas et « Fixé par ton administrateur ».
+
 > [!NOTE]
 > Une ligne marquée d'un cadenas et de « Fixé par ton administrateur » ne peut pas être changée. Certaines notifications sont obligatoires, par exemple pour la sécurité de votre compte : leur interrupteur reste allumé.
 
@@ -77,6 +90,8 @@ Dans la carte « Résumé par e-mail », choisissez comment recevoir vos e-mails
 - « Envoyer chaque e-mail » : un e-mail par notification ;
 - « Résumé quotidien » : un seul e-mail par jour qui regroupe tout ;
 - « Résumé hebdomadaire » : un seul e-mail par semaine.
+
+![La carte « Résumé par e-mail » et son choix](shot:notifications-resume)
 
 ## Les newsletters
 

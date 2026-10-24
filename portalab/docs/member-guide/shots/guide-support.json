@@ -1,0 +1,73 @@
+[
+  {
+    "name": "support-nouveau",
+    "page": "guide-support",
+    "route": "/support/new",
+    "height": 1000,
+    "marks": [
+      {
+        "target": ".new-ticket > .ds-field:nth-child(1)",
+        "pad": 4
+      },
+      {
+        "target": ".new-ticket > .ds-field:nth-child(2)",
+        "pad": 4
+      },
+      {
+        "target": ".service-picker",
+        "pad": 4
+      },
+      {
+        "target": ".new-ticket .ds-field:has(textarea)",
+        "pad": 4
+      },
+      {
+        "target": ".new-ticket > .ds-stack--row",
+        "pad": 4
+      },
+      {
+        "target": ".new-ticket > form",
+        "pad": 4
+      }
+    ],
+    "before": [
+      {
+        "waitFor": ".service-picker",
+        "wait": 1500
+      }
+    ]
+  },
+  {
+    "name": "support-avis",
+    "page": "guide-support",
+    "route": "/feedback",
+    "height": 1000,
+    "marks": [
+      {
+        "target": ".feedback-block:has(.feedback-requests)",
+        "pad": 4
+      },
+      {
+        "target": ".feedback-kinds",
+        "pad": 4
+      },
+      {
+        "target": ".feedback-block__head",
+        "pick": "last",
+        "pad": 4
+      }
+    ],
+    "before": [
+      {
+        "waitFor": ".feedback-kinds"
+      },
+      {
+        "waitFor": ".feedback-mine > *"
+      },
+      {
+        "css": ".feedback-mine{display:none!important}",
+        "wait": 1200
+      }
+    ]
+  }
+]
