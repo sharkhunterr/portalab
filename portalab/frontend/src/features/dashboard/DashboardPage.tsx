@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { type RefObject, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../api/client";
 import { connectStream } from "../../api/stream";
@@ -22,7 +22,7 @@ import { cellsFor, type LayoutMode, useEditSession } from "./edit/EditSession";
 import { EmptyWidgets } from "./frame/emptiness";
 import { WidgetFrame } from "./frame/WidgetFrame";
 import { DashboardGrid } from "./grid/DashboardGrid";
-import { VIEW_COLUMNS, type View } from "./grid/engine";
+import { bands, VIEW_COLUMNS, type View } from "./grid/engine";
 import "./summary/SinceLastLoginCard";
 import "./widgets/tiles";
 import "./widgets/layout";
@@ -56,6 +56,28 @@ export function greetingKey(hour: number): string {
   if (hour < 12) return "dashboard:greeting.morning";
   if (hour < 18) return "dashboard:greeting.afternoon";
   return "dashboard:greeting.evening";
+}
+
+const LANE = 54; // rem: the narrowest a desktop grid may be when several stand side by side (issue 235)
+const MOST_LANES = 3;
+
+/** Issue 235: how many desktop grids side by side the space the page stands in has room for. */
+function useRoom(page: RefObject<HTMLElement | null>): number {
+  const [room, setRoom] = useState(1);
+  useEffect(() => {
+    const host = page.current?.parentElement;
+    if (!host || typeof ResizeObserver === "undefined") return;
+    const measure = () => {
+      const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const gap = 0.75 * rem;
+      setRoom(Math.max(1, Math.min(MOST_LANES, Math.floor((host.clientWidth + gap) / (LANE * rem + gap)))));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(host);
+    return () => observer.disconnect();
+  }, [page]);
+  return room;
 }
 
 const VIEWS: Array<{ view: View; icon: string }> = [
@@ -129,6 +151,12 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
   const shownView: View = arranging ? session.view : deviceView;
   const columns = VIEW_COLUMNS[shownView];
   const cells = session.draft ?? cellsFor(visible, shownView, mode);
+  // issue 235: a wide screen shows the arrangement's bands side by side (the theme's narrow width keeps one)
+  const page = useRef<HTMLDivElement>(null);
+  const room = useRoom(page);
+  const lanes =
+    shownView === "desktop" && !isEditing && document.documentElement.dataset.content !== "narrow" ? room : 1;
+  const wide = lanes > 1 && bands([...cells].map(([id, cell]) => ({ id, ...cell }))).length > 1;
   const fresh = async () => {
     await client.refetchQueries({ queryKey: DASHBOARD_KEY });
     return (client.getQueryData<{ instances?: Instance[] }>(DASHBOARD_KEY)?.instances ?? []).filter(
@@ -183,7 +211,7 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
     if (arranging) session.start(next === "shared" ? "desktop" : session.view, instancesNow, next);
   };
   return (
-    <div className="dashboard-page">
+    <div className="dashboard-page" ref={page} data-lanes={wide ? lanes : undefined}>
       <PageHeader
         title={name ? t(greetingKey(new Date().getHours()), { name }) : t("dashboard:title")}
         context={
@@ -298,6 +326,7 @@ export function DashboardPage({ live = true }: { live?: boolean }) {
             instances={visible}
             cells={cells}
             columns={columns}
+            lanes={lanes}
             arranger={arranging ? session : null}
             collapsed={emptyWidgets}
             render={(instance, handles, cell) => (

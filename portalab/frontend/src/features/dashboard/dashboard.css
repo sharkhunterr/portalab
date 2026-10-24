@@ -2471,3 +2471,17 @@ html[data-motion="none"] .widget-shuffle__track {
     scroll-snap-align: start;
   }
 }
+
+/* Issue 235: the home page may take the screen's width — its content keeps the usual width until the
+   dashboard spreads its bands side by side */
+.shell-content:has(.dashboard-page) {
+  max-inline-size: none;
+}
+.dashboard-page {
+  inline-size: 100%;
+  max-inline-size: var(--content-max);
+  margin-inline: auto;
+}
+.dashboard-page[data-lanes] {
+  max-inline-size: none;
+}
