@@ -1143,31 +1143,37 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  /* swiped sideways, the page still scrolls up and down */
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
 }
+.cards-hand > ul[data-dragging] {
+  cursor: grabbing;
+}
+/* placed every frame from its distance to the front (fractional while the hand turns): no transition */
 .cards-hand > ul > li {
+  --lift: max(0, 1 - var(--far));
   position: absolute;
   inset-block-start: 2rem;
   inset-inline-start: 50%;
   inline-size: var(--hand-card);
   margin-inline-start: calc(var(--hand-card) / -2);
   transform-origin: 50% 140%;
-  transform: translateX(calc(var(--d) * var(--hand-step))) translateY(calc(var(--far) * var(--far) * 0.3rem))
-    rotate(calc(var(--d) * 7deg));
-  transition:
-    transform 0.6s cubic-bezier(0.3, 0.7, 0.3, 1),
-    opacity 0.4s ease,
-    filter 0.4s ease;
+  transform: translateX(calc(var(--d) * var(--hand-step)))
+    translateY(calc(var(--far) * var(--far) * 0.3rem - var(--lift) * 0.75rem)) rotate(calc(var(--d) * 7deg))
+    scale(calc(1 + var(--lift) * 0.06));
+  filter: brightness(calc(1 - min(var(--far), 3) * 0.12));
+  will-change: transform;
   cursor: pointer;
 }
-.cards-hand > ul > li:not([data-front]) {
-  filter: brightness(calc(1 - var(--far) * 0.12));
-}
 .cards-hand > ul > li[data-front] {
-  transform: translateY(-0.75rem) scale(1.06);
   cursor: auto;
 }
+.cards-hand > ul[data-dragging] > li {
+  cursor: grabbing;
+}
 .cards-hand > ul > li[data-away] {
-  opacity: 0;
   pointer-events: none;
 }
 .cards-hand__turn {
@@ -1177,11 +1183,6 @@
   gap: var(--space-2);
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
-}
-@media (prefers-reduced-motion: reduce) {
-  .cards-hand > ul > li {
-    transition: none;
-  }
 }
 .cards-work__facts {
   display: grid;
