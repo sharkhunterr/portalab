@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import type { DeviceClass } from "../../design-system/components/Layout";
@@ -66,7 +66,6 @@ export function AppHeader({
         <div className="shell-header__end">
           <ControlCenterButton />
           <PluginSlot name="header.action" compact />
-          <HelpButton />
           {data.progression ? (
             <RegionBoundary resetKey="progression">
               <ProgressChip progression={data.progression} compact />
@@ -127,7 +126,6 @@ export function AppHeader({
       <div className="shell-header__end">
         <ControlCenterButton />
         <PluginSlot name="header.action" compact />
-        <HelpButton />
         {bottomBar ? null : <NotificationButton unread={data.unread} />}
         {data.progression ? (
           <RegionBoundary resetKey="progression">
@@ -177,25 +175,6 @@ function SearchField({ compact }: { compact: boolean }) {
       </span>
       <span className="visually-hidden">{strings.search}</span>
     </button>
-  );
-}
-
-/** Issue 202: the guide's page about the page shown (its help key), when the member may read one. */
-export function HelpButton() {
-  const { help } = useSlots();
-  const location = useLocation();
-  const target = help?.resolve(location.pathname);
-  if (!target) return null;
-  return (
-    <Link
-      to={target.href}
-      className="ds-button ds-button--ghost ds-button--icon"
-      aria-label={target.label}
-      title={target.label}
-      data-tour="help"
-    >
-      <Icon name="help" />
-    </Link>
   );
 }
 
