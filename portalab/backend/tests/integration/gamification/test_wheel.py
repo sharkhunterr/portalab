@@ -43,7 +43,8 @@ class Gifts:
 
 def test_segments_default_when_invalid() -> None:
     default = parse_segments(None)
-    assert [s.key for s in default][:2] == ["coins_20", "lose_10"]
+    assert [s.key for s in default][:2] == ["coins_20", "coins_5"]
+    assert all(s.amount >= 0 for s in default)
     assert any(s.kind == "product" and s.product == "booster_discovery" for s in default)
     # nonsense left out; fewer than two left: the default wheel
     assert parse_segments([{"key": "a", "kind": "coins", "amount": 0}, {"key": "b", "kind": "xp"}]) == default
@@ -74,16 +75,16 @@ async def test_coins_won_once_a_day(gm: GamHarness) -> None:
     assert await gm.balance(user, "coins") == 100
 
 
-async def test_a_loss_never_below_zero(gm: GamHarness) -> None:
-    user = gm.people["ursula"]
-    gm.module.wheel.rng = Pick("lose_25")  # type: ignore[assignment]
-    await gm.module.rewards.grant_manual(gm.p("boss"), user, "coins", 10, reason="seed", idempotency_key="w1")
-    state = await gm.module.wheel.spin(user)
-    assert state["today"]["amount"] == -25 and state["today"]["delta"] == -10
-    assert await gm.balance(user, "coins") == 0
-    gm.clock.advance(timedelta(days=1))
-    state = await gm.module.wheel.spin(user)  # nothing left to lose
-    assert state["today"]["delta"] == 0 and await gm.balance(user, "coins") == 0
+def test_the_wheel_never_takes() -> None:
+    """The owner's rule: the wheel only gives — a segment taking Coins is left out, whoever wrote it."""
+    kept = parse_segments(
+        [
+            {"key": "lose", "kind": "coins", "amount": -25},
+            {"key": "a", "kind": "coins", "amount": 5},
+            {"key": "b", "kind": "xp", "amount": 10},
+        ]
+    )
+    assert [s.key for s in kept] == ["a", "b"]
 
 
 async def test_the_day_is_the_economys(gm: GamHarness) -> None:
