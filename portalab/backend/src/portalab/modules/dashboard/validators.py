@@ -4,6 +4,7 @@ from typing import Any
 
 from portalab.capabilities.dashboard import CONDITION_TYPES, WidgetRegistry
 from portalab.modules.dashboard.arrangement import VIEW_COLUMNS
+from portalab.modules.dashboard.gateway.gateway import config_errors
 from portalab.modules.dashboard.settings import POLICIES, POLICY_CLASSES, STARTER
 
 
@@ -48,6 +49,10 @@ class DashboardValidators:
                     errors.append(f"{key}: « {flag} » is true or false")
             if "lockedConfig" in policy and not isinstance(policy["lockedConfig"], dict):
                 errors.append(f"{key}: lockedConfig must be an object")
+            elif "lockedConfig" in policy and (widget := self.registry.get(key)) is not None:
+                # issue 250: the settings the administrator imposes, checked as the widget's own
+                merged = {**widget.definition.config_defaults, **policy["lockedConfig"]}
+                errors.extend(f"{key}: {error}" for error in config_errors(widget, merged)[:5])
         return errors
 
     async def starter(self, value: Any) -> list[str]:
@@ -56,20 +61,33 @@ class DashboardValidators:
             if not isinstance(entry, dict) or not self._known(str(entry.get("widget_key", ""))):
                 errors.append(f"entry {index}: unknown widget")
                 continue
-            extra = set(entry) - {"widget_key", "w", "h", "roles", "config", "tablet", "phone"}
+            extra = set(entry) - {"widget_key", "x", "y", "w", "h", "roles", "config", "tablet", "phone"}
             if extra:
                 errors.append(f"entry {index}: unknown fields {sorted(extra)}")
+            # issue 250: its place on a computer, as the administrator put it (else it flows in order)
+            if ("x" in entry) != ("y" in entry):
+                errors.append(f"entry {index}: « x » and « y » go together")
+            elif "x" in entry and not _view_place(
+                {k: entry.get(k) for k in ("x", "y", "w", "h")}, VIEW_COLUMNS["desktop"]
+            ):
+                errors.append(f"entry {index}: « x, y, w, h » stay within 12 columns")
             # its own place on a tablet or a phone (else derived from the computer's)
             for view in ("tablet", "phone"):
                 if view in entry and not _view_place(entry[view], VIEW_COLUMNS[view]):
                     errors.append(
                         f"entry {index}: « {view} » is {{x, y, w, h}} within {VIEW_COLUMNS[view]} columns"
                     )
-            # 027: frame settings only (hide its title, its box, while empty) — a widget's own settings
-            # stay its defaults
+            # 027: how it is shown (its title, its box, while empty); issue 250: and its own settings, as its
+            # settings window checks them
             config = entry.get("config", {})
-            if not isinstance(config, dict) or set(config) - {"_hide_title", "_no_box", "_hide_empty"}:
-                errors.append(f"entry {index}: config holds frame settings only")
+            widget = self.registry.get(str(entry.get("widget_key", "")))
+            if not isinstance(config, dict):
+                errors.append(f"entry {index}: config is an object")
+            elif widget is not None:
+                errors.extend(
+                    f"entry {index}: {error}"
+                    for error in config_errors(widget, {**widget.definition.config_defaults, **config})[:5]
+                )
         return errors
 
     def table(self) -> dict[str, Any]:

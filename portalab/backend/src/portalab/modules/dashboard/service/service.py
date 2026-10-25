@@ -905,7 +905,11 @@ class DashboardService:
         layout = self.config().starter_layout
         policies = self.config().widget_policies
         widgets = {w.definition.key: w for w in self.registry.widgets()}
-        chosen: list[tuple[RegisteredWidget, int, int, dict[str, Any]]] = []
+        chosen: list[tuple[RegisteredWidget, int, int, dict[str, Any], tuple[int, int] | None]] = []
+        # issue 250: the administrator's composition puts each widget at its very place (else rows of 12)
+        placed = bool(layout) and all(
+            isinstance(entry, dict) and "x" in entry and "y" in entry for entry in layout
+        )
         # issue 186: the starter may place a widget on a tablet and a phone too — the member's dashboard
         # then starts arranged per screen
         views = {
@@ -931,8 +935,13 @@ class DashboardService:
                 if not await self.gateway.allowed(widget, principal):
                     continue
                 size = widget.definition.size.clamp(int(entry.get("w", 0) or 0), int(entry.get("h", 0) or 0))
-                frame = {k: v for k, v in dict(entry.get("config") or {}).items() if k in FRAME_KEYS}
-                chosen.append((widget, size.w, size.h, frame))
+                given = dict(entry.get("config") or {})
+                try:  # issue 250: its own settings too, as the administrator set them
+                    values = self._check_config(widget, given)
+                except ConfigInvalid:
+                    values = self._check_config(widget, {k: v for k, v in given.items() if k in FRAME_KEYS})
+                at = (int(entry["x"]), int(entry["y"])) if placed and "x" in entry else None
+                chosen.append((widget, size.w, size.h, values, at))
             except Exception:
                 log.warning("starter entry skipped")
         for key, widget in sorted(widgets.items()):
@@ -942,7 +951,13 @@ class DashboardService:
                 and await self.gateway.allowed(widget, principal)
             ):
                 chosen.append(
-                    (widget, widget.definition.size.default.w, widget.definition.size.default.h, {})
+                    (
+                        widget,
+                        widget.definition.size.default.w,
+                        widget.definition.size.default.h,
+                        dict(widget.definition.config_defaults),
+                        None,
+                    )
                 )
         now = utc_now(self.clock)
         async with self.database.unit_of_work() as uow:
@@ -962,18 +977,20 @@ class DashboardService:
                 ).scalars()
             )
             position = await self._next_position(session, user)
-            for widget, w, h, frame in chosen:
+            for widget, w, h, values, at in chosen:
                 if widget.definition.key in existing:
                     continue
+                existing.add(widget.definition.key)
                 session.add(
                     WidgetInstance(
                         user_id=user,
                         widget_key=widget.definition.key,
                         status="active",
                         position=position,
+                        **({"x": at[0], "y": at[1]} if at else {}),
                         w=w,
                         h=h,
-                        config={**widget.definition.config_defaults, **frame},
+                        config=values,
                         config_schema_version=widget.definition.schema_version,
                         views=views.get(widget.definition.key, {}),
                         origin="starter",
@@ -985,7 +1002,7 @@ class DashboardService:
             board.starter_applied_at = now
             if views:
                 board.layout_mode = "per_device"
-            await self._rearrange(session, user, by_position=True)
+            await self._rearrange(session, user, by_position=not placed)
             await self._bump(session, board, principal, starter=True)
             await self.events.publish(
                 session,
@@ -1019,9 +1036,19 @@ class DashboardService:
                 raise NotFound("This widget is not on your dashboard.", code="dashboard.instance_not_found")
             config: dict[str, Any] = dict(row.config)
             locked = self.config().widget_policies.get(row.widget_key) or {}
-            if locked.get("class") == "locked" and isinstance(locked.get("lockedConfig"), Mapping):
+            if locked.get("class") in LOCKED and isinstance(locked.get("lockedConfig"), Mapping):
                 config.update(locked["lockedConfig"])
             return row.widget_key, config
+
+    def imposed_config(self, key: str) -> dict[str, Any] | None:
+        """Issue 250: a pinned widget's settings imposed by the administrator, for a member who has no row of
+        it yet (shown from the policy alone)."""
+        policy = self.config().widget_policies.get(key) or {}
+        widget = self.registry.get(key)
+        imposed = policy.get("lockedConfig")
+        if widget is None or policy.get("class") not in LOCKED or not isinstance(imposed, Mapping):
+            return None
+        return {**widget.definition.config_defaults, **imposed}
 
     async def erase(self, user: UUID) -> None:
         async with self.database.unit_of_work() as uow:

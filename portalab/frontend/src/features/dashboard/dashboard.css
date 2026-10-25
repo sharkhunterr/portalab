@@ -1543,34 +1543,63 @@
   overflow: visible;
 }
 
-/* --- administration (027) --------------------------------------------------------------------------- */
-.pin-preview {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 4px;
-  padding: var(--space-2);
-  margin-block-end: var(--space-4);
-  border-radius: var(--radius-md);
-  background: repeating-linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--color-text) 5%, transparent) 0 calc(100% / 12 - 4px),
-    transparent calc(100% / 12 - 4px) calc(100% / 12)
-  );
+/* --- administration (027; issue 250: the default dashboard composed with the members' editor) -------- */
+.dashboard-compose {
+  inline-size: 100%; /* a tablet or phone preview keeps its width inside the page's grid */
+  margin-block-end: var(--space-5);
 }
-.pin-preview__item {
-  display: flex;
+.dash-lock {
+  display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-1);
+  min-block-size: 2rem;
   padding: 0 var(--space-2);
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--color-accent) 25%, var(--color-surface));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  overflow: hidden;
   white-space: nowrap;
 }
-.dashboard-policies,
-.dashboard-starter {
+button.dash-lock {
+  cursor: pointer;
+}
+.dash-lock[data-lock="always"] {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-raised));
+}
+.dash-lock[data-lock="locked"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+/* a narrow tile: the lock says itself with its icon only, its words kept for screen readers */
+@container widget-cell (max-width: 26rem) {
+  .dash-lock__label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+.dash-locks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.dash-locks li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.dashboard-policies {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -1579,18 +1608,12 @@
 }
 .dashboard-policy {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(10rem, 0.8fr) minmax(0, 1.6fr);
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: var(--space-2) var(--space-3);
   align-items: center;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-text) 3%, transparent);
-}
-.dashboard-policy[data-class="pinned"] {
-  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
-}
-.dashboard-policy[data-class="disabled"] {
-  opacity: 0.65;
 }
 .dashboard-policy .ds-field {
   margin: 0;
@@ -1604,38 +1627,6 @@
 .dashboard-policy__name > span {
   display: grid;
   min-inline-size: 0;
-}
-.dashboard-policy__place {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-2);
-}
-.dashboard-starter__row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 5rem 5rem auto;
-  gap: var(--space-2);
-  align-items: end;
-}
-.dashboard-starter__row .ds-field {
-  margin: 0;
-}
-.dashboard-starter__bar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  min-inline-size: 6rem;
-  max-inline-size: 100%;
-  block-size: 2.4rem;
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--color-accent) 18%, var(--color-surface));
-  font-size: var(--font-size-sm);
-  overflow: hidden;
-  white-space: nowrap;
-}
-.dashboard-starter__tools {
-  display: flex;
-  gap: var(--space-1);
 }
 @media (max-width: 52rem) {
   .dashboard-policy {

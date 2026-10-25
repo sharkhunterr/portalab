@@ -1,42 +1,73 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../../../api/client";
-import { AdminPage, AdminSection, FormActions, StatusBadge } from "../../../design-system/admin/AdminKit";
+import { AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
+import { CheckboxField, SelectField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
+import type { CatalogEntry, Instance } from "../api";
+import { ConfigDialog } from "../edit/EditControls";
+import type { Cell } from "../edit/EditSession";
+import { WidgetFrame } from "../frame/WidgetFrame";
+import { DashboardGrid } from "../grid/DashboardGrid";
+import {
+  autofit,
+  derive,
+  firstFree,
+  type Item,
+  move,
+  normalize,
+  resize,
+  VIEW_COLUMNS,
+  type View,
+} from "../grid/engine";
+import "../widgets/registered";
 import "../dashboard.css";
 
 /**
- * Members' dashboard (027, ``dashboard.manage``): what every dashboard shows. Each widget has a policy —
- * free, offered by default, required, locked, **pinned** (always there, at a place chosen here) or
- * disabled — and the starter dashboard is the one a first visit (or « Default ») gets, in rows of 12.
+ * Issue 250 — the members' default dashboard, composed by its administrator (``dashboard.manage``) with the
+ * members' own editor: the same grid and the same widgets drawn, dragged and resized (keyboard too), one
+ * arrangement per screen if wanted, each widget's settings in the members' own window — and how far it is
+ * locked, simply: free (the member changes it or removes it), always there (moved and set by the member,
+ * never removed), locked (at this place, this size, with these settings). A first visit and « Default » get
+ * it; always-there and locked widgets reach every member at once. The other widgets stay offered, or are
+ * switched off for everyone. One save writes it all (``PUT /admin/dashboard/composition``).
  */
-type Policy = { class: string; x?: number; y?: number; w?: number; h?: number; [key: string]: unknown };
+type Lock = "free" | "always" | "locked";
+type Place = { x: number; y: number; w: number; h: number };
+interface Composed extends Place {
+  widget_key: string;
+  config: Record<string, unknown>;
+  lock: Lock;
+  move?: boolean;
+  resize?: boolean;
+  tablet?: Place;
+  phone?: Place;
+  roles?: string[];
+}
+interface Composition {
+  items: Composed[];
+  disabled: string[];
+}
 interface WidgetInfo {
   key: string;
   title_key: string;
   icon?: string | null;
   sold?: boolean;
-  size?: { default: { w: number; h: number }; min: { w: number; h: number }; max: { w: number; h: number } };
-}
-interface Settings {
-  policies: Record<string, Policy>;
-  starter: Array<{ widget_key: string; w: number; h: number; roles?: string[] }>;
-  widgets: WidgetInfo[];
+  size?: { default: { w: number; h: number } };
 }
 
-const CLASSES = ["free", "default", "mandatory", "locked", "pinned", "disabled"];
-const KEY = ["admin", "dashboard"] as const;
-
-/** A policy without the place fields (only a pinned widget has a place). */
-function withoutPlace(policy: Policy): Policy {
-  const { x: _x, y: _y, w: _w, h: _h, move: _move, resize: _resize, ...rest } = policy;
-  return rest as Policy;
-}
+const KEY = ["admin", "dashboard", "composition"] as const;
+const LOCKS: readonly Lock[] = ["free", "always", "locked"];
+const LOCK_ICONS: Record<Lock, string> = { free: "user", always: "shield", locked: "lock" };
+const VIEWS: Array<{ view: View; icon: string }> = [
+  { view: "desktop", icon: "monitor" },
+  { view: "tablet", icon: "tablet" },
+  { view: "phone", icon: "smartphone" },
+];
 
 function errorText(error: unknown, fallback: string): string {
   if (!(error instanceof ApiError)) return fallback;
@@ -44,124 +75,398 @@ function errorText(error: unknown, fallback: string): string {
   return [error.message, ...(errors ?? [])].join(" — ");
 }
 
-/** The 12-column first rows with the pinned widgets drawn where they sit. */
-function PinPreview({ pins, titleOf }: { pins: Array<[string, Policy]>; titleOf: (key: string) => string }) {
+const placeOf = ({ x, y, w, h }: Place): Place => ({ x, y, w, h });
+
+/** Where each widget sits on one screen: its own place there, or the computer's arrangement derived. */
+export function cellsOf(items: readonly Composed[], view: View): Map<string, Cell> {
+  const desktop = items.map((i) => ({ id: i.widget_key, ...placeOf(i) }));
+  if (view === "desktop") return new Map(desktop.map(({ id, ...cell }) => [id, cell]));
+  const columns = VIEW_COLUMNS[view];
+  const derived = new Map(derive(desktop, columns).map(({ id, ...cell }) => [id, placeOf(cell)]));
+  if (!items.some((i) => i[view])) return derived;
+  const own = items.map((i) => ({
+    id: i.widget_key,
+    ...(i[view] ?? derived.get(i.widget_key) ?? { x: 0, y: 0, w: columns, h: i.h }),
+  }));
+  return new Map(normalize(own, columns).map(({ id, ...cell }) => [id, placeOf(cell)]));
+}
+
+/** The editor's draft: the composition, each screen's arrangement written back where it belongs. */
+function useComposer(saved: Composition | undefined) {
+  const [draft, setDraft] = useState<Composition | null>(null);
+  const [view, setView] = useState<View>("desktop");
+  useEffect(() => {
+    if (saved) setDraft(saved);
+  }, [saved]);
+  const items = useMemo(() => draft?.items ?? [], [draft]);
+  const columns = VIEW_COLUMNS[view];
+  const cells = useMemo(() => cellsOf(items, view), [items, view]);
+  const grid = useCallback(
+    (from: Map<string, Cell>): Item[] => [...from].map(([id, cell]) => ({ id, ...cell, locked: false })),
+    [],
+  );
+  const place = useCallback(
+    (next: Item[]) =>
+      setDraft((current) => {
+        if (!current) return current;
+        const at = new Map(next.map((i) => [i.id, placeOf(i)]));
+        return {
+          ...current,
+          items: current.items.map((item) => {
+            const cell = at.get(item.widget_key);
+            if (!cell) return item;
+            return view === "desktop" ? { ...item, ...cell } : { ...item, [view]: cell };
+          }),
+        };
+      }),
+    [view],
+  );
+  const update = (key: string, change: Partial<Composed>) =>
+    setDraft((current) =>
+      current
+        ? { ...current, items: current.items.map((i) => (i.widget_key === key ? { ...i, ...change } : i)) }
+        : current,
+    );
+  const add = (info: WidgetInfo) =>
+    setDraft((current) => {
+      if (!current) return current;
+      const size = info.size?.default ?? { w: 6, h: 3 };
+      const at = (v: View) => {
+        const placed = grid(cellsOf(current.items, v));
+        const w = v === "desktop" ? size.w : Math.min(size.w, VIEW_COLUMNS[v]);
+        return { ...firstFree(placed, { w, h: size.h }, VIEW_COLUMNS[v]), w, h: size.h };
+      };
+      const own = (v: "tablet" | "phone") => (current.items.some((i) => i[v]) ? { [v]: at(v) } : {});
+      const item: Composed = {
+        widget_key: info.key,
+        ...at("desktop"),
+        config: {},
+        lock: "free",
+        ...own("tablet"),
+        ...own("phone"),
+      };
+      return {
+        items: [...current.items, item],
+        disabled: current.disabled.filter((k) => k !== info.key),
+      };
+    });
+  const remove = (key: string) =>
+    setDraft((current) =>
+      current ? { ...current, items: current.items.filter((i) => i.widget_key !== key) } : current,
+    );
+  const disable = (key: string, off: boolean) =>
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            disabled: off ? [...current.disabled, key].sort() : current.disabled.filter((k) => k !== key),
+          }
+        : current,
+    );
+  /** A tablet or a phone back to the computer's arrangement (derived). */
+  const followDesktop = () => {
+    if (view === "desktop") return;
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            items: current.items.map(({ [view]: _own, ...rest }) => rest as Composed),
+          }
+        : current,
+    );
+  };
+  const arranger = {
+    move: (key: string, x: number, y: number) => place(move(grid(cells), key, { x, y }, columns)),
+    resize: (key: string, w: number, h: number) => place(resize(grid(cells), key, { w, h }, columns)),
+    preview: (key: string, to: Partial<Cell>): Item[] | null => {
+      const items = grid(cells);
+      const target = items.find((i) => i.id === key);
+      if (!target) return items;
+      return to.w !== undefined || to.h !== undefined
+        ? resize(items, key, { w: to.w ?? target.w, h: to.h ?? target.h }, columns)
+        : move(items, key, { x: to.x ?? target.x, y: to.y ?? target.y }, columns);
+    },
+  };
+  return {
+    draft,
+    setDraft,
+    items,
+    view,
+    setView,
+    columns,
+    cells,
+    arranger,
+    update,
+    add,
+    remove,
+    disable,
+    followDesktop,
+    autofit: () => place(autofit(grid(cells), columns)),
+    own: view !== "desktop" && items.some((i) => i[view]),
+  };
+}
+
+/** A composed widget drawn as a member would see it (no row of its own: the default settings' data). */
+function instanceOf(item: Composed, index: number, meta: CatalogEntry["widget"] | undefined): Instance {
+  return {
+    id: null,
+    widget_key: item.widget_key,
+    status: "active",
+    position: index,
+    ...placeOf(item),
+    config: item.config,
+    widget: meta ?? null,
+    policy: "free",
+    locked: false,
+    mandatory: false,
+    movable: true,
+    resizable: true,
+    removable: true,
+    hideable: false,
+    available: true,
+    views: {},
+  } as Instance;
+}
+
+function LockButton({ lock, onChange }: { lock: Lock; onChange: (next: Lock) => void }) {
   const t = useT();
-  const rows = Math.max(2, ...pins.map(([, p]) => (p.y ?? 0) + (p.h ?? 2)));
+  const next = LOCKS[(LOCKS.indexOf(lock) + 1) % LOCKS.length] as Lock;
   return (
-    <div
-      className="pin-preview"
-      role="img"
-      aria-label={t("dashboard:admin.preview")}
-      style={{ gridTemplateRows: `repeat(${rows}, 1.6rem)` }}
+    <button
+      type="button"
+      className="dash-lock"
+      data-lock={lock}
+      title={t(`dashboard:compose.lockHint.${lock}`)}
+      aria-label={t("dashboard:compose.lockNow", { lock: t(`dashboard:compose.lock.${lock}`) })}
+      onClick={() => onChange(next)}
     >
-      {pins.map(([key, p]) => (
-        <span
-          key={key}
-          className="pin-preview__item"
-          style={{
-            gridColumn: `${(p.x ?? 0) + 1} / span ${p.w ?? 6}`,
-            gridRow: `${(p.y ?? 0) + 1} / span ${p.h ?? 2}`,
-          }}
-        >
-          <Icon name="lock" size={12} /> {titleOf(key)}
-        </span>
-      ))}
-    </div>
+      <Icon name={LOCK_ICONS[lock]} size={14} />
+      <span className="dash-lock__label">{t(`dashboard:compose.lock.${lock}`)}</span>
+    </button>
   );
 }
 
 export default function DashboardAdmin() {
   const t = useT();
   const client = useQueryClient();
-  const settings = useQuery({
+  const saved = useQuery({
     queryKey: KEY,
-    queryFn: async () => (await api.GET("/api/v1/admin/dashboard/policies")).data as unknown as Settings,
+    queryFn: async () =>
+      (await api.GET("/api/v1/admin/dashboard/composition")).data as unknown as Composition,
   });
-  const [policies, setPolicies] = useState<Record<string, Policy>>({});
-  const [starter, setStarter] = useState<Settings["starter"]>([]);
-  const [saved, setSaved] = useState<string | null>(null);
-  useEffect(() => {
-    if (settings.data) {
-      setPolicies(settings.data.policies ?? {});
-      setStarter(settings.data.starter ?? []);
-    }
-  }, [settings.data]);
-  // 027: one save for the whole page — the policies and the starter dashboard together (two separate
-  // buttons let a change to one be lost by saving the other)
-  const saveAll = useMutation({
-    mutationFn: async () => {
-      await api.PUT("/api/v1/admin/dashboard/policies", { body: policies as never });
-      await api.PUT("/api/v1/admin/dashboard/starter", { body: starter as never });
-    },
-    onSuccess: () => {
-      setSaved("all");
-      void client.invalidateQueries({ queryKey: KEY });
+  const widgets = useQuery({
+    queryKey: ["admin", "dashboard"],
+    queryFn: async () =>
+      (
+        (await api.GET("/api/v1/admin/dashboard/policies")).data as unknown as {
+          widgets: WidgetInfo[];
+        }
+      ).widgets,
+  });
+  const catalog = useQuery({
+    queryKey: ["dashboard", "catalog"],
+    queryFn: async () => ((await api.GET("/api/v1/dashboard/catalog")).data ?? []) as CatalogEntry[],
+  });
+  const composer = useComposer(saved.data);
+  const [done, setDone] = useState(false);
+  const save = useMutation({
+    mutationFn: async (composition: Composition) =>
+      (
+        await api.PUT("/api/v1/admin/dashboard/composition", {
+          body: composition as never,
+        })
+      ).data as unknown as Composition,
+    onSuccess: (next) => {
+      client.setQueryData(KEY, next);
+      setDone(true);
+      void client.invalidateQueries({ queryKey: ["admin", "dashboard"] });
       void client.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
   const dirty =
-    Boolean(settings.data) &&
-    (JSON.stringify(policies) !== JSON.stringify(settings.data?.policies ?? {}) ||
-      JSON.stringify(starter) !== JSON.stringify(settings.data?.starter ?? []));
+    Boolean(saved.data && composer.draft) && JSON.stringify(saved.data) !== JSON.stringify(composer.draft);
+  useEffect(() => {
+    if (dirty) setDone(false);
+  }, [dirty]);
   useEffect(() => {
     if (!dirty) return;
     const warn = (event: BeforeUnloadEvent) => event.preventDefault();
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
-  if (!settings.data) return <FunctionalState state={settings.isError ? "unauthorized" : "loading"} />;
-  const widgets = [...settings.data.widgets].sort((a, b) => t(a.title_key).localeCompare(t(b.title_key)));
+  if (!composer.draft || !widgets.data)
+    return <FunctionalState state={saved.isError || widgets.isError ? "unauthorized" : "loading"} />;
+  const draft = composer.draft;
+  const metas = new Map((catalog.data ?? []).map((entry) => [entry.key, entry.widget]));
+  const infoOf = (key: string) => widgets.data.find((w) => w.key === key);
   const titleOf = (key: string) => {
-    const found = settings.data.widgets.find((w) => w.key === key);
-    return found ? t(found.title_key) : key;
+    const info = infoOf(key);
+    return info ? t(info.title_key) : key;
   };
+  const instances = composer.items.map((item, index) => instanceOf(item, index, metas.get(item.widget_key)));
+  const spare = [...widgets.data]
+    .filter((w) => !composer.items.some((i) => i.widget_key === w.key))
+    .sort((a, b) => t(a.title_key).localeCompare(t(b.title_key)));
   const saveBar = (
     <div className="dashboard-admin__save" data-dirty={dirty || undefined}>
-      {saveAll.isError ? (
+      {save.isError ? (
         <p role="alert" className="services-admin__ko">
-          {errorText(saveAll.error, t("dashboard:admin.failed"))}
+          {errorText(save.error, t("dashboard:admin.failed"))}
         </p>
-      ) : saved === "all" && !dirty ? (
+      ) : done && !dirty ? (
         <p role="status">{t("dashboard:admin.saved")}</p>
       ) : dirty ? (
         <p role="status">{t("dashboard:admin.unsaved")}</p>
       ) : null}
-      <Button disabled={saveAll.isPending || !dirty} onClick={() => saveAll.mutate()}>
+      {dirty ? (
+        <Button
+          variant="ghost"
+          disabled={save.isPending}
+          onClick={() => saved.data && composer.setDraft(saved.data)}
+        >
+          <Icon name="undo" size={16} />
+          {t("dashboard:compose.undo")}
+        </Button>
+      ) : null}
+      <Button disabled={save.isPending || !dirty} onClick={() => save.mutate(draft)}>
         <Icon name="check" size={16} />
         {t("dashboard:admin.save")}
       </Button>
     </div>
   );
-  const set = (key: string, next: Policy | null) => {
-    setSaved(null);
-    const copy = { ...policies };
-    if (next === null || next.class === "free") delete copy[key];
-    else copy[key] = next;
-    setPolicies(copy);
-  };
-  const pins = Object.entries(policies).filter(([, p]) => p.class === "pinned");
-  const spare = widgets.filter((w) => !starter.some((s) => s.widget_key === w.key));
   return (
     <AdminPage
       icon="dashboard"
       title={t("dashboard:admin.title")}
-      description={t("dashboard:admin.description")}
+      description={t("dashboard:compose.description")}
       primary={saveBar}
       wide
     >
+      <section className="dashboard-toolbar" aria-label={t("dashboard:toolbar")}>
+        <fieldset className="ds-subnav" aria-label={t("dashboard:screens")}>
+          {VIEWS.map(({ view, icon }) => (
+            <button
+              key={view}
+              type="button"
+              aria-pressed={composer.view === view}
+              onClick={() => composer.setView(view)}
+            >
+              <Icon name={icon} size={16} />
+              {t(`dashboard:view.${view}`)}
+            </button>
+          ))}
+        </fieldset>
+        {spare.length ? (
+          <SelectField
+            label={t("dashboard:admin.add")}
+            value=""
+            onChange={(event) => {
+              const info = infoOf(event.target.value);
+              if (info) composer.add(info);
+            }}
+          >
+            <option value="">—</option>
+            {spare.map((w) => (
+              <option key={w.key} value={w.key}>
+                {t(w.title_key)}
+                {w.sold ? ` · ${t("dashboard:admin.sold")}` : ""}
+              </option>
+            ))}
+          </SelectField>
+        ) : null}
+        <Button variant="secondary" onClick={composer.autofit}>
+          <Icon name="maximize" size={16} />
+          {t("dashboard:autofit")}
+        </Button>
+        {composer.own ? (
+          <Button variant="ghost" onClick={composer.followDesktop}>
+            <Icon name="sync" size={16} />
+            {t("dashboard:compose.followDesktop")}
+          </Button>
+        ) : null}
+        <p className="dashboard-page__hint">
+          {t("dashboard:compose.hint")}
+          {composer.view !== "desktop" && !composer.own ? ` ${t("dashboard:compose.derived")}` : ""}
+        </p>
+      </section>
+      <div
+        className="dashboard-stage dashboard-compose"
+        data-view={composer.view}
+        data-preview={composer.view !== "desktop" || undefined}
+      >
+        <DashboardGrid
+          label={t("dashboard:compose.grid")}
+          instances={instances}
+          cells={composer.cells}
+          columns={composer.columns}
+          arranger={composer.arranger}
+          render={(instance, handles, cell) => {
+            const item = composer.items.find((i) => i.widget_key === instance.widget_key) as Composed;
+            return (
+              <WidgetFrame
+                instance={instance}
+                rows={cell.h}
+                handles={handles}
+                controls={
+                  <div
+                    className="widget-frame__controls"
+                    role="toolbar"
+                    aria-label={titleOf(item.widget_key)}
+                  >
+                    <LockButton
+                      lock={item.lock}
+                      onChange={(lock) => composer.update(item.widget_key, { lock })}
+                    />
+                    <ConfigDialog
+                      key={JSON.stringify(item.config)}
+                      instance={instance}
+                      onSave={(config) => composer.update(item.widget_key, { config })}
+                    />
+                    <Button
+                      variant="ghost"
+                      className="dash-tool ds-button--quiet-danger"
+                      size="icon"
+                      aria-label={t("dashboard:admin.remove")}
+                      title={t("dashboard:admin.remove")}
+                      onClick={() => composer.remove(item.widget_key)}
+                    >
+                      <Icon name="trash" size={16} />
+                    </Button>
+                  </div>
+                }
+              />
+            );
+          }}
+        />
+      </div>
       <AdminSection
         span="full"
         icon="lock"
-        title={t("dashboard:admin.policies")}
-        description={t("dashboard:admin.policiesHint")}
+        title={t("dashboard:compose.locks")}
+        description={t("dashboard:compose.locksHint")}
       >
-        {pins.length ? <PinPreview pins={pins} titleOf={titleOf} /> : null}
-        <ul className="dashboard-policies">
-          {widgets.map((widget) => {
-            const policy = policies[widget.key] ?? { class: "free" };
-            return (
-              <li key={widget.key} className="dashboard-policy" data-class={policy.class}>
+        <ul className="dash-locks">
+          {LOCKS.map((lock) => (
+            <li key={lock}>
+              <span className="dash-lock" data-lock={lock}>
+                <Icon name={LOCK_ICONS[lock]} size={14} />
+                {t(`dashboard:compose.lock.${lock}`)}
+              </span>
+              <span className="admin-muted">{t(`dashboard:compose.lockHint.${lock}`)}</span>
+            </li>
+          ))}
+        </ul>
+      </AdminSection>
+      {spare.length ? (
+        <AdminSection
+          span="full"
+          icon="apps"
+          title={t("dashboard:compose.others")}
+          description={t("dashboard:compose.othersHint")}
+        >
+          <ul className="dashboard-policies">
+            {spare.map((widget) => (
+              <li key={widget.key} className="dashboard-policy">
                 <span className="dashboard-policy__name">
                   <Icon name={widget.icon ?? "dashboard"} size={18} />
                   <span>
@@ -172,157 +477,20 @@ export default function DashboardAdmin() {
                     </span>
                   </span>
                 </span>
-                <SelectField
-                  label={t("dashboard:admin.policy")}
-                  value={policy.class}
-                  onChange={(e) => {
-                    const cls = e.target.value;
-                    set(
-                      widget.key,
-                      cls === "pinned"
-                        ? {
-                            class: "pinned",
-                            x: 0,
-                            y: Math.max(0, ...pins.map(([, p]) => (p.y ?? 0) + (p.h ?? 2))),
-                            w: widget.size?.default.w ?? 6,
-                            h: widget.size?.default.h ?? 2,
-                          }
-                        : withoutPlace({ ...(policies[widget.key] ?? {}), class: cls }),
-                    );
-                  }}
-                >
-                  {CLASSES.map((cls) => (
-                    <option key={cls} value={cls}>
-                      {t(`dashboard:admin.class.${cls}`)}
-                    </option>
-                  ))}
-                </SelectField>
-                {policy.class === "pinned" ? (
-                  <span className="dashboard-policy__place">
-                    {(["x", "y", "w", "h"] as const).map((field) => (
-                      <TextField
-                        key={field}
-                        label={t(`dashboard:admin.place.${field}`)}
-                        type="number"
-                        min={field === "w" || field === "h" ? 1 : 0}
-                        max={field === "x" ? 11 : 12}
-                        value={String(policy[field] ?? 0)}
-                        onChange={(e) => set(widget.key, { ...policy, [field]: Number(e.target.value) })}
-                      />
-                    ))}
-                    {/* 027: what members may still do with it — it never leaves their dashboard */}
-                    <CheckboxField
-                      label={t("dashboard:admin.allowMove")}
-                      checked={Boolean(policy.move)}
-                      onChange={(e) => set(widget.key, { ...policy, move: e.target.checked })}
-                    />
-                    <CheckboxField
-                      label={t("dashboard:admin.allowResize")}
-                      checked={Boolean(policy.resize)}
-                      onChange={(e) => set(widget.key, { ...policy, resize: e.target.checked })}
-                    />
-                  </span>
-                ) : (
-                  <span className="admin-muted dashboard-policy__hint">
-                    {t(`dashboard:admin.classHint.${policy.class}`)}
-                  </span>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </AdminSection>
-
-      <AdminSection
-        span="full"
-        icon="sparkles"
-        title={t("dashboard:admin.starter")}
-        description={t("dashboard:admin.starterHint")}
-      >
-        <ol className="dashboard-starter">
-          {starter.map((entry, index) => {
-            const info = settings.data.widgets.find((w) => w.key === entry.widget_key);
-            return (
-              <li key={entry.widget_key} className="dashboard-starter__row">
-                <span className="dashboard-starter__bar" style={{ inlineSize: `${(entry.w / 12) * 100}%` }}>
-                  <Icon name={info?.icon ?? "dashboard"} size={14} /> {titleOf(entry.widget_key)}
-                </span>
-                <TextField
-                  label={t("dashboard:admin.place.w")}
-                  type="number"
-                  min={info?.size?.min.w ?? 1}
-                  max={info?.size?.max.w ?? 12}
-                  value={String(entry.w)}
-                  onChange={(e) =>
-                    setStarter(starter.map((s, i) => (i === index ? { ...s, w: Number(e.target.value) } : s)))
-                  }
+                <CheckboxField
+                  label={t("dashboard:compose.off")}
+                  checked={draft.disabled.includes(widget.key)}
+                  onChange={(event) => composer.disable(widget.key, event.target.checked)}
                 />
-                <TextField
-                  label={t("dashboard:admin.place.h")}
-                  type="number"
-                  min={info?.size?.min.h ?? 1}
-                  max={info?.size?.max.h ?? 12}
-                  value={String(entry.h)}
-                  onChange={(e) =>
-                    setStarter(starter.map((s, i) => (i === index ? { ...s, h: Number(e.target.value) } : s)))
-                  }
-                />
-                <span className="dashboard-starter__tools">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={t("dashboard:admin.up")}
-                    disabled={index === 0}
-                    onClick={() => {
-                      const next = [...starter];
-                      [next[index - 1], next[index]] = [
-                        next[index] as typeof entry,
-                        next[index - 1] as typeof entry,
-                      ];
-                      setStarter(next);
-                    }}
-                  >
-                    <Icon name="arrow-up" size={16} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={t("dashboard:admin.remove")}
-                    onClick={() => setStarter(starter.filter((_, i) => i !== index))}
-                  >
-                    <Icon name="trash" size={16} />
-                  </Button>
-                </span>
+                <Button variant="ghost" onClick={() => composer.add(widget)}>
+                  <Icon name="plus" size={16} />
+                  {t("dashboard:compose.place")}
+                </Button>
               </li>
-            );
-          })}
-        </ol>
-        {spare.length ? (
-          <SelectField
-            label={t("dashboard:admin.add")}
-            value=""
-            onChange={(e) => {
-              const info = settings.data.widgets.find((w) => w.key === e.target.value);
-              if (info)
-                setStarter([
-                  ...starter,
-                  { widget_key: info.key, w: info.size?.default.w ?? 6, h: info.size?.default.h ?? 3 },
-                ]);
-            }}
-          >
-            <option value="">—</option>
-            {spare.map((w) => (
-              <option key={w.key} value={w.key}>
-                {t(w.title_key)}
-              </option>
             ))}
-          </SelectField>
-        ) : null}
-        <p className="admin-muted">
-          <StatusBadge tone="info">{t("dashboard:admin.tip")}</StatusBadge> {t("dashboard:admin.tipText")}
-        </p>
-      </AdminSection>
-      <FormActions>{saveBar}</FormActions>
+          </ul>
+        </AdminSection>
+      ) : null}
     </AdminPage>
   );
 }

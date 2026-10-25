@@ -67,7 +67,7 @@ export function EditControls({ instance, apply }: { instance: Instance; apply: (
   );
 }
 
-function ConfigDialog({
+export function ConfigDialog({
   instance,
   onSave,
   disabled = false,

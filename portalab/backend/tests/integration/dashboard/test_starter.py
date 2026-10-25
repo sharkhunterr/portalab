@@ -51,8 +51,8 @@ async def test_starter(app: FastAPI, client: httpx.AsyncClient, dash: DashboardH
 async def test_starter_entries_carry_frame_settings(
     app: FastAPI, client: httpx.AsyncClient, dash: DashboardHarness
 ) -> None:
-    """027: a starter entry may set how its frame shows (« hide while empty ») — never the widget's own
-    settings."""
+    """027: a starter entry may set how its frame shows (« hide while empty »); issue 250: and the widget's
+    own settings, checked as its settings window checks them."""
     dash.module.config = replace(
         dash.module.config,
         starter_layout=[
@@ -65,10 +65,10 @@ async def test_starter_entries_carry_frame_settings(
     instances = {i["widget_key"]: i for i in (await client.get("/api/v1/dashboard")).json()["instances"]}
     assert instances["health.services_summary"]["config"]["_hide_empty"] is True
     assert "_hide_empty" not in instances["dashboard.welcome"]["config"]
-    errors = await dash.module.validators.starter(
-        [{"widget_key": "health.services_summary", "config": {"limit": 3}}]
-    )
-    assert errors == ["entry 0: config holds frame settings only"]
+    dash.registry.register(definition("t.limited"), FakeWidget())
+    assert await dash.module.validators.starter([{"widget_key": "t.limited", "config": {"limit": 3}}]) == []
+    errors = await dash.module.validators.starter([{"widget_key": "t.limited", "config": {"limit": 99}}])
+    assert len(errors) == 1 and errors[0].startswith("entry 0: 99 is greater than")
 
 
 async def test_starter_places_widgets_per_screen(

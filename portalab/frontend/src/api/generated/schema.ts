@@ -846,6 +846,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/dashboard/composition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Composition
+         * @description Issue 250: the default dashboard as the administrator composes it.
+         */
+        get: operations["get_composition_api_v1_admin_dashboard_composition_get"];
+        /** Put Composition */
+        put: operations["put_composition_api_v1_admin_dashboard_composition_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/dashboard/policies": {
         parameters: {
             query?: never;
@@ -12486,6 +12507,54 @@ export interface components {
             /** Votes */
             votes: number;
         };
+        /** CompositionIn */
+        CompositionIn: {
+            /** Disabled */
+            disabled?: string[];
+            /** Items */
+            items: components["schemas"]["CompositionItemIn"][];
+        };
+        /**
+         * CompositionItemIn
+         * @description Issue 250: one widget of the default dashboard — its place on a computer (12 columns), its settings,
+         *     how far it is locked, and (optionally) its own place on a tablet and a phone.
+         */
+        CompositionItemIn: {
+            /** Config */
+            config?: {
+                [key: string]: unknown;
+            };
+            /** H */
+            h: number;
+            /**
+             * Lock
+             * @default free
+             * @enum {string}
+             */
+            lock: "free" | "always" | "locked";
+            /**
+             * Move
+             * @default false
+             */
+            move: boolean;
+            phone?: components["schemas"]["PlaceIn"] | null;
+            /**
+             * Resize
+             * @default false
+             */
+            resize: boolean;
+            /** Roles */
+            roles?: string[] | null;
+            tablet?: components["schemas"]["PlaceIn"] | null;
+            /** W */
+            w: number;
+            /** Widget Key */
+            widget_key: string;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+        };
         /** Confirmations */
         Confirmations: {
             /** Contracts */
@@ -15481,6 +15550,17 @@ export interface components {
             place_of_birth: string | null;
             /** Popularity */
             popularity: number | null;
+        };
+        /** PlaceIn */
+        PlaceIn: {
+            /** H */
+            h: number;
+            /** W */
+            w: number;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
         };
         /** PlaceOut */
         PlaceOut: {
@@ -19826,6 +19906,63 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ChangesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_composition_api_v1_admin_dashboard_composition_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    put_composition_api_v1_admin_dashboard_composition_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompositionIn"];
             };
         };
         responses: {
