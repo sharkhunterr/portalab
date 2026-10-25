@@ -30,12 +30,12 @@ from typing import Any, Protocol
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from portalab.capabilities.administration import SECRETS_REKEY_CAPABILITY
+from portalab.capabilities.administration import BACKUP_LEFT_OUT_CAPABILITY, SECRETS_REKEY_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.logging import get_logger
 from portalab.core.secrets import SecretBox
-from portalab.modules.administration.backup.catalog import SPLIT, category_of, folder_category
+from portalab.modules.administration.backup.catalog import FOLDERS, SPLIT, category_of, folder_category
 from portalab.modules.administration.backup.crypto import DecryptingReader, EncryptingWriter
 
 log = get_logger(__name__)
@@ -509,6 +509,16 @@ async def _load(
             )
             rows += int(table.get("rows", 0))
         await _set_sequences(apg)
+        session = AsyncSession(bind=conn, expire_on_commit=False)
+        left_out = frozenset(
+            name
+            for name, category in FOLDERS.items()
+            if category == "media" and not manifest["options"].get("media")
+        )
+        if left_out:
+            for registration in capabilities.system_providers(BACKUP_LEFT_OUT_CAPABILITY):
+                await registration.provider.left_out(session, left_out)
+            await session.flush()
         secrets = await _rekey(conn, capabilities, SecretBox(old_key), SecretBox(new_key))
         await conn.commit()
     return {"tables": len(tables), "rows": rows, "skipped": skipped, "secrets": secrets}

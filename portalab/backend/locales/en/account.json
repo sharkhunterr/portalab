@@ -27,7 +27,7 @@
   "arrival.import.files": "Files",
   "arrival.import.holds": "It holds",
   "arrival.import.lead": "Bring in the archive saved from another portal (Administration › Backups): its members keep their accounts and passwords, its settings, services, content, play and history come with it.",
-  "arrival.import.noMedia": "without the media images (fetched again from the services)",
+  "arrival.import.noMedia": "without the images fetched from the services (fetched again)",
   "arrival.import.older": "Saved by an earlier Portalab ({version}): its data will be brought up to this version while it is imported.",
   "arrival.import.passphrase": "The archive's passphrase",
   "arrival.import.phase.done": "Done",

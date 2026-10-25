@@ -66,6 +66,14 @@ async def test_every_schema_is_sorted(database: Database) -> None:
     assert unsorted == [], f"declare these schemas in backup/catalog.py: {unsorted}"
 
 
+def test_what_every_backup_keeps() -> None:
+    """The members' own data is never left out, whatever the options (the media images and the technical
+    history aside)."""
+    for table in ("identity.users", "cards.cards", "cards.copies", "gamification.balances", "config.settings"):
+        assert category_of(table) == "data", table
+    assert category_of("identity.sessions") == "transient"
+
+
 async def test_round_trip_into_another_portal(database: Database, heads: set[str], tmp_path: Path) -> None:
     data = tmp_path / "data"
     full = make_full_platform(database, data / "blobs")
