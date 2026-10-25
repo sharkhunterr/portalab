@@ -664,6 +664,7 @@
   "services.access.generic": "API token",
   "services.access.plex": "Plex token",
   "services.add": "Add a service",
+  "services.another": "Connect another service",
   "services.category.ai": "Artificial intelligence",
   "services.category.books": "Books",
   "services.category.downloads": "Downloads",

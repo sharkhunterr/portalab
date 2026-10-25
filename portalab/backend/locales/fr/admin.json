@@ -664,6 +664,7 @@
   "services.access.generic": "Jeton d'API",
   "services.access.plex": "Jeton Plex",
   "services.add": "Ajouter un service",
+  "services.another": "Brancher un autre service",
   "services.category.ai": "Intelligence artificielle",
   "services.category.books": "Livres",
   "services.category.downloads": "Téléchargements",
