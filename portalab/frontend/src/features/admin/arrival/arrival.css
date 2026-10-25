@@ -392,6 +392,18 @@ li[data-state="done"] > .arrival-stage__dot {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
   gap: var(--space-3);
 }
+/* issue 253: the game's three ways side by side, one under the other on a phone */
+.arrival__choices--three {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+.arrival__note > .ds-button {
+  margin-inline-start: auto;
+}
+.arrival__game {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
 .arrival__choice {
   display: grid;
   align-content: start;
