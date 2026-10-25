@@ -20,6 +20,7 @@ AUDIT_STATUS_CAPABILITY = "audit.status"
 EXTENSION_STATE_CAPABILITY = "admin.extension_state"
 CONFIG_WRITER_CAPABILITY = "admin.config_writer"
 AUDIT_QUERY_CAPABILITY = "audit.query"
+SECRETS_REKEY_CAPABILITY = "admin.secrets_rekey"
 
 PanelState = Literal["available", "partial", "stale", "unavailable", "no-data"]
 
@@ -149,6 +150,15 @@ class AuditQueryPort(Protocol):
     ) -> tuple[list[dict[str, Any]], str | None]: ...
 
 
+@runtime_checkable
+class SecretsRekey(Protocol):
+    """Issue 247: after a restore, the secrets a module keeps encrypted are encrypted again — read with the
+    backed-up portal's key, written with this one's — in the restore's own transaction (``session``). Answers
+    how many were rewritten and how many could not be read (left out, to be entered again)."""
+
+    async def rekey(self, session: Any, old: Any, new: Any) -> tuple[int, int]: ...
+
+
 def _spec(name: str, protocol: type[Any], multi: bool, description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=multi, description=description
@@ -166,4 +176,5 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(EXTENSION_STATE_CAPABILITY, ExtensionState, False, "Enablement of modules/plugins (020 toggles)"),
     _spec(CONFIG_WRITER_CAPABILITY, ConfigWriter, False, "Audited global setting changes (020)"),
     _spec(AUDIT_QUERY_CAPABILITY, AuditQueryPort, False, "Owner-scoped audit reads (003)"),
+    _spec(SECRETS_REKEY_CAPABILITY, SecretsRekey, True, "Secrets encrypted again after a restore (247)"),
 )

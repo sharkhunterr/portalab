@@ -165,6 +165,71 @@ def _cmd_restore(args: argparse.Namespace) -> int:
     return 0
 
 
+def _report(phase: str, done: int, total: int) -> None:
+    sys.stderr.write(f"\r{phase} {done}/{total}   ")
+
+
+async def _archive(args: argparse.Namespace, passphrase: str) -> int:
+    """Issue 247: the portable, encrypted archive (the same as the administration's « Backups »)."""
+    from portalab.app.composition import import_all_models
+    from portalab.app.migrations import current_heads
+    from portalab.app.wiring import wire_platform
+    from portalab.capabilities.catalog import new_registry
+    from portalab.core.db import Database
+    from portalab.modules.administration.backup import archive
+
+    settings = load_settings()
+    import_all_models()
+    database = Database.from_url(settings.database_url.reveal())
+    capabilities = new_registry()
+    try:
+        platform = wire_platform(
+            database, data_dir=settings.data_dir, capabilities=capabilities, secret_key=settings.secret_key
+        )
+        heads = await current_heads(database)
+        if args.archive_command == "create":
+            site = str((await platform.ui.site.public()).get("name") or "Portalab")
+            manifest = await archive.create(
+                database,
+                settings.data_dir,
+                settings.secret_key,
+                Path(args.output),
+                passphrase,
+                options=archive.Options(history=args.history, media=not args.no_media),
+                heads=heads,
+                site=site,
+                progress=_report,
+            )
+            sys.stdout.write(f"\narchive written: {len(manifest.tables)} tables, {manifest.counts}\n")
+            return 0
+        if not args.yes:
+            sys.stderr.write("restore replaces this portal's data: re-run with --yes to confirm\n")
+            return 2
+        result = await archive.restore(
+            database,
+            settings.data_dir,
+            settings.secret_key,
+            Path(args.input),
+            passphrase,
+            capabilities=capabilities,
+            heads=heads,
+            progress=_report,
+        )
+        sys.stdout.write(f"\nrestored: {result}; restart the portal (serve and worker)\n")
+        return 0
+    except (archive.BackupError, ValueError) as exc:
+        sys.stderr.write(f"\narchive failed: {exc}\n")
+        return 5
+    finally:
+        await database.dispose()
+
+
+def _cmd_archive(args: argparse.Namespace) -> int:
+    configure_logging(load_settings().log_level)
+    passphrase = Path(args.passphrase_file).read_text(encoding="utf-8").strip()
+    return asyncio.run(_archive(args, passphrase))
+
+
 def _cmd_openapi(args: argparse.Namespace) -> int:
     from portalab.app.main import create_app
 
@@ -452,6 +517,20 @@ def build_parser() -> argparse.ArgumentParser:
     restore_cmd.add_argument("--pg-restore", default=None)
     restore_cmd.add_argument("--yes", action="store_true")
     restore_cmd.set_defaults(func=_cmd_restore)
+    archive_cmd = sub.add_parser(
+        "archive", help="portable encrypted archive of the portal (issue 247)"
+    ).add_subparsers(dest="archive_command", required=True)
+    archive_create = archive_cmd.add_parser("create", help="save the portal into an encrypted archive")
+    archive_create.add_argument("--output", required=True)
+    archive_create.add_argument("--passphrase-file", required=True)
+    archive_create.add_argument("--history", action="store_true", help="with the technical history")
+    archive_create.add_argument("--no-media", action="store_true", help="without the media images")
+    archive_create.set_defaults(func=_cmd_archive)
+    archive_restore = archive_cmd.add_parser("restore", help="bring an archive into this (new) portal")
+    archive_restore.add_argument("--input", required=True)
+    archive_restore.add_argument("--passphrase-file", required=True)
+    archive_restore.add_argument("--yes", action="store_true")
+    archive_restore.set_defaults(func=_cmd_archive)
     i18n = sub.add_parser("i18n", help="translation catalog tooling").add_subparsers(
         dest="i18n_command", required=True
     )

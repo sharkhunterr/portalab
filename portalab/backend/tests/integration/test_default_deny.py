@@ -37,6 +37,10 @@ ALLOW_LISTED = {
     "/api/v1/i18n/public/catalogs/{namespace}",
     "/api/v1/media/remote/{ticket}/session/{path:path}",  # 027 (#11): a cast device's stream
     "/api/v1/admin/first-run",  # spec 020: public only until the sole Admin exists
+    "/api/v1/admin/first-run/import",  # issue 247: the arrival wizard brings a backup in (until set up)
+    "/api/v1/admin/first-run/import/upload",
+    "/api/v1/admin/first-run/import/inspect",
+    "/api/v1/admin/first-run/import/status",
     "/metrics",  # spec 025: disabled by default; own token/permission check
 }
 

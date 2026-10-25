@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 from pathlib import Path
 
+from portalab.app.migrations import current_heads
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.connectors.builtin import register_builtin
 from portalab.core.audit_port import AuditSink, LogAuditSink
@@ -22,6 +23,7 @@ from portalab.core.event_port import EventPublisher, OutboxEventPublisher
 from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.secrets import SecretBox
+from portalab.modules.administration.backup.service import BackupService
 from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.ai.module import AiModule
 from portalab.modules.authz.module import AuthzModule
@@ -195,6 +197,19 @@ def wire_platform(
     observability.register_capabilities()
     ui = UiModule(database, events, authz.audit, capabilities)
     ui.register()
+
+    async def site_name() -> str:
+        return str((await ui.site.public()).get("name") or "Portalab")
+
+    administration.backups = BackupService(  # issue 247
+        database,
+        data_dir,
+        secret_key,
+        capabilities,
+        authz.audit,
+        heads=lambda: current_heads(database),
+        site=site_name,
+    )
     administration.registry.register_user_validator("ui.theme", ui.themes.choice_errors, owner="module:ui")
     for setting in ui.looks.SETTINGS:  # 027: shop cosmetics (notifications, palette, ambient, celebration)
         administration.registry.register_user_validator(

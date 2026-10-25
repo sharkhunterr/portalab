@@ -4994,6 +4994,32 @@
         "title": "ContentResolvedLinkOut",
         "type": "object"
       },
+      "CreateIn": {
+        "additionalProperties": false,
+        "properties": {
+          "history": {
+            "default": false,
+            "title": "History",
+            "type": "boolean"
+          },
+          "media": {
+            "default": true,
+            "title": "Media",
+            "type": "boolean"
+          },
+          "passphrase": {
+            "maxLength": 512,
+            "minLength": 12,
+            "title": "Passphrase",
+            "type": "string"
+          }
+        },
+        "required": [
+          "passphrase"
+        ],
+        "title": "CreateIn",
+        "type": "object"
+      },
       "CredentialsConfirmation": {
         "additionalProperties": false,
         "properties": {
@@ -12295,6 +12321,29 @@
           "completed_at"
         ],
         "title": "OnboardingStep",
+        "type": "object"
+      },
+      "OpenIn": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "passphrase": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Passphrase",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "passphrase"
+        ],
+        "title": "OpenIn",
         "type": "object"
       },
       "OperationIn": {
@@ -22206,6 +22255,145 @@
         ]
       }
     },
+    "/api/v1/admin/backups": {
+      "get": {
+        "operationId": "list_backups_api_v1_admin_backups_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Backups Api V1 Admin Backups Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Backups",
+        "tags": [
+          "administration"
+        ]
+      },
+      "post": {
+        "operationId": "create_backup_api_v1_admin_backups_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Create Backup Api V1 Admin Backups Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Backup",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/backups/{name}": {
+      "delete": {
+        "operationId": "delete_backup_api_v1_admin_backups__name__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Backup",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/backups/{name}/download": {
+      "get": {
+        "operationId": "download_backup_api_v1_admin_backups__name__download_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Download Backup",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
     "/api/v1/admin/campaigns": {
       "get": {
         "operationId": "list_campaigns_api_v1_admin_campaigns_get",
@@ -24041,6 +24229,164 @@
           }
         },
         "summary": "First Run",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/first-run/import": {
+      "get": {
+        "description": "The archives already on the server (copied into ``<DATA_DIR>/backups``).",
+        "operationId": "import_archives_api_v1_admin_first_run_import_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Import Archives Api V1 Admin First Run Import Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Import Archives",
+        "tags": [
+          "administration"
+        ]
+      },
+      "post": {
+        "operationId": "import_start_api_v1_admin_first_run_import_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Import Start Api V1 Admin First Run Import Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Import Start",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/first-run/import/inspect": {
+      "post": {
+        "operationId": "import_inspect_api_v1_admin_first_run_import_inspect_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Import Inspect Api V1 Admin First Run Import Inspect Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Import Inspect",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/first-run/import/status": {
+      "get": {
+        "description": "The restore's progress \u2014 answered until it is over, the portal then being set up.",
+        "operationId": "import_status_api_v1_admin_first_run_import_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Import Status Api V1 Admin First Run Import Status Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Import Status",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/first-run/import/upload": {
+      "post": {
+        "description": "An archive sent from the browser, as the request's body.",
+        "operationId": "import_upload_api_v1_admin_first_run_import_upload_post",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Import Upload Api V1 Admin First Run Import Upload Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Import Upload",
         "tags": [
           "administration"
         ]

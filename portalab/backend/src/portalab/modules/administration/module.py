@@ -7,6 +7,7 @@ from portalab.capabilities.administration import (
     CONFIG_WRITER_CAPABILITY,
     EXTENSION_STATE_CAPABILITY,
     PANEL_CAPABILITY,
+    SECRETS_REKEY_CAPABILITY,
     AdminSurface,
     default_admin_surfaces,
 )
@@ -24,11 +25,13 @@ from portalab.core.time import Clock
 from portalab.modules.administration import event_types as _event_types  # noqa: F401 — registers event types
 from portalab.modules.administration import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.administration import settings as _settings  # noqa: F401 — declares settings
+from portalab.modules.administration.backup.service import BackupService
 from portalab.modules.administration.config.ports import (
     ConfigI18nPolicyReader,
     ConfigUserLocalePreferenceReader,
 )
 from portalab.modules.administration.config.registry import SettingRegistry
+from portalab.modules.administration.config.rekey import ConfigSecretsRekey
 from portalab.modules.administration.config.service import Change, ConfigService
 from portalab.modules.administration.config.user_prefs import (
     PreferenceErasureParticipant,
@@ -98,6 +101,7 @@ class AdministrationModule:
         self.toggles = ToggleService(database, capabilities, audit, events, clock=clock)
         self.import_export = ImportExportService(self.config, audit, events, clock=clock)
         self.first_run = FirstRunService(database, capabilities, self.config, audit, events, clock=clock)
+        self.backups: BackupService | None = None  # issue 247: set by the wiring (it knows the data folder)
         self.control_center = ControlCenter(capabilities, authorizer, timeout_ms=panel_timeout_ms)
         self.clock = clock
 
@@ -114,6 +118,7 @@ class AdministrationModule:
             CONFIG_WRITER_CAPABILITY, _ConfigWriter(self.config), instance_ref="administration", owner=OWNER
         )
         provide(TOGGLE_WRITER, self.toggles, instance_ref="administration", owner=OWNER)
+        provide(SECRETS_REKEY_CAPABILITY, ConfigSecretsRekey(), instance_ref="administration", owner=OWNER)
         provide(
             LOCALE_READER,
             ConfigUserLocalePreferenceReader(self.config),

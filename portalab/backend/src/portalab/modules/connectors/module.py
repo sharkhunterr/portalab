@@ -4,6 +4,7 @@ from typing import Any
 
 from portalab.capabilities.administration import (
     FIRST_RUN_STEP_CAPABILITY,
+    SECRETS_REKEY_CAPABILITY,
     TOGGLE_HOOK_CAPABILITY,
     AdminSurface,
     default_admin_surfaces,
@@ -32,6 +33,7 @@ from portalab.modules.connectors.permissions import SERVICES_READ
 from portalab.modules.connectors.retention import register_targets
 from portalab.modules.connectors.services.compatibility import CompatibilityToggleHook
 from portalab.modules.connectors.services.manager import ManagerHooks, ServiceManager
+from portalab.modules.connectors.services.rekey import ServiceSecretsRekey
 from portalab.modules.connectors.services.tester import ConnectionTester
 from portalab.modules.connectors.settings import ConnectorsConfig
 from portalab.modules.connectors.sync.reconcile import FieldPriorities
@@ -106,6 +108,9 @@ class ConnectorsModule:
             CompatibilityToggleHook(self.manager.checker, self.manager.connector_key_of),
             instance_ref="connectors",
             owner=OWNER,
+        )
+        self.capabilities.provide(
+            SECRETS_REKEY_CAPABILITY, ServiceSecretsRekey(), instance_ref="connectors", owner=OWNER
         )
         self.capabilities.provide(
             FIRST_RUN_STEP_CAPABILITY,
