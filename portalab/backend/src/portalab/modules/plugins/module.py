@@ -12,7 +12,7 @@ from typing import Any
 
 from sqlalchemy import delete
 
-from portalab.capabilities.administration import TOGGLE_HOOK_CAPABILITY
+from portalab.capabilities.administration import SECRETS_REKEY_CAPABILITY, TOGGLE_HOOK_CAPABILITY
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
@@ -48,6 +48,7 @@ from portalab.modules.plugins.models import ErrorStat
 from portalab.modules.plugins.modules.registry import ModuleRegistry
 from portalab.modules.plugins.observability import log, metrics
 from portalab.modules.plugins.purge.service import Purges
+from portalab.modules.plugins.rekey import PluginSecretsRekey
 from portalab.modules.plugins.resolver.resolver import problems_for
 from portalab.modules.plugins.settings import SETTINGS, PluginsConfig
 from portalab.modules.plugins.store.package import PackageStore
@@ -146,6 +147,12 @@ class PluginsModule:
         ):
             self.capabilities.provide(
                 TOGGLE_HOOK_CAPABILITY, self.modules, instance_ref=INSTANCE, owner=OWNER
+            )
+        if not any(
+            p.instance_ref == INSTANCE for p in self.capabilities.system_providers(SECRETS_REKEY_CAPABILITY)
+        ):
+            self.capabilities.provide(
+                SECRETS_REKEY_CAPABILITY, PluginSecretsRekey(), instance_ref=INSTANCE, owner=OWNER
             )
         default_retention_targets.register(
             RetentionTarget(

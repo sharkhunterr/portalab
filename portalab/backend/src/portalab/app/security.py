@@ -157,6 +157,11 @@ ANONYMOUS_PATHS = frozenset(
         "/api/v1/auth/verify",
         "/api/v1/auth/deletion/cancel",
         "/api/v1/admin/first-run",
+        # issue 247: a new portal's arrival wizard brings a backup in (answered only until it is set up)
+        "/api/v1/admin/first-run/import",
+        "/api/v1/admin/first-run/import/upload",
+        "/api/v1/admin/first-run/import/inspect",
+        "/api/v1/admin/first-run/import/status",
         # issue 159: the site's name, slogan, images and home-screen manifest — the sign-in page shows them
         "/api/v1/auth/site",
         "/api/v1/auth/site/logo",
