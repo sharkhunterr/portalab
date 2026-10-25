@@ -5,36 +5,30 @@ import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
-import { type Archive, type Inspected, percent, type Run, uploadArchive } from "../backup/api";
+import { type Inspected, percent, type Run, uploadArchive } from "../backup/api";
 import { formatBytes } from "../ControlCenter";
 import "../backup/backup.css";
 
 /**
- * Issue 247 — the arrival wizard's import: an archive of another Portalab, sent from the browser or already
- * copied into the server's ``backups`` folder, opened with its passphrase and shown (whose portal, when,
- * how many members, services and packs) before it is brought in. Then its progress; once over, the portal is
+ * Issue 247 — the arrival wizard's import: an archive of another Portalab, sent from the browser (that is
+ * all: the file, then its passphrase), opened and shown (whose portal, when, how many members, services and
+ * packs) before it is brought in. Then its progress; once over, the portal is
  * restarted and its members sign in as before.
  */
 export function ImportArchive({ language }: { language: string }) {
   const t = useT();
-  const ids = { file: useId(), server: useId(), phrase: useId() };
+  const ids = { file: useId(), phrase: useId() };
   const [name, setName] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [sent, setSent] = useState<number | null>(null);
   const [passphrase, setPassphrase] = useState("");
   const [inspected, setInspected] = useState<Inspected | null>(null);
   const [started, setStarted] = useState(false);
-  const server = useQuery({
-    queryKey: ["arrival", "archives"],
-    retry: false,
-    queryFn: async () =>
-      ((await api.GET("/api/v1/admin/first-run/import")).data as unknown as { archives: Archive[] }).archives,
-  });
   const upload = useMutation({
     mutationFn: (file: File) => uploadArchive(file, setSent),
     onSuccess: (received) => {
       setName(received);
       setInspected(null);
-      void server.refetch();
     },
   });
   const inspect = useMutation({
@@ -110,33 +104,24 @@ export function ImportArchive({ language }: { language: string }) {
         accept=".plbackup"
         disabled={upload.isPending}
         onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) upload.mutate(file);
+          const chosen = e.target.files?.[0];
+          if (chosen) {
+            setFile(chosen);
+            setName("");
+            upload.mutate(chosen);
+          }
         }}
       />
       {upload.isPending && sent !== null ? (
         <progress max={1} value={sent} aria-label={t("account:arrival.import.sending")} />
       ) : null}
       {upload.isError ? <p role="alert">{t("account:arrival.import.sendFailed")}</p> : null}
-      {server.data?.length ? (
-        <>
-          <label htmlFor={ids.server}>{t("account:arrival.import.server")}</label>
-          <select
-            id={ids.server}
-            value={name}
-            onChange={(e) => (setName(e.target.value), setInspected(null))}
-          >
-            <option value="">—</option>
-            {server.data.map((a) => (
-              <option key={a.name} value={a.name}>
-                {a.name} ({formatBytes(a.bytes, language)})
-              </option>
-            ))}
-          </select>
-        </>
-      ) : (
-        <p className="field-hint">{t("account:arrival.import.serverHint")}</p>
-      )}
+      {name && file ? (
+        <p role="status" className="arrival-import__sent">
+          <Icon name="check" size={16} />
+          {t("account:arrival.import.sent", { name: file.name, size: formatBytes(file.size, language) })}
+        </p>
+      ) : null}
       <label htmlFor={ids.phrase}>{t("account:arrival.import.passphrase")}</label>
       <input
         id={ids.phrase}
