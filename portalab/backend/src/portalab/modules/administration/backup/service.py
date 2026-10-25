@@ -73,8 +73,9 @@ class BackupService:
         capabilities: CapabilityRegistry,
         audit: AuditSink,
         *,
-        heads: Callable[[], Awaitable[set[str]]],
+        versions: archive.Versions,
         site: Callable[[], Awaitable[str]],
+        portalab: str = "unknown",
     ) -> None:
         self.database = database
         self.data_dir = data_dir
@@ -82,8 +83,9 @@ class BackupService:
         self._key = secret_key
         self.capabilities = capabilities
         self.audit = audit
-        self._heads = heads
+        self.versions = versions
         self._site = site
+        self.portalab = portalab
         self.run: Run | None = None
         self._task: asyncio.Task[None] | None = None
 
@@ -140,17 +142,19 @@ class BackupService:
             raise BackupRefused("Wrong passphrase.", code="backup.wrong_passphrase") from exc
         except (NotAnArchive, BackupError) as exc:
             raise BackupRefused("This file is not a usable Portalab backup.", code="backup.damaged") from exc
-        heads = await self._heads()
+        compatibility = await self.versions.compare(manifest.get("heads", []))
         return {
             "name": name,
             "site": manifest.get("site", ""),
+            "portalab": manifest.get("portalab", "unknown"),
             "created_at": manifest.get("created_at", ""),
             "options": manifest.get("options", {}),
             "counts": manifest.get("counts", {}),
             "tables": len(manifest.get("tables", [])),
             "rows": sum(int(t.get("rows", 0)) for t in manifest.get("tables", [])),
             "folders": manifest.get("folders", []),
-            "compatible": sorted(manifest.get("heads", [])) == sorted(heads),
+            "compatibility": compatibility,  # same | older (upgraded while imported) | newer (refused)
+            "compatible": compatibility != "newer",
         }
 
     # --- running -----------------------------------------------------------------------------------------
@@ -204,8 +208,9 @@ class BackupService:
                 target,
                 passphrase,
                 options=options,
-                heads=await self._heads(),
+                heads=await self.versions.current(),
                 site=site,
+                portalab=self.portalab,
                 progress=self._progress(run),
             )
             summary = {
@@ -231,7 +236,7 @@ class BackupService:
                 path,
                 passphrase,
                 capabilities=self.capabilities,
-                heads=await self._heads(),
+                versions=self.versions,
                 progress=self._progress(run),
             )
             await self._audit(None, "admin.backup_restored", {"name": name, **result})

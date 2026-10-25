@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 from pathlib import Path
 
-from portalab.app.migrations import current_heads
+from portalab.app.backup_versions import SchemaVersions, portalab_version
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.connectors.builtin import register_builtin
 from portalab.core.audit_port import AuditSink, LogAuditSink
@@ -162,6 +162,7 @@ def wire_platform(
     capabilities: CapabilityRegistry,
     secret_key: bytes,
     jobs: JobRegistry | None = None,
+    database_url: str = "",
 ) -> Platform:
     """Production wiring shared by ``serve``, ``worker`` and the CLI."""
     events = EventStorePublisher()
@@ -207,8 +208,9 @@ def wire_platform(
         secret_key,
         capabilities,
         authz.audit,
-        heads=lambda: current_heads(database),
+        versions=SchemaVersions(database, database_url or ""),
         site=site_name,
+        portalab=portalab_version(),
     )
     administration.registry.register_user_validator("ui.theme", ui.themes.choice_errors, owner="module:ui")
     for setting in ui.looks.SETTINGS:  # 027: shop cosmetics (notifications, palette, ambient, celebration)

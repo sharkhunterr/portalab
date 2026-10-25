@@ -158,6 +158,10 @@ export function ImportArchive({ language }: { language: string }) {
               <dd>{inspected.site}</dd>
             </div>
             <div>
+              <dt>{t("account:arrival.import.version")}</dt>
+              <dd>Portalab {inspected.portalab}</dd>
+            </div>
+            <div>
               <dt>{t("account:arrival.import.saved")}</dt>
               <dd>{new Date(inspected.created_at).toLocaleString(language)}</dd>
             </div>
@@ -182,6 +186,11 @@ export function ImportArchive({ language }: { language: string }) {
               </dd>
             </div>
           </dl>
+          {inspected.compatibility === "older" ? (
+            <p className="arrival__lead">
+              {t("account:arrival.import.older", { version: inspected.portalab })}
+            </p>
+          ) : null}
           {inspected.compatible ? (
             <>
               <p className="arrival__lead">{t("account:arrival.import.warning")}</p>
@@ -192,7 +201,7 @@ export function ImportArchive({ language }: { language: string }) {
               {start.isError ? <p role="alert">{error(start.error)}</p> : null}
             </>
           ) : (
-            <p role="alert">{t("account:arrival.import.error.version")}</p>
+            <p role="alert">{t("account:arrival.import.error.newer", { version: inspected.portalab })}</p>
           )}
         </div>
       ) : null}

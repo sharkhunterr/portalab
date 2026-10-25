@@ -43,6 +43,11 @@ def _script() -> ScriptDirectory:
     return ScriptDirectory.from_config(alembic_config("postgresql+asyncpg://unused/unused"))
 
 
+def script() -> ScriptDirectory:
+    """The migrations' tree (every module's revisions), without a database."""
+    return _script()
+
+
 def satisfied_heads(raw: set[str]) -> set[str]:
     """``raw`` version-table heads plus the script heads they already include through ``depends_on``.
 
