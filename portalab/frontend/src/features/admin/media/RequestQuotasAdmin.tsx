@@ -156,10 +156,8 @@ function EditAccount({ account, onSave }: { account: Account; onSave: (limits: L
  * requests every number of days; empty or 0: no limit), then every account with the member it is, what it
  * used and its own limits, changed one by one or for a group at once. Every change is audited.
  */
-export default function RequestQuotasAdmin() {
-  const t = useT();
-  const client = useQueryClient();
-  const overview = useQuery({
+function useOverview() {
+  return useQuery({
     queryKey: KEY,
     retry: false,
     queryFn: async () => {
@@ -168,21 +166,76 @@ export default function RequestQuotasAdmin() {
       return data as unknown as Overview;
     },
   });
-  const [defaults, setDefaults] = useState<Limits | null>(null);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [bulk, setBulk] = useState<Limits>(EMPTY);
-  const done = (data: unknown) => {
+}
+
+function useDone() {
+  const client = useQueryClient();
+  return (data: unknown) => {
     client.setQueryData(KEY, data as Overview);
     void client.invalidateQueries({ queryKey: ["media", "quota"] });
   };
+}
+
+/**
+ * The request service's defaults (Seerr's own limits: films and series, a number of requests every number of
+ * days) — also a step of the arrival wizard and of the setup assistant when Seerr is connected (issue 249).
+ */
+export function RequestQuotaDefaults() {
+  const t = useT();
+  const overview = useOverview();
+  const done = useDone();
+  const [defaults, setDefaults] = useState<Limits | null>(null);
+  const [saved, setSaved] = useState(false);
   const saveDefaults = useMutation({
     mutationFn: async (limits: Limits) =>
       (await api.PUT("/api/v1/admin/media/quotas/defaults", { body: limits })).data,
     onSuccess: (data) => {
       done(data);
       setDefaults(null);
+      setSaved(true);
     },
   });
+  if (!overview.data) return null;
+  const shown = defaults ?? overview.data.defaults ?? EMPTY;
+  return (
+    <AdminSection
+      title={t("media:quotaAdmin.defaults")}
+      description={t("media:quotaAdmin.defaultsHint")}
+      icon="settings"
+    >
+      <LimitsFields
+        value={shown}
+        onChange={(next) => {
+          setSaved(false);
+          setDefaults(next);
+        }}
+        emptyHint={t("media:quota.unlimited")}
+      />
+      {saveDefaults.isError ? (
+        <p role="alert" className="quota-admin__error">
+          {t("media:quotaAdmin.failed")}
+        </p>
+      ) : null}
+      <FormActions>
+        {saved ? <p role="status">{t("media:quotaAdmin.saved")}</p> : null}
+        <Button
+          disabled={!defaults || saveDefaults.isPending}
+          onClick={() => defaults && saveDefaults.mutate(defaults)}
+        >
+          <Icon name="check" size={16} />
+          {t("media:quotaAdmin.save")}
+        </Button>
+      </FormActions>
+    </AdminSection>
+  );
+}
+
+export default function RequestQuotasAdmin() {
+  const t = useT();
+  const overview = useOverview();
+  const [selected, setSelected] = useState<string[]>([]);
+  const [bulk, setBulk] = useState<Limits>(EMPTY);
+  const done = useDone();
   const saveOne = useMutation({
     mutationFn: async ({ account, limits }: { account: string; limits: Limits }) =>
       (
@@ -203,8 +256,7 @@ export default function RequestQuotasAdmin() {
     },
   });
   const data = overview.data;
-  const shown = defaults ?? data?.defaults ?? EMPTY;
-  const failed = saveDefaults.isError || saveOne.isError || saveMany.isError;
+  const failed = saveOne.isError || saveMany.isError;
   return (
     <AdminPage icon="coins" title={t("media:quotaAdmin.title")} description={t("media:quotaAdmin.pitch")}>
       {overview.isPending ? <FunctionalState state="loading" /> : null}
@@ -222,22 +274,7 @@ export default function RequestQuotasAdmin() {
       ) : null}
       {data ? (
         <>
-          <AdminSection
-            title={t("media:quotaAdmin.defaults")}
-            description={t("media:quotaAdmin.defaultsHint")}
-            icon="settings"
-          >
-            <LimitsFields value={shown} onChange={setDefaults} emptyHint={t("media:quota.unlimited")} />
-            <FormActions>
-              <Button
-                disabled={!defaults || saveDefaults.isPending}
-                onClick={() => defaults && saveDefaults.mutate(defaults)}
-              >
-                <Icon name="check" size={16} />
-                {t("media:quotaAdmin.save")}
-              </Button>
-            </FormActions>
-          </AdminSection>
+          <RequestQuotaDefaults />
           {selected.length ? (
             <AdminSection
               title={t("media:quotaAdmin.bulkTitle", { count: selected.length })}

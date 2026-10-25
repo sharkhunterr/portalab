@@ -901,6 +901,7 @@
   "quotaAdmin.pitch": "Les limites du service de demandes (Seerr), réglées d'ici : un nombre de demandes tous les tant de jours, films et séries à part. Chaque modification est journalisée.",
   "quotaAdmin.reached": "Atteint",
   "quotaAdmin.save": "Enregistrer",
+  "quotaAdmin.saved": "Enregistré.",
   "quotaAdmin.title": "Quotas de demandes",
   "quotaAdmin.tv.days": "Séries : tous les (jours)",
   "quotaAdmin.tv.limit": "Séries : demandes",

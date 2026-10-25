@@ -1,5 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { type ReactNode, useId } from "react";
 import { Link, useNavigate } from "react-router";
+import { api } from "../../../api/client";
 import { AdminPage, StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
@@ -7,6 +9,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { PortalFeatures } from "../arrival/FeaturesPicker";
 import { SettingCard, type SettingItem } from "../ConfigEditor";
 import { EmailSettings } from "../communication/EmailSettings";
+import { RequestQuotaDefaults } from "../media/RequestQuotasAdmin";
 import { ServiceAccountsPanel } from "../members/ServiceAccountsPanel";
 import { AddServiceWizard } from "../services/ServicesAdmin";
 import { SiteIdentityAdmin } from "../site/SiteIdentityAdmin";
@@ -36,8 +39,23 @@ function StepSettings({ keys, settings }: { keys: readonly string[]; settings: S
   );
 }
 
+/** Issue 249: with Seerr connected, the request quotas are Seerr's own (the portal's then only stand in). */
+function useSeerr(): boolean {
+  const services = useQuery({
+    queryKey: ["admin", "services"],
+    retry: false,
+    queryFn: async () =>
+      ((await api.GET("/api/v1/services")).data as unknown as { items: Array<{ connector: string }> })
+        .items ?? [],
+  });
+  return (services.data ?? []).some((s) => s.connector === "seerr");
+}
+
 function StepBody({ step, settings }: { step: Step; settings: SettingItem[] }) {
+  const seerr = useSeerr();
+  const quotas = step.key === "media" && seerr;
   const embedded: Partial<Record<StepKey, ReactNode>> = {
+    media: quotas ? <RequestQuotaDefaults /> : null,
     identity: <SiteIdentityAdmin embedded />,
     services: <AddServiceWizard />,
     features: <PortalFeatures />,
@@ -47,7 +65,7 @@ function StepBody({ step, settings }: { step: Step; settings: SettingItem[] }) {
   return (
     <>
       {embedded[step.key] ?? null}
-      {step.settings ? <StepSettings keys={step.settings} settings={settings} /> : null}
+      {step.settings && !quotas ? <StepSettings keys={step.settings} settings={settings} /> : null}
     </>
   );
 }

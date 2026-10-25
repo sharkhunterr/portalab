@@ -901,6 +901,7 @@
   "quotaAdmin.pitch": "The request service's (Seerr) limits, set from here: a number of requests every so many days, films and series apart. Every change is audited.",
   "quotaAdmin.reached": "Reached",
   "quotaAdmin.save": "Save",
+  "quotaAdmin.saved": "Saved.",
   "quotaAdmin.title": "Request quotas",
   "quotaAdmin.tv.days": "Series: every (days)",
   "quotaAdmin.tv.limit": "Series: requests",
