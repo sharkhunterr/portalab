@@ -2,8 +2,13 @@
    step its real settings and screens, then the way forward. Theme tokens only. */
 .setup {
   display: grid;
+  /* one column on a phone that never grows past the screen: the steps' row scrolls within it */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-6);
   align-items: start;
+}
+.setup__steps {
+  min-inline-size: 0;
 }
 @media (min-width: 60rem) {
   .setup {
