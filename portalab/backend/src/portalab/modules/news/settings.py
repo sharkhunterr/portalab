@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
 
 OWNER = "module:news"
+NEWSLETTER_ON = "news.newsletter.enabled"
 
 
 @dataclass(frozen=True, slots=True)
@@ -36,6 +37,15 @@ def declare_news_settings(catalog: SettingCatalog = default_catalog) -> None:
                 description=_DESCRIPTIONS[name],
             )
 
+    if NEWSLETTER_ON not in known:  # issue 246: the newsletters may be switched off (the arrival wizard)
+        declare(
+            scope="global",
+            key=NEWSLETTER_ON,
+            schema=bool,
+            default=True,
+            owner=OWNER,
+            description="Newsletters on.",
+        )
     if "news.newsletter.optOut" not in known:  # 027: the newsletter channels a member does not want
         declare(
             scope="global",

@@ -8,14 +8,23 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Header, Query, Request, status
 from pydantic import BaseModel, ConfigDict, Field
 
+from portalab.capabilities.config import switched_on
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
-from portalab.core.errors import Unavailable, ValidationFailed
+from portalab.core.errors import NotFound, Unavailable, ValidationFailed
 from portalab.modules.support.incidents.service import IncidentView
 from portalab.modules.support.module import SupportModule
 from portalab.modules.support.permissions import INCIDENTS_MANAGE, INCIDENTS_READ, SERVICES_READ
+from portalab.modules.support.settings import INCIDENTS_ON
 
-router = APIRouter(prefix="/api/v1", tags=["support"])
+
+async def incidents_on(request: Request) -> None:
+    """Issue 246: incidents switched off answer nothing (as an address that does not exist)."""
+    if not await switched_on(request.app.state.capabilities, INCIDENTS_ON):
+        raise NotFound("The incidents are switched off.", code="support.incidents_off")
+
+
+router = APIRouter(prefix="/api/v1", tags=["support"], dependencies=[Depends(incidents_on)])
 
 
 def support_module(request: Request) -> SupportModule:

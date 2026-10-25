@@ -31,6 +31,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.news.articles import ArticleInput, ArticleService
 from portalab.modules.news.models import Article, Category, NewsletterSchedule
 from portalab.modules.news.permissions import NEWS_READ
+from portalab.modules.news.settings import NEWSLETTER_ON
 
 OPT_OUT = "news.newsletter.optOut"
 CATEGORY = "news.newsletter"
@@ -190,6 +191,8 @@ class Newsletters:
             category = await session.get(Category, row.category_id) if row.category_id else None
         if category is None or not category.newsletter or row.audience.get("mode", "all") != "all":
             return 0  # only channels sent by e-mail, to everyone who may read them
+        if not await self._setting(NEWSLETTER_ON, True):
+            return 0  # issue 246: the newsletters are switched off
         notify = _provider(self.capabilities, NOTIFY)
         contact = _provider(self.capabilities, CONTACT)
         if notify is None or contact is None:
@@ -359,6 +362,8 @@ class Newsletters:
         return article
 
     async def run_due(self) -> int:
+        if not await self._setting(NEWSLETTER_ON, True):
+            return 0  # issue 246: the newsletters are switched off
         now = utc_now(self.clock)
         async with self.database.session() as session:
             due = list(
