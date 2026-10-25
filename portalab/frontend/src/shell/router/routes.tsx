@@ -1,5 +1,6 @@
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, type RouteObject, redirect } from "react-router";
+import { FunctionalState } from "../../design-system/FunctionalState";
 import type { RouteHandle } from "./handle";
 import { RouteErrorElement } from "./RouteBoundary";
 
@@ -27,6 +28,7 @@ const Observability = lazy(() => import("../../pages/admin/ObservabilityRoute"))
 const Logs = lazy(() => import("../../pages/admin/LogsRoute"));
 const Site = lazy(() => import("../../pages/admin/SiteRoute")); // issue 159
 const SetupAssistant = lazy(() => import("../../features/admin/setup/SetupAssistant"));
+const ArrivalContinue = lazy(() => import("../../features/admin/arrival/ArrivalContinue")); // issue 249
 const BackupsAdmin = lazy(() => import("../../features/admin/backup/BackupsAdmin"));
 const SystemVersion = lazy(() => import("../../features/admin/backup/SystemVersion"));
 const Incidents = lazy(() => import("../../features/support/incidents/IncidentsPage"));
@@ -120,6 +122,16 @@ const h = (handle: RouteHandle) => handle;
 
 export function routes(shell: RouteObject["element"]): RouteObject[] {
   return [
+    {
+      // issue 249: the arrival wizard, signed in — a page of its own, never inside the portal's shell
+      path: "/setup",
+      errorElement: <RouteErrorElement />,
+      element: (
+        <Suspense fallback={<FunctionalState state="loading" detail="Portalab" />}>
+          <ArrivalContinue />
+        </Suspense>
+      ),
+    },
     {
       path: "/",
       element: shell,

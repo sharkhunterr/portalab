@@ -140,7 +140,7 @@ describe("admin screens", () => {
     await expectAccessible(container);
   });
 
-  it("arrival wizard (issue 246): language, installation, features, administrator, then everything at once", async () => {
+  it("arrival wizard (issues 246, 249): language, installation, identity, features, administrator, then everything at once", async () => {
     const calls: Array<{ method: string; path: string; body: unknown }> = [];
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;
@@ -165,13 +165,6 @@ describe("admin screens", () => {
         ]);
       return json(200, {});
     };
-    const assign = vi.fn();
-    vi.stubGlobal("location", {
-      ...globalThis.location,
-      assign,
-      pathname: "/setup",
-      origin: "https://portal.test",
-    });
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     });
@@ -190,6 +183,10 @@ describe("admin screens", () => {
     fireEvent.click(screen.getByRole("button", { name: /New installation/ }));
     await expectAccessible(container);
     fireEvent.click(screen.getByRole("button", { name: /Continue/ }));
+    // issue 249: the portal's name, before anything else
+    fireEvent.change(await screen.findByLabelText("Portal name"), { target: { value: "Xenoportal" } });
+    await expectAccessible(container);
+    fireEvent.click(screen.getByRole("button", { name: /Continue/ }));
     fireEvent.click(await screen.findByRole("checkbox", { name: /Wiki/ }));
     expect(screen.getByRole("checkbox", { name: /Wiki/ })).not.toBeChecked();
     fireEvent.click(screen.getByRole("checkbox", { name: /XP, levels/ }));
@@ -198,18 +195,100 @@ describe("admin screens", () => {
     fireEvent.click(screen.getByRole("button", { name: /Continue/ }));
     fireEvent.change(await screen.findByLabelText("Login"), { target: { value: "Admin" } });
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "a-strong-password" } });
+    // the password typed twice: a different one keeps the step
+    fireEvent.change(screen.getByLabelText("Confirm the password"), {
+      target: { value: "a-strong-passwork" },
+    });
+    expect(screen.getByText("The two passwords are not the same.")).toBeInTheDocument();
+    fireEvent.submit(container.querySelector("#arrival-admin") as HTMLFormElement);
+    expect(screen.getByRole("alert")).toHaveTextContent("The two passwords are not the same.");
+    fireEvent.change(screen.getByLabelText("Confirm the password"), {
+      target: { value: "a-strong-password" },
+    });
+    expect(screen.getByText("The passwords match.")).toBeInTheDocument();
     await expectAccessible(container);
     fireEvent.click(screen.getByRole("button", { name: /Continue/ }));
     expect(await screen.findByRole("heading", { name: "Ready to create the portal" })).toBeInTheDocument();
+    expect(screen.getByText("Xenoportal", { selector: "strong" })).toBeInTheDocument();
     expect(calls.some((c) => c.method !== "GET")).toBe(false); // nothing written before the last step
     fireEvent.click(screen.getByRole("button", { name: /Create the portal/ }));
-    await vi.waitFor(() => expect(assign).toHaveBeenCalledWith("/admin/setup"));
+    // the waiting screens: the ring, the tasks, until it is all in place
+    expect(await screen.findByRole("progressbar", { name: "Setting up the portal" })).toBeInTheDocument();
+    expect(await screen.findByText("All set!")).toBeInTheDocument();
+    await expectAccessible(container);
     const created = calls.find((c) => c.method === "POST" && c.path === "/api/v1/admin/first-run");
-    expect(created?.body).toMatchObject({ login: "admin", settings: { "i18n.defaultLanguage": "en" } });
+    expect(created?.body).toMatchObject({
+      login: "admin",
+      settings: { "i18n.defaultLanguage": "en", "admin.setup.progress": { arrival: { step: "services" } } },
+    });
     expect(calls.some((c) => c.path === "/api/v1/auth/login")).toBe(true);
+    const site = calls.find((c) => c.method === "PUT" && c.path === "/api/v1/admin/site");
+    expect(site?.body).toMatchObject({ name: "Xenoportal" });
     const disabled = calls.filter((c) => c.path === "/api/v1/admin/modules" && c.method === "PUT");
     expect(disabled.map((c) => (c.body as { key: string }).key)).toEqual(["wiki"]);
-    vi.unstubAllGlobals();
+  });
+  it("arrival wizard signed in (issue 249): who may join, then the portal opens behind its waiting screens", async () => {
+    const calls: Array<{ method: string; path: string; body: unknown }> = [];
+    let progress: Record<string, unknown> = { done: ["account"], arrival: { step: "access" } };
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      const body = request.method === "GET" ? null : await request.json().catch(() => null);
+      calls.push({ method: request.method, path, body });
+      if (path === "/api/v1/auth/site") return json(200, { name: "Xenoportal" });
+      if (path === "/api/v1/admin/config" && request.method === "PUT") {
+        const change = (body as { changes: Array<{ key: string; value: unknown }> }).changes[0];
+        if (change?.key === "admin.setup.progress") progress = change.value as Record<string, unknown>;
+        return json(200, {});
+      }
+      if (path === "/api/v1/admin/config")
+        return json(200, {
+          settings: [
+            { key: "admin.setup.progress", value: progress, source: "global" },
+            { key: "identity.registrationMode", value: "invite_only", source: "default" },
+          ],
+        });
+      if (path === "/api/v1/services") return json(200, { items: [] });
+      return json(200, {});
+    };
+    const { ArrivalContinue } = await import("../../src/features/admin/arrival/ArrivalContinue");
+    const { Routes, Route } = await import("react-router");
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    });
+    const { container } = render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={["/setup"]}>
+          <Routes>
+            <Route path="/setup" element={<ArrivalContinue />} />
+            <Route path="/" element={<p>the portal</p>} />
+            <Route path="/admin/setup" element={<p>the setup assistant</p>} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    expect(await screen.findByRole("heading", { name: "Who may join the portal" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /By invitation/ })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: /Open sign-up/ }));
+    await vi.waitFor(() =>
+      expect(
+        calls.some(
+          (c) =>
+            c.method === "PUT" &&
+            JSON.stringify(c.body).includes('"identity.registrationMode","value":"open"'),
+        ),
+      ).toBe(true),
+    );
+    await expectAccessible(container);
+    fireEvent.click(screen.getByRole("button", { name: /Skip/ })); // the e-mail: later
+    fireEvent.click(await screen.findByRole("button", { name: /Skip/ }));
+    expect(await screen.findByRole("heading", { name: "Everything is ready" })).toBeInTheDocument();
+    expect(screen.getByText("no service yet")).toBeInTheDocument();
+    await expectAccessible(container);
+    fireEvent.click(screen.getByRole("button", { name: /Open my portal/ }));
+    expect(await screen.findByText("Welcome to Xenoportal!")).toBeInTheDocument();
+    expect(await screen.findByText("the portal", {}, { timeout: 3000 })).toBeInTheDocument();
+    expect(progress).toMatchObject({ arrival: { step: "open" }, step: "summary" });
+    expect((progress.arrival as { finished_at?: string }).finished_at).toBeTruthy();
   });
   it("version page (issue 247): what runs here, and the reset only once the portal's name is typed", async () => {
     fake.handler = (request) => {

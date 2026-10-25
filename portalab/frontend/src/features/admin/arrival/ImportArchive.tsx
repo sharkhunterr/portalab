@@ -7,7 +7,18 @@ import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { type Inspected, percent, type Run, uploadArchive } from "../backup/api";
 import { formatBytes } from "../ControlCenter";
+import { holdArrival } from "./hold";
+import { Launch } from "./Launch";
 import "../backup/backup.css";
+
+const IMPORT_PHASES = ["reading", "schema", "tables", "upgrade", "files"] as const;
+const UPGRADE_ONLY = new Set<string>(["schema", "upgrade"]); // an archive of an older Portalab
+const IMPORT_SLIDES: ReadonlyArray<readonly [icon: string, key: string]> = [
+  ["users", "members"],
+  ["server", "services"],
+  ["shield", "secrets"],
+  ["sparkles", "after"],
+];
 
 /**
  * Issue 247 — the arrival wizard's import: an archive of another Portalab, sent from the browser (that is
@@ -39,7 +50,10 @@ export function ImportArchive({ language }: { language: string }) {
   });
   const start = useMutation({
     mutationFn: async () => api.POST("/api/v1/admin/first-run/import", { body: { name, passphrase } }),
-    onSuccess: () => setStarted(true),
+    onSuccess: () => {
+      holdArrival(true); // issue 249: the portal set up at the end, the wizard stays until then
+      setStarted(true);
+    },
   });
   const status = useQuery({
     queryKey: ["arrival", "import-status"],
@@ -54,41 +68,55 @@ export function ImportArchive({ language }: { language: string }) {
       ? t(`account:arrival.import.error.${e.code.replace("backup.", "")}`)
       : t("account:arrival.error");
 
-  if (run && run.state === "done") {
-    return (
-      <div className="arrival-import" role="status">
-        <h3>
-          <Icon name="check" size={18} /> {t("account:arrival.import.done")}
-        </h3>
-        <p>{t("account:arrival.import.restart")}</p>
-        <p>
-          <a className="ds-button ds-button--primary" href="/">
-            {t("account:arrival.signIn")}
-          </a>
-        </p>
-      </div>
-    );
-  }
   if (started) {
+    const phases = IMPORT_PHASES.filter((p) => inspected?.compatibility === "older" || !UPGRADE_ONLY.has(p));
+    const at =
+      run?.state === "done"
+        ? phases.length
+        : phases.indexOf((run?.phase ?? "reading") as (typeof phases)[number]);
+    const failed = run?.state === "failed";
     return (
-      <div className="arrival-import">
-        {run && run.state === "failed" ? (
+      <Launch
+        title={t(run?.state === "done" ? "account:arrival.import.done" : "account:arrival.import.running")}
+        lead={inspected ? t("account:arrival.import.from", { site: inspected.site }) : undefined}
+        tasks={phases.map((phase, index) => ({
+          key: phase,
+          label: t(`account:arrival.import.phase.${phase}`),
+          state:
+            index < at
+              ? "done"
+              : index === at || (at < 0 && index === 0)
+                ? failed
+                  ? "failed"
+                  : "running"
+                : "waiting",
+        }))}
+        percent={run ? percent(run) : 0}
+        slides={IMPORT_SLIDES.map(([icon, key]) => ({
+          icon,
+          title: t(`account:arrival.import.slide.${key}.title`),
+          text: t(`account:arrival.import.slide.${key}.text`),
+        }))}
+        failed={failed}
+        done={run?.state === "done"}
+      >
+        {failed ? (
           <p role="alert">
-            {t(`account:arrival.import.error.${(run.error?.code ?? "backup.failed").replace("backup.", "")}`)}
+            {t(
+              `account:arrival.import.error.${(run?.error?.code ?? "backup.failed").replace("backup.", "")}`,
+            )}
           </p>
-        ) : (
-          <div className="backup-run" role="status">
-            <span className="backup-run__label">
-              {t(`account:arrival.import.phase.${run?.phase ?? "starting"}`)} — {run ? percent(run) : 0} %
-            </span>
-            <progress
-              max={100}
-              value={run ? percent(run) : 0}
-              aria-label={t("account:arrival.import.progress")}
-            />
+        ) : run?.state === "done" ? (
+          <div className="launch__error" role="status">
+            <p>{t("account:arrival.import.restart")}</p>
+            <p>
+              <a className="ds-button ds-button--primary" href="/">
+                {t("account:arrival.signIn")}
+              </a>
+            </p>
           </div>
-        )}
-      </div>
+        ) : null}
+      </Launch>
     );
   }
   const submit = (event: FormEvent) => {
