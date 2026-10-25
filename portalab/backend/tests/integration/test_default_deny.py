@@ -33,6 +33,8 @@ ALLOW_LISTED = {
     "/api/v1/auth/site/logo",
     "/api/v1/auth/site/icon",
     "/api/v1/auth/site/manifest",
+    "/api/v1/i18n/public/languages",  # issue 246: the arrival wizard and sign-in in the visitor's language
+    "/api/v1/i18n/public/catalogs/{namespace}",
     "/api/v1/media/remote/{ticket}/session/{path:path}",  # 027 (#11): a cast device's stream
     "/api/v1/admin/first-run",  # spec 020: public only until the sole Admin exists
     "/metrics",  # spec 025: disabled by default; own token/permission check
