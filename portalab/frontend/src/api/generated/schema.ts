@@ -11424,8 +11424,10 @@ export interface components {
         };
         /** ApplyIn */
         ApplyIn: {
+            /** Packs */
+            packs?: string[] | null;
             /** Parts */
-            parts?: ("shop" | "settings" | "curve" | "rules" | "achievements" | "quests" | "campaigns")[];
+            parts?: ("shop" | "packs" | "settings" | "curve" | "rules" | "achievements" | "quests" | "campaigns")[];
             /** Preset */
             preset?: "lan" | null;
             /** Setup */

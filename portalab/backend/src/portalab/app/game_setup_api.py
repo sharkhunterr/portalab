@@ -2,7 +2,7 @@
 one applied (a shipped one, or one taken from another portal). Applying changes the play, the campaigns, the
 shop and the visual packs, so it needs those administrations."""
 
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, get_args
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, ConfigDict, Field
@@ -29,7 +29,12 @@ Platform = Annotated[Any, Depends(_platform)]
 
 @router.get("/admin/game/presets")
 async def presets(_: Manager) -> list[dict[str, Any]]:
-    return [{"key": key, "counts": game_setup.counts(game_setup.preset(key))} for key in game_setup.PRESETS]
+    out = []
+    for key in game_setup.PRESETS:
+        setup = game_setup.preset(key)
+        packs = [str(p) for p in (setup.get("shop") or {}).get("packs") or []]  # installed a few at a time
+        out.append({"key": key, "counts": game_setup.counts(setup), "packs": packs})
+    return out
 
 
 @router.get("/admin/game/setup")
@@ -37,8 +42,8 @@ async def current(_: Manager, platform: Platform) -> dict[str, Any]:
     return await game_setup.export(platform)
 
 
-Part = Literal["shop", "settings", "curve", "rules", "achievements", "quests", "campaigns"]
-PARTS: tuple[Part, ...] = ("shop", "settings", "curve", "rules", "achievements", "quests", "campaigns")
+Part = Literal["shop", "packs", "settings", "curve", "rules", "achievements", "quests", "campaigns"]
+PARTS: tuple[Part, ...] = get_args(Part)
 
 
 class ApplyIn(BaseModel):
@@ -46,6 +51,7 @@ class ApplyIn(BaseModel):
     preset: Literal["lan"] | None = None
     setup: dict[str, Any] | None = None
     parts: list[Part] = Field(default_factory=lambda: list(PARTS))
+    packs: list[str] | None = Field(default=None, max_length=500)  # the packs part for these packs only
 
 
 @router.post("/admin/game/setup")
@@ -64,6 +70,6 @@ async def apply(
     except KeyError as exc:
         raise NotFound("No such game setup.", code="game.preset_not_found") from exc
     try:
-        return await game_setup.apply(platform, principal, setup, tuple(body.parts))
+        return await game_setup.apply(platform, principal, setup, tuple(body.parts), body.packs)
     except ValueError as exc:
         raise ValidationFailed(str(exc), code="game.setup_invalid") from exc

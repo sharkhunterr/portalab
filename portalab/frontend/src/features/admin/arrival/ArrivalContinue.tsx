@@ -33,7 +33,8 @@ import "./arrival.css";
  * its own — the services (Plex, Jellyfin, Seerr…), the members' accounts on them, who may join, the e-mail,
  * the portal's look, play and the shop, the AI assistant (the last two only when their feature is kept) —
  * each one skippable, where it is kept by the server (``admin.setup.progress.arrival``, so a reload resumes
- * it). Then the last checks behind the waiting screens, and the portal opens. Once finished, ``/setup`` is
+ * it). Then the last checks behind the waiting screens — and the visual packs of the recommended install, put in
+ * place there rather than at the game step, a few at a time — and the portal opens. Once finished, ``/setup`` is
  * the setup assistant's (``/admin/setup``) to come back to.
  */
 type Step = Configure | "open";
@@ -344,6 +345,33 @@ function AppearanceStep() {
 }
 
 const OPEN_TASKS = ["save", "navigation", "services", "home"] as const;
+const PACKS_AT_ONCE = 5; // a request per few packs: the ring follows them, none runs for minutes
+const OPEN_WEIGHTS = { packs: 12 }; // a minute or so, where the other tasks take a moment
+
+/** The recommended install's visual packs, a few at a time; those not installed (an extension they dress is
+ * missing…) said, never fatal. */
+export async function installPacks(
+  progress: (share: number, detail?: string | null) => void,
+): Promise<string[]> {
+  const presets = (await api.GET("/api/v1/admin/game/presets")).data as unknown as Array<{
+    key: string;
+    packs?: string[];
+  }>;
+  const packs = (Array.isArray(presets) ? presets : []).find((p) => p.key === "lan")?.packs ?? [];
+  const missed: string[] = [];
+  for (let start = 0; start < packs.length; start += PACKS_AT_ONCE) {
+    progress(start / packs.length, `${start}/${packs.length}`);
+    const batch = packs.slice(start, start + PACKS_AT_ONCE);
+    const { data, error } = await api.POST("/api/v1/admin/game/setup", {
+      body: { preset: "lan", parts: ["packs"], packs: batch } as never,
+    });
+    if (error) throw error;
+    const report = data as unknown as { skipped: Array<{ part: string; key: string }> };
+    for (const s of report.skipped ?? []) if (s.key.startsWith("pack ")) missed.push(s.key.slice(5));
+  }
+  progress(1, `${packs.length}/${packs.length}`);
+  return missed;
+}
 
 /** What is ready, then the last checks behind the waiting screens, and the portal opens. */
 function Open({
@@ -363,12 +391,18 @@ function Open({
   const client = useQueryClient();
   const titleId = useId();
   const services = useServices();
-  const { states, percent, run, finished } = useTasks(OPEN_TASKS);
+  const game = progress.arrival?.game;
+  const [tasks] = useState<readonly string[]>(() =>
+    game === "lan" || game === "tune" ? ["packs", ...OPEN_TASKS] : OPEN_TASKS,
+  );
+  const { states, percent, detail, run, finished } = useTasks(tasks, OPEN_WEIGHTS);
+  const [missed, setMissed] = useState<string[]>([]);
   const slides = useArrivalSlides(ALL_FEATURES);
   const opened = useRef(false);
   const open = useMutation({
     mutationFn: async () => {
       opened.current = true;
+      if (tasks.includes("packs")) setMissed(await run("packs", installPacks)); // before the wizard ends
       await run("save", async () => {
         const now = new Date().toISOString();
         await save({
@@ -390,10 +424,10 @@ function Open({
     },
   });
   useEffect(() => {
-    if (!finished) return;
+    if (!finished || missed.length) return; // a pack not installed: said, the way in left to the button
     const timer = setTimeout(() => navigate("/", { replace: true }), 1600);
     return () => clearTimeout(timer);
-  }, [finished, navigate]);
+  }, [finished, missed.length, navigate]);
   if (opened.current || open.isPending || open.isSuccess) {
     return (
       <section className="arrival-card arrival-card--launch" aria-label={t("account:arrival.open.launching")}>
@@ -403,9 +437,10 @@ function Open({
               ? t("account:arrival.open.welcome", { name: site.name })
               : t("account:arrival.open.launching")
           }
-          tasks={OPEN_TASKS.map((key) => ({
+          tasks={tasks.map((key) => ({
             key,
             label: t(`account:arrival.open.task.${key}`),
+            detail: states[key] === "running" ? detail : null,
             state: states[key] ?? "waiting",
           }))}
           percent={percent}
@@ -422,12 +457,20 @@ function Open({
               </Button>
             </div>
           ) : finished ? (
-            <p>
-              <Button onClick={() => navigate("/", { replace: true })}>
-                {t("account:arrival.open.enter")}
-                <Icon name="chevron-right" size={16} />
-              </Button>
-            </p>
+            <>
+              {missed.length ? (
+                <p className="arrival__note">
+                  <Icon name="info" size={16} />
+                  {t("account:arrival.game.packs", { count: missed.length, packs: missed.join(", ") })}
+                </p>
+              ) : null}
+              <p>
+                <Button onClick={() => navigate("/", { replace: true })}>
+                  {t("account:arrival.open.enter")}
+                  <Icon name="chevron-right" size={16} />
+                </Button>
+              </p>
+            </>
           ) : null}
         </Launch>
       </section>

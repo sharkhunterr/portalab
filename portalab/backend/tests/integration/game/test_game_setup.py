@@ -2,7 +2,9 @@
 level curve and rewards, achievements, quests and campaigns in place, through the modules' own services; what
 the shop does not sell is said, never fatal; a second application changes nothing; the portal's setup then
 reads back as the one applied. The shop comes with it: Portalab's catalog, the packs switched on or installed
-(their products stay theirs), the products the administrators made and the scenes their boosters wear."""
+(their products stay theirs), the products the administrators made and the scenes their boosters wear. The
+packs are a part of their own: the arrival wizard installs them when the portal opens, a few at a time, and a
+level's reward that names one of their products keeps it in the meantime."""
 
 import secrets
 import shutil
@@ -41,7 +43,7 @@ async def test_the_lan_setup_on_a_fresh_portal(database: Database, tmp_path: Pat
     lan = game_setup.preset("lan")
     assert lan["format"] == game_setup.FORMAT and lan["rules"] and lan["achievements"]
     assert lan["shop"]["catalog"] and lan["shop"]["packs"] and lan["shop"]["products"]
-    play = tuple(p for p in game_setup.PARTS if p != "shop")  # the shop: its own test, on fewer packs
+    play = tuple(p for p in game_setup.PARTS if p not in ("shop", "packs"))  # their own test, fewer packs
 
     first = await game_setup.apply(platform, actor, lan, play)
     fatal = [s for s in first["skipped"] if s["reason"] != "product not in this shop"]
@@ -94,8 +96,21 @@ async def test_the_shop_comes_with_the_recommended_install(
     }
     setup = {"format": game_setup.FORMAT, "version": game_setup.VERSION, "shop": shop}
 
-    first = await game_setup.apply(platform, actor, setup)
-    assert first["skipped"] == [{"part": "shop", "key": "pack nowhere", "reason": "pack not shipped"}]
+    # the game step: the shop, the packs left for the opening; a level's reward of a pack's product kept
+    academy = sorted(await platform.visuals.packs.product_keys())[0]
+    setup["settings"] = {"economy.levelRewards": [{"level": 5, "coins": 10, "xp": 0, "product": academy}]}
+    game = await game_setup.apply(platform, actor, setup, ("shop", "settings"))
+    assert game["skipped"] == [] and game["applied"]["packs"] == 0
+    assert platform.gamification.config.level_rewards[0]["product"] == academy
+    states = {p["id"]: p["state"] for p in await platform.visuals.packs.listing()}
+    assert states["portalab-academy"] == "disabled"
+
+    # the opening: the packs a few at a time, each one's scene with it
+    first = await game_setup.apply(platform, actor, setup, ("packs",), ["nowhere", "portalab-academy"])
+    assert first["skipped"] == [{"part": "packs", "key": "pack nowhere", "reason": "pack not shipped"}]
+    assert first["applied"]["packs"] == 1  # academy switched on; mediacards and its scene not yet
+    second = await game_setup.apply(platform, actor, setup, ("packs",), ["mediacards"])
+    assert second["skipped"] == [] and second["applied"]["packs"] == 2  # installed, then its scene
     catalog = platform.marketplace.catalog
     sold = {p.key: p for p, _ in await catalog.listing(states=("available", "unavailable"))}
     assert {p["key"] for p in SHOP} <= set(sold)  # Portalab's own catalog
