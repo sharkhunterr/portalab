@@ -1746,6 +1746,7 @@
   "system.revision": "Révision",
   "system.schema": "Schéma par module",
   "system.schemaHint": "La dernière migration de chaque module : ce qu'une sauvegarde enregistre, pour être reprise dans un autre portail.",
+  "system.schemaShow": "{count, plural, one {Voir le module} other {Voir les # modules}}",
   "system.started": "En marche depuis",
   "system.subtitle": "Quel Portalab tourne ici, le schéma de chacun de ses modules — et repartir de zéro.",
   "system.title": "Version",

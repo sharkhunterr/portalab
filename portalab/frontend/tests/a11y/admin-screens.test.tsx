@@ -228,6 +228,7 @@ describe("admin screens", () => {
     };
     const { container } = render(withClient(<MemoryRouter>{<SystemVersion />}</MemoryRouter>));
     expect(await screen.findByText("0.1.0")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Show the module"));
     expect(screen.getByText("identity_0007")).toBeInTheDocument();
     const go = screen.getByRole("button", { name: /Erase everything/ });
     expect(go).toBeDisabled();

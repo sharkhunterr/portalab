@@ -125,19 +125,22 @@ export function SystemVersion() {
         icon="layers"
         flush
       >
-        <AdminTable
-          label={t("admin:system.schema")}
-          rows={v?.schema ?? []}
-          rowKey={(row) => row.revision}
-          columns={[
-            { key: "module", header: t("admin:system.module"), primary: true, render: (row) => row.module },
-            {
-              key: "revision",
-              header: t("admin:system.revision"),
-              render: (row) => <code>{row.revision}</code>,
-            },
-          ]}
-        />
+        <details className="system-schema">
+          <summary>{t("admin:system.schemaShow", { count: v?.schema.length ?? 0 })}</summary>
+          <AdminTable
+            label={t("admin:system.schema")}
+            rows={v?.schema ?? []}
+            rowKey={(row) => row.revision}
+            columns={[
+              { key: "module", header: t("admin:system.module"), primary: true, render: (row) => row.module },
+              {
+                key: "revision",
+                header: t("admin:system.revision"),
+                render: (row) => <code>{row.revision}</code>,
+              },
+            ]}
+          />
+        </details>
       </AdminSection>
       <AdminSection title={t("admin:system.reset.title")} icon="alert">
         <Reset />
