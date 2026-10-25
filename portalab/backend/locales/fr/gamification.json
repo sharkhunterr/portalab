@@ -621,5 +621,7 @@
   "widget.progress.streak": "{days, plural, one {# jour} other {# jours}} d’affilée",
   "widget.progress.title": "Ma progression",
   "widget.wheel.description": "Une fois par jour, faites tourner la roue : des coins à gagner (ou à perdre), de l’XP, un booster découverte…",
-  "widget.wheel.title": "Roue de la fortune"
+  "widget.wheel.title": "Roue de la fortune",
+  "levelUp.levels": "{count, plural, one {# niveau} other {# niveaux d'un coup}}",
+  "levelUp.byLevel": "Niveau par niveau"
 }

@@ -1211,6 +1211,10 @@
     "advanced": true,
     "group": "security"
   },
+  "shell.levelUp.celebrated": {
+    "advanced": true,
+    "group": "members"
+  },
   "shell.navigation.allowUserOrdering": {
     "advanced": false,
     "group": "general"

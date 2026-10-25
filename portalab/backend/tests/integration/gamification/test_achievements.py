@@ -167,3 +167,22 @@ async def test_some_achievements_unlock_cosmetics(gm: GamHarness) -> None:
     [unlocked] = [a for a in summary["achievements"] if a["key"] == "collector_test"]
     assert [u["product"] for u in unlocked["unlocks"]] == ["badge_completionist", "title_completionist"]
     assert unlocked["rewards"] == [{"value": "coins", "amount": 50}]
+    # issue 248: celebrated when the member comes back two days later, from the last level they saw
+    unlocked_at = gm.clock.now()
+    gm.clock.advance(timedelta(days=2))
+    away = await level_up_summary(
+        gm.database, gm.module.levels, gm.module.achievements, config, user, 3, 1, clock=gm.clock
+    )
+    assert not [a for a in away["achievements"] if a["key"] == "collector_test"]  # live: the last minutes
+    back = await level_up_summary(
+        gm.database,
+        gm.module.levels,
+        gm.module.achievements,
+        config,
+        user,
+        3,
+        1,
+        after=unlocked_at - timedelta(minutes=1),
+        clock=gm.clock,
+    )
+    assert [a["key"] for a in back["achievements"] if a["key"] == "collector_test"] == ["collector_test"]

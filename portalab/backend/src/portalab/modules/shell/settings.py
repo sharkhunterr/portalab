@@ -26,6 +26,8 @@ SETTINGS: tuple[tuple[str, Any, Any, bool, str], ...] = (
     ("shell.onboarding.play", str | None, None, True, "Whether you play: all, without the cards, or not."),
     ("shell.onboarding.stepsHiddenAt", str | None, None, True, "When you put the first steps away."),
     ("shell.onboarding.toursSeen", list[str], [], True, "The guided tours you saw to the end."),
+    # issue 248: the last level-up you saw celebrated ({level, at}) — one reached while away waits for you
+    ("shell.levelUp.celebrated", dict[str, Any] | None, None, True, "The last level-up you saw celebrated."),
 )
 
 

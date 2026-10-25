@@ -14,6 +14,7 @@ from portalab.modules.gamification.models import Balance, UserAchievement
 from portalab.modules.gamification.streaks.level_rewards import parse_rewards
 
 RECENT = timedelta(minutes=10)  # achievements unlocked around the level-up
+CATCH_UP = timedelta(days=7)  # issue 248: at most this far back when the member was away
 
 
 async def level_up_summary(
@@ -25,9 +26,13 @@ async def level_up_summary(
     level: int,
     since_level: int | None = None,
     *,
+    after: datetime | None = None,
     clock: Clock | None = None,
 ) -> dict[str, Any]:
+    """``after``: issue 248 — a level-up celebrated when the member comes back takes the achievements
+    unlocked since the last one they saw (a few days, a week at most), not only those of the last minutes."""
     now: datetime = utc_now(clock)
+    unlocked_since = max(after, now - CATCH_UP) if after is not None else now - RECENT
     previous = max(1, min(level - 1, since_level if since_level is not None else level - 1))
     tiers = [
         {
@@ -47,7 +52,7 @@ async def level_up_summary(
             (
                 await session.execute(
                     select(UserAchievement).where(
-                        UserAchievement.user_id == user, UserAchievement.unlocked_at >= now - RECENT
+                        UserAchievement.user_id == user, UserAchievement.unlocked_at >= unlocked_since
                     )
                 )
             )
