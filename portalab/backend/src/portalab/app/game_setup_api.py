@@ -1,6 +1,6 @@
 """Issue 253 — the game setup's API: the setups Portalab ships (the LAN's), the portal's own as it stands, and
-one applied (a shipped one, or one taken from another portal). Applying changes the play and the campaigns,
-so it needs both administrations."""
+one applied (a shipped one, or one taken from another portal). Applying changes the play, the campaigns, the
+shop and the visual packs, so it needs those administrations."""
 
 from typing import Annotated, Any, Literal
 
@@ -11,6 +11,7 @@ from portalab.app import game_setup
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import NotFound, Unavailable, ValidationFailed
+from portalab.modules.marketplace.permissions import MANAGE as SHOP_MANAGE
 
 router = APIRouter(prefix="/api/v1", tags=["game-setup"])
 Manager = Annotated[Principal, require("gamification.manage")]
@@ -36,8 +37,8 @@ async def current(_: Manager, platform: Platform) -> dict[str, Any]:
     return await game_setup.export(platform)
 
 
-Part = Literal["settings", "curve", "rules", "achievements", "quests", "campaigns"]
-PARTS: tuple[Part, ...] = ("settings", "curve", "rules", "achievements", "quests", "campaigns")
+Part = Literal["shop", "settings", "curve", "rules", "achievements", "quests", "campaigns"]
+PARTS: tuple[Part, ...] = ("shop", "settings", "curve", "rules", "achievements", "quests", "campaigns")
 
 
 class ApplyIn(BaseModel):
@@ -51,6 +52,8 @@ class ApplyIn(BaseModel):
 async def apply(
     principal: Manager,
     _campaigns: Annotated[Principal, require("campaigns.manage")],
+    _shop: Annotated[Principal, require(SHOP_MANAGE)],
+    _visuals: Annotated[Principal, require("visuals.manage")],
     body: ApplyIn,
     platform: Platform,
 ) -> dict[str, Any]:

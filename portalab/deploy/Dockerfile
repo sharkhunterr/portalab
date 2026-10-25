@@ -31,6 +31,8 @@ RUN uv sync --frozen --no-dev
 COPY --from=frontend /build/frontend/dist ./static
 # 028: Portalab's own visual packs (the socle, the universes, the seasons, the HD collections)
 COPY portalab/packs/builtin ./packs/builtin
+# 253: the example packs, extensions the recommended install sets up when the administrator chooses it
+COPY portalab/examples/visual-packs ./packs/examples
 
 RUN useradd --system --uid 10001 --home-dir /app --shell /usr/sbin/nologin portalab \
     && install -d -o 10001 -g 10001 -m 0700 /var/lib/portalab

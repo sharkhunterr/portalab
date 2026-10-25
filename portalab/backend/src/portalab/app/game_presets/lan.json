@@ -11,10 +11,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Unlock ten achievements.",
+        "description": "Débloquez dix succès.",
         "hidden": false,
         "icon": "trophy",
-        "label": "Achievement hunter",
+        "label": "Chasseur de succès",
         "rewards": [
           {
             "amount": 75,
@@ -24,7 +24,7 @@
         "unlocks": [
           {
             "kind": "badge",
-            "label": "Achievement hunter",
+            "label": "Chasseur de succès",
             "product": "badge_achievement_hunter"
           }
         ]
@@ -48,10 +48,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Rate 10 of the assistant's answers.",
+        "description": "Notez 10 réponses de l'assistant.",
         "hidden": false,
         "icon": "thumbs-up",
-        "label": "Critic",
+        "label": "Critique",
         "rewards": [
           {
             "amount": 30,
@@ -77,10 +77,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Get 25 answers from the assistant.",
+        "description": "Obtenez 25 réponses de l'assistant.",
         "hidden": false,
         "icon": "message",
-        "label": "Curious mind",
+        "label": "Esprit curieux",
         "rewards": [
           {
             "amount": 50,
@@ -102,10 +102,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Confirm an action the assistant proposed.",
+        "description": "Confirmez une action proposée par l'assistant.",
         "hidden": false,
         "icon": "check",
-        "label": "Delegator",
+        "label": "Délégateur",
         "rewards": [
           {
             "amount": 25,
@@ -133,10 +133,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Get 20 answers drawn from the portal's own data, with their sources.",
+        "description": "Obtenez 20 réponses tirées des données du portail, avec leurs sources.",
         "hidden": false,
         "icon": "book-open",
-        "label": "Fact checker",
+        "label": "Vérificateur",
         "rewards": [
           {
             "amount": 50,
@@ -158,10 +158,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Ask the assistant your first question.",
+        "description": "Posez votre première question à l'assistant.",
         "hidden": false,
         "icon": "sparkles",
-        "label": "First words",
+        "label": "Premiers mots",
         "rewards": [
           {
             "amount": 10,
@@ -187,10 +187,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Get 250 answers from the assistant.",
+        "description": "Obtenez 250 réponses de l'assistant.",
         "hidden": false,
         "icon": "brain",
-        "label": "Know-it-all",
+        "label": "Je-sais-tout",
         "rewards": [
           {
             "amount": 200,
@@ -222,7 +222,7 @@
             "kind": "event_count"
           }
         ],
-        "description": "Tell the assistant three times what you expected from an answer.",
+        "description": "Dites trois fois à l'assistant ce que vous attendiez d'une réponse.",
         "hidden": false,
         "icon": "lightbulb",
         "label": "Mentor",
@@ -251,10 +251,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Get one of the assistant's capacities in the shop.",
+        "description": "Obtenez une des capacités de l'assistant dans la boutique.",
         "hidden": false,
         "icon": "zap",
-        "label": "Power user",
+        "label": "Utilisateur averti",
         "rewards": [
           {
             "amount": 25,
@@ -282,10 +282,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Listen to an audiobook to the end.",
+        "description": "Écoutez un livre audio jusqu'au bout.",
         "hidden": false,
         "icon": "headphones",
-        "label": "All ears",
+        "label": "Tout ouïe",
         "rewards": [
           {
             "amount": 20,
@@ -307,10 +307,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Cast a film or an episode to a TV from the portal.",
+        "description": "Diffusez un film ou un épisode sur une TV depuis le portail.",
         "hidden": false,
         "icon": "cast",
-        "label": "Big screen",
+        "label": "Grand écran",
         "rewards": [
           {
             "amount": 20,
@@ -320,7 +320,7 @@
         "unlocks": [
           {
             "kind": "badge",
-            "label": "Big screen",
+            "label": "Grand écran",
             "product": "badge_big_screen"
           }
         ]
@@ -338,10 +338,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Buy 25 things in the shop.",
+        "description": "Achetez 25 articles dans la boutique.",
         "hidden": false,
         "icon": "gem",
-        "label": "Big spender",
+        "label": "Flambeur",
         "rewards": [
           {
             "amount": 100,
@@ -351,7 +351,7 @@
         "unlocks": [
           {
             "kind": "title",
-            "label": "Big spender",
+            "label": "Flambeur",
             "product": "title_big_spender"
           }
         ]
@@ -369,10 +369,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Finish 50 films or episodes.",
+        "description": "Terminez 50 films ou épisodes.",
         "hidden": false,
         "icon": "tv",
-        "label": "Binge-watcher",
+        "label": "Marathonien",
         "rewards": [
           {
             "amount": 40,
@@ -400,10 +400,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Finish ten books.",
+        "description": "Terminez dix livres.",
         "hidden": false,
         "icon": "library",
-        "label": "Bookworm",
+        "label": "Rat de bibliothèque",
         "rewards": [
           {
             "amount": 60,
@@ -417,7 +417,7 @@
         "unlocks": [
           {
             "kind": "badge",
-            "label": "Bookworm",
+            "label": "Rat de bibliothèque",
             "product": "badge_bookworm"
           }
         ]
@@ -435,10 +435,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Send three pieces of feedback.",
+        "description": "Envoyez trois retours.",
         "hidden": false,
         "icon": "bug",
-        "label": "Bug hunter",
+        "label": "Chasseur de bugs",
         "rewards": [
           {
             "amount": 3,
@@ -448,7 +448,7 @@
         "unlocks": [
           {
             "kind": "badge",
-            "label": "Bug hunter",
+            "label": "Chasseur de bugs",
             "product": "badge_bug_hunter"
           }
         ]
@@ -634,10 +634,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Tune in to live TV.",
+        "description": "Regardez la TV en direct.",
         "hidden": false,
         "icon": "radio",
-        "label": "Channel surfer",
+        "label": "Zappeur",
         "rewards": [
           {
             "amount": 10,
@@ -659,10 +659,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Finish 500 films or episodes.",
+        "description": "Terminez 500 films ou épisodes.",
         "hidden": false,
         "icon": "clapperboard",
-        "label": "Five hundred screenings",
+        "label": "Cinq cents séances",
         "rewards": [
           {
             "amount": 300,
@@ -672,7 +672,7 @@
         "unlocks": [
           {
             "kind": "title",
-            "label": "Five hundred screenings",
+            "label": "Cinq cents séances",
             "product": "title_five_hundred"
           }
         ]
@@ -690,10 +690,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Own three items from the shop.",
+        "description": "Possédez trois articles de la boutique.",
         "hidden": false,
         "icon": "star",
-        "label": "Collector",
+        "label": "Petit collectionneur",
         "rewards": [
           {
             "amount": 40,
@@ -715,10 +715,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Buy 150 things in the shop — nearly the whole catalog.",
+        "description": "Achetez 150 articles dans la boutique — presque tout le catalogue.",
         "hidden": false,
         "icon": "gem",
-        "label": "The Collector",
+        "label": "Le Collectionneur",
         "rewards": [
           {
             "amount": 500,
@@ -728,12 +728,12 @@
         "unlocks": [
           {
             "kind": "badge",
-            "label": "The Collector",
+            "label": "Le Collectionneur",
             "product": "badge_completionist"
           },
           {
             "kind": "title",
-            "label": "The Collector",
+            "label": "Le Collectionneur",
             "product": "title_completionist"
           }
         ]
@@ -751,10 +751,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Rearrange your dashboard five times.",
+        "description": "Réorganisez votre tableau de bord cinq fois.",
         "hidden": false,
         "icon": "dashboard",
-        "label": "Interior decorator",
+        "label": "Décorateur d'intérieur",
         "rewards": [
           {
             "amount": 20,
@@ -782,10 +782,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Drop by the portal on 365 days.",
+        "description": "Passez sur le portail 365 jours.",
         "hidden": false,
         "icon": "calendar",
-        "label": "Faithful",
+        "label": "Constance",
         "rewards": [
           {
             "amount": 250,
@@ -795,7 +795,7 @@
         "unlocks": [
           {
             "kind": "avatar_frame",
-            "label": "Faithful orbit frame",
+            "label": "Cadre orbital de la constance",
             "product": "frame_faithful"
           }
         ]
@@ -813,10 +813,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Buy something in the shop.",
+        "description": "Achetez quelque chose dans la boutique.",
         "hidden": false,
         "icon": "shop",
-        "label": "First purchase",
+        "label": "Premier achat",
         "rewards": [
           {
             "amount": 20,
@@ -838,10 +838,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Sign in to the portal for the first time.",
+        "description": "Connectez-vous au portail pour la première fois.",
         "hidden": false,
         "icon": "sparkles",
-        "label": "First steps",
+        "label": "Premiers pas",
         "rewards": [
           {
             "amount": 10,
@@ -863,10 +863,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Request a film or a series.",
+        "description": "Demandez un film ou une série.",
         "hidden": false,
         "icon": "inbox",
-        "label": "First wish",
+        "label": "Premier souhait",
         "rewards": [
           {
             "amount": 15,
@@ -888,10 +888,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Finish 250 films or episodes.",
+        "description": "Terminez 250 films ou épisodes.",
         "hidden": false,
         "icon": "clapperboard",
-        "label": "Golden cinephile",
+        "label": "Cinéphile d'or",
         "rewards": [
           {
             "amount": 150,
@@ -901,7 +901,7 @@
         "unlocks": [
           {
             "kind": "title",
-            "label": "Golden reel",
+            "label": "Bobine d'or",
             "product": "title_golden_reel"
           }
         ]
@@ -925,10 +925,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Finish ten films or episodes in the portal's player.",
+        "description": "Terminez dix films ou épisodes dans le lecteur du portail.",
         "hidden": false,
         "icon": "armchair",
-        "label": "Home cinema",
+        "label": "Home cinéma",
         "rewards": [
           {
             "amount": 40,
@@ -938,7 +938,7 @@
         "unlocks": [
           {
             "kind": "booster",
-            "label": "Reserve booster",
+            "label": "Booster Réserve",
             "product": "booster_reserve"
           }
         ]
@@ -954,10 +954,10 @@
             "level": 10
           }
         ],
-        "description": "Reach level 10.",
+        "description": "Atteignez le niveau 10.",
         "hidden": false,
         "icon": "medal",
-        "label": "Double digits",
+        "label": "Deux chiffres",
         "rewards": [
           {
             "amount": 100,
@@ -977,10 +977,10 @@
             "level": 20
           }
         ],
-        "description": "Reach level 20.",
+        "description": "Atteignez le niveau 20.",
         "hidden": false,
         "icon": "crown",
-        "label": "Living legend",
+        "label": "Légende vivante",
         "rewards": [
           {
             "amount": 250,
@@ -990,12 +990,12 @@
         "unlocks": [
           {
             "kind": "level_badge",
-            "label": "Crowned level badge",
+            "label": "Badge de niveau couronné",
             "product": "level_crown"
           },
           {
             "kind": "title",
-            "label": "Living legend",
+            "label": "Légende vivante",
             "product": "title_living_legend"
           }
         ]
@@ -1011,10 +1011,10 @@
             "level": 30
           }
         ],
-        "description": "Reach level 30.",
+        "description": "Atteignez le niveau 30.",
         "hidden": false,
         "icon": "medal",
-        "label": "Seasoned",
+        "label": "Chevronné",
         "rewards": [
           {
             "amount": 400,
@@ -1024,7 +1024,7 @@
         "unlocks": [
           {
             "kind": "title",
-            "label": "Seasoned",
+            "label": "Chevronné",
             "product": "title_seasoned"
           }
         ]
@@ -1040,10 +1040,10 @@
             "level": 40
           }
         ],
-        "description": "Reach level 40.",
+        "description": "Atteignez le niveau 40.",
         "hidden": false,
         "icon": "mountain",
-        "label": "Elder",
+        "label": "Ancien",
         "rewards": [
           {
             "amount": 600,
@@ -1057,12 +1057,12 @@
         "unlocks": [
           {
             "kind": "badge",
-            "label": "Elder",
+            "label": "Ancien",
             "product": "badge_elder"
           },
           {
             "kind": "avatar_frame",
-            "label": "Polaris frame",
+            "label": "Cadre étoile polaire",
             "product": "frame_polaris"
           }
         ]
@@ -1078,10 +1078,10 @@
             "level": 50
           }
         ],
-        "description": "Reach level 50, the highest.",
+        "description": "Atteignez le niveau 50, le plus haut.",
         "hidden": false,
         "icon": "crown",
-        "label": "Legend of the portal",
+        "label": "Légende du portail",
         "rewards": [
           {
             "amount": 1000,
@@ -1095,12 +1095,12 @@
         "unlocks": [
           {
             "kind": "badge",
-            "label": "Legend",
+            "label": "Légende",
             "product": "badge_portal_legend"
           },
           {
             "kind": "title",
-            "label": "Legend of the portal",
+            "label": "Légende du portail",
             "product": "title_portal_legend"
           }
         ]
@@ -1124,10 +1124,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Drop by the portal on a hundred days.",
+        "description": "Passez sur le portail cent jours.",
         "hidden": false,
         "icon": "heart",
-        "label": "Loyal",
+        "label": "Fidèle",
         "rewards": [
           {
             "amount": 120,
@@ -1137,7 +1137,7 @@
         "unlocks": [
           {
             "kind": "avatar_frame",
-            "label": "Loyal golden frame",
+            "label": "Cadre doré de la fidélité",
             "product": "frame_loyal"
           }
         ]
@@ -1161,10 +1161,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Draw a legendary card from a booster.",
+        "description": "Tirez une carte légendaire d'un booster.",
         "hidden": false,
         "icon": "dices",
-        "label": "Lucky hand",
+        "label": "Main heureuse",
         "rewards": [
           {
             "amount": 75,
@@ -1174,7 +1174,7 @@
         "unlocks": [
           {
             "kind": "badge",
-            "label": "Lucky hand",
+            "label": "Main heureuse",
             "product": "badge_lucky_hand"
           }
         ]
@@ -1198,10 +1198,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Listen to fifty songs.",
+        "description": "Écoutez cinquante morceaux.",
         "hidden": false,
         "icon": "music",
-        "label": "Music lover",
+        "label": "Mélomane",
         "rewards": [
           {
             "amount": 30,
@@ -1211,7 +1211,7 @@
         "unlocks": [
           {
             "kind": "title",
-            "label": "Music lover",
+            "label": "Mélomane",
             "product": "title_music_lover"
           }
         ]
@@ -1228,20 +1228,20 @@
             "value": "coins"
           }
         ],
-        "description": "A secret achievement.",
+        "description": "Un succès secret.",
         "hidden": true,
         "icon": "moon",
-        "label": "Night owl",
+        "label": "Oiseau de nuit",
         "rewards": [],
         "unlocks": [
           {
             "kind": "profile_banner",
-            "label": "Animated starry banner",
+            "label": "Bannière animée ciel étoilé",
             "product": "banner_live_starfield"
           },
           {
             "kind": "title",
-            "label": "Night watcher",
+            "label": "Veilleur de nuit",
             "product": "title_night_watcher"
           }
         ]
@@ -1259,10 +1259,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Open twenty boosters.",
+        "description": "Ouvrez vingt boosters.",
         "hidden": false,
         "icon": "gift",
-        "label": "Pack addict",
+        "label": "Accro aux boosters",
         "rewards": [
           {
             "amount": 50,
@@ -1272,7 +1272,7 @@
         "unlocks": [
           {
             "kind": "booster",
-            "label": "Prestige HD booster",
+            "label": "Booster Prestige HD",
             "product": "booster_prestige"
           }
         ]
@@ -1296,10 +1296,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Finish a book.",
+        "description": "Terminez un livre.",
         "hidden": false,
         "icon": "book-open",
-        "label": "Page turner",
+        "label": "Page après page",
         "rewards": [
           {
             "amount": 20,
@@ -1321,10 +1321,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Fund three community projects.",
+        "description": "Financez trois projets de la communauté.",
         "hidden": false,
         "icon": "handshake",
-        "label": "Patron of the arts",
+        "label": "Mécène des arts",
         "rewards": [
           {
             "amount": 5,
@@ -1334,12 +1334,12 @@
         "unlocks": [
           {
             "kind": "badge",
-            "label": "Patron",
+            "label": "Mécène",
             "product": "badge_patron"
           },
           {
             "kind": "title",
-            "label": "Patron of the arts",
+            "label": "Mécène des arts",
             "product": "title_patron"
           }
         ]
@@ -1356,10 +1356,10 @@
             "value": "contribution"
           }
         ],
-        "description": "Reach 25 Contribution points.",
+        "description": "Atteignez 25 points de Contribution.",
         "hidden": false,
         "icon": "heart",
-        "label": "Pillar of the community",
+        "label": "Pilier de la communauté",
         "rewards": [],
         "unlocks": []
       },
@@ -1376,10 +1376,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Finish your first film or episode.",
+        "description": "Terminez votre premier film ou épisode.",
         "hidden": false,
         "icon": "popcorn",
-        "label": "Popcorn time",
+        "label": "L'heure du pop-corn",
         "rewards": [
           {
             "amount": 10,
@@ -1412,10 +1412,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Watch a film to the end in the portal's player.",
+        "description": "Regardez un film jusqu'au bout dans le lecteur du portail.",
         "hidden": false,
         "icon": "film",
-        "label": "Private screening",
+        "label": "Projection privée",
         "rewards": [
           {
             "amount": 20,
@@ -1425,7 +1425,7 @@
         "unlocks": [
           {
             "kind": "title",
-            "label": "Front row",
+            "label": "Premier rang",
             "product": "title_front_row"
           }
         ]
@@ -1443,10 +1443,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Cast to a TV twenty-five times.",
+        "description": "Diffusez sur une TV vingt-cinq fois.",
         "hidden": false,
         "icon": "tv",
-        "label": "Projectionist",
+        "label": "Projectionniste",
         "rewards": [
           {
             "amount": 60,
@@ -1456,7 +1456,7 @@
         "unlocks": [
           {
             "kind": "title",
-            "label": "Projectionist",
+            "label": "Projectionniste",
             "product": "title_projectionist"
           }
         ]
@@ -1474,10 +1474,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Complete five quests.",
+        "description": "Terminez cinq quêtes.",
         "hidden": false,
         "icon": "map",
-        "label": "Quest runner",
+        "label": "Coureur de quêtes",
         "rewards": [
           {
             "amount": 40,
@@ -1510,10 +1510,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Read a book to the end in the portal's reader.",
+        "description": "Lisez un livre jusqu'au bout dans le lecteur du portail.",
         "hidden": false,
         "icon": "glasses",
-        "label": "Reading nook",
+        "label": "Coin lecture",
         "rewards": [
           {
             "amount": 15,
@@ -1541,10 +1541,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Drop by the portal on ten different days.",
+        "description": "Passez sur le portail dix jours différents.",
         "hidden": false,
         "icon": "calendar",
-        "label": "Regular",
+        "label": "Habitué",
         "rewards": [
           {
             "amount": 50,
@@ -1564,10 +1564,10 @@
             "level": 3
           }
         ],
-        "description": "Reach level 3.",
+        "description": "Atteignez le niveau 3.",
         "hidden": false,
         "icon": "star",
-        "label": "Rising star",
+        "label": "Étoile montante",
         "rewards": [
           {
             "amount": 25,
@@ -1588,10 +1588,10 @@
             "value": "coins"
           }
         ],
-        "description": "Hold at least 200 Coins.",
+        "description": "Gardez au moins 200 pièces de côté.",
         "hidden": false,
         "icon": "coins",
-        "label": "Saver",
+        "label": "Économe",
         "rewards": [],
         "unlocks": []
       },
@@ -1608,10 +1608,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Search the portal twenty times.",
+        "description": "Faites vingt recherches sur le portail.",
         "hidden": false,
         "icon": "search",
-        "label": "Seeker",
+        "label": "Chercheur",
         "rewards": [
           {
             "amount": 20,
@@ -1633,10 +1633,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Buy ten things in the shop.",
+        "description": "Achetez dix articles dans la boutique.",
         "hidden": false,
         "icon": "store",
-        "label": "Shopaholic",
+        "label": "Accro du shopping",
         "rewards": [
           {
             "amount": 60,
@@ -1664,10 +1664,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Listen to ten audiobooks to the end.",
+        "description": "Écoutez dix livres audio jusqu'au bout.",
         "hidden": false,
         "icon": "mic",
-        "label": "Story time",
+        "label": "L'heure du conte",
         "rewards": [
           {
             "amount": 60,
@@ -1677,7 +1677,7 @@
         "unlocks": [
           {
             "kind": "booster",
-            "label": "Cosmos booster",
+            "label": "Booster Cosmos",
             "product": "booster_cosmos"
           }
         ]
@@ -1695,10 +1695,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Change your theme five times.",
+        "description": "Changez de thème cinq fois.",
         "hidden": false,
         "icon": "palette",
-        "label": "Stylist",
+        "label": "Styliste",
         "rewards": [
           {
             "amount": 20,
@@ -1720,10 +1720,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Open a booster.",
+        "description": "Ouvrez un booster.",
         "hidden": false,
         "icon": "package",
-        "label": "Surprise pack",
+        "label": "Pochette surprise",
         "rewards": [
           {
             "amount": 15,
@@ -1733,7 +1733,7 @@
         "unlocks": [
           {
             "kind": "booster",
-            "label": "Discovery booster",
+            "label": "Booster Découverte",
             "product": "booster_discovery"
           }
         ]
@@ -1751,10 +1751,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Finish 1,000 films or episodes.",
+        "description": "Terminez 1 000 films ou épisodes.",
         "hidden": false,
         "icon": "moon",
-        "label": "A thousand nights",
+        "label": "Mille et une nuits",
         "rewards": [
           {
             "amount": 600,
@@ -1768,7 +1768,7 @@
         "unlocks": [
           {
             "kind": "badge",
-            "label": "A thousand nights",
+            "label": "Mille et une nuits",
             "product": "badge_thousand_nights"
           }
         ]
@@ -1784,10 +1784,10 @@
             "level": 5
           }
         ],
-        "description": "Reach level 5.",
+        "description": "Atteignez le niveau 5.",
         "hidden": false,
         "icon": "trophy",
-        "label": "Veteran",
+        "label": "Vétéran",
         "rewards": [
           {
             "amount": 50,
@@ -1809,10 +1809,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "One of your requests becomes available.",
+        "description": "Une de vos demandes devient disponible.",
         "hidden": false,
         "icon": "sparkles",
-        "label": "Wish granted",
+        "label": "Vœu exaucé",
         "rewards": [
           {
             "amount": 15,
@@ -1838,10 +1838,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Make 25 media requests.",
+        "description": "Faites 25 demandes de médias.",
         "hidden": false,
         "icon": "gift",
-        "label": "Wishlist master",
+        "label": "Maître des souhaits",
         "rewards": [
           {
             "amount": 50,
@@ -1851,7 +1851,7 @@
         "unlocks": [
           {
             "kind": "title",
-            "label": "Wish master",
+            "label": "Maître des souhaits",
             "product": "title_wish_master"
           }
         ]
@@ -1868,10 +1868,10 @@
             "value": "xp"
           }
         ],
-        "description": "Earn 10,000 XP.",
+        "description": "Gagnez 10 000 XP.",
         "hidden": false,
         "icon": "zap",
-        "label": "Ten thousand",
+        "label": "Dix mille",
         "rewards": [
           {
             "amount": 150,
@@ -1881,7 +1881,7 @@
         "unlocks": [
           {
             "kind": "level_up",
-            "label": "Premiere level-up",
+            "label": "Passage de niveau avant-première",
             "product": "levelup_cinema"
           }
         ]
@@ -1898,10 +1898,10 @@
             "value": "xp"
           }
         ],
-        "description": "Earn 100,000 XP.",
+        "description": "Gagnez 100 000 XP.",
         "hidden": false,
         "icon": "flame",
-        "label": "Hundred thousand",
+        "label": "Cent mille",
         "rewards": [
           {
             "amount": 500,
@@ -1911,7 +1911,7 @@
         "unlocks": [
           {
             "kind": "title",
-            "label": "Hundred thousand",
+            "label": "Cent mille",
             "product": "title_hundred_thousand"
           }
         ]
@@ -1928,10 +1928,10 @@
             "value": "xp"
           }
         ],
-        "description": "Earn 50,000 XP.",
+        "description": "Gagnez 50 000 XP.",
         "hidden": false,
         "icon": "zap",
-        "label": "Fifty thousand",
+        "label": "Cinquante mille",
         "rewards": [
           {
             "amount": 300,
@@ -1953,10 +1953,10 @@
             "kind": "event_count"
           }
         ],
-        "description": "Open your yearly recap.",
+        "description": "Ouvrez votre bilan de l'année.",
         "hidden": false,
         "icon": "sparkles",
-        "label": "Year in review",
+        "label": "L'année en revue",
         "rewards": [
           {
             "amount": 30,
@@ -4122,5 +4122,739 @@
       ]
     }
   },
-  "version": 1
+  "shop": {
+    "catalog": true,
+    "collections": [],
+    "packs": [
+      "abysses",
+      "briques",
+      "celeste",
+      "cinema",
+      "halloween-scene",
+      "horreur",
+      "maree",
+      "mediacards",
+      "messenger-bubbles",
+      "neon2077",
+      "noel",
+      "nordlys",
+      "odyssee",
+      "olympe",
+      "portalab-academy",
+      "portalab-alien",
+      "portalab-base",
+      "portalab-beach",
+      "portalab-binge",
+      "portalab-blockfall",
+      "portalab-blossom",
+      "portalab-caribbean",
+      "portalab-cartoon",
+      "portalab-christmas",
+      "portalab-classicdesk",
+      "portalab-comic",
+      "portalab-cozy",
+      "portalab-cupertino",
+      "portalab-cyberpunk",
+      "portalab-desert",
+      "portalab-disco",
+      "portalab-editions",
+      "portalab-funky",
+      "portalab-futuristic",
+      "portalab-galaxy",
+      "portalab-gazette",
+      "portalab-groove",
+      "portalab-halloween",
+      "portalab-hd-animations",
+      "portalab-hd-arcane",
+      "portalab-hd-aurora",
+      "portalab-hd-blaze",
+      "portalab-hd-candy",
+      "portalab-hd-celebrations",
+      "portalab-hd-christmas",
+      "portalab-hd-comets",
+      "portalab-hd-cosmos",
+      "portalab-hd-cyber",
+      "portalab-hd-frames",
+      "portalab-hd-halloween",
+      "portalab-hd-ice",
+      "portalab-hd-level-ups",
+      "portalab-hd-names",
+      "portalab-hd-nebulae",
+      "portalab-hd-notifications",
+      "portalab-hd-ocean",
+      "portalab-hd-planets",
+      "portalab-hd-plasma",
+      "portalab-hd-sakura",
+      "portalab-hd-shadow",
+      "portalab-hd-spring",
+      "portalab-hd-stars",
+      "portalab-hd-summer",
+      "portalab-hd-sunmoon",
+      "portalab-hd-time-portal",
+      "portalab-hd-titles",
+      "portalab-hd-toxic",
+      "portalab-hd-treasure",
+      "portalab-hd-valentine",
+      "portalab-hd-volcano",
+      "portalab-hd-voltage",
+      "portalab-hd-wheels",
+      "portalab-heroes",
+      "portalab-horror",
+      "portalab-invaders",
+      "portalab-manga",
+      "portalab-matrix",
+      "portalab-mazechase",
+      "portalab-mecha",
+      "portalab-middleearth",
+      "portalab-minimal",
+      "portalab-neowave",
+      "portalab-nostromo",
+      "portalab-nova",
+      "portalab-observatory",
+      "portalab-platformer",
+      "portalab-plex",
+      "portalab-pocket",
+      "portalab-season-christmas",
+      "portalab-season-halloween",
+      "portalab-season-spring",
+      "portalab-season-summer",
+      "portalab-season-valentine",
+      "portalab-sincity",
+      "portalab-social",
+      "portalab-spacestation",
+      "portalab-starship",
+      "portalab-upsidedown",
+      "portalab-vhs",
+      "portalab-wizard",
+      "retro",
+      "rouages",
+      "ruee-vers-l-or"
+    ],
+    "products": [
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "The film universes' booster: five looks of the films and series — space, horror, fantasy, heroes, the future, cartoons, the video shop… — opened in a movie palace.",
+          "fr": "Le booster des univers de films : cinq looks des films et des séries — espace, horreur, fantasy, super-héros, futur, dessins animés, vidéoclub… — ouvert dans un palace de cinéma."
+        },
+        "featured": true,
+        "icon": "film",
+        "key": "booster_cinema",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Cinema booster",
+          "fr": "Booster Cinéma"
+        },
+        "payload": {
+          "cards": 5,
+          "guarantee": "rare",
+          "look": "legend",
+          "odds": {
+            "common": 58,
+            "epic": 12,
+            "legendary": 3,
+            "rare": 27
+          },
+          "packs": [
+            "visual:portalab-alien",
+            "visual:portalab-nostromo",
+            "visual:portalab-matrix",
+            "visual:portalab-sincity",
+            "visual:portalab-upsidedown",
+            "visual:portalab-middleearth",
+            "visual:portalab-wizard",
+            "visual:portalab-galaxy",
+            "visual:portalab-heroes",
+            "visual:portalab-cyberpunk",
+            "visual:portalab-desert",
+            "visual:portalab-hd-time-portal",
+            "visual:portalab-caribbean",
+            "visual:portalab-horror",
+            "visual:portalab-starship",
+            "visual:portalab-spacestation",
+            "visual:portalab-mecha",
+            "visual:portalab-manga",
+            "visual:portalab-cartoon",
+            "visual:portalab-vhs",
+            "visual:portalab-binge",
+            "visual:portalab-plex"
+          ],
+          "pool": "looks",
+          "refunds": {
+            "common": 10,
+            "epic": 20,
+            "legendary": 30,
+            "rare": 15
+          }
+        },
+        "price": 500,
+        "rarity": "epic",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "Opened in the dark, if you dare: five looks of the night's darkest packs.",
+          "fr": "Ouvert dans le noir, si vous osez : cinq apparences des packs les plus sombres."
+        },
+        "featured": false,
+        "icon": "sparkles",
+        "key": "booster_horreur",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Horror booster",
+          "fr": "Booster Horreur"
+        },
+        "payload": {
+          "cards": 5,
+          "guarantee": "rare",
+          "look": "halloween",
+          "odds": {
+            "common": 55,
+            "epic": 13,
+            "legendary": 4,
+            "rare": 28
+          },
+          "packs": [
+            "visual:portalab-halloween",
+            "visual:portalab-hd-halloween",
+            "visual:portalab-hd-shadow",
+            "visual:portalab-horror",
+            "visual:portalab-nostromo",
+            "visual:portalab-season-halloween",
+            "visual:portalab-sincity",
+            "visual:portalab-upsidedown"
+          ],
+          "pool": "looks",
+          "refunds": {
+            "common": 10,
+            "epic": 20,
+            "legendary": 30,
+            "rare": 15
+          }
+        },
+        "price": 450,
+        "rarity": "epic",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "Hacked in a neon megacity: five looks of the cyberpunk nights.",
+          "fr": "Piraté dans une mégapole de néon : cinq apparences des nuits cyberpunk."
+        },
+        "featured": false,
+        "icon": "sparkles",
+        "key": "booster_neon2077",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Neon 2077 booster",
+          "fr": "Booster Néon 2077"
+        },
+        "payload": {
+          "cards": 5,
+          "guarantee": "rare",
+          "look": "prestige",
+          "odds": {
+            "common": 58,
+            "epic": 12,
+            "legendary": 3,
+            "rare": 27
+          },
+          "packs": [
+            "visual:portalab-cyberpunk",
+            "visual:portalab-hd-cyber",
+            "visual:portalab-hd-voltage",
+            "visual:portalab-matrix",
+            "visual:portalab-neowave",
+            "visual:portalab-sincity",
+            "pack_hd_plasma",
+            "pack_hd_toxic",
+            "visual:portalab-mecha"
+          ],
+          "pool": "looks",
+          "refunds": {
+            "common": 10,
+            "epic": 20,
+            "legendary": 30,
+            "rare": 15
+          }
+        },
+        "price": 500,
+        "rarity": "epic",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "Opened in an 8-bit game: five looks of the arcade, the cartridges and the VHS years.",
+          "fr": "Ouvert dans un jeu 8 bits : cinq apparences de l'arcade, des cartouches et des années VHS."
+        },
+        "featured": false,
+        "icon": "sparkles",
+        "key": "booster_retro",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Retro booster",
+          "fr": "Booster Rétro"
+        },
+        "payload": {
+          "cards": 5,
+          "guarantee": "rare",
+          "look": "discovery",
+          "odds": {
+            "common": 58,
+            "epic": 12,
+            "legendary": 3,
+            "rare": 27
+          },
+          "packs": [
+            "visual:portalab-blockfall",
+            "visual:portalab-funky",
+            "visual:portalab-groove",
+            "visual:portalab-invaders",
+            "visual:portalab-mazechase",
+            "visual:portalab-platformer",
+            "visual:portalab-vhs",
+            "visual:portalab-pocket",
+            "visual:portalab-classicdesk",
+            "visual:portalab-disco"
+          ],
+          "pool": "looks",
+          "refunds": {
+            "common": 10,
+            "epic": 20,
+            "legendary": 30,
+            "rare": 15
+          }
+        },
+        "price": 350,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released 1997 to 2009 (DVD edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis 1997 à 2009 (édition DVD)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_disc",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "DVD edition booster",
+          "fr": "Booster Édition DVD"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "disc"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released before 1980 (Film reel edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis avant 1980 (édition Pellicule)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_film",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Film reel edition booster",
+          "fr": "Booster Édition Pellicule"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "film"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released since 2010 (Streaming edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis depuis 2010 (édition Streaming)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_stream",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Streaming edition booster",
+          "fr": "Booster Édition Streaming"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "stream"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released 1980 to 1996 (VHS edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis 1980 à 1996 (édition VHS)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_vhs",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "VHS edition booster",
+          "fr": "Booster Édition VHS"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "vhs"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the library's « Action » films and series.",
+          "fr": "3 cartes tirées parmi les films et séries « Action » de la bibliothèque."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_action",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Action booster",
+          "fr": "Booster Action"
+        },
+        "payload": {
+          "cards": 3,
+          "family": "action"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the library's « Dark » films and series.",
+          "fr": "3 cartes tirées parmi les films et séries « Sombre » de la bibliothèque."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_dark",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Dark booster",
+          "fr": "Booster Sombre"
+        },
+        "payload": {
+          "cards": 3,
+          "family": "dark"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the library's « Drama » films and series.",
+          "fr": "3 cartes tirées parmi les films et séries « Drame » de la bibliothèque."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_drama",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Drama booster",
+          "fr": "Booster Drame"
+        },
+        "payload": {
+          "cards": 3,
+          "family": "drama"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the library's « Family » films and series.",
+          "fr": "3 cartes tirées parmi les films et séries « Familial » de la bibliothèque."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_family",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Family booster",
+          "fr": "Booster Familial"
+        },
+        "payload": {
+          "cards": 3,
+          "family": "family"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the library's « Fantasy » films and series.",
+          "fr": "3 cartes tirées parmi les films et séries « Fantastique » de la bibliothèque."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_fantasy",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Fantasy booster",
+          "fr": "Booster Fantastique"
+        },
+        "payload": {
+          "cards": 3,
+          "family": "fantasy"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the library's « Science fiction » films and series.",
+          "fr": "3 cartes tirées parmi les films et séries « Science-fiction » de la bibliothèque."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_sf",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Science fiction booster",
+          "fr": "Booster Science-fiction"
+        },
+        "payload": {
+          "cards": 3,
+          "family": "sf"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      }
+    ],
+    "scenes": {
+      "booster_celestial": {
+        "look": "celeste",
+        "pack": "celeste"
+      },
+      "booster_christmas": {
+        "look": "noel",
+        "pack": "noel"
+      },
+      "booster_cinema": {
+        "look": "cinema",
+        "pack": "cinema"
+      },
+      "booster_halloween": {
+        "look": "graveyard",
+        "pack": "halloween-scene"
+      },
+      "booster_horreur": {
+        "look": "horreur",
+        "pack": "horreur"
+      },
+      "booster_neon2077": {
+        "look": "neon2077",
+        "pack": "neon2077"
+      },
+      "booster_retro": {
+        "look": "retro8",
+        "pack": "retro"
+      },
+      "card_booster": {
+        "look": "mediacards",
+        "pack": "mediacards"
+      }
+    }
+  },
+  "version": 2
 }

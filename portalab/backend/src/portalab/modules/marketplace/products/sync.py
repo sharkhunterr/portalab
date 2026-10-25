@@ -15,7 +15,7 @@ from portalab.modules.marketplace.products.definition import AvailabilityIn, Pre
 from portalab.modules.marketplace.products.service import Catalog, ProductNotFound
 
 # an entry's fields: key, type, price, rarity, names, descriptions, payload, collection, icon, featured,
-# level, supply, limit, repeatable, reward_only, contribution, config_required, season
+# level, supply, limit, repeatable, reward_only, contribution, config_required, season, refund_policy (#253)
 Entry = Mapping[str, Any]
 
 
@@ -35,6 +35,7 @@ def definition(product: Entry) -> dict[str, Any]:
             ),
         ],
         **({"config_required": True} if product.get("config_required") else {}),
+        **({"refund_policy": product["refund_policy"]} if product.get("refund_policy") else {}),
     }
     return {
         "key": product["key"],
@@ -75,6 +76,7 @@ async def sync_product(catalog: Catalog, actor: Principal, product: Entry, *, re
             "descriptions": dict(version.descriptions),
             "payload": dict(version.payload),
             "conditions": list(version.conditions),
+            **({"refund_policy": dict(version.refund_policy)} if "refund_policy" in wanted else {}),
         }
         if stored != wanted:
             await catalog.revise(actor, product["key"], wanted)
