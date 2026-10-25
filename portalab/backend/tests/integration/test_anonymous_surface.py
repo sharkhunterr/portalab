@@ -47,9 +47,13 @@ async def test_a_visitor_reaches_nothing_but_signing_in(database: Database, head
 
 
 def test_the_allow_list_is_the_sign_in_and_nothing_else() -> None:
-    assert all(p.startswith(("/api/v1/auth/", "/api/v1/admin/first-run")) for p in ANONYMOUS_PATHS)
+    # issue 246: the arrival wizard reads the languages offered and its two catalogs, nothing more
+    arrival = ("/api/v1/admin/first-run", "/api/v1/i18n/public/languages")
+    assert all(p.startswith(("/api/v1/auth/", *arrival)) for p in ANONYMOUS_PATHS)
     assert anonymous_allowed("/api/v1/i18n/catalogs/auth")
     assert not anonymous_allowed("/api/v1/i18n/catalogs/admin")
+    assert anonymous_allowed("/api/v1/i18n/public/catalogs/account")
+    assert not anonymous_allowed("/api/v1/i18n/public/catalogs/admin")
     assert not anonymous_allowed("/api/v1/terms")
     assert not anonymous_allowed("/api/v1/visuals/sandbox")
     assert anonymous_allowed("/media/some-client-route")  # the SPA's pages: the sign-in page
