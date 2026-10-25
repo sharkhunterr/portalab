@@ -1,6 +1,6 @@
 """The daily wheel (issue 225): once a day — a day of the economy's time zone — a member spins it and wins
-what its segment says: Coins (or loses some: never more than the balance, which never goes negative), XP,
-a shop product offered (a discovery booster, into their reserve) or nothing.
+what its segment says: Coins, XP, a shop product offered (a discovery booster, into their reserve) or
+nothing — never a loss (the owner's rule: the wheel only gives; a segment taking Coins is left out).
 
 The draw is the server's (weighted by the segments' ``weight``), recorded with what it gave before the
 member's page animates anything: the page only turns the wheel to the segment it is told. A product is
@@ -45,7 +45,7 @@ class Segment(BaseModel):
     model_config = ConfigDict(extra="ignore", frozen=True)
     key: str = Field(pattern=r"^[a-z0-9][a-z0-9_-]{0,47}$")
     kind: Literal["coins", "xp", "product", "nothing"]
-    amount: int = Field(default=0, ge=-10_000, le=10_000)
+    amount: int = Field(default=0, ge=0, le=10_000)  # the wheel never takes anything
     product: str | None = Field(default=None, max_length=96)
     labels: dict[str, str] = Field(default_factory=dict)
     weight: int = Field(default=1, ge=1, le=1000)
@@ -53,8 +53,8 @@ class Segment(BaseModel):
 
     @model_validator(mode="after")
     def _coherent(self) -> "Segment":
-        if self.kind == "coins" and self.amount == 0:
-            raise ValueError("a Coins segment wins or loses some")
+        if self.kind == "coins" and self.amount <= 0:
+            raise ValueError("a Coins segment wins some")
         if self.kind == "xp" and self.amount <= 0:
             raise ValueError("an XP segment wins some")
         if self.kind == "product" and not self.product:
@@ -235,23 +235,18 @@ class Wheel:
         if drawn.kind not in ("coins", "xp"):
             return 0
         amount = drawn.amount
-        if amount < 0:  # a loss: never more than what the member has
-            balance = await session.get(Balance, (user, "coins"))
-            amount = -min(-amount, int(balance.amount) if balance else 0)
-            if amount == 0:
-                return 0
         await self.writer.record(
             session,
             Entry(
                 user_id=user,
                 value=drawn.kind,
                 delta=amount,
-                kind="grant" if amount > 0 else "spend",
+                kind="grant",
                 source_kind=SOURCE,
                 source_ref=f"wheel:{day.isoformat()}",
                 idempotency_key=f"wheel:{user}:{day.isoformat()}",
                 occurred_at=now,
-                base_amount=max(amount, 0),
+                base_amount=amount,
                 reason=f"wheel {drawn.key}",
             ),
         )

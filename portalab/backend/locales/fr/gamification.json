@@ -600,7 +600,7 @@
   "value.xp": "XP",
   "wheel.failed": "La roue n’a pas pu tourner. Réessayez dans un instant.",
   "wheel.go": "Go !",
-  "wheel.hint": "Des coins à gagner… ou à perdre, de l’XP, un booster découverte. Un tour par jour.",
+  "wheel.hint": "Des coins, de l’XP, un booster découverte… et jamais rien à perdre. Un tour par jour.",
   "wheel.history.lost": "Perdu au tour du jour",
   "wheel.history.won": "Gagné au tour du jour",
   "wheel.next": "Prochain tour dans {time}",
@@ -623,6 +623,6 @@
   "widget.progress.gained": "+{amount} {unit} en {days} jours",
   "widget.progress.streak": "{days, plural, one {# jour} other {# jours}} d’affilée",
   "widget.progress.title": "Ma progression",
-  "widget.wheel.description": "Une fois par jour, faites tourner la roue : des coins à gagner (ou à perdre), de l’XP, un booster découverte…",
+  "widget.wheel.description": "Une fois par jour, faites tourner la roue : des coins, de l’XP, un booster découverte… sans rien à perdre.",
   "widget.wheel.title": "Roue de la fortune"
 }

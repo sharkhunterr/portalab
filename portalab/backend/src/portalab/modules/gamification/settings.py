@@ -10,11 +10,11 @@ OWNER = "module:gamification"
 # issue 225: Coins won or lost, some XP, a discovery booster (« labels »: a product's name, per language)
 DEFAULT_SEGMENTS: list[dict[str, Any]] = [
     {"key": "coins_20", "kind": "coins", "amount": 20, "weight": 20},
-    {"key": "lose_10", "kind": "coins", "amount": -10, "weight": 14},
+    {"key": "coins_5", "kind": "coins", "amount": 5, "weight": 14},
     {"key": "coins_50", "kind": "coins", "amount": 50, "weight": 13},
     {"key": "xp_100", "kind": "xp", "amount": 100, "weight": 10},
     {"key": "coins_10", "kind": "coins", "amount": 10, "weight": 20},
-    {"key": "lose_25", "kind": "coins", "amount": -25, "weight": 8},
+    {"key": "xp_25", "kind": "xp", "amount": 25, "weight": 8},
     {
         "key": "booster",
         "kind": "product",
@@ -113,7 +113,7 @@ _DESCRIPTIONS = {
     "daily, quest, challenge, discovery, achievement, level_reward, contribution, automation.",
     "pace": "Overall pace: {factor, values} — multiplies every rule's gains of these values.",
     "wheel": "Daily wheel: {enabled, segments: [{key, kind: coins|xp|product|nothing, amount, product, "
-    "labels, weight}]} — one spin a day; Coins may be negative (never below the balance).",
+    "labels, weight}]} — one spin a day; it never takes anything (a segment of lost Coins is left out).",
 }
 
 

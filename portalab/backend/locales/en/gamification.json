@@ -600,7 +600,7 @@
   "value.xp": "XP",
   "wheel.failed": "The wheel could not turn. Try again in a moment.",
   "wheel.go": "Go!",
-  "wheel.hint": "Coins to win… or to lose, XP, a discovery booster. One spin a day.",
+  "wheel.hint": "Coins, XP, a discovery booster… and never anything to lose. One spin a day.",
   "wheel.history.lost": "Lost on the spin of the day",
   "wheel.history.won": "Won on the spin of the day",
   "wheel.next": "Next spin in {time}",
@@ -623,6 +623,6 @@
   "widget.progress.gained": "+{amount} {unit} in {days} days",
   "widget.progress.streak": "{days, plural, one {# day} other {# days}} in a row",
   "widget.progress.title": "My progression",
-  "widget.wheel.description": "Once a day, spin the wheel: coins to win (or lose), XP, a discovery booster…",
+  "widget.wheel.description": "Once a day, spin the wheel: coins, XP, a discovery booster… with nothing to lose.",
   "widget.wheel.title": "Wheel of fortune"
 }
