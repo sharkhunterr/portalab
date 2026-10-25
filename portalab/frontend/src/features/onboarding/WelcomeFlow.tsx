@@ -1,7 +1,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type ChangeEvent, useEffect, useId, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
 import type { UiPreferences } from "../../design-system/a11y/preferences";
@@ -56,6 +56,8 @@ export function WelcomeFlow() {
   const me = useMe();
   const welcome = useWelcome();
   const navigate = useNavigate();
+  // issue 246: the administrator setting the portal up is welcomed once the setup assistant is left
+  const setting = useLocation().pathname.startsWith("/admin/setup");
   const [welcomedAt, setWelcomedAt, ready] = useShellPreference<string | null>(
     "shell.onboarding.welcomedAt",
     null,
@@ -67,10 +69,10 @@ export function WelcomeFlow() {
 
   // opens by itself once, when everything needed to decide has arrived
   useEffect(() => {
-    if (decided.current || !ready || !me.data || !welcome.data) return;
+    if (decided.current || !ready || !me.data || !welcome.data || setting) return;
     decided.current = true;
     if (welcome.data.enabled && !welcomedAt && me.data.state === "active") setOpen(true);
-  }, [ready, me.data, welcome.data, welcomedAt]);
+  }, [ready, me.data, welcome.data, welcomedAt, setting]);
 
   // the personal menu brings it back
   useEffect(() => {

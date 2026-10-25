@@ -94,7 +94,7 @@ li[data-on] .features-picker__icon {
 li[data-on] .features-picker__mark {
   border-color: var(--color-accent);
   background: var(--color-accent);
-  color: var(--color-on-accent, var(--color-surface));
+  color: var(--color-accent-contrast);
 }
 .features-step {
   display: grid;
@@ -147,7 +147,7 @@ li[data-on] .features-picker__mark {
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill, 999px);
+  border-radius: var(--radius-pill);
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   white-space: nowrap;
@@ -209,7 +209,7 @@ li[data-on] .features-picker__mark {
 }
 .arrival__soon {
   padding: 0 var(--space-2);
-  border-radius: var(--radius-pill, 999px);
+  border-radius: var(--radius-pill);
   background: var(--color-surface-raised);
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
@@ -223,6 +223,17 @@ li[data-on] .features-picker__mark {
 .arrival__form input,
 .arrival__form select {
   inline-size: 100%;
+  min-block-size: max(var(--target-min), 2.75rem);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 70%, var(--color-surface-raised));
+  color: var(--color-text);
+  font: inherit;
+}
+.arrival__form :focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
 }
 .arrival__recap {
   display: grid;
