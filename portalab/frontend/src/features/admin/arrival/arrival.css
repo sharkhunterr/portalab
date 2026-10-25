@@ -207,14 +207,6 @@ li[data-on] .features-picker__mark {
   align-items: center;
   gap: var(--space-2);
 }
-.arrival__soon {
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-pill);
-  background: var(--color-surface-raised);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-}
 .arrival__form {
   display: grid;
   gap: var(--space-2);

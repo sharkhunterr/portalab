@@ -862,6 +862,19 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "keywords": ("setup", "wizard", "assistant", "configuration"),
     },
     {
+        "key": "administration.backups",  # issue 247
+        "owner": "module:administration",
+        "kind": "entry",
+        "label_key": "nav.admin.backups",
+        "icon": "database",
+        "route": "/admin/backups",
+        "group": "admin",
+        "topic": "system",
+        "order_hint": 3,
+        "required_permission": "configuration.manage",
+        "keywords": ("backup", "restore", "export", "import", "sauvegarde", "archive"),
+    },
+    {
         # issue 159: the site's name, slogan, logo, icon and currency
         "key": "ui.site_identity",
         "owner": "module:ui",
