@@ -28,6 +28,8 @@ export interface Inspected {
   rows: number;
   folders: { name: string; files: number; bytes: number }[];
   compatible: boolean;
+  compatibility: "same" | "older" | "newer";
+  portalab: string;
 }
 
 export const BACKUPS_KEY = ["admin", "backups"] as const;
@@ -45,7 +47,7 @@ export function useBackups() {
 export function percent(run: Run): number {
   if (run.state !== "running") return 100;
   const share = run.total > 0 ? Math.min(1, run.done / run.total) : 0;
-  const phases = ["starting", "reading", "tables", "files", "done"];
+  const phases = ["starting", "reading", "schema", "tables", "upgrade", "files", "done"];
   const index = Math.max(0, phases.indexOf(run.phase));
   return Math.round(((index + share) / phases.length) * 100);
 }

@@ -26,7 +26,7 @@ from collections.abc import AsyncIterator, Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -40,7 +40,7 @@ from portalab.modules.administration.backup.crypto import DecryptingReader, Encr
 
 log = get_logger(__name__)
 
-FORMAT = 1
+FORMAT = 2  # the archive's own layout; each older one is read through its upgrader below
 SUFFIX = ".plbackup"
 COUNTED = {"identity.users": "members", "connectors.services": "services", "visuals.packs": "packs"}
 
@@ -76,6 +76,39 @@ class Table:
     where: str | None = None
 
 
+class Versions(Protocol):
+    """The schema a backup carries against this portal's (``portalab.app.backup_versions``)."""
+
+    async def current(self) -> set[str]: ...
+
+    async def compare(self, archive_heads: Iterable[str]) -> str: ...
+
+    async def prepare(self, archive_heads: Iterable[str]) -> None: ...
+
+    async def finish(self) -> None: ...
+
+
+def _from_format_1(manifest: dict[str, Any]) -> dict[str, Any]:
+    return {**manifest, "format": 2, "portalab": "unknown"}
+
+
+UPGRADERS: dict[int, Callable[[dict[str, Any]], dict[str, Any]]] = {1: _from_format_1}
+
+
+def upgrade_manifest(manifest: dict[str, Any]) -> dict[str, Any]:
+    """An archive's description in this version's layout: older layouts upgraded step by step, a newer one
+    refused (made by a later Portalab: update this one first)."""
+    version = manifest.get("format")
+    if not isinstance(version, int) or version < 1:
+        raise BackupError("backup.damaged", "This archive has no readable description.")
+    if version > FORMAT:
+        raise BackupError("backup.newer", "This archive was made by a later Portalab: update this one first.")
+    while version < FORMAT:
+        manifest = UPGRADERS[version](manifest)
+        version = int(manifest["format"])
+    return manifest
+
+
 @dataclass(slots=True)
 class Manifest:
     created_at: str
@@ -86,11 +119,13 @@ class Manifest:
     partitions: list[dict[str, str]] = field(default_factory=list)
     folders: list[dict[str, Any]] = field(default_factory=list)
     counts: dict[str, int] = field(default_factory=dict)
+    portalab: str = "unknown"  # the Portalab version that saved it
     format: int = FORMAT
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "format": self.format,
+            "portalab": self.portalab,
             "created_at": self.created_at,
             "heads": self.heads,
             "options": self.options,
@@ -192,6 +227,7 @@ async def create(
     options: Options,
     heads: Iterable[str],
     site: str,
+    portalab: str = "unknown",
     progress: Progress = lambda *_: None,
 ) -> Manifest:
     """Write the archive at ``target`` (through ``target.partial``); answers its description."""
@@ -205,6 +241,7 @@ async def create(
             heads=sorted(heads),
             options={"history": options.history, "media": options.media},
             site=site,
+            portalab=portalab,
         )
         async with database.engine.connect() as conn:
             apg = await _driver(conn)
@@ -340,9 +377,7 @@ def inspect(path: Path, passphrase: str) -> dict[str, Any]:
             handle = tar.extractfile(member)
             assert handle is not None
             manifest: dict[str, Any] = json.loads(handle.read())
-    if manifest.get("format") != FORMAT:
-        raise BackupError("backup.format", "This archive was made by another version of Portalab.")
-    return manifest
+    return upgrade_manifest(manifest)
 
 
 def _unpack(path: Path, passphrase: str, staging: Path, progress: Progress) -> tuple[dict[str, Any], bytes]:
@@ -365,9 +400,9 @@ def _unpack(path: Path, passphrase: str, staging: Path, progress: Progress) -> t
                     continue
                 tar.extract(member, staging, filter="data")
                 progress("reading", source.tell(), size)
-    if manifest.get("format") != FORMAT or len(key) < 32:
+    if len(key) < 32:
         raise BackupError("backup.damaged", "This archive is incomplete.")
-    return manifest, key
+    return upgrade_manifest(manifest), key
 
 
 # --- restoring ---------------------------------------------------------------------------------------------
@@ -379,21 +414,37 @@ async def restore(
     passphrase: str,
     *,
     capabilities: CapabilityRegistry,
-    heads: Iterable[str],
+    versions: Versions,
     progress: Progress = lambda *_: None,
 ) -> dict[str, Any]:
-    """Bring the archive into this portal; answers what was brought (tables, rows, secrets, folders)."""
+    """Bring the archive into this portal; answers what was brought (tables, rows, secrets, folders).
+
+    Saved by the same schema, it is loaded as it is; by an older one, this new portal is first brought back
+    to that schema, then the loaded data migrated up to this version; by a newer one, it is refused."""
+    await asyncio.to_thread(data_dir.mkdir, parents=True, exist_ok=True)  # a brand-new portal may lack it
     staging = Path(tempfile.mkdtemp(prefix=".restore-", dir=data_dir))
+    prepared = False
     try:
         manifest, old_key = await asyncio.to_thread(_unpack, archive, passphrase, staging, progress)
-        if sorted(heads) != sorted(manifest.get("heads", [])):
+        saved = manifest.get("heads", [])
+        compatibility = await versions.compare(saved)
+        if compatibility == "newer":
             raise BackupError(
-                "backup.version",
-                "This archive was saved by another version of Portalab: install the same one, then import.",
+                "backup.newer", "This archive was saved by a later Portalab: update this one first."
             )
+        if compatibility == "older":
+            progress("schema", 0, 1)
+            prepared = True
+            await versions.prepare(saved)
         result = await _load(
             database, staging / "tables", manifest, old_key, secret_key, capabilities, progress
         )
+        if prepared:
+            progress("upgrade", 0, 1)
+            await versions.finish()
+            prepared = False
+        result["compatibility"] = compatibility
+        result["portalab"] = manifest.get("portalab", "unknown")
         progress("files", 0, 1)
         result["folders"] = await asyncio.to_thread(_swap_folders, staging / "files", data_dir, manifest)
         progress("done", 1, 1)
@@ -401,6 +452,11 @@ async def restore(
         result["created_at"] = manifest.get("created_at", "")
         return result
     finally:
+        if prepared:  # failed at the archive's schema: back to an empty portal of this version
+            try:
+                await versions.finish()
+            except Exception:
+                log.exception("the portal could not be migrated back after a failed restore")
         shutil.rmtree(staging, ignore_errors=True)
 
 

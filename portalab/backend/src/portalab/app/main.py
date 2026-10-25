@@ -320,6 +320,7 @@ def create_app(
             data_dir=settings.data_dir if settings else Path("/var/lib/portalab"),
             capabilities=app.state.capabilities,
             secret_key=settings.secret_key if settings else _EPHEMERAL_KEY,
+            database_url=settings.database_url.reveal() if settings else "",
         )
         app.state.platform = platform
         app.state.administration_module = platform.administration

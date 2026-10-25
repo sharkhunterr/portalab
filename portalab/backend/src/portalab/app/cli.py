@@ -171,8 +171,8 @@ def _report(phase: str, done: int, total: int) -> None:
 
 async def _archive(args: argparse.Namespace, passphrase: str) -> int:
     """Issue 247: the portable, encrypted archive (the same as the administration's « Backups »)."""
+    from portalab.app.backup_versions import SchemaVersions, portalab_version
     from portalab.app.composition import import_all_models
-    from portalab.app.migrations import current_heads
     from portalab.app.wiring import wire_platform
     from portalab.capabilities.catalog import new_registry
     from portalab.core.db import Database
@@ -186,7 +186,7 @@ async def _archive(args: argparse.Namespace, passphrase: str) -> int:
         platform = wire_platform(
             database, data_dir=settings.data_dir, capabilities=capabilities, secret_key=settings.secret_key
         )
-        heads = await current_heads(database)
+        versions = SchemaVersions(database, settings.database_url.reveal())
         if args.archive_command == "create":
             site = str((await platform.ui.site.public()).get("name") or "Portalab")
             manifest = await archive.create(
@@ -196,8 +196,9 @@ async def _archive(args: argparse.Namespace, passphrase: str) -> int:
                 Path(args.output),
                 passphrase,
                 options=archive.Options(history=args.history, media=not args.no_media),
-                heads=heads,
+                heads=await versions.current(),
                 site=site,
+                portalab=portalab_version(),
                 progress=_report,
             )
             sys.stdout.write(f"\narchive written: {len(manifest.tables)} tables, {manifest.counts}\n")
@@ -212,7 +213,7 @@ async def _archive(args: argparse.Namespace, passphrase: str) -> int:
             Path(args.input),
             passphrase,
             capabilities=capabilities,
-            heads=heads,
+            versions=versions,
             progress=_report,
         )
         sys.stdout.write(f"\nrestored: {result}; restart the portal (serve and worker)\n")
