@@ -129,6 +129,7 @@ class BackupService:
                 async for chunk in chunks:
                     await asyncio.to_thread(sink.write, chunk)
             partial.replace(self.folder / name)
+            (self.folder / name).chmod(0o600)  # personal data and secrets: the portal's eyes only
         except BaseException:
             partial.unlink(missing_ok=True)
             raise

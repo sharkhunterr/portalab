@@ -152,6 +152,10 @@ li[data-on] .features-picker__mark {
   font-size: var(--font-size-sm);
   white-space: nowrap;
 }
+.arrival__steps li[data-later] {
+  opacity: 0.6;
+  border: 1px dashed var(--color-border);
+}
 .arrival__steps li[aria-current="step"] {
   background: color-mix(in srgb, var(--color-accent) 14%, transparent);
   color: var(--color-text);

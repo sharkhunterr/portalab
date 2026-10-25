@@ -175,7 +175,12 @@ ANONYMOUS_PREFIXES = ("/api/v1/media/remote/",)  # a casting device's stream, by
 # issue 157: the terms of use, on the sign-in page — only while the administrators offer them there
 SIGN_IN_TERMS_PATH = "/api/v1/auth/terms"
 ANONYMOUS_CATALOGS = frozenset({"auth", "common", "errors"})  # the sign-in page's words
-PUBLIC_CATALOGS = frozenset({"core", "account"})  # issue 246: the arrival wizard's and sign-in's words
+PUBLIC_CATALOGS = frozenset({"core", "account"})
+# issue 247: a backup's archive (hundreds of MB, GB with its images) sent to a new portal's arrival wizard —
+# answered only until the portal is set up
+LARGE_BODIES = {
+    "/api/v1/admin/first-run/import/upload": 200 * 1024**3
+}  # issue 246: the arrival wizard's and sign-in's words
 HEALTH_PATHS = frozenset({"/healthz", "/readyz", "/metrics"})
 # who may ask the health checks: the machine itself and the local networks (the administrator narrows it)
 DEFAULT_HEALTH_NETWORKS = (
@@ -355,7 +360,8 @@ class SecurityMiddleware:
         declared = next(
             (value for name, value in scope.get("headers", ()) if name == b"content-length"), None
         )
-        if declared is not None and declared.isdigit() and int(declared) > self.max_body_bytes:
+        cap = LARGE_BODIES.get(path, self.max_body_bytes)
+        if declared is not None and declared.isdigit() and int(declared) > cap:
             await _problem(send, 413, "request.too_large", "Request body too large", [])
             return
 
@@ -367,7 +373,7 @@ class SecurityMiddleware:
             message = await receive()
             if message["type"] == "http.request":
                 received += len(message.get("body", b""))
-                if received > self.max_body_bytes:
+                if received > cap:
                     too_large = True
                     return {"type": "http.disconnect"}
             return message
