@@ -248,6 +248,10 @@ describe("admin screens", () => {
           ],
         });
       if (path === "/api/v1/services") return json(200, { items: [] });
+      if (path === "/api/v1/admin/modules") return json(200, []); // every feature kept
+      if (path === "/api/v1/admin/ai/servers") return json(200, []);
+      if (path === "/api/v1/admin/ai/config")
+        return json(200, { values: { enabled: false }, provider_secret_set: false });
       return json(200, {});
     };
     const { ArrivalContinue } = await import("../../src/features/admin/arrival/ArrivalContinue");
@@ -281,6 +285,20 @@ describe("admin screens", () => {
     await expectAccessible(container);
     fireEvent.click(screen.getByRole("button", { name: /Skip/ })); // the e-mail: later
     fireEvent.click(await screen.findByRole("button", { name: /Skip/ }));
+    // issue 249: the look, then play and the AI assistant (their features are kept), as in the setup assistant
+    expect(await screen.findByRole("heading", { name: "The portal's look" })).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole("button", { pressed: false })[0] as HTMLElement);
+    await vi.waitFor(() =>
+      expect(
+        calls.some((c) => c.method === "PUT" && JSON.stringify(c.body).includes("ui.defaultTheme")),
+      ).toBe(true),
+    );
+    await expectAccessible(container);
+    fireEvent.click(screen.getByRole("button", { name: /Skip/ }));
+    expect(await screen.findByRole("heading", { name: "Play and the shop" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Skip/ }));
+    expect(await screen.findByRole("heading", { name: "The AI assistant" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Skip/ }));
     expect(await screen.findByRole("heading", { name: "Everything is ready" })).toBeInTheDocument();
     expect(screen.getByText("no service yet")).toBeInTheDocument();
     await expectAccessible(container);
