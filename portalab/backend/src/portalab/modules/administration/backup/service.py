@@ -255,10 +255,11 @@ class BackupService:
 
         async def work(run: Run) -> dict[str, Any]:
             log.warning("portal reset", extra={"fields": {"by": str(actor.user_id)}})  # the audit goes too
-            run.phase = "schema"
-            await self.versions.reset()
+            # the folders first: the schema's reset writes Portalab's own packs again, their files with them
             run.phase = "files"
             cleared = await asyncio.to_thread(archive.clear_data, self.data_dir)
+            run.phase = "schema"
+            await self.versions.reset()
             run.phase = "done"
             return {"cleared": cleared}
 

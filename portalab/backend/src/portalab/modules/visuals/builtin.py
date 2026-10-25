@@ -100,6 +100,8 @@ class BuiltinSync:
                 continue
             if (manifest.id, files.sha) in shas:
                 report.unchanged += 1
+                if not dry_run:  # its files kept again when they went (a data folder emptied, #253)
+                    await asyncio.to_thread(self.packs.store.keep, manifest.id, files)
                 continue
             (report.updated if manifest.id in known else report.created).append(manifest.id)
             if dry_run:

@@ -249,7 +249,8 @@ async def test_reset_back_to_a_new_installation(
     migrated_db_url: str, heads: set[str], tmp_path: Path
 ) -> None:
     """Everything erased: the database as a new installation's (migrated, its permissions written again), the
-    data folders emptied — the backups kept, to bring one back."""
+    data folders emptied — the backups kept, to bring one back; then Portalab's own packs written again, their
+    files with them (#253: the folders emptied first, never after them)."""
     from portalab.app.backup_versions import SchemaVersions
 
     database = Database.from_url(migrated_db_url)
@@ -268,8 +269,14 @@ async def test_reset_back_to_a_new_installation(
                 )
             )
         versions = SchemaVersions(database, migrated_db_url)
+
+        async def builtin_packs() -> None:  # what the wiring hooks in: the built-in packs' sync
+            (data / "visuals" / "store").mkdir(parents=True)
+
+        versions.after_reset = builtin_packs
+        assert archive.clear_data(data) == ["blobs"]  # in the reset's order: the folders, then the schema
         await versions.reset()
-        assert archive.clear_data(data) == ["blobs"]
+        assert (data / "visuals" / "store").is_dir()
         assert await versions.current() == heads
         async with database.session() as session:
             settings = await session.scalar(text("SELECT count(*) FROM config.settings"))

@@ -7,7 +7,7 @@ import { Launch } from "./Launch";
 import { Stage } from "./Stage";
 import "../backup/backup.css";
 
-const PHASES = ["schema", "files"] as const;
+const PHASES = ["files", "schema"] as const;
 
 import "./arrival.css";
 
@@ -27,7 +27,7 @@ function Progress() {
   const run = status.data;
   const over = run?.state === "done" || (status.isFetched && !run);
   const failed = run?.state === "failed";
-  const at = over ? PHASES.length : PHASES.indexOf((run?.phase ?? "schema") as (typeof PHASES)[number]);
+  const at = over ? PHASES.length : PHASES.indexOf((run?.phase ?? "files") as (typeof PHASES)[number]);
   return (
     <Stage steps={[]}>
       <section className="arrival-card arrival-card--launch" aria-label={t("account:reset.title")}>

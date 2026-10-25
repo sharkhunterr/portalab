@@ -78,6 +78,14 @@ async def test_the_first_synchronisation_adopts_what_exists(database: Database, 
     # idempotent
     again = await BuiltinSync(service, packs).run(ADMIN)
     assert again.unchanged == 3 and not again.created and not again.updated
+    # #253: the data folder emptied under a registry that still has them — their files kept again, so an
+    # interface they bring can be switched on
+    shutil.rmtree(service.store.root / "store")
+    repaired = await BuiltinSync(service, packs).run(ADMIN)
+    assert repaired.unchanged == 3 and not repaired.created
+    for pack in ("portalab-socle", "portalab-academy", "portalab-alien"):
+        assert (service.store.root / "store" / pack).is_dir(), pack
+    await service.set_state(ADMIN, "portalab-alien", True)
 
 
 async def test_a_release_updates_keeps_choices_and_a_new_pack_arrives_off(
