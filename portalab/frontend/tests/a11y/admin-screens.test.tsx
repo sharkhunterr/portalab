@@ -4,7 +4,7 @@ import axe from "axe-core";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-// 020 T030 — Control Center, configuration editor (preview → apply), toggles, first-run wizard: explicit
+// 020 T030 — Control Center, configuration editor (preview → apply), toggles, arrival wizard: explicit
 // states, keyboard-operable native controls, no axe violations.
 
 const fake = vi.hoisted(() => ({
@@ -19,7 +19,7 @@ vi.mock("../../src/api/client", async (importOriginal) => {
 });
 
 import { MemoryRouter } from "react-router";
-import { ConfigEditor, ControlCenter, FirstRunWizard, Toggles } from "../../src/features/admin";
+import { ArrivalWizard, ConfigEditor, ControlCenter, Toggles } from "../../src/features/admin";
 import { json } from "../support/fake-api";
 
 function withClient(children: ReactNode) {
@@ -139,16 +139,69 @@ describe("admin screens", () => {
     await expectAccessible(container);
   });
 
-  it("first-run wizard and its closed state", async () => {
-    fake.handler = (request) =>
-      request.method === "GET"
-        ? json(200, { completed: false, steps: [{ step: "services", skippable: true }] })
-        : json(201, {});
-    const { container } = render(withClient(<FirstRunWizard />));
-    expect(await screen.findByRole("heading", { name: "Set up your portal" })).toBeInTheDocument();
+  it("arrival wizard (issue 246): language, installation, features, administrator, then everything at once", async () => {
+    const calls: Array<{ method: string; path: string; body: unknown }> = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      const body = request.method === "GET" ? null : await request.json().catch(() => null);
+      calls.push({ method: request.method, path, body });
+      if (path === "/api/v1/i18n/public/languages")
+        return json(200, {
+          default: "en",
+          items: [
+            { code: "en", name_native: "English", direction: "ltr" },
+            { code: "fr", name_native: "Français", direction: "ltr" },
+          ],
+        });
+      if (path.startsWith("/api/v1/i18n/public/catalogs/")) return json(200, { messages: {} });
+      if (path === "/api/v1/admin/first-run")
+        return request.method === "GET" ? json(200, { completed: false }) : json(201, {});
+      if (path === "/api/v1/admin/modules")
+        return json(200, [
+          { key: "content", enabled: true, requires: [], essential: false, needs_restart: false },
+          { key: "wiki", enabled: true, requires: ["content"], essential: false, needs_restart: false },
+          { key: "news", enabled: true, requires: ["content"], essential: false, needs_restart: false },
+        ]);
+      return json(200, {});
+    };
+    const assign = vi.fn();
+    vi.stubGlobal("location", {
+      ...globalThis.location,
+      assign,
+      pathname: "/setup",
+      origin: "https://portal.test",
+    });
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    });
+    const { container } = render(
+      <QueryClientProvider client={client}>
+        <ArrivalWizard />
+      </QueryClientProvider>,
+    );
+    expect(await screen.findByRole("heading", { name: "Welcome to Portalab" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Import another Portalab/ })).toBeDisabled();
     await expectAccessible(container);
-    fake.handler = () => json(200, { completed: true, steps: [] });
-    render(withClient(<FirstRunWizard />));
-    expect(await screen.findByText("The portal is already set up.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Continue/ }));
+    fireEvent.click(await screen.findByRole("checkbox", { name: /Wiki/ }));
+    expect(screen.getByRole("checkbox", { name: /Wiki/ })).not.toBeChecked();
+    fireEvent.click(screen.getByRole("checkbox", { name: /XP, levels/ }));
+    expect(screen.getByRole("checkbox", { name: /Shop/ })).not.toBeChecked(); // the shop needs play
+    await expectAccessible(container);
+    fireEvent.click(screen.getByRole("button", { name: /Continue/ }));
+    fireEvent.change(await screen.findByLabelText("Login"), { target: { value: "Admin" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "a-strong-password" } });
+    await expectAccessible(container);
+    fireEvent.click(screen.getByRole("button", { name: /Continue/ }));
+    expect(await screen.findByRole("heading", { name: "Ready to create the portal" })).toBeInTheDocument();
+    expect(calls.some((c) => c.method !== "GET")).toBe(false); // nothing written before the last step
+    fireEvent.click(screen.getByRole("button", { name: /Create the portal/ }));
+    await vi.waitFor(() => expect(assign).toHaveBeenCalledWith("/admin/setup"));
+    const created = calls.find((c) => c.method === "POST" && c.path === "/api/v1/admin/first-run");
+    expect(created?.body).toMatchObject({ login: "admin", settings: { "i18n.defaultLanguage": "en" } });
+    expect(calls.some((c) => c.path === "/api/v1/auth/login")).toBe(true);
+    const disabled = calls.filter((c) => c.path === "/api/v1/admin/modules" && c.method === "PUT");
+    expect(disabled.map((c) => (c.body as { key: string }).key)).toEqual(["wiki"]);
+    vi.unstubAllGlobals();
   });
 });

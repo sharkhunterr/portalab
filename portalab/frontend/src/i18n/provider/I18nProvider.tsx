@@ -68,13 +68,17 @@ export function I18nProvider({
   children,
   namespaces = DEFAULT_NAMESPACES,
   override,
+  anonymous = false,
 }: {
   children: ReactNode;
   namespaces?: string[];
   override?: Partial<LocaleContextValue>;
+  /** Issue 246: before signing in (the arrival wizard) — the public catalogs, in ``override.language``. */
+  anonymous?: boolean;
 }) {
   const context = useQuery({
     queryKey: ["i18n", "context"],
+    enabled: !anonymous,
     queryFn: async () => (await api.GET("/api/v1/i18n/context")).data as unknown as LocaleContextValue,
     staleTime: 5 * 60_000,
   });
@@ -88,6 +92,7 @@ export function I18nProvider({
   // 030: the catalogs of the plugins this member sees (their pages, navigation and messages)
   const plugins = useQuery({
     queryKey: ["i18n", "plugin-namespaces"],
+    enabled: !anonymous,
     retry: false,
     staleTime: 5 * 60_000,
     queryFn: async () => {
@@ -106,14 +111,21 @@ export function I18nProvider({
   const allNamespaces = useMemo(() => [...namespaces, ...pluginNamespaces], [namespaces, pluginNamespaces]);
   const catalogs = useQueries({
     queries: allNamespaces.map((namespace) => ({
-      queryKey: ["i18n", "catalog", locale.language, namespace],
+      queryKey: ["i18n", anonymous ? "public-catalog" : "catalog", locale.language, namespace],
       enabled: context.isSuccess || override !== undefined,
       staleTime: 5 * 60_000,
       queryFn: async () => {
         try {
-          const response = await api.GET("/api/v1/i18n/catalogs/{namespace}", {
-            params: { path: { namespace }, query: { lang: locale.language } },
-          });
+          const response = anonymous
+            ? await api.GET(
+                `/api/v1/i18n/public/catalogs/${namespace}` as never,
+                {
+                  params: { query: { lang: locale.language } },
+                } as never,
+              )
+            : await api.GET("/api/v1/i18n/catalogs/{namespace}", {
+                params: { path: { namespace }, query: { lang: locale.language } },
+              });
           const messages = (response.data as unknown as { messages?: Record<string, string> } | undefined)
             ?.messages;
           if (!messages) throw new Error("catalog unavailable");

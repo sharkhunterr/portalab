@@ -4,17 +4,20 @@ import { AdminPage, StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
+import { PortalFeatures } from "../arrival/FeaturesPicker";
 import { SettingCard, type SettingItem } from "../ConfigEditor";
 import { EmailSettings } from "../communication/EmailSettings";
+import { ServiceAccountsPanel } from "../members/ServiceAccountsPanel";
 import { AddServiceWizard } from "../services/ServicesAdmin";
 import { SiteIdentityAdmin } from "../site/SiteIdentityAdmin";
 import { type Progress, STEPS, type Step, type StepKey, useReadiness, useSetupProgress } from "./progress";
 import "./setup.css";
 
 /**
- * Issue 6 — the setup assistant: the portal set up step by step after its first run — its identity, the
- * administrator's account, who may join, the services, the media, communication, the look, play and shop, the
- * assistant — then what is left to do. Each step holds the real settings and screens (nothing is set twice),
+ * Issue 6 — the setup assistant: the portal set up step by step after its first run — its identity, its
+ * features (issue 246), the administrator's account, who may join, the services, the members and their
+ * services' accounts (issue 246), the media, communication, the look, play and shop, the assistant — then
+ * what is left to do. Each step holds the real settings and screens (nothing is set twice),
  * may be skipped and come back to; where it is (``admin.setup.progress``) is kept by the server, so it resumes
  * on any device and is opened again from the Control Center without losing anything. Every change goes
  * through the configuration (validated, audited); secrets are never shown back.
@@ -37,6 +40,8 @@ function StepBody({ step, settings }: { step: Step; settings: SettingItem[] }) {
   const embedded: Partial<Record<StepKey, ReactNode>> = {
     identity: <SiteIdentityAdmin embedded />,
     services: <AddServiceWizard />,
+    features: <PortalFeatures />,
+    members: <ServiceAccountsPanel />,
     communication: <EmailSettings />,
   };
   return (

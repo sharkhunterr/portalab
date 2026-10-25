@@ -20,6 +20,8 @@ import {
   ACCOUNTS_KEY,
   type AccountMember,
   accountLabel,
+  type CreatedMember,
+  createMembers,
   memberLabel,
   type ServiceAccount,
   type ServiceAccounts,
@@ -44,14 +46,75 @@ function useLink() {
   });
 }
 
+const NEW_MEMBER = "__new__";
+
+/** Issue 246: members made from accounts, the results kept to show their activation links. */
+function useCreateMembers(members: AccountMember[], onDone: (created: CreatedMember[]) => void) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (items: Array<{ service: string; account: ServiceAccount }>) => createMembers(items, members),
+    onSuccess: (created) => {
+      onDone(created);
+      void client.invalidateQueries({ queryKey: ACCOUNTS_KEY });
+    },
+  });
+}
+
+type Create = ReturnType<typeof useCreateMembers>;
+
+/** The members just made: who, their login, and the activation link to hand over (it is shown only now). */
+function CreatedMembers({ created }: { created: CreatedMember[] }) {
+  const t = useT();
+  if (!created.length) return null;
+  const made = created.filter((c) => c.login);
+  const failed = created.filter((c) => !c.login);
+  const origin = globalThis.location?.origin ?? "";
+  return (
+    <AdminSection title={t("admin:accounts.created.title", { count: made.length })} icon="user-plus" flush>
+      <p className="admin-muted admin-pad">{t("admin:accounts.created.hint")}</p>
+      <ul className="admin-list" role="status">
+        {made.map((c) => (
+          <li key={`${c.service}:${c.account.external_id}`}>
+            <span className="admin-list__main">
+              <strong>{accountLabel(c.account)}</strong>
+              <span className="admin-muted">@{c.login}</span>
+            </span>
+            {c.token ? (
+              <input
+                readOnly
+                className="accounts-created__link"
+                aria-label={`${t("admin:accounts.created.link")} — ${accountLabel(c.account)}`}
+                value={`${origin}/verify?token=${c.token}`}
+                onFocus={(e) => e.currentTarget.select()}
+              />
+            ) : null}
+          </li>
+        ))}
+        {failed.map((c) => (
+          <li key={`${c.service}:${c.account.external_id}`}>
+            <span className="admin-list__main">
+              <strong>{accountLabel(c.account)}</strong>
+              <span role="alert" className="admin-muted">
+                {t("admin:accounts.created.failed")} {c.error ?? ""}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </AdminSection>
+  );
+}
+
 function MemberPicker({
   block,
   account,
   members,
+  create,
 }: {
   block: ServiceAccounts;
   account: ServiceAccount;
   members: AccountMember[];
+  create: Create;
 }) {
   const t = useT();
   const link = useLink();
@@ -64,16 +127,19 @@ function MemberPicker({
         className="accounts-picker__select"
         aria-label={label}
         value={account.linked_user_id ?? ""}
-        disabled={link.isPending}
+        disabled={link.isPending || create.isPending}
         onChange={(e) =>
-          link.mutate({
-            service: block.service_id,
-            account: account.external_id,
-            user: e.target.value || null,
-          })
+          e.target.value === NEW_MEMBER
+            ? create.mutate([{ service: block.service_id, account }])
+            : link.mutate({
+                service: block.service_id,
+                account: account.external_id,
+                user: e.target.value || null,
+              })
         }
       >
         <option value="">{t("admin:accounts.unlinked")}</option>
+        {account.linked_user_id ? null : <option value={NEW_MEMBER}>{t("admin:accounts.createOne")}</option>}
         {members.map((m) => (
           <option key={m.id} value={m.id}>
             {memberLabel(m)}
@@ -109,11 +175,13 @@ function ServiceBlock({
   members,
   filter,
   needle,
+  create,
 }: {
   block: ServiceAccounts;
   members: AccountMember[];
   filter: string;
   needle: string;
+  create: Create;
 }) {
   const t = useT();
   const format = useFormat();
@@ -124,6 +192,7 @@ function ServiceBlock({
     onSuccess: () => void client.invalidateQueries({ queryKey: ACCOUNTS_KEY }),
   });
   const suggestions = block.accounts.filter((a) => !a.linked_user_id && a.suggestion).length;
+  const orphans = block.accounts.filter((a) => !a.linked_user_id && !a.suggestion);
   const rows = block.accounts.filter(
     (a) =>
       (filter === "all" ||
@@ -141,11 +210,28 @@ function ServiceBlock({
       icon="server"
       flush
       actions={
-        suggestions ? (
-          <Button variant="secondary" disabled={apply.isPending} onClick={() => apply.mutate()}>
-            <Icon name="sparkles" size={16} />
-            {t("admin:accounts.applyService", { count: suggestions })}
-          </Button>
+        suggestions || orphans.length ? (
+          <span className="accounts-actions">
+            {suggestions ? (
+              <Button variant="secondary" disabled={apply.isPending} onClick={() => apply.mutate()}>
+                <Icon name="sparkles" size={16} />
+                {t("admin:accounts.applyService", { count: suggestions })}
+              </Button>
+            ) : null}
+            {orphans.length && block.available ? (
+              <Button
+                variant="secondary"
+                disabled={create.isPending}
+                aria-busy={create.isPending}
+                onClick={() =>
+                  create.mutate(orphans.map((account) => ({ service: block.service_id, account })))
+                }
+              >
+                <Icon name="user-plus" size={16} />
+                {t("admin:accounts.createMissing", { count: orphans.length })}
+              </Button>
+            ) : null}
+          </span>
         ) : null
       }
     >
@@ -201,7 +287,7 @@ function ServiceBlock({
           {
             key: "member",
             header: t("admin:accounts.member"),
-            render: (a) => <MemberPicker block={block} account={a} members={members} />,
+            render: (a) => <MemberPicker block={block} account={a} members={members} create={create} />,
           },
         ]}
       />
@@ -216,6 +302,8 @@ export function ServiceAccountsPanel() {
   const overview = useServiceAccounts();
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
+  const [created, setCreated] = useState<CreatedMember[]>([]);
+  const create = useCreateMembers(overview.data?.members ?? [], (made) => setCreated((c) => [...made, ...c]));
   const applyAll = useMutation({
     mutationFn: async () => api.POST("/api/v1/admin/media/accounts/apply-suggestions", { body: {} }),
     onSuccess: () => void client.invalidateQueries({ queryKey: ACCOUNTS_KEY }),
@@ -299,6 +387,7 @@ export function ServiceAccountsPanel() {
           {t("admin:accounts.applied")}
         </p>
       ) : null}
+      <CreatedMembers created={created} />
       {services.map((block) => (
         <ServiceBlock
           key={block.service_id}
@@ -306,6 +395,7 @@ export function ServiceAccountsPanel() {
           members={members}
           filter={filter}
           needle={query.trim().toLowerCase()}
+          create={create}
         />
       ))}
     </>
