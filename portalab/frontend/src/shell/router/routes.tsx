@@ -28,6 +28,7 @@ const Logs = lazy(() => import("../../pages/admin/LogsRoute"));
 const Site = lazy(() => import("../../pages/admin/SiteRoute")); // issue 159
 const SetupAssistant = lazy(() => import("../../features/admin/setup/SetupAssistant"));
 const BackupsAdmin = lazy(() => import("../../features/admin/backup/BackupsAdmin"));
+const SystemVersion = lazy(() => import("../../features/admin/backup/SystemVersion"));
 const Incidents = lazy(() => import("../../features/support/incidents/IncidentsPage"));
 const IncidentConsole = lazy(() => import("../../features/support/incidents/IncidentConsole"));
 const Statistics = lazy(() => import("../../features/statistics/StatisticsPage"));
@@ -405,6 +406,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { index: true, element: <ControlCenter /> },
             { path: "setup", element: <SetupAssistant />, handle: h({ crumb: "Setup assistant" }) }, // issue 6
             { path: "backups", element: <BackupsAdmin />, handle: h({ crumb: "Backups" }) }, // issue 247
+            { path: "version", element: <SystemVersion />, handle: h({ crumb: "Version" }) }, // issue 247
             {
               path: "statistics",
               element: <StatisticsAdmin />,

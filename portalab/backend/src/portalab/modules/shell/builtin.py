@@ -875,6 +875,19 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "keywords": ("backup", "restore", "export", "import", "sauvegarde", "archive"),
     },
     {
+        "key": "administration.version",  # issue 247: the version, and starting again from scratch
+        "owner": "module:administration",
+        "kind": "entry",
+        "label_key": "nav.admin.version",
+        "icon": "info",
+        "route": "/admin/version",
+        "group": "admin",
+        "topic": "system",
+        "order_hint": 90,
+        "required_permission": "configuration.manage",
+        "keywords": ("version", "about", "reset", "à propos", "réinitialiser"),
+    },
+    {
         # issue 159: the site's name, slogan, logo, icon and currency
         "key": "ui.site_identity",
         "owner": "module:ui",

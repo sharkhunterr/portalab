@@ -87,6 +87,8 @@ class Versions(Protocol):
 
     async def finish(self) -> None: ...
 
+    async def reset(self) -> None: ...
+
 
 def _from_format_1(manifest: dict[str, Any]) -> dict[str, Any]:
     return {**manifest, "format": 2, "portalab": "unknown"}
@@ -565,6 +567,22 @@ async def _rekey(
         done, failed = done + rewritten, failed + unreadable
     await session.flush()
     return {"rewritten": done, "unreadable": failed}
+
+
+def clear_data(data_dir: Path) -> list[str]:
+    """Issue 247: the data folders emptied for a new installation — the backups kept (to bring one back)."""
+    cleared: list[str] = []
+    if not data_dir.is_dir():
+        return cleared
+    for entry in sorted(data_dir.iterdir()):
+        if entry.name == "backups":
+            continue
+        if entry.is_dir() and not entry.is_symlink():
+            shutil.rmtree(entry, ignore_errors=True)
+        else:
+            entry.unlink(missing_ok=True)
+        cleared.append(entry.name)
+    return cleared
 
 
 def _swap_folders(files_dir: Path, data_dir: Path, manifest: Mapping[str, Any]) -> list[str]:

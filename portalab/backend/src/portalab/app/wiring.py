@@ -14,6 +14,7 @@ from pathlib import Path
 
 from portalab.app.backup_versions import SchemaVersions, portalab_version
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.capabilities.visuals import builtin_root
 from portalab.connectors.builtin import register_builtin
 from portalab.core.audit_port import AuditSink, LogAuditSink
 from portalab.core.authz_port import Authorizer, DenyAllAuthorizer, Principal, ResourceRef
@@ -54,6 +55,7 @@ from portalab.modules.shell.module import ShellModule
 from portalab.modules.statistics.module import StatisticsModule
 from portalab.modules.support.module import SupportModule
 from portalab.modules.ui.module import UiModule
+from portalab.modules.visuals.builtin import BuiltinSync
 from portalab.modules.visuals.module import VisualsModule
 from portalab.modules.wiki.module import WikiModule
 
@@ -202,13 +204,14 @@ def wire_platform(
     async def site_name() -> str:
         return str((await ui.site.public()).get("name") or "Portalab")
 
+    versions = SchemaVersions(database, database_url)
     administration.backups = BackupService(  # issue 247
         database,
         data_dir,
         secret_key,
         capabilities,
         authz.audit,
-        versions=SchemaVersions(database, database_url or ""),
+        versions=versions,
         site=site_name,
         portalab=portalab_version(),
     )
@@ -285,6 +288,7 @@ def wire_platform(
     visuals = VisualsModule(
         database, events, authz.audit, capabilities, root=data_dir / "visuals", authorizer=authz.engine
     )
+    versions.after_reset = lambda: BuiltinSync(visuals.packs, builtin_root()).run(dry_run=False)  # 247
     # issue 229; issue 234: its events (a booster opened, a collection completed) count for the achievements
     cards = CardsModule(database, capabilities, events=events, blobs=context.blobs, root=data_dir / "cards")
     cards.register()
