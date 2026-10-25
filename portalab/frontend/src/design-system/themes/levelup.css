@@ -125,6 +125,15 @@
   flex: none;
   color: var(--glow);
 }
+/* issue 248: several levels at once — each level's rewards, scrolled when they are many */
+.levelup__tiers {
+  max-block-size: 12rem;
+  overflow-y: auto;
+}
+.levelup__count {
+  color: var(--glow);
+  font-weight: 600;
+}
 .levelup__actions {
   display: flex;
   flex-wrap: wrap;

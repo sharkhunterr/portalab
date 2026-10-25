@@ -151,6 +151,7 @@ async def my_level_up(
     module: Module,
     level: Annotated[int, Path(ge=2, le=100_000)],
     since: Annotated[int | None, Query(ge=1, le=100_000)] = None,
+    after: Annotated[datetime | None, Query()] = None,
 ) -> dict[str, Any]:
     """027: the level-up moment — the new level, the level rewards crossed, the achievements just
     unlocked and what they gave (own data only)."""
@@ -162,6 +163,7 @@ async def my_level_up(
         _me(principal),
         level,
         since,
+        after=after,
         clock=module.clock,
     )
 

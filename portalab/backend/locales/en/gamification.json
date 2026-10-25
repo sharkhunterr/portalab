@@ -621,5 +621,7 @@
   "widget.progress.streak": "{days, plural, one {# day} other {# days}} in a row",
   "widget.progress.title": "My progression",
   "widget.wheel.description": "Once a day, spin the wheel: coins to win (or lose), XP, a discovery booster…",
-  "widget.wheel.title": "Wheel of fortune"
+  "widget.wheel.title": "Wheel of fortune",
+  "levelUp.levels": "{count, plural, one {# level} other {# levels at once}}",
+  "levelUp.byLevel": "Level by level"
 }

@@ -1,6 +1,6 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
-import { type CSSProperties, useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../../api/client";
 import { LevelBadge } from "../../../design-system/components/Badges";
@@ -12,6 +12,7 @@ import { ExternalScript } from "../../../design-system/visuals/ExternalScript";
 import { externalLook, fxName, useExternalRevision } from "../../../design-system/visuals/registry";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useShellPreference } from "../../../shell/preferences";
 import type { Product } from "../../marketplace/api";
 import "../../../design-system/themes/levelup.css";
 
@@ -29,6 +30,28 @@ export interface LevelUpEvent {
   xp?: number | undefined;
   /** A preview (Appearance, the shop): sample content and this look. */
   preview?: string | undefined;
+  /** Issue 248: celebrated on coming back — the achievements since the last level-up seen. */
+  after?: string | undefined;
+}
+
+/** Issue 248: the last level-up the member saw celebrated, kept on the server (every device). */
+interface Celebrated {
+  level: number;
+  at: string;
+}
+
+const CELEBRATED = "shell.levelUp.celebrated";
+
+/** Several level-ups before the moment is closed (or reached while away): one moment, from the first. */
+export function mergeLevelUps(open: LevelUpEvent | null, next: LevelUpEvent): LevelUpEvent {
+  if (!open || open.preview || next.preview) return next;
+  const xp = (open.xp ?? 0) + (next.xp ?? 0);
+  return {
+    level: Math.max(open.level, next.level),
+    from: Math.min(open.from ?? open.level - 1, next.from ?? next.level - 1),
+    xp: xp || undefined,
+    after: open.after ?? next.after,
+  };
 }
 
 const EVENT = "portalab:level-up";
@@ -208,20 +231,49 @@ export function LevelUpMoment() {
   const { effective, looks } = useTheme();
   const [event, setEvent] = useState<LevelUpEvent | null>(null);
   useEffect(() => {
-    const onLevelUp = (e: Event) => setEvent((e as CustomEvent<LevelUpEvent>).detail);
+    const onLevelUp = (e: Event) =>
+      setEvent((open) => mergeLevelUps(open, (e as CustomEvent<LevelUpEvent>).detail));
     window.addEventListener(EVENT, onLevelUp);
     return () => window.removeEventListener(EVENT, onLevelUp);
   }, []);
+  // issue 248: a level reached while away is celebrated when the member comes back — once, on any device
+  const [celebrated, setCelebrated, ready] = useShellPreference<Celebrated | null>(CELEBRATED, null);
+  const current = useQuery({
+    queryKey: ["gamification", "level-up", "current"],
+    enabled: ready,
+    retry: false,
+    staleTime: Number.POSITIVE_INFINITY,
+    queryFn: async () => (await api.GET("/api/v1/me/progression")).data as unknown as { level: number },
+  });
+  const decided = useRef(false);
+  useEffect(() => {
+    const reached = current.data?.level;
+    if (decided.current || !ready || typeof reached !== "number") return;
+    decided.current = true;
+    if (!celebrated)
+      setCelebrated({ level: reached, at: new Date().toISOString() }); // nothing to catch up
+    else if (reached > celebrated.level)
+      showLevelUp({ level: reached, from: celebrated.level, after: celebrated.at });
+  }, [ready, current.data, celebrated, setCelebrated]);
+  const close = () => {
+    if (event && !event.preview && (!celebrated || event.level > celebrated.level))
+      setCelebrated({ level: event.level, at: new Date().toISOString() });
+    setEvent(null);
+  };
   const level = event?.level ?? 0;
   const from = event?.from;
+  const after = event?.after;
   const summary = useQuery({
-    queryKey: ["gamification", "level-up", level, from],
+    queryKey: ["gamification", "level-up", level, from, after],
     enabled: Boolean(event) && !event?.preview,
     retry: false,
     queryFn: async () =>
       (
         await api.GET("/api/v1/me/level-ups/{level}", {
-          params: { path: { level }, query: from ? { since: from } : {} },
+          params: {
+            path: { level },
+            query: { ...(from ? { since: from } : {}), ...(after ? { after } : {}) },
+          },
         })
       ).data as unknown as Summary,
   });
@@ -264,7 +316,7 @@ export function LevelUpMoment() {
   const toNext = data?.next_level_at ? Math.max(0, data.next_level_at - data.xp) : null;
   const reduced = effective.reducedMotion;
   return (
-    <DialogPrimitive.Root open onOpenChange={(open) => (open ? null : setEvent(null))}>
+    <DialogPrimitive.Root open onOpenChange={(open) => (open ? null : close())}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="levelup__overlay" />
         <DialogPrimitive.Content
@@ -286,7 +338,15 @@ export function LevelUpMoment() {
               <span className="levelup__kicker">{t("gamification:levelUp.kicker")}</span>
               {t("gamification:levelUp.title", { level })}
             </DialogPrimitive.Title>
-            <p className="levelup__from">{t("gamification:levelUp.from", { from: previous, level })}</p>
+            <p className="levelup__from">
+              {t("gamification:levelUp.from", { from: previous, level })}
+              {level - previous > 1 ? (
+                <span className="levelup__count">
+                  {" "}
+                  · {t("gamification:levelUp.levels", { count: level - previous })}
+                </span>
+              ) : null}
+            </p>
             {Object.keys(totals).length ? (
               <section className="levelup__section" aria-label={t("gamification:levelUp.won")}>
                 <h3>{t("gamification:levelUp.won")}</h3>
@@ -296,6 +356,31 @@ export function LevelUpMoment() {
                       <Icon name={VALUE_ICONS[value] ?? "star"} size={18} />
                       <strong>+{format.number(amount)}</strong>
                       <span>{t(`gamification:value.${value}`)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+            {level - previous > 1 && data?.rewards.length ? (
+              <section className="levelup__section" aria-label={t("gamification:levelUp.byLevel")}>
+                <h3>{t("gamification:levelUp.byLevel")}</h3>
+                <ul className="levelup__list levelup__tiers">
+                  {data.rewards.map((tier) => (
+                    <li key={tier.level}>
+                      <LevelBadge level={tier.level} label={t("shell:levelLabel", { level: tier.level })} />
+                      <span>
+                        {[
+                          tier.coins
+                            ? `+${format.number(tier.coins)} ${t("gamification:value.coins")}`
+                            : null,
+                          tier.contribution
+                            ? `+${format.number(tier.contribution)} ${t("gamification:value.contribution")}`
+                            : null,
+                          tier.product ? tier.label || tier.product : null,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -340,7 +425,7 @@ export function LevelUpMoment() {
             ) : null}
             <div className="levelup__actions">
               {event.preview ? null : (
-                <Link to="/progression" className="ds-button ds-button--ghost" onClick={() => setEvent(null)}>
+                <Link to="/progression" className="ds-button ds-button--ghost" onClick={close}>
                   {t("gamification:levelUp.progression")}
                 </Link>
               )}

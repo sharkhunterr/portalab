@@ -1393,6 +1393,8 @@
   "setting.security.rateLimit.perIpPerMinute.label": "Requests per minute per address",
   "setting.security.rateLimit.perUserPerMinute.hint": "Requests allowed per minute from one signed-in session.",
   "setting.security.rateLimit.perUserPerMinute.label": "Requests per minute per session",
+  "setting.shell.levelUp.celebrated.hint": "The last level whose celebration you saw: a level reached while you were away is celebrated when you come back.",
+  "setting.shell.levelUp.celebrated.label": "Last level-up celebrated",
   "setting.shell.navigation.allowUserOrdering.hint": "Members may change the order of their navigation menu.",
   "setting.shell.navigation.allowUserOrdering.label": "Let members reorder navigation",
   "setting.shell.navigation.expanded.hint": "Navigation sections this member keeps open.",
