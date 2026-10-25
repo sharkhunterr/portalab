@@ -1,6 +1,14 @@
-"""Issue 253 — a portal's game setup as a whole, taken from one portal and applied to another: what earns XP
-and Coins (the reward rules), the level curve, the rewards by level, the achievements, the quests, the
-campaigns, and the play settings (streak, pace, bonuses, the wheel, the contribution, the leaderboards).
+"""Issue 253 — a portal's game setup as a whole, taken from one portal and applied to another: its shop,
+what earns XP and Coins (the reward rules), the level curve, the rewards by level, the achievements, the
+quests, the campaigns, and the play settings (streak, pace, bonuses, the wheel, the contribution, the
+leaderboards).
+
+The shop keeps where each product comes from: Portalab's own catalog (features, widgets, statistics, perks —
+``demo_catalog.json``) is published as Portalab defines it; the products of visual packs stay their packs' —
+the setup names the packs to switch on (Portalab's own) or to install (the examples Portalab ships, extensions
+like any other), never their products; only the products the administrators made themselves (boosters, card
+boosters…) are carried, with the scene each booster wears. A product already in the shop is left as its
+administrators set it.
 
 It spans two modules (gamification, campaigns), so it lives here, beside the demo seed, and goes through each
 module's own services (validated, versioned, audited like an administrator's edits). Members' own state —
@@ -17,16 +25,21 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+from portalab.app.demo_shop import COLLECTIONS, SHOP
 from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
+from portalab.capabilities.visuals import LOOK_TYPES, examples_root, live_looks
 from portalab.core.authz_port import Principal
 from portalab.core.time import utc_now
 from portalab.modules.gamification.achievements.definition import parse_achievement
 from portalab.modules.gamification.quests.definition import parse_quest
 from portalab.modules.gamification.rules.definition import parse_rule
 from portalab.modules.gamification.settings import SETTINGS, EconomyConfig
+from portalab.modules.marketplace.products.service import Catalog
+from portalab.modules.marketplace.products.sync import sync_product
+from portalab.modules.visuals.manifest import ManifestError, parse_pack
 
 FORMAT = "portalab.game"
-VERSION = 1
+VERSION = 2  # 2: the shop
 PRESETS = ("lan",)
 # the play settings a setup carries (the operations' own — anomaly thresholds, retention — stay the portal's)
 CARRIED = (
@@ -41,7 +54,9 @@ CARRIED = (
     "leaderboard_include_coins",
 )
 LIVE_CAMPAIGNS = ("draft", "scheduled", "active", "paused")
-PARTS = ("settings", "curve", "rules", "achievements", "quests", "campaigns")
+# the shop first: the rewards by level, the achievements and the campaigns name its products
+PARTS = ("shop", "settings", "curve", "rules", "achievements", "quests", "campaigns")
+ACCESS_PERMISSIONS = "marketplace.access.allowedPermissions"
 
 
 def preset(key: str) -> dict[str, Any]:
@@ -51,7 +66,11 @@ def preset(key: str) -> dict[str, Any]:
 
 
 def counts(setup: Mapping[str, Any]) -> dict[str, int]:
+    shop = setup.get("shop") or {}
     return {
+        "catalog": len(SHOP) if shop.get("catalog") else 0,
+        "packs": len(shop.get("packs") or []),
+        "products": len(shop.get("products") or []),
         "settings": len(setup.get("settings") or {}),
         "rules": len(setup.get("rules") or []),
         "achievements": len(setup.get("achievements") or []),
@@ -103,6 +122,104 @@ async def export(platform: Any) -> dict[str, Any]:
         "achievements": sorted(achievements, key=lambda a: a["key"]),
         "quests": sorted(quests, key=lambda q: q["key"]),
         "campaigns": sorted(live, key=lambda c: c["key"]),
+        "shop": await _export_shop(platform),
+    }
+
+
+def examples() -> dict[str, Path]:
+    """The example packs Portalab ships: their id → their folder."""
+    root = examples_root()
+    out: dict[str, Path] = {}
+    for folder in sorted(root.iterdir()) if root is not None and root.is_dir() else []:
+        try:
+            out[parse_pack((folder / "pack.json").read_bytes()).id] = folder
+        except (OSError, ManifestError):
+            continue
+    return out
+
+
+def _entry(product: Any, version: Any, collection: str | None) -> dict[str, Any]:
+    """A product the administrators made, as the catalog's sync takes it."""
+    return {
+        "key": product.key,
+        "type": product.type,
+        "price": version.price_coins,
+        "rarity": product.rarity,
+        "names": dict(version.names),
+        "descriptions": dict(version.descriptions),
+        "payload": dict(version.payload),
+        "collection": collection,
+        "icon": product.icon,
+        "featured": product.featured,
+        "level": Catalog.min_level_of(version),
+        "contribution": Catalog.min_contribution_of(version),
+        "supply": product.supply,
+        "limit": [product.limit_count, product.limit_days] if product.limit_count else None,
+        "repeatable": product.repeatable,
+        "reward_only": product.state == "unavailable",
+        "config_required": version.config_required,
+        "season": product.season,
+        "refund_policy": dict(version.refund_policy),
+    }
+
+
+def _shown(product: Any, version: Any) -> bool:
+    """A look sold by the administrators shows a look some pack has (else it is nothing to wear)."""
+    field = LOOK_TYPES.get(product.type)
+    return field is None or str(version.payload.get(field, "")) in live_looks.known(product.type)
+
+
+async def _export_shop(platform: Any) -> dict[str, Any]:
+    catalog: Catalog = platform.marketplace.catalog
+    visuals = getattr(platform, "visuals", None)
+    packs: list[str] = []
+    held: frozenset[str] = frozenset()
+    scenes: dict[str, dict[str, str]] = {}
+    if visuals is not None:
+        shipped = examples()
+        packs = [
+            p["id"]
+            for p in await visuals.packs.listing()
+            if p["state"] == "enabled" and not p["socle"] and (p["builtin"] or p["id"] in shipped)
+        ]
+        held = await visuals.packs.product_keys()
+        scenes = {
+            booster: {"pack": bound["pack"], "look": bound["look"]}
+            for booster, bound in ((await visuals.packs.scene_bindings()).get("bindings") or {}).items()
+        }
+    base = {p["key"] for p in SHOP}
+    categories = {c.id: c for c in await catalog.categories()}
+    rows = await catalog.listing(states=("available", "unavailable"))
+    made = [
+        (product, version)
+        for product, version in rows
+        if product.key not in held
+        and product.key not in base
+        and product.extension_ref is None  # a plugin's own products are the plugin's
+        and not product.type.startswith("plugin:")
+        and _shown(product, version)
+    ]
+    used = {product.category_id for product, _ in made} - {None}
+    known = {key for key, *_ in COLLECTIONS}
+    return {
+        "catalog": any(product.key in base for product, _ in rows),
+        "packs": sorted(packs),
+        "collections": sorted(
+            (
+                {"key": c.key, "label": c.label_key, "icon": c.icon, "position": c.position}
+                for i, c in categories.items()
+                if i in used and c.key not in known
+            ),
+            key=lambda c: c["key"],
+        ),
+        "products": sorted(
+            (
+                _entry(p, v, categories[p.category_id].key if p.category_id in categories else None)
+                for p, v in made
+            ),
+            key=lambda e: e["key"],
+        ),
+        "scenes": dict(sorted(scenes.items())),
     }
 
 
@@ -128,6 +245,8 @@ async def apply(
     report = Report()
     gamification = platform.gamification
     now = utc_now(gamification.clock)
+    if "shop" in parts and setup.get("shop"):
+        await _shop(platform, actor, dict(setup["shop"]), report)
     if "settings" in parts:
         await _settings(platform, actor, dict(setup.get("settings") or {}), report)
     if "curve" in parts and setup.get("curve"):
@@ -167,6 +286,94 @@ async def apply(
         await _campaigns(platform.campaigns, actor, setup.get("campaigns") or [], report)
     await platform.refresh_config()
     return report.out()
+
+
+async def _shop(platform: Any, actor: Principal, shop: dict[str, Any], report: Report) -> None:
+    catalog: Catalog = platform.marketplace.catalog
+    if shop.get("catalog"):
+        await _access_permissions(platform, actor, report)
+        for key, label, icon, position in COLLECTIONS:
+            await catalog.add_category(key, label, position, icon)
+        for product in SHOP:
+            await _product(catalog, actor, product, report)
+    visuals = getattr(platform, "visuals", None)
+    if visuals is not None:
+        await _packs(visuals.packs, actor, [str(p) for p in shop.get("packs") or []], report)
+    elif shop.get("packs"):
+        report.skip("shop", "packs", "visual packs unavailable")
+    for collection in shop.get("collections") or []:
+        await catalog.add_category(
+            str(collection["key"]),
+            str(collection.get("label") or collection["key"]),
+            int(collection.get("position") or 0),
+            collection.get("icon"),
+        )
+    for product in shop.get("products") or []:
+        await _product(catalog, actor, product, report)
+    for booster, scene in (shop.get("scenes") or {}).items():
+        if visuals is None:
+            break
+        bound = ((await visuals.packs.scene_bindings()).get("bindings") or {}).get(booster) or {}
+        if (bound.get("pack"), bound.get("look")) == (scene.get("pack"), scene.get("look")):
+            report.kept["shop"] += 1
+            continue
+        try:
+            await visuals.packs.bind_scene(actor, str(booster), (str(scene["pack"]), str(scene["look"])))
+            report.applied["shop"] += 1
+        except Exception as error:
+            report.skip("shop", f"scene {booster}", error)
+
+
+async def _product(catalog: Catalog, actor: Principal, product: Mapping[str, Any], report: Report) -> None:
+    """Created when the shop has none of this key; one it has stays as its administrators set it."""
+    try:
+        outcome = await sync_product(catalog, actor, {**product, "keep_existing": True})
+    except Exception as error:
+        report.skip("shop", str(product.get("key")), error)
+        return
+    if outcome == "created":
+        report.applied["shop"] += 1
+    else:
+        report.kept["shop"] += 1
+
+
+async def _packs(packs: Any, actor: Principal, wanted: list[str], report: Report) -> None:
+    """Portalab's own packs switched on; the examples it ships installed (an extension like any other)."""
+    listed = {p["id"]: p for p in await packs.listing()}
+    shipped = examples()
+    for pack in wanted:
+        current = listed.get(pack)
+        try:
+            if current is not None and current["builtin"]:
+                if current["state"] == "enabled":
+                    report.kept["shop"] += 1
+                    continue
+                await packs.set_state(actor, pack, True)
+            elif pack in shipped:
+                if await packs.install_example(actor, shipped[pack]) == "kept":
+                    report.kept["shop"] += 1
+                    continue
+            else:
+                report.skip("shop", f"pack {pack}", "pack not shipped")
+                continue
+            report.applied["shop"] += 1
+        except Exception as error:
+            report.skip("shop", f"pack {pack}", error)
+
+
+async def _access_permissions(platform: Any, actor: Principal, report: Report) -> None:
+    """The permissions the catalog's « access » products grant, allowed for such products."""
+    marketplace = platform.marketplace
+    await marketplace.refresh_config()
+    allowed = set(marketplace.config.access_allowed_permissions)
+    wanted = sorted({str(p["payload"]["permission"]) for p in SHOP if p["type"] == "access"} | allowed)
+    writers = marketplace.capabilities.system_providers(CONFIG_WRITER_CAPABILITY)
+    if writers and set(wanted) != allowed:
+        try:
+            await writers[0].provider.set_global(actor, ACCESS_PERMISSIONS, wanted, reason="game setup")
+            await marketplace.refresh_config()
+        except Exception as error:
+            report.skip("shop", ACCESS_PERMISSIONS, error)
 
 
 async def _settings(platform: Any, actor: Principal, settings: dict[str, Any], report: Report) -> None:

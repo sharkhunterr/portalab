@@ -14,9 +14,10 @@ import { StreakPanel } from "../../gamification/admin/StreakPanel";
 import "./arrival.css";
 
 /**
- * Issue 253 — the arrival wizard's game: the LAN's game as Portalab ships it (what earns XP and Coins, the
- * level curve and what each level unlocks, the achievements, the quests, the campaigns), the LAN's game to
- * adjust, or everything set by hand — then the game administration's own screens, tab by tab. The choice is
+ * Issue 253 — the arrival wizard's game: the recommended install, the LAN's game as Portalab ships it (what
+ * earns XP and Coins, the level curve and what each level unlocks, the achievements, the quests, the campaigns)
+ * with its shop (Portalab's catalog, the visual packs it sells, the LAN's own products), the same to adjust,
+ * or everything set by hand — then the game administration's own screens, tab by tab. The choice is
  * kept with the wizard's progress; applying the LAN's game twice changes nothing.
  */
 export type GameChoice = "lan" | "tune" | "custom";
@@ -31,6 +32,9 @@ type Tab = (typeof TABS)[number];
 const GAME_KEYS = [["admin", "gamification"], ["gamification"], ["campaigns"], ["admin", "config"]] as const;
 
 interface Counts {
+  catalog: number;
+  packs: number;
+  products: number;
   settings: number;
   rules: number;
   achievements: number;
@@ -119,7 +123,9 @@ export function GameStep({
 
   const report = apply.data;
   const missing = report?.skipped.filter((s) => s.reason === "product not in this shop") ?? [];
-  const failed = report?.skipped.filter((s) => s.reason !== "product not in this shop") ?? [];
+  const isPack = (s: { part: string; key: string }) => s.part === "shop" && s.key.startsWith("pack ");
+  const packs = report?.skipped.filter(isPack) ?? [];
+  const failed = report?.skipped.filter((s) => s.reason !== "product not in this shop" && !isPack(s)) ?? [];
   return (
     <>
       <p className="arrival__note" role="status">
@@ -138,6 +144,15 @@ export function GameStep({
           {t("account:arrival.game.missing", {
             count: missing.length,
             products: missing.map((m) => m.key.split(": ").pop()).join(", "),
+          })}
+        </p>
+      ) : null}
+      {packs.length ? (
+        <p className="arrival__note">
+          <Icon name="info" size={16} />
+          {t("account:arrival.game.packs", {
+            count: packs.length,
+            packs: packs.map((p) => p.key.slice("pack ".length)).join(", "),
           })}
         </p>
       ) : null}

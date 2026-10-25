@@ -70,6 +70,22 @@ def builtin_root(env: Mapping[str, str] | None = None) -> Path | None:
     return repository if repository.is_dir() else None
 
 
+IMAGE_EXAMPLES = Path("/app/packs/examples")
+
+
+def examples_root(env: Mapping[str, str] | None = None) -> Path | None:
+    """Issue 253: the example packs Portalab ships (extensions like any other, installed only when an
+    administrator chooses them — the recommended install): ``PORTALAB_EXAMPLE_PACKS_DIR``, the image's folder,
+    or the repository's ``examples/visual-packs`` (development)."""
+    configured = (env if env is not None else os.environ).get("PORTALAB_EXAMPLE_PACKS_DIR")
+    if configured:
+        return Path(configured)
+    if IMAGE_EXAMPLES.is_dir():
+        return IMAGE_EXAMPLES
+    repository = Path(__file__).resolve().parents[4] / "examples" / "visual-packs"
+    return repository if repository.is_dir() else None
+
+
 def builtin_interfaces(root: Path | None = None) -> dict[str, str]:
     """The interfaces Portalab's own packs hold: key → its pack (the socle's first) — none is listed in the
     code; read once."""

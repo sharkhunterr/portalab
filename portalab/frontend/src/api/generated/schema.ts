@@ -11425,7 +11425,7 @@ export interface components {
         /** ApplyIn */
         ApplyIn: {
             /** Parts */
-            parts?: ("settings" | "curve" | "rules" | "achievements" | "quests" | "campaigns")[];
+            parts?: ("shop" | "settings" | "curve" | "rules" | "achievements" | "quests" | "campaigns")[];
             /** Preset */
             preset?: "lan" | null;
             /** Setup */

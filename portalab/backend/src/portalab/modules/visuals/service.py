@@ -1092,6 +1092,52 @@ class VisualPacks:
             actor, "switched_on" if enabled else "switched_off", pack=pack, version=version.version
         )
 
+    async def product_keys(self) -> frozenset[str]:
+        """Issue 253: the shop products the packs hold (their current versions', switched on or off)."""
+        async with self.database.session() as session:
+            rows = await session.scalars(
+                select(Element.product_key)
+                .join(Pack, Pack.current_version_id == Element.version_id)
+                .where(Pack.state != "removed", Element.product_key.is_not(None))
+            )
+            return frozenset(str(key) for key in rows)
+
+    async def install_example(self, actor: Principal, folder: Path) -> str:
+        """Issue 253: one of the example packs Portalab ships, set up because the administrator chose it (the
+        recommended install) — an extension like any other: imported and analysed like an upload, published
+        with the economy each element proposes, the administrator's choice standing for the confirmations its
+        review asks (its scripts, the data it reads). ``installed``, ``enabled`` (there, switched off) or
+        ``kept`` (on, or a newer version of it is). A version with blocking problems is refused."""
+        files = await asyncio.to_thread(read_folder, folder)
+        try:
+            manifest = parse_pack(files.get("pack.json") or b"")
+        except ManifestError as error:
+            raise VisualPackError(str(error)) from error
+        async with self.database.session() as session:
+            holder = await session.get(Pack, manifest.id)
+            current = (
+                await session.get(PackVersion, holder.current_version_id)
+                if holder is not None and holder.current_version_id is not None
+                else None
+            )
+        newer = current is not None and version_key(current.version) >= version_key(manifest.version)
+        if holder is not None and holder.state != "removed" and newer:
+            if holder.state == "enabled":
+                return "kept"
+            await self.set_state(actor, manifest.id, True)
+            return "enabled"
+        async with self.database.unit_of_work() as uow:
+            await self._lock(uow.session)
+            imported = await self._import(uow.session, files, {"kind": "example", "path": folder.name})
+        async with self.database.session() as session:
+            version = await self._version(session, imported.pack, imported.version)
+            elements = await self._elements(session, version.id)
+        contracts = sorted({str(c) for e in elements for c in e.data.get("contracts") or []})
+        await self.publish(
+            actor, imported.pack, imported.version, confirmations={"scripts": True, "contracts": contracts}
+        )
+        return "installed"
+
     async def set_builtin_state(self, actor: Principal, enabled: bool) -> list[str]:
         """Every one of Portalab's own packs switched on (the whole catalog) or off (the socle stays on);
         returns the packs changed."""

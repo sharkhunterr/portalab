@@ -4,8 +4,9 @@ import axe from "axe-core";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
-// Issue 253 — the arrival wizard's game: the LAN's game as Portalab ships it, adjusted, or set by hand; the
-// LAN's game applied in one go (what the shop does not sell said), then the game's screens tab by tab.
+// Issue 253 — the arrival wizard's game: the recommended install (the LAN's game as Portalab ships it, with its
+// shop), adjusted, or set by hand; the recommended install applied in one go (what the shop does not sell
+// said), then the game's screens tab by tab.
 
 const fake = vi.hoisted(() => ({
   handler: (_: Request): Response | Promise<Response> => new Response(null),
@@ -20,7 +21,17 @@ vi.mock("../../src/api/client", async (importOriginal) => {
 import { GameStep } from "../../src/features/admin/arrival/GameStep";
 import { json } from "../support/fake-api";
 
-const COUNTS = { settings: 2, rules: 16, achievements: 66, quests: 26, campaigns: 3, level_rewards: 11 };
+const COUNTS = {
+  catalog: 87,
+  packs: 103,
+  products: 14,
+  settings: 2,
+  rules: 16,
+  achievements: 66,
+  quests: 26,
+  campaigns: 3,
+  level_rewards: 11,
+};
 
 function wrap(node: React.ReactNode) {
   const client = new QueryClient({
@@ -34,7 +45,7 @@ function wrap(node: React.ReactNode) {
 }
 
 describe("arrival wizard's game", () => {
-  it("offers the LAN's game, applies it in one go and says what the shop does not sell", async () => {
+  it("offers the recommended install, applies it in one go and says what the shop does not sell", async () => {
     const sent: unknown[] = [];
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;
@@ -42,10 +53,19 @@ describe("arrival wizard's game", () => {
       if (path === "/api/v1/admin/game/setup") {
         sent.push(await request.json());
         return json(200, {
-          applied: { settings: 2, curve: 1, rules: 16, achievements: 66, quests: 17, campaigns: 3 },
+          applied: {
+            shop: 1300,
+            settings: 2,
+            curve: 1,
+            rules: 16,
+            achievements: 66,
+            quests: 17,
+            campaigns: 3,
+          },
           kept: {},
           skipped: [
             { part: "settings", key: "level 10: booster_reserve", reason: "product not in this shop" },
+            { part: "shop", key: "pack messenger-bubbles", reason: "ui.visual_pack_blocked" },
           ],
         });
       }
@@ -56,7 +76,7 @@ describe("arrival wizard's game", () => {
       wrap(<GameStep choice={undefined} onChoose={chosen} settings={<p>the play settings</p>} />),
     );
     const lan = await screen.findByRole("button", {
-      name: /^The LAN's game\s*As it runs.*16 gain rules, 66 achievements/,
+      name: /^The recommended install\s*The game and the shop.*16 gain rules, 66 achievements.*Portalab's 87 products, 103 visual packs and 14 products of the LAN/,
     });
     expect(screen.getByRole("button", { name: /Set everything myself/ })).toBeInTheDocument();
     const results = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
@@ -65,7 +85,11 @@ describe("arrival wizard's game", () => {
     await vi.waitFor(() => expect(chosen).toHaveBeenCalledWith("lan"));
     expect(sent).toEqual([{ preset: "lan" }]);
     rerender(wrap(<GameStep choice="lan" onChoose={chosen} settings={<p>the play settings</p>} />));
-    expect(screen.getByText(/The LAN's game is in place/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/The recommended install is in place.*1300 additions to the shop/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/A visual pack was not installed: messenger-bubbles/)).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).toBeNull(); // a pack not installed is no failure of the game
     expect(screen.getByText("the play settings")).toBeInTheDocument();
   });
 
