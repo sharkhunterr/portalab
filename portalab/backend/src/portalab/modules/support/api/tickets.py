@@ -10,18 +10,27 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Header, Query, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 
+from portalab.capabilities.config import switched_on
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.capabilities.support import TicketRequest
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
-from portalab.core.errors import Conflict, Forbidden, Unavailable
+from portalab.core.errors import Conflict, Forbidden, NotFound, Unavailable
 from portalab.modules.support.api.incidents import support_module
 from portalab.modules.support.models import Ticket
 from portalab.modules.support.module import SupportModule
 from portalab.modules.support.permissions import INCIDENTS_MANAGE
+from portalab.modules.support.settings import TICKETS_ON
 from portalab.modules.support.tickets.service import TICKETS_CREATE, TICKETS_MANAGE, TicketView
 
-router = APIRouter(prefix="/api/v1", tags=["support"])
+
+async def tickets_on(request: Request) -> None:
+    """Issue 246: tickets switched off answer nothing (as an address that does not exist)."""
+    if not await switched_on(request.app.state.capabilities, TICKETS_ON):
+        raise NotFound("The tickets are switched off.", code="support.tickets_off")
+
+
+router = APIRouter(prefix="/api/v1", tags=["support"], dependencies=[Depends(tickets_on)])
 Module = Annotated[SupportModule, Depends(support_module)]
 Requester = Annotated[Principal, require(TICKETS_CREATE)]
 Staff = Annotated[Principal, require(TICKETS_MANAGE)]

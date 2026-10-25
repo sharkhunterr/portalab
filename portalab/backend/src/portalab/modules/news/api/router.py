@@ -10,12 +10,13 @@ from fastapi import APIRouter, Depends, Query, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 
+from portalab.capabilities.config import switched_on
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.capabilities.content.audience import Audience
 from portalab.core.audit_port import AuditRecord
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
-from portalab.core.errors import Conflict, Forbidden, Unavailable
+from portalab.core.errors import Conflict, Forbidden, NotFound, Unavailable
 from portalab.modules.news.articles import ArticleInput, ArticleNotFound
 from portalab.modules.news.models import Article, Category
 from portalab.modules.news.module import NewsModule
@@ -27,6 +28,7 @@ from portalab.modules.news.permissions import (
     NEWS_PUBLISH,
     NEWS_READ,
 )
+from portalab.modules.news.settings import NEWSLETTER_ON
 
 router = APIRouter(prefix="/api/v1", tags=["news"])
 
@@ -44,6 +46,15 @@ def news_module(request: Request) -> NewsModule:
 
 
 Module = Annotated[NewsModule, Depends(news_module)]
+
+
+async def newsletters_on(request: Request) -> None:
+    """Issue 246: the newsletters switched off answer nothing (as an address that does not exist)."""
+    if not await switched_on(request.app.state.capabilities, NEWSLETTER_ON):
+        raise NotFound("The newsletters are switched off.", code="news.newsletters_off")
+
+
+NewslettersOn = [Depends(newsletters_on)]
 Reader = Annotated[Principal, require(NEWS_READ)]
 Author = Annotated[Principal, require(NEWS_CREATE)]
 Publisher = Annotated[Principal, require(NEWS_PUBLISH)]
@@ -470,13 +481,15 @@ async def put_category(principal: CategoryManager, body: NewsCategoryIn, module:
 
 # --- newsletters (027) -----------------------------------------------------------------------------------
 @router.get("/me/newsletters")
-async def my_newsletters(principal: Reader, module: Module) -> list[dict[str, Any]]:
+async def my_newsletters(principal: Reader, module: Module, request: Request) -> list[dict[str, Any]]:
     """The channels sent by e-mail, and whether I receive each one."""
     user = principal.acting_for or principal.user_id
+    if not await switched_on(request.app.state.capabilities, NEWSLETTER_ON):
+        return []
     return await module.newsletters.subscriptions(user) if user else []
 
 
-@router.put("/me/newsletters")
+@router.put("/me/newsletters", dependencies=NewslettersOn)
 async def set_my_newsletters(
     principal: Reader, body: SubscriptionsIn, module: Module
 ) -> list[dict[str, Any]]:
@@ -485,13 +498,16 @@ async def set_my_newsletters(
     return await module.newsletters.subscriptions(user) if user else []
 
 
-@router.get("/admin/news/newsletters", response_model=list[NewsletterScheduleOut])
+@router.get("/admin/news/newsletters", response_model=list[NewsletterScheduleOut], dependencies=NewslettersOn)
 async def schedules(principal: Publisher, module: Module) -> list[NewsletterScheduleOut]:
     return [_schedule_out(row) for row in await module.newsletters.schedules()]
 
 
 @router.post(
-    "/admin/news/newsletters", response_model=NewsletterScheduleOut, status_code=status.HTTP_201_CREATED
+    "/admin/news/newsletters",
+    response_model=NewsletterScheduleOut,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=NewslettersOn,
 )
 async def create_schedule(
     principal: Publisher, body: NewsletterScheduleIn, module: Module
@@ -499,20 +515,26 @@ async def create_schedule(
     return _schedule_out(await module.newsletters.save_schedule(None, body.model_dump()))
 
 
-@router.put("/admin/news/newsletters/{schedule_id}", response_model=NewsletterScheduleOut)
+@router.put(
+    "/admin/news/newsletters/{schedule_id}", response_model=NewsletterScheduleOut, dependencies=NewslettersOn
+)
 async def update_schedule(
     principal: Publisher, schedule_id: UUID, body: NewsletterScheduleIn, module: Module
 ) -> NewsletterScheduleOut:
     return _schedule_out(await module.newsletters.save_schedule(schedule_id, body.model_dump()))
 
 
-@router.delete("/admin/news/newsletters/{schedule_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/admin/news/newsletters/{schedule_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=NewslettersOn,
+)
 async def delete_schedule(principal: Publisher, schedule_id: UUID, module: Module) -> Response:
     await module.newsletters.delete_schedule(schedule_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.post("/admin/news/newsletters/{schedule_id}/run")
+@router.post("/admin/news/newsletters/{schedule_id}/run", dependencies=NewslettersOn)
 async def run_schedule(principal: Publisher, schedule_id: UUID, module: Module) -> dict[str, Any]:
     """Write the newsletter now (« preview » it in the news desk); nothing when there is nothing to tell."""
     article = await module.newsletters.generate(schedule_id, force=True)

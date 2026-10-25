@@ -35,6 +35,18 @@ class ConfigReader(Protocol):
     ) -> EffectiveValue: ...
 
 
+async def switched_on(capabilities: Any, key: str) -> bool:
+    """Issue 246: a feature's switch (a boolean global setting) — on when unset or unreadable."""
+    providers = capabilities.system_providers(CAPABILITY)
+    if not providers:
+        return True
+    try:
+        value = (await providers[0].provider.get(key)).value
+    except Exception:
+        return True
+    return True if value is None else bool(value)
+
+
 @dataclass(frozen=True, slots=True)
 class UserLocalePreference:
     language: str | None = None

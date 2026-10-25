@@ -879,6 +879,10 @@
     "advanced": false,
     "group": "media"
   },
+  "news.newsletter.enabled": {
+    "advanced": false,
+    "group": "communication"
+  },
   "news.newsletter.optOut": {
     "advanced": false,
     "group": "communication"
@@ -1311,6 +1315,10 @@
     "advanced": true,
     "group": "communication"
   },
+  "support.incidents.enabled": {
+    "advanced": false,
+    "group": "communication"
+  },
   "support.reopenWindowDays": {
     "advanced": false,
     "group": "communication"
@@ -1318,6 +1326,10 @@
   "support.ticketRetentionMonths": {
     "advanced": true,
     "group": "security"
+  },
+  "support.tickets.enabled": {
+    "advanced": false,
+    "group": "communication"
   },
   "ui.allowedThemes": {
     "advanced": false,

@@ -122,3 +122,26 @@ def test_next_run() -> None:
     assert next_run("daily", 0, 9, monday, paris).astimezone(paris) == datetime(2026, 10, 6, 9, tzinfo=paris)
     first = next_run("monthly", 0, 9, monday, paris).astimezone(paris)
     assert first == datetime(2026, 11, 2, 9, tzinfo=paris)  # the first Monday of next month
+
+
+async def test_newsletters_switched_off(
+    client: httpx.AsyncClient, ct: ContentHarness, people: dict[str, UUID]
+) -> None:
+    """Issue 246: switched off, the newsletters answer nothing, a member reads no channel and nothing is sent."""
+    from portalab.core.authz_port import Principal
+    from portalab.modules.administration.config.service import Change
+
+    config = ct.ev.full.administration.config
+    await config.apply(
+        [Change("news.newsletter.enabled", False)], Principal(user_id=people["boss"]), reason="t"
+    )
+    await login(client, "boss")
+    off = await client.get("/api/v1/admin/news/newsletters")
+    assert off.status_code == 404 and off.json()["code"] == "news.newsletters_off"
+    assert (await client.put("/api/v1/me/newsletters", json={"changes": {}})).status_code == 404
+    assert (await client.get("/api/v1/me/newsletters")).json() == []
+    assert await ct.news.newsletters.run_due() == 0
+    await config.apply(
+        [Change("news.newsletter.enabled", True)], Principal(user_id=people["boss"]), reason="t"
+    )
+    assert (await client.get("/api/v1/admin/news/newsletters")).status_code == 200

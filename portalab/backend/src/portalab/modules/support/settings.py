@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
 
 OWNER = "module:support"
+TICKETS_ON = "support.tickets.enabled"
+INCIDENTS_ON = "support.incidents.enabled"
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,6 +63,12 @@ def declare_support_settings(catalog: SettingCatalog = default_catalog) -> None:
             owner=OWNER,
             description=_DESCRIPTIONS[name],
         )
+    # issue 246: tickets and incidents may be switched off apart (the arrival wizard's features)
+    for key, what in ((TICKETS_ON, "Tickets"), (INCIDENTS_ON, "Incidents")):
+        if key not in known:
+            declare(
+                scope="global", key=key, schema=bool, default=True, owner=OWNER, description=f"{what} on."
+            )
 
 
 declare_support_settings()

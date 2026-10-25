@@ -99,9 +99,22 @@ class NavigationAssembler:
         user_order = list(await self._setting("shell.navigation.userOrder", principal, []))
         # issue 243: a member who plays without the cards (or does not play) has no cards in the menu
         cardless = await self._setting("shell.onboarding.play", principal, None) in WITHOUT_CARDS
+        # issue 246: a feature switched on or off (``visible_when.setting``) shows or hides its entries now
+        switches = {
+            key: await self._setting(key, principal, True)
+            for key in sorted(
+                {
+                    c.visible_when.setting
+                    for c in self.registry.all()
+                    if c.visible_when and c.visible_when.setting
+                }
+            )
+        }
         epochs = await self.epochs.current()
         fingerprint = hashlib.sha256(
-            json.dumps([layout, allow_user, user_order, cardless], sort_keys=True, default=str).encode()
+            json.dumps(
+                [layout, allow_user, user_order, cardless, switches], sort_keys=True, default=str
+            ).encode()
         ).hexdigest()
         key = (
             principal.user_id,

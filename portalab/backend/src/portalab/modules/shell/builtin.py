@@ -309,6 +309,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "group": "support",
         "order_hint": 32,
         "required_permission": "tickets.create",
+        "visible_when": {"setting": "support.tickets.enabled"},  # issue 246
     },
     {
         "key": "support.feedback",
@@ -332,6 +333,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "topic": "support",
         "order_hint": 1,
         "required_permission": "tickets.manage",
+        "visible_when": {"setting": "support.tickets.enabled"},  # issue 246
     },
     {
         "key": "support.feedback_review",
@@ -355,6 +357,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "group": "support",
         "order_hint": 30,
         "required_permission": "incidents.read",
+        "visible_when": {"setting": "support.incidents.enabled"},  # issue 246
     },
     {
         "key": "health.services",
@@ -978,6 +981,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "topic": "services",
         "order_hint": 2,
         "required_permission": "incidents.manage",
+        "visible_when": {"setting": "support.incidents.enabled"},  # issue 246
     },
     {
         "key": "shell.shortcuts_help",
@@ -1104,6 +1108,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "topic": "communication",
         "order_hint": 3,
         "required_permission": "news.publish",
+        "visible_when": {"setting": "news.newsletter.enabled"},  # issue 246
     },
     {
         "key": "notifications.banners",
