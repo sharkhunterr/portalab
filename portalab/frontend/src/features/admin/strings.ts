@@ -10,7 +10,8 @@ export const adminStrings = {
   passwordHint: "At least 12 characters.",
   displayNameField: "Display name",
   finish: "Create the account",
-  finished: "Your portal is ready. Sign in with the administrator account: the setup assistant will guide you.",
+  finished:
+    "Your portal is ready. Sign in with the administrator account: the setup assistant will guide you.",
   signIn: "Sign in",
   closed: "The portal is already set up.",
   genericError: "Something went wrong. Try again.",
