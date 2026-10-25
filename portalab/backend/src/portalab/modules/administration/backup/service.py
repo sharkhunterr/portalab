@@ -87,7 +87,11 @@ class BackupService:
         self._site = site
         self.portalab = portalab
         self.run: Run | None = None
+        self.started_at = datetime.now(UTC).isoformat(timespec="seconds")
         self._task: asyncio.Task[None] | None = None
+
+    async def site_name(self) -> str:
+        return await self._site()
 
     # --- the archives ------------------------------------------------------------------------------------
     def archives(self) -> list[dict[str, Any]]:
@@ -244,6 +248,21 @@ class BackupService:
             return result
 
         return self._start("restore", work)
+
+    def start_reset(self, actor: Principal) -> Run:
+        """Issue 247: everything erased — the database as a new installation's, the data folders emptied (the
+        backups kept); the portal then restarts on its arrival wizard."""
+
+        async def work(run: Run) -> dict[str, Any]:
+            log.warning("portal reset", extra={"fields": {"by": str(actor.user_id)}})  # the audit goes too
+            run.phase = "schema"
+            await self.versions.reset()
+            run.phase = "files"
+            cleared = await asyncio.to_thread(archive.clear_data, self.data_dir)
+            run.phase = "done"
+            return {"cleared": cleared}
+
+        return self._start("reset", work)
 
     async def _audit(self, actor: Principal | None, action: str, context: dict[str, Any]) -> None:
         try:

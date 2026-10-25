@@ -15430,6 +15430,29 @@
         "title": "RequestDecisionIn",
         "type": "object"
       },
+      "ResetIn": {
+        "additionalProperties": false,
+        "properties": {
+          "confirm": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Confirm",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "confirm",
+          "password"
+        ],
+        "title": "ResetIn",
+        "type": "object"
+      },
       "ResolveIn": {
         "additionalProperties": false,
         "properties": {
@@ -33080,6 +33103,74 @@
           }
         },
         "summary": "Surfaces",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/system/reset": {
+      "post": {
+        "description": "Everything erased (the backups kept): typed again, the portal's name; then the password.",
+        "operationId": "system_reset_api_v1_admin_system_reset_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response System Reset Api V1 Admin System Reset Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Reset",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/system/version": {
+      "get": {
+        "description": "Which Portalab this is: its version, its archives' layout, each module's schema, the database.",
+        "operationId": "system_version_api_v1_admin_system_version_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response System Version Api V1 Admin System Version Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "System Version",
         "tags": [
           "administration"
         ]

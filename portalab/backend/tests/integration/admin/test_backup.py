@@ -69,7 +69,13 @@ async def test_every_schema_is_sorted(database: Database) -> None:
 def test_what_every_backup_keeps() -> None:
     """The members' own data is never left out, whatever the options (the media images and the technical
     history aside)."""
-    for table in ("identity.users", "cards.cards", "cards.copies", "gamification.balances", "config.settings"):
+    for table in (
+        "identity.users",
+        "cards.cards",
+        "cards.copies",
+        "gamification.balances",
+        "config.settings",
+    ):
         assert category_of(table) == "data", table
     assert category_of("identity.sessions") == "transient"
 
@@ -237,3 +243,38 @@ async def test_an_archive_of_an_older_schema_is_migrated_up(
     finally:
         await source.dispose()
         await target.dispose()
+
+
+async def test_reset_back_to_a_new_installation(
+    migrated_db_url: str, heads: set[str], tmp_path: Path
+) -> None:
+    """Everything erased: the database as a new installation's (migrated, its permissions written again), the
+    data folders emptied — the backups kept, to bring one back."""
+    from portalab.app.backup_versions import SchemaVersions
+
+    database = Database.from_url(migrated_db_url)
+    data = tmp_path / "data"
+    (data / "blobs" / "avatars").mkdir(parents=True)
+    (data / "blobs" / "avatars" / "a.webp").write_bytes(b"a")
+    (data / "backups").mkdir()
+    (data / "backups" / f"keep{archive.SUFFIX}").write_bytes(b"k")
+    try:
+        async with database.unit_of_work() as uow:
+            await uow.session.execute(
+                text(
+                    "INSERT INTO config.settings (id, key, scope, scope_ref, value, schema_version, "
+                    "updated_at) VALUES (gen_random_uuid(), 'ui.defaultTheme', 'global', '', '\"nova\"', 1, "
+                    "now())"
+                )
+            )
+        versions = SchemaVersions(database, migrated_db_url)
+        await versions.reset()
+        assert archive.clear_data(data) == ["blobs"]
+        assert await versions.current() == heads
+        async with database.session() as session:
+            settings = await session.scalar(text("SELECT count(*) FROM config.settings"))
+            permissions = await session.scalar(text("SELECT count(*) FROM authz.permissions"))
+        assert settings == 0 and permissions > 0
+        assert (data / "backups" / f"keep{archive.SUFFIX}").exists() and not (data / "blobs").exists()
+    finally:
+        await database.dispose()

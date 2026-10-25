@@ -2,6 +2,7 @@
 (``configuration.manage``); a new portal's arrival wizard brings one in — answered only while nobody has set
 the portal up (then the same answer as any address), its progress until the restore is over."""
 
+import platform
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Request, Response, status
@@ -10,9 +11,9 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from portalab.core.authorization import public, require
 from portalab.core.authz_port import Principal
-from portalab.core.errors import Unauthorized, Unavailable
+from portalab.core.errors import Unauthorized, Unavailable, ValidationFailed
 from portalab.modules.administration.api.routes import MANAGE, Module
-from portalab.modules.administration.backup.archive import Options
+from portalab.modules.administration.backup.archive import FORMAT, Options
 from portalab.modules.administration.backup.service import BackupService
 
 router = APIRouter(prefix="/api/v1", tags=["administration"])
@@ -24,6 +25,12 @@ class CreateIn(BaseModel):
     passphrase: str = Field(min_length=12, max_length=512)
     history: bool = False
     media: bool = True
+
+
+class ResetIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    confirm: str = Field(min_length=1, max_length=120)  # the portal's name, typed again
+    password: str = Field(min_length=1, max_length=1024)
 
 
 class OpenIn(BaseModel):
@@ -61,6 +68,38 @@ async def download_backup(_: Manager, name: str, module: Module) -> FileResponse
 async def delete_backup(principal: Manager, name: str, module: Module) -> Response:
     await _backups(module).delete(principal, name)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# --- the portal's version, and starting again from scratch -------------------------------------------------
+@router.get("/admin/system/version")
+async def system_version(_: Manager, module: Module) -> dict[str, Any]:
+    """Which Portalab this is: its version, its archives' layout, each module's schema, the database."""
+    service = _backups(module)
+    heads = sorted(await service.versions.current())
+    async with service.database.engine.connect() as conn:
+        database = str((await conn.exec_driver_sql("SHOW server_version")).scalar())
+    return {
+        "portalab": service.portalab,
+        "archive_format": FORMAT,
+        "python": platform.python_version(),
+        "database": f"PostgreSQL {database}",
+        "started_at": service.started_at,
+        "schema": [{"module": head.rsplit("_", 1)[0], "revision": head} for head in heads],
+    }
+
+
+@router.post("/admin/system/reset", status_code=status.HTTP_202_ACCEPTED)
+async def system_reset(principal: Manager, body: ResetIn, request: Request, module: Module) -> dict[str, Any]:
+    """Everything erased (the backups kept): typed again, the portal's name; then the password."""
+    service = _backups(module)
+    if body.confirm.strip().casefold() != (await service.site_name()).strip().casefold():
+        raise ValidationFailed("Type the portal's name to confirm.", code="backup.reset_confirm")
+    identity = getattr(request.app.state, "identity_module", None)
+    if identity is None:
+        raise Unavailable("Accounts are not available.", code="identity.unavailable")
+    client = request.client.host if request.client else None
+    await identity.auth.reauthenticate(principal, body.password, client_ip=client)
+    return service.start_reset(principal).as_dict()
 
 
 # --- the arrival wizard: a new portal brings a backup in ----------------------------------------------------
@@ -105,7 +144,7 @@ async def import_status(module: Module) -> dict[str, Any]:
     """The restore's progress — answered until it is over, the portal then being set up."""
     service = _backups(module)
     run = service.state()
-    if run is None or run["kind"] != "restore":
+    if run is None or run["kind"] not in ("restore", "reset"):  # a reset ends on the arrival wizard
         await _arrival(module)
         return {"run": None}
     return {"run": run}

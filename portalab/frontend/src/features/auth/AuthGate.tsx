@@ -7,6 +7,7 @@ import { PortalUnreachable } from "../../shell/router/PortalUnreachable";
 import { inLanguage, useSite } from "../../shell/site/site";
 import { ApiError, stateForError } from "../../state/regions";
 import { ArrivalWizard } from "../admin/arrival/ArrivalWizard";
+import { Resetting } from "../admin/arrival/Resetting";
 import { LoginForm } from "./LoginForm";
 import { useAuthStrings } from "./strings";
 import { type Me, useLogout, useMe } from "./useAuth";
@@ -31,6 +32,7 @@ export function AuthGate({
   const tagline = inLanguage(site.tagline, globalThis.navigator?.language ?? "en") ?? t.tagline;
   const layout = { brand: site.name, logo: site.logo, tagline };
   // issue 246: a portal nobody has set up yet shows its arrival wizard, whatever the address
+  if (location?.pathname === "/resetting") return <Resetting />; // issue 247: the session goes with the data
   if (location?.pathname === "/setup" || (me.isSuccess && !me.data && arrival.data)) return <ArrivalWizard />;
   if (location?.pathname === "/verify") {
     const token = new URLSearchParams(location.search).get("token") ?? "";

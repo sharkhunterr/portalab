@@ -4103,6 +4103,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/system/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * System Reset
+         * @description Everything erased (the backups kept): typed again, the portal's name; then the password.
+         */
+        post: operations["system_reset_api_v1_admin_system_reset_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * System Version
+         * @description Which Portalab this is: its version, its archives' layout, each module's schema, the database.
+         */
+        get: operations["system_version_api_v1_admin_system_version_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/terms": {
         parameters: {
             query?: never;
@@ -16213,6 +16253,13 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** ResetIn */
+        ResetIn: {
+            /** Confirm */
+            confirm: string;
+            /** Password */
+            password: string;
+        };
         /** ResolveIn */
         ResolveIn: {
             /** Resolution */
@@ -26328,6 +26375,63 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     }[];
+                };
+            };
+        };
+    };
+    system_reset_api_v1_admin_system_reset_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    system_version_api_v1_admin_system_version_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };

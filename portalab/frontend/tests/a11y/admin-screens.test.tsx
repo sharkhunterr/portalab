@@ -20,6 +20,7 @@ vi.mock("../../src/api/client", async (importOriginal) => {
 
 import { MemoryRouter } from "react-router";
 import { ArrivalWizard, ConfigEditor, ControlCenter, Toggles } from "../../src/features/admin";
+import { SystemVersion } from "../../src/features/admin/backup/SystemVersion";
 import { json } from "../support/fake-api";
 
 function withClient(children: ReactNode) {
@@ -209,5 +210,32 @@ describe("admin screens", () => {
     const disabled = calls.filter((c) => c.path === "/api/v1/admin/modules" && c.method === "PUT");
     expect(disabled.map((c) => (c.body as { key: string }).key)).toEqual(["wiki"]);
     vi.unstubAllGlobals();
+  });
+  it("version page (issue 247): what runs here, and the reset only once the portal's name is typed", async () => {
+    fake.handler = (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/auth/site") return json(200, { name: "Xenoportal" });
+      if (path === "/api/v1/admin/system/version")
+        return json(200, {
+          portalab: "0.1.0",
+          archive_format: 2,
+          python: "3.12.3",
+          database: "PostgreSQL 16.14",
+          started_at: "2026-10-25T09:00:00Z",
+          schema: [{ module: "identity", revision: "identity_0007" }],
+        });
+      return json(200, {});
+    };
+    const { container } = render(withClient(<MemoryRouter>{<SystemVersion />}</MemoryRouter>));
+    expect(await screen.findByText("0.1.0")).toBeInTheDocument();
+    expect(screen.getByText("identity_0007")).toBeInTheDocument();
+    const go = screen.getByRole("button", { name: /Erase everything/ });
+    expect(go).toBeDisabled();
+    fireEvent.change(await screen.findByLabelText(/Type the portal's name to confirm: Xenoportal/), {
+      target: { value: "xenoportal" },
+    });
+    fireEvent.change(screen.getByLabelText("Your password"), { target: { value: "secret" } });
+    expect(go).toBeEnabled();
+    await expectAccessible(container);
   });
 });
