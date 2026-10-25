@@ -307,6 +307,10 @@ function ConfigureService({ connector, onBack }: { connector: ConnectorItem; onB
             </Button>
           )}
           {enable.isError ? <span role="alert">{t("admin:services.refused")}</span> : null}
+          <Button type="button" variant="ghost" onClick={onBack}>
+            <Icon name="plus" size={16} />
+            {t("admin:services.another")}
+          </Button>
         </div>
       ) : (
         <FormActions>

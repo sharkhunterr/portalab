@@ -226,7 +226,7 @@ describe("admin screens", () => {
     expect(site?.body).toMatchObject({ name: "Xenoportal" });
     const disabled = calls.filter((c) => c.path === "/api/v1/admin/modules" && c.method === "PUT");
     expect(disabled.map((c) => (c.body as { key: string }).key)).toEqual(["wiki"]);
-  });
+  }, 20_000); // many screens, each checked by axe
   it("arrival wizard signed in (issue 249): who may join, then the portal opens behind its waiting screens", async () => {
     const calls: Array<{ method: string; path: string; body: unknown }> = [];
     let progress: Record<string, unknown> = { done: ["account"], arrival: { step: "access" } };
@@ -289,7 +289,7 @@ describe("admin screens", () => {
     expect(await screen.findByText("the portal", {}, { timeout: 3000 })).toBeInTheDocument();
     expect(progress).toMatchObject({ arrival: { step: "open" }, step: "summary" });
     expect((progress.arrival as { finished_at?: string }).finished_at).toBeTruthy();
-  });
+  }, 20_000); // many screens, each checked by axe
   it("version page (issue 247): what runs here, and the reset only once the portal's name is typed", async () => {
     fake.handler = (request) => {
       const path = new URL(request.url).pathname;

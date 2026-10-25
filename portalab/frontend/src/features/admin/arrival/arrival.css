@@ -301,6 +301,7 @@ li[data-state="done"] > .arrival-stage__dot {
 }
 .arrival-stage__main {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-content: center;
   justify-items: center;
   min-inline-size: 0;
@@ -310,6 +311,7 @@ li[data-state="done"] > .arrival-stage__dot {
 /* one step: a card that slides in */
 .arrival-card {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* its content never wider than the screen */
   gap: var(--space-5);
   inline-size: min(100%, 52rem);
   min-inline-size: 0;
@@ -354,6 +356,7 @@ li[data-state="done"] > .arrival-stage__dot {
 }
 .arrival-card__body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
   min-inline-size: 0;
 }
