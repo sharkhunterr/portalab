@@ -93,6 +93,12 @@ interface Summary {
   }>;
 }
 
+/** Issue 248: the levels crossed, each one (the last 30 when they are more). */
+function crossed(previous: number, level: number): number[] {
+  const first = Math.max(previous + 1, level - 29);
+  return Array.from({ length: Math.max(0, level - first + 1) }, (_, i) => first + i);
+}
+
 const VALUE_ICONS: Record<string, string> = { xp: "sparkles", coins: "coins", contribution: "handshake" };
 
 /**
@@ -361,15 +367,14 @@ export function LevelUpMoment() {
                 </ul>
               </section>
             ) : null}
-            {level - previous > 1 && data?.rewards.length ? (
+            {level - previous > 1 && data ? (
               <section className="levelup__section" aria-label={t("gamification:levelUp.byLevel")}>
                 <h3>{t("gamification:levelUp.byLevel")}</h3>
                 <ul className="levelup__list levelup__tiers">
-                  {data.rewards.map((tier) => (
-                    <li key={tier.level}>
-                      <LevelBadge level={tier.level} label={t("shell:levelLabel", { level: tier.level })} />
-                      <span>
-                        {[
+                  {crossed(previous, level).map((reached) => {
+                    const tier = data.rewards.find((r) => r.level === reached);
+                    const parts = tier
+                      ? [
                           tier.coins
                             ? `+${format.number(tier.coins)} ${t("gamification:value.coins")}`
                             : null,
@@ -377,12 +382,15 @@ export function LevelUpMoment() {
                             ? `+${format.number(tier.contribution)} ${t("gamification:value.contribution")}`
                             : null,
                           tier.product ? tier.label || tier.product : null,
-                        ]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </span>
-                    </li>
-                  ))}
+                        ].filter(Boolean)
+                      : [];
+                    return (
+                      <li key={reached}>
+                        <LevelBadge level={reached} label={t("shell:levelLabel", { level: reached })} />
+                        <span>{parts.length ? parts.join(" · ") : t("gamification:levelUp.noTier")}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </section>
             ) : null}
