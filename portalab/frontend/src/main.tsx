@@ -56,7 +56,12 @@ async function renderGallery(): Promise<boolean> {
 }
 
 applySafeModeFromAddress(); // 029: ?safe=1 / ?safe=0
-const router = createRouter(<ShellLayout />);
+// created once signed in, at the address of that moment (issue 249: the arrival wizard signs in midway, at /setup)
+let router: ReturnType<typeof createRouter> | null = null;
+const shellRouter = () => {
+  router ??= createRouter(<ShellLayout />);
+  return router;
+};
 
 void renderGallery().then((gallery) => {
   if (gallery) return;
@@ -73,7 +78,7 @@ void renderGallery().then((gallery) => {
                       <AppearanceRoot>
                         <TermsGate>
                           <NavigationProvider>
-                            <RouterProvider router={router} />
+                            <RouterProvider router={shellRouter()} />
                           </NavigationProvider>
                         </TermsGate>
                       </AppearanceRoot>

@@ -7,6 +7,7 @@ import { PortalUnreachable } from "../../shell/router/PortalUnreachable";
 import { inLanguage, useSite } from "../../shell/site/site";
 import { ApiError, stateForError } from "../../state/regions";
 import { ArrivalWizard } from "../admin/arrival/ArrivalWizard";
+import { useArrivalHeld } from "../admin/arrival/hold";
 import { Resetting } from "../admin/arrival/Resetting";
 import { LoginForm } from "./LoginForm";
 import { useAuthStrings } from "./strings";
@@ -26,14 +27,17 @@ export function AuthGate({
 }) {
   const t = useAuthStrings();
   const me = useMe();
-  const arrival = useArrivalOpen(me.isSuccess && !me.data);
+  const anonymous = me.isSuccess && !me.data;
+  const arrival = useArrivalOpen(anonymous);
+  const held = useArrivalHeld(); // issue 249: the wizard signs in midway, and goes on until it is over
   // issue 159: the site's name, logo and slogan (in the browser's language, else the default one)
   const site = useSite();
   const tagline = inLanguage(site.tagline, globalThis.navigator?.language ?? "en") ?? t.tagline;
   const layout = { brand: site.name, logo: site.logo, tagline };
-  // issue 246: a portal nobody has set up yet shows its arrival wizard, whatever the address
+  // issue 246: a portal nobody has set up yet shows its arrival wizard, whatever the address; signed in, the
+  // wizard goes on at /setup inside the portal's router (issue 249)
   if (location?.pathname === "/resetting") return <Resetting />; // issue 247: the session goes with the data
-  if (location?.pathname === "/setup" || (me.isSuccess && !me.data && arrival.data)) return <ArrivalWizard />;
+  if (held || (anonymous && arrival.data)) return <ArrivalWizard />;
   if (location?.pathname === "/verify") {
     const token = new URLSearchParams(location.search).get("token") ?? "";
     return (

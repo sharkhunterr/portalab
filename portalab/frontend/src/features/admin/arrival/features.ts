@@ -150,22 +150,34 @@ async function readModules(): Promise<ModuleState[]> {
   return ((await api.GET("/api/v1/admin/modules")).data ?? []) as unknown as ModuleState[];
 }
 
+/** Where applying a selection is (issue 249: the arrival wizard's progress): ``done`` of ``total`` changes,
+ * the module being changed (``null`` for the switches). */
+export type ApplyProgress = (done: number, total: number, module: string | null) => void;
+
 /** Applies a selection on the portal (as its administrator): the switches, then the modules. Answers whether
  * a module must wait for a restart to come back. */
-export async function applySelection(selection: Selection): Promise<{ restart: boolean }> {
+export async function applySelection(
+  selection: Selection,
+  onProgress: ApplyProgress = () => undefined,
+): Promise<{ restart: boolean }> {
   const plan = planFor(selection, await readModules());
+  const total = 1 + plan.disable.length + plan.enable.length;
+  let done = 0;
+  onProgress(done, total, null);
   await api.PUT("/api/v1/admin/config", {
     body: {
       changes: plan.settings.map((s) => ({ ...s, scope: "global", scope_ref: "", unset: false })),
       reason: "features",
     } as never,
   });
-  for (const key of plan.disable) {
-    await api.PUT("/api/v1/admin/modules", { body: { key, enabled: false, cascade: false } as never });
+  for (const [key, enabled] of [
+    ...plan.disable.map((k) => [k, false] as const),
+    ...plan.enable.map((k) => [k, true] as const),
+  ]) {
+    onProgress(++done, total, key);
+    await api.PUT("/api/v1/admin/modules", { body: { key, enabled, cascade: false } as never });
   }
-  for (const key of plan.enable) {
-    await api.PUT("/api/v1/admin/modules", { body: { key, enabled: true, cascade: false } as never });
-  }
+  onProgress(total, total, null);
   return { restart: (await readModules()).some((m) => m.needs_restart) };
 }
 
