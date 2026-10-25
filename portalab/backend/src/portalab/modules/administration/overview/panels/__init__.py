@@ -10,7 +10,7 @@ from typing import Any
 from sqlalchemy import text
 
 from portalab.capabilities.administration import AUDIT_STATUS_CAPABILITY, PanelResult
-from portalab.capabilities.health import SERVICE_DIRECTORY, SERVICE_STATE
+from portalab.capabilities.health import SERVICE_DIRECTORY, SERVICE_STATE, watched
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
@@ -63,7 +63,7 @@ class ServicesPanel:
         states = self.capabilities.system_providers(SERVICE_STATE)
         if not directory or not states:
             return PanelResult("unavailable", {"reason": "not_installed"})
-        services = await directory[0].provider.services()
+        services = [s for s in await directory[0].provider.services() if watched(s)]
         views = {v.service_id: str(v.state) for v in await states[0].provider.all()}
         counts: dict[str, int] = {}
         for service in services:

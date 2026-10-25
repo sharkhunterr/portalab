@@ -54,3 +54,28 @@ async def test_service_links_give_each_service_its_state_and_address() -> None:
         ("Media", "operational", "https://plex.lan", "/services/s1"),
         ("Books", "unavailable", None, "/services/s2"),
     ]
+
+
+async def test_a_switched_off_service_is_not_watched() -> None:
+    """A service an administrator switched off is not watched: the services widget neither counts it as
+    unknown nor says « a source did not answer », and its quick link goes."""
+    from portalab.capabilities.health import ServiceInfo
+    from portalab.capabilities.i18n import LocaleContext
+    from portalab.modules.dashboard.widgets.builtin import ServiceLinksProvider
+
+    class Directory(FakeDirectory):
+        async def services(self) -> list[ServiceInfo]:
+            return [
+                *await super().services(),
+                ServiceInfo(id="s3", name="Search", connector="searxng", state="disabled"),
+                ServiceInfo(id="s4", name="New", connector="plex", state="configured"),
+            ]
+
+    capabilities = new_registry()
+    capabilities.provide(SERVICE_STATE, FakeHealth(), instance_ref="t", owner="module:health")
+    capabilities.provide(SERVICE_DIRECTORY, Directory(), instance_ref="t", owner="module:connectors")
+    summary = await ServicesSummaryProvider(capabilities, Authorizer()).load(ALLOWED, {}, LocaleContext())  # type: ignore[arg-type]
+    assert summary.state == "available" and summary.partial_reasons == ()
+    assert summary.data["total"] == 2 and "unknown" not in summary.data["counts"]
+    links = await ServiceLinksProvider(capabilities, Authorizer()).load(ALLOWED, {}, LocaleContext())  # type: ignore[arg-type]
+    assert [i["name"] for i in links.data["items"]] == ["Media", "Books"]

@@ -5,6 +5,7 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Query, Request
 
+from portalab.capabilities.health import watched
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import NotFound, ValidationFailed
@@ -22,6 +23,8 @@ async def overview(_: Annotated[Principal, require(SERVICES_READ)], module: Modu
     states = {view.service_id: view for view in await module.reader.all()}
     items = []
     for info in await module.state.services():
+        if not watched(info):
+            continue  # switched off (or not on yet): not watched, never « unknown »
         view = states.get(info.id)
         rule = module.state.rule(info)
         items.append(
