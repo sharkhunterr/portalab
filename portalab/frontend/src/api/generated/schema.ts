@@ -1233,6 +1233,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/game/presets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Presets */
+        get: operations["presets_api_v1_admin_game_presets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/game/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Current */
+        get: operations["current_api_v1_admin_game_setup_get"];
+        put?: never;
+        /** Apply */
+        post: operations["apply_api_v1_admin_game_setup_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/gamification/achievements": {
         parameters: {
             query?: never;
@@ -11387,6 +11422,17 @@ export interface components {
             /** Reason */
             reason: string;
         };
+        /** ApplyIn */
+        ApplyIn: {
+            /** Parts */
+            parts?: ("settings" | "curve" | "rules" | "achievements" | "quests" | "campaigns")[];
+            /** Preset */
+            preset?: "lan" | null;
+            /** Setup */
+            setup?: {
+                [key: string]: unknown;
+            } | null;
+        };
         /** ApplySuggestionsIn */
         ApplySuggestionsIn: {
             /** Service Id */
@@ -20727,6 +20773,85 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    presets_api_v1_admin_game_presets_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    current_api_v1_admin_game_setup_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    apply_api_v1_admin_game_setup_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
             };
             /** @description Validation Error */
             422: {

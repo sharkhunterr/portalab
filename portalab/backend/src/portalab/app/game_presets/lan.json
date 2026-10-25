@@ -1,0 +1,4126 @@
+{
+  "achievements": [
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "count": 10,
+            "event_type": "achievement.unlocked",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Unlock ten achievements.",
+        "hidden": false,
+        "icon": "trophy",
+        "label": "Achievement hunter",
+        "rewards": [
+          {
+            "amount": 75,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "badge",
+            "label": "Achievement hunter",
+            "product": "badge_achievement_hunter"
+          }
+        ]
+      },
+      "key": "achievement_hunter"
+    },
+    {
+      "definition": {
+        "category": "community",
+        "criteria": [
+          {
+            "count": 10,
+            "event_type": "ai.answer_rated",
+            "filter": [
+              {
+                "field": "commented",
+                "op": "eq",
+                "value": false
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Rate 10 of the assistant's answers.",
+        "hidden": false,
+        "icon": "thumbs-up",
+        "label": "Critic",
+        "rewards": [
+          {
+            "amount": 30,
+            "value": "xp"
+          },
+          {
+            "amount": 10,
+            "value": "coins"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "ai_critic"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 25,
+            "event_type": "ai.answered",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Get 25 answers from the assistant.",
+        "hidden": false,
+        "icon": "message",
+        "label": "Curious mind",
+        "rewards": [
+          {
+            "amount": 50,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "ai_curious"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "ai.action_confirmed",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Confirm an action the assistant proposed.",
+        "hidden": false,
+        "icon": "check",
+        "label": "Delegator",
+        "rewards": [
+          {
+            "amount": 25,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "ai_delegator"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 20,
+            "event_type": "ai.answered",
+            "filter": [
+              {
+                "field": "sourced",
+                "op": "eq",
+                "value": true
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Get 20 answers drawn from the portal's own data, with their sources.",
+        "hidden": false,
+        "icon": "book-open",
+        "label": "Fact checker",
+        "rewards": [
+          {
+            "amount": 50,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "ai_fact_checker"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "ai.answered",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Ask the assistant your first question.",
+        "hidden": false,
+        "icon": "sparkles",
+        "label": "First words",
+        "rewards": [
+          {
+            "amount": 10,
+            "value": "xp"
+          },
+          {
+            "amount": 10,
+            "value": "coins"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "ai_first_words"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 250,
+            "event_type": "ai.answered",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Get 250 answers from the assistant.",
+        "hidden": false,
+        "icon": "brain",
+        "label": "Know-it-all",
+        "rewards": [
+          {
+            "amount": 200,
+            "value": "xp"
+          },
+          {
+            "amount": 50,
+            "value": "coins"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "ai_know_it_all"
+    },
+    {
+      "definition": {
+        "category": "community",
+        "criteria": [
+          {
+            "count": 3,
+            "event_type": "ai.answer_rated",
+            "filter": [
+              {
+                "field": "commented",
+                "op": "eq",
+                "value": true
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Tell the assistant three times what you expected from an answer.",
+        "hidden": false,
+        "icon": "lightbulb",
+        "label": "Mentor",
+        "rewards": [
+          {
+            "amount": 15,
+            "value": "contribution"
+          },
+          {
+            "amount": 30,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "ai_mentor"
+    },
+    {
+      "definition": {
+        "category": "purchase",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "ai.capacity_gained",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Get one of the assistant's capacities in the shop.",
+        "hidden": false,
+        "icon": "zap",
+        "label": "Power user",
+        "rewards": [
+          {
+            "amount": 25,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "ai_power_user"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "audiobook"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Listen to an audiobook to the end.",
+        "hidden": false,
+        "icon": "headphones",
+        "label": "All ears",
+        "rewards": [
+          {
+            "amount": 20,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "all_ears"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "media.cast_started",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Cast a film or an episode to a TV from the portal.",
+        "hidden": false,
+        "icon": "cast",
+        "label": "Big screen",
+        "rewards": [
+          {
+            "amount": 20,
+            "value": "xp"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "badge",
+            "label": "Big screen",
+            "product": "badge_big_screen"
+          }
+        ]
+      },
+      "key": "big_screen"
+    },
+    {
+      "definition": {
+        "category": "purchase",
+        "criteria": [
+          {
+            "count": 25,
+            "event_type": "marketplace.purchase",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Buy 25 things in the shop.",
+        "hidden": false,
+        "icon": "gem",
+        "label": "Big spender",
+        "rewards": [
+          {
+            "amount": 100,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "title",
+            "label": "Big spender",
+            "product": "title_big_spender"
+          }
+        ]
+      },
+      "key": "big_spender"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 50,
+            "event_type": "media.playback_finished",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Finish 50 films or episodes.",
+        "hidden": false,
+        "icon": "tv",
+        "label": "Binge-watcher",
+        "rewards": [
+          {
+            "amount": 40,
+            "value": "coins"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "binge_watcher"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 10,
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "book"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Finish ten books.",
+        "hidden": false,
+        "icon": "library",
+        "label": "Bookworm",
+        "rewards": [
+          {
+            "amount": 60,
+            "value": "coins"
+          },
+          {
+            "amount": 1,
+            "value": "contribution"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "badge",
+            "label": "Bookworm",
+            "product": "badge_bookworm"
+          }
+        ]
+      },
+      "key": "bookworm"
+    },
+    {
+      "definition": {
+        "category": "community",
+        "criteria": [
+          {
+            "count": 3,
+            "event_type": "feedback.submitted",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Send three pieces of feedback.",
+        "hidden": false,
+        "icon": "bug",
+        "label": "Bug hunter",
+        "rewards": [
+          {
+            "amount": 3,
+            "value": "contribution"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "badge",
+            "label": "Bug hunter",
+            "product": "badge_bug_hunter"
+          }
+        ]
+      },
+      "key": "bug_hunter"
+    },
+    {
+      "definition": {
+        "category": "content",
+        "criteria": [
+          {
+            "count": 25,
+            "event_type": "cards.pack_opened",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Ouvrir 25 boosters de cartes.",
+        "hidden": false,
+        "icon": "layers",
+        "label": "Collectionneur",
+        "rewards": [
+          {
+            "amount": 150,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "cards_boosters_25"
+    },
+    {
+      "definition": {
+        "category": "content",
+        "criteria": [
+          {
+            "count": 10,
+            "event_type": "cards.set_completed",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Compléter 10 collections.",
+        "hidden": false,
+        "icon": "library",
+        "label": "Archiviste",
+        "rewards": [
+          {
+            "amount": 500,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "cards_collections_10"
+    },
+    {
+      "definition": {
+        "category": "content",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "cards.pack_opened",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Ouvrir son premier booster de cartes.",
+        "hidden": false,
+        "icon": "gift",
+        "label": "Premier booster",
+        "rewards": [
+          {
+            "amount": 25,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "cards_first_booster"
+    },
+    {
+      "definition": {
+        "category": "content",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "cards.set_completed",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Réunir toutes les cartes d'un film ou d'une série.",
+        "hidden": false,
+        "icon": "trophy",
+        "label": "Collection complète",
+        "rewards": [
+          {
+            "amount": 150,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "cards_first_collection"
+    },
+    {
+      "definition": {
+        "category": "content",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "cards.pack_opened",
+            "filter": [
+              {
+                "field": "legendary",
+                "op": "gte",
+                "value": 1
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Tirer une carte légendaire d'un booster.",
+        "hidden": false,
+        "icon": "crown",
+        "label": "Main légendaire",
+        "rewards": [
+          {
+            "amount": 100,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "cards_legendary"
+    },
+    {
+      "definition": {
+        "category": "content",
+        "criteria": [
+          {
+            "count": 3,
+            "event_type": "cards.set_completed",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "series"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Compléter les collections de 3 séries.",
+        "hidden": false,
+        "icon": "tv",
+        "label": "Sériephile",
+        "rewards": [
+          {
+            "amount": 250,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "cards_series_collections"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "media.playback_started",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "live"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Tune in to live TV.",
+        "hidden": false,
+        "icon": "radio",
+        "label": "Channel surfer",
+        "rewards": [
+          {
+            "amount": 10,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "channel_surfer"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 500,
+            "event_type": "media.playback_finished",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Finish 500 films or episodes.",
+        "hidden": false,
+        "icon": "clapperboard",
+        "label": "Five hundred screenings",
+        "rewards": [
+          {
+            "amount": 300,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "title",
+            "label": "Five hundred screenings",
+            "product": "title_five_hundred"
+          }
+        ]
+      },
+      "key": "cinephile_500"
+    },
+    {
+      "definition": {
+        "category": "purchase",
+        "criteria": [
+          {
+            "count": 3,
+            "event_type": "marketplace.purchase",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Own three items from the shop.",
+        "hidden": false,
+        "icon": "star",
+        "label": "Collector",
+        "rewards": [
+          {
+            "amount": 40,
+            "value": "coins"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "collector"
+    },
+    {
+      "definition": {
+        "category": "purchase",
+        "criteria": [
+          {
+            "count": 150,
+            "event_type": "marketplace.purchase",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Buy 150 things in the shop — nearly the whole catalog.",
+        "hidden": false,
+        "icon": "gem",
+        "label": "The Collector",
+        "rewards": [
+          {
+            "amount": 500,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "badge",
+            "label": "The Collector",
+            "product": "badge_completionist"
+          },
+          {
+            "kind": "title",
+            "label": "The Collector",
+            "product": "title_completionist"
+          }
+        ]
+      },
+      "key": "completionist"
+    },
+    {
+      "definition": {
+        "category": "other",
+        "criteria": [
+          {
+            "count": 5,
+            "event_type": "dashboard.layout_changed",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Rearrange your dashboard five times.",
+        "hidden": false,
+        "icon": "dashboard",
+        "label": "Interior decorator",
+        "rewards": [
+          {
+            "amount": 20,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "decorator"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 365,
+            "event_type": "quest.completed",
+            "filter": [
+              {
+                "field": "quest",
+                "op": "eq",
+                "value": "daily_visit"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Drop by the portal on 365 days.",
+        "hidden": false,
+        "icon": "calendar",
+        "label": "Faithful",
+        "rewards": [
+          {
+            "amount": 250,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "avatar_frame",
+            "label": "Faithful orbit frame",
+            "product": "frame_faithful"
+          }
+        ]
+      },
+      "key": "faithful"
+    },
+    {
+      "definition": {
+        "category": "purchase",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "marketplace.purchase",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Buy something in the shop.",
+        "hidden": false,
+        "icon": "shop",
+        "label": "First purchase",
+        "rewards": [
+          {
+            "amount": 20,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "first_purchase"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "user.signed_in",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Sign in to the portal for the first time.",
+        "hidden": false,
+        "icon": "sparkles",
+        "label": "First steps",
+        "rewards": [
+          {
+            "amount": 10,
+            "value": "coins"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "first_steps"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "media.request_created",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Request a film or a series.",
+        "hidden": false,
+        "icon": "inbox",
+        "label": "First wish",
+        "rewards": [
+          {
+            "amount": 15,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "first_wish"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 250,
+            "event_type": "media.playback_finished",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Finish 250 films or episodes.",
+        "hidden": false,
+        "icon": "clapperboard",
+        "label": "Golden cinephile",
+        "rewards": [
+          {
+            "amount": 150,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "title",
+            "label": "Golden reel",
+            "product": "title_golden_reel"
+          }
+        ]
+      },
+      "key": "golden_cinephile"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 10,
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "via",
+                "op": "eq",
+                "value": "portal"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Finish ten films or episodes in the portal's player.",
+        "hidden": false,
+        "icon": "armchair",
+        "label": "Home cinema",
+        "rewards": [
+          {
+            "amount": 40,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "booster",
+            "label": "Reserve booster",
+            "product": "booster_reserve"
+          }
+        ]
+      },
+      "key": "home_cinema"
+    },
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "kind": "level_at_least",
+            "level": 10
+          }
+        ],
+        "description": "Reach level 10.",
+        "hidden": false,
+        "icon": "medal",
+        "label": "Double digits",
+        "rewards": [
+          {
+            "amount": 100,
+            "value": "coins"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "level_10"
+    },
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "kind": "level_at_least",
+            "level": 20
+          }
+        ],
+        "description": "Reach level 20.",
+        "hidden": false,
+        "icon": "crown",
+        "label": "Living legend",
+        "rewards": [
+          {
+            "amount": 250,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "level_badge",
+            "label": "Crowned level badge",
+            "product": "level_crown"
+          },
+          {
+            "kind": "title",
+            "label": "Living legend",
+            "product": "title_living_legend"
+          }
+        ]
+      },
+      "key": "level_20"
+    },
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "kind": "level_at_least",
+            "level": 30
+          }
+        ],
+        "description": "Reach level 30.",
+        "hidden": false,
+        "icon": "medal",
+        "label": "Seasoned",
+        "rewards": [
+          {
+            "amount": 400,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "title",
+            "label": "Seasoned",
+            "product": "title_seasoned"
+          }
+        ]
+      },
+      "key": "level_30"
+    },
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "kind": "level_at_least",
+            "level": 40
+          }
+        ],
+        "description": "Reach level 40.",
+        "hidden": false,
+        "icon": "mountain",
+        "label": "Elder",
+        "rewards": [
+          {
+            "amount": 600,
+            "value": "coins"
+          },
+          {
+            "amount": 2,
+            "value": "contribution"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "badge",
+            "label": "Elder",
+            "product": "badge_elder"
+          },
+          {
+            "kind": "avatar_frame",
+            "label": "Polaris frame",
+            "product": "frame_polaris"
+          }
+        ]
+      },
+      "key": "level_40"
+    },
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "kind": "level_at_least",
+            "level": 50
+          }
+        ],
+        "description": "Reach level 50, the highest.",
+        "hidden": false,
+        "icon": "crown",
+        "label": "Legend of the portal",
+        "rewards": [
+          {
+            "amount": 1000,
+            "value": "coins"
+          },
+          {
+            "amount": 5,
+            "value": "contribution"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "badge",
+            "label": "Legend",
+            "product": "badge_portal_legend"
+          },
+          {
+            "kind": "title",
+            "label": "Legend of the portal",
+            "product": "title_portal_legend"
+          }
+        ]
+      },
+      "key": "level_50"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 100,
+            "event_type": "quest.completed",
+            "filter": [
+              {
+                "field": "quest",
+                "op": "eq",
+                "value": "daily_visit"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Drop by the portal on a hundred days.",
+        "hidden": false,
+        "icon": "heart",
+        "label": "Loyal",
+        "rewards": [
+          {
+            "amount": 120,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "avatar_frame",
+            "label": "Loyal golden frame",
+            "product": "frame_loyal"
+          }
+        ]
+      },
+      "key": "loyal"
+    },
+    {
+      "definition": {
+        "category": "purchase",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "marketplace.booster_opened",
+            "filter": [
+              {
+                "field": "best",
+                "op": "eq",
+                "value": "legendary"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Draw a legendary card from a booster.",
+        "hidden": false,
+        "icon": "dices",
+        "label": "Lucky hand",
+        "rewards": [
+          {
+            "amount": 75,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "badge",
+            "label": "Lucky hand",
+            "product": "badge_lucky_hand"
+          }
+        ]
+      },
+      "key": "lucky_hand"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 50,
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "track"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Listen to fifty songs.",
+        "hidden": false,
+        "icon": "music",
+        "label": "Music lover",
+        "rewards": [
+          {
+            "amount": 30,
+            "value": "xp"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "title",
+            "label": "Music lover",
+            "product": "title_music_lover"
+          }
+        ]
+      },
+      "key": "music_lover"
+    },
+    {
+      "definition": {
+        "category": "other",
+        "criteria": [
+          {
+            "amount": 5000,
+            "kind": "value_at_least",
+            "value": "coins"
+          }
+        ],
+        "description": "A secret achievement.",
+        "hidden": true,
+        "icon": "moon",
+        "label": "Night owl",
+        "rewards": [],
+        "unlocks": [
+          {
+            "kind": "profile_banner",
+            "label": "Animated starry banner",
+            "product": "banner_live_starfield"
+          },
+          {
+            "kind": "title",
+            "label": "Night watcher",
+            "product": "title_night_watcher"
+          }
+        ]
+      },
+      "key": "night_owl"
+    },
+    {
+      "definition": {
+        "category": "purchase",
+        "criteria": [
+          {
+            "count": 20,
+            "event_type": "marketplace.booster_opened",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Open twenty boosters.",
+        "hidden": false,
+        "icon": "gift",
+        "label": "Pack addict",
+        "rewards": [
+          {
+            "amount": 50,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "booster",
+            "label": "Prestige HD booster",
+            "product": "booster_prestige"
+          }
+        ]
+      },
+      "key": "pack_addict"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "book"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Finish a book.",
+        "hidden": false,
+        "icon": "book-open",
+        "label": "Page turner",
+        "rewards": [
+          {
+            "amount": 20,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "page_turner"
+    },
+    {
+      "definition": {
+        "category": "community",
+        "criteria": [
+          {
+            "count": 3,
+            "event_type": "project.funding_added",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Fund three community projects.",
+        "hidden": false,
+        "icon": "handshake",
+        "label": "Patron of the arts",
+        "rewards": [
+          {
+            "amount": 5,
+            "value": "contribution"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "badge",
+            "label": "Patron",
+            "product": "badge_patron"
+          },
+          {
+            "kind": "title",
+            "label": "Patron of the arts",
+            "product": "title_patron"
+          }
+        ]
+      },
+      "key": "patron"
+    },
+    {
+      "definition": {
+        "category": "community",
+        "criteria": [
+          {
+            "amount": 25,
+            "kind": "value_at_least",
+            "value": "contribution"
+          }
+        ],
+        "description": "Reach 25 Contribution points.",
+        "hidden": false,
+        "icon": "heart",
+        "label": "Pillar of the community",
+        "rewards": [],
+        "unlocks": []
+      },
+      "key": "pillar"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "media.playback_finished",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Finish your first film or episode.",
+        "hidden": false,
+        "icon": "popcorn",
+        "label": "Popcorn time",
+        "rewards": [
+          {
+            "amount": 10,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "popcorn_time"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "movie"
+              },
+              {
+                "field": "via",
+                "op": "eq",
+                "value": "portal"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Watch a film to the end in the portal's player.",
+        "hidden": false,
+        "icon": "film",
+        "label": "Private screening",
+        "rewards": [
+          {
+            "amount": 20,
+            "value": "xp"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "title",
+            "label": "Front row",
+            "product": "title_front_row"
+          }
+        ]
+      },
+      "key": "private_screening"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 25,
+            "event_type": "media.cast_started",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Cast to a TV twenty-five times.",
+        "hidden": false,
+        "icon": "tv",
+        "label": "Projectionist",
+        "rewards": [
+          {
+            "amount": 60,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "title",
+            "label": "Projectionist",
+            "product": "title_projectionist"
+          }
+        ]
+      },
+      "key": "projectionist"
+    },
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "count": 5,
+            "event_type": "quest.completed",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Complete five quests.",
+        "hidden": false,
+        "icon": "map",
+        "label": "Quest runner",
+        "rewards": [
+          {
+            "amount": 40,
+            "value": "coins"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "quest_runner"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "book"
+              },
+              {
+                "field": "via",
+                "op": "eq",
+                "value": "portal"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Read a book to the end in the portal's reader.",
+        "hidden": false,
+        "icon": "glasses",
+        "label": "Reading nook",
+        "rewards": [
+          {
+            "amount": 15,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "reading_nook"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 10,
+            "event_type": "quest.completed",
+            "filter": [
+              {
+                "field": "quest",
+                "op": "eq",
+                "value": "daily_visit"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Drop by the portal on ten different days.",
+        "hidden": false,
+        "icon": "calendar",
+        "label": "Regular",
+        "rewards": [
+          {
+            "amount": 50,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "regular"
+    },
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "kind": "level_at_least",
+            "level": 3
+          }
+        ],
+        "description": "Reach level 3.",
+        "hidden": false,
+        "icon": "star",
+        "label": "Rising star",
+        "rewards": [
+          {
+            "amount": 25,
+            "value": "coins"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "rising_star"
+    },
+    {
+      "definition": {
+        "category": "purchase",
+        "criteria": [
+          {
+            "amount": 200,
+            "kind": "value_at_least",
+            "value": "coins"
+          }
+        ],
+        "description": "Hold at least 200 Coins.",
+        "hidden": false,
+        "icon": "coins",
+        "label": "Saver",
+        "rewards": [],
+        "unlocks": []
+      },
+      "key": "saver"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 20,
+            "event_type": "search.performed",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Search the portal twenty times.",
+        "hidden": false,
+        "icon": "search",
+        "label": "Seeker",
+        "rewards": [
+          {
+            "amount": 20,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "seeker"
+    },
+    {
+      "definition": {
+        "category": "purchase",
+        "criteria": [
+          {
+            "count": 10,
+            "event_type": "marketplace.purchase",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Buy ten things in the shop.",
+        "hidden": false,
+        "icon": "store",
+        "label": "Shopaholic",
+        "rewards": [
+          {
+            "amount": 60,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "shopaholic"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 10,
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "audiobook"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Listen to ten audiobooks to the end.",
+        "hidden": false,
+        "icon": "mic",
+        "label": "Story time",
+        "rewards": [
+          {
+            "amount": 60,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "booster",
+            "label": "Cosmos booster",
+            "product": "booster_cosmos"
+          }
+        ]
+      },
+      "key": "story_time"
+    },
+    {
+      "definition": {
+        "category": "other",
+        "criteria": [
+          {
+            "count": 5,
+            "event_type": "theme.changed",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Change your theme five times.",
+        "hidden": false,
+        "icon": "palette",
+        "label": "Stylist",
+        "rewards": [
+          {
+            "amount": 20,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "stylist"
+    },
+    {
+      "definition": {
+        "category": "purchase",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "marketplace.booster_opened",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Open a booster.",
+        "hidden": false,
+        "icon": "package",
+        "label": "Surprise pack",
+        "rewards": [
+          {
+            "amount": 15,
+            "value": "xp"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "booster",
+            "label": "Discovery booster",
+            "product": "booster_discovery"
+          }
+        ]
+      },
+      "key": "surprise_pack"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1000,
+            "event_type": "media.playback_finished",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Finish 1,000 films or episodes.",
+        "hidden": false,
+        "icon": "moon",
+        "label": "A thousand nights",
+        "rewards": [
+          {
+            "amount": 600,
+            "value": "coins"
+          },
+          {
+            "amount": 2,
+            "value": "contribution"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "badge",
+            "label": "A thousand nights",
+            "product": "badge_thousand_nights"
+          }
+        ]
+      },
+      "key": "thousand_nights"
+    },
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "kind": "level_at_least",
+            "level": 5
+          }
+        ],
+        "description": "Reach level 5.",
+        "hidden": false,
+        "icon": "trophy",
+        "label": "Veteran",
+        "rewards": [
+          {
+            "amount": 50,
+            "value": "coins"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "veteran"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "media.request_available",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "One of your requests becomes available.",
+        "hidden": false,
+        "icon": "sparkles",
+        "label": "Wish granted",
+        "rewards": [
+          {
+            "amount": 15,
+            "value": "xp"
+          },
+          {
+            "amount": 1,
+            "value": "contribution"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "wish_granted"
+    },
+    {
+      "definition": {
+        "category": "service_usage",
+        "criteria": [
+          {
+            "count": 25,
+            "event_type": "media.request_created",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Make 25 media requests.",
+        "hidden": false,
+        "icon": "gift",
+        "label": "Wishlist master",
+        "rewards": [
+          {
+            "amount": 50,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "title",
+            "label": "Wish master",
+            "product": "title_wish_master"
+          }
+        ]
+      },
+      "key": "wishlist_master"
+    },
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "amount": 10000,
+            "kind": "value_at_least",
+            "value": "xp"
+          }
+        ],
+        "description": "Earn 10,000 XP.",
+        "hidden": false,
+        "icon": "zap",
+        "label": "Ten thousand",
+        "rewards": [
+          {
+            "amount": 150,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "level_up",
+            "label": "Premiere level-up",
+            "product": "levelup_cinema"
+          }
+        ]
+      },
+      "key": "xp_10000"
+    },
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "amount": 100000,
+            "kind": "value_at_least",
+            "value": "xp"
+          }
+        ],
+        "description": "Earn 100,000 XP.",
+        "hidden": false,
+        "icon": "flame",
+        "label": "Hundred thousand",
+        "rewards": [
+          {
+            "amount": 500,
+            "value": "coins"
+          }
+        ],
+        "unlocks": [
+          {
+            "kind": "title",
+            "label": "Hundred thousand",
+            "product": "title_hundred_thousand"
+          }
+        ]
+      },
+      "key": "xp_100000"
+    },
+    {
+      "definition": {
+        "category": "progression",
+        "criteria": [
+          {
+            "amount": 50000,
+            "kind": "value_at_least",
+            "value": "xp"
+          }
+        ],
+        "description": "Earn 50,000 XP.",
+        "hidden": false,
+        "icon": "zap",
+        "label": "Fifty thousand",
+        "rewards": [
+          {
+            "amount": 300,
+            "value": "coins"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "xp_50000"
+    },
+    {
+      "definition": {
+        "category": "content",
+        "criteria": [
+          {
+            "count": 1,
+            "event_type": "statistics.wrapped_generated",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "description": "Open your yearly recap.",
+        "hidden": false,
+        "icon": "sparkles",
+        "label": "Year in review",
+        "rewards": [
+          {
+            "amount": 30,
+            "value": "xp"
+          }
+        ],
+        "unlocks": []
+      },
+      "key": "year_in_review"
+    }
+  ],
+  "campaigns": [
+    {
+      "definition": {
+        "achievements": [],
+        "description": "Les fêtes au chaud : toutes les lectures rapportent 1,5 fois plus d'XP, les films de Noël double XP et double Xenocoins, -10 % sur toute la boutique et -20 % sur les articles de Noël — et un calendrier de l'Avent.",
+        "discounts": [
+          {
+            "categories": [],
+            "everything": true,
+            "id": "shop_wide",
+            "percent": 10,
+            "products": [],
+            "seasons": []
+          },
+          {
+            "categories": [],
+            "everything": false,
+            "id": "festive_shop",
+            "percent": 20,
+            "products": [],
+            "seasons": [
+              "christmas"
+            ]
+          }
+        ],
+        "ending_soon_hours": 48,
+        "modifiers": [
+          {
+            "factor": 1.5,
+            "gains": [],
+            "id": "festive_xp",
+            "value": "xp",
+            "when": {
+              "activity": [
+                "media.playback_finished"
+              ],
+              "audience": {
+                "kind": "all",
+                "max_level": null,
+                "min_level": null,
+                "roles": [],
+                "users": []
+              },
+              "genre": [],
+              "keyword": [],
+              "media_kind": [],
+              "objects": [],
+              "title_contains": []
+            }
+          },
+          {
+            "factor": null,
+            "gains": [
+              {
+                "factor": 2.0,
+                "value": "xp"
+              },
+              {
+                "factor": 2.0,
+                "value": "coins"
+              }
+            ],
+            "id": "xmas",
+            "value": null,
+            "when": {
+              "activity": [
+                "media.playback_finished"
+              ],
+              "audience": {
+                "kind": "all",
+                "max_level": null,
+                "min_level": null,
+                "roles": [],
+                "users": []
+              },
+              "genre": [],
+              "keyword": [
+                "christmas",
+                "santa claus"
+              ],
+              "media_kind": [],
+              "objects": [],
+              "title_contains": [
+                "noël",
+                "christmas",
+                "xmas"
+              ]
+            }
+          }
+        ],
+        "names": {
+          "en": "Christmas",
+          "fr": "Noël"
+        },
+        "quests": [
+          {
+            "definition": {
+              "description": "Passez chaque jour pendant les fêtes : 15 Xenocoins et 10 XP.",
+              "icon": "calendar",
+              "kind": "daily",
+              "label": "Calendrier de l'Avent",
+              "period": "day",
+              "rewards": [
+                {
+                  "amount": 15,
+                  "value": "coins"
+                },
+                {
+                  "amount": 10,
+                  "value": "xp"
+                }
+              ],
+              "steps": [
+                {
+                  "count": 1,
+                  "event_type": "user.visited",
+                  "kind": "event_count"
+                }
+              ]
+            },
+            "key": "daily_visit"
+          },
+          {
+            "definition": {
+              "description": "Passez le 25 décembre : un booster de Noël vous attend dans votre réserve.",
+              "icon": "gift",
+              "kind": "quest",
+              "label": "Le cadeau de Noël",
+              "period": "month",
+              "steps": [
+                {
+                  "count": 1,
+                  "event_type": "user.visited",
+                  "kind": "event_count"
+                }
+              ],
+              "unlocks": [
+                {
+                  "kind": "booster",
+                  "label": "Booster de Noël",
+                  "product": "booster_christmas"
+                }
+              ],
+              "window": {
+                "ends_at": "2026-12-26T00:00:00+01:00",
+                "starts_at": "2026-12-25T00:00:00+01:00"
+              }
+            },
+            "key": "christmas_day"
+          },
+          {
+            "definition": {
+              "description": "Passez chacun des 25 jours, du 1er au 25 décembre : un booster légendaire offert.",
+              "icon": "sparkles",
+              "kind": "quest",
+              "label": "L'Avent au complet",
+              "period": "month",
+              "steps": [
+                {
+                  "count": 25,
+                  "event_type": "quest.completed",
+                  "filter": [
+                    {
+                      "field": "quest",
+                      "op": "eq",
+                      "value": "christmas.daily_visit"
+                    }
+                  ],
+                  "kind": "event_count"
+                }
+              ],
+              "unlocks": [
+                {
+                  "kind": "booster",
+                  "label": "Booster Légendaire",
+                  "product": "booster_legend"
+                }
+              ],
+              "window": {
+                "ends_at": "2026-12-26T00:00:00+01:00",
+                "starts_at": "2026-12-01T00:00:00+01:00"
+              }
+            },
+            "key": "advent_complete"
+          },
+          {
+            "definition": {
+              "description": "Portez l'interface Noël : chaque jour, 20 XP et 10 Xenocoins en plus.",
+              "icon": "palette",
+              "kind": "daily",
+              "label": "L'esprit de Noël",
+              "period": "day",
+              "requires": [
+                {
+                  "kind": "setting_in",
+                  "setting": "ui.theme",
+                  "values": [
+                    "christmas"
+                  ]
+                }
+              ],
+              "rewards": [
+                {
+                  "amount": 20,
+                  "value": "xp"
+                },
+                {
+                  "amount": 10,
+                  "value": "coins"
+                }
+              ],
+              "steps": [
+                {
+                  "count": 1,
+                  "event_type": "user.visited",
+                  "kind": "event_count"
+                }
+              ]
+            },
+            "key": "festive_look"
+          }
+        ],
+        "schedule": {
+          "duration_hours": null,
+          "end_at": "2027-01-02T23:59:00",
+          "recurrence": {
+            "count": 5,
+            "every": 1,
+            "kind": "yearly",
+            "unit": "weeks"
+          },
+          "start_at": "2026-12-01T00:00:00"
+        },
+        "schema_version": 1,
+        "theme": null,
+        "timezone": "Europe/Paris"
+      },
+      "key": "christmas"
+    },
+    {
+      "definition": {
+        "achievements": [],
+        "description": "Une semaine pour les films : chaque film terminé rapporte double XP, et les fonds et ambiances sont à -10 %.",
+        "discounts": [
+          {
+            "categories": [
+              "backgrounds",
+              "ambients"
+            ],
+            "everything": false,
+            "id": "cinema_shop",
+            "percent": 10,
+            "products": [],
+            "seasons": []
+          }
+        ],
+        "ending_soon_hours": null,
+        "modifiers": [
+          {
+            "factor": 2.0,
+            "gains": [],
+            "id": "film_xp",
+            "value": "xp",
+            "when": {
+              "activity": [
+                "media.playback_finished"
+              ],
+              "audience": {
+                "kind": "all",
+                "max_level": null,
+                "min_level": null,
+                "roles": [],
+                "users": []
+              },
+              "genre": [],
+              "keyword": [],
+              "media_kind": [
+                "movie"
+              ],
+              "objects": [],
+              "title_contains": []
+            }
+          }
+        ],
+        "names": {
+          "en": "Cinema festival",
+          "fr": "Fête du cinéma"
+        },
+        "quests": [],
+        "schedule": {
+          "duration_hours": null,
+          "end_at": "2027-07-02T23:59:00",
+          "recurrence": {
+            "count": 5,
+            "every": 1,
+            "kind": "yearly",
+            "unit": "weeks"
+          },
+          "start_at": "2027-06-25T00:00:00"
+        },
+        "schema_version": 1,
+        "theme": null,
+        "timezone": "Europe/Paris"
+      },
+      "key": "cinema_festival"
+    },
+    {
+      "definition": {
+        "achievements": [],
+        "description": "Frissons garantis : films, séries, livres et livres audio d'horreur ou thrillers rapportent double XP et double Coins, tout comme les films et séries d'Halloween (sorcières, fantômes, citrouilles…), et la boutique d'Halloween est à -20 %.",
+        "discounts": [
+          {
+            "categories": [],
+            "everything": false,
+            "id": "spooky_shop",
+            "percent": 20,
+            "products": [
+              "theme_halloween",
+              "theme_horror",
+              "ultimate_halloween",
+              "ultimate_horror",
+              "banner_halloween",
+              "name_halloween",
+              "name_horror",
+              "frame_pumpkin",
+              "badge_pumpkin_king",
+              "badge_ghost",
+              "effect_pumpkin",
+              "ambient_bats",
+              "ambient_fog",
+              "bg_bats",
+              "booster_halloween",
+              "pack_hd_halloween",
+              "pack_season_halloween"
+            ],
+            "seasons": []
+          }
+        ],
+        "ending_soon_hours": 48,
+        "modifiers": [
+          {
+            "factor": 2.0,
+            "gains": [],
+            "id": "horror_xp",
+            "value": "xp",
+            "when": {
+              "activity": [
+                "media.playback_finished"
+              ],
+              "audience": {
+                "kind": "all",
+                "max_level": null,
+                "min_level": null,
+                "roles": [],
+                "users": []
+              },
+              "genre": [
+                "horreur",
+                "horror",
+                "thriller",
+                "épouvante",
+                "épouvante-horreur",
+                "horror fiction"
+              ],
+              "keyword": [],
+              "media_kind": [
+                "movie",
+                "series",
+                "episode",
+                "book",
+                "audiobook"
+              ],
+              "objects": [],
+              "title_contains": []
+            }
+          },
+          {
+            "factor": 2.0,
+            "gains": [],
+            "id": "horror_coins",
+            "value": "coins",
+            "when": {
+              "activity": [
+                "media.playback_finished"
+              ],
+              "audience": {
+                "kind": "all",
+                "max_level": null,
+                "min_level": null,
+                "roles": [],
+                "users": []
+              },
+              "genre": [
+                "horreur",
+                "horror",
+                "thriller",
+                "épouvante",
+                "épouvante-horreur",
+                "horror fiction"
+              ],
+              "keyword": [],
+              "media_kind": [
+                "movie",
+                "series",
+                "episode",
+                "book",
+                "audiobook"
+              ],
+              "objects": [],
+              "title_contains": []
+            }
+          },
+          {
+            "factor": null,
+            "gains": [
+              {
+                "factor": 2.0,
+                "value": "xp"
+              },
+              {
+                "factor": 2.0,
+                "value": "coins"
+              }
+            ],
+            "id": "halloween_themed",
+            "value": null,
+            "when": {
+              "activity": [
+                "media.playback_finished"
+              ],
+              "audience": {
+                "kind": "all",
+                "max_level": null,
+                "min_level": null,
+                "roles": [],
+                "users": []
+              },
+              "genre": [],
+              "keyword": [
+                "halloween",
+                "trick or treat",
+                "jack-o'-lantern",
+                "pumpkin",
+                "witch",
+                "haunted house",
+                "ghost",
+                "zombie",
+                "vampire",
+                "werewolf",
+                "frankenstein",
+                "dracula",
+                "monster",
+                "skeleton",
+                "day of the dead",
+                "samhain",
+                "costume party"
+              ],
+              "media_kind": [
+                "movie",
+                "series",
+                "episode"
+              ],
+              "objects": [],
+              "title_contains": [
+                "halloween",
+                "sorcière",
+                "citrouille",
+                "fantôme"
+              ]
+            }
+          }
+        ],
+        "names": {
+          "en": "Halloween",
+          "fr": "Halloween"
+        },
+        "quests": [],
+        "schedule": {
+          "duration_hours": null,
+          "end_at": "2026-11-02T23:59:00",
+          "recurrence": {
+            "count": 5,
+            "every": 1,
+            "kind": "yearly",
+            "unit": "weeks"
+          },
+          "start_at": "2026-10-20T00:00:00"
+        },
+        "schema_version": 1,
+        "theme": null,
+        "timezone": "Europe/Paris"
+      },
+      "key": "halloween"
+    }
+  ],
+  "curve": {
+    "base": 100,
+    "exponent": 1.9,
+    "kind": "power"
+  },
+  "format": "portalab.game",
+  "quests": [
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Passez chaque jour jusqu'à Noël.",
+        "icon": "gift",
+        "kind": "daily",
+        "label": "Calendrier de l'Avent",
+        "period": "day",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 15,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "user.signed_in",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2026-12-24T23:00:00Z",
+          "starts_at": "2026-11-30T23:00:00Z"
+        }
+      },
+      "key": "advent_2026"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Trois livres ou livres audio par mois.",
+        "icon": "book",
+        "kind": "daily",
+        "label": "Automne des lectures",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 120,
+            "value": "xp"
+          },
+          {
+            "amount": 30,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 3,
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "in",
+                "value": [
+                  "book",
+                  "audiobook"
+                ]
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2026-12-20T23:00:00Z",
+          "starts_at": "2026-09-21T22:00:00Z"
+        }
+      },
+      "key": "autumn_reading_2026"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Deux lectures dans la journée.",
+        "icon": "clapperboard",
+        "kind": "daily",
+        "label": "Séance double",
+        "period": "day",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 25,
+            "value": "xp"
+          }
+        ],
+        "steps": [
+          {
+            "count": 2,
+            "event_type": "media.playback_finished",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-12-31T23:00:00Z",
+          "starts_at": "2025-12-31T23:00:00Z"
+        }
+      },
+      "key": "daily_double_feature"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Terminez un film, un épisode ou un livre audio.",
+        "icon": "play",
+        "kind": "daily",
+        "label": "Une lecture par jour",
+        "period": "day",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 10,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "media.playback_finished",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-12-31T23:00:00Z",
+          "starts_at": "2025-12-31T23:00:00Z"
+        }
+      },
+      "key": "daily_episode"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Drop by the portal today.",
+        "icon": "home",
+        "kind": "daily",
+        "label": "Daily visit",
+        "period": "day",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 5,
+            "value": "xp"
+          },
+          {
+            "amount": 5,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "user.signed_in",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "daily_visit"
+    },
+    {
+      "definition": {
+        "complete_on": "any",
+        "description": "Follow its tour, or ask it a first question.",
+        "icon": "sparkles",
+        "kind": "discovery",
+        "label": "Meet the assistant",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 30,
+            "value": "xp"
+          },
+          {
+            "amount": 15,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "ai.answered",
+            "filter": [],
+            "kind": "event_count"
+          },
+          {
+            "count": 1,
+            "event_type": "user.tour_completed",
+            "filter": [
+              {
+                "field": "tour",
+                "op": "eq",
+                "value": "assistant"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "discover_assistant"
+    },
+    {
+      "definition": {
+        "complete_on": "any",
+        "description": "Follow its tour, or add, move or resize a widget.",
+        "icon": "dashboard",
+        "kind": "discovery",
+        "label": "Arrange your dashboard",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 40,
+            "value": "xp"
+          },
+          {
+            "amount": 20,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "dashboard.layout_changed",
+            "filter": [
+              {
+                "field": "starter",
+                "op": "eq",
+                "value": false
+              }
+            ],
+            "kind": "event_count"
+          },
+          {
+            "count": 1,
+            "event_type": "user.tour_completed",
+            "filter": [
+              {
+                "field": "tour",
+                "op": "eq",
+                "value": "dashboard"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "discover_dashboard"
+    },
+    {
+      "definition": {
+        "complete_on": "any",
+        "description": "Follow its tour, add a picture or change your name.",
+        "icon": "user",
+        "kind": "discovery",
+        "label": "Make your profile yours",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 25,
+            "value": "xp"
+          },
+          {
+            "amount": 10,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "user.profile_updated",
+            "filter": [],
+            "kind": "event_count"
+          },
+          {
+            "count": 1,
+            "event_type": "user.tour_completed",
+            "filter": [
+              {
+                "field": "tour",
+                "op": "eq",
+                "value": "profile"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "discover_profile"
+    },
+    {
+      "definition": {
+        "complete_on": "any",
+        "description": "Follow its tour, or request a title that is not in the library yet.",
+        "icon": "inbox",
+        "kind": "discovery",
+        "label": "Ask for a title",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 50,
+            "value": "xp"
+          },
+          {
+            "amount": 25,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "media.request_created",
+            "filter": [],
+            "kind": "event_count"
+          },
+          {
+            "count": 1,
+            "event_type": "user.tour_completed",
+            "filter": [
+              {
+                "field": "tour",
+                "op": "eq",
+                "value": "request"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "discover_request"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "See where a request stands on the title's page.",
+        "icon": "clock",
+        "kind": "discovery",
+        "label": "Follow a request",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 25,
+            "value": "xp"
+          },
+          {
+            "amount": 10,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "user.tour_completed",
+            "filter": [
+              {
+                "field": "tour",
+                "op": "eq",
+                "value": "request_status"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "discover_request_status"
+    },
+    {
+      "definition": {
+        "complete_on": "any",
+        "description": "Follow its tour, or get something in the shop with your Coins.",
+        "icon": "shop",
+        "kind": "discovery",
+        "label": "Treat yourself",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 30,
+            "value": "xp"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "marketplace.purchase",
+            "filter": [],
+            "kind": "event_count"
+          },
+          {
+            "count": 1,
+            "event_type": "user.tour_completed",
+            "filter": [
+              {
+                "field": "tour",
+                "op": "eq",
+                "value": "shop"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "discover_shop"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "What you watched, read and played, in charts.",
+        "icon": "chart",
+        "kind": "discovery",
+        "label": "Read your statistics",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 25,
+            "value": "xp"
+          },
+          {
+            "amount": 10,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "user.tour_completed",
+            "filter": [
+              {
+                "field": "tour",
+                "op": "eq",
+                "value": "stats"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "discover_stats"
+    },
+    {
+      "definition": {
+        "complete_on": "any",
+        "description": "Follow its tour, or open a ticket: a question, a problem, an idea.",
+        "icon": "lifebuoy",
+        "kind": "discovery",
+        "label": "Ask the support",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 30,
+            "value": "xp"
+          },
+          {
+            "amount": 15,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "ticket.created",
+            "filter": [],
+            "kind": "event_count"
+          },
+          {
+            "count": 1,
+            "event_type": "user.tour_completed",
+            "filter": [
+              {
+                "field": "tour",
+                "op": "eq",
+                "value": "ticket"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "discover_ticket"
+    },
+    {
+      "definition": {
+        "complete_on": "any",
+        "description": "A minute to see where everything is.",
+        "icon": "compass",
+        "kind": "discovery",
+        "label": "Take the tour",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 25,
+            "value": "xp"
+          },
+          {
+            "amount": 10,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "user.onboarding_step_completed",
+            "filter": [
+              {
+                "field": "step",
+                "op": "eq",
+                "value": "tour"
+              }
+            ],
+            "kind": "event_count"
+          },
+          {
+            "count": 1,
+            "event_type": "user.tour_completed",
+            "filter": [
+              {
+                "field": "tour",
+                "op": "eq",
+                "value": "portal"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "discover_tour"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Come back on five days to discover everything.",
+        "icon": "compass",
+        "kind": "quest",
+        "label": "Explorer",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 80,
+            "value": "xp"
+          },
+          {
+            "amount": 20,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 5,
+            "event_type": "quest.completed",
+            "filter": [
+              {
+                "field": "quest",
+                "op": "eq",
+                "value": "daily_visit"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "explorer"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Vingt lectures ce mois-ci.",
+        "icon": "film",
+        "kind": "daily",
+        "label": "Cinéphile du mois",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 200,
+            "value": "xp"
+          },
+          {
+            "amount": 50,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 20,
+            "event_type": "media.playback_finished",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-12-31T23:00:00Z",
+          "starts_at": "2025-12-31T23:00:00Z"
+        }
+      },
+      "key": "monthly_cinephile"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Un achat dans la boutique ce mois-ci.",
+        "icon": "shop",
+        "kind": "daily",
+        "label": "Une petite folie",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 40,
+            "value": "xp"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "marketplace.purchase",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-12-31T23:00:00Z",
+          "starts_at": "2025-12-31T23:00:00Z"
+        }
+      },
+      "key": "monthly_treat"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Donnez votre avis une fois dans le mois.",
+        "icon": "message",
+        "kind": "daily",
+        "label": "La voix des membres",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 30,
+            "value": "xp"
+          },
+          {
+            "amount": 2,
+            "value": "contribution"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "feedback.submitted",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-12-31T23:00:00Z",
+          "starts_at": "2025-12-31T23:00:00Z"
+        }
+      },
+      "key": "monthly_voice"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Trois demandes de médias par mois.",
+        "icon": "flower",
+        "kind": "daily",
+        "label": "Printemps des découvertes",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 80,
+            "value": "xp"
+          },
+          {
+            "amount": 20,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 3,
+            "event_type": "media.request_created",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-06-20T22:00:00Z",
+          "starts_at": "2027-03-19T23:00:00Z"
+        }
+      },
+      "key": "spring_discoveries_2027"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Quatre films par semaine cet été.",
+        "icon": "sun",
+        "kind": "daily",
+        "label": "Été cinéma",
+        "period": "week",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 70,
+            "value": "xp"
+          },
+          {
+            "amount": 20,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 4,
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "in",
+                "value": [
+                  "movie"
+                ]
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-09-21T22:00:00Z",
+          "starts_at": "2027-06-20T22:00:00Z"
+        }
+      },
+      "key": "summer_cinema_2027"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Cinq lectures cette semaine.",
+        "icon": "flame",
+        "kind": "daily",
+        "label": "Marathon de la semaine",
+        "period": "week",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 60,
+            "value": "xp"
+          },
+          {
+            "amount": 15,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 5,
+            "event_type": "media.playback_finished",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-12-31T23:00:00Z",
+          "starts_at": "2025-12-31T23:00:00Z"
+        }
+      },
+      "key": "weekly_marathon"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Drop by on three days this week.",
+        "icon": "calendar",
+        "kind": "daily",
+        "label": "Weekly regular",
+        "period": "week",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 30,
+            "value": "xp"
+          }
+        ],
+        "steps": [
+          {
+            "count": 3,
+            "event_type": "quest.completed",
+            "filter": [
+              {
+                "field": "quest",
+                "op": "eq",
+                "value": "daily_visit"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": null
+      },
+      "key": "weekly_regular"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Passez sur le portail quatre jours.",
+        "icon": "calendar",
+        "kind": "daily",
+        "label": "Habitué de la semaine",
+        "period": "week",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 20,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 4,
+            "event_type": "quest.completed",
+            "filter": [
+              {
+                "field": "quest",
+                "op": "eq",
+                "value": "daily_visit"
+              }
+            ],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-12-31T23:00:00Z",
+          "starts_at": "2025-12-31T23:00:00Z"
+        }
+      },
+      "key": "weekly_regular_visits"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Demandez un film ou une série.",
+        "icon": "inbox",
+        "kind": "daily",
+        "label": "Une envie par semaine",
+        "period": "week",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 20,
+            "value": "xp"
+          }
+        ],
+        "steps": [
+          {
+            "count": 1,
+            "event_type": "media.request_created",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-12-31T23:00:00Z",
+          "starts_at": "2025-12-31T23:00:00Z"
+        }
+      },
+      "key": "weekly_wish"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Sept lectures par semaine tout l'hiver.",
+        "icon": "snowflake",
+        "kind": "daily",
+        "label": "Hiver au chaud",
+        "period": "week",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 90,
+            "value": "xp"
+          },
+          {
+            "amount": 25,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 7,
+            "event_type": "media.playback_finished",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-03-19T23:00:00Z",
+          "starts_at": "2026-12-20T23:00:00Z"
+        }
+      },
+      "key": "winter_cosy_2027"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Deux cents lectures en un an.",
+        "icon": "trophy",
+        "kind": "challenge",
+        "label": "Le défi de l'année",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "amount": 1500,
+            "value": "xp"
+          },
+          {
+            "amount": 400,
+            "value": "coins"
+          }
+        ],
+        "steps": [
+          {
+            "count": 200,
+            "event_type": "media.playback_finished",
+            "filter": [],
+            "kind": "event_count"
+          }
+        ],
+        "unlocks": [],
+        "window": {
+          "ends_at": "2027-10-05T22:00:00Z",
+          "starts_at": "2026-10-05T22:00:00Z"
+        }
+      },
+      "key": "year_challenge_2026"
+    }
+  ],
+  "rules": [
+    {
+      "definition": {
+        "event_type": "feedback.submitted",
+        "grants": [
+          {
+            "amount": 10,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 1,
+            "per_unit": null,
+            "value": "contribution"
+          }
+        ],
+        "label": "Avis envoyé",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 30,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 3600,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": [
+          {
+            "field": "target",
+            "op": "eq",
+            "value": "submitted"
+          }
+        ]
+      },
+      "key": "feedback_given"
+    },
+    {
+      "definition": {
+        "event_type": "feedback.submitted",
+        "grants": [
+          {
+            "amount": 25,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 10,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Réponse à une demande d'avis",
+        "limits": {
+          "caps": [],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": [
+          {
+            "field": "target",
+            "op": "eq",
+            "value": "request"
+          }
+        ]
+      },
+      "key": "feedback_request"
+    },
+    {
+      "definition": {
+        "event_type": "media.leaving_watched",
+        "grants": [
+          {
+            "amount": 30,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 15,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Un titre bientôt supprimé sauvé",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 150,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": []
+      },
+      "key": "leaving_watched"
+    },
+    {
+      "definition": {
+        "event_type": "media.playback_finished",
+        "grants": [
+          {
+            "amount": 40,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 8,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Livre audio écouté jusqu'au bout",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 120,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": [
+          {
+            "field": "kind",
+            "op": "in",
+            "value": [
+              "audiobook"
+            ]
+          }
+        ]
+      },
+      "key": "media_finished_audiobook"
+    },
+    {
+      "definition": {
+        "event_type": "media.playback_finished",
+        "grants": [
+          {
+            "amount": 50,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 10,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Livre lu jusqu'au bout",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 150,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": [
+          {
+            "field": "kind",
+            "op": "in",
+            "value": [
+              "book"
+            ]
+          }
+        ]
+      },
+      "key": "media_finished_book"
+    },
+    {
+      "definition": {
+        "event_type": "media.playback_finished",
+        "grants": [
+          {
+            "amount": 5,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 1,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Épisode vu jusqu'au bout",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 60,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": [
+          {
+            "field": "kind",
+            "op": "eq",
+            "value": "episode"
+          }
+        ]
+      },
+      "key": "media_finished_episode"
+    },
+    {
+      "definition": {
+        "boosters": 1,
+        "event_type": "media.playback_finished",
+        "grants": [
+          {
+            "amount": 30,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 5,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Film vu jusqu'au bout",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 150,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": [
+          {
+            "field": "kind",
+            "op": "eq",
+            "value": "movie"
+          }
+        ]
+      },
+      "key": "media_finished_movie"
+    },
+    {
+      "definition": {
+        "event_type": "media.request_created",
+        "grants": [
+          {
+            "amount": 5,
+            "per_unit": null,
+            "value": "xp"
+          }
+        ],
+        "label": "Demande d'un film ou d'une série",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 25,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": []
+      },
+      "key": "media_request"
+    },
+    {
+      "definition": {
+        "event_type": "media.playback_finished",
+        "grants": [
+          {
+            "amount": null,
+            "per_unit": {
+              "factor": 0.016666666666666666,
+              "field": "watched_s",
+              "max": 240
+            },
+            "value": "xp"
+          }
+        ],
+        "label": "Minutes regardées, écoutées ou lues (jusqu'à la fin)",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 1500,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": []
+      },
+      "key": "media_watch_time"
+    },
+    {
+      "definition": {
+        "event_type": "media.playback_abandoned",
+        "grants": [
+          {
+            "amount": null,
+            "per_unit": {
+              "factor": 0.016666666666666666,
+              "field": "watched_s",
+              "max": 240
+            },
+            "value": "xp"
+          }
+        ],
+        "label": "Minutes regardées, écoutées ou lues (séance interrompue)",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 1000,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": [
+          {
+            "field": "watched_s",
+            "op": "gte",
+            "value": 120
+          }
+        ]
+      },
+      "key": "media_watch_time_partial"
+    },
+    {
+      "definition": {
+        "event_type": "media.radio_listened",
+        "grants": [
+          {
+            "amount": 5,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 1,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Un quart d'heure de radio",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 40,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": []
+      },
+      "key": "radio_listening"
+    },
+    {
+      "definition": {
+        "event_type": "media.radio_requested",
+        "grants": [
+          {
+            "amount": 5,
+            "per_unit": null,
+            "value": "xp"
+          }
+        ],
+        "label": "Un titre demandé au DJ",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 15,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": []
+      },
+      "key": "radio_request"
+    },
+    {
+      "definition": {
+        "event_type": "media.request_watched",
+        "grants": [
+          {
+            "amount": 5,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 2,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Un titre demandé est regardé par un autre membre",
+        "limits": {
+          "caps": [],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": []
+      },
+      "key": "request_watched"
+    },
+    {
+      "definition": {
+        "boosters": 1,
+        "event_type": "media.season_finished",
+        "grants": [],
+        "label": "Saison terminée",
+        "limits": {
+          "caps": [],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": []
+      },
+      "key": "season_finished"
+    },
+    {
+      "definition": {
+        "event_type": "marketplace.purchase",
+        "grants": [
+          {
+            "amount": 15,
+            "per_unit": null,
+            "value": "xp"
+          }
+        ],
+        "label": "Achat dans la boutique",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 150,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": []
+      },
+      "key": "shop_purchase"
+    },
+    {
+      "definition": {
+        "event_type": "ticket.created",
+        "grants": [
+          {
+            "amount": 10,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 2,
+            "per_unit": null,
+            "value": "contribution"
+          }
+        ],
+        "label": "Création d'un ticket support",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 50,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 600,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": []
+      },
+      "key": "ticket_created"
+    }
+  ],
+  "settings": {
+    "economy.levelRewards": [
+      {
+        "coins": 50,
+        "contribution": 0,
+        "label": "Bronze I",
+        "level": 3,
+        "product": null,
+        "xp": 20
+      },
+      {
+        "coins": 75,
+        "contribution": 0,
+        "label": "Bronze II",
+        "level": 5,
+        "product": "ultimate_nova",
+        "xp": 30
+      },
+      {
+        "coins": 150,
+        "contribution": 1,
+        "label": "Bronze III",
+        "level": 10,
+        "product": "booster_reserve",
+        "xp": 60
+      },
+      {
+        "coins": 200,
+        "contribution": 0,
+        "label": "Argent I",
+        "level": 13,
+        "product": "badge_binge_watcher",
+        "xp": 70
+      },
+      {
+        "coins": 250,
+        "contribution": 0,
+        "label": "Argent II",
+        "level": 16,
+        "product": "booster_celestial",
+        "xp": 80
+      },
+      {
+        "coins": 400,
+        "contribution": 1,
+        "label": "Argent III",
+        "level": 20,
+        "product": "booster_cosmos",
+        "xp": 120
+      },
+      {
+        "coins": 450,
+        "contribution": 0,
+        "label": "Or I",
+        "level": 23,
+        "product": "badge_golden_cinephile",
+        "xp": 140
+      },
+      {
+        "coins": 500,
+        "contribution": 0,
+        "label": "Or II",
+        "level": 26,
+        "product": "title_star_sailor",
+        "xp": 170
+      },
+      {
+        "coins": 700,
+        "contribution": 2,
+        "label": "Or III",
+        "level": 30,
+        "product": "booster_prestige",
+        "xp": 200
+      },
+      {
+        "coins": 750,
+        "contribution": 0,
+        "label": "Platine I",
+        "level": 33,
+        "product": null,
+        "xp": 230
+      },
+      {
+        "coins": 800,
+        "contribution": 0,
+        "label": "Platine II",
+        "level": 36,
+        "product": null,
+        "xp": 260
+      },
+      {
+        "coins": 1000,
+        "contribution": 2,
+        "label": "Platine III",
+        "level": 40,
+        "product": "booster_legend",
+        "xp": 300
+      },
+      {
+        "coins": 1100,
+        "contribution": 0,
+        "label": "Diamant I",
+        "level": 43,
+        "product": null,
+        "xp": 340
+      },
+      {
+        "coins": 1300,
+        "contribution": 0,
+        "label": "Diamant II",
+        "level": 46,
+        "product": "badge_supernova",
+        "xp": 380
+      },
+      {
+        "coins": 2000,
+        "contribution": 5,
+        "label": "Légende",
+        "level": 50,
+        "product": "booster_legend",
+        "xp": 0
+      }
+    ],
+    "economy.streak": {
+      "enabled": true,
+      "event_types": [
+        "media.playback_finished",
+        "media.playback_abandoned"
+      ],
+      "min_watched_s": 300,
+      "tiers": [
+        {
+          "days": 2,
+          "multiplier": 1.5
+        },
+        {
+          "days": 5,
+          "multiplier": 2.0
+        },
+        {
+          "days": 10,
+          "multiplier": 2.5
+        }
+      ],
+      "values": [
+        "xp",
+        "coins"
+      ]
+    }
+  },
+  "version": 1
+}

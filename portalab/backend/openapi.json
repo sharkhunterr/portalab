@@ -1790,6 +1790,52 @@
         "title": "AnomalyDecisionIn",
         "type": "object"
       },
+      "ApplyIn": {
+        "additionalProperties": false,
+        "properties": {
+          "parts": {
+            "items": {
+              "enum": [
+                "settings",
+                "curve",
+                "rules",
+                "achievements",
+                "quests",
+                "campaigns"
+              ],
+              "type": "string"
+            },
+            "title": "Parts",
+            "type": "array"
+          },
+          "preset": {
+            "anyOf": [
+              {
+                "const": "lan",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preset"
+          },
+          "setup": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup"
+          }
+        },
+        "title": "ApplyIn",
+        "type": "object"
+      },
       "ApplySuggestionsIn": {
         "additionalProperties": false,
         "properties": {
@@ -24677,6 +24723,96 @@
         "summary": "Reopen First Run",
         "tags": [
           "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/game/presets": {
+      "get": {
+        "operationId": "presets_api_v1_admin_game_presets_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Presets Api V1 Admin Game Presets Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Presets",
+        "tags": [
+          "game-setup"
+        ]
+      }
+    },
+    "/api/v1/admin/game/setup": {
+      "get": {
+        "operationId": "current_api_v1_admin_game_setup_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Current Api V1 Admin Game Setup Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Current",
+        "tags": [
+          "game-setup"
+        ]
+      },
+      "post": {
+        "operationId": "apply_api_v1_admin_game_setup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Apply Api V1 Admin Game Setup Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Apply",
+        "tags": [
+          "game-setup"
         ]
       }
     },

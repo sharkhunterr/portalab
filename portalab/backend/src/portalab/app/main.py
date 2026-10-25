@@ -20,6 +20,7 @@ from starlette.responses import Response
 import portalab
 from portalab.app.composition import BACKEND_DIR
 from portalab.app.exposure_api import router as exposure_router
+from portalab.app.game_setup_api import router as game_setup_router
 from portalab.app.health import router as health_router
 from portalab.app.migrations import expected_heads
 from portalab.app.security import (
@@ -555,6 +556,7 @@ def create_app(
     app.include_router(stream_router)
     app.include_router(intrusion_router)
     app.include_router(exposure_router)  # 029: what Portalab opens to an extension
+    app.include_router(game_setup_router)  # issue 253: the game setup, shipped or taken from another portal
     for router in [
         *identity_routers(),
         *authz_routers(),

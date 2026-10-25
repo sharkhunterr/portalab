@@ -22,6 +22,7 @@ import { type Progress, type StepKey, useSetupProgress } from "../setup/progress
 import { type Configure, configureWay, useArrivalSlides, wayOf } from "./ArrivalWizard";
 import { useCurrentFeatures } from "./FeaturesPicker";
 import { ALL_FEATURES, type Selection } from "./features";
+import { type GameChoice, GameStep } from "./GameStep";
 import { Launch, useTasks } from "./Launch";
 import { Stage, StepCard } from "./Stage";
 import "../../ai/ai.css";
@@ -63,6 +64,7 @@ interface Arrival {
   step?: Step;
   skipped?: Step[];
   finished_at?: string | null;
+  game?: GameChoice; // issue 253: the LAN's game, adjusted, or set by hand
 }
 
 type WithArrival = Progress & { arrival?: Arrival };
@@ -194,7 +196,16 @@ function Way({
           {step === "access" ? <AccessStep /> : null}
           {step === "email" ? <EmailSettings /> : null}
           {step === "appearance" ? <AppearanceStep /> : null}
-          {step === "play" ? <Settings keys={PLAY} /> : null}
+          {step === "play" ? (
+            <GameStep
+              choice={arrival.game}
+              onChoose={(game) => {
+                const { game: _former, ...rest } = arrival;
+                keep({ ...progress, arrival: game ? { ...rest, game } : rest }).catch(() => undefined);
+              }}
+              settings={<Settings keys={PLAY} />}
+            />
+          ) : null}
           {step === "ai" ? <ModelSettings /> : null}
         </StepCard>
       )}

@@ -1,0 +1,91 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render, screen } from "@testing-library/react";
+import axe from "axe-core";
+import { MemoryRouter } from "react-router";
+import { describe, expect, it, vi } from "vitest";
+
+// Issue 253 — the arrival wizard's game: the LAN's game as Portalab ships it, adjusted, or set by hand; the
+// LAN's game applied in one go (what the shop does not sell said), then the game's screens tab by tab.
+
+const fake = vi.hoisted(() => ({
+  handler: (_: Request): Response | Promise<Response> => new Response(null),
+}));
+vi.mock("../../src/api/client", async (importOriginal) => {
+  const { installFakeApi } = await import("../support/fake-api");
+  const installed = installFakeApi();
+  Object.defineProperty(installed, "handler", { get: () => fake.handler });
+  return importOriginal();
+});
+
+import { GameStep } from "../../src/features/admin/arrival/GameStep";
+import { json } from "../support/fake-api";
+
+const COUNTS = { settings: 2, rules: 16, achievements: 66, quests: 26, campaigns: 3, level_rewards: 11 };
+
+function wrap(node: React.ReactNode) {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return (
+    <QueryClientProvider client={client}>
+      <MemoryRouter>{node}</MemoryRouter>
+    </QueryClientProvider>
+  );
+}
+
+describe("arrival wizard's game", () => {
+  it("offers the LAN's game, applies it in one go and says what the shop does not sell", async () => {
+    const sent: unknown[] = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/admin/game/presets") return json(200, [{ key: "lan", counts: COUNTS }]);
+      if (path === "/api/v1/admin/game/setup") {
+        sent.push(await request.json());
+        return json(200, {
+          applied: { settings: 2, curve: 1, rules: 16, achievements: 66, quests: 17, campaigns: 3 },
+          kept: {},
+          skipped: [
+            { part: "settings", key: "level 10: booster_reserve", reason: "product not in this shop" },
+          ],
+        });
+      }
+      return json(200, {});
+    };
+    const chosen = vi.fn();
+    const { container, rerender } = render(
+      wrap(<GameStep choice={undefined} onChoose={chosen} settings={<p>the play settings</p>} />),
+    );
+    const lan = await screen.findByRole("button", {
+      name: /^The LAN's game\s*As it runs.*16 gain rules, 66 achievements/,
+    });
+    expect(screen.getByRole("button", { name: /Set everything myself/ })).toBeInTheDocument();
+    const results = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
+    expect(results.violations.map((v) => v.id)).toEqual([]);
+    fireEvent.click(lan);
+    await vi.waitFor(() => expect(chosen).toHaveBeenCalledWith("lan"));
+    expect(sent).toEqual([{ preset: "lan" }]);
+    rerender(wrap(<GameStep choice="lan" onChoose={chosen} settings={<p>the play settings</p>} />));
+    expect(screen.getByText(/The LAN's game is in place/)).toBeInTheDocument();
+    expect(screen.getByText("the play settings")).toBeInTheDocument();
+  });
+
+  it("set by hand: nothing applied, the game's screens tab by tab", async () => {
+    const sent: string[] = [];
+    fake.handler = (request) => {
+      const path = new URL(request.url).pathname;
+      if (request.method !== "GET") sent.push(path);
+      if (path === "/api/v1/admin/game/presets") return json(200, [{ key: "lan", counts: COUNTS }]);
+      return json(200, []);
+    };
+    const chosen = vi.fn();
+    const { rerender } = render(wrap(<GameStep choice={undefined} onChoose={chosen} settings={null} />));
+    fireEvent.click(await screen.findByRole("button", { name: /Set everything myself/ }));
+    expect(chosen).toHaveBeenCalledWith("custom");
+    expect(sent).toEqual([]);
+    rerender(wrap(<GameStep choice="custom" onChoose={chosen} settings={<p>the play settings</p>} />));
+    for (const tab of ["Levels and unlocks", "Gains and streak", "Achievements", "Quests", "Campaigns"])
+      expect(screen.getByRole("button", { name: tab })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    expect(screen.getByText("the play settings")).toBeInTheDocument();
+  });
+});

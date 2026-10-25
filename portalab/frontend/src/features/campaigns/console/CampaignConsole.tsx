@@ -31,33 +31,35 @@ const TONES: Record<string, "ok" | "bad" | "info" | "neutral"> = {
  * its bonuses and shop discounts in words — edited in a form (each save publishes a new version);
  * activation, deactivation and cancellation need a reason and a confirmation; simulation and history.
  */
-export default function CampaignConsole() {
+/** The way to create a campaign (issue 253: also in the arrival wizard). */
+export function CreateCampaign() {
   const t = useT();
-  const campaigns = useCampaignsAdmin();
   const [creating, setCreating] = useState(false);
   return (
-    <AdminPage
-      icon="star"
-      title={t("campaigns:admin.title")}
-      description={t("campaigns:admin.description")}
-      primary={
-        <Dialog
-          open={creating}
-          onOpenChange={setCreating}
-          title={t("campaigns:admin.create")}
-          closeLabel={t("campaigns:editor.close")}
-          size="lg"
-          trigger={
-            <Button>
-              <Icon name="plus" size={16} />
-              {t("campaigns:admin.create")}
-            </Button>
-          }
-        >
-          <CampaignEditor onDone={() => setCreating(false)} />
-        </Dialog>
+    <Dialog
+      open={creating}
+      onOpenChange={setCreating}
+      title={t("campaigns:admin.create")}
+      closeLabel={t("campaigns:editor.close")}
+      size="lg"
+      trigger={
+        <Button>
+          <Icon name="plus" size={16} />
+          {t("campaigns:admin.create")}
+        </Button>
       }
     >
+      <CampaignEditor onDone={() => setCreating(false)} />
+    </Dialog>
+  );
+}
+
+/** The campaigns, each a card (issue 253: also in the arrival wizard). */
+export function CampaignList() {
+  const t = useT();
+  const campaigns = useCampaignsAdmin();
+  return (
+    <>
       {campaigns.data && !campaigns.data.length ? (
         <AdminEmpty icon="star" title={t("campaigns:editor.empty")} />
       ) : null}
@@ -66,6 +68,20 @@ export default function CampaignConsole() {
           <CampaignCard key={campaign.id} campaign={campaign} />
         ))}
       </div>
+    </>
+  );
+}
+
+export default function CampaignConsole() {
+  const t = useT();
+  return (
+    <AdminPage
+      icon="star"
+      title={t("campaigns:admin.title")}
+      description={t("campaigns:admin.description")}
+      primary={<CreateCampaign />}
+    >
+      <CampaignList />
     </AdminPage>
   );
 }

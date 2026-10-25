@@ -295,7 +295,7 @@ describe("admin screens", () => {
     );
     await expectAccessible(container);
     fireEvent.click(screen.getByRole("button", { name: /Skip/ }));
-    expect(await screen.findByRole("heading", { name: "Play and the shop" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "The game" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Skip/ }));
     expect(await screen.findByRole("heading", { name: "The AI assistant" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Skip/ }));
