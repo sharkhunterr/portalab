@@ -16,11 +16,11 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Literal
 
-from portalab.capabilities.health import HealthState
+from portalab.capabilities.health import WATCHED_STATES, HealthState
 
 RULES_VERSION = 1
 Reason = Literal["probe", "breaker", "stale", "maintenance", "inactive", "latency", "warning"]
-MONITORED = frozenset({"enabled", "error", "unavailable", "maintenance"})
+MONITORED = WATCHED_STATES
 
 
 @dataclass(frozen=True, slots=True)

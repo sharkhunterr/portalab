@@ -18,7 +18,7 @@ from portalab.capabilities.dashboard import (
     WidgetUnavailable,
     with_styles,
 )
-from portalab.capabilities.health import SERVICE_DIRECTORY, SERVICE_STATE
+from portalab.capabilities.health import SERVICE_DIRECTORY, SERVICE_STATE, watched
 from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.service_events import STATUS_CHANGED
@@ -441,6 +441,8 @@ class ServicesSummaryProvider:
         by_id = {view.service_id: view for view in views}
         rows = []
         for service in services:
+            if not watched(service):
+                continue  # switched off: not watched, so neither unknown nor « a source did not answer »
             view = by_id.get(service.id)
             rows.append(
                 {
@@ -519,7 +521,7 @@ class ServiceLinksProvider(ServicesSummaryProvider):
                 "route": f"/services/{service.id}",
             }
             for service in services
-            if service.state != "disconnected"
+            if watched(service)
         ]
         if not items:
             return WidgetPayload("no-data", as_of=utc_now(self.clock))

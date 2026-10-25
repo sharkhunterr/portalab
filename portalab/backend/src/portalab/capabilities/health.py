@@ -322,6 +322,15 @@ class ServiceInfo:
     alerting: Mapping[str, Any] = field(default_factory=dict)
 
 
+# The connection states of a service that is watched: one configured but never switched on, switched off by
+# an administrator or disconnected is not — it is neither « unknown » nor counted in the portal's health.
+WATCHED_STATES = frozenset({"enabled", "error", "unavailable", "maintenance"})
+
+
+def watched(info: ServiceInfo) -> bool:
+    return info.state in WATCHED_STATES
+
+
 @runtime_checkable
 class ServiceDirectory(Protocol):
     async def services(self) -> list[ServiceInfo]: ...

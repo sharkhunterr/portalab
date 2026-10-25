@@ -9,7 +9,7 @@ from collections.abc import Callable, Sequence
 from datetime import timedelta
 from typing import Any
 
-from portalab.capabilities.health import SERVICE_DIRECTORY, SERVICE_STATE, ServiceInfo
+from portalab.capabilities.health import SERVICE_DIRECTORY, SERVICE_STATE, ServiceInfo, watched
 from portalab.capabilities.observability import Check, CheckResult, DiagnosticAction, ObservedComponent
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.time import Clock, utc_now
@@ -51,7 +51,7 @@ def service_components(
             return []
         components = []
         for info in await directory.services():
-            if info.state in ("configured", "disconnected"):
+            if not watched(info):
                 continue
             components.extend(_for_service(capabilities, info.id, info.name, config, clock))
         return components
