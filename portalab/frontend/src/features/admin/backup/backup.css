@@ -48,3 +48,9 @@
   padding-inline-start: var(--space-5);
   color: var(--color-text-muted);
 }
+.system-schema summary {
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  color: var(--color-accent);
+  font-weight: 600;
+}

@@ -1746,6 +1746,7 @@
   "system.revision": "Revision",
   "system.schema": "Schema by module",
   "system.schemaHint": "Each module's last migration: what a backup records, to be brought into another portal.",
+  "system.schemaShow": "{count, plural, one {Show the module} other {Show the # modules}}",
   "system.started": "Running since",
   "system.subtitle": "Which Portalab this is, the schema of each of its modules — and starting again from scratch.",
   "system.title": "Version",
