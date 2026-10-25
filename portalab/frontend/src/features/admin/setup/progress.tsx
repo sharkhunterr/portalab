@@ -11,9 +11,11 @@ import "./setup.css";
  * assistant and the Control Center's card (which does not load the assistant's screens). */
 export type StepKey =
   | "identity"
+  | "features"
   | "account"
   | "access"
   | "services"
+  | "members"
   | "media"
   | "communication"
   | "appearance"
@@ -39,6 +41,7 @@ export const STEPS: readonly Step[] = [
       "notifications.email.portalUrl",
     ],
   },
+  { key: "features", icon: "blocks", links: [["/admin/modules", "modules"]] }, // issue 246
   {
     key: "account",
     icon: "user",
@@ -62,6 +65,7 @@ export const STEPS: readonly Step[] = [
     links: [["/admin/members", "members"]],
   },
   { key: "services", icon: "server", links: [["/admin/services", "services"]] },
+  { key: "members", icon: "users", links: [["/admin/members", "members"]] }, // issue 246
   {
     key: "media",
     icon: "film",

@@ -1,10 +1,12 @@
+import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
+import { api } from "../../api/client";
 import { AuthLayout } from "../../design-system/components/AuthLayout";
 import { FunctionalState } from "../../design-system/FunctionalState";
 import { PortalUnreachable } from "../../shell/router/PortalUnreachable";
 import { inLanguage, useSite } from "../../shell/site/site";
 import { ApiError, stateForError } from "../../state/regions";
-import { FirstRunWizard } from "../admin/FirstRunWizard";
+import { ArrivalWizard } from "../admin/arrival/ArrivalWizard";
 import { LoginForm } from "./LoginForm";
 import { useAuthStrings } from "./strings";
 import { type Me, useLogout, useMe } from "./useAuth";
@@ -23,11 +25,13 @@ export function AuthGate({
 }) {
   const t = useAuthStrings();
   const me = useMe();
+  const arrival = useArrivalOpen(me.isSuccess && !me.data);
   // issue 159: the site's name, logo and slogan (in the browser's language, else the default one)
   const site = useSite();
   const tagline = inLanguage(site.tagline, globalThis.navigator?.language ?? "en") ?? t.tagline;
   const layout = { brand: site.name, logo: site.logo, tagline };
-  if (location?.pathname === "/setup") return <FirstRunWizard />;
+  // issue 246: a portal nobody has set up yet shows its arrival wizard, whatever the address
+  if (location?.pathname === "/setup" || (me.isSuccess && !me.data && arrival.data)) return <ArrivalWizard />;
   if (location?.pathname === "/verify") {
     const token = new URLSearchParams(location.search).get("token") ?? "";
     return (
@@ -50,6 +54,24 @@ export function AuthGate({
       </AuthLayout>
     );
   return <>{children(me.data)}</>;
+}
+
+/** Whether the portal still waits for its first administrator (asked only by a visitor without a session). */
+function useArrivalOpen(anonymous: boolean) {
+  return useQuery({
+    queryKey: ["admin", "first-run", "open"],
+    enabled: anonymous,
+    retry: false,
+    staleTime: 60_000,
+    queryFn: async () => {
+      try {
+        const data = (await api.GET("/api/v1/admin/first-run")).data as unknown as { completed?: boolean };
+        return data?.completed === false;
+      } catch {
+        return false; // set up: the very same answer as any address
+      }
+    },
+  });
 }
 
 export function SignOutButton() {
