@@ -24,6 +24,8 @@ import "./arrival.css";
 type Step = "welcome" | "features" | "admin" | "recap" | "import";
 const NEW: readonly Step[] = ["welcome", "features", "admin", "recap"];
 const IMPORT: readonly Step[] = ["welcome", "import"]; // issue 247: another Portalab brought in
+// what the setup assistant goes on with once the account exists (shown so the whole way is known)
+const LATER = ["services", "members", "identity"] as const;
 
 interface Account {
   login: string;
@@ -96,7 +98,7 @@ function Arrival({
             email: account.email || null,
             settings: {
               "i18n.defaultLanguage": language,
-              "admin.setup.progress": { install: "new", step: "identity", done: ["account", "features"] },
+              "admin.setup.progress": { install: "new", step: "services", done: ["account", "features"] },
             },
             steps: {},
           } as never,
@@ -154,6 +156,14 @@ function Arrival({
             {t(`account:arrival.step.${s}`)}
           </li>
         ))}
+        {install === "new"
+          ? LATER.map((s, position) => (
+              <li key={s} data-later title={t("account:arrival.later")}>
+                <span aria-hidden="true">{STEPS.length + position + 1}</span>
+                {t(`account:arrival.step.${s}`)}
+              </li>
+            ))
+          : null}
       </ol>
       <section className="arrival__panel" aria-labelledby={ids.title}>
         {step === "welcome" ? (
