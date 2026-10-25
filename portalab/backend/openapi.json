@@ -4792,6 +4792,135 @@
         "title": "CommunityVoteOut",
         "type": "object"
       },
+      "CompositionIn": {
+        "additionalProperties": false,
+        "properties": {
+          "disabled": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "title": "Disabled",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CompositionItemIn"
+            },
+            "maxItems": 200,
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "CompositionIn",
+        "type": "object"
+      },
+      "CompositionItemIn": {
+        "additionalProperties": false,
+        "description": "Issue 250: one widget of the default dashboard \u2014 its place on a computer (12 columns), its settings,\nhow far it is locked, and (optionally) its own place on a tablet and a phone.",
+        "properties": {
+          "config": {
+            "additionalProperties": true,
+            "title": "Config",
+            "type": "object"
+          },
+          "h": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "H",
+            "type": "integer"
+          },
+          "lock": {
+            "default": "free",
+            "enum": [
+              "free",
+              "always",
+              "locked"
+            ],
+            "title": "Lock",
+            "type": "string"
+          },
+          "move": {
+            "default": false,
+            "title": "Move",
+            "type": "boolean"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlaceIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resize": {
+            "default": false,
+            "title": "Resize",
+            "type": "boolean"
+          },
+          "roles": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roles"
+          },
+          "tablet": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlaceIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "w": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "W",
+            "type": "integer"
+          },
+          "widget_key": {
+            "maxLength": 96,
+            "title": "Widget Key",
+            "type": "string"
+          },
+          "x": {
+            "maximum": 11.0,
+            "minimum": 0.0,
+            "title": "X",
+            "type": "integer"
+          },
+          "y": {
+            "maximum": 500.0,
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "widget_key",
+          "x",
+          "y",
+          "w",
+          "h"
+        ],
+        "title": "CompositionItemIn",
+        "type": "object"
+      },
       "Confirmations": {
         "additionalProperties": false,
         "properties": {
@@ -13088,6 +13217,43 @@
           "imdb"
         ],
         "title": "PersonProfileOut",
+        "type": "object"
+      },
+      "PlaceIn": {
+        "additionalProperties": false,
+        "properties": {
+          "h": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "H",
+            "type": "integer"
+          },
+          "w": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "W",
+            "type": "integer"
+          },
+          "x": {
+            "maximum": 11.0,
+            "minimum": 0.0,
+            "title": "X",
+            "type": "integer"
+          },
+          "y": {
+            "maximum": 500.0,
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "w",
+          "h"
+        ],
+        "title": "PlaceIn",
         "type": "object"
       },
       "PlaceOut": {
@@ -23352,6 +23518,71 @@
         "summary": "Validate Config",
         "tags": [
           "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/dashboard/composition": {
+      "get": {
+        "description": "Issue 250: the default dashboard as the administrator composes it.",
+        "operationId": "get_composition_api_v1_admin_dashboard_composition_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Composition Api V1 Admin Dashboard Composition Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Composition",
+        "tags": [
+          "dashboard"
+        ]
+      },
+      "put": {
+        "operationId": "put_composition_api_v1_admin_dashboard_composition_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompositionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Put Composition Api V1 Admin Dashboard Composition Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Composition",
+        "tags": [
+          "dashboard"
         ]
       }
     },

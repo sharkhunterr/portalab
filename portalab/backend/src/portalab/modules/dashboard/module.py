@@ -28,6 +28,7 @@ from portalab.core.db import Database
 from portalab.core.errors import Unavailable, ValidationFailed
 from portalab.core.event_port import EventPublisher
 from portalab.core.time import Clock
+from portalab.modules.dashboard import composition
 from portalab.modules.dashboard import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.dashboard.conditions.evaluator import ConditionEvaluator
 from portalab.modules.dashboard.events import register_event_types
@@ -164,6 +165,35 @@ class DashboardModule:
 
     async def set_starter(self, principal: Principal, value: list[dict[str, Any]]) -> None:
         await self.set_setting(principal, STARTER, value)
+
+    def _defaults(self) -> dict[str, tuple[int, int, dict[str, Any]]]:
+        return {
+            w.definition.key: (
+                w.definition.size.default.w,
+                w.definition.size.default.h,
+                dict(w.definition.config_defaults),
+            )
+            for w in self.registry.widgets()
+        }
+
+    async def composition(self) -> dict[str, Any]:
+        """Issue 250: the default dashboard as placed widgets (place, settings, lock), and the widgets off."""
+        await self.refresh_config()
+        return composition.read(self.config.widget_policies, self.config.starter_layout, self._defaults())
+
+    async def set_composition(
+        self, principal: Principal, items: list[dict[str, Any]], disabled: list[str]
+    ) -> None:
+        """Both settings checked first, then written: a composition never lands half."""
+        await self.refresh_config()
+        policies, starter = composition.write(items, disabled, self.config.widget_policies, self._defaults())
+        errors = [*await self.validators.policies(policies), *await self.validators.starter(starter)]
+        if errors:
+            raise ValidationFailed(
+                "Invalid dashboard setting.", code="dashboard.invalid_policy", extensions={"errors": errors}
+            )
+        await self.set_setting(principal, POLICIES, policies)
+        await self.set_setting(principal, STARTER, starter)
 
     async def probe(self) -> CheckResult:
         """Functional check (025): every mandatory widget is registered (every dashboard can show it)."""

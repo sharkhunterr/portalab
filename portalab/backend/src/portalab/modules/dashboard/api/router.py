@@ -392,6 +392,8 @@ async def widget_data(
         instance_key, stored = await module.service.stored_config(principal, instance)
         if instance_key != key:
             raise NotFound("This widget is not on your dashboard.", code="dashboard.instance_not_found")
+    else:
+        stored = module.service.imposed_config(key)  # issue 250: pinned with its settings, no row yet
     payload = await module.gateway.load(
         key, principal, await _locale(module, principal), stored, preview=preview and instance is None
     )
@@ -476,3 +478,53 @@ async def get_starter(_: Manager, module: Module) -> dict[str, Any]:
 async def put_starter(principal: Manager, body: list[dict[str, Any]], module: Module) -> dict[str, Any]:
     await module.set_starter(principal, body)
     return {"starter": module.config.starter_layout}
+
+
+class PlaceIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    x: int = Field(ge=0, le=11)
+    y: int = Field(ge=0, le=500)
+    w: int = Field(ge=1, le=12)
+    h: int = Field(ge=1, le=12)
+
+
+class CompositionItemIn(BaseModel):
+    """Issue 250: one widget of the default dashboard — its place on a computer (12 columns), its settings,
+    how far it is locked, and (optionally) its own place on a tablet and a phone."""
+
+    model_config = ConfigDict(extra="forbid")
+    widget_key: str = Field(max_length=96)
+    x: int = Field(ge=0, le=11)
+    y: int = Field(ge=0, le=500)
+    w: int = Field(ge=1, le=12)
+    h: int = Field(ge=1, le=12)
+    config: dict[str, Any] = Field(default_factory=dict)
+    lock: Literal["free", "always", "locked"] = "free"
+    move: bool = False
+    resize: bool = False
+    tablet: PlaceIn | None = None
+    phone: PlaceIn | None = None
+    roles: list[str] | None = None
+
+
+class CompositionIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    items: list[CompositionItemIn] = Field(max_length=200)
+    disabled: list[str] = Field(default_factory=list, max_length=500)
+
+
+@router.get("/admin/dashboard/composition")
+async def get_composition(_: Manager, module: Module) -> dict[str, Any]:
+    """Issue 250: the default dashboard as the administrator composes it."""
+    return await module.composition()
+
+
+@router.put("/admin/dashboard/composition")
+async def put_composition(principal: Manager, body: CompositionIn, module: Module) -> dict[str, Any]:
+    keys = [item.widget_key for item in body.items]
+    if len(set(keys)) != len(keys):
+        raise ValidationFailed("A widget is placed once.", code="dashboard.invalid_policy")
+    await module.set_composition(
+        principal, [item.model_dump(exclude_none=True) for item in body.items], list(body.disabled)
+    )
+    return await module.composition()

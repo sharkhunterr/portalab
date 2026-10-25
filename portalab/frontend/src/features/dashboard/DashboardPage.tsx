@@ -23,25 +23,7 @@ import { EmptyWidgets } from "./frame/emptiness";
 import { WidgetFrame } from "./frame/WidgetFrame";
 import { DashboardGrid } from "./grid/DashboardGrid";
 import { bands, VIEW_COLUMNS, type View } from "./grid/engine";
-import "./summary/SinceLastLoginCard";
-import "./widgets/tiles";
-import "./widgets/layout";
-import "./widgets/builtin";
-import "./widgets/media";
-import "./widgets/calendar";
-import "../gamification/widget";
-import "../community/widget";
-import "../marketplace/widget";
-import "../support/incidents/widget";
-import "../support/tickets/widget";
-import "../campaigns/widget";
-import "./widgets/discover";
-import "./widgets/downloads";
-import "./widgets/leaving";
-import "./widgets/service-status";
-import "../services/HostWidgets";
-import "./widgets/pack/PackWidget"; // 028: packs' widgets
-import "./widgets/skins"; // 027 (#31): last — the other looks wrap the widgets registered above
+import "./widgets/registered";
 
 const ONBOARDED = "portalab.onboarding.dashboard";
 

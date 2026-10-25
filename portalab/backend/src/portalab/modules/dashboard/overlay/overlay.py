@@ -181,6 +181,8 @@ def effective(
             continue  # locked ≠ forced: only constrains instances the user has
         default_size: Size = definition.size.default
         pin = pin_of(policies, key)
+        # issue 250: the settings imposed with it, before the member has a row of their own
+        imposed = (policies.get(key) or {}).get("lockedConfig") if pin is not None else None
         out.instances.append(
             EffectiveInstance(
                 None,
@@ -189,7 +191,7 @@ def effective(
                 next_position,
                 pin[2] if pin else default_size.w,
                 pin[3] if pin else default_size.h,
-                dict(definition.config_defaults),
+                {**definition.config_defaults, **(imposed if isinstance(imposed, Mapping) else {})},
                 cls,
                 pin is not None,
                 cls in MANDATORY,
