@@ -16,9 +16,10 @@ import "./arrival.css";
 /**
  * Issue 253 — the arrival wizard's game: the recommended install, the LAN's game as Portalab ships it (what
  * earns XP and Coins, the level curve and what each level unlocks, the achievements, the quests, the campaigns)
- * with its shop (Portalab's catalog, the visual packs it sells, the LAN's own products), the same to adjust,
- * or everything set by hand — then the game administration's own screens, tab by tab. The choice is
- * kept with the wizard's progress; applying the LAN's game twice changes nothing.
+ * with its shop (Portalab's catalog, the LAN's own products), the same to adjust, or everything set by hand —
+ * then the game administration's own screens, tab by tab. The visual packs it sells are installed when the
+ * portal opens (``Open``), not here. The choice is kept with the wizard's progress; applying the LAN's game
+ * twice changes nothing.
  */
 export type GameChoice = "lan" | "tune" | "custom";
 
@@ -29,6 +30,8 @@ const CHOICES: ReadonlyArray<{ key: GameChoice; icon: string }> = [
 ];
 const TABS = ["levels", "gains", "achievements", "quests", "campaigns", "settings"] as const;
 type Tab = (typeof TABS)[number];
+// all but the packs: the opening installs them
+const PARTS = ["shop", "settings", "curve", "rules", "achievements", "quests", "campaigns"] as const;
 const GAME_KEYS = [["admin", "gamification"], ["gamification"], ["campaigns"], ["admin", "config"]] as const;
 
 interface Counts {
@@ -72,7 +75,7 @@ export function GameStep({
   const lan = (Array.isArray(presets.data) ? presets.data : []).find((p) => p.key === "lan")?.counts;
   const apply = useMutation({
     mutationFn: async () =>
-      (await api.POST("/api/v1/admin/game/setup", { body: { preset: "lan" } as never }))
+      (await api.POST("/api/v1/admin/game/setup", { body: { preset: "lan", parts: PARTS } as never }))
         .data as unknown as Report,
     onSuccess: async () => {
       await Promise.all(GAME_KEYS.map((queryKey) => client.invalidateQueries({ queryKey })));
@@ -123,9 +126,7 @@ export function GameStep({
 
   const report = apply.data;
   const missing = report?.skipped.filter((s) => s.reason === "product not in this shop") ?? [];
-  const isPack = (s: { part: string; key: string }) => s.part === "shop" && s.key.startsWith("pack ");
-  const packs = report?.skipped.filter(isPack) ?? [];
-  const failed = report?.skipped.filter((s) => s.reason !== "product not in this shop" && !isPack(s)) ?? [];
+  const failed = report?.skipped.filter((s) => s.reason !== "product not in this shop") ?? [];
   return (
     <>
       <p className="arrival__note" role="status">
@@ -144,15 +145,6 @@ export function GameStep({
           {t("account:arrival.game.missing", {
             count: missing.length,
             products: missing.map((m) => m.key.split(": ").pop()).join(", "),
-          })}
-        </p>
-      ) : null}
-      {packs.length ? (
-        <p className="arrival__note">
-          <Icon name="info" size={16} />
-          {t("account:arrival.game.packs", {
-            count: packs.length,
-            packs: packs.map((p) => p.key.slice("pack ".length)).join(", "),
           })}
         </p>
       ) : null}

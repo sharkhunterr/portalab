@@ -29,8 +29,9 @@ const SLIDE_EVERY = 4500;
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/** Tasks run one after the other, each one's state and the share of the running one kept for the ring. */
-export function useTasks(keys: readonly string[]) {
+/** Tasks run one after the other, each one's state and the share of the running one kept for the ring; a task
+ * that lasts longer than the others counts more (``weights``, 1 by default). */
+export function useTasks(keys: readonly string[], weights: Readonly<Record<string, number>> = {}) {
   const initial = () => Object.fromEntries(keys.map((k) => [k, "waiting" as TaskState]));
   const [states, setStates] = useState<Record<string, TaskState>>(initial);
   const [share, setShare] = useState(0);
@@ -60,10 +61,12 @@ export function useTasks(keys: readonly string[]) {
     },
     [],
   );
-  const done = keys.filter((k) => states[k] === "done").length;
-  const running = keys.some((k) => states[k] === "running");
-  const percent = keys.length ? Math.round(((done + (running ? share : 0)) / keys.length) * 100) : 0;
-  return { states, percent, detail, run, finished: done === keys.length };
+  const weight = (k: string) => weights[k] ?? 1;
+  const total = keys.reduce((sum, k) => sum + weight(k), 0);
+  const done = keys.filter((k) => states[k] === "done").reduce((sum, k) => sum + weight(k), 0);
+  const running = keys.find((k) => states[k] === "running");
+  const percent = total ? Math.round(((done + (running ? weight(running) * share : 0)) / total) * 100) : 0;
+  return { states, percent, detail, run, finished: keys.every((k) => states[k] === "done") };
 }
 
 function Ring({ percent, done, failed }: { percent: number; done: boolean; failed: boolean }) {

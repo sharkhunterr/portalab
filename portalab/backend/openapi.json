@@ -1793,10 +1793,26 @@
       "ApplyIn": {
         "additionalProperties": false,
         "properties": {
+          "packs": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 500,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Packs"
+          },
           "parts": {
             "items": {
               "enum": [
                 "shop",
+                "packs",
                 "settings",
                 "curve",
                 "rules",

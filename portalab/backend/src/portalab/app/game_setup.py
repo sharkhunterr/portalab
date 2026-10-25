@@ -8,7 +8,8 @@ The shop keeps where each product comes from: Portalab's own catalog (features, 
 the setup names the packs to switch on (Portalab's own) or to install (the examples Portalab ships, extensions
 like any other), never their products; only the products the administrators made themselves (boosters, card
 boosters…) are carried, with the scene each booster wears. A product already in the shop is left as its
-administrators set it.
+administrators set it. The packs are a part of their own (``packs``: the packs, then the scenes): the arrival
+wizard puts the game in place at its game step and installs the packs when the portal opens.
 
 It spans two modules (gamification, campaigns), so it lives here, beside the demo seed, and goes through each
 module's own services (validated, versioned, audited like an administrator's edits). Members' own state —
@@ -21,7 +22,7 @@ Portalab ships one setup, the LAN's (``game_presets/lan.json``, captured by
 """
 
 import json
-from collections.abc import Mapping
+from collections.abc import Collection, Mapping
 from pathlib import Path
 from typing import Any
 
@@ -54,8 +55,8 @@ CARRIED = (
     "leaderboard_include_coins",
 )
 LIVE_CAMPAIGNS = ("draft", "scheduled", "active", "paused")
-# the shop first: the rewards by level, the achievements and the campaigns name its products
-PARTS = ("shop", "settings", "curve", "rules", "achievements", "quests", "campaigns")
+# the shop first: the rewards by level, the achievements and the campaigns name its products (or its packs')
+PARTS = ("shop", "packs", "settings", "curve", "rules", "achievements", "quests", "campaigns")
 ACCESS_PERMISSIONS = "marketplace.access.allowedPermissions"
 
 
@@ -238,7 +239,11 @@ class Report:
 
 
 async def apply(
-    platform: Any, actor: Principal, setup: Mapping[str, Any], parts: tuple[str, ...] = PARTS
+    platform: Any,
+    actor: Principal,
+    setup: Mapping[str, Any],
+    parts: tuple[str, ...] = PARTS,
+    packs: Collection[str] | None = None,  # the packs part for these packs only (a few at a time)
 ) -> dict[str, Any]:
     if setup.get("format") != FORMAT or int(setup.get("version") or 0) > VERSION:
         raise ValueError("not a game setup this Portalab reads")
@@ -247,6 +252,8 @@ async def apply(
     now = utc_now(gamification.clock)
     if "shop" in parts and setup.get("shop"):
         await _shop(platform, actor, dict(setup["shop"]), report)
+    if "packs" in parts and setup.get("shop"):
+        await _visual_packs(platform, actor, dict(setup["shop"]), report, packs)
     if "settings" in parts:
         await _settings(platform, actor, dict(setup.get("settings") or {}), report)
     if "curve" in parts and setup.get("curve"):
@@ -296,11 +303,6 @@ async def _shop(platform: Any, actor: Principal, shop: dict[str, Any], report: R
             await catalog.add_category(key, label, position, icon)
         for product in SHOP:
             await _product(catalog, actor, product, report)
-    visuals = getattr(platform, "visuals", None)
-    if visuals is not None:
-        await _packs(visuals.packs, actor, [str(p) for p in shop.get("packs") or []], report)
-    elif shop.get("packs"):
-        report.skip("shop", "packs", "visual packs unavailable")
     for collection in shop.get("collections") or []:
         await catalog.add_category(
             str(collection["key"]),
@@ -310,18 +312,31 @@ async def _shop(platform: Any, actor: Principal, shop: dict[str, Any], report: R
         )
     for product in shop.get("products") or []:
         await _product(catalog, actor, product, report)
+
+
+async def _visual_packs(
+    platform: Any, actor: Principal, shop: dict[str, Any], report: Report, only: Collection[str] | None
+) -> None:
+    """The packs, then the scenes the boosters wear (of the packs just handled, when only some are)."""
+    wanted = [str(p) for p in shop.get("packs") or [] if only is None or str(p) in only]
+    visuals = getattr(platform, "visuals", None)
+    if visuals is None:
+        if wanted:
+            report.skip("packs", "packs", "visual packs unavailable")
+        return
+    await _packs(visuals.packs, actor, wanted, report)
     for booster, scene in (shop.get("scenes") or {}).items():
-        if visuals is None:
-            break
+        if only is not None and scene.get("pack") not in only:
+            continue
         bound = ((await visuals.packs.scene_bindings()).get("bindings") or {}).get(booster) or {}
         if (bound.get("pack"), bound.get("look")) == (scene.get("pack"), scene.get("look")):
-            report.kept["shop"] += 1
+            report.kept["packs"] += 1
             continue
         try:
             await visuals.packs.bind_scene(actor, str(booster), (str(scene["pack"]), str(scene["look"])))
-            report.applied["shop"] += 1
+            report.applied["packs"] += 1
         except Exception as error:
-            report.skip("shop", f"scene {booster}", error)
+            report.skip("packs", f"scene {booster}", error)
 
 
 async def _product(catalog: Catalog, actor: Principal, product: Mapping[str, Any], report: Report) -> None:
@@ -346,19 +361,19 @@ async def _packs(packs: Any, actor: Principal, wanted: list[str], report: Report
         try:
             if current is not None and current["builtin"]:
                 if current["state"] == "enabled":
-                    report.kept["shop"] += 1
+                    report.kept["packs"] += 1
                     continue
                 await packs.set_state(actor, pack, True)
             elif pack in shipped:
                 if await packs.install_example(actor, shipped[pack]) == "kept":
-                    report.kept["shop"] += 1
+                    report.kept["packs"] += 1
                     continue
             else:
-                report.skip("shop", f"pack {pack}", "pack not shipped")
+                report.skip("packs", f"pack {pack}", "pack not shipped")
                 continue
-            report.applied["shop"] += 1
+            report.applied["packs"] += 1
         except Exception as error:
-            report.skip("shop", f"pack {pack}", error)
+            report.skip("packs", f"pack {pack}", error)
 
 
 async def _access_permissions(platform: Any, actor: Principal, report: Report) -> None:
@@ -401,12 +416,15 @@ async def _settings(platform: Any, actor: Principal, settings: dict[str, Any], r
 
 
 async def _sold_only(platform: Any, rewards: Any, report: Report) -> list[dict[str, Any]]:
-    """A level's reward keeps its Coins, XP and contribution; a product the shop does not sell is left out."""
+    """A level's reward keeps its Coins, XP and contribution; a product the shop does not sell is left out —
+    one of a pack this portal has stays, the pack switched on when the portal opens."""
+    visuals = getattr(platform, "visuals", None)
+    of_packs = await visuals.packs.product_keys() if visuals is not None else frozenset()
     out = []
     for reward in rewards if isinstance(rewards, list) else []:
         reward = dict(reward)
         product = reward.get("product")
-        if product:
+        if product and str(product) not in of_packs:
             try:
                 await platform.marketplace.catalog.get(str(product))
             except Exception:
