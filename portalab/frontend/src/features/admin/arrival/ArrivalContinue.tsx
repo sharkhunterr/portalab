@@ -5,41 +5,54 @@ import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/FunctionalState";
+import { DEFAULT_FAMILY } from "../../../design-system/themes/builtin";
+import type { ThemeDefinition } from "../../../design-system/themes/schema";
+import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import { useT } from "../../../i18n/hooks/useT";
 import { NAVIGATION_KEY } from "../../../shell/nav/NavigationProvider";
 import { useSite } from "../../../shell/site/site";
+import { ModelSettings } from "../../ai/admin/AiSettings";
+import { ThemeMiniature } from "../../appearance/AppearanceSettings";
+import { SettingCard } from "../ConfigEditor";
 import { EmailSettings } from "../communication/EmailSettings";
 import { ServiceAccountsPanel } from "../members/ServiceAccountsPanel";
 import { AddServiceWizard } from "../services/ServicesAdmin";
 import { type Progress, type StepKey, useSetupProgress } from "../setup/progress";
-import { CONFIGURE, useArrivalSlides, wayOf } from "./ArrivalWizard";
-import { ALL_FEATURES } from "./features";
+import { type Configure, configureWay, useArrivalSlides, wayOf } from "./ArrivalWizard";
+import { useCurrentFeatures } from "./FeaturesPicker";
+import { ALL_FEATURES, type Selection } from "./features";
 import { Launch, useTasks } from "./Launch";
 import { Stage, StepCard } from "./Stage";
+import "../../ai/ai.css";
 import "./arrival.css";
 
 /**
  * Issue 249 — the arrival wizard, signed in: right after the account is created, at ``/setup``, still a page of
- * its own — the services (Plex, Jellyfin, Seerr…), the members' accounts on them, who may join, the e-mail —
+ * its own — the services (Plex, Jellyfin, Seerr…), the members' accounts on them, who may join, the e-mail,
+ * the portal's look, play and the shop, the AI assistant (the last two only when their feature is kept) —
  * each one skippable, where it is kept by the server (``admin.setup.progress.arrival``, so a reload resumes
  * it). Then the last checks behind the waiting screens, and the portal opens. Once finished, ``/setup`` is
  * the setup assistant's (``/admin/setup``) to come back to.
  */
-type Configure = (typeof CONFIGURE)[number];
 type Step = Configure | "open";
-const ORDER: readonly Step[] = [...CONFIGURE, "open"];
 // the setup assistant's steps each one of the wizard's covers
 const COVERS: Record<Configure, StepKey> = {
   services: "services",
   members: "members",
   access: "access",
   email: "communication",
+  appearance: "appearance",
+  play: "play",
+  ai: "ai",
 };
 const ICONS: Record<Step, string> = {
   services: "server",
   members: "users",
   access: "key",
   email: "mail",
+  appearance: "palette",
+  play: "trophy",
+  ai: "bot",
   open: "rocket",
 };
 
@@ -69,17 +82,28 @@ function useServices() {
 
 export function ArrivalContinue() {
   const { settings, progress, save } = useSetupProgress();
+  const features = useCurrentFeatures();
   const state = progress as WithArrival;
   const going = useRef(false); // once on its way, the wizard ends itself (its last step finishes it)
-  if (settings.isPending) return <FunctionalState state="loading" detail="Portalab" />;
+  if (settings.isPending || features.isPending) return <FunctionalState state="loading" detail="Portalab" />;
   if (settings.isError) return <Navigate to="/" replace />; // not the portal's administrator
   if (!going.current && (!state.arrival || state.arrival.finished_at))
     return <Navigate to="/admin/setup" replace />;
   going.current = true;
-  return <Way initial={state} save={(next) => save.mutateAsync(next)} />;
+  return (
+    <Way initial={state} features={features.data ?? ALL_FEATURES} save={(next) => save.mutateAsync(next)} />
+  );
 }
 
-function Way({ initial, save }: { initial: WithArrival; save: (next: WithArrival) => Promise<void> }) {
+function Way({
+  initial,
+  features,
+  save,
+}: {
+  initial: WithArrival;
+  features: Selection;
+  save: (next: WithArrival) => Promise<void>;
+}) {
   const t = useT();
   const site = useSite();
   const titleId = useId();
@@ -89,10 +113,11 @@ function Way({ initial, save }: { initial: WithArrival; save: (next: WithArrival
     await save(next);
   };
   const arrival = progress.arrival ?? {};
-  const step: Step = ORDER.includes(arrival.step as Step) ? (arrival.step as Step) : "services";
-  const index = ORDER.indexOf(step);
+  const order: readonly Step[] = [...configureWay(features), "open"];
+  const step: Step = order.includes(arrival.step as Step) ? (arrival.step as Step) : "services";
+  const index = order.indexOf(step);
   const prepare = ["welcome", "identity", "features", "admin", "recap"];
-  const way = wayOf(step, "new", prepare).map((s) =>
+  const way = wayOf(step, "new", prepare, features).map((s) =>
     arrival.skipped?.includes(s.key as Step) && s.state === "done" ? { ...s, state: "skipped" as const } : s,
   );
   const move = (to: Step, mark: "done" | "skipped" | null) => {
@@ -106,8 +131,8 @@ function Way({ initial, save }: { initial: WithArrival; save: (next: WithArrival
       () => undefined, // kept the next time
     );
   };
-  const next = ORDER[index + 1];
-  const previous = ORDER[index - 1];
+  const next = order[index + 1];
+  const previous = order[index - 1];
   const footer =
     step === "open" ? null : (
       <>
@@ -135,7 +160,12 @@ function Way({ initial, save }: { initial: WithArrival; save: (next: WithArrival
   return (
     <Stage steps={way} name={site.name}>
       {step === "open" ? (
-        <Open progress={progress} save={keep} onBack={() => move("email", null)} />
+        <Open
+          progress={progress}
+          steps={order.filter((s): s is Configure => s !== "open")}
+          save={keep}
+          onBack={() => move(order[index - 1] ?? "services", null)}
+        />
       ) : (
         <StepCard
           id={titleId}
@@ -149,6 +179,9 @@ function Way({ initial, save }: { initial: WithArrival; save: (next: WithArrival
           {step === "members" ? <ServiceAccountsPanel /> : null}
           {step === "access" ? <AccessStep /> : null}
           {step === "email" ? <EmailSettings /> : null}
+          {step === "appearance" ? <AppearanceStep /> : null}
+          {step === "play" ? <Settings keys={PLAY} /> : null}
+          {step === "ai" ? <ModelSettings /> : null}
         </StepCard>
       )}
     </Stage>
@@ -184,23 +217,43 @@ function ServicesStep() {
   );
 }
 
-const REGISTRATION = "identity.registrationMode";
-
-function AccessStep() {
-  const t = useT();
+/** One global setting written as the wizard's choice (validated and audited like any other). */
+function useSetting(key: string) {
   const client = useQueryClient();
   const { settings } = useSetupProgress();
-  const current = (settings.data?.find((s) => s.key === REGISTRATION)?.value as string) ?? "invite_only";
   const set = useMutation({
-    mutationFn: async (value: string) =>
+    mutationFn: async (value: unknown) =>
       api.PUT("/api/v1/admin/config", {
         body: {
-          changes: [{ key: REGISTRATION, value, scope: "global", scope_ref: "", unset: false }],
+          changes: [{ key, value, scope: "global", scope_ref: "", unset: false }],
           reason: "arrival wizard",
         } as never,
       }),
     onSettled: () => client.invalidateQueries({ queryKey: ["admin", "config"] }),
   });
+  return { value: settings.data?.find((s) => s.key === key)?.value, set };
+}
+
+/** The real settings of a step, each one a card that saves itself. */
+function Settings({ keys }: { keys: readonly string[] }) {
+  const { settings } = useSetupProgress();
+  const items = keys.flatMap((key) => settings.data?.find((s) => s.key === key) ?? []);
+  if (!items.length) return null;
+  return (
+    <ul className="setting-cards">
+      {items.map((item) => (
+        <SettingCard key={`${item.key}:${JSON.stringify(item.value)}`} item={item} />
+      ))}
+    </ul>
+  );
+}
+
+const PLAY = ["economy.timezone", "economy.contribution.amount"] as const;
+
+function AccessStep() {
+  const t = useT();
+  const { value, set } = useSetting("identity.registrationMode");
+  const current = (value as string | undefined) ?? "invite_only";
   return (
     <div className="arrival__choices">
       {(["invite_only", "open"] as const).map((value) => (
@@ -224,15 +277,58 @@ function AccessStep() {
   );
 }
 
+/** The interface members get until they choose one: each family drawn in miniature, then those they may pick. */
+function AppearanceStep() {
+  const t = useT();
+  const { themes } = useTheme();
+  const { value, set } = useSetting("ui.defaultTheme");
+  const shown = themes.filter(
+    (theme, index) => !theme.family || themes.findIndex((other) => other.family === theme.family) === index,
+  );
+  const chosen = (theme: ThemeDefinition) => value === theme.key || (theme.family && value === theme.family);
+  return (
+    <>
+      <ul className="theme-gallery__list" aria-label={t("account:arrival.appearance.default")}>
+        {shown.map((theme) => (
+          <li key={theme.key} className="theme-gallery__item">
+            <button
+              type="button"
+              className="theme-card"
+              aria-pressed={Boolean(chosen(theme))}
+              disabled={set.isPending}
+              onClick={() => set.mutate(theme.family ?? theme.key)}
+            >
+              <ThemeMiniature theme={theme} />
+              <span className="theme-card__name">
+                {theme.family === DEFAULT_FAMILY ? "Portalab" : (theme.family ?? theme.name)}
+                {chosen(theme) ? (
+                  <span className="theme-card__current">
+                    <Icon name="check" size={12} />
+                    {t("account:arrival.appearance.chosen")}
+                  </span>
+                ) : null}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {set.isError ? <p role="alert">{t("account:arrival.error")}</p> : null}
+      <Settings keys={["ui.allowedThemes"]} />
+    </>
+  );
+}
+
 const OPEN_TASKS = ["save", "navigation", "services", "home"] as const;
 
 /** What is ready, then the last checks behind the waiting screens, and the portal opens. */
 function Open({
   progress,
+  steps,
   save,
   onBack,
 }: {
   progress: WithArrival;
+  steps: readonly Configure[];
   save: (next: WithArrival) => Promise<void>;
   onBack: () => void;
 }) {
@@ -313,18 +409,14 @@ function Open({
     );
   }
   const skipped = progress.arrival?.skipped ?? [];
-  const facts: Array<[Step, string]> = [
-    ["services", t("account:arrival.open.services", { count: services.data?.length ?? 0 })],
-    [
-      "members",
-      skipped.includes("members") ? t("account:arrival.open.later") : t("account:arrival.open.ready"),
-    ],
-    [
-      "access",
-      skipped.includes("access") ? t("account:arrival.open.later") : t("account:arrival.open.ready"),
-    ],
-    ["email", skipped.includes("email") ? t("account:arrival.open.later") : t("account:arrival.open.ready")],
-  ];
+  const facts: Array<[Step, string]> = steps.map((key) => [
+    key,
+    key === "services"
+      ? t("account:arrival.open.services", { count: services.data?.length ?? 0 })
+      : skipped.includes(key)
+        ? t("account:arrival.open.later")
+        : t("account:arrival.open.ready"),
+  ]);
   return (
     <StepCard
       id={titleId}

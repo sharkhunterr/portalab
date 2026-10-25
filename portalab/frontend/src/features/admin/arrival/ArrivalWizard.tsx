@@ -22,13 +22,24 @@ import "./arrival.css";
  * its backup — issue 247), its name, which features to keep and the administrator's account, and shows it all
  * before creating anything. Creating puts it all in place behind waiting screens (the account, the sign-in,
  * the identity, each module), then the wizard goes on signed in at ``/setup`` (services, members, access,
- * e-mail — ``ArrivalContinue``) without ever showing the portal before it is ready.
+ * e-mail, the look, play, the AI assistant — ``ArrivalContinue``) without ever showing the portal before it is ready.
  */
 type Step = "welcome" | "identity" | "features" | "admin" | "recap" | "import" | "create";
 const NEW: readonly Step[] = ["welcome", "identity", "features", "admin", "recap"];
 const IMPORT: readonly Step[] = ["welcome", "import"]; // issue 247: another Portalab brought in
 // the way on, signed in (shown from the start so the whole way is known)
-export const CONFIGURE = ["services", "members", "access", "email"] as const;
+export const CONFIGURE = ["services", "members", "access", "email", "appearance", "play", "ai"] as const;
+export type Configure = (typeof CONFIGURE)[number];
+// a step for a feature left out is not on the way
+const NEEDS: Partial<Record<Configure, string>> = { play: "play", ai: "ai" };
+
+/** The steps signed in, for the features the portal keeps. */
+export function configureWay(features: Selection): Configure[] {
+  return CONFIGURE.filter((step) => {
+    const feature = NEEDS[step];
+    return !feature || features.has(feature);
+  });
+}
 export const ARRIVAL_PATH = "/setup";
 
 interface Account {
@@ -90,11 +101,16 @@ export function strength(password: string): number {
 }
 
 /** The whole way, for the side of the wizard. */
-export function wayOf(current: string, install: "new" | "import", done: readonly string[] = []): StageStep[] {
+export function wayOf(
+  current: string,
+  install: "new" | "import",
+  done: readonly string[] = [],
+  features: Selection = ALL_FEATURES,
+): StageStep[] {
   const prepare = install === "import" ? IMPORT : NEW;
   const all: Array<[string, StageGroup]> = [
     ...prepare.map((s) => [s, "prepare"] as [string, StageGroup]),
-    ...(install === "new" ? CONFIGURE.map((s) => [s, "configure"] as [string, StageGroup]) : []),
+    ...(install === "new" ? configureWay(features).map((s) => [s, "configure"] as [string, StageGroup]) : []),
     ["open", "open"],
   ];
   const at = all.findIndex(([key]) => key === current);
@@ -181,7 +197,7 @@ function Arrival({
   const index = STEPS.indexOf(step);
   const next = () => setStep(STEPS[index + 1] ?? step);
   const back = () => setStep(STEPS[index - 1] ?? step);
-  const way = wayOf(step === "create" ? "recap" : step, install); // created at the recap's word
+  const way = wayOf(step === "create" ? "recap" : step, install, [], features); // created at the recap's word
   const languageName = languages?.items.find((l) => l.code === language)?.name_native ?? language;
 
   if (step === "create") {

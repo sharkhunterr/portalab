@@ -73,10 +73,9 @@ export function FeaturesPicker({
 }
 
 /** The setup assistant's step: the portal's features as they are, changed and applied here. */
-export function PortalFeatures() {
-  const t = useT();
-  const draft = useFeatureDraft();
-  const current = useQuery({
+/** The features the portal keeps today, read from its modules and switches. */
+export function useCurrentFeatures() {
+  return useQuery({
     queryKey: ["admin", "features"],
     queryFn: async () => {
       const [modules, config] = await Promise.all([
@@ -89,6 +88,12 @@ export function PortalFeatures() {
       );
     },
   });
+}
+
+export function PortalFeatures() {
+  const t = useT();
+  const draft = useFeatureDraft();
+  const current = useCurrentFeatures();
   const loaded = useRef(false);
   const { setSelection } = draft;
   useEffect(() => {
