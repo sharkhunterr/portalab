@@ -6162,6 +6162,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/i18n/public/catalogs/{namespace}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Public Catalog */
+        get: operations["public_catalog_api_v1_i18n_public_catalogs__namespace__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/public/languages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Public Languages */
+        get: operations["public_languages_api_v1_i18n_public_languages_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/incidents": {
         parameters: {
             query?: never;
@@ -30037,6 +30071,61 @@ export interface operations {
         };
     };
     languages_api_v1_i18n_languages_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    public_catalog_api_v1_i18n_public_catalogs__namespace__get: {
+        parameters: {
+            query?: {
+                lang?: string | null;
+            };
+            header?: never;
+            path: {
+                namespace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    public_languages_api_v1_i18n_public_languages_get: {
         parameters: {
             query?: never;
             header?: never;
