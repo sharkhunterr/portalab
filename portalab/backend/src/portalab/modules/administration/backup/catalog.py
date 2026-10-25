@@ -72,6 +72,8 @@ TABLES: dict[str, Category] = {
     "notify.email_outbox": "transient",  # never send the former portal's e-mails again
     "plugins.error_stats": "transient",
     "search.index_state": "transient",  # the index is built again
+    # the covers fetched from the services go with their files: left out, they are fetched again
+    "media.images": "media",
     # the technical history: saved on request
     "health.health_samples": "history",
     "health.infra_samples": "history",
