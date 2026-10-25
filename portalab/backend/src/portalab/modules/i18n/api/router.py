@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 
 from portalab.capabilities.i18n import LocaleContext
-from portalab.core.authorization import require
+from portalab.core.authorization import public, require
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.errors import NotFound, Unavailable
 from portalab.modules.i18n.models import Language
@@ -80,6 +80,47 @@ async def catalog(
     return JSONResponse(
         {"namespace": namespace, "language": ctx.language, "version": version, "messages": messages},
         headers={"ETag": etag, "Cache-Control": "private, no-cache"},
+    )
+
+
+# issue 246: the screens shown before signing in (the arrival wizard, sign-in, activation) speak the visitor's
+# language — only their catalogs, interface texts and nothing else, are read without an account
+PUBLIC_NAMESPACES = frozenset({"core", "account"})
+
+
+@router.get("/i18n/public/languages")
+@public
+async def public_languages(module: Module) -> dict[str, Any]:
+    policy = await module.resolver.policy()
+    async with module.database.session() as session:
+        rows = (await session.execute(select(Language).order_by(Language.code))).scalars().all()
+    return {
+        "default": policy.default_language,
+        "items": [
+            {"code": r.code, "name_native": r.name_native, "direction": r.direction}
+            for r in rows
+            if r.code in policy.enabled_languages
+        ],
+    }
+
+
+@router.get("/i18n/public/catalogs/{namespace}")
+@public
+async def public_catalog(
+    namespace: str, module: Module, lang: str | None = Query(default=None, max_length=35)
+) -> Response:
+    if namespace not in PUBLIC_NAMESPACES:
+        raise NotFound("No such catalog.", code="i18n.catalog_not_public")
+    await module.catalogs.ensure_loaded()
+    policy = await module.resolver.policy()
+    language = lang if lang in policy.enabled_languages else policy.default_language
+    chain = tuple(dict.fromkeys((language, policy.default_language, "en")))
+    messages, version = module.catalogs.bundle(
+        namespace, LocaleContext(language, language, fallback_chain=chain)
+    )
+    return JSONResponse(
+        {"namespace": namespace, "language": language, "version": version, "messages": messages},
+        headers={"Cache-Control": "public, max-age=300"},
     )
 
 

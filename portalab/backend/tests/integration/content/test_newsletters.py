@@ -127,7 +127,7 @@ def test_next_run() -> None:
 async def test_newsletters_switched_off(
     client: httpx.AsyncClient, ct: ContentHarness, people: dict[str, UUID]
 ) -> None:
-    """Issue 246: switched off, the newsletters answer nothing, a member reads no channel and nothing is sent."""
+    """Issue 246: switched off, the newsletters answer nothing, members read no channel, nothing is sent."""
     from portalab.core.authz_port import Principal
     from portalab.modules.administration.config.service import Change
 

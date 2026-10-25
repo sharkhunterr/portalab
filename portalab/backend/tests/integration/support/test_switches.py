@@ -1,5 +1,5 @@
-"""Issue 246 — tickets and incidents switched off apart (the arrival wizard's features): their addresses answer
-nothing, their menu entries go at once, and switched on again they come back as they were."""
+"""Issue 246 — tickets and incidents switched off apart (the arrival wizard's features): their addresses
+answer nothing, their menu entries go at once, and switched on again they come back as they were."""
 
 from uuid import UUID
 

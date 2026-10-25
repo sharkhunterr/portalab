@@ -162,12 +162,15 @@ ANONYMOUS_PATHS = frozenset(
         "/api/v1/auth/site/logo",
         "/api/v1/auth/site/icon",
         "/api/v1/auth/site/manifest",
+        # issue 246: the languages offered before signing in (the arrival wizard, sign-in)
+        "/api/v1/i18n/public/languages",
     }
 )
 ANONYMOUS_PREFIXES = ("/api/v1/media/remote/",)  # a casting device's stream, by its ticket
 # issue 157: the terms of use, on the sign-in page — only while the administrators offer them there
 SIGN_IN_TERMS_PATH = "/api/v1/auth/terms"
 ANONYMOUS_CATALOGS = frozenset({"auth", "common", "errors"})  # the sign-in page's words
+PUBLIC_CATALOGS = frozenset({"core", "account"})  # issue 246: the arrival wizard's and sign-in's words
 HEALTH_PATHS = frozenset({"/healthz", "/readyz", "/metrics"})
 # who may ask the health checks: the machine itself and the local networks (the administrator narrows it)
 DEFAULT_HEALTH_NETWORKS = (
@@ -188,6 +191,8 @@ def anonymous_allowed(path: str) -> bool:
         return True
     if path.startswith("/api/v1/i18n/catalogs/"):
         return path.rsplit("/", 1)[-1] in ANONYMOUS_CATALOGS
+    if path.startswith("/api/v1/i18n/public/catalogs/"):  # issue 246: the pre-sign-in screens' words
+        return path.rsplit("/", 1)[-1] in PUBLIC_CATALOGS
     return not path.startswith("/api/")
 
 

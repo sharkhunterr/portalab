@@ -37,6 +37,8 @@ PUBLIC = {
     "/api/v1/auth/site/logo",
     "/api/v1/auth/site/icon",
     "/api/v1/auth/site/manifest",
+    "/api/v1/i18n/public/languages",  # issue 246: the arrival wizard and sign-in in the visitor's language
+    "/api/v1/i18n/public/catalogs/{namespace}",  # only the pre-sign-in screens' catalogs (core, account)
     "/metrics",  # spec 025: disabled by default; own token/permission check
 }
 USER_ROLE = {
