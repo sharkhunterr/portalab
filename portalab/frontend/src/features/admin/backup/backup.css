@@ -1,0 +1,20 @@
+/* issue 247 — the backups: a run's progress, an archive's actions. Theme tokens only. */
+.backup-run {
+  display: grid;
+  gap: var(--space-2);
+}
+.backup-run progress {
+  inline-size: 100%;
+  block-size: 0.75rem;
+  accent-color: var(--color-accent);
+}
+.backup-run__label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}

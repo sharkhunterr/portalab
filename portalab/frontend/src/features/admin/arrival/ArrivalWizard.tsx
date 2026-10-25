@@ -9,19 +9,21 @@ import { I18nProvider } from "../../../i18n/provider/I18nProvider";
 import { ApiError } from "../../../state/regions";
 import { FeaturesPicker } from "./FeaturesPicker";
 import { ALL_FEATURES, applySelection, FEATURES, type Selection, toggle } from "./features";
+import { ImportArchive } from "./ImportArchive";
 import "./arrival.css";
 
 /**
  * Issue 246 — the arrival wizard: what a new portal shows before anyone has an account. In the visitor's
- * language (chosen first, read from the public catalogs), it asks how the portal is installed (from scratch;
- * importing another Portalab comes with issue 247), which features to keep, then the administrator's account,
+ * language (chosen first, read from the public catalogs), it asks how the portal is installed (from scratch,
+ * or another Portalab brought in from its backup — issue 247), which features to keep, then the administrator's account,
  * and shows it all before creating anything. Creating runs the first run (the account, the language), signs
  * the administrator in, applies the features and opens the setup assistant for the rest (identity, services,
  * members and their accounts…). Nothing is written before the last step; once the portal is set up the
  * wizard answers nothing more.
  */
-type Step = "welcome" | "features" | "admin" | "recap";
-const STEPS: readonly Step[] = ["welcome", "features", "admin", "recap"];
+type Step = "welcome" | "features" | "admin" | "recap" | "import";
+const NEW: readonly Step[] = ["welcome", "features", "admin", "recap"];
+const IMPORT: readonly Step[] = ["welcome", "import"]; // issue 247: another Portalab brought in
 
 interface Account {
   login: string;
@@ -72,6 +74,7 @@ function Arrival({
   const ids = { title: useId(), language: useId(), login: useId(), password: useId(), hint: useId() };
   const ids2 = { name: useId(), email: useId() };
   const [step, setStep] = useState<Step>("welcome");
+  const [install, setInstall] = useState<"new" | "import">("new");
   const [features, setFeatures] = useState<Selection>(ALL_FEATURES);
   const [account, setAccount] = useState<Account>({ login: "", password: "", displayName: "", email: "" });
   const [phase, setPhase] = useState<"account" | "signIn" | "features" | null>(null);
@@ -124,6 +127,7 @@ function Arrival({
     );
   }
 
+  const STEPS = install === "import" ? IMPORT : NEW;
   const index = STEPS.indexOf(step);
   const go = (to: Step | undefined) => to && setStep(to);
   const next = () => go(STEPS[index + 1]);
@@ -168,22 +172,38 @@ function Arrival({
             </div>
             <h3>{t("account:arrival.welcome.install")}</h3>
             <div className="arrival__choices">
-              <button type="button" className="arrival__choice" aria-pressed="true">
+              <button
+                type="button"
+                className="arrival__choice"
+                aria-pressed={install === "new"}
+                onClick={() => setInstall("new")}
+              >
                 <strong>
                   <Icon name="sparkles" size={18} />
                   {t("account:arrival.install.new")}
                 </strong>
                 <span>{t("account:arrival.install.newHint")}</span>
               </button>
-              <button type="button" className="arrival__choice" aria-pressed="false" disabled>
+              <button
+                type="button"
+                className="arrival__choice"
+                aria-pressed={install === "import"}
+                onClick={() => setInstall("import")}
+              >
                 <strong>
                   <Icon name="download" size={18} />
                   {t("account:arrival.install.import")}
-                  <span className="arrival__soon">{t("account:arrival.install.soon")}</span>
                 </strong>
                 <span>{t("account:arrival.install.importHint")}</span>
               </button>
             </div>
+          </>
+        ) : null}
+        {step === "import" ? (
+          <>
+            <h2 id={ids.title}>{t("account:arrival.import.title")}</h2>
+            <p className="arrival__lead">{t("account:arrival.import.lead")}</p>
+            <ImportArchive language={language} />
           </>
         ) : null}
         {step === "features" ? (
@@ -288,6 +308,8 @@ function Arrival({
               <Icon name="rocket" size={16} />
               {t("account:arrival.create")}
             </Button>
+          ) : step === "import" ? (
+            <span />
           ) : (
             <Button onClick={next}>
               {t("account:arrival.next")}

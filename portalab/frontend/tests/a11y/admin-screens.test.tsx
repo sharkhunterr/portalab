@@ -180,7 +180,13 @@ describe("admin screens", () => {
       </QueryClientProvider>,
     );
     expect(await screen.findByRole("heading", { name: "Welcome to Portalab" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Import another Portalab/ })).toBeDisabled();
+    // issue 247: importing another Portalab opens its own step (the archive, its passphrase)
+    fireEvent.click(screen.getByRole("button", { name: /Import another Portalab/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Continue/ }));
+    expect(await screen.findByLabelText("The archive's passphrase")).toBeInTheDocument();
+    await expectAccessible(container);
+    fireEvent.click(screen.getByRole("button", { name: /Back/ }));
+    fireEvent.click(screen.getByRole("button", { name: /New installation/ }));
     await expectAccessible(container);
     fireEvent.click(screen.getByRole("button", { name: /Continue/ }));
     fireEvent.click(await screen.findByRole("checkbox", { name: /Wiki/ }));
