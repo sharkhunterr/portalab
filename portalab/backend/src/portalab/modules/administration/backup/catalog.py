@@ -95,10 +95,10 @@ SPLIT: dict[str, tuple[str, str]] = {
 FOLDERS: dict[str, Category] = {
     "blobs/avatars": "data",
     "blobs/content": "data",
-    "blobs/cards": "data",
+    "blobs/cards": "media",  # the cards' images: fetched from the services, cut out, looked for again
     "blobs/media": "media",
     "blobs/media-metadata": "media",
-    "cards": "data",
+    "cards": "transient",  # the cards' models (downloaded again when needed)
     "visuals": "data",
     "plugins": "data",
     "plugins-run": "transient",

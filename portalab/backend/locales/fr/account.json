@@ -27,7 +27,7 @@
   "arrival.import.files": "Fichiers",
   "arrival.import.holds": "Contenu",
   "arrival.import.lead": "Reprenez l'archive sauvegardée depuis un autre portail (Administration › Sauvegardes) : ses membres gardent leurs comptes et mots de passe, et ses réglages, services, contenus, jeu et historique suivent.",
-  "arrival.import.noMedia": "sans les images des médias (rechargées depuis les services)",
+  "arrival.import.noMedia": "sans les images récupérées des services (rechargées ensuite)",
   "arrival.import.older": "Sauvegardée par une version précédente de Portalab ({version}) : ses données seront mises à niveau pendant l'import.",
   "arrival.import.passphrase": "La phrase de passe de l'archive",
   "arrival.import.phase.done": "Terminé",

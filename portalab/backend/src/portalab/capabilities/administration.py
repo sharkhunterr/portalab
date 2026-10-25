@@ -21,6 +21,7 @@ EXTENSION_STATE_CAPABILITY = "admin.extension_state"
 CONFIG_WRITER_CAPABILITY = "admin.config_writer"
 AUDIT_QUERY_CAPABILITY = "audit.query"
 SECRETS_REKEY_CAPABILITY = "admin.secrets_rekey"
+BACKUP_LEFT_OUT_CAPABILITY = "admin.backup_left_out"
 
 PanelState = Literal["available", "partial", "stale", "unavailable", "no-data"]
 
@@ -159,6 +160,15 @@ class SecretsRekey(Protocol):
     async def rekey(self, session: Any, old: Any, new: Any) -> tuple[int, int]: ...
 
 
+@runtime_checkable
+class BackupLeftOut(Protocol):
+    """Issue 247: after a restore whose archive left some data folders out (the images fetched from the
+    services, to keep it small), a module forgets its references to those files — in the restore's own
+    transaction — so it fetches or computes them again as it would the first time."""
+
+    async def left_out(self, session: Any, folders: frozenset[str]) -> None: ...
+
+
 def _spec(name: str, protocol: type[Any], multi: bool, description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=multi, description=description
@@ -177,4 +187,5 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(CONFIG_WRITER_CAPABILITY, ConfigWriter, False, "Audited global setting changes (020)"),
     _spec(AUDIT_QUERY_CAPABILITY, AuditQueryPort, False, "Owner-scoped audit reads (003)"),
     _spec(SECRETS_REKEY_CAPABILITY, SecretsRekey, True, "Secrets encrypted again after a restore (247)"),
+    _spec(BACKUP_LEFT_OUT_CAPABILITY, BackupLeftOut, True, "Files left out of a restored archive (247)"),
 )

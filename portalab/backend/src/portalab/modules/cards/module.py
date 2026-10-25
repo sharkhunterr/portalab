@@ -8,6 +8,7 @@ from typing import Any
 
 from sqlalchemy import update
 
+from portalab.capabilities.administration import BACKUP_LEFT_OUT_CAPABILITY
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.events import (
     ConsumerRegistry,
@@ -28,6 +29,7 @@ from portalab.core.logging import get_logger
 from portalab.core.time import Clock
 from portalab.modules.cards import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.cards.artwork import FanArt
+from portalab.modules.cards.backup import CardsLeftOut
 from portalab.modules.cards.characters import CharacterSheets
 from portalab.modules.cards.cutouts import ArtCutouts, Cutter
 from portalab.modules.cards.events import register_event_types
@@ -135,6 +137,13 @@ class CardsModule:
                     payload_fields=BOOSTER_FIELDS,
                     label_key="marketplace:type.card_booster",
                 )
+            )
+        # issue 247: its images left out of a restored backup are looked for again
+        if not any(
+            p.instance_ref == "cards" for p in self.capabilities.system_providers(BACKUP_LEFT_OUT_CAPABILITY)
+        ):
+            self.capabilities.provide(
+                BACKUP_LEFT_OUT_CAPABILITY, CardsLeftOut(), instance_ref="cards", owner=OWNER
             )
         # issue 234: a content's boosters, given by the reward rules the administrators set
         if not self.capabilities.system_providers(CONTENT_BOOSTERS):
