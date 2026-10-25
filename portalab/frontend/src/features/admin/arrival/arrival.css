@@ -256,3 +256,10 @@ li[data-on] .features-picker__mark {
   padding-block-start: var(--space-3);
   border-block-start: 1px solid var(--color-border);
 }
+.arrival-import__sent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--state-available-fg);
+}
