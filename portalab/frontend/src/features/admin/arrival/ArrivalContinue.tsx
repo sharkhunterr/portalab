@@ -15,6 +15,7 @@ import { ModelSettings } from "../../ai/admin/AiSettings";
 import { ThemeMiniature } from "../../appearance/AppearanceSettings";
 import { SettingCard } from "../ConfigEditor";
 import { EmailSettings } from "../communication/EmailSettings";
+import { RequestQuotaDefaults } from "../media/RequestQuotasAdmin";
 import { ServiceAccountsPanel } from "../members/ServiceAccountsPanel";
 import { AddServiceWizard } from "../services/ServicesAdmin";
 import { type Progress, type StepKey, useSetupProgress } from "../setup/progress";
@@ -38,6 +39,7 @@ type Step = Configure | "open";
 // the setup assistant's steps each one of the wizard's covers
 const COVERS: Record<Configure, StepKey> = {
   services: "services",
+  quotas: "media",
   members: "members",
   access: "access",
   email: "communication",
@@ -47,6 +49,7 @@ const COVERS: Record<Configure, StepKey> = {
 };
 const ICONS: Record<Step, string> = {
   services: "server",
+  quotas: "coins",
   members: "users",
   access: "key",
   email: "mail",
@@ -83,25 +86,35 @@ function useServices() {
 export function ArrivalContinue() {
   const { settings, progress, save } = useSetupProgress();
   const features = useCurrentFeatures();
+  const services = useServices();
   const state = progress as WithArrival;
   const going = useRef(false); // once on its way, the wizard ends itself (its last step finishes it)
-  if (settings.isPending || features.isPending) return <FunctionalState state="loading" detail="Portalab" />;
+  // the services first: whether Seerr is connected decides if the request quotas are on the way
+  if (settings.isPending || features.isPending || services.isPending)
+    return <FunctionalState state="loading" detail="Portalab" />;
   if (settings.isError) return <Navigate to="/" replace />; // not the portal's administrator
   if (!going.current && (!state.arrival || state.arrival.finished_at))
     return <Navigate to="/admin/setup" replace />;
   going.current = true;
   return (
-    <Way initial={state} features={features.data ?? ALL_FEATURES} save={(next) => save.mutateAsync(next)} />
+    <Way
+      initial={state}
+      features={features.data ?? ALL_FEATURES}
+      seerr={(services.data ?? []).some((s) => s.connector === "seerr")}
+      save={(next) => save.mutateAsync(next)}
+    />
   );
 }
 
 function Way({
   initial,
   features,
+  seerr,
   save,
 }: {
   initial: WithArrival;
   features: Selection;
+  seerr: boolean;
   save: (next: WithArrival) => Promise<void>;
 }) {
   const t = useT();
@@ -113,11 +126,11 @@ function Way({
     await save(next);
   };
   const arrival = progress.arrival ?? {};
-  const order: readonly Step[] = [...configureWay(features), "open"];
+  const order: readonly Step[] = [...configureWay(features, seerr), "open"];
   const step: Step = order.includes(arrival.step as Step) ? (arrival.step as Step) : "services";
   const index = order.indexOf(step);
   const prepare = ["welcome", "identity", "features", "admin", "recap"];
-  const way = wayOf(step, "new", prepare, features).map((s) =>
+  const way = wayOf(step, "new", prepare, features, seerr).map((s) =>
     arrival.skipped?.includes(s.key as Step) && s.state === "done" ? { ...s, state: "skipped" as const } : s,
   );
   const move = (to: Step, mark: "done" | "skipped" | null) => {
@@ -176,6 +189,7 @@ function Way({
           footer={footer}
         >
           {step === "services" ? <ServicesStep /> : null}
+          {step === "quotas" ? <RequestQuotaDefaults /> : null}
           {step === "members" ? <ServiceAccountsPanel /> : null}
           {step === "access" ? <AccessStep /> : null}
           {step === "email" ? <EmailSettings /> : null}

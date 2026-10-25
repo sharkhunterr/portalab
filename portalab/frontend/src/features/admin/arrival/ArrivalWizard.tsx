@@ -28,14 +28,25 @@ type Step = "welcome" | "identity" | "features" | "admin" | "recap" | "import" |
 const NEW: readonly Step[] = ["welcome", "identity", "features", "admin", "recap"];
 const IMPORT: readonly Step[] = ["welcome", "import"]; // issue 247: another Portalab brought in
 // the way on, signed in (shown from the start so the whole way is known)
-export const CONFIGURE = ["services", "members", "access", "email", "appearance", "play", "ai"] as const;
+export const CONFIGURE = [
+  "services",
+  "quotas",
+  "members",
+  "access",
+  "email",
+  "appearance",
+  "play",
+  "ai",
+] as const;
 export type Configure = (typeof CONFIGURE)[number];
 // a step for a feature left out is not on the way
 const NEEDS: Partial<Record<Configure, string>> = { play: "play", ai: "ai" };
 
-/** The steps signed in, for the features the portal keeps. */
-export function configureWay(features: Selection): Configure[] {
+/** The steps signed in, for the features the portal keeps; the request quotas once Seerr is connected (they
+ * are Seerr's own). */
+export function configureWay(features: Selection, seerr = false): Configure[] {
   return CONFIGURE.filter((step) => {
+    if (step === "quotas") return seerr;
     const feature = NEEDS[step];
     return !feature || features.has(feature);
   });
@@ -106,11 +117,14 @@ export function wayOf(
   install: "new" | "import",
   done: readonly string[] = [],
   features: Selection = ALL_FEATURES,
+  seerr = false,
 ): StageStep[] {
   const prepare = install === "import" ? IMPORT : NEW;
   const all: Array<[string, StageGroup]> = [
     ...prepare.map((s) => [s, "prepare"] as [string, StageGroup]),
-    ...(install === "new" ? configureWay(features).map((s) => [s, "configure"] as [string, StageGroup]) : []),
+    ...(install === "new"
+      ? configureWay(features, seerr).map((s) => [s, "configure"] as [string, StageGroup])
+      : []),
     ["open", "open"],
   ];
   const at = all.findIndex(([key]) => key === current);
