@@ -135,6 +135,9 @@ function Card({
   const format = useFormat();
   const rarity = card.product.rarity ?? "common";
   const rank = RANK[rarity] ?? 0;
+  // turned over: the card lies flat again — no 3D left around its face (an animated face in a turned 3D
+  // context flickers on phones, issue 255)
+  const [settled, setSettled] = useState(false);
   const parts = scene?.parts;
   // face down, its back tells nothing: the « common » back until it starts turning
   const back = parts?.back?.[(state === "hidden" ? "common" : rarity) as Rarity] ?? parts?.back?.common;
@@ -161,6 +164,7 @@ function Card({
       data-card-back={hookOf(back)}
       data-card-face={state === "hidden" ? undefined : hookOf(face)}
       data-reveal={state === "revealed" ? hookOf(reveal) : undefined}
+      data-settled={(state === "revealed" && (settled || reduced)) || undefined}
       style={{ "--i": index, "--offset": index - (total - 1) / 2 } as CSSProperties}
     >
       {state === "revealed" && reveal ? (
@@ -184,7 +188,12 @@ function Card({
         disabled={state !== "hidden" && !(state === "revealed" && card.face && onZoom)}
         aria-label={label}
       >
-        <span className="booster-card__inner">
+        <span
+          className="booster-card__inner"
+          onAnimationEnd={(event) => {
+            if (event.animationName === "booster-flip") setSettled(true);
+          }}
+        >
           <span className="booster-card__back" aria-hidden="true">
             {/* a back drawn by the GPU (HD), under its pattern and its sigil */}
             <ScenePart

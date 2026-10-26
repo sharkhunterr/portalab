@@ -237,7 +237,7 @@
   inset-block-start: -12cqi;
   block-size: 10cqi;
   background: linear-gradient(180deg, transparent, rgba(220, 255, 230, 0.7) 45%, rgba(255, 255, 255, 0.9) 50%, transparent);
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
 }
 /* the toner, trembling (in place of the night sky) */
 .mcard[data-frame="edition-zine"][data-hd] .mcard__backdrop::after {
@@ -245,7 +245,7 @@
   background: var(--edition-toner);
   mask: none;
   opacity: 0.55;
-  mix-blend-mode: multiply;
+  mix-blend-mode: normal;
 }
 .mcard[data-frame="edition-zine"][data-frameless] .mcard__art,
 .mcard[data-frame="edition-zine"][data-frameless] .mcard__art[data-cutout] {
@@ -308,7 +308,7 @@
   block-size: 10cqi;
   pointer-events: none;
   background: linear-gradient(180deg, transparent, rgba(220, 255, 230, 0.55) 45%, rgba(255, 255, 255, 0.7) 50%, transparent);
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
 }
 @media (prefers-reduced-motion: no-preference) {
   .mcard[data-frame="edition-zine"][data-hd] .mcard__backdrop::before,

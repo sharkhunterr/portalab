@@ -203,6 +203,10 @@
 .mcard[data-frame="edition-tiles"] .mcard__sparkle {
   display: none;
 }
+/* its passing light: a flat white stripe, never a rainbow */
+.mcard[data-frame="edition-tiles"] .mcard__foil::before {
+  background: linear-gradient(110deg, transparent 0 45%, rgba(255, 255, 255, 0.3) 45% 51%, transparent 51% 100%);
+}
 /* a work's own card holds more (three figures, its line): its box tighter */
 .mcard[data-frame="edition-tiles"][data-kind="title"] .mcard__lower {
   padding-block: 1cqi;

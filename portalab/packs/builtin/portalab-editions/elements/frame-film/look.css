@@ -310,7 +310,7 @@
   pointer-events: none;
   border-radius: inherit;
   background: linear-gradient(100deg, transparent 30%, rgba(255, 240, 200, 0.45) 46%, transparent 62%) 0 0 / 300% 100%;
-  mix-blend-mode: soft-light;
+  mix-blend-mode: normal;
 }
 @media (prefers-reduced-motion: no-preference) {
   .mcard[data-frame="edition-film"][data-hd] .mcard__backdrop::before {

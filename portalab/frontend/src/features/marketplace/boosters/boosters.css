@@ -1015,6 +1015,18 @@
 .booster-card[data-state="revealed"] .booster-card__inner {
   animation: booster-flip 0.8s cubic-bezier(0.3, 1.35, 0.45, 1) both;
 }
+/* turned over: flat again, its face as it is, the back gone */
+.booster-card[data-settled] .booster-card__inner {
+  animation: none;
+  transform: none;
+  transform-style: flat;
+}
+.booster-card[data-settled] .booster-card__face {
+  transform: none;
+}
+.booster-card[data-settled] .booster-card__back {
+  visibility: hidden;
+}
 @keyframes booster-flip {
   from {
     transform: rotateY(0deg) scale(1.08);
@@ -1827,6 +1839,9 @@
 }
 .booster-stage[data-reduced] .booster-card[data-state="revealed"] .booster-card__inner {
   transform: rotateY(180deg);
+}
+.booster-stage[data-reduced] .booster-card[data-settled] .booster-card__inner {
+  transform: none;
 }
 .booster-stage[data-reduced] .booster-card__stamp,
 .booster-stage[data-reduced] .booster-card__refund {

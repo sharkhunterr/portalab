@@ -274,7 +274,7 @@
   pointer-events: none;
   border-radius: inherit;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
 }
 @media (prefers-reduced-motion: no-preference) {
   .mcard[data-frame="edition-bubble"][data-hd] .mcard__backdrop::before {
