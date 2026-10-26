@@ -79,13 +79,17 @@ def _among(among: Mapping[str, Any]) -> list[Any]:
     return out
 
 
-BOOSTER_FIELDS = ("family", "edition", "kind", "cards")
+BOOSTER_FIELDS = ("family", "edition", "kind", "cards", "rarity")
+# issue 255: a booster that guarantees a card of this rarity (one of its cards drawn at it)
+GUARANTEES = ("rare", "epic", "legendary")
 CARD_BOOSTER = "card_booster"
 
 
 def booster_of(payload: Mapping[str, Any]) -> dict[str, Any]:
-    """A shop's booster's own: what it draws among and how many cards (3 to 10)."""
+    """A shop's booster's own: what it draws among, how many cards (3 to 10) and the rarity it guarantees."""
     out: dict[str, Any] = {k: payload[k] for k in ("family", "edition", "kind") if payload.get(k)}
+    if payload.get("rarity") in GUARANTEES:
+        out["rarity"] = payload["rarity"]
     try:
         out["cards"] = max(3, min(10, int(payload.get("cards") or SIZE)))
     except (TypeError, ValueError):
@@ -130,8 +134,11 @@ class Packs:
         set_key: str | None,
         among: Mapping[str, Any] | None = None,
         drawn: Sequence[UUID] = (),
+        rarity: str | None = None,  # issue 255: the rarity a booster guarantees, else drawn by the odds
     ) -> Card | None:
-        rarity = self.rng.choices(list(RARITY_WEIGHTS), weights=list(RARITY_WEIGHTS.values()), k=1)[0]
+        rarity = (
+            rarity or self.rng.choices(list(RARITY_WEIGHTS), weights=list(RARITY_WEIGHTS.values()), k=1)[0]
+        )
         base = (
             select(Card)
             .join(CardSet, CardSet.key == Card.set_key)
@@ -153,13 +160,16 @@ class Packs:
         return None
 
     async def drawable(self, among: Mapping[str, Any]) -> bool:
-        """Issue 234: whether a shop's booster has cards to draw among the works it names."""
+        """Issue 234: whether a shop's booster has cards to draw among the works it names — issue 255: one of
+        the rarity it guarantees among them."""
         query = (
             select(Card.id)
             .join(CardSet, CardSet.key == Card.set_key)
             .where(Card.retired.is_(False), CardSet.present.is_(True), *_among(among))
             .limit(1)
         )
+        if among.get("rarity") in GUARANTEES:
+            query = query.where(Card.rarity == among["rarity"])
         async with self.database.session() as session:
             return (await session.execute(query)).first() is not None
 
@@ -172,6 +182,7 @@ class Packs:
         detail: dict[str, Any] | None = None,
         among: Mapping[str, Any] | None = None,
         size: int = SIZE,
+        guarantee: str | None = None,
     ) -> UUID | None:
         """A pack for this member (once per ``key``): its cards drawn now, revealed when opened — all of
         ``set_key`` (a content's) or ``among`` the works it names (issue 234: a shop's booster)."""
@@ -196,9 +207,10 @@ class Packs:
             if pack_id is None:
                 return None  # given already
             drawn: list[UUID] = []
-            for _ in range(size):
-                # issue 234: a content's booster holds its work's cards only
-                card = await self._draw(session, set_key, among, drawn)
+            for index in range(size):
+                # issue 234: a content's booster holds its work's cards only; issue 255: its first card drawn
+                # at the rarity it guarantees, before any other could take the only one there is
+                card = await self._draw(session, set_key, among, drawn, guarantee if index == 0 else None)
                 if card is None:
                     continue
                 drawn.append(card.id)
@@ -429,6 +441,7 @@ class CardBoosterHandler:
             {**booster, "product": ownership.product_key},
             among=booster,
             size=booster["cards"],
+            guarantee=booster.get("rarity"),
         )
         return ActivationResult("active")
 

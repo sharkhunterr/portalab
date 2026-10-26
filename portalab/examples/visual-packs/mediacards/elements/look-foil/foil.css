@@ -48,6 +48,79 @@
     conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--mc-tooth) 51% repeat-x;
 }
 
+/* issue 255: the edition's metal and its symbol (a booster of an edition's works) — a genre's metal, when the
+   booster names one too, comes after and wins */
+[data-booster-look="mediacards"] .booster-pack[data-edition="nitrate"] {
+  --mc-tint: #c9c9cf;
+  --mc-accent: #b48a57;
+  --mc-symbol: var(--card-edition-nitrate);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="noir"] {
+  --mc-tint: #8d8a82;
+  --mc-accent: #d8c497;
+  --mc-symbol: var(--card-edition-noir);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="drivein"] {
+  --mc-tint: #3fb6aa;
+  --mc-accent: #d7263d;
+  --mc-symbol: var(--card-edition-drivein);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="super8"] {
+  --mc-tint: #ff5a1f;
+  --mc-accent: #b93cd6;
+  --mc-symbol: var(--card-edition-super8);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="film"] {
+  --mc-tint: #d9a55a;
+  --mc-accent: #b4472b;
+  --mc-symbol: var(--card-edition-film);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="laserdisc"] {
+  --mc-tint: #ff6fa5;
+  --mc-accent: #2ec4b6;
+  --mc-symbol: var(--card-edition-laserdisc);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="vhs"] {
+  --mc-tint: #3b44d6;
+  --mc-accent: #ff3fa4;
+  --mc-symbol: var(--card-edition-vhs);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="zine"] {
+  --mc-tint: #d8d4c6;
+  --mc-accent: #f4ef2a;
+  --mc-symbol: var(--card-edition-zine);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="bubble"] {
+  --mc-tint: #29a9d6;
+  --mc-accent: #38f28a;
+  --mc-symbol: var(--card-edition-bubble);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="disc"] {
+  --mc-tint: #7a5bb0;
+  --mc-accent: #c9a55a;
+  --mc-symbol: var(--card-edition-disc);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="leather"] {
+  --mc-tint: #a86a3c;
+  --mc-accent: #e9e1cf;
+  --mc-symbol: var(--card-edition-leather);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="tiles"] {
+  --mc-tint: #0a6cff;
+  --mc-accent: #ff2d7a;
+  --mc-symbol: var(--card-edition-tiles);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="stream"] {
+  --mc-tint: #1fb6d8;
+  --mc-accent: #38e1ff;
+  --mc-symbol: var(--card-edition-stream);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition="glass"] {
+  --mc-tint: #7c5cff;
+  --mc-accent: #7ef0d0;
+  --mc-symbol: var(--card-edition-glass);
+}
+
 /* the genre's metal */
 [data-booster-look="mediacards"] .booster-pack[data-family="sf"] {
   --mc-tint: #47a8ff;
@@ -230,6 +303,103 @@
   font-size: 0.72em;
   font-weight: 800;
   rotate: 12deg;
+}
+
+/* an edition's booster without the art of a work: its symbol in the middle of the panel, in the edition's light */
+[data-booster-look="mediacards"] .booster-pack[data-edition]:not([data-art]) .booster-pack__stars {
+  background:
+    linear-gradient(152deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 30%),
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--mc-accent) 55%, transparent), transparent 62%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0 2px, transparent 2px 6px),
+    linear-gradient(180deg, color-mix(in srgb, var(--mc-tint) 50%, #0b0e16), #070910);
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition] .booster-pack__emblem,
+[data-booster-look="mediacards"] .booster-pack[data-guaranteed] .booster-pack__emblem {
+  position: relative;
+  color: transparent;
+}
+[data-booster-look="mediacards"] .booster-pack[data-edition] .booster-pack__emblem::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  background: linear-gradient(160deg, #ffffff, color-mix(in srgb, var(--mc-accent) 70%, #ffffff) 45%, var(--mc-accent));
+  mask: var(--mc-symbol) center / contain no-repeat;
+  filter: drop-shadow(0 0 0.35rem color-mix(in srgb, var(--mc-accent) 80%, transparent));
+}
+
+/* issue 255: a booster that guarantees a rarity — its wrapper in the rarity's metal, its gem in the middle (the
+   same shapes as on the cards: a sapphire diamond, an amethyst hexagon, a gold star) */
+[data-booster-look="mediacards"] .booster-pack[data-guaranteed="rare"] {
+  --mc-tint: #4fa3ea;
+  --mc-metal: linear-gradient(145deg, #e3f3ff, #4fa3ea 32%, #174a8c 64%, #a6d6fb);
+  --mc-gem: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  --mc-glow: rgba(79, 163, 234, 0.75);
+}
+[data-booster-look="mediacards"] .booster-pack[data-guaranteed="epic"] {
+  --mc-tint: #b46cf0;
+  --mc-metal: linear-gradient(145deg, #f6e3ff, #b46cf0 32%, #561a95 64%, #e4bcff);
+  --mc-gem: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%);
+  --mc-glow: rgba(180, 108, 240, 0.8);
+}
+[data-booster-look="mediacards"] .booster-pack[data-guaranteed="legendary"] {
+  --mc-tint: #f5c443;
+  --mc-metal: linear-gradient(145deg, #fff8d6, #f5c443 30%, #a8700a 58%, #ffe58f 80%, #c98a12);
+  --mc-gem: polygon(50% 0, 62% 35%, 98% 36%, 69% 58%, 79% 94%, 50% 72%, 21% 94%, 31% 58%, 2% 36%, 38% 35%);
+  --mc-glow: rgba(245, 196, 67, 0.9);
+}
+[data-booster-look="mediacards"] .booster-pack[data-guaranteed]::before,
+[data-booster-look="mediacards"] .booster-pack[data-guaranteed]::after {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0 1px, rgba(0, 0, 0, 0.3) 1px 2px, transparent 2px 4px),
+    var(--mc-metal);
+}
+[data-booster-look="mediacards"] .booster-pack[data-guaranteed]:not([data-art]) .booster-pack__stars {
+  background:
+    linear-gradient(152deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 30%),
+    radial-gradient(circle at 50% 42%, var(--mc-glow), transparent 58%),
+    repeating-conic-gradient(from 0deg at 50% 42%, rgba(255, 255, 255, 0.07) 0 6deg, transparent 6deg 18deg),
+    linear-gradient(180deg, color-mix(in srgb, var(--mc-tint) 45%, #0b0e16), #070910);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, var(--mc-tint) 60%, #ffffff),
+    inset 0 0 1.4rem rgba(0, 0, 0, 0.6);
+}
+[data-booster-look="mediacards"] .booster-pack[data-guaranteed] .booster-pack__emblem::after {
+  content: "";
+  position: absolute;
+  inset: 2%;
+  background: var(--mc-metal);
+  mask: none;
+  clip-path: var(--mc-gem);
+  filter: none;
+}
+[data-booster-look="mediacards"] .booster-pack[data-guaranteed] .booster-pack__emblem {
+  filter: drop-shadow(0 0 0.6rem var(--mc-glow)) drop-shadow(0 0 0.2rem var(--mc-glow));
+}
+[data-booster-look="mediacards"] .booster-pack[data-guaranteed] .booster-pack__count {
+  background: var(--mc-metal);
+}
+/* a legendary's: its gem breathes, its gleam passes gold */
+[data-booster-look="mediacards"] .booster-pack[data-guaranteed="legendary"] .booster-pack__foil {
+  opacity: 0.8;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 236, 160, 0.5) 44%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 210, 120, 0.45) 56%,
+    transparent 70%
+  );
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-booster-look="mediacards"] .booster-pack[data-guaranteed="legendary"] .booster-pack__emblem {
+    animation: mc-legendary-breath 2.6s ease-in-out infinite;
+  }
+}
+@keyframes mc-legendary-breath {
+  50% {
+    scale: 1.08;
+    filter: drop-shadow(0 0 1.1rem var(--mc-glow)) drop-shadow(0 0 0.3rem var(--mc-glow));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

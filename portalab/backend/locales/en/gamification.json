@@ -383,6 +383,7 @@
   "cards.pack.failed": "This pack could not be opened.",
   "cards.pack.fresh": "{count, plural, =0 {No new card} one {# new card in your collection} other {# new cards in your collection}}",
   "cards.pack.from": "Pack from “{name}”",
+  "cards.pack.guarantee": "{rarity} guaranteed",
   "cards.pack.kind.movie": "Films",
   "cards.pack.kind.series": "Series",
   "cards.pack.open": "Open",

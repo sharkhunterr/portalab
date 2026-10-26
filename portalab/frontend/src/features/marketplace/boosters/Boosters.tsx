@@ -51,6 +51,8 @@ export interface PackLook {
   backdrop?: string | null;
   family?: string | null;
   edition?: string | null;
+  /** issue 255: the rarity a booster of cards guarantees (``data-guaranteed``, for its wrapper) */
+  guaranteed?: string | null;
 }
 
 /** The sealed pack itself — foil, a tear line, the booster's name; ``stage`` for the opening, ``card``
@@ -74,6 +76,7 @@ export function BoosterPack({
       data-art={booster.art ? "" : undefined}
       data-family={booster.family ?? undefined}
       data-edition={booster.edition ?? undefined}
+      data-guaranteed={booster.guaranteed ?? undefined}
       aria-hidden="true"
     >
       {booster.backdrop ? (
@@ -153,7 +156,17 @@ export function CardBoosterPack({
   size?: string | undefined;
 }) {
   const scene = bindingOf(useSceneBindings(), product.key, CARD_BOOSTER);
-  const booster = { names: product.names, look: "cosmos", cards };
+  // the works it draws among and the rarity it guarantees: for its wrapper to show (issue 255)
+  const preview = (product.preview ?? {}) as Record<string, unknown>;
+  const field = (name: string) => (typeof preview[name] === "string" ? (preview[name] as string) : null);
+  const booster = {
+    names: product.names,
+    look: "cosmos",
+    cards,
+    family: field("family"),
+    edition: field("edition"),
+    guaranteed: field("rarity"),
+  };
   const small = size === "mini" ? "mini" : "card";
   return scene?.booster_look ? (
     <span className="booster-scene-pack" data-booster-look={scene.booster_look} data-size={small}>

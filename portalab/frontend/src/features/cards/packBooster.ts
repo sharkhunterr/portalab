@@ -23,6 +23,9 @@ export function packName(t: Translate, pack: CardPack): string {
     look?.family ? t(`gamification:cards.family.${look.family}`) : null,
     look?.kind ? t(`gamification:cards.pack.kind.${look.kind}`) : null,
     look?.edition ? t(`gamification:cards.edition.${look.edition}`) : null,
+    look?.rarity
+      ? t("gamification:cards.pack.guarantee", { rarity: t(`gamification:cards.rarity.${look.rarity}`) })
+      : null,
   ].filter(Boolean);
   return among.length ? among.join(" · ") : t("gamification:cards.pack.any");
 }
@@ -44,5 +47,6 @@ export function packBooster(t: Translate, pack: CardPack, locale: string): Boost
     backdrop: cardImage(look?.backdrop, "w780"),
     family: look?.family ?? null,
     edition: look?.edition ?? null,
+    guaranteed: look?.rarity ?? null,
   };
 }

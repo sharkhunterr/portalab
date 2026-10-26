@@ -1,14 +1,14 @@
 {
   "format": 1,
   "id": "mediacards",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "names": {
     "fr": "Mediacards — boosters de cartes",
     "en": "Mediacards — card boosters"
   },
   "descriptions": {
-    "fr": "L'emballage des boosters Mediacards, à part des boosters de looks : un vrai paquet de cartes à collectionner en alu métallisé, soudé et cranté en haut et en bas, froissé, teinté par le genre du titre, avec l'image du film ou de la série imprimée et fondue dans l'alu, son fond en sérigraphie sous son titre en bas et un reflet holographique qui passe. Les cartes, face cachée, ont un dos Mediacards.",
-    "en": "The wrapper of the Mediacards boosters, apart from the looks boosters: a real trading-card pack of metallised foil, heat-sealed and crimped top and bottom, crinkled, tinted by the work's genre, the film's or series' art printed and melting into the foil, its backdrop screen-printed under its title at the foot and a holographic gleam passing. Face down, the cards wear a Mediacards back."
+    "fr": "L'emballage des boosters Mediacards, à part des boosters de looks : un vrai paquet de cartes à collectionner en alu métallisé, soudé et cranté en haut et en bas, froissé, teinté par le genre du titre, avec l'image du film ou de la série imprimée et fondue dans l'alu, son fond en sérigraphie sous son titre en bas et un reflet holographique qui passe. Les cartes, face cachée, ont un dos Mediacards. Un booster d'édition porte le métal et le symbole de son édition ; un booster qui garantit une rareté, le métal de cette rareté et sa gemme.",
+    "en": "The wrapper of the Mediacards boosters, apart from the looks boosters: a real trading-card pack of metallised foil, heat-sealed and crimped top and bottom, crinkled, tinted by the work's genre, the film's or series' art printed and melting into the foil, its backdrop screen-printed under its title at the foot and a holographic gleam passing. Face down, the cards wear a Mediacards back. An edition's booster wears its edition's metal and symbol; a booster that guarantees a rarity, that rarity's metal and its gem."
   },
   "author": "Portalab (example)",
   "license": "CC0-1.0"

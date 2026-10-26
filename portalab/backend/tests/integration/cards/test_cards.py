@@ -9,6 +9,7 @@ from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
+from sqlalchemy import select
 
 from portalab.capabilities.catalog import new_registry
 from portalab.capabilities.marketplace import OwnershipView
@@ -18,7 +19,7 @@ from portalab.core.db import Database
 from portalab.modules.cards.artwork import FanArt
 from portalab.modules.cards.generator import CardForge, plan, set_code
 from portalab.modules.cards.models import Card, CardSet, Copy
-from portalab.modules.cards.packs import CardBoosterHandler, ContentBoosters, Packs, variant_for
+from portalab.modules.cards.packs import CardBoosterHandler, ContentBoosters, Packs, booster_of, variant_for
 from portalab.modules.cards.participant import CardsParticipant
 from portalab.modules.cards.rarity import Ranked, rarities
 from portalab.modules.cards.roles import RoleArt, best
@@ -719,6 +720,47 @@ async def test_a_shops_booster_draws_among_the_works_it_names(database: Database
             .all()
         )
     assert len(sets) == 5 and set(sets) == {str(space.object_id)}  # science fiction since 2010 only
+
+
+async def test_a_booster_guarantees_its_rarity(database: Database) -> None:
+    """Issue 255: a booster of the shop that guarantees a rarity holds a card of it — one that names a rarity
+    its works have none of is not sold."""
+    capabilities = new_registry()
+    film = work("Dune", 12000, "US", ["Timothée", "Zendaya", "Rebecca", "Oscar", "Josh"])
+    capabilities.provide(CARD_SOURCES, Sources([film]), instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    async with database.session() as session:
+        present = set((await session.execute(select(Card.rarity))).scalars())
+    best = next(r for r in ("legendary", "epic", "rare") if r in present)
+    user = uuid4()
+    async with database.unit_of_work() as uow:
+        await uow.session.execute(INSERT_USER, {"id": user, "login": f"u{user.hex[:8]}"})
+    packs = Packs(database, capabilities, rng=random.Random(11))  # noqa: S311 — deterministic test data
+    handler = CardBoosterHandler(packs)
+    assert booster_of({"rarity": "mythic", "cards": "3"}) == {
+        "cards": 3
+    }  # an unknown rarity guarantees nothing
+    for attempt in range(6):  # the odds alone would seldom give it six times running
+        ownership = OwnershipView(
+            uuid4(), user, f"rarity_{attempt}", "card_booster", {"rarity": best, "cards": 3}
+        )
+        assert (await handler.activate(ownership)).state == "active"
+    async with database.session() as session:
+        rarities = (
+            await session.execute(
+                select(Copy.pack_id, Card.rarity)
+                .join(Card, Card.id == Copy.card_id)
+                .where(Copy.user_id == user)
+            )
+        ).all()
+    by_pack: dict[Any, set[str]] = {}
+    for pack_id, rarity in rarities:
+        by_pack.setdefault(pack_id, set()).add(rarity)
+    assert len(by_pack) == 6 and all(best in found for found in by_pack.values())
+    absent = [r for r in ("rare", "epic", "legendary") if r not in present]
+    if absent:
+        ownership = OwnershipView(uuid4(), user, "absent", "card_booster", {"rarity": absent[0]})
+        assert (await handler.activate(ownership)).state == "incompatible"
 
 
 class Published:
