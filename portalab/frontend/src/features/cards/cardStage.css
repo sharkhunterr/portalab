@@ -143,24 +143,9 @@
   }
 }
 
-/* issue 255: a card seen big — the stage behind it holds still and out of sight, only that card moves (a phone
-   drawing the whole stage's moving cards and lights under it left parts of the screen undrawn) */
+/* issue 255: a card seen big — the stage stays behind it, holding still: only that card moves */
 .booster-stage[data-zoomed] * {
   animation-play-state: paused;
-}
-.booster-stage[data-zoomed] .booster-cards,
-.booster-stage[data-zoomed] .booster-atmosphere {
-  visibility: hidden;
-}
-/* issue 255: a booster of media cards — its cards (foil, HD) move a lot of their own, so the stage around them
-   is lighter on a phone: its fog and projectors stand still, no mist drawn by the GPU (left out), and its
-   summary is not a blur of what moves behind it */
-.booster-stage[data-cards]
-:is(.booster-atmosphere__fog, .booster-atmosphere__beam, .booster-atmosphere__glow) {
-  animation: none;
-}
-.booster-stage[data-cards] .booster-atmosphere__dust {
-  display: none;
 }
 /* a turned legendary's glint passes once; a card out of sight holds still */
 .booster-stage[data-cards] .booster-card[data-state="revealed"][data-rarity="legendary"] .booster-card__shine {
@@ -168,10 +153,6 @@
 }
 .booster-stage[data-cards] .booster-card[data-offscreen] * {
   animation-play-state: paused;
-}
-.booster-stage[data-cards] .booster-summary {
-  backdrop-filter: none;
-  background: color-mix(in srgb, var(--booster-ink) 92%, var(--tone));
 }
 /* a media card's own motion (its foil, its HD backdrop) waits until it lies flat and its moment is over: turned
    in 3D, grown and shaken with all its layers moving, a legendary tore on a phone; and while a legendary has the
