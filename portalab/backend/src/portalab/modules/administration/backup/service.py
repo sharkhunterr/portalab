@@ -43,6 +43,8 @@ class Run:
     phase: str = "starting"
     done: int = 0
     total: int = 0
+    steps: list[str] = field(default_factory=list)  # a reset's steps, known from its start (#247)
+    on: str | None = None  # what the step is on (a folder, a module, a pack)
     started_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat(timespec="seconds"))
     result: dict[str, Any] = field(default_factory=dict)
     error: dict[str, str] | None = None
@@ -54,6 +56,8 @@ class Run:
             "phase": self.phase,
             "done": self.done,
             "total": self.total,
+            "steps": self.steps,
+            "on": self.on,
             "started_at": self.started_at,
             "result": self.result,
             "error": self.error,
@@ -256,12 +260,21 @@ class BackupService:
         async def work(run: Run) -> dict[str, Any]:
             log.warning("portal reset", extra={"fields": {"by": str(actor.user_id)}})  # the audit goes too
             # the folders first: the schema's reset writes Portalab's own packs again, their files with them
-            run.phase = "files"
-            cleared = await asyncio.to_thread(archive.clear_data, self.data_dir)
-            run.phase = "schema"
-            await self.versions.reset()
-            run.phase = "done"
-            return {"cleared": cleared}
+            entries = await asyncio.to_thread(archive.data_entries, self.data_dir)
+            run.steps = [
+                *(f"files.{entry.name}" for entry in entries),
+                *("schema.drop", "schema.create", "schema.permissions", "schema.packs"),
+            ]
+
+            def step(key: str, done: int, total: int, on: str | None) -> None:
+                run.phase, run.done, run.total, run.on = key, done, total, on
+
+            for entry in entries:
+                step(f"files.{entry.name}", 0, 0, None)
+                await asyncio.to_thread(archive.clear_entry, entry)
+            await self.versions.reset(step)
+            step("done", 0, 0, None)
+            return {"cleared": [entry.name for entry in entries]}
 
         return self._start("reset", work)
 

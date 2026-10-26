@@ -76,6 +76,10 @@ class Table:
     where: str | None = None
 
 
+# a reset's step told as it goes: its key, how far (done of total) and what it is on
+ResetStep = Callable[[str, int, int, str | None], None]
+
+
 class Versions(Protocol):
     """The schema a backup carries against this portal's (``portalab.app.backup_versions``)."""
 
@@ -87,7 +91,7 @@ class Versions(Protocol):
 
     async def finish(self) -> None: ...
 
-    async def reset(self) -> None: ...
+    async def reset(self, step: ResetStep | None = None) -> None: ...
 
 
 def _from_format_1(manifest: dict[str, Any]) -> dict[str, Any]:
@@ -569,18 +573,25 @@ async def _rekey(
     return {"rewritten": done, "unreadable": failed}
 
 
+def data_entries(data_dir: Path) -> list[Path]:
+    """Issue 247: what a reset empties, in its order — every data folder (and file) but the backups."""
+    if not data_dir.is_dir():
+        return []
+    return [entry for entry in sorted(data_dir.iterdir()) if entry.name != "backups"]
+
+
+def clear_entry(entry: Path) -> None:
+    if entry.is_dir() and not entry.is_symlink():
+        shutil.rmtree(entry, ignore_errors=True)
+    else:
+        entry.unlink(missing_ok=True)
+
+
 def clear_data(data_dir: Path) -> list[str]:
     """Issue 247: the data folders emptied for a new installation — the backups kept (to bring one back)."""
     cleared: list[str] = []
-    if not data_dir.is_dir():
-        return cleared
-    for entry in sorted(data_dir.iterdir()):
-        if entry.name == "backups":
-            continue
-        if entry.is_dir() and not entry.is_symlink():
-            shutil.rmtree(entry, ignore_errors=True)
-        else:
-            entry.unlink(missing_ok=True)
+    for entry in data_entries(data_dir):
+        clear_entry(entry)
         cleared.append(entry.name)
     return cleared
 

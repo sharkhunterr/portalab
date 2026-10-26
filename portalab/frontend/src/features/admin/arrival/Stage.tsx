@@ -51,12 +51,14 @@ export function Stage({
             <p>{t("account:arrival.subtitle")}</p>
           </div>
         </header>
-        <div className="arrival-stage__meter">
-          <span>{t("account:arrival.count", { step: position + 1, total: steps.length })}</span>
-          <span className="arrival-stage__bar" aria-hidden="true">
-            <span style={{ inlineSize: `${share}%` }} />
-          </span>
-        </div>
+        {steps.length ? ( // none while the portal is reset
+          <div className="arrival-stage__meter">
+            <span>{t("account:arrival.count", { step: position + 1, total: steps.length })}</span>
+            <span className="arrival-stage__bar" aria-hidden="true">
+              <span style={{ inlineSize: `${share}%` }} />
+            </span>
+          </div>
+        ) : null}
         <nav aria-label={t("account:arrival.steps")}>
           {GROUP_ORDER.filter((g) => steps.some((s) => s.group === g)).map((group) => (
             <div key={group} className="arrival-stage__group">

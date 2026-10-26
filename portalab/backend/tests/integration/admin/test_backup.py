@@ -4,7 +4,7 @@ or left out (sessions, media images) does not travel; every schema is sorted for
 
 import asyncio
 import json
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 from uuid import UUID
 
@@ -270,13 +270,25 @@ async def test_reset_back_to_a_new_installation(
             )
         versions = SchemaVersions(database, migrated_db_url)
 
-        async def builtin_packs() -> None:  # what the wiring hooks in: the built-in packs' sync
+        async def builtin_packs(told: Callable[[int, int, str], None]) -> None:  # the built-in packs' sync
+            told(0, 1, "portalab-base")
             (data / "visuals" / "store").mkdir(parents=True)
 
         versions.after_reset = builtin_packs
         assert archive.clear_data(data) == ["blobs"]  # in the reset's order: the folders, then the schema
-        await versions.reset()
+        steps: list[tuple[str, int, int, str | None]] = []
+        await versions.reset(lambda *step: steps.append(step))
         assert (data / "visuals" / "store").is_dir()
+        # every step told: each module's data dropped, the base created, the permissions, the packs one by one
+        assert {key for key, *_ in steps} == {
+            "schema.drop",
+            "schema.create",
+            "schema.permissions",
+            "schema.packs",
+        }
+        assert steps[0][:2] == ("schema.drop", 0) and steps[0][2] > 1
+        assert {"config", "identity"} <= {on for key, _, _, on in steps if key == "schema.drop"}
+        assert steps[-1] == ("schema.packs", 0, 1, "portalab-base")
         assert await versions.current() == heads
         async with database.session() as session:
             settings = await session.scalar(text("SELECT count(*) FROM config.settings"))

@@ -288,7 +288,7 @@ def wire_platform(
     visuals = VisualsModule(
         database, events, authz.audit, capabilities, root=data_dir / "visuals", authorizer=authz.engine
     )
-    versions.after_reset = lambda: BuiltinSync(visuals.packs, builtin_root()).run(dry_run=False)  # 247
+    versions.after_reset = lambda told: BuiltinSync(visuals.packs, builtin_root()).run(progress=told)  # 247
     # issue 229; issue 234: its events (a booster opened, a collection completed) count for the achievements
     cards = CardsModule(database, capabilities, events=events, blobs=context.blobs, root=data_dir / "cards")
     cards.register()

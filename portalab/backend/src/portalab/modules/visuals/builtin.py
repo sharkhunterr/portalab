@@ -14,6 +14,7 @@ Idempotent: a version already known (same fingerprint) is skipped, so a start co
 
 import asyncio
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -72,7 +73,13 @@ class BuiltinSync:
             return []
         return sorted(p for p in self.root.iterdir() if p.is_dir() and (p / "pack.json").is_file())
 
-    async def run(self, actor: Principal = SYSTEM, *, dry_run: bool = False) -> SyncReport:
+    async def run(
+        self,
+        actor: Principal = SYSTEM,
+        *,
+        dry_run: bool = False,
+        progress: Callable[[int, int, str], None] | None = None,  # (done, total, the pack's folder)
+    ) -> SyncReport:
         report = SyncReport()
         folders = self.folders()
         if not folders:
@@ -91,7 +98,9 @@ class BuiltinSync:
             }
         report.first = not known
         writer = self.packs._writer() if report.first and not dry_run else None
-        for folder in folders:
+        for done, folder in enumerate(folders):
+            if progress is not None:
+                progress(done, len(folders), folder.name)
             try:
                 files = await asyncio.to_thread(read_folder, folder)
                 manifest = parse_pack(files.get("pack.json") or b"")

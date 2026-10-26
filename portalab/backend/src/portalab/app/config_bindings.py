@@ -49,6 +49,11 @@ async def _values(config: ConfigService, fields: dict[str, str]) -> dict[str, An
 
 async def refresh(platform: Any) -> None:
     config: ConfigService = platform.administration.config
+    async with config.read_at_once():  # every setting read at once, not one query each
+        await _refresh(platform, config)
+
+
+async def _refresh(platform: Any, config: ConfigService) -> None:
     identity = platform.identity.ctx
     identity.config = replace(identity.config, **await _values(config, IDENTITY_FIELDS))
 
