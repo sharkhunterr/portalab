@@ -1,0 +1,349 @@
+/* Portalab — card_frame/edition-leather: the leather & linen edition (2009–2012), skeuomorphic — a rim of
+   stitched leather with brass rivets, the body in linen, the name pressed in letterpress, the art a print held
+   by photo corners, a satin ribbon for what it is, the work on a notebook's page, the rarity on a leather label.
+   Behind a cut-out character: a watercolour sky. Its HD version: the sky over the whole card, clouds drifting,
+   balloons rising. */
+
+.mcard[data-frame="edition-leather"] {
+  --edition-linen: #e9e1cf;
+  --edition-ink: #4b3a28;
+  --edition-hide: #6e3f22;
+  --edition-thread: #e7cfa4;
+  --edition-paper: #fffaf0;
+  --edition-sky:
+    radial-gradient(38% 12% at 24% 28%, rgba(255, 255, 255, 0.92), transparent 70%),
+    radial-gradient(44% 12% at 74% 52%, rgba(255, 255, 255, 0.82), transparent 70%),
+    radial-gradient(30% 9% at 40% 70%, rgba(255, 255, 255, 0.7), transparent 70%),
+    radial-gradient(60% 40% at 72% 18%, rgba(255, 238, 196, 0.55), transparent 70%),
+    linear-gradient(180deg, #7ec1e8 0%, #bfe2f2 62%, #f5e7c6 100%);
+}
+/* stitched leather, a brass rivet in each corner, the halo of the rarity around it */
+.mcard[data-frame="edition-leather"] .mcard__card {
+  padding: 3.8cqi;
+  border-radius: 5cqi;
+  background:
+    radial-gradient(circle at 2.2cqi 2.2cqi, #fff3c4 0, #c9993d 0.9cqi, #6b4a12 1.3cqi, transparent 1.5cqi),
+    radial-gradient(circle at calc(100% - 2.2cqi) 2.2cqi, #fff3c4 0, #c9993d 0.9cqi, #6b4a12 1.3cqi, transparent 1.5cqi),
+    radial-gradient(circle at 2.2cqi calc(100% - 2.2cqi), #fff3c4 0, #c9993d 0.9cqi, #6b4a12 1.3cqi, transparent 1.5cqi),
+    radial-gradient(
+        circle at calc(100% - 2.2cqi) calc(100% - 2.2cqi),
+        #fff3c4 0,
+        #c9993d 0.9cqi,
+        #6b4a12 1.3cqi,
+        transparent 1.5cqi
+      ),
+    radial-gradient(120% 80% at 30% 20%, #9a6238 0%, var(--edition-hide) 55%, #4a2914 100%);
+  box-shadow:
+    0 0 0 0.33cqi #2a160a,
+    0 0 2.6cqi 0.8cqi var(--mcard-glow),
+    0 0.35rem 1rem rgba(0, 0, 0, 0.45),
+    inset 0 0.3cqi 0 rgba(255, 220, 180, 0.35);
+}
+.mcard[data-frame="edition-leather"] .mcard__card::after {
+  content: "";
+  position: absolute;
+  inset: 1.7cqi;
+  border: 0.45cqi dashed var(--edition-thread);
+  border-radius: 3.6cqi;
+  opacity: 0.85;
+  pointer-events: none;
+}
+.mcard[data-frame="edition-leather"] .mcard__body {
+  gap: 1.8cqi;
+  padding: 2.6cqi 3cqi 2cqi;
+  border-radius: 2.2cqi;
+  background:
+    repeating-linear-gradient(0deg, rgba(120, 100, 70, 0.08) 0 0.33cqi, transparent 0.33cqi 0.9cqi),
+    repeating-linear-gradient(90deg, rgba(120, 100, 70, 0.08) 0 0.33cqi, transparent 0.33cqi 0.9cqi),
+    var(--edition-linen);
+  box-shadow: inset 0 0.6cqi 1.6cqi rgba(60, 35, 15, 0.45);
+  color: var(--edition-ink);
+}
+/* the name pressed into the paper */
+.mcard[data-frame="edition-leather"] .mcard__name {
+  font-family: "Playfair Display", serif;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: #6a5139;
+  text-shadow:
+    0 0.3cqi 0 rgba(255, 255, 255, 0.75),
+    0 -0.25cqi 0 rgba(60, 35, 15, 0.35);
+}
+/* the genre on a leather tag, stitched, its brass eyelet */
+.mcard[data-frame="edition-leather"] .mcard__genre {
+  padding: 0.7cqi 2.4cqi 0.7cqi 0.7cqi;
+  border-radius: 0.8cqi 2.4cqi 2.4cqi 0.8cqi;
+  background: linear-gradient(180deg, #8a5530, #5e3519);
+  color: #f3e3c4;
+  box-shadow: 0 0.5cqi 0.9cqi rgba(40, 20, 5, 0.4);
+  outline: 0.3cqi dashed rgba(243, 227, 196, 0.6);
+  outline-offset: -1cqi;
+  font-family: "EB Garamond", serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.mcard[data-frame="edition-leather"] .mcard__emblem {
+  background: radial-gradient(circle at 35% 30%, #fff3c4, #c9993d 55%, #6b4a12);
+  color: #3a2410;
+}
+/* the art: a print with its white border, held by four black photo corners */
+.mcard[data-frame="edition-leather"] .mcard__art {
+  margin: 1.8cqi 2.2cqi 1cqi;
+  border-radius: 0;
+  background: #d9cfbb;
+  box-shadow:
+    0 0 0 1.6cqi #fbf8f0,
+    0 1.4cqi 2.4cqi 1.6cqi rgba(60, 35, 15, 0.35);
+  transform: rotate(-0.8deg);
+}
+.mcard[data-frame="edition-leather"] .mcard__art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, #2a1d12 50%, transparent 50%) 0 0 / 5.4cqi 5.4cqi no-repeat,
+    linear-gradient(225deg, #2a1d12 50%, transparent 50%) 100% 0 / 5.4cqi 5.4cqi no-repeat,
+    linear-gradient(45deg, #2a1d12 50%, transparent 50%) 0 100% / 5.4cqi 5.4cqi no-repeat,
+    linear-gradient(315deg, #2a1d12 50%, transparent 50%) 100% 100% / 5.4cqi 5.4cqi no-repeat;
+}
+/* behind a cut-out character: a watercolour sky with its paper clouds */
+.mcard[data-frame="edition-leather"] .mcard__art[data-cutout] {
+  background: var(--edition-sky);
+}
+.mcard[data-frame="edition-leather"] .mcard__sky {
+  background: var(--edition-sky);
+  mask: none;
+}
+/* what it is, on a satin ribbon running off the page */
+.mcard[data-frame="edition-leather"] .mcard__strip {
+  margin-inline: -3cqi 0;
+  padding: 0.7cqi 2.6cqi 0.7cqi 3cqi;
+  border-radius: 0;
+  background: linear-gradient(180deg, #c0392b, #8e1f16);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 1.8cqi) 50%, 100% 100%, 0 100%);
+  color: #fbeee0;
+  font-family: "EB Garamond", serif;
+  font-size: 3.3cqi;
+  font-style: italic;
+  text-shadow: 0 -0.2cqi 0 rgba(0, 0, 0, 0.35);
+}
+.mcard[data-frame="edition-leather"] .mcard__stage {
+  padding: 0 1.4cqi 0 0;
+  background: none;
+  color: #fbeee0;
+  font-family: "EB Garamond", serif;
+  font-size: 2.8cqi;
+  font-style: normal;
+  letter-spacing: 0.18em;
+}
+/* the work on a notebook's page */
+.mcard[data-frame="edition-leather"] .mcard__lower {
+  padding: 1.6cqi 2cqi;
+  border-radius: 0.6cqi;
+  background: repeating-linear-gradient(180deg, var(--edition-paper) 0 4.6cqi, #d9cfbb 4.6cqi 4.9cqi);
+  box-shadow: 0 0.6cqi 1.4cqi rgba(60, 35, 15, 0.3);
+  font-family: "EB Garamond", serif;
+}
+.mcard[data-frame="edition-leather"] .mcard__poster {
+  margin: 0;
+  border-radius: 0.4cqi;
+  box-shadow:
+    0 0 0 0.8cqi #fbf8f0,
+    0 0.6cqi 1.2cqi 0.8cqi rgba(60, 35, 15, 0.3);
+  transform: rotate(1.5deg);
+}
+.mcard[data-frame="edition-leather"] .mcard__work {
+  border-block-end: 0.33cqi dashed #c9b89a;
+}
+.mcard[data-frame="edition-leather"] .mcard__work strong {
+  font-family: "Caveat", cursive;
+  font-weight: 700;
+  color: #2d5b8a;
+}
+.mcard[data-frame="edition-leather"] .mcard__meta {
+  border-block-end: 0.33cqi dashed #c9b89a;
+}
+.mcard[data-frame="edition-leather"] .mcard__figures li:not(:first-child) {
+  border-block-start-color: #d9cfbb;
+}
+.mcard[data-frame="edition-leather"] .mcard__cost {
+  background: radial-gradient(circle at 35% 30%, #fff3c4, #c9993d 55%, #6b4a12);
+  color: #3a2410;
+}
+.mcard[data-frame="edition-leather"] .mcard__figures strong {
+  font-family: "Caveat", cursive;
+  color: #2d5b8a;
+}
+.mcard[data-frame="edition-leather"] .mcard__flavor {
+  border: 0.33cqi dashed #c9b89a;
+  background: var(--edition-paper);
+  font-family: "Caveat", cursive;
+  font-size: 4cqi;
+  font-style: normal;
+  color: #2d5b8a;
+}
+.mcard[data-frame="edition-leather"] .mcard__foot {
+  font-family: "EB Garamond", serif;
+  letter-spacing: 0.12em;
+  color: #7a6650;
+  text-shadow: 0 0.25cqi 0 rgba(255, 255, 255, 0.6);
+}
+/* the rarity on a stitched leather label: its gem in its metal, its name, its colour around */
+.mcard[data-frame="edition-leather"] .mcard__rarity {
+  padding: 0.8cqi 2.2cqi 0.8cqi 1cqi;
+  border-radius: 0.8cqi;
+  background: linear-gradient(180deg, #6a3d1f, #3f2210);
+  color: #f6e7c8;
+  box-shadow:
+    inset 0 0 0 0.45cqi var(--mcard-rarity),
+    0 0 1.8cqi var(--mcard-glow),
+    0 0.4cqi 0.8cqi rgba(40, 20, 5, 0.45);
+  outline: 0.25cqi dashed rgba(243, 227, 196, 0.55);
+  outline-offset: -1.1cqi;
+  font-family: "EB Garamond", serif;
+  font-size: 3cqi;
+  letter-spacing: 0.14em;
+  text-shadow: none;
+}
+.mcard[data-frame="edition-leather"] .mcard__gem {
+  inline-size: 4.4cqi;
+  block-size: 4.4cqi;
+  background: var(--mcard-rim);
+}
+/* a work's own card holds more (three figures, its line): its box tighter */
+.mcard[data-frame="edition-leather"][data-kind="title"] .mcard__lower {
+  padding-block: 0.8cqi;
+}
+.mcard[data-frame="edition-leather"][data-kind="title"] .mcard__figures li {
+  padding-block: 0.3cqi;
+  font-size: 3.2cqi;
+}
+.mcard[data-frame="edition-leather"][data-kind="title"] .mcard__flavor {
+  padding-block: 0.4cqi;
+  font-size: 3.4cqi;
+  line-height: 1;
+  -webkit-line-clamp: 1;
+}
+
+/* --- HD (a legendary): the sky over the whole page, clouds drifting, balloons rising ------------------- */
+.mcard[data-frame="edition-leather"][data-hd] .mcard__backdrop {
+  background: var(--edition-sky);
+}
+.mcard[data-frame="edition-leather"][data-hd] .mcard__backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0 -60%;
+  background:
+    radial-gradient(14% 6% at 20% 18%, rgba(255, 255, 255, 0.95), transparent 70%),
+    radial-gradient(18% 7% at 46% 40%, rgba(255, 255, 255, 0.85), transparent 70%),
+    radial-gradient(12% 5% at 72% 26%, rgba(255, 255, 255, 0.9), transparent 70%),
+    radial-gradient(16% 6% at 88% 62%, rgba(255, 255, 255, 0.8), transparent 70%);
+  mask: none;
+  opacity: 1;
+}
+/* the balloons: a cluster of colours on their strings, bobbing */
+.mcard[data-frame="edition-leather"][data-hd] .mcard__backdrop::after {
+  inset: auto 6% 40% 52%;
+  block-size: 46%;
+  background:
+    radial-gradient(circle at 30% 20%, #e94b4b 0 6%, transparent 6.5%),
+    radial-gradient(circle at 50% 12%, #f6c343 0 7%, transparent 7.5%),
+    radial-gradient(circle at 68% 22%, #4bb3e9 0 6.5%, transparent 7%),
+    radial-gradient(circle at 42% 32%, #8bd24f 0 6%, transparent 6.5%),
+    radial-gradient(circle at 60% 36%, #c46ae0 0 6%, transparent 6.5%),
+    radial-gradient(circle at 24% 36%, #ff8a3d 0 5.5%, transparent 6%),
+    radial-gradient(circle at 76% 40%, #ff6fa5 0 5.5%, transparent 6%),
+    linear-gradient(100deg, transparent 49.6%, rgba(122, 106, 88, 0.7) 50%, transparent 50.4%) 0 0 / 100% 100%;
+  mask: none;
+  opacity: 0.95;
+}
+/* the frame stays, the print's border and corners go: the character over the sky */
+.mcard[data-frame="edition-leather"][data-frameless] .mcard__art,
+.mcard[data-frame="edition-leather"][data-frameless] .mcard__art[data-cutout] {
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+.mcard[data-frame="edition-leather"][data-frameless] .mcard__art::before {
+  content: none;
+}
+.mcard[data-frame="edition-leather"][data-frameless] .mcard__lower {
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 250, 240, 0.86) 0 4.6cqi,
+    rgba(217, 207, 187, 0.86) 4.6cqi 4.9cqi
+  );
+}
+/* a work, borderless: its scene over the whole card, clouds passing over it, the light of the paper moving */
+.mcard[data-frame="edition-leather"][data-borderless] .mcard__body {
+  background: none;
+  box-shadow: none;
+  color: #fffaf0;
+}
+.mcard[data-frame="edition-leather"][data-borderless] .mcard__art {
+  margin: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+.mcard[data-frame="edition-leather"][data-borderless] .mcard__name {
+  color: #fffaf0;
+  text-shadow: 0 0.3cqi 1.2cqi rgba(30, 15, 5, 0.85);
+}
+.mcard[data-frame="edition-leather"][data-borderless] .mcard__foot {
+  color: #f6e7c8;
+  text-shadow: 0 0.3cqi 1cqi rgba(30, 15, 5, 0.85);
+}
+.mcard[data-frame="edition-leather"][data-borderless] .mcard__art::before {
+  content: none;
+}
+/* over the scene (after it, under the texts): clouds passing, the light of the paper moving */
+.mcard[data-frame="edition-leather"][data-hd][data-borderless] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 3cqi;
+  pointer-events: none;
+  background:
+    radial-gradient(9% 4% at 20% 16%, rgba(255, 255, 255, 0.6), transparent 70%) 0 0 / 200% 100%,
+    radial-gradient(11% 5% at 70% 30%, rgba(255, 255, 255, 0.5), transparent 70%) 0 0 / 200% 100%,
+    linear-gradient(105deg, transparent 38%, rgba(255, 236, 196, 0.32) 50%, transparent 62%) 0 0 / 300% 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mcard[data-frame="edition-leather"][data-hd] .mcard__backdrop::before {
+    animation: edition-leather-clouds 38s linear infinite alternate;
+  }
+  .mcard[data-frame="edition-leather"][data-hd] .mcard__backdrop::after {
+    animation: edition-leather-balloons 5s ease-in-out infinite alternate;
+  }
+  .mcard[data-frame="edition-leather"][data-hd][data-borderless] .mcard__art::after {
+    animation: edition-leather-pass 14s ease-in-out infinite alternate;
+  }
+}
+@keyframes edition-leather-clouds {
+  from {
+    transform: translateX(-18%);
+  }
+  to {
+    transform: translateX(18%);
+  }
+}
+@keyframes edition-leather-balloons {
+  from {
+    transform: translate(0, 2%) rotate(-2deg);
+  }
+  to {
+    transform: translate(-3%, -7%) rotate(2deg);
+  }
+}
+@keyframes edition-leather-pass {
+  from {
+    background-position: 0 0, 100% 0, 100% 0;
+  }
+  to {
+    background-position: 100% 0, 0 0, 0 0;
+  }
+}

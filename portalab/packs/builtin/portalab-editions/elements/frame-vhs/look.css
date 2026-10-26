@@ -1,11 +1,38 @@
-/* Portalab — card_frame/edition-vhs: the VHS edition (1980–1996), the arcade — a plastic cabinet of the genre's
+/* Portalab — card_frame/edition-vhs: the VHS edition (1986–1992), the arcade — a plastic cabinet of the genre's
    colour with pixel-stepped corners, a lit marquee, the art on a curved cathode screen, the texts in a role-
-   playing game's blue dialog box. */
+   playing game's blue dialog box. Behind a cut-out character: a game's dusk sky in pixel bands over a pixel
+   skyline. Its HD version (issue 255): that sky inside the cabinet, its stars blinking, the scanlines rolling,
+   a tracking band of the tape passing. */
 
 .mcard[data-frame="edition-vhs"] {
   --edition-step: 1.6cqi;
   --edition-dark: color-mix(in srgb, var(--mcard-accent) 25%, #07070d);
   --edition-neon: color-mix(in srgb, var(--mcard-accent) 35%, #ffffff);
+  --edition-sky:
+    linear-gradient(#0b0b16 0 0) 0 100% / 16% 22% no-repeat,
+    linear-gradient(#0b0b16 0 0) 14% 100% / 10% 34% no-repeat,
+    linear-gradient(#0b0b16 0 0) 26% 100% / 14% 26% no-repeat,
+    linear-gradient(#0b0b16 0 0) 42% 100% / 8% 40% no-repeat,
+    linear-gradient(#0b0b16 0 0) 52% 100% / 16% 24% no-repeat,
+    linear-gradient(#0b0b16 0 0) 70% 100% / 10% 36% no-repeat,
+    linear-gradient(#0b0b16 0 0) 82% 100% / 18% 28% no-repeat,
+    linear-gradient(#fff6d0 0 0) 12% 12% / 1cqi 1cqi no-repeat,
+    linear-gradient(#fff6d0 0 0) 34% 6% / 0.7cqi 0.7cqi no-repeat,
+    linear-gradient(#fff6d0 0 0) 66% 16% / 1cqi 1cqi no-repeat,
+    linear-gradient(#fff6d0 0 0) 88% 8% / 0.7cqi 0.7cqi no-repeat,
+    radial-gradient(circle at 50% 72%, #ffd06a 0 9cqi, #ff8a4c 9cqi 11cqi, transparent 11cqi),
+    linear-gradient(
+      180deg,
+      #1a1446 0 20%,
+      #2e1c63 20% 34%,
+      #5a2378 34% 46%,
+      #a1347c 46% 56%,
+      #e0507a 56% 64%,
+      #ff8a4c 64% 72%,
+      #ffd06a 72% 100%
+    );
+  /* its halo: the clipped cabinet keeps no shadow of its own */
+  filter: drop-shadow(0 0 1.8cqi var(--mcard-glow));
 }
 .mcard[data-frame="edition-vhs"] .mcard__card {
   padding: 2.2cqi;
@@ -201,12 +228,29 @@
   color: #ffffff;
   text-shadow: 0.33cqi 0.33cqi 0 #000000;
 }
+/* the rarity: a pixel badge of its colour, its gem in its metal, its name — the high score's corner */
 .mcard[data-frame="edition-vhs"] .mcard__rarity {
+  padding: 0.9cqi 1.8cqi 0.9cqi 0.9cqi;
   border-radius: 0;
   box-shadow:
-    0.33cqi 0.33cqi 0 #000000,
-    inset 0 0 0 0.33cqi rgba(255, 255, 255, 0.6);
-  text-shadow: none;
+    0.5cqi 0.5cqi 0 #000000,
+    inset 0 0 0 0.45cqi rgba(255, 255, 255, 0.7),
+    0 0 1.6cqi var(--mcard-glow);
+  font-size: 2.2cqi;
+  text-shadow: 0.25cqi 0.25cqi 0 #000000;
+}
+.mcard[data-frame="edition-vhs"] .mcard__gem {
+  inline-size: 4cqi;
+  block-size: 4cqi;
+  background: var(--mcard-rim);
+}
+/* behind a cut-out character: the game's dusk sky, its pixel skyline */
+.mcard[data-frame="edition-vhs"] .mcard__art[data-cutout] {
+  background: var(--edition-sky);
+}
+.mcard[data-frame="edition-vhs"] .mcard__sky {
+  background: var(--edition-sky);
+  mask: none;
 }
 /* a work's own card holds more (three figures, its line): its box tighter */
 .mcard[data-frame="edition-vhs"][data-kind="title"] .mcard__lower {
@@ -234,4 +278,103 @@
   font-size: 3.2cqi;
   line-height: 1;
   -webkit-line-clamp: 1;
+}
+
+/* --- HD (a legendary, issue 255): the sky inside the cabinet, the cabinet's plastic around it ---------- */
+.mcard[data-frame="edition-vhs"][data-hd] .mcard__backdrop {
+  inset: 1.2cqi;
+  border-radius: 0;
+  background: var(--edition-sky);
+}
+/* the stars blinking */
+.mcard[data-frame="edition-vhs"][data-hd] .mcard__backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(#ffffff 0 0) 22% 9% / 0.8cqi 0.8cqi no-repeat,
+    linear-gradient(#ffffff 0 0) 48% 14% / 1cqi 1cqi no-repeat,
+    linear-gradient(#ffffff 0 0) 76% 5% / 0.8cqi 0.8cqi no-repeat,
+    linear-gradient(#ffffff 0 0) 8% 24% / 0.8cqi 0.8cqi no-repeat,
+    linear-gradient(#ffffff 0 0) 92% 22% / 1cqi 1cqi no-repeat;
+}
+/* the scanlines rolling, a tracking band passing */
+.mcard[data-frame="edition-vhs"][data-hd] .mcard__backdrop::after {
+  inset: -10% 0 0;
+  background:
+    linear-gradient(180deg, transparent 0 46%, rgba(255, 255, 255, 0.16) 47%, rgba(255, 255, 255, 0.04) 51%, transparent 53%),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0 0.33cqi, transparent 0.33cqi 0.9cqi);
+  mask: none;
+  opacity: 1;
+}
+/* the frame stays, the screen's bezel goes: the character over the sky */
+.mcard[data-frame="edition-vhs"][data-frameless] .mcard__art,
+.mcard[data-frame="edition-vhs"][data-frameless] .mcard__art[data-cutout] {
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.mcard[data-frame="edition-vhs"][data-frameless] .mcard__art::after {
+  content: none;
+}
+.mcard[data-frame="edition-vhs"][data-frameless] .mcard__lower {
+  background: rgba(27, 39, 136, 0.82);
+}
+/* a work, borderless: its scene on the whole cathode screen, scanlines and a tracking band over it */
+.mcard[data-frame="edition-vhs"][data-borderless] .mcard__body {
+  background: #050507;
+}
+.mcard[data-frame="edition-vhs"][data-borderless] .mcard__art {
+  margin: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.mcard[data-frame="edition-vhs"][data-borderless] .mcard__art .mcard__picture {
+  border-radius: 4cqi / 3cqi;
+}
+.mcard[data-frame="edition-vhs"][data-borderless] .mcard__art::after {
+  z-index: -1;
+  border-radius: 4cqi / 3cqi;
+  background:
+    linear-gradient(180deg, transparent 0 46%, rgba(255, 255, 255, 0.14) 47%, rgba(255, 255, 255, 0.04) 51%, transparent 53%) 0
+      0 / 100% 300%,
+    linear-gradient(160deg, rgba(255, 255, 255, 0.16), transparent 30%),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0 0.33cqi, transparent 0.33cqi 0.9cqi);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mcard[data-frame="edition-vhs"][data-hd] .mcard__backdrop::before {
+    animation: edition-vhs-blink 1.4s steps(2) infinite;
+  }
+  .mcard[data-frame="edition-vhs"][data-hd] .mcard__backdrop::after {
+    animation: edition-vhs-roll 4s linear infinite;
+  }
+  .mcard[data-frame="edition-vhs"][data-hd][data-borderless] .mcard__art::after {
+    animation: edition-vhs-tracking 5s linear infinite;
+  }
+}
+@keyframes edition-vhs-blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.2;
+  }
+}
+@keyframes edition-vhs-roll {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(50%);
+  }
+}
+@keyframes edition-vhs-tracking {
+  from {
+    background-position: 0 100%, 0 0, 0 0, 0 0;
+  }
+  to {
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
 }

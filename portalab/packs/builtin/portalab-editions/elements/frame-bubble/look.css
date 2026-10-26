@@ -1,0 +1,317 @@
+/* Portalab — card_frame/edition-bubble: the bubble edition (1998–2002), translucent Y2K — a candy-blue plastic
+   shell over the rarity's metal, fine horizontal stripes, a chrome name, gel buttons with their gloss, the art on
+   a gumdrop screen in a translucent bezel, the work on a frosted panel. Behind a cut-out character, translucent
+   bubbles over a rain of green code; the HD version (#255): bubbles rising, code falling over the whole card. */
+
+.mcard[data-frame="edition-bubble"] {
+  --edition-blue: #29a9d6;
+  --edition-ice: #dfe8ee;
+  --edition-deep: #0d2b3e;
+  --edition-steel: #9fb4c2;
+  --edition-code: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'%3E%3Cg font-family='monospace' font-size='12' fill='%2338f28a'%3E%3Ctext x='4' y='14' opacity='0.9'%3E7%3C/text%3E%3Ctext x='4' y='34' opacity='0.6'%3E3%3C/text%3E%3Ctext x='4' y='54' opacity='0.35'%3E0%3C/text%3E%3Ctext x='4' y='74' opacity='0.15'%3E1%3C/text%3E%3Ctext x='30' y='44' opacity='0.85'%3EA%3C/text%3E%3Ctext x='30' y='64' opacity='0.55'%3E9%3C/text%3E%3Ctext x='30' y='84' opacity='0.3'%3E4%3C/text%3E%3Ctext x='56' y='24' opacity='0.8'%3EZ%3C/text%3E%3Ctext x='56' y='44' opacity='0.5'%3E5%3C/text%3E%3Ctext x='56' y='64' opacity='0.25'%3E8%3C/text%3E%3Ctext x='82' y='70' opacity='0.9'%3E2%3C/text%3E%3Ctext x='82' y='90' opacity='0.5'%3EK%3C/text%3E%3Ctext x='82' y='110' opacity='0.2'%3E6%3C/text%3E%3Ctext x='108' y='34' opacity='0.7'%3EX%3C/text%3E%3Ctext x='108' y='54' opacity='0.4'%3E1%3C/text%3E%3C/g%3E%3C/svg%3E");
+  --edition-bubbles: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='220' viewBox='0 0 200 220'%3E%3Cdefs%3E%3CradialGradient id='b' cx='35%25' cy='30%25' r='70%25'%3E%3Cstop offset='0' stop-color='%23ffffff' stop-opacity='0.9'/%3E%3Cstop offset='0.25' stop-color='%23bfeaff' stop-opacity='0.35'/%3E%3Cstop offset='0.85' stop-color='%2329a9d6' stop-opacity='0.25'/%3E%3Cstop offset='1' stop-color='%23ffffff' stop-opacity='0.7'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='40' cy='60' r='26' fill='url%28%23b%29'/%3E%3Ccircle cx='150' cy='30' r='14' fill='url%28%23b%29'/%3E%3Ccircle cx='120' cy='140' r='34' fill='url%28%23b%29'/%3E%3Ccircle cx='30' cy='170' r='12' fill='url%28%23b%29'/%3E%3Ccircle cx='180' cy='190' r='18' fill='url%28%23b%29'/%3E%3C/svg%3E");
+  --edition-scene:
+    var(--edition-bubbles) 0 0 / 50cqi 55cqi,
+    var(--edition-code) 0 0 / 26cqi 26cqi,
+    radial-gradient(ellipse at 50% 30%, #0f4a5c 0%, #02160f 75%);
+  --edition-gel: linear-gradient(180deg, #ffffff -20%, var(--mcard-accent) 48%, color-mix(in srgb, var(--mcard-accent) 70%, #000000) 100%);
+}
+/* the shell: translucent blue plastic over the rarity's metal, its gloss on top */
+.mcard[data-frame="edition-bubble"] .mcard__card {
+  padding: 2.6cqi;
+  border-radius: 7cqi;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), transparent 5cqi),
+    linear-gradient(180deg, rgba(120, 214, 245, 0.55), rgba(18, 110, 160, 0.55)),
+    var(--mcard-rim);
+}
+.mcard[data-frame="edition-bubble"] .mcard__body {
+  gap: 1.8cqi;
+  padding: 3cqi 3.2cqi 2.4cqi;
+  border-radius: 5cqi;
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0 0.33cqi, rgba(214, 228, 236, 0.7) 0.33cqi 0.66cqi),
+    linear-gradient(180deg, #f4f8fb, #cfdde6);
+  box-shadow:
+    inset 0 0 0 0.33cqi var(--edition-steel),
+    inset 0 0.6cqi 1.6cqi rgba(13, 43, 62, 0.25);
+  color: var(--edition-deep);
+}
+/* the name in chrome */
+.mcard[data-frame="edition-bubble"] .mcard__name {
+  font-family: "Audiowide", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  background: linear-gradient(180deg, #ffffff 0%, var(--edition-steel) 44%, #3d5566 52%, #c9dbe6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0.25cqi 0 var(--edition-deep));
+}
+/* the genre, a gel button with its gloss */
+.mcard[data-frame="edition-bubble"] .mcard__genre {
+  position: relative;
+  background: var(--edition-gel);
+  box-shadow:
+    inset 0 0 0 0.25cqi rgba(13, 43, 62, 0.45),
+    0 0.4cqi 0.8cqi rgba(13, 43, 62, 0.35);
+  color: var(--edition-deep);
+  font-family: "Exo 2", sans-serif;
+}
+.mcard[data-frame="edition-bubble"] .mcard__genre::before {
+  content: "";
+  position: absolute;
+  inset: 0.3cqi 1.6cqi auto;
+  block-size: 45%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1));
+  pointer-events: none;
+}
+.mcard[data-frame="edition-bubble"] .mcard__emblem {
+  background: rgba(255, 255, 255, 0.5);
+}
+/* the gumdrop screen in its translucent bezel, its glass's reflection */
+.mcard[data-frame="edition-bubble"] .mcard__art {
+  margin: 1.8cqi 1.8cqi 1.2cqi;
+  border-radius: 5cqi 5cqi 7cqi 7cqi;
+  background: #02160f;
+  box-shadow:
+    0 0 0 1.6cqi rgba(41, 169, 214, 0.85),
+    0 0 0 2cqi rgba(255, 255, 255, 0.75),
+    0 0.8cqi 1.6cqi 2cqi rgba(13, 43, 62, 0.35),
+    inset 0 0 0 0.4cqi rgba(0, 0, 0, 0.45);
+}
+.mcard[data-frame="edition-bubble"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0 8% 60%;
+  z-index: 1;
+  border-radius: 0 0 50% 50% / 0 0 30% 30%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent);
+  pointer-events: none;
+}
+.mcard[data-frame="edition-bubble"] .mcard__art[data-cutout] {
+  background: none;
+}
+/* behind a cut-out character: bubbles over green code, no night sky */
+.mcard[data-frame="edition-bubble"] .mcard__sky {
+  mask: none;
+  background: var(--edition-scene);
+}
+/* what it is, on a gel bar */
+.mcard[data-frame="edition-bubble"] .mcard__strip {
+  padding: 0.6cqi 1cqi 0.6cqi 0.6cqi;
+  background: linear-gradient(180deg, #e9f1f6, #b6c9d5);
+  box-shadow:
+    inset 0 0.25cqi 0 #ffffff,
+    inset 0 0 0 0.25cqi #8aa2b2;
+  font-family: "Exo 2", sans-serif;
+  font-style: normal;
+}
+.mcard[data-frame="edition-bubble"] .mcard__stage {
+  background: linear-gradient(180deg, #4fc2ea, #0d6a97);
+  box-shadow: inset 0 0.25cqi 0 rgba(255, 255, 255, 0.7);
+  font-family: "Exo 2", sans-serif;
+  font-weight: 700;
+}
+.mcard[data-frame="edition-bubble"] .mcard__edition {
+  background: radial-gradient(circle at 34% 28%, #ffffff 0 18%, #7fd6f5 32%, #1484c2 72%, #0b4f7a);
+}
+/* the work on a frosted panel */
+.mcard[data-frame="edition-bubble"] .mcard__lower {
+  padding: 1.6cqi 2cqi;
+  border-radius: 3.4cqi;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(214, 228, 236, 0.85));
+  box-shadow:
+    inset 0 0 0 0.25cqi var(--edition-steel),
+    inset 0 0.25cqi 0 #ffffff;
+  font-family: "Exo 2", sans-serif;
+}
+.mcard[data-frame="edition-bubble"] .mcard__poster {
+  margin: 0;
+  border-radius: 2cqi;
+  box-shadow:
+    0 0 0 0.6cqi rgba(255, 255, 255, 0.8),
+    0 0.4cqi 1cqi rgba(13, 43, 62, 0.35);
+}
+.mcard[data-frame="edition-bubble"] .mcard__work {
+  border-block-end: 0.25cqi solid var(--edition-steel);
+}
+.mcard[data-frame="edition-bubble"] .mcard__work strong,
+.mcard[data-frame="edition-bubble"] .mcard__figures strong {
+  font-family: "Audiowide", sans-serif;
+  font-weight: 400;
+}
+.mcard[data-frame="edition-bubble"] .mcard__meta {
+  border-block-end: 0.25cqi solid var(--edition-steel);
+}
+.mcard[data-frame="edition-bubble"] .mcard__figures li:not(:first-child) {
+  border-block-start: 0.25cqi solid var(--edition-steel);
+}
+.mcard[data-frame="edition-bubble"] .mcard__cost {
+  background: radial-gradient(circle at 34% 28%, #ffffff 0 16%, #7fd6f5 32%, #1484c2 72%, #0b4f7a);
+  box-shadow: 0 0.25cqi 0.5cqi rgba(13, 43, 62, 0.45);
+}
+.mcard[data-frame="edition-bubble"] .mcard__flavor {
+  border-color: var(--edition-steel);
+  border-radius: 2cqi;
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--edition-deep);
+}
+.mcard[data-frame="edition-bubble"] .mcard__foot {
+  font-family: "Exo 2", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #3d5566;
+}
+/* the rarity: a frosted capsule ringed in its colour, its gem in its metal, its gloss */
+.mcard[data-frame="edition-bubble"] .mcard__rarity {
+  position: relative;
+  gap: 1.4cqi;
+  padding: 0.7cqi 2.4cqi 0.7cqi 1.2cqi;
+  background: linear-gradient(180deg, #ffffff, var(--edition-ice));
+  color: var(--edition-deep);
+  box-shadow:
+    inset 0 0 0 0.7cqi var(--mcard-rarity),
+    inset 0 0.9cqi 0 rgba(255, 255, 255, 0.8),
+    0 0.4cqi 0.9cqi rgba(13, 43, 62, 0.35);
+  font-family: "Audiowide", sans-serif;
+  font-size: 3cqi;
+}
+.mcard[data-frame="edition-bubble"] .mcard__gem {
+  inline-size: 4.4cqi;
+  block-size: 4.4cqi;
+  background: var(--mcard-rim);
+}
+.mcard[data-frame="edition-bubble"][data-kind="title"] .mcard__lower {
+  padding-block: 0.8cqi;
+}
+.mcard[data-frame="edition-bubble"][data-kind="title"] .mcard__figures li {
+  padding-block: 0.3cqi;
+}
+.mcard[data-frame="edition-bubble"][data-kind="title"] .mcard__flavor {
+  padding-block: 0.5cqi;
+  -webkit-line-clamp: 1;
+}
+
+/* --- the HD version (#255): a legendary's, foil ---------------------------------------------------------- */
+.mcard[data-frame="edition-bubble"][data-hd] .mcard__backdrop {
+  background: radial-gradient(ellipse at 50% 30%, #0f4a5c 0%, #02160f 75%);
+  box-shadow: inset 0 0 0 0.33cqi var(--edition-steel);
+}
+/* the bubbles, rising */
+.mcard[data-frame="edition-bubble"][data-hd] .mcard__backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -110cqi;
+  background: var(--edition-bubbles) 0 0 / 50cqi 55cqi;
+}
+/* the code, falling (in place of the night sky) */
+.mcard[data-frame="edition-bubble"][data-hd] .mcard__backdrop::after {
+  inset: -104cqi 0 0;
+  background: var(--edition-code) 0 0 / 26cqi 26cqi;
+  mask: none;
+  opacity: 0.9;
+}
+.mcard[data-frame="edition-bubble"][data-frameless] .mcard__art,
+.mcard[data-frame="edition-bubble"][data-frameless] .mcard__art[data-cutout] {
+  background: none;
+  box-shadow: none;
+}
+.mcard[data-frame="edition-bubble"][data-frameless] .mcard__art::after {
+  display: none;
+}
+.mcard[data-frame="edition-bubble"][data-frameless] .mcard__strip,
+.mcard[data-frame="edition-bubble"][data-frameless] .mcard__lower {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(214, 228, 236, 0.7));
+}
+.mcard[data-frame="edition-bubble"][data-frameless] .mcard__name {
+  filter: drop-shadow(0 0.25cqi 0 var(--edition-deep)) drop-shadow(0 0 1cqi rgba(41, 169, 214, 0.9));
+}
+.mcard[data-frame="edition-bubble"][data-frameless] .mcard__foot {
+  color: var(--edition-ice);
+}
+/* a work: its scene under the translucent plastic */
+.mcard[data-frame="edition-bubble"][data-borderless] .mcard__body {
+  color: #ffffff;
+}
+.mcard[data-frame="edition-bubble"][data-borderless] .mcard__art {
+  margin: 0;
+  background: none;
+  box-shadow: none;
+}
+.mcard[data-frame="edition-bubble"][data-borderless] .mcard__art::after {
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), transparent 18%),
+    linear-gradient(180deg, rgba(41, 169, 214, 0.18), rgba(13, 43, 62, 0.2));
+}
+.mcard[data-frame="edition-bubble"][data-borderless] .mcard__strip {
+  background: linear-gradient(180deg, rgba(233, 241, 246, 0.85), rgba(182, 201, 213, 0.85));
+  color: var(--edition-deep);
+}
+.mcard[data-frame="edition-bubble"][data-borderless] .mcard__foot {
+  color: var(--edition-ice);
+}
+.mcard[data-frame="edition-bubble"][data-hd][data-borderless] .mcard__art::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -110cqi;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--edition-bubbles) 0 0 / 50cqi 55cqi;
+  opacity: 0.8;
+}
+.mcard[data-frame="edition-bubble"][data-hd][data-borderless] .mcard__body::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: 0;
+  inline-size: 40%;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  mix-blend-mode: screen;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mcard[data-frame="edition-bubble"][data-hd] .mcard__backdrop::before {
+    animation: edition-bubble-rise 12s linear infinite;
+  }
+  .mcard[data-frame="edition-bubble"][data-hd] .mcard__backdrop::after {
+    animation: edition-bubble-rain 6s linear infinite;
+  }
+  .mcard[data-frame="edition-bubble"][data-hd][data-borderless] .mcard__art::before {
+    animation: edition-bubble-rise 14s linear infinite;
+  }
+  .mcard[data-frame="edition-bubble"][data-hd][data-borderless] .mcard__body::before {
+    animation: edition-bubble-gloss 5s ease-in-out infinite;
+  }
+}
+@keyframes edition-bubble-rise {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-110cqi);
+  }
+}
+@keyframes edition-bubble-rain {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(104cqi);
+  }
+}
+@keyframes edition-bubble-gloss {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  60%,
+  100% {
+    transform: translateX(300%) skewX(-18deg);
+  }
+}

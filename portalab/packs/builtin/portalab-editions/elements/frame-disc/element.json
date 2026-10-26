@@ -6,8 +6,8 @@
     "fr": "DVD — filigrane"
   },
   "descriptions": {
-    "en": "The frame of the media cards' disc edition (the cards' edition version wears it).",
-    "fr": "Le cadre de cette édition des cartes médias : leur version édition le porte."
+    "en": "The frame of the media cards' DVD edition (2003–2008): its edition version wears it, and its HD version for the legendaries — a character without the window round it over a damask lit through stained glass, a work borderless, light rays moving, embers rising.",
+    "fr": "Le cadre de l'édition DVD des cartes médias (2003–2008) : leur version édition le porte, et leur version HD pour les légendaires — un personnage sans la fenêtre autour de lui sur un damas éclairé par un vitrail, un film borderless, des rayons de lumière qui bougent, des braises qui montent."
   },
   "render": {
     "kind": "css",

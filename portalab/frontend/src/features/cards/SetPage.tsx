@@ -41,7 +41,9 @@ export function CardSheet({ card }: { card: MediaCard }) {
             ? card.kind === "title" && card.rarity !== "common"
             : v.startsWith("showcase")
               ? Boolean(card.set_edition)
-              : true,
+              : v === "hd"
+                ? card.rarity === "legendary" && Boolean(card.set_edition) // issue 255
+                : true,
         ).map((variant) => (
           <figure key={variant} data-owned={(card.owned[variant] ?? 0) > 0 || undefined}>
             <MediaCardView card={card} variant={variant} missing={!(card.owned[variant] ?? 0)} />

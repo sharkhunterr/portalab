@@ -8,6 +8,7 @@ import { Dialog, DialogActions } from "../../../design-system/components/Overlay
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import { looksOf, useLooks } from "../../../design-system/visuals/vocabulary";
 import { useT } from "../../../i18n/hooks/useT";
+import { EDITIONS } from "../../cards/api";
 import type { Category, Product } from "../api";
 import {
   DEPARTMENTS,
@@ -75,10 +76,7 @@ const CHOICES: Record<string, Array<[value: string, label: string]>> = {
     f,
     `gamification:cards.family.${f}`,
   ]),
-  "card_booster.edition": ["film", "vhs", "disc", "stream"].map((e) => [
-    e,
-    `gamification:cards.edition.${e}`,
-  ]),
+  "card_booster.edition": EDITIONS.map((e) => [e, `gamification:cards.edition.${e}`]),
   "card_booster.kind": [
     ["movie", "gamification:cards.pack.kind.movie"],
     ["series", "gamification:cards.pack.kind.series"],

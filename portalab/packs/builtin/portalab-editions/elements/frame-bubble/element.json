@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "edition-bubble",
+  "names": {
+    "en": "Bubble — translucent Y2K",
+    "fr": "Bulle — plastique translucide"
+  },
+  "descriptions": {
+    "en": "The frame of the media cards' edition (the cards' edition version and their HD version wear it).",
+    "fr": "Le cadre de cette édition des cartes médias : leur version édition et leur version HD le portent."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

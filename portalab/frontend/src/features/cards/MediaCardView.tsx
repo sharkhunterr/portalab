@@ -199,11 +199,16 @@ export function MediaCardView({
 }) {
   const t = useT();
   const actorBadge = usePreferences().preferences.cardActorBadge;
-  const borderless = variant === "borderless" || variant === "borderless_foil";
-  const foil = variant === "foil" || variant.endsWith("_foil");
   // issue 233: its edition's version wears the edition's frame (a visual pack's ``card_frame``)
   const edition = card.set_edition ?? null;
   const showcase = (variant === "showcase" || variant === "showcase_foil") && Boolean(edition);
+  // issue 255: a legendary's HD version, foil, in its edition's frame: a work borderless and animated, a
+  // character without the frame around it, over its edition's animated backdrop spread over the whole card
+  const hd = variant === "hd" && Boolean(edition);
+  const borderless =
+    variant === "borderless" || variant === "borderless_foil" || (hd && card.kind === "title");
+  const frameless = hd && card.kind !== "title";
+  const foil = variant === "foil" || variant.endsWith("_foil") || hd;
   // an actor's card shows their character in this work (once found); without one (issue 231), their portrait
   // with the work's poster in its box below — the poster stands in the window only when there is no portrait
   // either. The borderless alternative: another image of the character, else their portrait
@@ -299,7 +304,9 @@ export function MediaCardView({
       data-rarity={card.rarity}
       data-borderless={borderless || undefined}
       data-edition={edition ?? undefined}
-      data-frame={showcase ? `edition-${edition}` : undefined}
+      data-frame={showcase || hd ? `edition-${edition}` : undefined}
+      data-hd={hd || undefined}
+      data-frameless={frameless || undefined}
       data-foil={foil || undefined}
       data-missing={missing || undefined}
       onPointerMove={foil ? tilt : undefined}
@@ -310,6 +317,7 @@ export function MediaCardView({
     >
       <div className="mcard__card">
         <div className="mcard__body">
+          {hd ? <span className="mcard__backdrop" aria-hidden="true" /> : null}
           <header className="mcard__head">
             <span className="mcard__name" style={{ fontSize: fit(title, room, 8.6, 3.6) }}>
               {title}

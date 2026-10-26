@@ -3,7 +3,14 @@ import { api } from "../../api/client";
 
 /** Issue 229: the media cards — my collection, the sets, a set, a person's cards, my packs. */
 export type Rarity = "common" | "rare" | "epic" | "legendary";
-export type Variant = "normal" | "foil" | "showcase" | "showcase_foil" | "borderless" | "borderless_foil";
+export type Variant =
+  | "normal"
+  | "foil"
+  | "showcase"
+  | "showcase_foil"
+  | "borderless"
+  | "borderless_foil"
+  | "hd";
 // from the most common version to the rarest
 export const VARIANTS: Variant[] = [
   "normal",
@@ -12,9 +19,26 @@ export const VARIANTS: Variant[] = [
   "showcase_foil",
   "borderless",
   "borderless_foil",
+  "hd",
 ];
-/** Issue 233: a card's edition — the medium of its work's era of release. */
-export type Edition = "film" | "vhs" | "disc" | "stream";
+/** Issue 233: a card's edition — the medium of its work's era of release; issue 255: fourteen generations. */
+export const EDITIONS = [
+  "nitrate",
+  "noir",
+  "drivein",
+  "super8",
+  "film",
+  "laserdisc",
+  "vhs",
+  "zine",
+  "bubble",
+  "disc",
+  "leather",
+  "tiles",
+  "stream",
+  "glass",
+] as const;
+export type Edition = (typeof EDITIONS)[number];
 
 export type Family = "sf" | "action" | "fantasy" | "family" | "drama" | "dark";
 export interface WorkFacts {

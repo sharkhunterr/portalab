@@ -6,8 +6,8 @@
     "fr": "Streaming — holo-tech"
   },
   "descriptions": {
-    "en": "The frame of the media cards' stream edition (the cards' edition version wears it).",
-    "fr": "Le cadre de cette édition des cartes médias : leur version édition le porte."
+    "en": "The frame of the media cards' streaming edition (2017–2021): its edition version wears it, and its HD version for the legendaries — a character without the brackets round it over a holographic floor scrolling away, a work borderless, a scan beam, a glitch now and then, neon particles.",
+    "fr": "Le cadre de l'édition streaming des cartes médias (2017–2021) : leur version édition le porte, et leur version HD pour les légendaires — un personnage sans les crochets autour de lui sur un sol holographique qui défile, un film borderless, un faisceau de balayage, un glitch de temps en temps, des particules néon."
   },
   "render": {
     "kind": "css",

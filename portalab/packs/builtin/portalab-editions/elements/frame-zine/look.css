@@ -1,0 +1,362 @@
+/* Portalab — card_frame/edition-zine: the zine edition (1993–1997), a photocopied fanzine — toner grain on the
+   page, the name cut out and stuck on, the genre circled in marker, the art photocopied in halftone with a strip
+   of tape, a highlighter over what it is, the work typed on a torn page of a notebook, the rarity as a round
+   sticker ringed in its colour. Behind a cut-out character, a photocopied collage; the HD version (#255): that
+   collage over the whole card, the copier's light passing over it, the toner trembling. */
+
+.mcard[data-frame="edition-zine"] {
+  --edition-paper: #efece3;
+  --edition-ink: #111111;
+  --edition-yellow: #f4ef2a;
+  --edition-red: #d8352a;
+  --edition-toner: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23n%29'/%3E%3C/svg%3E");
+  --edition-collage: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cpath d='M0 0h130l-8 40 10 30-14 50H0z' fill='%23d9d4c6'/%3E%3Cpath d='M150 10h110v120l-12-4-10 8-14-6-12 6-16-8-14 4-12-6-10 6z' fill='%23bdb6a6'/%3E%3Cpath d='M20 150l120-10 6 90-126 14z' fill='%23f4ef2a' opacity='0.85'/%3E%3Cpath d='M170 160h90v100h-96z' fill='%232a2a2a'/%3E%3Cg stroke='%23111' stroke-width='3' opacity='0.5'%3E%3Cpath d='M180 190h60'/%3E%3Cpath d='M180 205h48'/%3E%3Cpath d='M180 220h56'/%3E%3C/g%3E%3Cpath d='M60 60l60 30' stroke='%23d8352a' stroke-width='8' stroke-linecap='round' opacity='0.8'/%3E%3C/svg%3E");
+  --edition-scene:
+    radial-gradient(circle, rgba(17, 17, 17, 0.45) 0.3cqi, transparent 0.5cqi) 0 0 / 1.4cqi 1.4cqi,
+    var(--edition-collage) 0 0 / 62cqi 62cqi,
+    var(--edition-paper);
+}
+.mcard[data-frame="edition-zine"] .mcard__card {
+  padding: 2cqi;
+  border-radius: 1.6cqi;
+}
+.mcard[data-frame="edition-zine"] .mcard__body {
+  gap: 1.8cqi;
+  padding: 3cqi 3.2cqi 2.4cqi;
+  border-radius: 0.6cqi;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.3), transparent 3cqi),
+    var(--edition-toner),
+    var(--edition-paper);
+  background-blend-mode: normal, multiply, normal;
+  box-shadow: none;
+  color: var(--edition-ink);
+}
+/* the name cut out of a magazine and stuck on, a little askew */
+.mcard[data-frame="edition-zine"] .mcard__name {
+  flex: 0 1 auto;
+  padding: 0.2cqi 1.6cqi;
+  background: var(--edition-ink);
+  color: var(--edition-paper);
+  font-family: "Bangers", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  box-shadow: 0.6cqi 0.6cqi 0 var(--edition-yellow);
+  transform: rotate(-1.5deg);
+}
+.mcard[data-frame="edition-zine"] .mcard__head {
+  justify-content: space-between;
+}
+/* the genre, circled in marker */
+.mcard[data-frame="edition-zine"] .mcard__genre {
+  padding: 0.8cqi 2.2cqi;
+  border: 0.5cqi solid var(--mcard-accent);
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+  color: var(--mcard-accent);
+  font-family: "Caveat", cursive;
+  font-size: 4cqi;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  transform: rotate(-6deg);
+}
+.mcard[data-frame="edition-zine"] .mcard__emblem {
+  display: none;
+}
+/* the art photocopied, its halftone showing, a strip of tape holding it */
+.mcard[data-frame="edition-zine"] .mcard__art {
+  overflow: visible;
+  margin: 1.4cqi 1.6cqi 0.8cqi;
+  border-radius: 0;
+  background: #d9d4c6;
+  box-shadow:
+    0 0 0 1.2cqi #ffffff,
+    0 0.6cqi 1.6cqi 1.2cqi rgba(0, 0, 0, 0.3);
+  transform: rotate(0.8deg);
+}
+.mcard[data-frame="edition-zine"] .mcard__art .mcard__picture,
+.mcard[data-frame="edition-zine"] .mcard__art .mcard__badge {
+  filter: grayscale(0.85) contrast(1.35) brightness(1.05);
+}
+.mcard[data-frame="edition-zine"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(17, 17, 17, 0.55) 0.25cqi, transparent 0.42cqi) 0 0 / 1.1cqi 1.1cqi;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+.mcard[data-frame="edition-zine"] .mcard__art::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -2.4cqi;
+  inset-inline-start: -4cqi;
+  z-index: 2;
+  inline-size: 20cqi;
+  block-size: 5.4cqi;
+  background: rgba(226, 214, 170, 0.78);
+  box-shadow: 0 0.3cqi 0.6cqi rgba(0, 0, 0, 0.2);
+  transform: rotate(-24deg);
+  pointer-events: none;
+}
+.mcard[data-frame="edition-zine"] .mcard__art[data-cutout] {
+  background: none;
+}
+/* behind a cut-out character: a photocopied collage, no night sky */
+.mcard[data-frame="edition-zine"] .mcard__sky {
+  mask: none;
+  background: var(--edition-scene);
+  filter: grayscale(0.4) contrast(1.15);
+}
+/* what it is, under a stroke of highlighter */
+.mcard[data-frame="edition-zine"] .mcard__strip {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  font-family: "Special Elite", monospace;
+  font-style: normal;
+  font-weight: 400;
+}
+.mcard[data-frame="edition-zine"] .mcard__stage {
+  padding: 0.4cqi 1.8cqi;
+  border-radius: 0;
+  background: linear-gradient(176deg, transparent 18%, var(--edition-yellow) 22% 88%, transparent 92%);
+  color: var(--edition-ink);
+  font-family: "Black Ops One", sans-serif;
+  font-size: 3.4cqi;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+.mcard[data-frame="edition-zine"] .mcard__edition {
+  background: var(--edition-ink);
+  filter: none;
+}
+/* the work typed on a torn page of a notebook */
+.mcard[data-frame="edition-zine"] .mcard__lower {
+  padding: 2cqi 1.8cqi 1.2cqi 3cqi;
+  background:
+    linear-gradient(90deg, transparent 1.6cqi, #e58f8f 1.6cqi 1.9cqi, transparent 1.9cqi),
+    repeating-linear-gradient(180deg, #ffffff 0 4.4cqi, #a9c1e8 4.4cqi 4.7cqi);
+  clip-path: polygon(0 3%, 6% 0, 14% 4%, 23% 1%, 31% 4%, 40% 0, 50% 3%, 61% 0, 70% 4%, 80% 1%, 90% 4%, 100% 1%, 100% 100%, 0 100%);
+  font-family: "Special Elite", monospace;
+}
+.mcard[data-frame="edition-zine"] .mcard__poster {
+  margin: 0;
+  border-radius: 0;
+  box-shadow: 0 0 0 0.6cqi var(--edition-red);
+  transform: rotate(-2deg);
+}
+.mcard[data-frame="edition-zine"] .mcard__poster img {
+  filter: grayscale(0.6) contrast(1.25);
+}
+.mcard[data-frame="edition-zine"] .mcard__facts .mcard__by {
+  font-family: "Special Elite", monospace;
+  font-style: normal;
+}
+.mcard[data-frame="edition-zine"] .mcard__work {
+  border-block-end: none;
+}
+.mcard[data-frame="edition-zine"] .mcard__work strong,
+.mcard[data-frame="edition-zine"] .mcard__figures strong {
+  font-family: "Bangers", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+.mcard[data-frame="edition-zine"] .mcard__meta {
+  border-block-end: none;
+}
+.mcard[data-frame="edition-zine"] .mcard__figures li:not(:first-child) {
+  border-block-start: none;
+}
+.mcard[data-frame="edition-zine"] .mcard__cost {
+  background: var(--edition-ink);
+  color: var(--edition-yellow);
+  box-shadow: none;
+}
+.mcard[data-frame="edition-zine"] .mcard__flavor {
+  border: none;
+  border-radius: 0;
+  background: var(--edition-yellow);
+  color: var(--edition-ink);
+  font-family: "Caveat", cursive;
+  font-style: normal;
+  font-weight: 700;
+  transform: rotate(-1deg);
+}
+.mcard[data-frame="edition-zine"] .mcard__foot {
+  font-family: "Caveat", cursive;
+  font-size: 3.6cqi;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+/* the rarity: a round sticker ringed in its colour, its gem in its metal */
+.mcard[data-frame="edition-zine"] .mcard__rarity {
+  gap: 1.2cqi;
+  padding: 0.9cqi 2.4cqi 0.9cqi 1.2cqi;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--edition-ink);
+  box-shadow:
+    inset 0 0 0 0.8cqi var(--mcard-rarity),
+    0 0.4cqi 0.9cqi rgba(0, 0, 0, 0.35);
+  font-family: "Bangers", sans-serif;
+  font-size: 3.4cqi;
+  letter-spacing: 0.08em;
+  transform: rotate(4deg);
+}
+.mcard[data-frame="edition-zine"] .mcard__gem {
+  inline-size: 4.4cqi;
+  block-size: 4.4cqi;
+  background: var(--mcard-rim);
+}
+.mcard[data-frame="edition-zine"][data-kind="title"] .mcard__lower {
+  padding-block: 1.4cqi 0.6cqi;
+}
+.mcard[data-frame="edition-zine"][data-kind="title"] .mcard__figures li {
+  padding-block: 0.3cqi;
+}
+.mcard[data-frame="edition-zine"][data-kind="title"] .mcard__flavor {
+  padding-block: 0.4cqi;
+  -webkit-line-clamp: 1;
+}
+
+/* --- the HD version (#255): a legendary's, foil ---------------------------------------------------------- */
+.mcard[data-frame="edition-zine"][data-hd] .mcard__backdrop {
+  background: var(--edition-scene);
+  filter: grayscale(0.3) contrast(1.1);
+}
+/* the copier's light, passing */
+.mcard[data-frame="edition-zine"][data-hd] .mcard__backdrop::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: -12cqi;
+  block-size: 10cqi;
+  background: linear-gradient(180deg, transparent, rgba(220, 255, 230, 0.7) 45%, rgba(255, 255, 255, 0.9) 50%, transparent);
+  mix-blend-mode: screen;
+}
+/* the toner, trembling (in place of the night sky) */
+.mcard[data-frame="edition-zine"][data-hd] .mcard__backdrop::after {
+  inset: -4%;
+  background: var(--edition-toner);
+  mask: none;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+}
+.mcard[data-frame="edition-zine"][data-frameless] .mcard__art,
+.mcard[data-frame="edition-zine"][data-frameless] .mcard__art[data-cutout] {
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+.mcard[data-frame="edition-zine"][data-frameless] .mcard__art::after {
+  display: none;
+}
+.mcard[data-frame="edition-zine"][data-frameless] .mcard__art::before {
+  inset-block-start: auto;
+  inset-block-end: 4cqi;
+  inset-inline-start: auto;
+  inset-inline-end: -3cqi;
+}
+.mcard[data-frame="edition-zine"][data-frameless] .mcard__lower {
+  opacity: 0.94;
+}
+/* a work: the photocopy over the whole page */
+.mcard[data-frame="edition-zine"][data-borderless] .mcard__body {
+  color: var(--edition-paper);
+}
+.mcard[data-frame="edition-zine"][data-borderless] .mcard__art {
+  margin: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+.mcard[data-frame="edition-zine"][data-borderless] .mcard__art::before {
+  display: none;
+}
+.mcard[data-frame="edition-zine"][data-borderless] .mcard__art::after {
+  z-index: -1;
+  border-radius: inherit;
+}
+.mcard[data-frame="edition-zine"][data-borderless] .mcard__stage {
+  color: var(--edition-ink);
+}
+.mcard[data-frame="edition-zine"][data-borderless] .mcard__by {
+  padding: 0.2cqi 1.2cqi;
+  background: var(--edition-paper);
+  color: var(--edition-ink);
+  font-family: "Special Elite", monospace;
+  font-style: normal;
+  text-shadow: none;
+}
+.mcard[data-frame="edition-zine"][data-borderless] .mcard__foot > span:first-child {
+  padding: 0 1.2cqi;
+  background: var(--edition-ink);
+  color: var(--edition-yellow);
+  text-shadow: none;
+}
+.mcard[data-frame="edition-zine"][data-hd][data-borderless] .mcard__body::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: -12cqi;
+  z-index: 0;
+  block-size: 10cqi;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(220, 255, 230, 0.55) 45%, rgba(255, 255, 255, 0.7) 50%, transparent);
+  mix-blend-mode: screen;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mcard[data-frame="edition-zine"][data-hd] .mcard__backdrop::before,
+  .mcard[data-frame="edition-zine"][data-hd][data-borderless] .mcard__body::before {
+    animation: edition-zine-scan 4.2s ease-in-out infinite;
+  }
+  .mcard[data-frame="edition-zine"][data-hd] .mcard__backdrop::after {
+    animation: edition-zine-jitter 0.5s steps(2) infinite;
+  }
+  .mcard[data-frame="edition-zine"][data-frameless] .mcard__art::before {
+    animation: edition-zine-flap 2.6s ease-in-out infinite;
+  }
+}
+@keyframes edition-zine-scan {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  10%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(160cqi);
+    opacity: 0;
+  }
+}
+@keyframes edition-zine-jitter {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(0.3cqi, -0.3cqi);
+  }
+  50% {
+    transform: translate(-0.3cqi, 0.3cqi);
+  }
+  75% {
+    transform: translate(0.3cqi, 0.3cqi);
+  }
+}
+@keyframes edition-zine-flap {
+  0%,
+  100% {
+    transform: rotate(-24deg);
+  }
+  50% {
+    transform: rotate(-14deg) translateY(-0.8cqi);
+  }
+}
