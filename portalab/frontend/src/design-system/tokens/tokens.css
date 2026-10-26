@@ -410,29 +410,22 @@ h1 {
   --card-symbol-epic: #d4a72c;
   --card-symbol-legendary: #e2541b;
   --card-shadow: rgba(0, 0, 0, 0.45);
-  /* the foil: a rainbow film that slides as the card turns, an etched grain that catches it, the glare of the
-     light and its glitter */
-  --card-foil-rainbow: repeating-linear-gradient(
+  /* the foil (issue 255): its film's fine etching, the band of rainbow light with a white heart passing over it
+     and its glitter */
+  --card-foil-grain:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(45deg, rgba(190, 230, 255, 0.025) 0 1px, transparent 1px 4px);
+  --card-foil-band: linear-gradient(
     110deg,
-    #ff7a9a 0%,
-    #ffd36e 4%,
-    #8dffa0 8%,
-    #6fe6ff 12%,
-    #9f8bff 16%,
-    #ff7ae0 20%,
-    #ff7a9a 24%
+    transparent 0 33%,
+    rgba(255, 92, 170, 0.26) 38%,
+    rgba(255, 214, 92, 0.3) 43%,
+    rgba(255, 255, 255, 0.55) 48%,
+    rgba(110, 240, 190, 0.3) 53%,
+    rgba(96, 190, 255, 0.3) 58%,
+    rgba(170, 120, 255, 0.24) 62%,
+    transparent 66% 100%
   );
-  --card-foil-etch: repeating-linear-gradient(
-    -45deg,
-    #2a2f45 0%,
-    #9fb2b8 1.6%,
-    #c8dcdf 2%,
-    #9fb2b8 2.4%,
-    #2a2f45 4%,
-    #2a2f45 5%
-  );
-  --card-foil-glare: rgba(255, 255, 255, 0.85);
-  --card-foil-shade: rgba(10, 12, 24, 0.55);
   --card-foil-spark: rgba(255, 255, 255, 0.95);
   /* issue 233: the editions' symbols (silhouettes: only their shape counts) — reel, cassette, disc, stream */
   --card-edition-film: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 1a11 11 0 1 0 0 22 11 11 0 0 0 0-22zm0 3.1a2.7 2.7 0 1 1 0 5.4 2.7 2.7 0 0 1 0-5.4zm0 10.4a2.7 2.7 0 1 1 0 5.4 2.7 2.7 0 0 1 0-5.4zM6.8 9.3a2.7 2.7 0 1 1 0 5.4 2.7 2.7 0 0 1 0-5.4zm10.4 0a2.7 2.7 0 1 1 0 5.4 2.7 2.7 0 0 1 0-5.4zM12 10.9a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2z'/%3E%3C/svg%3E");

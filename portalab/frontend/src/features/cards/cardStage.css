@@ -18,6 +18,11 @@
 .booster-stage[data-cards] .booster-card__own > * {
   inline-size: 100%;
 }
+/* issue 255: a media card glows by itself — its face's halo held still, not redrawn around a moving card */
+.booster-stage[data-cards] .booster-card[data-settled] .booster-card__face[data-own] {
+  animation: none;
+  box-shadow: none;
+}
 /* issue 234: cards of their own faces (media cards) are read — bigger, and on a phone one at a time,
    swiped; a turned one is seen big on a tap */
 .booster-stage[data-cards] .booster-cards[data-own] .booster-card {
