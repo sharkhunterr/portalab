@@ -290,14 +290,14 @@
 }
 @keyframes edition-tiles-wave {
   0% {
-    clip-path: inset(0 100% 0 0);
+    transform: translateX(-100%);
   }
   45%,
   55% {
-    clip-path: inset(0 0 0 0);
+    transform: translateX(0);
   }
   100% {
-    clip-path: inset(0 0 0 100%);
+    transform: translateX(100%);
   }
 }
 @keyframes edition-tiles-sun {
@@ -309,10 +309,11 @@
   }
 }
 @keyframes edition-tiles-stripes {
-  from {
-    background-position: 0 0;
+  0%,
+  100% {
+    opacity: 0.35;
   }
-  to {
-    background-position: 100% 0;
+  50% {
+    opacity: 1;
   }
 }

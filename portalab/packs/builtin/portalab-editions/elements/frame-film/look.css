@@ -362,10 +362,10 @@
 }
 @keyframes edition-film-light {
   0%,
-  20% {
-    background-position: 100% 0;
-  }
   100% {
-    background-position: 0 0;
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
   }
 }

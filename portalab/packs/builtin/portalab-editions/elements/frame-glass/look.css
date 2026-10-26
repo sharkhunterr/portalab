@@ -311,18 +311,19 @@
 }
 @keyframes edition-glass-glint {
   0%,
-  25% {
-    background-position: 100% 0;
-  }
   100% {
-    background-position: 0 0;
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
   }
 }
 @keyframes edition-glass-pass {
-  from {
-    background-position: 100% 0, 0 0, 0 0;
+  0%,
+  100% {
+    opacity: 0.35;
   }
-  to {
-    background-position: 0 0, 100% 100%, 0 0;
+  50% {
+    opacity: 1;
   }
 }

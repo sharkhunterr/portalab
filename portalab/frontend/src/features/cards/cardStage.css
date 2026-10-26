@@ -142,3 +142,13 @@
     transform: translateY(calc(var(--cards-rise) / 2)) scale(calc(1 + (var(--cards-zoom) - 1) / 2));
   }
 }
+
+/* issue 255: a card seen big — the stage behind it holds still and out of sight, only that card moves (a phone
+   drawing the whole stage's moving cards and lights under it left parts of the screen undrawn) */
+.booster-stage[data-zoomed] * {
+  animation-play-state: paused;
+}
+.booster-stage[data-zoomed] .booster-cards,
+.booster-stage[data-zoomed] .booster-atmosphere {
+  visibility: hidden;
+}
