@@ -73,6 +73,16 @@ function Burst({ rank, seed }: { rank: number; seed: number }) {
   );
 }
 
+/** The bits of foil the tear throws out as it runs along the pack, left to right (issue 255). */
+const SHARDS = Array.from({ length: 12 }, (_, i) => ({
+  "--x": `${4 + i * 8 + noise(i, 11) * 4}%`,
+  "--dx": `${(noise(i, 12) - 0.3) * 160}%`,
+  "--dy": `${-(140 + noise(i, 13) * 260)}%`,
+  "--r": `${(noise(i, 14) - 0.5) * 540}deg`,
+  "--d": `${0.3 + i * 0.055}s`,
+  "--s": `${0.35 + noise(i, 15) * 0.45}rem`,
+})) as CSSProperties[];
+
 /** The mist the stage stands in: clouds drifting, dust rising, projectors sweeping it from above — its mist drawn
  * by the GPU unless ``gpu`` is false (a booster of media cards: its cards move a lot of their own, issue 255). */
 function Atmosphere({ gpu = true }: { gpu?: boolean }) {
@@ -576,6 +586,18 @@ export function BoosterReveal({
             aria-label={t("marketplace:booster.tear", { name })}
           >
             <BoosterPack booster={booster} stage />
+            {/* the strip torn off: the pack's own top, cut along the tear (the pack itself loses it there) */}
+            {phase !== "sealed" ? (
+              <span className="booster-stage__strip" aria-hidden="true">
+                <BoosterPack booster={booster} stage />
+              </span>
+            ) : null}
+            <span className="booster-stage__shards" aria-hidden="true">
+              {SHARDS.map((style, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: shards of the tear, fixed
+                <span key={i} style={style} />
+              ))}
+            </span>
             <span className="booster-stage__tearline" aria-hidden="true" />
             <span className="booster-stage__glow" aria-hidden="true" />
             <span className="booster-stage__rising" aria-hidden="true">

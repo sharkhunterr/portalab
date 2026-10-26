@@ -804,39 +804,185 @@
   opacity: 0;
 }
 .booster-stage[data-phase="tearing"] .booster-stage__tear {
-  animation: booster-brace 1.5s ease-in both;
+  animation: booster-brace 1.5s linear both;
 }
+/* issue 255: held tight, it trembles harder as the tear starts, keeps trembling while it runs, and jolts when
+   the strip gives */
 @keyframes booster-brace {
-  0%,
+  0% {
+    transform: none;
+  }
+  6%,
+  14% {
+    transform: translateX(-1px) rotate(-0.4deg) scale(1.01);
+  }
+  10%,
+  18% {
+    transform: translateX(2px) rotate(0.7deg) scale(1.015);
+  }
+  22%,
+  34%,
+  46%,
+  58%,
+  70% {
+    transform: translate(-1px, 1px) rotate(-0.3deg) scale(1.01);
+  }
+  28%,
+  40%,
+  52%,
+  64% {
+    transform: translate(1px, -1px) rotate(0.3deg) scale(1.01);
+  }
+  76% {
+    transform: translateY(3%) rotate(-1deg) scale(0.99);
+  }
+  86%,
   100% {
     transform: none;
   }
-  10%,
-  30%,
-  50% {
-    transform: translateX(-2px) rotate(-0.6deg);
-  }
-  20%,
-  40%,
-  60% {
-    transform: translateX(2px) rotate(0.6deg);
-  }
 }
 .booster-stage[data-phase="tearing"] .booster-stage__tearline {
-  animation: booster-tearline 0.9s 0.2s cubic-bezier(0.6, 0, 0.4, 1) both;
+  animation: booster-tearline 1.5s linear both;
 }
 @keyframes booster-tearline {
-  0% {
+  0%,
+  20% {
     transform: scaleX(0);
     opacity: 1;
   }
-  85% {
+  72% {
     transform: scaleX(1);
     opacity: 1;
   }
+  80% {
+    transform: scaleX(1) scaleY(3);
+    opacity: 1;
+  }
   100% {
-    transform: scaleX(1);
+    transform: scaleX(1) scaleY(1);
     opacity: 0;
+  }
+}
+/* issue 255: a real tear — the pack's own top, cut along a ragged line, is the strip: it lifts from the left
+   while the tear runs right, still held on the right, then gives all at once and flies off spinning; the pack
+   keeps its torn edge; bits of foil fly out along the tear */
+.booster-stage__tear {
+  --tear-line:
+    0 13.5%, 4% 12.2%, 7% 14.1%, 11% 12.6%, 15% 13.9%, 19% 12.1%, 24% 14.3%, 28% 12.8%, 33% 13.6%, 37% 12%,
+    42% 14.2%, 46% 12.9%, 51% 13.8%, 55% 12.3%, 60% 14%, 64% 12.5%, 69% 13.7%, 73% 12.2%, 78% 14.2%,
+    82% 12.7%, 87% 13.9%, 91% 12.4%, 96% 13.8%, 100% 12.9%;
+}
+.booster-stage__tearline {
+  inset-block-start: 12.8%;
+}
+.booster-stage:is([data-phase="tearing"], [data-phase="emerging"]) .booster-stage__tear > .booster-pack {
+  clip-path: polygon(var(--tear-line), 100% 100%, 0 100%);
+}
+.booster-stage:is([data-phase="tearing"], [data-phase="emerging"])
+  .booster-stage__tear
+  > .booster-pack
+  .booster-pack__flap {
+  visibility: hidden;
+}
+.booster-stage__strip {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 4;
+  pointer-events: none;
+  transform-origin: 100% 13%;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 12.9%,
+    96% 13.8%,
+    91% 12.4%,
+    87% 13.9%,
+    82% 12.7%,
+    78% 14.2%,
+    73% 12.2%,
+    69% 13.7%,
+    64% 12.5%,
+    60% 14%,
+    55% 12.3%,
+    51% 13.8%,
+    46% 12.9%,
+    42% 14.2%,
+    37% 12%,
+    33% 13.6%,
+    28% 12.8%,
+    24% 14.3%,
+    19% 12.1%,
+    15% 13.9%,
+    11% 12.6%,
+    7% 14.1%,
+    4% 12.2%,
+    0 13.5%
+  );
+  filter: drop-shadow(0 0.3rem 0.4rem color-mix(in srgb, var(--booster-ink) 70%, transparent));
+}
+.booster-stage__strip .booster-pack,
+.booster-stage[data-phase] .booster-stage__strip .booster-pack__flap {
+  animation: none;
+}
+.booster-stage[data-phase="tearing"] .booster-stage__strip {
+  animation: booster-strip 1.5s cubic-bezier(0.45, 0, 0.55, 1) both;
+}
+.booster-stage[data-phase="emerging"] .booster-stage__strip {
+  visibility: hidden;
+}
+@keyframes booster-strip {
+  0%,
+  20% {
+    transform: none;
+  }
+  45% {
+    transform: translateY(-1%) rotate(-3deg);
+  }
+  72% {
+    transform: translateY(-3%) rotate(-8deg);
+  }
+  78% {
+    transform: translate(-2%, -9%) rotate(-12deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(38%, -170%) rotate(-58deg);
+    opacity: 0;
+  }
+}
+.booster-stage__shards {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.booster-stage__shards span {
+  position: absolute;
+  inset-block-start: 13%;
+  inset-inline-start: var(--x);
+  inline-size: var(--s);
+  block-size: calc(var(--s) * 0.7);
+  background: linear-gradient(
+    135deg,
+    var(--booster-light),
+    color-mix(in srgb, var(--booster-epic) 55%, var(--booster-light)) 60%,
+    color-mix(in srgb, var(--booster-ink) 40%, var(--booster-light))
+  );
+  clip-path: polygon(0 20%, 60% 0, 100% 45%, 70% 100%, 15% 80%);
+  opacity: 0;
+}
+.booster-stage[data-phase="tearing"] .booster-stage__shards span {
+  animation: booster-shard 0.7s var(--d) cubic-bezier(0.2, 0.7, 0.4, 1) both;
+}
+@keyframes booster-shard {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) rotate(var(--r));
   }
 }
 /* the strip peels off from the left and flies away, spinning */
