@@ -173,3 +173,13 @@
   backdrop-filter: none;
   background: color-mix(in srgb, var(--booster-ink) 92%, var(--tone));
 }
+/* a media card's own motion (its foil, its HD backdrop) waits until it lies flat and its moment is over: turned
+   in 3D, grown and shaken with all its layers moving, a legendary tore on a phone; and while a legendary has the
+   stage the others only darken, never blurred (a blur over moving cards is redrawn every frame) */
+.booster-stage[data-cards] .booster-card:not([data-settled]) .booster-card__face *,
+.booster-stage[data-cards][data-moment] .booster-card__face * {
+  animation-play-state: paused;
+}
+.booster-stage[data-cards][data-moment="legendary"] .booster-card:not([data-rarity="legendary"]) {
+  filter: none;
+}
