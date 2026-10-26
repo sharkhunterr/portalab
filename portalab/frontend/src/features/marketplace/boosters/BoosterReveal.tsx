@@ -73,8 +73,9 @@ function Burst({ rank, seed }: { rank: number; seed: number }) {
   );
 }
 
-/** The mist the stage stands in: clouds drifting, dust rising, projectors sweeping it from above. */
-function Atmosphere() {
+/** The mist the stage stands in: clouds drifting, dust rising, projectors sweeping it from above — drawn by the
+ * GPU unless ``gpu`` is false (a booster of media cards: its cards move a lot of their own, issue 255). */
+function Atmosphere({ gpu = true }: { gpu?: boolean }) {
   const dust = useMemo(
     () =>
       Array.from({ length: 34 }, (_, i) => ({
@@ -89,9 +90,11 @@ function Atmosphere() {
   return (
     <span className="booster-atmosphere" aria-hidden="true">
       {/* HD: the fog and the projectors drawn by the GPU; the CSS ones below stay where it cannot draw */}
-      <span className="booster-atmosphere__gpu">
-        <FxLayer effect="mist" maxSide={900} className="booster-stage__gpu-canvas" />
-      </span>
+      {gpu ? (
+        <span className="booster-atmosphere__gpu">
+          <FxLayer effect="mist" maxSide={900} className="booster-stage__gpu-canvas" />
+        </span>
+      ) : null}
       <span className="booster-atmosphere__beam" data-beam="1" />
       <span className="booster-atmosphere__beam" data-beam="2" />
       <span className="booster-atmosphere__beam" data-beam="3" />
@@ -509,7 +512,7 @@ export function BoosterReveal({
           />
         </span>
       ) : (
-        <Atmosphere />
+        <Atmosphere gpu={!opener} />
       )}
       {moment === "legendary" && !scene?.parts.reveal?.legendary ? (
         // HD: the dark closing in, motes drawn to the middle, then a flash, rings, rays and embers as it turns
