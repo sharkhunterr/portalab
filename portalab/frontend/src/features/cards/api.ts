@@ -129,6 +129,8 @@ export interface PackLook {
   season: number | null;
   /** a shop's booster: its product (the works it draws among are its family, edition and kind) */
   product?: string | null;
+  /** issue 255: the rarity it guarantees */
+  rarity?: Rarity | null;
 }
 
 export interface CardPack {

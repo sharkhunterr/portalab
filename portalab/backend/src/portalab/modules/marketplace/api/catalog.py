@@ -128,7 +128,8 @@ PREVIEW_FIELDS: dict[str, tuple[str, ...]] = {
         "edition",
         "kind",
         "cards",
-    ),  # issue 234: the works a booster of cards draws among
+        "rarity",
+    ),  # issue 234: the works a booster of cards draws among — issue 255: the rarity it guarantees
     "radio_requests": ("count",),  # issue 184: how many requests to the radio's DJ
     "booster": PAYLOAD_FIELDS,  # #81: what it holds and its odds
 }

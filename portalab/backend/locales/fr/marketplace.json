@@ -842,5 +842,6 @@
   "vitrine.pick.mediacards": "Boosters Mediacards",
   "admin.boosters.cardScene": "Scène des boosters Mediacards",
   "admin.boosters.cardSceneHint": "L'emballage et l'ouverture de tous les boosters Mediacards, achetés ou gagnés en regardant ; ils ne prennent jamais la scène des boosters de looks.",
-  "admin.boosters.cardScenePortalab": "Celle de Portalab"
+  "admin.boosters.cardScenePortalab": "Celle de Portalab",
+  "admin.field.card_booster.rarity": "Rareté garantie"
 }

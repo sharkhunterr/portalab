@@ -842,5 +842,6 @@
   "vitrine.pick.mediacards": "Mediacards boosters",
   "admin.boosters.cardScene": "Mediacards boosters' scene",
   "admin.boosters.cardSceneHint": "The wrapper and the opening of every Mediacards booster, bought or earned by watching; they never take the looks boosters' scene.",
-  "admin.boosters.cardScenePortalab": "Portalab's own"
+  "admin.boosters.cardScenePortalab": "Portalab's own",
+  "admin.field.card_booster.rarity": "Guaranteed rarity"
 }

@@ -77,6 +77,8 @@ const CHOICES: Record<string, Array<[value: string, label: string]>> = {
     `gamification:cards.family.${f}`,
   ]),
   "card_booster.edition": EDITIONS.map((e) => [e, `gamification:cards.edition.${e}`]),
+  // issue 255: one of its cards at this rarity
+  "card_booster.rarity": ["rare", "epic", "legendary"].map((r) => [r, `gamification:cards.rarity.${r}`]),
   "card_booster.kind": [
     ["movie", "gamification:cards.pack.kind.movie"],
     ["series", "gamification:cards.pack.kind.series"],

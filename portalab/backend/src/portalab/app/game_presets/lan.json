@@ -4485,8 +4485,8 @@
         "config_required": false,
         "contribution": null,
         "descriptions": {
-          "en": "5 cards drawn among the films and series released 1997 to 2009 (DVD edition).",
-          "fr": "5 cartes tirées parmi les films et séries sortis 1997 à 2009 (édition DVD)."
+          "fr": "5 cartes tirées parmi les films et séries sortis de 2003 à 2008 (édition DVD).",
+          "en": "5 cards drawn among the films and series released 2003 to 2008 (DVD edition)."
         },
         "featured": false,
         "icon": "layers",
@@ -4494,8 +4494,8 @@
         "level": null,
         "limit": null,
         "names": {
-          "en": "DVD edition booster",
-          "fr": "Booster Édition DVD"
+          "fr": "Booster Édition DVD",
+          "en": "DVD edition booster"
         },
         "payload": {
           "cards": 5,
@@ -4519,8 +4519,8 @@
         "config_required": false,
         "contribution": null,
         "descriptions": {
-          "en": "5 cards drawn among the films and series released before 1980 (Film reel edition).",
-          "fr": "5 cartes tirées parmi les films et séries sortis avant 1980 (édition Pellicule)."
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1970 à 1979 (édition Pellicule).",
+          "en": "5 cards drawn among the films and series released 1970 to 1979 (Film reel edition)."
         },
         "featured": false,
         "icon": "layers",
@@ -4528,8 +4528,8 @@
         "level": null,
         "limit": null,
         "names": {
-          "en": "Film reel edition booster",
-          "fr": "Booster Édition Pellicule"
+          "fr": "Booster Édition Pellicule",
+          "en": "Film reel edition booster"
         },
         "payload": {
           "cards": 5,
@@ -4553,8 +4553,8 @@
         "config_required": false,
         "contribution": null,
         "descriptions": {
-          "en": "5 cards drawn among the films and series released since 2010 (Streaming edition).",
-          "fr": "5 cartes tirées parmi les films et séries sortis depuis 2010 (édition Streaming)."
+          "fr": "5 cartes tirées parmi les films et séries sortis de 2017 à 2021 (édition Streaming).",
+          "en": "5 cards drawn among the films and series released 2017 to 2021 (Streaming edition)."
         },
         "featured": false,
         "icon": "layers",
@@ -4562,8 +4562,8 @@
         "level": null,
         "limit": null,
         "names": {
-          "en": "Streaming edition booster",
-          "fr": "Booster Édition Streaming"
+          "fr": "Booster Édition Streaming",
+          "en": "Streaming edition booster"
         },
         "payload": {
           "cards": 5,
@@ -4587,8 +4587,8 @@
         "config_required": false,
         "contribution": null,
         "descriptions": {
-          "en": "5 cards drawn among the films and series released 1980 to 1996 (VHS edition).",
-          "fr": "5 cartes tirées parmi les films et séries sortis 1980 à 1996 (édition VHS)."
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1986 à 1992 (édition VHS).",
+          "en": "5 cards drawn among the films and series released 1986 to 1992 (VHS edition)."
         },
         "featured": false,
         "icon": "layers",
@@ -4596,8 +4596,8 @@
         "level": null,
         "limit": null,
         "names": {
-          "en": "VHS edition booster",
-          "fr": "Booster Édition VHS"
+          "fr": "Booster Édition VHS",
+          "en": "VHS edition booster"
         },
         "payload": {
           "cards": 5,
@@ -4809,6 +4809,448 @@
         },
         "price": 30,
         "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées parmi les films et séries sortis jusqu'en 1929 (édition Nitrate).",
+          "en": "5 cards drawn among the films and series released up to 1929 (Nitrate edition)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_nitrate",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Édition Nitrate",
+          "en": "Nitrate edition booster"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "nitrate"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1930 à 1949 (édition Noir).",
+          "en": "5 cards drawn among the films and series released 1930 to 1949 (Noir edition)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_noir",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Édition Noir",
+          "en": "Noir edition booster"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "noir"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1950 à 1959 (édition Drive-in).",
+          "en": "5 cards drawn among the films and series released 1950 to 1959 (Drive-in edition)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_drivein",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Édition Drive-in",
+          "en": "Drive-in edition booster"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "drivein"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1960 à 1969 (édition Super 8).",
+          "en": "5 cards drawn among the films and series released 1960 to 1969 (Super 8 edition)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_super8",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Édition Super 8",
+          "en": "Super 8 edition booster"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "super8"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1980 à 1985 (édition LaserDisc).",
+          "en": "5 cards drawn among the films and series released 1980 to 1985 (LaserDisc edition)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_laserdisc",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Édition LaserDisc",
+          "en": "LaserDisc edition booster"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "laserdisc"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1993 à 1997 (édition Fanzine).",
+          "en": "5 cards drawn among the films and series released 1993 to 1997 (Zine edition)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_zine",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Édition Fanzine",
+          "en": "Zine edition booster"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "zine"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1998 à 2002 (édition Bulle).",
+          "en": "5 cards drawn among the films and series released 1998 to 2002 (Bubble edition)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_bubble",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Édition Bulle",
+          "en": "Bubble edition booster"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "bubble"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées parmi les films et séries sortis de 2009 à 2012 (édition Cuir & lin).",
+          "en": "5 cards drawn among the films and series released 2009 to 2012 (Leather & linen edition)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_leather",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Édition Cuir & lin",
+          "en": "Leather & linen edition booster"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "leather"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées parmi les films et séries sortis de 2013 à 2016 (édition Tuiles).",
+          "en": "5 cards drawn among the films and series released 2013 to 2016 (Tiles edition)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_tiles",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Édition Tuiles",
+          "en": "Tiles edition booster"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "tiles"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées parmi les films et séries sortis depuis 2022 (édition Verre liquide).",
+          "en": "5 cards drawn among the films and series released since 2022 (Liquid glass edition)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_glass",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Édition Verre liquide",
+          "en": "Liquid glass edition booster"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "glass"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées dans toute la bibliothèque, dont au moins une rare.",
+          "en": "5 cards drawn from the whole library, at least one of them rare."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_rarity_rare",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Rare",
+          "en": "Rare booster"
+        },
+        "payload": {
+          "cards": 5,
+          "rarity": "rare"
+        },
+        "price": 80,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées dans toute la bibliothèque, dont au moins une épique.",
+          "en": "5 cards drawn from the whole library, at least one of them epic."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_rarity_epic",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Épique",
+          "en": "Epic booster"
+        },
+        "payload": {
+          "cards": 5,
+          "rarity": "epic"
+        },
+        "price": 180,
+        "rarity": "epic",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "fr": "5 cartes tirées dans toute la bibliothèque, dont au moins une légendaire.",
+          "en": "5 cards drawn from the whole library, at least one of them legendary."
+        },
+        "featured": true,
+        "icon": "layers",
+        "key": "cards_rarity_legendary",
+        "level": null,
+        "limit": null,
+        "names": {
+          "fr": "Booster Légendaire",
+          "en": "Legendary booster"
+        },
+        "payload": {
+          "cards": 5,
+          "rarity": "legendary"
+        },
+        "price": 450,
+        "rarity": "legendary",
         "refund_policy": {
           "percent": 0,
           "refundable": false,

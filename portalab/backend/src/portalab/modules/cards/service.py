@@ -63,6 +63,7 @@ def _pack_look(
             "year": None,
             "family": detail.get("family"),
             "edition": detail.get("edition"),
+            "rarity": detail.get("rarity"),  # issue 255: the rarity it guarantees
             "poster": None,
             "backdrop": None,
             "logos": {},
