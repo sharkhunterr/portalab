@@ -327,9 +327,9 @@
 @keyframes edition-drivein-bulbs {
   0%,
   100% {
-    filter: brightness(1);
+    opacity: 0.85;
   }
   50% {
-    filter: brightness(1.25);
+    opacity: 1;
   }
 }

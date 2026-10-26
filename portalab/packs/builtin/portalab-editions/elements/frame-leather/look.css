@@ -340,10 +340,11 @@
   }
 }
 @keyframes edition-leather-pass {
-  from {
-    background-position: 0 0, 100% 0, 100% 0;
+  0%,
+  100% {
+    opacity: 0.35;
   }
-  to {
-    background-position: 100% 0, 0 0, 0 0;
+  50% {
+    opacity: 1;
   }
 }

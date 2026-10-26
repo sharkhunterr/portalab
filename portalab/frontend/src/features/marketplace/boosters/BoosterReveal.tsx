@@ -494,6 +494,7 @@ export function BoosterReveal({
       data-moment={moment ?? undefined}
       data-best={phase === "done" ? RARITIES[best] : undefined}
       data-reduced={reduced || undefined}
+      data-zoomed={zoom !== null || undefined}
       data-scene={scene?.look}
       data-own-opening={scene?.parts.opening ? "" : undefined}
       data-cards={opener ? "" : undefined}

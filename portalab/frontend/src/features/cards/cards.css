@@ -91,16 +91,16 @@
     color-mix(in srgb, var(--card-text) 75%, transparent) 50%,
     transparent 65%
   );
-  background-size: 300% 100%;
-  animation: mcard-shine 5s ease-in-out infinite;
+  transform: translateX(-100%);
+  animation: mcard-shine 5s ease-in-out infinite; /* moved, never redrawn (issue 255) */
 }
 @keyframes mcard-shine {
   0%,
   60% {
-    background-position: 100% 0;
+    transform: translateX(-100%);
   }
   100% {
-    background-position: 0 0;
+    transform: translateX(100%);
   }
 }
 .mcard__body {
@@ -685,9 +685,9 @@
 .mcard__foil::before {
   content: "";
   position: absolute;
-  inset: -10% -100%;
+  inset: -10% 0;
   background: var(--card-foil-band);
-  transform: translateX(-34%);
+  transform: translateX(-100%);
 }
 .mcard__sparkle::before,
 .mcard__sparkle::after {
@@ -716,7 +716,7 @@
 }
 /* under the pointer, the band stands where the light is */
 .mcard[data-foil][data-active] .mcard__foil::before {
-  transform: translateX(calc((var(--mcard-px) - 50%) * 0.68));
+  transform: translateX(calc((var(--mcard-px) - 50%) * 2));
 }
 .mcard[data-foil][data-active] .mcard__sparkle::before {
   opacity: 0.85;
@@ -743,11 +743,11 @@
 }
 @keyframes mcard-foil-pass {
   0% {
-    transform: translateX(-34%);
+    transform: translateX(-100%);
   }
   62%,
   100% {
-    transform: translateX(34%);
+    transform: translateX(100%);
   }
 }
 @keyframes mcard-foil-twinkle {

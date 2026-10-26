@@ -235,15 +235,33 @@
 .mcard[data-frame="edition-stream"][data-hd] .mcard__backdrop::before {
   content: "";
   position: absolute;
-  inset: 48% -60% -60%;
+  inset: 48% 0 -12cqi;
+  /* a floor drawn flat: its lines meeting at the horizon, its rungs closer and closer towards it (no 3D layer:
+     a plane leaning in 3D tore the card on phones) */
   background:
-    linear-gradient(color-mix(in srgb, var(--edition-neon) 50%, transparent) 0.33cqi, transparent 0.33cqi) 0 0 / 100%
-      7cqi,
-    linear-gradient(90deg, color-mix(in srgb, var(--edition-neon) 50%, transparent) 0.33cqi, transparent 0.33cqi) 0 0 /
-      7cqi 100%;
-  mask: linear-gradient(180deg, transparent, #000000 25%);
-  transform: perspective(34cqi) rotateX(62deg);
-  transform-origin: 50% 0;
+    repeating-conic-gradient(
+      from 180deg at 50% 0%,
+      color-mix(in srgb, var(--edition-neon) 55%, transparent) 0deg 0.5deg,
+      transparent 0.5deg 9deg
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--edition-neon) 50%, transparent) 0 0.3cqi,
+      transparent 0.3cqi 2cqi,
+      color-mix(in srgb, var(--edition-neon) 50%, transparent) 2cqi 2.3cqi,
+      transparent 2.3cqi 5.5cqi,
+      color-mix(in srgb, var(--edition-neon) 50%, transparent) 5.5cqi 5.8cqi,
+      transparent 5.8cqi 11cqi,
+      color-mix(in srgb, var(--edition-neon) 50%, transparent) 11cqi 11.33cqi,
+      transparent 11.33cqi 19cqi,
+      color-mix(in srgb, var(--edition-neon) 50%, transparent) 19cqi 19.33cqi,
+      transparent 19.33cqi 30cqi,
+      color-mix(in srgb, var(--edition-neon) 50%, transparent) 30cqi 30.33cqi,
+      transparent 30.33cqi 44cqi,
+      color-mix(in srgb, var(--edition-neon) 50%, transparent) 44cqi 44.33cqi,
+      transparent 44.33cqi
+    );
+  mask: linear-gradient(180deg, transparent, #000000 22%);
 }
 .mcard[data-frame="edition-stream"][data-hd] .mcard__backdrop::after {
   inset: 0 0 -40cqi;
@@ -372,10 +390,10 @@
 }
 @keyframes edition-stream-floor {
   from {
-    transform: perspective(34cqi) rotateX(62deg) translateY(0);
+    transform: translateY(0);
   }
   to {
-    transform: perspective(34cqi) rotateX(62deg) translateY(7cqi);
+    transform: translateY(12cqi);
   }
 }
 @keyframes edition-stream-rise {
