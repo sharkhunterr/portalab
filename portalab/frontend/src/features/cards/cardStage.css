@@ -143,12 +143,24 @@
   }
 }
 
+/* issue 255: a booster of media cards — its cards move a lot of their own: its mist is not drawn by the GPU, and
+   its fog and projectors move without a blur redrawn every frame (the fog banks are soft gradients already, the
+   projectors' edges fade through a mask) */
+.booster-stage[data-cards] .booster-atmosphere__fog {
+  filter: none;
+}
+.booster-stage[data-cards] .booster-atmosphere__beam {
+  filter: none;
+  mask-image: linear-gradient(90deg, transparent 18%, var(--card-foil-mask) 42% 58%, transparent 82%);
+}
 /* issue 255: a card seen big — the stage stays behind it, holding still: only that card moves */
 .booster-stage[data-zoomed] * {
   animation-play-state: paused;
 }
 /* a turned legendary's glint passes once; a card out of sight holds still */
-.booster-stage[data-cards] .booster-card[data-state="revealed"][data-rarity="legendary"] .booster-card__shine {
+.booster-stage[data-cards]
+  .booster-card[data-state="revealed"][data-rarity="legendary"]
+  .booster-card__shine {
   animation-iteration-count: 1;
 }
 .booster-stage[data-cards] .booster-card[data-offscreen] * {
