@@ -148,6 +148,43 @@
    projectors' edges fade through a mask) */
 .booster-stage[data-cards] .booster-atmosphere__fog {
   filter: none;
+  animation: none;
+}
+.booster-stage[data-cards] .booster-atmosphere__glow {
+  animation: none;
+}
+/* its dust: one layer rising, never thirty-four */
+.booster-stage[data-cards] .booster-atmosphere__dust span {
+  display: none;
+}
+.booster-stage[data-cards] .booster-atmosphere__dust::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -40vh;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--booster-light) 70%, transparent) 0 1px, transparent 2px)
+    0 0 / 9rem 11rem,
+    radial-gradient(
+      circle,
+      color-mix(in srgb, var(--booster-light) 45%, transparent) 0 1.5px,
+      transparent 2.5px
+    )
+    4rem 6rem / 13rem 17rem;
+  opacity: 0.7;
+}
+.booster-stage[data-cards] .booster-summary {
+  backdrop-filter: none;
+  background: color-mix(in srgb, var(--booster-ink) 92%, var(--tone));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .booster-stage[data-cards] .booster-atmosphere__dust::before {
+    animation: cards-dust 24s linear infinite;
+  }
+}
+@keyframes cards-dust {
+  to {
+    transform: translateY(-40vh);
+  }
 }
 .booster-stage[data-cards] .booster-atmosphere__beam {
   filter: none;
