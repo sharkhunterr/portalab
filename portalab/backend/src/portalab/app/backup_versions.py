@@ -15,6 +15,7 @@ from typing import Literal
 
 from portalab.app.migrations import current_heads, script, upgrade
 from portalab.core.db import Database
+from portalab.modules.administration.backup.archive import ResetStep
 
 Compatibility = Literal["same", "older", "newer"]
 
@@ -30,7 +31,8 @@ class SchemaVersions:
     def __init__(self, database: Database, database_url: str) -> None:
         self.database = database
         self.url = database_url
-        self.after_reset: Callable[[], Awaitable[object]] | None = None  # the built-in packs written again
+        # the built-in packs written again, each one told (done, total, pack)
+        self.after_reset: Callable[[Callable[[int, int, str], None]], Awaitable[object]] | None = None
 
     async def current(self) -> set[str]:
         return await current_heads(self.database)
@@ -52,16 +54,20 @@ class SchemaVersions:
         }
         return "older" if saved <= applied else "newer"
 
-    async def _drop_everything(self) -> None:
+    async def _drop_everything(self, step: ResetStep | None = None) -> None:
         """Every schema of the portal dropped (and its plugins' roles): the database as on its first day."""
         async with self.database.engine.begin() as conn:
-            schemas = (
-                await conn.exec_driver_sql(
-                    "SELECT nspname FROM pg_namespace WHERE nspname NOT LIKE 'pg\\_%' "
-                    "AND nspname NOT IN ('information_schema', 'public')"
-                )
-            ).scalars()
-            for schema in list(schemas):
+            schemas = list(
+                (
+                    await conn.exec_driver_sql(
+                        "SELECT nspname FROM pg_namespace WHERE nspname NOT LIKE 'pg\\_%' "
+                        "AND nspname NOT IN ('information_schema', 'public') ORDER BY nspname"
+                    )
+                ).scalars()
+            )
+            for done, schema in enumerate(schemas):
+                if step is not None:
+                    step("schema.drop", done, len(schemas), schema)
                 await conn.exec_driver_sql(f'DROP SCHEMA "{schema}" CASCADE')
         async with self.database.engine.begin() as conn:
             roles = list(
@@ -83,17 +89,25 @@ class SchemaVersions:
             await asyncio.to_thread(upgrade, self.url, head)
         await self.database.engine.dispose()  # no connection keeps plans of the dropped tables
 
-    async def reset(self) -> None:
+    async def reset(self, step: ResetStep | None = None) -> None:
         """Issue 247: the portal back to a new installation — everything dropped, migrated again, its
-        built-in catalogs (permissions, visual packs) written again, as ``portalab migrate`` does."""
+        built-in catalogs (permissions, visual packs) written again, as ``portalab migrate`` does; each step
+        told to ``step`` as it goes."""
         from portalab.app.cli import _sync_permission_catalog
 
-        await self._drop_everything()
+        def tell(key: str, done: int = 0, total: int = 0, on: str | None = None) -> None:
+            if step is not None:
+                step(key, done, total, on)
+
+        await self._drop_everything(step)
+        tell("schema.create")
         await asyncio.to_thread(upgrade, self.url)
         await self.database.engine.dispose()
+        tell("schema.permissions")
         await _sync_permission_catalog(self.url)
         if self.after_reset is not None:
-            await self.after_reset()
+            tell("schema.packs")
+            await self.after_reset(lambda done, total, pack: tell("schema.packs", done, total, pack))
 
     async def finish(self) -> None:
         """Migrate up to this version (the data loaded at the archive's schema transformed on the way)."""

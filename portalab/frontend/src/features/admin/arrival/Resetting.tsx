@@ -2,19 +2,48 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../../../api/client";
 import { useT } from "../../../i18n/hooks/useT";
 import { I18nProvider } from "../../../i18n/provider/I18nProvider";
-import { percent, type Run } from "../backup/api";
-import { Launch } from "./Launch";
+import type { Run } from "../backup/api";
+import { Launch, type LaunchTask } from "./Launch";
 import { Stage } from "./Stage";
 import "../backup/backup.css";
-
-const PHASES = ["files", "schema"] as const;
-
 import "./arrival.css";
 
 /**
- * Issue 247 — the portal being reset, followed outside the shell (the session went with the database): its
- * progress, then the restart to do; the arrival wizard is what the portal shows next.
+ * Issue 247 — the portal being reset, followed outside the shell (the session went with the database): every
+ * step as the server tells it — each data folder emptied (the visual packs, the files sent, the cards…), each
+ * module's data dropped, a new database, its permissions, Portalab's own packs written again — then the
+ * restart to do; the arrival wizard is what the portal shows next.
  */
+type Reset = Run & { steps?: string[]; on?: string | null };
+
+const STEPS = ["schema.drop", "schema.create", "schema.permissions", "schema.packs"]; // before the server tells
+
+export function resetTasks(
+  run: Reset | null | undefined,
+  over: boolean,
+  failed: boolean,
+  t: (id: string, values?: Record<string, string | number>) => string,
+): { tasks: LaunchTask[]; percent: number } {
+  const steps = run?.steps?.length ? run.steps : STEPS;
+  const at = over ? steps.length : Math.max(0, steps.indexOf(run?.phase ?? ""));
+  const share = run && run.total > 0 ? Math.min(1, run.done / run.total) : 0;
+  const tasks = steps.map((key, index): LaunchTask => {
+    const id = `account:reset.phase.${key}`;
+    const known = t(id);
+    const unknownFolder = key.startsWith("files.") && known === id.slice("account:".length);
+    const label = unknownFolder ? t("account:reset.phase.files.other", { name: key.slice(6) }) : known;
+    const running = index === at && !over;
+    return {
+      key,
+      label,
+      detail:
+        running && run?.on ? (run.total > 0 ? `${run.on} (${run.done + 1}/${run.total})` : run.on) : null,
+      state: index < at ? "done" : running ? (failed ? "failed" : "running") : "waiting",
+    };
+  });
+  return { tasks, percent: over ? 100 : Math.round(((at + share) / steps.length) * 100) };
+}
+
 function Progress() {
   const t = useT();
   const status = useQuery({
@@ -27,18 +56,14 @@ function Progress() {
   const run = status.data;
   const over = run?.state === "done" || (status.isFetched && !run);
   const failed = run?.state === "failed";
-  const at = over ? PHASES.length : PHASES.indexOf((run?.phase ?? "files") as (typeof PHASES)[number]);
+  const { tasks, percent } = resetTasks(run as Reset | null | undefined, over, failed, t);
   return (
     <Stage steps={[]}>
       <section className="arrival-card arrival-card--launch" aria-label={t("account:reset.title")}>
         <Launch
           title={t(over ? "account:reset.done" : "account:reset.title")}
-          tasks={PHASES.map((phase, index) => ({
-            key: phase,
-            label: t(`account:reset.phase.${phase}`),
-            state: index < at ? "done" : index === at ? (failed ? "failed" : "running") : "waiting",
-          }))}
-          percent={run ? percent(run) : 0}
+          tasks={tasks}
+          percent={percent}
           slides={[
             {
               icon: "database",

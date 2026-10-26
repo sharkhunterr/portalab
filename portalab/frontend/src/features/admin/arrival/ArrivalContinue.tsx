@@ -22,7 +22,7 @@ import { type Progress, type StepKey, useSetupProgress } from "../setup/progress
 import { type Configure, configureWay, useArrivalSlides, wayOf } from "./ArrivalWizard";
 import { useCurrentFeatures } from "./FeaturesPicker";
 import { ALL_FEATURES, type Selection } from "./features";
-import { type GameChoice, GameStep } from "./GameStep";
+import { applyGame, GAME_TASKS, type GameChoice, GameStep, notApplied } from "./GameStep";
 import { Launch, useTasks } from "./Launch";
 import { Stage, StepCard } from "./Stage";
 import "../../ai/ai.css";
@@ -33,9 +33,10 @@ import "./arrival.css";
  * its own — the services (Plex, Jellyfin, Seerr…), the members' accounts on them, who may join, the e-mail,
  * the portal's look, play and the shop, the AI assistant (the last two only when their feature is kept) —
  * each one skippable, where it is kept by the server (``admin.setup.progress.arrival``, so a reload resumes
- * it). Then the last checks behind the waiting screens — and the visual packs of the recommended install, put in
- * place there rather than at the game step, a few at a time — and the portal opens. Once finished, ``/setup`` is
- * the setup assistant's (``/admin/setup``) to come back to.
+ * it). Then the last checks behind the waiting screens — and the recommended install, put in place there rather
+ * than at the game step: its game and shop part after part (unless adjusted, then already in place), its visual
+ * packs a few at a time — and the portal opens. Once finished, ``/setup`` is the setup assistant's
+ * (``/admin/setup``) to come back to.
  */
 type Step = Configure | "open";
 // the setup assistant's steps each one of the wizard's covers
@@ -346,7 +347,7 @@ function AppearanceStep() {
 
 const OPEN_TASKS = ["save", "navigation", "services", "home"] as const;
 const PACKS_AT_ONCE = 5; // a request per few packs: the ring follows them, none runs for minutes
-const OPEN_WEIGHTS = { packs: 12 }; // a minute or so, where the other tasks take a moment
+const OPEN_WEIGHTS = { packs: 12, shop: 3 }; // a minute or so, a few seconds, where the others take a moment
 
 /** The recommended install's visual packs, a few at a time; those not installed (an extension they dress is
  * missing…) said, never fatal. */
@@ -392,16 +393,23 @@ function Open({
   const titleId = useId();
   const services = useServices();
   const game = progress.arrival?.game;
-  const [tasks] = useState<readonly string[]>(() =>
-    game === "lan" || game === "tune" ? ["packs", ...OPEN_TASKS] : OPEN_TASKS,
-  );
+  const [tasks] = useState<readonly string[]>(() => [
+    ...(game === "lan" ? GAME_TASKS : []), // adjusted: already in place at the game step
+    ...(game === "lan" || game === "tune" ? ["packs"] : []),
+    ...OPEN_TASKS,
+  ]);
   const { states, percent, detail, run, finished } = useTasks(tasks, OPEN_WEIGHTS);
   const [missed, setMissed] = useState<string[]>([]);
+  const [failed, setFailed] = useState<string[]>([]);
   const slides = useArrivalSlides(ALL_FEATURES);
   const opened = useRef(false);
   const open = useMutation({
     mutationFn: async () => {
       opened.current = true;
+      const left: string[] = [];
+      for (const task of GAME_TASKS)
+        if (tasks.includes(task)) left.push(...notApplied(await run(task, () => applyGame(task))));
+      setFailed(left);
       if (tasks.includes("packs")) setMissed(await run("packs", installPacks)); // before the wizard ends
       await run("save", async () => {
         const now = new Date().toISOString();
@@ -424,10 +432,10 @@ function Open({
     },
   });
   useEffect(() => {
-    if (!finished || missed.length) return; // a pack not installed: said, the way in left to the button
+    if (!finished || missed.length || failed.length) return; // what is not in place said, the way in left to the button
     const timer = setTimeout(() => navigate("/", { replace: true }), 1600);
     return () => clearTimeout(timer);
-  }, [finished, missed.length, navigate]);
+  }, [finished, missed.length, failed.length, navigate]);
   if (opened.current || open.isPending || open.isSuccess) {
     return (
       <section className="arrival-card arrival-card--launch" aria-label={t("account:arrival.open.launching")}>
@@ -458,6 +466,12 @@ function Open({
             </div>
           ) : finished ? (
             <>
+              {failed.length ? (
+                <p className="arrival__note">
+                  <Icon name="info" size={16} />
+                  {t("account:arrival.game.failed", { keys: failed.join(", ") })}
+                </p>
+              ) : null}
               {missed.length ? (
                 <p className="arrival__note">
                   <Icon name="info" size={16} />

@@ -39,3 +39,19 @@ async def test_dynamic_validator_and_plugin_settings(full: FullPlatform) -> None
     finally:
         registry.unregister(OWNER)
         registry.unregister("plugin:weather")
+
+
+async def test_settings_read_at_once_for_a_refresh(full: FullPlatform) -> None:
+    """Every module's configuration refreshed from one read of the settings — the same values as one by one,
+    a user's own value still read as asked, and a change made after it seen again."""
+    config = full.administration.config
+    admin = user(await insert_user(full.database))
+    await config.set("identity.dormancyDays", 400, actor=admin)
+    one_by_one = (await config.get("identity.dormancyDays")).value
+    async with config.read_at_once():
+        assert (await config.get("identity.dormancyDays")).value == one_by_one == 400
+        assert (await config.get("privacy.minAggregateSize")).value == (
+            default_catalog.get("privacy.minAggregateSize").default
+        )
+    await config.set("identity.dormancyDays", 401, actor=admin)
+    assert (await config.get("identity.dormancyDays")).value == 401

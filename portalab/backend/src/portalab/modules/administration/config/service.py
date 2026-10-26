@@ -10,7 +10,9 @@
 
 import hashlib
 import json
-from collections.abc import Awaitable, Callable, Iterable, Mapping
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterable, Mapping
+from contextlib import asynccontextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from typing import Any
 from uuid import UUID
@@ -55,6 +57,11 @@ class ScopeNotAllowed(ValidationFailed):
 class OutOfBounds(ValidationFailed):
     default_code = "admin.out_of_bounds"
     default_title = "Value outside the administrator's bounds"
+
+
+# the settings read once for a refresh (``ConfigService.read_at_once``): rows by key, policies by key —
+# emptied when it ends, so a task started meanwhile (which inherits it) reads the database again
+_SNAPSHOT: ContextVar[dict[str, Any] | None] = ContextVar("config_snapshot", default=None)
 
 
 @dataclass(frozen=True, slots=True)
@@ -141,6 +148,26 @@ class ConfigService:
         return MASK if declaration.sensitive else redact(value, key=declaration.key)
 
     # --- reads -------------------------------------------------------------------------------------------
+    @asynccontextmanager
+    async def read_at_once(self) -> AsyncIterator[None]:
+        """Every global, module and plugin setting and every policy read at once, the reads inside answered
+        from them — a refresh of every module's configuration in two queries instead of one per setting (a
+        user's own value is still read as it is asked)."""
+        async with self.database.session() as session:
+            rows = (await session.execute(select(Setting).where(Setting.scope != "user"))).scalars().all()
+            policies = (await session.execute(select(Policy).where(Policy.removed_at.is_(None)))).scalars()
+            by_policy = {policy.key: policy for policy in policies}
+        by_key: dict[str, list[Setting]] = {}
+        for row in rows:
+            by_key.setdefault(row.key, []).append(row)
+        snapshot: dict[str, Any] = {"rows": by_key, "policies": by_policy}
+        token = _SNAPSHOT.set(snapshot)
+        try:
+            yield
+        finally:
+            snapshot.clear()
+            _SNAPSHOT.reset(token)
+
     async def _rows(self, session: AsyncSession, key: str) -> list[Setting]:
         memo = request_memo()
         cache_key = ("admin.config.rows", key)
@@ -160,9 +187,13 @@ class ConfigService:
         self, key: str, *, user_id: UUID | None = None, module: str | None = None, plugin: str | None = None
     ) -> EffectiveValue:
         declaration = self.registry.declaration(key)
-        async with self.database.session() as session:
-            rows = await self._rows(session, key)
-            policy = await self._policy(session, key)
+        snapshot = _SNAPSHOT.get()
+        if snapshot and user_id is None:
+            rows, policy = snapshot["rows"].get(key, []), snapshot["policies"].get(key)
+        else:
+            async with self.database.session() as session:
+                rows = await self._rows(session, key)
+                policy = await self._policy(session, key)
         wanted = {
             "global": "",
             "module": module
