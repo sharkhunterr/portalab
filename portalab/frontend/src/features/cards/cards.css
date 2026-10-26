@@ -382,6 +382,36 @@
 .mcard[data-edition="stream"] {
   --mcard-edition-symbol: var(--card-edition-stream);
 }
+.mcard[data-edition="nitrate"] {
+  --mcard-edition-symbol: var(--card-edition-nitrate);
+}
+.mcard[data-edition="noir"] {
+  --mcard-edition-symbol: var(--card-edition-noir);
+}
+.mcard[data-edition="drivein"] {
+  --mcard-edition-symbol: var(--card-edition-drivein);
+}
+.mcard[data-edition="super8"] {
+  --mcard-edition-symbol: var(--card-edition-super8);
+}
+.mcard[data-edition="laserdisc"] {
+  --mcard-edition-symbol: var(--card-edition-laserdisc);
+}
+.mcard[data-edition="zine"] {
+  --mcard-edition-symbol: var(--card-edition-zine);
+}
+.mcard[data-edition="bubble"] {
+  --mcard-edition-symbol: var(--card-edition-bubble);
+}
+.mcard[data-edition="leather"] {
+  --mcard-edition-symbol: var(--card-edition-leather);
+}
+.mcard[data-edition="tiles"] {
+  --mcard-edition-symbol: var(--card-edition-tiles);
+}
+.mcard[data-edition="glass"] {
+  --mcard-edition-symbol: var(--card-edition-glass);
+}
 .mcard__stage {
   flex: none;
   padding: 0.5cqi 2cqi;
@@ -745,6 +775,67 @@
     --mcard-py: 72%;
     --mcard-rx: -2deg;
     --mcard-ry: -5deg;
+  }
+}
+
+/* issue 255: a legendary's HD version, foil, in its edition's frame — its edition's pack draws the backdrop
+   and its motion; without one, the genre's and the rarity's lights over a drifting starfield */
+.mcard__backdrop {
+  display: none;
+}
+.mcard[data-hd] .mcard__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(80% 60% at 30% 18%, var(--mcard-accent), transparent 70%),
+    radial-gradient(70% 55% at 80% 92%, var(--mcard-rarity), transparent 70%), var(--card-border);
+}
+.mcard[data-hd] .mcard__backdrop::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: var(--card-text);
+  mask: var(--card-starfield) 0 0 / 110cqi 110cqi repeat;
+  opacity: 0.6;
+}
+.mcard[data-hd] .mcard__foil {
+  opacity: 0.45;
+}
+/* a character without the frame around it: its window holds nothing but it, the backdrop shows through; a
+   photograph not cut out fades into it */
+.mcard[data-frameless] .mcard__art,
+.mcard[data-frameless]:not([data-borderless]) .mcard__art[data-cutout] {
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+}
+.mcard[data-frameless] .mcard__sky {
+  display: none;
+}
+.mcard[data-frameless] .mcard__art:not([data-cutout]) .mcard__picture {
+  mask-image: radial-gradient(75% 80% at 50% 45%, var(--card-foil-mask) 55%, transparent 100%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mcard[data-hd] .mcard__backdrop::after {
+    animation: mcard-hd-drift 28s linear infinite;
+  }
+  .mcard[data-hd][data-borderless] .mcard__picture {
+    animation: mcard-hd-pan 16s ease-in-out infinite alternate;
+  }
+}
+@keyframes mcard-hd-drift {
+  to {
+    transform: translate(-12%, -12%);
+  }
+}
+@keyframes mcard-hd-pan {
+  to {
+    transform: scale(1.1) translate(-2%, -2%);
   }
 }
 

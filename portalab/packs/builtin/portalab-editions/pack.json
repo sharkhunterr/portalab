@@ -1,14 +1,14 @@
 {
   "format": 1,
   "id": "portalab-editions",
-  "version": "1.0.0+38be8367ae",
+  "version": "1.0.0+0f9fa128b6",
   "names": {
     "en": "Media card editions",
     "fr": "Éditions des cartes médias"
   },
   "descriptions": {
-    "en": "The frames of the media cards' editions: film reel (period poster), VHS (arcade screen), DVD (filigree showcase) and streaming (holo-tech).",
-    "fr": "Les cadres des éditions des cartes médias : pellicule (affiche d'époque), VHS (écran d'arcade), DVD (filigrane showcase) et streaming (holo-tech)."
+    "en": "The frames of the media cards' fourteen editions, from the silent film's intertitle to liquid glass — each with its backdrop behind a cut-out character and its animated HD version for the legendaries.",
+    "fr": "Les cadres des quatorze éditions des cartes médias, de l'intertitre du muet au verre liquide — chacun avec son fond derrière un personnage détouré et sa version HD animée pour les légendaires."
   },
   "author": "Portalab",
   "license": "AGPL-3.0-or-later"

@@ -25,7 +25,8 @@ from portalab.core.ids import new_id
 from portalab.core.privacy_registry import not_personal
 
 RARITIES = ("common", "rare", "epic", "legendary")
-VARIANTS = ("normal", "foil", "borderless", "borderless_foil", "showcase", "showcase_foil")
+# issue 255: "hd", a legendary's HD version
+VARIANTS = ("normal", "foil", "borderless", "borderless_foil", "showcase", "showcase_foil", "hd")
 
 
 class CardsBase(DeclarativeBase):

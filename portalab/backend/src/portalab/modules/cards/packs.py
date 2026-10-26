@@ -7,7 +7,9 @@ A copy's version is drawn with it, like a trading card game's: foil at any rarit
 (the full-art alternative: a work's scene over the whole card) for the works' cards only, mostly at the high
 rarities — never a common, seldom a rare, often an epic or a legendary — and borderless foil rarer still.
 Issue 233: any card of a work with a year of release may come in its edition's version (its edition's frame),
-the more often the rarer, foil or not."""
+the more often the rarer, foil or not. Issue 255: a legendary of such a work, now and then, in its edition's
+HD version — a character without the frame around it over the edition's animated backdrop, a work borderless
+and animated — always foil."""
 
 import random
 import secrets
@@ -46,6 +48,9 @@ FOIL = 1 / 8
 BORDERLESS = {"common": 0.0, "rare": 1 / 40, "epic": 1 / 10, "legendary": 1 / 4}
 # the chance a copy is in its edition's version (issue 233), by the card's rarity
 SHOWCASE = {"common": 1 / 30, "rare": 1 / 15, "epic": 1 / 8, "legendary": 1 / 5}
+# issue 255: the chance a copy is in its edition's HD version — a legendary's only
+HD = {"legendary": 1 / 6}
+TRIAL_HD = 0.5
 
 
 # issue 234: what a shop's booster may draw among — the works' genre, edition, kind (all of them when unsaid)
@@ -89,6 +94,8 @@ def booster_of(payload: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def variant_for(rarity: str, rng: random.Random, kind: str = "title", edition: str | None = None) -> str:
+    if edition is not None and rng.random() < HD.get(rarity, 0.0):
+        return "hd"  # issue 255: foil already, its frame its edition's
     # the borderless alternative is a work's: its scene over the whole card (a person's card has none)
     borderless = kind == "title" and rng.random() < BORDERLESS.get(rarity, 0.0)
     # its edition's version: a work released some year (its edition known)
@@ -242,6 +249,11 @@ class Packs:
                     continue
                 card_set = await session.get(CardSet, card.set_key)
                 edition = edition_of(card_set.year if card_set else None)
+                if edition is not None and card.rarity in HD and self.rng.random() < TRIAL_HD:
+                    session.add(
+                        Copy(user_id=user, card_id=card.id, variant="hd", pack_id=pack_id, acquired_at=now)
+                    )
+                    continue
                 borderless = card.kind == "title" and self.rng.random() < TRIAL_BORDERLESS
                 showcase = not borderless and edition is not None and self.rng.random() < TRIAL_SHOWCASE
                 foil = self.rng.random() < TRIAL_FOIL

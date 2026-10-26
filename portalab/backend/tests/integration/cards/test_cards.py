@@ -701,7 +701,7 @@ async def test_a_shops_booster_draws_among_the_works_it_names(database: Database
     def bought(**payload: Any) -> OwnershipView:
         return OwnershipView(uuid4(), user, "sf_stream", "card_booster", payload)
 
-    assert (await handler.activate(bought(family="sf", edition="stream", cards="5"))).state == "active"
+    assert (await handler.activate(bought(family="sf", edition="tiles", cards="5"))).state == "active"
     assert (await handler.activate(bought(family="family", edition="film"))).state == "incompatible"
     unopened = await packs.unopened(user)
     assert len(unopened) == 1 and unopened[0].source == "shop"

@@ -1,0 +1,314 @@
+/* Portalab — card_frame/edition-tiles: the tiles edition (2013–2016), flat design — no matter left: the card a
+   grid of flat tiles, 1.2cqi apart on a rim of the genre's colour, no shadow, no gradient, no rounding inside;
+   thin lowercase type and big light figures; the rarity a tile of its own colour. Behind a cut-out character: a
+   mosaic of coloured tiles. Its HD version: the mosaic over the whole card, its tiles turning over in a wave,
+   a flat sun pulsing; the foil as flat stripes sweeping. (Hard-stop gradients only draw flat shapes.) */
+
+.mcard[data-frame="edition-tiles"] {
+  --edition-ink: #111111;
+  --edition-paper: #ffffff;
+  --edition-mosaic:
+    linear-gradient(var(--edition-ink) 0 1cqi, transparent 0) 0 0 / 100% 14cqi,
+    linear-gradient(90deg, var(--edition-ink) 0 1cqi, transparent 0) 0 0 / 14cqi 100%,
+    conic-gradient(#0a6cff 0 25%, #ff2d7a 0 50%, #ffb21f 0 75%, #60c21a 0) 0 0 / 28cqi 28cqi,
+    #8b2fe0;
+  --edition-mosaic-turned:
+    linear-gradient(var(--edition-ink) 0 1cqi, transparent 0) 0 0 / 100% 14cqi,
+    linear-gradient(90deg, var(--edition-ink) 0 1cqi, transparent 0) 0 0 / 14cqi 100%,
+    conic-gradient(#8b2fe0 0 25%, #ffb21f 0 50%, #0a6cff 0 75%, #ff2d7a 0) 0 0 / 28cqi 28cqi,
+    #60c21a;
+}
+/* one colour around, nothing inside it but tiles; the halo of the rarity outside */
+.mcard[data-frame="edition-tiles"] .mcard__card {
+  padding: 2.2cqi;
+  border-radius: 1cqi;
+  background: var(--mcard-accent);
+  box-shadow:
+    0 0 0 0.33cqi var(--edition-ink),
+    0 0 2.6cqi 0.8cqi var(--mcard-glow),
+    0 0.35rem 1rem rgba(0, 0, 0, 0.35);
+}
+.mcard[data-frame="edition-tiles"] .mcard__card::before {
+  content: none;
+}
+.mcard[data-frame="edition-tiles"] .mcard__body {
+  gap: 1.2cqi;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--edition-ink);
+}
+.mcard[data-frame="edition-tiles"] .mcard__head {
+  min-block-size: 12cqi;
+  padding: 0 2cqi 0 3cqi;
+  background: var(--edition-ink);
+}
+.mcard[data-frame="edition-tiles"] .mcard__name {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  text-transform: lowercase;
+  color: var(--edition-paper);
+  text-shadow: none;
+}
+.mcard[data-frame="edition-tiles"] .mcard__genre {
+  padding: 0.8cqi 2cqi 0.8cqi 0.8cqi;
+  border-radius: 0;
+  background: var(--edition-paper);
+  box-shadow: none;
+  color: var(--edition-ink);
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+.mcard[data-frame="edition-tiles"] .mcard__emblem {
+  border-radius: 0;
+  background: var(--mcard-accent);
+  color: var(--edition-paper);
+}
+.mcard[data-frame="edition-tiles"] .mcard__art {
+  margin: 0;
+  border-radius: 0;
+  background: var(--edition-ink);
+  box-shadow: none;
+}
+.mcard[data-frame="edition-tiles"] .mcard__art[data-cutout] .mcard__picture {
+  filter: none;
+}
+.mcard[data-frame="edition-tiles"] .mcard__art .mcard__badge {
+  border-radius: 0;
+  box-shadow: 0 0 0 1cqi var(--edition-paper);
+}
+/* behind a cut-out character: the mosaic */
+.mcard[data-frame="edition-tiles"] .mcard__art[data-cutout] {
+  background: var(--edition-mosaic);
+}
+.mcard[data-frame="edition-tiles"] .mcard__sky {
+  background: var(--edition-mosaic);
+  mask: none;
+}
+.mcard[data-frame="edition-tiles"] .mcard__strip {
+  padding: 1cqi 2cqi 1cqi 1cqi;
+  border-radius: 0;
+  background: var(--edition-ink);
+  color: var(--edition-paper);
+  font-family: "Poppins", sans-serif;
+  font-size: 3cqi;
+  font-style: normal;
+  font-weight: 400;
+  text-transform: lowercase;
+}
+.mcard[data-frame="edition-tiles"] .mcard__stage {
+  border-radius: 0;
+  background: #60c21a;
+  color: var(--edition-ink);
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+}
+.mcard[data-frame="edition-tiles"] .mcard__edition {
+  filter: none;
+}
+.mcard[data-frame="edition-tiles"] .mcard__lower {
+  padding: 2cqi 2.4cqi;
+  background: var(--edition-paper);
+  font-family: "Poppins", sans-serif;
+}
+.mcard[data-frame="edition-tiles"] .mcard__poster {
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.mcard[data-frame="edition-tiles"] .mcard__facts .mcard__by {
+  font-style: normal;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+.mcard[data-frame="edition-tiles"] .mcard__work,
+.mcard[data-frame="edition-tiles"] .mcard__meta {
+  border-block-end: 0.33cqi solid #e5e5e5;
+}
+.mcard[data-frame="edition-tiles"] .mcard__work strong {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  text-transform: lowercase;
+}
+.mcard[data-frame="edition-tiles"] .mcard__figures li {
+  font-weight: 600;
+  text-transform: lowercase;
+}
+.mcard[data-frame="edition-tiles"] .mcard__figures li:not(:first-child) {
+  border-block-start: 0.33cqi solid #e5e5e5;
+}
+.mcard[data-frame="edition-tiles"] .mcard__cost {
+  border-radius: 0;
+  background: var(--mcard-accent);
+  box-shadow: none;
+}
+.mcard[data-frame="edition-tiles"] .mcard__figures strong {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+}
+.mcard[data-frame="edition-tiles"] .mcard__flavor {
+  border: 0;
+  border-radius: 0;
+  background: #f2f2f2;
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+/* the foot on the rim's colour; the rarity a tile of its own, its gem white in its shape */
+.mcard[data-frame="edition-tiles"] .mcard__foot {
+  padding: 0 0.4cqi;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--edition-paper);
+}
+.mcard[data-frame="edition-tiles"] .mcard__rarity {
+  padding: 1cqi 2.6cqi 1cqi 1.2cqi;
+  border-radius: 0;
+  background: var(--mcard-rarity);
+  box-shadow: 0 0 0 0.5cqi var(--edition-paper);
+  color: var(--edition-paper);
+  font-size: 3cqi;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  text-shadow: none;
+}
+.mcard[data-frame="edition-tiles"] .mcard__gem {
+  inline-size: 4.4cqi;
+  block-size: 4.4cqi;
+  background: var(--edition-paper);
+}
+/* the foil: flat stripes, never a rainbow wash */
+.mcard[data-frame="edition-tiles"] .mcard__foil {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 16cqi,
+    rgba(255, 255, 255, 0.22) 16cqi 18cqi,
+    transparent 18cqi 30cqi,
+    rgba(255, 255, 255, 0.12) 30cqi 31cqi
+  );
+  background-size: 200% 100%;
+  background-blend-mode: normal;
+  mix-blend-mode: normal;
+  filter: none;
+  mask-image: none;
+}
+.mcard[data-frame="edition-tiles"] .mcard__sparkle {
+  display: none;
+}
+/* a work's own card holds more (three figures, its line): its box tighter */
+.mcard[data-frame="edition-tiles"][data-kind="title"] .mcard__lower {
+  padding-block: 1cqi;
+}
+.mcard[data-frame="edition-tiles"][data-kind="title"] .mcard__figures li {
+  padding-block: 0.3cqi;
+  font-size: 3.2cqi;
+}
+.mcard[data-frame="edition-tiles"][data-kind="title"] .mcard__flavor {
+  padding-block: 0.4cqi;
+  font-size: 3.2cqi;
+  line-height: 1.1;
+  -webkit-line-clamp: 1;
+}
+
+/* --- HD (a legendary): the mosaic over the whole card, turning over in a wave; a flat sun -------------- */
+.mcard[data-frame="edition-tiles"][data-hd] .mcard__backdrop {
+  background: var(--edition-mosaic);
+}
+.mcard[data-frame="edition-tiles"][data-hd] .mcard__backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--edition-mosaic-turned);
+  clip-path: inset(0 100% 0 0);
+}
+.mcard[data-frame="edition-tiles"][data-hd] .mcard__backdrop::after {
+  inset: 6% 6% auto auto;
+  inline-size: 36cqi;
+  block-size: 36cqi;
+  border-radius: 50%;
+  background: #fff1c9;
+  mask: none;
+  opacity: 1;
+}
+/* the frame stays, its window goes: the character over the mosaic, between the tiles */
+.mcard[data-frame="edition-tiles"][data-frameless] .mcard__art,
+.mcard[data-frame="edition-tiles"][data-frameless] .mcard__art[data-cutout] {
+  background: none;
+}
+/* a work, borderless: its scene over the whole card under flat bars; stripes sweeping over it */
+.mcard[data-frame="edition-tiles"][data-borderless] .mcard__body::after {
+  background: none;
+}
+.mcard[data-frame="edition-tiles"][data-borderless] .mcard__art {
+  background: none;
+}
+.mcard[data-frame="edition-tiles"][data-borderless] .mcard__art .mcard__picture {
+  border-radius: 0;
+}
+.mcard[data-frame="edition-tiles"][data-borderless] .mcard__foot {
+  padding: 1cqi 1.2cqi;
+  background: var(--edition-ink);
+  text-shadow: none;
+}
+.mcard[data-frame="edition-tiles"][data-hd][data-borderless] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+      90deg,
+      transparent 0 20cqi,
+      rgba(255, 255, 255, 0.16) 20cqi 23cqi,
+      transparent 23cqi 40cqi
+    )
+    0 0 / 200% 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mcard[data-frame="edition-tiles"][data-hd] .mcard__backdrop::before {
+    animation: edition-tiles-wave 6s steps(8) infinite;
+  }
+  .mcard[data-frame="edition-tiles"][data-hd] .mcard__backdrop::after {
+    animation: edition-tiles-sun 3s ease-in-out infinite alternate;
+  }
+  .mcard[data-frame="edition-tiles"][data-hd] .mcard__foil,
+  .mcard[data-frame="edition-tiles"][data-hd][data-borderless] .mcard__art::after {
+    animation: edition-tiles-stripes 5s linear infinite;
+  }
+}
+@keyframes edition-tiles-wave {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  45%,
+  55% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+@keyframes edition-tiles-sun {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+@keyframes edition-tiles-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}

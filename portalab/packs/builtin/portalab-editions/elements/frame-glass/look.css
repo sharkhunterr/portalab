@@ -1,0 +1,328 @@
+/* Portalab — card_frame/edition-glass: the liquid glass edition (2022 on) — an aurora under plates of frosted
+   glass, each with its highlight on top and its light edge; a specular rim tinted with the rarity; the art seen
+   through a lens; the genre's colour one of the aurora's veils. Behind a cut-out character: the aurora. Its HD
+   version: the aurora over the whole card, its veils moving, a glint crossing the glass. */
+
+.mcard[data-frame="edition-glass"] {
+  --edition-night: #181033;
+  --edition-glass: rgba(255, 255, 255, 0.12);
+  --edition-edge: rgba(255, 255, 255, 0.24);
+  --edition-text: #ffffff;
+  --edition-soft: rgba(255, 255, 255, 0.84);
+  --edition-aurora:
+    radial-gradient(60% 45% at 15% 10%, var(--mcard-accent) 0%, transparent 70%),
+    radial-gradient(55% 40% at 95% 30%, #2fd6c0 0%, transparent 70%),
+    radial-gradient(70% 50% at 70% 100%, #ff9a3c 0%, transparent 70%),
+    radial-gradient(60% 50% at 0% 80%, #3a2bb8 0%, transparent 70%),
+    var(--edition-night);
+}
+/* the rim: a specular edge, tinted with the rarity's colour; its halo around */
+.mcard[data-frame="edition-glass"] .mcard__card {
+  padding: 0.6cqi;
+  border-radius: 7.5cqi;
+  background: linear-gradient(
+    150deg,
+    #ffffff 0%,
+    color-mix(in srgb, var(--mcard-rarity) 70%, transparent) 28%,
+    rgba(255, 255, 255, 0.06) 58%,
+    color-mix(in srgb, var(--mcard-rarity) 60%, #ffffff) 100%
+  );
+  box-shadow:
+    0 0 2.8cqi 0.8cqi var(--mcard-glow),
+    0 0.5rem 1.4rem rgba(10, 6, 30, 0.6);
+}
+.mcard[data-frame="edition-glass"] .mcard__body {
+  gap: 2cqi;
+  padding: 3cqi;
+  border-radius: 7cqi;
+  background: var(--edition-aurora);
+  box-shadow: none;
+  color: var(--edition-text);
+}
+/* a plate of glass: frosted, its highlight, its light edge */
+.mcard[data-frame="edition-glass"] .mcard__head,
+.mcard[data-frame="edition-glass"] .mcard__lower {
+  background: var(--edition-glass);
+  backdrop-filter: blur(3.4cqi) saturate(1.6);
+  box-shadow:
+    inset 0 0.3cqi 0 rgba(255, 255, 255, 0.55),
+    inset 0 0 0 0.3cqi var(--edition-edge);
+}
+.mcard[data-frame="edition-glass"] .mcard__head {
+  padding: 1.4cqi 1.8cqi 1.4cqi 3.4cqi;
+  border-radius: 5cqi;
+}
+.mcard[data-frame="edition-glass"] .mcard__name {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--edition-text);
+  text-shadow: 0 0.2cqi 1.2cqi rgba(10, 6, 30, 0.45);
+}
+.mcard[data-frame="edition-glass"] .mcard__genre {
+  padding: 0.6cqi 2.2cqi 0.6cqi 0.6cqi;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 0.3cqi 0 rgba(255, 255, 255, 0.6),
+    inset 0 0 0 0.3cqi rgba(255, 255, 255, 0.3);
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.mcard[data-frame="edition-glass"] .mcard__emblem {
+  background: rgba(255, 255, 255, 0.22);
+}
+/* the art behind a lens: rounded, its glare on top */
+.mcard[data-frame="edition-glass"] .mcard__art {
+  margin: 0.4cqi 0 0.2cqi;
+  border-radius: 5.6cqi;
+  background: var(--edition-night);
+  box-shadow:
+    0 0 0 0.3cqi rgba(255, 255, 255, 0.38),
+    0 2.6cqi 6cqi rgba(10, 6, 30, 0.45);
+}
+.mcard[data-frame="edition-glass"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.3) 0%, transparent 22%),
+    linear-gradient(340deg, rgba(255, 255, 255, 0.16) 0%, transparent 16%);
+}
+.mcard[data-frame="edition-glass"] .mcard__art .mcard__badge {
+  box-shadow:
+    0 0 0 0.6cqi rgba(255, 255, 255, 0.7),
+    0 1.4cqi 3cqi rgba(10, 6, 30, 0.45);
+}
+/* behind a cut-out character: the aurora */
+.mcard[data-frame="edition-glass"] .mcard__art[data-cutout] {
+  background: var(--edition-aurora);
+}
+.mcard[data-frame="edition-glass"] .mcard__sky {
+  background: var(--edition-aurora);
+  mask: none;
+}
+/* what it is, in a pill of glass */
+.mcard[data-frame="edition-glass"] .mcard__strip {
+  padding: 0.8cqi 2.2cqi 0.8cqi 0.8cqi;
+  background: rgba(20, 10, 30, 0.3);
+  backdrop-filter: blur(2.6cqi);
+  box-shadow:
+    inset 0 0.3cqi 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 0 0.3cqi rgba(255, 255, 255, 0.2);
+  color: var(--edition-text);
+  font-family: "Poppins", sans-serif;
+  font-style: normal;
+  font-weight: 500;
+}
+.mcard[data-frame="edition-glass"] .mcard__stage {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0.3cqi 0 rgba(255, 255, 255, 0.5);
+  color: var(--edition-text);
+  font-family: "Poppins", sans-serif;
+  letter-spacing: 0.08em;
+}
+.mcard[data-frame="edition-glass"] .mcard__lower {
+  padding: 2cqi 2.4cqi;
+  border-radius: 5cqi;
+  font-family: "Poppins", sans-serif;
+}
+.mcard[data-frame="edition-glass"] .mcard__poster {
+  margin: 0;
+  border-radius: 2.6cqi;
+  box-shadow:
+    0 0 0 0.3cqi rgba(255, 255, 255, 0.4),
+    0 1cqi 2cqi rgba(10, 6, 30, 0.4);
+}
+.mcard[data-frame="edition-glass"] .mcard__facts .mcard__by,
+.mcard[data-frame="edition-glass"] .mcard__work small,
+.mcard[data-frame="edition-glass"] .mcard__meta {
+  color: var(--edition-soft);
+  opacity: 1;
+}
+.mcard[data-frame="edition-glass"] .mcard__work,
+.mcard[data-frame="edition-glass"] .mcard__meta {
+  border-block-end-color: rgba(255, 255, 255, 0.18);
+}
+.mcard[data-frame="edition-glass"] .mcard__work strong,
+.mcard[data-frame="edition-glass"] .mcard__figures strong {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.mcard[data-frame="edition-glass"] .mcard__figures li:not(:first-child) {
+  border-block-start-color: rgba(255, 255, 255, 0.18);
+}
+.mcard[data-frame="edition-glass"] .mcard__cost {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 0.3cqi 0 rgba(255, 255, 255, 0.6),
+    inset 0 0 0 0.3cqi rgba(255, 255, 255, 0.3);
+}
+.mcard[data-frame="edition-glass"] .mcard__flavor {
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.08);
+  font-family: "Poppins", sans-serif;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--edition-soft);
+}
+.mcard[data-frame="edition-glass"] .mcard__foot {
+  padding-inline: 1.6cqi 0;
+  font-family: "Poppins", sans-serif;
+  letter-spacing: 0.08em;
+  color: var(--edition-soft);
+}
+/* the rarity: a pill of glass of its colour, its gem in its metal, its halo */
+.mcard[data-frame="edition-glass"] .mcard__rarity {
+  padding: 0.8cqi 2.6cqi 0.8cqi 1cqi;
+  background: color-mix(in srgb, var(--mcard-rarity) 58%, transparent);
+  backdrop-filter: blur(2.4cqi);
+  box-shadow:
+    inset 0 0.3cqi 0 rgba(255, 255, 255, 0.65),
+    inset 0 0 0 0.3cqi var(--mcard-rarity),
+    0 0 2.4cqi var(--mcard-glow);
+  color: var(--edition-text);
+  font-size: 3cqi;
+  font-weight: 700;
+  text-shadow: none;
+}
+.mcard[data-frame="edition-glass"] .mcard__gem {
+  inline-size: 4.4cqi;
+  block-size: 4.4cqi;
+  background: var(--mcard-rim);
+}
+/* a work's own card holds more (three figures, its line): its box tighter */
+.mcard[data-frame="edition-glass"][data-kind="title"] .mcard__lower {
+  padding-block: 1cqi;
+}
+.mcard[data-frame="edition-glass"][data-kind="title"] .mcard__figures li {
+  padding-block: 0.3cqi;
+  font-size: 3.2cqi;
+}
+.mcard[data-frame="edition-glass"][data-kind="title"] .mcard__flavor {
+  padding-block: 0.4cqi;
+  font-size: 3.2cqi;
+  line-height: 1.1;
+  -webkit-line-clamp: 1;
+}
+
+/* --- HD (a legendary): the aurora over the whole card, its veils moving, a glint crossing the glass ----- */
+.mcard[data-frame="edition-glass"][data-hd] .mcard__backdrop {
+  background: var(--edition-night);
+}
+.mcard[data-frame="edition-glass"][data-hd] .mcard__backdrop::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(28% 22% at 22% 18%, var(--mcard-accent), transparent 70%),
+    radial-gradient(26% 20% at 78% 34%, #2fd6c0, transparent 70%),
+    radial-gradient(32% 22% at 62% 86%, #ff9a3c, transparent 70%);
+}
+.mcard[data-frame="edition-glass"][data-hd] .mcard__backdrop::after {
+  inset: -25%;
+  background: radial-gradient(30% 24% at 20% 72%, #3a2bb8, transparent 70%),
+    radial-gradient(22% 18% at 82% 70%, #b04ad8, transparent 70%);
+  mask: none;
+  opacity: 0.9;
+}
+/* the glint crossing the glass, between the aurora and the plates */
+.mcard[data-frame="edition-glass"][data-frameless] .mcard__body::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 38%, rgba(255, 255, 255, 0.22) 50%, transparent 62%) 0 0 / 300%
+    100%;
+}
+/* the frame stays, the lens goes: the character over the aurora */
+.mcard[data-frame="edition-glass"][data-frameless] .mcard__art,
+.mcard[data-frame="edition-glass"][data-frameless] .mcard__art[data-cutout] {
+  background: none;
+  box-shadow: none;
+}
+.mcard[data-frame="edition-glass"][data-frameless] .mcard__art::after {
+  content: none;
+}
+/* a work, borderless: its scene under two plates of glass, a glint and the aurora's light passing over it */
+.mcard[data-frame="edition-glass"][data-borderless] .mcard__body {
+  background: none;
+}
+.mcard[data-frame="edition-glass"][data-borderless] .mcard__art {
+  margin: 0;
+  background: none;
+  box-shadow: none;
+}
+.mcard[data-frame="edition-glass"][data-borderless] .mcard__art .mcard__picture {
+  border-radius: 6cqi;
+}
+.mcard[data-frame="edition-glass"][data-borderless] .mcard__foot {
+  padding: 1cqi 1.2cqi 1cqi 2.4cqi;
+  border-radius: 999px;
+  background: rgba(20, 10, 30, 0.3);
+  backdrop-filter: blur(2.6cqi);
+  box-shadow: inset 0 0.3cqi 0 rgba(255, 255, 255, 0.4);
+}
+.mcard[data-frame="edition-glass"][data-borderless] .mcard__art::after {
+  z-index: -1;
+  border-radius: 6cqi;
+  background:
+    linear-gradient(100deg, transparent 38%, rgba(255, 255, 255, 0.24) 50%, transparent 62%) 0 0 / 300% 100%,
+    radial-gradient(40% 30% at 20% 10%, color-mix(in srgb, var(--mcard-accent) 45%, transparent), transparent 70%) 0
+      0 / 200% 200%,
+    linear-gradient(160deg, rgba(255, 255, 255, 0.28) 0%, transparent 20%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mcard[data-frame="edition-glass"][data-hd] .mcard__backdrop::before {
+    animation: edition-glass-veils 11s ease-in-out infinite alternate;
+  }
+  .mcard[data-frame="edition-glass"][data-hd] .mcard__backdrop::after {
+    animation: edition-glass-veils-back 14s ease-in-out infinite alternate;
+  }
+  .mcard[data-frame="edition-glass"][data-frameless] .mcard__body::after {
+    animation: edition-glass-glint 6s ease-in-out infinite;
+  }
+  .mcard[data-frame="edition-glass"][data-hd][data-borderless] .mcard__art::after {
+    animation: edition-glass-pass 9s ease-in-out infinite alternate;
+  }
+}
+@keyframes edition-glass-veils {
+  from {
+    transform: translate(-8%, -5%) scale(1);
+  }
+  to {
+    transform: translate(9%, 7%) scale(1.15);
+  }
+}
+@keyframes edition-glass-veils-back {
+  from {
+    transform: translate(7%, 6%) scale(1.1);
+  }
+  to {
+    transform: translate(-9%, -8%) scale(0.95);
+  }
+}
+@keyframes edition-glass-glint {
+  0%,
+  25% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+@keyframes edition-glass-pass {
+  from {
+    background-position: 100% 0, 0 0, 0 0;
+  }
+  to {
+    background-position: 0 0, 100% 100%, 0 0;
+  }
+}

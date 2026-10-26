@@ -1,0 +1,300 @@
+/* Portalab — card_frame/edition-laserdisc: the LaserDisc edition (1980–1985), Memphis — a rim of graph paper
+   over the rarity's metal, a page of confetti (triangles, squiggles, hatching), flat pastels ringed in black,
+   solid offset shadows, the name underlined by a bar of yellow, the genre in a half moon. Behind a cut-out
+   character, a pastel grid under a yellow sun; the HD version (#255): that grid over the whole card, the
+   confetti drifting and turning, the squiggles waving, an iridescent disc spinning. */
+
+.mcard[data-frame="edition-laserdisc"] {
+  --edition-ink: #111111;
+  --edition-paper: #fbf8f1;
+  --edition-yellow: #ffd23f;
+  --edition-pink: #ff6fa5;
+  --edition-teal: #2ec4b6;
+  --edition-blue: #3b4cca;
+  --edition-confetti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M14 10l12-7 2 14z' fill='%232ec4b6' stroke='%23111' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M70 22q6-8 12 0t12 0t12 0' fill='none' stroke='%23ff6fa5' stroke-width='3.5' stroke-linecap='round'/%3E%3Ccircle cx='104' cy='68' r='5' fill='%233b4cca'/%3E%3Cpath d='M30 84l10 0-5 9z' fill='%23ffd23f' stroke='%23111' stroke-width='1.8' stroke-linejoin='round'/%3E%3Cg stroke='%23111' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M76 98l7-7'/%3E%3Cpath d='M84 104l7-7'/%3E%3Cpath d='M92 110l7-7'/%3E%3C/g%3E%3Cpath d='M8 52q5-6 10 0t10 0' fill='none' stroke='%232ec4b6' stroke-width='3' stroke-linecap='round'/%3E%3Crect x='52' y='56' width='9' height='9' fill='%23ff6fa5' stroke='%23111' stroke-width='1.6' transform='rotate%2820 56 60%29'/%3E%3C/svg%3E");
+  --edition-squiggles: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cpath d='M6 30q10-14 20 0t20 0t20 0t20 0t20 0t20 0' fill='none' stroke='%23ff6fa5' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M10 110q8-10 16 0t16 0t16 0' fill='none' stroke='%23111' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M80 84l14-8 2 16z' fill='%23ffd23f' stroke='%23111' stroke-width='2'/%3E%3C/svg%3E");
+  --edition-grid:
+    linear-gradient(rgba(17, 17, 17, 0.14) 0.25cqi, transparent 0.25cqi) 0 0 / 4.4cqi 4.4cqi,
+    linear-gradient(90deg, rgba(17, 17, 17, 0.14) 0.25cqi, transparent 0.25cqi) 0 0 / 4.4cqi 4.4cqi;
+  --edition-scene:
+    radial-gradient(circle at 72% 30%, var(--edition-yellow) 0 11cqi, var(--edition-ink) 11.1cqi 11.6cqi, transparent 11.7cqi),
+    var(--edition-confetti) 0 0 / 30cqi 30cqi,
+    var(--edition-grid),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--edition-teal) 55%, var(--edition-paper)) 0%,
+      color-mix(in srgb, var(--edition-pink) 45%, var(--edition-paper)) 100%
+    );
+}
+/* the rim: graph paper over the rarity's metal */
+.mcard[data-frame="edition-laserdisc"] .mcard__card {
+  padding: 2.2cqi;
+  border-radius: 2.4cqi;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.55) 0.25cqi, transparent 0.25cqi) 0 0 / 1.6cqi 1.6cqi,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0.25cqi, transparent 0.25cqi) 0 0 / 1.6cqi 1.6cqi,
+    var(--mcard-rim);
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__body {
+  gap: 1.8cqi;
+  padding: 3cqi 3.2cqi 2.4cqi;
+  border-radius: 1.2cqi;
+  background: var(--edition-confetti) 0 0 / 34cqi 34cqi, var(--edition-paper);
+  box-shadow: inset 0 0 0 0.6cqi var(--edition-ink);
+  color: var(--edition-ink);
+}
+/* the name, underlined by a bar of yellow */
+.mcard[data-frame="edition-laserdisc"] .mcard__name {
+  flex: 0 1 auto;
+  padding: 0 1cqi;
+  background: linear-gradient(180deg, transparent 58%, var(--edition-yellow) 58% 92%, transparent 92%);
+  font-family: "Dela Gothic One", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--edition-ink);
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__head {
+  justify-content: space-between;
+}
+/* the genre in a half moon of its colour, ringed in black */
+.mcard[data-frame="edition-laserdisc"] .mcard__genre {
+  padding: 1.6cqi 2.2cqi 0.5cqi 1cqi;
+  border-radius: 7cqi 7cqi 0 0;
+  background: var(--mcard-accent);
+  box-shadow: inset 0 0 0 0.5cqi var(--edition-ink);
+  color: var(--edition-ink);
+  font-family: "Poppins", sans-serif;
+  font-size: 2.6cqi;
+  font-weight: 700;
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__emblem {
+  background: var(--edition-paper);
+  box-shadow: 0 0 0 0.4cqi var(--edition-ink);
+}
+/* the art offset on a solid pink shadow */
+.mcard[data-frame="edition-laserdisc"] .mcard__art {
+  margin: 0.6cqi 2.8cqi 2.4cqi 0.6cqi;
+  border-radius: 0;
+  background: var(--edition-blue);
+  box-shadow:
+    0 0 0 0.6cqi var(--edition-ink),
+    2.4cqi 2.4cqi 0 0.6cqi var(--edition-pink),
+    2.4cqi 2.4cqi 0 1.2cqi var(--edition-ink);
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__art[data-cutout] {
+  background: none;
+}
+/* behind a cut-out character: a pastel grid under a yellow sun, confetti — no night sky */
+.mcard[data-frame="edition-laserdisc"] .mcard__sky {
+  mask: none;
+  background: var(--edition-scene);
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__strip {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  font-family: "Poppins", sans-serif;
+  font-style: normal;
+  font-weight: 700;
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__stage {
+  padding: 0.6cqi 2.4cqi;
+  border-radius: 0;
+  background: var(--edition-ink);
+  color: var(--edition-paper);
+  font-family: "Dela Gothic One", sans-serif;
+  font-size: 2.8cqi;
+  font-weight: 400;
+}
+/* the edition's symbol, iridescent like a disc */
+.mcard[data-frame="edition-laserdisc"] .mcard__edition {
+  inline-size: 5.6cqi;
+  block-size: 5.6cqi;
+  background: conic-gradient(from 20deg, var(--edition-pink), var(--edition-yellow), var(--edition-teal), var(--edition-blue), #b98cff, var(--edition-pink));
+  filter: drop-shadow(0.3cqi 0.3cqi 0 var(--edition-ink));
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__lower {
+  padding: 1.4cqi 1.8cqi;
+  background: var(--edition-yellow);
+  box-shadow:
+    inset 0 0 0 0.5cqi var(--edition-ink),
+    1cqi 1cqi 0 var(--edition-ink);
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__poster {
+  margin: 0;
+  border-radius: 0;
+  box-shadow:
+    0 0 0 0.5cqi var(--edition-ink),
+    0.8cqi 0.8cqi 0 0.5cqi var(--edition-teal);
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__work {
+  border-block-end: 0.4cqi dashed var(--edition-ink);
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__work strong,
+.mcard[data-frame="edition-laserdisc"] .mcard__figures strong {
+  font-family: "Dela Gothic One", sans-serif;
+  font-weight: 400;
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__meta {
+  border-block-end: 0.4cqi dashed var(--edition-ink);
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__figures li:not(:first-child) {
+  border-block-start: 0.4cqi dashed var(--edition-ink);
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__cost {
+  border-radius: 0;
+  background: var(--edition-teal);
+  color: var(--edition-ink);
+  box-shadow: 0 0 0 0.4cqi var(--edition-ink);
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__flavor {
+  border: 0.5cqi solid var(--edition-ink);
+  border-radius: 0;
+  background: var(--edition-pink);
+  box-shadow: 0.8cqi 0.8cqi 0 var(--edition-ink);
+  color: var(--edition-ink);
+  font-family: "Poppins", sans-serif;
+  font-style: normal;
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__foot {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+/* the rarity: a cartouche ringed in its colour, its gem in its metal, a solid shadow */
+.mcard[data-frame="edition-laserdisc"] .mcard__rarity {
+  gap: 1.4cqi;
+  padding: 0.6cqi 2.2cqi 0.6cqi 1cqi;
+  border-radius: 0;
+  background: var(--edition-paper);
+  color: var(--edition-ink);
+  box-shadow:
+    inset 0 0 0 0.7cqi var(--mcard-rarity),
+    0 0 0 0.4cqi var(--edition-ink),
+    0.8cqi 0.8cqi 0 0.4cqi var(--edition-ink);
+  font-family: "Dela Gothic One", sans-serif;
+  font-size: 3cqi;
+  font-weight: 400;
+}
+.mcard[data-frame="edition-laserdisc"] .mcard__gem {
+  inline-size: 4.4cqi;
+  block-size: 4.4cqi;
+  background: var(--mcard-rim);
+}
+/* a work's own card holds more (three figures, its line): its box tighter */
+.mcard[data-frame="edition-laserdisc"][data-kind="title"] .mcard__lower {
+  padding-block: 0.8cqi;
+}
+.mcard[data-frame="edition-laserdisc"][data-kind="title"] .mcard__figures li {
+  padding-block: 0.3cqi;
+}
+.mcard[data-frame="edition-laserdisc"][data-kind="title"] .mcard__flavor {
+  padding-block: 0.6cqi;
+  -webkit-line-clamp: 1;
+}
+
+/* --- the HD version (#255): a legendary's, foil ---------------------------------------------------------- */
+.mcard[data-frame="edition-laserdisc"][data-hd] .mcard__backdrop {
+  background: var(--edition-scene);
+  box-shadow: inset 0 0 0 0.6cqi var(--edition-ink);
+}
+/* an iridescent disc, spinning */
+.mcard[data-frame="edition-laserdisc"][data-hd] .mcard__backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 34cqi -12cqi auto auto;
+  inline-size: 40cqi;
+  block-size: 40cqi;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--edition-paper) 0 3cqi, var(--edition-ink) 3cqi 3.6cqi, transparent 3.7cqi),
+    conic-gradient(from 0deg, var(--edition-pink), var(--edition-yellow), var(--edition-teal), var(--edition-blue), #b98cff, var(--edition-pink));
+  box-shadow: 0 0 0 0.6cqi var(--edition-ink);
+  opacity: 0.85;
+}
+/* the squiggles and confetti, waving (in place of the night sky) */
+.mcard[data-frame="edition-laserdisc"][data-hd] .mcard__backdrop::after {
+  inset: -20%;
+  background: var(--edition-squiggles) 0 0 / 36cqi 36cqi;
+  mask: none;
+  opacity: 0.9;
+}
+/* a character: the frame without its window — the character stands on the grid */
+.mcard[data-frame="edition-laserdisc"][data-frameless] .mcard__art,
+.mcard[data-frame="edition-laserdisc"][data-frameless] .mcard__art[data-cutout] {
+  background: none;
+  box-shadow: none;
+}
+.mcard[data-frame="edition-laserdisc"][data-frameless] .mcard__lower {
+  background: color-mix(in srgb, var(--edition-yellow) 88%, transparent);
+}
+.mcard[data-frame="edition-laserdisc"][data-frameless] .mcard__name {
+  background: linear-gradient(180deg, var(--edition-paper) 0 58%, var(--edition-yellow) 58% 92%, transparent 92%);
+}
+/* a work: its scene over the whole card, the cartouches ringed over it */
+.mcard[data-frame="edition-laserdisc"][data-borderless] .mcard__body {
+  color: var(--edition-paper);
+}
+.mcard[data-frame="edition-laserdisc"][data-borderless] .mcard__art {
+  margin: 0;
+  background: none;
+  box-shadow: none;
+}
+.mcard[data-frame="edition-laserdisc"][data-borderless] .mcard__name {
+  background: linear-gradient(180deg, var(--edition-paper) 0 58%, var(--edition-yellow) 58% 92%, transparent 92%);
+  color: var(--edition-ink);
+  text-shadow: none;
+}
+.mcard[data-frame="edition-laserdisc"][data-borderless] .mcard__by {
+  padding: 0.3cqi 1.4cqi;
+  background: var(--edition-paper);
+  color: var(--edition-ink);
+  box-shadow: 0 0 0 0.4cqi var(--edition-ink);
+  text-shadow: none;
+}
+.mcard[data-frame="edition-laserdisc"][data-borderless] .mcard__foot > span:first-child {
+  padding: 0.3cqi 1.2cqi;
+  background: var(--edition-ink);
+  color: var(--edition-paper);
+}
+.mcard[data-frame="edition-laserdisc"][data-hd][data-borderless] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--edition-confetti) 0 0 / 34cqi 34cqi;
+  opacity: 0.85;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mcard[data-frame="edition-laserdisc"][data-hd] .mcard__backdrop::before {
+    animation: edition-laserdisc-spin 9s linear infinite;
+  }
+  .mcard[data-frame="edition-laserdisc"][data-hd] .mcard__backdrop::after {
+    animation: edition-laserdisc-wave 3.6s ease-in-out infinite alternate;
+  }
+  .mcard[data-frame="edition-laserdisc"][data-hd][data-borderless] .mcard__art::after {
+    animation: edition-laserdisc-float 14s linear infinite;
+  }
+}
+@keyframes edition-laserdisc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes edition-laserdisc-wave {
+  from {
+    transform: translate(-2cqi, 1cqi) rotate(-2deg);
+  }
+  to {
+    transform: translate(2cqi, -1cqi) rotate(2deg);
+  }
+}
+@keyframes edition-laserdisc-float {
+  from {
+    transform: translateY(0) rotate(0);
+  }
+  to {
+    transform: translateY(-34cqi) rotate(8deg);
+  }
+}

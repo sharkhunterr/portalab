@@ -1,14 +1,25 @@
-"""Issue 233: a card's edition, like a trading card game's — the medium of its work's era of release: the
-cinema's film reel, the video shop's cassette, the disc, then streaming. Each card has, besides its own
-versions, its edition's: its edition's frame (drawn by a visual pack's ``card_frame``, Portalab drawing the
-card) with the edition's symbol on its band, foil or not."""
+"""Issue 233: a card's edition, like a trading card game's — the medium and the look of its work's era of
+release. Issue 255: fourteen generations, from the silent film's intertitle to today's glass: each card has,
+besides its own versions, its edition's: its edition's frame (drawn by a visual pack's ``card_frame``,
+Portalab drawing the card) with the edition's symbol on its band, foil or not — and, for a legendary, its HD
+version."""
 
 # the editions in order: their key, the last year of release they hold (the last one: every year since)
 EDITIONS: tuple[tuple[str, int | None], ...] = (
+    ("nitrate", 1929),
+    ("noir", 1949),
+    ("drivein", 1959),
+    ("super8", 1969),
     ("film", 1979),
-    ("vhs", 1996),
-    ("disc", 2009),
-    ("stream", None),
+    ("laserdisc", 1985),
+    ("vhs", 1992),
+    ("zine", 1997),
+    ("bubble", 2002),
+    ("disc", 2008),
+    ("leather", 2012),
+    ("tiles", 2016),
+    ("stream", 2021),
+    ("glass", None),
 )
 
 
