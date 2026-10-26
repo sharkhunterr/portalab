@@ -141,6 +141,18 @@ function Card({
   // turned over: the card lies flat again — no 3D left around its face (an animated face in a turned 3D
   // context flickers on phones, issue 255)
   const [settled, setSettled] = useState(false);
+  // out of sight (the row scrolls on a phone): its motion paused, so only what is seen moves (issue 255)
+  const slot = useRef<HTMLLIElement>(null);
+  const [offscreen, setOffscreen] = useState(false);
+  useEffect(() => {
+    const element = slot.current;
+    if (!element || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(([entry]) => setOffscreen(!entry?.isIntersecting), {
+      rootMargin: "0px 25%",
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
   const parts = scene?.parts;
   // face down, its back tells nothing: the « common » back until it starts turning
   const back = parts?.back?.[(state === "hidden" ? "common" : rarity) as Rarity] ?? parts?.back?.common;
@@ -158,7 +170,9 @@ function Card({
       : t("marketplace:booster.hidden", { n: index + 1 });
   return (
     <li
+      ref={slot}
       className="booster-card"
+      data-offscreen={offscreen || undefined}
       // face down, nothing tells its rarity — not even in the page
       data-rarity={state === "hidden" ? undefined : rarity}
       data-state={state}
