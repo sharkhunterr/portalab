@@ -1739,8 +1739,11 @@
   max-inline-size: 22rem;
 }
 
-.gam-ops__what > .admin-muted {
+.gam-ops__what > * {
   display: block;
+}
+
+.gam-ops__what > .admin-muted {
   font-size: var(--font-size-xs);
 }
 
