@@ -35,6 +35,7 @@ from portalab.modules.gamification.progression.sources import (
     PLAY_SOURCES,
     QUESTS,
     action_of,
+    factors,
     is_wheel,
     play_source,
     since_days,
@@ -727,6 +728,7 @@ async def members_details(
 class BonusOut(BaseModel):
     source: str  # streak, campaigns, pace, boost
     amount: float  # its share of the operation's amount
+    factor: float | None = None  # issue 258: its multiplier (1.5 for a streak of two days)
 
 
 class OperationOut(BaseModel):
@@ -932,6 +934,7 @@ async def _operations(
             t.source_ref,
         )
         shares = split(t.source_kind, int(t.delta), int(t.base_amount or 0), t.modifiers or {}, action)
+        multipliers = factors(t.modifiers or {})
         level = curve.level_for(max(0, after_it)) if t.value == "xp" else None
         before = curve.level_for(max(0, after_it - int(t.delta))) if t.value == "xp" else None
         items.append(
@@ -964,7 +967,11 @@ async def _operations(
                     else None
                 ),
                 bonuses=[
-                    BonusOut(source=source, amount=round(amount, 1))
+                    BonusOut(
+                        source=source,
+                        amount=round(amount, 1),
+                        factor=round(multipliers[source], 2) if source in multipliers else None,
+                    )
                     for source, amount in shares.items()
                     if source != action and amount > 0
                 ],

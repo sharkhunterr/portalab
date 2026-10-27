@@ -71,7 +71,7 @@ from portalab.modules.gamification.manual.service import RewardServiceImpl
 from portalab.modules.gamification.models import AppliedEvent, Withheld
 from portalab.modules.gamification.modifiers.combiner import ModifierCombiner
 from portalab.modules.gamification.modifiers.rewards import RewardBonuses
-from portalab.modules.gamification.notify import CATEGORIES, Notifier
+from portalab.modules.gamification.notify import CATEGORIES, SERIES_S, Notifier
 from portalab.modules.gamification.observability import log
 from portalab.modules.gamification.privacy.participant import GamificationParticipant
 from portalab.modules.gamification.progression.service import ProgressionService
@@ -225,7 +225,12 @@ class GamificationModule:
             )
         for category in CATEGORIES:
             if default_categories.get(category) is None:
-                declare_category(category, OWNER, f"gamification:category.{category.split('.', 1)[1]}")
+                declare_category(
+                    category,
+                    OWNER,
+                    f"gamification:category.{category.split('.', 1)[1]}",
+                    series_s=SERIES_S if category == "gamification.reward" else 0,
+                )
         default_retention_targets.register(
             RetentionTarget(
                 "gamification.withheld",

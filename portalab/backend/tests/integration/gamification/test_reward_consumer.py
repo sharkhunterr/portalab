@@ -83,6 +83,16 @@ async def test_events_grant_once(gm: GamHarness) -> None:
     assert await gm.balance(user, "xp") == 220 and await gm.balance(user, "coins") == 15
     assert {r.category for r in outbox.sent} >= {"gamification.reward", "gamification.level_up"}
     assert all(r.audience.ids == (user,) for r in outbox.sent)  # type: ignore[union-attr]
+    # issue 258: one gain, one notification — its XP and its Coins together, merged with the rule's others
+    rewards = [r for r in outbox.sent if r.category == "gamification.reward"]
+    assert len(rewards) == 3
+    assert {k: rewards[0].params[k] for k in ("value", "xp", "coins", "rule")} == {
+        "value": "xp",
+        "xp": 60,
+        "coins": 5,
+        "rule": "listen",
+    }
+    assert {r.subject_ref for r in rewards} == {f"progression:{user}:listen"}
 
 
 async def test_concurrent_events_for_one_user(gm: GamHarness) -> None:

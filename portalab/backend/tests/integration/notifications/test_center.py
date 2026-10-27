@@ -4,6 +4,7 @@ archive and delete (several at once too, #112), owner-only; text is rendered in 
 repeats about one subject are coalesced (critical never); a muted portal channel is suppressed while e-mail
 is unaffected; a content-free live ping is published."""
 
+from datetime import timedelta
 from uuid import UUID
 
 import httpx
@@ -13,6 +14,7 @@ from sqlalchemy import text
 
 from portalab.capabilities.notifications import CommunicationRequest, Users, WithPermission, declare_category
 from portalab.core.authz_port import Principal
+from portalab.core.time import FixedClock
 from portalab.modules.administration.config.service import Change
 from portalab.modules.notifications.producer.service import AudienceForbidden
 from tests.integration.identity.helpers import create_user, login, module_of
@@ -149,3 +151,35 @@ async def test_preferences_and_authority(
         )
     mine = await notify.module.send(request(alex, "p4"), caller=Principal(user_id=alex))  # oneself is fine
     assert mine.created
+
+
+async def test_a_series_of_rewards_is_one_item_with_its_total(
+    app: FastAPI, client: httpx.AsyncClient, notify: NotifyHarness, clock: FixedClock
+) -> None:
+    """Issue 258: a category whose repeats come in series merges them while unread, well past the portal's
+    coalescing window, and the item tells what they brought in all — one per value or as ``value``/``amount``;
+    once read, the next one starts a new item."""
+    declare_category("game.reward", "module:game", "game:category", series_s=3600, registry=notify.categories)
+    zoe = await create_user(module_of(app), "zoe")
+
+    def gain(key: str, **params: object) -> CommunicationRequest:
+        about = {"category": "game.reward", "subject_ref": "progression:radio"}
+        return request(zoe, key, params={"reason": "Radio", **params}, **about)
+
+    await notify.module.send(gain("q1", value="xp", amount=5, xp=5, coins=1))
+    clock.advance(timedelta(minutes=15))  # far past the 120 s window
+    await notify.module.send(gain("q2", value="xp", amount=5, xp=5, coins=1))
+    clock.advance(timedelta(minutes=15))
+    await notify.module.send(gain("q3", value="coins", amount=2))  # told the former way
+    await login(client, "zoe")
+    items = (await client.get("/api/v1/me/notifications")).json()["items"]
+    assert [(i["count"], i["rewards"]) for i in items] == [
+        (3, [{"value": "xp", "amount": 10}, {"value": "coins", "amount": 4}])
+    ]
+    await client.post(f"/api/v1/me/notifications/{items[0]['id']}/read")
+    await notify.module.send(gain("q4", value="xp", amount=5, xp=5, coins=1))
+    items = (await client.get("/api/v1/me/notifications")).json()["items"]
+    assert [(i["count"], i["rewards"]) for i in items] == [
+        (1, [{"value": "xp", "amount": 5}, {"value": "coins", "amount": 1}]),
+        (3, [{"value": "xp", "amount": 10}, {"value": "coins", "amount": 4}]),
+    ]

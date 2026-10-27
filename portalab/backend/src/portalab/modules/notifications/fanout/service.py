@@ -31,6 +31,7 @@ from portalab.core.db import Database
 from portalab.core.jobs.queue import enqueue
 from portalab.core.live import publish_live
 from portalab.core.time import Clock, utc_now
+from portalab.modules.notifications.fanout.merge import merged
 from portalab.modules.notifications.models import Communication, Delivery, EmailOutbox, Notification
 from portalab.modules.notifications.observability import log, metrics
 from portalab.modules.notifications.preferences.resolver import decide
@@ -208,7 +209,9 @@ class FanOut:
     async def _portal(
         self, communication: Communication, user: UUID, ctx: LocaleContext, title: str, body: str, now: Any
     ) -> UUID:
-        window = timedelta(seconds=max(0, self.config().coalesce_window_seconds))
+        category = self.categories.get(communication.category)
+        series = category.series_s if category is not None else 0
+        window = timedelta(seconds=max(0, self.config().coalesce_window_seconds, series))
         async with self.database.unit_of_work() as uow:
             session = uow.session
             if communication.priority != "critical" and communication.subject_ref and window:
@@ -231,6 +234,13 @@ class FanOut:
                 if existing is not None:
                     existing.count += 1
                     existing.title, existing.body, existing.updated_at = title, body, now
+                    # issue 258: what the repeats brought in all (the first one's parameters when none yet)
+                    before = existing.params
+                    if before is None:
+                        before = await session.scalar(
+                            select(Communication.params).where(Communication.id == existing.communication_id)
+                        )
+                    existing.params = merged(before or {}, communication.params or {})
                     existing.priority_rank = max(existing.priority_rank, RANK[communication.priority])
                     await self._delivery(session, communication, user, "portal", "delivered")
                     metrics.increment("notifications.coalesced")

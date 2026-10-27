@@ -1,13 +1,14 @@
 import { useRef, useState } from "react";
 import { AdminEmpty, AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { SelectField } from "../../../design-system/components/Field";
+import { CheckboxField, SelectField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import type { LedgerValue } from "../api";
 import { SOURCES } from "../progression/GainSources";
+import { type JournalLine, repeats } from "./repeats";
 import { LEDGER_VALUES, type Operation, useOperations } from "./tuning";
 
 const SIZES = [25, 50, 100];
@@ -38,6 +39,7 @@ export function Operations({
   const [value, setValue] = useState<LedgerValue | "">("");
   const [play, setPlay] = useState(""); // issue 160: one kind of play only
   const [size, setSize] = useState(SIZES[0] ?? 25);
+  const [each, setEach] = useState(false); // issue 258: every operation, a series not told as one line
   // where each page starts (the first at the top); a change of filter starts over
   const filters = `${days}|${member}|${value}|${size}|${play}`;
   const [pages, setPages] = useState<{ filters: string; cursors: (string | null)[] }>({
@@ -48,6 +50,9 @@ export function Operations({
   const page = cursors.length - 1;
   const journal = useOperations(days, member, value, cursors[page] ?? null, size, mine, play);
   const rows = journal.data?.items ?? [];
+  const lines: JournalLine[] = each
+    ? rows.map((row) => ({ ...row, count: 1, since: row.occurred_at }))
+    : repeats(rows);
   const total = journal.data?.total ?? 0;
   const next = journal.data?.next_cursor ?? null;
   const go = (to: (string | null)[]) => setPages({ filters, cursors: to });
@@ -103,6 +108,11 @@ export function Operations({
               </option>
             ))}
           </SelectField>
+          <CheckboxField
+            label={t("gamification:admin.operations.each")}
+            checked={each}
+            onChange={(event) => setEach(event.target.checked)}
+          />
         </span>
       }
       flush
@@ -133,11 +143,18 @@ export function Operations({
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
+                {lines.map((row) => (
                   <tr key={row.id}>
                     <th scope="row" className="gam-ops__when">
                       <span>{format.date(row.occurred_at, "short")}</span>
-                      <span className="admin-muted">{format.time(row.occurred_at)}</span>
+                      <span className="admin-muted">
+                        {row.count > 1
+                          ? t("gamification:admin.operations.between", {
+                              from: format.time(row.since),
+                              to: format.time(row.occurred_at),
+                            })
+                          : format.time(row.occurred_at)}
+                      </span>
                     </th>
                     {mine ? null : (
                       <td>
@@ -155,6 +172,14 @@ export function Operations({
                         {row.delta > 0 ? "+" : ""}
                         {format.number(row.delta)} {t(`gamification:value.${row.value}`)}
                       </span>
+                      {row.count > 1 ? (
+                        <span
+                          className="gam-ops__repeat"
+                          title={t("gamification:admin.operations.repeats", { count: row.count })}
+                        >
+                          ×{format.number(row.count)}
+                        </span>
+                      ) : null}
                     </td>
                     <td>
                       <span className="gam-ops__source">
@@ -179,10 +204,17 @@ export function Operations({
                               >
                                 <Icon name={SOURCES[bonus.source]?.icon ?? "sparkles"} size={10} />
                               </span>
-                              {t("gamification:admin.operations.bonus", {
-                                amount: format.number(bonus.amount),
-                                source: t(`gamification:sources.${bonus.source}`),
-                              })}
+                              {t(
+                                bonus.factor
+                                  ? "gamification:admin.operations.bonusFactor"
+                                  : "gamification:admin.operations.bonus",
+                                {
+                                  amount: format.number(bonus.amount),
+                                  source: t(`gamification:sources.${bonus.source}`),
+                                  // issue 258: the bonus's multiplier (a streak's ×1.5)
+                                  factor: format.number(bonus.factor ?? 1),
+                                },
+                              )}
                             </span>
                           ))}
                         </span>

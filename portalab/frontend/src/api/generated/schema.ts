@@ -11779,6 +11779,8 @@ export interface components {
         BonusOut: {
             /** Amount */
             amount: number;
+            /** Factor */
+            factor?: number | null;
             /** Source */
             source: string;
         };

@@ -222,12 +222,13 @@ async def test_operations_tell_their_bonuses(gm: GamHarness, client: AsyncClient
     await login(client, "ursula")
     mine = (await client.get("/api/v1/me/progression/operations", params={"value": "xp"})).json()["items"]
     assert [(o["delta"], o["source"], o["bonuses"]) for o in mine] == [
-        (30, "media", [{"source": "streak", "amount": 10.0}]),  # 20 · 1.5: the streak's 10 named
+        # 20 · 1.5: the streak's 10 named, and (#258) its multiplier
+        (30, "media", [{"source": "streak", "amount": 10.0, "factor": 1.5}]),
         (20, "media", []),
     ]
     await login(client, "boss")
     ops = (await client.get("/api/v1/admin/gamification/operations", params={"value": "xp"})).json()["items"]
-    assert ops[0]["bonuses"] == [{"source": "streak", "amount": 10.0}]
+    assert ops[0]["bonuses"] == [{"source": "streak", "amount": 10.0, "factor": 1.5}]  # #258: its 1.5 too
 
 
 async def test_rewards_follow_the_streak(gm: GamHarness) -> None:

@@ -80,6 +80,18 @@ def bonus_of(source_ref: str) -> str | None:
     return None  # the rule's own multiplier stays with the action
 
 
+def factors(modifiers: dict[str, Any]) -> dict[str, float]:
+    """Issue 258: each bonus's multiplier in a movement (a streak's 1.5, a boost's 2), as the journal shows
+    it."""
+    out: dict[str, float] = {}
+    for m in (modifiers or {}).get("applied", []):
+        source = bonus_of(str(m.get("source_ref", "")))
+        factor = float(m.get("factor", 1))
+        if source and factor > 1:
+            out[source] = out.get(source, 1.0) * factor
+    return out
+
+
 def split(row_kind: str, delta: int, base: int, modifiers: dict[str, Any], action: str) -> dict[str, float]:
     """One movement's amount by source: the action's own part, the bonuses in proportion to their boost —
     an action's, or (issue 226) a quest's, an achievement's or a level's reward boosted the same way."""
