@@ -90,8 +90,9 @@ async def radio_request(
 @router.get("/media/radio/stream", include_in_schema=False)
 async def radio_stream(principal: Listener, module: Module) -> StreamingResponse:
     """The live stream, relayed as it plays (until the member stops listening). Issue 227: the time it was
-    relayed counts as this member's listening (the server's count) — issue 257: added to their day every
-    ``HEARD_EVERY`` seconds and when the stream ends, so a pause (a new stream to play on) loses nothing."""
+    relayed counts as this member's listening (the server's count) — added to their sitting every
+    ``HEARD_EVERY`` seconds and when the stream ends, so a pause (a new stream to play on) loses nothing; the
+    sitting's minutes count once it is over (issue 259)."""
     stack = AsyncExitStack()
     body = await stack.enter_async_context(module.radio.listen())
     user = principal.acting_for or principal.user_id

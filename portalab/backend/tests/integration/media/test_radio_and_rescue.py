@@ -1,5 +1,6 @@
-"""Issue 227 — the radio listened to in the portal's player counts, by the server, in slices of a quarter of
-an hour of stream relayed (never told by the page), and a song taken by the DJ is an event of its own.
+"""Issue 227 — the radio listened to in the portal's player counts, by the server (never told by the page)
+— issue 259: by sittings, their minutes told once one is over — and a song taken by the DJ is an event of
+its own.
 Issue 228 — a title about to be deleted (Maintainerr), played to the end: ``media.leaving_watched`` for who
 played it, once per member and title (an episode rescues its series), never in a replay."""
 
@@ -144,26 +145,28 @@ async def test_a_song_asked_is_an_event(app: FastAPI, client: httpx.AsyncClient,
     assert await published(media, "media.radio_requested") == [(str(people["uma"]), {"request": "r1"})]
 
 
-async def test_listening_counted_by_slices(media: MediaHarness, app: FastAPI, clock: FixedClock) -> None:
-    """Issue 257: the minutes add up over the day, whatever the streams they came in (a pause closes one,
-    playing on opens another) — each quarter of an hour reached counts once."""
+async def test_listening_counted_by_sittings(media: MediaHarness, app: FastAPI, clock: FixedClock) -> None:
+    """Issue 259: like a film's minutes — the radio heard adds up in a sitting, pauses included (a new stream
+    to play on), and counts once the sitting is over (nothing heard for a while): one event, its minutes."""
     people = await users(app, media, "ivy")
     user: UUID = people["ivy"]
-    day = clock.now().date().isoformat()
-    await media.module.radio.heard(user, 600)  # ten minutes, then a pause
+    radio = media.module.radio
+    await radio.heard(user, 600)  # ten minutes, then a pause
+    clock.advance(timedelta(minutes=5))
+    await radio.heard(user, 400)  # played on: the same sitting
+    clock.advance(timedelta(minutes=9))
+    assert await radio.sweep() == 0  # still going
     assert await published(media, "media.radio_listened") == []
-    await media.module.radio.heard(user, 400)  # the quarter of an hour reached in the next stream
-    await media.module.radio.heard(user, 1000)  # past the second
+    clock.advance(timedelta(minutes=2))  # nothing heard for more than ten minutes: over
+    assert await radio.sweep() == 1
     told = await published(media, "media.radio_listened")
-    assert [payload["slice"] for _, payload in told] == [1, 2]
-    assert told[0] == (str(user), {"minutes": 15, "session": day, "slice": 1})
-    await media.module.radio.heard(user, 0)
-    await media.module.radio.heard(user, 100)  # 2100 s: still the second
-    assert len(await published(media, "media.radio_listened")) == 2
+    assert [(who, payload["minutes"]) for who, payload in told] == [(str(user), 16)]
+    assert await radio.sweep() == 0  # counted once
 
-    clock.advance(timedelta(days=1))  # a new day starts from nothing
-    await media.module.radio.heard(user, 800)
-    assert len(await published(media, "media.radio_listened")) == 2
+    await radio.heard(user, 50)  # a new sitting, too short to say anything
+    clock.advance(timedelta(minutes=11))
+    assert await radio.sweep() == 1
+    assert len(await published(media, "media.radio_listened")) == 1
 
 
 class _Streaming(_Station):
@@ -180,10 +183,14 @@ class _Streaming(_Station):
 
 
 async def test_the_stream_relayed_is_heard_across_pauses(
-    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, monkeypatch: pytest.MonkeyPatch
+    app: FastAPI,
+    client: httpx.AsyncClient,
+    media: MediaHarness,
+    monkeypatch: pytest.MonkeyPatch,
+    clock: FixedClock,
 ) -> None:
-    """Issue 257: two streams of eight minutes and a half (a pause between them) make a quarter of an hour —
-    the first one's minutes are kept when it ends."""
+    """Issue 257: two streams of eight minutes and a half (a pause between them) are one sitting of seventeen
+    minutes — the first one's are kept when it ends; issue 259: told once the sitting is over."""
     people = await users(app, media, "zoe")
     ticks = iter(range(0, 100_000, 30))  # each chunk relayed half a minute after the one before
     monkeypatch.setattr(
@@ -196,8 +203,10 @@ async def test_the_stream_relayed_is_heard_across_pauses(
         assert heard.status_code == 200, heard.text
     async with media.database.session() as session:
         seconds = await session.scalar(
-            text("SELECT seconds FROM media.radio_listening WHERE user_id = :u"), {"u": people["zoe"]}
+            text("SELECT seconds FROM media.radio_sittings WHERE user_id = :u"), {"u": people["zoe"]}
         )
     assert seconds == 2 * 17 * 30
+    clock.advance(timedelta(minutes=11))
+    assert await media.module.radio.sweep() == 1
     told = await published(media, "media.radio_listened")
-    assert [(who, payload["slice"]) for who, payload in told] == [(str(people["zoe"]), 1)]
+    assert [(who, payload["minutes"]) for who, payload in told] == [(str(people["zoe"]), 17)]

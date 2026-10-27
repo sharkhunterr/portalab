@@ -1,7 +1,7 @@
 """Schema ``media`` (specs/024-media/data-model.md). Objects are never deleted when a source disappears;
 ``service_id`` and source references are opaque (no FK outside the module except ``identity.users``)."""
 
-from datetime import date, datetime
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
@@ -9,7 +9,6 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     CheckConstraint,
-    Date,
     Float,
     ForeignKey,
     Index,
@@ -17,6 +16,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -389,18 +389,23 @@ class RadioCreditLedger(MediaBase):
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
 
-class RadioListening(MediaBase):
-    """Issue 257: the radio heard by a member in a day (UTC), across all the streams opened that day (the
-    player opens a new one at each play) — the seconds relayed in all, and the slices of a quarter of an hour
-    already counted as ``media.radio_listened``."""
+class RadioSitting(MediaBase):
+    """Issue 259: a member's sitting in front of the radio — the seconds the stream was relayed to them,
+    across the streams it took (the player opens a new one at each play). It ends once nothing more was heard
+    for a while, and its minutes then count, once (``media.radio_listened``)."""
 
-    __tablename__ = "radio_listening"
+    __tablename__ = "radio_sittings"
+    __table_args__ = (
+        Index("ix_radio_sittings_user", "user_id", "updated_at"),
+        Index("ix_radio_sittings_open", "updated_at", postgresql_where=text("ended_at IS NULL")),
+    )
 
-    user_id: Mapped[UUID] = mapped_column(primary_key=True)
-    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)
     seconds: Mapped[float] = mapped_column(Float, nullable=False)
-    slices: Mapped[int] = mapped_column(Integer, nullable=False)
+    started_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    ended_at: Mapped[datetime | None] = mapped_column(TZDateTime)
 
 
 class MediaRequest(MediaBase):

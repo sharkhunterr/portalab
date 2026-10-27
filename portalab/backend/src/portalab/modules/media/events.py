@@ -5,7 +5,7 @@ user, private): ``media.playback_started|progressed|paused|finished|abandoned|er
 ``(session, state_seq)`` (``finished`` once per session; ``via`` the portal's own player or reader, #103),
 ``media.resume_available``, ``media.cast_started`` (#103: sent to a casting device). Requests:
 ``media.request_created|updated|available`` deduplicated by ``(request, state)``. The radio (issue 227):
-``media.radio_listened`` (slices of listening, counted by the server), ``media.radio_requested``; issue 228:
+``media.radio_listened`` (a sitting's minutes, counted by the server), ``media.radio_requested``; issue 228:
 ``media.leaving_watched`` (a title about to be deleted, watched to the end); issue 234:
 ``media.season_finished`` (every episode of a season finished)."""
 
@@ -47,13 +47,13 @@ class Playback(BaseModel):
 
 
 class RadioListened(BaseModel):
-    """Issue 227: a member listened to the radio in the portal's player — one per slice of ``minutes`` the
-    stream was relayed to them (counted by the server, never told by the page). Issue 257: the slices are
-    counted over a day, across streams — ``session`` is that day (``YYYY-MM-DD``, UTC)."""
+    """Issue 227: a member listened to the radio in the portal's player (counted by the server, never told
+    by the page). Issue 259: once per sitting, when it is over — ``minutes`` heard in it, ``session`` the
+    sitting; ``slice`` was a quarter of an hour's number, when the radio counted them as it went (#257)."""
 
     minutes: int
     session: str
-    slice: int
+    slice: int | None = None
 
 
 class RadioRequested(BaseModel):
@@ -182,7 +182,7 @@ def register_event_types(registry: EventTypeRegistry) -> None:
     )
     # issue 227: the radio listened to and a song asked for; issue 228: a title rescued by watching it
     for name, schema, dedup, fields in (
-        ("media.radio_listened", RadioListened, ("session", "slice"), frozenset({"minutes"})),
+        ("media.radio_listened", RadioListened, ("session",), frozenset({"minutes"})),
         ("media.radio_requested", RadioRequested, ("request",), frozenset()),
         ("media.leaving_watched", LeavingWatched, ("object",), frozenset({"kind"})),
         ("media.season_finished", SeasonFinished, ("object",), frozenset({"episodes"})),
