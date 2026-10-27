@@ -22,7 +22,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.gamification.achievements.evaluator import Achievements
 from portalab.modules.gamification.anomaly.service import AnomalyService
 from portalab.modules.gamification.antiabuse.guards import Guards
-from portalab.modules.gamification.calculator.calculator import base_amounts
+from portalab.modules.gamification.calculator.calculator import base_amounts, measured
 from portalab.modules.gamification.events import OWN_TYPES
 from portalab.modules.gamification.ledger.writer import Entry, LedgerWriter, lock_user
 from portalab.modules.gamification.models import AppliedEvent, GainContext, PlayKind, Withheld
@@ -305,7 +305,8 @@ class RewardPipeline:
                     kind="grant",
                     base_amount=base,
                     multiplier=round(combined.factor, 4),
-                    modifiers=combined.record(),
+                    # issue 261: with what the rule counted, for the journal to say how
+                    modifiers=combined.record() | _measures(rule, envelope, value),
                     guards=verdict.effects,
                     **common,
                 ),
@@ -328,6 +329,8 @@ class RewardPipeline:
                         "rule": rule.key,
                         # issue 175: why — the rule's name (« Film watched to the end »)
                         "reason": (rule.definition.label or "").strip()[:120] or "none",
+                        # issue 261: what it was about, the minutes its rule counted, a streak's multiplier
+                        **_detail(rule, envelope, value, combined.applied),
                         # #55: a boost bought in the shop shows on each gain it multiplied
                         "boost": next(
                             (
@@ -374,3 +377,29 @@ class RewardPipeline:
             )
         )
         metrics.increment(f"gamification.withheld.{reason}")
+
+
+def _measures(rule: RuleVersion, envelope: Envelope, value: str) -> dict[str, Any]:
+    counted = measured(rule.definition, envelope.payload, value)
+    return {"measured": counted} if counted else {}
+
+
+def _detail(
+    rule: RuleVersion, envelope: Envelope, value: str, applied: list[dict[str, Any]]
+) -> dict[str, Any]:
+    out: dict[str, Any] = {}
+    content = _uuid(envelope.payload.get("object"))
+    if content is not None:
+        out["object"] = str(content)
+    counted = measured(rule.definition, envelope.payload, value)
+    if "watched_s" in counted:
+        out["minutes"] = int(counted["watched_s"] // 60)
+    elif "minutes" in counted:
+        out["minutes"] = int(counted["minutes"])
+    streak = 1.0
+    for m in applied:
+        if str(m.get("source_ref", "")).startswith("streak"):
+            streak *= float(m.get("factor", 1))
+    if streak > 1:
+        out["streak"] = round(streak, 2)
+    return out

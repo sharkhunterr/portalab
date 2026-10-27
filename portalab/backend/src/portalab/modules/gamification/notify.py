@@ -2,15 +2,17 @@
 notification engine (010), after the ledger transaction committed, with coalescing-friendly dedup keys.
 A notification failure never affects the reward."""
 
+import re
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field, replace
 from typing import Any
 from uuid import UUID
 
 from portalab.capabilities.marketplace import GIFTS
-from portalab.capabilities.media_core import CONTENT_BOOSTERS
+from portalab.capabilities.media_core import CATALOG, CONTENT_BOOSTERS
 from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, Users
 from portalab.capabilities.registry import CapabilityRegistry
+from portalab.core.authz_port import Principal
 from portalab.modules.gamification.observability import log
 
 CATEGORIES = (
@@ -26,7 +28,8 @@ REWARD_VALUES = ("xp", "coins", "contribution")
 
 
 DEFAULTS: dict[str, dict[str, Any]] = {
-    "reward": {"reason": "none", "boost": "none"},
+    # issue 261: the work a gain was about, the minutes its rule counted, a streak's multiplier
+    "reward": {"reason": "none", "boost": "none", "work": "none", "minutes": 0, "streak": 0},
     "quest": {"xp": 0, "coins": 0, "contribution": 0},
     "achievement": {"xp": 0, "coins": 0, "contribution": 0},
 }
@@ -55,6 +58,7 @@ class Notifier:
         if not providers:
             return
         for note in notes:
+            note = await self._work(note)
             try:
                 await providers[0].provider.send(
                     CommunicationRequest(
@@ -71,6 +75,26 @@ class Notifier:
                 )
             except Exception:
                 log.warning("reward notification not sent", extra={"fields": {"kind": note.kind}})
+
+    async def _work(self, note: Note) -> Note:
+        """Issue 261: the work a gain was about (« Sissi · S2 E6 », « Dune (2021) »), as the member may see it
+        in the catalog — its object in place of its name; a failure leaves it unsaid."""
+        raw = note.params.get("object")
+        if note.kind != "reward" or not raw:
+            return note
+        params = {key: value for key, value in note.params.items() if key != "object"}
+        try:
+            catalog = self.capabilities.system_providers(CATALOG)
+            work = (
+                await catalog[0].provider.get(UUID(str(raw)), Principal(user_id=note.user))
+                if catalog
+                else None
+            )
+        except Exception:
+            work = None
+        if work is not None:
+            params["work"] = work_name(work)[:160]
+        return replace(note, params=params)
 
     async def boosters(self, user: UUID, content: UUID, count: int, reason: str) -> int:
         """Issue 234: a content's boosters a rule gives (the cards') — how many were given; a failure never
@@ -126,3 +150,14 @@ def together(notes: list[Note]) -> list[Note]:
         kept = out[first[key]]
         out[first[key]] = replace(kept, params={**kept.params, str(value): note.params.get("amount", 0)})
     return out
+
+
+def work_name(work: Any) -> str:
+    """An episode by its series, season and number (and its own title when it says more than its number), a
+    film by its year."""
+    if work.kind == "episode" and work.series:
+        season, number = ("?" if n is None else n for n in (work.season, work.number))
+        at = f"S{season} E{number}"
+        own = "" if re.fullmatch(r"(?i)[ée]pisode \d+", work.title or "") else f" · {work.title}"
+        return f"{work.series} · {at}{own}"
+    return f"{work.title} ({work.year})" if work.year else str(work.title)

@@ -3,7 +3,7 @@ pagination, one object with its ids, children and poster, and the ``media.catalo
 modules. Merged objects resolve to their survivor; hidden ones are only shown to ``media.manage``."""
 
 from collections.abc import Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 from typing import Any
 from uuid import UUID
@@ -371,9 +371,23 @@ class CatalogPort:
             return None
         async with self.query.database.session() as session:
             row = await live_object(session, object_id)
-        if row is None or row.status != "active":
-            return None
-        return summary(row)
+            if row is None or row.status != "active":
+                return None
+            if row.kind != "episode" or row.parent_id is None:
+                return summary(row)
+            # issue 261: an episode is told with its series and its season (« Sissi · S2 E6 »)
+            season = await session.get(MediaObject, row.parent_id)
+            series = (
+                await session.get(MediaObject, season.parent_id)
+                if season is not None and season.parent_id is not None
+                else None
+            )
+        return replace(
+            summary(row),
+            series=series.title if series is not None else None,
+            season=season.position if season is not None else None,
+            number=row.position,
+        )
 
     async def resolve_ref(self, ref: str, viewer: Principal) -> MediaSummary | None:
         scheme, _, value = ref.partition(":")

@@ -169,6 +169,10 @@ class MediaSummary:
     available: bool
     route: str
     genres: tuple[str, ...] = ()
+    # issue 261: for an episode, its series' title, its season's number and its own
+    series: str | None = None
+    season: int | None = None
+    number: int | None = None
 
 
 @dataclass(frozen=True, slots=True)

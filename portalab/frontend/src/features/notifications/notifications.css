@@ -274,6 +274,9 @@
 .notif-reward[data-value="contribution"] {
   --reward: var(--state-available-fg);
 }
+.notif-reward[data-value="streak"] {
+  --reward: var(--rarity-rare);
+}
 .notif-reward[data-value="boost"] {
   --reward: var(--rarity-epic);
 }

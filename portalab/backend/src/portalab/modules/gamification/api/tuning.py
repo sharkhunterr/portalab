@@ -2,6 +2,7 @@
 be rewarded (event types and their rewardable attributes), play streaks, level rewards and how members
 progress over time (daily gains, the members who progress most, where the gains come from)."""
 
+import math
 import types
 from datetime import UTC, date, datetime, timedelta
 from typing import Annotated, Any, Literal, Union, get_args, get_origin
@@ -731,6 +732,30 @@ class BonusOut(BaseModel):
     factor: float | None = None  # issue 258: its multiplier (1.5 for a streak of two days)
 
 
+class ReckoningOut(BaseModel):
+    """Issue 261: how the rule in force at the time reckoned a gain's own amount, before its bonuses."""
+
+    fixed: int | None = None  # the rule's fixed amount
+    field: str | None = None  # what it counted per unit (watched_s, minutes…)
+    quantity: float | None = None  # how much of it, as the event said (unknown for a gain older than #261)
+    factor: float | None = None  # the amount per unit counted
+    max: int | None = None  # the most the per-unit part gives
+    base: int  # the action's own amount
+    multiplier: float  # its bonuses' multiplier, all together
+    capped: bool  # a limit (the day's cap…) kept some of it back
+
+
+class WorkOut(BaseModel):
+    """Issue 261: the work played, as the catalog tells it — an episode with its series and season."""
+
+    kind: str
+    title: str
+    year: int | None = None
+    series: str | None = None
+    season: int | None = None
+    number: int | None = None
+
+
 class OperationOut(BaseModel):
     id: UUID
     occurred_at: datetime
@@ -748,6 +773,8 @@ class OperationOut(BaseModel):
     level_up: bool  # for XP: a new level was reached
     play: str | None = None  # issue 160: for a play, what was played (episode, movie, book, audiobook…)
     title: str | None = None  # and its title, when the catalog still knows it
+    work: WorkOut | None = None  # issue 261: and the work itself, an episode with its series and season
+    reckoning: ReckoningOut | None = None  # issue 261: how its rule counted it
     # the other member involved (e.g. who watched a title this member asked for) — the administration's only
     other: str | None = None
     # the bonuses on top of the action's own amount (streak, campaign, pace, boost), as on the charts
@@ -896,17 +923,33 @@ async def _operations(
         }
         more = len(rows) > limit
         rows = rows[:limit]
-        triggers = {t.trigger_event_id for t, _ in rows if t.trigger_event_id is not None}
-        plays: dict[UUID, tuple[str, str | None]] = {
-            event: (kind, played)
-            for event, kind, played in (
-                await session.execute(
-                    select(PlayKind.event_id, PlayKind.kind, PlayKind.object).where(
-                        PlayKind.event_id.in_(triggers)
+        versions = {(t.rule_key, t.rule_version) for t, _ in rows if t.rule_key and t.rule_version}
+        definitions: dict[tuple[str, int], dict[str, Any]] = (
+            {
+                (key, version): definition
+                for key, version, definition in (
+                    await session.execute(
+                        select(RewardRule.key, RewardRule.version, RewardRule.definition).where(
+                            tuple_(RewardRule.key, RewardRule.version).in_(versions)
+                        )
                     )
+                ).all()
+            }
+            if versions
+            else {}
+        )
+        triggers = {t.trigger_event_id for t, _ in rows if t.trigger_event_id is not None}
+        plays: dict[UUID, tuple[str, str | None]] = {}
+        watched: dict[UUID, int] = {}  # issue 261: a play's time, for a gain older than its measure kept
+        for event, kind, played, seconds in (
+            await session.execute(
+                select(PlayKind.event_id, PlayKind.kind, PlayKind.object, PlayKind.watched_s).where(
+                    PlayKind.event_id.in_(triggers)
                 )
-            ).all()
-        }
+            )
+        ).all():
+            plays[event] = (kind, played)
+            watched[event] = int(seconds or 0)
         contexts: dict[UUID, tuple[str | None, UUID | None]] = {
             event: (about, other)
             for event, about, other in (
@@ -917,7 +960,7 @@ async def _operations(
                 )
             ).all()
         }
-    titles = await _titles(
+    works = await _works(
         module, viewer, {o for _, o in plays.values() if o} | {o for o, _ in contexts.values() if o}
     )
     others = {other for _, other in contexts.values() if other} if team else set()
@@ -954,12 +997,14 @@ async def _operations(
                 level=level,
                 level_up=level is not None and before is not None and level > before,
                 play=play_source(played[0]) if played else None,
-                title=(
-                    titles.get(played[1] or "")
-                    if played
-                    else titles.get(about[0] or "")
-                    if (about := contexts.get(t.trigger_event_id))
-                    else None
+                title=work.title
+                if (work := _work_of(works, played, contexts.get(t.trigger_event_id)))
+                else None,
+                work=work,
+                reckoning=_reckoning(
+                    t,
+                    definitions.get((t.rule_key or "", t.rule_version or 0)),
+                    watched.get(t.trigger_event_id),
                 ),
                 other=(
                     names.get(about[1])
@@ -994,10 +1039,51 @@ def _cursor(cursor: str | None) -> tuple[datetime, int] | None:
         return None
 
 
-async def _titles(module: Any, viewer: Principal, objects: set[str]) -> dict[str, str]:
-    """Issue 160: the titles of the plays shown, as the viewer may see them (the catalog decides)."""
+def _work_of(
+    works: dict[str, WorkOut],
+    played: tuple[str, str | None] | None,
+    about: tuple[str | None, UUID | None] | None,
+) -> WorkOut | None:
+    if played:
+        return works.get(played[1] or "")
+    return works.get(about[0] or "") if about else None
+
+
+def _reckoning(
+    row: LedgerTransaction, definition: dict[str, Any] | None, watched_s: int | None
+) -> ReckoningOut | None:
+    """Issue 261: a rule's gain told as its rule reckoned it — the fixed part, what it counted per unit and
+    how much of it (kept with the gain since #261, a play's time before), the bonuses' multiplier, a cap."""
+    if row.source_kind != "reward_rule" or definition is None:
+        return None
+    grant = next((g for g in definition.get("grants") or [] if g.get("value") == row.value), None)
+    if grant is None:
+        return None
+    unit = grant.get("per_unit") or {}
+    field = unit.get("field")
+    counted = (row.modifiers or {}).get("measured") or {}
+    quantity = counted.get(field) if field else None
+    if quantity is None and field == "watched_s" and watched_s:
+        quantity = watched_s
+    base = int(row.base_amount or 0)
+    multiplier = float(row.multiplier or 1)
+    return ReckoningOut(
+        fixed=grant.get("amount"),
+        field=field,
+        quantity=float(quantity) if quantity is not None else None,
+        factor=unit.get("factor"),
+        max=unit.get("max"),
+        base=base,
+        multiplier=round(multiplier, 4),
+        capped=int(row.delta) < math.floor(base * multiplier),
+    )
+
+
+async def _works(module: Any, viewer: Principal, objects: set[str]) -> dict[str, WorkOut]:
+    """Issue 160: the works played, as the viewer may see them (the catalog decides) — issue 261: an episode
+    with its series and season."""
     catalog = module.capabilities.system_providers(MEDIA_CATALOG)
-    out: dict[str, str] = {}
+    out: dict[str, WorkOut] = {}
     if not catalog:
         return out
     for raw in objects:
@@ -1006,7 +1092,14 @@ async def _titles(module: Any, viewer: Principal, objects: set[str]) -> dict[str
         except Exception:
             summary = None  # gone from the catalog, or hidden from this viewer: the kind alone shows
         if summary is not None:
-            out[raw] = summary.title
+            out[raw] = WorkOut(
+                kind=summary.kind,
+                title=summary.title,
+                year=summary.year,
+                series=summary.series,
+                season=summary.season,
+                number=summary.number,
+            )
     return out
 
 
