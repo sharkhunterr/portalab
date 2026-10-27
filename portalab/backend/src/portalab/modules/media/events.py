@@ -48,7 +48,8 @@ class Playback(BaseModel):
 
 class RadioListened(BaseModel):
     """Issue 227: a member listened to the radio in the portal's player — one per slice of ``minutes`` the
-    stream was relayed to them (counted by the server, never told by the page)."""
+    stream was relayed to them (counted by the server, never told by the page). Issue 257: the slices are
+    counted over a day, across streams — ``session`` is that day (``YYYY-MM-DD``, UTC)."""
 
     minutes: int
     session: str

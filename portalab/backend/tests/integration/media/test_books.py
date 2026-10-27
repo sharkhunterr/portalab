@@ -223,8 +223,8 @@ async def test_a_sitting_ends_even_when_the_page_goes_away_without_a_word(
     assert await endings() == [("media.playback_abandoned", 600.0)]
     assert await media.module.books.sweep() == 0  # ended once
 
-    # the next time, the page leaves (its sitting ends), then comes back from the browser's cache and plays on:
-    # another sitting, ended in its turn — each counted once, the late close of an ended one adds nothing
+    # the next time, the page leaves (its sitting ends), then comes back from the browser's cache and plays
+    # on: another sitting, ended in its turn — each counted once, the late close of an ended one adds nothing
     second = (await client.get(f"/api/v1/media/{audiobook}/listen")).json()["ticket"]
     await report(second, "playing", 700.0, 1)
     clock.advance(timedelta(minutes=5))

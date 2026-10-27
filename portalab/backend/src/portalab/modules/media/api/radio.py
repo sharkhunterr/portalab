@@ -5,8 +5,8 @@ import time
 from collections.abc import AsyncIterator
 from contextlib import AsyncExitStack
 from typing import Annotated, Any
-from uuid import uuid4
 
+import anyio
 from fastapi import APIRouter, Path
 from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field
@@ -15,7 +15,7 @@ from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.modules.media.api.router import Module, _me
 from portalab.modules.media.permissions import MEDIA_PLAY
-from portalab.modules.media.radio import LISTEN_MINUTES
+from portalab.modules.media.radio import HEARD_EVERY
 
 router = APIRouter(prefix="/api/v1", tags=["media"])
 Listener = Annotated[Principal, require(MEDIA_PLAY)]
@@ -89,25 +89,28 @@ async def radio_request(
 
 @router.get("/media/radio/stream", include_in_schema=False)
 async def radio_stream(principal: Listener, module: Module) -> StreamingResponse:
-    """The live stream, relayed as it plays (until the member stops listening). Issue 227: every
-    ``LISTEN_MINUTES`` it was relayed counts as a slice of listening for this member (the server's count)."""
+    """The live stream, relayed as it plays (until the member stops listening). Issue 227: the time it was
+    relayed counts as this member's listening (the server's count) — issue 257: added to their day every
+    ``HEARD_EVERY`` seconds and when the stream ends, so a pause (a new stream to play on) loses nothing."""
     stack = AsyncExitStack()
     body = await stack.enter_async_context(module.radio.listen())
     user = principal.acting_for or principal.user_id
-    session = uuid4().hex
 
     async def relay() -> AsyncIterator[bytes]:
-        started = time.monotonic()
-        counted = 0
+        added = last = time.monotonic()
         try:
             async for chunk in body.chunks:
                 yield chunk
-                heard = int((time.monotonic() - started) // (LISTEN_MINUTES * 60))
-                while user is not None and counted < heard:
-                    counted += 1
-                    await module.radio.listened(user, session, counted)
+                last = time.monotonic()
+                if user is not None and last - added >= HEARD_EVERY:
+                    await module.radio.heard(user, last - added)
+                    added = last
         finally:
-            await stack.aclose()
+            # the member gone, the response is being cancelled: what was relayed since is still theirs
+            with anyio.CancelScope(shield=True):
+                if user is not None:
+                    await module.radio.heard(user, last - added)
+                await stack.aclose()
 
     return StreamingResponse(relay(), media_type=body.content_type, headers=dict(NO_STORE))
 

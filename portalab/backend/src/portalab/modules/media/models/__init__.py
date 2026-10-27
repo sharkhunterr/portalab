@@ -1,7 +1,7 @@
 """Schema ``media`` (specs/024-media/data-model.md). Objects are never deleted when a source disappears;
 ``service_id`` and source references are opaque (no FK outside the module except ``identity.users``)."""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 from uuid import UUID
 
@@ -9,6 +9,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     CheckConstraint,
+    Date,
     Float,
     ForeignKey,
     Index,
@@ -386,6 +387,20 @@ class RadioCreditLedger(MediaBase):
     reason: Mapped[str] = mapped_column(String(12), nullable=False)
     source_ref: Mapped[str] = mapped_column(String(200), nullable=False)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class RadioListening(MediaBase):
+    """Issue 257: the radio heard by a member in a day (UTC), across all the streams opened that day (the
+    player opens a new one at each play) — the seconds relayed in all, and the slices of a quarter of an hour
+    already counted as ``media.radio_listened``."""
+
+    __tablename__ = "radio_listening"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    seconds: Mapped[float] = mapped_column(Float, nullable=False)
+    slices: Mapped[int] = mapped_column(Integer, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
 
 class MediaRequest(MediaBase):
