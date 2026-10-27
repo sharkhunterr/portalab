@@ -191,6 +191,19 @@
 .booster-stage[data-cards] .booster-atmosphere__beam[data-beam="3"] {
   transform: rotate(18deg);
 }
+/* its mist, moving again: fog, projectors and dust painted on one small canvas stretched over the stage (they
+   stand in the still layers above, which stay where a canvas cannot be drawn) */
+.booster-atmosphere__mist {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+.booster-stage[data-cards]
+  .booster-atmosphere:has(.booster-atmosphere__mist:not([data-failed]))
+  :is(.booster-atmosphere__fog, .booster-atmosphere__beam, .booster-atmosphere__dust) {
+  display: none;
+}
 /* issue 255: a card seen big — the stage stays behind it, holding still: only that card moves; the row of
    cards under it is put out of sight (held still, their layers were still drawn under the big one) */
 .booster-stage[data-zoomed] * {

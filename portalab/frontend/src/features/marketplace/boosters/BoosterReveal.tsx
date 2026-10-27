@@ -17,6 +17,7 @@ import { ProductArt } from "../catalog/ProductArt";
 import { productTypeLabel } from "../typeLabel";
 import { type Booster, type BoosterCard, localized, requestKey, useOpenBooster } from "./api";
 import { BoosterPack, useCanOpen } from "./Boosters";
+import { StageMist } from "./StageMist";
 import { hookOf, type Rarity, type Scene, ScenePart, useBoosterScene } from "./scene/scene";
 
 type Phase = "sealed" | "tearing" | "emerging" | "spread" | "done";
@@ -86,9 +87,10 @@ const SHARDS = Array.from({ length: 12 }, (_, i) => ({
   "--s": `${0.35 + noise(i, 15) * 0.45}rem`,
 })) as CSSProperties[];
 
-/** The mist the stage stands in: clouds drifting, dust rising, projectors sweeping it from above — its mist drawn
- * by the GPU unless ``gpu`` is false (a booster of media cards: its cards move a lot of their own, issue 255). */
-function Atmosphere({ gpu = true }: { gpu?: boolean }) {
+/** The mist the stage stands in: clouds drifting, dust rising, projectors sweeping it from above — drawn by the
+ * GPU, or for a booster of media cards (its cards move a lot of their own, issue 255) on one small canvas, held
+ * still while ``mist.hold``. */
+function Atmosphere({ mist }: { mist?: { hold: boolean; reduced: boolean } | undefined }) {
   const dust = useMemo(
     () =>
       Array.from({ length: 34 }, (_, i) => ({
@@ -103,11 +105,13 @@ function Atmosphere({ gpu = true }: { gpu?: boolean }) {
   return (
     <span className="booster-atmosphere" aria-hidden="true">
       {/* HD: the fog and the projectors drawn by the GPU; the CSS ones below stay where it cannot draw */}
-      {gpu ? (
+      {mist ? (
+        <StageMist hold={mist.hold} reduced={mist.reduced} />
+      ) : (
         <span className="booster-atmosphere__gpu">
           <FxLayer effect="mist" maxSide={900} className="booster-stage__gpu-canvas" />
         </span>
-      ) : null}
+      )}
       <span className="booster-atmosphere__beam" data-beam="1" />
       <span className="booster-atmosphere__beam" data-beam="2" />
       <span className="booster-atmosphere__beam" data-beam="3" />
@@ -378,6 +382,8 @@ export function BoosterReveal({
   const [states, setStates] = useState<CardState[]>([]);
   const [moment, setMoment] = useState<string | null>(null);
   const [zoom, setZoom] = useState<number | null>(null);
+  // cards turning now (their charge and their flip): a media cards' stage holds its mist still meanwhile
+  const [turning, setTurning] = useState(0);
   // issue 234: on a phone, cards of their own faces are swiped one at a time — the row follows the turning one
   const row = useRef<HTMLUListElement>(null);
   const follow = useCallback((index: number) => {
@@ -411,6 +417,7 @@ export function BoosterReveal({
     setGift(shown.sealed > 0);
     setStates([]);
     setMoment(null);
+    setTurning(0);
     setPhase("sealed");
   };
 
@@ -476,6 +483,8 @@ export function BoosterReveal({
       const rank = RANK[card.product.rarity ?? "common"] ?? 0;
       const charge = reduced ? 0 : (CHARGE_MS[rank] ?? 0);
       follow(index);
+      setTurning((n) => n + 1);
+      later(() => setTurning((n) => Math.max(0, n - 1)), charge + FLIP_MS);
       setStates((now) => now.map((s, i) => (i === index && s === "hidden" ? "charging" : s)));
       if (rank >= 2 && !reduced) setMoment(RARITIES[rank] ?? null);
       later(() => {
@@ -559,7 +568,9 @@ export function BoosterReveal({
           />
         </span>
       ) : (
-        <Atmosphere gpu={!opener} />
+        <Atmosphere
+          mist={opener ? { hold: turning > 0 || moment !== null || zoom !== null, reduced } : undefined}
+        />
       )}
       {moment === "legendary" && !scene?.parts.reveal?.legendary ? (
         // HD: the dark closing in, motes drawn to the middle, then a flash, rings, rays and embers as it turns
