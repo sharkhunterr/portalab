@@ -3,6 +3,8 @@ an hour of stream relayed (never told by the page), and a song taken by the DJ i
 Issue 228 — a title about to be deleted (Maintainerr), played to the end: ``media.leaving_watched`` for who
 played it, once per member and title (an episode rescues its series), never in a replay."""
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
@@ -15,8 +17,9 @@ from fastapi import FastAPI
 from sqlalchemy import select, text
 
 from portalab.capabilities.events import Envelope
-from portalab.capabilities.media import RADIO, RadioRequest, RadioState
+from portalab.capabilities.media import RADIO, RadioRequest, RadioState, StreamBody
 from portalab.capabilities.media.testkit import library_record
+from portalab.core.time import FixedClock
 from portalab.modules.media.models import MediaObject
 from portalab.modules.media.requests.watched import LeavingWatched
 from tests.integration.identity.helpers import login
@@ -141,11 +144,60 @@ async def test_a_song_asked_is_an_event(app: FastAPI, client: httpx.AsyncClient,
     assert await published(media, "media.radio_requested") == [(str(people["uma"]), {"request": "r1"})]
 
 
-async def test_listening_counted_by_slices(media: MediaHarness, app: FastAPI) -> None:
+async def test_listening_counted_by_slices(media: MediaHarness, app: FastAPI, clock: FixedClock) -> None:
+    """Issue 257: the minutes add up over the day, whatever the streams they came in (a pause closes one,
+    playing on opens another) — each quarter of an hour reached counts once."""
     people = await users(app, media, "ivy")
     user: UUID = people["ivy"]
-    for slice_ in (1, 2, 2):  # the same slice twice (a retry): once
-        await media.module.radio.listened(user, "s1", slice_)
+    day = clock.now().date().isoformat()
+    await media.module.radio.heard(user, 600)  # ten minutes, then a pause
+    assert await published(media, "media.radio_listened") == []
+    await media.module.radio.heard(user, 400)  # the quarter of an hour reached in the next stream
+    await media.module.radio.heard(user, 1000)  # past the second
     told = await published(media, "media.radio_listened")
     assert [payload["slice"] for _, payload in told] == [1, 2]
-    assert told[0] == (str(user), {"minutes": 15, "session": "s1", "slice": 1})
+    assert told[0] == (str(user), {"minutes": 15, "session": day, "slice": 1})
+    await media.module.radio.heard(user, 0)
+    await media.module.radio.heard(user, 100)  # 2100 s: still the second
+    assert len(await published(media, "media.radio_listened")) == 2
+
+    clock.advance(timedelta(days=1))  # a new day starts from nothing
+    await media.module.radio.heard(user, 800)
+    assert len(await published(media, "media.radio_listened")) == 2
+
+
+class _Streaming(_Station):
+    def __init__(self, chunks: int) -> None:
+        self.chunks = chunks
+
+    @asynccontextmanager
+    async def listen(self) -> AsyncIterator[StreamBody]:
+        async def chunks() -> AsyncIterator[bytes]:
+            for _ in range(self.chunks):
+                yield b"ID3"
+
+        yield StreamBody(status=200, content_type="audio/mpeg", length=None, chunks=chunks())
+
+
+async def test_the_stream_relayed_is_heard_across_pauses(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Issue 257: two streams of eight minutes and a half (a pause between them) make a quarter of an hour —
+    the first one's minutes are kept when it ends."""
+    people = await users(app, media, "zoe")
+    ticks = iter(range(0, 100_000, 30))  # each chunk relayed half a minute after the one before
+    monkeypatch.setattr(
+        "portalab.modules.media.api.radio.time", SimpleNamespace(monotonic=lambda: next(ticks))
+    )
+    media.module.capabilities.provide(RADIO, _Streaming(17), instance_ref="test", owner="test")
+    await login(client, "zoe")
+    for _ in range(2):
+        heard = await client.get("/api/v1/media/radio/stream")
+        assert heard.status_code == 200, heard.text
+    async with media.database.session() as session:
+        seconds = await session.scalar(
+            text("SELECT seconds FROM media.radio_listening WHERE user_id = :u"), {"u": people["zoe"]}
+        )
+    assert seconds == 2 * 17 * 30
+    told = await published(media, "media.radio_listened")
+    assert [(who, payload["slice"]) for who, payload in told] == [(str(people["zoe"]), 1)]

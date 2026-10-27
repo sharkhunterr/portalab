@@ -13,7 +13,8 @@ from datetime import time as clock_time
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, select, text
+from sqlalchemy import func, select, text, update
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
@@ -35,14 +36,16 @@ from portalab.core.errors import PortalError, Unavailable
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.ids import new_id
 from portalab.core.time import Clock, utc_now
-from portalab.modules.media.models import RadioCreditLedger
+from portalab.modules.media.models import RadioCreditLedger, RadioListening
 from portalab.modules.media.observability import log
 from portalab.modules.media.permissions import MEDIA_PLAY
 from portalab.modules.media.settings import MediaConfig
 
 ASK_EVERY = 20
-# issue 227: the radio's listening counted in slices of this many minutes of stream relayed to a member
+# issue 227: the radio's listening counted in slices of this many minutes of stream relayed to a member (issue
+# 257: added up over the day, across streams); what is relayed is added every ``HEARD_EVERY`` seconds
 LISTEN_MINUTES = 15
+HEARD_EVERY = 60
 
 
 class RadioUnavailable(Unavailable):
@@ -259,15 +262,49 @@ class RadioService:
         return {**request_out(answer), "allowance": await self.allowance(user)}
 
     # --- issue 227: listening, counted by the server -------------------------------------------------------
-    async def listened(self, user: UUID, session: str, slice_: int) -> None:
-        """One more slice of ``LISTEN_MINUTES`` the stream was relayed to this member (the rules cap what it
-        earns in a day)."""
-        await self._publish(
-            user,
-            "media.radio_listened",
-            {"minutes": LISTEN_MINUTES, "session": session, "slice": slice_},
-            f"{session}:{slice_}",
-        )
+    async def heard(self, user: UUID, seconds: float) -> None:
+        """The stream was relayed to this member ``seconds`` more. Issue 257: added up over the day, whatever
+        the streams it came in (the player opens one at each play), each quarter of an hour reached is one
+        ``media.radio_listened`` (the rules cap what it earns in a day)."""
+        if self.database is None or seconds <= 0:
+            return
+        now = utc_now(self.clock)
+        day = now.date()
+        try:
+            async with self.database.unit_of_work() as uow:
+                session = uow.session
+                added = (
+                    insert(RadioListening)
+                    .values(user_id=user, day=day, seconds=seconds, slices=0, updated_at=now)
+                    .on_conflict_do_update(
+                        index_elements=["user_id", "day"],
+                        set_={"seconds": RadioListening.seconds + seconds, "updated_at": now},
+                    )
+                    .returning(RadioListening.seconds, RadioListening.slices)
+                )
+                total, counted = (await session.execute(added)).one()
+                reached = int(total // (LISTEN_MINUTES * 60))
+                if reached <= counted:
+                    return
+                await session.execute(
+                    update(RadioListening)
+                    .where(RadioListening.user_id == user, RadioListening.day == day)
+                    .values(slices=reached)
+                )
+                if self.events is None:
+                    return
+                for slice_ in range(counted + 1, reached + 1):
+                    await self.events.publish(
+                        session,
+                        "media.radio_listened",
+                        {"minutes": LISTEN_MINUTES, "session": day.isoformat(), "slice": slice_},
+                        occurred_at=now,
+                        subject=SubjectRef("user", str(user)),
+                        source="media",
+                        dedup_key=f"media.radio_listened:{user}:{day.isoformat()}:{slice_}",
+                    )
+        except Exception:  # the radio plays on whatever happens to its rewards
+            log.warning("radio listening not counted", exc_info=True)
 
     async def _publish(self, user: UUID, name: str, payload: dict[str, Any], key: str) -> None:
         if self.events is None or self.database is None:
