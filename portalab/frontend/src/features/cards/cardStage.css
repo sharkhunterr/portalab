@@ -43,6 +43,7 @@
     /* room above and below for a moment's light (the scrolling row cuts what overflows it) */
     margin-block: -4rem;
     padding: 5rem 13vw;
+    pointer-events: none;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
@@ -51,6 +52,18 @@
     flex: none;
     inline-size: 74vw;
     scroll-snap-align: center;
+    pointer-events: auto;
+  }
+  /* issue 255: what a card's moment throws around it (its ring, an epic's vortex, a legendary's halo, the shock
+     waves) is two to four times the card, and the row cut it flat: until the summary, the row reaches far past
+     the screen's edges (its room taken back by its margins, let through to what lies under it: only its cards
+     are touched) and the stage, holding only the row and its buttons then, does not scroll */
+  .booster-stage[data-cards]:not([data-phase="done"]) {
+    overflow-y: hidden;
+  }
+  .booster-stage[data-cards]:not([data-phase="done"]) .booster-cards[data-own] {
+    margin-block: calc(1rem - 40vh);
+    padding-block: 40vh;
   }
 }
 .booster-zoom {
