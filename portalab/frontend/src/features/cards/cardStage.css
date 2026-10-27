@@ -143,9 +143,9 @@
   }
 }
 
-/* issue 255: a booster of media cards — its cards move a lot of their own: its mist is not drawn by the GPU, and
-   its fog and projectors move without a blur redrawn every frame (the fog banks are soft gradients already, the
-   projectors' edges fade through a mask) */
+/* issue 255: a booster of media cards — its cards move a lot of their own, so its stage is painted once and
+   holds still: no mist drawn by the GPU, fog banks without a blur (soft gradients already), the projectors' edges
+   fading through a mask */
 .booster-stage[data-cards] .booster-atmosphere__fog {
   filter: none;
   animation: none;
@@ -153,14 +153,14 @@
 .booster-stage[data-cards] .booster-atmosphere__glow {
   animation: none;
 }
-/* its dust: one layer rising, never thirty-four */
+/* its dust: one layer of motes, never thirty-four */
 .booster-stage[data-cards] .booster-atmosphere__dust span {
   display: none;
 }
 .booster-stage[data-cards] .booster-atmosphere__dust::before {
   content: "";
   position: absolute;
-  inset: 0 0 -11rem;
+  inset: 0;
   background:
     radial-gradient(circle, color-mix(in srgb, var(--booster-light) 70%, transparent) 0 1px, transparent 2px)
     0 0 / 9rem 11rem,
@@ -176,48 +176,28 @@
   backdrop-filter: none;
   background: color-mix(in srgb, var(--booster-ink) 92%, var(--tone));
 }
-@media (prefers-reduced-motion: no-preference) {
-  .booster-stage[data-cards] .booster-atmosphere__dust::before {
-    animation: cards-dust 14s linear infinite;
-  }
-}
-/* one tile of dust risen, and it starts again where it was: a layer barely taller than the screen */
-@keyframes cards-dust {
-  to {
-    transform: translateY(-11rem);
-  }
-}
-/* its projectors hold their angle and only breathe: three tall layers turning over the cards tore on a phone */
+/* its projectors hold their angle: three tall layers turning over the cards tore on a phone. Nothing of this
+   stage moves (the dust, the fog, the glow, the projectors all painted once): only its cards do */
 .booster-stage[data-cards] .booster-atmosphere__beam {
   filter: none;
   mask-image: linear-gradient(90deg, transparent 18%, var(--card-foil-mask) 42% 58%, transparent 82%);
   transform: rotate(-16deg);
+  opacity: 0.8;
   animation: none;
 }
 .booster-stage[data-cards] .booster-atmosphere__beam[data-beam="2"] {
   transform: rotate(5deg);
-  animation-delay: -2s;
 }
 .booster-stage[data-cards] .booster-atmosphere__beam[data-beam="3"] {
   transform: rotate(18deg);
-  animation-delay: -4s;
 }
-@media (prefers-reduced-motion: no-preference) {
-  .booster-stage[data-cards] .booster-atmosphere__beam {
-    animation: cards-beam 6s ease-in-out infinite alternate;
-  }
-}
-@keyframes cards-beam {
-  from {
-    opacity: 0.55;
-  }
-  to {
-    opacity: 1;
-  }
-}
-/* issue 255: a card seen big — the stage stays behind it, holding still: only that card moves */
+/* issue 255: a card seen big — the stage stays behind it, holding still: only that card moves; the row of
+   cards under it is put out of sight (held still, their layers were still drawn under the big one) */
 .booster-stage[data-zoomed] * {
   animation-play-state: paused;
+}
+.booster-stage[data-cards][data-zoomed] .booster-cards {
+  visibility: hidden;
 }
 /* a turned legendary's glint passes once; a card out of sight holds still */
 .booster-stage[data-cards]
