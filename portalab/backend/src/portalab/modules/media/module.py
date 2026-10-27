@@ -517,6 +517,11 @@ class MediaModule:
         async def images() -> None:  # 027: covers whose fetch failed are tried again
             await self.images.backfill()
 
+        # #256: books and audiobooks left without a word end, their minutes counted
+        async def sittings() -> None:
+            while await self.books.sweep():
+                pass
+
         return [
             self.start,
             register_periodic(jobs, self.database, POLL_JOB, timedelta(seconds=15), poll, owner=OWNER),
@@ -534,6 +539,9 @@ class MediaModule:
             ),
             register_periodic(
                 jobs, self.database, "media.images_backfill", timedelta(hours=1), images, owner=OWNER
+            ),
+            register_periodic(
+                jobs, self.database, "media.books_sweep", timedelta(minutes=5), sittings, owner=OWNER
             ),
             register_periodic(
                 jobs,

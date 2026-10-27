@@ -313,6 +313,10 @@ class BookPosition(MediaBase):
     session_ref: Mapped[str | None] = mapped_column(String(64))
     session_start_s: Mapped[float | None] = mapped_column(Float)
     session_started_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    # #256: the sitting over (its minutes counted, once) — and the minutes it had reached, for ending it
+    # when the member's page went away without a word
+    session_ended_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    session_watched_s: Mapped[float | None] = mapped_column(Float)
 
 
 class QuotaUnits(MediaBase):

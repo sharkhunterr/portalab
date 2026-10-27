@@ -358,9 +358,11 @@ export function restore() {
   }
 }
 
-/** The page goes away: the last position is sent (keepalive). */
+/** The page goes away: the last position is sent (keepalive) and the sitting ends — its minutes are counted
+ * (issue 256: a sitting left paused stayed open and earned nothing). Back from the browser's cache, the next
+ * report begins another. */
 export function leaving() {
-  if (state.info && audio && !audio.paused) report("paused", true);
+  if (state.info && audio) report("stopped", true);
 }
 
 // --- the lock screen and headphones -------------------------------------------------------------------
