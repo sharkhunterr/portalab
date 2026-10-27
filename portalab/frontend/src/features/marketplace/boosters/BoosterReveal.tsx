@@ -27,6 +27,9 @@ const RANK: Record<string, number> = { common: 0, rare: 1, epic: 2, legendary: 3
 const CHARGE_MS = [180, 700, 1250, 2100];
 // how long its moment lasts once turned
 const AFTER_MS = [450, 800, 1100, 1700];
+// a card's turn (booster-flip), then the time it is left to be read before « reveal all » turns the next one
+const FLIP_MS = 800;
+const READ_MS = [1400, 1800, 2200, 2800];
 const TEAR_MS = 1500;
 // the GPU's bursts around a card per rarity (none for a common one; a legendary has the whole stage)
 const GPU_BURST = ["", "burst:voltage", "burst:plasma", ""];
@@ -384,6 +387,7 @@ export function BoosterReveal({
     list.scrollTo({ left: item.offsetLeft - (list.clientWidth - item.offsetWidth) / 2, behavior: "smooth" });
   }, []);
   const timers = useRef<number[]>([]);
+  const auto = useRef(false);
   const dialog = useRef<HTMLDivElement>(null);
   const cards = demo
     ? tried
@@ -400,6 +404,7 @@ export function BoosterReveal({
   const again = () => {
     for (const id of timers.current) window.clearTimeout(id);
     timers.current = [];
+    auto.current = false;
     opening.reset();
     setTried(false);
     attempt.current = requestKey();
@@ -482,14 +487,30 @@ export function BoosterReveal({
     [cards, later, reduced, follow],
   );
 
+  // « reveal all »: one card after the other, each turned and left to be read; a card seen big holds the next back,
+  // and one turned by hand meanwhile is skipped
+  const latest = useRef({ states, zoom });
+  latest.current = { states, zoom };
+  const next = useRef(() => {});
+  next.current = () => {
+    if (!auto.current) return;
+    if (latest.current.zoom !== null) {
+      later(() => next.current(), 400);
+      return;
+    }
+    const index = latest.current.states.indexOf("hidden");
+    if (index < 0) {
+      auto.current = false;
+      return;
+    }
+    revealOne(index);
+    const rank = RANK[cards[index]?.product.rarity ?? "common"] ?? 0;
+    later(() => next.current(), reduced ? 150 : (CHARGE_MS[rank] ?? 0) + FLIP_MS + (READ_MS[rank] ?? 1400));
+  };
   const revealAll = () => {
-    let wait = 0;
-    states.forEach((state, index) => {
-      if (state !== "hidden") return;
-      later(() => revealOne(index), wait);
-      const rank = RANK[cards[index]?.product.rarity ?? "common"] ?? 0;
-      wait += reduced ? 150 : (CHARGE_MS[rank] ?? 0) + (AFTER_MS[rank] ?? 400) + 150;
-    });
+    if (auto.current) return;
+    auto.current = true;
+    next.current();
   };
 
   // the cards once spread: the row from its first
@@ -499,7 +520,9 @@ export function BoosterReveal({
 
   const all = states.length > 0 && states.every((s) => s === "revealed");
   useEffect(() => {
-    if (all && phase === "spread") later(() => setPhase("done"), reduced ? 0 : 1400);
+    // the last one turned is read too before the summary comes over the row
+    if (all && phase === "spread")
+      later(() => setPhase("done"), reduced ? 0 : FLIP_MS + (READ_MS[0] ?? 1400));
   }, [all, phase, later, reduced]);
 
   const refund = cards.reduce((sum, card) => sum + (card.duplicate ? card.refund : 0), 0);
@@ -664,7 +687,7 @@ export function BoosterReveal({
           {phase === "spread" && !all ? (
             <div className="booster-stage__actions">
               <p className="booster-stage__hint">{t("marketplace:booster.tapCards")}</p>
-              <Button variant="secondary" onClick={revealAll} disabled={busy}>
+              <Button variant="secondary" onClick={revealAll} disabled={busy || auto.current}>
                 <Icon name="sparkles" size={16} />
                 {t("marketplace:booster.revealAll")}
               </Button>
