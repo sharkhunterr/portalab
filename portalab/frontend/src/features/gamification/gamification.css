@@ -1965,13 +1965,9 @@
   }
 }
 
-/* issue 258: a series of the same operation told as one line — how many it stands for */
-.gam-ops__repeat {
-  margin-inline-start: var(--space-1);
-  padding: 0 0.4rem;
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  color: var(--color-accent);
-  font-size: 0.7rem;
-  font-weight: var(--font-weight-bold);
+/* issue 261: how a rule reckoned a gain (« 51 min × 1 XP/min = 51 XP ») */
+.gam-ops__reckoning {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
 }

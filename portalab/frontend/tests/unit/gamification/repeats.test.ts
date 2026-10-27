@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { repeats } from "../../../src/features/gamification/admin/repeats";
 import type { Operation } from "../../../src/features/gamification/admin/tuning";
 
-// Issue 258: the same gain made again and again is one line of the journal, its amounts added up.
+// Issue 258: the same gain made again and again is one line of the journal, its amounts added up — issue 261:
+// not a sitting (a film, an episode, a session of radio), each its own line.
 
 let n = 0;
 function op(at: string, extra: Partial<Operation> = {}): Operation {
@@ -16,8 +17,8 @@ function op(at: string, extra: Partial<Operation> = {}): Operation {
     delta: 5,
     kind: "grant",
     source_kind: "reward_rule",
-    source: "radio",
-    label: "Un quart d'heure de radio",
+    source: "quests",
+    label: "Objectif du jour",
     reason: null,
     balance: 100 + n,
     level: 5,

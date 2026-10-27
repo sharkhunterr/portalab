@@ -8,6 +8,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import type { LedgerValue } from "../api";
 import { SOURCES } from "../progression/GainSources";
+import { reckoning, workOf } from "./reckoning";
 import { type JournalLine, repeats } from "./repeats";
 import { LEDGER_VALUES, type Operation, useOperations } from "./tuning";
 
@@ -143,110 +144,113 @@ export function Operations({
                 </tr>
               </thead>
               <tbody>
-                {lines.map((row) => (
-                  <tr key={row.id}>
-                    <th scope="row" className="gam-ops__when">
-                      <span>{format.date(row.occurred_at, "short")}</span>
-                      <span className="admin-muted">
-                        {row.count > 1
-                          ? t("gamification:admin.operations.between", {
-                              from: format.time(row.since),
-                              to: format.time(row.occurred_at),
-                            })
-                          : format.time(row.occurred_at)}
-                      </span>
-                    </th>
-                    {mine ? null : (
+                {lines.map((row) => {
+                  const work = workOf(row, t);
+                  const reckoned = reckoning(row, t, format.number);
+                  return (
+                    <tr key={row.id}>
+                      <th scope="row" className="gam-ops__when">
+                        <span>{format.date(row.occurred_at, "short")}</span>
+                        <span className="admin-muted">
+                          {row.count > 1
+                            ? t("gamification:admin.operations.between", {
+                                from: format.time(row.since),
+                                to: format.time(row.occurred_at),
+                              })
+                            : format.time(row.occurred_at)}
+                        </span>
+                      </th>
+                      {mine ? null : (
+                        <td>
+                          {member || !onMember ? (
+                            nameOf(row)
+                          ) : (
+                            <button type="button" className="ds-link" onClick={() => onMember(row.user_id)}>
+                              {nameOf(row)}
+                            </button>
+                          )}
+                        </td>
+                      )}
+                      <td data-align="end">
+                        <span className="gam-ops__amount" data-sign={row.delta < 0 ? "minus" : "plus"}>
+                          {row.delta > 0 ? "+" : ""}
+                          {format.number(row.delta)} {t(`gamification:value.${row.value}`)}
+                        </span>
+                      </td>
                       <td>
-                        {member || !onMember ? (
-                          nameOf(row)
+                        <span className="gam-ops__source">
+                          <span
+                            className="gam-ops__dot"
+                            style={{ background: SOURCES[row.source]?.color ?? "var(--cal-other)" }}
+                            aria-hidden="true"
+                          >
+                            <Icon name={SOURCES[row.source]?.icon ?? "sparkles"} size={12} />
+                          </span>
+                          {t(`gamification:sources.${row.source}`)}
+                        </span>
+                        {/* the bonuses inside the amount (streak, campaign, pace, boost), as the charts split them */}
+                        {row.bonuses?.length ? (
+                          <span className="gam-ops__bonuses">
+                            {row.bonuses.map((bonus) => (
+                              <span key={bonus.source} className="gam-ops__bonus">
+                                <span
+                                  className="gam-ops__dot"
+                                  style={{ background: SOURCES[bonus.source]?.color ?? "var(--cal-other)" }}
+                                  aria-hidden="true"
+                                >
+                                  <Icon name={SOURCES[bonus.source]?.icon ?? "sparkles"} size={10} />
+                                </span>
+                                {t(
+                                  bonus.factor
+                                    ? "gamification:admin.operations.bonusFactor"
+                                    : "gamification:admin.operations.bonus",
+                                  {
+                                    amount: format.number(bonus.amount),
+                                    source: t(`gamification:sources.${bonus.source}`),
+                                    // issue 258: the bonus's multiplier (a streak's ×1.5)
+                                    factor: format.number(bonus.factor ?? 1),
+                                  },
+                                )}
+                              </span>
+                            ))}
+                          </span>
+                        ) : null}
+                      </td>
+                      <td className="gam-ops__what">
+                        {work ? <strong>{work.name}</strong> : null}
+                        {work?.part ? <span>{work.part}</span> : null}
+                        {work ? <span className="admin-muted">{what(row)}</span> : what(row)}
+                        {reckoned ? <span className="gam-ops__reckoning">{reckoned}</span> : null}
+                        {row.count > 1 ? (
+                          <span className="admin-muted">
+                            {t("gamification:admin.operations.repeats", { count: row.count })}
+                          </span>
+                        ) : null}
+                        {row.reason ? <span className="admin-muted">{row.reason}</span> : null}
+                        {row.other ? (
+                          <span className="admin-muted">
+                            {t("gamification:admin.operations.by", { name: row.other })}
+                          </span>
+                        ) : null}
+                      </td>
+                      <td data-align="end" className="gam-ops__num">
+                        {format.number(row.balance)}
+                      </td>
+                      <td>
+                        {row.level == null ? (
+                          "—"
+                        ) : row.level_up ? (
+                          <strong className="gam-ops__up">
+                            <Icon name="trending" size={14} />
+                            {t("gamification:admin.operations.levelUp", { level: row.level })}
+                          </strong>
                         ) : (
-                          <button type="button" className="ds-link" onClick={() => onMember(row.user_id)}>
-                            {nameOf(row)}
-                          </button>
+                          String(row.level)
                         )}
                       </td>
-                    )}
-                    <td data-align="end">
-                      <span className="gam-ops__amount" data-sign={row.delta < 0 ? "minus" : "plus"}>
-                        {row.delta > 0 ? "+" : ""}
-                        {format.number(row.delta)} {t(`gamification:value.${row.value}`)}
-                      </span>
-                      {row.count > 1 ? (
-                        <span
-                          className="gam-ops__repeat"
-                          title={t("gamification:admin.operations.repeats", { count: row.count })}
-                        >
-                          ×{format.number(row.count)}
-                        </span>
-                      ) : null}
-                    </td>
-                    <td>
-                      <span className="gam-ops__source">
-                        <span
-                          className="gam-ops__dot"
-                          style={{ background: SOURCES[row.source]?.color ?? "var(--cal-other)" }}
-                          aria-hidden="true"
-                        >
-                          <Icon name={SOURCES[row.source]?.icon ?? "sparkles"} size={12} />
-                        </span>
-                        {t(`gamification:sources.${row.source}`)}
-                      </span>
-                      {/* the bonuses inside the amount (streak, campaign, pace, boost), as the charts split them */}
-                      {row.bonuses?.length ? (
-                        <span className="gam-ops__bonuses">
-                          {row.bonuses.map((bonus) => (
-                            <span key={bonus.source} className="gam-ops__bonus">
-                              <span
-                                className="gam-ops__dot"
-                                style={{ background: SOURCES[bonus.source]?.color ?? "var(--cal-other)" }}
-                                aria-hidden="true"
-                              >
-                                <Icon name={SOURCES[bonus.source]?.icon ?? "sparkles"} size={10} />
-                              </span>
-                              {t(
-                                bonus.factor
-                                  ? "gamification:admin.operations.bonusFactor"
-                                  : "gamification:admin.operations.bonus",
-                                {
-                                  amount: format.number(bonus.amount),
-                                  source: t(`gamification:sources.${bonus.source}`),
-                                  // issue 258: the bonus's multiplier (a streak's ×1.5)
-                                  factor: format.number(bonus.factor ?? 1),
-                                },
-                              )}
-                            </span>
-                          ))}
-                        </span>
-                      ) : null}
-                    </td>
-                    <td className="gam-ops__what">
-                      {row.title ? <strong>{row.title}</strong> : null}
-                      {row.title ? <span className="admin-muted">{what(row)}</span> : what(row)}
-                      {row.reason ? <span className="admin-muted">{row.reason}</span> : null}
-                      {row.other ? (
-                        <span className="admin-muted">
-                          {t("gamification:admin.operations.by", { name: row.other })}
-                        </span>
-                      ) : null}
-                    </td>
-                    <td data-align="end" className="gam-ops__num">
-                      {format.number(row.balance)}
-                    </td>
-                    <td>
-                      {row.level == null ? (
-                        "—"
-                      ) : row.level_up ? (
-                        <strong className="gam-ops__up">
-                          <Icon name="trending" size={14} />
-                          {t("gamification:admin.operations.levelUp", { level: row.level })}
-                        </strong>
-                      ) : (
-                        String(row.level)
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </section>

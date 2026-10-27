@@ -74,6 +74,7 @@ class NotificationOut(BaseModel):
     subtitle: str | None = None
     rewards: list[NotificationRewardOut] = Field(default_factory=list)
     boost: str | None = None
+    streak: float | None = None  # issue 261: a streak's multiplier on a gain (1.5)
 
 
 class NotificationPage(BaseModel):
@@ -210,7 +211,11 @@ def _details(params: Mapping[str, Any] | None) -> dict[str, Any]:
         if amount > 0
     ]
     boost = params.get("boost")
+    streak = params.get("streak")
     return {
+        "streak": float(streak)
+        if isinstance(streak, int | float) and not isinstance(streak, bool) and streak > 1
+        else None,
         "subtitle": subtitle,
         "rewards": rewards,
         "boost": str(boost)

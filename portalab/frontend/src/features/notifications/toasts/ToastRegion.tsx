@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { connectStream, type LiveEvent } from "../../../api/stream";
 import { useNotify } from "../../../design-system/components/Notification";
-import { useT } from "../../../i18n/hooks/useT";
+import { type Translate, useT } from "../../../i18n/hooks/useT";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import type { NotificationItem } from "../api";
 import { fetchLatest } from "../api";
@@ -56,11 +56,12 @@ export function ToastRegion({ connect = connectStream }: ToastRegionProps) {
   return null;
 }
 
-function toastBody(item: NotificationItem, t: (key: string) => string): string {
+function toastBody(item: NotificationItem, t: Translate): string {
   const rewards = (item.rewards ?? []).map(
     (reward) =>
       `+${reward.amount} ${reward.value === "coins" ? t("shell:coins") : t(`notifications:reward.${reward.value}`)}`,
   );
+  if (item.streak) rewards.push(t("notifications:reward.streak", { factor: item.streak }));
   if (item.boost) rewards.push(`×${item.boost}`);
   return [
     item.subtitle,

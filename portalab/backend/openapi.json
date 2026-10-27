@@ -12353,6 +12353,17 @@
             "title": "Rewards",
             "type": "array"
           },
+          "streak": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Streak"
+          },
           "subtitle": {
             "anyOf": [
               {
@@ -12674,6 +12685,16 @@
             ],
             "title": "Reason"
           },
+          "reckoning": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReckoningOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "source": {
             "title": "Source",
             "type": "string"
@@ -12701,6 +12722,16 @@
           "value": {
             "title": "Value",
             "type": "string"
+          },
+          "work": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -15444,6 +15475,85 @@
           "file_ref"
         ],
         "title": "ReadingPositionOut",
+        "type": "object"
+      },
+      "ReckoningOut": {
+        "description": "Issue 261: how the rule in force at the time reckoned a gain's own amount, before its bonuses.",
+        "properties": {
+          "base": {
+            "title": "Base",
+            "type": "integer"
+          },
+          "capped": {
+            "title": "Capped",
+            "type": "boolean"
+          },
+          "factor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Factor"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "fixed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fixed"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max"
+          },
+          "multiplier": {
+            "title": "Multiplier",
+            "type": "number"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity"
+          }
+        },
+        "required": [
+          "base",
+          "multiplier",
+          "capped"
+        ],
+        "title": "ReckoningOut",
         "type": "object"
       },
       "RefuseIn": {
@@ -21008,6 +21118,69 @@
           "password"
         ],
         "title": "WizardIn",
+        "type": "object"
+      },
+      "WorkOut": {
+        "description": "Issue 261: the work played, as the catalog tells it \u2014 an episode with its series and season.",
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "season": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Season"
+          },
+          "series": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "kind",
+          "title"
+        ],
+        "title": "WorkOut",
         "type": "object"
       },
       "WrappedDefinitionIn": {

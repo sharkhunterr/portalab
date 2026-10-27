@@ -10,13 +10,22 @@ export interface JournalLine extends Operation {
 
 /**
  * Issue 258: the same gain made again and again (the radio's quarters of an hour, a page of the same quest)
- * told once — one line per member, value, source, rule and title in a day, where the latest of them is, with
+ * told once (issue 261: not a sitting — a film, an episode, a session of radio is a line of its own) — one
+ * line per member, value, source, rule and title in a day, where the latest of them is, with
  * their amounts and bonuses added up; its balance and level are the latest's.
  */
+const SITTINGS = new Set(["radio", "episode", "movie", "live", "book", "audiobook", "music", "game"]);
+
 export function repeats(rows: Operation[]): JournalLine[] {
   const lines: JournalLine[] = [];
   const at = new Map<string, number>();
   for (const row of rows) {
+    // issue 261: a sitting (a film, an episode, a session of radio) or a work is its own gain, with its own
+    // reckoning — one line each, never added up
+    if (row.work || row.reckoning?.field || SITTINGS.has(row.source)) {
+      lines.push({ ...row, count: 1, since: row.occurred_at });
+      continue;
+    }
     const key = [
       row.user_id,
       row.value,

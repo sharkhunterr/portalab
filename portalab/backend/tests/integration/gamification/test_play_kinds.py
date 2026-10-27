@@ -129,3 +129,38 @@ async def test_older_plays_get_their_kind_back(gm: GamHarness, client: AsyncClie
         restored = (await session.execute(select(PlayKind))).scalars().one()
     assert (restored.kind, restored.finished, restored.watched_s) == ("movie", True, 600)
     assert restored.occurred_at <= gm.clock.now() + timedelta(seconds=5)
+
+
+async def test_a_gain_says_how_its_rule_reckoned_it(gm: GamHarness, client: AsyncClient) -> None:
+    """Issue 261: the journal tells each gain as its rule reckoned it — what it counted and how much of it
+    (kept with the gain), the rule's rate or fixed amount."""
+    await _setup(gm)
+    ursula = gm.people["ursula"]
+    await gm.module.pipeline.process(
+        gm.envelope(ursula, sitting("movie", 3_055.7), event_type="media.playback_finished")
+    )
+    await login(client, "ursula")
+    journal = (await client.get("/api/v1/me/progression/operations?days=7&value=xp")).json()
+    reckonings = sorted((item["reckoning"] for item in journal["items"]), key=lambda r: r["base"])
+    assert reckonings == [
+        {
+            "fixed": 30,
+            "field": None,
+            "quantity": None,
+            "factor": None,
+            "max": None,
+            "base": 30,
+            "multiplier": 1.0,
+            "capped": False,
+        },
+        {
+            "fixed": None,
+            "field": "watched_s",
+            "quantity": 3_055.7,
+            "factor": pytest.approx(1 / 60),
+            "max": 240,
+            "base": 50,
+            "multiplier": 1.0,
+            "capped": False,
+        },
+    ]

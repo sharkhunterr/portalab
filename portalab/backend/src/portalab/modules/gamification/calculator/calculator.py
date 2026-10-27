@@ -23,3 +23,15 @@ def base_amounts(rule: RuleDefinition, payload: Mapping[str, Any]) -> list[tuple
         if amount > 0:
             out.append((grant.value, amount))
     return out
+
+
+def measured(rule: RuleDefinition, payload: Mapping[str, Any], value: str) -> dict[str, float]:
+    """Issue 261: what a grant of ``value`` counted (``watched_s``, ``minutes``…), as the event said it — kept
+    with the gain so its journal can say how it was reckoned."""
+    out: dict[str, float] = {}
+    for grant in rule.grants:
+        if grant.value == value and grant.per_unit is not None:
+            raw = payload.get(grant.per_unit.field)
+            if not isinstance(raw, bool) and isinstance(raw, int | float):
+                out[grant.per_unit.field] = round(float(raw), 1)
+    return out

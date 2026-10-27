@@ -257,12 +257,13 @@ export function NotificationPanel({
 
 const REWARD_ICONS: Record<string, string> = { xp: "sparkles", coins: "coins", contribution: "heart" };
 
-/** Issue 186: what a notification brought — XP, the site's currency, contribution, a boost — as badges. */
+/** Issue 186: what a notification brought — XP, the site's currency, contribution, a boost — as badges; issue 261:
+ * a streak's multiplier too. */
 export function Rewards({ item }: { item: NotificationItem }) {
   const t = useT();
   const format = useFormat();
   const rewards = item.rewards ?? [];
-  if (!rewards.length && !item.boost) return null;
+  if (!rewards.length && !item.boost && !item.streak) return null;
   return (
     <span className="notif-rewards">
       {rewards.map((reward) => (
@@ -271,6 +272,15 @@ export function Rewards({ item }: { item: NotificationItem }) {
           {reward.value === "coins" ? <CurrencyShort /> : t(`notifications:reward.${reward.value}`)}
         </span>
       ))}
+      {item.streak ? (
+        <span
+          className="notif-reward"
+          data-value="streak"
+          title={t("notifications:reward.streak", { factor: format.number(item.streak) })}
+        >
+          <Icon name="flame" size={12} />×{format.number(item.streak)}
+        </span>
+      ) : null}
       {item.boost ? (
         <span className="notif-reward" data-value="boost">
           <Icon name="rocket" size={12} />×{item.boost}

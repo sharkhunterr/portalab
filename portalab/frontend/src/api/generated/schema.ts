@@ -15309,6 +15309,8 @@ export interface components {
             read: boolean;
             /** Rewards */
             rewards?: components["schemas"]["NotificationRewardOut"][];
+            /** Streak */
+            streak?: number | null;
             /** Subtitle */
             subtitle?: string | null;
             /** Title */
@@ -15410,6 +15412,7 @@ export interface components {
             play?: string | null;
             /** Reason */
             reason: string | null;
+            reckoning?: components["schemas"]["ReckoningOut"] | null;
             /** Source */
             source: string;
             /** Source Kind */
@@ -15423,6 +15426,7 @@ export interface components {
             user_id: string;
             /** Value */
             value: string;
+            work?: components["schemas"]["WorkOut"] | null;
         };
         /** OperationsOut */
         OperationsOut: {
@@ -16321,6 +16325,28 @@ export interface components {
             percent: number;
             /** Position */
             position: string;
+        };
+        /**
+         * ReckoningOut
+         * @description Issue 261: how the rule in force at the time reckoned a gain's own amount, before its bonuses.
+         */
+        ReckoningOut: {
+            /** Base */
+            base: number;
+            /** Capped */
+            capped: boolean;
+            /** Factor */
+            factor?: number | null;
+            /** Field */
+            field?: string | null;
+            /** Fixed */
+            fixed?: number | null;
+            /** Max */
+            max?: number | null;
+            /** Multiplier */
+            multiplier: number;
+            /** Quantity */
+            quantity?: number | null;
         };
         /** RefuseIn */
         RefuseIn: {
@@ -18219,6 +18245,24 @@ export interface components {
             steps?: {
                 [key: string]: unknown;
             };
+        };
+        /**
+         * WorkOut
+         * @description Issue 261: the work played, as the catalog tells it — an episode with its series and season.
+         */
+        WorkOut: {
+            /** Kind */
+            kind: string;
+            /** Number */
+            number?: number | null;
+            /** Season */
+            season?: number | null;
+            /** Series */
+            series?: string | null;
+            /** Title */
+            title: string;
+            /** Year */
+            year?: number | null;
         };
         /** WrappedDefinitionIn */
         WrappedDefinitionIn: {
