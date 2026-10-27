@@ -527,17 +527,17 @@ export function BoosterReveal({
     if (phase === "spread") later(() => row.current?.scrollTo({ left: 0 }), 950);
   }, [phase, later]);
 
-  const all = states.length > 0 && states.every((s) => s === "revealed");
-  useEffect(() => {
-    // the last one turned is read too before the summary comes over the row
-    if (all && phase === "spread")
-      later(() => setPhase("done"), reduced ? 0 : FLIP_MS + (READ_MS[0] ?? 1400));
-  }, [all, phase, later, reduced]);
-
   const refund = cards.reduce((sum, card) => sum + (card.duplicate ? card.refund : 0), 0);
   const kept = cards.filter((card) => card.outcome === "reserve").length;
   const fresh = cards.filter((card) => card.outcome === "new").length;
   const best = cards.reduce((top, card) => Math.max(top, RANK[card.product.rarity ?? "common"] ?? 0), 0);
+  const all = states.length > 0 && states.every((s) => s === "revealed");
+  useEffect(() => {
+    // the last one turned is read too before the summary comes over the row (and the best one's moment is over:
+    // a legendary's halo fades 2.6 s long)
+    if (all && phase === "spread")
+      later(() => setPhase("done"), reduced ? 0 : FLIP_MS + (READ_MS[best] ?? 1400));
+  }, [all, phase, later, reduced, best]);
   const name = localized(booster.names, locale);
   const busy = states.some((s) => s === "charging");
 
