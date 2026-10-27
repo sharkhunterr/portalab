@@ -991,7 +991,13 @@ async def _operations(
                 kind=t.kind,
                 source_kind=t.source_kind,
                 source=action,
-                label=_label_of(labels, t.source_ref, t.rule_key),
+                # issue 261: a rule's gain under the name of its version in force
+                label=str(
+                    definitions.get((t.rule_key or "", t.rule_version or 0), {}).get("label")
+                    or _label_of(labels, t.source_ref, t.rule_key)
+                    or ""
+                )
+                or None,
                 reason=None if action == "wheel" else t.reason,  # the interface says what the wheel gave
                 balance=after_it,
                 level=level,
@@ -1052,21 +1058,34 @@ def _work_of(
 def _reckoning(
     row: LedgerTransaction, definition: dict[str, Any] | None, watched_s: int | None
 ) -> ReckoningOut | None:
-    """Issue 261: a rule's gain told as its rule reckoned it — the fixed part, what it counted per unit and
-    how much of it (kept with the gain since #261, a play's time before), the bonuses' multiplier, a cap."""
-    if row.source_kind != "reward_rule" or definition is None:
+    """Issue 261: a gain told as it was reckoned — a rule's fixed part, what it counted per unit and how much
+    of it (kept with the gain since #261, a play's time before); a quest's, an achievement's, a level's, the
+    wheel's or an administrator's amount; then the bonuses' multiplier, and a cap. A spend or a correction
+    is no sum: none."""
+    base = int(row.base_amount or 0)
+    multiplier = float(row.multiplier or 1)
+    if row.kind not in ("grant", "manual") or int(row.delta) <= 0:
         return None
-    grant = next((g for g in definition.get("grants") or [] if g.get("value") == row.value), None)
+    grant = (
+        next((g for g in definition.get("grants") or [] if g.get("value") == row.value), None)
+        if row.source_kind == "reward_rule" and definition is not None
+        else None
+    )
     if grant is None:
-        return None
+        if base <= 0:  # an older gain without its base: its amount as it came
+            return ReckoningOut(fixed=int(row.delta), base=int(row.delta), multiplier=1.0, capped=False)
+        return ReckoningOut(
+            fixed=base,
+            base=base,
+            multiplier=round(multiplier, 4),
+            capped=int(row.delta) < math.floor(base * multiplier),
+        )
     unit = grant.get("per_unit") or {}
     field = unit.get("field")
     counted = (row.modifiers or {}).get("measured") or {}
     quantity = counted.get(field) if field else None
     if quantity is None and field == "watched_s" and watched_s:
         quantity = watched_s
-    base = int(row.base_amount or 0)
-    multiplier = float(row.multiplier or 1)
     return ReckoningOut(
         fixed=grant.get("amount"),
         field=field,

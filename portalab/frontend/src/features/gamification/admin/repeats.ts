@@ -20,9 +20,9 @@ export function repeats(rows: Operation[]): JournalLine[] {
   const lines: JournalLine[] = [];
   const at = new Map<string, number>();
   for (const row of rows) {
-    // issue 261: a sitting (a film, an episode, a session of radio) or a work is its own gain, with its own
-    // reckoning — one line each, never added up
-    if (row.work || row.reckoning?.field || SITTINGS.has(row.source)) {
+    // issue 261: a gain reckoned (a rule's, a quest's, an achievement's…), a sitting or a work is a line of
+    // its own with its own sum — never added up
+    if (row.work || row.reckoning || SITTINGS.has(row.source)) {
       lines.push({ ...row, count: 1, since: row.occurred_at });
       continue;
     }
