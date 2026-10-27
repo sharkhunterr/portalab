@@ -160,7 +160,7 @@
 .booster-stage[data-cards] .booster-atmosphere__dust::before {
   content: "";
   position: absolute;
-  inset: 0 0 -40vh;
+  inset: 0 0 -11rem;
   background:
     radial-gradient(circle, color-mix(in srgb, var(--booster-light) 70%, transparent) 0 1px, transparent 2px)
     0 0 / 9rem 11rem,
@@ -169,7 +169,7 @@
       color-mix(in srgb, var(--booster-light) 45%, transparent) 0 1.5px,
       transparent 2.5px
     )
-    4rem 6rem / 13rem 17rem;
+    4rem 6rem / 13rem 11rem;
   opacity: 0.7;
 }
 .booster-stage[data-cards] .booster-summary {
@@ -178,17 +178,42 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   .booster-stage[data-cards] .booster-atmosphere__dust::before {
-    animation: cards-dust 24s linear infinite;
+    animation: cards-dust 14s linear infinite;
   }
 }
+/* one tile of dust risen, and it starts again where it was: a layer barely taller than the screen */
 @keyframes cards-dust {
   to {
-    transform: translateY(-40vh);
+    transform: translateY(-11rem);
   }
 }
+/* its projectors hold their angle and only breathe: three tall layers turning over the cards tore on a phone */
 .booster-stage[data-cards] .booster-atmosphere__beam {
   filter: none;
   mask-image: linear-gradient(90deg, transparent 18%, var(--card-foil-mask) 42% 58%, transparent 82%);
+  transform: rotate(-16deg);
+  animation: none;
+}
+.booster-stage[data-cards] .booster-atmosphere__beam[data-beam="2"] {
+  transform: rotate(5deg);
+  animation-delay: -2s;
+}
+.booster-stage[data-cards] .booster-atmosphere__beam[data-beam="3"] {
+  transform: rotate(18deg);
+  animation-delay: -4s;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .booster-stage[data-cards] .booster-atmosphere__beam {
+    animation: cards-beam 6s ease-in-out infinite alternate;
+  }
+}
+@keyframes cards-beam {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
 }
 /* issue 255: a card seen big — the stage stays behind it, holding still: only that card moves */
 .booster-stage[data-zoomed] * {
