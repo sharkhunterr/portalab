@@ -4,6 +4,8 @@ pages too, under a ticket only its member may use (and only for what it was open
 stops is kept in the portal, written back to the library when it keeps this member's progress, and
 published as activity; the settings turn each off."""
 
+from datetime import timedelta
+
 import httpx
 import pytest
 from fastapi import FastAPI
@@ -11,6 +13,7 @@ from sqlalchemy import text
 
 from portalab.capabilities.media import AUDIO, READING
 from portalab.capabilities.media.testkit import AUDIO_BYTES, FakeAudio, FakeReading, library_record
+from portalab.core.time import FixedClock
 from tests.integration.identity.helpers import login
 from tests.integration.media.conftest import MediaHarness, users
 
@@ -184,3 +187,57 @@ async def test_settings_turn_listening_and_reading_off(
     assert (await client.get(f"/api/v1/media/{book}/read")).status_code == 200
     await media.configure("media.reading.enabled", False)
     assert (await client.get(f"/api/v1/media/{book}/read")).json()["code"] == "media.books_disabled"
+
+
+async def test_a_sitting_ends_even_when_the_page_goes_away_without_a_word(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, clock: FixedClock
+) -> None:
+    """#256: the minutes heard count once the sitting ends — the page leaving ends it, and one left paused (a
+    phone's app closed) is ended by the sweep; a sitting is never counted twice."""
+    await users(app, media, "max")
+    audiobook, _, _, _ = await _library(media)
+    await login(client, "max")
+
+    async def report(ticket: str, state: str, at: float, seq: int) -> None:
+        sent = await client.post(
+            f"/api/v1/media/listen/{ticket}/position",
+            json={"state": state, "position_s": at, "duration_s": 36000, "seq": seq},
+        )
+        assert sent.status_code == 204, sent.text
+
+    async def endings() -> list[tuple[str, float]]:
+        return [
+            (name, payload.get("watched_s", 0.0))
+            for name, payload, _ in await media.events("media.playback")
+            if name in ("media.playback_abandoned", "media.playback_finished")
+        ]
+
+    # listened ten minutes, paused, then the phone's app was closed: nothing more is heard of it
+    first = (await client.get(f"/api/v1/media/{audiobook}/listen")).json()["ticket"]
+    await report(first, "playing", 100.0, 1)
+    clock.advance(timedelta(minutes=10))
+    await report(first, "paused", 700.0, 2)
+    assert await media.module.books.sweep() == 0  # not yet: it may go on
+    clock.advance(timedelta(minutes=31))
+    assert await media.module.books.sweep() == 1
+    assert await endings() == [("media.playback_abandoned", 600.0)]
+    assert await media.module.books.sweep() == 0  # ended once
+
+    # the next time, the page leaves (its sitting ends), then comes back from the browser's cache and plays on:
+    # another sitting, ended in its turn — each counted once, the late close of an ended one adds nothing
+    second = (await client.get(f"/api/v1/media/{audiobook}/listen")).json()["ticket"]
+    await report(second, "playing", 700.0, 1)
+    clock.advance(timedelta(minutes=5))
+    await report(second, "stopped", 1000.0, 2)
+    await report(second, "stopped", 1000.0, 3)
+    clock.advance(timedelta(minutes=1))
+    await report(second, "playing", 1000.0, 4)
+    clock.advance(timedelta(minutes=4))
+    await report(second, "stopped", 1240.0, 5)
+    clock.advance(timedelta(minutes=31))
+    assert await media.module.books.sweep() == 0
+    assert await endings() == [
+        ("media.playback_abandoned", 600.0),
+        ("media.playback_abandoned", 300.0),
+        ("media.playback_abandoned", 240.0),
+    ]

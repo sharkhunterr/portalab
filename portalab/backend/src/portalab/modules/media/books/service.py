@@ -48,6 +48,9 @@ TIMEOUT_S = 30.0
 STREAM_TIMEOUT_S = 90.0
 STATES = ("playing", "paused", "stopped", "finished")
 FINISHED = 0.995  # a book read to here is finished
+# #256: a sitting nothing has been heard of for this long is over (its page went away without a word)
+IDLE = timedelta(minutes=30)
+ENDINGS = ("media.playback_finished", "media.playback_abandoned")
 AUDIO_FORMAT = "audio"
 
 
@@ -453,48 +456,139 @@ class BookService:
                 row.percent, row.updated_at = percent, now
             watched = None
             if row is not None:  # #94: the minutes of this sitting — what the progression counts
-                if row.session_ref != ticket.session[:64] or row.session_started_at is None:
+                ended = row.session_ref == ticket.session[:64] and row.session_ended_at is not None
+                if ended and state in ("paused", "stopped"):
+                    return  # #256: its end was counted already — the page left, then the player closed
+                if ended or row.session_ref != ticket.session[:64] or row.session_started_at is None:
+                    # a new sitting (or the same page back from the browser's cache once its sitting ended)
                     row.session_ref, row.session_start_s = ticket.session[:64], position_s
-                    row.session_started_at = now
-                elapsed = (now - row.session_started_at).total_seconds()
-                if kind == "book":  # a book reports the time spent reading in this sitting
-                    watched = min(max(0.0, position_s), elapsed + 60)
-                else:  # an audiobook its position: what was heard since the sitting began (up to 3x)
-                    heard = position_s - (
-                        row.session_start_s if row.session_start_s is not None else position_s
-                    )
-                    watched = min(max(0.0, heard), elapsed * 3 + 60)
+                    row.session_started_at, row.session_ended_at = now, None
+                watched = _watched(kind, position_s, row.session_start_s, now - row.session_started_at)
+                row.session_watched_s = watched
             name = self._event(state, seq, row.event_at if row is not None else None, now)
             if name is None:
                 return
             if row is not None and name in ("media.playback_progressed", "media.playback_started"):
                 row.event_at = now
-            payload = {
-                "object": str(ticket.object_id),
-                "kind": kind,
-                "service": str(ticket.service),
-                "session": ticket.session,
-                "state_seq": max(0, int(seq)),
-                "position_s": round(max(0.0, position_s), 1),
-                "duration_s": duration_s,
-                "percent": round(percent, 4),
-                "occurred_at": now.isoformat(),
-                **({"watched_s": round(watched, 1)} if watched is not None else {}),
-                "via": "portal",  # #103: read or listened to in the portal
-            }
-            await self.events.publish(
+            if row is not None and name in ENDINGS:
+                row.session_ended_at = now
+            await self._publish(
                 session,
                 name,
-                payload,
-                occurred_at=now,
-                subject=SubjectRef("user", str(ticket.user)),
-                source="media",
-                dedup_key=(
-                    f"media.playback_finished:{ticket.session}"
-                    if name == "media.playback_finished"
-                    else f"media.playback:{ticket.session}:{seq}"
-                ),
+                user=ticket.user,
+                object_id=ticket.object_id,
+                service=ticket.service,
+                sitting=ticket.session,
+                started=row.session_started_at if row is not None else None,
+                kind=kind,
+                seq=seq,
+                position_s=position_s,
+                duration_s=duration_s,
+                percent=percent,
+                watched=watched,
+                at=now,
             )
+
+    async def _publish(
+        self,
+        session: Any,
+        name: str,
+        *,
+        user: UUID,
+        object_id: UUID,
+        service: UUID,
+        sitting: str,
+        started: datetime | None,
+        kind: str,
+        seq: int,
+        position_s: float,
+        duration_s: float | None,
+        percent: float,
+        watched: float | None,
+        at: datetime,
+    ) -> None:
+        payload = {
+            "object": str(object_id),
+            "kind": kind,
+            "service": str(service),
+            "session": sitting,
+            "state_seq": max(0, int(seq)),
+            "position_s": round(max(0.0, position_s), 1),
+            "duration_s": duration_s,
+            "percent": round(percent, 4),
+            "occurred_at": at.isoformat(),
+            **({"watched_s": round(watched, 1)} if watched is not None else {}),
+            "via": "portal",  # #103: read or listened to in the portal
+        }
+        # a sitting ends once: finished once per session, abandoned once per sitting (#256: the page leaving,
+        # then the player closed, or the sweep after either, never count its minutes twice)
+        if name == "media.playback_finished":
+            dedup = f"media.playback_finished:{sitting}"
+        elif name == "media.playback_abandoned":
+            begun = int(started.timestamp()) if started is not None else seq
+            dedup = f"media.playback_abandoned:{sitting}:{begun}"
+        else:
+            dedup = f"media.playback:{sitting}:{seq}"
+        await self.events.publish(
+            session,
+            name,
+            payload,
+            occurred_at=at,
+            subject=SubjectRef("user", str(user)),
+            source="media",
+            dedup_key=dedup,
+        )
+
+    async def sweep(self, limit: int = 200) -> int:
+        """#256: end the sittings nothing has been heard of for a while — the member's page went away
+        without a word (a phone's app closed, a tab dropped): their minutes are counted, as when the member
+        closes it."""
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            rows = (
+                await session.execute(
+                    select(BookPosition)
+                    .where(
+                        BookPosition.session_ref.is_not(None),
+                        BookPosition.session_started_at.is_not(None),
+                        BookPosition.session_ended_at.is_(None),
+                        BookPosition.updated_at < now - IDLE,
+                    )
+                    .order_by(BookPosition.updated_at)
+                    .limit(limit)
+                    .with_for_update(skip_locked=True)
+                )
+            ).scalars()
+            ended = 0
+            for row in rows:
+                audio = row.format == AUDIO_FORMAT
+                kind = "audiobook" if audio else "book"
+                heard = float(row.position) if audio and _number(row.position) else None
+                watched = row.session_watched_s
+                if watched is None and heard is not None and row.session_started_at is not None:
+                    spent = row.updated_at - row.session_started_at
+                    watched = _watched(kind, heard, row.session_start_s, spent)
+                row.session_ended_at = now
+                await self._publish(
+                    session,
+                    "media.playback_finished" if row.percent >= FINISHED else "media.playback_abandoned",
+                    user=row.user_id,
+                    object_id=row.object_id,
+                    service=row.service_id,
+                    sitting=row.session_ref or "",
+                    started=row.session_started_at,
+                    kind=kind,
+                    seq=0,
+                    # a book's « position » in the activity: the time spent reading it (as it reports it)
+                    position_s=heard if heard is not None else (watched or 0.0),
+                    duration_s=None,
+                    percent=row.percent,
+                    watched=watched,
+                    at=row.updated_at,  # when it was last heard of: when it really ended
+                )
+                ended += 1
+            return ended
 
     def _event(self, state: str, seq: int, last: datetime | None, now: datetime) -> str | None:
         """The activity a report means: started once, progress at most every so often, then paused,
@@ -511,6 +605,16 @@ class BookService:
         if last is None or now - last >= every:
             return "media.playback_progressed"
         return None
+
+
+def _watched(kind: str, position_s: float, start_s: float | None, elapsed: timedelta) -> float:
+    """#94: the minutes of a sitting — a book reports the time spent reading in it, an audiobook its position:
+    what was heard since the sitting began (up to 3x its time, for a fast reader)."""
+    seconds = elapsed.total_seconds()
+    if kind == "book":
+        return min(max(0.0, position_s), seconds + 60)
+    heard = position_s - (start_s if start_s is not None else position_s)
+    return min(max(0.0, heard), seconds * 3 + 60)
 
 
 def _number(text: str) -> bool:

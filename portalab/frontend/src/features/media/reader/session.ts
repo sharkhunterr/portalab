@@ -56,7 +56,8 @@ export function useReadingSession(ticket: string, format: string, fileRef: strin
     const hidden = () => {
       if (document.visibilityState === "hidden") send("paused");
     };
-    const leave = () => send("paused");
+    // the page goes away: the sitting ends, its minutes counted (issue 256)
+    const leave = () => send("stopped");
     document.addEventListener("visibilitychange", hidden);
     window.addEventListener("pagehide", leave);
     return () => {
