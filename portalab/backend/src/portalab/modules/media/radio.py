@@ -8,13 +8,12 @@ import time
 from collections.abc import AsyncIterator, Callable, Mapping
 from contextlib import asynccontextmanager
 from dataclasses import asdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from datetime import time as clock_time
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, select, text, update
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.dashboard import Refresh, Size, SizeLimits, WidgetDefinition, WidgetPayload
@@ -36,16 +35,17 @@ from portalab.core.errors import PortalError, Unavailable
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.ids import new_id
 from portalab.core.time import Clock, utc_now
-from portalab.modules.media.models import RadioCreditLedger, RadioListening
+from portalab.modules.media.models import RadioCreditLedger, RadioSitting
 from portalab.modules.media.observability import log
 from portalab.modules.media.permissions import MEDIA_PLAY
 from portalab.modules.media.settings import MediaConfig
 
 ASK_EVERY = 20
-# issue 227: the radio's listening counted in slices of this many minutes of stream relayed to a member (issue
-# 257: added up over the day, across streams); what is relayed is added every ``HEARD_EVERY`` seconds
-LISTEN_MINUTES = 15
+# issue 227: the radio's listening counted by the server — what the stream relayed to a member is added to
+# their sitting every ``HEARD_EVERY`` seconds; issue 259: a sitting nothing was heard of for ``IDLE`` is over,
+# and its minutes count then (like a film's)
 HEARD_EVERY = 60
+IDLE = timedelta(minutes=10)
 
 
 class RadioUnavailable(Unavailable):
@@ -263,48 +263,67 @@ class RadioService:
 
     # --- issue 227: listening, counted by the server -------------------------------------------------------
     async def heard(self, user: UUID, seconds: float) -> None:
-        """The stream was relayed to this member ``seconds`` more. Issue 257: added up over the day, whatever
-        the streams it came in (the player opens one at each play), each quarter of an hour reached is one
-        ``media.radio_listened`` (the rules cap what it earns in a day)."""
+        """The stream was relayed to this member ``seconds`` more. Issue 259: added to their sitting — the one
+        heard of less than ``IDLE`` ago (a pause opens a new stream to play on), or a new one."""
         if self.database is None or seconds <= 0:
             return
         now = utc_now(self.clock)
-        day = now.date()
         try:
             async with self.database.unit_of_work() as uow:
                 session = uow.session
-                added = (
-                    insert(RadioListening)
-                    .values(user_id=user, day=day, seconds=seconds, slices=0, updated_at=now)
-                    .on_conflict_do_update(
-                        index_elements=["user_id", "day"],
-                        set_={"seconds": RadioListening.seconds + seconds, "updated_at": now},
+                sitting = await session.scalar(
+                    select(RadioSitting)
+                    .where(
+                        RadioSitting.user_id == user,
+                        RadioSitting.ended_at.is_(None),
+                        RadioSitting.updated_at >= now - IDLE,
                     )
-                    .returning(RadioListening.seconds, RadioListening.slices)
+                    .order_by(RadioSitting.updated_at.desc())
+                    .limit(1)
+                    .with_for_update()
                 )
-                total, counted = (await session.execute(added)).one()
-                reached = int(total // (LISTEN_MINUTES * 60))
-                if reached <= counted:
-                    return
-                await session.execute(
-                    update(RadioListening)
-                    .where(RadioListening.user_id == user, RadioListening.day == day)
-                    .values(slices=reached)
-                )
-                if self.events is None:
-                    return
-                for slice_ in range(counted + 1, reached + 1):
-                    await self.events.publish(
-                        session,
-                        "media.radio_listened",
-                        {"minutes": LISTEN_MINUTES, "session": day.isoformat(), "slice": slice_},
-                        occurred_at=now,
-                        subject=SubjectRef("user", str(user)),
-                        source="media",
-                        dedup_key=f"media.radio_listened:{user}:{day.isoformat()}:{slice_}",
+                if sitting is None:
+                    sitting = RadioSitting(
+                        user_id=user, seconds=0.0, started_at=now - timedelta(seconds=seconds), updated_at=now
                     )
+                    session.add(sitting)
+                sitting.seconds += seconds
+                sitting.updated_at = now
         except Exception:  # the radio plays on whatever happens to its rewards
             log.warning("radio listening not counted", exc_info=True)
+
+    async def sweep(self, limit: int = 200) -> int:
+        """Issue 259: the sittings nothing was heard of for ``IDLE`` end — each one's minutes make one
+        ``media.radio_listened`` (the rules say what it earns, as a film's minutes). How many ended."""
+        if self.database is None:
+            return 0
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            over = (
+                await session.scalars(
+                    select(RadioSitting)
+                    .where(RadioSitting.ended_at.is_(None), RadioSitting.updated_at < now - IDLE)
+                    .order_by(RadioSitting.updated_at)
+                    .limit(limit)
+                    .with_for_update(skip_locked=True)
+                )
+            ).all()
+            for sitting in over:
+                sitting.ended_at = sitting.updated_at
+                minutes = int(sitting.seconds // 60)
+                if self.events is None or minutes < 1:
+                    continue
+                await self.events.publish(
+                    session,
+                    "media.radio_listened",
+                    {"minutes": minutes, "session": str(sitting.id)},
+                    occurred_at=sitting.updated_at,
+                    subject=SubjectRef("user", str(sitting.user_id)),
+                    source="media",
+                    dedup_key=f"media.radio_listened:{sitting.user_id}:{sitting.id}",
+                )
+        return len(over)
 
     async def _publish(self, user: UUID, name: str, payload: dict[str, Any], key: str) -> None:
         if self.events is None or self.database is None:

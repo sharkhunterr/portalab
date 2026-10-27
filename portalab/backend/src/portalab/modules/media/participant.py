@@ -21,7 +21,7 @@ from portalab.modules.media.models import (
     QuotaLedger,
     QuotaUnits,
     RadioCreditLedger,
-    RadioListening,
+    RadioSitting,
     RescueLedger,
     UserLink,
     UserProgress,
@@ -111,16 +111,16 @@ class MediaParticipant:
                         },
                     )
                 )
-            for heard in (
-                await session.execute(select(RadioListening).where(RadioListening.user_id == user_id))
+            for sitting in (
+                await session.execute(select(RadioSitting).where(RadioSitting.user_id == user_id))
             ).scalars():
-                records.append(  # #257: the radio heard in the portal, by day
+                records.append(  # #259: the radio heard in the portal, sitting by sitting
                     ExportRecord(
-                        "media.radio_listening",
+                        "media.radio_sitting",
                         {
-                            "day": heard.day.isoformat(),
-                            "seconds": round(heard.seconds),
-                            "slices": heard.slices,
+                            "started_at": sitting.started_at.isoformat(),
+                            "until": sitting.updated_at.isoformat(),
+                            "seconds": round(sitting.seconds),
                         },
                     )
                 )
@@ -173,7 +173,7 @@ class MediaParticipant:
                 QuotaLedger,
                 RescueLedger,
                 RadioCreditLedger,
-                RadioListening,
+                RadioSitting,
                 BookPosition,
             ):
                 await session.execute(delete(model).where(model.user_id == user_id))

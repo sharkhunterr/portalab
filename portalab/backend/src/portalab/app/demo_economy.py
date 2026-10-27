@@ -70,12 +70,14 @@ RULES: dict[str, dict[str, Any]] = {
         "label": "Un titre demandé est regardé par un autre membre",
         "grants": [{"value": "xp", "amount": 5}, {"value": "coins", "amount": 2}],
     },
-    # issue 227: the radio listened to in the portal's player (a slice of 15 minutes counted by the server)
-    # and a song asked of its DJ
+    # issue 227: the radio listened to in the portal's player (counted by the server) and a song asked of
+    # its DJ — issue 259: like a film's minutes, once a sitting is over, in proportion (1 XP for 3 minutes,
+    # from 3: less earns nothing)
     "radio_listening": {
         "event_type": "media.radio_listened",
-        "label": "Un quart d'heure de radio",
-        "grants": [{"value": "xp", "amount": 5}, {"value": "coins", "amount": 1}],
+        "label": "Minutes de radio écoutées",
+        "predicate": [{"field": "minutes", "op": "gte", "value": 3}],
+        "grants": [{"value": "xp", "per_unit": {"field": "minutes", "factor": 1 / 3, "max": 80}}],
         "limits": {"caps": [{"period": "day", "max_amount": 40, "value": "xp"}]},
     },
     "radio_request": {
@@ -140,6 +142,12 @@ REPLACED_RULES: dict[str, dict[str, Any]] = {
         "predicate": [{"field": "kind", "op": "in", "value": ["book", "audiobook"]}],
         "grants": [{"value": "xp", "amount": 50}, {"value": "coins", "amount": 10}],
     },
+}
+
+# issue 259: the radio's quarters of an hour (#227), each a gain of XP and Coins as one listened
+REPLACED_RULES["radio_listening"] = {
+    "event_type": "media.radio_listened",
+    "grants": [{"value": "xp", "amount": 5}, {"value": "coins", "amount": 1}],
 }
 
 # #94: the former rule (a play's whole length, only once finished) — retired where it was left unchanged

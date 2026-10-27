@@ -517,9 +517,11 @@ class MediaModule:
         async def images() -> None:  # 027: covers whose fetch failed are tried again
             await self.images.backfill()
 
-        # #256: books and audiobooks left without a word end, their minutes counted
+        # #256: books and audiobooks left without a word end, their minutes counted (#259: the radio too)
         async def sittings() -> None:
             while await self.books.sweep():
+                pass
+            while await self.radio.sweep():  # #259: the radio's too
                 pass
 
         return [
