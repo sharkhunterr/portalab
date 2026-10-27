@@ -2784,6 +2784,17 @@
             "title": "Amount",
             "type": "number"
           },
+          "factor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Factor"
+          },
           "source": {
             "title": "Source",
             "type": "string"

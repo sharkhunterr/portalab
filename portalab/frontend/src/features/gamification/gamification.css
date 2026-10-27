@@ -1964,3 +1964,14 @@
     display: none;
   }
 }
+
+/* issue 258: a series of the same operation told as one line — how many it stands for */
+.gam-ops__repeat {
+  margin-inline-start: var(--space-1);
+  padding: 0 0.4rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-accent);
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-bold);
+}

@@ -290,6 +290,12 @@ describe("gamification administration", () => {
       "Balance after",
       "Level",
     ]);
+    // issue 258: the same operation again and again is one line, with how many it stands for…
+    const grouped = Array.from(table.querySelectorAll("tbody tr")).map((tr) => tr.textContent);
+    expect(grouped.length).toBeLessThan(25);
+    expect(grouped.some((line) => /×\d+/.test(line ?? ""))).toBe(true);
+    // …every one of them on asking
+    fireEvent.click(screen.getByRole("checkbox", { name: "Each operation" }));
     const first = Array.from(table.querySelectorAll("tbody tr")).map((tr) => tr.textContent);
     expect(first).toHaveLength(25);
     expect(first[0]).toContain("+10 XP");

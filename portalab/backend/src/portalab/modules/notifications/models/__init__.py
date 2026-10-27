@@ -82,6 +82,9 @@ class Notification(NotifyBase):
     priority_rank: Mapped[int] = mapped_column(Integer, nullable=False)
     subject_ref: Mapped[str | None] = mapped_column(String(160))
     count: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    # issue 258: the parameters of the repeats merged into it (their rewards added up); none: its
+    # communication's
+    params: Mapped[dict[str, Any] | None] = mapped_column(JSONB, info=pii("activity"))
     action_url: Mapped[str | None] = mapped_column(String(256))
     read_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     archived_at: Mapped[datetime | None] = mapped_column(TZDateTime)

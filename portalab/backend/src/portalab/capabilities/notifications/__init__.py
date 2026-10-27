@@ -97,6 +97,9 @@ class CategoryDef:
     default_channels: tuple[str, ...] = ("portal",)
     mandatory_channels: tuple[str, ...] = ()
     user_mutable: bool = True
+    # issue 258: repeats that come in series (a reward every quarter of an hour) merge into one item over this
+    # many seconds since the last, while it is unread (0: the portal's coalescing window only)
+    series_s: int = 0
 
 
 class CategoryError(ValueError):
@@ -153,6 +156,7 @@ def declare_category(
     default_channels: Sequence[str] = ("portal",),
     mandatory_channels: Sequence[str] = (),
     user_mutable: bool = True,
+    series_s: int = 0,
     registry: CategoryRegistry | None = None,
 ) -> CategoryDef:
     return (registry or default_categories).declare(
@@ -164,6 +168,7 @@ def declare_category(
             tuple(default_channels),
             tuple(mandatory_channels),
             user_mutable,
+            series_s,
         )
     )
 

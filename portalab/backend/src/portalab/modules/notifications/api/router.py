@@ -21,6 +21,7 @@ from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.errors import NotFound, Unavailable, ValidationFailed
 from portalab.core.time import utc_now
+from portalab.modules.notifications.fanout.merge import rewards_of
 from portalab.modules.notifications.models import Announcement, Communication, Delivery, Notification
 from portalab.modules.notifications.module import NotificationsModule
 from portalab.modules.notifications.permissions import NOTIFICATIONS_BROADCAST, NOTIFICATIONS_MANAGE, SELF
@@ -188,7 +189,6 @@ class CategoryPolicyIn(BaseModel):
     locked: bool = False
 
 
-REWARD_VALUES = ("xp", "coins", "contribution")
 SUBJECTS = ("quest", "achievement", "product", "item", "reason")
 
 
@@ -205,14 +205,10 @@ def _details(params: Mapping[str, Any] | None) -> dict[str, Any]:
         None,
     )
     rewards = [
-        NotificationRewardOut(value=value, amount=int(params[value]))
-        for value in REWARD_VALUES
-        if isinstance(params.get(value), int | float)
-        and not isinstance(params.get(value), bool)
-        and params[value] > 0
+        NotificationRewardOut(value=value, amount=int(amount))
+        for value, amount in rewards_of(params).items()
+        if amount > 0
     ]
-    if not rewards and params.get("value") in REWARD_VALUES and isinstance(params.get("amount"), int | float):
-        rewards = [NotificationRewardOut(value=str(params["value"]), amount=int(params["amount"]))]
     boost = params.get("boost")
     return {
         "subtitle": subtitle,
@@ -326,10 +322,17 @@ async def my_notifications(
                     )
                 ).all()
             ]
-    params: dict[UUID, Mapping[str, Any]] = {ident: values for ident, _, values in found}
-    texts = await _texts(module, user, lang, found)
+    sent = {ident: (template, values) for ident, template, values in found}
+    # issue 258: a series merged into one item says what it brought in all (its merged parameters)
+    shown: list[tuple[UUID, str, Any]] = []
+    for r in rows[:PAGE]:
+        if r.communication_id in sent:
+            template, values = sent[r.communication_id]
+            shown.append((r.id, template, r.params if r.params is not None else values))
+    params: dict[UUID, Mapping[str, Any]] = {ident: values for ident, _, values in shown}
+    texts = await _texts(module, user, lang, shown)
     return NotificationPage(
-        items=[_out(r, params.get(r.communication_id), texts.get(r.communication_id)) for r in rows[:PAGE]],
+        items=[_out(r, params.get(r.id), texts.get(r.id)) for r in rows[:PAGE]],
         next_cursor=encode_cursor(offset + PAGE) if len(rows) > PAGE else None,
         unread=await _unread(module, user),
     )
