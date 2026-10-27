@@ -3816,17 +3816,16 @@
         "event_type": "media.radio_listened",
         "grants": [
           {
-            "amount": 5,
-            "per_unit": null,
+            "amount": null,
+            "per_unit": {
+              "factor": 0.3333333333333333,
+              "field": "minutes",
+              "max": 80
+            },
             "value": "xp"
-          },
-          {
-            "amount": 1,
-            "per_unit": null,
-            "value": "coins"
           }
         ],
-        "label": "Un quart d'heure de radio",
+        "label": "Minutes de radio écoutées",
         "limits": {
           "caps": [
             {
@@ -3839,7 +3838,13 @@
           "diminishing": null
         },
         "multiplier": 1.0,
-        "predicate": []
+        "predicate": [
+          {
+            "field": "minutes",
+            "op": "gte",
+            "value": 3
+          }
+        ]
       },
       "key": "radio_listening"
     },
