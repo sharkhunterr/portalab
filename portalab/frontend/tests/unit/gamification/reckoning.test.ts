@@ -61,19 +61,23 @@ describe("a gain's reckoning", () => {
   });
 
   it("tells a film's minutes, then its streak", () => {
-    expect(reckoning(op({ delta: 75, reckoning: film }), t, number)).toBe(
-      "50 min × 1 XP/min = 50 XP, × 1,5 avec les bonus = 75 XP",
+    const bonuses = [{ source: "streak", amount: 25, factor: 1.5 }];
+    expect(reckoning(op({ delta: 75, reckoning: film, bonuses }), t, number)).toBe(
+      "50 min × 1 XP/min × 1,5 (Bonus de série) = 75 XP",
     );
   });
 
   it("tells a fixed amount, and a limit that kept some back", () => {
     expect(
       reckoning(op({ delta: 3, reckoning: { fixed: 5, base: 5, multiplier: 1, capped: true } }), t, number),
-    ).toBe("5 XP, montant fixe de la règle, ramené à 3 XP par une limite");
+    ).toBe("5 XP → 3 XP (plafond)");
+    expect(reckoning(op({ reckoning: { fixed: 5, base: 5, multiplier: 1, capped: false } }), t, number)).toBe(
+      "5 XP",
+    );
   });
 
   it("says the rate alone for a gain older than its measure kept", () => {
-    expect(reckoning(op({ reckoning: { ...radio, quantity: null } }), t, number)).toBe("1 XP / 3 min : 5 XP");
+    expect(reckoning(op({ reckoning: { ...radio, quantity: null } }), t, number)).toBe("1 XP / 3 min = 5 XP");
   });
 });
 

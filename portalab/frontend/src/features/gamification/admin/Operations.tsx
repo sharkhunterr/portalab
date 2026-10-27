@@ -189,7 +189,8 @@ export function Operations({
                           {t(`gamification:sources.${row.source}`)}
                         </span>
                         {/* the bonuses inside the amount (streak, campaign, pace, boost), as the charts split them */}
-                        {row.bonuses?.length ? (
+                        {/* issue 261: a rule's gain says its bonus in its sum */}
+                        {row.bonuses?.length && !reckoned ? (
                           <span className="gam-ops__bonuses">
                             {row.bonuses.map((bonus) => (
                               <span key={bonus.source} className="gam-ops__bonus">
@@ -219,7 +220,7 @@ export function Operations({
                       <td className="gam-ops__what">
                         {work ? <strong>{work.name}</strong> : null}
                         {work?.part ? <span>{work.part}</span> : null}
-                        {work ? <span className="admin-muted">{what(row)}</span> : what(row)}
+                        <span className={work ? "admin-muted" : undefined}>{what(row)}</span>
                         {reckoned ? <span className="gam-ops__reckoning">{reckoned}</span> : null}
                         {row.count > 1 ? (
                           <span className="admin-muted">

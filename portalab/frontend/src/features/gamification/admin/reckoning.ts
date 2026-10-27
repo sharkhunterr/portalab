@@ -4,16 +4,17 @@ import type { Operation } from "./tuning";
 type Number = (value: number) => string;
 
 /**
- * Issue 261: how a rule reckoned a gain, said in a line — « 51 min × 1 XP/min = 51 XP », « 16 min × 1 XP / 3 min
- * = 5 XP », « 5 XP fixed » — then its bonuses' multiplier (a streak's ×1.5) and a limit that kept some back.
- * Time is told in minutes, whether the rule counts seconds (``watched_s``) or minutes.
+ * Issue 261: how a rule reckoned a gain, as a sum — « 26 min × 1 XP/min × 1,5 (Streak bonus) = 39 XP »,
+ * « 16 min × 1 XP / 3 min = 5 XP », « 5 XP » — and a limit that kept some back (« → 30 XP (limit) »). Time is
+ * told in minutes, whether the rule counts seconds (``watched_s``) or minutes.
  */
 export function reckoning(row: Operation, t: Translate, number: Number): string | null {
   const r = row.reckoning;
   if (!r) return null;
   const unit = t(`gamification:value.${row.value}`);
   const amount = (n: number) => `${number(n)} ${unit}`;
-  let text: string;
+  const terms: string[] = [];
+  if (r.fixed) terms.push(amount(r.fixed));
   if (r.field && r.factor) {
     const seconds = r.field.endsWith("_s");
     const timed = seconds || r.field === "minutes";
@@ -31,33 +32,25 @@ export function reckoning(row: Operation, t: Translate, number: Number): string 
               count: Math.floor(seconds ? r.quantity / 60 : r.quantity),
             })
           : t("gamification:admin.operations.reckon.units", { quantity: number(r.quantity), field: r.field });
-    const part = r.base - (r.fixed ?? 0);
-    let per = counted
-      ? t("gamification:admin.operations.reckon.perUnit", { quantity: counted, rate, amount: amount(part) })
-      : t("gamification:admin.operations.reckon.rateOnly", { rate, amount: amount(part) });
-    if (r.max != null && part >= r.max) {
-      per = t("gamification:admin.operations.reckon.max", { text: per, max: amount(r.max) });
+    let term = counted ? `${counted} × ${rate}` : rate;
+    if (r.max != null && r.base - (r.fixed ?? 0) >= r.max) {
+      term = t("gamification:admin.operations.reckon.max", { term });
     }
-    text = r.fixed
-      ? t("gamification:admin.operations.reckon.plus", {
-          fixed: amount(r.fixed),
-          part: per,
-          total: amount(r.base),
-        })
-      : per;
-  } else {
-    text = t("gamification:admin.operations.reckon.fixed", { amount: amount(r.base) });
+    terms.push(term);
   }
-  if (Math.abs(r.multiplier - 1) > 0.001) {
-    text = t("gamification:admin.operations.reckon.bonus", {
-      text,
-      factor: number(r.multiplier),
-      total: amount(Math.floor(r.base * r.multiplier)),
-    });
+  let text = terms.length > 1 ? `(${terms.join(" + ")})` : (terms[0] ?? amount(r.base));
+  const bonus = Math.abs(r.multiplier - 1) > 0.001;
+  if (bonus) {
+    // the bonus named when one alone made it (a streak), as the charts name it
+    const named = (row.bonuses ?? []).filter((b) => b.factor);
+    const by = named.length === 1 && named[0] ? ` (${t(`gamification:sources.${named[0].source}`)})` : "";
+    text = `${text} × ${number(r.multiplier)}${by}`;
   }
-  if (r.capped) {
-    text = t("gamification:admin.operations.reckon.capped", { text, amount: amount(row.delta) });
-  }
+  const total = Math.floor(r.base * r.multiplier);
+  // a fixed amount alone says itself; anything else, its result
+  if (bonus || r.field) text = `${text} = ${amount(total)}`;
+  if (r.capped)
+    text = `${text} → ${t("gamification:admin.operations.reckon.capped", { amount: amount(row.delta) })}`;
   return text;
 }
 
