@@ -18,7 +18,7 @@ export function Tabs({
   defaultValue?: string;
 }) {
   return (
-    <TabsPrimitive.Root defaultValue={defaultValue ?? items[0]?.value ?? ""}>
+    <TabsPrimitive.Root className="ds-tabs" defaultValue={defaultValue ?? items[0]?.value ?? ""}>
       <TabsPrimitive.List className="ds-tabs__list" aria-label={label}>
         {items.map((item) => (
           <TabsPrimitive.Trigger key={item.value} value={item.value} className="ds-tabs__trigger">
@@ -27,7 +27,7 @@ export function Tabs({
         ))}
       </TabsPrimitive.List>
       {items.map((item) => (
-        <TabsPrimitive.Content key={item.value} value={item.value}>
+        <TabsPrimitive.Content key={item.value} value={item.value} className="ds-tabs__panel">
           {item.content}
         </TabsPrimitive.Content>
       ))}

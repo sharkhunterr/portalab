@@ -112,6 +112,14 @@
   inset-inline-start: 0;
   inset-inline-end: auto;
 }
+/* tabs inside a grid or a flex row never widen it: a scrolling row in a panel scrolls within the page */
+.ds-tabs,
+.ds-tabs__panel {
+  min-inline-size: 0;
+}
+.ds-tabs__panel {
+  padding-block-start: var(--space-3);
+}
 .ds-tabs__list {
   display: flex;
   flex-wrap: wrap;
