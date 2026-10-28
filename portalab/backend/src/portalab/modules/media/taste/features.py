@@ -87,6 +87,13 @@ STOP = {
 _SAGA = re.compile(
     r"\s*[-\u2013(]?\s*\b(saga|collection|la saga|trilogie|trilogy)\b\s*\)?\s*$", re.IGNORECASE
 )
+# what a ROM's name says when it is no game of the catalogue: « ZZZ(notgame) », « (Hack) », « (Pirate) »,
+# a file name left as it was (« Star Trek (…).bin »)
+_NOT_A_GAME = re.compile(
+    r"^zzz|\([^)]*\b(?:notgame|pirate|hack|bootleg|unl|proto|beta|demo)\b[^)]*\)"
+    r"|\.(?:nes|sfc|smc|gbc?|gba|n64|z64|v64|nds|md|gen|sms|gg|pce|a26|lnx|bin|iso|cue|chd|zip|7z)$",
+    re.IGNORECASE,
+)
 PRIOR = 6.6  # the rating a title is assumed to have before its votes tell otherwise
 VOTES = 40
 
@@ -188,6 +195,8 @@ async def build_index(session: Any) -> Index:
         )
     )
     for object_id, kind, title, year, available, rating, series, publisher, platform in rows:
+        if kind == "game" and _NOT_A_GAME.search(title):
+            continue  # a dump's demo, hack or pirate cartridge, an unnamed file: never a game to offer
         quality, votes = _quality(rating, 0)
         work = Work(object_id, kind, title, year, bool(available), quality, votes)
         works[object_id] = work

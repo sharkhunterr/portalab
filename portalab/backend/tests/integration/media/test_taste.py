@@ -280,3 +280,51 @@ async def test_games_played_count_and_nothing_is_said_seen(
     assert (await client.get("/api/v1/me/media/taste")).json()["families"] == ["games"]
     seen = await client.put(f"/api/v1/me/media/taste/titles/{ids['Tetris']}", json={"verdict": "seen"})
     assert seen.status_code == 422
+
+
+async def test_something_different_off_my_beaten_track(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Beside the recommendations: a well-rated title of a genre I never go to, and a game of a saga I love in
+    books though I play no games — never one of my recommendations, never a genre I set aside twice."""
+    await users(app, media, "zoe")
+    one = media.service(1)
+    media.library(one)
+    book = {"kind": "book", "rating": 8.0}
+    await media.module.library.upsert(
+        [
+            library_record("b1", title="Dune", genres=["Science Fiction"], series="Dune", **book),
+            library_record("b2", title="Fondation", genres=["Science Fiction"], **book),
+            library_record("b3", title="Hypérion", genres=["Science Fiction"], **book),
+            library_record("b4", title="Orgueil et Préjugés", genres=["Romance"], kind="book", rating=9.0),
+            library_record("b5", title="Un roman sans lecteurs", genres=["Romance"], kind="book", rating=5.0),
+            *(
+                library_record(f"h{n}", title=title, genres=["Horreur"], **book)
+                for n, title in enumerate(("Ça", "Shining", "Carrie"))
+            ),
+            library_record("g1", title="Dune II", kind="game", genres=["Strategy"], series="Dune"),
+            library_record("g2", title="Tetris", kind="game", genres=["Puzzle"]),
+        ],
+        one,
+    )
+    async with media.database.session() as session:
+        ids = {t: i for t, i in (await session.execute(select(MediaObject.title, MediaObject.id))).all()}
+    await login(client, "zoe")
+    assert (await client.get("/api/v1/me/media/taste/discover")).json()["items"] == []  # no taste yet
+    for title, verdict in (
+        ("Dune", "like"),
+        ("Fondation", "like"),
+        ("Ça", "dislike"),
+        ("Shining", "dislike"),
+    ):
+        await client.put(f"/api/v1/me/media/taste/titles/{ids[title]}", json={"verdict": verdict})
+
+    found = {
+        c["title"]: c["reason"] for c in (await client.get("/api/v1/me/media/taste/discover")).json()["items"]
+    }
+    assert found == {
+        "Orgueil et Préjugés": {"kind": "detour", "name": "Romance", "titles": []},
+        "Dune II": {"kind": "bridge", "name": "Dune", "titles": ["Dune"]},
+    }
+    offered = [c["title"] for c in (await client.get("/api/v1/me/media/recommendations")).json()["items"]]
+    assert "Hypérion" in offered and not set(found) & set(offered)

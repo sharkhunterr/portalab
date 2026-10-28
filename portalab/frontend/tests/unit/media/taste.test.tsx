@@ -77,11 +77,17 @@ describe("issue 190 — my taste", () => {
             reason: { kind: "director", name: "Christopher Nolan", titles: ["Inception", "Interstellar"] },
           }),
           card("b", "The Hobbit", { reason: { kind: "saga", name: "The Lord of the Rings", titles: [] } }),
+          // something different: a genre I seldom go to, a medium I do not use by a saga I love
+          card("c", "Cinema Paradiso", { reason: { kind: "detour", name: "Romance", titles: [] } }),
+          card("d", "Dune II", { kind: "game", reason: { kind: "bridge", name: "Dune", titles: ["Dune"] } }),
         ]}
       />,
     );
     expect(await screen.findByText("Directed by Christopher Nolan")).toBeTruthy();
     expect(screen.getByText("The Lord of the Rings saga")).toBeTruthy();
+    // the section's title says « something different »: the reason only names the genre or the saga
+    expect(screen.getByText("Romance")).toBeTruthy();
+    expect(screen.getByRole("link", { name: /Dune II/ }).getAttribute("title")).toBe("Like Dune");
     expect(screen.getByRole("link", { name: /Tenet/ }).getAttribute("title")).toBe(
       "Like Inception and Interstellar",
     );

@@ -83,6 +83,16 @@ async def my_deck(
     return TasteCards(items=await _cards(module, await module.taste.deck(_me(principal), limit=limit)))
 
 
+@router.get("/me/media/taste/discover", response_model=TasteCards)
+async def my_discoveries(
+    principal: Reader, module: Module, limit: Annotated[int, Query(ge=1, le=30)] = 12
+) -> TasteCards:
+    """Off my beaten track, yet maybe for me: well-rated titles of genres I seldom go to, and titles of a
+    medium I do not use yet that share a saga, an author or a theme with what I love — none of my
+    recommendations."""
+    return TasteCards(items=await _cards(module, await module.taste.discover(_me(principal), limit=limit)))
+
+
 @router.get("/me/media/taste")
 async def my_taste(principal: Reader, module: Module) -> dict[str, Any]:
     """My taste as it is drawn: the genres, people, sagas and themes that weigh most, those that weigh

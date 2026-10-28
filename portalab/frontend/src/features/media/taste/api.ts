@@ -45,6 +45,16 @@ export function useRecommendations(kind?: string, limit = 20) {
   });
 }
 
+/** Off my beaten track, yet maybe for me: genres I seldom go to, a medium I do not use yet. */
+export function useDiscoveries(limit = 12) {
+  return useQuery({
+    queryKey: [...KEY, "discover", limit],
+    staleTime: 5 * 60_000,
+    queryFn: async () =>
+      (await api.GET("/api/v1/me/media/taste/discover", { params: { query: { limit } } })).data?.items ?? [],
+  });
+}
+
 export function useDeck(limit = 12) {
   return useQuery({
     queryKey: [...KEY, "deck", limit],

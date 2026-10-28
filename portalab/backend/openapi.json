@@ -42901,6 +42901,52 @@
         ]
       }
     },
+    "/api/v1/me/media/taste/discover": {
+      "get": {
+        "description": "Off my beaten track, yet maybe for me: well-rated titles of genres I seldom go to, and titles of a\nmedium I do not use yet that share a saga, an author or a theme with what I love \u2014 none of my\nrecommendations.",
+        "operationId": "my_discoveries_api_v1_me_media_taste_discover_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 12,
+              "maximum": 30,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TasteCards"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Discoveries",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/me/media/taste/lists/{verdict}": {
       "get": {
         "description": "The titles I said I like, are not for me, or keep for later \u2014 the last said first.",

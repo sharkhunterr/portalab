@@ -76,6 +76,8 @@ POOL = 400
 # what crosses the media, and how much of it: a saga, an author or a genre loved in films for a book
 CROSS = ("saga", "franchise", "author", "genre", "keyword")
 CROSSING = 0.35
+# what leads to a medium I do not use: a saga, a franchise or an author — a genre in common is too little
+BRIDGES = ("saga", "franchise", "author")
 
 
 @dataclass(slots=True)
@@ -585,6 +587,91 @@ class TasteService:
             stream = streams[pattern[at % len(pattern)]] or next(s for s in streams if s)
             out.append(stream.pop(0))
             at += 1
+        return out
+
+    async def discover(self, user: UUID, *, limit: int) -> list[Pick]:
+        """Off the beaten track, yet maybe for me: well-rated titles of a genre I seldom go to (« Something
+        different: Western »), and titles of a medium I do not use yet that share a saga, an author or a theme
+        with what I love (the Alien audiobook for the films' viewer) — never what my recommendations already
+        offer, nor what I set aside twice. One per genre or saga, a little shuffled each visit."""
+        index = await self.index()
+        taste = await self.taste(user, index)
+        if not any(w > 0 for w in taste.weights.values()):
+            return []
+        offered = {p.work.id for p in await self.recommend(user, limit=60, taste=taste)}
+        copies = {
+            (index.works[w].family, fold(index.works[w].title)) for w in taste.known if w in index.works
+        }
+        mass: dict[str, float] = defaultdict(float)
+        genres: dict[str, dict[Trait, float]] = defaultdict(lambda: defaultdict(float))
+        for work_id, weight in taste.weights.items():
+            if weight <= 0:
+                continue
+            item = index.works[work_id]
+            mass[item.family] += weight
+            for trait in item.traits:
+                if trait[0] == "genre":
+                    genres[item.family][trait] += weight
+        against = {trait for trait, n in taste.opposed.items() if n >= 2}
+        ranked: list[tuple[float, Work, Trait, dict[str, Any]]] = []
+        for work in index.works.values():
+            if (
+                not work.available
+                or work.id in taste.known
+                or work.id in offered
+                or (work.family, fold(work.title)) in copies
+                or any(t in against for t in work.traits)
+            ):
+                continue
+            fit = self._fit(taste, work)
+            if sum(fit.values()) < 0:
+                continue
+            liked = sum(v for v in fit.values() if v > 0)
+            hook = max(
+                (
+                    (v * REASON_BIAS.get(t[0], 0.5), t)
+                    for t, v in fit.items()
+                    if v > 0 and any(w != work.id for w in taste.support.get(t, ()))
+                ),
+                default=None,
+            )
+            titles = (
+                [index.works[w].title for w in taste.support[hook[1]] if w != work.id][:2] if hook else []
+            )
+            family = mass.get(work.family, 0.0)
+            if family < ELIGIBLE:  # a medium I do not use: only by what it shares with my taste
+                if hook is None or hook[1][0] not in BRIDGES or work.quality < 6.0:
+                    continue
+                trait = hook[1]
+                reason = {"kind": "bridge", "name": index.labels.get(trait, trait[1]), "titles": titles}
+            else:
+                if work.quality < 7.0 or (work.family == "video" and work.votes < 100):
+                    continue
+                fresh = [
+                    t
+                    for t in work.traits
+                    if t[0] == "genre"
+                    and genres[work.family].get(t, 0.0) / family < 0.08
+                    and index.share(work.family, t) >= 0.01  # a genre, not a tag of three titles
+                ]
+                if not fresh:
+                    continue
+                trait = max(fresh, key=lambda t: (index.share(work.family, t), t))
+                reason = {"kind": "detour", "name": index.labels.get(trait, trait[1]), "titles": titles}
+            score = self._quality(work) + 0.1 * min(1.0, math.log1p(work.votes) / 8.5) + 0.3 * min(1.0, liked)
+            ranked.append((score * (0.85 + 0.3 * self.rng.random()), work, trait, reason))
+        ranked.sort(key=lambda p: (-p[0], str(p[1].id)))
+        out: list[Pick] = []
+        used: set[Trait] = set()
+        kinds: Counter[str] = Counter()
+        for score, work, trait, reason in ranked:
+            if trait in used or kinds[work.kind] >= max(2, limit // 3):
+                continue
+            used.add(trait)
+            kinds[work.kind] += 1
+            out.append(Pick(work, score, reason))
+            if len(out) >= limit:
+                break
         return out
 
     async def profile(self, user: UUID) -> dict[str, Any]:
