@@ -31,6 +31,7 @@ from portalab.modules.games.solo import Solo
 OWNER = "module:games"
 CHALLENGE_JOB = "games.challenge"
 SWEEP_JOB = "games.sweep"
+BOARDS_JOB = "games.boards"
 log = get_logger("portalab.games")
 
 
@@ -78,6 +79,9 @@ class GamesModule:
         async def sweep() -> None:
             await self.parties.sweep()
 
+        async def boards() -> None:
+            await self.boards.close()
+
         return [
             self.refresh_config,
             # who completed the week's challenge (their play sessions), every half hour
@@ -86,4 +90,6 @@ class GamesModule:
             ),
             # parties left open without a move close, every hour
             register_periodic(jobs, self.database, SWEEP_JOB, timedelta(hours=1), sweep, owner=OWNER),
+            # a week or a month over: each member placed on a board told their place, every hour
+            register_periodic(jobs, self.database, BOARDS_JOB, timedelta(hours=1), boards, owner=OWNER),
         ]
