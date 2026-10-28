@@ -7353,6 +7353,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/media/recommendations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Recommendations
+         * @description What my taste recommends among the library's titles not seen yet — a film, a series, a book… or only
+         *     one ``kind`` — each with its reason, never ten of one saga or director in a row.
+         */
+        get: operations["my_recommendations_api_v1_me_media_recommendations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/media/requests": {
         parameters: {
             query?: never;
@@ -7445,6 +7466,94 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/media/taste": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Taste
+         * @description My taste as it is drawn: the genres, people, sagas and themes that weigh most, those that weigh
+         *     against, how many works it comes from and my verdicts' counts.
+         */
+        get: operations["my_taste_api_v1_me_media_taste_get"];
+        put?: never;
+        post?: never;
+        /**
+         * Forget My Taste
+         * @description Forget everything I said of the titles (my history is untouched: its use is a preference).
+         */
+        delete: operations["forget_my_taste_api_v1_me_media_taste_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/media/taste/deck": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Deck
+         * @description Titles to judge one by one (« I like it », « not for me », « seen », « later »): mostly what my taste
+         *     recommends, now and then one of mine not judged yet, and a well-rated one out of my habits.
+         */
+        get: operations["my_deck_api_v1_me_media_taste_deck_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/media/taste/lists/{verdict}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My List
+         * @description The titles I said I like, are not for me, saw, or keep for later — the last said first.
+         */
+        get: operations["my_list_api_v1_me_media_taste_lists__verdict__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/media/taste/titles/{object_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Verdict */
+        get: operations["my_verdict_api_v1_me_media_taste_titles__object_id__get"];
+        /**
+         * Judge
+         * @description Say what I think of a title: an episode's or a season's verdict goes to its series.
+         */
+        put: operations["judge_api_v1_me_media_taste_titles__object_id__put"];
+        post?: never;
+        /** Unjudge */
+        delete: operations["unjudge_api_v1_me_media_taste_titles__object_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -17320,6 +17429,83 @@ export interface components {
             key: string;
             /** Version */
             version: number;
+        };
+        /** TasteCard */
+        TasteCard: {
+            /** Author */
+            author?: string | null;
+            /**
+             * Available
+             * @default true
+             */
+            available: boolean;
+            /**
+             * Genres
+             * @default []
+             */
+            genres: string[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Image Id */
+            image_id?: string | null;
+            /** Kind */
+            kind: string;
+            /** Overview */
+            overview?: string | null;
+            /** Rating */
+            rating?: number | null;
+            reason?: components["schemas"]["TasteReason"] | null;
+            /**
+             * Seen
+             * @default false
+             */
+            seen: boolean;
+            /** Title */
+            title: string;
+            /** Verdict */
+            verdict?: ("like" | "dislike" | "seen" | "later") | null;
+            /** Year */
+            year?: number | null;
+        };
+        /** TasteCards */
+        TasteCards: {
+            /** Items */
+            items: components["schemas"]["TasteCard"][];
+        };
+        /**
+         * TasteReason
+         * @description Why a title is offered: a trait it shares with my taste (``kind``: saga, franchise, director, cast,
+         *     author, genre, keyword… and its ``name``) and the titles of mine that have it; ``rated`` when it is only
+         *     well rated.
+         */
+        TasteReason: {
+            /** Kind */
+            kind: string;
+            /** Name */
+            name?: string | null;
+            /**
+             * Titles
+             * @default []
+             */
+            titles: string[];
+        };
+        /** TasteVerdictIn */
+        TasteVerdictIn: {
+            /**
+             * Verdict
+             * @enum {string}
+             */
+            verdict: "like" | "dislike" | "seen" | "later";
+        };
+        /** TasteVerdictOut */
+        TasteVerdictOut: {
+            /** Object Id */
+            object_id: string | null;
+            /** Verdict */
+            verdict: ("like" | "dislike" | "seen" | "later") | null;
         };
         /** TermsAdminOut */
         TermsAdminOut: {
@@ -32568,6 +32754,38 @@ export interface operations {
             };
         };
     };
+    my_recommendations_api_v1_me_media_recommendations_get: {
+        parameters: {
+            query?: {
+                kind?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TasteCards"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     my_requests_api_v1_me_media_requests_get: {
         parameters: {
             query?: never;
@@ -32683,6 +32901,205 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    my_taste_api_v1_me_media_taste_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    forget_my_taste_api_v1_me_media_taste_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    my_deck_api_v1_me_media_taste_deck_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TasteCards"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_list_api_v1_me_media_taste_lists__verdict__get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                verdict: "like" | "dislike" | "seen" | "later";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TasteCards"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_verdict_api_v1_me_media_taste_titles__object_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TasteVerdictOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    judge_api_v1_me_media_taste_titles__object_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TasteVerdictIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TasteVerdictOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unjudge_api_v1_me_media_taste_titles__object_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

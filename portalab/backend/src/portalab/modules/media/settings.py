@@ -129,4 +129,27 @@ def declare_media_settings(catalog: SettingCatalog = default_catalog) -> None:
                 )
 
 
+# issue 190: what each member chooses of their taste (``/me/preferences``)
+USER_SETTINGS = (
+    ("media.taste.useHistory", bool, True, "Draw your taste from what you watched, listened to and read."),
+)
+
+
+def declare_media_user_settings(catalog: SettingCatalog = default_catalog) -> None:
+    declare = declare_setting if catalog is default_catalog else catalog.declare
+    known = {declaration.key for declaration in catalog.all()}
+    for key, schema, default, description in USER_SETTINGS:
+        if key not in known:
+            declare(
+                scope="global",
+                key=key,
+                schema=schema,
+                default=default,
+                user_overridable=True,
+                owner=OWNER,
+                description=description,
+            )
+
+
 declare_media_settings()
+declare_media_user_settings()

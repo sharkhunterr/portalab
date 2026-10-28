@@ -15,6 +15,8 @@ import { LeavingBadge } from "../discover/StatusBadge";
 import { KIND_ICONS, MediaGrid, Poster } from "../MediaGrid";
 import { useRadio } from "../radio/api";
 import { RadioCard } from "../radio/RadioCard";
+import { useRecommendations, useTasteList } from "../taste/api";
+import { TasteRail } from "../taste/TasteRail";
 import "../media.css";
 
 /** A title from the services' history (027): in the library (``id``) or not (the provider's poster). */
@@ -126,6 +128,32 @@ function Row({
       </header>
       {children}
     </section>
+  );
+}
+
+/** Issue 190: what my taste recommends, each with its reason — and what I kept for later. */
+function TasteRows() {
+  const t = useT();
+  const recommended = useRecommendations();
+  const later = useTasteList("later");
+  const more = { to: "/media/taste", label: t("media:taste.myTaste") };
+  return (
+    <>
+      {recommended.data?.length ? (
+        <Row icon="heart" title={t("media:shelf.recommended")} more={more}>
+          <TasteRail items={recommended.data} label={t("media:shelf.recommended")} />
+        </Row>
+      ) : recommended.isSuccess ? (
+        <Row icon="heart" title={t("media:shelf.recommended")} more={more}>
+          <p className="media-muted">{t("media:taste.startHere")}</p>
+        </Row>
+      ) : null}
+      {later.data?.length ? (
+        <Row icon="bookmark" title={t("media:taste.list.later")} more={more}>
+          <TasteRail items={later.data} label={t("media:taste.list.later")} />
+        </Row>
+      ) : null}
+    </>
   );
 }
 
@@ -290,7 +318,7 @@ export function MediaHome() {
         </Row>
       ) : null}
       <Shelf name="trending" icon="trending" />
-      <Shelf name="recommended" icon="heart" />
+      <TasteRows />
       {/* #4: what one can ask for, like Seerr's home */}
       <DiscoverShelves />
       <Row icon="list" title={t("media:home.byKind")}>

@@ -65,6 +65,19 @@ const MOCKS: Record<string, () => Record<string, unknown>> = {
   "media.continue": () => ({
     items: cards(3).map((c, i) => ({ ...c, subtitle: c.meta, progress: 0.25 + i * 0.25 })),
   }),
+  // issue 190: the taste's recommendations with their reasons, and a title to judge
+  "media.for_you": () => ({
+    items: cards(6).map((c) => ({ ...c, reason: { kind: "saga", name: c.title, titles: [] } })),
+  }),
+  "media.taste": () => ({
+    items: cards(4).map((c) => ({
+      ...c,
+      year: 2024,
+      genres: ["Sci-Fi"],
+      overview: "A crew far from home, a signal nobody expected.",
+      reason: { kind: "rated", name: null, titles: [] },
+    })),
+  }),
   "media.living_wall": () => ({
     items: [...cards(8), ...cards(8)].map((c, i) => ({ ...c, id: `wall-${i}` })),
   }),

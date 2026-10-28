@@ -70,7 +70,7 @@ from portalab.modules.media.books.service import BookService
 from portalab.modules.media.cards import MediaCardSources
 from portalab.modules.media.catalog import CatalogPort, CatalogQuery
 from portalab.modules.media.cleanup import CleanupService
-from portalab.modules.media.discovery.shelves import BaselineRecommender, Discovery
+from portalab.modules.media.discovery.shelves import Discovery
 from portalab.modules.media.events import register_event_types
 from portalab.modules.media.fields.resolver import FieldResolver
 from portalab.modules.media.history.projection import HistoryProjection
@@ -139,6 +139,7 @@ from portalab.modules.media.providers.search import (
     RequestableSearchProvider,
 )
 from portalab.modules.media.providers.summary import MediaChanges
+from portalab.modules.media.providers.taste_widgets import FOR_YOU, TASTE, ForYouWidget, TasteWidget
 from portalab.modules.media.providers.widgets import (
     CONTINUE,
     RECENT,
@@ -167,6 +168,7 @@ from portalab.modules.media.settings import (
 )
 from portalab.modules.media.signals import register_media_signals
 from portalab.modules.media.sink.library import CatalogWriter, LibrarySink
+from portalab.modules.media.taste.service import TasteRecommender, TasteService
 
 OWNER = "module:media"
 CATEGORIES = (
@@ -261,7 +263,9 @@ class MediaModule:
             clock=clock,
         )
         self.discovery = Discovery(database, capabilities, self.history, lambda: self.config, clock=clock)
-        self.recommender = BaselineRecommender(database, clock=clock)
+        # issue 190: each member's taste, and the recommendations made from it (with their reasons)
+        self.taste = TasteService(database, capabilities, clock=clock)
+        self.recommender = TasteRecommender(self.taste)
         self.history_reader = HistoryReader(database, visibility)
         # 027: Telemetra-style statistics, metadata enrichment and release calendars
         self.ingestor = ActivityIngestor(database, capabilities, clock=clock)
@@ -465,6 +469,8 @@ class MediaModule:
             (LIVING_WALL, LivingWallWidget(self.database, self.clock)),
             (SERVER_PLAYING, ServerPlayingWidget(self.database, self.clock, self.enricher)),
             (ON_THIS_DAY, OnThisDayWidget(self.database, self.clock, self.enricher)),
+            (FOR_YOU, ForYouWidget(self.database, self.taste, self.clock)),  # issue 190
+            (TASTE, TasteWidget(self.database, self.taste, self.clock)),
         )
         for definition, widget in widgets:
             if self.widgets.get(definition.key) is None:

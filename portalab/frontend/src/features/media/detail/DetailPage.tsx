@@ -25,6 +25,7 @@ import { RequestDialog } from "../discover/RequestDialog";
 import { useMeasures } from "../insights/api";
 import { openBook, useListen } from "../listen/store";
 import { usePlayerInfo, useResetResume } from "../player/api";
+import { TasteButtons } from "../taste/TasteButtons";
 import { BookView } from "./BookView";
 import { EnrichedView, Enrichment, metadataImage, normalize, useMetadata } from "./Enrichment";
 import { RequestJourney, useJourney } from "./Journey";
@@ -865,6 +866,8 @@ function DirectRequest({
   );
 }
 
+const TASTED = ["movie", "series", "season", "episode", "book", "audiobook", "game"];
+
 export function DetailPage() {
   const t = useT();
   const format = useFormat();
@@ -947,6 +950,8 @@ export function DetailPage() {
       >
         {/* 030: what plugins add to a title's page (« + Playlist »…), drawn by Portalab */}
         <PluginSlot name="media.actions" params={{ item: media.id }} />
+        {/* issue 190: what I think of it — it shapes my recommendations */}
+        {TASTED.includes(media.kind) ? <TasteButtons objectId={media.id} title={media.title} /> : null}
       </TitleHero>
       <LeavingNotice objectId={media.id} title={media.title} />
       <RequestJourney objectId={media.id} title={media.title} />

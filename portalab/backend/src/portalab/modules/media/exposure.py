@@ -1,7 +1,7 @@
 """029: what an extension may read or do with the media (the exposure catalog). Streams and reading
 tickets never."""
 
-from portalab.capabilities.exposure import committing, read
+from portalab.capabilities.exposure import action, committing, read
 
 A = "/api/v1"
 LABELS = (
@@ -20,6 +20,21 @@ LABELS = (
     read(f"{A}/media/discover/{{kind}}/{{tmdb_id}}", "A title to request", "Un titre à demander"),
     read(f"{A}/media/discovery/{{shelf}}", "Recommendations", "Des recommandations"),
     read(f"{A}/me/media/continue", "What you are watching", "Ce que vous regardez"),
+    # issue 190: my recommendations, the cards to judge, my lists — and saying what I think of a title
+    read(f"{A}/me/media/recommendations", "Recommendations for you", "Vos recommandations"),
+    read(f"{A}/me/media/taste/deck", "Titles to judge", "Des titres à juger"),
+    read(
+        f"{A}/me/media/taste/lists/{{verdict}}",
+        "Your lists (liked, later…)",
+        "Vos listes (aimés, plus tard…)",
+    ),
+    read(f"{A}/me/media/taste/titles/{{object_id}}", "What you said of a title", "Votre avis sur un titre"),
+    action(
+        "PUT", f"{A}/me/media/taste/titles/{{object_id}}", "Like a title, or not", "Aimer un titre, ou non"
+    ),
+    action(
+        "DELETE", f"{A}/me/media/taste/titles/{{object_id}}", "Take back your verdict", "Retirer votre avis"
+    ),
     read(f"{A}/me/media/history", "Your watch history", "Votre historique"),
     read(f"{A}/me/media/now-playing", "What is playing now", "Ce qui joue en ce moment"),
     read(f"{A}/me/media/requests", "Your requests", "Vos demandes"),

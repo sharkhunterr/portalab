@@ -18466,6 +18466,238 @@
         "title": "SupportWorkflowOut",
         "type": "object"
       },
+      "TasteCard": {
+        "properties": {
+          "author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author"
+          },
+          "available": {
+            "default": true,
+            "title": "Available",
+            "type": "boolean"
+          },
+          "genres": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Genres",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "image_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Id"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "overview": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overview"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TasteReason"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "seen": {
+            "default": false,
+            "title": "Seen",
+            "type": "boolean"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "verdict": {
+            "anyOf": [
+              {
+                "enum": [
+                  "like",
+                  "dislike",
+                  "seen",
+                  "later"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verdict"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title"
+        ],
+        "title": "TasteCard",
+        "type": "object"
+      },
+      "TasteCards": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TasteCard"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "TasteCards",
+        "type": "object"
+      },
+      "TasteReason": {
+        "description": "Why a title is offered: a trait it shares with my taste (``kind``: saga, franchise, director, cast,\nauthor, genre, keyword\u2026 and its ``name``) and the titles of mine that have it; ``rated`` when it is only\nwell rated.",
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "titles": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Titles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "TasteReason",
+        "type": "object"
+      },
+      "TasteVerdictIn": {
+        "properties": {
+          "verdict": {
+            "enum": [
+              "like",
+              "dislike",
+              "seen",
+              "later"
+            ],
+            "title": "Verdict",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verdict"
+        ],
+        "title": "TasteVerdictIn",
+        "type": "object"
+      },
+      "TasteVerdictOut": {
+        "properties": {
+          "object_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Object Id"
+          },
+          "verdict": {
+            "anyOf": [
+              {
+                "enum": [
+                  "like",
+                  "dislike",
+                  "seen",
+                  "later"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verdict"
+          }
+        },
+        "required": [
+          "object_id",
+          "verdict"
+        ],
+        "title": "TasteVerdictOut",
+        "type": "object"
+      },
       "TermsAdminOut": {
         "properties": {
           "enabled": {
@@ -42386,6 +42618,69 @@
         ]
       }
     },
+    "/api/v1/me/media/recommendations": {
+      "get": {
+        "description": "What my taste recommends among the library's titles not seen yet \u2014 a film, a series, a book\u2026 or only\none ``kind`` \u2014 each with its reason, never ten of one saga or director in a row.",
+        "operationId": "my_recommendations_api_v1_me_media_recommendations_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TasteCards"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Recommendations",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/me/media/requests": {
       "get": {
         "operationId": "my_requests_api_v1_me_media_requests_get",
@@ -42521,6 +42816,279 @@
           }
         },
         "summary": "My Requests Soon",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/taste": {
+      "delete": {
+        "description": "Forget everything I said of the titles (my history is untouched: its use is a preference).",
+        "operationId": "forget_my_taste_api_v1_me_media_taste_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Forget My Taste",
+        "tags": [
+          "media"
+        ]
+      },
+      "get": {
+        "description": "My taste as it is drawn: the genres, people, sagas and themes that weigh most, those that weigh\nagainst, how many works it comes from and my verdicts' counts.",
+        "operationId": "my_taste_api_v1_me_media_taste_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Taste Api V1 Me Media Taste Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Taste",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/taste/deck": {
+      "get": {
+        "description": "Titles to judge one by one (\u00ab I like it \u00bb, \u00ab not for me \u00bb, \u00ab seen \u00bb, \u00ab later \u00bb): mostly what my taste\nrecommends, now and then one of mine not judged yet, and a well-rated one out of my habits.",
+        "operationId": "my_deck_api_v1_me_media_taste_deck_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 12,
+              "maximum": 30,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TasteCards"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Deck",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/taste/lists/{verdict}": {
+      "get": {
+        "description": "The titles I said I like, are not for me, saw, or keep for later \u2014 the last said first.",
+        "operationId": "my_list_api_v1_me_media_taste_lists__verdict__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "verdict",
+            "required": true,
+            "schema": {
+              "enum": [
+                "like",
+                "dislike",
+                "seen",
+                "later"
+              ],
+              "title": "Verdict",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TasteCards"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My List",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/taste/titles/{object_id}": {
+      "delete": {
+        "operationId": "unjudge_api_v1_me_media_taste_titles__object_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unjudge",
+        "tags": [
+          "media"
+        ]
+      },
+      "get": {
+        "operationId": "my_verdict_api_v1_me_media_taste_titles__object_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TasteVerdictOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Verdict",
+        "tags": [
+          "media"
+        ]
+      },
+      "put": {
+        "description": "Say what I think of a title: an episode's or a season's verdict goes to its series.",
+        "operationId": "judge_api_v1_me_media_taste_titles__object_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TasteVerdictIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TasteVerdictOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Judge",
         "tags": [
           "media"
         ]
