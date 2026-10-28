@@ -408,6 +408,25 @@ class RadioSitting(MediaBase):
     ended_at: Mapped[datetime | None] = mapped_column(TZDateTime)
 
 
+class TasteVerdict(MediaBase):
+    """Issue 190: what a member said of a work — ``like``, ``dislike`` (not for me), ``seen`` (seen, without
+    an opinion) or ``later`` (to watch or read later). One per member and work (a film, a series, a book…:
+    an episode's goes to its series); it weighs on their taste beside what they watched and read."""
+
+    __tablename__ = "taste"
+    __table_args__ = (
+        CheckConstraint("verdict IN ('like', 'dislike', 'seen', 'later')", name="verdict"),
+        Index("ix_taste_user", "user_id", "verdict", "updated_at"),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    object_id: Mapped[UUID] = mapped_column(
+        ForeignKey("media.objects.id", ondelete="CASCADE"), primary_key=True
+    )
+    verdict: Mapped[str] = mapped_column(String(8), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
 class MediaRequest(MediaBase):
     __tablename__ = "requests"
     __table_args__ = (

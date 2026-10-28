@@ -1,0 +1,310 @@
+/* Issue 190: my taste — the verdict buttons of a title's page, the reason under a recommendation, my taste's
+   page and the card to judge (the dashboard's « like it or not »). */
+
+.media-taste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  margin-block-start: 0.6rem;
+  padding: 0;
+  border: 0;
+}
+
+.media-taste__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-block-size: 2.25rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition:
+    background var(--motion-duration-fast) var(--motion-easing),
+    border-color var(--motion-duration-fast) var(--motion-easing);
+}
+.media-taste__button:hover {
+  border-color: var(--color-accent);
+}
+.media-taste__button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.media-taste__button[data-verdict="dislike"][aria-pressed="true"] {
+  border-color: var(--state-error-fg);
+  background: var(--state-error-bg);
+  color: var(--state-error-fg);
+}
+
+/* the reason under a recommendation's title: « Saga Hunger Games » */
+.media-card__reason {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  overflow: hidden;
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+.media-card__reason > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* my taste's page */
+.media-taste-page {
+  display: grid;
+  gap: var(--space-6);
+}
+.media-taste-page__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-muted);
+}
+.media-taste-page__deck {
+  max-inline-size: 40rem;
+  block-size: 24rem;
+  container-type: inline-size;
+}
+.media-taste-traits {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+.media-taste-traits section {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.media-taste-traits h3 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-md);
+}
+.media-taste-traits ol {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.media-taste-trait {
+  display: grid;
+  gap: 0.15rem;
+}
+.media-taste-trait__name {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+.media-taste-trait__name small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.media-taste-trait__bar {
+  block-size: 0.3rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+}
+.media-taste-trait__bar > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+}
+.media-taste-against {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.media-taste-against li {
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--state-error-bg);
+  color: var(--state-error-fg);
+  font-size: var(--font-size-xs);
+}
+.media-taste-tabs {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.widget-taste {
+  block-size: 100%;
+  container-type: inline-size;
+}
+
+/* one title to judge: its poster, what it is, why it is here, and the four answers */
+.taste-deck {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  gap: var(--space-3);
+  block-size: 100%;
+  min-block-size: 0;
+}
+.taste-deck__stage {
+  position: relative;
+  min-block-size: 0;
+  touch-action: pan-y;
+}
+.taste-deck__card {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(5rem, 38%) minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-3);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-2);
+  cursor: grab;
+  user-select: none;
+  transition: transform var(--motion-duration-fast) var(--motion-easing);
+}
+.taste-deck__card[data-dragging] {
+  cursor: grabbing;
+  transition: none;
+}
+.taste-deck__card[data-leaving] {
+  transition:
+    transform 260ms var(--motion-easing-out),
+    opacity 260ms var(--motion-easing-out);
+  opacity: 0;
+}
+.taste-deck__next {
+  position: absolute;
+  inset: 0.4rem 0.4rem -0.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  transform: scale(0.97);
+}
+.taste-deck__poster {
+  min-block-size: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+.taste-deck__poster .media-card__poster {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.taste-deck__text {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  min-inline-size: 0;
+  overflow: hidden;
+}
+.taste-deck__title {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--font-size-md);
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.taste-deck__facts {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.taste-deck__seen {
+  justify-self: start;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--state-available-bg);
+  color: var(--state-available-fg);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+.taste-deck__overview {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+}
+/* what the drag says before it is let go */
+.taste-deck__hint {
+  position: absolute;
+  inset-block-start: var(--space-3);
+  padding: 0.2rem 0.6rem;
+  border: 2px solid currentColor;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  opacity: var(--hint, 0);
+  pointer-events: none;
+}
+.taste-deck__hint[data-side="like"] {
+  inset-inline-start: var(--space-3);
+  color: var(--state-available-fg);
+}
+.taste-deck__hint[data-side="dislike"] {
+  inset-inline-end: var(--space-3);
+  color: var(--state-error-fg);
+}
+.taste-deck__answers {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.taste-deck__answers .media-taste__button {
+  justify-content: center;
+  padding-inline: 0.4rem;
+}
+.taste-deck__answers .media-taste__button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.taste-deck__undo {
+  justify-self: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+@container (max-width: 22rem) {
+  .taste-deck__answers .media-taste__button span {
+    position: absolute;
+    clip: rect(0 0 0 0);
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .taste-deck__card,
+  .taste-deck__card[data-leaving] {
+    transition: none;
+  }
+}

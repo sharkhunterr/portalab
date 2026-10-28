@@ -10,6 +10,9 @@ import type { Radio } from "../../media/radio/api";
 import { RadioCard } from "../../media/radio/RadioCard";
 import type { SoonCard } from "../../media/requests/api";
 import { SoonList } from "../../media/requests/SoonList";
+import type { TasteCard, TasteReason } from "../../media/taste/api";
+import { reasonOf } from "../../media/taste/reason";
+import { TasteDeck } from "../../media/taste/TasteDeck";
 import { WidgetHeaderLink } from "../frame/actions";
 import { CompactLine, PosterStrip } from "./compact";
 import type { StatsPoint } from "./MediaStatsChart";
@@ -658,3 +661,37 @@ registerWidgetComponent("media.shuffle", Shuffle);
 registerWidgetComponent("media.radio", RadioWidget);
 registerWidgetComponent("media.continue", Continue);
 registerWidgetComponent("media.stats", Stats);
+
+/** Issue 190: « for you » — what my taste recommends, each poster with why it is here (« Saga Dune »). */
+function ForYou(props: WidgetProps) {
+  const t = useT();
+  const format = useFormat();
+  const items =
+    ((props.payload.data ?? {}) as { items?: (Card & { reason?: TasteReason | null })[] }).items ?? [];
+  const cards = items.map((card) => ({
+    ...card,
+    subtitle: reasonOf(card.reason, t, format.list)?.short ?? null,
+    meta: [card.kind ? t(`media:kind.${card.kind}`) : null, card.year ? String(card.year) : null]
+      .filter(Boolean)
+      .join(" · "),
+  }));
+  return (
+    <>
+      <WidgetHeaderLink to="/media/taste" label={t("media:taste.myTaste")} />
+      <Posters {...props} payload={{ ...props.payload, data: { items: cards } }} />
+    </>
+  );
+}
+
+/** Issue 190: « like it or not » — a title at a time to judge, swiped or answered with its buttons. */
+function Taste({ payload }: WidgetProps) {
+  const items = ((payload.data ?? {}) as { items?: TasteCard[] }).items ?? [];
+  return (
+    <div className="widget-taste">
+      <TasteDeck initial={items} />
+    </div>
+  );
+}
+
+registerWidgetComponent("media.for_you", ForYou);
+registerWidgetComponent("media.taste", Taste);

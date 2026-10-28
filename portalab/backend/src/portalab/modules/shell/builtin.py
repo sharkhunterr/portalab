@@ -243,6 +243,17 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "order_hint": 25,
         "required_permission": "media.read",
     },
+    {  # issue 190: what my taste is made of, the titles to judge, my lists
+        "key": "media.taste",
+        "owner": "module:media",
+        "kind": "entry",
+        "label_key": "nav.media_taste",
+        "icon": "heart",
+        "route": "/media/taste",
+        "group": "media",
+        "order_hint": 26,
+        "required_permission": "media.read",
+    },
     {
         "key": "media.accounts",
         "owner": "module:media",

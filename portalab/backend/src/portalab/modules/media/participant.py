@@ -1,7 +1,7 @@
-"""Privacy participant (T003): media history, play/read activity (027), progress, sessions, account links
-and requests are personal (``activity``) — exported and erased with the account; catalog objects and
-community aggregates are not personal and stay (requests keep their catalog effect, the requester is
-removed)."""
+"""Privacy participant (T003): media history, play/read activity (027), progress, sessions, account links,
+what a member said of a title (#190) and requests are personal (``activity``) — exported and erased with the
+account; catalog objects and community aggregates are not personal and stay (requests keep their catalog
+effect, the requester is removed)."""
 
 from collections.abc import Sequence
 from uuid import UUID
@@ -23,6 +23,7 @@ from portalab.modules.media.models import (
     RadioCreditLedger,
     RadioSitting,
     RescueLedger,
+    TasteVerdict,
     UserLink,
     UserProgress,
 )
@@ -153,6 +154,18 @@ class MediaParticipant:
                         },
                     )
                 )
+            for verdict, title in await session.execute(
+                select(TasteVerdict, MediaObject.title)
+                .join(MediaObject, MediaObject.id == TasteVerdict.object_id)
+                .where(TasteVerdict.user_id == user_id)
+                .order_by(TasteVerdict.updated_at)
+            ):
+                records.append(  # #190: what I said of a title — like, not for me, seen, later
+                    ExportRecord(
+                        "media.taste",
+                        {"title": title, "verdict": verdict.verdict, "at": verdict.updated_at.isoformat()},
+                    )
+                )
         return records
 
     async def erase(self, user_id: UUID, mode: ErasureMode) -> None:
@@ -175,6 +188,7 @@ class MediaParticipant:
                 RadioCreditLedger,
                 RadioSitting,
                 BookPosition,
+                TasteVerdict,
             ):
                 await session.execute(delete(model).where(model.user_id == user_id))
             await session.execute(

@@ -1,9 +1,8 @@
 """Discovery (T028; R13, OQ-118): shelves ``new|recent|continue|trending|recommended`` behind a
-``RecommendationProvider`` port. The baseline recommender is deterministic: genre/people affinity from the
-viewer's own history plus community popularity (distinct finishers over 30 days, only counted above the
-cohort floor). Every shelf is permission- and privacy-bounded and an empty shelf names a next action."""
+``RecommendationProvider`` port — issue 190: the viewer's taste (``modules/media/taste``) — plus community
+popularity (distinct finishers over 30 days, only counted above the cohort floor). Every shelf is permission-
+and privacy-bounded and an empty shelf names a next action."""
 
-from collections import Counter
 from collections.abc import Sequence
 from datetime import timedelta
 from typing import Any
@@ -18,7 +17,7 @@ from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.discovery.recent import Recent, recent_releases, recently_added
 from portalab.modules.media.history.projection import HistoryProjection
-from portalab.modules.media.models import HistoryEntry, MediaObject, ObjectTag
+from portalab.modules.media.models import HistoryEntry, MediaObject
 from portalab.modules.media.observability import log
 
 SHELVES = ("new", "released", "recent", "continue", "trending", "recommended")
@@ -31,52 +30,6 @@ NEXT_ACTION = {
     "trending": "browse",
     "recommended": "link_account",
 }
-
-
-class BaselineRecommender:
-    def __init__(self, database: Database, *, clock: Clock | None = None) -> None:
-        self.database = database
-        self.clock = clock
-
-    async def recommend(self, viewer: Principal, *, limit: int) -> Sequence[UUID]:
-        user = viewer.acting_for or viewer.user_id
-        if user is None:
-            return []
-        async with self.database.session() as session:
-            seen = {
-                row[0]
-                for row in await session.execute(
-                    select(HistoryEntry.object_id).where(HistoryEntry.user_id == user).distinct()
-                )
-            }
-            if not seen:
-                return []
-            tags = Counter(
-                (kind, value.casefold())
-                for kind, value in await session.execute(
-                    select(ObjectTag.tag_kind, ObjectTag.value).where(ObjectTag.object_id.in_(seen))
-                )
-            )
-            if not tags:
-                return []
-            candidates = await session.execute(
-                select(ObjectTag.object_id, ObjectTag.tag_kind, ObjectTag.value)
-                .join(MediaObject, MediaObject.id == ObjectTag.object_id)
-                .where(
-                    MediaObject.status == "active",
-                    MediaObject.available.is_(True),
-                    MediaObject.parent_id.is_(None),
-                    ObjectTag.object_id.not_in(seen),
-                )
-            )
-            scores: Counter[UUID] = Counter()
-            for object_id, kind, value in candidates:
-                scores[object_id] += tags.get((kind, value.casefold()), 0) * (2 if kind == "person" else 1)
-        return [
-            object_id
-            for object_id, score in sorted(scores.items(), key=lambda p: (-p[1], str(p[0])))
-            if score
-        ][:limit]
 
 
 class Discovery:
