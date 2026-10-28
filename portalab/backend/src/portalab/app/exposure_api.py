@@ -16,6 +16,7 @@ from portalab.modules.calendar import exposure as calendar
 from portalab.modules.cards import exposure as cards
 from portalab.modules.community import exposure as community
 from portalab.modules.dashboard import exposure as dashboard
+from portalab.modules.games import exposure as games
 from portalab.modules.gamification import exposure as gamification
 from portalab.modules.marketplace import exposure as marketplace
 from portalab.modules.media import exposure as media
@@ -26,7 +27,7 @@ from portalab.modules.statistics import exposure as statistics
 from portalab.modules.wiki import exposure as wiki
 
 TABLES = (
-    calendar, cards, community, dashboard, gamification, marketplace, media,
+    calendar, cards, community, dashboard, games, gamification, marketplace, media,
     news, notifications, search, statistics, wiki,
 )  # fmt: skip
 

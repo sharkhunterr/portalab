@@ -79,6 +79,13 @@ const Campaigns = lazy(() => import("../../features/campaigns/CampaignsPage"));
 const GamificationAdmin = lazy(() => import("../../features/gamification/admin/GamificationAdmin"));
 const Progression = lazy(() => import("../../features/gamification/progression/ProgressionPage"));
 const Cards = lazy(() => import("../../features/cards/CollectionPage")); // issue 229
+// issue 265: the games page — alone, the day's title, the parties, and its administration
+const Games = lazy(() => import("../../features/games/GamesPage"));
+const GameSolo = lazy(() => import("../../features/games/SoloPage"));
+const GameCinemot = lazy(() => import("../../features/games/CinemotPage"));
+const GameParties = lazy(() => import("../../features/games/PartyHomePage"));
+const GameParty = lazy(() => import("../../features/games/PartyPage"));
+const GamesAdmin = lazy(() => import("../../features/games/AdminGames"));
 const CardSet = lazy(() => import("../../features/cards/SetPage"));
 const CardPerson = lazy(() => import("../../features/cards/PersonPage"));
 const Community = lazy(() => import("../../features/community/CommunityPage"));
@@ -154,6 +161,17 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
         },
         { path: "progression", element: <Progression />, handle: h({ crumb: "My progression" }) },
         { path: "cards", element: <Cards />, handle: h({ crumb: "My cards" }) },
+        {
+          path: "games",
+          handle: h({ crumb: "Games", requiredPermission: "games.play" }),
+          children: [
+            { index: true, element: <Games /> },
+            { path: "play/:game", element: <GameSolo />, handle: h({ crumb: "A game" }) },
+            { path: "cinemot", element: <GameCinemot />, handle: h({ crumb: "The day's title" }) },
+            { path: "party", element: <GameParties />, handle: h({ crumb: "Play together" }) },
+            { path: "party/:code", element: <GameParty />, handle: h({ crumb: "A party" }) },
+          ],
+        },
         { path: "cards/sets/:key", element: <CardSet />, handle: h({ crumb: "A card set" }) },
         { path: "cards/people", element: <CardPerson />, handle: h({ crumb: "A person's cards" }) },
         {
@@ -435,6 +453,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               handle: h({ crumb: "Assistant" }),
             })),
             { path: "gamification", element: <GamificationAdmin />, handle: h({ crumb: "Gamification" }) },
+            { path: "games", element: <GamesAdmin />, handle: h({ crumb: "Games" }) },
             { path: "campaigns", element: <CampaignConsole />, handle: h({ crumb: "Campaigns" }) },
             { path: "automations", element: <Automations />, handle: h({ crumb: "Automations" }) },
             { path: "projects", element: <ProjectConsole />, handle: h({ crumb: "Projects" }) },

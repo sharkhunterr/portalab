@@ -1790,6 +1790,40 @@
         "title": "AnomalyDecisionIn",
         "type": "object"
       },
+      "AnswerIn": {
+        "properties": {
+          "choice": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Choice"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 16,
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          }
+        },
+        "title": "AnswerIn",
+        "type": "object"
+      },
       "ApplyIn": {
         "additionalProperties": false,
         "properties": {
@@ -7008,6 +7042,21 @@
         "title": "FilmCreditOut",
         "type": "object"
       },
+      "FlipIn": {
+        "properties": {
+          "position": {
+            "maximum": 60.0,
+            "minimum": 0.0,
+            "title": "Position",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "position"
+        ],
+        "title": "FlipIn",
+        "type": "object"
+      },
       "FoundOut": {
         "properties": {
           "country": {
@@ -7322,6 +7371,21 @@
           }
         },
         "title": "GroupPatch",
+        "type": "object"
+      },
+      "GuessIn": {
+        "properties": {
+          "guess": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Guess",
+            "type": "string"
+          }
+        },
+        "required": [
+          "guess"
+        ],
+        "title": "GuessIn",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -12909,6 +12973,51 @@
           "pages"
         ],
         "title": "PagesOut",
+        "type": "object"
+      },
+      "PartyIn": {
+        "properties": {
+          "game": {
+            "maxLength": 24,
+            "title": "Game",
+            "type": "string"
+          },
+          "host_plays": {
+            "default": true,
+            "title": "Host Plays",
+            "type": "boolean"
+          },
+          "rounds": {
+            "anyOf": [
+              {
+                "maximum": 30.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rounds"
+          },
+          "seconds": {
+            "anyOf": [
+              {
+                "maximum": 180.0,
+                "minimum": 5.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seconds"
+          }
+        },
+        "required": [
+          "game"
+        ],
+        "title": "PartyIn",
         "type": "object"
       },
       "PasswordChange": {
@@ -25243,6 +25352,88 @@
         "summary": "Apply",
         "tags": [
           "game-setup"
+        ]
+      }
+    },
+    "/api/v1/admin/games": {
+      "get": {
+        "description": "The games' configuration in force, the games there are, and what was played (7 and 30 days).",
+        "operationId": "games_admin_api_v1_admin_games_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Games Admin Api V1 Admin Games Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Games Admin",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/admin/games/challenge/redraw": {
+      "post": {
+        "description": "This week's challenges drawn again \u2014 one kind or all (a title pinned stays).",
+        "operationId": "redraw_api_v1_admin_games_challenge_redraw_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "game",
+                    "movie",
+                    "book",
+                    "audiobook"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Redraw Api V1 Admin Games Challenge Redraw Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Redraw",
+        "tags": [
+          "games"
         ]
       }
     },
@@ -39603,6 +39794,951 @@
         "summary": "Forms",
         "tags": [
           "support"
+        ]
+      }
+    },
+    "/api/v1/games": {
+      "get": {
+        "description": "The games open, what I played this week, the day's title (found or not) and my parties.",
+        "operationId": "games_api_v1_games_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Games Api V1 Games Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Games",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/challenge": {
+      "get": {
+        "description": "The week's challenges \u2014 a game to play, a film to watch through, a book and an audiobook to take\nsome way: the title, the target, where I am (what my services and the portal tell).",
+        "operationId": "challenge_api_v1_games_challenge_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Challenge Api V1 Games Challenge Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Challenge",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/cinemot": {
+      "get": {
+        "description": "The day's title to find: its letters' pattern, its hints, my guesses so far.",
+        "operationId": "cinemot_api_v1_games_cinemot_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Cinemot Api V1 Games Cinemot Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Cinemot",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/cinemot/guesses": {
+      "post": {
+        "operationId": "cinemot_guess_api_v1_games_cinemot_guesses_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuessIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Cinemot Guess Api V1 Games Cinemot Guesses Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cinemot Guess",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/leaderboard": {
+      "get": {
+        "description": "A game's board: each member's best score (``party``: the parties won; ``challenge``: the weeks).",
+        "operationId": "leaderboard_api_v1_games_leaderboard_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "game",
+            "required": true,
+            "schema": {
+              "maxLength": 24,
+              "title": "Game",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "week",
+              "enum": [
+                "week",
+                "month",
+                "all"
+              ],
+              "title": "Period",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Leaderboard Api V1 Games Leaderboard Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Leaderboard",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/memory/sessions": {
+      "post": {
+        "description": "A memory: my own cards (or the library's posters) laid face down by the server.",
+        "operationId": "start_memory_api_v1_games_memory_sessions_post",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Start Memory Api V1 Games Memory Sessions Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Start Memory",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/parties": {
+      "get": {
+        "operationId": "my_parties_api_v1_games_parties_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Parties Api V1 Games Parties Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Parties",
+        "tags": [
+          "games"
+        ]
+      },
+      "post": {
+        "description": "A party on a game, its code to share; its host plays too unless they only run it (a screen).",
+        "operationId": "open_party_api_v1_games_parties_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Open Party Api V1 Games Parties Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Open Party",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/parties/{code}": {
+      "get": {
+        "operationId": "party_api_v1_games_parties__code__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "maxLength": 6,
+              "minLength": 4,
+              "pattern": "^[A-Za-z]+$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Party Api V1 Games Parties  Code  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Party",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/parties/{code}/answer": {
+      "post": {
+        "operationId": "party_answer_api_v1_games_parties__code__answer_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "maxLength": 6,
+              "minLength": 4,
+              "pattern": "^[A-Za-z]+$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Party Answer Api V1 Games Parties  Code  Answer Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Party Answer",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/parties/{code}/audio": {
+      "get": {
+        "operationId": "party_audio_api_v1_games_parties__code__audio_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "maxLength": 6,
+              "minLength": 4,
+              "pattern": "^[A-Za-z]+$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Party Audio",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/parties/{code}/image": {
+      "get": {
+        "operationId": "party_image_api_v1_games_parties__code__image_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "maxLength": 6,
+              "minLength": 4,
+              "pattern": "^[A-Za-z]+$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Party Image",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/parties/{code}/join": {
+      "post": {
+        "operationId": "join_api_v1_games_parties__code__join_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "maxLength": 6,
+              "minLength": 4,
+              "pattern": "^[A-Za-z]+$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Join Api V1 Games Parties  Code  Join Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Join",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/parties/{code}/leave": {
+      "post": {
+        "operationId": "leave_api_v1_games_parties__code__leave_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "maxLength": 6,
+              "minLength": 4,
+              "pattern": "^[A-Za-z]+$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Leave",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/parties/{code}/next": {
+      "post": {
+        "operationId": "party_next_api_v1_games_parties__code__next_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "maxLength": 6,
+              "minLength": 4,
+              "pattern": "^[A-Za-z]+$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Party Next Api V1 Games Parties  Code  Next Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Party Next",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/parties/{code}/start": {
+      "post": {
+        "operationId": "start_party_api_v1_games_parties__code__start_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "maxLength": 6,
+              "minLength": 4,
+              "pattern": "^[A-Za-z]+$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Start Party Api V1 Games Parties  Code  Start Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start Party",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/sessions/{session_id}": {
+      "get": {
+        "operationId": "session_api_v1_games_sessions__session_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Session Api V1 Games Sessions  Session Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Session",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/sessions/{session_id}/answer": {
+      "post": {
+        "description": "My answer to the question asked (a choice, or an order): its result and the right answer.",
+        "operationId": "answer_api_v1_games_sessions__session_id__answer_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Answer Api V1 Games Sessions  Session Id  Answer Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Answer",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/sessions/{session_id}/audio": {
+      "get": {
+        "operationId": "session_audio_api_v1_games_sessions__session_id__audio_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Session Audio",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/sessions/{session_id}/flip": {
+      "post": {
+        "description": "The memory: a card turned over (two not matching turn back at the next).",
+        "operationId": "flip_api_v1_games_sessions__session_id__flip_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlipIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Flip Api V1 Games Sessions  Session Id  Flip Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Flip",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/sessions/{session_id}/image": {
+      "get": {
+        "description": "The question's poster, as blurred as its time says (sharp once answered).",
+        "operationId": "session_image_api_v1_games_sessions__session_id__image_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Session Image",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/sessions/{session_id}/next": {
+      "post": {
+        "operationId": "next_question_api_v1_games_sessions__session_id__next_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Next Question Api V1 Games Sessions  Session Id  Next Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Next Question",
+        "tags": [
+          "games"
+        ]
+      }
+    },
+    "/api/v1/games/{game}/sessions": {
+      "post": {
+        "description": "A game alone, question after question (``poster``, ``casting``, ``synopsis``, ``higher_lower``,\n``timeline``, ``blindtest``, ``memories``).",
+        "operationId": "start_api_v1_games__game__sessions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "game",
+            "required": true,
+            "schema": {
+              "maxLength": 24,
+              "title": "Game",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Start Api V1 Games  Game  Sessions Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start",
+        "tags": [
+          "games"
         ]
       }
     },

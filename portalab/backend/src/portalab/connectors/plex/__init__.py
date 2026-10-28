@@ -34,6 +34,7 @@ from portalab.capabilities.media import (
     LIBRARY,
     PLAYBACK,
     STREAMING,
+    THEMES,
     VIDEO_FRAMES,
     ActivityPage,
     ServiceAccount,
@@ -42,7 +43,7 @@ from portalab.capabilities.media import (
     SourcePlayback,
     resolution_of,
 )
-from portalab.capabilities.results import InvalidPayload
+from portalab.capabilities.results import InvalidPayload, ProviderNotFound
 from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_time, safe_id
 
 PAGE = 200
@@ -104,6 +105,7 @@ class PlexConnector(HttpConnector):
         binding(ITEM_LINKS),
         binding(STREAMING),
         binding(VIDEO_FRAMES),
+        binding(THEMES),
     )
     status_path = "/"
     public_path = "/identity"
@@ -219,6 +221,8 @@ class PlexConnector(HttpConnector):
             from portalab.connectors.plex.frames import PlexFrames
 
             return PlexFrames(self, service)
+        if capability == THEMES:
+            return _Themes(self, service)
         return None
 
 
@@ -228,6 +232,22 @@ class _Library:
 
     async def fetch_image(self, ref: str) -> bytes:
         return await self.connector.get_bytes(self.service, f"/library/metadata/{safe_id(ref)}/thumb")
+
+
+class _Themes:
+    """Issue 265: a show's theme music (the blind test) — ``None`` when Plex keeps none."""
+
+    def __init__(self, connector: PlexConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def theme(self, external_id: str) -> bytes | None:
+        try:
+            data = await self.connector.get_bytes(
+                self.service, f"/library/metadata/{safe_id(external_id)}/theme"
+            )
+        except ProviderNotFound:
+            return None
+        return data or None
 
 
 class _Playback:

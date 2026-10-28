@@ -94,6 +94,13 @@ _NOT_A_GAME = re.compile(
     r"|\.(?:nes|sfc|smc|gbc?|gba|n64|z64|v64|nds|md|gen|sms|gg|pce|a26|lnx|bin|iso|cue|chd|zip|7z)$",
     re.IGNORECASE,
 )
+
+
+def not_a_game(title: str) -> bool:
+    """A ROM's name that says it is no game of the catalogue (a demo, a hack, a pirate cartridge, a file)."""
+    return bool(_NOT_A_GAME.search(title))
+
+
 PRIOR = 6.6  # the rating a title is assumed to have before its votes tell otherwise
 VOTES = 40
 
@@ -195,7 +202,7 @@ async def build_index(session: Any) -> Index:
         )
     )
     for object_id, kind, title, year, available, rating, series, publisher, platform in rows:
-        if kind == "game" and _NOT_A_GAME.search(title):
+        if kind == "game" and not_a_game(title):
             continue  # a dump's demo, hack or pirate cartridge, an unnamed file: never a game to offer
         quality, votes = _quality(rating, 0)
         work = Work(object_id, kind, title, year, bool(available), quality, votes)

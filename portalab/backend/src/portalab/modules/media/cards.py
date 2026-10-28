@@ -135,6 +135,7 @@ class MediaCardSources:
                     ids={str(k): str(v) for k, v in (data.get("ids") or {}).items() if v},
                     genres=_strings(data.get("genres")),
                     facts=_facts(data),
+                    overview=str(data["overview"])[:1200] if data.get("overview") else None,
                 )
             )
         return out

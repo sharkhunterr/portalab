@@ -31,6 +31,7 @@ SCHEMAS: dict[str, Category] = {
     "core": "transient",
     "dashboard": "data",
     "events": "data",
+    "games": "data",  # issue 265: the games played, the parties, the challenges
     "gamification": "data",
     "health": "data",
     "i18n": "data",
