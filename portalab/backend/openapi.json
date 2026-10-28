@@ -18560,7 +18560,6 @@
                 "enum": [
                   "like",
                   "dislike",
-                  "seen",
                   "later"
                 ],
                 "type": "string"
@@ -18646,7 +18645,6 @@
             "enum": [
               "like",
               "dislike",
-              "seen",
               "later"
             ],
             "title": "Verdict",
@@ -18679,7 +18677,6 @@
                 "enum": [
                   "like",
                   "dislike",
-                  "seen",
                   "later"
                 ],
                 "type": "string"
@@ -42860,7 +42857,7 @@
     },
     "/api/v1/me/media/taste/deck": {
       "get": {
-        "description": "Titles to judge one by one (\u00ab I like it \u00bb, \u00ab not for me \u00bb, \u00ab seen \u00bb, \u00ab later \u00bb): mostly what my taste\nrecommends, now and then one of mine not judged yet, and a well-rated one out of my habits.",
+        "description": "Titles to judge one by one (\u00ab I like it \u00bb, \u00ab not for me \u00bb, \u00ab later \u00bb): mostly what my taste\nrecommends, now and then one of mine not judged yet, and a well-rated one out of my habits.",
         "operationId": "my_deck_api_v1_me_media_taste_deck_get",
         "parameters": [
           {
@@ -42906,7 +42903,7 @@
     },
     "/api/v1/me/media/taste/lists/{verdict}": {
       "get": {
-        "description": "The titles I said I like, are not for me, saw, or keep for later \u2014 the last said first.",
+        "description": "The titles I said I like, are not for me, or keep for later \u2014 the last said first.",
         "operationId": "my_list_api_v1_me_media_taste_lists__verdict__get",
         "parameters": [
           {
@@ -42917,7 +42914,6 @@
               "enum": [
                 "like",
                 "dislike",
-                "seen",
                 "later"
               ],
               "title": "Verdict",

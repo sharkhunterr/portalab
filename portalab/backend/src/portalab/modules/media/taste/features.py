@@ -5,7 +5,7 @@ folded (no case, no accents) so that the same author or genre from two sources i
 
 import re
 import unicodedata
-from collections import Counter
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from typing import Any
 from uuid import UUID
@@ -58,6 +58,18 @@ GENRES = {
     "sports": "sport",
     "role playing game": "role playing rpg",
 }
+# what a library files a work under that says nothing of what it is (Grimmory's shelves, formats)
+NOT_GENRES = {
+    "accueil",
+    "home",
+    "none",
+    "audiobook",
+    "audiobooks",
+    "ebooks",
+    "ebook",
+    "livres audio",
+    "fiction",
+}
 # what a keyword or a saga says of how a work was made or sold, not of what it is
 STOP = {
     ("keyword", "sequel"),
@@ -86,11 +98,12 @@ def fold(text: str) -> str:
 
 
 def genres_of(value: str) -> list[str]:
-    """« Science-Fiction & Fantastique » is two genres; « Sci-Fi » and « Science-Fiction » one."""
+    """« Science-Fiction & Fantastique » and « Science-fiction et fantasy » are two genres; « Sci-Fi » and
+    « Science-Fiction » one; a library's shelf (« Accueil ») or a format (« Ebooks ») none."""
     out = []
-    for part in re.split(r"\s*&\s*|\s*/\s*|,\s*", value):
+    for part in re.split(r"\s*&\s*|\s*/\s*|,\s*|\s+(?:et|and)\s+", value):
         key = fold(part)
-        if key:
+        if key and key not in NOT_GENRES:
             out.append(GENRES.get(key, key))
     return out
 
@@ -178,7 +191,7 @@ async def build_index(session: Any) -> Index:
         quality, votes = _quality(rating, 0)
         work = Work(object_id, kind, title, year, bool(available), quality, votes)
         works[object_id] = work
-        if series and kind in ("book", "audiobook"):  # a book's series is its saga
+        if series and kind in ("book", "audiobook", "game"):  # a book's series, a game's franchise: its saga
             add(work, "saga", series)
             sagas.add(saga_key(series))
             add(work, "franchise", series, saga_key(series))
@@ -195,6 +208,14 @@ async def build_index(session: Any) -> Index:
             continue
         for key in genres_of(value):
             add(tagged, "genre", value, key)
+    # a library's own tags: a book's themes, a game's franchises and modes (RomM, from IGDB)
+    tags: dict[UUID, list[str]] = defaultdict(list)
+    for object_id, value in await session.execute(
+        select(ObjectTag.object_id, ObjectTag.value).where(ObjectTag.tag_kind == "tag")
+    ):
+        if object_id in works:
+            tags[object_id].append(value)
+            add(works[object_id], "keyword", value)
     for object_id, role, name, folded, position in await session.execute(
         select(Credit.object_id, Credit.role, Credit.name, Credit.folded, Credit.position).where(
             Credit.role.in_(("director", "creator", "cast", "writer", "author", "narrator"))
@@ -238,8 +259,13 @@ async def build_index(session: Any) -> Index:
         for country in (countries if isinstance(countries, list) else [])[:2]:
             if isinstance(country, str):
                 add(described, "country", country, country.upper())
-    # a title named after a saga known elsewhere (« Star Wars : The Clone Wars », a game « Star Wars : … »)
-    # joins its franchise, whatever its medium
+    # a title named after a saga known elsewhere (« Star Wars : The Clone Wars », a game « Star Wars : … »),
+    # or a game of a franchise (IGDB's « Alien ») joins it, whatever its medium
+    for object_id, values in tags.items():
+        for value in values:
+            key = saga_key(value)
+            if key in sagas:
+                add(works[object_id], "franchise", value, key)
     for work in works.values():
         for head in re.split(r"\s*[:\u2013]\s*|\s+-\s+", work.title)[:1]:
             key = fold(head)

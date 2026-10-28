@@ -4,11 +4,11 @@ import type { components } from "../../../api/generated/schema";
 
 /**
  * Issue 190: my taste — the recommendations made for me (each with its reason), the cards to judge one by
- * one, what I said of a title (like, not for me, seen, later) and the lists it makes, my taste as drawn.
+ * one, what I said of a title (like, not for me, later) and the lists it makes, my taste as drawn.
  */
 export type TasteCard = components["schemas"]["TasteCard"];
 export type TasteReason = components["schemas"]["TasteReason"];
-export type Verdict = "like" | "dislike" | "seen" | "later";
+export type Verdict = "like" | "dislike" | "later";
 
 export interface TasteTrait {
   name: string;

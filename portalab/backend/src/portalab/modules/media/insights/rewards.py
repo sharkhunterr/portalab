@@ -77,6 +77,8 @@ class HistoryRewards:
                             Activity.counted.is_(True),
                             Activity.started_at >= now - WINDOW,
                             Activity.rewarded_at.is_(None),
+                            # #190: a game played is no film watched — its minutes are no watching time
+                            Activity.kind != "game",
                         )
                     )
                 )

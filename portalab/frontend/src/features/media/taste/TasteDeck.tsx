@@ -20,7 +20,7 @@ async function more(limit: number): Promise<TasteCard[]> {
 
 /**
  * Issue 190: one title at a time to judge — swiped right « I like it », left « not for me », or answered
- * with the four buttons (and the arrow keys): like, not for me, seen, later. The next cards are asked for as
+ * with the buttons (and the arrow keys): like, not for me, later — or passed without a word. The next cards are asked for as
  * the last ones go; the last answer can be taken back.
  */
 export function TasteDeck({ initial, limit = 12 }: { initial?: TasteCard[] | undefined; limit?: number }) {
@@ -58,12 +58,13 @@ export function TasteDeck({ initial, limit = 12 }: { initial?: TasteCard[] | und
   }, [refill]);
 
   const card = queue[0];
-  const answer = (verdict: Verdict) => {
+  /** ``null``: passed — nothing said of it, the next one comes. */
+  const answer = (verdict: Verdict | null) => {
     if (!card || leaving) return;
     answered.current.add(card.id);
-    judge.mutate({ objectId: card.id, verdict });
-    setLeaving(verdict);
-    setLast(card);
+    if (verdict) judge.mutate({ objectId: card.id, verdict });
+    setLeaving(verdict ?? "later");
+    setLast(verdict ? card : null);
     window.setTimeout(() => {
       setQueue((current) => current.slice(1));
       setLeaving(null);
@@ -176,7 +177,8 @@ export function TasteDeck({ initial, limit = 12 }: { initial?: TasteCard[] | und
         </article>
       </div>
       <fieldset className="taste-deck__answers" aria-label={t("media:taste.about", { title: card.title })}>
-        {VERDICTS.map(({ verdict, icon }) => (
+        {/* a title already in my history is not for later: liked, or not, or passed */}
+        {VERDICTS.filter(({ verdict }) => !(card.seen && verdict === "later")).map(({ verdict, icon }) => (
           <button
             key={verdict}
             type="button"
@@ -186,13 +188,19 @@ export function TasteDeck({ initial, limit = 12 }: { initial?: TasteCard[] | und
             title={t(`media:taste.verdict.${verdict}`)}
           >
             <Icon name={icon} size={16} />
-            <span>
-              {t(
-                card.seen && verdict === "seen" ? "media:taste.deck.skip" : `media:taste.verdict.${verdict}`,
-              )}
-            </span>
+            <span>{t(`media:taste.verdict.${verdict}`)}</span>
           </button>
         ))}
+        <button
+          type="button"
+          className="media-taste__button"
+          data-verdict="skip"
+          onClick={() => answer(null)}
+          title={t("media:taste.deck.skip")}
+        >
+          <Icon name="chevron-right" size={16} />
+          <span>{t("media:taste.deck.skip")}</span>
+        </button>
       </fieldset>
       {last ? (
         <button type="button" className="media-row__more taste-deck__undo" onClick={undo}>

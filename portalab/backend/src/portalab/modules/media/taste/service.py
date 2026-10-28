@@ -36,7 +36,7 @@ from portalab.modules.media.models import (
 )
 from portalab.modules.media.taste.features import FAMILY, WEIGHTS, Index, Trait, Work, build_index, fold
 
-VERDICTS = ("like", "dislike", "seen", "later")
+VERDICTS = ("like", "dislike", "later")  # what was seen, read or played: the services tell
 USE_HISTORY = "media.taste.useHistory"
 INTERESTS = "shell.onboarding.interests"
 # what the welcome's « what did you come for? » says of the families of works (issue 243)
@@ -51,7 +51,8 @@ INTEREST_KINDS = {
 }
 HALF_LIFE_DAYS = 540  # a film seen a year and a half ago weighs half
 FLOOR = 0.3  # …and never less than this: an old love is still one
-LIKE, DISLIKE, LATER, SEEN = 2.0, -2.0, 0.5, 0.6
+LIKE, DISLIKE, LATER = 2.0, -2.0, 0.5
+ELIGIBLE = 0.6  # a family recommended from: a film seen, a book read, a game played a while
 # the traits a reason is best told by: a saga or a director before a genre
 REASON_BIAS = {
     "saga": 1.4,
@@ -102,10 +103,17 @@ class Pick:
     seen: bool = False
 
 
-def _engagement(kind: str, best: float, finished: int, episodes: int, recent: bool) -> float:
+def _engagement(
+    kind: str, best: float, finished: int, episodes: int, recent: bool, played: float = 0.0
+) -> float:
     """What a work weighs by what was done with it, before time: a film watched through 1, seen again more;
     abandoned early, a little against; a series by the episodes followed; a book read through more than a
-    film (it took longer)."""
+    film (it took longer); a game by the time played and whether its player finished it — played at all, an
+    interest (a game is seldom finished)."""
+    if kind == "game":
+        if best >= 0.8:
+            return 1.2
+        return 1.0 if played >= 7200 else 0.6 if played >= 1800 else 0.35
     if kind == "series":
         if not episodes:
             return 0.2 if recent else 0.0
@@ -282,10 +290,12 @@ class TasteService:
         finished: Counter[UUID] = Counter()
         episodes: dict[UUID, set[UUID]] = defaultdict(set)
         last: dict[UUID, datetime] = {}
+        played: dict[UUID, float] = defaultdict(float)  # the seconds spent on it (a game's play time)
         known: set[UUID] = set()
 
-        def seen(work: UUID, part: UUID | None, done: float, at: datetime | None) -> None:
+        def seen(work: UUID, part: UUID | None, done: float, at: datetime | None, spent: float = 0.0) -> None:
             known.add(work)
+            played[work] += spent
             best[work] = max(best[work], done)
             if done >= 0.8:
                 finished[work] += 1
@@ -302,10 +312,11 @@ class TasteService:
                 )
             }
             if use_history:
-                for work, part, progress, watched, duration, started, stopped in await session.execute(
+                for work, part, kind, progress, watched, duration, started, stopped in await session.execute(
                     select(
                         Activity.work_id,
                         Activity.object_id,
+                        Activity.kind,
                         Activity.progress,
                         Activity.watched_s,
                         Activity.duration_s,
@@ -318,9 +329,11 @@ class TasteService:
                     done = (
                         float(progress)
                         if progress is not None
+                        else 0.0
+                        if kind == "game"  # a game is finished when its player says so, never by time
                         else (watched / duration if duration else min(1.0, watched / 7200))
                     )
-                    seen(work, part, done, stopped or started)
+                    seen(work, part, done, stopped or started, watched or 0.0)
                 # the portal's own player and reader
                 rows = (
                     await session.execute(
@@ -347,7 +360,9 @@ class TasteService:
                 continue
             at = last.get(work)
             age = (now - at).days if at else HALF_LIFE_DAYS
-            weight = _engagement(item.kind, best[work], finished[work], len(episodes[work]), age < 21)
+            weight = _engagement(
+                item.kind, best[work], finished[work], len(episodes[work]), age < 21, played[work]
+            )
             weights[work] = weight * max(FLOOR, 0.5 ** (age / HALF_LIFE_DAYS)) if weight > 0 else weight
         for work, verdict in verdicts.items():
             if work not in index.works:
@@ -357,9 +372,8 @@ class TasteService:
             weights[work] = {
                 "like": max(weight, 0) + LIKE,
                 "dislike": DISLIKE,
-                "seen": max(weight, SEEN),
                 "later": max(weight, 0) + LATER,
-            }[verdict]
+            }.get(verdict, weight)
         # per family: what the member's works have, against what the library's have — a trait counts by how
         # much more often it comes back in what they loved than in the library (a director twice in fifty
         # films tells more than « Comédie » in half of them)
@@ -394,7 +408,7 @@ class TasteService:
                 elif value < 0:  # what was disliked or left early: against, the more as it is rare
                     scores[trait] = -WEIGHTS[trait[0]] * min(2.0, -value * math.log(1 / base) / 4) * sure
             affinity[family] = scores
-        eligible = {family for family, weight in families.items() if weight >= 1.0}
+        eligible = {family for family, weight in families.items() if weight >= ELIGIBLE}
         for interest in interests:
             eligible.update(FAMILY[kind] for kind in INTEREST_KINDS[interest])
         return Taste(

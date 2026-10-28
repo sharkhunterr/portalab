@@ -1,6 +1,6 @@
 """HTTP API of each member's taste (issue 190): the recommendations made for me, each with its reason; the
-cards to judge one by one; what I said of a title (like, not for me, seen, later), the lists it makes, and my
-taste as I may see it — and forget."""
+cards to judge one by one; what I said of a title (like, not for me, later), the lists it makes, and my taste
+as I may see it — and forget. What I saw, read or played is the services' to tell."""
 
 from typing import Annotated, Any, Literal
 from uuid import UUID
@@ -14,7 +14,7 @@ from portalab.modules.media.taste.features import KINDS
 from portalab.modules.media.taste.service import Pick
 
 router = APIRouter(prefix="/api/v1", tags=["media"])
-Verdict = Literal["like", "dislike", "seen", "later"]
+Verdict = Literal["like", "dislike", "later"]
 
 
 class TasteReason(BaseModel):
@@ -39,7 +39,7 @@ class TasteCard(BaseModel):
     rating: float | None = None
     author: str | None = None
     reason: TasteReason | None = None
-    seen: bool = False  # a title of mine, not judged yet: « did you like it? »
+    seen: bool = False  # a title the services say I saw, read or played, not judged yet: « did you like it? »
     verdict: Verdict | None = None
 
 
@@ -78,7 +78,7 @@ async def my_recommendations(
 async def my_deck(
     principal: Reader, module: Module, limit: Annotated[int, Query(ge=1, le=30)] = 12
 ) -> TasteCards:
-    """Titles to judge one by one (« I like it », « not for me », « seen », « later »): mostly what my taste
+    """Titles to judge one by one (« I like it », « not for me », « later »): mostly what my taste
     recommends, now and then one of mine not judged yet, and a well-rated one out of my habits."""
     return TasteCards(items=await _cards(module, await module.taste.deck(_me(principal), limit=limit)))
 
@@ -100,7 +100,7 @@ async def forget_my_taste(principal: Reader, module: Module) -> None:
 async def my_list(
     principal: Reader, verdict: Verdict, module: Module, limit: Annotated[int, Query(ge=1, le=100)] = 50
 ) -> TasteCards:
-    """The titles I said I like, are not for me, saw, or keep for later — the last said first."""
+    """The titles I said I like, are not for me, or keep for later — the last said first."""
     index = await module.taste.index()
     rows = await module.taste.listed(_me(principal), verdict, limit=limit)
     picks = [Pick(index.works[i], 0.0, None) for i, _ in rows if i in index.works]

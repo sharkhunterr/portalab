@@ -120,7 +120,7 @@ describe("issue 190 — my taste", () => {
 
   it("asks a title of mine whether I liked it", async () => {
     show(<TasteDeck initial={[card("a", "Inception", { seen: true })]} />);
-    expect(await screen.findByText("You saw it: liked it?")).toBeTruthy();
+    expect(await screen.findByText("Already in your history: liked it?")).toBeTruthy();
     expect(screen.getByRole("button", { name: /Skip/ })).toBeTruthy();
   });
 });

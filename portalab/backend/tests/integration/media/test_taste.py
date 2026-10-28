@@ -212,3 +212,71 @@ async def test_a_member_may_keep_their_history_out_of_their_taste(
     assert paused.status_code == 200, paused.text
     assert (await client.get("/api/v1/me/media/recommendations")).json()["items"] == []
     assert (await client.get("/api/v1/me/media/taste")).json()["use_history"] is False
+
+
+async def test_games_played_count_and_nothing_is_said_seen(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, clock: FixedClock
+) -> None:
+    """What I played in RomM tells my taste in games as films tell it in films; whether I saw, read or played
+    a title is the services' to say — no « seen » verdict."""
+    people = await users(app, media, "zoe")
+    one = media.service(1)
+    media.library(one)
+    game = {"kind": "game", "platform": "SNES"}
+    await media.module.library.upsert(
+        [
+            library_record(
+                "g1",
+                title="Super Metroid",
+                genres=["SNES", "Platform"],
+                tags=["Metroid"],
+                series="Metroid",
+                **game,
+            ),
+            library_record(
+                "g2",
+                kind="game",
+                title="Metroid Fusion",
+                genres=["Game Boy Advance", "Platform"],
+                tags=["Metroid"],
+                series="Metroid",
+                platform="Game Boy Advance",
+            ),
+            library_record(
+                "g3", title="Tetris", genres=["Game Boy", "Puzzle"], kind="game", platform="Game Boy"
+            ),
+            library_record("g4", title="Mario Kart", genres=["SNES", "Racing"], tags=["Mario"], **game),
+            library_record("g5", title="Columns", genres=["Sega Game Gear", "Puzzle"], kind="game"),
+        ],
+        one,
+    )
+    async with media.database.session() as session:
+        ids = {t: i for t, i in (await session.execute(select(MediaObject.title, MediaObject.id))).all()}
+    async with media.database.unit_of_work() as uow:
+        uow.session.add(
+            Activity(
+                service_id=media.service(3, "romm").service_id,
+                ref="session:1",
+                family="romm",
+                priority=10,
+                counted=True,
+                external_user_id="1",
+                user_id=people["zoe"],
+                kind="game",
+                title="Super Metroid",
+                object_id=ids["Super Metroid"],
+                work_id=ids["Super Metroid"],
+                ids={},
+                started_at=clock.now() - timedelta(days=3),
+                watched_s=3 * 3600.0,
+                received_at=clock.now(),
+            )
+        )
+    await login(client, "zoe")
+    games = (await client.get("/api/v1/me/media/recommendations", params={"kind": "game"})).json()["items"]
+    assert games[0]["title"] == "Metroid Fusion"
+    assert games[0]["reason"] == {"kind": "saga", "name": "Metroid", "titles": ["Super Metroid"]}
+    assert "Super Metroid" not in [g["title"] for g in games]
+    assert (await client.get("/api/v1/me/media/taste")).json()["families"] == ["games"]
+    seen = await client.put(f"/api/v1/me/media/taste/titles/{ids['Tetris']}", json={"verdict": "seen"})
+    assert seen.status_code == 422
