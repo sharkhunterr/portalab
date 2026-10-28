@@ -13,6 +13,23 @@ import "./taste.css";
 
 const THROW = 110; // pixels a card is dragged to be judged on release
 const LEAVE_MS = 260;
+const SWIPED = "portalab.taste.swiped"; // once swiped, the hint to swipe is not shown again (this browser)
+
+function swipedBefore(): boolean {
+  try {
+    return window.localStorage.getItem(SWIPED) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function rememberSwipe() {
+  try {
+    window.localStorage.setItem(SWIPED, "1");
+  } catch {
+    // a private window: shown again next time, no harm
+  }
+}
 
 async function more(limit: number): Promise<TasteCard[]> {
   return (await api.GET("/api/v1/me/media/taste/deck", { params: { query: { limit } } })).data?.items ?? [];
@@ -33,6 +50,8 @@ export function TasteDeck({ initial, limit = 12 }: { initial?: TasteCard[] | und
   const [leaving, setLeaving] = useState<Verdict | null>(null);
   const [last, setLast] = useState<TasteCard | null>(null);
   const answered = useRef(new Set<string>());
+  // the first card sways and says it can be swiped — until one answers (for good once one has swiped)
+  const [coach, setCoach] = useState(() => !swipedBefore());
   const start = useRef(0);
 
   const asking = useRef(false);
@@ -61,6 +80,7 @@ export function TasteDeck({ initial, limit = 12 }: { initial?: TasteCard[] | und
   /** ``null``: passed — nothing said of it, the next one comes. */
   const answer = (verdict: Verdict | null) => {
     if (!card || leaving) return;
+    setCoach(false);
     answered.current.add(card.id);
     if (verdict) judge.mutate({ objectId: card.id, verdict });
     setLeaving(verdict ?? "later");
@@ -121,6 +141,7 @@ export function TasteDeck({ initial, limit = 12 }: { initial?: TasteCard[] | und
           aria-label={card.title}
           data-dragging={drag !== null && !leaving ? "" : undefined}
           data-leaving={leaving ? "" : undefined}
+          data-coach={coach && drag === null && !leaving ? "" : undefined}
           style={{
             transform: `translateX(${dx}px) rotate(${dx / 24}deg)`,
             ["--hint" as string]: String(Math.min(1, Math.abs(drag ?? 0) / THROW)),
@@ -136,6 +157,7 @@ export function TasteDeck({ initial, limit = 12 }: { initial?: TasteCard[] | und
           }}
           onPointerUp={() => {
             if (drag === null) return;
+            if (Math.abs(drag) > THROW) rememberSwipe();
             if (drag > THROW) answer("like");
             else if (drag < -THROW) answer("dislike");
             else setDrag(null);
@@ -175,6 +197,13 @@ export function TasteDeck({ initial, limit = 12 }: { initial?: TasteCard[] | und
             {t("media:taste.verdict.dislike")}
           </span>
         </article>
+        {coach && drag === null && !leaving ? (
+          <span className="taste-deck__coach" aria-hidden="true">
+            <Icon name="chevron-left" size={16} />
+            {t("media:taste.deck.swipe")}
+            <Icon name="chevron-right" size={16} />
+          </span>
+        ) : null}
       </div>
       <fieldset className="taste-deck__answers" aria-label={t("media:taste.about", { title: card.title })}>
         {/* a title already in my history is not for later: liked, or not, or passed */}
