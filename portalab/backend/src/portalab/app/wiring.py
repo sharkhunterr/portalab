@@ -38,6 +38,7 @@ from portalab.modules.content.module import ContentModule
 from portalab.modules.dashboard.module import DashboardModule
 from portalab.modules.events.module import EventsModule
 from portalab.modules.events.publisher.publisher import EventStorePublisher
+from portalab.modules.games.module import GamesModule
 from portalab.modules.gamification.module import GamificationModule
 from portalab.modules.health.module import HealthModule
 from portalab.modules.i18n.module import I18nModule
@@ -138,6 +139,7 @@ class Platform:
     seeds: list[Callable[[], Awaitable[None]]]
     visuals: VisualsModule | None = None  # 028: visual packs
     cards: CardsModule | None = None  # issue 229: the media trading cards
+    games: GamesModule | None = None  # issue 265: the games page
 
     async def seed_periodic_jobs(self) -> None:
         for seed in self.seeds:
@@ -292,6 +294,9 @@ def wire_platform(
     # issue 229; issue 234: its events (a booster opened, a collection completed) count for the achievements
     cards = CardsModule(database, capabilities, events=events, blobs=context.blobs, root=data_dir / "cards")
     cards.register()
+    # issue 265: the games page — its events (a game played, the week's challenge) go to the reward rules
+    games = GamesModule(database, capabilities, events=events)
+    games.register()
     plugins = PluginsModule(
         database,
         events,
@@ -346,6 +351,7 @@ def wire_platform(
         seeds.extend(marketplace.register_jobs(jobs))
         seeds.extend(plugins.register_jobs(jobs))
         seeds.extend(cards.register_jobs(jobs))
+        seeds.extend(games.register_jobs(jobs))
     platform = Platform(
         authz,
         privacy,
@@ -378,6 +384,7 @@ def wire_platform(
         seeds,
         visuals,
         cards,
+        games,
     )
     from portalab.app.config_bindings import bind
 

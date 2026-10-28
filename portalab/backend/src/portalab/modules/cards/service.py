@@ -382,3 +382,37 @@ class CardService:
     async def pack(self, user: UUID, pack_id: UUID) -> dict[str, Any] | None:
         found = [p for p in await self.packs(user, unopened=False, limit=200) if p["id"] == str(pack_id)]
         return found[0] if found else None
+
+
+class CardFaces:
+    """Issue 265: ``cards.faces`` — the memory game's faces: a member's own cards, one each (the rarest
+    first, then at random), filled up with cards of the sets present when they own too few."""
+
+    def __init__(self, database: Database) -> None:
+        self.database = database
+
+    async def faces(self, user: UUID, count: int) -> list[dict[str, Any]]:
+        rank = {"legendary": 0, "epic": 1, "rare": 2, "common": 3}
+        async with self.database.session() as session:
+            owned = (
+                await session.execute(
+                    select(Card, CardSet)
+                    .join(CardSet, CardSet.key == Card.set_key)
+                    .where(Card.id.in_(select(Copy.card_id).where(Copy.user_id == user)))
+                    .order_by(func.random())
+                    .limit(count * 4)
+                )
+            ).all()
+            chosen = sorted(owned, key=lambda row: rank.get(row[0].rarity, 4))[:count]
+            if len(chosen) < count:
+                others = (
+                    await session.execute(
+                        select(Card, CardSet)
+                        .join(CardSet, CardSet.key == Card.set_key)
+                        .where(CardSet.present.is_(True), Card.retired.is_(False), Card.art.is_not(None))
+                        .order_by(func.random())
+                        .limit(count - len(chosen))
+                    )
+                ).all()
+                chosen += [row for row in others if row[0].id not in {c.id for c, _ in chosen}]
+        return [card_out(card, card_set) for card, card_set in chosen]

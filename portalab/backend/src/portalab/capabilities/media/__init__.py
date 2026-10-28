@@ -59,6 +59,7 @@ CLEANUP = "media.cleanup"  # #57: titles a cleanup tool will delete, and keeping
 IMAGE_SEARCH = "media.image_search"  # issue 229: images found on the web (a self-hosted SearXNG)
 ARTWORK = "media.artwork"  # issue 229: a work's artwork from an art site (fanart.tv): backgrounds, clearart…
 VIDEO_FRAMES = "media.video_frames"  # issue 230: still images taken from a title's own video file
+THEMES = "media.themes"  # issue 265: a series' theme music, from its media server (the blind test)
 CHARACTERS = "media.characters"  # issue 231: each role's own image, made by a community database (TheTVDB)
 REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the request service (Seerr)
 REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
@@ -756,6 +757,14 @@ class VideoFrames(Protocol):
 
 
 @runtime_checkable
+class ThemeMusic(Protocol):
+    """Issue 265: a series' theme music as its media server keeps it (Plex: the show's theme, an MP3) —
+    ``None`` when it has none."""
+
+    async def theme(self, external_id: str) -> bytes | None: ...
+
+
+@runtime_checkable
 class PeopleProvider(Protocol):
     """#92 — what a service knows of a person (TMDB, Seerr: biography and filmography; Jellyfin: biography
     and portrait; Grimmory: an author's description and photo). Found by the ids the portal knows of them
@@ -1213,6 +1222,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(IMAGE_SEARCH, ImageSearch, "Images found on the web for a query, fetched safely (issue 229)"),
     _spec(ARTWORK, ArtworkProvider, "A work's artwork from an art site: backgrounds, clearart (229)"),
     _spec(VIDEO_FRAMES, VideoFrames, "Still images taken from a title's own video file (issue 230)"),
+    _spec(THEMES, ThemeMusic, "A series' theme music, from its media server (issue 265)"),
     _spec(CHARACTERS, CharacterArt, "Each role's own image in a work, from a community database (231)"),
     _spec(REQUEST_QUOTAS, RequestQuotas, "Each account's request limits on the request service (#3)"),
     _spec(REQUEST_DISCOVERY, RequestDiscovery, "Titles one can ask for: search, shelves, details (#4)"),

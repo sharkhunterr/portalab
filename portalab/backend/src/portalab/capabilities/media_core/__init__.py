@@ -21,6 +21,8 @@ RESCUES = "media.rescues"  # #57: rescues bought in the shop, spent saving a tit
 RADIO_CREDITS = "media.radio_credits"  # issue 184: requests to the radio's DJ bought in the shop
 CARD_SOURCES = "media.card_sources"  # issue 229: the works present, what the cards are made of
 CONTENT_BOOSTERS = "media.content_boosters"  # issue 234: a content's booster, given by a reward rule
+GAME_SOURCES = "media.game_sources"  # issue 265: what the games page draws from beyond the works
+CARD_FACES = "cards.faces"  # issue 265: a member's cards, as the memory game lays them face down
 
 
 _KIND = re.compile(r"[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)?")
@@ -288,6 +290,7 @@ class CardWork:
     # issue 229: the work's own figures, printed on its cards (frozen when its set is made): budget, revenue,
     # runtime (minutes), seasons, its director's name
     facts: Mapping[str, Any] = field(default_factory=dict)
+    overview: str | None = None  # issue 265: what it tells (the games' synopsis to guess from)
 
 
 @dataclass(frozen=True, slots=True)
@@ -339,6 +342,66 @@ class ContentBoosters(Protocol):
     async def give(self, user: UUID, object_id: UUID, count: int, reason: str) -> int: ...
 
 
+@dataclass(frozen=True, slots=True)
+class PlayableGame:
+    """Issue 265: a title of the library a week's challenge is about — a game (RomM), a film, a book, an
+    audiobook."""
+
+    object_id: UUID
+    title: str
+    platform: str | None
+    image_id: UUID | None
+    year: int | None = None
+    kind: str = "game"
+
+
+@dataclass(frozen=True, slots=True)
+class SeenWork:
+    """Issue 265: a work a member watched, read or played (a series for its episodes), the last time."""
+
+    object_id: UUID
+    kind: str
+    title: str
+    year: int | None
+    last_at: datetime
+
+
+@runtime_checkable
+class GameSources(Protocol):
+    """Issue 265: what the games page needs of the media beyond the works the cards are made of — a series'
+    theme music (the blind test), the library's titles a week's challenge is about, and how far each member
+    went in one since a moment (what its services tell: play sessions, history, the portal's progress)."""
+
+    async def theme(self, object_id: UUID) -> bytes | None: ...
+
+    async def blurred(self, ref: str, radius: int) -> bytes:
+        """A metadata image (a scene of a work) blurred by ``radius`` pixels (0: sharp), as a JPEG."""
+        ...
+
+    async def titles(self, kind: str, *, limit: int) -> Sequence[PlayableGame]:
+        """Titles of a kind present in the library, at random (a game of a franchise first)."""
+        ...
+
+    async def title(self, object_id: UUID) -> PlayableGame | None: ...
+
+    async def progress(self, kind: str, object_id: UUID, since: datetime) -> Mapping[UUID, float]:
+        """Per member since ``since``: a game's seconds played; a film's, a book's, an audiobook's furthest
+        point (0 to 1) — what their services and the portal's player and reader tell."""
+        ...
+
+    async def seen(self, user: UUID, *, limit: int) -> Sequence[SeenWork]:
+        """The works a member watched, read or played, the latest first (what their services tell)."""
+        ...
+
+
+@runtime_checkable
+class CardFaces(Protocol):
+    """Issue 265: ``count`` of a member's own cards (the rarest first, then any other), each as the cards'
+    page shows it — the memory game's faces; fewer when there are not so many."""
+
+    async def faces(self, user: UUID, count: int) -> Sequence[Mapping[str, Any]]: ...
+
+
 SPECS: tuple[CapabilitySpec, ...] = (
     _spec(CATALOG, MediaCatalog, False, "Media catalog lookups (024)"),
     _spec(HISTORY, MediaHistoryReader, False, "Privacy-bounded media history and progress (024)"),
@@ -348,6 +411,8 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(RADIO_CREDITS, RadioCredits, False, "Requests to the radio's DJ bought in the shop (issue 184)"),
     _spec(CARD_SOURCES, CardSources, False, "The works present and their credits, for the cards (issue 229)"),
     _spec(CONTENT_BOOSTERS, ContentBoosters, False, "A content's booster given to a member (issue 234)"),
+    _spec(GAME_SOURCES, GameSources, False, "Theme music, games and play time for the games page (265)"),
+    _spec(CARD_FACES, CardFaces, False, "A member's cards, as the memory game lays them (issue 265)"),
 )
 
 QuotaSummary = Mapping[str, int]

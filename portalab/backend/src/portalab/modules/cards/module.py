@@ -17,7 +17,7 @@ from portalab.capabilities.events import (
     default_event_types,
 )
 from portalab.capabilities.marketplace import ProductType, ProductTypeRegistry, default_product_types
-from portalab.capabilities.media_core import CONTENT_BOOSTERS
+from portalab.capabilities.media_core import CARD_FACES, CONTENT_BOOSTERS
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.blobstore import BlobStore
@@ -48,7 +48,7 @@ from portalab.modules.cards.packs import (
 from portalab.modules.cards.participant import CardsParticipant
 from portalab.modules.cards.roles import RoleArt
 from portalab.modules.cards.search import RoleSearch
-from portalab.modules.cards.service import CardService
+from portalab.modules.cards.service import CardFaces, CardService
 from portalab.modules.cards.settings import SETTINGS, CardsConfig
 
 OWNER = "module:cards"
@@ -145,6 +145,9 @@ class CardsModule:
             self.capabilities.provide(
                 BACKUP_LEFT_OUT_CAPABILITY, CardsLeftOut(), instance_ref="cards", owner=OWNER
             )
+        # issue 265: the memory game lays a member's own cards face down
+        if not self.capabilities.system_providers(CARD_FACES):
+            self.capabilities.provide(CARD_FACES, CardFaces(self.database), instance_ref="cards", owner=OWNER)
         # issue 234: a content's boosters, given by the reward rules the administrators set
         if not self.capabilities.system_providers(CONTENT_BOOSTERS):
             self.capabilities.provide(

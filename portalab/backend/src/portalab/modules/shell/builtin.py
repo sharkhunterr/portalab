@@ -78,6 +78,7 @@ SECTIONS: tuple[dict[str, object], ...] = (
     _section("media", "film", 10, "media"),
     _section("content", "compass", 20, "news", "wiki", "calendar", "content", "search", "statistics"),
     _section("community", "users", 40, "community", "gamification", "campaigns"),
+    _section("games", "gamepad", 45, "games"),  # issue 265: the games page, alone or together
     _section("marketplace", "shop", 50, "marketplace"),
     # 027: services' status sits with incidents and tickets — what a member checks when something is off
     _section("support", "lifebuoy", 60, "support", "health"),
@@ -663,6 +664,40 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "group": "community",
         "order_hint": 61,
         "required_permission": "cards.read",
+    },
+    {
+        "key": "games.page",  # issue 265: the games — alone, the day's title, the week's challenge
+        "owner": "module:games",
+        "kind": "entry",
+        "label_key": "nav.games",
+        "icon": "gamepad",
+        "route": "/games",
+        "group": "games",
+        "order_hint": 10,
+        "required_permission": "games.play",
+    },
+    {
+        "key": "games.party",  # issue 265: playing together, joined by a code
+        "owner": "module:games",
+        "kind": "entry",
+        "label_key": "nav.games_party",
+        "icon": "users",
+        "route": "/games/party",
+        "group": "games",
+        "order_hint": 20,
+        "required_permission": "games.play",
+    },
+    {
+        "key": "games.admin",
+        "owner": "module:games",
+        "kind": "entry",
+        "label_key": "nav.admin.games",
+        "icon": "gamepad",
+        "route": "/admin/games",
+        "group": "admin",
+        "topic": "engagement",
+        "order_hint": 3,
+        "required_permission": "games.manage",
     },
     {
         "key": "gamification.admin",

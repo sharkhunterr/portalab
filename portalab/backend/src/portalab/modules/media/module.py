@@ -26,6 +26,7 @@ from portalab.capabilities.media import ACTIVITY_HISTORY, DIGEST, LIBRARY, METAD
 from portalab.capabilities.media_core import (
     CARD_SOURCES,
     CATALOG,
+    GAME_SOURCES,
     HISTORY,
     QUOTA,
     RADIO_CREDITS,
@@ -73,6 +74,7 @@ from portalab.modules.media.cleanup import CleanupService
 from portalab.modules.media.discovery.shelves import Discovery
 from portalab.modules.media.events import register_event_types
 from portalab.modules.media.fields.resolver import FieldResolver
+from portalab.modules.media.games import MediaGameSources
 from portalab.modules.media.history.projection import HistoryProjection
 from portalab.modules.media.identity.resolver import IdentityResolver
 from portalab.modules.media.images.service import JOB as IMAGE_JOB
@@ -418,6 +420,7 @@ class MediaModule:
             (RESCUES, self.cleanup),
             (RADIO_CREDITS, self.radio),
             (CARD_SOURCES, MediaCardSources(self.database, self.capabilities, self.enricher)),  # issue 229
+            (GAME_SOURCES, MediaGameSources(self.database, self.capabilities, self.enricher)),  # issue 265
             (RECOMMENDATIONS, self.recommender),
             (ACTIVITY, MediaActivityAttributes(self.database)),
         )
