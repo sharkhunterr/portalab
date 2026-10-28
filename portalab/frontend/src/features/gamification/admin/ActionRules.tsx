@@ -13,6 +13,7 @@ import { Dialog } from "../../../design-system/components/Overlays";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { type Translate, useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
+import { GameRuleBuilder, gameRuleChips, useProposedGameRules } from "../../games/RewardRules";
 import { type RewardRule, useRuleAdmin, useRules, type Value } from "../api";
 import { SimulationPanel } from "./SimulationPanel";
 import {
@@ -631,7 +632,15 @@ function RuleCard({
               {t("gamification:admin.rule.boostersChip", { count: definition.boosters })}
             </span>
           ) : null}
-          {(definition.predicate ?? []).map((c) =>
+          {/* issue 265: a game's rule says its conditions in words (the game, the score, the place…) */}
+          {rule.event_type.startsWith("games.")
+            ? gameRuleChips(t, rule.event_type, definition.predicate ?? []).map((chip) => (
+                <span key={chip} className="gam-chip" data-kind="if">
+                  <Icon name="dices" size={12} /> {chip}
+                </span>
+              ))
+            : null}
+          {(rule.event_type.startsWith("games.") ? [] : (definition.predicate ?? [])).map((c) =>
             c.field === "kind" && (c.op === "in" || c.op === "eq") ? (
               <span key={`${c.field}${c.op}`} className="gam-chip" data-kind="if">
                 <Icon name="play" size={12} />{" "}
@@ -716,6 +725,7 @@ export function ActionRules() {
   const types = useEventTypes();
   const [open, setOpen] = useState<string | null>(null);
   const [preset, setPreset] = useState<RuleDefinition | null>(null);
+  const games = useProposedGameRules(); // issue 265: the games' rules live here, with every other
   const list = (rules.data ?? []).filter((rule) => rule.status !== "retired");
   const retired = (rules.data ?? []).filter((rule) => rule.status === "retired");
   const typeList = types.data ?? [];
@@ -766,23 +776,51 @@ export function ActionRules() {
         </Dialog>
       }
     >
-      {available.length ? (
-        <div className="gam-presets">
-          <span className="admin-muted">{t("gamification:admin.presets.title")}</span>
-          {available.map((p) => (
-            <Button
-              key={p.key}
-              variant="secondary"
-              onClick={() => {
-                setPreset(p.definition);
-                setOpen("new");
-              }}
-            >
-              <Icon name={p.icon} size={16} />
-              {p.definition.label}
+      <div className="gam-presets" id="games-rules">
+        <span className="admin-muted">{t("gamification:admin.presets.title")}</span>
+        {available.map((p) => (
+          <Button
+            key={p.key}
+            variant="secondary"
+            onClick={() => {
+              setPreset(p.definition);
+              setOpen("new");
+            }}
+          >
+            <Icon name={p.icon} size={16} />
+            {p.definition.label}
+          </Button>
+        ))}
+        {/* issue 265: a mini-game's rule in a few choices (taking part, a score, a win, a place, a challenge) */}
+        <Dialog
+          open={open === "games"}
+          onOpenChange={(next) => setOpen(next ? "games" : null)}
+          title={t("gamification:admin.presets.game")}
+          closeLabel={t("gamification:admin.close")}
+          size="lg"
+          trigger={
+            <Button variant="secondary">
+              <Icon name="dices" size={16} />
+              {t("gamification:admin.presets.game")}
             </Button>
-          ))}
-        </div>
+          }
+        >
+          <GameRuleBuilder
+            taken={new Set((rules.data ?? []).map((rule) => rule.key))}
+            onDone={() => setOpen(null)}
+          />
+        </Dialog>
+        {games.missing ? (
+          <Button variant="secondary" disabled={games.create.isPending} onClick={() => games.create.mutate()}>
+            <Icon name="sparkles" size={16} />
+            {t("gamification:admin.presets.games")}
+          </Button>
+        ) : null}
+      </div>
+      {games.create.error ? (
+        <p role="alert" className="services-admin__ko">
+          {games.create.error.message}
+        </p>
       ) : null}
       {rules.data && !list.length ? (
         <AdminEmpty icon="zap" title={t("gamification:admin.rules.empty")} />

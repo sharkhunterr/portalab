@@ -9,7 +9,7 @@ import { Skeleton } from "../../design-system/components/Placeholders";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { type ChallengeItem, GAME_ICONS, useChallenge } from "./api";
-import { RewardRules } from "./RewardRules";
+import { GameRulesLink } from "./RewardRules";
 import "./games.css";
 
 interface RoundSettings {
@@ -590,7 +590,7 @@ export default function AdminGames() {
             </div>
           </section>
 
-          <RewardRules />
+          <GameRulesLink />
           <WheelEditor />
         </div>
       )}

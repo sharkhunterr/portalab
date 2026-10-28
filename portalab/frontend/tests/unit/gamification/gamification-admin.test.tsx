@@ -104,7 +104,7 @@ function operation(n: number) {
 const OPERATIONS = Array.from({ length: 27 }, (_, n) => operation(n + 1));
 const seenCursors: string[] = [];
 
-function serve(sent: Array<{ method: string; path: string; body: unknown }>) {
+function serve(sent: Array<{ method: string; path: string; body: unknown }>, rules: unknown[] = []) {
   fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
     if (["PUT", "POST"].includes(request.method)) {
@@ -155,7 +155,7 @@ function serve(sent: Array<{ method: string; path: string; body: unknown }>) {
       case "/api/v1/admin/gamification/level-rewards":
         return json(200, { rewards: [], levels: [] });
       case "/api/v1/admin/gamification/rules":
-        return json(200, []);
+        return json(200, rules);
       case "/api/v1/admin/gamification/streak":
         return json(200, {
           enabled: false,
@@ -199,6 +199,36 @@ describe("gamification administration", () => {
     );
     // the simple mode has no per-action tab
     expect(screen.queryByRole("button", { name: "XP per action" })).toBeNull();
+  });
+
+  it("keeps the mini-games' rules with the others: said in words, and one more made from there", async () => {
+    const sent: Array<{ method: string; path: string; body: unknown }> = [];
+    serve(sent, [
+      {
+        key: "games_board_week",
+        version: 1,
+        status: "active",
+        event_type: "games.board_ranked",
+        definition: {
+          event_type: "games.board_ranked",
+          label: "On the week's podium",
+          predicate: [
+            { field: "game", op: "eq", value: "casting" },
+            { field: "period", op: "eq", value: "week" },
+            { field: "rank", op: "lte", value: 3 },
+          ],
+          grants: [{ value: "xp", amount: 50 }],
+        },
+      },
+    ]);
+    show("/admin/gamification?tab=gains&mode=detailed");
+    expect(await screen.findByText("On the week's podium")).toBeTruthy();
+    for (const chip of ["The cast", "of the week", "top 3 on the board"])
+      expect(screen.getByText(chip, { exact: false })).toBeTruthy();
+    // the rules Portalab proposes for the games, while some are missing
+    expect(await screen.findByRole("button", { name: /The mini-games' proposed rewards/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /Mini-game rule/ }));
+    expect(await screen.findByRole("button", { name: /Minimum score/ })).toBeTruthy();
   });
 
   it("writes a per-action rule from a preset: fixed plus per minute, then publishes it", async () => {
