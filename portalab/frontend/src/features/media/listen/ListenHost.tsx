@@ -3,6 +3,7 @@ import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
+import { bottomOverlay } from "../../../shell/bottomOverlays";
 import { imageUrl } from "../api";
 import { clock } from "../books/api";
 import {
@@ -65,7 +66,7 @@ function MiniPlayer() {
   const chapter = currentChapter(listen.position);
   const share = listen.duration ? Math.min(1, listen.position / listen.duration) : 0;
   return (
-    <section className="listen-mini" aria-label={t("media:listen.player")}>
+    <section ref={bottomOverlay} className="listen-mini" aria-label={t("media:listen.player")}>
       <span className="listen-mini__progress" aria-hidden="true">
         <span style={{ inlineSize: `${share * 100}%` }} />
       </span>

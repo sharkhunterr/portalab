@@ -65,8 +65,8 @@ describe("issue 265 — the games' rewards", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create the rule" }));
     await waitFor(() => expect(sent).toHaveLength(2));
     expect(sent[1]?.path).toMatch(/\/rules\/games_[a-z0-9_]+\/publish$/);
-    const { definition } = sent[0]?.body as { definition: Record<string, unknown> };
-    expect(definition).toEqual({
+    const saved = sent[0]?.body as { definition: Record<string, unknown> } | undefined;
+    expect(saved?.definition).toEqual({
       event_type: "games.board_ranked",
       label: "In the first 3 on the board of the week (The cast)",
       predicate: [
