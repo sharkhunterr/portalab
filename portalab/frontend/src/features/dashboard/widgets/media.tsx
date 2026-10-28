@@ -32,6 +32,13 @@ interface Card {
   episode?: number | null;
   plays?: number;
   seconds?: number;
+  /** Issue 262: what « continue » tells of a title beside its poster */
+  year?: number | null;
+  genres?: string[] | null;
+  rating?: number | null;
+  author?: string | null;
+  duration_s?: number | null;
+  pages?: number | null;
   image_id: string | null;
   /** 027: the metadata provider's poster when the library has none (requests, upcoming releases). */
   poster_ref?: string | null;
@@ -214,6 +221,52 @@ function Resume({
   return card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>;
 }
 
+/** Issue 262: what a title is — its kind and year, then its rating and first genre (cut first) — beside its
+ * poster, on two short lines that a narrow card does not cut. */
+function Facts({ card }: { card: Card }) {
+  const t = useT();
+  const format = useFormat();
+  const genre = card.genres?.[0];
+  return (
+    <>
+      <span className="widget-continue__facts">
+        <span>{t(`media:kind.${card.kind ?? "movie"}`)}</span>
+        {card.year ? <span>{card.year}</span> : null}
+      </span>
+      {card.rating || genre ? (
+        <span className="widget-continue__facts">
+          {card.rating ? (
+            <span className="widget-continue__rating">
+              <Icon name="star" size={11} />
+              {format.number(Math.round(card.rating * 10) / 10)}
+            </span>
+          ) : null}
+          {genre ? <span>{genre}</span> : null}
+        </span>
+      ) : null}
+    </>
+  );
+}
+
+/** Issue 262: what is left — the share, and the time (or a book's pages) when its length is known. */
+function Left({ card }: { card: Card & { progress?: number | null } }) {
+  const t = useT();
+  const format = useFormat();
+  const measures = useMeasures();
+  if (card.progress === null || card.progress === undefined) return null;
+  const left = Math.max(0, 1 - card.progress);
+  const length = card.duration_s
+    ? measures.duration(left * card.duration_s)
+    : card.pages
+      ? t("media:widget.continue.pages", { count: Math.max(1, Math.round(left * card.pages)) })
+      : "none";
+  return (
+    <span className="widget-continue__left">
+      {t("media:widget.continue.left", { percent: format.percent(left), length })}
+    </span>
+  );
+}
+
 function Continue({ payload, config, compact }: WidgetProps) {
   const t = useT();
   const all = ((payload.data ?? {}) as { items?: Array<Card & { progress?: number | null }> }).items ?? [];
@@ -256,22 +309,25 @@ function Continue({ payload, config, compact }: WidgetProps) {
               </span>
               <span className="widget-continue__text">
                 <span className="widget-continue__title">{card.title}</span>
-                {card.subtitle ? <span className="widget-continue__meta">{card.subtitle}</span> : null}
+                {card.subtitle || card.author ? (
+                  <span className="widget-continue__meta">{card.subtitle || card.author}</span>
+                ) : null}
+                <Facts card={card} />
                 {percent !== null ? (
-                  <span
-                    className="widget-continue__bar"
-                    role="progressbar"
-                    aria-valuenow={percent}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-label={card.title}
-                  >
-                    <span style={{ inlineSize: `${percent}%` }} />
-                  </span>
-                ) : card.subtitle ? null : (
-                  // the kind only when nothing else says what it is (an episode has its « S02E11 »)
-                  <span className="widget-continue__meta">{t(`media:kind.${card.kind ?? "movie"}`)}</span>
-                )}
+                  <>
+                    <span
+                      className="widget-continue__bar"
+                      role="progressbar"
+                      aria-valuenow={percent}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label={card.title}
+                    >
+                      <span style={{ inlineSize: `${percent}%` }} />
+                    </span>
+                    <Left card={card} />
+                  </>
+                ) : null}
               </span>
             </>
           );

@@ -86,7 +86,7 @@ class ContinueWidget(_Base):
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
     ) -> WidgetPayload:
         from portalab.modules.media.insights.continuing import in_progress, resume_item
-        from portalab.modules.media.providers.insight_widgets import with_posters
+        from portalab.modules.media.providers.insight_widgets import details, with_posters
 
         user = principal.acting_for or principal.user_id
         if user is None:
@@ -101,8 +101,10 @@ class ContinueWidget(_Base):
             self.enricher,
             [resume_item(point, object_id) for point, object_id in (live.points if live else [])],
             lookups=12,
+            detailed=True,  # #262: each card says its year, genres, rating, author and length
         )
         images = await posters(self.history.database, (o.id for _, o in rows))
+        facts = await details(self.history.database, (o.id for _, o in rows))
         items = [
             {
                 "title": o.title,
@@ -113,6 +115,7 @@ class ContinueWidget(_Base):
                 "progress": p.percent,  # 027: a bar under the title
                 "image_id": images.get(o.id),
                 "at": p.last_occurred_at.isoformat(),
+                **facts.get(o.id, {}),
             }
             for p, o in rows
         ]
@@ -131,6 +134,7 @@ class ContinueWidget(_Base):
                 skip_families=live.families if live is not None else frozenset(),
             ),
             lookups=12,
+            detailed=True,
         )
         for row in history:
             if row.get("route") and row["route"] in known:
@@ -139,6 +143,8 @@ class ContinueWidget(_Base):
         # #20, #21: the most recent first, whatever told it (a server, the portal's player, listening or
         # reading in the portal, the imported history) — a book read this morning is not pushed out by films
         items.sort(key=lambda item: str(item.get("at") or ""), reverse=True)
+        for item in items:
+            item.pop("overview", None)  # #262: the card has no room for it
         return self.payload(items[:10])
 
 

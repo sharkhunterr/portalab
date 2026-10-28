@@ -1671,3 +1671,8 @@
     display: none;
   }
 }
+
+/* Issue 262: a one-row tile keeps the title and its bar — what it is and what is left need the full card */
+.widget-frame[data-tile] .widget-continue[data-compact] :is(.widget-continue__facts, .widget-continue__left) {
+  display: none;
+}

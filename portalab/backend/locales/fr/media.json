@@ -1055,6 +1055,8 @@
   "widget.continue.config.open.page": "Ouvrir sa fiche",
   "widget.continue.config.open.resume": "Reprendre directement",
   "widget.continue.description": "Reprenez là où vous vous êtes arrêté.",
+  "widget.continue.left": "Reste {percent}{length, select, none {} other { · {length}}}",
+  "widget.continue.pages": "{count, plural, one {# page} other {# pages}}",
   "widget.continue.title": "Reprendre",
   "widget.downloads.config.scope": "Téléchargements de",
   "widget.downloads.config.scope.all": "Tout le serveur",

@@ -1290,7 +1290,7 @@
 .widget-continue {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(13rem, 1fr);
+  grid-auto-columns: minmax(16rem, 1fr); /* Issue 262: room for the title and what it is */
   gap: var(--space-3);
   margin: 0;
   padding: 0 0 var(--space-1);
@@ -1341,14 +1341,47 @@
 }
 .widget-continue__text {
   display: grid;
-  gap: 0.2rem;
+  align-content: center;
+  gap: 0.25rem;
   min-inline-size: 0;
 }
+/* Issue 262: the title whole on two lines, then what it is, then what is left */
 .widget-continue__title {
+  display: -webkit-box;
   overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.widget-continue__facts {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.widget-continue__facts > span + span::before {
+  content: "·";
+  margin-inline: 0.35rem;
+}
+.widget-continue__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+.widget-continue__rating svg {
+  color: var(--rarity-legendary, var(--color-accent));
+}
+.widget-continue__left {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
 }
 .widget-continue__meta {
   overflow: hidden;
@@ -2217,8 +2250,8 @@ button.dash-lock {
   container-type: normal;
 }
 
-/* « continue »: posters as tall as the block — a row of compact cards in a low block, upright posters
-   with their title below in a tall one */
+/* « continue »: posters as tall as the block, what they are beside them (Issue 262: in a tall block too — a
+   bigger poster, never the title squeezed under it) */
 .widget-frame__body .widget-continue {
   block-size: 100cqh;
   box-sizing: border-box;
@@ -2239,33 +2272,15 @@ button.dash-lock {
 }
 @container (min-height: 11rem) {
   .widget-frame__body .widget-continue {
-    grid-auto-columns: clamp(6rem, calc((100cqh - var(--scroller-gap, 0.5rem) - 4.2rem) * 2 / 3), 12rem);
-    justify-content: space-between; /* a few posters spread over the whole width */
-  }
-  .widget-frame__body .widget-continue :is(a, .widget-continue__resume),
-  .widget-frame__body .widget-continue li > span {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
-    align-items: stretch;
-    padding: 0;
-    background: none;
-  }
-  .widget-frame__body .widget-continue :is(a, .widget-continue__resume):hover {
-    background: none;
-  }
-  .widget-frame__body .widget-continue :is(a, .widget-continue__resume):hover .widget-continue__art {
-    outline: 2px solid var(--color-accent);
+    grid-auto-columns: minmax(19rem, 1fr);
   }
   .widget-frame__body .widget-continue__art {
-    max-block-size: none;
-    inline-size: 100%;
-    border-radius: var(--radius-md);
-  }
-  .widget-frame__body .widget-continue__text {
-    padding-inline: 0.1rem;
+    max-block-size: 15rem;
   }
   .widget-frame__body .widget-continue__title {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
   }
 }
 

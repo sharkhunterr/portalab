@@ -57,6 +57,30 @@ describe("widget looks", () => {
     expect(glows[0]?.style.backgroundImage).toContain("/api/v1/media/images/img1");
   });
 
+  it("tells beside each poster of « continue » what it is and what is left (issue 262)", () => {
+    const audiobook = {
+      ...card(1),
+      title: "Alien - Le fleuve des souffrances",
+      kind: "audiobook",
+      author: "Christopher Golden",
+      year: 2018,
+      genres: ["Science fiction", "First contact"],
+      rating: 9.4,
+      duration_s: 36000,
+      progress: 0.25,
+    };
+    const book = { ...card(2), kind: "book", pages: 200, progress: 0.5 };
+    const film = { ...card(3), progress: 0.4 };
+    show("media.continue", { items: [audiobook, book, film] });
+    expect(screen.getByText("Alien - Le fleuve des souffrances")).toBeInTheDocument();
+    expect(screen.getByText("Christopher Golden")).toBeInTheDocument();
+    const facts = document.querySelectorAll(".widget-continue__facts");
+    expect([facts[0]?.textContent, facts[1]?.textContent]).toEqual(["Audiobook2018", "9.4Science fiction"]);
+    expect(screen.getByText("75% left · 7 hr 30 min")).toBeInTheDocument();
+    expect(screen.getByText("50% left · 100 pages")).toBeInTheDocument();
+    expect(screen.getByText("60% left")).toBeInTheDocument();
+  });
+
   it("draws a heartbeat under the services, in the tone of their health", () => {
     show(
       "health.services_summary",
