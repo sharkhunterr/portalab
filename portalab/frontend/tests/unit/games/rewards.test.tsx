@@ -3,8 +3,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
-// Issue 265: what the games give, set on the games' page — a rule made in a few choices (here: on the
-// podium of the week's board), saved then published as any reward rule; the rules shown in words.
+// Issue 265: what the games give, set with the other gains (« XP per action ») — a rule made in a few choices
+// (here: on the podium of the week's board), saved then published as any reward rule.
 
 const fake = vi.hoisted(() => ({
   handler: (_: Request): Response | Promise<Response> => new Response(null),
@@ -16,7 +16,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
   return importOriginal();
 });
 
-import { RewardRules } from "../../../src/features/games/RewardRules";
+import { GameRuleBuilder } from "../../../src/features/games/RewardRules";
 import { json } from "../../support/fake-api";
 
 const PLAYED = {
@@ -46,7 +46,11 @@ function show(sent: Array<{ path: string; body: unknown }>) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
     <QueryClientProvider client={client}>
-      <RouterProvider router={createMemoryRouter([{ path: "/", element: <RewardRules /> }])} />
+      <RouterProvider
+        router={createMemoryRouter([
+          { path: "/", element: <GameRuleBuilder taken={new Set()} onDone={() => {}} /> },
+        ])}
+      />
     </QueryClientProvider>,
   );
 }
@@ -55,11 +59,7 @@ describe("issue 265 — the games' rewards", () => {
   it("makes a rule for the week's podium, then publishes it", async () => {
     const sent: Array<{ path: string; body: unknown }> = [];
     show(sent);
-    expect(await screen.findByText("A game played")).toBeTruthy();
-    expect(screen.getByText("score ≥ 500")).toBeTruthy();
-    expect(screen.getByText("max 200 XP/day")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Add a rule" }));
-    fireEvent.click(screen.getByRole("button", { name: /Place on the board/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /Place on the board/ }));
     fireEvent.change(screen.getByLabelText("Game"), { target: { value: "casting" } });
     fireEvent.change(screen.getByLabelText("Coins"), { target: { value: "20" } });
     fireEvent.click(screen.getByRole("button", { name: "Create the rule" }));

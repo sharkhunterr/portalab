@@ -9,11 +9,13 @@ import { type Translate, useT } from "../../i18n/hooks/useT";
 import { keyOf } from "../gamification/admin/tuning";
 import { ROUND_GAMES } from "./api";
 import { DEFAULT_GAME_RULES } from "./rewards";
+import "./games.css";
 
 /**
- * Issue 265: what the games give — reward rules like any other (the gains' page shows and changes them all),
- * made here in a few choices: a game played, a minimum score, a game won, a place in a party, a place on a
- * game's board when the week or the month is over, a challenge of the week. XP and Coins, capped per day.
+ * Issue 265: what the games give — reward rules like any other, kept with them on the gains' page (« XP per
+ * action »): a rule made there in a few choices — a game played, a minimum score, a game won, a place in a
+ * party, a place on a game's board when the week or the month is over, a challenge of the week; XP and Coins,
+ * capped per day — and the rules' conditions said in words. The games' page only leads there.
  */
 
 interface Condition {
@@ -142,10 +144,10 @@ function definitionOf(t: Translate, draft: Draft): Definition {
 }
 
 /** A rule's conditions as short chips: the game, the score, the place… */
-function chipsOf(t: Translate, rule: Rule): string[] {
+export function gameRuleChips(t: Translate, eventType: string, predicate: Condition[]): string[] {
   const out: string[] = [];
-  const board = rule.event_type === "games.board_ranked";
-  for (const c of rule.definition.predicate ?? []) {
+  const board = eventType === "games.board_ranked";
+  for (const c of predicate) {
     const v = Array.isArray(c.value) ? c.value.join(", ") : String(c.value);
     if (c.field === "game" && c.op === "eq") out.push(gameName(t, v));
     else if (c.field === "score") out.push(t("gamification:games.admin.rule.chip.score", { score: v }));
@@ -160,19 +162,9 @@ function chipsOf(t: Translate, rule: Rule): string[] {
   return out;
 }
 
-function kindOf(rule: Rule): Kind {
-  if (rule.event_type === "games.board_ranked") return "board";
-  if (rule.event_type === "games.challenge_completed") return "challenge";
-  const fields = new Set((rule.definition.predicate ?? []).map((c) => c.field));
-  if (fields.has("rank")) return "party";
-  if (fields.has("won")) return "won";
-  if (fields.has("score")) return "score";
-  return "played";
-}
-
-function useGameRules() {
+export function useGameRules() {
   return useQuery({
-    queryKey: ["admin", "gamification", "rules", "games"],
+    queryKey: ["gamification", "rules", "games"],
     queryFn: async () =>
       ((await api.GET("/api/v1/admin/gamification/rules")).data as unknown as Rule[]).filter((r) =>
         r.event_type.startsWith("games."),
@@ -193,7 +185,7 @@ async function saveAndPublish(key: string, definition: Definition) {
   });
 }
 
-function RuleBuilder({ taken, onDone }: { taken: Set<string>; onDone: () => void }) {
+export function GameRuleBuilder({ taken, onDone }: { taken: Set<string>; onDone: () => void }) {
   const t = useT();
   const client = useQueryClient();
   const [draft, setDraft] = useState<Draft>(EMPTY);
@@ -206,7 +198,7 @@ function RuleBuilder({ taken, onDone }: { taken: Set<string>; onDone: () => void
       await saveAndPublish(key, definition);
     },
     onSuccess: () => {
-      void client.invalidateQueries({ queryKey: ["admin", "gamification", "rules"] });
+      void client.invalidateQueries({ queryKey: ["gamification", "rules"] });
       onDone();
     },
   });
@@ -352,107 +344,48 @@ function RuleBuilder({ taken, onDone }: { taken: Set<string>; onDone: () => void
   );
 }
 
-export function RewardRules() {
-  const t = useT();
+/** Issue 265: the rules Portalab proposes for the games, added in one go (those missing, published). */
+export function useProposedGameRules() {
   const client = useQueryClient();
   const rules = useGameRules();
-  const [adding, setAdding] = useState(false);
-  const proposed = useMutation({
+  const missing =
+    Boolean(rules.data) && DEFAULT_GAME_RULES.some((d) => !rules.data?.some((r) => r.key === d.key));
+  const create = useMutation({
     mutationFn: async () => {
       const taken = new Set((rules.data ?? []).map((r) => r.key));
       for (const rule of DEFAULT_GAME_RULES)
         if (!taken.has(rule.key)) await saveAndPublish(rule.key, rule.definition as unknown as Definition);
     },
-    onSettled: () => client.invalidateQueries({ queryKey: ["admin", "gamification", "rules"] }),
+    onSettled: () => client.invalidateQueries({ queryKey: ["gamification", "rules"] }),
   });
-  const retire = useMutation({
-    mutationFn: async (key: string) =>
-      api.POST("/api/v1/admin/gamification/rules/{key}/retire", { params: { path: { key } } }),
-    onSettled: () => client.invalidateQueries({ queryKey: ["admin", "gamification", "rules"] }),
-  });
-  const list = (rules.data ?? []).filter((r) => r.status !== "retired");
-  const missing = DEFAULT_GAME_RULES.some((d) => !(rules.data ?? []).some((r) => r.key === d.key));
+  return { missing, create };
+}
+
+/** The games' page: what the games give is set with the other gains — a word, how many rules, the way there. */
+export function GameRulesLink() {
+  const t = useT();
+  const rules = useGameRules();
+  const active = (rules.data ?? []).filter((r) => r.status === "active").length;
   return (
     <section className="games-panel">
       <h2>
         <Icon name="coins" size={18} />
         {t("gamification:games.admin.rewards")}
       </h2>
-      <p className="games-muted">{t("gamification:games.admin.rewardsPitch")}</p>
-      {list.length ? (
-        <ul className="games-rules">
-          {list.map((rule) => (
-            <li key={rule.key} data-status={rule.status}>
-              <span className="games-rules__icon" aria-hidden="true">
-                <Icon name={KIND_ICONS[kindOf(rule)]} size={18} />
-              </span>
-              <div className="games-rules__body">
-                <b>{rule.definition.label || rule.key}</b>
-                <span className="games-rules__chips">
-                  {chipsOf(t, rule).map((chip) => (
-                    <span key={chip}>{chip}</span>
-                  ))}
-                </span>
-              </div>
-              <span className="games-rules__gain">
-                {(rule.definition.grants ?? []).map((g) => (
-                  <b key={g.value} data-value={g.value}>
-                    +{g.amount ?? 0} {t(`gamification:games.admin.value.${g.value}`)}
-                    {g.per_unit ? "…" : ""}
-                  </b>
-                ))}
-                {(rule.definition.limits?.caps ?? []).map((c) => (
-                  <span key={c.value} className="games-muted">
-                    {t("gamification:games.admin.rule.capShown", {
-                      amount: c.max_amount,
-                      value: t(`gamification:games.admin.value.${c.value}`),
-                    })}
-                  </span>
-                ))}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label={t("gamification:games.admin.rule.retire", {
-                  label: rule.definition.label ?? rule.key,
-                })}
-                disabled={retire.isPending}
-                onClick={() => retire.mutate(rule.key)}
-              >
-                <Icon name="trash" size={16} />
-              </Button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>{t("gamification:games.admin.noRewards")}</p>
-      )}
-      {adding ? (
-        <RuleBuilder taken={new Set((rules.data ?? []).map((r) => r.key))} onDone={() => setAdding(false)} />
-      ) : (
-        <div className="games-actions">
-          <Button onClick={() => setAdding(true)}>
-            <Icon name="plus" size={16} />
-            {t("gamification:games.admin.rule.add")}
-          </Button>
-          {missing ? (
-            <Button variant="secondary" disabled={proposed.isPending} onClick={() => proposed.mutate()}>
-              <Icon name="sparkles" size={16} />
-              {t("gamification:games.admin.createRewards")}
-            </Button>
-          ) : null}
-          <Button asChild variant="ghost">
-            <RouterLink to="/admin/gamification?tab=gains">
-              {t("gamification:games.admin.editRewards")}
-            </RouterLink>
-          </Button>
-        </div>
-      )}
-      {proposed.error ? <p className="games-error">{proposed.error.message}</p> : null}
-      {retire.error ? <p className="games-error">{retire.error.message}</p> : null}
-      <p className="games-muted">
-        <Icon name="info" size={14} /> {t("gamification:games.admin.rule.where")}
+      <p className="games-muted">{t("gamification:games.admin.rewardsThere")}</p>
+      <p>
+        {active
+          ? t("gamification:games.admin.rewardsCount", { count: active })
+          : t("gamification:games.admin.noRewards")}
       </p>
+      <div className="games-actions">
+        <Button asChild>
+          <RouterLink to="/admin/gamification?tab=gains&mode=detailed#games-rules">
+            <Icon name="zap" size={16} />
+            {t("gamification:games.admin.editRewards")}
+          </RouterLink>
+        </Button>
+      </div>
     </section>
   );
 }
