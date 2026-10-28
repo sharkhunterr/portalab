@@ -33,6 +33,7 @@ ACTIONS = (
     ("ticket.", "support"),
     ("feedback.", "support"),
     ("user.signed_in", "visits"),
+    ("games.", "minigames"),  # issue 265: the games page's games, the day's title, the week's challenges
 )
 
 

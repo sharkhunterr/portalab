@@ -4,7 +4,7 @@ the memory of one's own cards, the parties played together by code, the week's r
 over told once to the reward rules, a member's games exported and erased with them."""
 
 import io
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from typing import Any
 from uuid import UUID, uuid4
@@ -157,8 +157,9 @@ class Events:
     def __init__(self) -> None:
         self.told: list[tuple[str, dict[str, Any], str | None]] = []
 
-    async def publish(self, session: Any, event_type: str, metadata: Any = None, **kw: Any) -> None:
+    async def publish(self, session: Any, event_type: str, metadata: Any = None, **kw: Any) -> Any:
         self.told.append((event_type, dict(metadata or {}), kw.get("dedup_key")))
+        return SimpleNamespace(duplicate=False)
 
 
 async def _users(database: Database, *names: str) -> list[UUID]:
@@ -406,3 +407,35 @@ async def test_boards_settings_and_a_member_s_data(database: Database) -> None:
         assert not await session.scalar(
             select(func.count()).select_from(GameSession).where(GameSession.user_id == zoe)
         )
+
+
+async def test_the_boards_told_once_the_week_is_over(database: Database) -> None:
+    """The week over, each member placed on a game's board is told their place, once — for the reward
+    rules (« on the podium of the week »)."""
+    zoe, max_ = await _users(database, "zoe", "max")
+    last_week, _, _, _ = _module(database, FixedClock(NOW - timedelta(days=7)))
+    scores = {}
+    for user, right in ((zoe, True), (max_, False)):
+        view = await last_week.solo.start(user, "timeline")
+        for at in range(view["rounds"]):
+            answer = await _answer_of(database, view["id"])
+            if not right and at:
+                answer = list(reversed(answer))
+            view = await last_week.solo.answer(user, UUID(view["id"]), answer)
+            view = await last_week.solo.next(user, UUID(view["id"]))
+        scores[user] = view["score"]
+    assert scores[zoe] > scores[max_] > 0
+
+    module, _, events, _ = _module(database, FixedClock(NOW))
+    assert await module.boards.close() == 2
+    told = sorted(
+        (m["rank"], m["game"], m["period"], m["start"], m["value"], m["players"], key)
+        for t, m, key in events.told
+        if t == "games.board_ranked"
+    )
+    assert [r[:6] for r in told] == [
+        (1, "timeline", "week", "2026-10-19", scores[zoe], 2),
+        (2, "timeline", "week", "2026-10-19", scores[max_], 2),
+    ]
+    assert told[0][6] == f"games.board_ranked:timeline:week:2026-10-19:{zoe}"  # once per member and week
+    assert await module.boards.close() == 0  # already told

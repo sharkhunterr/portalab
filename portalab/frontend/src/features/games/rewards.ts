@@ -1,7 +1,7 @@
 /**
  * Issue 265: the games' rewards as Portalab proposes them — reward rules like any other (the administrators
  * change or retire them on the gains' page): a game played, a game won alone, a party won, the day's title
- * found, the week's challenge completed. Bounded per day so that playing all evening stays a pleasure, not
+ * found, a podium on a game's board when the week is over, the week's challenge completed. Bounded per day so that playing all evening stays a pleasure, not
  * a mine.
  */
 export const DEFAULT_GAME_RULES: { key: string; definition: Record<string, unknown> }[] = [
@@ -58,6 +58,21 @@ export const DEFAULT_GAME_RULES: { key: string; definition: Record<string, unkno
         { field: "won", op: "eq", value: true },
       ],
       grants: [{ value: "coins", amount: 20 }],
+    },
+  },
+  {
+    key: "games_board_week",
+    definition: {
+      event_type: "games.board_ranked",
+      label: "Sur le podium d'un jeu, la semaine finie",
+      predicate: [
+        { field: "period", op: "eq", value: "week" },
+        { field: "rank", op: "lte", value: 3 },
+      ],
+      grants: [
+        { value: "xp", amount: 50 },
+        { value: "coins", amount: 20 },
+      ],
     },
   },
   {

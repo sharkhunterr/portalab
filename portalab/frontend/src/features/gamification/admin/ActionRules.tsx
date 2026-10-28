@@ -36,6 +36,7 @@ const OWNER_ICONS: Record<string, string> = {
   news: "newspaper",
   calendar: "calendar",
   campaigns: "flame",
+  games: "dices", // issue 265: the games page
 };
 const OPS: Condition["op"][] = ["eq", "ne", "in", "gt", "gte", "lt", "lte"];
 // issue 160: the kinds a play may be — picked as chips for the playback actions, shown by their names

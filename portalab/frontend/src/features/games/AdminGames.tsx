@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Link as RouterLink } from "react-router";
 import { api } from "../../api/client";
 import { AdminPage } from "../../design-system/admin/AdminKit";
 import { Button } from "../../design-system/components/Button";
@@ -10,7 +9,7 @@ import { Skeleton } from "../../design-system/components/Placeholders";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { type ChallengeItem, GAME_ICONS, useChallenge } from "./api";
-import { DEFAULT_GAME_RULES } from "./rewards";
+import { RewardRules } from "./RewardRules";
 import "./games.css";
 
 interface RoundSettings {
@@ -46,14 +45,6 @@ interface AdminView {
   solo_only: string[];
   party_only: string[];
   figures: Record<string, Figures>;
-}
-
-interface Rule {
-  key: string;
-  version: number;
-  status: string;
-  event_type: string;
-  definition: { label?: string; grants?: { value: string; amount?: number | null }[] };
 }
 
 interface WheelSegment {
@@ -205,76 +196,6 @@ function ChallengePicker({ config, set }: { config: GamesConfig; set: (c: GamesC
         <ChallengeKind key={kind} kind={kind} config={config} set={set} current={current[kind]} />
       ))}
     </div>
-  );
-}
-
-function Rewards() {
-  const t = useT();
-  const client = useQueryClient();
-  const rules = useQuery({
-    queryKey: ["admin", "gamification", "rules", "games"],
-    queryFn: async () =>
-      ((await api.GET("/api/v1/admin/gamification/rules")).data as unknown as Rule[]).filter((r) =>
-        r.event_type.startsWith("games."),
-      ),
-  });
-  const create = useMutation({
-    mutationFn: async () => {
-      for (const rule of DEFAULT_GAME_RULES) {
-        const saved = (
-          await api.POST("/api/v1/admin/gamification/rules/{key}", {
-            params: { path: { key: rule.key } },
-            body: { definition: rule.definition },
-          })
-        ).data as unknown as Rule;
-        await api.POST("/api/v1/admin/gamification/rules/{key}/publish", {
-          params: { path: { key: rule.key } },
-          body: { version: saved.version },
-        });
-      }
-    },
-    onSettled: () => client.invalidateQueries({ queryKey: ["admin", "gamification", "rules"] }),
-  });
-  const list = rules.data ?? [];
-  return (
-    <section className="games-panel">
-      <h2>
-        <Icon name="coins" size={18} />
-        {t("gamification:games.admin.rewards")}
-      </h2>
-      <p className="games-muted">{t("gamification:games.admin.rewardsPitch")}</p>
-      {list.length ? (
-        <ul className="games-admin__rules">
-          {list.map((rule) => (
-            <li key={rule.key} data-status={rule.status}>
-              <b>{rule.definition.label || rule.key}</b>
-              <span>
-                {(rule.definition.grants ?? [])
-                  .map((g) => `${g.amount ?? "…"} ${t(`gamification:games.admin.value.${g.value}`)}`)
-                  .join(" + ")}
-              </span>
-              <span className="games-muted">{t(`gamification:games.admin.ruleStatus.${rule.status}`)}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>{t("gamification:games.admin.noRewards")}</p>
-      )}
-      <div className="games-actions">
-        {!list.length ? (
-          <Button disabled={create.isPending} onClick={() => create.mutate()}>
-            <Icon name="sparkles" size={16} />
-            {t("gamification:games.admin.createRewards")}
-          </Button>
-        ) : null}
-        <Button asChild variant="secondary">
-          <RouterLink to="/admin/gamification?tab=gains">
-            {t("gamification:games.admin.editRewards")}
-          </RouterLink>
-        </Button>
-      </div>
-      {create.error ? <p className="games-error">{create.error.message}</p> : null}
-    </section>
   );
 }
 
@@ -669,7 +590,7 @@ export default function AdminGames() {
             </div>
           </section>
 
-          <Rewards />
+          <RewardRules />
           <WheelEditor />
         </div>
       )}
