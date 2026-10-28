@@ -519,7 +519,9 @@ a.ai-card:hover {
 .ai-fab {
   position: fixed;
   z-index: 40;
-  inset-block-end: calc(var(--frame-bottom, 0px) + var(--space-4) + env(safe-area-inset-bottom, 0px));
+  --ai-fab-floor: calc(var(--frame-bottom, 0px) + var(--space-4) + env(safe-area-inset-bottom, 0px));
+  /* a player's bar open (the radio, an audiobook): just above it — never under it */
+  inset-block-end: max(var(--ai-fab-floor), calc(var(--overlay-bottom, 0px) + var(--space-3)));
   inset-inline-end: var(--space-4);
   display: inline-grid;
   place-items: center;
@@ -531,11 +533,13 @@ a.ai-card:hover {
   color: var(--color-accent-contrast);
   box-shadow: var(--shadow-3);
   cursor: pointer;
-  transition: transform var(--motion-duration-fast, 160ms) ease-out;
+  transition:
+    transform var(--motion-duration-fast, 160ms) ease-out,
+    inset-block-end var(--motion-duration-normal, 240ms) ease-out;
 }
 /* issue 136: the orbit navigation's bubble holds the same corner — the assistant sits above it, never over it */
 .shell[data-nav="orbit"] .ai-fab {
-  inset-block-end: calc(
+  --ai-fab-floor: calc(
     var(--frame-bottom, 0px) +
     var(--space-5) +
     3.75rem +

@@ -4,6 +4,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
+import { bottomOverlay } from "../../../shell/bottomOverlays";
 import { ApiError } from "../../../state/regions";
 import { useListen } from "../listen/store";
 import {
@@ -65,7 +66,7 @@ function RadioBar() {
   const current = radio?.current ?? null;
   const on = playback.playing || playback.loading;
   return (
-    <section className="listen-mini radio-mini" aria-label={t("media:radio.player")}>
+    <section ref={bottomOverlay} className="listen-mini radio-mini" aria-label={t("media:radio.player")}>
       <span
         className="listen-mini__progress radio-mini__live"
         aria-hidden="true"
