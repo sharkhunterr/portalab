@@ -19,6 +19,7 @@ import asyncio
 from collections.abc import AsyncIterator, Mapping, Sequence
 from dataclasses import replace
 from typing import Any
+from urllib.parse import quote, urlencode
 
 from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError
 from portalab.capabilities.connector_sdk import (
@@ -321,6 +322,15 @@ class SeerrConnector(HttpConnector):
 
     def looks_like_us(self, public: Any) -> bool:
         return isinstance(public, Mapping) and "version" in public and "commitTag" in public
+
+    async def get_json(self, service: ServiceHandle, path: str, **params: Any) -> Any:
+        """Seerr's request validator refuses a query string not strictly encoded — ``+`` for a space, a bare
+        ``'`` or ``:`` — with a 400 (« L'amour est dans le pré » was never found): encoded here the way its
+        own pages do (``encodeURIComponent``, ``!'()*`` too), handed over whole."""
+        given = {k: v for k, v in params.items() if v is not None}
+        if not given:
+            return await super().get_json(service, path)
+        return await super().get_json(service, f"{path}?{urlencode(given, quote_via=quote, safe='')}")
 
     async def _title(self, service: ServiceHandle, kind: str, tmdb: Any, cache: dict[str, str]) -> str:
         key = f"{kind}:{tmdb}"

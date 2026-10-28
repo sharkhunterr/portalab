@@ -4,6 +4,7 @@ API key's own account when the service refuses), quota and duplicate refusals to
 can ask for (search, shelves, details with seasons asked for or there)."""
 
 import json
+import re
 from typing import Any
 from uuid import uuid4
 
@@ -49,6 +50,9 @@ class Seerr:
     def respond(self, request: httpx.Request) -> httpx.Response:
         self.seen.append(request)
         path, method = request.url.path, request.method
+        # like Seerr's request validator: a query string not strictly encoded is refused
+        if re.search(rb"[+'!():,;$&*]", request.url.query.replace(b"&", b"").replace(b"=", b"")):
+            return httpx.Response(400, json={"message": "Parameter 'query' must be url encoded."})
         body = json.loads(request.content) if request.content else {}
         if path == "/api/v1/request" and method == "POST":
             if self.duplicate:
@@ -229,6 +233,10 @@ async def test_titles_to_ask_for() -> None:
         ("series", "Andor", 2022, "unknown"),
     ]  # people left out
     assert found[0].poster == "/dune.jpg" and found[0].rating == 7.8
+    # several words, an apostrophe, an accent, a colon: encoded the way Seerr wants (never ``+``)
+    assert len(await discovery.search("L'amour est dans le pré: (2008)!", "fr")) == 2
+    asked = seerr.seen[-1].url.query.decode()
+    assert asked.startswith("query=L%27amour%20est%20dans%20le%20pr%C3%A9%3A%20%282008%29%21&page=1")
     assert [t.title for t in await discovery.shelf("trending", "fr")] == ["Dune", "Andor"]
     # the discovery lists take no language (Seerr would filter by the titles' original language)
     assert all(
