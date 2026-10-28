@@ -63,7 +63,16 @@ CHARACTERS = "media.characters"  # issue 231: each role's own image, made by a c
 REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the request service (Seerr)
 REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
 PEOPLE = "media.people"  # #92: what a service knows of a person — biography, portrait, filmography
-ACTIVITY_KINDS: tuple[str, ...] = ("movie", "episode", "live", "track", "book", "audiobook", "other")
+ACTIVITY_KINDS: tuple[str, ...] = (
+    "movie",
+    "episode",
+    "live",
+    "track",
+    "book",
+    "audiobook",
+    "game",  # #190: a game played (RomM)
+    "other",
+)
 
 PlaybackState = Literal["playing", "paused", "buffering", "stopped"]
 RequestState = Literal["pending", "approved", "declined", "processing", "available", "failed", "cancelled"]

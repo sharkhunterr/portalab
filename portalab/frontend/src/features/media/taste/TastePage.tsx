@@ -23,7 +23,7 @@ import "../media.css";
 import "./taste.css";
 
 const KINDS = ["all", "movie", "series", "book", "audiobook"] as const;
-const LISTS: Verdict[] = ["later", "like", "dislike", "seen"];
+const LISTS: Verdict[] = ["later", "like", "dislike"];
 
 function Traits({ title, traits }: { title: string; traits: TasteTrait[] }) {
   const t = useT();

@@ -6,12 +6,12 @@ import "./taste.css";
 export const VERDICTS: { verdict: Verdict; icon: string }[] = [
   { verdict: "like", icon: "thumbs-up" },
   { verdict: "dislike", icon: "thumbs-down" },
-  { verdict: "seen", icon: "eye" },
   { verdict: "later", icon: "bookmark" },
 ];
 
 /**
- * Issue 190: on a title's page, what I think of it — « I like it », « not for me », « seen », « later ».
+ * Issue 190: on a title's page, what I think of it — « I like it », « not for me », « later » (what I saw,
+ * read or played, the services tell).
  * One at a time; pressing the chosen one again takes it back. An episode's goes to its series.
  */
 export function TasteButtons({ objectId, title }: { objectId: string; title: string }) {

@@ -409,13 +409,13 @@ class RadioSitting(MediaBase):
 
 
 class TasteVerdict(MediaBase):
-    """Issue 190: what a member said of a work — ``like``, ``dislike`` (not for me), ``seen`` (seen, without
-    an opinion) or ``later`` (to watch or read later). One per member and work (a film, a series, a book…:
-    an episode's goes to its series); it weighs on their taste beside what they watched and read."""
+    """Issue 190: what a member said of a work — ``like``, ``dislike`` (not for me) or ``later`` (to watch,
+    read or play later). One per member and work (a film, a series, a book, a game…: an episode's goes to its
+    series); it weighs on their taste beside what the services tell they watched, read and played."""
 
     __tablename__ = "taste"
     __table_args__ = (
-        CheckConstraint("verdict IN ('like', 'dislike', 'seen', 'later')", name="verdict"),
+        CheckConstraint("verdict IN ('like', 'dislike', 'later')", name="verdict"),
         Index("ix_taste_user", "user_id", "verdict", "updated_at"),
     )
 
@@ -463,7 +463,7 @@ class Activity(MediaBase):
     __table_args__ = (
         UniqueConstraint("service_id", "ref", name="uq_activity_service_ref"),
         CheckConstraint(
-            "kind IN ('movie', 'episode', 'live', 'track', 'book', 'audiobook', 'other')", name="kind"
+            "kind IN ('movie', 'episode', 'live', 'track', 'book', 'audiobook', 'game', 'other')", name="kind"
         ),
         Index("ix_activity_started", "started_at"),
         Index("ix_activity_user", "user_id", "started_at"),

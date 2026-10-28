@@ -1,6 +1,6 @@
 """What a member is in the middle of (027): their latest session of each title in the services' history
 (Plex/Tautulli, Grimmory…) when it was started but not finished — films, episodes, books and audiobooks,
-newest first. Live TV and finished titles are left out."""
+newest first — and (#190) the games played in RomM. Live TV and finished titles are left out."""
 
 from datetime import datetime, timedelta
 from typing import Any
@@ -64,7 +64,10 @@ def _item(row: Activity, progress: float | None) -> dict[str, Any]:
         "progress": progress,
         "meta": f"{round(progress * 100)} %" if progress is not None else None,
         "at": row.started_at.isoformat(),
-        "_lookup": (
+        # #190: a game is never looked for among films (« Alien Resurrection » the game is not the film)
+        "_lookup": None
+        if row.kind == "game"
+        else (
             TMDB_KIND.get(row.kind, "movie"),
             dict(row.ids or {}),
             row.parent_title if series else row.title,

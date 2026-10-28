@@ -11,6 +11,7 @@ import pytest
 from portalab.capabilities.ai import MODELS
 from portalab.capabilities.connector_sdk import SourceRecord
 from portalab.capabilities.media import (
+    ACTIVITY_HISTORY,
     ARTWORK,
     CLEANUP,
     IMAGE_SEARCH,
@@ -134,6 +135,65 @@ async def test_romm_both_page_shapes() -> None:
     assert found[0].payload["image"] == "roms/2/1/cover/big.png"
     legacy = {**ROUTES["romm"], "/api/roms": ROUTES["romm"]["/api/roms"]["items"]}  # RomM 3: a bare list
     assert len(await records(RommConnector(), "romm", routes=legacy)) == 2
+
+
+async def test_romm_tells_what_its_account_played() -> None:
+    """#190: the games the account played — a row per game and day of its last play (finished when its
+    player said so) — and each play session with its length, under the account's own id."""
+
+    def roms(request: httpx.Request) -> Any:
+        if request.url.params.get("last_played") == "true":
+            offset = int(request.url.params.get("offset", "0"))
+            played = [
+                {
+                    "id": 7,
+                    "name": "Driver 2",
+                    "platform_display_name": "PlayStation",
+                    "rom_user": {"last_played": "2026-09-02T08:32:45+00:00", "status": "incomplete"},
+                },
+                {
+                    "id": 8,
+                    "name": "Jak II",
+                    "igdb_id": 1,
+                    "rom_user": {"last_played": "2026-08-29T05:09:11+00:00", "status": "finished"},
+                },
+                {"id": 9, "name": "Never played", "rom_user": {"last_played": None}},
+            ]
+            return {"items": played if offset == 0 else [], "total": 3}
+        return ROUTES["romm"]["/api/roms"]
+
+    routes = {
+        **ROUTES["romm"],
+        "/api/users/me": {"id": 1, "username": "portal"},
+        "/api/roms": roms,
+        "/api/play-sessions": [
+            {
+                "id": 9,
+                "rom_id": 7,
+                "start_time": "2026-09-02T09:00:00",
+                "end_time": "2026-09-02T09:40:00",
+                "duration_ms": 2_400_000,
+            },
+            {"id": 10, "rom_id": 12, "start_time": "2026-09-01T20:00:00", "duration_ms": 600_000},
+        ],
+        "/api/roms/12": {"id": 12, "name": "Crash Nitro Kart"},
+    }
+    provider = RommConnector().provider(ACTIVITY_HISTORY, handle_for("romm", routes=routes))
+    page = await provider.history(since=None, cursor=None)
+    rows = {row.ref: row for row in page.items}
+    assert set(rows) == {"played:7:2026-09-02", "played:8:2026-08-29", "session:9", "session:10"}
+    assert {row.kind for row in page.items} == {"game"} and {row.external_user_id for row in page.items} == {
+        "1"
+    }
+    assert rows["played:8:2026-08-29"].progress == 1.0 and rows["played:7:2026-09-02"].progress is None
+    assert (rows["session:9"].title, rows["session:9"].watched_s, rows["session:9"].item_external_id) == (
+        "Driver 2",
+        2400.0,
+        "7",
+    )
+    assert rows["session:10"].title == "Crash Nitro Kart" and page.cursor is None
+    later = await provider.history(since=datetime(2026, 9, 1, tzinfo=UTC), cursor=None)
+    assert "played:8:2026-08-29" not in {row.ref for row in later.items}
 
 
 def test_image_refs_cannot_escape_the_service() -> None:

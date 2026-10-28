@@ -7505,7 +7505,7 @@ export interface paths {
         };
         /**
          * My Deck
-         * @description Titles to judge one by one (« I like it », « not for me », « seen », « later »): mostly what my taste
+         * @description Titles to judge one by one (« I like it », « not for me », « later »): mostly what my taste
          *     recommends, now and then one of mine not judged yet, and a well-rated one out of my habits.
          */
         get: operations["my_deck_api_v1_me_media_taste_deck_get"];
@@ -7526,7 +7526,7 @@ export interface paths {
         };
         /**
          * My List
-         * @description The titles I said I like, are not for me, saw, or keep for later — the last said first.
+         * @description The titles I said I like, are not for me, or keep for later — the last said first.
          */
         get: operations["my_list_api_v1_me_media_taste_lists__verdict__get"];
         put?: never;
@@ -17466,7 +17466,7 @@ export interface components {
             /** Title */
             title: string;
             /** Verdict */
-            verdict?: ("like" | "dislike" | "seen" | "later") | null;
+            verdict?: ("like" | "dislike" | "later") | null;
             /** Year */
             year?: number | null;
         };
@@ -17498,14 +17498,14 @@ export interface components {
              * Verdict
              * @enum {string}
              */
-            verdict: "like" | "dislike" | "seen" | "later";
+            verdict: "like" | "dislike" | "later";
         };
         /** TasteVerdictOut */
         TasteVerdictOut: {
             /** Object Id */
             object_id: string | null;
             /** Verdict */
-            verdict: ("like" | "dislike" | "seen" | "later") | null;
+            verdict: ("like" | "dislike" | "later") | null;
         };
         /** TermsAdminOut */
         TermsAdminOut: {
@@ -32983,7 +32983,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                verdict: "like" | "dislike" | "seen" | "later";
+                verdict: "like" | "dislike" | "later";
             };
             cookie?: never;
         };
