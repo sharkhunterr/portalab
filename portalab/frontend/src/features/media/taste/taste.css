@@ -189,6 +189,62 @@
     opacity 260ms var(--motion-easing-out);
   opacity: 0;
 }
+/* the first card sways, a label below says it can be swiped */
+.taste-deck__card[data-coach] {
+  animation: taste-nudge 2.6s var(--motion-easing) 0.8s 3;
+}
+.taste-deck__coach {
+  position: absolute;
+  inset-block-end: var(--space-3);
+  inset-inline-start: 50%;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-inline-size: calc(100% - 2 * var(--space-3));
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  box-shadow: var(--shadow-2);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%);
+  backdrop-filter: blur(6px);
+  animation: taste-coach-in var(--motion-duration-normal) var(--motion-easing) both;
+}
+.taste-deck__coach > svg:first-child {
+  color: var(--state-error-fg);
+}
+.taste-deck__coach > svg:last-child {
+  color: var(--state-available-fg);
+}
+@keyframes taste-nudge {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+  20% {
+    transform: translateX(2.2rem) rotate(2deg);
+  }
+  45% {
+    transform: translateX(0) rotate(0);
+  }
+  65% {
+    transform: translateX(-2.2rem) rotate(-2deg);
+  }
+  85% {
+    transform: translateX(0) rotate(0);
+  }
+}
+@keyframes taste-coach-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0.5rem);
+  }
+}
 .taste-deck__next {
   position: absolute;
   inset: 0.4rem 0.4rem -0.2rem;
@@ -307,5 +363,10 @@
   .taste-deck__card,
   .taste-deck__card[data-leaving] {
     transition: none;
+  }
+  /* no sway: the label alone says it */
+  .taste-deck__card[data-coach],
+  .taste-deck__coach {
+    animation: none;
   }
 }

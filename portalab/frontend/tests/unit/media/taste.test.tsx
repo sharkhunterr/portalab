@@ -124,6 +124,26 @@ describe("issue 190 — my taste", () => {
     );
   });
 
+  it("shows the first card can be swiped — until one answers, and never again once one has swiped", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    window.localStorage.removeItem("portalab.taste.swiped");
+    const first = show(<TasteDeck initial={[card("a", "Tenet"), card("b", "Dune")]} />);
+    const hint = "Swipe: right I like it, left not for me";
+    expect(await screen.findByText(hint)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /Not for me/ }));
+    await act(async () => {
+      vi.advanceTimersByTime(400);
+    });
+    expect(await screen.findByRole("heading", { name: "Dune" })).toBeTruthy();
+    expect(screen.queryByText(hint)).toBeNull();
+    first.unmount();
+    window.localStorage.setItem("portalab.taste.swiped", "1");
+    show(<TasteDeck initial={[card("c", "Arrival")]} />);
+    expect(await screen.findByRole("heading", { name: "Arrival" })).toBeTruthy();
+    expect(screen.queryByText(hint)).toBeNull();
+    window.localStorage.removeItem("portalab.taste.swiped");
+  });
+
   it("asks a title of mine whether I liked it", async () => {
     show(<TasteDeck initial={[card("a", "Inception", { seen: true })]} />);
     expect(await screen.findByText("Already in your history: liked it?")).toBeTruthy();
