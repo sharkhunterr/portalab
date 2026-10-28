@@ -29,7 +29,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     for table, keys in (("challenges", ["week"]), ("challenge_done", ["week", "user_id"])):
-        op.execute(f"DELETE FROM games.{table} WHERE kind <> 'game'")
+        op.execute(f"DELETE FROM games.{table} WHERE kind <> 'game'")  # noqa: S608 — constant table names
         op.drop_constraint(f"pk_{table}", table, type_="primary", schema="games")
         op.create_primary_key(f"pk_{table}", table, keys, schema="games")
         op.drop_column(table, "kind", schema="games")
