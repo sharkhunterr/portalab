@@ -50,14 +50,23 @@ function Cinemot({ status }: { status: { status: string; won: boolean } | null }
   const t = useT();
   const state = !status ? "new" : status.status === "playing" ? "playing" : status.won ? "won" : "lost";
   return (
-    <article className="games-today__card" data-state={state}>
+    <article className="games-today__card games-today__cinemot" data-game="cinemot" data-state={state}>
       <h3>
         <Icon name="type" size={18} />
         {t("gamification:games.game.cinemot.name")}
       </h3>
+      <div className="games-today__letters" aria-hidden="true">
+        {["?", "?", "?", "?", "?"].map((letter, at) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: a decoration
+          <span key={at} data-mark={state === "won" ? "right" : at === 1 ? "elsewhere" : undefined}>
+            {letter}
+          </span>
+        ))}
+      </div>
       <p>{t(`gamification:games.cinemot.state.${state}`)}</p>
       <Button asChild variant={state === "new" || state === "playing" ? "primary" : "secondary"}>
         <RouterLink to="/games/cinemot">
+          <Icon name={state === "won" || state === "lost" ? "eye" : "play"} size={16} />
           {state === "won" || state === "lost"
             ? t("gamification:games.cinemot.see")
             : t("gamification:games.play")}
@@ -78,95 +87,123 @@ function ChallengeCard({ item }: { item: ChallengeItem }) {
   const t = useT();
   const format = useFormat();
   const share = Math.min(1, item.mine / item.target);
+  const icon = CHALLENGE_ICONS[item.kind] ?? "gamepad";
   return (
-    <article className="games-today__card games-challenge" data-done={item.done || undefined}>
-      <h3>
-        <Icon name={CHALLENGE_ICONS[item.kind] ?? "gamepad"} size={18} />
-        {t(`gamification:games.challenge.kind.${item.kind}`)}
-      </h3>
-      <div className="games-challenge__game">
+    <li className="games-challenge" data-kind={item.kind} data-done={item.done || undefined}>
+      <div className="games-challenge__cover">
         {item.title.image_id ? (
           <img src={imageUrl(item.title.image_id) ?? ""} alt="" />
         ) : (
-          <Icon name={CHALLENGE_ICONS[item.kind] ?? "gamepad"} size={40} />
+          <Icon name={icon} size={32} />
         )}
-        <div>
-          <RouterLink to={`/media/${item.title.id}`}>
-            <b>{item.title.title}</b>
-          </RouterLink>
-          {item.title.platform ? <span className="games-muted">{item.title.platform}</span> : null}
-          <span>{t(`gamification:games.challenge.goal.${item.unit}`, { target: item.target })}</span>
+        {item.done ? (
+          <span className="games-challenge__done" aria-hidden="true">
+            <Icon name="check" size={18} />
+          </span>
+        ) : null}
+      </div>
+      <div className="games-challenge__body">
+        <span className="games-challenge__kind">
+          <Icon name={icon} size={14} />
+          {t(`gamification:games.challenge.kind.${item.kind}`)}
+        </span>
+        <RouterLink className="games-challenge__title" to={`/media/${item.title.id}`}>
+          {item.title.title}
+        </RouterLink>
+        {item.title.platform ? <span className="games-muted">{item.title.platform}</span> : null}
+        <div
+          className="games-progress"
+          role="progressbar"
+          aria-label={t(`gamification:games.challenge.goal.${item.unit}`, { target: item.target })}
+          aria-valuemin={0}
+          aria-valuemax={item.target}
+          aria-valuenow={item.mine}
+        >
+          <span style={{ inlineSize: `${share * 100}%` }} />
         </div>
+        <p className="games-challenge__figures">
+          {item.done ? (
+            <b>{t("gamification:games.challenge.done")}</b>
+          ) : (
+            <>
+              <b>
+                {t(`gamification:games.challenge.short.${item.unit}`, {
+                  mine: format.number(item.mine),
+                  target: item.target,
+                })}
+              </b>
+              <span className="games-muted">
+                {t("gamification:games.challenge.until", { until: format.date(item.ends_at) })}
+              </span>
+            </>
+          )}
+        </p>
+        <p className="games-muted">
+          {t("gamification:games.challenge.finishers", { count: item.finishers })}
+        </p>
       </div>
-      <div
-        className="games-progress"
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={item.target}
-        aria-valuenow={item.mine}
-      >
-        <span style={{ inlineSize: `${share * 100}%` }} />
-      </div>
-      <p className="games-muted">
-        {item.done
-          ? t("gamification:games.challenge.done")
-          : t(`gamification:games.challenge.progress.${item.unit}`, {
-              mine: format.number(item.mine),
-              target: item.target,
-              until: format.date(item.ends_at),
-            })}
-      </p>
-      <p className="games-muted">{t("gamification:games.challenge.finishers", { count: item.finishers })}</p>
-    </article>
+    </li>
   );
 }
 
 function Challenges() {
+  const t = useT();
   const challenge = useChallenge();
+  const items = challenge.data?.items ?? [];
+  if (!items.length) return null;
   return (
-    <>
-      {(challenge.data?.items ?? []).map((item) => (
-        <ChallengeCard key={item.kind} item={item} />
-      ))}
-    </>
+    <section aria-labelledby="games-week">
+      <h2 id="games-week">{t("gamification:games.week")}</h2>
+      <ul className="games-challenges">
+        {items.map((item) => (
+          <ChallengeCard key={item.kind} item={item} />
+        ))}
+      </ul>
+    </section>
   );
 }
 
+/** A game of the page: the whole tile opens it (its intro: alone or together). */
 function GameTile({ game }: { game: HubGame }) {
   const t = useT();
   const format = useFormat();
-  const to = game.key === "cinemot" ? "/games/cinemot" : `/games/play/${game.key}`;
+  const to =
+    game.key === "cinemot"
+      ? "/games/cinemot"
+      : game.solo
+        ? `/games/play/${game.key}`
+        : `/games/party?game=${game.key}`;
   return (
     <li className="games-tile-card" data-game={game.key}>
-      <span className="games-tile-card__icon" aria-hidden="true">
-        <Icon name={GAME_ICONS[game.key] ?? "gamepad"} size={28} />
-      </span>
-      <h3>{t(`gamification:games.game.${game.key}.name`)}</h3>
-      <p>{t(`gamification:games.game.${game.key}.pitch`)}</p>
-      {game.best_week ? (
-        <span className="games-tile-card__best">
-          <Icon name="trophy" size={14} />
-          {t("gamification:games.bestWeek", { score: format.number(game.best_week) })}
+      <RouterLink to={to}>
+        <span className="games-tile-card__art" aria-hidden="true">
+          <Icon name={GAME_ICONS[game.key] ?? "gamepad"} size={36} />
         </span>
-      ) : null}
-      <div className="games-tile-card__actions">
-        {game.solo ? (
-          <Button asChild size="md">
-            <RouterLink to={to}>
-              <Icon name="play" size={16} />
-              {t("gamification:games.play")}
-            </RouterLink>
-          </Button>
-        ) : null}
-        {game.party ? (
-          <Button asChild variant="secondary">
-            <RouterLink to={`/games/party?game=${game.key}`}>
-              <Icon name="users" size={16} />
-              {t("gamification:games.together")}
-            </RouterLink>
-          </Button>
-        ) : null}
-      </div>
+        <span className="games-tile-card__body">
+          <h3>{t(`gamification:games.game.${game.key}.name`)}</h3>
+          <span className="games-tile-card__pitch">{t(`gamification:games.game.${game.key}.pitch`)}</span>
+          <span className="games-tile-card__tags">
+            {game.solo ? (
+              <span>
+                <Icon name="user" size={12} />
+                {t("gamification:games.alone")}
+              </span>
+            ) : null}
+            {game.party ? (
+              <span>
+                <Icon name="users" size={12} />
+                {t("gamification:games.together")}
+              </span>
+            ) : null}
+            {game.best_week ? (
+              <span className="games-tile-card__best">
+                <Icon name="trophy" size={12} />
+                {format.number(game.best_week)}
+              </span>
+            ) : null}
+          </span>
+        </span>
+      </RouterLink>
     </li>
   );
 }
@@ -193,7 +230,7 @@ function JoinBox() {
         placeholder="ABCD"
         onChange={(event) => setCode(event.target.value.replace(/[^a-zA-Z]/g, "").toUpperCase())}
       />
-      <Button type="submit" disabled={code.length < 4}>
+      <Button type="submit" variant="secondary" disabled={code.length < 4}>
         {t("gamification:games.party.join")}
       </Button>
     </form>
@@ -228,9 +265,10 @@ export default function GamesPage() {
             <div className="games-today__grid">
               <Wheel />
               {games.some((g) => g.key === "cinemot") ? <Cinemot status={hub.data.cinemot} /> : null}
-              {games.some((g) => g.key === "challenge") ? <Challenges /> : null}
             </div>
           </section>
+
+          {games.some((g) => g.key === "challenge") ? <Challenges /> : null}
 
           <section aria-labelledby="games-all">
             <h2 id="games-all">{t("gamification:games.all")}</h2>
@@ -243,11 +281,14 @@ export default function GamesPage() {
 
           {hub.data.party ? (
             <section className="games-together" aria-labelledby="games-together">
+              <span className="games-together__art" aria-hidden="true">
+                <Icon name="party" size={36} />
+              </span>
               <h2 id="games-together">{t("gamification:games.party.title")}</h2>
               <p className="games-muted">{t("gamification:games.party.pitch")}</p>
               <div className="games-together__row">
                 <JoinBox />
-                <Button asChild variant="secondary">
+                <Button asChild>
                   <RouterLink to="/games/party">
                     <Icon name="plus" size={16} />
                     {t("gamification:games.party.open")}

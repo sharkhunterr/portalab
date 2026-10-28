@@ -24,27 +24,34 @@ export function useRemaining(started: string | undefined, seconds: number, skew:
 function TimerBar({ left, seconds }: { left: number; seconds: number }) {
   const t = useT();
   const share = Math.max(0, Math.min(1, left / (seconds * 1000)));
+  const low = share < 0.25 || undefined;
   return (
     <div
       className="games-timer"
       role="timer"
+      data-low={low}
       aria-label={t("gamification:games.timeLeft", { seconds: Math.ceil(left / 1000) })}
     >
       <span className="games-timer__bar">
-        <span style={{ inlineSize: `${share * 100}%` }} data-low={share < 0.25 || undefined} />
+        <span style={{ inlineSize: `${share * 100}%` }} />
       </span>
-      <b>{Math.ceil(left / 1000)}</b>
+      <b>
+        <Icon name="clock" size={14} />
+        {Math.ceil(left / 1000)}
+      </b>
     </div>
   );
 }
 
 function PosterPrompt({
   base,
+  round,
   elapsed,
   seconds,
   revealed,
 }: {
   base: string;
+  round: number;
   elapsed: number;
   seconds: number;
   revealed: boolean;
@@ -55,42 +62,83 @@ function PosterPrompt({
     : Math.min(BLUR_STEPS - 2, Math.floor(elapsed / ((seconds * 1000) / (BLUR_STEPS - 1))));
   return (
     <div className="games-poster">
-      <img src={`${base}/image?step=${step}`} alt={t("gamification:games.posterAlt")} />
+      {/* the round in the address: each question's image is its own, never the browser's last one */}
+      <img src={`${base}/image?round=${round}&step=${step}`} alt={t("gamification:games.posterAlt")} />
     </div>
   );
 }
 
-function AudioPrompt({ base, revealed }: { base: string; revealed: boolean }) {
+/** Plays, or says the browser would not (no sound before a tap, on a phone). */
+function play(element: HTMLAudioElement, blocked: () => void) {
+  try {
+    element.play()?.catch(blocked);
+  } catch {
+    blocked();
+  }
+}
+
+/** A theme tune to recognise: a turning record while it plays, a button to pause it or hear it again. */
+function AudioPrompt({ base, round, revealed }: { base: string; round: number; revealed: boolean }) {
   const t = useT();
   const audio = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState(false);
   const [blocked, setBlocked] = useState(false);
   useEffect(() => {
     const element = audio.current;
     if (!element) return;
-    element.play().catch(() => setBlocked(true));
+    play(element, () => setBlocked(true));
   }, []);
   useEffect(() => {
     if (revealed) audio.current?.pause();
   }, [revealed]);
+  const toggle = () => {
+    const element = audio.current;
+    if (!element) return;
+    setBlocked(false);
+    if (element.paused) play(element, () => setBlocked(true));
+    else element.pause();
+  };
+  const again = () => {
+    const element = audio.current;
+    if (!element) return;
+    element.currentTime = 0;
+    setBlocked(false);
+    play(element, () => setBlocked(true));
+  };
   return (
-    <div className="games-audio">
-      <Icon name="music" size={48} />
+    <div className="games-audio" data-playing={playing || undefined}>
+      <span className="games-audio__disc" aria-hidden="true">
+        <Icon name="music" size={28} />
+      </span>
+      <span className="games-audio__bars" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <i />
+        <i />
+      </span>
       {/* biome-ignore lint/a11y/useMediaCaption: a theme tune to guess, no words */}
-      <audio ref={audio} src={`${base}/audio`} preload="auto" controls={blocked} />
-      {blocked ? (
-        <Button
-          variant="secondary"
-          onClick={() => {
-            setBlocked(false);
-            void audio.current?.play();
-          }}
-        >
-          <Icon name="play" size={16} />
-          {t("gamification:games.listen")}
+      <audio
+        ref={audio}
+        src={`${base}/audio?round=${round}`}
+        preload="auto"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => setPlaying(false)}
+      />
+      <div className="games-actions">
+        <Button variant={blocked ? "primary" : "secondary"} onClick={toggle}>
+          <Icon name={playing ? "pause" : "play"} size={16} />
+          {playing ? t("gamification:games.pause") : t("gamification:games.listen")}
         </Button>
-      ) : (
-        <p className="games-muted">{t("gamification:games.listening")}</p>
-      )}
+        <Button variant="ghost" onClick={again}>
+          <Icon name="replay" size={16} />
+          {t("gamification:games.replay")}
+        </Button>
+      </div>
+      <p className="games-muted">
+        {blocked ? t("gamification:games.tapToListen") : t("gamification:games.listening")}
+      </p>
     </div>
   );
 }
@@ -98,12 +146,14 @@ function AudioPrompt({ base, revealed }: { base: string; revealed: boolean }) {
 function Prompt({
   question,
   base,
+  round,
   elapsed,
   seconds,
   revealed,
 }: {
   question: Question;
   base: string;
+  round: number;
   elapsed: number;
   seconds: number;
   revealed: boolean;
@@ -122,9 +172,9 @@ function Prompt({
     <div className="games-prompt">
       <p className="games-ask">{ask}</p>
       {question.image ? (
-        <PosterPrompt base={base} elapsed={elapsed} seconds={seconds} revealed={revealed} />
+        <PosterPrompt base={base} round={round} elapsed={elapsed} seconds={seconds} revealed={revealed} />
       ) : null}
-      {question.audio ? <AudioPrompt base={base} revealed={revealed} /> : null}
+      {question.audio ? <AudioPrompt base={base} round={round} revealed={revealed} /> : null}
       {prompt.people?.length ? (
         <ul className="games-people">
           {prompt.people.map((person) => (
@@ -143,6 +193,8 @@ function Prompt({
     </div>
   );
 }
+
+const LETTERS = "ABCDEFGHI";
 
 function shown(
   value: string | number | null | undefined,
@@ -171,26 +223,26 @@ export function RevealView({
   const poster = metadataImage(reveal.poster, "w185");
   return (
     <div className="games-reveal" data-correct={mine?.correct ? "true" : played ? "false" : undefined}>
-      {played ? (
-        <p className="games-reveal__verdict">
-          <Icon name={mine?.correct ? "check" : "close"} size={20} />
-          {mine?.correct
-            ? t("gamification:games.right", { points: mine.points })
-            : mine
-              ? t("gamification:games.wrong", { points: mine.points })
-              : t("gamification:games.tooLate")}
-        </p>
-      ) : null}
-      {reveal.title ? (
-        <div className="games-reveal__title">
-          {poster ? <img src={poster} alt="" /> : null}
-          <span>
+      {poster ? <img className="games-reveal__poster" src={poster} alt="" /> : null}
+      <div className="games-reveal__text">
+        {played ? (
+          <p className="games-reveal__verdict">
+            <Icon name={mine?.correct ? "check" : "close"} size={20} />
+            {mine?.correct
+              ? t("gamification:games.right", { points: mine.points })
+              : mine
+                ? t("gamification:games.wrong", { points: mine.points })
+                : t("gamification:games.tooLate")}
+          </p>
+        ) : null}
+        {reveal.title ? (
+          <p className="games-reveal__title">
             {reveal.who ? <b>{reveal.who} · </b> : null}
             {reveal.title}
-            {reveal.year ? ` (${reveal.year})` : ""}
-          </span>
-        </div>
-      ) : null}
+            {reveal.year ? <span className="games-muted"> ({reveal.year})</span> : null}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -273,6 +325,7 @@ function Ordering({
 export function QuestionView({
   question,
   base,
+  round = 1,
   started,
   seconds,
   skew,
@@ -288,6 +341,8 @@ export function QuestionView({
 }: {
   question: Question;
   base: string;
+  /** the round's number: its image and its sound are asked for by it, never the browser's last ones */
+  round?: number | undefined;
   started: string | undefined;
   seconds: number;
   skew: number;
@@ -323,10 +378,42 @@ export function QuestionView({
       )
     : undefined;
   const posters = question.choices.some((c) => c.image);
+  // 1, 2, 3, 4 (or A, B, C, D) on a keyboard answer as a tap does
+  useEffect(() => {
+    if (disabled || question.ordered) return undefined;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      const target = event.target;
+      if (target instanceof Element && target.closest("input, textarea, select, [contenteditable]")) return;
+      const key = event.key.toUpperCase();
+      const at = /^[1-9]$/.test(key) ? Number(key) - 1 : LETTERS.indexOf(key);
+      const choice = at >= 0 ? question.choices[at] : undefined;
+      if (!choice) return;
+      event.preventDefault();
+      onAnswer?.({ choice: choice.id });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [disabled, question, onAnswer]);
   return (
-    <section className="games-question" data-screen={screen || undefined} aria-live="polite">
-      {!revealed ? <TimerBar left={left} seconds={seconds} /> : null}
-      <Prompt question={question} base={base} elapsed={elapsed} seconds={seconds} revealed={revealed} />
+    <section
+      className="games-question"
+      data-game={question.game}
+      data-phase={phase}
+      data-screen={screen || undefined}
+      aria-live="polite"
+    >
+      <div className="games-stage">
+        {!revealed ? <TimerBar left={left} seconds={seconds} /> : null}
+        <Prompt
+          question={question}
+          base={base}
+          round={round}
+          elapsed={elapsed}
+          seconds={seconds}
+          revealed={revealed}
+        />
+      </div>
       {question.ordered ? (
         <Ordering
           key={`${base}:${question.choices.map((c) => c.id).join()}`}
@@ -338,7 +425,7 @@ export function QuestionView({
         />
       ) : (
         <div className="games-choices" data-layout={posters ? "posters" : "list"}>
-          {question.choices.map((choice) => {
+          {question.choices.map((choice, at) => {
             const state = revealed
               ? choice.id === answer
                 ? "right"
@@ -357,8 +444,14 @@ export function QuestionView({
                 disabled={disabled}
                 onClick={() => onAnswer?.({ choice: choice.id })}
               >
-                {choice.image ? <img src={metadataImage(choice.image, "w342") ?? ""} alt="" /> : null}
-                <span>{choice.label}</span>
+                {choice.image ? (
+                  <img src={metadataImage(choice.image, "w342") ?? ""} alt="" />
+                ) : (
+                  <span className="games-choice__key" aria-hidden="true">
+                    {LETTERS[at]}
+                  </span>
+                )}
+                <span className="games-choice__label">{choice.label}</span>
                 {values?.[choice.id] ? <b className="games-choice__value">{values[choice.id]}</b> : null}
               </button>
             );
