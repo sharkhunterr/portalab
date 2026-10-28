@@ -680,3 +680,53 @@ async def test_titles_marked_watched_in_bulk_are_no_plays(media: MediaHarness, c
     assert counted["Marked one"] is False and counted["Tautulli's"]
     # no richer source around it (Tautulli not running yet): the lone dated entries keep counting
     assert counted["Watched alone"]
+
+
+async def test_a_card_tells_what_its_title_is(media: MediaHarness) -> None:
+    """#262 — « continue » says beside a poster what the title is: a book its author, rating and pages; an
+    episode the genres and rating of its series."""
+    from sqlalchemy import select as pick
+
+    from portalab.modules.media.providers.insight_widgets import details
+
+    one = media.service(1)
+    media.library(one)
+    await media.module.library.upsert(
+        [
+            library_record(
+                "b1",
+                kind="book",
+                title="Obsession",
+                year=2005,
+                authors=["W. Haden Blackman"],
+                rating=7.9,
+                pages=120,
+            ),
+            library_record(
+                "s1", kind="series", title="Hannibal", year=2013, genres=["Drama", "Crime"], rating=8.3
+            ),
+            library_record("se1", kind="season", title="Season 2", parent="s1", position=2),
+            library_record(
+                "e1", kind="episode", title="Ko No Mono", parent="se1", position=11, duration_s=2600
+            ),
+        ],
+        one,
+    )
+    async with media.database.session() as session:
+        found = (await session.execute(pick(MediaObject.title, MediaObject.id))).all()
+    ids = {title: object_id for title, object_id in found}
+
+    told = await details(media.database, [ids["Obsession"], ids["Ko No Mono"]])
+    book, episode = told[ids["Obsession"]], told[ids["Ko No Mono"]]
+    assert (book["author"], book["rating"], book["pages"], book["year"]) == (
+        "W. Haden Blackman",
+        7.9,
+        120,
+        2005,
+    )
+    assert (episode["genres"], episode["rating"], episode["year"], episode["duration_s"]) == (
+        ["Drama", "Crime"],
+        8.3,
+        2013,
+        2600,
+    )

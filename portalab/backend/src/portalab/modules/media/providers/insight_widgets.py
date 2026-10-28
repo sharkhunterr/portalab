@@ -249,29 +249,76 @@ async def posters(database: Database, object_ids: Iterable[UUID | None]) -> dict
 
 async def details(database: Database, object_ids: Iterable[UUID]) -> dict[UUID, dict[str, Any]]:
     """027: what the cards of a title say of it — its year, genres, overview and rating (the metadata
-    provider's, when it was enriched)."""
+    provider's, when it was enriched, else its library's: a book's). #262: its author (a book's, an
+    audiobook's), its length (``duration_s``, or a book's ``pages``); an episode or a season tells what it
+    does not know of itself — the genres, the rating — from its series."""
     wanted = set(object_ids)
     if not wanted:
         return {}
     async with database.session() as session:
         found = await session.execute(select(MediaObject).where(MediaObject.id.in_(wanted)))
         objects = found.scalars().all()
+        series = await _series_of(session, objects)
+        known = wanted | {s.id for s in series.values()}
         rated = await session.execute(
             select(ObjectMetadata.object_id, ObjectMetadata.data["vote_average"].astext).where(
-                ObjectMetadata.object_id.in_(wanted), ObjectMetadata.status == "found"
+                ObjectMetadata.object_id.in_(known), ObjectMetadata.status == "found"
             )
         )
         ratings: dict[UUID, str | None] = {row[0]: row[1] for row in rated.all()}
+
+    def rating_of(item: MediaObject) -> float | None:
+        for value in (ratings.get(item.id), item.effective.get("rating")):
+            number = _number(value)  # none, or « null »: the next one
+            if number is not None:
+                return round(number, 1)
+        return None
+
     out: dict[UUID, dict[str, Any]] = {}
     for item in objects:
-        rating = ratings.get(item.id)
+        whole = series.get(item.id)
+        genres = item.effective.get("genres") or (whole.effective.get("genres") if whole else None) or []
+        authors = item.effective.get("authors") or []
+        author = authors if isinstance(authors, str) else (authors[0] if authors else None)
         out[item.id] = {
-            "year": item.year,
-            "genres": [str(g) for g in (item.effective.get("genres") or [])][:3],
+            "year": item.year or (whole.year if whole else None),
+            "genres": [str(g) for g in genres][:3],
             "overview": str(item.effective.get("overview") or "")[:400] or None,
-            "rating": round(float(rating), 1) if rating not in (None, "", "null") else None,
+            "rating": rating_of(item) or (rating_of(whole) if whole else None),
+            "author": str(author) if author else None,
+            "duration_s": _number(item.effective.get("duration_s")),
+            "pages": _number(item.effective.get("pages")),
         }
     return out
+
+
+async def _series_of(session: Any, objects: Iterable[MediaObject]) -> dict[UUID, MediaObject]:
+    """#262: the series of each episode (through its season) and of each season."""
+    out: dict[UUID, MediaObject] = {}
+    pending = {o.id: o.parent_id for o in objects if o.kind in ("episode", "season") and o.parent_id}
+    for _ in range(2):  # an episode's season, then the season's series
+        if not pending:
+            break
+        found = await session.execute(select(MediaObject).where(MediaObject.id.in_(set(pending.values()))))
+        parents = {p.id: p for p in found.scalars().all()}
+        following: dict[UUID, UUID] = {}
+        for child, parent_id in pending.items():
+            parent = parents.get(parent_id)
+            if parent is None:
+                continue
+            out[child] = parent
+            if parent.kind == "season" and parent.parent_id:
+                following[child] = parent.parent_id
+        pending = following
+    return out
+
+
+def _number(value: Any) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if number > 0 else None
 
 
 async def with_posters(
