@@ -200,6 +200,20 @@ async def test_titles_to_ask_for_and_search(
     assert [s["status"] for s in got["seasons"]] == ["available", "unknown"] and got["trailer"] == "abc"
     assert (await client.get("/api/v1/media/discover/series/1")).status_code == 404
 
+    # #267: asked for, and in the catalog under its TVDB id only (a series from Sonarr) — still its page
+    body = {"ids": {"tmdb": "1399", "tvdb": "121361"}, "kind": "series", "title": "Game of Thrones"}
+    asked = await client.post("/api/v1/media/requests", json={**body, "idempotency_key": "seerr-d-0002"})
+    assert asked.status_code == 201
+    async with media.database.session() as session, session.begin():
+        page = await session.scalar(
+            select(MediaRequest.object_id).where(MediaRequest.id == UUID(asked.json()["id"]))
+        )
+        await session.execute(
+            text("DELETE FROM media.external_ids WHERE object_id = :o AND scheme = 'tmdb'"), {"o": page}
+        )
+    got = (await client.get("/api/v1/media/discover/series/1399")).json()
+    assert got["object_id"] == str(page) and got["request"] == {"mine": True}
+
     provider = media.module.search.provider("request")
     assert provider is not None
     query = ParsedQuery(text="matrix", normalized="matrix", terms=("matrix",))

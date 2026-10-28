@@ -128,7 +128,23 @@ class RequestableCatalog:
                     MediaObject.status == "active",
                 )
             )
-            for value, kind, object_id, available in rows:
+            # #267: a title the catalog has under other ids only (a series from Sonarr: its TVDB id) is found
+            # through the request made for it, which knows its catalog page
+            linked = await session.execute(
+                select(
+                    MediaRequest.external_ref["ids"]["tmdb"].astext,
+                    MediaObject.kind,
+                    MediaObject.id,
+                    MediaObject.available,
+                )
+                .join(MediaObject, MediaObject.id == MediaRequest.object_id)
+                .where(
+                    MediaRequest.external_ref["ids"]["tmdb"].astext.in_(wanted),
+                    MediaObject.kind.in_(("movie", "series")),
+                    MediaObject.status == "active",
+                )
+            )
+            for value, kind, object_id, available in [*rows, *linked]:
                 current = known.get((value, kind))
                 if current is None or (available and not current[1]):
                     known[(value, kind)] = (object_id, bool(available))
