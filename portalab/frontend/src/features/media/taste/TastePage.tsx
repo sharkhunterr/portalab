@@ -11,6 +11,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useShellPreference } from "../../../shell/preferences";
 import {
   type TasteTrait,
+  useDiscoveries,
   useForgetTaste,
   useRecommendations,
   useTasteList,
@@ -71,6 +72,7 @@ export function TastePage() {
   const client = useQueryClient();
   const [kind, setKind] = useState<(typeof KINDS)[number]>("all");
   const recommended = useRecommendations(kind === "all" ? undefined : kind, 30);
+  const different = useDiscoveries(12);
   const profile = useTasteProfile();
   const forget = useForgetTaste();
   const [useHistory, setUseHistory] = useShellPreference<boolean>("media.taste.useHistory", true);
@@ -116,6 +118,20 @@ export function TastePage() {
           <TasteRail items={recommended.data} label={t("media:taste.forYou")} grid />
         ) : (
           <p className="media-muted">{t("media:taste.nothingYet")}</p>
+        )}
+      </section>
+
+      <section aria-labelledby="taste-different" className="media-row">
+        <header className="media-row__head">
+          <h3 id="taste-different">{t("media:taste.different")}</h3>
+        </header>
+        <p className="media-muted">{t("media:taste.differentPitch")}</p>
+        {different.isPending ? (
+          <Skeleton shape="tile" count={6} label={t("media:taste.different")} />
+        ) : different.data?.length ? (
+          <TasteRail items={different.data} label={t("media:taste.different")} />
+        ) : (
+          <p className="media-muted">{t("media:taste.differentNone")}</p>
         )}
       </section>
 

@@ -17,6 +17,8 @@ const KNOWN = new Set([
   "platform",
   "country",
   "rated",
+  "detour", // off my beaten track: a genre I seldom go to
+  "bridge", // a medium I do not use yet, by a saga or an author I love
 ]);
 
 /**

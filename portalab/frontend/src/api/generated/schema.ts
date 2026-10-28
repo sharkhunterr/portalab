@@ -7517,6 +7517,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/media/taste/discover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Discoveries
+         * @description Off my beaten track, yet maybe for me: well-rated titles of genres I seldom go to, and titles of a
+         *     medium I do not use yet that share a saga, an author or a theme with what I love — none of my
+         *     recommendations.
+         */
+        get: operations["my_discoveries_api_v1_me_media_taste_discover_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/media/taste/lists/{verdict}": {
         parameters: {
             query?: never;
@@ -32946,6 +32968,37 @@ export interface operations {
         };
     };
     my_deck_api_v1_me_media_taste_deck_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TasteCards"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_discoveries_api_v1_me_media_taste_discover_get: {
         parameters: {
             query?: {
                 limit?: number;

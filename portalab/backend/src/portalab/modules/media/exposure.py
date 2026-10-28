@@ -23,6 +23,7 @@ LABELS = (
     # issue 190: my recommendations, the cards to judge, my lists — and saying what I think of a title
     read(f"{A}/me/media/recommendations", "Recommendations for you", "Vos recommandations"),
     read(f"{A}/me/media/taste/deck", "Titles to judge", "Des titres à juger"),
+    read(f"{A}/me/media/taste/discover", "Something different for you", "Pour changer, pour vous"),
     read(
         f"{A}/me/media/taste/lists/{{verdict}}",
         "Your lists (liked, later…)",
