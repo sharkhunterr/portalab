@@ -76,6 +76,7 @@ describe("issue 265 — the games", () => {
       <QuestionView
         question={question}
         base="/api/v1/games/sessions/s1"
+        round={3}
         started={now}
         seconds={20}
         skew={0}
@@ -87,9 +88,61 @@ describe("issue 265 — the games", () => {
       />,
     );
     const image = (await screen.findByAltText("A blurred scene to recognise")) as HTMLImageElement;
-    expect(image.src).toContain("/api/v1/games/sessions/s1/image?step=5"); // sharp once answered
+    // the round in the address (never the browser's last image), sharp once answered
+    expect(image.src).toContain("/api/v1/games/sessions/s1/image?round=3&step=5");
     expect(screen.getByRole("button", { name: "Alien (1979)" }).getAttribute("data-state")).toBe("right");
     expect(screen.getByRole("button", { name: "Heat (1995)" }).getAttribute("data-state")).toBe("wrong");
+  });
+
+  it("asks each question's theme tune by its round — never the first one again", async () => {
+    const question: Question = {
+      game: "blindtest",
+      prompt: { kind: "series" },
+      choices: [
+        { id: "a1", label: "Lost" },
+        { id: "b2", label: "Dexter" },
+      ],
+      ordered: false,
+      image: false,
+      audio: true,
+    };
+    const props = { question, base: "/x", started: now, seconds: 20, skew: 0, phase: "question" as const };
+    const first = show(<QuestionView {...props} round={1} />);
+    await screen.findByText("Which series has this theme?");
+    expect(first.container.querySelector("audio")?.getAttribute("src")).toBe("/x/audio?round=1");
+    cleanup();
+    const second = show(<QuestionView {...props} round={2} />);
+    await screen.findByText("Which series has this theme?");
+    expect(second.container.querySelector("audio")?.getAttribute("src")).toBe("/x/audio?round=2");
+  });
+
+  it("answers with the keyboard: 2 is the second choice", async () => {
+    const onAnswer = vi.fn();
+    const question: Question = {
+      game: "casting",
+      prompt: { kind: "movie", people: [] },
+      choices: [
+        { id: "a1", label: "Alien (1979)" },
+        { id: "b2", label: "Heat (1995)" },
+      ],
+      ordered: false,
+      image: false,
+      audio: false,
+    };
+    show(
+      <QuestionView
+        question={question}
+        base="/x"
+        started={now}
+        seconds={20}
+        skew={0}
+        phase="question"
+        onAnswer={onAnswer}
+      />,
+    );
+    await screen.findByText("Which title do they play in?");
+    fireEvent.keyDown(window, { key: "2" });
+    expect(onAnswer).toHaveBeenCalledWith({ choice: "b2" });
   });
 
   it("puts titles in order, then sends the order", async () => {

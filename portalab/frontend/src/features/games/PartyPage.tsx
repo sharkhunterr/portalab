@@ -7,7 +7,15 @@ import { PageHeader } from "../../design-system/components/PageHeader";
 import { Skeleton } from "../../design-system/components/Placeholders";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
-import { type PartyView, skewOf, useGamesHub, useOpenParty, useParty, usePartyAction } from "./api";
+import {
+  GAME_ICONS,
+  type PartyView,
+  skewOf,
+  useGamesHub,
+  useOpenParty,
+  useParty,
+  usePartyAction,
+} from "./api";
 import { QuestionView, RevealView, useRemaining } from "./QuestionView";
 import "./games.css";
 
@@ -217,10 +225,13 @@ export default function PartyRoom() {
   const link = `${window.location.origin}/games/party/${view.code}?join=1`;
   const round = view.status === "playing";
   return (
-    <div className="games-page games-room" data-screen={screen || undefined}>
+    <div className="games-page games-room" data-game={view.game} data-screen={screen || undefined}>
       <header className="games-room__head">
         <div>
-          <p className="games-muted">{t(`gamification:games.game.${view.game}.name`)}</p>
+          <p className="games-room__game">
+            <Icon name={GAME_ICONS[view.game] ?? "gamepad"} size={16} />
+            {t(`gamification:games.game.${view.game}.name`)}
+          </p>
           <h1
             className="games-room__code"
             aria-label={t("gamification:games.party.codeIs", { code: view.code })}
@@ -300,6 +311,7 @@ export default function PartyRoom() {
               key={view.round}
               question={view.question}
               base={`/api/v1/games/parties/${view.code}`}
+              round={view.round}
               started={view.started}
               seconds={view.settings.seconds}
               skew={skew}
@@ -314,7 +326,7 @@ export default function PartyRoom() {
             />
           ) : null}
           {view.phase === "reveal" && view.reveal ? (
-            <div className="games-after">
+            <div className="games-after" data-correct={view.reveal.mine?.correct ? "true" : "false"}>
               <RevealView
                 reveal={view.reveal.reveal}
                 mine={view.reveal.mine}
