@@ -19,6 +19,9 @@ from portalab.modules.identity.models import Credential
 from portalab.modules.identity.settings import Argon2Params, PasswordPolicy
 
 SCHEME = "argon2id"
+# #276: at most this many Argon2 computations at once (64 MiB each) — a burst of sign-ins queues instead of
+# taking the server's memory
+CONCURRENT_HASHES = 4
 
 
 class PasswordRejected(ValidationFailed):
@@ -52,9 +55,16 @@ class CredentialHasher:
         )
         # verifying against this hash costs the same as a real verification
         self._dummy = self._hasher.hash(secrets.token_urlsafe(24))
+        self._limiter: anyio.CapacityLimiter | None = None
+
+    @property
+    def limiter(self) -> anyio.CapacityLimiter:
+        if self._limiter is None:  # made in the event loop, on first use
+            self._limiter = anyio.CapacityLimiter(CONCURRENT_HASHES)
+        return self._limiter
 
     async def hash(self, password: str) -> str:
-        return await anyio.to_thread.run_sync(self._hasher.hash, password)
+        return await anyio.to_thread.run_sync(self._hasher.hash, password, limiter=self.limiter)
 
     def _verify(self, stored: str, password: str) -> bool:
         try:
@@ -65,9 +75,9 @@ class CredentialHasher:
     async def verify(self, stored: str | None, password: str) -> bool:
         """Constant-work verification; ``stored=None`` (unknown login) always fails after the same work."""
         if stored is None:
-            await anyio.to_thread.run_sync(self._verify, self._dummy, password)
+            await anyio.to_thread.run_sync(self._verify, self._dummy, password, limiter=self.limiter)
             return False
-        return await anyio.to_thread.run_sync(self._verify, stored, password)
+        return await anyio.to_thread.run_sync(self._verify, stored, password, limiter=self.limiter)
 
     def needs_rehash(self, stored: str) -> bool:
         try:

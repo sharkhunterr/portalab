@@ -6,6 +6,7 @@ disclose that the account is unavailable (``auth.account_unavailable``). Failed 
 hashed identifier and the client network prefix, never the raw login.
 """
 
+import asyncio
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Protocol
@@ -97,9 +98,25 @@ class AuthService:
         self.sessions = sessions
         self.throttle = throttle
         self.accounts = accounts
+        self._attempts: dict[
+            str, tuple[asyncio.Lock, list[int]]
+        ] = {}  # #276: one at a time per key (+ waiting)
 
     async def verify_credentials(self, login: str, password: str, *, client_ip: str | None) -> UUID:
-        """Throttled credential check shared by sign-in and re-authentication flows."""
+        """Throttled credential check shared by sign-in and re-authentication flows — the attempts on one key
+        run one after the other (#276: a burst sent at once cannot slip between the check and the count)."""
+        key = throttle_key(login, ip_prefix(client_ip))
+        lock, waiting = self._attempts.setdefault(key, (asyncio.Lock(), [0]))
+        waiting[0] += 1
+        try:
+            async with lock:
+                return await self._verify_credentials(login, password, client_ip=client_ip)
+        finally:
+            waiting[0] -= 1
+            if not waiting[0]:
+                del self._attempts[key]
+
+    async def _verify_credentials(self, login: str, password: str, *, client_ip: str | None) -> UUID:
         prefix = ip_prefix(client_ip)
         key = throttle_key(login, prefix)
         now = self.ctx.now()

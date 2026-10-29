@@ -71,3 +71,29 @@ def test_keys_hide_the_identifier() -> None:
     key = throttle_key("Admin", "192.0.2.0/24")
     assert "admin" not in key and len(key) == 64
     assert key == throttle_key("admin ", "192.0.2.0/24")
+
+
+def test_a_lookalike_login_is_the_same_key() -> None:
+    """#276: the key folds the login like the account is looked up — full-width or mathematical letters
+    reach the same account, so they count as the same attempts."""
+    admin = throttle_key("admin", "192.0.2.0/24")
+    assert throttle_key("\uff41\uff44\uff4d\uff49\uff4e", "192.0.2.0/24") == admin  # full-width
+    assert throttle_key("\U0001d41a" + "dmin", "192.0.2.0/24") == admin  # mathematical bold
+
+
+async def test_a_burst_sent_at_once_is_throttled_like_one_after_the_other(
+    app: FastAPI, client: httpx.AsyncClient
+) -> None:
+    """#276: attempts on one key run one after the other — a burst cannot slip between the check and the
+    count of failures."""
+    import asyncio
+
+    await create_user(module_of(app), "admin")
+    answers = await asyncio.gather(
+        *(
+            client.post("/api/v1/auth/login", json={"login": login_, "password": "bad password!"})
+            for login_ in ["admin", "ADMIN", "\uff41dmin"] * 5
+        )
+    )
+    codes = [a.status_code for a in answers]
+    assert codes.count(401) == FREE_ATTEMPTS and codes.count(429) == len(codes) - FREE_ATTEMPTS
