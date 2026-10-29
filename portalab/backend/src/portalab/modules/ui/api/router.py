@@ -259,7 +259,10 @@ async def site_manifest(module: Module) -> JSONResponse:
     icons = (
         [{"src": identity["icon"], "sizes": "512x512", "type": "image/png", "purpose": "any"}]
         if identity["icon"]
-        else []
+        else [  # Portalab's own (frontend/public, rendered from assets/icon.svg)
+            {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+            {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
+        ]
     )
     return JSONResponse(
         {

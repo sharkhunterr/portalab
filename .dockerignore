@@ -26,3 +26,12 @@ portalab/spec-kit
 portalab/claude
 portalab/.specify
 portalab/.claude
+# release tooling and brand sources (not part of the image)
+assets
+scripts
+package.json
+package-lock.json
+GITHUB_RELEASES.md
+CHANGELOG.md
+README.md
+.gitleaksignore

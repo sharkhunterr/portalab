@@ -108,7 +108,7 @@ export function SiteRoot({ children }: { children: ReactNode }) {
   const site = useSite();
   useEffect(() => {
     document.title = site.name;
-    headLink("icon", site.icon);
+    headLink("icon", site.icon ?? "/favicon.svg"); // the site's own icon, else Portalab's
     headLink("manifest", `/api/v1/auth/site/manifest?v=${site.version}`);
   }, [site.name, site.icon, site.version]);
   // issue 16: the name the « unreachable » page shows
