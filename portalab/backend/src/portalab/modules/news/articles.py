@@ -21,7 +21,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.content.audience import Audience, can_read
-from portalab.capabilities.content.render import RENDERER_VERSION, render_markdown
+from portalab.capabilities.content.render import RENDERER_VERSION, render_markdown_async
 from portalab.capabilities.i18n import normalize_for_search
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.identity_directory import CONTACT
@@ -151,7 +151,7 @@ class ArticleService:
         """``actor=None``: written by the portal itself (an automatic newsletter)."""
         if actor is not None and not await self.allowed(actor, NEWS_CREATE):
             raise Forbidden("You cannot write news.")
-        rendered = render_markdown(data.body_md)
+        rendered = await render_markdown_async(data.body_md)
         audience = Audience.model_validate(
             data.audience or {"mode": self.config().default_audience}
         ).model_dump()
@@ -212,7 +212,7 @@ class ArticleService:
     async def update(
         self, actor: Principal, article_id: UUID, data: ArticleInput, base_version: int | None
     ) -> Article:
-        rendered = render_markdown(data.body_md)
+        rendered = await render_markdown_async(data.body_md)
         now = utc_now(self.clock)
         async with self.database.unit_of_work() as uow:
             session = uow.session
@@ -398,7 +398,7 @@ class ArticleService:
     async def translate(
         self, actor: Principal, article_id: UUID, language: str, title: str, summary: str, body: str
     ) -> Article:
-        rendered = render_markdown(body)
+        rendered = await render_markdown_async(body)
         async with self.database.unit_of_work() as uow:
             row = await self._for_edit(uow.session, article_id, actor)
             if language == row.language:
@@ -549,7 +549,9 @@ class ArticleService:
         if row is None or not await self.readable(row, viewer):
             raise ArticleNotFound("This article does not exist.")
         if row.renderer_version != RENDERER_VERSION:
-            row.rendered_html = render_markdown(row.body_md).html  # derived cache, refreshed lazily
+            row.rendered_html = (
+                await render_markdown_async(row.body_md)
+            ).html  # derived cache, refreshed lazily
         return row
 
     async def translation(self, article: Article, language: str | None) -> ArticleTranslation | None:

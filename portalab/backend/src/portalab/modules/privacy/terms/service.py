@@ -19,7 +19,7 @@ from uuid import UUID
 from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
 
-from portalab.capabilities.content.render import render_markdown
+from portalab.capabilities.content.render import render_markdown_async
 from portalab.capabilities.privacy_participants import ErasureMode, ExportRecord
 from portalab.core.audit_port import AuditRecord, AuditSink
 from portalab.core.authz_port import Principal, ResourceRef
@@ -231,7 +231,7 @@ class TermsService:
         title, body_md = title.strip(), body_md.strip()
         if not title or not body_md:
             raise ValidationFailed("The terms need a title and a text.", code="terms.empty")
-        rendered = render_markdown(body_md)
+        rendered = await render_markdown_async(body_md)
         async with self.database.unit_of_work() as uow:
             await uow.session.execute(select(func.pg_advisory_xact_lock(TERMS_LOCK)))  # one at a time
             last = await uow.session.scalar(select(func.max(TermsVersion.version)))

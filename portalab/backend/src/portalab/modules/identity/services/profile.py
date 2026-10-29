@@ -6,6 +6,7 @@ visibility engine belongs to Privacy (021); until it is wired, :func:`visible_to
 only, ``leaderboard`` fields stay out of profiles and ``private`` never leaves the owner.
 """
 
+import asyncio
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -180,7 +181,8 @@ class ProfileService:
     async def set_avatar(self, principal: Principal, data: bytes) -> None:
         if principal.user_id is None:
             raise UserNotFound()
-        normalized = normalize_avatar(data)  # 422 before anything changes: the old avatar is kept
+        # 422 before anything changes: the old avatar is kept (#274: decoded off the event loop)
+        normalized = await asyncio.to_thread(normalize_avatar, data)
         blob = await self.ctx.blobs.put(AVATAR_NAMESPACE, normalized, content_type=OUTPUT_CONTENT_TYPE)
         await self._replace(principal, blob.key, OUTPUT_CONTENT_TYPE)
 

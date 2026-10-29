@@ -16,11 +16,14 @@ Output is deterministic for a given ``RENDERER_VERSION``.
 
 import html
 import re
+import threading
 import unicodedata
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from functools import partial
 from typing import Any
 
+import anyio
 import nh3
 from markdown_it import MarkdownIt
 from markdown_it.renderer import RendererHTML
@@ -86,6 +89,9 @@ class RenderedContent:
     renderer_version: str = RENDERER_VERSION
 
 
+MAX_OUTLINE = 1000  # #274: a table of contents longer than this helps no one
+
+
 @dataclass
 class _State:
     allow_external_images: bool
@@ -94,6 +100,7 @@ class _State:
     assets: list[str] = field(default_factory=list)
     outline: list[OutlineEntry] = field(default_factory=list)
     anchors: set[str] = field(default_factory=set)
+    suffixes: dict[str, int] = field(default_factory=dict)  # #274: the next number tried for a repeated id
 
 
 def _slug(text: str) -> str:
@@ -190,11 +197,14 @@ class MarkdownRenderer:
         inline = tokens[idx + 1]
         text = self.renderer.renderInlineAsText(inline.children or [], options, env).strip()
         anchor = f"h-{_slug(text)}"
-        base, n = anchor, 2
-        while anchor in state.anchors:
-            anchor, n = f"{base}-{n}", n + 1
+        if anchor in state.anchors:  # #274: numbered from where the last repeat stopped — never from 2 again
+            base, n = anchor, state.suffixes.get(anchor, 2)
+            while (anchor := f"{base}-{n}") in state.anchors:
+                n += 1
+            state.suffixes[base] = n + 1
         state.anchors.add(anchor)
-        state.outline.append(OutlineEntry(int(token.tag[1]), text[:200], anchor))
+        if len(state.outline) < MAX_OUTLINE:
+            state.outline.append(OutlineEntry(int(token.tag[1]), text[:200], anchor))
         return f'<{token.tag} id="{anchor}">'
 
     # --- callouts (token rewrite) -------------------------------------------------------------------------
@@ -295,11 +305,35 @@ class MarkdownRenderer:
         )
 
 
-_default: MarkdownRenderer | None = None
+_local = threading.local()  # #274: one renderer per thread (documents are rendered off the event loop)
 
 
 def render_markdown(source: str, *, allow_external_images: bool = False) -> RenderedContent:
-    global _default
-    if _default is None:
-        _default = MarkdownRenderer()
-    return _default.render(source, allow_external_images=allow_external_images)
+    renderer: MarkdownRenderer | None = getattr(_local, "renderer", None)
+    if renderer is None:
+        renderer = _local.renderer = MarkdownRenderer()
+    return renderer.render(source, allow_external_images=allow_external_images)
+
+
+async def render_markdown_async(source: str, *, allow_external_images: bool = False) -> RenderedContent:
+    """#274: :func:`render_markdown` in a worker thread — a long document takes a second or two, the server
+    answers everyone else meanwhile."""
+    return await anyio.to_thread.run_sync(
+        partial(render_markdown, source, allow_external_images=allow_external_images)
+    )
+
+
+_HEADING = re.compile(r'<h([1-6]) id="(h-[a-z0-9-]+)">(.*?)</h\1>', re.S)
+_TAG = re.compile(r"<[^>]*>")
+
+
+def outline_of(rendered_html: str) -> tuple[OutlineEntry, ...]:
+    """#274: the outline of an already rendered document, read from its headings (linear — a page shown is
+    never rendered again just for its table of contents)."""
+    entries: list[OutlineEntry] = []
+    for match in _HEADING.finditer(rendered_html):
+        text = html.unescape(_TAG.sub("", match.group(3))).strip()
+        entries.append(OutlineEntry(int(match.group(1)), text[:200], match.group(2)))
+        if len(entries) >= MAX_OUTLINE:
+            break
+    return tuple(entries)

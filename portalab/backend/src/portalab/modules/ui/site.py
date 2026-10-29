@@ -216,9 +216,9 @@ class SiteIdentityService:
             )
         try:
             if which == "icon":
-                cleaned, kind = square_icon(data), "image/png"
+                cleaned, kind = await asyncio.to_thread(square_icon, data), "image/png"
             else:
-                cleaned, kind = reencode_image(data, max_side=512)
+                cleaned, kind = await asyncio.to_thread(reencode_image, data, max_side=512)
         except UnsafeUpload as exc:
             raise InvalidSiteIdentity(
                 "The image cannot be read (PNG, JPEG, WebP or GIF).",

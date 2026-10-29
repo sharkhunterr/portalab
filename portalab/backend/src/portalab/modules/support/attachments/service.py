@@ -91,7 +91,9 @@ class AttachmentService:
             raise AttachmentRejected("Too many files on this post.", extensions={"reason": "too_many"})
         allowed = frozenset(config.attachments_allowed_types)
         try:
-            clean = clean_upload(data, filename, allowed=allowed, max_bytes=config.attachments_max_bytes)
+            clean = await asyncio.to_thread(  # #274: decoded off the event loop
+                clean_upload, data, filename, allowed=allowed, max_bytes=config.attachments_max_bytes
+            )
         except UnsafeUpload as exc:
             raise AttachmentRejected(
                 "This file type or size is not accepted.", extensions={"reason": exc.reason}
