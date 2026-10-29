@@ -1,6 +1,7 @@
 """027 — single sign-on (OIDC): start sends to the provider with PKCE; the way back checks the ID token's
-signature, audience and nonce, finds or creates the member (by a linked account, else the same e-mail),
-opens the session, and the state is used once."""
+signature, audience and nonce, finds or creates the member (by a linked account, else the member signed in,
+else the same e-mail — the Admin's only when the provider vouches for it), opens the session, and the state
+is used once, in the browser that started it (#277)."""
 
 import base64
 import hashlib
@@ -16,7 +17,7 @@ from sqlalchemy import select, update
 
 from portalab.modules.identity.models import ExternalIdentity, User
 from portalab.modules.identity.module import IdentityModule
-from portalab.modules.identity.services.oidc import OidcSettings, SignOnFailed, safe_next
+from portalab.modules.identity.services.oidc import OidcSettings, SignOnFailed, browser_binding, safe_next
 from tests.identity_fakes import IdentityHarness
 from tests.integration.identity.helpers import create_user
 
@@ -81,14 +82,27 @@ def ready(module: IdentityModule, provider: Provider, create: bool = True) -> No
     module.oidc.transport = httpx.MockTransport(provider.handle)
 
 
-async def sign_on(module: IdentityModule, provider: Provider, claims: dict[str, Any]) -> tuple[Any, str]:
+async def sign_on(
+    module: IdentityModule,
+    provider: Provider,
+    claims: dict[str, Any],
+    *,
+    token: str | None = None,
+    browser: str | None = "",
+) -> tuple[Any, str]:
     url = urlparse(await module.oidc.start(REDIRECT, "/media"))
     query = parse_qs(url.query)
     assert query["code_challenge_method"] == ["S256"] and query["redirect_uri"] == [REDIRECT]
     provider.nonce = query["nonce"][0]
     provider.claims = claims
     signed, next_path = await module.oidc.finish(
-        "code", query["state"][0], REDIRECT, client_ip="10.0.0.1", user_agent="test", previous_token=None
+        "code",
+        query["state"][0],
+        REDIRECT,
+        client_ip="10.0.0.1",
+        user_agent="test",
+        previous_token=token,
+        browser=browser_binding(query["state"][0]) if browser == "" else browser,
     )
     challenge = base64.urlsafe_b64encode(hashlib.sha256(provider.verifier.encode()).digest()).rstrip(b"=")
     assert query["code_challenge"] == [challenge.decode()]  # the verifier sent matches the challenge
@@ -116,10 +130,14 @@ async def test_same_email_links_the_existing_member(module: IdentityModule) -> N
     user_id = await create_user(module, "grace")
     async with module.ctx.database.unit_of_work() as uow:
         await uow.session.execute(update(User).where(User.id == user_id).values(email="grace@example.org"))
-    signed, _ = await sign_on(module, provider, {"sub": "ak-2", "email": "grace@example.org"})
+    signed, _ = await sign_on(
+        module, provider, {"sub": "ak-2", "email": "grace@example.org", "email_verified": True}
+    )
     assert signed.user_id == user_id
     with pytest.raises(SignOnFailed):  # nobody with this e-mail, and no account creation
-        await sign_on(module, provider, {"sub": "ak-3", "email": "nobody@example.org"})
+        await sign_on(
+            module, provider, {"sub": "ak-3", "email": "nobody@example.org", "email_verified": True}
+        )
 
 
 async def test_a_state_is_used_once_and_a_forged_token_refused(module: IdentityModule) -> None:
@@ -130,7 +148,64 @@ async def test_a_state_is_used_once_and_a_forged_token_refused(module: IdentityM
     provider.nonce = "not the one"  # the ID token carries another nonce
     provider.claims = {"sub": "ak-4"}
     with pytest.raises(SignOnFailed):
-        await module.oidc.finish("c", state, REDIRECT, client_ip=None, user_agent=None, previous_token=None)
+        await module.oidc.finish(
+            "c",
+            state,
+            REDIRECT,
+            client_ip=None,
+            user_agent=None,
+            previous_token=None,
+            browser=browser_binding(state),
+        )
     with pytest.raises(SignOnFailed):  # already used
-        await module.oidc.finish("c", state, REDIRECT, client_ip=None, user_agent=None, previous_token=None)
+        await module.oidc.finish(
+            "c",
+            state,
+            REDIRECT,
+            client_ip=None,
+            user_agent=None,
+            previous_token=None,
+            browser=browser_binding(state),
+        )
     assert safe_next("https://evil.example.org") == "/" and safe_next("//evil") == "/"
+
+
+async def test_an_e_mail_the_provider_disowns_links_nobody(module: IdentityModule) -> None:
+    provider = Provider()
+    ready(module, provider, create=False)
+    user_id = await create_user(module, "hedy")
+    async with module.ctx.database.unit_of_work() as uow:
+        await uow.session.execute(update(User).where(User.id == user_id).values(email="hedy@example.org"))
+    with pytest.raises(SignOnFailed):
+        await sign_on(module, provider, {"sub": "ak-5", "email": "hedy@example.org", "email_verified": False})
+    signed, _ = await sign_on(module, provider, {"sub": "ak-5", "email": "hedy@example.org"})
+    assert signed.user_id == user_id  # left out (Authentik's own users): linked by the server
+
+
+async def test_the_admin_is_found_by_e_mail_only_when_the_provider_vouches(
+    module: IdentityModule, harness: IdentityHarness
+) -> None:
+    """#277: anyone able to set their e-mail at the provider would otherwise become the Admin."""
+    provider = Provider()
+    ready(module, provider, create=False)
+    admin = await create_user(module, "root")
+    harness.authority.admin = admin
+    async with module.ctx.database.unit_of_work() as uow:
+        await uow.session.execute(update(User).where(User.id == admin).values(email="root@example.org"))
+    with pytest.raises(SignOnFailed):
+        await sign_on(module, provider, {"sub": "ak-6", "email": "root@example.org"})
+    signed, _ = await sign_on(
+        module, provider, {"sub": "ak-6", "email": "root@example.org", "email_verified": True}
+    )
+    assert signed.user_id == admin
+    again, _ = await sign_on(module, provider, {"sub": "ak-6"})
+    assert again.user_id == admin
+
+
+async def test_the_way_back_is_refused_in_another_browser(module: IdentityModule) -> None:
+    """#277: a victim sent the attacker's way back (code and state) is not signed in as the attacker."""
+    provider = Provider()
+    ready(module, provider)
+    for browser in (None, "x" * 64, browser_binding("another state")):
+        with pytest.raises(SignOnFailed):
+            await sign_on(module, provider, {"sub": "ak-7"}, browser=browser)

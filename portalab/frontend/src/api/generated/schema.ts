@@ -5083,7 +5083,9 @@ export interface paths {
         };
         /**
          * Oidc Start
-         * @description 027: off to the single sign-on provider (the way back is ``/auth/oidc/callback``).
+         * @description 027: off to the single sign-on provider (the way back is ``/auth/oidc/callback``) — #277: this browser
+         *     keeps a cookie without which the way back is refused. A member signed in connects their provider
+         *     account.
          */
         get: operations["oidc_start_api_v1_auth_oidc_start_get"];
         put?: never;

@@ -29,9 +29,12 @@ from portalab.modules.identity.api.schemas import (
 from portalab.modules.identity.models import Credential, Profile, User
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.identity.services.common import UserNotFound, self_actor
+from portalab.modules.identity.services.oidc import PENDING, browser_binding, state_of
 
 router = APIRouter(prefix="/api/v1", tags=["identity"])
 Module = Annotated[IdentityModule, Depends(identity_module)]
+
+SSO_COOKIE = "__Host-portalab_sso"  # #277: the browser a single sign-on was started in
 
 PROBLEMS: dict[int | str, dict[str, Any]] = {
     401: {"description": "auth.invalid_credentials"},
@@ -85,8 +88,21 @@ async def oidc_status(module: Module) -> SingleSignOn:
 @router.get("/auth/oidc/start", response_class=RedirectResponse, status_code=status.HTTP_302_FOUND)
 @public
 async def oidc_start(request: Request, module: Module, next: str | None = None) -> RedirectResponse:
-    """027: off to the single sign-on provider (the way back is ``/auth/oidc/callback``)."""
-    return RedirectResponse(await module.oidc.start(_callback(request), next), status_code=302)
+    """027: off to the single sign-on provider (the way back is ``/auth/oidc/callback``) — #277: this browser
+    keeps a cookie without which the way back is refused. A member signed in connects their provider
+    account."""
+    url = await module.oidc.start(_callback(request), next)
+    response = RedirectResponse(url, status_code=302)
+    response.set_cookie(
+        SSO_COOKIE,
+        browser_binding(state_of(url)),
+        max_age=int(PENDING.total_seconds()),
+        path="/",
+        secure=True,
+        httponly=True,
+        samesite="lax",  # sent back on the provider's redirect (a top-level navigation)
+    )
+    return response
 
 
 @router.get(
@@ -111,12 +127,16 @@ async def oidc_callback(
             client_ip=client_ip(request),
             user_agent=request.headers.get("user-agent"),
             previous_token=request.cookies.get(SESSION_COOKIE),
+            browser=request.cookies.get(SSO_COOKIE),
         )
     except Exception as exc:
         code_name = getattr(exc, "code", "auth.sso_failed")
         reason = "unavailable" if code_name == "auth.account_unavailable" else "failed"
-        return RedirectResponse(f"/login?sso={reason}", status_code=302)
+        refused = RedirectResponse(f"/login?sso={reason}", status_code=302)
+        refused.delete_cookie(SSO_COOKIE, path="/", secure=True, httponly=True, samesite="lax")
+        return refused
     response = RedirectResponse(next_path, status_code=302)
+    response.delete_cookie(SSO_COOKIE, path="/", secure=True, httponly=True, samesite="lax")
     set_session_cookies(response, signed.issued, module.ctx.config.session_absolute_hours * 3600)
     return response
 
