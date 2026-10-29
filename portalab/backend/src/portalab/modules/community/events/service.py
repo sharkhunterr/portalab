@@ -15,7 +15,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.content import CalendarItem, CalendarSourceResult
-from portalab.capabilities.content.render import render_markdown
+from portalab.capabilities.content.render import render_markdown_async
 from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.user_grants import ROLES_CAPABILITY
@@ -172,7 +172,7 @@ class CommunityEvents:
         event = CommunityEvent(
             title=data.title.strip(),
             description_md=data.description_md,
-            rendered_html=render_markdown(data.description_md).html,
+            rendered_html=(await render_markdown_async(data.description_md)).html,
             starts_at=data.starts_at,
             ends_at=data.ends_at,
             all_day=data.all_day,
@@ -201,7 +201,7 @@ class CommunityEvents:
                 raise Conflict("A cancelled event cannot be edited.", code="community.event_cancelled")
             event.title = data.title.strip()
             event.description_md = data.description_md
-            event.rendered_html = render_markdown(data.description_md).html
+            event.rendered_html = (await render_markdown_async(data.description_md)).html
             event.starts_at, event.ends_at, event.all_day = data.starts_at, data.ends_at, data.all_day
             event.reference_tz = data.reference_tz
             event.audience, event.audience_roles = data.audience, data.audience_roles

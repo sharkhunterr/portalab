@@ -11,6 +11,10 @@ from dataclasses import dataclass
 from PIL import Image, UnidentifiedImageError
 
 IMAGE_TYPES = frozenset({"image/png", "image/jpeg", "image/webp", "image/gif"})
+# #274/#278: only these decoders ever read a member's file, and never past this many pixels (a 10 MB file
+# could otherwise unfold into hundreds of MB)
+IMAGE_FORMATS = ("PNG", "JPEG", "WEBP", "GIF")
+MAX_PIXELS = 40_000_000
 DOCUMENT_TYPES = frozenset({"application/pdf", "text/plain"})
 _MAGIC: tuple[tuple[bytes, int, str], ...] = (
     (b"\x89PNG\r\n\x1a\n", 0, "image/png"),
@@ -59,12 +63,16 @@ def reencode_image(data: bytes, *, max_side: int = 2048) -> tuple[bytes, str]:
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("error", Image.DecompressionBombWarning)
-            with Image.open(io.BytesIO(data)) as probe:
+            with Image.open(io.BytesIO(data), formats=IMAGE_FORMATS) as probe:
+                if probe.width * probe.height > MAX_PIXELS:
+                    raise UnsafeUpload("too_large")
                 probe.verify()
-            with Image.open(io.BytesIO(data)) as image:
+            with Image.open(io.BytesIO(data), formats=IMAGE_FORMATS) as image:
                 image.seek(0)
                 has_alpha = image.mode in ("RGBA", "LA", "P")
                 frame = image.convert("RGBA" if has_alpha else "RGB")
+    except UnsafeUpload:
+        raise
     except (UnidentifiedImageError, OSError, ValueError, SyntaxError, Image.DecompressionBombError) as exc:
         raise UnsafeUpload("undecodable") from exc
     except Image.DecompressionBombWarning as exc:

@@ -11,6 +11,7 @@ import warnings
 from PIL import Image, UnidentifiedImageError
 
 from portalab.core.errors import ValidationFailed
+from portalab.core.uploads import IMAGE_FORMATS, sniff
 
 MAX_BYTES = 2 * 1024 * 1024
 MIN_SIDE = 16
@@ -33,7 +34,7 @@ def normalize_avatar(data: bytes) -> bytes:
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("error", Image.DecompressionBombWarning)
-            with Image.open(io.BytesIO(data)) as probe:
+            with Image.open(io.BytesIO(data), formats=IMAGE_FORMATS) as probe:  # #278: these decoders only
                 image_format = probe.format
                 width, height = probe.size
                 probe.verify()
@@ -44,13 +45,18 @@ def normalize_avatar(data: bytes) -> bytes:
                     f"Images must be between {MIN_SIDE} and {MAX_SIDE} pixels per side.",
                     extensions={"reason": "dimensions"},
                 )
-            with Image.open(io.BytesIO(data)) as image:
+            with Image.open(io.BytesIO(data), formats=IMAGE_FORMATS) as image:
                 image.seek(0)
                 frame = image.convert("RGBA")
     except InvalidAvatar:
         raise
+    except UnidentifiedImageError as exc:  # #278: none of the four decoders reads it — another format?
+        if sniff(data) is not None:  # one of ours (or text), but broken
+            raise InvalidAvatar(
+                "The file is not a readable image.", extensions={"reason": "undecodable"}
+            ) from exc
+        raise InvalidAvatar("Use a PNG, JPEG, WebP or GIF image.", extensions={"reason": "format"}) from exc
     except (
-        UnidentifiedImageError,
         OSError,
         ValueError,
         SyntaxError,

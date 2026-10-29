@@ -217,10 +217,10 @@ async def create_page(principal: Editor, body: WikiPageIn, module: Module) -> Wi
 async def update_page(
     principal: Editor, page_id: UUID, body: WikiPageUpdateIn, module: Module
 ) -> WikiPageOut:
-    from portalab.capabilities.content.render import render_markdown
+    from portalab.capabilities.content.render import render_markdown_async
 
     view = await module.pages.update(principal, page_id, body.base_version, _input(body))
-    return _out(view, warnings=list(render_markdown(body.body_md).warnings))
+    return _out(view, warnings=list((await render_markdown_async(body.body_md)).warnings))
 
 
 @router.post("/wiki/pages/{page_id}/move", response_model=WikiPageOut)

@@ -7,7 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 
-from portalab.capabilities.content.render import render_markdown
+from portalab.capabilities.content.render import render_markdown_async
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import Unavailable
@@ -124,7 +124,9 @@ async def resolve(
 
 @router.post("/content/render", response_model=ContentRenderOut)
 async def preview(principal: User, body: ContentRenderIn, module: Module) -> ContentRenderOut:
-    rendered = render_markdown(body.markdown, allow_external_images=module.config.allow_external_images)
+    rendered = await render_markdown_async(
+        body.markdown, allow_external_images=module.config.allow_external_images
+    )
     return ContentRenderOut(
         html=rendered.html,
         outline=[ContentOutlineOut(level=o.level, text=o.text, anchor=o.anchor) for o in rendered.outline],

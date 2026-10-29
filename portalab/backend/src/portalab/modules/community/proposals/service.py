@@ -13,7 +13,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from portalab.capabilities.content.render import RENDERER_VERSION, render_markdown
+from portalab.capabilities.content.render import RENDERER_VERSION, render_markdown_async
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.marketplace import LIFECYCLE
 from portalab.capabilities.registry import CapabilityRegistry
@@ -130,7 +130,7 @@ class Proposals:
                 return existing
         now = utc_now(self.clock)
         moderated = bool(self.config().proposals_moderation)
-        rendered = render_markdown(body)
+        rendered = await render_markdown_async(body)
         proposal = Proposal(
             kind=kind,
             provenance_ref=provenance,
@@ -263,7 +263,7 @@ class Proposals:
                 )
             if not title.strip() or len(title) > 200 or len(body) > 20_000:
                 raise ValidationFailed("A proposal needs a title.", code="community.invalid_proposal")
-            rendered = render_markdown(body)
+            rendered = await render_markdown_async(body)
             proposal.title, proposal.body_md = title.strip(), body
             proposal.rendered_html, proposal.renderer_version = rendered.html, RENDERER_VERSION
             proposal.tags, proposal.updated_at = clean_tags(tags), utc_now(self.clock)

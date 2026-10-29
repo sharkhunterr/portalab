@@ -4,6 +4,7 @@ owning object; an asset is readable only by viewers who may read that owner (res
 ``LinkResolver``) — or by its uploader. Link resolution is batched per viewer and never leaks a title for
 a forbidden target."""
 
+import asyncio
 import hashlib
 from collections import defaultdict
 from collections.abc import Sequence
@@ -101,7 +102,9 @@ class ContentService:
         if state.state not in ("ok", "archived"):
             raise Forbidden("You cannot add files to this content.")
         try:
-            clean = clean_upload(data, filename, allowed=IMAGE_TYPES, max_bytes=MAX_BYTES)
+            clean = await asyncio.to_thread(  # #274: decoded off the event loop
+                clean_upload, data, filename, allowed=IMAGE_TYPES, max_bytes=MAX_BYTES
+            )
         except UnsafeUpload as exc:
             raise UnsafeAsset(
                 "This file is not an accepted image.", extensions={"reason": exc.reason}

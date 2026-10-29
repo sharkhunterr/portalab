@@ -21,7 +21,7 @@ from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.content.audience import Audience, can_read
-from portalab.capabilities.content.render import RENDERER_VERSION, render_markdown
+from portalab.capabilities.content.render import RENDERER_VERSION, outline_of, render_markdown_async
 from portalab.capabilities.i18n import normalize_for_search
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Authorizer, Principal
@@ -169,12 +169,12 @@ class PageService:
         )
 
     # --- writes ------------------------------------------------------------------------------------------
-    def _render(self, body: str) -> Any:
+    async def _render(self, body: str) -> Any:
         config: WikiConfig = self.config()
         if len(body.encode()) > config.max_page_bytes:
             raise UnsafeMarkdown("This page is too large.", extensions={"max_bytes": config.max_page_bytes})
         try:
-            return render_markdown(body)
+            return await render_markdown_async(body)
         except Exception as exc:  # renderer failure: the save is refused, the source is kept by the client
             raise UnsafeMarkdown("This content could not be rendered safely.") from exc
 
@@ -219,7 +219,7 @@ class PageService:
         if publish and not await self.allowed(actor, WIKI_PUBLISH):
             raise Forbidden("You cannot publish wiki pages.")
         audience = Audience.model_validate(data.audience or {}).model_dump()
-        rendered = self._render(data.body_md)
+        rendered = await self._render(data.body_md)
         now = utc_now(self.clock)
         if data.slug is not None and not _SLUG.match(data.slug):
             raise ValidationFailed("Use lowercase letters, digits and dashes.", code="wiki.invalid_slug")
@@ -292,7 +292,7 @@ class PageService:
         return page
 
     async def update(self, actor: Principal, page_id: UUID, base_version: int, data: PageInput) -> PageView:
-        rendered = self._render(data.body_md)
+        rendered = await self._render(data.body_md)
         audience = Audience.model_validate(data.audience or {}).model_dump()
         now = utc_now(self.clock)
         async with self.database.unit_of_work() as uow:
@@ -338,7 +338,7 @@ class PageService:
             old = await session.get(Revision, (page.id, version))
             if old is None:
                 raise PageNotFound("This version does not exist.")
-            rendered = self._render(old.body_md)
+            rendered = await self._render(old.body_md)
             page.current_version += 1
             page.title, page.updated_at = old.title, now
             page.search_vector = self._vector(old.title, rendered.text)
@@ -403,7 +403,7 @@ class PageService:
         *,
         machine: bool = False,
     ) -> PageView:
-        rendered = self._render(body_md)
+        rendered = await self._render(body_md)
         async with self.database.unit_of_work() as uow:
             session = uow.session
             page = await self._editable(session, page_id, actor)
@@ -464,7 +464,9 @@ class PageService:
         assert revision is not None
         html, title, body = revision.rendered_html, page.title, revision.body_md
         if revision.renderer_version != RENDERER_VERSION:
-            html = render_markdown(body).html  # lazy re-render after a renderer upgrade (cache is derived)
+            html = (
+                await render_markdown_async(body)
+            ).html  # lazy re-render after a renderer upgrade (cache is derived)
         is_translation = False
         if translation is not None and translation.state == "translated":
             html, title, body, is_translation = (
@@ -473,9 +475,8 @@ class PageService:
                 translation.body_md,
                 True,
             )
-        outline = [
-            {"level": o.level, "text": o.text, "anchor": o.anchor} for o in render_markdown(body).outline
-        ]
+        # #274: read from the page as rendered, never rendered again just for its table of contents
+        outline = [{"level": o.level, "text": o.text, "anchor": o.anchor} for o in outline_of(html)]
         return PageView(
             id=page.id,
             slug=page.slug,
