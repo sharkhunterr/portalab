@@ -23,7 +23,7 @@ export function AuthGate({
   location = globalThis.location,
 }: {
   children: (me: Me) => ReactNode;
-  location?: Pick<Location, "pathname" | "search">;
+  location?: Pick<Location, "pathname" | "search"> & { hash?: string };
 }) {
   const t = useAuthStrings();
   const me = useMe();
@@ -39,7 +39,7 @@ export function AuthGate({
   if (location?.pathname === "/resetting") return <Resetting />; // issue 247: the session goes with the data
   if (held || (anonymous && arrival.data)) return <ArrivalWizard />;
   if (location?.pathname === "/verify") {
-    const token = new URLSearchParams(location.search).get("token") ?? "";
+    const token = verifyToken(location);
     return (
       <AuthLayout {...layout}>
         <VerifyForm initialToken={token} />
@@ -60,6 +60,16 @@ export function AuthGate({
       </AuthLayout>
     );
   return <>{children(me.data)}</>;
+}
+
+/** issue 280: the token of a single-purpose link — after « # », which the browser never sends (older links: in
+the query). The form takes it out of the address bar once it holds it. */
+function verifyToken(location: Pick<Location, "search"> & { hash?: string }): string {
+  return (
+    new URLSearchParams((location.hash ?? "").slice(1)).get("token") ??
+    new URLSearchParams(location.search).get("token") ??
+    ""
+  );
 }
 
 /** Whether the portal still waits for its first administrator (asked only by a visitor without a session). */

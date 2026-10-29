@@ -11,6 +11,7 @@ import pytest
 from portalab.capabilities.media import RADIO, SPECS, RadioRequest, RadioState, StreamBody
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.connectors.subwave import SubwaveConnector, map_request, map_track
+from portalab.core.errors import NotFound
 from portalab.modules.media.radio import RadioAskedTooSoon, RadioService
 
 
@@ -82,7 +83,10 @@ async def test_the_radio_service() -> None:
     assert station.asked == [("something calm", "anon")]  # no directory: credited « anon »
     with pytest.raises(RadioAskedTooSoon):
         await service.ask(member, "again")
-    assert (await service.ask(uuid4(), "another member"))["id"] == "r1"
-    assert (await service.request_status("r1"))["status"] == "queued"
+    someone = uuid4()
+    assert (await service.ask(someone, "another member"))["id"] == "r1"
+    assert (await service.request_status("r1", someone))["status"] == "queued"
+    with pytest.raises(NotFound):  # #280: a member follows only their own requests
+        await service.request_status("r1", member)
     async with service.listen() as body:
         assert [chunk async for chunk in body.chunks] == [b"ID3"]

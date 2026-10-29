@@ -62,7 +62,20 @@ describe("visual packs — sandbox files", () => {
   it("serves the sandbox only files inside its own element", () => {
     expect(safeAssetPath("font.woff2")).toBe("font.woff2");
     expect(safeAssetPath("./img/a.png")).toBe("img/a.png");
-    for (const path of ["../pack.json", "/etc/passwd", "a/../../b", "https://example.org/x", "a\\b", "", 3]) {
+    // issue 279: escapes too — « %2e%2e » is « .. » once the browser reads the address
+    for (const path of [
+      "../pack.json",
+      "/etc/passwd",
+      "a/../../b",
+      "https://example.org/x",
+      "a\\b",
+      "",
+      3,
+      "%2e%2e/%2e%2e/me",
+      "nav/%2E%2e/x",
+      "a%2fb",
+      "%5c",
+    ]) {
       expect(safeAssetPath(path)).toBeNull();
     }
   });

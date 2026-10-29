@@ -31,7 +31,7 @@ from portalab.capabilities.media import (
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
-from portalab.core.errors import PortalError, Unavailable
+from portalab.core.errors import NotFound, PortalError, Unavailable
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.ids import new_id
 from portalab.core.time import Clock, utc_now
@@ -46,6 +46,9 @@ ASK_EVERY = 20
 # and its minutes count then (like a film's)
 HEARD_EVERY = 60
 IDLE = timedelta(minutes=10)
+
+
+MAX_FOLLOWED = 5000  # the requests whose owner is kept, the oldest forgotten first
 
 
 class RadioUnavailable(Unavailable):
@@ -98,6 +101,7 @@ class RadioService:
         self.clock = clock
         self.events = events
         self._asked: dict[UUID, float] = {}
+        self._requests: dict[str, UUID] = {}  # #280: whose request each one is (the last ones asked)
 
     # --- issue 184: free requests each day, then credits -----------------------------------------------
     def _today(self) -> datetime:
@@ -259,6 +263,9 @@ class RadioService:
             await self._refund(user)  # refused by the station: it does not count
         else:
             await self._publish(user, "media.radio_requested", {"request": str(answer.id)}, str(answer.id))
+            self._requests[str(answer.id)] = user
+            while len(self._requests) > MAX_FOLLOWED:
+                del self._requests[next(iter(self._requests))]
         return {**request_out(answer), "allowance": await self.allowance(user)}
 
     # --- issue 227: listening, counted by the server -------------------------------------------------------
@@ -342,7 +349,10 @@ class RadioService:
         except Exception:  # the radio plays on whatever happens to its rewards
             log.warning("radio event not published", exc_info=True)
 
-    async def request_status(self, request_id: str) -> dict[str, Any]:
+    async def request_status(self, request_id: str, user: UUID | None = None) -> dict[str, Any]:
+        """Where a request stands — #280: a member follows only their own."""
+        if user is not None and self._requests.get(request_id) != user:
+            raise NotFound("No such request.")
         try:
             return request_out(unwrap(await self._station().request_status(request_id)))
         except RadioUnavailable:

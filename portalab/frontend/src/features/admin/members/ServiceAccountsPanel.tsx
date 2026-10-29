@@ -84,7 +84,7 @@ function CreatedMembers({ created }: { created: CreatedMember[] }) {
                 readOnly
                 className="accounts-created__link"
                 aria-label={`${t("admin:accounts.created.link")} — ${accountLabel(c.account)}`}
-                value={`${origin}/verify?token=${c.token}`}
+                value={`${origin}/verify#token=${c.token}`}
                 onFocus={(e) => e.currentTarget.select()}
               />
             ) : null}

@@ -5,6 +5,7 @@ Mutations accept ``If-Match: <version>``."""
 
 from datetime import datetime
 from typing import Annotated, Any, Literal
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Query, Request, Response, status
@@ -283,6 +284,13 @@ async def my_tickets(principal: User, module: Module) -> list[TicketCard]:
     return [card(t) for t in await module.tickets.mine(user)]
 
 
+def content_disposition(disposition: str, filename: str) -> str:
+    """#280: any name in any script — an ASCII fallback plus the exact name (RFC 6266); a name the header
+    cannot carry as is no longer breaks the download."""
+    fallback = "".join(c if 32 <= ord(c) < 127 and c not in '"\\' else "_" for c in filename) or "file"
+    return f"{disposition}; filename=\"{fallback}\"; filename*=UTF-8''{quote(filename, safe='')}"
+
+
 @router.get("/tickets/attachments/{attachment_id}")
 async def attachment(principal: User, attachment_id: UUID, module: Module) -> Response:
     file = await module.attachments.read(principal, attachment_id)
@@ -291,7 +299,7 @@ async def attachment(principal: User, attachment_id: UUID, module: Module) -> Re
         content=file.data,
         media_type=file.content_type,
         headers={
-            "Content-Disposition": f'{disposition}; filename="{file.filename}"',
+            "Content-Disposition": content_disposition(disposition, file.filename),
             "X-Content-Type-Options": "nosniff",
             "Content-Security-Policy": "default-src 'none'; sandbox",
             "Cache-Control": "private, no-store",

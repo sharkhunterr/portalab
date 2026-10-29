@@ -84,7 +84,7 @@ async def ask_radio(principal: Listener, body: RadioAskIn, module: Module) -> di
 async def radio_request(
     principal: Listener, module: Module, request_id: Annotated[str, Path(pattern=r"^[A-Za-z0-9_.:-]{1,80}$")]
 ) -> dict[str, Any]:
-    return await module.radio.request_status(request_id)
+    return await module.radio.request_status(request_id, _me(principal))
 
 
 @router.get("/media/radio/stream", include_in_schema=False)
