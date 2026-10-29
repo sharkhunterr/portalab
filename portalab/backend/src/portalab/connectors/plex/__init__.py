@@ -44,7 +44,7 @@ from portalab.capabilities.media import (
     resolution_of,
 )
 from portalab.capabilities.results import InvalidPayload, ProviderNotFound
-from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_time, safe_id
+from portalab.connectors.http_base import HttpConnector, _Probe, binding, image_key, parse_time, safe_id
 
 PAGE = 200
 # Plex metadata type numbers per section type, and the Media kind each becomes.
@@ -68,6 +68,15 @@ def _container(document: Any) -> Mapping[str, Any]:
         raise InvalidPayload("not a Plex MediaContainer")
     container: Mapping[str, Any] = document["MediaContainer"]
     return container
+
+
+def _image_ref(key: str, thumb: Any) -> str | None:
+    """#272: the poster's reference carries its version (``/library/metadata/<key>/thumb/<version>``), so a
+    poster changed on Plex is fetched again; the item's key alone never changed."""
+    if not thumb:
+        return None
+    version = str(thumb).rstrip("/").rsplit("/", 1)[-1]
+    return f"{key}:{version}" if version.isdigit() else key
 
 
 def _ids(item: Mapping[str, Any]) -> dict[str, str]:
@@ -187,7 +196,7 @@ class PlexConnector(HttpConnector):
                                 :10
                             ],
                             "duration_s": _seconds(item.get("duration")),
-                            "image": key if item.get("thumb") else None,
+                            "image": _image_ref(key, item.get("thumb")),
                             # 027: release (or air) date, for « Recent releases »
                             "released": _day(item.get("originallyAvailableAt")),
                             "resolution": resolution_of(_media(item).get("videoResolution")),
@@ -231,7 +240,7 @@ class _Library:
         self.connector, self.service = connector, service
 
     async def fetch_image(self, ref: str) -> bytes:
-        return await self.connector.get_bytes(self.service, f"/library/metadata/{safe_id(ref)}/thumb")
+        return await self.connector.get_bytes(self.service, f"/library/metadata/{image_key(ref)}/thumb")
 
 
 class _Themes:

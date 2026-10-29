@@ -240,12 +240,17 @@ class ImageService:
     async def run(self, payload: dict[str, object]) -> None:
         await self.fetch(UUID(str(payload["object"])))
 
-    async def content(self, image_id: UUID) -> bytes:
+    async def content(self, image_id: UUID, known: str | None = None) -> tuple[str, bytes | None]:
+        """The image and its tag (its content); no bytes when the browser already holds that one — #272: a
+        poster fetched again keeps its address, the tag tells it apart."""
         async with self.database.session() as session:
             row = await session.get(Image, image_id)
         if row is None or self.blobs is None:
             raise MediaNotFound("This image does not exist.")
-        return await self.blobs.get(row.blob_key)
+        tag = f'"{row.content_hash[:32]}"'
+        if known == tag:
+            return tag, None
+        return tag, await self.blobs.get(row.blob_key)
 
     async def for_object(self, session: AsyncSession, object_id: UUID) -> UUID | None:
         return (

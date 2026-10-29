@@ -412,13 +412,13 @@ async def _leaving_shelf(module: MediaModule) -> MediaShelf:
 
 
 @router.get("/media/images/{image_id}")
-async def image(_: Reader, image_id: UUID, module: Module) -> Response:
-    data = await module.images.content(image_id)
-    return Response(
-        content=data,
-        media_type=CONTENT_TYPE,
-        headers={"Cache-Control": "private, max-age=86400", "X-Content-Type-Options": "nosniff"},
-    )
+async def image(_: Reader, image_id: UUID, module: Module, request: Request) -> Response:
+    tag, data = await module.images.content(image_id, request.headers.get("if-none-match"))
+    # #272: kept an hour, then asked again by its tag — a poster changed at the source shows within the hour
+    headers = {"Cache-Control": "private, max-age=3600", "ETag": tag, "X-Content-Type-Options": "nosniff"}
+    if data is None:
+        return Response(status_code=status.HTTP_304_NOT_MODIFIED, headers=headers)
+    return Response(content=data, media_type=CONTENT_TYPE, headers=headers)
 
 
 async def _quota(module: MediaModule, user: UUID) -> dict[str, Any]:
