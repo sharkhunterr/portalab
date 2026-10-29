@@ -59,6 +59,11 @@ class Shared:
     async def today(self, at: datetime) -> date:
         return at.astimezone(await self.zone()).date()
 
+    async def day_start(self, at: datetime) -> datetime:
+        """When the day of ``at`` started, in the economy's time zone (a UTC instant)."""
+        zone = await self.zone()
+        return datetime.combine(at.astimezone(zone).date(), datetime.min.time(), zone)
+
     async def week(self, at: datetime) -> tuple[date, datetime, datetime]:
         """The week's Monday, and when it starts and ends (UTC instants)."""
         zone = await self.zone()

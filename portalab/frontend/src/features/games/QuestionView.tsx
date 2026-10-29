@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
@@ -247,71 +247,211 @@ export function RevealView({
   );
 }
 
-/** Titles to put in order: tapped one after the other, then sent. */
+interface Drag {
+  id: string;
+  from: number;
+  to: number;
+  dy: number;
+  step: number;
+}
+
+/**
+ * Issue 269: titles to put in order on a timeline, the oldest at the top — dragged into place (a mouse, a
+ * finger) or moved a place up or down by their arrows; sent with « Send », or as they are when the time runs
+ * out. Once answered, the right timeline with each title's year, and where I had put those out of place.
+ */
 function Ordering({
   question,
   onAnswer,
+  onArrange,
   disabled,
   answer,
+  given,
   values,
 }: {
   question: Question;
   onAnswer?: ((order: string[]) => void) | undefined;
+  /** the order as it stands, and whether the member moved anything (what the time running out sends) */
+  onArrange?: ((order: string[], touched: boolean) => void) | undefined;
   disabled: boolean;
   answer?: string[] | undefined;
+  given?: string[] | undefined;
   values?: Record<string, string | number | null> | undefined;
 }) {
   const t = useT();
-  const [order, setOrder] = useState<string[]>([]);
-  const shown = answer ?? order;
-  const rest = question.choices.filter((c) => !shown.includes(c.id));
+  const [order, setOrder] = useState<string[]>(() => question.choices.map((c) => c.id));
+  const [drag, setDrag] = useState<Drag | null>(null);
+  const [said, setSaid] = useState("");
+  const touched = useRef(false);
+  const start = useRef<{ y: number; centers: number[] }>({ y: 0, centers: [] });
+  const nodes = useRef(new Map<string, HTMLLIElement>());
+  const tops = useRef(new Map<string, number>());
   const byId = Object.fromEntries(question.choices.map((c) => [c.id, c]));
+  const mine = given?.length ? given : touched.current ? order : undefined;
+  const shown = answer ?? order;
+  const fixed = Boolean(answer) || disabled;
+
+  // a title that changed place glides to it (its arrows, a drop, the right timeline once answered): from
+  // where it was seen — its place in the list, and how far a drag had moved it — to its new place; only when
+  // the order changed (the time's ticks and an image loading move nothing)
+  const seen = useRef("");
+  const shifts = useRef(new Map<string, number>());
+  useLayoutEffect(() => {
+    const key = shown.join();
+    const changed = key !== seen.current;
+    seen.current = key;
+    const still = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    for (const [id, node] of nodes.current) {
+      const top = node.offsetTop;
+      const before = tops.current.get(id);
+      tops.current.set(id, top + (shifts.current.get(id) ?? 0));
+      if (!changed || drag || still || before == null || Math.abs(before - top) < 1 || !node.animate)
+        continue;
+      node.animate([{ transform: `translateY(${before - top}px)` }, { transform: "none" }], {
+        duration: 240,
+        easing: "cubic-bezier(.2,.8,.2,1)",
+      });
+    }
+  });
+
+  const move = (from: number, to: number) => {
+    if (from === to || to < 0 || to >= order.length) return;
+    const next = [...order];
+    const [id] = next.splice(from, 1);
+    if (!id) return;
+    next.splice(to, 0, id);
+    touched.current = true;
+    setOrder(next);
+    onArrange?.(next, true);
+    setSaid(t("gamification:games.order.moved", { title: byId[id]?.label ?? "", place: to + 1 }));
+  };
+
+  const grab = (event: React.PointerEvent<HTMLLIElement>, id: string, at: number) => {
+    if (fixed || event.button !== 0) return;
+    if (event.target instanceof Element && event.target.closest("button")) return;
+    const boxes = order.map((key) => nodes.current.get(key)?.getBoundingClientRect());
+    const box = boxes[at];
+    if (!box) return;
+    const after = boxes[at + 1] ?? boxes[at - 1];
+    const gap = after ? Math.abs((boxes[at + 1] ? after.top - box.bottom : box.top - after.bottom) || 0) : 0;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    start.current = { y: event.clientY, centers: boxes.map((b) => (b ? b.top + b.height / 2 : 0)) };
+    setDrag({ id, from: at, to: at, dy: 0, step: box.height + gap });
+  };
+  const follow = (event: React.PointerEvent<HTMLLIElement>) => {
+    if (!drag) return;
+    const dy = event.clientY - start.current.y;
+    const center = (start.current.centers[drag.from] ?? 0) + dy;
+    const to = start.current.centers.filter((c, i) => i !== drag.from && c < center).length;
+    setDrag({ ...drag, dy, to });
+  };
+  const drop = () => {
+    if (!drag) return;
+    setDrag(null);
+    move(drag.from, drag.to);
+  };
+  const shift = (at: number): number => {
+    if (!drag) return 0;
+    if (at === drag.from) return drag.dy;
+    if (drag.from < drag.to && at > drag.from && at <= drag.to) return -drag.step;
+    if (drag.to < drag.from && at >= drag.to && at < drag.from) return drag.step;
+    return 0;
+  };
+  /** where a title would land, were the one dragged dropped now */
+  const landing = (at: number): number => {
+    if (!drag) return at;
+    if (at === drag.from) return drag.to;
+    const by = shift(at);
+    return by > 0 ? at + 1 : by < 0 ? at - 1 : at;
+  };
+  shifts.current = new Map(shown.map((id, at) => [id, shift(at)]));
+
   return (
-    <div className="games-order">
-      <ol className="games-order__picked">
-        {shown.map((id, at) => (
-          <li
-            key={id}
-            data-right={answer && order.length ? (order[at] === id ? "true" : "false") : undefined}
-          >
-            <span className="games-order__rank">{at + 1}</span>
-            {byId[id]?.image ? <img src={metadataImage(byId[id]?.image, "w92") ?? ""} alt="" /> : null}
-            <span>{byId[id]?.label}</span>
-            {values?.[id] != null ? <b>{values[id]}</b> : null}
-          </li>
-        ))}
-      </ol>
-      {!answer ? (
-        <>
-          <div className="games-choices" data-layout="posters">
-            {rest.map((choice) => (
-              <button
-                key={choice.id}
-                type="button"
-                className="games-choice"
-                disabled={disabled}
-                onClick={() => setOrder([...order, choice.id])}
-              >
-                {choice.image ? <img src={metadataImage(choice.image, "w185") ?? ""} alt="" /> : null}
-                <span>{choice.label}</span>
-              </button>
-            ))}
-          </div>
-          <div className="games-actions">
-            <Button
-              variant="ghost"
-              disabled={disabled || !order.length}
-              onClick={() => setOrder(order.slice(0, -1))}
+    <div className="games-order" data-dragging={drag ? "true" : undefined} data-fixed={fixed || undefined}>
+      <p className="games-order__end">
+        <Icon name="arrow-up" size={14} />
+        {t("gamification:games.order.older")}
+      </p>
+      <ol className="games-order__line">
+        {shown.map((id, at) => {
+          const choice = byId[id];
+          const place = mine ? mine.indexOf(id) : -1;
+          const right = answer && mine ? place === at : undefined;
+          return (
+            <li
+              key={id}
+              className="games-order__item"
+              ref={(node) => {
+                if (node) nodes.current.set(id, node);
+                else nodes.current.delete(id);
+              }}
+              data-right={right === undefined ? undefined : String(right)}
+              data-lifted={drag?.id === id || undefined}
+              style={{ "--shift": `${shift(at)}px` } as CSSProperties}
+              onPointerDown={(event) => grab(event, id, at)}
+              onPointerMove={follow}
+              onPointerUp={drop}
+              onPointerCancel={drop}
             >
-              <Icon name="undo" size={16} />
-              {t("gamification:games.undo")}
-            </Button>
-            <Button disabled={disabled || rest.length > 0} onClick={() => onAnswer?.(order)}>
-              <Icon name="check" size={16} />
-              {t("gamification:games.send")}
-            </Button>
-          </div>
-        </>
+              <span className="games-order__rank" aria-hidden="true">
+                {right === undefined ? landing(at) + 1 : <Icon name={right ? "check" : "close"} size={14} />}
+              </span>
+              <span className="games-order__card">
+                {choice?.image ? (
+                  <img src={metadataImage(choice.image, "w92") ?? ""} alt="" draggable={false} />
+                ) : null}
+                <span className="games-order__title">
+                  <span>{choice?.label}</span>
+                  {right === false && place >= 0 ? (
+                    <small>{t("gamification:games.order.was", { place: place + 1 })}</small>
+                  ) : null}
+                </span>
+                {values?.[id] != null ? <b className="games-order__year">{values[id]}</b> : null}
+                {!fixed ? (
+                  <span className="games-order__moves">
+                    <button
+                      type="button"
+                      disabled={at === 0}
+                      aria-label={t("gamification:games.order.up", { title: choice?.label ?? "" })}
+                      onClick={() => move(at, at - 1)}
+                    >
+                      <Icon name="chevron-up" size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={at === shown.length - 1}
+                      aria-label={t("gamification:games.order.down", { title: choice?.label ?? "" })}
+                      onClick={() => move(at, at + 1)}
+                    >
+                      <Icon name="chevron-down" size={16} />
+                    </button>
+                  </span>
+                ) : null}
+                {!fixed ? (
+                  <span className="games-order__grip" aria-hidden="true">
+                    <Icon name="grip" size={18} />
+                  </span>
+                ) : null}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+      <p className="games-order__end">
+        <Icon name="arrow-down" size={14} />
+        {t("gamification:games.order.newer")}
+      </p>
+      <p className="games-sr" aria-live="polite">
+        {said}
+      </p>
+      {!answer && onAnswer ? (
+        <div className="games-actions">
+          <p className="games-muted">{t("gamification:games.order.drag")}</p>
+          <Button disabled={disabled} onClick={() => onAnswer(order)}>
+            <Icon name="check" size={16} />
+            {t("gamification:games.send")}
+          </Button>
+        </div>
       ) : null}
     </div>
   );
@@ -363,11 +503,17 @@ export function QuestionView({
   const answered = given != null;
   const disabled = busy || answered || revealed || !onAnswer || left <= 0;
   const timedOut = useRef(false);
+  const arranged = useRef<string[] | null>(null); // a timeline put in order, not sent yet
   useEffect(() => {
-    if (left > 0 || answered || revealed || timedOut.current || !onTimeout) return;
-    timedOut.current = true;
-    onTimeout();
-  }, [left, answered, revealed, onTimeout]);
+    if (left > 0 || answered || revealed || timedOut.current) return;
+    if (arranged.current && onAnswer && !busy) {
+      timedOut.current = true;
+      onAnswer({ order: arranged.current });
+    } else if (onTimeout) {
+      timedOut.current = true;
+      onTimeout();
+    }
+  }, [left, answered, revealed, onTimeout, onAnswer, busy]);
   const criterion = question.prompt.criterion;
   const values = reveal?.values
     ? Object.fromEntries(
@@ -419,8 +565,12 @@ export function QuestionView({
           key={`${base}:${question.choices.map((c) => c.id).join()}`}
           question={question}
           disabled={disabled}
-          onAnswer={(order) => onAnswer?.({ order })}
+          onAnswer={onAnswer ? (order) => onAnswer({ order }) : undefined}
+          onArrange={(order, touched) => {
+            arranged.current = touched ? order : null;
+          }}
           answer={revealed && Array.isArray(answer) ? answer : undefined}
+          given={Array.isArray(given) ? (given as string[]) : undefined}
           values={values}
         />
       ) : (

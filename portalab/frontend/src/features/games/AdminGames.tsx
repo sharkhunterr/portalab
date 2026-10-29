@@ -17,6 +17,7 @@ interface RoundSettings {
   rounds: number;
   seconds: number;
   choices: number;
+  per_day: number;
 }
 
 interface GamesConfig {
@@ -24,7 +25,7 @@ interface GamesConfig {
   library: { kinds: string[]; min_votes: number; available_only: boolean };
   rounds: Record<string, RoundSettings>;
   cinemot: { enabled: boolean; tries: number; min_letters: number; max_letters: number };
-  memory: { enabled: boolean; pairs: number; own_cards: boolean };
+  memory: { enabled: boolean; pairs: number; own_cards: boolean; per_day: number };
   challenge: {
     enabled: boolean;
     kinds: Record<string, { enabled: boolean; target: number; item: string | null }>;
@@ -419,6 +420,7 @@ export default function AdminGames() {
                 <span>{t("gamification:games.admin.rounds")}</span>
                 <span>{t("gamification:games.admin.seconds")}</span>
                 <span>{t("gamification:games.admin.choices")}</span>
+                <span>{t("gamification:games.admin.perDay")}</span>
                 <span>{t("gamification:games.admin.played")}</span>
               </div>
               {view.round_games.map((game) => {
@@ -474,6 +476,17 @@ export default function AdminGames() {
                         set({ choices: Math.max(2, Math.min(8, Number(e.target.value) || 2)) })
                       }
                     />
+                    <input
+                      type="number"
+                      aria-label={t("gamification:games.admin.perDay")}
+                      min={0}
+                      max={100}
+                      value={row.per_day}
+                      disabled={view.party_only.includes(game)}
+                      onChange={(e) =>
+                        set({ per_day: Math.max(0, Math.min(100, Number(e.target.value) || 0)) })
+                      }
+                    />
                     <span className="games-muted">
                       {format.number(figures?.solo?.month ?? 0)} /{" "}
                       {format.number(figures?.party?.parties ?? 0)}
@@ -483,6 +496,7 @@ export default function AdminGames() {
               })}
             </div>
             <p className="games-muted">{t("gamification:games.admin.playedHint")}</p>
+            <p className="games-muted">{t("gamification:games.admin.perDayHint")}</p>
           </section>
 
           <section className="games-panel">
@@ -534,6 +548,13 @@ export default function AdminGames() {
               min={4}
               max={15}
               onChange={(n) => setConfig({ ...config, memory: { ...config.memory, pairs: n } })}
+            />
+            <Num
+              label={t("gamification:games.admin.memoryPerDay")}
+              value={config.memory.per_day}
+              min={0}
+              max={100}
+              onChange={(n) => setConfig({ ...config, memory: { ...config.memory, per_day: n } })}
             />
             <CheckboxField
               label={t("gamification:games.admin.ownCards")}

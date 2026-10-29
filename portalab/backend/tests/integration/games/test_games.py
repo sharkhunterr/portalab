@@ -34,7 +34,7 @@ from portalab.modules.games.module import GamesModule
 from portalab.modules.games.participant import GamesParticipant
 from portalab.modules.games.pool import NoTitles
 from portalab.modules.games.settings import normalized
-from portalab.modules.games.solo import NotNow
+from portalab.modules.games.solo import DailyLimit, NotNow
 from tests.authz_fixtures import INSERT_USER
 
 pytestmark = pytest.mark.integration
@@ -407,6 +407,33 @@ async def test_boards_settings_and_a_member_s_data(database: Database) -> None:
         assert not await session.scalar(
             select(func.count()).select_from(GameSession).where(GameSession.user_id == zoe)
         )
+
+
+async def test_so_many_games_a_day(database: Database) -> None:
+    (zoe,) = await _users(database, "zoe")
+    clock = FixedClock(NOW)
+    module, _, _, _ = _module(database, clock)
+    module.config.rounds["poster"] = module.config.round("poster").model_copy(update={"per_day": 2})
+    module.config.memory.per_day = 1
+    await module.solo.start(zoe, "poster")  # left half-way: it counts all the same
+    await module.solo.start(zoe, "poster")
+    with pytest.raises(DailyLimit):
+        await module.solo.start(zoe, "poster")
+    await module.solo.start(zoe, "casting")  # each game its own count
+    await module.solo.memory(zoe)
+    with pytest.raises(DailyLimit):
+        await module.solo.memory(zoe)
+    hub = {g["key"]: g for g in (await module.boards.hub(zoe))["games"]}
+    assert (hub["poster"]["per_day"], hub["poster"]["today"]) == (2, 2)
+    assert (hub["casting"]["per_day"], hub["casting"]["today"]) == (5, 1)
+    assert (hub["memory"]["per_day"], hub["memory"]["today"]) == (1, 1)
+    assert "per_day" not in hub["cinemot"]
+
+    clock.set(NOW + timedelta(days=1))  # a new day
+    await module.solo.start(zoe, "poster")
+    module.config.rounds["poster"] = module.config.round("poster").model_copy(update={"per_day": 0})
+    for _ in range(3):  # no limit
+        await module.solo.start(zoe, "poster")
 
 
 async def test_the_boards_told_once_the_week_is_over(database: Database) -> None:

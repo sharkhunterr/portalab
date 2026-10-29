@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from portalab.capabilities.media_core import CARD_FACES, GAME_SOURCES
 from portalab.core.db import Database
@@ -19,7 +19,7 @@ from portalab.modules.games.common import GameNotFound, Shared
 from portalab.modules.games.models import GameSession
 from portalab.modules.games.pool import BLUR, NoTitles, Pool
 from portalab.modules.games.rounds import make, public, worth
-from portalab.modules.games.settings import PARTY_ONLY, ROUND_GAMES
+from portalab.modules.games.settings import PARTY_ONLY, ROUND_GAMES, GamesConfig
 
 SUDDEN = ("higher_lower",)  # played until the first mistake
 
@@ -27,6 +27,11 @@ SUDDEN = ("higher_lower",)  # played until the first mistake
 class NotNow(Conflict):
     default_code = "games.not_now"
     default_title = "Not at this point of the game"
+
+
+class DailyLimit(Conflict):
+    default_code = "games.daily_limit"
+    default_title = "No more games of this one today"
 
 
 def _at(value: str) -> datetime:
@@ -54,6 +59,7 @@ class Solo:
         if game not in ROUND_GAMES or game in PARTY_ONLY:
             raise GameNotFound("No such game to play alone.")
         config = self.shared.open(game)
+        await self._may_start(user, game, config)
         settings = config.round(game)
         items = await self.pool.items(config)
         extra: dict[str, Any] = {}
@@ -89,6 +95,27 @@ class Solo:
         async with self.database.unit_of_work() as uow:
             uow.session.add(row)
         return self._view(row, now)
+
+    @staticmethod
+    async def started_today(session: Any, user: UUID, since: datetime) -> dict[str, int]:
+        """The games a member started alone since the day began, by game: each one started counts, finished
+        or not — a game left to start it again is one played."""
+        rows = await session.execute(
+            select(GameSession.game, func.count())
+            .where(GameSession.user_id == user, GameSession.mode == "solo", GameSession.started_at >= since)
+            .group_by(GameSession.game)
+        )
+        return {game: int(count) for game, count in rows.all()}
+
+    async def _may_start(self, user: UUID, game: str, config: GamesConfig) -> None:
+        limit = config.per_day(game)
+        if not limit:
+            return
+        since = await self.shared.day_start(utc_now(self.clock))
+        async with self.database.session() as session:
+            started = (await self.started_today(session, user, since)).get(game, 0)
+        if started >= limit:
+            raise DailyLimit(f"{limit} games of it a day: come back tomorrow.")
 
     async def _mine(self, session: Any, user: UUID, session_id: UUID, *, lock: bool = False) -> GameSession:
         query = select(GameSession).where(GameSession.id == session_id, GameSession.user_id == user)
@@ -220,6 +247,7 @@ class Solo:
     # --- the memory --------------------------------------------------------------------------------------
     async def memory(self, user: UUID) -> dict[str, Any]:
         config = self.shared.open("memory")
+        await self._may_start(user, "memory", config)
         pairs = config.memory.pairs
         faces: list[dict[str, Any]] = []
         if config.memory.own_cards:

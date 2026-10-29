@@ -35,6 +35,7 @@ class RoundGame(BaseModel):
     rounds: int = Field(default=6, ge=1, le=50)  # higher or lower: the longest streak played
     seconds: int = Field(default=20, ge=5, le=180)
     choices: int = Field(default=4, ge=2, le=8)  # the timeline: how many titles to put in order
+    per_day: int = Field(default=5, ge=0, le=100)  # games a member may start alone each day (0: no limit)
 
 
 DEFAULT_ROUNDS: dict[str, RoundGame] = {
@@ -72,6 +73,7 @@ class Memory(BaseModel):
     enabled: bool = True
     pairs: int = Field(default=8, ge=4, le=15)
     own_cards: bool = True  # the member's own cards (the posters when they own too few)
+    per_day: int = Field(default=5, ge=0, le=100)
 
 
 CHALLENGE_KINDS = ("game", "movie", "book", "audiobook")
@@ -128,6 +130,12 @@ class GamesConfig(BaseModel):
     def round(self, game: str) -> RoundGame:
         return self.rounds.get(game) or DEFAULT_ROUNDS[game]
 
+    def per_day(self, game: str) -> int:
+        """How many games of it a member may start alone each day (0: as many as they like)."""
+        if game == "memory":
+            return self.memory.per_day
+        return self.round(game).per_day if game in ROUND_GAMES else 0
+
     def enabled_games(self) -> list[str]:
         if not self.enabled:
             return []
@@ -166,9 +174,9 @@ def declare_games_settings(catalog: SettingCatalog = default_catalog) -> None:
             owner=OWNER,
             description=(
                 "The games page: switched on or off; the titles its games draw from (kinds, votes, present "
-                "only); each game's rounds, seconds and choices; the day's title to find (tries, letters); "
-                "the memory (pairs, the member's own cards); the week's challenges (a game's minutes, a "
-                "film's, a book's, an audiobook's percent; a title pinned); "
+                "only); each game's rounds, seconds, choices and games a day; the day's title to find "
+                "(tries, letters); the memory (pairs, the member's own cards, games a day); the week's "
+                "challenges (a game's minutes, a film's, a book's, an audiobook's percent; a title pinned); "
                 "the parties (players, reveal and countdown seconds). Rewards: the reward rules of "
                 "games.played and games.challenge_completed."
             ),

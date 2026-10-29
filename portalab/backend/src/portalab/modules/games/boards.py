@@ -18,6 +18,7 @@ from portalab.modules.games.common import Shared
 from portalab.modules.games.events import BOARD
 from portalab.modules.games.models import ChallengeDone, GameSession, Party, PartyPlayer
 from portalab.modules.games.settings import GAMES, PARTY_ONLY, ROUND_GAMES, SOLO_ONLY
+from portalab.modules.games.solo import Solo
 
 PERIODS = ("week", "month", "all")
 TOP = 10
@@ -148,6 +149,7 @@ class Boards:
         today = await self.shared.today(now)
         week = (await self.shared.week(now))[1]
         async with self.database.session() as session:
+            started = await Solo.started_today(session, user, await self.shared.day_start(now))
             best: dict[str, int] = {
                 game: int(score or 0)
                 for game, score in (
@@ -183,6 +185,9 @@ class Boards:
                 }
             else:
                 entry |= {"kind": game, "solo": True, "party": False}
+            if entry["solo"] and game not in ("cinemot", "challenge"):
+                # how many games of it a day, and how many I started today (0: no limit)
+                entry |= {"per_day": config.per_day(game), "today": started.get(game, 0)}
             games.append(entry)
         return {
             "enabled": config.enabled,

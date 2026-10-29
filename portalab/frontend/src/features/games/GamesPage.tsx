@@ -11,7 +11,7 @@ import { useT } from "../../i18n/hooks/useT";
 import type { WidgetPayload } from "../dashboard/api";
 import { WheelWidget } from "../gamification/wheel/WheelWidget";
 import { imageUrl } from "../media/api";
-import { type ChallengeItem, GAME_ICONS, type HubGame, useChallenge, useGamesHub } from "./api";
+import { type ChallengeItem, GAME_ICONS, gamesLeft, type HubGame, useChallenge, useGamesHub } from "./api";
 import { Board } from "./Boards";
 import "./games.css";
 
@@ -167,6 +167,7 @@ function Challenges() {
 function GameTile({ game }: { game: HubGame }) {
   const t = useT();
   const format = useFormat();
+  const quota = gamesLeft(game);
   const to =
     game.key === "cinemot"
       ? "/games/cinemot"
@@ -193,6 +194,12 @@ function GameTile({ game }: { game: HubGame }) {
               <span>
                 <Icon name="users" size={12} />
                 {t("gamification:games.together")}
+              </span>
+            ) : null}
+            {quota ? (
+              <span className="games-tile-card__today" data-empty={quota.left === 0 || undefined}>
+                <Icon name="clock" size={12} />
+                {t("gamification:games.today.short", quota)}
               </span>
             ) : null}
             {game.best_week ? (

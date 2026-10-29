@@ -20,7 +20,7 @@ function Face({ face }: { face: MemoryFace }) {
  * Issue 265: the memory — my own cards (the library's posters when I own too few) laid face down by the
  * server, two turned over at a time: a pair found stays up, two that differ turn back at the next try.
  */
-export function MemoryBoard({ view, onAgain }: { view: SoloView; onAgain: () => void }) {
+export function MemoryBoard({ view, onAgain }: { view: SoloView; onAgain?: (() => void) | undefined }) {
   const t = useT();
   const act = useSessionAction(view.id);
   const board = view.board ?? [];
@@ -57,7 +57,7 @@ export function MemoryBoard({ view, onAgain }: { view: SoloView; onAgain: () => 
           <Icon name="trophy" size={40} />
           <h2>{t("gamification:games.score", { score: view.score })}</h2>
           <div className="games-actions">
-            <Button onClick={onAgain}>
+            <Button disabled={!onAgain} onClick={onAgain}>
               <Icon name="retry" size={16} />
               {t("gamification:games.again")}
             </Button>
