@@ -109,6 +109,15 @@ export interface HubGame {
   rounds?: number;
   seconds?: number;
   best_week?: number | null;
+  /** issue 270: the games of it a member may start alone each day (0: no limit), and those started today */
+  per_day?: number;
+  today?: number;
+}
+
+/** What is left of a game's games of the day (none: as many as one likes). */
+export function gamesLeft(game: HubGame | undefined): { left: number; max: number } | null {
+  if (!game?.per_day) return null;
+  return { left: Math.max(0, game.per_day - (game.today ?? 0)), max: game.per_day };
 }
 
 export interface PartyRef {
@@ -263,7 +272,10 @@ export function useStart() {
         ? ((await api.POST("/api/v1/games/memory/sessions")).data as unknown as SoloView)
         : ((await api.POST("/api/v1/games/{game}/sessions", { params: { path: { game } } }))
             .data as unknown as SoloView),
-    onSuccess: (view) => client.setQueryData([...KEY, "session", view.id], view),
+    onSuccess: (view) => {
+      client.setQueryData([...KEY, "session", view.id], view);
+      void client.invalidateQueries({ queryKey: [...KEY, "hub"] }); // one game fewer for today
+    },
   });
 }
 

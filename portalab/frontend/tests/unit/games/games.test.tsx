@@ -170,11 +170,54 @@ describe("issue 265 — the games", () => {
         onAnswer={onAnswer}
       />,
     );
-    const send = await screen.findByRole("button", { name: "Send" });
-    expect((send as HTMLButtonElement).disabled).toBe(true);
-    for (const title of ["Alien", "Heat", "Dune"])
-      fireEvent.click(screen.getByRole("button", { name: title }));
+    // issue 269: on a timeline, moved by their arrows (or dragged), then sent as they stand
+    await screen.findByText("Oldest");
+    fireEvent.click(screen.getByRole("button", { name: "Move « Alien » up" }));
+    expect(screen.getByText("« Alien » now 1st")).toBeTruthy();
+    expect((screen.getByRole("button", { name: "Move « Alien » up" }) as HTMLButtonElement).disabled).toBe(
+      true,
+    );
     fireEvent.click(screen.getByRole("button", { name: "Send" }));
     expect(onAnswer).toHaveBeenCalledWith({ order: ["y", "x", "z"] });
+  });
+
+  it("sends a timeline as it stands when the time runs out, then shows the right one and where I had them", async () => {
+    const onAnswer = vi.fn();
+    const question: Question = {
+      game: "timeline",
+      prompt: { count: 3 },
+      choices: [
+        { id: "x", label: "Heat" },
+        { id: "y", label: "Alien" },
+        { id: "z", label: "Dune" },
+      ],
+      ordered: true,
+      image: false,
+      audio: false,
+    };
+    const props = { question, base: "/x", seconds: 45, skew: 0, onAnswer };
+    const late = new Date(Date.now() - 46_000).toISOString();
+    // rendered alone (no router): the same question rendered again keeps what was moved
+    const { rerender } = render(<QuestionView {...props} started={now} phase="question" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Move « Dune » up" }));
+    expect(onAnswer).not.toHaveBeenCalled();
+    rerender(<QuestionView {...props} started={late} phase="question" />);
+    expect(onAnswer).toHaveBeenCalledWith({ order: ["x", "z", "y"] });
+
+    rerender(
+      <QuestionView
+        {...props}
+        started={late}
+        phase="reveal"
+        given={["x", "z", "y"]}
+        answer={["y", "x", "z"]}
+        reveal={{ values: { x: 1995, y: 1979, z: 2021 } }}
+      />,
+    );
+    const lines = screen.getAllByRole("listitem");
+    expect(lines.map((l) => l.getAttribute("data-right"))).toEqual(["false", "false", "false"]);
+    expect(lines[0]?.textContent).toContain("1979");
+    expect(screen.getByText("You had it 3rd")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Send" })).toBeNull();
   });
 });

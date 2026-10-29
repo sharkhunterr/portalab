@@ -8,6 +8,7 @@ import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import {
   GAME_ICONS,
+  gamesLeft,
   type SoloView,
   skewOf,
   useGamesHub,
@@ -32,7 +33,7 @@ function Steps({ view }: { view: SoloView }) {
           ? result.correct
             ? "right"
             : "wrong"
-          : at === view.results.length && view.status === "playing"
+          : at === view.results.length && view.status === "playing" && view.phase !== "reveal"
             ? "now"
             : undefined;
         // biome-ignore lint/suspicious/noArrayIndexKey: the rounds in their order
@@ -74,9 +75,31 @@ function GameBar({ view }: { view: SoloView }) {
   );
 }
 
+/** Issue 270: the games of the day left, or that there are none — the way back is tomorrow. */
+function Today({ game }: { game: string }) {
+  const t = useT();
+  const hub = useGamesHub();
+  const quota = gamesLeft(hub.data?.games.find((g) => g.key === game));
+  if (!quota) return null;
+  if (quota.left === 0)
+    return (
+      <p className="games-today-none" role="status">
+        <Icon name="clock" size={16} />
+        {t("gamification:games.today.none", { max: quota.max })}
+      </p>
+    );
+  return <p className="games-muted">{t("gamification:games.today.left", quota)}</p>;
+}
+
+function useNoneLeft(game: string): boolean {
+  const hub = useGamesHub();
+  return gamesLeft(hub.data?.games.find((g) => g.key === game))?.left === 0;
+}
+
 function Over({ view, onAgain, busy }: { view: SoloView; onAgain: () => void; busy: boolean }) {
   const t = useT();
   const format = useFormat();
+  const noneLeft = useNoneLeft(view.game);
   const sudden = view.game === "higher_lower";
   return (
     <section className="games-over" data-game={view.game}>
@@ -93,8 +116,9 @@ function Over({ view, onAgain, busy }: { view: SoloView; onAgain: () => void; bu
         </p>
         <Steps view={view} />
         {view.last?.reveal ? <RevealView reveal={view.last.reveal} mine={null} played={false} /> : null}
+        <Today game={view.game} />
         <div className="games-actions">
-          <Button disabled={busy} onClick={onAgain}>
+          <Button disabled={busy || noneLeft} onClick={onAgain}>
             <Icon name="retry" size={16} />
             {t("gamification:games.again")}
           </Button>
@@ -155,6 +179,7 @@ function Intro({ game, onStart, busy }: { game: string; onStart: () => void; bus
   const hub = useGamesHub();
   const info = hub.data?.games.find((g) => g.key === game);
   const solo = info?.solo ?? true;
+  const quota = gamesLeft(info);
   return (
     <section className="games-hero" data-game={game}>
       <div className="games-hero__art" aria-hidden="true">
@@ -164,7 +189,7 @@ function Intro({ game, onStart, busy }: { game: string; onStart: () => void; bus
         <h2>{t(`gamification:games.game.${game}.name`)}</h2>
         <p className="games-hero__pitch">{t(`gamification:games.game.${game}.pitch`)}</p>
         <p>{t(`gamification:games.game.${game}.rules`)}</p>
-        {info?.rounds || info?.seconds ? (
+        {info && (info.rounds || info.seconds || quota) ? (
           <ul className="games-facts">
             {game === "higher_lower" ? (
               <li>
@@ -189,11 +214,23 @@ function Intro({ game, onStart, busy }: { game: string; onStart: () => void; bus
                 {t("gamification:games.facts.together")}
               </li>
             ) : null}
+            {quota && quota.left > 0 ? (
+              <li>
+                <Icon name="calendar" size={14} />
+                {t("gamification:games.today.left", quota)}
+              </li>
+            ) : null}
           </ul>
+        ) : null}
+        {quota?.left === 0 ? (
+          <p className="games-today-none" role="status">
+            <Icon name="clock" size={16} />
+            {t("gamification:games.today.none", { max: quota.max })}
+          </p>
         ) : null}
         <div className="games-actions">
           {solo ? (
-            <Button className="games-hero__start" disabled={busy} onClick={onStart}>
+            <Button className="games-hero__start" disabled={busy || quota?.left === 0} onClick={onStart}>
               <Icon name="play" size={18} />
               {t("gamification:games.start")}
             </Button>
@@ -220,6 +257,7 @@ export default function SoloPage() {
   const id = search.get("session") ?? undefined;
   const session = useSession(id);
   const start = useStart();
+  const noneLeft = useNoneLeft(game);
   const begin = () =>
     start.mutate(game, { onSuccess: (view) => setSearch({ session: view.id }, { replace: Boolean(id) }) });
   const view = session.data;
@@ -247,7 +285,7 @@ export default function SoloPage() {
       ) : !view ? (
         <p className="games-error">{t("gamification:games.gone")}</p>
       ) : (
-        <MemoryBoard view={view} onAgain={begin} />
+        <MemoryBoard view={view} onAgain={noneLeft ? undefined : begin} />
       )}
     </div>
   );
