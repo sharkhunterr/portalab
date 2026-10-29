@@ -1,0 +1,14 @@
+# gitleaks false positives (reviewed 2026-10-29): event "key" slugs in the game presets and the demo catalog,
+# and fake tokens in test fixtures — none is a secret. One fingerprint per finding (commit:file:rule:line).
+cef2514a48a9b5ddfb06bf358ddf951b70f874b6:portalab/backend/src/portalab/app/game_presets/lan.json:generic-api-key:3249
+cef2514a48a9b5ddfb06bf358ddf951b70f874b6:portalab/backend/src/portalab/app/game_presets/lan.json:generic-api-key:3421
+c3cd508bb5c2ea02adca88d3fc5dafca3a24559e:portalab/backend/src/portalab/app/demo_catalog.json:generic-api-key:2362
+1b5c202340d3f556a02c0021f163d91f9bd607f2:portalab/backend/tests/contract/ai/test_provider_kit.py:generic-api-key:15
+1b5c202340d3f556a02c0021f163d91f9bd607f2:portalab/backend/tests/security/ai/test_secrets_audit.py:generic-api-key:19
+67f34d246e322aa3fe8415460a1386c720669b57:portalab/backend/tests/unit/observability/test_error_recorder.py:generic-api-key:25
+7799ba7308d137bd0dc808585e689b989765569c:portalab/backend/tests/integration/events/test_fanout_isolation.py:generic-api-key:30
+7e36493f4f5fff42a4e852feb5c4d3a7fd5a35fa:portalab/frontend/tests/unit/auth.test.tsx:generic-api-key:101
+45e31233e45cdc035da0b41a3a2f3d0ac89884a8:portalab/backend/tests/contract/test_isolation.py:generic-api-key:108
+45e31233e45cdc035da0b41a3a2f3d0ac89884a8:portalab/backend/tests/integration/test_jobs_retry.py:generic-api-key:53
+45e31233e45cdc035da0b41a3a2f3d0ac89884a8:portalab/backend/tests/unit/test_errors.py:generic-api-key:63
+45e31233e45cdc035da0b41a3a2f3d0ac89884a8:portalab/backend/tests/unit/test_logging.py:generic-api-key:64

@@ -13,6 +13,16 @@ RUN npm run build
 
 # ---------------------------------------------------------------- runtime
 FROM python:3.12-slim AS runtime
+ARG VERSION=dev
+ARG VCS_REF=unknown
+ARG BUILD_DATE=unknown
+LABEL org.opencontainers.image.title="Portalab" \
+      org.opencontainers.image.description="The self-hosted portal for your community: media, trading cards, games, wiki, radio and more." \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.source="https://github.com/sharkhunterr/portalab" \
+      org.opencontainers.image.documentation="https://github.com/sharkhunterr/portalab#readme"
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     UV_COMPILE_BYTECODE=1 \

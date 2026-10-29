@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Portalab</title>
+  <!-- palette: Portalab's default theme (portalab-dark / portalab-light) — see assets/README.md -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#161b2b"/>
+      <stop offset="1" stop-color="#0b0e17"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a3b8ff"/>
+      <stop offset="0.5" stop-color="#7f9cff"/>
+      <stop offset="1" stop-color="#3a55d0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.6" r="0.55">
+      <stop offset="0" stop-color="#7f9cff" stop-opacity="0.75"/>
+      <stop offset="0.5" stop-color="#3a55d0" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#3a55d0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="door" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef1f8"/>
+      <stop offset="1" stop-color="#a3b8ff"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a3b8ff" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#a3b8ff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <circle cx="256" cy="268" r="190" fill="url(#glow)"/>
+  <!-- the portal ring -->
+  <circle cx="256" cy="256" r="150" fill="none" stroke="url(#ring)" stroke-width="30"/>
+  <!-- the doorway, lit from inside, its light on the floor -->
+  <path d="M200 352 L312 352 L352 392 L160 392 Z" fill="url(#floor)"/>
+  <path d="M200 352 V246 a56 56 0 0 1 112 0 V352 Z" fill="url(#door)"/>
+  <path d="M222 352 V252 a34 34 0 0 1 68 0 V352 Z" fill="#ffffff" fill-opacity="0.55"/>
+  <!-- what the portal gathers, on its ring: the rarities' colours -->
+  <circle cx="362" cy="150" r="21" fill="#ffb547" stroke="#0b0e17" stroke-width="9"/>
+  <circle cx="106" cy="256" r="17" fill="#5cb4ff" stroke="#0b0e17" stroke-width="9"/>
+  <circle cx="362" cy="362" r="14" fill="#c48dff" stroke="#0b0e17" stroke-width="9"/>
+</svg>
