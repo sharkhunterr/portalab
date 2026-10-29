@@ -67,6 +67,15 @@ def safe_id(value: Any) -> str:
     return text
 
 
+def image_key(ref: str) -> str:
+    """#272: an image reference is ``<item>`` or ``<item>:<version>`` — both safe identifiers; the item is
+    what is fetched, the version only tells a changed image apart."""
+    key, _, version = str(ref).partition(":")
+    if version:
+        safe_id(version)
+    return safe_id(key)
+
+
 def parse_time(value: Any) -> datetime | None:
     """ISO 8601 strings (with or without zone) and epoch seconds/milliseconds."""
     if value is None or value == "":

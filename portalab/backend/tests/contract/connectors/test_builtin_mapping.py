@@ -55,7 +55,7 @@ async def test_jellyfin_library() -> None:
     assert [r.kind for r in found] == ["movie", "series", "season", "episode"]  # folders are skipped
     dune = LibraryPayload.model_validate(dict(by_id["m1"].payload))
     assert dune.ids == {"tmdb": "438631", "imdb": "tt1160419"} and dune.duration_s == 9360.0
-    assert dune.image == "m1" and by_id["m1"].observed_at == datetime(2024, 1, 2, 3, 4, 5, 123456, UTC)
+    assert dune.image == "m1:x" and by_id["m1"].observed_at == datetime(2024, 1, 2, 3, 4, 5, 123456, UTC)
     assert by_id["se1"].payload["parent"] == "s1" and by_id["e1"].payload["parent"] == "se1"
     assert 'Token="jf-secret-key"' in seen[0].headers["authorization"]
 
@@ -69,7 +69,7 @@ async def test_jellyfin_playback() -> None:
 async def test_plex_pages_and_ids() -> None:
     found = await records(PlexConnector(), "plex")
     assert [r.external_id for r in found] == ["101", "102", "103"]  # three items over two pages
-    assert found[0].payload["ids"] == {"tmdb": "438631"} and found[0].payload["image"] == "101"
+    assert found[0].payload["ids"] == {"tmdb": "438631"} and found[0].payload["image"] == "101:1"
     assert "image" not in found[1].payload
     sessions = await PlexConnector().provider(PLAYBACK, handle_for("plex")).now_playing()
     assert sessions[0].state == "paused" and sessions[0].external_user_id == "1"
@@ -211,8 +211,12 @@ async def test_images_go_through_the_service() -> None:
     library = JellyfinConnector().provider(LIBRARY, handle_for("jellyfin", seen=seen))
     assert await library.fetch_image("m1") == b"\x89PNG-image"
     assert seen[-1].url.path == "/Items/m1/Images/Primary" and seen[-1].url.host.startswith("jellyfin-")
-    with pytest.raises(InvalidPayload):
-        await library.fetch_image("http://evil.example/x")
+    # #272: the image's version is part of its reference, never of what is fetched
+    assert await library.fetch_image("m1:3f2a") == b"\x89PNG-image"
+    assert seen[-1].url.path == "/Items/m1/Images/Primary"
+    for bad in ("http://evil.example/x", "m1:../x", "../x:1"):
+        with pytest.raises(InvalidPayload):
+            await library.fetch_image(bad)
 
 
 def test_parse_time_formats() -> None:

@@ -35,7 +35,7 @@ from portalab.capabilities.media import (
     resolution_of,
 )
 from portalab.capabilities.results import InvalidPayload
-from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_time, safe_id
+from portalab.connectors.http_base import HttpConnector, _Probe, binding, image_key, parse_time, safe_id
 
 PAGE = 200
 TICKS = 10_000_000  # 100 ns ticks per second
@@ -144,7 +144,10 @@ class JellyfinConnector(HttpConnector):
                         if p.get("Name") and p.get("Type") == "Director"
                     ][:10],
                     "duration_s": _seconds(item.get("RunTimeTicks")),
-                    "image": item_id if (item.get("ImageTags") or {}).get("Primary") else None,
+                    # #272: with its tag, so a poster changed on Jellyfin is fetched again
+                    "image": f"{item_id}:{tag}"
+                    if (tag := (item.get("ImageTags") or {}).get("Primary"))
+                    else None,
                     "resolution": resolution_of(item.get("Height")),  # 027: the file's frame height
                 }
                 yield self.record(service, item_id, kind, payload, parse_time(item.get("DateCreated")))
@@ -194,7 +197,7 @@ class _Library:
 
     async def fetch_image(self, ref: str) -> bytes:
         return await self.connector.get_bytes(
-            self.service, f"/Items/{safe_id(ref)}/Images/Primary", maxWidth=600, quality=85
+            self.service, f"/Items/{image_key(ref)}/Images/Primary", maxWidth=600, quality=85
         )
 
 
