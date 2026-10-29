@@ -69,10 +69,23 @@ function moduleSource(url: string): Promise<string | null> {
 export function safeAssetPath(path: unknown): string | null {
   if (typeof path !== "string" || !path || path.length > 200) return null;
   const clean = path.replace(/^\.\//, "");
-  if (clean.startsWith("/") || clean.includes("\\") || clean.includes("\0")) return null;
+  // issue 279: no escapes either — « %2e%2e » is « .. » once the browser reads the address
+  if (clean.startsWith("/") || clean.includes("\\") || clean.includes("\0") || clean.includes("%"))
+    return null;
   if (/^[a-z][a-z0-9+.-]*:/i.test(clean)) return null;
   if (clean.split("/").some((part) => part === ".." || part === "")) return null;
   return clean;
+}
+
+/** issue 279: the address the browser will ask stays in the element's folder, as resolved (never trusted from text). */
+function within(base: string, path: string): boolean {
+  try {
+    const folder = new URL(base, window.location.origin);
+    const asked = new URL(path, folder);
+    return asked.origin === folder.origin && asked.pathname.startsWith(folder.pathname);
+  } catch {
+    return false;
+  }
 }
 
 /** Runs ``element``'s script in ``frame`` (an iframe the caller placed); returns how to update and stop it. */
@@ -140,7 +153,7 @@ export function runSandbox(
         return;
       case "asset": {
         const path = safeAssetPath(data.path);
-        if (!path || !base) {
+        if (!path || !base || !within(base, path)) {
           post({ type: "asset", id: data.id, error: "refused" });
           return;
         }

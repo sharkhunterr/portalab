@@ -15,7 +15,7 @@ export default defineConfig({
   },
   build: {
     outDir: "dist",
-    sourcemap: true,
+    sourcemap: false, // #280: the source stays home (the dev server keeps its maps)
     // the shared vendor chunk (React, Radix, TanStack, zod) is ~540 kB; Mermaid (core ~620 kB, some diagram types ~690 kB) is only
     // fetched when a page actually contains a diagram (spec 011)
     chunkSizeWarningLimit: 700,

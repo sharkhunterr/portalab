@@ -20,6 +20,11 @@ export function VerifyForm({ initialToken = "" }: { initialToken?: string }) {
   const passwordId = useId();
   const hintId = useId();
   const [token, setToken] = useState(initialToken);
+  useEffect(() => {
+    // issue 280: held by the form — out of the address bar and the history
+    if (initialToken && globalThis.location?.pathname === "/verify")
+      globalThis.history?.replaceState(null, "", "/verify");
+  }, [initialToken]);
   const [password, setPassword] = useState("");
   const messageRef = useRef<HTMLParagraphElement>(null);
   const mutation = useMutation({

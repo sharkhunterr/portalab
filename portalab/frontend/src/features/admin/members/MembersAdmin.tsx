@@ -72,7 +72,8 @@ export async function allMembers(): Promise<Member[]> {
 }
 
 function verifyLink(token: string): string {
-  return `${window.location.origin}/verify?token=${encodeURIComponent(token)}`;
+  // issue 280: after « # » — the browser never sends it, so no server or proxy log keeps the token
+  return `${window.location.origin}/verify#token=${encodeURIComponent(token)}`;
 }
 
 function InviteForm() {
