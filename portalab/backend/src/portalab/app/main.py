@@ -551,10 +551,12 @@ def create_app(
         max_body_bytes=security.max_body_bytes,
         per_ip_per_minute=security.rate_limit_per_ip_per_minute,
         per_user_per_minute=security.rate_limit_per_user_per_minute,
+        sign_in_per_minute=security.rate_limit_sign_in_per_minute,
         guard=guard_of(app),
         # 028: without a session, nothing answers but signing in (the sign-in page and its own files)
         anonymous_gate=True,
         health_networks=settings.health_networks if settings else DEFAULT_HEALTH_NETWORKS,
+        setup_networks=settings.setup_networks if settings else DEFAULT_HEALTH_NETWORKS,
         public_assets=public_assets_of(static_dir),
     )
     app.include_router(health_router)

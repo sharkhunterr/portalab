@@ -32,6 +32,7 @@ from portalab.core.authorization import (
     route_access,
 )
 from portalab.core.errors import PROBLEM_CONTENT_TYPE, Forbidden, Unauthorized
+from portalab.core.logging import get_logger
 from portalab.modules.identity.guard import IntrusionGuard, weigh
 
 __all__ = [
@@ -122,8 +123,10 @@ ASGIApp = Callable[[Scope, Receive, Send], Awaitable[None]]
 SECURITY_HEADERS: tuple[tuple[bytes, bytes], ...] = (
     (
         b"content-security-policy",
-        # 027 (#11): www.gstatic.com serves the Cast SDK (the player's Chromecast button)
-        b"default-src 'self'; script-src 'self' https://www.gstatic.com; style-src 'self'; "
+        # 027 (#11): www.gstatic.com serves the Cast SDK (the player's Chromecast button) — #280: its three
+        # folders only (the loader, the framework, Android's sender), not every script Google hosts there
+        b"default-src 'self'; script-src 'self' https://www.gstatic.com/cv/js/sender/ "
+        b"https://www.gstatic.com/cast/sdk/libs/ https://www.gstatic.com/eureka/clank/; style-src 'self'; "
         b"img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; media-src 'self' blob:; "
         b"object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
     ),
@@ -140,6 +143,7 @@ EXEMPT_PATHS = frozenset({"/healthz", "/readyz"})
 # 028: and the files of the live visual packs (immutable, fingerprinted, a page shows dozens of them)
 EXEMPT_GET_PREFIXES = ("/api/v1/i18n/catalogs/", "/api/v1/visuals/files/", "/api/v1/visuals/bundle/")
 SESSION_COOKIE_NAME = "__Host-portalab_session"
+log = get_logger("portalab.security")
 _ALERTS: set["asyncio.Task[None]"] = set()  # alerts on their way (kept until done)
 
 # --- the minimal public surface (spec 028 FR-036/FR-037, issue 135) -----------------------------------------
@@ -170,6 +174,13 @@ ANONYMOUS_PATHS = frozenset(
         # issue 246: the languages offered before signing in (the arrival wizard, sign-in)
         "/api/v1/i18n/public/languages",
     }
+)
+# #275: setting a portal up (or bringing a backup into it) without an account — only from the local networks
+SETUP_PATHS = frozenset(p for p in ANONYMOUS_PATHS if p.startswith("/api/v1/admin/first-run"))
+# #276: where passwords and accounts are tried — held to their own pace per address, and an address blocked
+# stays blocked there whatever session cookie it shows
+SIGN_IN_PATHS = (
+    frozenset({"/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/verify"}) | SETUP_PATHS
 )
 ANONYMOUS_PREFIXES = ("/api/v1/media/remote/",)  # a casting device's stream, by its ticket
 # issue 157: the terms of use, on the sign-in page — only while the administrators offer them there
@@ -226,6 +237,24 @@ def public_assets_of(static_dir: Path | None) -> frozenset[str] | None:
     except (OSError, ValueError):
         return None
     return frozenset(str(n) for n in names) if isinstance(names, list) else None
+
+
+def forwarded_hops(scope: Scope) -> list[str]:
+    return [
+        hop.strip()
+        for name, value in scope.get("headers", ())
+        if name == b"x-forwarded-for"
+        for hop in value.decode("latin-1").split(",")
+        if hop.strip()
+    ]
+
+
+def behind_untrusted_proxy(scope: Scope) -> bool:
+    """#273: the request names who it is for (``X-Forwarded-For``) but the server did not believe it — a
+    reverse proxy that is not in ``TRUSTED_PROXIES``: the address seen is the proxy's, not the visitor's."""
+    hops = forwarded_hops(scope)
+    client = (scope.get("client") or ("", 0))[0]
+    return bool(hops) and client not in hops
 
 
 def networks_of(cidrs: Iterable[str]) -> tuple[ipaddress.IPv4Network | ipaddress.IPv6Network, ...]:
@@ -299,20 +328,25 @@ class SecurityMiddleware:
         max_body_bytes: int,
         per_ip_per_minute: int,
         per_user_per_minute: int,
+        sign_in_per_minute: int = 30,
         clock: Callable[[], float] = time.monotonic,
         guard: IntrusionGuard | None = None,
         anonymous_gate: bool = False,
         health_networks: Iterable[str] = DEFAULT_HEALTH_NETWORKS,
+        setup_networks: Iterable[str] = DEFAULT_HEALTH_NETWORKS,
         public_assets: frozenset[str] | None = None,
     ) -> None:
         self.app = app
         self.guard = guard  # issue 1: who probes what they may not reach is blocked
         self.anonymous_gate = anonymous_gate  # 028: nothing answers a visitor but signing in
         self.health_networks = networks_of(health_networks)
+        self.setup_networks = networks_of(setup_networks)
+        self._proxy_warned = False
         self.public_assets = public_assets  # 028: the static files the sign-in page needs (None: all)
         self.max_body_bytes = max_body_bytes
         self.per_ip = SlidingWindowLimiter(per_ip_per_minute, clock=clock)
         self.per_user = SlidingWindowLimiter(per_user_per_minute, clock=clock)
+        self.sign_in = SlidingWindowLimiter(sign_in_per_minute, clock=clock)
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http":
@@ -330,7 +364,9 @@ class SecurityMiddleware:
             # a signed-in member answers for their own session (and account, checked once they are known);
             # an address is held against requests without one — the members sharing it are never shut out
             left = self.guard.blocked(
-                [k for k in keys if k.startswith("session:")] if len(keys) > 1 else keys
+                [k for k in keys if k.startswith("session:")]
+                if len(keys) > 1 and path not in SIGN_IN_PATHS
+                else keys
             )
             if left is not None:
                 retry = str(max(1, int(left + 0.999))).encode()
@@ -342,11 +378,13 @@ class SecurityMiddleware:
                     [(b"retry-after", retry)],
                 )
                 return
-        if path in HEALTH_PATHS and not address_in(str(client[0]), self.health_networks):
+        if path in HEALTH_PATHS and not self._local(scope, self.health_networks):
             await self._refuse_anonymous(scope, send, keys, path)
             return
         if path.startswith("/api/") and not exempt:
             wait = self.per_ip.hit(f"ip:{client[0]}")
+            if wait is None and path in SIGN_IN_PATHS and scope.get("method") == "POST":
+                wait = self.sign_in.hit(f"ip:{client[0]}")
             session = _session_key(scope)
             if wait is None and session is not None:
                 wait = self.per_user.hit(f"session:{session}")
@@ -398,13 +436,27 @@ class SecurityMiddleware:
             await _problem(send, 413, "request.too_large", "Request body too large", [])
         self._weigh(scope, keys, path, status)
 
+    def _local(self, scope: Scope, networks: Iterable[ipaddress.IPv4Network | ipaddress.IPv6Network]) -> bool:
+        """Whether the request comes from one of ``networks`` — never when a proxy that is not trusted
+        brought it (#273: its own local address would vouch for anyone on the internet)."""
+        if behind_untrusted_proxy(scope):
+            if not self._proxy_warned:
+                self._proxy_warned = True
+                log.warning(
+                    "requests arrive through a reverse proxy that is not trusted: set TRUSTED_PROXIES to its "
+                    "address, or every visitor shares the proxy's address (rate limits, blocking, audit)",
+                    extra={"fields": {"proxy": (scope.get("client") or ("?", 0))[0]}},
+                )
+            return False
+        return address_in(str((scope.get("client") or ("", 0))[0]), networks)
+
     async def _may_pass(self, scope: Scope, path: str) -> bool:
         """028: a request without a valid session reaches only the public surface."""
         if path.startswith("/assets/") and self.public_assets is not None:
             # the SPA's chunks: those of the sign-in page for everyone, the rest once signed in (by its
             # cookie: code, no data — checking the session for dozens of files would cost more than it saves)
             return path.rsplit("/", 1)[-1] in self.public_assets or _session_key(scope) is not None
-        if anonymous_allowed(path):
+        if anonymous_allowed(path) and (path not in SETUP_PATHS or self._local(scope, self.setup_networks)):
             return True
         app_state = getattr(scope.get("app"), "state", None)
         if path == SIGN_IN_TERMS_PATH and await _terms_on_sign_in(app_state):

@@ -19,6 +19,7 @@ import gzip
 import io
 import json
 import os
+import re
 import shutil
 import tarfile
 import tempfile
@@ -112,7 +113,25 @@ def upgrade_manifest(manifest: dict[str, Any]) -> dict[str, Any]:
     while version < FORMAT:
         manifest = UPGRADERS[version](manifest)
         version = int(manifest["format"])
+    _check_names(manifest)
     return manifest
+
+
+def _check_names(manifest: Mapping[str, Any]) -> None:
+    """#275: every table, partition and folder an archive names has the shape Portalab writes — checked when
+    it is read, before anything is emptied."""
+    try:
+        names = [t["name"] for t in manifest.get("tables", [])]
+        for p in manifest.get("partitions", []):
+            names += [p["name"], p["parent"]]
+            if not _BOUND.fullmatch(p["bound"]):
+                raise ValueError(p["bound"])
+        if not all(_TABLE.fullmatch(n) for n in names):
+            raise ValueError("table")
+        if not all(_FOLDER.fullmatch(f["name"]) for f in manifest.get("folders", [])):
+            raise ValueError("folder")
+    except (KeyError, TypeError, ValueError) as exc:
+        raise BackupError("backup.damaged", "This archive's description is not one Portalab writes.") from exc
 
 
 @dataclass(slots=True)
@@ -141,6 +160,15 @@ class Manifest:
             "folders": self.folders,
             "counts": self.counts,
         }
+
+
+# #275: what an archive's manifest names is checked before it reaches SQL or the disk — a crafted archive
+# could otherwise run SQL as the superuser the restore needs, or move folders out of the data folder
+_TABLE = re.compile(r"[a-z_][a-z0-9_]{0,62}\.[a-z_][a-z0-9_]{0,62}")
+_BOUND = re.compile(
+    r"DEFAULT|FOR VALUES (?:FROM \('[^'\\]{1,64}'\) TO \('[^'\\]{1,64}'\)|IN \('[^'\\]{1,64}'\))"
+)
+_FOLDER = re.compile(r"[a-z0-9_-]{1,64}(?:/[a-z0-9_-]{1,64})?")
 
 
 def _quote(name: str) -> str:
@@ -598,10 +626,13 @@ def clear_data(data_dir: Path) -> list[str]:
 
 def _swap_folders(files_dir: Path, data_dir: Path, manifest: Mapping[str, Any]) -> list[str]:
     swapped: list[str] = []
+    root = data_dir.resolve()
     for folder in manifest.get("folders", []):
         name = folder["name"]
         staged = files_dir / name
         live = data_dir / name
+        if not _FOLDER.fullmatch(name) or not live.resolve().is_relative_to(root) or live.resolve() == root:
+            raise BackupError("backup.damaged", "This archive names a folder outside the portal's data.")
         live.parent.mkdir(parents=True, exist_ok=True)
         old = live.with_name(live.name + ".before-restore")
         if live.exists():

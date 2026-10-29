@@ -24,6 +24,9 @@ class SettingsError(ValueError):
 # 028: the machine itself and the local networks; the proxy on the machine itself
 HEALTH_NETWORKS = ("127.0.0.0/8", "::1/128", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "fc00::/7")
 TRUSTED_PROXIES = ("127.0.0.1",)
+SETUP_NETWORKS = (
+    HEALTH_NETWORKS  # #275: where a portal not yet set up may be set up from (never the internet)
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -37,6 +40,7 @@ class BootstrapSettings:
     # 028: who may ask the health checks, and the reverse proxies whose X-Forwarded-For is believed
     health_networks: tuple[str, ...] = HEALTH_NETWORKS
     trusted_proxies: tuple[str, ...] = TRUSTED_PROXIES
+    setup_networks: tuple[str, ...] = SETUP_NETWORKS
 
 
 def normalize_database_url(url: str) -> str:
@@ -113,10 +117,12 @@ def load_settings(env: Mapping[str, str] | None = None) -> BootstrapSettings:
 
     health_networks = _networks(env, "HEALTH_NETWORKS", HEALTH_NETWORKS)
     trusted_proxies = _networks(env, "TRUSTED_PROXIES", TRUSTED_PROXIES)
+    setup_networks = _networks(env, "SETUP_NETWORKS", SETUP_NETWORKS)
 
     return BootstrapSettings(
         health_networks=health_networks,
         trusted_proxies=trusted_proxies,
+        setup_networks=setup_networks,
         database_url=database_url,
         secret_key=secret_key,
         bind_host=bind_host,

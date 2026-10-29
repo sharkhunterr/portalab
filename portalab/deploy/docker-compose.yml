@@ -20,6 +20,15 @@ x-portalab: &portalab
     BIND_PORT: "8080"
     LOG_LEVEL: ${LOG_LEVEL:-INFO}
     DATA_DIR: /var/lib/portalab
+    # #273: behind a reverse proxy (Nginx Proxy Manager…), its address or network as Portalab sees it — the
+    # NPM container's Docker network (e.g. 172.18.0.0/16) or the host it runs on. Never 0.0.0.0/0: anyone
+    # could then claim any address. Without it, every visitor has the proxy's address (one rate limit for
+    # all, one block shutting everyone out) and Portalab logs a warning.
+    TRUSTED_PROXIES: ${PORTALAB_TRUSTED_PROXIES:-127.0.0.1}
+    # who may ask /healthz, /readyz, /metrics (the container's own health check asks from itself)
+    HEALTH_NETWORKS: ${PORTALAB_HEALTH_NETWORKS:-127.0.0.1/32,::1/128}
+    # #275: where a portal not yet set up (or reset) may be set up from — the local networks, never the internet
+    SETUP_NETWORKS: ${PORTALAB_SETUP_NETWORKS:-127.0.0.0/8,::1/128,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7}
   secrets: [database_url, secret_key]
   volumes:
     - portalab-data:/var/lib/portalab

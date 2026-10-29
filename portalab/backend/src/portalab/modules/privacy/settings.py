@@ -32,6 +32,7 @@ class SecurityConfig:
     max_body_bytes: int = 10 * 1024 * 1024
     rate_limit_per_ip_per_minute: int = 600
     rate_limit_per_user_per_minute: int = 300
+    rate_limit_sign_in_per_minute: int = 30  # #276: password and account attempts per address
     # 030 (issue 144): outgoing calls only to known hosts, when switched on
     egress_enabled: bool = False
     egress_hosts: list[str] = field(default_factory=list)

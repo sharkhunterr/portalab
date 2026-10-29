@@ -6,6 +6,7 @@ are throttled independently. A successful sign-in clears the key.
 """
 
 import hashlib
+import unicodedata
 from datetime import datetime, timedelta
 
 from sqlalchemy import delete
@@ -21,7 +22,8 @@ MAX_DELAY = timedelta(minutes=15)
 
 
 def throttle_key(identifier: str, client_prefix: str | None) -> str:
-    material = f"{identifier.strip().casefold()}|{client_prefix or '-'}"
+    # #276: folded like the login is looked up (NFKC): a full-width « admin » is « admin »
+    material = f"{unicodedata.normalize('NFKC', identifier).strip().casefold()}|{client_prefix or '-'}"
     return hashlib.sha256(material.encode("utf-8")).hexdigest()
 
 
