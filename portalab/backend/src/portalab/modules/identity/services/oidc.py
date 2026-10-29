@@ -9,12 +9,13 @@ state rules apply)."""
 
 import base64
 import hashlib
+import hmac
 import secrets
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import Any
-from urllib.parse import urlencode, urlsplit
+from urllib.parse import parse_qs, urlencode, urlsplit
 from uuid import UUID
 
 import httpx
@@ -66,6 +67,16 @@ class SignOnFailed(Unauthorized):
 
 def _b64(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
+
+
+def browser_binding(state: str) -> str:
+    """#277: what the browser that started a sign-on keeps (a cookie) — the way back is accepted only in that
+    browser, so nobody can finish someone else's sign-on (or their own in a victim's browser)."""
+    return hashlib.sha256(state[:64].encode()).hexdigest()
+
+
+def state_of(provider_url: str) -> str:
+    return parse_qs(urlsplit(provider_url).query)["state"][0]
 
 
 def safe_next(path: str | None) -> str:
@@ -217,11 +228,15 @@ class OidcService:
         client_ip: str | None,
         user_agent: str | None,
         previous_token: str | None,
+        browser: str | None,
     ) -> tuple[SignedIn, str]:
-        """Check the provider's answer and open the member's session; returns it with where to go next."""
+        """Check the provider's answer and open the member's session; returns it with where to go next.
+        ``browser`` is what the browser kept when it started (:func:`browser_binding`)."""
         config = await self.settings()
         if not config.ready:
             raise Unavailable("The single sign-on is not set up.", code="auth.sso_disabled")
+        if not browser or not hmac.compare_digest(browser, browser_binding(state)):
+            raise SignOnFailed("started in another browser")
         now = self.ctx.now()
         async with self.ctx.database.unit_of_work() as uow:
             login = await uow.session.get(OidcLogin, state[:64], with_for_update=True)
@@ -230,16 +245,29 @@ class OidcService:
         if login is None or login.created_at < now - PENDING:
             raise SignOnFailed("unknown or expired state")
         claims = await self._claims(config, code, redirect_uri, login)
-        user_id = await self._member(config, claims)
+        user_id = await self._member(config, claims, await self._signed_in(previous_token))
         signed = await self.auth.open_session(
             user_id, client_ip=client_ip, user_agent=user_agent, previous_token=previous_token
         )
         return signed, login.next_path
 
-    async def _member(self, config: OidcSettings, claims: Mapping[str, Any]) -> UUID:
+    async def _signed_in(self, token: str | None) -> UUID | None:
+        """The member already signed in in this browser (a live session), if any."""
+        if not token:
+            return None
+        async with self.ctx.database.unit_of_work() as uow:
+            row = await self.auth.sessions.resolve(uow.session, token, self.ctx.now())
+            return row.user_id if row is not None else None
+
+    async def _member(self, config: OidcSettings, claims: Mapping[str, Any], signed_in: UUID | None) -> UUID:
+        """The member a provider account signs in as: the one it is linked to; else the member signed in in
+        this browser; else the member of the same e-mail (linked by the server, nobody does it by hand) —
+        the Admin only when the provider **vouches** for that e-mail (#277: anyone able to set their e-mail
+        at the provider would otherwise become the Admin); else a new member, when allowed."""
         issuer, subject = config.issuer, str(claims["sub"])[:255]
         email = str(claims.get("email") or "").strip().lower() or None
         verified = claims.get("email_verified") is not False  # Authentik leaves it out for its own users
+        vouched = claims.get("email_verified") is True
         now = self.ctx.now()
         async with self.ctx.database.unit_of_work() as uow:
             session = uow.session
@@ -251,9 +279,15 @@ class OidcService:
             if linked is not None:
                 linked.last_sign_in_at = now
                 return linked.user_id
-            user = None
-            if email and verified:
+            user = await session.get(User, signed_in) if signed_in is not None else None
+            if user is None and email and verified:
                 user = await session.scalar(select(User).where(func.lower(User.email) == email))
+                if (
+                    user is not None
+                    and not vouched
+                    and await self.ctx.admin_authority().is_admin(session, user.id)
+                ):
+                    raise SignOnFailed("the provider does not vouch for the Admin's e-mail")
             if user is None:
                 if not config.create_accounts:
                     raise SignOnFailed("no portal account for this provider account")

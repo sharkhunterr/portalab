@@ -36491,7 +36491,7 @@
     },
     "/api/v1/auth/oidc/start": {
       "get": {
-        "description": "027: off to the single sign-on provider (the way back is ``/auth/oidc/callback``).",
+        "description": "027: off to the single sign-on provider (the way back is ``/auth/oidc/callback``) \u2014 #277: this browser\nkeeps a cookie without which the way back is refused. A member signed in connects their provider\naccount.",
         "operationId": "oidc_start_api_v1_auth_oidc_start_get",
         "parameters": [
           {
