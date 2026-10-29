@@ -80,8 +80,8 @@ function latestNotes() {
 
 /** The version standard-version is about to write (from its dry run). */
 function nextVersion() {
-  let command = 'npx --no-install standard-version --dry-run --silent';
-  if (options.releaseType) command += ` --release-as ${options.releaseType}`;
+  let command = 'npx --no-install standard-version --dry-run 2>&1';
+  if (options.releaseType) command = command.replace(' 2>&1', ` --release-as ${options.releaseType} 2>&1`);
   const output = execSync(command, { encoding: 'utf8', cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] });
   const match = output.match(/bumping version in \S+ from \S+ to (\d+\.\d+\.\d+)/);
   if (!match) throw new Error('could not tell the next version from standard-version');
