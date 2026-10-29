@@ -19,6 +19,7 @@ import {
 import {
   closeRadio,
   expandRadio,
+  restoreRadio,
   setRadioVolume,
   stopRadio,
   useRadioPlayback,
@@ -37,9 +38,20 @@ import "./radio.css";
 export function RadioHost() {
   const playback = useRadioPlayback();
   const book = useListen();
+  const radio = useRadio(playback.open);
+  const restored = useRef(false);
+  useEffect(() => {
+    restored.current = restoreRadio();
+  }, []);
   useEffect(() => {
     if (book.objectId && playback.open) closeRadio(); // one player at a time
   }, [book.objectId, playback.open]);
+  // brought back after a reload while the radio is gone (switched off, out of reach): the bar goes too
+  useEffect(() => {
+    if (!restored.current || !(radio.isSuccess || radio.isError)) return;
+    restored.current = false;
+    if (radio.isError || radio.data?.available === false) closeRadio();
+  }, [radio.isSuccess, radio.isError, radio.data?.available]);
   if (!playback.open) return null;
   return (
     <>
