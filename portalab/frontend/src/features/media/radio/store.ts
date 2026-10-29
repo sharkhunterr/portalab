@@ -7,6 +7,7 @@ import { closeBook, useListen } from "../listen/store";
  * stream: each start opens a fresh connection (no stale buffer), a pause closes it.
  */
 export const RADIO_STREAM = "/api/v1/media/radio/stream";
+const SAVED = "portalab.radio";
 
 export interface RadioPlayback {
   /** the player is shown (the bar at the bottom), playing or paused */
@@ -31,8 +32,19 @@ const listeners = new Set<() => void>();
 let audio: HTMLAudioElement | null = null;
 
 function set(next: Partial<RadioPlayback>) {
+  const was = state;
   state = { ...state, ...next };
+  if (state.open !== was.open || state.volume !== was.volume) remember();
   for (const listener of listeners) listener();
+}
+
+/** Issue 271: whether the player is shown and its volume, kept for a reload. */
+function remember() {
+  try {
+    localStorage.setItem(SAVED, JSON.stringify({ open: state.open, volume: state.volume }));
+  } catch {
+    // private window: the player simply does not come back after a reload
+  }
 }
 
 function element(): HTMLAudioElement {
@@ -90,6 +102,23 @@ export function setRadioVolume(volume: number) {
   const value = Math.min(1, Math.max(0, volume));
   if (audio) audio.volume = value;
   set({ volume: value });
+}
+
+/** After a reload, the player comes back paused as the member left it — the browser plays nothing without a
+ * gesture, and a live stream has no place to go back to: a touch on play tunes in again. */
+export function restoreRadio(): boolean {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVED) ?? "null") as {
+      open?: boolean;
+      volume?: number;
+    } | null;
+    if (typeof saved?.volume === "number") setRadioVolume(saved.volume);
+    if (!saved?.open || state.open) return false;
+    set({ open: true });
+    return true;
+  } catch {
+    return false; // nothing to restore
+  }
 }
 
 /** Play or stop, an audiobook stepping aside when the radio starts. */
