@@ -2,12 +2,12 @@
   "type": "card_reveal",
   "look": "impact-legendary",
   "names": {
-    "fr": "Flammes toxiques",
-    "en": "Toxic flames"
+    "fr": "Explosion de puissance",
+    "en": "Power burst"
   },
   "descriptions": {
-    "fr": "Dessinée dans EffectCraft, image par image : flammes d'énergie verte en trois tons de cel-shading autour de sa dalle, anneaux lime, gouttes de slime projetées, deux grands éclats.",
-    "en": "Drawn in EffectCraft, frame by frame: green energy flames in three cel tones round its slab, lime rings, goo drops flying off, two great glints."
+    "fr": "Dessinée dans EffectCraft, image par image : sortie de sa tornade, la plus grande explosion — rayons roses, blancs et or cernés d'encre, lignes de vitesse —, des anneaux blancs et roses, des éclats or et blancs projetés et deux grands éclats.",
+    "en": "Drawn in EffectCraft, frame by frame: out of its vortex, the biggest burst — inked pink, white and gold rays, speed lines — white and pink rings, gold and white glints flying off and two great glints."
   },
   "render": {
     "kind": "glsl",
@@ -16,7 +16,7 @@
       "reveal.css"
     ],
     "stage": true,
-    "duration": 3.0,
+    "duration": 2.5,
     "rarity": "legendary"
   }
 }

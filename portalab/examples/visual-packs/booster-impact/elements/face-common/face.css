@@ -1,5 +1,5 @@
 /* A common card: inked all round, a pale rim in hard cel bands, the paper halftone, an outlined comic title.
-   (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform; a turned media
+   (Its hook: the card once turned, data-card-face.) The face turns in 3D: never its transform; a turned media
    card is never redrawn — what moves, moves once, as it is revealed. */
 @font-face {
   font-family: "Impact Bangers";
