@@ -19,11 +19,25 @@
   background: url("frames.webp") 0 0 / 800% 800% no-repeat;
   animation: impact-opening-x 0.3333s steps(8) 8 both, impact-opening-y 2.667s steps(8) both;
 }
+@media (max-width: 40rem) {
+  [data-opening="impact"] .booster-stage__opening {
+    background: url("frames-phone.webp") 0 0 / 800% 800% no-repeat;
+    animation: impact-opening-phone-x 0.3333s steps(8) 8 both, impact-opening-phone-y 2.667s steps(8) both;
+  }
+}
 @keyframes impact-opening-x {
   from { background-position-x: 0%; }
   to { background-position-x: 114.2857%; }
 }
 @keyframes impact-opening-y {
+  from { background-position-y: 0%; }
+  to { background-position-y: 114.2857%; }
+}
+@keyframes impact-opening-phone-x {
+  from { background-position-x: 0%; }
+  to { background-position-x: 114.2857%; }
+}
+@keyframes impact-opening-phone-y {
   from { background-position-y: 0%; }
   to { background-position-y: 114.2857%; }
 }

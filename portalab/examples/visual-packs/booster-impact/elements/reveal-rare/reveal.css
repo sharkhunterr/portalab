@@ -6,11 +6,25 @@
   background: url("frames.webp") 0 0 / 800% 600% no-repeat;
   animation: impact-reveal-rare-x 0.3333s steps(8) 6 both, impact-reveal-rare-y 2s steps(6) both;
 }
+@media (max-width: 40rem) {
+  [data-reveal="impact-rare"] .booster-fx__scene {
+    background: url("frames-phone.webp") 0 0 / 800% 600% no-repeat;
+    animation: impact-reveal-rare-phone-x 0.3333s steps(8) 6 both, impact-reveal-rare-phone-y 2s steps(6) both;
+  }
+}
 @keyframes impact-reveal-rare-x {
   from { background-position-x: 0%; }
   to { background-position-x: 114.2857%; }
 }
 @keyframes impact-reveal-rare-y {
+  from { background-position-y: 0%; }
+  to { background-position-y: 120.0000%; }
+}
+@keyframes impact-reveal-rare-phone-x {
+  from { background-position-x: 0%; }
+  to { background-position-x: 114.2857%; }
+}
+@keyframes impact-reveal-rare-phone-y {
   from { background-position-y: 0%; }
   to { background-position-y: 120.0000%; }
 }

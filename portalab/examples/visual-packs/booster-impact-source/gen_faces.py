@@ -186,7 +186,6 @@ def face(rarity: str, p: dict) -> str:
 /* frames: end */
 {h}::after {{
   z-index: 3;
-  background-image: url("vortex-front.webp");
 }}
 /* on a phone, the cards' row scrolls sideways and cuts what overflows it 5rem above and below a card: the
    vortex has faded out before it */
