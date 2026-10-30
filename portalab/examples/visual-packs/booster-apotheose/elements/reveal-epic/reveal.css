@@ -12,7 +12,6 @@
   font-style: normal;
   letter-spacing: 0.04em;
   color: #ffffff;
-  -webkit-text-stroke: 0.55rem #14081f;
+  -webkit-text-stroke: 0.35rem #14081f;
   paint-order: stroke fill;
-  text-shadow: 0.6rem 0.6rem 0 #14081f;
 }

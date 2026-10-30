@@ -85,55 +85,69 @@ var CARD_AT = 22, FACE_AT = 42;
 var PALETTE = {
   rare: { main: CYAN, light: CYAN_L, deep: [0.03, 0.2, 0.55], dark: [0.02, 0.05, 0.14], length: 76 },
   epic: { main: PINK, light: PINK_L, deep: [0.55, 0.05, 0.25], dark: [0.07, 0.01, 0.05], length: 92 },
-  legendary: { main: ORANGE, light: GOLD_L, deep: [0.45, 0.12, 0.02], dark: [0.08, 0.02, 0.01], length: 110 }
+  legendary: { main: ORANGE, light: GOLD_L, deep: [0.45, 0.12, 0.02], dark: [0.15, 0.03, 0.02], length: 110 }
 };
-// thick ink slashes sweeping across the screen on a slant — the title screen's strokes
-function inkSlashes(L, f, count, base, color) {
-  seed(base);
-  for (var k = 0; k < count; k++) {
-    var y = between(-200, 1280), speed = between(60, 110), x = -900 + ((f + between(0, 20)) * speed) % 2900, len = between(700, 1300), thick = between(40, 120);
-    polys(L, slash(x, y + 300, x + len, y - 300, thick, 1, between(-0.6, 0.6)), color, 100);
+// the title screen: few, big, flat shapes — the rarity's colour filling the screen, two great dark wedges cutting
+// its corners and drifting, a thin line of colour, two white brush flicks (u: 0..1 over the title)
+function titleScreen(fr, P, u, f) {
+  var drift = u * 60;
+  polys(fr.main, [[[-80, -80], [700 - drift, -80], [-80, 520 - drift]]], P.dark, 100);
+  polys(fr.main, [[[1160, 1160], [380 + drift, 1160], [1160, 560 + drift]]], P.dark, 100);
+  lines(fr.main, [[[-80, 600 - drift], [820 - drift, -80]]], P.main, 10);
+  lines(fr.main, [[[1160, 470 + drift], [260 + drift, 1160]]], P.main, 6);
+  var flick = function (x, y, r, a0, sweep, w) { return [ring(x, y, r, 1, a0, a0 + sweep)]; };
+  if (f >= 3 && f < 14) lines(fr.top, flick(240, 300, 110, 3.6, 1.1 * ease((f - 2) / 4)), WHITE, 9 * fade(f, 9, 14));
+  if (f >= 7 && f < 19) lines(fr.top, flick(820, 760, 140, 0.4, 1.0 * ease((f - 6) / 4)), WHITE, 11 * fade(f, 13, 19));
+  polys(fr.main, [full()], P.main, 100);
+}
+// the wipe out of it: dark bands, edged in the rarity's colour, sweeping across on a slant (v: 0..1)
+function wipe(fr, P, v) {
+  var bands = [];
+  for (var k = 0; k < 6; k++) {
+    var x = -1600 + v * 2600 + k * 230, w = 150;
+    bands.push([[x, 1160], [x + w, 1160], [x + w + 1240, -80], [x + 1240, -80]]);
   }
+  lines(fr.top, bands, P.main, 5);
+  polys(fr.top, bands, P.dark, 100);
 }
 // the comic crown round the card: a white ring, its outside a star burst, its inside torn into teeth, the card
 // showing through — r: its inner size (0..1.4)
 function crown(L, r, turn, color, base) {
   seed(base);
-  var outer = burst(C, C, 26, 1150 * r, 760 * r, 0.25, turn, 1), inner = [], n = 34;
+  var outer = burst(C, C, 18, 1100 * r, 760 * r, 0.22, turn, 1), inner = [], n = 22;
   for (var i = 0; i < n * 2; i++) {
-    var a = turn + i / (n * 2) * Math.PI * 2, d = (i % 2 ? 300 : between(360, 470)) * r;
+    var a = turn + i / (n * 2) * Math.PI * 2, d = (i % 2 ? 310 : between(380, 470)) * r;
     inner.push([C + Math.cos(a) * d * 0.82, C + Math.sin(a) * d * 1.08]);
   }
   polys(L, [outer, inner], color, 100, true);
+}
+// a clean burst: n great wedges from the middle, the rarity's colour and white in turn, dark between
+function cleanBurst(L, n, turn, reach, P, o) {
+  var mains = [], whites = [];
+  for (var i = 0; i < n * 2; i++) {
+    var a = turn + i / (n * 2) * Math.PI * 2, w = Math.PI / (n * 2) * 0.62;
+    (i % 2 ? whites : mains).push([[C, C], [C + Math.cos(a - w) * reach, C + Math.sin(a - w) * reach], [C + Math.cos(a + w) * reach, C + Math.sin(a + w) * reach]]);
+  }
+  polys(L, whites, WHITE, o * 0.92); polys(L, mains, P.main, o);
 }
 function stagedBehind(rarity) {
   var P = PALETTE[rarity], comp = square("reveal-" + rarity, P.length), N = P.length;
   for (var f = 0; f < N; f++) {
     var fr = frameOf(comp, f); if (!fr.main) continue;
     var o = fade(f, N - 12, N - 1) * 100;
-    if (f < CARD_AT + 2) {   // the title screen: the rarity's colour, ink slashes, lightning
-      if (f < 2) polys(fr.top, [full()], WHITE, 90 - f * 40);
-      inkSlashes(fr.main, f, 7, 100 + Math.floor(f / 2), INK);
-      seed(150 + f); var bolts = [];
-      for (var k = 0; k < 3; k++) bolts = bolts.concat(bolt(between(100, 980), between(-40, 300), between(100, 980), between(780, 1120), 60, true));
-      lines(fr.glow, bolts, P.light, 18); lines(fr.top, bolts, WHITE, 4);
-      polys(fr.main, streaks(C, C, 600, 600, 30, -0.9, 500, 6), P.light, 60);
-      polys(fr.main, [full()], P.main, 100);
-      continue;
-    }
-    // the card's stage: black, the rarity's spikes and white bursting from the middle, speed lines rushing in
-    var g = ease((f - CARD_AT) / 5), at = f - FACE_AT, spin = (f - CARD_AT) * 0.01;
-    if (at >= 0 && at < 4) polys(fr.top, [full()], WHITE, 100 - at * 25);
+    if (f < CARD_AT) titleScreen(fr, P, f / CARD_AT, f);
+    if (f >= CARD_AT - 4 && f < CARD_AT + 4) wipe(fr, P, (f - CARD_AT + 4) / 8);
+    if (f < CARD_AT - 1) continue;
+    // the card's stage: a clean burst turning slowly on dark; as it turns over, a flash, then the white crown
+    var g = ease((f - CARD_AT) / 6), at = f - FACE_AT, spin = (f - CARD_AT) * 0.008;
+    if (at >= 0 && at < 3) polys(fr.top, [full()], WHITE, 100 - at * 33);
     if (at >= 0) {
-      var cr = 0.55 + 0.55 * back(at / 6) + 0.004 * at;
-      crown(fr.main, cr, spin * 2, WHITE, 300);
-      crown(fr.main, cr * 1.04 + 0.03, spin * 2 + 0.05, P.main, 300);
-      for (var w = 0; w < 2; w++) { var age = at - w * 6; if (age < 0 || age > 18) continue; var rr = 300 + age * 36; lines(fr.glow, [ring(C, C, rr, 1.15)], P.light, 26, fade(age, 8, 18) * o); lines(fr.main, [ring(C, C, rr, 1.15)], WHITE, 5, fade(age, 8, 18) * o); }
-    } else {
-      polys(fr.top, concentration(C, C, 70, 360, 900, 14), WHITE, 45);
+      var cr = 0.55 + 0.5 * back(at / 6);
+      crown(fr.main, cr, spin * 1.5, WHITE, 300);
+      crown(fr.main, cr * 1.05 + 0.03, spin * 1.5 + 0.06, P.main, 300);
     }
-    spikes(fr.main, 22, spin, [[P.main, o], [WHITE, o * (at >= 0 ? 0.95 : 0.8)], [P.deep, o]], 400 + (at >= 0 ? 1 : 0), 240 + 900 * g);
-    polys(fr.haze, [circle(C, C, 330, 1.35, 40)], P.main, o * 0.9);
+    cleanBurst(fr.main, 12, spin, (300 + 900 * g) * (at >= 0 ? 1.1 : 1), P, o);
+    polys(fr.haze, [circle(C, C, 330, 1.35, 40)], P.main, o * 0.7);
     polys(fr.main, [full()], P.dark, o);
   }
 }
@@ -148,20 +162,14 @@ function stagedOver(rarity) {
   for (var f = 0; f < N; f++) {
     var fr = frameOf(comp, f); if (!fr.main) continue;
     var at = f - FACE_AT + 3;
-    if (at >= 0 && at < 9) {
-      var so = fade(at, 4, 9) * 100, u = ease(at / 3);
-      polys(fr.glow, slash(-60, 830, 1140, 250, 74, u, 1), P.main, so);
-      polys(fr.top, slash(-60, 830, 1140, 250, 52, u, 1), WHITE, so);
+    if (at >= 0 && at < 8) {
+      var so = fade(at, 4, 8) * 100, u = ease(at / 3);
+      polys(fr.glow, slash(-60, 830, 1140, 250, 70, u, 1), P.main, so);
+      polys(fr.top, slash(-60, 830, 1140, 250, 50, u, 1), WHITE, so);
     }
-    if (at >= 3) sparks(fr.main, fr.glow, at - 3, rarity === "legendary" ? 70 : 46, P.main, 1500, 24);
-    if (rarity === "legendary" && at >= 4 && at < N - FACE_AT - 8) {
-      seed(1600 + f); var arcs = [];
-      for (var k = 0; k < 3; k++) { var a = between(0, Math.PI * 2), a2 = a + between(0.4, 0.9), r = toEdge(a, 160, 222), r2 = toEdge(a2, 160, 222); arcs = arcs.concat(bolt(C + Math.cos(a) * r, C + Math.sin(a) * r, C + Math.cos(a2) * r2, C + Math.sin(a2) * r2, 24, true)); }
-      lines(fr.glow, arcs, GOLD, 14); lines(fr.top, arcs, WHITE, 3);
-    }
-    var big = { 6: 0.5, 7: 1, 8: 0.85, 9: 0.6, 10: 0.3 }[at], small = { 24: 0.5, 25: 1, 26: 0.7, 27: 0.35 }[at];
+    if (at >= 3) sparks(fr.main, fr.glow, at - 3, 18, P.main, 1500, 22);
+    var big = { 6: 0.5, 7: 1, 8: 0.85, 9: 0.6, 10: 0.3 }[at];
     if (big) { polys(fr.glow, glintPolys([[C + 150, C - 215, 190 * big]]), P.light); polys(fr.top, glintPolys([[C + 150, C - 215, 130 * big]]), WHITE); }
-    if (small) polys(fr.top, glintPolys([[C - 150, C + 215, 100 * small]]), WHITE);
   }
 }
 if (ONLY === "over-rare") stagedOver("rare");
