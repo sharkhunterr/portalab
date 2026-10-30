@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "geode-epic",
+  "names": {
+    "fr": "Face épique",
+    "en": "Epic face"
+  },
+  "descriptions": {
+    "fr": "Un cadre taillé dans l'améthyste, à facettes, un sertissage d'argent ; en se retournant, un reflet prismatique glisse sur elle.",
+    "en": "A frame cut in amethyst, faceted, a silver bezel; as it turns, a prismatic gleam glides over it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

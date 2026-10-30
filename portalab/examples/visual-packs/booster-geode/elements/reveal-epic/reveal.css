@@ -1,0 +1,18 @@
+/* A epic card turned (its hook: data-reveal), 2.4 s: violet rays turning, a fan of amethysts and rose quartz
+   shooting out one after another round the card, shards orbiting it, then all shattering — drawn in EffectCraft,
+   played as a video (24 frames a second) in its layer behind the card. */
+/* room for the effect: a layer 2.6 times the card, fading out towards its edges — never the outline of its box */
+[data-reveal="geode-epic"] .booster-fx__scene {
+  inset: -80%;
+  width: 260%;
+  height: 260%;
+  mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+}
+/* on a phone, the cards' row scrolls sideways and cuts what overflows it 5rem above and below a card: the
+   effect has faded out before it */
+@media (max-width: 40rem) {
+  [data-reveal="geode-epic"] .booster-fx__scene {
+    mask-image: radial-gradient(closest-side, #000 72%, transparent 100%), linear-gradient(to bottom, transparent calc(30.77% - 4.5rem), #000 calc(30.77% - 1.5rem), #000 calc(69.23% + 1.5rem), transparent calc(69.23% + 4.5rem));
+    mask-composite: intersect;
+  }
+}

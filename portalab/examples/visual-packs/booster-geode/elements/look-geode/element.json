@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "geode",
+  "names": {
+    "fr": "Géode scellée",
+    "en": "Sealed geode"
+  },
+  "descriptions": {
+    "fr": "Une géode encore close : pierre brute taillée en octogone, traversée de fêlures de lumière violette qui pulsent ; l'image de l'œuvre dans une fenêtre polie jusqu'au cristal, cerclée d'améthyste ; son nom gravé ; le nombre de cartes sur une gemme taillée ; un éclat à son coin.",
+    "en": "A geode not yet opened: rough stone cut into an octagon, cracks of violet light pulsing through it; the work's art in a window polished through to the crystal, ringed with amethyst; its name engraved; the card count on a cut gem; a glint at its corner."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

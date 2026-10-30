@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "geode",
+  "names": {
+    "fr": "Scène Géode",
+    "en": "Geode scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture au cœur d'une géode, jouée en vidéo. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening inside a geode, played as videos. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-geode",
+      "backdrop": "backdrop-geode",
+      "opening": "opening-geode",
+      "back": {
+        "common": "back-geode"
+      },
+      "face": {
+        "common": "face-common",
+        "rare": "face-rare",
+        "epic": "face-epic",
+        "legendary": "face-legendary"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

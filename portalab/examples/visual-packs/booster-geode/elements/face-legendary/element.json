@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "geode-legendary",
+  "names": {
+    "fr": "Face légendaire",
+    "en": "Legendary face"
+  },
+  "descriptions": {
+    "fr": "Un cadre d'opale arc-en-ciel taillée à facettes, serti d'or ; en se posant, l'or la balaie et un éclat traverse son image.",
+    "en": "A frame of rainbow opal cut in facets, set in gold; as it lands, gold sweeps over it and a glint crosses its art."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

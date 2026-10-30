@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "geode-epic",
+  "names": {
+    "fr": "Éventail d'améthystes",
+    "en": "Amethyst fan"
+  },
+  "descriptions": {
+    "fr": "Dessinée dans EffectCraft, jouée en vidéo : des rayons violets qui tournent, un éventail d'améthystes et de quartz rose qui jaillissent un à un autour de la carte, des éclats en orbite, puis tout se brise.",
+    "en": "Drawn in EffectCraft, played as a video: violet rays turning, a fan of amethysts and rose quartz shooting out one after another round the card, shards orbiting it, then all shatters."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic"
+  }
+}

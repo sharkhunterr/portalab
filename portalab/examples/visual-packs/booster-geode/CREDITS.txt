@@ -1,0 +1,8 @@
+Géode — an example booster scene for Portalab (CC0-1.0), every shader, stylesheet and drawing original.
+
+Font: Cinzel by Natanael Gama — SIL Open Font License 1.1 (https://openfontlicense.org), from Google Fonts
+(latin subset, variable weight); embedded unmodified in the pack and each card face as Cinzel.woff2.
+
+Animations (*.mp4): drawn and rendered with EffectCraft (Apache-2.0, https://github.com/storytold/effectcraft),
+made into videos with ffmpeg (../tools/alpha_video.py); still shapes (*.svg) drawn by gen_svgs.py; sources and
+build in ../booster-geode-source.

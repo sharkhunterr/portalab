@@ -43,6 +43,15 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   rather than sprite sheets, from the same EffectCraft renders (`booster-impact-source/video.py`), to compare
   the two: at their full size, 7.5 MB against 27 MB; the legendary's vortex is its reveal's two videos (behind
   the card, then over it);
+- `booster-geode/` (`geode`): **an opening inside a geode, made for video** — every animation drawn frame by
+  frame in EffectCraft, with real glows (blurred, added light), and played as transparent videos (sources and
+  `build.sh` in `booster-geode-source/`): a cavern whose walls are lined with faceted amethyst points flashing
+  now and then (GLSL); a pack of rough stone chipped where amethyst breaks through, cracked with pulsing violet
+  light, that trembles and bursts — a flash, a shockwave, its shell flying in pieces — into a crown of
+  amethysts, citrine and quartz that glints then shatters into shards; cards set like stones (polished stone,
+  blue quartz, amethyst, rainbow opal set in gold) with engraved titles — druses of quartz for a rare, a fan of
+  amethysts and orbiting shards for an epic, and for a legendary prismatic rays, a crown of giant crystals of
+  every gem and a belt of shards passing behind then over the card;
 - `booster-sumi/` (`sumi`): **an opening in ink and gold, like Japanese lacquerware** — every animation drawn
   frame by frame in EffectCraft at 24 fps with a brush of bristles that lands heavy and runs dry, played as
   transparent videos (sources and `build.sh` in `booster-sumi-source/`), on a stage of black urushi lacquer where gold seigaiha waves rise and gold

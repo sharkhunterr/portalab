@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "geode",
+  "names": {
+    "fr": "Cœur de géode",
+    "en": "Inside a geode"
+  },
+  "descriptions": {
+    "fr": "Au cœur d'une géode : des parois tapissées de pointes d'améthyste à facettes, leurs arêtes qui accrochent la lumière, une pointe qui étincelle de temps en temps, le creux sombre et profond baigné d'une lueur violette, des rais de lumière lents et une poussière minérale en suspension (HD).",
+    "en": "Inside a geode: walls lined with faceted amethyst points, their ridges catching the light, now and then one flashing, the hollow dark and deep in a violet glow, slow shafts of light and mineral dust floating (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "cavern.glsl",
+    "stage": true
+  }
+}

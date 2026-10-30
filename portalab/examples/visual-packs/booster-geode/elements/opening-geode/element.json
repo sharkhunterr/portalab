@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "geode",
+  "names": {
+    "fr": "Éclosion",
+    "en": "Bursting open"
+  },
+  "descriptions": {
+    "fr": "Dessinée image par image dans EffectCraft, jouée en vidéo : des fêlures de lumière courent sur la pierre qui tremble de plus en plus, la lumière fuit ; elle éclate — un flash, une onde de choc, sa coque qui vole en morceaux —, la géode s'ouvre : un cœur de petits cristaux et une couronne d'améthystes, de citrines et de quartz qui jaillit, scintille puis se brise en éclats étincelants.",
+    "en": "Drawn frame by frame in EffectCraft, played as a video: cracks of light run over the stone as it trembles harder and harder, light leaking; it bursts — a flash, a shockwave, its shell flying in pieces —, the geode opens: a heart of small crystals and a crown of amethysts, citrines and quartz shooting out, glinting, then shattering into sparkling shards."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "burst.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}
