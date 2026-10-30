@@ -1878,7 +1878,7 @@
   "visuals.check.video.invalid": "{file} is not the video its name says.",
   "visuals.check.video.over_elsewhere": "Only a card's reveal plays a video over the card.",
   "visuals.check.render.no_renderer": "The renderer is not named (render.renderer).",
-  "visuals.check.scene.duration": "Too long ({seconds} s): an opening lasts 4 s at most, a reveal 3 s.",
+  "visuals.check.scene.duration": "Too long ({seconds} s): an opening lasts 4 s at most, a reveal 3 s (over the whole screen: 5 s).",
   "visuals.check.scene.empty": "The scene names no part.",
   "visuals.check.scene.part": "The part {slot} ({part}) is not an element of the right type in this pack.",
   "visuals.check.scene.rarity": "Unknown rarity for {slot}: {rarity}.",

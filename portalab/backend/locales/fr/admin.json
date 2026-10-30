@@ -1878,7 +1878,7 @@
   "visuals.check.video.invalid": "{file} n'est pas la vidéo qu'annonce son nom.",
   "visuals.check.video.over_elsewhere": "Seule la révélation d'une carte joue une vidéo devant la carte.",
   "visuals.check.render.no_renderer": "Le rendu n'est pas nommé (render.renderer).",
-  "visuals.check.scene.duration": "Trop long ({seconds} s) : une ouverture dure 4 s au plus, une révélation 3 s.",
+  "visuals.check.scene.duration": "Trop long ({seconds} s) : une ouverture dure 4 s au plus, une révélation 3 s (en plein écran : 5 s).",
   "visuals.check.scene.empty": "La scène ne nomme aucune partie.",
   "visuals.check.scene.part": "La partie {slot} ({part}) n'est pas un élément du bon type dans ce pack.",
   "visuals.check.scene.rarity": "Rareté inconnue pour {slot} : {rarity}.",

@@ -313,9 +313,9 @@ def _element(
         report.add("blocking", "booster.pool_undefined", key)  # it must say exactly what it may draw
     if element.type == "booster_scene":
         _scene(report, key, element, scene_parts)
-    if element.type in ("booster_opening", "card_reveal") and (element.render.duration or 0) > (
-        4 if element.type == "booster_opening" else 3
-    ):
+    # an opening lasts 4 s at most, a reveal 3 s — one over the whole screen 5 s (issue 290)
+    longest = 4 if element.type == "booster_opening" else 5 if element.render.place == "screen" else 3
+    if element.type in ("booster_opening", "card_reveal") and (element.render.duration or 0) > longest:
         report.add("blocking", "scene.duration", key, seconds=element.render.duration)
     if not element.economy.sold and element.type not in GIVEABLE:
         report.add("blocking", "economy.not_giveable", key, type=element.type)

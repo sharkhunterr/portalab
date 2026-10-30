@@ -335,6 +335,13 @@ def test_only_a_reveal_takes_the_whole_screen() -> None:
     report = analyse(files_of(files))
     assert not [i for i in report["items"] if i["level"] == "blocking"]
     assert report["elements"][0]["render"]["place"] == "screen"
+    # over the whole screen, a reveal may last 5 s (3 s otherwise)
+    assert not [
+        i
+        for i in analyse(files_of(_reveal(place="screen", duration=4.5)))["items"]
+        if i["level"] == "blocking"
+    ]
+    assert "scene.duration" in [i["code"] for i in analyse(files_of(_reveal(duration=4.5)))["items"]]
     files = tiny_pack(
         type="booster_opening",
         look="tiny",
