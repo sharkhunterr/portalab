@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "shonen",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Shōnen — aura de combat",
+    "en": "Shōnen — a fighting aura"
+  },
+  "descriptions": {
+    "fr": "Une ouverture de booster façon manga de combat, ses animations dessinées image par image dans EffectCraft et jouées en vidéo haute qualité : un plateau rocheux sous l'orage ; un paquet noir imprimé de flammes, qui se charge d'une aura orange, soulève les rochers et crépite d'éclairs avant qu'un pilier de lumière ne jaillisse ; des cartes au lettrage épais, révélées par une aura bleue, une aura violette et ses rochers en lévitation ou — légendaire — une aura dorée qui explose sous un pilier de lumière.",
+    "en": "A booster opening like a fighting manga's, its animations drawn frame by frame in EffectCraft and played as high-quality video: a rocky plateau under a storm; a black pack printed with flames that charges with an orange aura, lifts the rocks and crackles with lightning before a pillar of light shoots up; cards in heavy lettering, revealed by a blue aura, a violet aura and its levitating rocks or — legendary — a golden aura exploding under a pillar of light."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

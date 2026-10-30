@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ninja",
+  "names": {
+    "fr": "Coffret scellé",
+    "en": "Sealed box"
+  },
+  "descriptions": {
+    "fr": "Un coffret de bois sombre ceint d'une corde, scellé d'une étiquette de papier au cercle vermillon ; l'image de l'œuvre comme un panneau peint ; son nom tracé au pinceau ; un shuriken.",
+    "en": "A dark wooden box tied with a cord, sealed with a paper tag bearing a vermillion circle; the work's art like a painted panel; its name brushed; a shuriken."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "mecha",
+  "names": {
+    "fr": "Dos blindé",
+    "en": "Armoured back"
+  },
+  "descriptions": {
+    "fr": "Plaques blindées rivetées, une trame hexagonale, un réacteur cyan au centre.",
+    "en": "Riveted armour plates, a hexagonal grid, a cyan reactor in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

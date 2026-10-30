@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "magical",
+  "names": {
+    "fr": "Dos en dentelle",
+    "en": "Lace back"
+  },
+  "descriptions": {
+    "fr": "Lilas nacré, une bordure de dentelle, un nœud et un cœur-gemme au centre.",
+    "en": "Pearly lilac, a lace border, a bow and a heart gem in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

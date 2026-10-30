@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "ninja-legendary",
+  "names": {
+    "fr": "Invocation",
+    "en": "Summoning"
+  },
+  "descriptions": {
+    "fr": "Un cercle de sceaux s'allume sous la carte, la fumée éclate et un dragon de feu en surgit, s'enroule autour d'elle devant et derrière, des braises montent.",
+    "en": "A circle of seals glows under the card, smoke bursts and a dragon of fire rises out of it, coiling round it in front and behind, embers rising."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary",
+    "over": "over.mp4"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "mecha",
+  "names": {
+    "fr": "Déverrouillage",
+    "en": "Release"
+  },
+  "descriptions": {
+    "fr": "Un HUD verrouille le paquet, ses quatre verrous sautent, des jets de vapeur fusent, ses plaques s'arrachent dans l'éclair cyan du réacteur, des arcs électriques, une onde de choc hexagonale et des étincelles.",
+    "en": "A HUD locks on the pack, its four bolts release, steam jets burst, its plates fly off in the reactor's cyan flash, electric arcs, a hexagonal shockwave and sparks."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ninja",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Ninja — techniques de l'ombre",
+    "en": "Ninja — shadow techniques"
+  },
+  "descriptions": {
+    "fr": "Une ouverture de booster façon manga de ninjas, ses animations dessinées image par image dans EffectCraft et jouées en vidéo haute qualité : une nuit sous une lune rouge géante, des toits de tuiles et la brume ; un paquet de bois sombre scellé d'une étiquette de papier ; un sceau qui s'embrase, une bombe fumigène, un éclair de lame et une volée de shuriken ; des cartes de bois et de papier révélées par un tourbillon de shuriken, des kunai et des éclairs bleus ou — légendaire — l'invocation d'un dragon de feu.",
+    "en": "A booster opening like a ninja manga's, its animations drawn frame by frame in EffectCraft and played as high-quality video: night under a huge red moon, tiled roofs and mist; a dark wooden pack sealed with a paper tag; a seal catching fire, a smoke bomb, a blade's flash and a volley of shuriken; cards of wood and paper revealed by a whirlwind of shuriken, kunai and blue lightning or — legendary — the summoning of a dragon of fire."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

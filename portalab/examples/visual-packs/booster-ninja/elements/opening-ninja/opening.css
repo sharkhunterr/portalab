@@ -1,0 +1,30 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video (24 frames a second): The pack's seal catches fire, a smoke bomb bursts and swallows it, a blade's
+   flash crosses it, shuriken shoot out of the cloud every way and maple leaves swirl. Meanwhile the pack itself
+   slumps and vanishes into the smoke. */
+[data-opening="ninja"] .booster-stage__tear .booster-pack {
+  animation: manga-charge 2.6s linear both;
+}
+@keyframes manga-charge {
+  0% { transform: none; filter: none; opacity: 1; }
+  8% { transform: translate(-1px, 0); filter: sepia(0.3); }
+  15% { transform: translate(1px, 0) scale(1.02); filter: sepia(0.5) brightness(1.2); opacity: 1; }
+  19% { transform: translateY(6px) scale(1.08, 0.9); filter: brightness(1.5) blur(1px); opacity: 0.8; }
+  24% { transform: translateY(14px) scale(0.85, 0.6); filter: brightness(1.8) blur(4px); opacity: 0; }
+  100% { opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges — never the outline of its box */
+[data-opening="ninja"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="ninja"] .booster-stage__tear .booster-pack {
+    animation: manga-fade 2.6s linear both;
+  }
+}
+@keyframes manga-fade {
+  0%, 30% { opacity: 1; }
+  45%, 100% { opacity: 0; }
+}

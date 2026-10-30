@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "ninja-rare",
+  "names": {
+    "fr": "Tourbillon de shuriken",
+    "en": "Shuriken whirlwind"
+  },
+  "descriptions": {
+    "fr": "Un nuage de fumée, puis un tourbillon de shuriken autour de la carte, en traînées, projetés au loin.",
+    "en": "A puff of smoke, then a whirlwind of shuriken round the card, streaking, flung away."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

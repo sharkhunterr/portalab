@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "magical",
+  "names": {
+    "fr": "Ciel pastel",
+    "en": "Pastel sky"
+  },
+  "descriptions": {
+    "fr": "Un ciel pastel du lilas au rose et au cyan, des étoiles qui scintillent, des bulles irisées qui montent, un croissant de lune et des halos de lumière (HD).",
+    "en": "A pastel sky from lilac to pink and cyan, stars twinkling, iridescent bubbles rising, a crescent moon and soft halos of light (HD)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

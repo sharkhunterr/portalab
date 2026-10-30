@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ninja",
+  "names": {
+    "fr": "Dos de bois",
+    "en": "Wooden back"
+  },
+  "descriptions": {
+    "fr": "Bois sombre, une lune rouge et un shuriken au centre.",
+    "en": "Dark wood, a red moon and a shuriken in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

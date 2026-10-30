@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "shonen",
+  "names": {
+    "fr": "Scène Shōnen",
+    "en": "Shōnen scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture, jouée en vidéo. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening, played as videos. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-shonen",
+      "backdrop": "backdrop-shonen",
+      "opening": "opening-shonen",
+      "back": {
+        "common": "back-shonen"
+      },
+      "face": {
+        "common": "face-common",
+        "rare": "face-rare",
+        "epic": "face-epic",
+        "legendary": "face-legendary"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

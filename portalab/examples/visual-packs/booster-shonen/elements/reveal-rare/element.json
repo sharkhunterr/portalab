@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "shonen-rare",
+  "names": {
+    "fr": "Aura bleue",
+    "en": "Blue aura"
+  },
+  "descriptions": {
+    "fr": "Une aura bleue flambe autour de la carte, des éclairs crépitent, une onde de choc, des braises bleues montent.",
+    "en": "A blue aura flares round the card, lightning crackles, a shockwave, blue embers rise."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

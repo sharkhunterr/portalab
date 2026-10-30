@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "magical",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Magical girl — transformation",
+    "en": "Magical girl — a transformation"
+  },
+  "descriptions": {
+    "fr": "Une ouverture de booster façon magical girl, ses animations dessinées image par image dans EffectCraft et jouées en vidéo haute qualité : un ciel pastel semé d'étoiles et de bulles ; un paquet rose bordé de dentelle et noué d'un nœud, un cœur-gemme ; un cercle magique, des rubans qui s'enroulent, un éclat d'étoile et une pluie de cœurs, d'étoiles et de pétales ; des cartes en dentelle révélées par des bulles irisées, des rubans et des cœurs ou — légendaire — un cercle magique géant et une pluie d'étoiles.",
+    "en": "A booster opening like a magical girl's transformation, its animations drawn frame by frame in EffectCraft and played as high-quality video: a pastel sky strewn with stars and bubbles; a pink pack trimmed with lace and tied with a bow, a heart gem; a magic circle, ribbons spiralling, a star flash and a shower of hearts, stars and petals; lace cards revealed by iridescent bubbles, ribbons and hearts or — legendary — a giant magic circle and a rain of stars."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

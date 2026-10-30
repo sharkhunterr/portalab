@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "shonen",
+  "names": {
+    "fr": "Transformation",
+    "en": "Power up"
+  },
+  "descriptions": {
+    "fr": "Une aura orange flambe de plus en plus haut autour du paquet, des rochers s'arrachent du sol, des éclairs de ki crépitent, des lignes de concentration se resserrent ; puis un pilier de lumière jaillit, une onde de choc fend le sol dans la poussière, rochers et braises volent.",
+    "en": "An orange aura flares higher and higher round the pack, rocks tear off the ground, ki lightning crackles, concentration lines close in; then a pillar of light shoots up, a shockwave cracks the ground in dust, rocks and embers fly."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

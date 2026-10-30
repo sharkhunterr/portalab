@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "mecha-common",
+  "names": {
+    "fr": "Face commune",
+    "en": "Common face"
+  },
+  "descriptions": {
+    "fr": "La carte commune de la scène, son cadre, son corps et son lettrage dans le style de la scène.",
+    "en": "The scene's common card: its frame, its body and its lettering in the scene's style."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

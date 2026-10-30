@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "shonen",
+  "names": {
+    "fr": "Paquet de combat",
+    "en": "Fighting pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet noir imprimé de flammes orange cernées d'encre, sous une trame ; l'image de l'œuvre dans une case encrée ; son nom en lettres épaisses cernées ; le nombre de cartes sur une étoile d'impact.",
+    "en": "A black pack printed with inked orange flames under halftone; the work's art in an inked panel; its name in heavy outlined letters; the card count on an impact star."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

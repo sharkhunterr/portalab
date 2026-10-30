@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "shonen-epic",
+  "names": {
+    "fr": "Aura violette",
+    "en": "Violet aura"
+  },
+  "descriptions": {
+    "fr": "Une aura violette, des rochers arrachés qui lévitent autour de la carte, des éclairs, des lignes de concentration, un impact.",
+    "en": "A violet aura, rocks torn off and levitating round the card, lightning, concentration lines, an impact."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic"
+  }
+}

@@ -1,0 +1,69 @@
+/* The sealed pack (its hook: data-booster-look): A capsule of riveted armour plates, a hazard stripe, its cyan
+   reactor glowing; the work's art on a screen; its name in technical letters; the card count on an indicator. */
+@font-face {
+  font-family: "Manga Petch";
+  src: url("ChakraPetch.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+[data-booster-look="mecha"] .booster-pack {
+  border-radius: 0.4rem;
+  background: url("panel.svg") 0 0 / 100% 100%, repeating-linear-gradient(135deg, #ffc83e 0 10px, #14101a 10px 20px) 0 100% / 100% 8% no-repeat, linear-gradient(170deg, #6a7280, #2a2e38);
+  box-shadow: inset 0 0 0 3px #0e1218, inset 0 0 0 6px #3ee8ff, inset 0 0 0 8px #0e1218, 0 0 1.2rem rgba(62, 232, 255, 0.45);
+}
+[data-booster-look="mecha"] .booster-pack__art {
+  inset: 14% 11% 32%;
+  inline-size: 78%;
+  block-size: 54%;
+  border: 3px solid #0e1218; border-radius: 0.2rem; box-shadow: 0 0 0 3px #3ee8ff, 0 0 1rem rgba(62, 232, 255, 0.6);
+  mask: none;
+}
+[data-booster-look="mecha"] .booster-pack__stars {
+  opacity: 0;
+}
+/* its crimp: a hazard stripe */
+[data-booster-look="mecha"] .booster-pack__flap {
+  border: 0;
+  background: repeating-linear-gradient(135deg, #ffc83e 0 10px, #14101a 10px 20px);
+  box-shadow: inset 0 -3px 0 #0e1218;
+}
+[data-booster-look="mecha"] .booster-pack__name {
+  inset: auto 4% 12%;
+  font-family: "Manga Petch", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1rem, 2.3vw, 1.4rem);
+  line-height: 1.1;
+  color: #d6f6ff; letter-spacing: 0.1em; text-transform: uppercase; text-shadow: 0 0 0.6rem #3ee8ff;
+}
+[data-booster-look="mecha"] .booster-pack__subtitle {
+  inset: auto 4% 5%;
+  color: #e8e2ee;
+  font-family: "Manga Petch", sans-serif;
+}
+[data-booster-look="mecha"] .booster-pack__count {
+  inset: 0.5rem 0.5rem auto auto;
+  display: grid;
+  place-items: center;
+  inline-size: 2.8rem;
+  block-size: 2.8rem;
+  padding: 0;
+  border-radius: 0;
+  background: url("core.svg") center / contain no-repeat; color: #0e1218;
+  font-family: "Manga Petch", sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: none;
+}
+/* tension while it waits: a pulse of the scene's light, added to Portalab's float (never replacing it) */
+[data-booster-look="mecha"] .booster-stage__tear {
+  animation: booster-hover 4s ease-in-out infinite, manga-pulse 2.8s ease-in-out infinite;
+}
+@keyframes manga-pulse {
+  0%, 70%, 100% { filter: none; }
+  80% { filter: drop-shadow(0 0 0.9rem #ffc83e); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="mecha"] .booster-stage__tear {
+    animation: none;
+  }
+}

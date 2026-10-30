@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "magical-rare",
+  "names": {
+    "fr": "Bulles",
+    "en": "Bubbles"
+  },
+  "descriptions": {
+    "fr": "Un anneau de lumière, des bulles irisées qui montent autour de la carte, des étincelles.",
+    "en": "A ring of light, iridescent bubbles rising round the card, sparkles."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

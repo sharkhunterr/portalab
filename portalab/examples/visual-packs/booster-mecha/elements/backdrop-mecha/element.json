@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "mecha",
+  "names": {
+    "fr": "Hangar aux néons",
+    "en": "Neon hangar"
+  },
+  "descriptions": {
+    "fr": "Un hangar sombre : une grille de néons cyan qui file vers l'horizon, des projecteurs qui balaient, des hexagones d'interface, des étincelles et des voyants qui clignotent (HD).",
+    "en": "A dark hangar: a grid of cyan neon running to the horizon, searchlights sweeping, interface hexagons, sparks and blinking lights (HD)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

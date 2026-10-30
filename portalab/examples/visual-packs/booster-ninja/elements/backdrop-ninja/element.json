@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ninja",
+  "names": {
+    "fr": "Nuit sous la lune rouge",
+    "en": "Night under the red moon"
+  },
+  "descriptions": {
+    "fr": "Une nuit bleu sombre sous une lune rouge géante voilée de nuages, des silhouettes de toits de tuiles, la brume qui passe, des feuilles d'érable qui tombent et, de temps en temps, l'ombre d'un ninja qui bondit devant la lune (HD).",
+    "en": "A dark blue night under a huge red moon veiled with clouds, silhouettes of tiled roofs, mist drifting, maple leaves falling and, now and then, the shadow of a ninja leaping across the moon (HD)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

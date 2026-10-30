@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "magical-legendary",
+  "names": {
+    "fr": "Cercle magique",
+    "en": "Magic circle"
+  },
+  "descriptions": {
+    "fr": "Un cercle magique géant qui tourne derrière la carte, des rayons pastel, des rubans qui l'enlacent devant et derrière, une pluie d'étoiles, des cœurs et de grands éclats.",
+    "en": "A giant magic circle turning behind the card, pastel rays, ribbons wrapping it in front and behind, a rain of stars, hearts and great glints."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary",
+    "over": "over.mp4"
+  }
+}

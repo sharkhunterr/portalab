@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "mecha-legendary",
+  "names": {
+    "fr": "Face légendaire",
+    "en": "Legendary face"
+  },
+  "descriptions": {
+    "fr": "La carte légendaire de la scène, son cadre, son corps et son lettrage dans le style de la scène.",
+    "en": "The scene's legendary card: its frame, its body and its lettering in the scene's style."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

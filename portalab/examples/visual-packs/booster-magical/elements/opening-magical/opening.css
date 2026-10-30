@@ -1,0 +1,32 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video (24 frames a second): A magic circle draws itself, ribbons spiral round the pack, hearts and
+   sparkles rise; a star flash, a ring of light, the ribbons unwind and a shower of hearts, stars, petals and
+   bubbles falls. Meanwhile the pack itself whirls round and implodes into a point, the star's flash. */
+[data-opening="magical"] .booster-stage__tear .booster-pack {
+  animation: manga-charge 2.6s linear both;
+}
+@keyframes manga-charge {
+  0% { transform: none; filter: none; opacity: 1; }
+  14% { transform: translateY(-8px) rotate(-2deg); }
+  24% { transform: translateY(-12px) rotate(3deg) scale(1.03); filter: brightness(1.15); }
+  29% { transform: translateY(-14px) rotate(40deg) scale(0.9); filter: brightness(1.4) blur(0); }
+  33% { transform: translateY(-16px) rotate(220deg) scale(0.55); filter: brightness(1.9) blur(1px); }
+  36% { transform: translateY(-18px) rotate(480deg) scale(0.2); filter: brightness(2.6) blur(2px); opacity: 1; }
+  38% { transform: translateY(-18px) rotate(620deg) scale(0.02); filter: brightness(4) blur(3px); opacity: 0; }
+  100% { transform: translateY(-18px) scale(0.02); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges — never the outline of its box */
+[data-opening="magical"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="magical"] .booster-stage__tear .booster-pack {
+    animation: manga-fade 2.6s linear both;
+  }
+}
+@keyframes manga-fade {
+  0%, 30% { opacity: 1; }
+  45%, 100% { opacity: 0; }
+}

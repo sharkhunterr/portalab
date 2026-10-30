@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "ninja-epic",
+  "names": {
+    "fr": "Kunai et éclairs",
+    "en": "Kunai and lightning"
+  },
+  "descriptions": {
+    "fr": "Des kunai fusent et se plantent autour de la carte, des éclairs bleus crépitent entre eux, la fumée, des feuilles.",
+    "en": "Kunai fly in and strike round the card, blue lightning crackles between them, smoke, leaves."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic"
+  }
+}
