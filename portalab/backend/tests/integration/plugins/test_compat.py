@@ -20,7 +20,7 @@ async def test_compatibility(pl: PlHarness, client: AsyncClient) -> None:
     pl.package(
         "fine",
         manifest={
-            "requires_portal": ">=0.1,<1",
+            "requires_portal": ">=0.1,<99",  # any version this portal may run
             "requires_capabilities": [{"name": "identity.directory", "range": ">=1.0,<2"}],
         },
     )
