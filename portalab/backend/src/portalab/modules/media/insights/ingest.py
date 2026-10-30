@@ -163,6 +163,11 @@ class _Resolver:
             )
         return self.families[family]
 
+    async def of(self, object_id: UUID) -> tuple[UUID | None, UUID | None]:
+        """#282: an object known already (a sitting in the portal) → (object, work), merges followed."""
+        obj = await self._follow(object_id)
+        return (obj.id if obj else None, await self._work(obj))
+
     async def resolve(self, service_id: UUID, item: SourceActivity) -> tuple[UUID | None, UUID | None]:
         key = (str(service_id), item.item_external_id or f"ids:{sorted(item.ids.items())}")
         if key in self.cache:
