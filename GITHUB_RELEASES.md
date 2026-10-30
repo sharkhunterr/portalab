@@ -3,7 +3,9 @@
 > Release notes for the GitLab and GitHub release pages. The **first `# vX.Y.Z` block** of this file is what
 > the release pipeline posts (`release:gitlab` / `release:github`), and `npm run release` refuses to run
 > unless that block is the version about to be released. Write the new block at the top, in English,
-> **before** `npm run release:full`; `npm run release:notes` shows what will be posted.
+> **before** `npm run release:full`; `npm run release:notes` shows what will be posted. The version that
+> block announces is the one released when it is above the current one (a major or minor release is chosen
+> by writing its notes); otherwise the commits decide (`feat` → minor, `fix` → patch).
 >
 > Every release after v1.0.0 lists the GitLab issues it closes, sorted by kind: `npm run release:issues`
 > prints them (security, fixed, new, documentation and tooling, improved) — rewrite each title in English,

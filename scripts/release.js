@@ -12,6 +12,8 @@
  *
  * Usage:
  *   npm run release              # bump + tag + push to GitLab (pipeline: validate, test, build, GitLab release)
+ *                                # the version is the one GITHUB_RELEASES.md announces when it is above the
+ *                                # current one (v1.0.0 first); otherwise the commits decide (feat → minor…)
  *   npm run release:full         # + Docker Hub, GitHub mirror and GitHub release
  *   npm run release:minor        # force the bump (patch | minor | major)
  *   npm run release:dry          # what would happen, nothing changed
@@ -80,10 +82,26 @@ function latestNotes() {
   return { version, notes: body.join('\n').replace(/\n{3,}/g, '\n\n').trim() };
 }
 
+/** a > b, both `X.Y.Z`. */
+function above(a, b) {
+  const [x, y] = [a, b].map((v) => v.split('.').map(Number));
+  for (let i = 0; i < 3; i += 1) if (x[i] !== y[i]) return x[i] > y[i];
+  return false;
+}
+
+/** What standard-version is told: the bump asked for, else the version the notes announce when it is above
+ * the current one (the notes are written first: they say which release this is), else nothing — the
+ * commits decide. */
+function releaseAs(notesVersion) {
+  if (options.releaseType) return options.releaseType;
+  const current = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
+  return notesVersion && above(notesVersion, current) ? notesVersion : null;
+}
+
 /** The version standard-version is about to write (from its dry run). */
-function nextVersion() {
+function nextVersion(as) {
   let command = 'npx --no-install standard-version --dry-run 2>&1';
-  if (options.releaseType) command = command.replace(' 2>&1', ` --release-as ${options.releaseType} 2>&1`);
+  if (as) command = command.replace(' 2>&1', ` --release-as ${as} 2>&1`);
   const output = execSync(command, { encoding: 'utf8', cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] });
   const match = output.match(/bumping version in \S+ from \S+ to (\d+\.\d+\.\d+)/);
   if (!match) throw new Error('could not tell the next version from standard-version');
@@ -115,7 +133,8 @@ function main() {
   }
 
   // 1. the release notes come first
-  const next = nextVersion();
+  const as = releaseAs(notesVersion);
+  const next = nextVersion(as);
   console.log(`\nNext version: v${next}`);
   if (!options.skipNotesCheck) {
     if (notesVersion !== next || !notes) {
@@ -137,7 +156,7 @@ function main() {
 
   // 2. bump, changelog, commit, tag
   let bump = 'npx --no-install standard-version';
-  if (options.releaseType) bump += ` --release-as ${options.releaseType}`;
+  if (as) bump += ` --release-as ${as}`;
   if (options.dryRun) bump += ' --dry-run';
   run(bump, 'Bumping the version (standard-version)');
   if (options.dryRun) {
