@@ -39,6 +39,14 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   a yellow comic title rimmed in red and ink, sticker badges and a holographic film in hard bands — a halftone
   shockwave for a rare, inked rays, lightning and a brush slash for an epic, and for a legendary a power vortex —
   energy ribbons whirling round the card, in front and behind — that blasts away into the biggest burst;
+- `booster-sumi/` (`sumi`): **an opening in ink and gold, like Japanese lacquerware** — every animation drawn
+  frame by frame in EffectCraft at 24 fps with a brush of bristles that lands heavy and runs dry, played as
+  transparent videos (sources and `build.sh` in `booster-sumi-source/`), on a stage of black urushi lacquer where gold seigaiha waves rise and gold
+  dust twinkles; a washi pack tied with mizuhiki cords, cut through by one huge dry-brush stroke after gold
+  cracks run over it, bursting in a gilded ink splash and gold leaf, a great gold ensō drying away; cards of
+  lacquer and washi with brushed titles and vermillion seals — an ensō and ripples for a rare, crossing
+  vermillion strokes and a storm of cherry blossoms for an epic, and for a legendary an ink dragon, scaled and
+  gilded, coiling round the card in front and behind before soaring away, leaving gold cracks across the stage;
 - `rouages/`, `ruee-vers-l-or/`, `olympe/`: **three complete universes**, each one pack of every kind of look a
   member wears (no messenger bubble): an interface (colours, fonts, layout, sounds, its own words — « L'atelier »,
   « Le saloon », « Le temple »…; Olympe is a light one, on marble), a palette, a GPU ambience and profile

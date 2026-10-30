@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "sumi-rare",
+  "names": {
+    "fr": "Ensō et ondes",
+    "en": "Ensō and ripples"
+  },
+  "descriptions": {
+    "fr": "Dessinée dans EffectCraft, image par image : un ensō blanc tracé d'un geste autour de la carte, bordé d'indigo, des ondes qui s'éloignent comme sur un étang, des gouttes et des éclats d'argent.",
+    "en": "Drawn in EffectCraft, frame by frame: a white ensō brushed round the card in one breath, edged in indigo, ripples spreading as on a pond, silver drops and glints."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare",
+    "alpha": "stacked"
+  }
+}

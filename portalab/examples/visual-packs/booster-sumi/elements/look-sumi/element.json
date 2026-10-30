@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "sumi",
+  "names": {
+    "fr": "Paquet washi",
+    "en": "Washi pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet emballé comme un cadeau au Japon : papier washi semé de feuille d'or, un ensō d'or en filigrane ; l'image de l'œuvre montée comme un rouleau peint, cernée d'or ; un rabat vermillon noué de cordons mizuhiki ; son nom tracé en blanc sur un trait d'encre ; le nombre de cartes sur un sceau vermillon ; un éclat d'or à son coin.",
+    "en": "A pack wrapped like a gift in Japan: washi paper strewn with gold leaf, a faint gold ensō; the work's art mounted like a scroll painting, lined in gold; a vermillion crimp tied with mizuhiki cords; its name brushed white on a stroke of ink; the card count on a vermillion seal; a gold glint at its corner."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

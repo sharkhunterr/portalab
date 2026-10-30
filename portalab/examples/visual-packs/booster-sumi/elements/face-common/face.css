@@ -1,0 +1,86 @@
+/* A common card: black lacquer round washi paper, a fine gold line, ink lettering. (Its hook: the card once
+   turned, data-card-face.) The face turns in 3D: never its transform; a turned media card is never redrawn —
+   what moves, moves once, as it is revealed. */
+@font-face {
+  font-family: "Sumi Yuji";
+  src: url("YujiSyuku.woff2") format("woff2");
+  font-display: swap;
+}
+/* the card: lacquer, a soft gloss on its upper edge, inked round */
+[data-card-face="sumi-common"] .mcard__card {
+  padding: 3.2cqi;
+  border-radius: 2.6cqi;
+  background:
+    radial-gradient(ellipse 80% 30% at 30% 0%, rgba(255, 255, 255, 0.16), transparent 70%),
+    linear-gradient(165deg, #2a1c18, #140c0a);
+  box-shadow: inset 0 0 0 0.35cqi rgba(255, 255, 255, 0.08), 0 0 0 0.45cqi #0e0a09, 0 1.6cqi 3cqi rgba(0, 0, 0, 0.45);
+}
+/* the body: washi paper, a fine line of the rarity's metal round it */
+[data-card-face="sumi-common"] .mcard__body {
+  border-radius: 1.4cqi;
+  background: url("washi.svg") 0 0 / 100% auto, #f3e9d3;
+  box-shadow: 0 0 0 0.45cqi #d9a43a, 0 0 0 0.8cqi #0e0a09;
+  color: #0e0a09;
+}
+/* the title, brushed */
+[data-card-face="sumi-common"] .mcard[data-rarity] .mcard__name {
+  font-family: "Sumi Yuji", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: #0e0a09;
+}
+/* the genre: a little seal */
+[data-card-face="sumi-common"] .mcard__genre {
+  border-radius: 0.6cqi;
+  background: #c42c18;
+  color: #f3e9d3;
+  box-shadow: 0 0 0 0.3cqi #0e0a09;
+  font-family: "Sumi Yuji", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+[data-card-face="sumi-common"] .mcard__emblem {
+  background: #0e0a09;
+  color: #d9a43a;
+}
+/* the art, mounted like a scroll painting: a fine gold line, inked */
+[data-card-face="sumi-common"] .mcard__art {
+  border-radius: 0.6cqi;
+  box-shadow: 0 0 0 0.4cqi #d9a43a, 0 0 0 0.8cqi #0e0a09;
+}
+[data-card-face="sumi-common"] .mcard__picture,
+[data-card-face="sumi-common"] .mcard__scene {
+  filter: sepia(0.12) saturate(1.05) contrast(1.04);
+}
+[data-card-face="sumi-common"] .mcard__badge {
+  box-shadow: 0 0 0 0.4cqi #d9a43a, 0 0 0 0.75cqi #0e0a09;
+}
+[data-card-face="sumi-common"] .mcard__strip {
+  border-radius: 0.4cqi;
+  background: #0e0a09;
+  color: #f3e9d3;
+}
+[data-card-face="sumi-common"] .mcard__poster {
+  box-shadow: 0 0 0 0.35cqi #d9a43a, 0 0 0 0.65cqi #0e0a09;
+}
+[data-card-face="sumi-common"] .mcard__cost {
+  background: #0e0a09;
+  color: #f3e9d3;
+  box-shadow: 0 0 0 0.3cqi #0e0a09;
+}
+[data-card-face="sumi-common"] .mcard__figures strong {
+  font-family: "Sumi Yuji", var(--mcard-title);
+  font-weight: 400;
+}
+/* the rarity: stamped in vermillion */
+[data-card-face="sumi-common"] .mcard__rarity {
+  border-radius: 0.5cqi;
+  background: #c42c18;
+  color: #f3e9d3;
+  box-shadow: 0 0 0 0.3cqi #0e0a09;
+  font-family: "Sumi Yuji", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  rotate: -4deg;
+}

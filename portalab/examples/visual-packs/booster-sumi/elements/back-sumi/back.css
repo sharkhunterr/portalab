@@ -1,0 +1,39 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity: black
+   lacquer, gold seigaiha waves rising from its foot, a gold ensō in the middle with a vermillion seal at its
+   heart, a fine gold line round it. */
+[data-card-back="sumi"] .booster-card__back {
+  border: 0;
+  border-radius: 0.55rem;
+  background:
+    radial-gradient(ellipse 80% 30% at 30% 0%, rgba(255, 255, 255, 0.14), transparent 70%),
+    linear-gradient(to top, transparent 0 34%, #120807 34%) 0 0 / 100% 100% no-repeat,
+    url("seigaiha.svg") 0 100% / 18% auto repeat,
+    #120807;
+  box-shadow:
+    inset 0 0 0 2px #0e0a09,
+    inset 0 0 0 4px #d9a43a,
+    inset 0 0 0 6px #0e0a09,
+    0 0 0 1px #0e0a09,
+    0 0.5rem 1rem rgba(0, 0, 0, 0.45);
+}
+[data-card-back="sumi"] .booster-card__back-pattern {
+  opacity: 0;
+}
+/* the lacquer's gloss passing */
+[data-card-back="sumi"] .booster-card__back::after {
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 236, 190, 0.22) 48%, rgba(255, 255, 255, 0.3) 50%, transparent 58%);
+}
+/* the ensō and its seal */
+[data-card-back="sumi"] .booster-card__back-sigil {
+  inline-size: 66%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  background:
+    url("seal.svg") 50% 50% / 30% auto no-repeat,
+    url("enso-gold.svg") center / contain no-repeat;
+  box-shadow: none;
+}
+[data-card-back="sumi"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

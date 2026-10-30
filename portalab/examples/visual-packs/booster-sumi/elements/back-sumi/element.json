@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "sumi",
+  "names": {
+    "fr": "Dos laqué",
+    "en": "Lacquered back"
+  },
+  "descriptions": {
+    "fr": "Laque noire, vagues seigaiha d'or montant du bas, un ensō d'or au centre et un sceau vermillon en son cœur, un fin liseré d'or.",
+    "en": "Black lacquer, gold seigaiha waves rising from its foot, a gold ensō in the middle with a vermillion seal at its heart, a fine gold line."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

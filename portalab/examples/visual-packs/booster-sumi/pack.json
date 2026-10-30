@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "sumi",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Sumi — encre et or",
+    "en": "Sumi — ink and gold"
+  },
+  "descriptions": {
+    "fr": "Une ouverture de booster à l'encre et à l'or, comme une laque japonaise — ses animations dessinées image par image dans EffectCraft : une scène de laque noire où montent des vagues d'or ; un paquet de washi noué de mizuhiki, tranché d'un immense trait de pinceau ; des éclaboussures d'encre dorées, de la feuille d'or, des ensō tracés d'un geste ; des cartes en laque et papier, révélées par des ondes, une tempête de cerisiers ou — légendaire — un dragon d'encre qui s'enroule autour d'elles puis s'envole, laissant des fêlures d'or.",
+    "en": "A booster opening in ink and gold, like Japanese lacquerware — its animations drawn frame by frame in EffectCraft: a black lacquer stage with gold waves rising; a washi pack tied with mizuhiki, cut through by one huge brush stroke; gilded ink splashes, gold leaf, ensō drawn in one breath; cards of lacquer and paper, revealed by ripples, a storm of cherry blossoms or — legendary — an ink dragon coiling round them, then soaring away, leaving gold cracks behind."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "sumi-legendary",
+  "names": {
+    "fr": "Dragon et kintsugi",
+    "en": "Dragon and kintsugi"
+  },
+  "descriptions": {
+    "fr": "Dessinée dans EffectCraft, jouée en vidéo : pendant qu'elle se retourne, un dragon d'encre doré s'enroule autour d'elle, devant et derrière, puis s'envole en semant son encre ; alors des fêlures d'or courent depuis la carte sur toute la scène, des rayons d'or, de l'encre projetée, un grand ensō d'or tracé autour d'elle, une tempête de feuille d'or et deux grands éclats.",
+    "en": "Drawn in EffectCraft, played as a video: as it turns, a gilded ink dragon coils round it, over and under it, then soars away flinging its ink; then gold cracks run out from the card across everything, gold rays, ink flung out, a great gold ensō drawn round it, a storm of gold leaf and two great glints."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary",
+    "alpha": "stacked",
+    "over": "over.mp4"
+  }
+}
