@@ -115,6 +115,7 @@ class Report:
                 **counts,
                 "elements": len(self.elements),
                 "hd": any(e["hd"] for e in self.elements),
+                "video": any(e["video"] for e in self.elements),  # issue 287
                 "script": any(e["script"] for e in self.elements),
                 "publishable": counts["blocking"] == 0,
                 "security": {
@@ -336,7 +337,8 @@ def _element(
             "folder_files": element.files(),
             "contracts": element.contracts,
             "free": element.free,
-            "hd": kind in ("glsl", "video"),
+            "hd": kind == "glsl",
+            "video": kind == "video",
             "script": kind == "js",
             "names": element.names.model_dump(),
             "descriptions": element.descriptions.model_dump(),

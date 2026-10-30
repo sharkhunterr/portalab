@@ -33,6 +33,11 @@ export function AnalysisStep({ detail }: { detail: VersionDetail }) {
                     HD
                   </span>
                 ) : null}
+                {element.kind === "video" ? (
+                  <span className="visuals-flag" data-flag="video">
+                    {t("admin:visuals.video")}
+                  </span>
+                ) : null}
               </p>
               <p className="visuals-element__meta">
                 <code>{element.product}</code>

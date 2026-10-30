@@ -292,7 +292,8 @@ def test_a_reveal_plays_a_video_behind_the_card_and_another_over_it() -> None:
     report = analyse(files_of(files))
     assert not [i for i in report["items"] if i["level"] == "blocking"]
     element = report["elements"][0]
-    assert element["hd"] and element["render"]["over"] == "over.mp4" and "over.mp4" in element["folder_files"]
+    assert element["video"] and not element["hd"] and report["summary"]["video"]
+    assert element["render"]["over"] == "over.mp4" and "over.mp4" in element["folder_files"]
 
 
 @pytest.mark.parametrize(

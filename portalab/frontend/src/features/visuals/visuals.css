@@ -110,6 +110,11 @@
   background: var(--color-accent);
   color: var(--color-accent-contrast);
 }
+/* issue 287: a part played as a video */
+.visuals-flag[data-flag="video"] {
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+}
 .visuals-flag[data-flag="script"] {
   border: 1px solid var(--color-accent-alt);
   color: var(--color-accent-alt);

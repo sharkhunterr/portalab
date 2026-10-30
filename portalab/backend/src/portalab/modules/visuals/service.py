@@ -1655,12 +1655,15 @@ def _blocked(row: PackVersion) -> bool:
 
 def _version_row(row: PackVersion) -> dict[str, Any]:
     report = row.report or {}
+    summary = report.get("summary")
+    if summary is not None and "video" not in summary:  # issue 287: a report made before it said so
+        summary = {**summary, "video": any(e.get("kind") == "video" for e in report.get("elements") or [])}
     return {
         "version": row.version,
         "sha": row.sha256[:16],
         "step": row.step,
         "outcomes": row.outcomes,
-        "summary": report.get("summary"),
+        "summary": summary,
         "names": (report.get("pack") or {}).get("names"),
         "author": (report.get("pack") or {}).get("author"),
         "license": (report.get("pack") or {}).get("license"),
