@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "impact-video-rare",
+  "names": {
+    "fr": "Face rare",
+    "en": "Rare face"
+  },
+  "descriptions": {
+    "fr": "Un liseré cyan, une holographie en bandes arc-en-ciel nettes ; en se retournant, une explosion manga encrée jaillit derrière elle.",
+    "en": "A cyan rim, a holographic film in hard rainbow bands; as it turns, an inked manga burst shoots out behind it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

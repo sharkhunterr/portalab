@@ -39,6 +39,10 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   a yellow comic title rimmed in red and ink, sticker badges and a holographic film in hard bands — a halftone
   shockwave for a rare, inked rays, lightning and a brush slash for an epic, and for a legendary a power vortex —
   energy ribbons whirling round the card, in front and behind — that blasts away into the biggest burst;
+- `booster-impact-video/` (`impact-video`): **Impact again, its animations played as transparent videos**
+  rather than sprite sheets, from the same EffectCraft renders (`booster-impact-source/video.py`), to compare
+  the two: at their full size, 7.5 MB against 27 MB; the legendary's vortex is its reveal's two videos (behind
+  the card, then over it);
 - `booster-sumi/` (`sumi`): **an opening in ink and gold, like Japanese lacquerware** — every animation drawn
   frame by frame in EffectCraft at 24 fps with a brush of bristles that lands heavy and runs dry, played as
   transparent videos (sources and `build.sh` in `booster-sumi-source/`), on a stage of black urushi lacquer where gold seigaiha waves rise and gold

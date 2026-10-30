@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "impact-video",
+  "names": {
+    "fr": "Dos comics",
+    "en": "Comic back"
+  },
+  "descriptions": {
+    "fr": "Aplats violets en bandes de cel-shading, tags graffiti, trame rose, liseré néon entre deux traits d'encre et un emblème au centre.",
+    "en": "Flat violet in hard cel bands, graffiti doodles, a pink halftone, a neon rim between two ink lines and an emblem in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

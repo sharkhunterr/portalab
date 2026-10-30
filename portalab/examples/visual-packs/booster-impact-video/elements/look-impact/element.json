@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "impact-video",
+  "names": {
+    "fr": "Paquet comics",
+    "en": "Comic pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet façon comics : aplats violets en bandes de cel-shading sous des tags graffiti et une trame, un épais trait d'encre autour d'un liseré néon rose, une ombre portée nette ; l'image de l'œuvre dans une case encrée, penchée ; son nom en lettres BD cernées ; le nombre de cartes sur un autocollant ; un éclat qui scintille à son coin et un double battement de cœur.",
+    "en": "A comic-style pack: flat violet in hard cel bands under graffiti doodles and halftone, a thick ink line round a neon pink rim, a hard drop shadow; the work's art in an inked panel, tilted; its name in outlined comic letters; the card count on a sticker; a glint flaring at its corner and a double heartbeat."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

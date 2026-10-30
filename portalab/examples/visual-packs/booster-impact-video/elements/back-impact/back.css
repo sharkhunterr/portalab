@@ -1,0 +1,36 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity: flat
+   violet in hard cel bands under graffiti doodles and a pink halftone, a neon pink rim between two ink lines,
+   the emblem big in the middle. */
+[data-card-back="impact-video"] .booster-card__back {
+  border: 0;
+  border-radius: 0.7rem;
+  background:
+    url("doodles.svg") 0 0 / 72% auto repeat,
+    radial-gradient(circle, rgba(255, 45, 143, 0.42) 0 1.2px, transparent 1.8px) 0 0 / 7px 7px,
+    linear-gradient(160deg, #8a35e0 0 32%, #5e1cb8 32% 68%, #3b0f82 68%);
+  box-shadow:
+    inset 0 0 0 3px #12061c,
+    inset 0 0 0 7px #ff2d8f,
+    inset 0 0 0 10px #12061c,
+    0 0 0 2px #12061c,
+    0.35rem 0.45rem 0 2px #12061c;
+}
+[data-card-back="impact-video"] .booster-card__back-pattern {
+  opacity: 0;
+}
+/* a hard glint, two white bars passing */
+[data-card-back="impact-video"] .booster-card__back::after {
+  background: linear-gradient(115deg, transparent 44%, rgba(255, 255, 255, 0.5) 44% 47%, transparent 47% 50%, rgba(255, 255, 255, 0.35) 50% 51.5%, transparent 51.5%);
+}
+/* the emblem */
+[data-card-back="impact-video"] .booster-card__back-sigil {
+  inline-size: 64%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  box-shadow: none;
+}
+[data-card-back="impact-video"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

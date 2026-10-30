@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "impact-video-epic",
+  "names": {
+    "fr": "Face épique",
+    "en": "Epic face"
+  },
+  "descriptions": {
+    "fr": "Un liseré magenta, une holographie plus vive et des paillettes ; en se retournant, des éclairs roses crépitent autour d'elle et un coup de pinceau blanc la tranche.",
+    "en": "A magenta rim, a brighter film and glitter; as it turns, pink lightning crackles round it and a white brush slash cuts across it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

@@ -6,8 +6,8 @@
     "en": "Manga burst"
   },
   "descriptions": {
-    "fr": "Comme les images-chocs d'un anime, dessinées image par image dans EffectCraft et jouées à 12 images/s : rayons roses et blancs cernés d'encre autour du paquet qui tournoie, éclairs roses qui crépitent, lignes de vitesse, deux coups de pinceau blancs qui se croisent, une explosion BD blanche qui envahit tout puis se dissout en trame.",
-    "en": "Like an anime's impact frames, drawn frame by frame in EffectCraft and played at 12 frames a second: inked pink and white rays round the spinning pack, crackling pink lightning, speed lines, two white brush slashes crossing, a white comic explosion swelling over everything, then dissolving into halftone."
+    "fr": "Comme les images-chocs d'un anime, dessinées image par image dans EffectCraft et jouées à 24 images/s : rayons roses et blancs cernés d'encre autour du paquet qui tournoie, éclairs roses qui crépitent, lignes de vitesse, deux coups de pinceau blancs qui se croisent, une explosion BD blanche qui envahit tout puis se dissout en trame.",
+    "en": "Like an anime's impact frames, drawn frame by frame in EffectCraft and played at 24 frames a second: inked pink and white rays round the spinning pack, crackling pink lightning, speed lines, two white brush slashes crossing, a white comic explosion swelling over everything, then dissolving into halftone."
   },
   "render": {
     "kind": "glsl",

@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "impact-video-legendary",
+  "names": {
+    "fr": "Explosion de puissance",
+    "en": "Power burst"
+  },
+  "descriptions": {
+    "fr": "Dessinée dans EffectCraft, image par image : sortie de sa tornade, la plus grande explosion — rayons roses, blancs et or cernés d'encre, lignes de vitesse —, des anneaux blancs et roses, des éclats or et blancs projetés et deux grands éclats.",
+    "en": "Drawn in EffectCraft, frame by frame: out of its vortex, the biggest burst — inked pink, white and gold rays, speed lines — white and pink rings, gold and white glints flying off and two great glints."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 2.5,
+    "rarity": "legendary",
+    "alpha": "stacked",
+    "over": "over.mp4"
+  }
+}
