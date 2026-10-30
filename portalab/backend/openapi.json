@@ -46594,7 +46594,7 @@
             "required": false,
             "schema": {
               "default": "all",
-              "pattern": "^(all|movies|series|live|music|books|audiobooks)$",
+              "pattern": "^(all|movies|series|live|music|books|audiobooks|radio|games)$",
               "title": "Category",
               "type": "string"
             }
@@ -46655,6 +46655,35 @@
         ]
       }
     },
+    "/api/v1/media/insights/categories": {
+      "get": {
+        "description": "#283: the statistics' tabs a configured service feeds \u2014 a catalog or a history of that kind, the radio\nwhen a station is connected, the requests when a request service is.",
+        "operationId": "insight_categories_api_v1_media_insights_categories_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "title": "Response Insight Categories Api V1 Media Insights Categories Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Insight Categories",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/insights/{section}": {
       "get": {
         "description": "027: one tab of the statistics in depth (casting, production, playback, profile), compared with the\nprevious period \u2014 mine, or the server's (devices only for \u00ab me \u00bb and media managers).",
@@ -46687,7 +46716,7 @@
             "required": false,
             "schema": {
               "default": "all",
-              "pattern": "^(all|movies|series|live|music|books|audiobooks)$",
+              "pattern": "^(all|movies|series|live|music|books|audiobooks|radio|games)$",
               "title": "Category",
               "type": "string"
             }

@@ -72,6 +72,7 @@ ACTIVITY_KINDS: tuple[str, ...] = (
     "book",
     "audiobook",
     "game",  # #190: a game played (RomM)
+    "radio",  # #283: a sitting at the radio's stream (counted by the server)
     "other",
 )
 

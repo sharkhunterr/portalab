@@ -26,6 +26,7 @@ import {
   PERIODS,
   type Ranked,
   type Scope,
+  useInsightCategories,
   useInsights,
   useLockedStatistics,
   useMeasures,
@@ -41,7 +42,7 @@ import "./insights.css";
  * genres, people, decades, records, the box office of the films watched, requests and devices. « Me » or
  * the whole server (anonymous for members; members, devices and ingestion sources for media managers).
  */
-const KIND_ORDER = ["movie", "episode", "live", "track", "book", "audiobook", "other"];
+const KIND_ORDER = ["movie", "episode", "live", "track", "book", "audiobook", "radio", "game", "other"];
 
 /** 027: the tabs of each category (after Telemetra): overview, casting, production, playback, profile. */
 const SECTIONS: Record<Category, string[]> = {
@@ -52,6 +53,8 @@ const SECTIONS: Record<Category, string[]> = {
   music: ["overview", "profile"],
   books: ["overview", "profile"],
   audiobooks: ["overview", "profile"],
+  radio: ["overview"],
+  games: ["overview"],
 };
 
 function Trend({ now, before }: { now: number; before: number | undefined }) {
@@ -384,6 +387,7 @@ export default function InsightsPage() {
   const category = (CATEGORIES as string[]).includes(params.get("category") ?? "")
     ? (params.get("category") as Category)
     : "all";
+  const available = useInsightCategories().data; // issue 283: only the tabs a configured service feeds
   const sections = SECTIONS[category];
   const section = sections.includes(params.get("tab") ?? "") ? (params.get("tab") as string) : "overview";
   const [period, setPeriod] = useState(params.get("period") ?? "30d");
@@ -448,10 +452,12 @@ export default function InsightsPage() {
           else following.set("category", next);
           setParams(following, { replace: true });
         }}
-        tabs={[...CATEGORIES, "requests"].map((c) => ({
-          key: c,
-          label: t(`media:insights.categories.${c}`),
-        }))}
+        tabs={[...CATEGORIES, "requests"]
+          .filter((c) => !available || available.includes(c) || c === (requests ? "requests" : category))
+          .map((c) => ({
+            key: c,
+            label: t(`media:insights.categories.${c}`),
+          }))}
       />
       {blocked ? <LockedStat name={blocked} icon="lock" span="full" /> : null}
       {requests && !blocked ? <RequestsTab period={period} /> : null}

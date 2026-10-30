@@ -4,8 +4,27 @@ import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 
 /** Media statistics (027): what was watched, listened to and read — mine or the server's. */
 export type Scope = "me" | "all";
-export type Category = "all" | "movies" | "series" | "live" | "music" | "books" | "audiobooks";
-export const CATEGORIES: Category[] = ["all", "movies", "series", "live", "music", "books", "audiobooks"];
+export type Category =
+  | "all"
+  | "movies"
+  | "series"
+  | "live"
+  | "music"
+  | "books"
+  | "audiobooks"
+  | "radio"
+  | "games";
+export const CATEGORIES: Category[] = [
+  "all",
+  "movies",
+  "series",
+  "live",
+  "music",
+  "books",
+  "audiobooks",
+  "radio",
+  "games",
+];
 export const PERIODS = ["7d", "30d", "90d", "ytd", "365d", "all"] as const;
 
 export interface Work {
@@ -281,6 +300,16 @@ export function useInsights(scope: Scope, category: Category, period: string, en
           params: { query: { scope, category, period, tz: time_zone || "UTC" } },
         })
       ).data as unknown as Insights,
+  });
+}
+
+/** Issue 283: the tabs a configured service feeds (and « requests » when a request service is connected). */
+export function useInsightCategories() {
+  return useQuery({
+    queryKey: ["media", "insights", "categories"],
+    staleTime: 5 * 60_000,
+    queryFn: async () =>
+      ((await api.GET("/api/v1/media/insights/categories")).data?.categories ?? ["all"]) as string[],
   });
 }
 

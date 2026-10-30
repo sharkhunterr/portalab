@@ -6,6 +6,8 @@
   --kind-track: color-mix(in oklab, var(--color-accent-alt) 50%, var(--state-available-fg));
   --kind-book: var(--state-available-fg);
   --kind-audiobook: color-mix(in oklab, var(--state-available-fg) 55%, var(--color-accent-alt));
+  --kind-radio: color-mix(in oklab, var(--color-accent-alt) 60%, var(--state-error-fg)); /* issue 283 */
+  --kind-game: color-mix(in oklab, var(--color-accent) 50%, var(--state-available-fg)); /* issue 283 */
   --kind-other: var(--color-text-muted);
   /* 027: the statistics in depth — a palette, the previous period, streams and resolutions */
   --chart-1: var(--color-accent);
@@ -81,6 +83,12 @@
 }
 .insights-legend__item[data-kind="audiobook"]::before {
   background: var(--kind-audiobook);
+}
+.insights-legend__item[data-kind="radio"]::before {
+  background: var(--kind-radio);
+}
+.insights-legend__item[data-kind="game"]::before {
+  background: var(--kind-game);
 }
 
 /* weekday x hour */

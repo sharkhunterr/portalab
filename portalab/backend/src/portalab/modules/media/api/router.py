@@ -15,7 +15,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
-from portalab.capabilities.media import QuotaLimits
+from portalab.capabilities.media import ACTIVITY_HISTORY, LIBRARY, RADIO, REQUESTS, QuotaLimits
 from portalab.capabilities.themes import COSMETICS
 from portalab.core.audit_port import AuditRecord
 from portalab.core.authorization import require
@@ -497,7 +497,7 @@ async def cancel_request(principal: Requester, request_id: UUID, module: Module)
 
 # --- 027: statistics, upcoming releases, enriched details -------------------------------------------------
 INSIGHT_PERIOD = r"^(7d|30d|90d|365d|ytd|all|\d{4})$"
-INSIGHT_CATEGORY = r"^(all|movies|series|live|music|books|audiobooks)$"
+INSIGHT_CATEGORY = r"^(all|movies|series|live|music|books|audiobooks|radio|games)$"
 IMAGE_SIZE = r"^(w92|w154|w185|w300|w342|w500|w780|w1280|h632|original)$"
 
 
@@ -583,6 +583,30 @@ async def _guard_filters(module: Any, principal: Principal, period: str, scope: 
 async def locked_statistics(principal: Reader, module: Module) -> dict[str, list[str]]:
     """061: what is still to unlock in the shop — sections, tabs, filters and request statistics."""
     return {"locked": sorted(await _locked_statistics(module, principal))}
+
+
+@router.get("/media/insights/categories")
+async def insight_categories(principal: Reader, module: Module) -> dict[str, list[str]]:
+    """#283: the statistics' tabs a configured service feeds — a catalog or a history of that kind, the radio
+    when a station is connected, the requests when a request service is."""
+
+    def connected(capability: str) -> set[UUID]:
+        try:
+            registrations = module.capabilities.system_providers(capability)
+        except Exception:
+            return set()
+        out = set()
+        for registration in registrations:
+            try:
+                out.add(UUID(registration.instance_ref))
+            except ValueError:
+                continue
+        return out
+
+    stations = connected(RADIO)
+    services = connected(LIBRARY) | connected(ACTIVITY_HISTORY) | stations
+    categories = await module.insights.categories(sorted(services), radio=bool(stations))
+    return {"categories": [*categories, *(["requests"] if connected(REQUESTS) else [])]}
 
 
 @router.get("/media/insights")

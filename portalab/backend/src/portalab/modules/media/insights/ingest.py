@@ -19,12 +19,19 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, func, literal, or_, select, update
+from sqlalchemy import String, and_, cast, exists, func, literal, or_, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
-from portalab.capabilities.media import ACTIVITY_HISTORY, ACTIVITY_KINDS, ActivityPage, SourceActivity, unwrap
+from portalab.capabilities.media import (
+    ACTIVITY_HISTORY,
+    ACTIVITY_KINDS,
+    RADIO,
+    ActivityPage,
+    SourceActivity,
+    unwrap,
+)
 from portalab.capabilities.record_sink import Report, ServiceRef, SinkResult
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
@@ -40,6 +47,7 @@ from portalab.modules.media.models import (
     MediaObject,
     MediaRequest,
     PlaybackSession,
+    RadioSitting,
     SourceItem,
     UserLink,
 )
@@ -51,6 +59,7 @@ BACKFILL_PAGES = 40  # per run and service: a large history is caught up over a 
 INCREMENTAL_PAGES = 10
 MAX_DRIVEN_RUNS = 100  # « sync now »: up to 4,000 pages of history in one go
 OVERLAP = timedelta(hours=6)
+RADIO_FLOOR = 60.0  # #283: a radio sitting under a minute is no listening (as for its reward)
 WORKS = frozenset({"movie", "series", "album", "book", "audiobook", "game"})
 
 
@@ -236,6 +245,10 @@ class ActivityIngestor:
             except Exception as exc:  # one failing service never stops the others
                 await self._failed(service_id, "history", exc)
         stored += await self._sessions(with_history)
+        try:
+            stored += await self._radio()
+        except Exception as exc:
+            log.warning("media radio listening not stored: %s", type(exc).__name__)
         families = await self._families_touched()
         for family in families:
             await self.dedup(family)
@@ -483,6 +496,69 @@ class ActivityIngestor:
                 state.mode, state.items = "incremental", state.items + stored
                 state.last_run_at, state.last_error = utc_now(self.clock), None
         return stored
+
+    # --- the radio (#283) ----------------------------------------------------------------------------------
+    async def _radio(self) -> int:
+        """The radio sittings the server counted (issue 259), once ended, as activity rows of their members —
+        rewarded already (``media.radio_listened``). Kept while a station is connected."""
+        try:
+            stations = self.capabilities.system_providers(RADIO)
+            service_id = UUID(stations[0].instance_ref) if stations else None
+        except Exception:
+            return 0
+        if service_id is None:
+            return 0
+        ref = literal("radio:") + cast(RadioSitting.id, String)
+        async with self.database.session() as session:
+            sittings = (
+                await session.scalars(
+                    select(RadioSitting)
+                    .where(
+                        RadioSitting.ended_at.is_not(None),
+                        RadioSitting.seconds >= RADIO_FLOOR,
+                        ~exists().where(Activity.kind == "radio", Activity.ref == ref),
+                    )
+                    .order_by(RadioSitting.ended_at)
+                    .limit(2000)
+                )
+            ).all()
+        if not sittings:
+            return 0
+        try:
+            title = unwrap(await stations[0].provider.state()).station or "Radio"
+        except Exception:  # the station's name when it answers; its listening counts all the same
+            title = "Radio"
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            await uow.session.execute(
+                insert(Activity)
+                .values(
+                    [
+                        {
+                            "service_id": service_id,
+                            "ref": f"radio:{s.id}",
+                            "family": None,
+                            "priority": 10,
+                            "counted": True,
+                            "external_user_id": f"portal:{s.user_id}",
+                            "user_id": s.user_id,
+                            "kind": "radio",
+                            "title": title[:500],
+                            "ids": {},
+                            "started_at": s.started_at,
+                            "stopped_at": s.ended_at,
+                            "watched_s": s.seconds,
+                            "platform": "Portalab",
+                            "received_at": now,
+                            "rewarded_at": now,  # ``media.radio_listened`` gave its XP
+                        }
+                        for s in sittings
+                    ]
+                )
+                .on_conflict_do_nothing(constraint="uq_activity_service_ref")
+            )
+            await mark_days(uow.session, (s.started_at for s in sittings))
+        return len(sittings)
 
     # --- de-duplication ----------------------------------------------------------------------------------
     async def _families_touched(self) -> list[str]:
