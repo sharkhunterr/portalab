@@ -4591,7 +4591,7 @@ export interface paths {
         put?: never;
         /**
          * Upload
-         * @description A raw ``application/zip`` body (no multipart), 20 MB at most.
+         * @description A raw ``application/zip`` body (no multipart), 40 MB at most.
          */
         post: operations["upload_api_v1_admin_visuals_upload_post"];
         delete?: never;

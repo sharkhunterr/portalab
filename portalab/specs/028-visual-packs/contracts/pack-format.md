@@ -10,7 +10,7 @@ elements/<folder>/element.json  one element
 elements/<folder>/…             its files: .css .glsl .js .json .svg .png .webp .jpg .woff2 .ogg .wav .txt
 ```
 
-Limits (refused before anything is stored): archive ≤ 20 MB, ≤ 400 files, file ≤ 5 MB, path ≤ 200 chars,
+Limits (refused before anything is stored): archive ≤ 40 MB, ≤ 400 files, file ≤ 5 MB, path ≤ 200 chars,
 no `..`, no absolute path, no link, no NUL, no other extension, folder names `^[a-z0-9][a-z0-9-]{0,47}$`.
 
 ## element.json

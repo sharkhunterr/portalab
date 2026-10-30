@@ -35,7 +35,7 @@ through six steps; each one shows what it found, and the next opens only when no
 
 | step | what happens |
 |---|---|
-| **Import** | from the inbox (`DATA_DIR/visuals/inbox/`, a folder or a `.zip`), an upload (`.zip`, 20 MB at most) or a GitHub address (`https://github.com/<owner>/<repo>[/tree/<ref>/<folder>]`: the latest release or the default branch; *Check for updates* compares versions and never installs on its own). Each version is stored apart, under its fingerprint |
+| **Import** | from the inbox (`DATA_DIR/visuals/inbox/`, a folder or a `.zip`), an upload (`.zip`, 40 MB at most) or a GitHub address (`https://github.com/<owner>/<repo>[/tree/<ref>/<folder>]`: the latest release or the default branch; *Check for updates* compares versions and never installs on its own). Each version is stored apart, under its fingerprint |
 | **Analysis** | the format, the files, the look keys, the economy, the texts — see [the analysis](#the-analysis) |
 | **Security** | what the stylesheets and scripts would try, and what Portalab refuses anyway |
 | **Test** | the elements drawn in a sandbox in the administrator's browser: GPU looks compiled, frames per second, scripts started; « try on myself » for this session only |
@@ -56,7 +56,7 @@ elements/<folder>/element.json  one element
 elements/<folder>/…             its files: .css .glsl .js .json .svg .png .webp .jpg .woff2 .ogg .wav .txt
 ```
 
-Limits (refused before anything is stored): archive ≤ 20 MB, ≤ 400 files, file ≤ 5 MB, path ≤ 200 characters,
+Limits (refused before anything is stored): archive ≤ 40 MB, ≤ 400 files, file ≤ 5 MB, path ≤ 200 characters,
 no `..`, no absolute path, no link, no NUL, no other extension, folder names `^[a-z0-9][a-z0-9-]{0,47}$`. The
 pack's `id` and look keys: lowercase letters, digits, `-` and `_` (48 at most); `portalab-…` is reserved.
 
