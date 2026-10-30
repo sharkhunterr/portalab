@@ -88,6 +88,7 @@ from portalab.modules.media.insights.enrich import JOB as ENRICH_JOB
 from portalab.modules.media.insights.enrich import MetadataEnricher
 from portalab.modules.media.insights.ingest import JOB as ACTIVITY_JOB
 from portalab.modules.media.insights.ingest import ActivityIngestor
+from portalab.modules.media.insights.portal import PortalActivity
 from portalab.modules.media.insights.rewards import HistoryRewards
 from portalab.modules.media.insights.stats import InsightsQuery
 from portalab.modules.media.insights.upcoming import Upcoming
@@ -446,6 +447,7 @@ class MediaModule:
             self.history.consumer(),
             RequestWatched(self.database, self.events).consumer(),
             LeavingWatched(self.database, self.events, self.cleanup).consumer(),  # issue 228
+            PortalActivity(self.database, clock=self.clock).consumer(),  # #282
         ):
             if self.consumers.get(consumer.name) is None:
                 self.consumers.register(consumer)
