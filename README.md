@@ -10,58 +10,196 @@
   <img alt="PostgreSQL 16" src="https://img.shields.io/badge/postgresql-16-7f9cff?style=flat-square&labelColor=161b2b">
 </p>
 
+<h3 align="center">The front door of your homelab.<br>Watch, read, listen, ask, play and talk — in one place your members love to open.</h3>
+
 <p align="center">
-  <b>One portal for everything your community shares — the media server, the games, the talk — hosted at home.</b>
+  <a href="#what-your-members-get">Features</a> ·
+  <a href="#connects-to-your-stack">Integrations</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="docs/README.md">Documentation</a> ·
+  <a href="GITHUB_RELEASES.md">Release notes</a>
 </p>
+
+<p align="center">
+  <img src="assets/screenshots/title.jpg" alt="A title's page: where to watch it, what members think, the cast" width="100%">
+</p>
+
+Your friends and family already use your Plex, your Seerr, your book library and your game shelf — through
+a dozen apps and a group chat full of *"is my film there yet?"*. **Portalab puts all of it behind one
+door**: one catalog for every service, requests that explain themselves, a player, a reader and a radio in
+the browser, statistics of everything they watched, read and heard, a wiki, news and support — and, for
+those who want it, a whole game on top: levels, quests, collectible cards cut from your own library and a
+shop to spend what they earn.
+
+It runs on your server from **one Docker image and a PostgreSQL database**. Nothing leaves your network
+unless you connect it yourself, and **every feature is set by the administrator** — turned on, tuned,
+priced or switched off.
 
 ---
 
-Portalab gathers what a homelab community lives on into one place its members actually enjoy opening:
-what is on the media server and what is coming, what to watch or read next, the trading cards they collect,
-the games they play, the wiki and the news, the radio — with profiles, progression and a shop where the
-community's own currency is spent. Everything runs on your server, from one Docker image and a PostgreSQL
-database, and nothing is sent anywhere you did not connect yourself.
+## What your members get
 
-## Highlights
+### Everything on the media server, in one place
 
-**Media, unified.** One catalog for every service: Plex, Jellyfin, Sonarr, Radarr, Seerr, RomM, Grimmory and
-more merge into one page per title, with what is available, requested, downloading or leaving soon. Members
-watch in the browser (or cast to a Chromecast), read books and comics, listen to audiobooks, request what is
-missing within their quota, and follow a request from the ask to the download.
+<table>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/media.jpg" alt="The media home: the radio live, what was just added, what is coming"></td>
+    <td width="50%"><img src="assets/screenshots/catalog.jpg" alt="The catalog: every film, series, book, audiobook and game, with filters"></td>
+  </tr>
+</table>
 
-**Collect and play.** Trading cards cut from the films and series of your own library, opened in boosters
-with a scene of their own; a games page with a wheel and mini-games; achievements, quests, levels,
-leaderboards and seasonal campaigns. Two currencies earned by taking part — never bought with money — and a
-marketplace where the community funds projects together.
+- **One catalog for every service.** Films, series, music, books, comics, audiobooks and retro games from
+  Plex, Jellyfin, Sonarr, Radarr, Grimmory and RomM merge into **one page per title** — available, coming,
+  requested or leaving soon (Maintainerr), with the cast, the artwork, the quality of each copy and the
+  community's verdict.
+- **Ask from Portalab.** Search any film or series, see if it is already there, and request it in one
+  click within your quota (Overseerr / Jellyseerr behind the scenes).
+- **Watch, read and listen without leaving the portal.** A video player with subtitles and Chromecast, a
+  reader for EPUB, PDF and comics, an audiobook player that remembers where you stopped — on any device.
+- **The radio.** The station's live stream (SUB/WAVE) in a player that follows you from page to page; see
+  what plays, and ask the DJ for a song.
+- **My taste.** Like, dislike or keep for later, and get recommendations drawn from what you actually watch.
 
-**A living community.** Member profiles with frames and name styles, an activity feed, discovery shelves,
-events with proposals and votes, a calendar, news with an editorial workflow, a versioned wiki, support
-tickets and incident notices, notifications in the portal and by e-mail.
+### "Why is the film I asked for still not on Plex?" — answered
 
-**Yours to shape.** Themes (light, dark and many universes), visual packs that restyle anything from a widget
-to the whole interface — safely sandboxed — a dashboard each member arranges, statistics the administrator
-declares, automations (when / if / then), plugins, and an optional AI assistant that only ever acts with the
-member's own rights.
+<p align="center">
+  <img src="assets/screenshots/request-journey.jpg" alt="Where a request stands: requested, approved, released, searched, downloading, imported, available" width="100%">
+</p>
 
-**Built to be trusted.** Default-deny permissions on every route, roles and groups, privacy controls and data
-export for every member, an audit log, rate limits and an intrusion guard, encrypted secrets, and encrypted
-backups that move a whole portal to another server. English and French included, more through the
-translation tools.
+Every request is followed **from the ask to the screen**: approved, released or not yet, searched,
+downloading (with the torrent's real progress and why it stalls), imported, available. Each step says what
+it waits for in plain words — and the assistant can explain it too. *My requests* gathers them all, with
+what became of them.
 
-## Integrations
+### Your statistics, beautifully
 
-| Area | Services |
-| --- | --- |
-| Media servers | Plex, Jellyfin, Tautulli |
-| Requests and downloads | Seerr (Overseerr, Jellyseerr), Sonarr, Radarr, qBittorrent, Deluge, Maintainerr |
-| Libraries | RomM (retro games), Grimmory (books, comics, audiobooks) |
-| Metadata | TMDB, TheTVDB, Fanart.tv |
-| Radio | SUB/WAVE |
-| Infrastructure | Unraid, Glances |
-| Search and AI | SearXNG, Ollama and OpenAI-compatible servers, MCP tools |
-| Sign-in | Any OpenID Connect provider (Authentik, …) |
+<table>
+  <tr>
+    <td width="66%"><img src="assets/screenshots/statistics.jpg" alt="Statistics: time spent, plays, titles, active days, activity over time"></td>
+    <td width="34%"><img src="assets/screenshots/phone-statistics.jpg" alt="Statistics on a phone"></td>
+  </tr>
+</table>
 
-Every integration is a connector: a plugin can add more without touching the core.
+Time spent, plays, favourite titles, habits by hour and weekday, genres, actors, decades, devices and
+streaming quality — **films, series, live TV, music, books, audiobooks, the radio and games**, each tab
+shown only when a service of yours feeds it. Yours, or the whole server's (anonymous for members), over
+any period, plus a yearly recap.
+
+### A game for those who want to play
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/progression.jpg" alt="My progression: level, XP, where XP comes from"></td>
+    <td width="50%"><img src="assets/screenshots/cards.jpg" alt="Mediacards: a film's card set, collected from boosters"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/games.jpg" alt="Games: the daily wheel, the title of the day, weekly challenges, mini-games"></td>
+    <td width="50%"><img src="assets/screenshots/marketplace.jpg" alt="The marketplace: interfaces, profile looks, features, packs, boosters"></td>
+  </tr>
+</table>
+
+Gamification is **optional for every member** — play it all, play without the cards, or don't play at all
+(your profile then stays anonymous).
+
+- **XP, levels, coins and contribution** earned by watching, reading and listening, by asking for titles,
+  and by taking part: news, wiki, tickets, feedback, events. Quests, achievements, streaks, leaderboards
+  and seasonal campaigns.
+- **Mini-games** drawn from your own library — the daily wheel, the title of the day, the blurred scene,
+  the cast, the hidden synopsis, higher or lower, the timeline — alone or **together in a party**.
+- **Mediacards** — collect your favourite films and series as trading cards cut from your own library:
+  thousands of sets, rarities, boosters opened in a scene of their own.
+- **The marketplace** — spend what you earn (never real money) on looks: interfaces, palettes, frames,
+  name styles, badges, effects, sounds; and on features: statistics tabs, extra requests, radio requests,
+  widgets, access to content. Members also fund **community projects** together.
+
+### A community that lives on its own
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/news.jpg" alt="News: articles from the team, by category"></td>
+    <td width="50%"><img src="assets/screenshots/wiki.jpg" alt="The wiki: the server's internal guide, versioned"></td>
+  </tr>
+</table>
+
+- **News** with an editorial workflow, and **newsletters by e-mail** (what arrived, what is coming) at
+  the rhythm each member chooses.
+- **An internal wiki**, versioned, for the server's guides and rules.
+- **A calendar** of releases, events, campaigns and maintenance; **events and proposals** the community
+  votes on; member profiles and an activity feed.
+- **Terms of use** published in versions, accepted by every member.
+
+### Help, and the truth about what is down
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/services.jpg" alt="Service status: every service, its uptime over 24 hours"></td>
+    <td width="50%"><img src="assets/screenshots/feedback.jpg" alt="Feedback: surveys, bug reports and suggestions, with the team's answers"></td>
+  </tr>
+</table>
+
+- **Support tickets** with attachments and replies; **feedback** — report a bug, suggest a feature, answer
+  the team's surveys and review forms.
+- **Service status** for every connected service, and **incidents** that say what broke, since when and
+  when it was fixed — no more "is Plex down or is it me?".
+
+### Make it yours
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/settings-appearance.jpg" alt="Appearance: interfaces, light and dark, colour palettes, level badge"></td>
+    <td width="50%"><img src="assets/screenshots/search.jpg" alt="Search everything: media, people, wiki, news, tickets, products"></td>
+  </tr>
+</table>
+
+- **A dashboard of your own** — add, arrange and resize widgets: continue watching, the radio, requests,
+  statistics, quests, the calendar, the leaderboard…
+- **Full personalisation** — interface and palette, light or dark, profile (avatar, frame, name style),
+  language and region, and notification preferences per topic, in the portal and by e-mail.
+- **Search everything** at once — titles, people, wiki pages, news, tickets, products — exact or by meaning.
+- **An AI assistant** (Ollama or any OpenAI-compatible server) that answers about the server and acts only
+  with the member's own rights, confirming anything sensitive.
+- **Guided tours** that show each part of the portal, step by step.
+
+<p align="center">
+  <img src="assets/screenshots/phone-home.jpg" alt="Portalab on a phone" width="30%">
+  &nbsp;
+  <img src="assets/screenshots/phone-title.jpg" alt="A title's page on a phone" width="30%">
+</p>
+
+## Everything is in the administrator's hands
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/admin.jpg" alt="The control center: what needs attention, services, storage, audit"></td>
+    <td width="50%"><img src="assets/screenshots/admin-gamification.jpg" alt="Gamification: how members progress, rules, levels, rewards"></td>
+  </tr>
+</table>
+
+Each module can be turned on or off. Rewards, levels, quests, achievements and campaigns; card sets and
+boosters; shop products, prices and sales; request quotas; themes, palettes and visual packs (sandboxed);
+the members' default dashboard; news, wiki, newsletters, terms and banners; roles and permissions, single
+sign-on, privacy policies; automations, the assistant's models and tools; alerts, incidents, backups and
+the audit log — all from the administration, nothing in config files.
+
+## Connects to your stack
+
+| Area | Services | What members get |
+| --- | --- | --- |
+| Media servers | **Plex**, **Jellyfin** / Emby | the catalog, live sessions, watching in the browser (Plex) |
+| Watch history | **Tautulli** | every play, for statistics and progression |
+| Requests | **Overseerr**, **Jellyseerr** | asking for titles, quotas, request status |
+| Downloads | **Sonarr**, **Radarr**, **qBittorrent**, **Deluge** | the request journey, the download queue, calendars |
+| Library cleanup | **Maintainerr** | "leaving soon" on titles |
+| Books and audiobooks | **Grimmory** | reading and listening in the portal, reading history |
+| Retro games | **RomM** | the games library and what was played |
+| Radio | **SUB/WAVE** | the live station, now playing, asking the DJ |
+| Metadata and art | **TMDB**, **TheTVDB**, **fanart.tv**, **SearXNG** | overviews, cast, artwork, card art |
+| AI | **Ollama**, OpenAI-compatible servers, MCP | the assistant |
+| Sign-in | **Authentik**, any OpenID Connect provider | single sign-on, accounts linked automatically |
+| Infrastructure | **Unraid**, **Glances** | server health on the status page |
+
+Every integration is a connector; plugins can add more without touching the core. Details in
+[docs/admin/services.md](docs/admin/services.md).
 
 ## Quick start
 
@@ -83,10 +221,11 @@ docker compose up -d portalab worker
 
 Open `http://<server>:8080` **from your local network**: the arrival wizard creates the administrator,
 sets the portal up and can bring a backup in. Then connect your services in *Administration › Services*.
+The full walk-through is in [docs/getting-started.md](docs/getting-started.md).
 
 The image is published as [`sharkhunterr/portalab`](https://hub.docker.com/r/sharkhunterr/portalab)
-(`latest` and one tag per release, e.g. `v1.0.0`); `docker-compose.yml` builds it from source when
-`PORTALAB_IMAGE` is not set.
+(`latest` and one tag per release); `docker-compose.yml` builds it from source when `PORTALAB_IMAGE` is
+not set.
 
 ## Configuration
 
@@ -104,13 +243,26 @@ database (and in its backups).
 | `HEALTH_NETWORKS` | local networks | who may call `/healthz`, `/readyz`, `/metrics` |
 | `SETUP_NETWORKS` | local networks | where a new (or reset) portal may be set up from |
 
+More in [docs/configuration.md](docs/configuration.md).
+
 ## On the internet
 
 Put Portalab behind a reverse proxy that terminates TLS (Nginx Proxy Manager, Traefik, Caddy…), declare
 that proxy in `TRUSTED_PROXIES`, and keep the first setup on your local network. Single sign-on through
-Authentik (or any OpenID Connect provider) links members' accounts automatically. The whole checklist —
-proxy settings, Authentik, what to keep private — is in
+Authentik (or any OpenID Connect provider) links members' accounts automatically. Portalab was audited for
+the internet and scanned with Semgrep, Bandit, Trivy, Gitleaks, Nuclei and OWASP ZAP: default-deny
+permissions on every route, throttled sign-in and an intrusion guard, a strict Content-Security-Policy,
+sandboxed visual packs, encrypted secrets and backups. The checklist is in
 [`portalab/docs/internet-exposure.md`](portalab/docs/internet-exposure.md).
+
+## Documentation
+
+| For | Read |
+| --- | --- |
+| Installing and running it | [Getting started](docs/getting-started.md) · [Configuration](docs/configuration.md) · [Operations](docs/admin/operations.md) |
+| Members | [Media](docs/members/media.md) · [Statistics](docs/members/statistics.md) · [Gamification](docs/members/gamification.md) · [Community](docs/members/community.md) · [Support](docs/members/support.md) · [Personalisation](docs/members/personalization.md) · [Assistant and search](docs/members/assistant.md) |
+| Administrators | [Services](docs/admin/services.md) · [Members and roles](docs/admin/members-and-roles.md) · [Gamification and economy](docs/admin/gamification-and-economy.md) · [Content](docs/admin/content.md) · [Customisation](docs/admin/customization.md) · [AI and automations](docs/admin/ai-and-automations.md) |
+| Developers | [Module guides](portalab/docs/) · [Plugin authoring](portalab/docs/plugin-authoring.md) · [Visual packs](portalab/docs/visual-packs.md) |
 
 ## Architecture
 
@@ -121,8 +273,7 @@ proxy settings, Authentik, what to keep private — is in
 | Delivery | one Docker image (read-only, non-root, no capabilities), PostgreSQL 16 |
 
 The code is organised in layers (`core ← capabilities ← modules | connectors ← app`) enforced by
-import-linter; plugins and visual packs only see their SDKs. Module guides live in
-[`portalab/docs/`](portalab/docs/).
+import-linter; plugins and visual packs only see their SDKs. English and French are included.
 
 ## Development
 
@@ -143,15 +294,17 @@ Releases are cut from the repository root:
 
 ```bash
 npm ci                      # release tooling (standard-version)
+npm run release:issues      # the GitLab issues closed since the last tag, by kind
 npm run release:dry         # preview the next version
 npm run release:full        # bump, CHANGELOG, tag, push — the tag pipeline does the rest
 ```
 
 Before releasing, add the new version's notes at the top of [`GITHUB_RELEASES.md`](GITHUB_RELEASES.md)
-(`# vX.Y.Z`): they become the GitLab and GitHub release pages, and the release script refuses to run
-without them. The tag pipeline validates and tests both halves, builds the image, publishes it to Docker Hub,
-mirrors the repository to GitHub and creates both releases (see [`.gitlab-ci.yml`](.gitlab-ci.yml) for the
-CI/CD variables it expects).
+(`# vX.Y.Z`, with its closed issues by kind): they become the GitLab and GitHub release pages, and the
+release script refuses to run without them. The tag pipeline validates and tests both halves, builds the
+image, publishes it to Docker Hub, mirrors the repository to GitHub and creates both releases (see
+[`.gitlab-ci.yml`](.gitlab-ci.yml) for the CI/CD variables it expects). The screenshots are taken from a
+running portal with `portalab/scripts/guide_shots.mjs assets/screenshots/shots.json` (read-only).
 
 ## Brand
 

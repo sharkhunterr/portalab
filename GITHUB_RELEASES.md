@@ -5,6 +5,14 @@
 > unless that block is the version about to be released. Write the new block at the top, in English,
 > **before** `npm run release:full`; `npm run release:notes` shows what will be posted.
 >
+> Every release after v1.0.0 lists the GitLab issues it closes, sorted by kind: `npm run release:issues`
+> prints them (security, fixed, new, documentation and tooling, improved) — rewrite each title in English,
+> as a member or an administrator would read it, keeping its `#123`. The release script refuses notes
+> without a `### Closed issues` part (v1.0.0, the first public release, is the exception).
+>
+> Images are absolute links pinned to the tag (`https://raw.githubusercontent.com/sharkhunterr/portalab/vX.Y.Z/assets/screenshots/<name>.jpg`):
+> release pages do not resolve relative paths.
+>
 > Template:
 >
 > ```markdown
@@ -14,14 +22,27 @@
 >
 > <one or two sentences: what this release brings>
 >
-> ### New
+> <a screenshot of the headline feature, when there is one>
+>
+> ### Highlights
 > - **<feature>** — what a member or an administrator can now do.
 >
-> ### Improved
-> - …
+> ### Closed issues
 >
-> ### Fixed
-> - **<symptom as users saw it>** — what was wrong, what happens now.
+> #### Security
+> - <what was exposed, what is closed now> (#123)
+>
+> #### Fixed
+> - <the symptom as users saw it — what happens now> (#124)
+>
+> #### New
+> - <what members or administrators can now do> (#125)
+>
+> #### Documentation and tooling
+> - … (#126)
+>
+> #### Improved
+> - … (#127)
 >
 > ### Upgrading
 > - Migrations run with `docker compose run --rm migrate`; anything else to do.
@@ -33,62 +54,93 @@
 
 # v1.0.0
 
-## Portalab v1.0.0 — the first public release
+## Portalab v1.0.0 — the front door of your homelab
 
-Portalab is the self-hosted portal for your community: the media server, the games, the trading cards, the
-wiki, the radio and the people, in one place that runs on your own server. This first public release ships
-everything below as one Docker image.
+**Portalab is the portal your friends and family open instead of a dozen apps.** One catalog for every media
+service, requests that explain themselves, a player, a reader and a radio in the browser, statistics of
+everything they watched, read and heard, news, a wiki and support — and, for those who want it, a whole
+game on top: levels, quests, mini-games, collectible cards cut from your own library and a shop to spend
+what they earn. One Docker image, one PostgreSQL database, your server. Every feature is set by the
+administrator.
 
-### Media
+![A title's page in Portalab](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.0.0/assets/screenshots/title.jpg)
 
-- **One catalog for every service** — Plex, Jellyfin, Sonarr, Radarr, Seerr, RomM and Grimmory merge into one
-  page per title, with what is available, requested, downloading or leaving soon (Maintainerr).
-- **Watch, read and listen in the browser** — video with subtitles and Chromecast, books and comics,
-  audiobooks; posters refreshed when they change at the source.
-- **Requests that explain themselves** — quotas, and a request followed from the ask to the download
-  (Seerr, the *arr queues, qBittorrent and Deluge).
-- **The radio** — SUB/WAVE's live stream, what plays, and asking its DJ for a song; the player survives a
-  page reload.
+### Everything on the media server, in one place
 
-### Collect and play
+- **One catalog** for Plex, Jellyfin, Sonarr, Radarr, Grimmory and RomM: films, series, music, books,
+  comics, audiobooks and retro games — one page per title, available, coming, requested or leaving soon.
+- **Ask from Portalab** — search any film or series and request it in one click, within your quota
+  (Overseerr / Jellyseerr).
+- **"Why is my film still not on Plex?" — answered.** Every request is followed from the ask to the
+  screen: approved, released, searched, downloading (with the torrent's real state), imported, available —
+  each step in plain words, and the assistant can explain it.
+- **Watch, read and listen in the browser** — video with subtitles and Chromecast, EPUB/PDF/comics reader,
+  audiobook player that remembers where you stopped.
+- **The radio** — SUB/WAVE live, what plays, ask the DJ for a song; the player follows you across pages.
 
-- **Trading cards** cut from your own library's films and series, opened in boosters with a scene of their own.
-- **Games** — a games page with party games and mini-games.
-- **Progression** — levels, achievements, quests, leaderboards and seasonal campaigns; two community currencies
-  earned by taking part, never bought with money.
-- **Marketplace** — a shop for the community currency and community-funded projects.
+![Where a request stands](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.0.0/assets/screenshots/request-journey.jpg)
 
-### Community and content
+### Statistics of everything you watch, read and hear
 
-- Member profiles with frames and name styles, an activity feed, discovery shelves, events with proposals and votes.
-- News with an editorial workflow, a versioned wiki, a calendar, support tickets and incident notices.
-- Notifications in the portal and by e-mail; global search across every module.
+Time spent, plays, favourite titles, hours and weekdays, genres, cast, decades, devices and quality — films,
+series, live TV, music, books, audiobooks, radio and games, each tab shown only when a service of yours
+feeds it. Yours or the whole server's, over any period, plus a yearly recap.
 
-### Make it yours
+![Statistics](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.0.0/assets/screenshots/statistics.jpg)
 
-- Themes, and **visual packs** that restyle anything from a widget to the whole interface, run in a sandbox.
-- A dashboard each member arranges, administrator-declared statistics, automations, plugins.
-- An optional **AI assistant** (Ollama or any OpenAI-compatible server, MCP tools) acting only with the
-  member's own rights.
-- English and French.
+### A game — for those who want to play
 
-### Security
+Optional for every member: play it all, play without the cards, or don't play.
 
-Hardened for the internet, after a full audit and external scans (Semgrep, Bandit, Trivy, Gitleaks, Nuclei,
-OWASP ZAP):
+- **XP, levels, coins and contribution** from watching, reading and listening, from requests, and from
+  taking part (news, wiki, tickets, feedback, events); quests, achievements, streaks, leaderboards and
+  seasonal campaigns.
+- **Mini-games** from your own library — the daily wheel, the title of the day, the blurred scene, the cast,
+  the hidden synopsis, higher or lower, the timeline — alone or in a party.
+- **Mediacards** — collect your favourite films and series as trading cards cut from your library, opened
+  from boosters in a scene of their own.
+- **The marketplace** — spend what you earn (never real money) on interfaces, palettes, frames, name
+  styles, badges, effects, and on features: statistics tabs, extra requests, radio requests, widgets,
+  access to content. Community projects funded together.
 
-- **Behind a reverse proxy** — the proxy is declared (`TRUSTED_PROXIES`); a request a proxy nobody declared
-  brings never counts as local, and the server says so in its logs.
-- **First setup from the local network only** (`SETUP_NETWORKS`); a crafted backup cannot run SQL or touch
-  folders outside the data folder.
-- **Sign-in** — attempts throttled per login and per address (lookalike logins included), bounded password
-  hashing, an intrusion guard, default-deny permissions on every route.
-- **Single sign-on** (Authentik, any OpenID Connect provider) — accounts linked by the server; the
-  administrator's only when the provider vouches for the e-mail; a sign-on finishes only in the browser that
-  started it.
-- **Content** — documents and images that could stall the server are bounded and handled off the event loop;
-  only the PNG, JPEG, WebP and GIF decoders read a member's file.
-- Strict Content-Security-Policy, sandboxed visual packs, encrypted secrets and backups, no source maps shipped.
+![Mediacards](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.0.0/assets/screenshots/cards.jpg)
+
+![The marketplace](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.0.0/assets/screenshots/marketplace.jpg)
+
+### Community, content and help
+
+- **News** with an editorial workflow and **newsletters by e-mail**; an **internal wiki**, versioned; a
+  **calendar**; events and proposals voted by the community; profiles and an activity feed.
+- **Terms of use** published in versions and accepted by every member.
+- **Support tickets**, **feedback** (bug reports, suggestions, surveys and review forms with the team's
+  answers), **service status** for every connected service and **incidents** that say what broke and when
+  it was fixed.
+
+### Yours to shape
+
+- **A personal dashboard** — add, arrange and resize widgets.
+- **Full personalisation** — interface, palette, light or dark, profile, language, notification
+  preferences per topic, in the portal and by e-mail; **guided tours** of every part.
+- **Global search** across media, people, wiki, news, tickets and products — exact or by meaning.
+- **An AI assistant** (Ollama or any OpenAI-compatible server, MCP tools) acting only with the member's own
+  rights.
+- **For administrators** — every module, reward, price, quota, theme, page and permission is set from the
+  administration; themes and sandboxed visual packs, automations, plugins, backups, audit, alerts.
+
+![The administration's control center](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.0.0/assets/screenshots/admin.jpg)
+
+### Connects to your stack
+
+Plex · Jellyfin / Emby · Tautulli · Overseerr / Jellyseerr · Sonarr · Radarr · qBittorrent · Deluge ·
+Maintainerr · Grimmory · RomM · SUB/WAVE · TMDB · TheTVDB · fanart.tv · SearXNG · Ollama and
+OpenAI-compatible servers · Authentik and any OpenID Connect provider · Unraid · Glances.
+
+### Ready for the internet
+
+Audited and scanned (Semgrep, Bandit, Trivy, Gitleaks, Nuclei, OWASP ZAP) before this release:
+reverse-proxy aware (`TRUSTED_PROXIES`), first setup from the local network only, throttled sign-in and an
+intrusion guard, default-deny permissions on every route, single sign-on with accounts linked by the
+server, strict Content-Security-Policy, sandboxed visual packs, encrypted secrets and backups.
 
 ### Getting started
 
@@ -96,8 +148,10 @@ OWASP ZAP):
 docker pull sharkhunterr/portalab:v1.0.0
 ```
 
-Follow the quick start in the README: create the secrets, `docker compose up -d postgres`,
-`docker compose run --rm migrate`, `docker compose up -d portalab worker`, then open the portal from your
-local network to set it up. Going on the internet: see `portalab/docs/internet-exposure.md`.
+Follow the [quick start](https://github.com/sharkhunterr/portalab#quick-start): create the secrets,
+`docker compose up -d postgres`, `docker compose run --rm migrate`, `docker compose up -d portalab worker`,
+then open the portal from your local network to set it up. The
+[documentation](https://github.com/sharkhunterr/portalab/tree/main/docs) covers members, administrators and
+going on the internet.
 
 ---

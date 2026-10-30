@@ -1,0 +1,747 @@
+[
+  {
+    "name": "home",
+    "page": "readme",
+    "route": "/",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 25000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "media",
+    "page": "readme",
+    "route": "/media",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 25000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "catalog",
+    "page": "readme",
+    "route": "/media/browse",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      },
+      {
+        "click": ".catalog__kinds button:has-text(\"Films\")",
+        "wait": 6000
+      }
+    ]
+  },
+  {
+    "name": "title",
+    "page": "readme",
+    "route": "/media/01a10781-7223-702e-9f61-b7c77c1b1fc3",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "request-journey",
+    "page": "readme",
+    "route": "/media/01a133cb-ce4d-709e-8066-6297573470fd",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "discover",
+    "page": "readme",
+    "route": "/media/discover",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "my-requests",
+    "page": "readme",
+    "route": "/media/requests",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "statistics",
+    "page": "readme",
+    "route": "/media/insights",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "taste",
+    "page": "readme",
+    "route": "/media/taste",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "search",
+    "page": "readme",
+    "route": "/search?q=alien",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ],
+    "reads": [
+      "/api/v1/search"
+    ]
+  },
+  {
+    "name": "cards",
+    "page": "readme",
+    "route": "/cards/sets/01a10781-39c8-7c76-94ca-d0efd2673513",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 20000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "cards-home",
+    "page": "readme",
+    "route": "/cards",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "games",
+    "page": "readme",
+    "route": "/games",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "progression",
+    "page": "readme",
+    "route": "/progression",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "quests",
+    "page": "readme",
+    "route": "/community/quests",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "achievements",
+    "page": "readme",
+    "route": "/community/achievements",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "leaderboards",
+    "page": "readme",
+    "route": "/community/leaderboards",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }.rank-who, .community-podium__who, .community-member, .community-timeline__who, .widget-activity__who, .widget-leaderboard__podium, .gam-pace__member, .recharts-legend-wrapper, .gam-sources__name { filter: blur(5px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "community",
+    "page": "readme",
+    "route": "/community",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }.rank-who, .community-podium__who, .community-member, .community-timeline__who, .widget-activity__who, .widget-leaderboard__podium, .gam-pace__member, .recharts-legend-wrapper, .gam-sources__name { filter: blur(5px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "marketplace",
+    "page": "readme",
+    "route": "/marketplace",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "projects",
+    "page": "readme",
+    "route": "/projects",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "news",
+    "page": "readme",
+    "route": "/news",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "wiki",
+    "page": "readme",
+    "route": "/wiki/getting-started",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "calendar",
+    "page": "readme",
+    "route": "/calendar",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "support",
+    "page": "readme",
+    "route": "/support",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "feedback",
+    "page": "readme",
+    "route": "/feedback",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "services",
+    "page": "readme",
+    "route": "/services",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "guide",
+    "page": "readme",
+    "route": "/guide",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "settings-appearance",
+    "page": "readme",
+    "route": "/settings/appearance",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "settings-play",
+    "page": "readme",
+    "route": "/settings/play",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "settings-notifications",
+    "page": "readme",
+    "route": "/settings/notifications",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "admin",
+    "page": "readme",
+    "route": "/admin",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "admin-services",
+    "page": "readme",
+    "route": "/admin/services",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "admin-gamification",
+    "page": "readme",
+    "route": "/admin/gamification",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }.rank-who, .community-podium__who, .community-member, .community-timeline__who, .widget-activity__who, .widget-leaderboard__podium, .gam-pace__member, .recharts-legend-wrapper, .gam-sources__name { filter: blur(5px); } .gam-chart--wide svg text, .gam-chart--wide .recharts-yAxis { filter: blur(5px); }",
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "admin-marketplace",
+    "page": "readme",
+    "route": "/admin/marketplace",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "admin-themes",
+    "page": "readme",
+    "route": "/admin/themes",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "admin-newsletters",
+    "page": "readme",
+    "route": "/admin/newsletters",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "admin-terms",
+    "page": "readme",
+    "route": "/admin/terms",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 12000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "admin-ai",
+    "page": "readme",
+    "route": "/admin/ai",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 20000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "phone-home",
+    "page": "readme",
+    "route": "/",
+    "clip": "body",
+    "screen": "phone",
+    "height": 860,
+    "maxHeight": 860,
+    "settle": 25000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "phone-statistics",
+    "page": "readme",
+    "route": "/media/insights",
+    "clip": "body",
+    "screen": "phone",
+    "height": 860,
+    "maxHeight": 860,
+    "settle": 14000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "phone-title",
+    "page": "readme",
+    "route": "/media/01a10781-7223-702e-9f61-b7c77c1b1fc3",
+    "clip": "body",
+    "screen": "phone",
+    "height": 860,
+    "maxHeight": 860,
+    "settle": 14000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); }",
+        "wait": 300
+      }
+    ]
+  }
+]

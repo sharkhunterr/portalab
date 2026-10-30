@@ -13,6 +13,7 @@
     "release:full": "node scripts/release.js --github --deploy",
     "release:dry": "node scripts/release.js --dry-run",
     "release:notes": "node scripts/release.js --notes",
+    "release:issues": "node scripts/release-issues.js",
     "push": "node scripts/push.js",
     "push:github": "node scripts/push.js --github",
     "push:all": "node scripts/push.js --all",
