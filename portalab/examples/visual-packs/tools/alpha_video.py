@@ -1,10 +1,10 @@
 """Makes a pack's video from frames — PNG with transparency, 24 a second — for a scene part of ``kind: video``
-with ``alpha: stacked`` (issue 287): the picture in the upper half (premultiplied: black where it is
-transparent), its transparency in grey in the lower half, as an H.264 MP4 every browser plays on its hardware
-decoder. Several frame folders are laid one over the other (the first at the bottom), each from the video's
+with ``alpha: side`` (or ``stacked``, issue 287): the picture in the left (upper) half — premultiplied: black
+where it is transparent —, its transparency in grey in the right (lower) half, as an H.264 MP4 every browser
+plays on its hardware decoder (side by side, a tall layer's video stays within the 4K phones decode). Several frame folders are laid one over the other (the first at the bottom), each from the video's
 first frame or from a later one (``FRAMES@12``: from its 12th), transparent before and after. Needs ffmpeg.
 
-    alpha_video.py OUT.mp4 FRAMES[@START] [FRAMES[@START]…] [--scale 0.75] [--crf 20] [--fps 24] [--length 72]
+    alpha_video.py OUT.mp4 FRAMES[@START] [FRAMES[@START]…] [--scale 0.75] [--crf 20] [--fps 24] [--length 72] [--layout side|stacked]
 """
 
 import argparse
@@ -29,6 +29,7 @@ def main() -> None:
     parser.add_argument("--crf", type=int, default=20)
     parser.add_argument("--fps", type=int, default=24)
     parser.add_argument("--length", type=int, default=0, help="at most this many frames")
+    parser.add_argument("--layout", choices=("side", "stacked"), default="side")
     args = parser.parse_args()
     layers = []
     for given in args.frames:
@@ -52,7 +53,8 @@ def main() -> None:
         f";[{last}]scale={size}:flags=lanczos,split[c][a]"
         ";[c]format=rgba,premultiply=inplace=1,format=gbrp[picture]"
         ";[a]format=rgba,alphaextract,format=gray,format=gbrp[alpha]"
-        f";[picture][alpha]vstack,format=yuv420p,trim=end_frame={args.length or longest}[out]"
+        f";[picture][alpha]{'hstack' if args.layout == 'side' else 'vstack'},format=yuv420p"
+        f",trim=end_frame={args.length or longest}[out]"
     )
     subprocess.run(
         ["ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", graph, "-map", "[out]",

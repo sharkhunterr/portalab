@@ -11,8 +11,8 @@ Pillow, and [EffectCraft](https://github.com/storytold/effectcraft) 0.18's `effe
   over, cherry petals and blossoms, gold cracks (kintsugi), ripples, rays and the dragon (scaled and gilded
   body, fins, vermillion mane, horns, whiskers). The reveals play behind the card; the dragon's front half over
   it.
-- The frames become the videos the parts play (`../tools/alpha_video.py`: H.264 MP4, the transparency stacked
-  under the picture — `kind: video`, `alpha: stacked`): the legendary's reveal plays its dragon's back half and,
+- The frames become the videos the parts play (`../tools/alpha_video.py`: H.264 MP4, the transparency beside
+  the picture — `kind: video`, `alpha: side`): the legendary's reveal plays its dragon's back half and,
   from when the dragon soars away, its reveal, behind the card, and the dragon's front half over it.
 - `gen_svgs.py`: the still shapes — washi paper, the name's ink band (the same brush, in Python), mizuhiki cords,
   ensō, seigaiha and asanoha patterns, kintsugi seams, cherry blossoms, cut gold leaf, a glint, a seal.

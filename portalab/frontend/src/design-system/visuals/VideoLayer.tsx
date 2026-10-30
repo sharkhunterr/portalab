@@ -3,10 +3,11 @@ import "./external.css";
 
 /**
  * Issue 287: a pack's video, played in its layer — once (an opening, a reveal) or over and over (a backdrop).
- * Muted, inline, never controlled by the member: a moment of the scene, not a film. ``stacked``: its upper half
- * the picture (premultiplied: black where it is transparent — the two halves blur alike as the video is
- * compressed, no dark fringe), its lower half the transparency in grey — put back together on the GPU as it
- * plays (H.264 has no transparency of its own; this way every browser plays it on its hardware decoder). Read
+ * Muted, inline, never controlled by the member: a moment of the scene, not a film. ``side`` / ``stacked``: the
+ * picture in its left / upper half (premultiplied: black where it is transparent — the two halves blur alike as
+ * the video is compressed, no dark fringe), the transparency in grey in its right / lower half — put back
+ * together on the GPU as it plays (H.264 has no transparency of its own; this way every browser plays it on its
+ * hardware decoder; side by side, a tall layer's video stays within the 4K phones decode). Read
  * once, kept for the page's life (a booster's videos are preloaded with its scene, so they start at once);
  * played once, it leaves nothing behind (its last frame is not held).
  */
@@ -32,14 +33,17 @@ void main() {
   v_uv = vec2(a_pos.x * 0.5 + 0.5, 0.5 - a_pos.y * 0.5);
   gl_Position = vec4(a_pos, 0.0, 1.0);
 }`;
-// the picture from the upper half (premultiplied), its transparency from the lower half (a little margin: the
-// video's limited range never quite reaches black; the picture never brighter than its transparency allows)
+// the picture from one half (premultiplied), its transparency from the other (``u_half``: where it starts — a
+// little margin: the video's limited range never quite reaches black; the picture never brighter than its
+// transparency allows)
 const FRAGMENT = `precision mediump float;
 uniform sampler2D u_video;
+uniform vec2 u_half;
 varying vec2 v_uv;
 void main() {
-  vec3 color = texture2D(u_video, vec2(v_uv.x, v_uv.y * 0.5)).rgb;
-  float alpha = clamp((texture2D(u_video, vec2(v_uv.x, 0.5 + v_uv.y * 0.5)).r - 0.03) / 0.94, 0.0, 1.0);
+  vec2 at = v_uv * (vec2(1.0) - u_half);
+  vec3 color = texture2D(u_video, at).rgb;
+  float alpha = clamp((texture2D(u_video, at + u_half).r - 0.03) / 0.94, 0.0, 1.0);
   gl_FragColor = vec4(min(color, vec3(alpha)), alpha);
 }`;
 
@@ -61,8 +65,14 @@ function program(gl: WebGLRenderingContext): WebGLProgram | null {
   return gl.getProgramParameter(linked, gl.LINK_STATUS) ? linked : null;
 }
 
-/** Draws each frame of a stacked video on a canvas, the canvas sized to its box (at most the video's own). */
-function stack(video: HTMLVideoElement, canvas: HTMLCanvasElement): () => void {
+type Alpha = "none" | "side" | "stacked";
+
+/** Draws each frame of a video holding its transparency on a canvas, sized to its box (at most the video's). */
+function recompose(
+  video: HTMLVideoElement,
+  canvas: HTMLCanvasElement,
+  alpha: Exclude<Alpha, "none">,
+): () => void {
   const gl = canvas.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: false });
   const linked = gl ? program(gl) : null;
   if (!gl || !linked) return () => {};
@@ -73,6 +83,8 @@ function stack(video: HTMLVideoElement, canvas: HTMLCanvasElement): () => void {
   const position = gl.getAttribLocation(linked, "a_pos");
   gl.enableVertexAttribArray(position);
   gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+  const side = alpha === "side";
+  gl.uniform2f(gl.getUniformLocation(linked, "u_half"), side ? 0.5 : 0, side ? 0 : 0.5);
   gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -85,8 +97,11 @@ function stack(video: HTMLVideoElement, canvas: HTMLCanvasElement): () => void {
     if (video.readyState >= 2 && video.videoWidth) {
       const box = canvas.getBoundingClientRect();
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
-      const width = Math.max(2, Math.min(Math.round(box.width * ratio), video.videoWidth));
-      const height = Math.max(2, Math.min(Math.round(box.height * ratio), video.videoHeight / 2));
+      const width = Math.max(2, Math.min(Math.round(box.width * ratio), video.videoWidth / (side ? 2 : 1)));
+      const height = Math.max(
+        2,
+        Math.min(Math.round(box.height * ratio), video.videoHeight / (side ? 1 : 2)),
+      );
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;
@@ -121,7 +136,7 @@ export function VideoLayer({
   over,
 }: {
   src: string;
-  alpha: "none" | "stacked";
+  alpha: Alpha;
   loop: boolean;
   className: string;
   /** a reveal's second video, drawn over the card */
@@ -146,7 +161,7 @@ export function VideoLayer({
   useEffect(() => {
     const element = video.current;
     if (!local || !element) return;
-    const stop = alpha === "stacked" && canvas.current ? stack(element, canvas.current) : () => {};
+    const stop = alpha !== "none" && canvas.current ? recompose(element, canvas.current, alpha) : () => {};
     element.currentTime = 0;
     element.play().catch(() => setFailed(true));
     return () => {
@@ -159,7 +174,7 @@ export function VideoLayer({
     <span className={className} aria-hidden="true" data-over={over || undefined}>
       <video
         ref={video}
-        className={alpha === "stacked" ? "visual-video visual-video--source" : "visual-video"}
+        className={alpha === "none" ? "visual-video" : "visual-video visual-video--source"}
         src={local ?? undefined}
         muted
         playsInline
@@ -169,7 +184,7 @@ export function VideoLayer({
         tabIndex={-1}
         onEnded={() => setEnded(true)}
       />
-      {alpha === "stacked" ? <canvas ref={canvas} className="visual-video" /> : null}
+      {alpha === "none" ? null : <canvas ref={canvas} className="visual-video" />}
     </span>
   );
 }

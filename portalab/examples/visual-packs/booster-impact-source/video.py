@@ -50,7 +50,7 @@ def main(frames: Path) -> None:
     for element, video, _ in VIDEOS.values():
         manifest = PACK / "elements" / element / "element.json"
         data = json.loads(manifest.read_text())
-        data["render"].update(kind="video", alpha="stacked")
+        data["render"].update(kind="video", alpha="side")
         data["render"]["over" if video == "over.mp4" else "file"] = video
         manifest.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
         for css in data["render"].get("css", []):

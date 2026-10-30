@@ -162,7 +162,7 @@ export function ScenePart({
     return <ExternalScript element={part} context={context} className={className} />;
   }
   if (part.kind === "video" && part.file) {
-    const alpha = part.alpha === "stacked" ? "stacked" : "none";
+    const alpha = part.alpha ?? "none";
     const loop = part.type === "booster_backdrop";
     return (
       <>
