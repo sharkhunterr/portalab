@@ -1,0 +1,61 @@
+/* A common card (its hook: the card once turned, data-card-face): a frame in the rarity's neon over deep violet,
+   neon bands on a slant, comic lettering outlined in ink. The face turns in 3D: never its transform; a turned
+   media card is never redrawn. */
+@font-face {
+  font-family: "Apotheose Bangers";
+  src: url("Bangers.woff2") format("woff2");
+  font-display: swap;
+}
+[data-card-face="apotheose-common"] .mcard__card {
+  padding: 3cqi;
+  border-radius: 2.6cqi;
+  background:
+    linear-gradient(118deg, transparent 0 62%, #8f84ad 62% 65%, transparent 65% 68%, #d9d2ea 68% 69.5%, transparent 69.5%),
+    linear-gradient(160deg, #d9d2ea, #8f84ad 40%, #4b4266);
+  box-shadow: 0 0 0 0.8cqi #14081f, 0 0 3cqi #8f84ad;
+}
+[data-card-face="apotheose-common"] .mcard__body {
+  border-radius: 1.8cqi;
+  background: linear-gradient(170deg, #2a1050, #14081f);
+  box-shadow: inset 0 0 0 0.6cqi #14081f;
+  color: #f4ecff;
+}
+[data-card-face="apotheose-common"] .mcard[data-rarity] .mcard__name {
+  overflow: visible;
+  text-overflow: clip;
+  font-family: "Apotheose Bangers", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #ffffff;
+  -webkit-text-stroke: 1.2cqi #14081f;
+  paint-order: stroke fill;
+  text-shadow: 0.9cqi 1.1cqi 0 #8f84ad;
+}
+[data-card-face="apotheose-common"] .mcard__genre,
+[data-card-face="apotheose-common"] .mcard__rarity,
+[data-card-face="apotheose-common"] .mcard__cost {
+  background: #8f84ad;
+  color: #14081f;
+  box-shadow: 0 0 0 0.45cqi #14081f;
+  font-family: "Apotheose Bangers", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+[data-card-face="apotheose-common"] .mcard__emblem {
+  background: #14081f;
+  color: #8f84ad;
+}
+[data-card-face="apotheose-common"] .mcard__art {
+  border-radius: 1cqi;
+  box-shadow: 0 0 0 0.6cqi #14081f, 1cqi 1.1cqi 0 0.6cqi #8f84ad;
+}
+[data-card-face="apotheose-common"] .mcard__strip {
+  background: #8f84ad;
+  color: #14081f;
+}
+[data-card-face="apotheose-common"] .mcard__figures strong {
+  font-family: "Apotheose Bangers", var(--mcard-title);
+  font-weight: 400;
+}

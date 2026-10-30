@@ -159,7 +159,13 @@ function Takeover({
     copy.setAttribute("data-settled", "");
     copy.removeAttribute("data-offscreen");
     copy.setAttribute("aria-hidden", "true");
-    copy.querySelector("button")?.setAttribute("tabindex", "-1");
+    // its button a plain box (no button within the takeover's own)
+    for (const button of copy.querySelectorAll("button")) {
+      const box = document.createElement("span");
+      box.className = button.className;
+      box.append(...button.childNodes);
+      button.replaceWith(box);
+    }
     target.replaceChildren(copy);
   }, [source]);
   useEffect(() => {

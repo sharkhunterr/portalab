@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "apotheose",
+  "names": {
+    "fr": "Néons",
+    "en": "Neons"
+  },
+  "descriptions": {
+    "fr": "Violet profond, des bandes néon rose, cyan et or qui glissent en biais, des trames dans les coins, une lueur rose au centre, des éclats qui scintillent — en vidéo en boucle.",
+    "en": "Deep violet, pink, cyan and gold neon bands sliding on a slant, halftone in the corners, a pink glow in the middle, glints twinkling — as a looping video."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}
