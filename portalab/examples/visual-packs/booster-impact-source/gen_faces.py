@@ -173,17 +173,17 @@ def face(rarity: str, p: dict) -> str:
 """
     if rarity == "legendary":
         css += f"""/* as it turns: the power vortex — energy ribbons whirling round the card, its back half under the card, its
-   front half over it, then blasting away (drawn in EffectCraft, 18 frames at 12 a second, played frame by frame) */
+   front half over it, then blasting away (drawn in EffectCraft at 24 frames a second, played frame by frame) */
 {h}::before,
 {h}::after {{
   content: "";
   position: absolute;
   inset: -80%;
   pointer-events: none;
-  background: url("vortex-back.webp") 0 0 / 600% 300% no-repeat;
   mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
-  animation: impact-vortex-x 0.5s steps(6) 3 both, impact-vortex-y 1.5s steps(3) both;
 }}
+/* frames: begin (written by booster-impact-source/sheets.py) */
+/* frames: end */
 {h}::after {{
   z-index: 3;
   background-image: url("vortex-front.webp");
@@ -196,14 +196,6 @@ def face(rarity: str, p: dict) -> str:
     mask-image: radial-gradient(closest-side, #000 72%, transparent 100%), linear-gradient(to bottom, transparent calc(30.77% - 4.5rem), #000 calc(30.77% - 1.5rem), #000 calc(69.23% + 1.5rem), transparent calc(69.23% + 4.5rem));
     mask-composite: intersect;
   }}
-}}
-@keyframes impact-vortex-x {{
-  from {{ background-position-x: 0%; }}
-  to {{ background-position-x: 120%; }}
-}}
-@keyframes impact-vortex-y {{
-  from {{ background-position-y: 0%; }}
-  to {{ background-position-y: 150%; }}
 }}
 """
         css += f"""/* a great glint crossing the art now and then — on its own small part, not the whole card */

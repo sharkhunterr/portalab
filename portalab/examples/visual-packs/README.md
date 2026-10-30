@@ -33,7 +33,7 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
 - `booster-impact/` (`impact`): **an animated trading-card game's opening, drawn as a comic** — inked
   outlines, flat cel colours, halftone and hard edges everywhere; its opening and reveals are anime impact
   frames made in [EffectCraft](https://github.com/storytold/effectcraft) and played from WebP sprite sheets
-  on twos (sources and `build.sh` in `booster-impact-source/`): speed lines and halftone corners on black; a pack in flat violet with graffiti
+  at 24 fps (sources and `build.sh` in `booster-impact-source/`): speed lines and halftone corners on black; a pack in flat violet with graffiti
   doodles, its art in an inked panel, spinning in crackling pink lightning and inked manga rays, cut by two
   huge white brush slashes, bursting in a white comic explosion that dissolves into halftone; media cards with
   a yellow comic title rimmed in red and ink, sticker badges and a holographic film in hard bands — a halftone

@@ -1,19 +1,20 @@
 /* A legendary card turned (its hook: data-reveal), 2.5 s: once it has landed out of its vortex, the biggest
    burst — inked pink, white and gold rays, speed lines — white and pink rings rolling away, gold and white
-   glints flying off and two great glints — drawn in EffectCraft, played here frame by frame on twos
-   (frames.webp, 30 frames at 12 a second) in its layer round the card. */
+   glints flying off and two great glints — drawn in EffectCraft, played here frame by frame (frames.webp, 24 frames a second) in its layer round the card. */
+/* frames: begin (written by booster-impact-source/sheets.py) */
 [data-reveal="impact-legendary"] .booster-fx__scene {
-  background: url("frames.webp") 0 0 / 600% 500% no-repeat;
-  animation: impact-reveal-legendary-x 0.5s steps(6) 5 both, impact-reveal-legendary-y 2.5s steps(5) both;
+  background: url("frames.webp") 0 0 / 800% 800% no-repeat;
+  animation: impact-reveal-legendary-x 0.3333s steps(8) 8 both, impact-reveal-legendary-y 2.667s steps(8) both;
 }
 @keyframes impact-reveal-legendary-x {
   from { background-position-x: 0%; }
-  to { background-position-x: 120.0000%; }
+  to { background-position-x: 114.2857%; }
 }
 @keyframes impact-reveal-legendary-y {
   from { background-position-y: 0%; }
-  to { background-position-y: 125.0000%; }
+  to { background-position-y: 114.2857%; }
 }
+/* frames: end */
 /* room for the effect: a layer 2.6 times the card, fading out towards its edges — never the outline of its box */
 [data-reveal="impact-legendary"] .booster-fx__scene {
   inset: -80%;

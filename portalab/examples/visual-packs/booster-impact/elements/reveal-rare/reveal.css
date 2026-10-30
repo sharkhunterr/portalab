@@ -1,18 +1,20 @@
 /* A rare card turned (its hook: data-reveal), 1.8 s: inked pink and white rays bursting from behind the card,
    speed lines, a ring of cyan halftone dots rolling away, glints — drawn in EffectCraft, played here frame by
-   frame on twos (frames.webp, 22 frames at 12 a second) in its layer round the card. */
+   frame (frames.webp, 24 frames a second) in its layer round the card. */
+/* frames: begin (written by booster-impact-source/sheets.py) */
 [data-reveal="impact-rare"] .booster-fx__scene {
-  background: url("frames.webp") 0 0 / 600% 400% no-repeat;
-  animation: impact-reveal-rare-x 0.5s steps(6) 4 both, impact-reveal-rare-y 2s steps(4) both;
+  background: url("frames.webp") 0 0 / 800% 600% no-repeat;
+  animation: impact-reveal-rare-x 0.3333s steps(8) 6 both, impact-reveal-rare-y 2s steps(6) both;
 }
 @keyframes impact-reveal-rare-x {
   from { background-position-x: 0%; }
-  to { background-position-x: 120.0000%; }
+  to { background-position-x: 114.2857%; }
 }
 @keyframes impact-reveal-rare-y {
   from { background-position-y: 0%; }
-  to { background-position-y: 133.3333%; }
+  to { background-position-y: 120.0000%; }
 }
+/* frames: end */
 /* room for the effect: a layer 2.6 times the card, fading out towards its edges — never the outline of its box */
 [data-reveal="impact-rare"] .booster-fx__scene {
   inset: -80%;
