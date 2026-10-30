@@ -81,6 +81,10 @@
     {
       "filename": "portalab/backend/src/portalab/__init__.py",
       "updater": "scripts/version/python-init.js"
+    },
+    {
+      "filename": "portalab/backend/openapi.json",
+      "updater": "scripts/version/openapi.js"
     }
   ],
   "skip": {
