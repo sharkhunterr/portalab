@@ -152,7 +152,10 @@ the right (lower) half (white: opaque) — Portalab puts them back together
 as it plays, so an H.264 MP4 (the one format every browser, Safari and phones included, plays on its hardware
 decoder) can be transparent — side by side, a tall layer's video stays within the 4K a phone decodes:
 frame-by-frame animations weigh far less than sprite sheets, and only one frame
-is decoded at a time. `examples/visual-packs/tools/alpha_video.py` makes one from PNG frames (ffmpeg).
+is decoded at a time. `examples/visual-packs/tools/alpha_video.py` makes one from PNG frames (ffmpeg). A video
+without transparency covers its layer, cropped rather than stretched: a backdrop played as a looping video (a
+stage written as a shader and recorded by `examples/visual-packs/tools/stage_video.mjs`, its end blended into its
+start) costs a phone far less than a full-screen shader every frame.
 
 ## Widgets
 

@@ -30,6 +30,7 @@ def main() -> None:
     parser.add_argument("--fps", type=int, default=24)
     parser.add_argument("--length", type=int, default=0, help="at most this many frames")
     parser.add_argument("--layout", choices=("side", "stacked"), default="side")
+    parser.add_argument("--max-kb", type=int, default=4900, help="compressed a little more until it weighs less (a pack's file: 5 MB)")
     args = parser.parse_args()
     layers = []
     for given in args.frames:
@@ -56,12 +57,17 @@ def main() -> None:
         f";[picture][alpha]{'hstack' if args.layout == 'side' else 'vstack'},format=yuv420p"
         f",trim=end_frame={args.length or longest}[out]"
     )
-    subprocess.run(
-        ["ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", graph, "-map", "[out]",
-         "-c:v", "libx264", "-preset", "slow", "-crf", str(args.crf), "-tune", "animation",
-         "-r", str(args.fps), "-movflags", "+faststart", "-an", str(args.out)],
-        check=True,
-    )  # fmt: skip
+    crf = args.crf
+    while True:
+        subprocess.run(
+            ["ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", graph, "-map", "[out]",
+             "-c:v", "libx264", "-preset", "slow", "-crf", str(crf), "-tune", "animation",
+             "-r", str(args.fps), "-movflags", "+faststart", "-an", str(args.out)],
+            check=True,
+        )  # fmt: skip
+        if args.out.stat().st_size <= args.max_kb * 1024 or crf >= 32:
+            break
+        crf += 2
     print(f"{args.out.name}: {args.out.stat().st_size // 1024} KB")
 
 
