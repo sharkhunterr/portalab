@@ -2323,3 +2323,104 @@
   block-size: 3.9rem;
   padding: 0;
 }
+
+/* issue 290: a rarity staged over the whole screen (a reveal of ``place: screen``) — over everything on the
+   stage, but its close button: the reveal's videos covering it (behind the card, and over it), a copy of the card
+   turned brought to the middle, big, and the rarity's name, written by Portalab (the pack's hook styles it) */
+.booster-stage > .booster-takeover {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--booster-ink) 70%, transparent);
+  color: var(--booster-light);
+  cursor: pointer;
+  animation:
+    booster-takeover-in 0.18s ease-out both,
+    booster-takeover-out 0.35s ease-in calc(var(--takeover-s) - 0.35s) both;
+}
+@keyframes booster-takeover-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes booster-takeover-out {
+  to {
+    opacity: 0;
+  }
+}
+.booster-takeover__scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.booster-takeover__scene[data-over] {
+  z-index: 3;
+}
+.booster-takeover__card {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  perspective: 1400px;
+  pointer-events: none;
+  animation: booster-takeover-card 0.7s cubic-bezier(0.2, 1.3, 0.4, 1) 0.15s both;
+}
+@keyframes booster-takeover-card {
+  from {
+    opacity: 0;
+    transform: scale(0.45) rotate(-8deg);
+  }
+}
+.booster-stage .booster-takeover .booster-takeover__card .booster-card {
+  inline-size: min(66vw, 19rem, calc(62vh * 63 / 88));
+  aspect-ratio: 63 / 88;
+  animation: none;
+}
+/* the rarity's name, slammed across the screen then gone — Portalab's words, the pack's look */
+.booster-takeover__word {
+  position: absolute;
+  inset: auto 0 12%;
+  z-index: 4;
+  font-size: clamp(2.6rem, 12vw, 7rem);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--booster-light);
+  text-shadow: 0 0.3rem 1.6rem color-mix(in srgb, var(--booster-ink) 80%, transparent);
+  pointer-events: none;
+  animation: booster-takeover-word calc(var(--takeover-s) * 0.7) cubic-bezier(0.2, 1.2, 0.3, 1) both;
+}
+@keyframes booster-takeover-word {
+  0% {
+    opacity: 0;
+    transform: translateX(-60%) skewX(-12deg) scale(1.4);
+  }
+  18%,
+  75% {
+    opacity: 1;
+    transform: translateX(0) skewX(-12deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(40%) skewX(-12deg) scale(0.95);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-stage > .booster-takeover,
+  .booster-takeover__card,
+  .booster-takeover__word {
+    animation: none;
+  }
+}

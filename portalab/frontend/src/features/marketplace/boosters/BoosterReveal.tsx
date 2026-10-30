@@ -130,6 +130,65 @@ function Atmosphere({ mist }: { mist?: { hold: boolean; reduced: boolean } | und
   );
 }
 
+/**
+ * Issue 290: a rarity staged over the whole screen (a reveal of ``place: screen``) — a copy of the card turned,
+ * brought to the middle, big, between the reveal's videos (behind it, and over it), the rarity's name written by
+ * Portalab over them (translated; its look the pack's, through its hook). It ends with its videos, or on a tap.
+ */
+function Takeover({
+  element,
+  rarity,
+  source,
+  onDone,
+}: {
+  element: ExternalElement;
+  rarity: string;
+  /** the card turned, in the row: copied as it is (a picture of it — nothing in the copy is live) */
+  source: HTMLElement | null;
+  onDone: () => void;
+}) {
+  const t = useT();
+  const holder = useRef<HTMLSpanElement>(null);
+  const seconds = Math.min(3, Math.max(1, element.duration ?? 2.5));
+  useEffect(() => {
+    const target = holder.current;
+    if (!target || !source) return;
+    const copy = source.cloneNode(true) as HTMLElement;
+    for (const layer of copy.querySelectorAll(".booster-fx, .booster-fx__scene, .booster-card__gpu"))
+      layer.remove();
+    copy.setAttribute("data-settled", "");
+    copy.removeAttribute("data-offscreen");
+    copy.setAttribute("aria-hidden", "true");
+    copy.querySelector("button")?.setAttribute("tabindex", "-1");
+    target.replaceChildren(copy);
+  }, [source]);
+  useEffect(() => {
+    const id = window.setTimeout(onDone, seconds * 1000 + 150);
+    return () => window.clearTimeout(id);
+  }, [onDone, seconds]);
+  return (
+    <button
+      type="button"
+      className="booster-takeover"
+      data-reveal={hookOf(element)}
+      data-rarity={rarity}
+      style={{ "--takeover-s": `${seconds}s` } as CSSProperties}
+      onClick={onDone}
+      aria-label={t("marketplace:booster.close")}
+    >
+      <ScenePart
+        element={element}
+        className="booster-takeover__scene"
+        context={{ reducedMotion: false, phase: "reveal", rarity }}
+      />
+      <span ref={holder} className="booster-takeover__card booster-cards" aria-hidden="true" />
+      <span className="booster-takeover__word" aria-hidden="true">
+        {t(`marketplace:rarity.${rarity}`)}
+      </span>
+    </button>
+  );
+}
+
 function Card({
   card,
   index,
@@ -139,11 +198,14 @@ function Card({
   onZoom,
   scene,
   reduced = false,
+  screen = false,
 }: {
   card: BoosterCard;
   index: number;
   total: number;
   state: CardState;
+  /** issue 290: a reveal over the whole screen is played by the stage (not in the card's place) */
+  screen?: boolean;
   onReveal: () => void;
   /** issue 234: a card of its own face (a media card), turned: seen big on a tap */
   onZoom?: (() => void) | undefined;
@@ -201,7 +263,7 @@ function Card({
       data-settled={(state === "revealed" && (settled || reduced)) || undefined}
       style={{ "--i": index, "--offset": index - (total - 1) / 2 } as CSSProperties}
     >
-      {state === "revealed" && reveal ? (
+      {state === "revealed" && reveal && !(screen && reveal.place === "screen") ? (
         <ScenePart
           element={reveal}
           className="booster-fx__scene"
@@ -382,6 +444,8 @@ export function BoosterReveal({
   const [states, setStates] = useState<CardState[]>([]);
   const [moment, setMoment] = useState<string | null>(null);
   const [zoom, setZoom] = useState<number | null>(null);
+  // issue 290: the card whose rarity is being staged over the whole screen
+  const [takeover, setTakeover] = useState<number | null>(null);
   // cards turning now (their charge and their flip): a media cards' stage holds its mist still meanwhile
   const [turning, setTurning] = useState(0);
   // issue 234: on a phone, cards of their own faces are swiped one at a time — the row follows the turning one
@@ -487,23 +551,25 @@ export function BoosterReveal({
       later(() => setTurning((n) => Math.max(0, n - 1)), charge + FLIP_MS);
       setStates((now) => now.map((s, i) => (i === index && s === "hidden" ? "charging" : s)));
       if (rank >= 2 && !reduced) setMoment(RARITIES[rank] ?? null);
+      const screen = scene?.parts.reveal?.[RARITIES[rank] as Rarity];
       later(() => {
         setStates((now) => now.map((s, i) => (i === index ? "revealed" : s)));
+        if (screen?.place === "screen" && !reduced) setTakeover(index);
         void sound.play(rank >= 2 ? "reward" : rank === 1 ? "success" : "ui");
         later(() => setMoment((m) => (m === RARITIES[rank] ? null : m)), AFTER_MS[rank] ?? 400);
       }, charge);
     },
-    [cards, later, reduced, follow],
+    [cards, later, reduced, follow, scene],
   );
 
   // « reveal all »: one card after the other, each turned and left to be read; a card seen big holds the next back,
   // and one turned by hand meanwhile is skipped
-  const latest = useRef({ states, zoom });
-  latest.current = { states, zoom };
+  const latest = useRef({ states, zoom, takeover });
+  latest.current = { states, zoom, takeover };
   const next = useRef(() => {});
   next.current = () => {
     if (!auto.current) return;
-    if (latest.current.zoom !== null) {
+    if (latest.current.zoom !== null || latest.current.takeover !== null) {
       later(() => next.current(), 400);
       return;
     }
@@ -516,6 +582,7 @@ export function BoosterReveal({
     const rank = RANK[cards[index]?.product.rarity ?? "common"] ?? 0;
     later(() => next.current(), reduced ? 150 : (CHARGE_MS[rank] ?? 0) + FLIP_MS + (READ_MS[rank] ?? 1400));
   };
+  const closeTakeover = useCallback(() => setTakeover(null), []);
   const revealAll = () => {
     if (auto.current) return;
     auto.current = true;
@@ -678,9 +745,22 @@ export function BoosterReveal({
                   if (!busy) revealOne(index);
                 }}
                 onZoom={() => setZoom(index)}
+                screen
               />
             ))}
           </ul>
+          {takeover !== null && scene ? (
+            <Takeover
+              element={
+                scene.parts.reveal?.[
+                  (cards[takeover]?.product.rarity ?? "common") as Rarity
+                ] as ExternalElement
+              }
+              rarity={cards[takeover]?.product.rarity ?? "common"}
+              source={(row.current?.children[takeover] as HTMLElement | undefined) ?? null}
+              onDone={closeTakeover}
+            />
+          ) : null}
           {zoom !== null && cards[zoom]?.face
             ? // issue 234: a turned card seen big, over the stage — a tap anywhere puts it back
               createPortal(

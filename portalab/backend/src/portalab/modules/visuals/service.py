@@ -1347,6 +1347,8 @@ class VisualPacks:
                 # issue 287: a reveal's video played over the card, and how a video holds its transparency
                 "over": f"{folder}/{render['over']}" if render.get("over") else None,
                 "alpha": render.get("alpha") if render.get("alpha") not in (None, "none") else None,
+                # issue 290: a card's reveal over the whole screen
+                "place": "screen" if render.get("place") == "screen" else None,
                 "css": [f"{folder}/{name}" for name in render.get("css") or []],
                 "stage": render.get("stage", False),
                 "shape": render.get("shape", 0),
