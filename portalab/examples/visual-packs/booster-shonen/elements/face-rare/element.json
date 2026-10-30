@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "shonen-rare",
+  "names": {
+    "fr": "Face rare",
+    "en": "Rare face"
+  },
+  "descriptions": {
+    "fr": "La carte rare de la scène, son cadre, son corps et son lettrage dans le style de la scène.",
+    "en": "The scene's rare card: its frame, its body and its lettering in the scene's style."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

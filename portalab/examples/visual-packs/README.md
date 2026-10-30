@@ -52,6 +52,14 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   blue quartz, amethyst, rainbow opal set in gold) with engraved titles — druses of quartz for a rare, a fan of
   amethysts and orbiting shards for an epic, and for a legendary prismatic rays, a crown of giant crystals of
   every gem and a belt of shards passing behind then over the card;
+- `booster-shonen/`, `booster-magical/`, `booster-ninja/`, `booster-mecha/`: **a manga universe in four
+  scenes**, built together from `booster-manga-source/` (one EffectCraft toolkit, one stylesheet generator) and
+  played as high-quality videos (1.5× the earlier scenes; their stages too, as looping videos): a **fighting
+  aura** — flames licking up round the pack, rocks lifting, ki lightning, a pillar of light, a golden aura for a
+  legendary; a **magical girl's transformation** — magic circles, ribbons, hearts, stars, bubbles; **ninja
+  techniques** — a smoke bomb, shuriken, kunai and blue lightning, a fire dragon summoned; **giant robots** — a
+  HUD locking on, steam, armour flying off, a missile salvo, wings of energy. Each pack goes its own way:
+  exploding, imploding, vanishing in smoke, shutting off like a screen;
 - `booster-sumi/` (`sumi`): **an opening in ink and gold, like Japanese lacquerware** — every animation drawn
   frame by frame in EffectCraft at 24 fps with a brush of bristles that lands heavy and runs dry, played as
   transparent videos (sources and `build.sh` in `booster-sumi-source/`), on a stage of black urushi lacquer where gold seigaiha waves rise and gold

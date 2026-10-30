@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ninja",
+  "names": {
+    "fr": "Bombe fumigène",
+    "en": "Smoke bomb"
+  },
+  "descriptions": {
+    "fr": "Le sceau du paquet s'embrase, une bombe fumigène éclate et l'engloutit, un éclair de lame la traverse, des shuriken jaillissent du nuage dans toutes les directions et des feuilles d'érable tourbillonnent.",
+    "en": "The pack's seal catches fire, a smoke bomb bursts and swallows it, a blade's flash crosses it, shuriken shoot out of the cloud every way and maple leaves swirl."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

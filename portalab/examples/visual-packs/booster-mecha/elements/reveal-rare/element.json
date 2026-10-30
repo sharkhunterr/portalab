@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "mecha-rare",
+  "names": {
+    "fr": "Scan",
+    "en": "Scan"
+  },
+  "descriptions": {
+    "fr": "Un HUD verrouille la carte, une ligne de scan la balaie, des barres de données, des étincelles.",
+    "en": "A HUD locks on the card, a scan line sweeps it, data bars, sparks."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

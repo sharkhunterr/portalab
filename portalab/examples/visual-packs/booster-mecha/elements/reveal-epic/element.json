@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "mecha-epic",
+  "names": {
+    "fr": "Salve de missiles",
+    "en": "Missile salvo"
+  },
+  "descriptions": {
+    "fr": "Une salve de missiles lancée de derrière la carte, en éventail sur des traînées de fumée, qui explosent haut et loin, des étincelles.",
+    "en": "A missile salvo launched from behind the card, fanning out on trails of smoke, blasting high and wide, sparks."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic"
+  }
+}

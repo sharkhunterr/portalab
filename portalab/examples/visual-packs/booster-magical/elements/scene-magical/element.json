@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "magical",
+  "names": {
+    "fr": "Scène Magical girl",
+    "en": "Magical girl scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture, jouée en vidéo. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening, played as videos. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-magical",
+      "backdrop": "backdrop-magical",
+      "opening": "opening-magical",
+      "back": {
+        "common": "back-magical"
+      },
+      "face": {
+        "common": "face-common",
+        "rare": "face-rare",
+        "epic": "face-epic",
+        "legendary": "face-legendary"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

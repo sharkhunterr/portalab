@@ -1,0 +1,35 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video (24 frames a second): An orange aura flares higher and higher round the pack, rocks tear off the
+   ground, ki lightning crackles, concentration lines close in; then a pillar of light shoots up, a shockwave
+   cracks the ground in dust, rocks and embers fly. Meanwhile the pack itself swells, trembling, white-hot, and
+   explodes. */
+[data-opening="shonen"] .booster-stage__tear .booster-pack {
+  animation: manga-charge 2.6s linear both;
+}
+@keyframes manga-charge {
+  0% { transform: none; filter: none; opacity: 1; }
+  12% { transform: translate(-1px, 0) scale(1.01); }
+  18% { transform: translate(2px, -1px) scale(1.025); }
+  24% { transform: translate(-2px, 1px) scale(1.04); filter: brightness(1.15); }
+  30% { transform: translate(3px, -1px) scale(1.06) skewX(-1deg); filter: brightness(1.3) saturate(1.4); }
+  35% { transform: translate(-4px, 1px) scale(1.09) skewX(1deg); filter: brightness(1.6) saturate(1.6); }
+  39% { transform: translate(4px, 0) scale(1.13, 1.1); filter: brightness(2.4) saturate(0.6); opacity: 1; }
+  41% { transform: scale(1.3, 1.24); filter: brightness(4); opacity: 0.9; }
+  43% { transform: scale(1.55); filter: brightness(5); opacity: 0; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges — never the outline of its box */
+[data-opening="shonen"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="shonen"] .booster-stage__tear .booster-pack {
+    animation: manga-fade 2.6s linear both;
+  }
+}
+@keyframes manga-fade {
+  0%, 30% { opacity: 1; }
+  45%, 100% { opacity: 0; }
+}

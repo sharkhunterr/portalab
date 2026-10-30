@@ -1,0 +1,92 @@
+/* A legendary card of the magical scene: its frame, its body and its lettering in the scene's style. (Its hook:
+   the card once turned, data-card-face.) The face turns in 3D: never its transform; a turned media card is never
+   redrawn — what moves, moves once, as it is revealed. */
+@font-face {
+  font-family: "Manga Mochiy";
+  src: url("MochiyPopOne.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-card-face="magical-legendary"] .mcard__card {
+  padding: 3cqi;
+  border-radius: 3.4cqi;
+  background: url("lace.svg") 0 0 / 30% auto repeat-x, url("lace.svg") 0 100% / 30% auto repeat-x, conic-gradient(from 200deg at 40% 45%, #ffd6e8, #ffe9b0, #c8ffd9, #b8e4ff, #d9c4ff, #ffd6e8);
+  box-shadow: inset 0 0 0 0.35cqi rgba(255, 255, 255, 0.18), 0 0 0 0.45cqi #0c0a10, 0 1.4cqi 3cqi rgba(0, 0, 0, 0.5);
+}
+[data-card-face="magical-legendary"] .mcard__body {
+  border-radius: 2.6cqi;
+  background: radial-gradient(circle at 20% 15%, rgba(255, 190, 228, 0.5), transparent 40%), radial-gradient(circle at 85% 90%, rgba(190, 230, 255, 0.5), transparent 45%), #fff7fc;
+  box-shadow: 0 0 0 0.5cqi #ffffff, 0 0 0 0.8cqi #c08a1a;
+  color: #5a2a4a;
+}
+[data-card-face="magical-legendary"] .mcard[data-rarity] .mcard__name {
+  font-family: "Manga Mochiy", var(--mcard-title);
+  font-weight: 400;
+  line-height: 1.15;
+  color: #c08a1a;
+  text-shadow: 0 0.3cqi 0 #ffffff, 0 0 1.2cqi rgba(255, 140, 200, 0.6);
+}
+[data-card-face="magical-legendary"] .mcard__genre,
+[data-card-face="magical-legendary"] .mcard__rarity,
+[data-card-face="magical-legendary"] .mcard__cost {
+  background: #c08a1a;
+  color: #ffffff;
+  box-shadow: 0 0 0 0.3cqi #5a2a4a;
+  font-family: "Manga Mochiy", var(--mcard-title);
+  font-weight: 400;
+}
+[data-card-face="magical-legendary"] .mcard__emblem {
+  background: #5a2a4a;
+  color: #c08a1a;
+}
+[data-card-face="magical-legendary"] .mcard__art {
+  border-radius: 2cqi;
+  box-shadow: 0 0 0 0.5cqi #ffffff, 0 0 0 0.8cqi #c08a1a;
+}
+[data-card-face="magical-legendary"] .mcard__strip {
+  background: #5a2a4a;
+  color: #ffffff;
+}
+[data-card-face="magical-legendary"] .mcard__figures strong {
+  font-family: "Manga Mochiy", var(--mcard-title);
+  font-weight: 400;
+}
+/* a blaze of the scene's colour sweeping over it once as it lands, a glint crossing its art */
+[data-card-face="magical-legendary"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 38%, #c08a1a 47%, rgba(255, 255, 255, 0.95) 50%, #c08a1a 53%, transparent 62%) 0 0 / 300% 300%;
+  mix-blend-mode: overlay;
+  opacity: 0.65;
+  animation: manga-blaze 1.6s ease-in-out 1s both;
+}
+@keyframes manga-blaze {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 80% 80%; }
+}
+[data-card-face="magical-legendary"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(120deg, transparent 44%, rgba(255, 255, 255, 0.95) 46%, transparent 49%) -150% 0 / 250% 100% no-repeat;
+  animation: manga-glint 1.4s ease-in-out 1.7s both;
+}
+@keyframes manga-glint {
+  0% { background-position: -150% 0; }
+  100% { background-position: 250% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="magical-legendary"] .booster-card__face::after {
+    animation: none;
+  }
+  [data-card-face="magical-legendary"] .mcard__art::after {
+    animation: none;
+    opacity: 0;
+  }
+}

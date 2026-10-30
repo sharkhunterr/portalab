@@ -1,0 +1,69 @@
+/* The sealed pack (its hook: data-booster-look): A dark wooden box tied with a cord, sealed with a paper tag
+   bearing a vermillion circle; the work's art like a painted panel; its name brushed; a shuriken. */
+@font-face {
+  font-family: "Manga Boku";
+  src: url("YujiBoku.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-booster-look="ninja"] .booster-pack {
+  border-radius: 0.4rem;
+  background: url("wood.svg") 0 0 / 100% 100%, linear-gradient(170deg, #3a2a22, #140c0a);
+  box-shadow: inset 0 0 0 3px #0c0806, inset 0 0 0 6px #6a4a2a, inset 0 0 0 8px #0c0806, 0 1rem 1.6rem rgba(0, 0, 0, 0.6);
+}
+[data-booster-look="ninja"] .booster-pack__art {
+  inset: 14% 11% 32%;
+  inline-size: 78%;
+  block-size: 54%;
+  border: 3px solid #0c0806; border-radius: 0.2rem; box-shadow: 0 0 0 3px #c4271c, 0 0 0 6px #0c0806;
+  mask: none;
+}
+[data-booster-look="ninja"] .booster-pack__stars {
+  opacity: 0;
+}
+/* the paper seal tag across its top */
+[data-booster-look="ninja"] .booster-pack__flap {
+  border: 0;
+  background: url("ofuda.svg") 82% 0 / 16% auto no-repeat, linear-gradient(180deg, transparent 40%, #c4271c 40% 52%, transparent 52%);
+  box-shadow: none;
+}
+[data-booster-look="ninja"] .booster-pack__name {
+  inset: auto 4% 12%;
+  font-family: "Manga Boku", sans-serif;
+  font-weight: 400;
+  font-size: clamp(1rem, 2.3vw, 1.4rem);
+  line-height: 1.1;
+  color: #f2e6cc; text-shadow: 2px 2px 0 #c4271c, 0 0 0.6rem rgba(0, 0, 0, 0.8);
+}
+[data-booster-look="ninja"] .booster-pack__subtitle {
+  inset: auto 4% 5%;
+  color: #e8e2ee;
+  font-family: "Manga Boku", sans-serif;
+}
+[data-booster-look="ninja"] .booster-pack__count {
+  inset: 0.5rem 0.5rem auto auto;
+  display: grid;
+  place-items: center;
+  inline-size: 2.8rem;
+  block-size: 2.8rem;
+  padding: 0;
+  border-radius: 0;
+  background: url("shuriken.svg") center / contain no-repeat; color: #ffffff; text-shadow: 0 1px 2px #000000;
+  font-family: "Manga Boku", sans-serif;
+  font-weight: 400;
+  font-size: 0.85rem;
+  box-shadow: none;
+}
+/* tension while it waits: a pulse of the scene's light, added to Portalab's float (never replacing it) */
+[data-booster-look="ninja"] .booster-stage__tear {
+  animation: booster-hover 4s ease-in-out infinite, manga-pulse 2.8s ease-in-out infinite;
+}
+@keyframes manga-pulse {
+  0%, 70%, 100% { filter: none; }
+  80% { filter: drop-shadow(0 0 0.9rem #ff9a1e); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="ninja"] .booster-stage__tear {
+    animation: none;
+  }
+}

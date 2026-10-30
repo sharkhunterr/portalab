@@ -1,0 +1,63 @@
+/* The sealed pack (its hook: data-booster-look): A black pack printed with inked orange flames under halftone;
+   the work's art in an inked panel; its name in heavy outlined letters; the card count on an impact star. */
+@font-face {
+  font-family: "Manga Dela";
+  src: url("DelaGothicOne.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-booster-look="shonen"] .booster-pack {
+  border-radius: 0.4rem;
+  background: url("flames-orange.svg") 50% 108% / 130% auto no-repeat, radial-gradient(circle, rgba(255, 138, 30, 0.35) 0 1.2px, transparent 1.8px) 0 0 / 8px 8px, linear-gradient(170deg, #2a2430, #0e0a12);
+  box-shadow: inset 0 0 0 3px #14101a, inset 0 0 0 7px #ff8a1e, inset 0 0 0 10px #14101a, 0.5rem 0.6rem 0 #14101a;
+}
+[data-booster-look="shonen"] .booster-pack__art {
+  inset: 14% 11% 32%;
+  inline-size: 78%;
+  block-size: 54%;
+  border: 4px solid #14101a; border-radius: 0.3rem; box-shadow: 5px 6px 0 #ff8a1e, 5px 6px 0 3px #14101a;
+  mask: none;
+}
+[data-booster-look="shonen"] .booster-pack__stars {
+  opacity: 0;
+}
+[data-booster-look="shonen"] .booster-pack__name {
+  inset: auto 4% 12%;
+  font-family: "Manga Dela", sans-serif;
+  font-weight: 400;
+  font-size: clamp(1rem, 2.3vw, 1.4rem);
+  line-height: 1.1;
+  color: #ffd21f; -webkit-text-stroke: 5px #14101a; paint-order: stroke fill; text-shadow: 3px 4px 0 #ff5a1e, 5px 6px 0 #14101a;
+}
+[data-booster-look="shonen"] .booster-pack__subtitle {
+  inset: auto 4% 5%;
+  color: #e8e2ee;
+  font-family: "Manga Dela", sans-serif;
+}
+[data-booster-look="shonen"] .booster-pack__count {
+  inset: 0.5rem 0.5rem auto auto;
+  display: grid;
+  place-items: center;
+  inline-size: 2.8rem;
+  block-size: 2.8rem;
+  padding: 0;
+  border-radius: 0;
+  background: url("impact.svg") center / contain no-repeat; color: #14101a;
+  font-family: "Manga Dela", sans-serif;
+  font-weight: 400;
+  font-size: 0.85rem;
+  box-shadow: none;
+}
+/* tension while it waits: a pulse of the scene's light, added to Portalab's float (never replacing it) */
+[data-booster-look="shonen"] .booster-stage__tear {
+  animation: booster-hover 4s ease-in-out infinite, manga-pulse 2.8s ease-in-out infinite;
+}
+@keyframes manga-pulse {
+  0%, 70%, 100% { filter: none; }
+  80% { filter: drop-shadow(0 0 0.9rem #ffc21e); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="shonen"] .booster-stage__tear {
+    animation: none;
+  }
+}

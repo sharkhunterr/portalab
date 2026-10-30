@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "mecha",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Mecha — robots géants",
+    "en": "Mecha — giant robots"
+  },
+  "descriptions": {
+    "fr": "Une ouverture de booster façon anime de robots géants, ses animations dessinées image par image dans EffectCraft et jouées en vidéo haute qualité : un hangar aux néons, une grille au sol et des projecteurs ; une capsule blindée aux plaques rivetées, son réacteur qui luit ; un HUD qui verrouille la cible, des verrous qui sautent, de la vapeur, le blindage qui s'arrache dans l'éclair du réacteur ; des cartes blindées à l'écran de pilotage, révélées par un scan, une salve de missiles ou — légendaire — des ailes d'énergie qui se déploient.",
+    "en": "A booster opening like a giant-robot anime's, its animations drawn frame by frame in EffectCraft and played as high-quality video: a neon hangar, a grid floor and searchlights; an armoured capsule of riveted plates, its reactor glowing; a HUD locking on, bolts releasing, steam, the armour torn off in the reactor's flash; armoured cards with a cockpit screen, revealed by a scan, a missile salvo or — legendary — wings of energy unfolding."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "mecha",
+  "names": {
+    "fr": "Capsule blindée",
+    "en": "Armoured capsule"
+  },
+  "descriptions": {
+    "fr": "Une capsule de plaques blindées rivetées, une bande de danger, son réacteur cyan qui luit ; l'image de l'œuvre sur un écran ; son nom en lettres techniques ; le nombre de cartes sur un voyant.",
+    "en": "A capsule of riveted armour plates, a hazard stripe, its cyan reactor glowing; the work's art on a screen; its name in technical letters; the card count on an indicator."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

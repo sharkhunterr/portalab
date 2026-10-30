@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "shonen-legendary",
+  "names": {
+    "fr": "Aura dorée",
+    "en": "Golden aura"
+  },
+  "descriptions": {
+    "fr": "Une aura dorée explose autour de la carte sous un pilier de lumière, ondes de choc, rochers et braises ; devant elle, des éclairs la traversent et de grands éclats.",
+    "en": "A golden aura explodes round the card under a pillar of light, shockwaves, rocks and embers; in front of it, lightning crosses it and great glints."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary",
+    "over": "over.mp4"
+  }
+}

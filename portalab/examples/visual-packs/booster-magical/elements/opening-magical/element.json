@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "magical",
+  "names": {
+    "fr": "Transformation",
+    "en": "Transformation"
+  },
+  "descriptions": {
+    "fr": "Un cercle magique se trace, des rubans s'enroulent autour du paquet, des cœurs et des étincelles montent ; un éclat d'étoile, un anneau de lumière, les rubans se déroulent et une pluie de cœurs, d'étoiles, de pétales et de bulles retombe.",
+    "en": "A magic circle draws itself, ribbons spiral round the pack, hearts and sparkles rise; a star flash, a ring of light, the ribbons unwind and a shower of hearts, stars, petals and bubbles falls."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

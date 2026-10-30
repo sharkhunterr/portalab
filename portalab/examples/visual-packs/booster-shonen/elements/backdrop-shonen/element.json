@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "shonen",
+  "names": {
+    "fr": "Plateau sous l'orage",
+    "en": "Stormy plateau"
+  },
+  "descriptions": {
+    "fr": "Un plateau rocheux sous un ciel d'orage : nuages qui roulent, éclairs au loin, rochers qui flottent et oscillent, poussière soulevée par le vent (HD).",
+    "en": "A rocky plateau under a stormy sky: clouds rolling, distant lightning, rocks floating and bobbing, dust lifted by the wind (HD)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

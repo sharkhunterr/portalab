@@ -1,0 +1,35 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video (24 frames a second): A HUD locks on the pack, its four bolts release, steam jets burst, its plates
+   fly off in the reactor's cyan flash, electric arcs, a hexagonal shockwave and sparks. Meanwhile the pack
+   itself glitches in shifting slices, then shuts off like a screen — crushed into a line, then a point. */
+[data-opening="mecha"] .booster-stage__tear .booster-pack {
+  animation: manga-charge 2.6s linear both;
+}
+@keyframes manga-charge {
+  0% { transform: none; filter: none; clip-path: inset(0 0 0 0); opacity: 1; }
+  16% { transform: none; clip-path: inset(0 0 0 0); }
+  20% { transform: translateX(6px); filter: hue-rotate(40deg) brightness(1.2); clip-path: inset(12% 0 58% 0); }
+  21% { transform: translateX(-8px); clip-path: inset(46% 0 22% 0); }
+  22% { transform: translateX(4px); filter: hue-rotate(-30deg); clip-path: inset(0 0 0 0); }
+  24% { transform: translateX(-5px); clip-path: inset(70% 0 4% 0); }
+  25% { transform: none; filter: brightness(1.4); clip-path: inset(0 0 0 0); }
+  29% { transform: scale(1.04, 0.03); filter: brightness(3); opacity: 1; }
+  33% { transform: scale(0.02, 0.02); filter: brightness(4); opacity: 1; }
+  35% { transform: scale(0, 0); opacity: 0; }
+  100% { transform: scale(0, 0); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges — never the outline of its box */
+[data-opening="mecha"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="mecha"] .booster-stage__tear .booster-pack {
+    animation: manga-fade 2.6s linear both;
+  }
+}
+@keyframes manga-fade {
+  0%, 30% { opacity: 1; }
+  45%, 100% { opacity: 0; }
+}

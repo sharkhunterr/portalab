@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "mecha-legendary",
+  "names": {
+    "fr": "Ailes d'énergie",
+    "en": "Wings of energy"
+  },
+  "descriptions": {
+    "fr": "Des ailes d'énergie cyan et blanches se déploient derrière la carte, ses propulseurs flambent sous elle, un réticule ; devant elle, le cadre du HUD, une ligne de scan, des étincelles et de grands éclats.",
+    "en": "Wings of cyan and white energy unfold behind the card, its thrusters flare under it, a reticle; in front of it, the HUD's frame, a scan line, sparks and great glints."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary",
+    "over": "over.mp4"
+  }
+}

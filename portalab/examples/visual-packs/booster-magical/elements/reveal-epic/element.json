@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "magical-epic",
+  "names": {
+    "fr": "Rubans",
+    "en": "Ribbons"
+  },
+  "descriptions": {
+    "fr": "Deux rubans tourbillonnent autour de la carte, une gerbe de cœurs, d'étoiles et de pétales, des étincelles.",
+    "en": "Two ribbons whirl round the card, a burst of hearts, stars and petals, sparkles."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic"
+  }
+}

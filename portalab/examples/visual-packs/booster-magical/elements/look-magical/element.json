@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "magical",
+  "names": {
+    "fr": "Paquet en dentelle",
+    "en": "Lace pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet rose nacré bordé de dentelle, noué d'un nœud de ruban, un cœur taillé comme une gemme ; l'image de l'œuvre dans un médaillon ; son nom en lettres rondes ; des étincelles.",
+    "en": "A pearly pink pack trimmed with lace, tied with a ribbon bow, a heart cut like a gem; the work's art in a locket; its name in round letters; sparkles."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

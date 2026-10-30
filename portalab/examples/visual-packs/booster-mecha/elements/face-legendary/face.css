@@ -1,0 +1,94 @@
+/* A legendary card of the mecha scene: its frame, its body and its lettering in the scene's style. (Its hook:
+   the card once turned, data-card-face.) The face turns in 3D: never its transform; a turned media card is never
+   redrawn — what moves, moves once, as it is revealed. */
+@font-face {
+  font-family: "Manga Petch";
+  src: url("ChakraPetch.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+[data-card-face="mecha-legendary"] .mcard__card {
+  padding: 3cqi;
+  border-radius: 1.6cqi;
+  background: url("panel.svg") 0 0 / 100% 100%, linear-gradient(160deg, #8a7a50, #3a3018);
+  box-shadow: inset 0 0 0 0.35cqi rgba(255, 255, 255, 0.18), 0 0 0 0.45cqi #0c0a10, 0 1.4cqi 3cqi rgba(0, 0, 0, 0.5);
+}
+[data-card-face="mecha-legendary"] .mcard__body {
+  border-radius: 0.8cqi;
+  background: url("hexes.svg") 0 0 / 9cqi auto, linear-gradient(180deg, #102030, #0c1420);
+  box-shadow: 0 0 0 0.35cqi #ffc83e, 0 0 1.4cqi #ffc83e, inset 0 0 1.2cqi rgba(62, 232, 255, 0.25);
+  color: #d6f6ff;
+}
+[data-card-face="mecha-legendary"] .mcard[data-rarity] .mcard__name {
+  font-family: "Manga Petch", var(--mcard-title);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #ffc83e;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 1cqi #ffc83e;
+}
+[data-card-face="mecha-legendary"] .mcard__genre,
+[data-card-face="mecha-legendary"] .mcard__rarity,
+[data-card-face="mecha-legendary"] .mcard__cost {
+  background: #ffc83e;
+  color: #14101a;
+  box-shadow: 0 0 0 0.3cqi #ffc83e;
+  font-family: "Manga Petch", var(--mcard-title);
+  font-weight: 700;
+}
+[data-card-face="mecha-legendary"] .mcard__emblem {
+  background: #0c1420;
+  color: #ffc83e;
+}
+[data-card-face="mecha-legendary"] .mcard__art {
+  border-radius: 0.6cqi;
+  box-shadow: 0 0 0 0.35cqi #ffc83e, 0 0 1.4cqi #ffc83e, inset 0 0 1.2cqi rgba(62, 232, 255, 0.25);
+}
+[data-card-face="mecha-legendary"] .mcard__strip {
+  background: #ffc83e;
+  color: #0c1420;
+}
+[data-card-face="mecha-legendary"] .mcard__figures strong {
+  font-family: "Manga Petch", var(--mcard-title);
+  font-weight: 700;
+}
+/* a blaze of the scene's colour sweeping over it once as it lands, a glint crossing its art */
+[data-card-face="mecha-legendary"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 38%, #ffc83e 47%, rgba(255, 255, 255, 0.95) 50%, #ffc83e 53%, transparent 62%) 0 0 / 300% 300%;
+  mix-blend-mode: overlay;
+  opacity: 0.65;
+  animation: manga-blaze 1.6s ease-in-out 1s both;
+}
+@keyframes manga-blaze {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 80% 80%; }
+}
+[data-card-face="mecha-legendary"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(120deg, transparent 44%, rgba(255, 255, 255, 0.95) 46%, transparent 49%) -150% 0 / 250% 100% no-repeat;
+  animation: manga-glint 1.4s ease-in-out 1.7s both;
+}
+@keyframes manga-glint {
+  0% { background-position: -150% 0; }
+  100% { background-position: 250% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="mecha-legendary"] .booster-card__face::after {
+    animation: none;
+  }
+  [data-card-face="mecha-legendary"] .mcard__art::after {
+    animation: none;
+    opacity: 0;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "shonen",
+  "names": {
+    "fr": "Dos de combat",
+    "en": "Fighting back"
+  },
+  "descriptions": {
+    "fr": "Noir, des flammes orange imprimées, une étoile d'impact au centre.",
+    "en": "Black, printed with orange flames, an impact star in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}
