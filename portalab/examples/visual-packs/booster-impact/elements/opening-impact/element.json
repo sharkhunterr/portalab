@@ -6,12 +6,12 @@
     "en": "Manga burst"
   },
   "descriptions": {
-    "fr": "Comme les images-chocs d'un anime : le paquet tourne de plus en plus vite dans des éclairs roses crépitants, une explosion manga encrée enfle derrière lui, deux immenses coups de pinceau blancs traversent l'écran, un flash blanc qui se dissout en trame — et les cartes jaillissent.",
-    "en": "Like an anime's impact frames: the pack spins faster and faster in crackling pink lightning, an inked manga burst swelling behind it, two huge white brush slashes cutting across the screen, a white flash dissolving into halftone — and the cards burst out."
+    "fr": "Comme les images-chocs d'un anime, dessinées image par image dans EffectCraft et jouées à 12 images/s : rayons roses et blancs cernés d'encre autour du paquet qui tournoie, éclairs roses qui crépitent, lignes de vitesse, deux coups de pinceau blancs qui se croisent, une explosion BD blanche qui envahit tout puis se dissout en trame.",
+    "en": "Like an anime's impact frames, drawn frame by frame in EffectCraft and played at 12 frames a second: inked pink and white rays round the spinning pack, crackling pink lightning, speed lines, two white brush slashes crossing, a white comic explosion swelling over everything, then dissolving into halftone."
   },
   "render": {
     "kind": "glsl",
-    "file": "burst.glsl",
+    "file": "still.glsl",
     "css": [
       "spin.css"
     ],

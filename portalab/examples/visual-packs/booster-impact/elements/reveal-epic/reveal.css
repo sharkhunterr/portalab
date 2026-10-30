@@ -1,0 +1,15 @@
+/* A epic card turned (its hook: data-reveal), 2.4 s: inked rays bursting, crackling pink lightning round the
+   card, glints flying off, a crosshair snapping on at its corner — drawn in EffectCraft, played here frame by
+   frame on twos (frames.webp, 29 frames at 12 a second) in its layer round the card. */
+[data-reveal="impact-epic"] .booster-fx__scene {
+  background: url("frames.webp") 0 0 / 600% 500% no-repeat;
+  animation: impact-reveal-epic-x 0.5s steps(6) 5 both, impact-reveal-epic-y 2.5s steps(5) both;
+}
+@keyframes impact-reveal-epic-x {
+  from { background-position-x: 0%; }
+  to { background-position-x: 120.0000%; }
+}
+@keyframes impact-reveal-epic-y {
+  from { background-position-y: 0%; }
+  to { background-position-y: 125.0000%; }
+}

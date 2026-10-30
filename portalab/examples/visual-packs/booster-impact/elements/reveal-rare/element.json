@@ -6,12 +6,15 @@
     "en": "Halftone wave"
   },
   "descriptions": {
-    "fr": "Des lignes de vitesse blanches jaillissent de derrière la carte, une onde de choc roule en trame de points cernée d'encre.",
-    "en": "White speed lines shoot out from behind the card, a shockwave rolls away as an inked ring of halftone dots."
+    "fr": "Dessinée dans EffectCraft, image par image : rayons encrés jaillissant de derrière la carte, lignes de vitesse, un anneau de points cyan qui s'éloigne, des éclats.",
+    "en": "Drawn in EffectCraft, frame by frame: inked rays bursting from behind the card, speed lines, a ring of cyan halftone dots rolling away, glints."
   },
   "render": {
     "kind": "glsl",
-    "file": "reveal.glsl",
+    "file": "still.glsl",
+    "css": [
+      "reveal.css"
+    ],
     "stage": true,
     "duration": 1.8,
     "rarity": "rare"

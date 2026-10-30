@@ -1,4 +1,4 @@
-/* An epic card: a magenta rim, a brighter film and glitter; as it turns, pink lightning crackles round it and a white brush slash cuts across it.
+/* An epic card: a magenta rim, a brighter film and glitter; as it turns, a white brush slash cuts across it.
    (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform; a turned media
    card is never redrawn — what moves, moves once, as it is revealed. */
 @font-face {
@@ -124,25 +124,7 @@
   mix-blend-mode: screen;
   opacity: 0.22;
 }
-/* as it turns: pink lightning crackling round it, redrawn on each beat, then gone */
-[data-card-face="impact-epic"]::before {
-  content: "";
-  position: absolute;
-  inset: -14% -20%;
-  pointer-events: none;
-  background: url("zap.svg") center / 100% 100% no-repeat;
-  animation: impact-crackle-epic 1.8s steps(1, end) both;
-}
-@keyframes impact-crackle-epic {
-  0% { opacity: 1; transform: none; }
-  12% { transform: scale(-1, 1); }
-  24% { transform: scale(1, -1) rotate(2deg); }
-  36% { transform: scale(-1, -1) rotate(-3deg); }
-  48% { transform: scale(1.05, 1) rotate(2deg); }
-  60% { transform: scale(-1.05, 1.03); opacity: 1; }
-  72%, 100% { opacity: 0; }
-}
-/* and a white brush slash cutting across it, drawn in a few frames */
+/* as it turns: a white brush slash cutting across it, over it, drawn in a few frames */
 [data-card-face="impact-epic"]::after {
   content: "";
   position: absolute;
@@ -161,7 +143,6 @@
   72%, 100% { clip-path: inset(0 0 0 100%); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-card-face="impact-epic"]::before,
   [data-card-face="impact-epic"]::after {
     animation: none;
     opacity: 0;

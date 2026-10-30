@@ -6,12 +6,15 @@
     "en": "Toxic flames"
   },
   "descriptions": {
-    "fr": "Des flammes d'énergie verte en cel-shading, cernées d'encre, lèchent sa dalle ; des anneaux lime s'éloignent ; un grand éclat encré à quatre branches surgit à son coin, puis un autre (HD).",
-    "en": "Cel-shaded green energy flames, inked, lick round its slab; lime rings roll away; a great inked four-pointed glint snaps out at its corner, then another (HD)."
+    "fr": "Dessinée dans EffectCraft, image par image : flammes d'énergie verte en trois tons de cel-shading autour de sa dalle, anneaux lime, gouttes de slime projetées, deux grands éclats.",
+    "en": "Drawn in EffectCraft, frame by frame: green energy flames in three cel tones round its slab, lime rings, goo drops flying off, two great glints."
   },
   "render": {
     "kind": "glsl",
-    "file": "reveal.glsl",
+    "file": "still.glsl",
+    "css": [
+      "reveal.css"
+    ],
     "stage": true,
     "duration": 3.0,
     "rarity": "legendary"

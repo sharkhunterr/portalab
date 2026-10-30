@@ -1,0 +1,15 @@
+/* A legendary card turned (its hook: data-reveal), 3 s: green energy flames in three cel tones licking round
+   its slab, lime rings rolling away, drops of goo flying off, two great glints — drawn in EffectCraft, played
+   here frame by frame on twos (frames.webp, 36 frames at 12 a second) in its layer round the card. */
+[data-reveal="impact-legendary"] .booster-fx__scene {
+  background: url("frames.webp") 0 0 / 600% 600% no-repeat;
+  animation: impact-reveal-legendary-x 0.5s steps(6) 6 both, impact-reveal-legendary-y 3s steps(6) both;
+}
+@keyframes impact-reveal-legendary-x {
+  from { background-position-x: 0%; }
+  to { background-position-x: 120.0000%; }
+}
+@keyframes impact-reveal-legendary-y {
+  from { background-position-y: 0%; }
+  to { background-position-y: 120.0000%; }
+}

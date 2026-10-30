@@ -2,3 +2,6 @@ Impact — an example booster scene for Portalab (CC0-1.0), every shader and sty
 
 Font: Bangers by Vernon Adams — SIL Open Font License 1.1 (https://openfontlicense.org), from
 @fontsource/bangers; embedded unmodified in each card face as Bangers.woff2.
+
+Animations (frames.webp): drawn and rendered with EffectCraft (Apache-2.0, https://github.com/storytold/effectcraft);
+sources and build in ../booster-impact-source.
