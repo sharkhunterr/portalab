@@ -6,6 +6,12 @@
   background: url("frames.webp") 0 0 / 800% 800% no-repeat;
   animation: impact-reveal-legendary-x 0.3333s steps(8) 8 both, impact-reveal-legendary-y 2.667s steps(8) both;
 }
+@media (max-width: 40rem) {
+  [data-reveal="impact-legendary"] .booster-fx__scene {
+    background: url("frames-phone.webp") 0 0 / 900% 700% no-repeat;
+    animation: impact-reveal-legendary-phone-x 0.375s steps(9) 7 both, impact-reveal-legendary-phone-y 2.625s steps(7) both;
+  }
+}
 @keyframes impact-reveal-legendary-x {
   from { background-position-x: 0%; }
   to { background-position-x: 114.2857%; }
@@ -13,6 +19,14 @@
 @keyframes impact-reveal-legendary-y {
   from { background-position-y: 0%; }
   to { background-position-y: 114.2857%; }
+}
+@keyframes impact-reveal-legendary-phone-x {
+  from { background-position-x: 0%; }
+  to { background-position-x: 112.5000%; }
+}
+@keyframes impact-reveal-legendary-phone-y {
+  from { background-position-y: 0%; }
+  to { background-position-y: 116.6667%; }
 }
 /* frames: end */
 /* room for the effect: a layer 2.6 times the card, fading out towards its edges — never the outline of its box */

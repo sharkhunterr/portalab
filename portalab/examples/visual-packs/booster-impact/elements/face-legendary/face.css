@@ -141,6 +141,19 @@
   background: url("vortex-back.webp") 0 0 / 800% 500% no-repeat;
   animation: impact-vortex-x 0.3333s steps(8) 5 both, impact-vortex-y 1.667s steps(5) both;
 }
+[data-card-face="impact-legendary"]::after {
+  background-image: url("vortex-front.webp");
+}
+@media (max-width: 40rem) {
+  [data-card-face="impact-legendary"]::before,
+  [data-card-face="impact-legendary"]::after {
+    background: url("vortex-back-phone.webp") 0 0 / 600% 600% no-repeat;
+    animation: impact-vortex-phone-x 0.25s steps(6) 6 both, impact-vortex-phone-y 1.5s steps(6) both;
+  }
+  [data-card-face="impact-legendary"]::after {
+    background-image: url("vortex-front-phone.webp");
+  }
+}
 @keyframes impact-vortex-x {
   from { background-position-x: 0%; }
   to { background-position-x: 114.2857%; }
@@ -149,10 +162,17 @@
   from { background-position-y: 0%; }
   to { background-position-y: 125.0000%; }
 }
+@keyframes impact-vortex-phone-x {
+  from { background-position-x: 0%; }
+  to { background-position-x: 120.0000%; }
+}
+@keyframes impact-vortex-phone-y {
+  from { background-position-y: 0%; }
+  to { background-position-y: 120.0000%; }
+}
 /* frames: end */
 [data-card-face="impact-legendary"]::after {
   z-index: 3;
-  background-image: url("vortex-front.webp");
 }
 /* on a phone, the cards' row scrolls sideways and cuts what overflows it 5rem above and below a card: the
    vortex has faded out before it */
