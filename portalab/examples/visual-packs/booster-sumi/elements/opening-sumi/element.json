@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "sumi",
+  "names": {
+    "fr": "Trait de sabre",
+    "en": "Sword stroke"
+  },
+  "descriptions": {
+    "fr": "Dessinée image par image dans EffectCraft, à 24 images/s : l'encre s'enroule autour du paquet, la poussière d'or avec elle, un cercle d'or se referme ; des fêlures d'or (kintsugi) courent sur le paquet qui tremble ; un immense trait de pinceau sec le tranche, un fil blanc en son cœur, un éclair ; une éclaboussure d'encre dorée jaillit, la feuille d'or s'envole, un grand ensō d'or se trace puis sèche.",
+    "en": "Drawn frame by frame in EffectCraft at 24 frames a second: ink curls round the pack, gold dust with it, a gold circle closing; gold cracks (kintsugi) run over the trembling pack; one huge dry-brush stroke cuts it through, a white hairline at its heart, a flash; a gilded ink splash bursts out, gold leaf flying, a great gold ensō is drawn and dries away."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "css": [
+      "cut.css"
+    ],
+    "stage": true,
+    "duration": 2.6,
+    "alpha": "stacked"
+  }
+}

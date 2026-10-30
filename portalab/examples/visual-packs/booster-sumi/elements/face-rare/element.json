@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "sumi-rare",
+  "names": {
+    "fr": "Face rare",
+    "en": "Rare face"
+  },
+  "descriptions": {
+    "fr": "Laque indigo semée de feuilles de chanvre d'argent (asanoha), un liseré d'argent ; en se retournant, la nacre (raden) glisse sur elle.",
+    "en": "Indigo lacquer laid with silver hemp leaves (asanoha), a silver line; as it turns, mother-of-pearl (raden) glides over it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

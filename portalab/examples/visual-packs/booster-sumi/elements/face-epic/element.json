@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "sumi-epic",
+  "names": {
+    "fr": "Face épique",
+    "en": "Epic face"
+  },
+  "descriptions": {
+    "fr": "Laque vermillon, des fleurs de cerisier à ses coins, un liseré d'or ; en se retournant, des pétales la traversent et la nacre glisse sur elle.",
+    "en": "Vermillion lacquer, cherry blossoms in its corners, a gold line; as it turns, petals drift across it and mother-of-pearl glides over it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

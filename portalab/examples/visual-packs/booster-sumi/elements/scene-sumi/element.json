@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "sumi",
+  "names": {
+    "fr": "Scène Sumi",
+    "en": "Sumi scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture à l'encre et à l'or. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening in ink and gold. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-sumi",
+      "backdrop": "backdrop-sumi",
+      "opening": "opening-sumi",
+      "back": {
+        "common": "back-sumi"
+      },
+      "face": {
+        "common": "face-common",
+        "rare": "face-rare",
+        "epic": "face-epic",
+        "legendary": "face-legendary"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

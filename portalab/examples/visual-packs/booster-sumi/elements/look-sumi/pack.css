@@ -1,0 +1,129 @@
+/* The sealed pack (its hook: data-booster-look), wrapped like a gift in Japan: washi paper strewn with cut gold
+   leaf, a gold ensō faint behind; the work's art mounted like a scroll painting, a fine gold line round it; a
+   vermillion crimp tied with mizuhiki cords; its name brushed white on a stroke of ink; the card count stamped on
+   a vermillion seal; a gold glint at its corner, the wrapping breathing while it waits. */
+@font-face {
+  font-family: "Sumi Yuji";
+  src: url("YujiSyuku.woff2") format("woff2");
+  font-display: swap;
+}
+[data-booster-look="sumi"] .booster-pack {
+  border-radius: 0.45rem;
+  background:
+    url("flecks.svg") 0 0 / 100% 100% no-repeat,
+    url("enso-faint.svg") 50% 42% / 104% auto no-repeat,
+    url("washi.svg") 0 0 / 100% auto,
+    linear-gradient(170deg, #f6eedb, #e6d6b6);
+  box-shadow:
+    inset 0 0 0 2px #0e0a09,
+    inset 0 0 0 5px #d9a43a,
+    inset 0 0 0 7px #0e0a09,
+    0 0 0 1px rgba(14, 10, 9, 0.6),
+    0 1.1rem 2.2rem rgba(0, 0, 0, 0.55);
+}
+/* the work's art, mounted like a scroll painting */
+[data-booster-look="sumi"] .booster-pack__art {
+  inset: 15% 12% 31%;
+  inline-size: 76%;
+  block-size: 54%;
+  border: 2px solid #d9a43a;
+  border-radius: 0.15rem;
+  box-shadow: 0 0 0 3px #0e0a09, 0 0.4rem 0.9rem rgba(14, 10, 9, 0.45);
+  mask: none;
+  filter: sepia(0.15) saturate(1.05) contrast(1.05);
+}
+[data-booster-look="sumi"] .booster-pack__foil {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 224, 154, 0.5) 48%, rgba(255, 255, 255, 0.55) 50%, transparent 58%) -160% 0 / 200% 100% no-repeat;
+  mix-blend-mode: soft-light;
+  animation: sumi-sweep 5.2s ease-in-out infinite;
+}
+@keyframes sumi-sweep {
+  0%, 55% { background-position: -160% 0; }
+  85%, 100% { background-position: 260% 0; }
+}
+[data-booster-look="sumi"] .booster-pack__stars {
+  opacity: 0;
+}
+/* the crimp: vermillion paper tied with mizuhiki cords */
+[data-booster-look="sumi"] .booster-pack__flap {
+  border: 0;
+  background:
+    url("mizuhiki.svg") center / 100% auto no-repeat,
+    linear-gradient(180deg, #d8321d, #9b1a0c);
+  box-shadow: inset 0 -2px 0 #0e0a09, inset 0 -4px 0 #d9a43a;
+}
+/* a pack with no art: the gold ensō, big */
+[data-booster-look="sumi"] .booster-pack__emblem {
+  inline-size: 70%;
+  aspect-ratio: 1;
+  background: url("enso-gold.svg") center / contain no-repeat;
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-booster-look="sumi"] .booster-pack__emblem svg {
+  opacity: 0;
+}
+/* its name, brushed white on a stroke of ink */
+[data-booster-look="sumi"] .booster-pack__name {
+  inset: auto 2% 11%;
+  padding: 0.55rem 0.8rem 0.65rem;
+  background: url("band.svg") center / 100% 100% no-repeat;
+  font-family: "Sumi Yuji", serif;
+  font-weight: 400;
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  color: #f8f1e1;
+}
+[data-booster-look="sumi"] .booster-pack__subtitle {
+  inset: auto 4% 4.5%;
+  color: #3a2a22;
+  font-family: "Sumi Yuji", serif;
+  font-weight: 400;
+}
+/* the card count, stamped on a vermillion seal */
+[data-booster-look="sumi"] .booster-pack__count {
+  inset: 2.1rem 0.6rem auto auto;
+  padding: 0.25rem 0.45rem;
+  border-radius: 0.25rem;
+  background: #d8321d;
+  color: #f8f1e1;
+  font-family: "Sumi Yuji", serif;
+  font-weight: 400;
+  font-size: 0.95rem;
+  box-shadow: 0 0 0 2px rgba(216, 50, 29, 0.35), inset 0 0 0 1.5px rgba(248, 241, 225, 0.55);
+  rotate: -6deg;
+}
+/* on the stage: a gold glint at the pack's corner now and then */
+[data-booster-look="sumi"] .booster-stage__tear::after {
+  content: "";
+  position: absolute;
+  inset: -5% -10% auto auto;
+  z-index: 4;
+  inline-size: 26%;
+  aspect-ratio: 1;
+  pointer-events: none;
+  background: url("glint.svg") center / contain no-repeat;
+  animation: sumi-flare 4.1s ease-in-out infinite;
+}
+@keyframes sumi-flare {
+  0%, 60%, 100% { transform: scale(0) rotate(0deg); }
+  70% { transform: scale(1) rotate(25deg); }
+  84% { transform: scale(0.2) rotate(45deg); }
+}
+/* the wrapping breathing slowly, added to Portalab's float (never replacing it) */
+[data-booster-look="sumi"] .booster-stage__tear {
+  animation: booster-hover 4s ease-in-out infinite, sumi-breath 5.5s ease-in-out infinite;
+}
+@keyframes sumi-breath {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.018; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="sumi"] .booster-pack__foil,
+  [data-booster-look="sumi"] .booster-stage__tear::after,
+  [data-booster-look="sumi"] .booster-stage__tear {
+    animation: none;
+  }
+}

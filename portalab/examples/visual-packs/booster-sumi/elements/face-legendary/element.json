@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "sumi-legendary",
+  "names": {
+    "fr": "Face légendaire",
+    "en": "Legendary face"
+  },
+  "descriptions": {
+    "fr": "Laque noire brisée et réparée à l'or (kintsugi), feuille d'or découpée, un double liseré d'or ; en se posant, l'or la balaie et un éclat traverse son image.",
+    "en": "Black lacquer broken and mended in gold (kintsugi), cut gold leaf, a double gold line; as it lands, gold sweeps over it and a glint crosses its art."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}

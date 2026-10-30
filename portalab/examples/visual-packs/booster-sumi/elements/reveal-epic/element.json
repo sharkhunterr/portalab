@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "sumi-epic",
+  "names": {
+    "fr": "Tempête de cerisiers",
+    "en": "Cherry storm"
+  },
+  "descriptions": {
+    "fr": "Dessinée dans EffectCraft, image par image : deux traits de pinceau vermillon qui se croisent derrière la carte, une tempête de pétales et de fleurs de cerisier, de la feuille d'or, un sceau vermillon apposé à son coin.",
+    "en": "Drawn in EffectCraft, frame by frame: two vermillion brush strokes crossing behind the card, a storm of cherry petals and blossoms, gold leaf, a vermillion seal stamped by its corner."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic",
+    "alpha": "stacked"
+  }
+}

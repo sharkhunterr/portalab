@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "sumi-common",
+  "names": {
+    "fr": "Face commune",
+    "en": "Common face"
+  },
+  "descriptions": {
+    "fr": "Laque noire autour d'un papier washi, un fin liseré d'or, un titre tracé au pinceau, un sceau vermillon.",
+    "en": "Black lacquer round washi paper, a fine gold line, a brushed title, a vermillion seal."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

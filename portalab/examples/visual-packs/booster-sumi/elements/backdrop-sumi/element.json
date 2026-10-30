@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "sumi",
+  "names": {
+    "fr": "Laque et or",
+    "en": "Lacquer and gold"
+  },
+  "descriptions": {
+    "fr": "Une laque urushi noire qui rougeoie en son cœur, un reflet qui glisse lentement ; des vagues seigaiha d'or montant du bas (maki-e), une poussière d'or qui scintille, des paillettes qui s'élèvent, une brume d'encre et, en filigrane, un grand ensō d'or (HD).",
+    "en": "Black urushi lacquer glowing red-brown at its heart, a sheen gliding slowly across; gold seigaiha waves rising from the foot (maki-e), gold dust twinkling, flecks drifting up, ink mist and, faint behind it all, a great gold ensō (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "lacquer.glsl",
+    "stage": true
+  }
+}

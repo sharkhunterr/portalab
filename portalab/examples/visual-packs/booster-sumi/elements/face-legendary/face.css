@@ -1,0 +1,127 @@
+/* A legendary card: black lacquer broken and mended in gold (kintsugi), cut gold leaf, a double gold line; as
+   it lands, gold sweeps over it and a glint crosses its art (its reveal brings the ink dragon coiling round
+   it). (Its hook: the card once turned, data-card-face.) The face turns in 3D: never its transform; a turned
+   media card is never redrawn — what moves, moves once, as it is revealed. */
+@font-face {
+  font-family: "Sumi Yuji";
+  src: url("YujiSyuku.woff2") format("woff2");
+  font-display: swap;
+}
+/* the card: lacquer, a soft gloss on its upper edge, inked round */
+[data-card-face="sumi-legendary"] .mcard__card {
+  padding: 3.2cqi;
+  border-radius: 2.6cqi;
+  background:
+    radial-gradient(ellipse 80% 30% at 30% 0%, rgba(255, 255, 255, 0.16), transparent 70%),
+    url("kintsugi.svg") 0 0 / 100% 100% no-repeat, url("flecks.svg") 0 0 / 100% 100% no-repeat, linear-gradient(165deg, #231614, #0b0706);
+  box-shadow: inset 0 0 0 0.35cqi rgba(255, 255, 255, 0.08), 0 0 0 0.45cqi #0e0a09, 0 1.6cqi 3cqi rgba(0, 0, 0, 0.45);
+}
+/* the body: washi paper, a fine line of the rarity's metal round it */
+[data-card-face="sumi-legendary"] .mcard__body {
+  border-radius: 1.4cqi;
+  background: url("washi.svg") 0 0 / 100% auto, #f3e9d3;
+  box-shadow: 0 0 0 0.45cqi #d9a43a, 0 0 0 0.8cqi #0e0a09, 0 0 0 1.2cqi #0e0a09, 0 0 0 1.5cqi #d9a43a;
+  color: #0e0a09;
+}
+/* the title, brushed */
+[data-card-face="sumi-legendary"] .mcard[data-rarity] .mcard__name {
+  font-family: "Sumi Yuji", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: #0e0a09;
+}
+/* the genre: a little seal */
+[data-card-face="sumi-legendary"] .mcard__genre {
+  border-radius: 0.6cqi;
+  background: #c42c18;
+  color: #f3e9d3;
+  box-shadow: 0 0 0 0.3cqi #0e0a09;
+  font-family: "Sumi Yuji", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+[data-card-face="sumi-legendary"] .mcard__emblem {
+  background: #0e0a09;
+  color: #d9a43a;
+}
+/* the art, mounted like a scroll painting: a fine gold line, inked */
+[data-card-face="sumi-legendary"] .mcard__art {
+  border-radius: 0.6cqi;
+  box-shadow: 0 0 0 0.4cqi #d9a43a, 0 0 0 0.8cqi #0e0a09;
+}
+[data-card-face="sumi-legendary"] .mcard__picture,
+[data-card-face="sumi-legendary"] .mcard__scene {
+  filter: sepia(0.12) saturate(1.05) contrast(1.04);
+}
+[data-card-face="sumi-legendary"] .mcard__badge {
+  box-shadow: 0 0 0 0.4cqi #d9a43a, 0 0 0 0.75cqi #0e0a09;
+}
+[data-card-face="sumi-legendary"] .mcard__strip {
+  border-radius: 0.4cqi;
+  background: #0e0a09;
+  color: #f3e9d3;
+}
+[data-card-face="sumi-legendary"] .mcard__poster {
+  box-shadow: 0 0 0 0.35cqi #d9a43a, 0 0 0 0.65cqi #0e0a09;
+}
+[data-card-face="sumi-legendary"] .mcard__cost {
+  background: #8a560f;
+  color: #f3e9d3;
+  box-shadow: 0 0 0 0.3cqi #0e0a09;
+}
+[data-card-face="sumi-legendary"] .mcard__figures strong {
+  font-family: "Sumi Yuji", var(--mcard-title);
+  font-weight: 400;
+}
+/* the rarity: stamped in vermillion */
+[data-card-face="sumi-legendary"] .mcard__rarity {
+  border-radius: 0.5cqi;
+  background: #c42c18;
+  color: #f3e9d3;
+  box-shadow: 0 0 0 0.3cqi #0e0a09;
+  font-family: "Sumi Yuji", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  rotate: -4deg;
+}
+/* gold foil sweeping over it once as it lands */
+[data-card-face="sumi-legendary"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 224, 154, 0.9) 48%, rgba(255, 255, 255, 0.95) 50%, rgba(217, 164, 58, 0.9) 52%, transparent 62%) 0 0 / 300% 300%;
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+  animation: sumi-foil-legendary 1.6s ease-in-out 0.9s both;
+}
+@keyframes sumi-foil-legendary {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 80% 80%; }
+}
+/* a gold glint crossing the art once — on its own small part, not the whole card */
+[data-card-face="sumi-legendary"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(120deg, transparent 44%, rgba(255, 236, 190, 0.95) 46%, transparent 49%) -150% 0 / 250% 100% no-repeat;
+  animation: sumi-glint-legendary 1.4s ease-in-out 1.6s both;
+}
+@keyframes sumi-glint-legendary {
+  0% { background-position: -150% 0; }
+  100% { background-position: 250% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="sumi-legendary"] .mcard__art::after {
+    animation: none;
+    opacity: 0;
+  }
+  [data-card-face="sumi-legendary"] .booster-card__face::after {
+    animation: none;
+  }
+}
