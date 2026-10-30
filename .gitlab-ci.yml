@@ -192,6 +192,8 @@ validate:secrets:
 # =============================================================================
 # Stage: test
 # =============================================================================
+# The runner shares its machine with GitLab and Ollama (4 cores, ~8 GB left): the test jobs run one after the
+# other (``needs``), each with bounded workers and memory — together they once froze the machine.
 test:backend:
   extends: .python
   stage: test
@@ -206,7 +208,7 @@ test:backend:
     PORTALAB_REQUIRE_DB: "1"
   script:
     # unit + contract + security + integration (real PostgreSQL, migrations from scratch and upgrade)
-    - uv run pytest -n auto --dist loadfile --junitxml=report.xml
+    - uv run pytest -n 2 --dist loadfile --junitxml=report.xml
   artifacts:
     when: always
     reports:
@@ -226,6 +228,7 @@ test:backend-semantic-search:
   variables:
     PORTALAB_TEST_DATABASE_URL: "postgresql://portalab@postgres:5432/portalab_ci"
     PORTALAB_REQUIRE_DB: "1"
+  needs: [{ job: "test:backend", artifacts: false, optional: true }]
   script:
     - uv run pytest tests/integration/search/test_semantic.py
   rules:
@@ -234,9 +237,12 @@ test:backend-semantic-search:
 test:frontend:
   extends: .node
   stage: test
+  needs: [{ job: "test:backend-semantic-search", artifacts: false, optional: true }]
+  variables:
+    NODE_OPTIONS: "--max-old-space-size=3072"
   script:
     # unit + accessibility (axe, WCAG 2.2 AA token contrast) — Vitest
-    - npx vitest run --reporter=default --reporter=junit --outputFile.junit=report.xml
+    - npx vitest run --maxWorkers=2 --reporter=default --reporter=junit --outputFile.junit=report.xml
     # the production bundle builds
     - npm run build
   artifacts:
@@ -252,11 +258,14 @@ test:frontend-a11y:
   # Playwright against the Vite dev server with a stubbed API
   image: mcr.microsoft.com/playwright:v1.63.0-noble
   stage: test
+  needs: [{ job: "test:frontend", artifacts: false, optional: true }]
+  variables:
+    NODE_OPTIONS: "--max-old-space-size=2048"
   before_script:
     - cd portalab/frontend
     - npm ci --no-audit --no-fund
   script:
-    - npx playwright test
+    - npx playwright test --workers=1
   artifacts:
     when: on_failure
     paths: [portalab/frontend/test-results/]
