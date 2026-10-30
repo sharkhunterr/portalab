@@ -1,6 +1,7 @@
 """Writes the Impact pack's four card faces (comic style) — one stylesheet per rarity, self-contained."""
 
 import sys
+import textwrap
 from pathlib import Path
 
 INK = "#12061c"
@@ -11,17 +12,16 @@ RARITIES = {
                  intro="A rare card: a cyan rim, a holographic film in hard rainbow bands."),
     "epic": dict(bands=("#ff8ae0", "#d21dc4", "#8a0f98"), paper="#fff3fb", accent="#ff2d8f", title="#ffffff", rim="#ff2d8f",
                  intro="An epic card: a magenta rim, a brighter film and glitter; as it turns, a white brush slash cuts across it."),
-    "legendary": dict(bands=("#efff7a", "#b8f02a", "#4fbf18"), paper="#fbffe6", accent="#2bff6e", title="#ffd21f", rim="#ff2a3d",
-                      intro="A legendary card, slabbed: a lime wall of binary digits behind it, toxic green goo wrapping its frame with drips, an intense film, glitter and a great glint crossing it."),
+    "legendary": dict(bands=("#fff3a8", "#ffc81f", "#e8891a"), paper="#fffbea", accent="#ff2d8f", title="#ffd21f", rim="#ff2a3d",
+                      intro="A legendary card: a gold rim, an intense film, glitter and a great glint crossing it; as it turns, a power vortex — energy ribbons drawn in EffectCraft — whirls round it, over and under it, then blasts away."),
 }
 
 
 def face(rarity: str, p: dict) -> str:
     h = f'[data-card-face="impact-{rarity}"]'
     b1, b2, b3 = p["bands"]
-    css = f"""/* {p['intro']}
-   (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform; a turned media
-   card is never redrawn — what moves, moves once, as it is revealed. */
+    intro = textwrap.wrap(p["intro"] + " (Its hook: the card once turned, data-card-face.) The face turns in 3D: never its transform; a turned media card is never redrawn — what moves, moves once, as it is revealed.", 108)
+    css = f"""/* {chr(10).join(('   ' if i else '') + line for i, line in enumerate(intro))} */
 @font-face {{
   font-family: "Impact Bangers";
   src: url("Bangers.woff2") format("woff2");
@@ -172,40 +172,31 @@ def face(rarity: str, p: dict) -> str:
 }}
 """
     if rarity == "legendary":
-        css += f"""/* slabbed on a wall: a lime panel of bold binary digits behind it, inked, popping in as it turns */
-{h}::before {{
-  content: "";
-  position: absolute;
-  inset: -9% -13%;
-  pointer-events: none;
-  border-radius: 1.2rem;
-  background: url("binary.svg") 0 0 / 46% auto repeat, #d4f53c;
-  box-shadow: 0 0 0 4px {INK}, 0.5rem 0.6rem 0 4px {INK};
-  rotate: -2deg;
-  animation: impact-slab 0.7s steps(7, end) both;
-}}
-@keyframes impact-slab {{
-  0% {{ transform: scale(0.3); }}
-  60% {{ transform: scale(1.08); }}
-  100% {{ transform: scale(1); }}
-}}
-/* toxic goo wrapping its frame, splatting on as it turns, its drips hanging */
+        css += f"""/* as it turns: the power vortex — energy ribbons whirling round the card, its back half under the card, its
+   front half over it, then blasting away (drawn in EffectCraft, 18 frames at 12 a second, played frame by frame) */
+{h}::before,
 {h}::after {{
   content: "";
   position: absolute;
-  inset: -15% -21.4%;
-  z-index: 3;
+  inset: -40%;
   pointer-events: none;
-  background: url("slime.svg") center / 100% 100% no-repeat;
-  animation: impact-splat 0.9s steps(9, end) both;
+  background: url("vortex-back.webp") 0 0 / 600% 300% no-repeat;
+  animation: impact-vortex-x 0.5s steps(6) 3 both, impact-vortex-y 1.5s steps(3) both;
 }}
-@keyframes impact-splat {{
-  0% {{ transform: scale(1.5); opacity: 0; }}
-  30% {{ transform: scale(0.94); opacity: 1; }}
-  55% {{ transform: scale(1.03); }}
-  100% {{ transform: scale(1); opacity: 1; }}
+{h}::after {{
+  z-index: 3;
+  background-image: url("vortex-front.webp");
 }}
-/* a great glint crossing the art now and then — on its own small part, not the whole card */
+@keyframes impact-vortex-x {{
+  from {{ background-position-x: 0%; }}
+  to {{ background-position-x: 120%; }}
+}}
+@keyframes impact-vortex-y {{
+  from {{ background-position-y: 0%; }}
+  to {{ background-position-y: 150%; }}
+}}
+"""
+        css += f"""/* a great glint crossing the art now and then — on its own small part, not the whole card */
 {h} .mcard__art::after {{
   content: "";
   position: absolute;
@@ -221,9 +212,9 @@ def face(rarity: str, p: dict) -> str:
 }}
 """
     # what moves once: stilled when motion is reduced — the passing effects not shown at all
-    passing = {"epic": ["::after"], "legendary": [".mcard__art::after"]}.get(rarity, [])
+    passing = {"epic": ["::after"], "legendary": ["::before", "::after", ".mcard__art::after"]}.get(rarity, [])
     staying = {"rare": [".booster-card__face::after"], "epic": [".booster-card__face::after"],
-               "legendary": [".booster-card__face::after", "::before", "::after"]}.get(rarity, [])
+               "legendary": [".booster-card__face::after"]}.get(rarity, [])
     sel = lambda items: ",\n".join(f"  {h}{'' if s.startswith('::') else ' '}{s}" for s in items)
     if passing or staying:
         css += "@media (prefers-reduced-motion: reduce) {\n"

@@ -37,8 +37,8 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   doodles, its art in an inked panel, spinning in crackling pink lightning and inked manga rays, cut by two
   huge white brush slashes, bursting in a white comic explosion that dissolves into halftone; media cards with
   a yellow comic title rimmed in red and ink, sticker badges and a holographic film in hard bands — a halftone
-  shockwave for a rare, inked rays, lightning and a brush slash for an epic, and for a legendary a slab on a
-  lime wall of binary digits wrapped in dripping green goo with cel-shaded toxic flames;
+  shockwave for a rare, inked rays, lightning and a brush slash for an epic, and for a legendary a power vortex —
+  energy ribbons whirling round the card, in front and behind — that blasts away into the biggest burst;
 - `rouages/`, `ruee-vers-l-or/`, `olympe/`: **three complete universes**, each one pack of every kind of look a
   member wears (no messenger bubble): an interface (colours, fonts, layout, sounds, its own words — « L'atelier »,
   « Le saloon », « Le temple »…; Olympe is a light one, on marble), a palette, a GPU ambience and profile

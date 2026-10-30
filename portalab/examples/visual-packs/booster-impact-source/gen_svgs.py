@@ -211,9 +211,9 @@ TARGETS = {
     "slash-a.svg": (lambda: slash(1, 1), ["face-epic"]),
     "slash-b.svg": (lambda: slash(2, -1), []),
     "zap.svg": (zap, []),
-    "slime.svg": (slime, ["face-legendary"]),
+    "slime.svg": (slime, []),
     "glint.svg": (glint, ["look-impact"]),
-    "binary.svg": (binary, ["face-legendary"]),
+    "binary.svg": (binary, []),
     "emblem.svg": (emblem, ["look-impact", "back-impact"]),
     "doodles.svg": (doodles, ["look-impact", "back-impact"]),
 }

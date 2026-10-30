@@ -1,6 +1,6 @@
-/* A rare card: a cyan rim, a holographic film in hard rainbow bands.
-   (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform; a turned media
-   card is never redrawn — what moves, moves once, as it is revealed. */
+/* A rare card: a cyan rim, a holographic film in hard rainbow bands. (Its hook: the card once turned, data-
+   card-face.) The face turns in 3D: never its transform; a turned media card is never redrawn — what moves,
+   moves once, as it is revealed. */
 @font-face {
   font-family: "Impact Bangers";
   src: url("Bangers.woff2") format("woff2");

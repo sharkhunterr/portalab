@@ -233,24 +233,90 @@ if (ONLY === "reveal-epic") (function () {  // epic, 2.4 s: 29 frames
     glints(C, [[cx, cy, 10]], WHITE); }
 })();
 
-if (ONLY === "reveal-legendary") (function () {  // legendary, 3.0 s: 36 frames
-  var comp = revealComp("reveal-legendary", 36);
-  for (var f = 1; f < 31; f++) {
-    var amp = 120 * Math.min(1, f / 4) * (1 - Math.max(0, f - 24) / 7);
-    flames(frames(comp, "flames-" + f, f, f + 1), RX, RY, RW + 18, RH + 18, amp, f * 1.3);
+// the legendary's power vortex, played while the card turns (0.8 s) and just after: three energy ribbons — white,
+// rimmed in pink, inked — spiralling round the card, tightening, then blasting outwards as it lands; pink
+// lightning crackling round its edges. Its front half goes over the card, its back half under it.
+function ribbonRuns(f, k, front) {
+  var spin = f * 0.75, tight = f < 9 ? 1 - f / 9 : 0, blast = f < 9 ? 0 : (f - 9) / 6;
+  // each ribbon its own pitch, reach and tilt: they cross, a whirlwind rather than a barber's pole
+  var turns = [1.0, 1.45, 1.8][k], reach = [1.0, 1.12, 0.92][k], tilt = [0.24, -0.3, 0.12][k], dir = k === 1 ? -1 : 1;
+  var R = (185 + 120 * tight + 260 * blast) * reach, H = 2 * RH + 150, thin = Math.max(0.15, 1 - blast);
+  var pts = [], n = 64;
+  for (var i = 0; i <= n; i++) {
+    var u = i / n, th = dir * (spin + u * turns * Math.PI * 2) + k * Math.PI * 2 / 3;
+    pts.push({ x: RX + R * Math.cos(th), y: RY + (0.5 - u) * H + tilt * R * Math.sin(th) + (u - 0.5) * 40 * k, d: Math.sin(th), w: [30, 24, 34][k] * Math.pow(Math.sin(Math.PI * u), 0.7) * thin });
+  }
+  var runs = [], run = [];
+  for (var j = 0; j < pts.length; j++) {
+    if ((pts[j].d > 0) === front) run.push(pts[j]);
+    else if (run.length) { runs.push(run); run = []; }
+  }
+  if (run.length) runs.push(run);
+  var polysOut = [];
+  for (var r = 0; r < runs.length; r++) {
+    var rr = runs[r]; if (rr.length < 3) continue;
+    var left = [], right = [];
+    for (var q = 0; q < rr.length; q++) {
+      var a = rr[Math.max(0, q - 1)], b = rr[Math.min(rr.length - 1, q + 1)], tx = b.x - a.x, ty = b.y - a.y, l = Math.sqrt(tx * tx + ty * ty) || 1;
+      var nx = -ty / l, ny = tx / l, w = rr[q].w * (q === 0 || q === rr.length - 1 ? 0.35 : 1);
+      left.push([rr[q].x + nx * w, rr[q].y + ny * w]); right.push([rr[q].x - nx * w * 0.7, rr[q].y - ny * w * 0.7]);
+    }
+    polysOut.push(left.concat(right.reverse()));
+  }
+  return polysOut;
+}
+function ribbons(L, f, front) {
+  var white = [], pink = [];
+  for (var k = 0; k < 3; k++) {
+    var list = ribbonRuns(f, k, front);
+    for (var i = 0; i < list.length; i++) {
+      white.push(list[i]);
+      var rim = []; for (var v = 0; v < list[i].length; v++) rim.push([list[i][v][0] + 7, list[i][v][1] + 10]);
+      pink.push(rim);
+    }
+  }
+  if (white.length) { polys(L, white, WHITE, 7, false); polys(L, pink, PINK, 0, false); }
+}
+if (ONLY === "legendary-front") (function () {  // over the card, 1.5 s: 18 frames
+  var comp = revealComp("legendary-front", 18);
+  for (var f = 0; f < 16; f++) {
+    var L = frames(comp, "front-" + f, f, f + 1);
+    if (f < 11) { seed(4100 + f); zaps(L, RX, RY, RW * 1.04, RH * 1.04, 5, 8); }
+    ribbons(L, f, true);
+  }
+})();
+if (ONLY === "legendary-back") (function () {  // under the card, 1.5 s: 18 frames
+  var comp = revealComp("legendary-back", 18);
+  for (var f = 0; f < 16; f++) {
+    seed(4300 + f);
+    var L = frames(comp, "back-" + f, f, f + 1), g = Math.min(1, (f + 2) / 8);
+    ribbons(L, f, false);
+    speedLines(L, RX, RY, 60, 300 + f * 8, 460 + f * 8, 8, WHITE);
+    spikes(L, RX, RY, RW, RH, 18, 150 * g, 70, WHITE, 6, 0.1);
+    spikes(L, RX, RY, RW, RH, 24, 230 * g, 90, PINK, 8, 0);
+  }
+})();
+// the legendary's reveal, once it has landed, 2.5 s: 30 frames — the biggest burst, rings, great glints
+if (ONLY === "reveal-legendary") (function () {
+  var comp = revealComp("reveal-legendary", 30);
+  for (var f = 0; f < 16; f++) {
+    seed(4500 + f);
+    var g = f < 3 ? (f + 1) / 3 : 1 - Math.max(0, f - 10) / 6, L = frames(comp, "burst-" + f, f, f + 1);
+    speedLines(L, RX, RY, 64, 280 + f * 10, 420 + f * 10, 9, WHITE);
+    spikes(L, RX, RY, RW, RH, 18, 170 * g, 70, WHITE, 6, 0.12);
+    spikes(L, RX, RY, RW, RH, 26, 260 * g, 95, PINK, 9, 0);
+    spikes(L, RX, RY, RW, RH, 12, 330 * g, 60, YELLOW, 7, 0.27);
   }
   for (var r = 0; r < 14; r++) { var R = frames(comp, "rings-" + r, r, r + 1);
-    for (var k = 0; k < 2; k++) { var rad = 230 + (r - k * 4) * 18; if (r - k * 4 < 0) continue; var ring = [];
-      for (var q = 0; q <= 60; q++) ring.push([RX + Math.cos(q / 60 * Math.PI * 2) * rad, RY + Math.sin(q / 60 * Math.PI * 2) * rad * 1.15]);
-      var gi = group(R, "lime"); pathInto(gi, ring, true); strokeInto(gi, LIME, 7);
+    for (var k = 0; k < 2; k++) { var s = r - k * 4; if (s < 0) continue; var rad = 230 + s * 20, ring = circle(RX, RY, rad, 1.2);
+      var gi = group(R, "white"); pathInto(gi, ring, true); strokeInto(gi, k ? PINK : WHITE, 7);
       var go = group(R, "ink"); pathInto(go, ring, true); strokeInto(go, INK, 15); } }
-  for (var s = 2; s < 16; s++) { seed(3300); var S = frames(comp, "drops-" + s, s, s + 1), drops = [];
-    for (var i = 0; i < 12; i++) { var a = between(0, Math.PI * 2), d = 240 + (s - 2) * between(12, 22), rr = between(8, 15) * (1 - (s - 2) / 16);
-      drops.push(circle(RX + Math.cos(a) * d, RY + Math.sin(a) * d * 1.1, rr, 1)); }
-    polys(S, drops, GREEN, 4, false); }
-  var big = [[4, 0.5], [5, 1], [6, 0.85], [7, 0.6], [8, 0.4], [9, 0.2]], small = [[17, 0.5], [18, 1], [19, 0.7], [20, 0.4], [21, 0.2]];
-  for (var b = 0; b < big.length; b++) glints(frames(comp, "glintA-" + b, big[b][0], big[b][0] + 1), [[470, 150, 120 * big[b][1]]], WHITE);
-  for (var m = 0; m < small.length; m++) glints(frames(comp, "glintB-" + m, small[m][0], small[m][0] + 1), [[110, 650, 80 * small[m][1]]], WHITE);
+  for (var s2 = 2; s2 < 22; s2++) { seed(4700); var S = frames(comp, "sparks-" + s2, s2, s2 + 1), wl = [], yl = [];
+    for (var i = 0; i < 12; i++) { var a = between(0, Math.PI * 2), d = 230 + (s2 - 2) * between(9, 18); (i % 2 ? wl : yl).push([RX + Math.cos(a) * d, RY + Math.sin(a) * d * 1.15, between(10, 20) * (1 - (s2 - 2) / 21)]); }
+    glints(S, wl, WHITE); glints(S, yl, YELLOW); }
+  var big = [[1, 0.5], [2, 1], [3, 0.85], [4, 0.6], [5, 0.4], [6, 0.2]], small = [[14, 0.5], [15, 1], [16, 0.7], [17, 0.4], [18, 0.2]];
+  for (var b = 0; b < big.length; b++) glints(frames(comp, "glintA-" + b, big[b][0], big[b][0] + 1), [[470, 150, 130 * big[b][1]]], WHITE);
+  for (var m = 0; m < small.length; m++) glints(frames(comp, "glintB-" + m, small[m][0], small[m][0] + 1), [[110, 650, 90 * small[m][1]]], YELLOW);
 })();
 
 writeLn("comps " + app.project.numItems);

@@ -1,6 +1,7 @@
-/* A legendary card, slabbed: a lime wall of binary digits behind it, toxic green goo wrapping its frame with drips, an intense film, glitter and a great glint crossing it.
-   (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform; a turned media
-   card is never redrawn — what moves, moves once, as it is revealed. */
+/* A legendary card: a gold rim, an intense film, glitter and a great glint crossing it; as it turns, a power
+   vortex — energy ribbons drawn in EffectCraft — whirls round it, over and under it, then blasts away. (Its
+   hook: the card once turned, data-card-face.) The face turns in 3D: never its transform; a turned media card
+   is never redrawn — what moves, moves once, as it is revealed. */
 @font-face {
   font-family: "Impact Bangers";
   src: url("Bangers.woff2") format("woff2");
@@ -10,7 +11,7 @@
 [data-card-face="impact-legendary"] .mcard__card {
   padding: 3cqi;
   border-radius: 3.4cqi;
-  background: linear-gradient(155deg, #efff7a 0 28%, #b8f02a 28% 70%, #4fbf18 70%);
+  background: linear-gradient(155deg, #fff3a8 0 28%, #ffc81f 28% 70%, #e8891a 70%);
   box-shadow: 0 0 0 0.9cqi #12061c, 1.6cqi 1.9cqi 0 0.9cqi #12061c;
 }
 /* the body: printed paper, a light halftone */
@@ -18,7 +19,7 @@
   border-radius: 2.2cqi;
   background:
     radial-gradient(circle, rgba(18, 6, 28, 0.09) 0 0.35cqi, transparent 0.5cqi) 0 0 / 2.2cqi 2.2cqi,
-    #fbffe6;
+    #fffbea;
   box-shadow: inset 0 0 0 0.75cqi #12061c;
   color: #12061c;
 }
@@ -42,7 +43,7 @@
 }
 /* the genre: a tilted sticker */
 [data-card-face="impact-legendary"] .mcard__genre {
-  background: #2bff6e;
+  background: #ff2d8f;
   color: #ffffff;
   box-shadow: 0 0 0 0.55cqi #12061c, 0.7cqi 0.8cqi 0 0.55cqi #12061c;
   font-family: "Impact Bangers", var(--mcard-title);
@@ -57,7 +58,7 @@
 /* the art, in an inked panel, its shadow the rarity's colour */
 [data-card-face="impact-legendary"] .mcard__art {
   border-radius: 1.6cqi;
-  box-shadow: 0 0 0 0.8cqi #12061c, 1.2cqi 1.4cqi 0 0.8cqi #2bff6e;
+  box-shadow: 0 0 0 0.8cqi #12061c, 1.2cqi 1.4cqi 0 0.8cqi #ff2d8f;
 }
 [data-card-face="impact-legendary"] .mcard__picture,
 [data-card-face="impact-legendary"] .mcard__scene {
@@ -69,11 +70,11 @@
   color: #ffffff;
 }
 [data-card-face="impact-legendary"] .mcard__poster {
-  box-shadow: 0 0 0 0.6cqi #12061c, 0.6cqi 0.7cqi 0 0.6cqi #2bff6e;
+  box-shadow: 0 0 0 0.6cqi #12061c, 0.6cqi 0.7cqi 0 0.6cqi #ff2d8f;
   rotate: -3deg;
 }
 [data-card-face="impact-legendary"] .mcard__cost {
-  background: #2bff6e;
+  background: #ff2d8f;
   color: #ffffff;
   box-shadow: 0 0 0 0.45cqi #12061c;
 }
@@ -84,8 +85,8 @@
 }
 [data-card-face="impact-legendary"] .mcard__rarity {
   background: #12061c;
-  color: #2bff6e;
-  box-shadow: 0.5cqi 0.6cqi 0 #2bff6e;
+  color: #ff2d8f;
+  box-shadow: 0.5cqi 0.6cqi 0 #ff2d8f;
   font-family: "Impact Bangers", var(--mcard-title);
   font-weight: 400;
   letter-spacing: 0.06em;
@@ -124,38 +125,28 @@
   mix-blend-mode: screen;
   opacity: 0.22;
 }
-/* slabbed on a wall: a lime panel of bold binary digits behind it, inked, popping in as it turns */
-[data-card-face="impact-legendary"]::before {
-  content: "";
-  position: absolute;
-  inset: -9% -13%;
-  pointer-events: none;
-  border-radius: 1.2rem;
-  background: url("binary.svg") 0 0 / 46% auto repeat, #d4f53c;
-  box-shadow: 0 0 0 4px #12061c, 0.5rem 0.6rem 0 4px #12061c;
-  rotate: -2deg;
-  animation: impact-slab 0.7s steps(7, end) both;
-}
-@keyframes impact-slab {
-  0% { transform: scale(0.3); }
-  60% { transform: scale(1.08); }
-  100% { transform: scale(1); }
-}
-/* toxic goo wrapping its frame, splatting on as it turns, its drips hanging */
+/* as it turns: the power vortex — energy ribbons whirling round the card, its back half under the card, its
+   front half over it, then blasting away (drawn in EffectCraft, 18 frames at 12 a second, played frame by frame) */
+[data-card-face="impact-legendary"]::before,
 [data-card-face="impact-legendary"]::after {
   content: "";
   position: absolute;
-  inset: -15% -21.4%;
-  z-index: 3;
+  inset: -40%;
   pointer-events: none;
-  background: url("slime.svg") center / 100% 100% no-repeat;
-  animation: impact-splat 0.9s steps(9, end) both;
+  background: url("vortex-back.webp") 0 0 / 600% 300% no-repeat;
+  animation: impact-vortex-x 0.5s steps(6) 3 both, impact-vortex-y 1.5s steps(3) both;
 }
-@keyframes impact-splat {
-  0% { transform: scale(1.5); opacity: 0; }
-  30% { transform: scale(0.94); opacity: 1; }
-  55% { transform: scale(1.03); }
-  100% { transform: scale(1); opacity: 1; }
+[data-card-face="impact-legendary"]::after {
+  z-index: 3;
+  background-image: url("vortex-front.webp");
+}
+@keyframes impact-vortex-x {
+  from { background-position-x: 0%; }
+  to { background-position-x: 120%; }
+}
+@keyframes impact-vortex-y {
+  from { background-position-y: 0%; }
+  to { background-position-y: 150%; }
 }
 /* a great glint crossing the art now and then — on its own small part, not the whole card */
 [data-card-face="impact-legendary"] .mcard__art::after {
@@ -172,13 +163,13 @@
   100% { background-position: 250% 0; }
 }
 @media (prefers-reduced-motion: reduce) {
+  [data-card-face="impact-legendary"]::before,
+  [data-card-face="impact-legendary"]::after,
   [data-card-face="impact-legendary"] .mcard__art::after {
     animation: none;
     opacity: 0;
   }
-  [data-card-face="impact-legendary"] .booster-card__face::after,
-  [data-card-face="impact-legendary"]::before,
-  [data-card-face="impact-legendary"]::after {
+  [data-card-face="impact-legendary"] .booster-card__face::after {
     animation: none;
   }
 }
