@@ -1,5 +1,5 @@
 /* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s: an anime's impact frames, drawn
-   in EffectCraft and played here frame by frame on twos (frames.webp, 32 frames at 12 a second) — inked
+   in EffectCraft and played here frame by frame (frames.webp, 24 frames a second) — inked
    pink and white rays bursting round the pack, crackling pink lightning, speed lines, two white brush slashes
    crossing, a white comic explosion swelling over everything, then halftone dots shrinking away. Meanwhile
    the pack spins faster and faster and bursts at 1.9 s; the cards come out of it. */
@@ -14,9 +14,10 @@
   77%, 100% { transform: rotateY(1560deg) scale(1.5); opacity: 0; }
 }
 /* the frames, over the whole opening's layer */
+/* frames: begin (written by booster-impact-source/sheets.py) */
 [data-opening="impact"] .booster-stage__opening {
-  background: url("frames.webp") 0 0 / 800% 400% no-repeat;
-  animation: impact-opening-x 0.6667s steps(8) 4 both, impact-opening-y 2.667s steps(4) both;
+  background: url("frames.webp") 0 0 / 800% 800% no-repeat;
+  animation: impact-opening-x 0.3333s steps(8) 8 both, impact-opening-y 2.667s steps(8) both;
 }
 @keyframes impact-opening-x {
   from { background-position-x: 0%; }
@@ -24,8 +25,9 @@
 }
 @keyframes impact-opening-y {
   from { background-position-y: 0%; }
-  to { background-position-y: 133.3333%; }
+  to { background-position-y: 114.2857%; }
 }
+/* frames: end */
 /* room for the frames: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
    out towards its edges — never the outline of its box */
 [data-opening="impact"] .booster-stage__opening {

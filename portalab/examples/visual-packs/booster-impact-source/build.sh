@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Rebuilds the Impact pack's drawn parts: its SVG shapes and card faces, and its four animations — built in
-# EffectCraft (https://github.com/storytold/effectcraft, 0.18), rendered on twos (12 fps, PNG with alpha) and
+# EffectCraft (https://github.com/storytold/effectcraft, 0.18), rendered at 24 fps (PNG with alpha) and
 # assembled into the sprite sheets its stylesheets play.
 #   EFFECTCRAFT=~/.local/opt/effectcraft/bin/effectcraft-cli ./build.sh
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 pack="$here/../booster-impact"
 cli="${EFFECTCRAFT:-effectcraft-cli}"
-work="$(mktemp -d)"
-trap 'rm -rf "$work"' EXIT
+work="${IMPACT_WORK:-$(mktemp -d)}"   # IMPACT_WORK keeps the renders (sheets.py alone can then be run again)
+[ -n "${IMPACT_WORK:-}" ] || trap 'rm -rf "$work"' EXIT
 python3 "$here/gen_svgs.py" "$pack/elements"
 python3 "$here/gen_faces.py" "$pack/elements"
 for comp in opening reveal-rare reveal-epic reveal-legendary legendary-front legendary-back; do

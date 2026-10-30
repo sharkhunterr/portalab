@@ -1,4 +1,4 @@
-// Impact — helpers to draw comic shapes in EffectCraft: inked flat paths, stars, tapered lines, keys on twos.
+// Impact — helpers to draw comic shapes in EffectCraft: inked flat paths, stars, tapered lines, held keys.
 var INK = [0.07, 0.02, 0.11], PINK = [1, 0.18, 0.56], PINK_L = [1, 0.55, 0.8], WHITE = [1, 1, 1];
 var VIOLET = [0.42, 0.13, 0.79], LIME = [0.83, 0.96, 0.24], GREEN = [0.17, 1, 0.43], GREEN_D = [0.04, 0.6, 0.25];
 var GREEN_L = [0.75, 1, 0.65], CYAN = [0.13, 0.75, 0.94], YELLOW = [1, 0.82, 0.12];
@@ -59,7 +59,7 @@ function glintVerts(r, k) {
   return v;
 }
 
-// keys on a property, eased, held between frames for the anime cadence (the comp runs at 12 fps)
+// keys on a property, eased, held between frames for the anime cadence (the comps run at 24 fps)
 function keys(prop, pairs) { for (var i = 0; i < pairs.length; i++) prop.setValueAtTime(pairs[i][0], pairs[i][1]); }
 function tr(L, name) { return L.property("ADBE Transform Group").property(name); }
 // visible only between two times (hold keys on opacity)
