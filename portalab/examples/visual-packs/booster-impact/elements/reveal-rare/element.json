@@ -2,12 +2,12 @@
   "type": "card_reveal",
   "look": "impact-rare",
   "names": {
-    "fr": "Éclat rose",
-    "en": "Pink burst"
+    "fr": "Onde tramée",
+    "en": "Halftone wave"
   },
   "descriptions": {
-    "fr": "Derrière la carte, une explosion de rayons roses et une onde.",
-    "en": "Behind the card, a burst of pink rays and a shockwave."
+    "fr": "Des lignes de vitesse blanches jaillissent de derrière la carte, une onde de choc roule en trame de points cernée d'encre.",
+    "en": "White speed lines shoot out from behind the card, a shockwave rolls away as an inked ring of halftone dots."
   },
   "render": {
     "kind": "glsl",

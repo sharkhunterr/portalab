@@ -2,12 +2,12 @@
   "type": "card_reveal",
   "look": "impact-legendary",
   "names": {
-    "fr": "Mur binaire",
-    "en": "Binary wall"
+    "fr": "Flammes toxiques",
+    "en": "Toxic flames"
   },
   "descriptions": {
-    "fr": "Un mur de chiffres binaires vert-jaune derrière la carte, des flammes d'énergie verte qui montent, une onde et un immense éclat à quatre branches (HD).",
-    "en": "A wall of green-yellow binary digits behind the card, green energy flames rising, a shockwave and a huge four-pointed glint (HD)."
+    "fr": "Des flammes d'énergie verte en cel-shading, cernées d'encre, lèchent sa dalle ; des anneaux lime s'éloignent ; un grand éclat encré à quatre branches surgit à son coin, puis un autre (HD).",
+    "en": "Cel-shaded green energy flames, inked, lick round its slab; lime rings roll away; a great inked four-pointed glint snaps out at its corner, then another (HD)."
   },
   "render": {
     "kind": "glsl",

@@ -1,41 +1,97 @@
-/* A rare card (its hook: the card once turned, data-card-face): a cyan frame, the outlined title, a rainbow
-   holographic film sliding over it. The face turns in 3D: never its transform. */
+/* A rare card: a cyan rim, a holographic film in hard rainbow bands, an inked manga burst behind it as it turns.
+   (its hook: the card once turned, data-card-face). The face turns in 3D: never its transform; a turned media
+   card is never redrawn — what moves, moves once, as it is revealed. */
 @font-face {
   font-family: "Impact Bangers";
   src: url("Bangers.woff2") format("woff2");
   font-display: swap;
 }
-/* the frame: its rim the rarity's colour, edged dark, glowing */
+/* the card: inked, its rim the rarity's flat colour in hard cel bands, a hard drop shadow */
 [data-card-face="impact-rare"] .mcard__card {
-  background: linear-gradient(160deg, #7ff3ff, #1d8fd8 55%, #0b3f8a);
-  box-shadow: 0 0 0 0.6cqi #14051f, 0 0 0 1.2cqi #3fe0ff, 0 0 4cqi 1cqi rgba(63, 224, 255, 0.55);
+  padding: 3cqi;
+  border-radius: 3.4cqi;
+  background: linear-gradient(155deg, #7fefff 0 28%, #22bff0 28% 70%, #0b84c4 70%);
+  box-shadow: 0 0 0 0.9cqi #12061c, 1.6cqi 1.9cqi 0 0.9cqi #12061c;
 }
-[data-card-face="impact-rare"] .booster-card__face:not([data-own]) {
-  border-color: #3fe0ff;
-  box-shadow: 0 0 0 2px #14051f, 0 0 0.8rem rgba(63, 224, 255, 0.55);
+/* the body: printed paper, a light halftone */
+[data-card-face="impact-rare"] .mcard__body {
+  border-radius: 2.2cqi;
+  background:
+    radial-gradient(circle, rgba(18, 6, 28, 0.09) 0 0.35cqi, transparent 0.5cqi) 0 0 / 2.2cqi 2.2cqi,
+    #f1fbff;
+  box-shadow: inset 0 0 0 0.75cqi #12061c;
+  color: #12061c;
 }
-/* the title, comic style: thick outlined capitals with a hard shadow */
-[data-card-face="impact-rare"] .mcard__name {
+/* the title, comic lettering: yellow, rimmed with red, outlined in ink, a hard shadow */
+[data-card-face="impact-rare"] .mcard[data-rarity] .mcard__name {
+  overflow: visible;
+  text-overflow: clip;
+  padding-inline: 0.8cqi;
   font-family: "Impact Bangers", var(--mcard-title);
   font-weight: 400;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
   text-transform: uppercase;
-  color: #fff36a;
-  -webkit-text-stroke: 1.5cqi #14051f;
+  color: #ffd21f;
+  -webkit-text-stroke: 1.3cqi #ff2a3d;
   paint-order: stroke fill;
-  text-shadow: 0.9cqi 0.9cqi 0 #1d8fd8;
+  text-shadow:
+    0.75cqi 0 0 #12061c, -0.75cqi 0 0 #12061c, 0 0.75cqi 0 #12061c, 0 -0.75cqi 0 #12061c,
+    0.55cqi 0.55cqi 0 #12061c, -0.55cqi 0.55cqi 0 #12061c, 0.55cqi -0.55cqi 0 #12061c, -0.55cqi -0.55cqi 0 #12061c,
+    1.4cqi 1.6cqi 0 #12061c;
 }
-[data-card-face="impact-rare"] .booster-card__name {
-  font-family: "Impact Bangers", sans-serif;
+/* the genre: a tilted sticker */
+[data-card-face="impact-rare"] .mcard__genre {
+  background: #22bff0;
+  color: #ffffff;
+  box-shadow: 0 0 0 0.55cqi #12061c, 0.7cqi 0.8cqi 0 0.55cqi #12061c;
+  font-family: "Impact Bangers", var(--mcard-title);
   font-weight: 400;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: #fff36a;
-  -webkit-text-stroke: 1px #14051f;
-  paint-order: stroke fill;
-  text-shadow: 2px 2px 0 #1d8fd8;
+  font-size: 3.4cqi;
+  letter-spacing: 0.06em;
+  rotate: 4deg;
 }
-/* the holographic film: a rainbow band sliding over the card as it catches the light */
+[data-card-face="impact-rare"] .mcard__emblem {
+  background: #12061c;
+}
+/* the art, in an inked panel, its shadow the rarity's colour */
+[data-card-face="impact-rare"] .mcard__art {
+  border-radius: 1.6cqi;
+  box-shadow: 0 0 0 0.8cqi #12061c, 1.2cqi 1.4cqi 0 0.8cqi #22bff0;
+}
+[data-card-face="impact-rare"] .mcard__picture,
+[data-card-face="impact-rare"] .mcard__scene {
+  filter: saturate(1.3) contrast(1.08);
+}
+[data-card-face="impact-rare"] .mcard__strip {
+  border-radius: 0.8cqi;
+  background: #12061c;
+  color: #ffffff;
+}
+[data-card-face="impact-rare"] .mcard__poster {
+  box-shadow: 0 0 0 0.6cqi #12061c, 0.6cqi 0.7cqi 0 0.6cqi #22bff0;
+  rotate: -3deg;
+}
+[data-card-face="impact-rare"] .mcard__cost {
+  background: #22bff0;
+  color: #ffffff;
+  box-shadow: 0 0 0 0.45cqi #12061c;
+}
+[data-card-face="impact-rare"] .mcard__figures strong {
+  font-family: "Impact Bangers", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+}
+[data-card-face="impact-rare"] .mcard__rarity {
+  background: #12061c;
+  color: #22bff0;
+  box-shadow: 0.5cqi 0.6cqi 0 #22bff0;
+  font-family: "Impact Bangers", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  rotate: -3deg;
+}
+/* the holographic film: hard rainbow bands, sliding over the card as it catches the light */
 [data-card-face="impact-rare"] .booster-card__face::after {
   content: "";
   position: absolute;
@@ -43,19 +99,35 @@
   z-index: 3;
   pointer-events: none;
   border-radius: inherit;
-  background-image:
-    linear-gradient(115deg, transparent 20%, rgba(255, 60, 170, 0.9) 32%, rgba(255, 230, 60, 0.9) 40%, rgba(60, 255, 160, 0.9) 48%, rgba(60, 200, 255, 0.9) 56%, rgba(170, 80, 255, 0.9) 64%, transparent 78%);
-  background-size: 260% 260%;
+  background: linear-gradient(115deg, transparent 0 40%, #ff2d8f 40% 42%, #ffd21f 42% 44%, #2bff6e 44% 46%, #22bff0 46% 48%, #9a45f0 48% 50%, transparent 50%) 0 0 / 300% 300%;
   mix-blend-mode: color-dodge;
   opacity: 0.3;
-  animation: impact-holo-rare 6s ease-in-out infinite both;
+  animation: impact-holo-rare 1.4s steps(14, end) both;
 }
 @keyframes impact-holo-rare {
-  0%, 100% { background-position: 0% 0%; }
-  50% { background-position: 100% 100%; }
+  0% { background-position: 0% 0%; }
+  100% { background-position: 55% 55%; }
+}
+/* as it turns: an inked manga burst behind it, shooting out and gone */
+[data-card-face="impact-rare"]::before {
+  content: "";
+  position: absolute;
+  inset: -45% -60%;
+  pointer-events: none;
+  background: url("burst.svg") center / contain no-repeat;
+  animation: impact-pop-rare 1.2s steps(12, end) both;
+}
+@keyframes impact-pop-rare {
+  0% { transform: scale(0.2) rotate(0deg); opacity: 1; }
+  40% { transform: scale(1) rotate(15deg); opacity: 1; }
+  75% { transform: scale(1.15) rotate(25deg); opacity: 1; }
+  100% { transform: scale(1.3) rotate(30deg); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-
+  [data-card-face="impact-rare"]::before {
+    animation: none;
+    opacity: 0;
+  }
   [data-card-face="impact-rare"] .booster-card__face::after {
     animation: none;
   }

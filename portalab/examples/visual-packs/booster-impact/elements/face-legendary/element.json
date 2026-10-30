@@ -6,8 +6,8 @@
     "en": "Legendary face"
   },
   "descriptions": {
-    "fr": "Un cadre or et vert : l'énergie qui crépite tout autour, une holographie intense, des paillettes, un grand éclat qui traverse la carte et le titre qui pulse (HD).",
-    "en": "A gold and green frame: energy crackling all around, an intense holographic film, glitter, a great glint crossing the card and the title pulsing (HD)."
+    "fr": "Mise en dalle sur un mur lime de chiffres binaires, un slime vert toxique qui enveloppe son cadre et dégouline, une holographie intense, des paillettes et un grand éclat qui la traverse.",
+    "en": "Slabbed on a lime wall of binary digits, toxic green goo wrapping its frame and dripping, an intense film, glitter and a great glint crossing it."
   },
   "render": {
     "kind": "css",

@@ -1,64 +1,116 @@
-/* The sealed pack (its hook: data-booster-look): violet and magenta, edged with pink neon, a halftone falling
-   from its top corner, a glint sliding across now and then, its emblem glowing; it breathes while it waits. */
+/* The sealed pack (its hook: data-booster-look), comic style: flat violet in hard cel bands under graffiti
+   doodles and halftone, a thick ink outline round a neon pink rim, a hard offset shadow; the work's art in an
+   inked panel, tilted; its name in outlined comic letters; the card count on a sticker; a glint flaring at
+   its corner and a double heartbeat while it waits. */
+@font-face {
+  font-family: "Impact Bangers";
+  src: url("Bangers.woff2") format("woff2");
+  font-display: swap;
+}
 [data-booster-look="impact"] .booster-pack {
-  border: 0;
-  border-radius: 0.9rem;
+  border-radius: 0.7rem;
   background:
-    radial-gradient(circle at 18% 14%, rgba(255, 60, 170, 0.55) 0 1.2px, transparent 1.8px) 0 0 / 9px 9px,
-    linear-gradient(150deg, rgba(255, 255, 255, 0.16), transparent 32%),
-    radial-gradient(ellipse at 50% 42%, #b21dd8 0%, #6a12b8 38%, #2a0a5c 78%, #160634 100%);
+    url("doodles.svg") 0 0 / 62% auto repeat,
+    radial-gradient(circle, rgba(255, 45, 143, 0.5) 0 1.3px, transparent 1.9px) 0 0 / 8px 8px,
+    linear-gradient(158deg, #9a45f0 0 30%, #6a22c9 30% 66%, #45138f 66%);
   box-shadow:
-    inset 0 0 0 2px rgba(255, 80, 190, 0.95),
-    inset 0 0 0 5px rgba(40, 6, 70, 0.9),
-    inset 0 0 1.6rem rgba(255, 40, 160, 0.45),
-    0 0 1.4rem rgba(255, 40, 160, 0.65),
-    0 0 3.2rem rgba(150, 40, 255, 0.4);
-  animation: impact-glint 4.2s ease-in-out infinite;
+    inset 0 0 0 3px #12061c,
+    inset 0 0 0 7px #ff2d8f,
+    inset 0 0 0 10px #12061c,
+    0 0 0 3px #12061c,
+    0.55rem 0.65rem 0 #12061c;
 }
-@keyframes impact-glint {
-  0%, 62%, 100% { filter: none; }
-  70% { filter: brightness(1.25) saturate(1.2); }
-  76% { filter: none; }
+/* the work's art, in an inked comic panel, tilted, punchy */
+[data-booster-look="impact"] .booster-pack__art {
+  inset: 13% 11% 33%;
+  inline-size: 78%;
+  block-size: 54%;
+  border: 4px solid #12061c;
+  border-radius: 0.35rem;
+  box-shadow: 5px 6px 0 #ff2d8f, 5px 6px 0 3px #12061c;
+  mask: none;
+  filter: contrast(1.12) saturate(1.35);
+  rotate: -3deg;
 }
-/* a gloss sweeping over the foil */
 [data-booster-look="impact"] .booster-pack__foil {
   opacity: 1;
-  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.45) 48%, rgba(255, 140, 220, 0.35) 52%, transparent 62%) -160% 0 / 200% 100% no-repeat;
-  mix-blend-mode: screen;
-  animation: impact-sweep 4.2s ease-in-out infinite;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.55) 47%, transparent 47.5%, transparent 51%, rgba(255, 255, 255, 0.35) 51.5%, transparent 56%) -160% 0 / 200% 100% no-repeat;
+  animation: impact-sweep 4.4s ease-in-out infinite;
 }
 @keyframes impact-sweep {
   0%, 58% { background-position: -160% 0; }
   80%, 100% { background-position: 260% 0; }
 }
 [data-booster-look="impact"] .booster-pack__stars {
-  opacity: 0.9;
-  color: #ffd6f2;
-  filter: drop-shadow(0 0 0.35rem rgba(255, 60, 170, 0.9));
+  opacity: 0;
 }
+/* the crimped strip on top: an ink zigzag */
 [data-booster-look="impact"] .booster-pack__flap {
   border: 0;
-  background: linear-gradient(180deg, rgba(255, 80, 190, 0.85), rgba(150, 20, 200, 0.6));
-  box-shadow: 0 2px 0 rgba(40, 6, 70, 0.9);
+  background:
+    linear-gradient(135deg, #12061c 25%, transparent 25%) 0 100% / 10px 10px repeat-x,
+    linear-gradient(225deg, #12061c 25%, transparent 25%) 0 100% / 10px 10px repeat-x,
+    linear-gradient(180deg, #ff2d8f, #d21dc4);
+  box-shadow: inset 0 -3px 0 #12061c;
 }
+/* a pack with no art: the emblem, big */
 [data-booster-look="impact"] .booster-pack__emblem {
-  color: #ffffff;
-  background: radial-gradient(circle, rgba(255, 90, 200, 0.6), rgba(120, 20, 220, 0.15) 60%, transparent 72%);
-  border-radius: 1.1rem;
-  box-shadow: inset 0 0 0 3px #ff4fc0, 0 0 1.2rem rgba(255, 60, 170, 0.9);
-  filter: drop-shadow(0 0 0.5rem rgba(255, 255, 255, 0.7));
-  animation: impact-emblem 2.6s ease-in-out infinite;
+  inline-size: 62%;
+  aspect-ratio: 1;
+  background: url("emblem.svg") center / contain no-repeat;
+  border-radius: 0;
+  box-shadow: none;
 }
-@keyframes impact-emblem {
-  0%, 100% { box-shadow: inset 0 0 0 3px #ff4fc0, 0 0 1rem rgba(255, 60, 170, 0.7); }
-  50% { box-shadow: inset 0 0 0 3px #ffffff, 0 0 2rem rgba(255, 60, 170, 1); }
+[data-booster-look="impact"] .booster-pack__emblem svg {
+  opacity: 0;
 }
 [data-booster-look="impact"] .booster-pack__name {
+  inset: auto 4% 13%;
+  font-family: "Impact Bangers", sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.05rem, 2.4vw, 1.5rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: #ffd21f;
+  -webkit-text-stroke: 5px #12061c;
+  paint-order: stroke fill;
+  text-shadow: 2px 2px 0 #ff2a3d, 4px 4px 0 #12061c;
+  rotate: -4deg;
+}
+[data-booster-look="impact"] .booster-pack__subtitle {
+  inset: auto 4% 6%;
   color: #ffffff;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-shadow: 2px 2px 0 #ff2f9a, -1px -1px 0 #2a0a5c, 0 0 0.8rem rgba(255, 60, 170, 0.9);
+  font-weight: 800;
+  text-shadow: 1px 1px 0 #12061c, -1px -1px 0 #12061c;
+}
+[data-booster-look="impact"] .booster-pack__count {
+  inset: 0.55rem 0.55rem auto auto;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #ffd21f;
+  color: #12061c;
+  font-family: "Impact Bangers", sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  box-shadow: 0 0 0 3px #12061c, 3px 3px 0 3px #12061c;
+  rotate: 8deg;
+}
+/* on the stage: a glint flaring at the pack's corner now and then */
+[data-booster-look="impact"] .booster-stage__tear::after {
+  content: "";
+  position: absolute;
+  inset: -6% -14% auto auto;
+  z-index: 4;
+  inline-size: 34%;
+  aspect-ratio: 1;
+  pointer-events: none;
+  background: url("glint.svg") center / contain no-repeat;
+  animation: impact-flare 3.3s ease-in-out infinite;
+}
+@keyframes impact-flare {
+  0%, 55%, 100% { transform: scale(0) rotate(0deg); }
+  65% { transform: scale(1) rotate(20deg); }
+  78% { transform: scale(0.3) rotate(40deg); }
 }
 /* tension: a double heartbeat now and then, added to Portalab's float (never replacing it) */
 [data-booster-look="impact"] .booster-stage__tear {
@@ -66,15 +118,14 @@
 }
 @keyframes impact-heartbeat {
   0%, 60%, 100% { scale: 1; }
-  66% { scale: 1.025; }
+  66% { scale: 1.03; }
   71% { scale: 0.995; }
-  77% { scale: 1.04; }
+  77% { scale: 1.045; }
   86% { scale: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-booster-look="impact"] .booster-pack,
   [data-booster-look="impact"] .booster-pack__foil,
-  [data-booster-look="impact"] .booster-pack__emblem,
+  [data-booster-look="impact"] .booster-stage__tear::after,
   [data-booster-look="impact"] .booster-stage__tear {
     animation: none;
   }
