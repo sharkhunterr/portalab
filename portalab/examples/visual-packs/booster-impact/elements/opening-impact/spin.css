@@ -26,6 +26,12 @@
   from { background-position-y: 0%; }
   to { background-position-y: 133.3333%; }
 }
+/* room for the frames: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges — never the outline of its box */
+[data-opening="impact"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+}
 /* its corner glint, while it waits, stays out of the opening */
 [data-opening="impact"][data-booster-look] .booster-stage__tear::after {
   content: none;
