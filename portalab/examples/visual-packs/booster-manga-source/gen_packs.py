@@ -301,14 +301,6 @@ def room(sel):
   height: 260%;
   mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
 }}
-/* on a phone, the cards' row scrolls sideways and cuts what overflows it 5rem above and below a card: the
-   effect has faded out before it */
-@media (max-width: 40rem) {{
-  {sel} {{
-    mask-image: radial-gradient(closest-side, #000 72%, transparent 100%), linear-gradient(to bottom, transparent calc(30.77% - 4.5rem), #000 calc(30.77% - 1.5rem), #000 calc(69.23% + 1.5rem), transparent calc(69.23% + 4.5rem));
-    mask-composite: intersect;
-  }}
-}}
 """
 
 
@@ -675,7 +667,7 @@ def write(style):
                                    "face": {r: f"face-{r}" for r in RARE}, "reveal": {r: f"reveal-{r}" for r in ("rare", "epic", "legendary")}}}}
     (elements / f"scene-{style}").mkdir(parents=True, exist_ok=True)
     (elements / f"scene-{style}" / "element.json").write_text(json.dumps(scene, ensure_ascii=False, indent=2) + "\n")
-    (pack / "pack.json").write_text(json.dumps({"format": 1, "id": style, "version": "1.0.0", "names": s["names"], "descriptions": s["descriptions"],
+    (pack / "pack.json").write_text(json.dumps({"format": 1, "id": style, "version": "1.0.1", "names": s["names"], "descriptions": s["descriptions"],
                                                 "author": "Portalab (example)", "license": "CC0-1.0"}, ensure_ascii=False, indent=2) + "\n")
     font_name = {"shonen": "Dela Gothic One by artakana", "magical": "Mochiy Pop One by FONTDASU", "ninja": "Yuji Boku by Kinuta Font Factory", "mecha": "Chakra Petch by Cadson Demak"}[style]
     (pack / "CREDITS.txt").write_text(f"""{s['names']['en']} — an example booster scene for Portalab (CC0-1.0), one of the manga universe's four, every
