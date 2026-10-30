@@ -21,7 +21,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/screenshots/title.jpg" alt="A title's page: where to watch it, what members think, the cast" width="100%">
+  <img src="assets/screenshots/home.jpg" alt="Portalab's home: each member's own dashboard — what to continue, what is new, the services' state, the wheel of the day, the calendar" width="100%">
 </p>
 
 Your friends and family already use your Plex, your Seerr, your book library and your game shelf — through
@@ -38,6 +38,21 @@ priced or switched off.
 ---
 
 ## What your members get
+
+### A home page that shows everything at a glance
+
+<table>
+  <tr>
+    <td width="70%"><img src="assets/screenshots/home.jpg" alt="The home dashboard: continue, since your last visit, why not tonight, the wheel, the calendar"></td>
+    <td width="30%"><img src="assets/screenshots/phone-home.jpg" alt="The same home on a phone"></td>
+  </tr>
+</table>
+
+Portalab opens on **a dashboard each member builds for themselves**: what to continue, what arrived since
+the last visit, a title for tonight, whether every service is up, the wheel of the day, the calendar,
+the radio, requests, quests, statistics, the leaderboard… **Add, arrange and resize widgets** — on the
+desktop and on the phone, each with its own layout — or keep the one the administrator prepared. It is the
+front page of your homelab: one look, and members know what is new, what works and what to watch next.
 
 ### Everything on the media server, in one place
 
@@ -151,8 +166,6 @@ Gamification is **optional for every member** — play it all, play without the 
   </tr>
 </table>
 
-- **A dashboard of your own** — add, arrange and resize widgets: continue watching, the radio, requests,
-  statistics, quests, the calendar, the leaderboard…
 - **Full personalisation** — interface and palette, light or dark, profile (avatar, frame, name style),
   language and region, and notification preferences per topic, in the portal and by e-mail.
 - **Search everything** at once — titles, people, wiki pages, news, tickets, products — exact or by meaning.
@@ -161,9 +174,9 @@ Gamification is **optional for every member** — play it all, play without the 
 - **Guided tours** that show each part of the portal, step by step.
 
 <p align="center">
-  <img src="assets/screenshots/phone-home.jpg" alt="Portalab on a phone" width="30%">
-  &nbsp;
   <img src="assets/screenshots/phone-title.jpg" alt="A title's page on a phone" width="30%">
+  &nbsp;
+  <img src="assets/screenshots/phone-statistics.jpg" alt="Statistics on a phone" width="30%">
 </p>
 
 ## Everything is in the administrator's hands

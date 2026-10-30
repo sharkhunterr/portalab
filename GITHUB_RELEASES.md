@@ -65,7 +65,14 @@ game on top: levels, quests, mini-games, collectible cards cut from your own lib
 what they earn. One Docker image, one PostgreSQL database, your server. Every feature is set by the
 administrator.
 
-![A title's page in Portalab](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.0.0/assets/screenshots/title.jpg)
+![Portalab's home: each member's own dashboard](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.0.0/assets/screenshots/home.jpg)
+
+### A home page that shows everything at a glance
+
+Portalab opens on **a dashboard each member builds**: what to continue, what arrived since the last visit,
+a title for tonight, whether every service is up, the wheel of the day, the calendar, the radio, requests,
+quests, statistics… Add, arrange and resize widgets, with a layout of its own on the phone — or keep the
+one the administrator prepared.
 
 ### Everything on the media server, in one place
 
@@ -78,6 +85,8 @@ administrator.
   each step in plain words, and the assistant can explain it.
 - **Watch, read and listen in the browser** — video with subtitles and Chromecast, EPUB/PDF/comics reader,
   audiobook player that remembers where you stopped.
+
+![A title's page](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.0.0/assets/screenshots/title.jpg)
 - **The radio** — SUB/WAVE live, what plays, ask the DJ for a song; the player follows you across pages.
 
 ![Where a request stands](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.0.0/assets/screenshots/request-journey.jpg)
@@ -120,7 +129,6 @@ Optional for every member: play it all, play without the cards, or don't play.
 
 ### Yours to shape
 
-- **A personal dashboard** — add, arrange and resize widgets.
 - **Full personalisation** — interface, palette, light or dark, profile, language, notification
   preferences per topic, in the portal and by e-mail; **guided tours** of every part.
 - **Global search** across media, people, wiki, news, tickets and products — exact or by meaning.

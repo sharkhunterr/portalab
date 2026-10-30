@@ -5,16 +5,18 @@
 **Portalab is the front door of your homelab** — the portal your friends and family open instead of a dozen
 apps. One catalog for Plex, Jellyfin, Sonarr, Radarr, Grimmory and RomM; requests from the portal and their
 status from the ask to the screen ("why is my film still not on Plex?"); a player, a reader and a radio in
-the browser; statistics of everything watched, read and heard; news, newsletters, a wiki, support tickets,
+the browser; a home dashboard each member arranges with widgets; statistics of everything watched, read and heard; news, newsletters, a wiki, support tickets,
 feedback, service status and incidents; a personal dashboard, full personalisation, global search and an AI
 assistant. And for those who want to play: XP, levels, quests, mini-games, **Mediacards** cut from your own
 library and a marketplace to spend what they earn. Everything is set by the administrator.
 
 <p>
+  <img src="https://raw.githubusercontent.com/sharkhunterr/portalab/main/assets/screenshots/home.jpg" alt="The home dashboard each member arranges" width="49%">
   <img src="https://raw.githubusercontent.com/sharkhunterr/portalab/main/assets/screenshots/title.jpg" alt="A title's page" width="49%">
   <img src="https://raw.githubusercontent.com/sharkhunterr/portalab/main/assets/screenshots/request-journey.jpg" alt="Where a request stands" width="49%">
   <img src="https://raw.githubusercontent.com/sharkhunterr/portalab/main/assets/screenshots/statistics.jpg" alt="Statistics" width="49%">
   <img src="https://raw.githubusercontent.com/sharkhunterr/portalab/main/assets/screenshots/marketplace.jpg" alt="The marketplace" width="49%">
+  <img src="https://raw.githubusercontent.com/sharkhunterr/portalab/main/assets/screenshots/cards.jpg" alt="Mediacards" width="49%">
 </p>
 
 Source, documentation and release notes: **https://github.com/sharkhunterr/portalab**
