@@ -8,3 +8,16 @@ iframe[data-sandboxed] {
 iframe[data-sandboxed][aria-hidden="true"] {
   pointer-events: none;
 }
+/* issue 287: a pack's video fills its layer (a stacked one is drawn by its canvas, the video itself unseen) */
+.visual-video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+.visual-video--source {
+  opacity: 0;
+}

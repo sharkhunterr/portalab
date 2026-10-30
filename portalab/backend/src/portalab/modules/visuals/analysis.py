@@ -256,7 +256,7 @@ def _element(
             continue
         if files.get(f"{folder}/{name}") is None:
             report.add("blocking", "file.missing", key, file=name)
-    if kind in ("glsl", "js", "theme") and not element.render.file:
+    if kind in ("glsl", "js", "video", "theme") and not element.render.file:
         report.add("blocking", "render.no_file", key, kind=kind)
     if kind == "renderer" and not element.render.renderer:
         report.add("blocking", "render.no_renderer", key)
@@ -290,6 +290,10 @@ def _element(
         _glsl(report, key, element, source)
     if kind == "js" and main is not None:
         _js(report, key, source)
+    if kind == "video":
+        _video(report, key, element, files, folder)
+    elif element.render.over:
+        report.add("blocking", "video.over_elsewhere", key)
     if kind == "theme" and main is not None:
         _theme(report, key, element, source, own_looks, interfaces, builtin=builtin)
     if element.sold:
@@ -332,7 +336,7 @@ def _element(
             "folder_files": element.files(),
             "contracts": element.contracts,
             "free": element.free,
-            "hd": kind == "glsl",
+            "hd": kind in ("glsl", "video"),
             "script": kind == "js",
             "names": element.names.model_dump(),
             "descriptions": element.descriptions.model_dump(),
@@ -719,3 +723,27 @@ def looks_of(report: Mapping[str, Any]) -> Iterable[tuple[str, str]]:
     for element in report.get("elements", []):
         if element.get("look") and element["type"] in LOOK_TYPES:
             yield element["type"], element["look"]
+
+
+# issue 287: what a video part may be — an MP4 or a WebM, really one (its first bytes), its second video
+# (played over the card) a reveal's only
+VIDEO_SIGNATURES = {
+    ".mp4": lambda data: data[4:8] == b"ftyp",
+    ".webm": lambda data: data[:4] == b"\x1a\x45\xdf\xa3",
+}
+
+
+def _video(report: Report, key: str, element: Element, files: Files, folder: str) -> None:
+    if element.render.over and element.type != "card_reveal":
+        report.add("blocking", "video.over_elsewhere", key)
+    for name in (element.render.file, element.render.over):
+        if not name:
+            continue
+        suffix = PurePosixPath(name).suffix.lower()
+        signature = VIDEO_SIGNATURES.get(suffix)
+        if signature is None:
+            report.add("blocking", "video.kind", key, file=name)
+            continue
+        data = files.get(f"{folder}/{name}")
+        if data is not None and not signature(data[:16]):
+            report.add("blocking", "video.invalid", key, file=name)

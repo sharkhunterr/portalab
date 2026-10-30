@@ -10,6 +10,7 @@ import {
   normaliseElement,
   uninstallScope,
 } from "../../../../design-system/visuals/registry";
+import { preloadVideo, VideoLayer } from "../../../../design-system/visuals/VideoLayer";
 
 /**
  * 028 (US5): the booster scene a pack brings — parts drawn *around* what Portalab draws: the sealed
@@ -68,6 +69,11 @@ export function useBoosterScene(boosterKey: string | null | undefined, kind?: st
   useEffect(() => {
     if (!scene) return;
     void installElements(elementsOf(scene), "scene");
+    // issue 287: its videos read at once, so each starts the moment it is played
+    for (const element of elementsOf(scene)) {
+      if (element.kind !== "video") continue;
+      for (const url of [element.file, element.over]) if (url) void preloadVideo(url);
+    }
     return () => uninstallScope("scene");
   }, [scene]);
   return scene;
@@ -130,8 +136,9 @@ export function sceneFrom(elements: ExternalElement[], scene: ExternalElement): 
   return { pack: scene.pack, look: scene.look ?? "", parts };
 }
 
-/** A part drawn by itself over a place of the scene: a GPU stage, or a script in its sandbox; a CSS part
- * styles its hook (the ``data-*`` attribute the scene sets) and needs nothing here. */
+/** A part drawn by itself over a place of the scene: a GPU stage, a script in its sandbox, or a video (a
+ * reveal's second one over the card, issue 287); a CSS part styles its hook (the ``data-*`` attribute the
+ * scene sets) and needs nothing here. */
 export function ScenePart({
   element,
   context,
@@ -153,6 +160,18 @@ export function ScenePart({
   }
   if (part.kind === "js") {
     return <ExternalScript element={part} context={context} className={className} />;
+  }
+  if (part.kind === "video" && part.file) {
+    const alpha = part.alpha === "stacked" ? "stacked" : "none";
+    const loop = part.type === "booster_backdrop";
+    return (
+      <>
+        <VideoLayer src={part.file} alpha={alpha} loop={loop} className={className} />
+        {part.over ? (
+          <VideoLayer src={part.over} alpha={alpha} loop={loop} className={className} over />
+        ) : null}
+      </>
+    );
   }
   return null;
 }

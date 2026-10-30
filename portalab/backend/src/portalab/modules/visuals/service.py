@@ -1344,6 +1344,9 @@ class VisualPacks:
                 "kind": element["kind"],
                 "names": element["names"],
                 "file": f"{folder}/{render['file']}" if render.get("file") else None,
+                # issue 287: a reveal's video played over the card, and how a video holds its transparency
+                "over": f"{folder}/{render['over']}" if render.get("over") else None,
+                "alpha": render.get("alpha") if render.get("alpha") not in (None, "none") else None,
                 "css": [f"{folder}/{name}" for name in render.get("css") or []],
                 "stage": render.get("stage", False),
                 "shape": render.get("shape", 0),

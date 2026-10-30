@@ -53,7 +53,7 @@ purged. Every action is in the audit log.
 ```text
 pack.json                       {format: 1, id, version, names{fr,en}, descriptions{fr,en}, author, license, homepage?}
 elements/<folder>/element.json  one element
-elements/<folder>/…             its files: .css .glsl .js .json .svg .png .webp .jpg .woff2 .ogg .wav .txt
+elements/<folder>/…             its files: .css .glsl .js .json .svg .png .webp .jpg .woff2 .ogg .wav .mp4 .webm .txt
 ```
 
 Limits (refused before anything is stored): archive ≤ 40 MB, ≤ 400 files, file ≤ 5 MB, path ≤ 200 characters,
@@ -68,7 +68,7 @@ pack's `id` and look keys: lowercase letters, digits, `-` and `_` (48 at most); 
 | `look` | the look's key — what preferences and profiles store, what the interface's `data-*` attributes carry; required for every type that has one; never a built-in look's or another pack's (unless `replaces`) |
 | `product` | the shop product's key (default `<prefix>_<look>`) |
 | `names`, `descriptions` | `{fr, en}` (one missing: a warning; both: blocking) |
-| `render` | `{kind: css\|glsl\|js\|theme\|data\|renderer, file?, css[]?, stage?, shape?, radius?, reveal?, duration?, nav?, rarity?, place?}` |
+| `render` | `{kind: css\|glsl\|js\|video\|theme\|data\|renderer, file?, css[]?, stage?, shape?, radius?, reveal?, duration?, nav?, rarity?, place?, alpha?, over?}` |
 | `economy` | proposed `{price, rarity, level, supply, collection, icon, repeatable, season, sold}` — no price: reward only; `sold: false`: offered to everyone (widgets, their looks and options) |
 | `payload` | per type (below) |
 | `palette` | palettes: `{dark: {accent, accentAlt, contrast}, light: {…}}` |
@@ -139,9 +139,19 @@ stays Portalab's; the cards and their rarities are always the ones the server dr
 | `booster_look` | `[data-booster-look="<look>"]` on the sealed pack | its dress **and its shape** (the strip is `.booster-pack__flap`, the emblem `.booster-pack__emblem`); a GLSL stage around it |
 | `booster_opening` | `[data-opening="<look>"]` while it opens | `duration` ≤ 4 s: **replaces** Portalab's tear (inflating then bursting, a lid swinging open…), and its duration is when the cards come; Portalab stills its strip, glow and rising cards meanwhile, the opening may bring them back with its own movement |
 | `card_face`, `card_back` | `[data-card-face]`, `[data-card-back]` | per rarity (`render.rarity`); the shape goes on `.booster-card__face` / `.booster-card__back`, never on `.booster-card__inner` (the part turning in 3D); face down, a card always wears the `common` back. A face or a back may also be **drawn by the GPU** (`kind: glsl`, a stage, with its `css`): drawn in `.booster-card__gpu`, over the card's panel and under its art and words, cut by its shape — the pack places it on its own hook (`[data-card-face="<look>"] .booster-card__gpu { inset: 13px; }`, inside a thick frame) |
-| `card_reveal` | `[data-reveal="<look>"]` | per rarity, a GLSL stage or a script, `duration` ≤ 3 s |
+| `card_reveal` | `[data-reveal="<look>"]` | per rarity, a GLSL stage, a script or a video, `duration` ≤ 3 s; a video reveal may bring a second video, `over`, played **over** the card (the first plays behind it) — an effect wrapping the card |
 
 A script part is told `{phase, rarity?, index?, count, reducedMotion}` — never a product's data.
+
+**Video parts** (`kind: video`, issue 287) — a backdrop, an opening or a reveal may be a video (`.mp4` or
+`.webm`, checked by its first bytes), muted and played in the part's layer — a backdrop over and over, an
+opening or a reveal once, from its start; preloaded with the scene, never played when motion is reduced. Its
+layer is sized and masked by the part's own stylesheet, like a GPU stage's. `alpha: stacked`: the picture in
+the upper half (premultiplied: black where it is transparent), its transparency in grey in the lower half
+(white: opaque) — Portalab puts them back together
+as it plays, so an H.264 MP4 (the one format every browser, Safari and phones included, plays on its hardware
+decoder) can be transparent: frame-by-frame animations weigh far less than sprite sheets, and only one frame
+is decoded at a time. `examples/visual-packs/tools/alpha_video.py` makes one from PNG frames (ffmpeg).
 
 ## Widgets
 
@@ -307,6 +317,9 @@ version; warnings are published knowingly; infos inform.
 | `theme.nav` | info | Navigation used: {nav}. |
 | `theme.unchecked` | blocking | The interface could not be checked. |
 | `theme.vocabulary` | blocking | An interface may rename only the navigation, page titles and value names ({keys}). |
+| `video.invalid` | blocking | {file} is not the video its name says. |
+| `video.kind` | blocking | The video {file} is neither an MP4 nor a WebM. |
+| `video.over_elsewhere` | blocking | Only a card's reveal plays a video over the card. |
 | `widget.contract_twice` | warning | A data contract is asked for twice. |
 | `widget.contracts_elsewhere` | blocking | Only a widget may ask for data contracts. |
 | `widget.empty` | blocking | What it says when empty: short texts (200 characters at most). |

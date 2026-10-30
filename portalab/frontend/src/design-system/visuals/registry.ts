@@ -13,6 +13,7 @@ import { guardedSheet } from "./cssGuard";
  *   contract as the built-in effects) or, for an ambience, run as a full-screen shader after ``COMMON``;
  * - ``js``: its module runs in a sandbox (``sandbox.ts``: an iframe of an opaque origin — no account, no
  *   network, no page of Portalab's), never in this page;
+ * - ``video``: a booster scene's part played as a video (``VideoLayer``, issue 287);
  * - ``theme``: an interface — its definition is served by the interfaces' registry, its stylesheets linked;
  * - ``renderer``: a renderer of Portalab's own, with the element's parameters (particles, weather…);
  * - ``data``: packs, boosters, palettes (their colours come with the element), titles and badges.
@@ -21,7 +22,7 @@ import { guardedSheet } from "./cssGuard";
  * administration's sandbox before it is validated — it wins over ``live`` while the sandbox is open).
  */
 
-export type ExternalKind = "css" | "glsl" | "js" | "theme" | "renderer" | "data" | "none";
+export type ExternalKind = "css" | "glsl" | "js" | "video" | "theme" | "renderer" | "data" | "none";
 export type Scope = "live" | "preview" | "scene";
 
 export interface NavPlace {
@@ -40,6 +41,10 @@ export interface ExternalElement {
   kind: ExternalKind;
   names: Record<string, string>;
   file: string | null;
+  /** issue 287: a reveal's video played over the card (``file`` plays behind it) */
+  over?: string | null;
+  /** issue 287: how a video holds its transparency (``stacked``: in its lower half) */
+  alpha?: "none" | "stacked" | null;
   css: string[];
   stage: boolean;
   shape: number;

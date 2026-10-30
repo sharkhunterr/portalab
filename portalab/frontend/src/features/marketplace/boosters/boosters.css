@@ -2170,6 +2170,10 @@
   height: 180%;
   z-index: 0;
 }
+/* issue 287: a reveal's second video, over the card */
+.booster-fx__scene[data-over] {
+  z-index: 3;
+}
 /* 028: a scene's own opening replaces Portalab's tear (the booster's shape and its way of opening are the
    scene's: inflating then bursting, melting, shattering…) */
 .booster-stage[data-own-opening][data-phase="tearing"] .booster-stage__tear,
