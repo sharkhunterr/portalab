@@ -18,7 +18,7 @@ test("keyboard-only: sign in, reach and change appearance settings", async ({ pa
   await page.keyboard.press("Control+k"); // command palette → appearance settings, keyboard only
   await page.keyboard.type("appear");
   await page.keyboard.press("Enter");
-  const theme = page.getByLabel("Theme", { exact: true });
+  const theme = page.getByLabel("Interface", { exact: true }); // the interface picker ('Dark' among them)
   await expect(theme).toBeVisible();
   for (let i = 0; i < 60 && !(await theme.evaluate((el) => el === document.activeElement)); i += 1) {
     await page.keyboard.press("Tab");
@@ -43,7 +43,9 @@ test("gallery: no focus trap, focus always visible, targets ≥ 24 px", async ({
     const info = await page.evaluate(() => {
       const el = document.activeElement as HTMLElement | null;
       if (!el || el === document.body) return null;
-      const box = el.getBoundingClientRect();
+      // a checkbox or a radio is a compact box whose whole row — box and label — is the target (kit.css)
+      const choice = el instanceof HTMLInputElement && (el.type === "checkbox" || el.type === "radio");
+      const box = ((choice && el.closest(".ds-check")) || el).getBoundingClientRect();
       const style = getComputedStyle(el);
       return {
         key: `${el.tagName}:${el.textContent?.slice(0, 20)}:${el.getAttribute("aria-label") ?? el.id}`,
