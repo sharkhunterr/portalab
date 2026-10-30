@@ -35,13 +35,14 @@ void main() {
 }`;
 // the picture from one half (premultiplied), its transparency from the other (``u_half``: where it starts — a
 // little margin: the video's limited range never quite reaches black; the picture never brighter than its
-// transparency allows)
+// transparency allows); ``u_cover``: the part of the picture its box shows, cropped to cover it (issue 290)
 const FRAGMENT = `precision mediump float;
 uniform sampler2D u_video;
 uniform vec2 u_half;
+uniform vec2 u_cover;
 varying vec2 v_uv;
 void main() {
-  vec2 at = v_uv * (vec2(1.0) - u_half);
+  vec2 at = (0.5 + (v_uv - 0.5) * u_cover) * (vec2(1.0) - u_half);
   vec3 color = texture2D(u_video, at).rgb;
   float alpha = clamp((texture2D(u_video, at + u_half).r - 0.03) / 0.94, 0.0, 1.0);
   gl_FragColor = vec4(min(color, vec3(alpha)), alpha);
@@ -85,6 +86,7 @@ function recompose(
   gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
   const side = alpha === "side";
   gl.uniform2f(gl.getUniformLocation(linked, "u_half"), side ? 0.5 : 0, side ? 0 : 0.5);
+  const cover = gl.getUniformLocation(linked, "u_cover");
   gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -95,13 +97,18 @@ function recompose(
   const draw = () => {
     if (stopped) return;
     if (video.readyState >= 2 && video.videoWidth) {
+      // the canvas its box's shape, no larger than the picture shown in it; the picture cropped to cover it
       const box = canvas.getBoundingClientRect();
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
-      const width = Math.max(2, Math.min(Math.round(box.width * ratio), video.videoWidth / (side ? 2 : 1)));
-      const height = Math.max(
-        2,
-        Math.min(Math.round(box.height * ratio), video.videoHeight / (side ? 1 : 2)),
-      );
+      const pictureW = video.videoWidth / (side ? 2 : 1);
+      const pictureH = video.videoHeight / (side ? 1 : 2);
+      const boxW = Math.max(1, box.width * ratio);
+      const boxH = Math.max(1, box.height * ratio);
+      const fit = Math.min(1, Math.max(pictureW / boxW, pictureH / boxH));
+      const width = Math.max(2, Math.round(boxW * fit));
+      const height = Math.max(2, Math.round(boxH * fit));
+      const shape = boxW / boxH / (pictureW / pictureH);
+      gl.uniform2f(cover, shape > 1 ? 1 : shape, shape > 1 ? 1 / shape : 1);
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;

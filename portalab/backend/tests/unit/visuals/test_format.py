@@ -327,3 +327,20 @@ def test_only_a_reveal_plays_a_video_over_the_card() -> None:
     files["elements/frame/o.mp4"] = MP4
     report = analyse(files_of(files))
     assert "video.over_elsewhere" in [i["code"] for i in report["items"] if i["level"] == "blocking"]
+
+
+def test_only_a_reveal_takes_the_whole_screen() -> None:
+    """Issue 290: a card's reveal over the whole screen (``place: screen``) — no other part."""
+    files = _reveal(place="screen")
+    report = analyse(files_of(files))
+    assert not [i for i in report["items"] if i["level"] == "blocking"]
+    assert report["elements"][0]["render"]["place"] == "screen"
+    files = tiny_pack(
+        type="booster_opening",
+        look="tiny",
+        economy={},
+        render={"kind": "video", "file": "o.mp4", "place": "screen", "duration": 2},
+    )
+    files["elements/frame/o.mp4"] = MP4
+    report = analyse(files_of(files))
+    assert "render.screen_elsewhere" in [i["code"] for i in report["items"] if i["level"] == "blocking"]

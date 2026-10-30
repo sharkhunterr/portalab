@@ -291,6 +291,8 @@ def _element(
         _glsl(report, key, element, source)
     if kind == "js" and main is not None:
         _js(report, key, source)
+    if element.render.place == "screen" and element.type != "card_reveal":
+        report.add("blocking", "render.screen_elsewhere", key)  # only a card's reveal takes the whole screen
     if kind == "video":
         _video(report, key, element, files, folder)
     elif element.render.over:

@@ -152,7 +152,9 @@ class Render(BaseModel):
     rarity: Literal["common", "rare", "epic", "legendary"] | None = None  # scene parts: the rarity it is for
     # a widget option's script: shown instead of the widget's content, drawn over it (animations), or in the
     # region the widget keeps for it (``stage``: the daily wheel's face; the widget keeps its texts, controls)
-    place: Literal["replace", "overlay", "stage"] | None = None
+    # issue 290: a card's reveal over the whole screen (``screen``): Portalab brings the card to the middle,
+    # big, its videos behind and over it, the rarity's name written by Portalab over them
+    place: Literal["replace", "overlay", "stage", "screen"] | None = None
     # issue 287: a video (a scene's backdrop plays it over and over, an opening or a reveal once) — its
     # transparency beside its picture (``side``: in its right half) or under it (``stacked``: its lower half),
     # in grey (white: opaque), which Portalab puts back together as it plays; ``over``: a reveal's second

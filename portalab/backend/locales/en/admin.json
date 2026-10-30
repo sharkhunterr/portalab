@@ -1873,6 +1873,7 @@
   "visuals.check.render.builtin_reserved": "Only Portalab's own packs may use its built-in renderer.",
   "visuals.check.render.kind": "A {type} cannot be drawn in {kind} (possible: {allowed}).",
   "visuals.check.render.no_file": "The {kind} rendering names no file.",
+  "visuals.check.render.screen_elsewhere": "Only a card's reveal may take the whole screen.",
   "visuals.check.video.kind": "The video {file} is neither an MP4 nor a WebM.",
   "visuals.check.video.invalid": "{file} is not the video its name says.",
   "visuals.check.video.over_elsewhere": "Only a card's reveal plays a video over the card.",

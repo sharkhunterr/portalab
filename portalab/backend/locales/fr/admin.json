@@ -1873,6 +1873,7 @@
   "visuals.check.render.builtin_reserved": "Seuls les packs de Portalab peuvent utiliser son rendu intégré.",
   "visuals.check.render.kind": "Un {type} ne peut pas être dessiné en {kind} (possible : {allowed}).",
   "visuals.check.render.no_file": "Le rendu {kind} n'indique pas son fichier.",
+  "visuals.check.render.screen_elsewhere": "Seule la révélation d'une carte peut occuper tout l'écran.",
   "visuals.check.video.kind": "La vidéo {file} n'est ni un MP4 ni un WebM.",
   "visuals.check.video.invalid": "{file} n'est pas la vidéo qu'annonce son nom.",
   "visuals.check.video.over_elsewhere": "Seule la révélation d'une carte joue une vidéo devant la carte.",
