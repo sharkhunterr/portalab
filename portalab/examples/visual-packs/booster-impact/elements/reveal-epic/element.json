@@ -2,12 +2,12 @@
   "type": "card_reveal",
   "look": "impact-epic",
   "names": {
-    "fr": "Coup de pinceau",
-    "en": "Brush slash"
+    "fr": "Rayons encrés",
+    "en": "Inked rays"
   },
   "descriptions": {
-    "fr": "Deux coups de pinceau blancs, une explosion rose, des étincelles et un viseur qui s'allume.",
-    "en": "Two white brush slashes, a pink burst, sparks and a crosshair lighting up."
+    "fr": "Des rayons roses et blancs cernés d'encre éclatent derrière elle, des étoiles encrées s'envolent, un viseur s'allume à son coin.",
+    "en": "Inked pink and white rays burst behind it, inked four-pointed sparks fly off, a crosshair snaps on at its corner."
   },
   "render": {
     "kind": "glsl",

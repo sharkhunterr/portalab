@@ -2,19 +2,17 @@
   "type": "booster_look",
   "look": "impact",
   "names": {
-    "fr": "Paquet néon",
-    "en": "Neon pack"
+    "fr": "Paquet comics",
+    "en": "Comic pack"
   },
   "descriptions": {
-    "fr": "Un paquet violet et magenta cerné de néon rose, son emblème qui brille, une trame et des éclats ; il respire en attendant d'être ouvert, des étoiles scintillent autour (HD).",
-    "en": "A violet and magenta pack edged with pink neon, its emblem glowing, halftone and glints; it breathes while it waits to be opened, stars twinkling around it (HD)."
+    "fr": "Un paquet façon comics : aplats violets en bandes de cel-shading sous des tags graffiti et une trame, un épais trait d'encre autour d'un liseré néon rose, une ombre portée nette ; l'image de l'œuvre dans une case encrée, penchée ; son nom en lettres BD cernées ; le nombre de cartes sur un autocollant ; un éclat qui scintille à son coin et un double battement de cœur.",
+    "en": "A comic-style pack: flat violet in hard cel bands under graffiti doodles and halftone, a thick ink line round a neon pink rim, a hard drop shadow; the work's art in an inked panel, tilted; its name in outlined comic letters; the card count on a sticker; a glint flaring at its corner and a double heartbeat."
   },
   "render": {
-    "kind": "glsl",
-    "file": "aura.glsl",
+    "kind": "css",
     "css": [
       "pack.css"
-    ],
-    "stage": true
+    ]
   }
 }

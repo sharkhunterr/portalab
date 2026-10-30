@@ -30,12 +30,14 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   (a scrolling pixel world, a cartridge, a console powering on, pixel coins and fireworks) and **a cyberpunk
   megacity in the rain** (holograms, flying cars, a data shard hacked, its ICE shattering, neon arcs). Every
   scene's effects fade out inside an ellipse of their layer, so its box never shows.
-- `booster-impact/` (`impact`): **an animated trading-card game's opening** — a black stage of pink and white
-  speed lines, halftone corners and twinkling four-pointed stars; a violet pack edged with neon that spins in a
-  pink manga burst, cut by white brush slashes, and bursts in a white flash; a comic face per rarity over the
-  media cards (an outlined Bangers title, a rim per rarity, a rainbow holographic film from rare up, steady green
-  energy round epic and legendary cards) and GPU reveals — a pink burst, an X of brush slashes with sparks, and
-  for a legendary a wall of binary digits, green flames licking its edges and a huge four-pointed glint;
+- `booster-impact/` (`impact`): **an animated trading-card game's opening, drawn as a comic** — inked
+  outlines, flat cel colours, halftone and hard edges everywhere (SVG shapes animated frame by frame, and
+  hard-edged shaders): speed lines and halftone corners on black; a pack in flat violet with graffiti
+  doodles, its art in an inked panel, spinning in crackling pink lightning and inked manga rays, cut by two
+  huge white brush slashes, bursting in a white comic explosion that dissolves into halftone; media cards with
+  a yellow comic title rimmed in red and ink, sticker badges and a holographic film in hard bands — a halftone
+  shockwave for a rare, inked rays, lightning and a brush slash for an epic, and for a legendary a slab on a
+  lime wall of binary digits wrapped in dripping green goo with cel-shaded toxic flames;
 - `rouages/`, `ruee-vers-l-or/`, `olympe/`: **three complete universes**, each one pack of every kind of look a
   member wears (no messenger bubble): an interface (colours, fonts, layout, sounds, its own words — « L'atelier »,
   « Le saloon », « Le temple »…; Olympe is a light one, on marble), a palette, a GPU ambience and profile

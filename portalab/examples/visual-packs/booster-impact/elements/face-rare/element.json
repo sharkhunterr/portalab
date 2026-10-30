@@ -6,8 +6,8 @@
     "en": "Rare face"
   },
   "descriptions": {
-    "fr": "Un cadre cyan, le titre cerné, une holographie arc-en-ciel qui glisse sur la carte.",
-    "en": "A cyan frame, the outlined title, a rainbow holographic film sliding over the card."
+    "fr": "Un liseré cyan, une holographie en bandes arc-en-ciel nettes ; en se retournant, une explosion manga encrée jaillit derrière elle.",
+    "en": "A cyan rim, a holographic film in hard rainbow bands; as it turns, an inked manga burst shoots out behind it."
   },
   "render": {
     "kind": "css",

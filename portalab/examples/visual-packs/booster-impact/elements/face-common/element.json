@@ -6,8 +6,8 @@
     "en": "Common face"
   },
   "descriptions": {
-    "fr": "Un cadre BD net, le titre en lettres cernées, une trame discrète.",
-    "en": "A clean comic frame, the title in outlined letters, a light halftone."
+    "fr": "Encrée tout autour, un liseré pâle en aplats, le papier tramé, un titre BD jaune bordé de rouge et de noir, des pastilles autocollants.",
+    "en": "Inked all round, a pale rim in flat cel bands, the halftoned paper, a yellow comic title rimmed with red and ink, sticker badges."
   },
   "render": {
     "kind": "css",
