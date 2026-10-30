@@ -69,7 +69,7 @@ A visual pack brings looks from outside: an interface (possibly with its own nav
 Three **Sources**:
 
 - the **Inbox**: drop folders or `.zip` files in the inbox folder on the server, then **Read the inbox**;
-- **Upload a .zip** (20 MB at most);
+- **Upload a .zip** (40 MB at most);
 - **From GitHub**: a repository's address; its latest release (or default branch) is imported. **Check for updates** compares versions and never installs on its own.
 
 ### The six steps

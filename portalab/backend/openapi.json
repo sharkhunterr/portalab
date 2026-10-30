@@ -34964,7 +34964,7 @@
     },
     "/api/v1/admin/visuals/upload": {
       "post": {
-        "description": "A raw ``application/zip`` body (no multipart), 20 MB at most.",
+        "description": "A raw ``application/zip`` body (no multipart), 40 MB at most.",
         "operationId": "upload_api_v1_admin_visuals_upload_post",
         "parameters": [
           {

@@ -472,7 +472,7 @@
   "extensions.importVisuals": "Bring visual packs in: from the inbox folder, a .zip, or a GitHub repository. Each version is then analysed, tried and reviewed before anyone sees it.",
   "extensions.importWidgets": "Widgets come in visual packs: import one here — new widgets, looks for widgets, options.",
   "extensions.updatesHint": "New versions on GitHub",
-  "extensions.zipHint": "A pack's archive, 20 MB at most",
+  "extensions.zipHint": "A pack's archive, 40 MB at most",
   "logs.allProcesses": "Server and worker",
   "logs.allSources": "All sources",
   "logs.at": "Time",

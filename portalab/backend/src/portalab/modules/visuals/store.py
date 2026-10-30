@@ -19,7 +19,7 @@ import zipfile
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
-MAX_BYTES = 20 * 1024 * 1024
+MAX_BYTES = 40 * 1024 * 1024
 MAX_FILES = 400
 MAX_FILE_BYTES = 5 * 1024 * 1024
 MAX_PATH = 200

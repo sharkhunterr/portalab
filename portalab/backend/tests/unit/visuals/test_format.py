@@ -16,7 +16,15 @@ from portalab.modules.visuals.analysis import (
 )
 from portalab.modules.visuals.github import GitHub, GitHubError, parse_address
 from portalab.modules.visuals.manifest import parse_element, version_key
-from portalab.modules.visuals.store import MAX_FILE_BYTES, Files, PackageError, Store, read_source, read_zip
+from portalab.modules.visuals.store import (
+    MAX_BYTES,
+    MAX_FILE_BYTES,
+    Files,
+    PackageError,
+    Store,
+    read_source,
+    read_zip,
+)
 from tests.unit.visuals.support import FakeInterfaces, files_of, tiny_pack, zip_of
 
 EXAMPLES = Path(__file__).resolve().parents[4] / "examples" / "visual-packs"
@@ -172,7 +180,7 @@ async def test_github_never_follows_a_redirect_elsewhere() -> None:
 
 async def test_an_answer_too_large_is_cut() -> None:
     def answer(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, content=b"0" * (21 * 1024 * 1024))
+        return httpx.Response(200, content=b"0" * (MAX_BYTES + 1))
 
     github = GitHub(httpx.AsyncClient(transport=httpx.MockTransport(answer)))
     with pytest.raises(PackageError):

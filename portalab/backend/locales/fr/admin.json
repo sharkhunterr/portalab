@@ -472,7 +472,7 @@
   "extensions.importVisuals": "Faites entrer des packs visuels : depuis le dossier d'arrivée, un .zip ou un dépôt GitHub. Chaque version est ensuite analysée, essayée et revue avant que quiconque la voie.",
   "extensions.importWidgets": "Les widgets arrivent dans des packs visuels : importez-en un ici — nouveaux widgets, visuels de widgets, options.",
   "extensions.updatesHint": "Nouvelles versions sur GitHub",
-  "extensions.zipHint": "L'archive d'un pack, 20 Mo au plus",
+  "extensions.zipHint": "L'archive d'un pack, 40 Mo au plus",
   "logs.allProcesses": "Serveur et worker",
   "logs.allSources": "Toutes les sources",
   "logs.at": "Heure",

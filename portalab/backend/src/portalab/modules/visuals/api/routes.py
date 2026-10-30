@@ -25,6 +25,7 @@ from portalab.modules.visuals.module import VisualsModule
 from portalab.modules.visuals.sandbox import DOCUMENT
 from portalab.modules.visuals.sandbox import HEADERS as SANDBOX_HEADERS
 from portalab.modules.visuals.service import VisualPacks
+from portalab.modules.visuals.store import MAX_BYTES
 
 members = APIRouter(prefix="/api/v1", tags=["visuals"])
 admin = APIRouter(prefix="/api/v1", tags=["visuals"])
@@ -255,12 +256,15 @@ async def scan(principal: Manager, packs: Packs) -> dict[str, Any]:
 async def upload(
     principal: Manager, packs: Packs, request: Request, filename: Annotated[str, Query(max_length=120)]
 ) -> dict[str, Any]:
-    """A raw ``application/zip`` body (no multipart), 20 MB at most."""
+    """A raw ``application/zip`` body (no multipart), 40 MB at most."""
     body = bytearray()
     async for chunk in request.stream():
         body.extend(chunk)
-        if len(body) > 20 * 1024 * 1024:
-            raise ValidationFailed("The pack is too large (20 MB at most).", code="ui.visual_pack_invalid")
+        if len(body) > MAX_BYTES:
+            raise ValidationFailed(
+                f"The pack is too large ({MAX_BYTES // 1024 // 1024} MB at most).",
+                code="ui.visual_pack_invalid",
+            )
     if not body:
         raise ValidationFailed("Send a .zip pack.", code="ui.visual_pack_invalid")
     imported = await packs.upload(filename, bytes(body), principal)
