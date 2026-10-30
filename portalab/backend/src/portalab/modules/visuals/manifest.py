@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 
 KEY = re.compile(r"^[a-z0-9][a-z0-9_-]{0,47}$")
 RARITIES = ("common", "rare", "epic", "legendary")
-RenderKind = Literal["css", "glsl", "js", "theme", "data", "renderer", "none"]  # ``none``: ``data``
+RenderKind = Literal["css", "glsl", "js", "video", "theme", "data", "renderer", "none"]  # ``none``: ``data``
 
 # what each type of element may be drawn with, and the prefix of its product key
 TYPES: dict[str, tuple[frozenset[str], str]] = {
@@ -41,9 +41,9 @@ TYPES: dict[str, tuple[frozenset[str], str]] = {
     "booster_scene": (frozenset({"data"}), "scene"),
     "booster_look": (frozenset({"css", "glsl"}), "booster_look"),
     # the stage's animated background
-    "booster_backdrop": (frozenset({"css", "glsl", "js"}), "booster_backdrop"),
-    "booster_opening": (frozenset({"css", "glsl", "js"}), "booster_opening"),
-    "card_reveal": (frozenset({"css", "glsl", "js"}), "card_reveal"),
+    "booster_backdrop": (frozenset({"css", "glsl", "js", "video"}), "booster_backdrop"),
+    "booster_opening": (frozenset({"css", "glsl", "js", "video"}), "booster_opening"),
+    "card_reveal": (frozenset({"css", "glsl", "js", "video"}), "card_reveal"),
     "card_face": (frozenset({"css", "glsl"}), "card_face"),
     "card_back": (frozenset({"css", "glsl"}), "card_back"),
     # issue 233: an edition's frame for the media cards (its look ``edition-<edition>``: the cards of that
@@ -135,7 +135,7 @@ class NavLayout(BaseModel):
 class Render(BaseModel):
     model_config = ConfigDict(extra="forbid")
     kind: RenderKind = "data"
-    file: str | None = None  # the GLSL fragment or the JS module
+    file: str | None = None  # the GLSL fragment, the JS module or the video
     css: list[str] = Field(default_factory=list)  # stylesheets (fonts declared in them, relative URLs)
     stage: bool = False  # GLSL: drawn over the whole stage (level-ups, celebrations) rather than a shape
     # GLSL: 0 rounded box, 1 hexagon, 2 diamond, 3 shield, 4 star, 5 triangle (frames); 6 pointed ends,
@@ -153,6 +153,12 @@ class Render(BaseModel):
     # a widget option's script: shown instead of the widget's content, drawn over it (animations), or in the
     # region the widget keeps for it (``stage``: the daily wheel's face; the widget keeps its texts, controls)
     place: Literal["replace", "overlay", "stage"] | None = None
+    # issue 287: a video (a scene's backdrop plays it over and over, an opening or a reveal once) —
+    # ``stacked``: its upper half the picture, its lower half the transparency in grey (white: opaque), which
+    # Portalab puts back together as it plays; ``over``: a reveal's second video, played over the card (the
+    # first plays behind it)
+    alpha: Literal["none", "stacked"] = "none"
+    over: str | None = None
 
     @field_validator("kind")
     @classmethod
@@ -219,7 +225,7 @@ class Element(BaseModel):
         return not self.free and self.type not in NOT_SOLD
 
     def files(self) -> list[str]:
-        return [f for f in (self.render.file, *self.render.css, self.preview) if f]
+        return [f for f in (self.render.file, self.render.over, *self.render.css, self.preview) if f]
 
 
 class Pack(BaseModel):

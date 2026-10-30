@@ -269,3 +269,60 @@ def test_an_interface_naming_a_navigation_nobody_brings_is_refused(tmp_path: Pat
 )
 def test_an_interface_renames_its_navigation_and_titles_only(key: str, ok: bool) -> None:
     assert vocabulary_key_ok(key) is ok
+
+
+MP4 = b"\x00\x00\x00\x20ftypisom\x00\x00\x02\x00isomiso2avc1mp41"
+
+
+def _reveal(**render: Any) -> dict[str, bytes | str]:
+    files = tiny_pack(
+        type="card_reveal",
+        look="tiny-rare",
+        economy={},
+        render={"kind": "video", "file": "behind.mp4", "alpha": "stacked", "rarity": "rare", **render},
+    )
+    files["elements/frame/behind.mp4"] = MP4
+    return files
+
+
+def test_a_reveal_plays_a_video_behind_the_card_and_another_over_it() -> None:
+    """Issue 287: a video part — MP4 or WebM, really one, its second video over the card a reveal's only."""
+    files = _reveal(over="over.mp4")
+    files["elements/frame/over.mp4"] = MP4
+    report = analyse(files_of(files))
+    assert not [i for i in report["items"] if i["level"] == "blocking"]
+    element = report["elements"][0]
+    assert element["hd"] and element["render"]["over"] == "over.mp4" and "over.mp4" in element["folder_files"]
+
+
+@pytest.mark.parametrize(
+    ("change", "code"),
+    [
+        ({"file": "behind.gif"}, "video.kind"),  # not a video
+        ({"file": None}, "render.no_file"),
+    ],
+)
+def test_a_video_part_names_a_video(change: dict[str, Any], code: str) -> None:
+    files = _reveal(**change)
+    files["elements/frame/behind.gif"] = b"GIF89a"
+    report = analyse(files_of(files))
+    assert code in [i["code"] for i in report["items"] if i["level"] == "blocking"]
+
+
+def test_a_video_is_what_its_name_says() -> None:
+    files = _reveal()
+    files["elements/frame/behind.mp4"] = b"<html>not a video</html>"
+    report = analyse(files_of(files))
+    assert "video.invalid" in [i["code"] for i in report["items"] if i["level"] == "blocking"]
+
+
+def test_only_a_reveal_plays_a_video_over_the_card() -> None:
+    files = tiny_pack(
+        type="booster_opening",
+        look="tiny",
+        economy={},
+        render={"kind": "video", "file": "o.mp4", "over": "o.mp4", "duration": 2},
+    )
+    files["elements/frame/o.mp4"] = MP4
+    report = analyse(files_of(files))
+    assert "video.over_elsewhere" in [i["code"] for i in report["items"] if i["level"] == "blocking"]
