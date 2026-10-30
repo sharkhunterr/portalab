@@ -2412,7 +2412,7 @@
   z-index: 4;
   /* its slant: a little, on a wide screen; steep, along its height, on one held upright */
   --word-turn: -14deg;
-  font-size: min(13vw, 24vh);
+  font-size: min(16vw, 28vh);
   font-weight: 900;
   font-style: italic;
   line-height: 1;
@@ -2434,19 +2434,23 @@
   --word-turn: -14deg;
   font-size: clamp(2.6rem, 11vw, 6rem);
 }
+/* slammed in, then drifting slowly as a camera closing in, cut as the card comes */
 @keyframes booster-takeover-word {
   0% {
     opacity: 0;
-    transform: rotate(var(--word-turn)) translateX(-70%) scale(1.6);
+    transform: rotate(var(--word-turn)) scale(1.9);
   }
-  22%,
-  78% {
+  14% {
     opacity: 1;
-    transform: rotate(var(--word-turn)) translateX(0) scale(1);
+    transform: rotate(var(--word-turn)) scale(1);
+  }
+  92% {
+    opacity: 1;
+    transform: rotate(var(--word-turn)) translateX(-5%) scale(1.12);
   }
   100% {
     opacity: 0;
-    transform: rotate(var(--word-turn)) translateX(45%) scale(1.15);
+    transform: rotate(var(--word-turn)) translateX(-6%) scale(1.14);
   }
 }
 @media (prefers-reduced-motion: reduce) {

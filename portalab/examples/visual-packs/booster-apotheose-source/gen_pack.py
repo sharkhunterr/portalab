@@ -241,9 +241,9 @@ def face(rarity):
 
 
 WORD = {
-    "rare": "color: #ffffff;\n  -webkit-text-stroke: 0.5rem #0b2a5e;\n  paint-order: stroke fill;\n  text-shadow: 0.6rem 0.6rem 0 #0b2a5e;",
-    "epic": "color: #ffffff;\n  -webkit-text-stroke: 0.55rem #14081f;\n  paint-order: stroke fill;\n  text-shadow: 0.6rem 0.6rem 0 #14081f;",
-    "legendary": "color: #1a0904;\n  -webkit-text-stroke: 0.3rem #ffe08a;\n  paint-order: stroke fill;\n  text-shadow: 0.5rem 0.5rem 0 #ffd23e, 1rem 1rem 0 #1a0904;",
+    "rare": "color: #ffffff;\n  -webkit-text-stroke: 0.35rem #06122e;\n  paint-order: stroke fill;",
+    "epic": "color: #ffffff;\n  -webkit-text-stroke: 0.35rem #14081f;\n  paint-order: stroke fill;",
+    "legendary": "color: #2a0806;\n  -webkit-text-stroke: 0.18rem #ffb04a;\n  paint-order: stroke fill;",
 }
 DESCRIPTIONS = {
     "rare": ("Éclat cyan", "Cyan burst", "Plein écran, joué en vidéo : d'abord RARE en lettres géantes (écrit par Portalab) sur un écran cyan balafré d'encre et d'éclairs ; puis la carte arrive de dos dans une explosion de rayons cyan et blancs, se retourne dans un éclair, une couronne blanche déchiquetée autour d'elle, des étincelles.",
@@ -340,7 +340,7 @@ def main():
         "payload": {"parts": {"booster_look": "look-apotheose", "backdrop": "backdrop-apotheose", "opening": "opening-apotheose", "back": {"common": "back-apotheose"},
                               "face": {r: f"face-{r}" for r in RARITY}, "reveal": {r: f"reveal-{r}" for r in ("rare", "epic", "legendary")}}}}, ensure_ascii=False, indent=2) + "\n")
     (PACK / "pack.json").write_text(json.dumps({
-        "format": 1, "id": "apotheose", "version": "1.1.0",
+        "format": 1, "id": "apotheose", "version": "1.2.0",
         "names": {"fr": "Apothéose — la rareté en plein écran", "en": "Apothéose — rarity over the whole screen"},
         "descriptions": {"fr": "Une ouverture de booster où chaque rareté prend tout l'écran, comme dans un jeu de cartes animé : la carte vient au centre, en grand, entre deux vidéos — derrière elle, l'écran qui explose de pointes cyan, roses ou orange et or ; devant elle, des coups de pinceau de lumière, des éclairs et des étincelles — et Portalab écrit la rareté en grandes lettres BD. Un paquet violet aux néons tranché par un faisceau de lumière, des cartes cadrées de néon, une scène de néons en vidéo en boucle.",
                          "en": "A booster opening where every rarity takes the whole screen, like an animated card game's: the card comes to the middle, big, between two videos — behind it the screen exploding in cyan, pink or orange and gold spikes; over it slashes of light, lightning and sparks — and Portalab writes the rarity in big comic letters. A neon violet pack sliced by a beam of light, neon-framed cards, a neon stage as a looping video."},
