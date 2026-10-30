@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "impact-rare",
+  "names": {
+    "fr": "Éclat rose",
+    "en": "Pink burst"
+  },
+  "descriptions": {
+    "fr": "Derrière la carte, une explosion de rayons roses et une onde.",
+    "en": "Behind the card, a burst of pink rays and a shockwave."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

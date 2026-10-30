@@ -1,0 +1,21 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening): the pack spins faster and faster in
+   its burst, glowing pink, swells and bursts in white at 1.9 s — the cards come out of the flash. */
+[data-opening="impact"] .booster-stage__tear .booster-pack {
+  animation: impact-spin 2.6s cubic-bezier(0.55, 0, 0.35, 1) both;
+}
+@keyframes impact-spin {
+  0% { transform: rotateY(0deg) scale(1); filter: none; opacity: 1; }
+  45% { transform: rotateY(720deg) scale(1.08); filter: drop-shadow(0 0 1rem #ff2f9a); }
+  68% { transform: rotateY(1440deg) scale(1.2); filter: drop-shadow(0 0 1.8rem #ff2f9a) brightness(1.4); opacity: 1; }
+  73% { transform: rotateY(1530deg) scale(1.32); filter: brightness(3); opacity: 1; }
+  77%, 100% { transform: rotateY(1560deg) scale(1.5); filter: brightness(4); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="impact"] .booster-stage__tear .booster-pack {
+    animation: impact-fade 2.6s linear both;
+  }
+}
+@keyframes impact-fade {
+  0%, 70% { opacity: 1; }
+  80%, 100% { opacity: 0; }
+}

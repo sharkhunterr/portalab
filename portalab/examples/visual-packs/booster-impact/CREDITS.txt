@@ -1,0 +1,4 @@
+Impact — an example booster scene for Portalab (CC0-1.0), every shader and stylesheet original.
+
+Font: Bangers by Vernon Adams — SIL Open Font License 1.1 (https://openfontlicense.org), from
+@fontsource/bangers; embedded unmodified in each card face as Bangers.woff2.

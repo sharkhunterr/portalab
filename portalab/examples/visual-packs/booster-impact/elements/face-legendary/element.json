@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "impact-legendary",
+  "names": {
+    "fr": "Face légendaire",
+    "en": "Legendary face"
+  },
+  "descriptions": {
+    "fr": "Un cadre or et vert : l'énergie qui crépite tout autour, une holographie intense, des paillettes, un grand éclat qui traverse la carte et le titre qui pulse (HD).",
+    "en": "A gold and green frame: energy crackling all around, an intense holographic film, glitter, a great glint crossing the card and the title pulsing (HD)."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}
