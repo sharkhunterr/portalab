@@ -1,0 +1,88 @@
+/* The sealed pack (its hook: data-booster-look): deep violet foil crossed by neon bands in pink, cyan and gold,
+   a gem-cut star burst, the work's art in a slanted window, its name in big comic letters, the card count on a
+   gold tag; a sweep of light now and then. */
+@font-face {
+  font-family: "Apotheose Bangers";
+  src: url("Bangers.woff2") format("woff2");
+  font-display: swap;
+}
+[data-booster-look="apotheose"] .booster-pack {
+  border-radius: 0.6rem;
+  background:
+    linear-gradient(118deg, transparent 0 58%, #ff2d78 58% 61%, transparent 61% 64%, #25c6f2 64% 66%, transparent 66% 69%, #ffd23e 69% 70.5%, transparent 70.5%),
+    radial-gradient(circle at 30% 20%, rgba(255, 45, 120, 0.45), transparent 55%),
+    linear-gradient(165deg, #5a1aa8, #2a0a5a 60%, #14081f);
+  box-shadow: inset 0 0 0 3px #14081f, inset 0 0 0 6px #ff2d78, inset 0 0 0 8px #14081f, 0 1rem 2rem rgba(0, 0, 0, 0.55), 0 0 1.6rem rgba(255, 45, 120, 0.35);
+}
+[data-booster-look="apotheose"] .booster-pack__art {
+  inset: 13% 10% 33%;
+  inline-size: 80%;
+  block-size: 54%;
+  border: 4px solid #14081f;
+  border-radius: 0.3rem;
+  box-shadow: 6px 6px 0 #25c6f2, 6px 6px 0 3px #14081f;
+  clip-path: polygon(0 4%, 100% 0, 100% 96%, 0 100%);
+  mask: none;
+  filter: saturate(1.25) contrast(1.06);
+}
+[data-booster-look="apotheose"] .booster-pack__foil {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.55) 48%, transparent 56%) -160% 0 / 200% 100% no-repeat;
+  animation: apotheose-sweep 3.6s ease-in-out infinite;
+}
+@keyframes apotheose-sweep {
+  0%, 55% { background-position: -160% 0; }
+  85%, 100% { background-position: 260% 0; }
+}
+[data-booster-look="apotheose"] .booster-pack__stars {
+  opacity: 0;
+}
+[data-booster-look="apotheose"] .booster-pack__flap {
+  border: 0;
+  background: repeating-linear-gradient(135deg, #ffd23e 0 8px, #14081f 8px 16px);
+  box-shadow: inset 0 -3px 0 #14081f;
+}
+[data-booster-look="apotheose"] .booster-pack__emblem {
+  inline-size: 64%;
+  aspect-ratio: 1;
+  background: url("emblem.svg") center / contain no-repeat;
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-booster-look="apotheose"] .booster-pack__emblem svg {
+  opacity: 0;
+}
+[data-booster-look="apotheose"] .booster-pack__name {
+  inset: auto 3% 11%;
+  font-family: "Apotheose Bangers", sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: #ffffff;
+  -webkit-text-stroke: 5px #14081f;
+  paint-order: stroke fill;
+  text-shadow: 3px 4px 0 #ff2d78, 5px 6px 0 #14081f;
+  rotate: -4deg;
+}
+[data-booster-look="apotheose"] .booster-pack__subtitle {
+  inset: auto 4% 4%;
+  color: #e8dcff;
+}
+[data-booster-look="apotheose"] .booster-pack__count {
+  inset: 0.5rem 0.5rem auto auto;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.3rem;
+  background: #ffd23e;
+  color: #14081f;
+  font-family: "Apotheose Bangers", sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  box-shadow: 0 0 0 3px #14081f, 3px 3px 0 3px #14081f;
+  rotate: 6deg;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="apotheose"] .booster-pack__foil {
+    animation: none;
+  }
+}

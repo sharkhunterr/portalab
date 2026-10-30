@@ -60,6 +60,12 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   techniques** — a smoke bomb, shuriken, kunai and blue lightning, a fire dragon summoned; **giant robots** — a
   HUD locking on, steam, armour flying off, a missile salvo, wings of energy. Each pack goes its own way:
   exploding, imploding, vanishing in smoke, shutting off like a screen;
+- `booster-apotheose/` (`apotheose`): **every rarity staged over the whole screen** (`place: screen`, sources in
+  `booster-apotheose-source/`, on the manga toolkit): the card brought to the middle, big, between two square
+  videos cropped to cover any screen — behind it the screen exploding in cyan, pink or orange and gold spikes
+  (orange bands cracked with lightning first, for a legendary); over it slashes of light, lightning and sparks —
+  and the rarity's name, written by Portalab, slammed across the screen first in big comic letters; a neon
+  violet pack sliced by a beam of light; neon-framed cards; a neon stage as a looping video;
 - `booster-sumi/` (`sumi`): **an opening in ink and gold, like Japanese lacquerware** — every animation drawn
   frame by frame in EffectCraft at 24 fps with a brush of bristles that lands heavy and runs dry, played as
   transparent videos (sources and `build.sh` in `booster-sumi-source/`), on a stage of black urushi lacquer where gold seigaiha waves rise and gold

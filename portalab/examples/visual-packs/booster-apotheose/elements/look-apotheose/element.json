@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "apotheose",
+  "names": {
+    "fr": "Paquet néon",
+    "en": "Neon pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet violet profond traversé de bandes néon rose, cyan et or, une étoile taillée comme une gemme, l'image de l'œuvre dans une fenêtre penchée, son nom en grandes lettres BD, le nombre de cartes sur une étiquette dorée.",
+    "en": "A deep violet pack crossed by pink, cyan and gold neon bands, a gem-cut star burst, the work's art in a slanted window, its name in big comic letters, the card count on a gold tag."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

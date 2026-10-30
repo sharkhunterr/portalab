@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "apotheose",
+  "names": {
+    "fr": "Scène Apothéose",
+    "en": "Apothéose scene"
+  },
+  "descriptions": {
+    "fr": "Chaque rareté mise en scène sur tout l'écran. Les cartes tirées, leurs raretés et leurs noms restent ceux de Portalab.",
+    "en": "Every rarity staged over the whole screen. The cards drawn, their rarities and names stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-apotheose",
+      "backdrop": "backdrop-apotheose",
+      "opening": "opening-apotheose",
+      "back": {
+        "common": "back-apotheose"
+      },
+      "face": {
+        "common": "face-common",
+        "rare": "face-rare",
+        "epic": "face-epic",
+        "legendary": "face-legendary"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

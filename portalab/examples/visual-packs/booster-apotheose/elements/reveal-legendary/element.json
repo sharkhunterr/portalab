@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "apotheose-legendary",
+  "names": {
+    "fr": "Apothéose",
+    "en": "Apotheosis"
+  },
+  "descriptions": {
+    "fr": "Plein écran, joué en vidéo : des bandes orange et or balaient l'écran, fendues d'éclairs blancs, puis un éclair, et des pointes orange et or qui tournent, des rayons, des anneaux de lumière ; la carte au centre, en grand, tranchée de lumière, des éclairs dorés le long de ses bords, deux grands éclats ; LÉGENDAIRE, écrit par Portalab sur une bande orange.",
+    "en": "Full screen, played as video: orange and gold bands sweep the screen, cracked with white lightning, then a flash, and orange and gold spikes turning, rays, rings of light; the card in the middle, big, cut by light, gold lightning along its edges, two great glints; LEGENDARY, written by Portalab on an orange band."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.0,
+    "rarity": "legendary"
+  }
+}

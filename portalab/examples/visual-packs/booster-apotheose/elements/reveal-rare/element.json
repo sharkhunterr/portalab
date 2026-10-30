@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "apotheose-rare",
+  "names": {
+    "fr": "Éclat cyan",
+    "en": "Cyan burst"
+  },
+  "descriptions": {
+    "fr": "Plein écran, joué en vidéo : un éclair cyan, des pointes cyan et blanches qui tournent sur un bleu profond, un anneau de lumière ; la carte au centre, en grand, traversée d'un trait blanc, des étincelles projetées ; RARE, écrit par Portalab, en lettres BD.",
+    "en": "Full screen, played as video: a cyan flash, cyan and white spikes turning over deep blue, a ring of light; the card in the middle, big, crossed by a white streak, sparks thrown off; RARE, written by Portalab, in comic letters."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

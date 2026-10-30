@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "apotheose",
+  "names": {
+    "fr": "Tranché de lumière",
+    "en": "Sliced by light"
+  },
+  "descriptions": {
+    "fr": "Dessinée dans EffectCraft, jouée en vidéo : le paquet s'élève, la lumière fuit par ses bords ; un faisceau de lumière s'abat et le tranche, des flammes roses lèchent la coupure, le paquet se replie dans la fente et disparaît ; un éclair blanc, puis une explosion de pointes roses, blanches et violettes et des étincelles.",
+    "en": "Drawn in EffectCraft, played as a video: the pack lifts, light leaking from its edges; a beam of light strikes down and slices it, pink flames licking the cut, the pack folds into the slit and is gone; a white flash, then a burst of pink, white and violet spikes and sparks."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

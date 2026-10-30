@@ -1,0 +1,25 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: the pack lifts, light leaking from its seams; a beam of light strikes down through it and slices
+   it — the pack folds into the cut and is gone; a white flash, then a burst of pink, white and violet spikes,
+   glints flying. The cards come out of it. */
+[data-opening="apotheose"] .booster-stage__tear .booster-pack {
+  animation: apotheose-slice 2.6s linear both;
+}
+@keyframes apotheose-slice {
+  0% { transform: none; clip-path: inset(0 0 0 0); filter: none; }
+  15% { transform: translateY(-10px) scale(1.03); filter: brightness(1.15); }
+  38% { transform: translateY(-14px) scale(1.05); clip-path: inset(0 0 0 0); filter: brightness(1.5); }
+  46% { transform: translateY(-14px) scale(1.05); clip-path: inset(0 49% 0 49%); filter: brightness(3); }
+  48%, 100% { transform: translateY(-14px) scale(1.05); clip-path: inset(0 50% 0 50%); filter: brightness(3); }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="apotheose"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="apotheose"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

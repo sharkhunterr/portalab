@@ -1,0 +1,83 @@
+/* A epic card (its hook: the card once turned, data-card-face): a frame in the rarity's neon over deep violet,
+   neon bands on a slant, comic lettering outlined in ink. The face turns in 3D: never its transform; a turned
+   media card is never redrawn. */
+@font-face {
+  font-family: "Apotheose Bangers";
+  src: url("Bangers.woff2") format("woff2");
+  font-display: swap;
+}
+[data-card-face="apotheose-epic"] .mcard__card {
+  padding: 3cqi;
+  border-radius: 2.6cqi;
+  background:
+    linear-gradient(118deg, transparent 0 62%, #ff2d78 62% 65%, transparent 65% 68%, #ffa8d0 68% 69.5%, transparent 69.5%),
+    linear-gradient(160deg, #ffa8d0, #ff2d78 40%, #8c0f4a);
+  box-shadow: 0 0 0 0.8cqi #14081f, 0 0 3cqi #ff2d78;
+}
+[data-card-face="apotheose-epic"] .mcard__body {
+  border-radius: 1.8cqi;
+  background: linear-gradient(170deg, #2a1050, #14081f);
+  box-shadow: inset 0 0 0 0.6cqi #14081f;
+  color: #f4ecff;
+}
+[data-card-face="apotheose-epic"] .mcard[data-rarity] .mcard__name {
+  overflow: visible;
+  text-overflow: clip;
+  font-family: "Apotheose Bangers", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #ffffff;
+  -webkit-text-stroke: 1.2cqi #14081f;
+  paint-order: stroke fill;
+  text-shadow: 0.9cqi 1.1cqi 0 #ff2d78;
+}
+[data-card-face="apotheose-epic"] .mcard__genre,
+[data-card-face="apotheose-epic"] .mcard__rarity,
+[data-card-face="apotheose-epic"] .mcard__cost {
+  background: #ff2d78;
+  color: #14081f;
+  box-shadow: 0 0 0 0.45cqi #14081f;
+  font-family: "Apotheose Bangers", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+[data-card-face="apotheose-epic"] .mcard__emblem {
+  background: #14081f;
+  color: #ff2d78;
+}
+[data-card-face="apotheose-epic"] .mcard__art {
+  border-radius: 1cqi;
+  box-shadow: 0 0 0 0.6cqi #14081f, 1cqi 1.1cqi 0 0.6cqi #ff2d78;
+}
+[data-card-face="apotheose-epic"] .mcard__strip {
+  background: #ff2d78;
+  color: #14081f;
+}
+[data-card-face="apotheose-epic"] .mcard__figures strong {
+  font-family: "Apotheose Bangers", var(--mcard-title);
+  font-weight: 400;
+}
+/* a sweep of the rarity's light over it, once */
+[data-card-face="apotheose-epic"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 36%, #ffa8d0 47%, rgba(255, 255, 255, 0.95) 50%, #ff2d78 53%, transparent 64%) 0 0 / 300% 300%;
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+  animation: apotheose-sweep-epic 1.5s ease-in-out 0.6s both;
+}
+@keyframes apotheose-sweep-epic {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 80% 80%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="apotheose-epic"] .booster-card__face::after {
+    animation: none;
+  }
+}

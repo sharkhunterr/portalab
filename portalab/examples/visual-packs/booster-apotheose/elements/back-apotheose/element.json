@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "apotheose",
+  "names": {
+    "fr": "Dos néon",
+    "en": "Neon back"
+  },
+  "descriptions": {
+    "fr": "Violet profond, des bandes néon en biais, l'étoile taillée au centre.",
+    "en": "Deep violet, neon bands on a slant, the gem-cut star in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

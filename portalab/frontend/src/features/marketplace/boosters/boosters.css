@@ -2372,7 +2372,7 @@
   list-style: none;
   perspective: 1400px;
   pointer-events: none;
-  animation: booster-takeover-card 0.7s cubic-bezier(0.2, 1.3, 0.4, 1) 0.15s both;
+  animation: booster-takeover-card 0.6s cubic-bezier(0.2, 1.3, 0.4, 1) 0.8s both;
 }
 @keyframes booster-takeover-card {
   from {
@@ -2385,10 +2385,12 @@
   aspect-ratio: 63 / 88;
   animation: none;
 }
-/* the rarity's name, slammed across the screen then gone — Portalab's words, the pack's look */
+/* the rarity's name, slammed across the middle of the screen first, alone, then gone as the card comes —
+   Portalab's words, the pack's look */
 .booster-takeover__word {
   position: absolute;
-  inset: auto 0 12%;
+  inset-inline: 0;
+  top: calc(50% - 0.6em);
   z-index: 4;
   font-size: clamp(2.6rem, 12vw, 7rem);
   font-weight: 900;
@@ -2400,21 +2402,21 @@
   color: var(--booster-light);
   text-shadow: 0 0.3rem 1.6rem color-mix(in srgb, var(--booster-ink) 80%, transparent);
   pointer-events: none;
-  animation: booster-takeover-word calc(var(--takeover-s) * 0.7) cubic-bezier(0.2, 1.2, 0.3, 1) both;
+  animation: booster-takeover-word 1s cubic-bezier(0.2, 1.2, 0.3, 1) both;
 }
 @keyframes booster-takeover-word {
   0% {
     opacity: 0;
     transform: translateX(-60%) skewX(-12deg) scale(1.4);
   }
-  18%,
-  75% {
+  20%,
+  70% {
     opacity: 1;
     transform: translateX(0) skewX(-12deg) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translateX(40%) skewX(-12deg) scale(0.95);
+    transform: translateX(60%) skewX(-12deg) scale(0.9);
   }
 }
 @media (prefers-reduced-motion: reduce) {

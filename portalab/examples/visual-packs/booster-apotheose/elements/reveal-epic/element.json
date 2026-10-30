@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "apotheose-epic",
+  "names": {
+    "fr": "Explosion rose",
+    "en": "Pink explosion"
+  },
+  "descriptions": {
+    "fr": "Plein écran, joué en vidéo : l'écran explose en pointes roses, blanches et noires, deux grands coups de pinceau se croisent ; la carte au centre, en grand, tranchée d'un éclat blanc, des lignes de vitesse, des étincelles ; ÉPIQUE, écrit par Portalab.",
+    "en": "Full screen, played as video: the screen explodes in pink, white and black spikes, two great brush slashes crossing; the card in the middle, big, cut by a white slash, speed lines, sparks; EPIC, written by Portalab."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 2.4,
+    "rarity": "epic"
+  }
+}

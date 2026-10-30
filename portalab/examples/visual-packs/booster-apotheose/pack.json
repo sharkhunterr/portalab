@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "apotheose",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Apothéose — la rareté en plein écran",
+    "en": "Apothéose — rarity over the whole screen"
+  },
+  "descriptions": {
+    "fr": "Une ouverture de booster où chaque rareté prend tout l'écran, comme dans un jeu de cartes animé : la carte vient au centre, en grand, entre deux vidéos — derrière elle, l'écran qui explose de pointes cyan, roses ou orange et or ; devant elle, des coups de pinceau de lumière, des éclairs et des étincelles — et Portalab écrit la rareté en grandes lettres BD. Un paquet violet aux néons tranché par un faisceau de lumière, des cartes cadrées de néon, une scène de néons en vidéo en boucle.",
+    "en": "A booster opening where every rarity takes the whole screen, like an animated card game's: the card comes to the middle, big, between two videos — behind it the screen exploding in cyan, pink or orange and gold spikes; over it slashes of light, lightning and sparks — and Portalab writes the rarity in big comic letters. A neon violet pack sliced by a beam of light, neon-framed cards, a neon stage as a looping video."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

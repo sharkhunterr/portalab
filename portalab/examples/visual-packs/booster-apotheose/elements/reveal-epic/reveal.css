@@ -1,0 +1,18 @@
+/* A epic card turned (its hook: data-reveal), staged over the whole screen (place: screen): Portalab brings the
+   card to the middle, big, between this reveal's two videos — behind it (reveal.mp4) and over it (over.mp4),
+   square, cropped to cover any screen — and writes the rarity's name, which this stylesheet dresses. */
+@font-face {
+  font-family: "Apotheose Bangers";
+  src: url("Bangers.woff2") format("woff2");
+  font-display: swap;
+}
+[data-reveal="apotheose-epic"] .booster-takeover__word {
+  font-family: "Apotheose Bangers", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  -webkit-text-stroke: 0.55rem #14081f;
+  paint-order: stroke fill;
+  text-shadow: 0.45rem 0.55rem 0 #ff2d78, 0 0 2.4rem rgba(255, 45, 120, 0.8);
+}

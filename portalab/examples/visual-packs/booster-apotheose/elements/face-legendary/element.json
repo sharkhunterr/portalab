@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "apotheose-legendary",
+  "names": {
+    "fr": "Face légendaire",
+    "en": "Legendary face"
+  },
+  "descriptions": {
+    "fr": "Un cadre au néon de sa rareté sur violet profond, des bandes en biais, un lettrage BD cerné d'encre.",
+    "en": "A frame in its rarity's neon over deep violet, slanted bands, comic lettering outlined in ink."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "legendary"
+  }
+}
