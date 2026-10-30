@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "impact-video-rare",
+  "names": {
+    "fr": "Onde tramée",
+    "en": "Halftone wave"
+  },
+  "descriptions": {
+    "fr": "Dessinée dans EffectCraft, image par image : rayons encrés jaillissant de derrière la carte, lignes de vitesse, un anneau de points cyan qui s'éloigne, des éclats.",
+    "en": "Drawn in EffectCraft, frame by frame: inked rays bursting from behind the card, speed lines, a ring of cyan halftone dots rolling away, glints."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare",
+    "alpha": "stacked"
+  }
+}

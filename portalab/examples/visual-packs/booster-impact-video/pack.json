@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "impact-video",
+  "version": "1.4.1",
+  "names": {
+    "fr": "Impact vidéo — scène de booster manga",
+    "en": "Impact video — an anime booster scene"
+  },
+  "descriptions": {
+    "fr": "Une ouverture de booster façon jeu de cartes animé, dessinée comme un comics — ses animations faites image par image dans EffectCraft : traits de vitesse et trames sur fond noir ; un paquet en aplats cernés d'encre qui tournoie dans des éclairs roses et des rayons manga, tranché par d'immenses coups de pinceau blancs, puis un flash qui se dissout en trame ; des cartes au lettrage BD, autocollants et holographie, révélées par une onde tramée, des rayons encrés et un coup de pinceau, ou — légendaire — enveloppées dans une tornade de puissance qui tourbillonne autour d'elles et éclate pour les révéler. Ses animations sont jouées en vidéo (même rendu qu'Impact, pour comparer).",
+    "en": "A booster opening like an animated trading card game's, drawn as a comic — its animations made frame by frame in EffectCraft: speed lines and halftone on black; a pack in inked flat colours spinning in pink lightning and manga rays, cut by huge white brush slashes, then a flash dissolving into halftone; cards with comic lettering, stickers and holographic foil, revealed by a halftone wave, inked rays and a brush slash, or — legendary — wrapped in a power vortex that whirls round them and blasts away to reveal them. Its animations play as videos (the same renders as Impact's, to compare)."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

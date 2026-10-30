@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "impact-video",
+  "names": {
+    "fr": "Scène Impact",
+    "en": "Impact scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture façon jeu de cartes animé. Les cartes tirées et leurs raretés restent celles de Portalab.",
+    "en": "The whole opening, animated trading-card style. The cards drawn and their rarities stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-impact",
+      "backdrop": "backdrop-impact",
+      "opening": "opening-impact",
+      "back": {
+        "common": "back-impact"
+      },
+      "face": {
+        "common": "face-common",
+        "rare": "face-rare",
+        "epic": "face-epic",
+        "legendary": "face-legendary"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

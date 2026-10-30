@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "impact-video-epic",
+  "names": {
+    "fr": "Rayons encrés",
+    "en": "Inked rays"
+  },
+  "descriptions": {
+    "fr": "Dessinée dans EffectCraft, image par image : rayons encrés, éclairs roses qui crépitent autour de la carte, éclats projetés, un viseur qui s'allume à son coin.",
+    "en": "Drawn in EffectCraft, frame by frame: inked rays, crackling pink lightning round the card, glints flying off, a crosshair snapping on at its corner."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic",
+    "alpha": "stacked"
+  }
+}

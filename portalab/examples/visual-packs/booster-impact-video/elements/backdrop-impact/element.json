@@ -1,0 +1,17 @@
+{
+  "type": "booster_backdrop",
+  "look": "impact-video",
+  "names": {
+    "fr": "Traits de vitesse",
+    "en": "Speed lines"
+  },
+  "descriptions": {
+    "fr": "Une scène noire où filent des traits de vitesse roses et blancs, des trames roses dans les coins, des étoiles à quatre branches qui scintillent et, de temps en temps, un viseur lumineux (HD).",
+    "en": "A black stage where pink and white speed lines streak by, pink halftone dots in the corners, four-pointed stars twinkling and, now and then, a glowing crosshair (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "speed.glsl",
+    "stage": true
+  }
+}
