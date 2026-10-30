@@ -463,7 +463,8 @@ class Activity(MediaBase):
     __table_args__ = (
         UniqueConstraint("service_id", "ref", name="uq_activity_service_ref"),
         CheckConstraint(
-            "kind IN ('movie', 'episode', 'live', 'track', 'book', 'audiobook', 'game', 'other')", name="kind"
+            "kind IN ('movie', 'episode', 'live', 'track', 'book', 'audiobook', 'game', 'radio', 'other')",
+            name="kind",
         ),
         Index("ix_activity_started", "started_at"),
         Index("ix_activity_user", "user_id", "started_at"),

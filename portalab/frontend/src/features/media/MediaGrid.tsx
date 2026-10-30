@@ -16,6 +16,7 @@ export const KIND_ICONS: Record<string, string> = {
   album: "music",
   track: "music",
   live: "radio",
+  radio: "radio", // issue 283: the station's sittings in the statistics
 };
 
 /** A poster, or (no image) the kind's icon on a soft gradient — never an empty frame. */

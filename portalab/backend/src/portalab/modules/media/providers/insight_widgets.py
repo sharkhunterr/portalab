@@ -88,7 +88,7 @@ STATS = _definition(
             "period": {"type": "string", "enum": ["7d", "30d", "90d", "365d", "all"]},
             "category": {
                 "type": "string",
-                "enum": ["all", "movies", "series", "live", "music", "books", "audiobooks"],
+                "enum": ["all", "movies", "series", "live", "music", "books", "audiobooks", "radio", "games"],
             },
             "metric": {"type": "string", "enum": ["time", "plays"]},
             "chart": {"type": "string", "enum": ["bars", "area", "donut", "top", "figures"]},

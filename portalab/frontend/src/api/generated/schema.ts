@@ -8903,6 +8903,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/insights/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Insight Categories
+         * @description #283: the statistics' tabs a configured service feeds — a catalog or a history of that kind, the radio
+         *     when a station is connected, the requests when a request service is.
+         */
+        get: operations["insight_categories_api_v1_media_insights_categories_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/insights/{section}": {
         parameters: {
             query?: never;
@@ -35907,6 +35928,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    insight_categories_api_v1_media_insights_categories_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string[];
+                    };
                 };
             };
         };

@@ -26,16 +26,35 @@ from portalab.modules.media.models import (
     MediaRequest,
     ObjectMetadata,
     ObjectTag,
+    SourceItem,
 )
 
 CATEGORIES: dict[str, tuple[str, ...]] = {
-    "all": ("movie", "episode", "live", "track", "book", "audiobook", "other"),
+    # #283: games stay out of « all » — a game played is no time watched, listened to or read
+    "all": ("movie", "episode", "live", "track", "book", "audiobook", "radio", "other"),
     "movies": ("movie",),
     "series": ("episode",),
     "live": ("live",),
     "music": ("track",),
     "books": ("book",),
     "audiobooks": ("audiobook",),
+    "radio": ("radio",),
+    "games": ("game",),
+}
+# #283: the tab each kind a service holds or tells opens (a series' seasons and episodes, an album's tracks…)
+CATEGORY_OF_KIND = {
+    "movie": "movies",
+    "series": "series",
+    "season": "series",
+    "episode": "series",
+    "live": "live",
+    "artist": "music",
+    "album": "music",
+    "track": "music",
+    "book": "books",
+    "audiobook": "audiobooks",
+    "radio": "radio",
+    "game": "games",
 }
 PERIODS = {"7d": 7, "30d": 30, "90d": 90, "365d": 365}
 TOP = 10
@@ -84,6 +103,32 @@ class InsightsQuery:
     def __init__(self, database: Database, *, clock: Clock | None = None) -> None:
         self.database = database
         self.clock = clock
+
+    async def categories(self, services: Sequence[UUID], *, radio: bool = False) -> list[str]:
+        """#283: the categories a configured service feeds — its catalog or its history holds that kind —, in
+        the tabs' order, « all » first. ``services``: the services connected now (a removed one opens none);
+        ``radio``: a station is connected (its tab shows before anyone listened)."""
+        if not services:
+            return ["all", "radio"] if radio else ["all"]
+        async with self.database.session() as session:
+            kinds = set(
+                (
+                    await session.scalars(
+                        select(distinct(SourceItem.kind)).where(
+                            SourceItem.service_id.in_(services), SourceItem.active.is_(True)
+                        )
+                    )
+                ).all()
+            )
+            kinds |= set(
+                (
+                    await session.scalars(
+                        select(distinct(Activity.kind)).where(Activity.service_id.in_(services))
+                    )
+                ).all()
+            )
+        fed = {CATEGORY_OF_KIND[k] for k in kinds if k in CATEGORY_OF_KIND} | ({"radio"} if radio else set())
+        return ["all", *(c for c in CATEGORIES if c != "all" and c in fed)]
 
     def _rows(self, win: Window, kinds: Sequence[str], user: UUID | None, *columns: Any) -> Select[Any]:
         query = select(*columns).where(
