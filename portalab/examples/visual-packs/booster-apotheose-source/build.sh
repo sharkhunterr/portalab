@@ -13,7 +13,7 @@ core="$here/../booster-manga-source/effectcraft/core.jsx"
 cli="${EFFECTCRAFT:-effectcraft-cli}"
 work="${APO_WORK:-$(mktemp -d)}"
 [ -n "${APO_WORK:-}" ] || trap 'rm -rf "$work"' EXIT
-declare -A LENGTH=([opening]=64 [reveal-rare]=44 [reveal-epic]=58 [reveal-legendary]=72 [over-rare]=44 [over-epic]=58 [over-legendary]=72)
+declare -A LENGTH=([opening]=64 [reveal-rare]=76 [reveal-epic]=92 [reveal-legendary]=110 [over-rare]=76 [over-epic]=92 [over-legendary]=110)
 SLICE=16
 scale="${SCALE:-1.3334}"
 comps=("$@"); [ ${#comps[@]} -gt 0 ] || comps=(opening reveal-rare reveal-epic reveal-legendary over-rare over-epic over-legendary)

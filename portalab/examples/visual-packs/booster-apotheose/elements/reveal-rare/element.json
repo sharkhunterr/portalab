@@ -6,8 +6,8 @@
     "en": "Cyan burst"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : un éclair cyan, des pointes cyan et blanches qui tournent sur un bleu profond, un anneau de lumière ; la carte au centre, en grand, traversée d'un trait blanc, des étincelles projetées ; RARE, écrit par Portalab, en lettres BD.",
-    "en": "Full screen, played as video: a cyan flash, cyan and white spikes turning over deep blue, a ring of light; the card in the middle, big, crossed by a white streak, sparks thrown off; RARE, written by Portalab, in comic letters."
+    "fr": "Plein écran, joué en vidéo : d'abord RARE en lettres géantes (écrit par Portalab) sur un écran cyan balafré d'encre et d'éclairs ; puis la carte arrive de dos dans une explosion de rayons cyan et blancs, se retourne dans un éclair, une couronne blanche déchiquetée autour d'elle, des étincelles.",
+    "en": "Full screen, played as video: first RARE in huge letters (written by Portalab) over a cyan screen slashed with ink and lightning; then the card flung in face down amid bursting cyan and white rays, turning over in a flash, a torn white comic crown round it, sparks."
   },
   "render": {
     "kind": "video",
@@ -18,7 +18,7 @@
     "css": [
       "reveal.css"
     ],
-    "duration": 1.8,
+    "duration": 3.2,
     "rarity": "rare"
   }
 }

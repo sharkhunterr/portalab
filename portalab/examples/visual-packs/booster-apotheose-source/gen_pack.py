@@ -241,19 +241,19 @@ def face(rarity):
 
 
 WORD = {
-    "rare": "color: #ffffff;\n  -webkit-text-stroke: 0.5rem #0b2a5e;\n  paint-order: stroke fill;\n  text-shadow: 0.4rem 0.5rem 0 #25c6f2, 0 0 2rem rgba(37, 198, 242, 0.8);",
-    "epic": "color: #ffffff;\n  -webkit-text-stroke: 0.55rem #14081f;\n  paint-order: stroke fill;\n  text-shadow: 0.45rem 0.55rem 0 #ff2d78, 0 0 2.4rem rgba(255, 45, 120, 0.8);",
-    "legendary": "padding: 0.35em 0 0.3em;\n  background: linear-gradient(90deg, transparent, #ff8a14 12% 88%, transparent);\n  color: #1a0904;\n  -webkit-text-stroke: 0.25rem #ffe08a;\n  paint-order: stroke fill;\n  text-shadow: 0.35rem 0.35rem 0 #ffd23e;\n  box-shadow: 0 0 3rem rgba(255, 138, 20, 0.7);",
+    "rare": "color: #ffffff;\n  -webkit-text-stroke: 0.5rem #0b2a5e;\n  paint-order: stroke fill;\n  text-shadow: 0.6rem 0.6rem 0 #0b2a5e;",
+    "epic": "color: #ffffff;\n  -webkit-text-stroke: 0.55rem #14081f;\n  paint-order: stroke fill;\n  text-shadow: 0.6rem 0.6rem 0 #14081f;",
+    "legendary": "color: #1a0904;\n  -webkit-text-stroke: 0.3rem #ffe08a;\n  paint-order: stroke fill;\n  text-shadow: 0.5rem 0.5rem 0 #ffd23e, 1rem 1rem 0 #1a0904;",
 }
 DESCRIPTIONS = {
-    "rare": ("Éclat cyan", "Cyan burst", "Plein écran, joué en vidéo : un éclair cyan, des pointes cyan et blanches qui tournent sur un bleu profond, un anneau de lumière ; la carte au centre, en grand, traversée d'un trait blanc, des étincelles projetées ; RARE, écrit par Portalab, en lettres BD.",
-             "Full screen, played as video: a cyan flash, cyan and white spikes turning over deep blue, a ring of light; the card in the middle, big, crossed by a white streak, sparks thrown off; RARE, written by Portalab, in comic letters."),
-    "epic": ("Explosion rose", "Pink explosion", "Plein écran, joué en vidéo : l'écran explose en pointes roses, blanches et noires, deux grands coups de pinceau se croisent ; la carte au centre, en grand, tranchée d'un éclat blanc, des lignes de vitesse, des étincelles ; ÉPIQUE, écrit par Portalab.",
-             "Full screen, played as video: the screen explodes in pink, white and black spikes, two great brush slashes crossing; the card in the middle, big, cut by a white slash, speed lines, sparks; EPIC, written by Portalab."),
-    "legendary": ("Apothéose", "Apotheosis", "Plein écran, joué en vidéo : des bandes orange et or balaient l'écran, fendues d'éclairs blancs, puis un éclair, et des pointes orange et or qui tournent, des rayons, des anneaux de lumière ; la carte au centre, en grand, tranchée de lumière, des éclairs dorés le long de ses bords, deux grands éclats ; LÉGENDAIRE, écrit par Portalab sur une bande orange.",
-                  "Full screen, played as video: orange and gold bands sweep the screen, cracked with white lightning, then a flash, and orange and gold spikes turning, rays, rings of light; the card in the middle, big, cut by light, gold lightning along its edges, two great glints; LEGENDARY, written by Portalab on an orange band."),
+    "rare": ("Éclat cyan", "Cyan burst", "Plein écran, joué en vidéo : d'abord RARE en lettres géantes (écrit par Portalab) sur un écran cyan balafré d'encre et d'éclairs ; puis la carte arrive de dos dans une explosion de rayons cyan et blancs, se retourne dans un éclair, une couronne blanche déchiquetée autour d'elle, des étincelles.",
+             "Full screen, played as video: first RARE in huge letters (written by Portalab) over a cyan screen slashed with ink and lightning; then the card flung in face down amid bursting cyan and white rays, turning over in a flash, a torn white comic crown round it, sparks."),
+    "epic": ("Explosion rose", "Pink explosion", "Plein écran, joué en vidéo : d'abord ÉPIQUE en lettres géantes sur un écran rose balafré d'encre et d'éclairs ; puis la carte arrive de dos dans une explosion de rayons roses et blancs, se retourne dans un éclair, une couronne blanche déchiquetée autour d'elle, des étincelles.",
+             "Full screen, played as video: first EPIC in huge letters over a pink screen slashed with ink and lightning; then the card flung in face down amid bursting pink and white rays, turning over in a flash, a torn white comic crown round it, sparks."),
+    "legendary": ("Apothéose", "Apotheosis", "Plein écran, joué en vidéo : d'abord LÉGENDAIRE en lettres géantes sur un écran orange balafré d'encre et d'éclairs blancs ; puis la carte arrive de dos dans une explosion de rayons orange et blancs, se retourne dans un éclair, une couronne blanche déchiquetée autour d'elle, des éclairs dorés le long de ses bords, des étincelles et deux grands éclats.",
+                  "Full screen, played as video: first LEGENDARY in huge letters over an orange screen slashed with ink and white lightning; then the card flung in face down amid bursting orange and white rays, turning over in a flash, a torn white comic crown round it, gold lightning along its edges, sparks and two great glints."),
 }
-DURATION = {"rare": 1.8, "epic": 2.4, "legendary": 3.0}
+DURATION = {"rare": 3.2, "epic": 3.8, "legendary": 4.6}
 
 
 def reveal(rarity):
@@ -340,7 +340,7 @@ def main():
         "payload": {"parts": {"booster_look": "look-apotheose", "backdrop": "backdrop-apotheose", "opening": "opening-apotheose", "back": {"common": "back-apotheose"},
                               "face": {r: f"face-{r}" for r in RARITY}, "reveal": {r: f"reveal-{r}" for r in ("rare", "epic", "legendary")}}}}, ensure_ascii=False, indent=2) + "\n")
     (PACK / "pack.json").write_text(json.dumps({
-        "format": 1, "id": "apotheose", "version": "1.0.0",
+        "format": 1, "id": "apotheose", "version": "1.1.0",
         "names": {"fr": "Apothéose — la rareté en plein écran", "en": "Apothéose — rarity over the whole screen"},
         "descriptions": {"fr": "Une ouverture de booster où chaque rareté prend tout l'écran, comme dans un jeu de cartes animé : la carte vient au centre, en grand, entre deux vidéos — derrière elle, l'écran qui explose de pointes cyan, roses ou orange et or ; devant elle, des coups de pinceau de lumière, des éclairs et des étincelles — et Portalab écrit la rareté en grandes lettres BD. Un paquet violet aux néons tranché par un faisceau de lumière, des cartes cadrées de néon, une scène de néons en vidéo en boucle.",
                          "en": "A booster opening where every rarity takes the whole screen, like an animated card game's: the card comes to the middle, big, between two videos — behind it the screen exploding in cyan, pink or orange and gold spikes; over it slashes of light, lightning and sparks — and Portalab writes the rarity in big comic letters. A neon violet pack sliced by a beam of light, neon-framed cards, a neon stage as a looping video."},

@@ -139,7 +139,7 @@ stays Portalab's; the cards and their rarities are always the ones the server dr
 | `booster_look` | `[data-booster-look="<look>"]` on the sealed pack | its dress **and its shape** (the strip is `.booster-pack__flap`, the emblem `.booster-pack__emblem`); a GLSL stage around it |
 | `booster_opening` | `[data-opening="<look>"]` while it opens | `duration` ≤ 4 s: **replaces** Portalab's tear (inflating then bursting, a lid swinging open…), and its duration is when the cards come; Portalab stills its strip, glow and rising cards meanwhile, the opening may bring them back with its own movement |
 | `card_face`, `card_back` | `[data-card-face]`, `[data-card-back]` | per rarity (`render.rarity`); the shape goes on `.booster-card__face` / `.booster-card__back`, never on `.booster-card__inner` (the part turning in 3D); face down, a card always wears the `common` back. A face or a back may also be **drawn by the GPU** (`kind: glsl`, a stage, with its `css`): drawn in `.booster-card__gpu`, over the card's panel and under its art and words, cut by its shape — the pack places it on its own hook (`[data-card-face="<look>"] .booster-card__gpu { inset: 13px; }`, inside a thick frame) |
-| `card_reveal` | `[data-reveal="<look>"]` | per rarity, a GLSL stage, a script or a video, `duration` ≤ 3 s; a video reveal may bring a second video, `over`, played **over** the card (the first plays behind it) — an effect wrapping the card; `place: "screen"` (issue 290) stages the rarity **over the whole screen**: Portalab brings a copy of the card turned to the middle, big, between the reveal's videos (behind it and over it, cropped to cover the screen), and writes the rarity's name itself — translated; the pack's stylesheet dresses it through its hook (`[data-reveal="<look>"] .booster-takeover__word`); a tap ends it, « reveal all » waits for it |
+| `card_reveal` | `[data-reveal="<look>"]` | per rarity, a GLSL stage, a script or a video, `duration` ≤ 3 s; a video reveal may bring a second video, `over`, played **over** the card (the first plays behind it) — an effect wrapping the card; `place: "screen"` (issue 290) stages the rarity **over the whole screen**, up to 5 s: first the rarity's name, huge, across the screen; then a copy of the card brought to the middle, big, face down, turning over (`--card-at`, `--flip-at`: 0.9 s and 1.45 s, the pack may move them) — between the reveal's videos (behind it and over it, cropped to cover the screen). Portalab writes the rarity's name itself — translated; the pack's stylesheet dresses it through its hook (`[data-reveal="<look>"] .booster-takeover__word`); a tap ends it, « reveal all » waits for it |
 
 A script part is told `{phase, rarity?, index?, count, reducedMotion}` — never a product's data.
 
@@ -310,7 +310,7 @@ version; warnings are published knowingly; infos inform.
 | `render.no_file` | blocking | The {kind} rendering names no file. |
 | `render.no_renderer` | blocking | The renderer is not named (render.renderer). |
 | `render.screen_elsewhere` | blocking | Only a card's reveal may take the whole screen. |
-| `scene.duration` | blocking | Too long ({seconds} s): an opening lasts 4 s at most, a reveal 3 s. |
+| `scene.duration` | blocking | Too long ({seconds} s): an opening lasts 4 s at most, a reveal 3 s (over the whole screen: 5 s). |
 | `scene.empty` | blocking | The scene names no part. |
 | `scene.part` | blocking | The part {slot} ({part}) is not an element of the right type in this pack. |
 | `scene.rarity` | blocking | Unknown rarity for {slot}: {rarity}. |

@@ -131,11 +131,13 @@ function Atmosphere({ mist }: { mist?: { hold: boolean; reduced: boolean } | und
 }
 
 /**
- * Issue 290: a rarity staged over the whole screen (a reveal of ``place: screen``) — a copy of the card turned,
- * brought to the middle, big, between the reveal's videos (behind it, and over it), the rarity's name written by
- * Portalab over them (translated; its look the pack's, through its hook). It ends with its videos, or on a tap.
+ * Issue 290: a rarity staged over the whole screen (a reveal of ``place: screen``) — first the rarity's name,
+ * written by Portalab across the screen (translated; its look the pack's, through its hook), then a copy of the
+ * card brought to the middle, big, face down, turning over — between the reveal's videos (behind it, and over
+ * it). It ends with its videos, or on a tap. Its moments (CSS, the pack may move them): the card comes at
+ * ``--card-at``, turns at ``--flip-at``.
  */
-function Takeover({
+export function Takeover({
   element,
   rarity,
   source,
@@ -149,14 +151,15 @@ function Takeover({
 }) {
   const t = useT();
   const holder = useRef<HTMLSpanElement>(null);
-  const seconds = Math.min(3, Math.max(1, element.duration ?? 2.5));
+  const seconds = Math.min(5, Math.max(1, element.duration ?? 2.5));
   useEffect(() => {
     const target = holder.current;
     if (!target || !source) return;
     const copy = source.cloneNode(true) as HTMLElement;
     for (const layer of copy.querySelectorAll(".booster-fx, .booster-fx__scene, .booster-card__gpu"))
       layer.remove();
-    copy.setAttribute("data-settled", "");
+    // face down again: it turns over in the takeover
+    copy.removeAttribute("data-settled");
     copy.removeAttribute("data-offscreen");
     copy.setAttribute("aria-hidden", "true");
     // its button a plain box (no button within the takeover's own)
@@ -938,6 +941,9 @@ export function ScenePartPreview({
   const reduced = useTheme().effective.reducedMotion;
   const scene = (parts: Scene["parts"]): Scene => ({ pack: element.pack, look: element.look ?? "", parts });
   const type = element.type;
+  if (type === "card_reveal" && element.place === "screen") {
+    return <ScreenPreview element={element} rarity={rarity} card={card} reduced={reduced} />;
+  }
   if (type === "card_back" || type === "card_face" || type === "card_reveal") {
     const parts: Scene["parts"] =
       type === "card_back"
@@ -998,6 +1004,65 @@ export function ScenePartPreview({
           <BoosterPack booster={booster} stage />
         </span>
       </div>
+    </div>
+  );
+}
+
+/** Issue 290: a reveal over the whole screen, tried in the Test step — staged within the preview's box, again on a
+ * tap. */
+function ScreenPreview({
+  element,
+  rarity,
+  card,
+  reduced,
+}: {
+  element: ExternalElement;
+  rarity: Rarity;
+  card: BoosterCard;
+  reduced: boolean;
+}) {
+  const row = useRef<HTMLUListElement>(null);
+  const [playing, setPlaying] = useState(true);
+  const [run, setRun] = useState(0);
+  const [source, setSource] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setSource((row.current?.children[0] as HTMLElement | undefined) ?? null);
+  }, []);
+  const scene: Scene = {
+    pack: element.pack,
+    look: element.look ?? "",
+    parts: { reveal: { [rarity]: element } },
+  };
+  return (
+    <div
+      className="booster-stage booster-stage--preview booster-stage--screen"
+      data-phase="spread"
+      data-reduced={reduced || undefined}
+    >
+      <ul ref={row} className="booster-cards">
+        <Card
+          card={{ ...card, product: { ...card.product, rarity } }}
+          index={0}
+          total={1}
+          state="revealed"
+          scene={scene}
+          reduced={reduced}
+          onReveal={() => {
+            setRun((n) => n + 1);
+            setPlaying(true);
+          }}
+          screen
+        />
+      </ul>
+      {source && playing && !reduced ? (
+        <Takeover
+          key={run}
+          element={element}
+          rarity={rarity}
+          source={source}
+          onDone={() => setPlaying(false)}
+        />
+      ) : null}
     </div>
   );
 }

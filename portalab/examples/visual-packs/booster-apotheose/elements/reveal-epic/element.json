@@ -6,8 +6,8 @@
     "en": "Pink explosion"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : l'écran explose en pointes roses, blanches et noires, deux grands coups de pinceau se croisent ; la carte au centre, en grand, tranchée d'un éclat blanc, des lignes de vitesse, des étincelles ; ÉPIQUE, écrit par Portalab.",
-    "en": "Full screen, played as video: the screen explodes in pink, white and black spikes, two great brush slashes crossing; the card in the middle, big, cut by a white slash, speed lines, sparks; EPIC, written by Portalab."
+    "fr": "Plein écran, joué en vidéo : d'abord ÉPIQUE en lettres géantes sur un écran rose balafré d'encre et d'éclairs ; puis la carte arrive de dos dans une explosion de rayons roses et blancs, se retourne dans un éclair, une couronne blanche déchiquetée autour d'elle, des étincelles.",
+    "en": "Full screen, played as video: first EPIC in huge letters over a pink screen slashed with ink and lightning; then the card flung in face down amid bursting pink and white rays, turning over in a flash, a torn white comic crown round it, sparks."
   },
   "render": {
     "kind": "video",
@@ -18,7 +18,7 @@
     "css": [
       "reveal.css"
     ],
-    "duration": 2.4,
+    "duration": 3.8,
     "rarity": "epic"
   }
 }

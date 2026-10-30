@@ -78,104 +78,92 @@ if (ONLY === "opening") (function () {
   }
 })();
 
-// --- the reveals, behind the card ----------------------------------------------------------------------------
-// rare, 1.8 s: a cyan flash, cyan and white spikes turning over a deep blue, a ring of light, glints
-if (ONLY === "reveal-rare") (function () {
-  var comp = square("reveal-rare", 44);
-  for (var f = 0; f < 44; f++) {
-    var fr = frameOf(comp, f); if (!fr.main) continue;
-    var o = fade(f, 30, 43) * 100, g = ease((f + 1) / 5);
-    spikes(fr.main, 16, f * 0.01, [[CYAN, o * 0.85], [WHITE, o * 0.5], [[0.1, 0.35, 0.8], o]], 100, 300 + 800 * g);
-    polys(fr.main, [full()], NAVY, o * 0.88);
-    if (f < 5) polys(fr.top, [full()], WHITE, 90 - f * 18);
-    if (f < 18) { var rr = 220 + f * 34; lines(fr.glow, [ring(C, C, rr, 1)], CYAN, 22, fade(f, 8, 18) * 100); lines(fr.main, [ring(C, C, rr, 1)], WHITE, 4, fade(f, 8, 18) * 100); }
-    polys(fr.glow, [circle(C, C, 300, 1.3, 40)], CYAN, o * 0.6);
+// --- the reveals over the whole screen ---------------------------------------------------------------------
+// Timed on Portalab's takeover: the rarity's name across the screen until --card-at (0.9 s, frame 22), the card
+// flung in face down, turning at --flip-at (1.45 s) — its face showing from frame 42.
+var CARD_AT = 22, FACE_AT = 42;
+var PALETTE = {
+  rare: { main: CYAN, light: CYAN_L, deep: [0.03, 0.2, 0.55], dark: [0.02, 0.05, 0.14], length: 76 },
+  epic: { main: PINK, light: PINK_L, deep: [0.55, 0.05, 0.25], dark: [0.07, 0.01, 0.05], length: 92 },
+  legendary: { main: ORANGE, light: GOLD_L, deep: [0.45, 0.12, 0.02], dark: [0.08, 0.02, 0.01], length: 110 }
+};
+// thick ink slashes sweeping across the screen on a slant — the title screen's strokes
+function inkSlashes(L, f, count, base, color) {
+  seed(base);
+  for (var k = 0; k < count; k++) {
+    var y = between(-200, 1280), speed = between(60, 110), x = -900 + ((f + between(0, 20)) * speed) % 2900, len = between(700, 1300), thick = between(40, 120);
+    polys(L, slash(x, y + 300, x + len, y - 300, thick, 1, between(-0.6, 0.6)), color, 100);
   }
-})();
-// epic, 2.4 s: the screen explodes in pink, white and black spikes, two slashes crossing, shards, a pink glow
-if (ONLY === "reveal-epic") (function () {
-  var comp = square("reveal-epic", 58);
-  for (var f = 0; f < 58; f++) {
-    var fr = frameOf(comp, f); if (!fr.main) continue;
-    var o = fade(f, 42, 57) * 100, g = ease((f + 1) / 4);
-    spikes(fr.main, 20, f * 0.014 + Math.sin(f * 0.3) * 0.02, [[PINK, o], [WHITE, o * 0.95], [[0.55, 0.05, 0.25], o]], 200, 250 + 900 * g);
-    polys(fr.main, [full()], INK, o * 0.9);
-    polys(fr.haze, [circle(C, C, 340, 1.3, 40)], PINK, o * 0.8);
-    if (f < 4) polys(fr.top, [full()], WHITE, 100 - f * 25);
-    if (f >= 2 && f < 22) {
-      var u = ease((f - 1) / 4), so = fade(f, 12, 22) * 100;
-      polys(fr.top, slash(-80, 860, 1160, 180, 70, u, 1), WHITE, so);
-      if (f >= 5) polys(fr.top, slash(1160, 900, -80, 220, 56, ease((f - 4) / 4), -1), PINK_L, so);
-    }
+}
+// the comic crown round the card: a white ring, its outside a star burst, its inside torn into teeth, the card
+// showing through — r: its inner size (0..1.4)
+function crown(L, r, turn, color, base) {
+  seed(base);
+  var outer = burst(C, C, 26, 1150 * r, 760 * r, 0.25, turn, 1), inner = [], n = 34;
+  for (var i = 0; i < n * 2; i++) {
+    var a = turn + i / (n * 2) * Math.PI * 2, d = (i % 2 ? 300 : between(360, 470)) * r;
+    inner.push([C + Math.cos(a) * d * 0.82, C + Math.sin(a) * d * 1.08]);
   }
-})();
-// legendary, 3 s: orange bands slashing across the screen, cracked with white lightning; a flash; then black with
-// orange and gold spikes turning, gold rays, rings of light, halftone, a golden glow
-if (ONLY === "reveal-legendary") (function () {
-  var comp = square("reveal-legendary", 72);
-  for (var f = 0; f < 72; f++) {
+  polys(L, [outer, inner], color, 100, true);
+}
+function stagedBehind(rarity) {
+  var P = PALETTE[rarity], comp = square("reveal-" + rarity, P.length), N = P.length;
+  for (var f = 0; f < N; f++) {
     var fr = frameOf(comp, f); if (!fr.main) continue;
-    var o = fade(f, 56, 71) * 100;
-    if (f < 16) {   // the orange bands, slanted, sliding in
-      var slide = ease((f + 1) / 6) * 1;
-      for (var b = 0; b < 4; b++) {
-        var y0 = -200 + b * 360, x = -1400 + slide * 1400 + b * 60;
-        polys(fr.main, [[[x, y0 + 260], [x + 1400, y0 - 260], [x + 1400 + 300, y0 - 260], [x + 300, y0 + 260]]], b % 2 ? GOLD : ORANGE, 100);
-      }
-      polys(fr.main, [full()], [0.12, 0.03, 0.02], 100);
-      if (f > 4) { seed(300 + f); var cracks = []; for (var k = 0; k < 4; k++) cracks = cracks.concat(bolt(between(100, 980), -20, between(100, 980), 1100, 50, true)); lines(fr.glow, cracks, GOLD_L, 14); lines(fr.top, cracks, WHITE, 3.5); }
+    var o = fade(f, N - 12, N - 1) * 100;
+    if (f < CARD_AT + 2) {   // the title screen: the rarity's colour, ink slashes, lightning
+      if (f < 2) polys(fr.top, [full()], WHITE, 90 - f * 40);
+      inkSlashes(fr.main, f, 7, 100 + Math.floor(f / 2), INK);
+      seed(150 + f); var bolts = [];
+      for (var k = 0; k < 3; k++) bolts = bolts.concat(bolt(between(100, 980), between(-40, 300), between(100, 980), between(780, 1120), 60, true));
+      lines(fr.glow, bolts, P.light, 18); lines(fr.top, bolts, WHITE, 4);
+      polys(fr.main, streaks(C, C, 600, 600, 30, -0.9, 500, 6), P.light, 60);
+      polys(fr.main, [full()], P.main, 100);
+      continue;
     }
-    if (f >= 14 && f < 19) polys(fr.top, [full()], WHITE, 100 - (f - 14) * 20);
-    if (f >= 14) {
-      var g = ease((f - 13) / 5);
-      spikes(fr.main, 22, (f - 14) * 0.012, [[ORANGE, o], [GOLD, o * 0.9], [[0.45, 0.12, 0.02], o]], 400, 260 + 900 * g);
-      seed(410); polys(fr.glow, rays(14, C, C, 0, 0, 900, 0.04, (f - 14) * -0.008), GOLD_L, o * 0.5);
-      for (var w = 0; w < 3; w++) { var age = f - 14 - w * 7; if (age < 0 || age > 22) continue; var rr = 240 + age * 30; lines(fr.glow, [ring(C, C, rr, 1)], GOLD, 24, fade(age, 10, 22) * o); lines(fr.main, [ring(C, C, rr, 1)], WHITE, 4, fade(age, 10, 22) * o); }
-      lines(fr.main, halftoneRows(C, C, 420, 760, 28), GOLD, 9 * (1 - (f - 14) / 70), o * 0.35, false, [0.1, 28]);
-      polys(fr.main, [full()], INK, o * 0.92);
-      polys(fr.haze, [circle(C, C, 360, 1.3, 40)], ORANGE, o * 0.9);
+    // the card's stage: black, the rarity's spikes and white bursting from the middle, speed lines rushing in
+    var g = ease((f - CARD_AT) / 5), at = f - FACE_AT, spin = (f - CARD_AT) * 0.01;
+    if (at >= 0 && at < 4) polys(fr.top, [full()], WHITE, 100 - at * 25);
+    if (at >= 0) {
+      var cr = 0.55 + 0.55 * back(at / 6) + 0.004 * at;
+      crown(fr.main, cr, spin * 2, WHITE, 300);
+      crown(fr.main, cr * 1.04 + 0.03, spin * 2 + 0.05, P.main, 300);
+      for (var w = 0; w < 2; w++) { var age = at - w * 6; if (age < 0 || age > 18) continue; var rr = 300 + age * 36; lines(fr.glow, [ring(C, C, rr, 1.15)], P.light, 26, fade(age, 8, 18) * o); lines(fr.main, [ring(C, C, rr, 1.15)], WHITE, 5, fade(age, 8, 18) * o); }
+    } else {
+      polys(fr.top, concentration(C, C, 70, 360, 900, 14), WHITE, 45);
     }
+    spikes(fr.main, 22, spin, [[P.main, o], [WHITE, o * (at >= 0 ? 0.95 : 0.8)], [P.deep, o]], 400 + (at >= 0 ? 1 : 0), 240 + 900 * g);
+    polys(fr.haze, [circle(C, C, 330, 1.35, 40)], P.main, o * 0.9);
+    polys(fr.main, [full()], P.dark, o);
   }
-})();
+}
+if (ONLY === "reveal-rare") stagedBehind("rare");
+if (ONLY === "reveal-epic") stagedBehind("epic");
+if (ONLY === "reveal-legendary") stagedBehind("legendary");
 
-// --- over the card ---------------------------------------------------------------------------------------------
-// rare: a white streak crossing it, sparks and glints thrown off its edges
-if (ONLY === "over-rare") (function () {
-  var comp = square("over-rare", 44);
-  for (var f = 0; f < 44; f++) {
+// over the card: as it turns, a slash of light across it; then sparks off its edges, lightning for a legendary,
+// great glints
+function stagedOver(rarity) {
+  var P = PALETTE[rarity], comp = square("over-" + rarity, P.length), N = P.length;
+  for (var f = 0; f < N; f++) {
     var fr = frameOf(comp, f); if (!fr.main) continue;
-    if (f >= 1 && f < 9) polys(fr.top, slash(80, 760, 1000, 320, 34, ease(f / 4), 0.6), WHITE, fade(f, 4, 9) * 100);
-    sparks(fr.main, fr.glow, f, 36, CYAN, 1200, 20);
-    seed(1300); var pts = []; for (var i = 0; i < 14; i++) { var a = between(0, Math.PI * 2), r = toEdge(a, 160, 220) + between(10, 120); pts.push([C + Math.cos(a) * r, C + Math.sin(a) * r]); }
-    polys(fr.top, glintPolys(twinkle(pts, f, 1, 26)), WHITE);
-  }
-})();
-// epic: a great white slash across it, pink speed lines rushing in, sparks, glints
-if (ONLY === "over-epic") (function () {
-  var comp = square("over-epic", 58);
-  for (var f = 0; f < 58; f++) {
-    var fr = frameOf(comp, f); if (!fr.main) continue;
-    if (f >= 1 && f < 12) { var so = fade(f, 6, 12) * 100; polys(fr.glow, slash(-40, 820, 1120, 260, 70, ease(f / 3), 1), PINK, so); polys(fr.top, slash(-40, 820, 1120, 260, 50, ease(f / 3), 1), WHITE, so); }
-    if (f < 34) inrush(fr.main, f, 70, 1400, fade(f, 20, 34) * 40);
-    sparks(fr.main, fr.glow, f, 50, PINK, 1500, 24);
-    var big = { 8: 0.5, 9: 1, 10: 0.8, 11: 0.5, 12: 0.25 }[f];
-    if (big) { polys(fr.glow, glintPolys([[C + 150, C - 210, 170 * big]]), PINK_L); polys(fr.top, glintPolys([[C + 150, C - 210, 120 * big]]), WHITE); }
-  }
-})();
-// legendary: a slash of light cutting across it, gold lightning crawling its edges, embers, two great glints
-if (ONLY === "over-legendary") (function () {
-  var comp = square("over-legendary", 72);
-  for (var f = 0; f < 72; f++) {
-    var fr = frameOf(comp, f); if (!fr.main) continue;
-    if (f >= 14 && f < 24) { var so = fade(f, 19, 24) * 100, u = ease((f - 13) / 3); polys(fr.glow, slash(1120, 780, -40, 300, 80, u, -1), GOLD, so); polys(fr.top, slash(1120, 780, -40, 300, 58, u, -1), WHITE, so); }
-    if (f >= 16 && f < 56) {
+    var at = f - FACE_AT + 3;
+    if (at >= 0 && at < 9) {
+      var so = fade(at, 4, 9) * 100, u = ease(at / 3);
+      polys(fr.glow, slash(-60, 830, 1140, 250, 74, u, 1), P.main, so);
+      polys(fr.top, slash(-60, 830, 1140, 250, 52, u, 1), WHITE, so);
+    }
+    if (at >= 3) sparks(fr.main, fr.glow, at - 3, rarity === "legendary" ? 70 : 46, P.main, 1500, 24);
+    if (rarity === "legendary" && at >= 4 && at < N - FACE_AT - 8) {
       seed(1600 + f); var arcs = [];
       for (var k = 0; k < 3; k++) { var a = between(0, Math.PI * 2), a2 = a + between(0.4, 0.9), r = toEdge(a, 160, 222), r2 = toEdge(a2, 160, 222); arcs = arcs.concat(bolt(C + Math.cos(a) * r, C + Math.sin(a) * r, C + Math.cos(a2) * r2, C + Math.sin(a2) * r2, 24, true)); }
-      lines(fr.glow, arcs, GOLD, 14, fade(f, 46, 56) * 100); lines(fr.top, arcs, WHITE, 3, fade(f, 46, 56) * 100);
+      lines(fr.glow, arcs, GOLD, 14); lines(fr.top, arcs, WHITE, 3);
     }
-    if (f >= 14) sparks(fr.main, fr.glow, f - 14, 60, ORANGE, 1700, 22);
-    var big = { 18: 0.5, 19: 1, 20: 0.85, 21: 0.6, 22: 0.3 }[f], small = { 40: 0.5, 41: 1, 42: 0.7, 43: 0.35 }[f];
-    if (big) { polys(fr.glow, glintPolys([[C + 150, C - 215, 190 * big]]), GOLD); polys(fr.top, glintPolys([[C + 150, C - 215, 130 * big]]), WHITE); }
+    var big = { 6: 0.5, 7: 1, 8: 0.85, 9: 0.6, 10: 0.3 }[at], small = { 24: 0.5, 25: 1, 26: 0.7, 27: 0.35 }[at];
+    if (big) { polys(fr.glow, glintPolys([[C + 150, C - 215, 190 * big]]), P.light); polys(fr.top, glintPolys([[C + 150, C - 215, 130 * big]]), WHITE); }
     if (small) polys(fr.top, glintPolys([[C - 150, C + 215, 100 * small]]), WHITE);
   }
-})();
+}
+if (ONLY === "over-rare") stagedOver("rare");
+if (ONLY === "over-epic") stagedOver("epic");
+if (ONLY === "over-legendary") stagedOver("legendary");

@@ -11,11 +11,8 @@
   font-weight: 400;
   font-style: normal;
   letter-spacing: 0.04em;
-  padding: 0.35em 0 0.3em;
-  background: linear-gradient(90deg, transparent, #ff8a14 12% 88%, transparent);
   color: #1a0904;
-  -webkit-text-stroke: 0.25rem #ffe08a;
+  -webkit-text-stroke: 0.3rem #ffe08a;
   paint-order: stroke fill;
-  text-shadow: 0.35rem 0.35rem 0 #ffd23e;
-  box-shadow: 0 0 3rem rgba(255, 138, 20, 0.7);
+  text-shadow: 0.5rem 0.5rem 0 #ffd23e, 1rem 1rem 0 #1a0904;
 }
