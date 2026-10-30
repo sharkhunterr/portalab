@@ -83,8 +83,11 @@ if (ONLY === "opening") (function () {
 })();
 
 // --- the reveals: 832 x 1154, the card in the middle, 320 x 444 — drawn behind the card -------------------
-function revealComp(name, count) { return app.project.items.addComp(name, 832, 1154, 1, count * F, 24); }
-var RX = 416, RY = 577, RW = 160, RH = 222;
+// the legendary's comps take more room: 4.4 times the card (its layer as much), the others 2.6 times
+var BIG = ONLY === "reveal-legendary" || ONLY === "legendary-front" || ONLY === "legendary-back", K = BIG ? 1.5 : 1;
+var CW = BIG ? 1408 : 832, CH = BIG ? 1954 : 1154;
+function revealComp(name, count) { return app.project.items.addComp(name, CW, CH, 1, count * F, 24); }
+var RX = CW / 2, RY = CH / 2, RW = 160, RH = 222;
 function ringLines(cx, cy, r, k) { var v = circle(cx, cy, r, k, 64); v.push(v[0]); return v; }
 
 // rare, 1.8 s: 44 frames — a white ensō brushed round the card, edged in indigo, ripples spreading as on a pond,
@@ -157,14 +160,14 @@ if (ONLY === "reveal-epic") (function () {
 // away upwards, flinging its ink, as the card lands. Its front half goes over the card, its back half under it.
 function dragonPoints(f) {
   var spin = 0.9 + f * 0.21, coil = f < 22 ? 1 - ease(f / 22) : 0, out = f < 22 ? 0 : ease((f - 22) / 11);
-  var R = 225 + 105 * coil + 120 * out, H = (2 * RH + 170) * (1 + 0.6 * out), turns = 1.55, rise = 820 * out, pts = [];
+  var R = (225 + 105 * coil) * (1 + (K - 1) * 0.8) + 260 * out * K, H = (2 * RH + 170 * K * K) * (1 + 0.6 * out), turns = 1.55, rise = 820 * K * out, pts = [];
   for (var i = 0; i <= 96; i++) {
     var u = i / 96, th = spin + u * turns * Math.PI * 2;
     pts.push({ x: RX + R * Math.cos(th), y: RY + (0.5 - u) * H + 0.22 * R * Math.sin(th) - rise, d: Math.sin(th), u: u });
   }
   return { pts: pts, thin: out < 0.75 ? 1 : Math.max(0.05, 1 - (out - 0.75) * 4) };
 }
-function bodyWidth(u) { return 9 + 36 * Math.pow(u, 0.55) * (u > 0.93 ? 0.86 : 1); }
+function bodyWidth(u) { return (9 + 36 * Math.pow(u, 0.55) * (u > 0.93 ? 0.86 : 1)) * (1 + (K - 1) * 0.7); }
 // the head, in its own frame (x forwards, y across), about twice the body's width
 var SKULL = [[-40, -34], [-5, -42], [30, -32], [62, -22], [90, -13], [100, -4], [86, 2], [52, 4], [22, 9], [-10, 15], [-42, 20]];
 var JAW = [[-30, 16], [10, 14], [48, 13], [82, 26], [72, 34], [40, 33], [4, 34], [-30, 32]];
@@ -197,7 +200,7 @@ function dragon(L, f, front) {
   var whiskers = [], eyes = [], pupils = [], teeth = [], mane = [], head = [];
   var hi = pts.length - 1, hp = pts[hi];
   if ((hp.d > 0) === front && D.thin > 0.3) {
-    var p2 = pts[hi - 3], ang = Math.atan2(hp.y - p2.y, hp.x - p2.x), s = 1.25 * D.thin;
+    var p2 = pts[hi - 3], ang = Math.atan2(hp.y - p2.y, hp.x - p2.x), s = 1.25 * (1 + (K - 1) * 0.7) * D.thin;
     head = headPolys([SKULL, JAW].concat(HORNS), hp.x, hp.y, ang, s);
     teeth = headPolys(TEETH, hp.x, hp.y, ang, s);
     for (var m = 0; m < 7; m++) { var mx = -34 - m * 15, flick = Math.sin(f * 0.7 + m) * 8; mane.push(rotated([[mx + 6, -30 + m * 3], [mx - 44 + flick, -74 + m * 7], [mx - 14, -24 + m * 3]], hp.x, hp.y, ang, s, s)); mane.push(rotated([[mx + 4, 24], [mx - 40 + flick, 56 + m * 2], [mx - 12, 22]], hp.x, hp.y, ang, s, s)); }
@@ -255,35 +258,65 @@ if (ONLY === "legendary-back") (function () {
 
 // the legendary's reveal, once it has landed, 2.5 s: 60 frames — gold cracks running out from the card across
 // everything, soft gold rays, ink flung out from behind it, a great gold ensō, a storm of gold leaf, two great glints
+// gold clouds (zuiun): a band of scalloped lobes over a flat foot, a curl in each lobe — w wide, at (x, y), facing
+// left or right (dir)
+function cloud(x, y, w, lobes, dir) {
+  var top = [], curls = [], r = w / lobes / 2;
+  for (var i = 0; i < lobes; i++) {
+    var cx = x + dir * (r + i * 2 * r), rr = r * (1 - 0.18 * Math.abs(i - lobes / 2) / lobes), cy = y - rr * 0.35;
+    for (var q = 0; q <= 10; q++) { var a = Math.PI + q / 10 * Math.PI; top.push([cx + Math.cos(a) * rr * dir, cy + Math.sin(a) * rr]); }
+    var c = []; for (var k = 0; k <= 18; k++) { var t = k / 18, ca = Math.PI * 1.1 + t * Math.PI * 1.6, cr = rr * 0.6 * (1 - t * 0.7); c.push([cx + Math.cos(ca) * cr * dir, cy + Math.sin(ca) * cr]); }
+    curls.push(c);
+  }
+  var foot = [[x + dir * w, y + r * 0.35], [x + dir * w * 1.08, y + r * 0.6], [x - dir * w * 0.06, y + r * 0.6], [x, y + r * 0.35]];
+  return { shape: top.concat(foot), curls: curls };
+}
+// the legendary's reveal, once it has landed, 2.5 s: 60 frames — a great vermillion sun rising behind the card,
+// ringed in gold; gold clouds drifting in from both sides; gold cracks running out from the card across
+// everything; soft gold rays; ink flung out; a great gold ensō; a storm of gold leaf; two great glints
 if (ONLY === "reveal-legendary") (function () {
   var comp = revealComp("reveal-legendary", 60);
+  for (var u = 0; u < 60; u++) {   // the sun: rising, swelling, fading
+    var su = frames(comp, "sun-" + u, u, u + 1, (u < 46 ? 100 : 100 - (u - 46) * 7) * 0.92), sr = 380 * ease((u + 1) / 10) + u * 1.2, sy = RY - 120 - 60 * ease(u / 30);
+    polys(su, [circle(RX, sy, sr * 0.97, 1, 72)], SHU);
+    lines(su, [circle(RX, sy, sr * 1.04, 1, 72).concat([[RX + sr * 1.04, sy]])], [[GOLD, 10]]);
+    lines(su, [circle(RX, sy, sr * 1.13, 1, 72).concat([[RX + sr * 1.13, sy]])], [[GOLD, 4, 70]]);
+  }
   for (var y = 0; y < 36; y++) {
     seed(4000); var Y = frames(comp, "rays-" + y, y, y + 1, y < 20 ? 40 : 40 - (y - 20) * 2.5), rays = [];
-    for (var i = 0; i < 30; i++) {
-      var a = i / 30 * Math.PI * 2 + y * 0.01, w = between(0.04, 0.1), reach = between(300, 560) * ease((y + 1) / 7);
+    for (var i = 0; i < 36; i++) {
+      var a = i / 36 * Math.PI * 2 + y * 0.01, w = between(0.03, 0.08), reach = between(450, 900) * ease((y + 1) / 7);
       var b1 = toEdge(a - w, RW, RH), b2 = toEdge(a + w, RW, RH), tip = toEdge(a, RW, RH) + reach;
       rays.push([[RX + Math.cos(a - w) * b1, RY + Math.sin(a - w) * b1], [RX + Math.cos(a) * tip, RY + Math.sin(a) * tip], [RX + Math.cos(a + w) * b2, RY + Math.sin(a + w) * b2]]);
     }
     polys(Y, rays, GOLD_L);
   }
-  for (var s = 0; s < 22; s++) gilded(frames(comp, "burst-" + s, s, s + 1), inkBurst(RX, RY, 18, RW, RH, 300, 64, 1, s, 4100), INK, GOLD, 5, 7);
+  for (var cl = 0; cl < 60; cl++) {   // the clouds, drifting in from both sides, then on
+    var CL = frames(comp, "clouds-" + cl, cl, cl + 1, cl < 46 ? 100 : 100 - (cl - 46) * 7), inn = ease((cl + 1) / 14), dx = (1 - inn) * 700 + cl * 1.5;
+    var set = [cloud(RX - 360 - dx, RY + 330, 420, 5, -1), cloud(RX + 360 + dx, RY - 380, 380, 4, 1), cloud(RX - 330 - dx * 1.2, RY - 620, 300, 3, -1), cloud(RX + 330 + dx * 1.2, RY + 640, 340, 4, 1)];
+    var shapes = [], curls = [];
+    for (var cs = 0; cs < set.length; cs++) { shapes.push(set[cs].shape); curls = curls.concat(set[cs].curls); }
+    lines(CL, curls, [[GOLD_D, 5]]);
+    gilded(CL, shapes, GOLD, GOLD_D, 4, 6);
+  }
+  for (var s = 0; s < 22; s++) gilded(frames(comp, "burst-" + s, s, s + 1), inkBurst(RX, RY, 22, RW, RH, 520, 80, 1, s, 4100), INK, GOLD, 5, 7);
   seed(4200);
   var cracks = [];
-  for (var c = 0; c < 8; c++) { var ca = c / 8 * Math.PI * 2 + between(-0.2, 0.2), ce = toEdge(ca, RW, RH); cracks = cracks.concat(crackLines(RX + Math.cos(ca) * ce, RY + Math.sin(ca) * ce, ca, between(170, 290), 0.035)); }
-  for (var k = 1; k < 48; k++) gold(frames(comp, "cracks-" + k, k, k + 1, k < 38 ? 100 : 100 - (k - 38) * 10), partOf(cracks, ease(k / 14)), 7);
+  for (var c = 0; c < 10; c++) { var ca = c / 10 * Math.PI * 2 + between(-0.2, 0.2), ce = toEdge(ca, RW, RH); cracks = cracks.concat(crackLines(RX + Math.cos(ca) * ce, RY + Math.sin(ca) * ce, ca, between(320, 560), 0.04)); }
+  for (var k = 1; k < 48; k++) gold(frames(comp, "cracks-" + k, k, k + 1, k < 38 ? 100 : 100 - (k - 38) * 10), partOf(cracks, ease(k / 14)), 8);
   for (var e = 6; e < 46; e++) {
     seed(4300 + Math.floor(e / 2));
     var E = frames(comp, "enso-" + e, e, e + 1, e < 42 ? 100 : 100 - (e - 41) * 24);
-    gilded(E, brushPolys(ensoLine(RX, RY, 345, 1.18, -2.0, Math.PI * 1.8), 64, ease((e - 5) / 9), 0.5, 11, e < 30 ? 0 : (e - 29) / 15), GOLD, GOLD_D, 5, 7);
+    gilded(E, brushPolys(ensoLine(RX, RY, 560, 1.12, -2.0, Math.PI * 1.8), 90, ease((e - 5) / 9), 0.5, 13, e < 30 ? 0 : (e - 29) / 15), GOLD, GOLD_D, 6, 8);
   }
   for (var l = 2; l < 60; l++) {
     seed(4400); var LL = frames(comp, "leaf-" + l, l, l + 1, l < 46 ? 100 : 100 - (l - 46) * 7), leaf = [], age = l - 2;
-    for (var j = 0; j < 40; j++) { var la = between(0, Math.PI * 2), ld = toEdge(la, RW, RH) + between(60, 420) * ease(age / 20); leaf.push([RX + Math.cos(la) * ld, RY + Math.sin(la) * ld + age * age * 0.1 * between(0.5, 1.2), between(9, 20), age * between(-0.2, 0.2), between(0, 6) + age * between(0.2, 0.45)]); }
+    for (var j = 0; j < 64; j++) { var la = between(0, Math.PI * 2), ld = toEdge(la, RW, RH) + between(80, 720) * ease(age / 20); leaf.push([RX + Math.cos(la) * ld, RY + Math.sin(la) * ld + age * age * 0.14 * between(0.5, 1.2), between(10, 24), age * between(-0.2, 0.2), between(0, 6) + age * between(0.2, 0.45)]); }
     flakes(LL, leaf);
   }
   var big = { 2: 0.5, 3: 1, 4: 0.85, 5: 0.6, 6: 0.4, 7: 0.2 }, small = { 28: 0.5, 29: 1, 30: 0.7, 31: 0.4, 32: 0.2 };
-  for (var bg in big) glints(frames(comp, "glintA-" + bg, +bg, +bg + 1), [[RX + 190, RY - 255, 130 * big[bg]]], GOLD_L);
-  for (var sm in small) glints(frames(comp, "glintB-" + sm, +sm, +sm + 1), [[RX - 185, RY + 255, 90 * small[sm]]], WHITE);
+  for (var bg in big) glints(frames(comp, "glintA-" + bg, +bg, +bg + 1), [[RX + 200, RY - 270, 170 * big[bg]]], GOLD_L);
+  for (var sm in small) glints(frames(comp, "glintB-" + sm, +sm, +sm + 1), [[RX - 195, RY + 270, 120 * small[sm]]], WHITE);
 })();
 
 writeLn("comps " + app.project.numItems);
