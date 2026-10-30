@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "geode-rare",
+  "names": {
+    "fr": "Face rare",
+    "en": "Rare face"
+  },
+  "descriptions": {
+    "fr": "Un cadre taillé dans le quartz bleu, à facettes, un sertissage d'argent ; en se retournant, un reflet prismatique glisse sur elle.",
+    "en": "A frame cut in blue quartz, faceted, a silver bezel; as it turns, a prismatic gleam glides over it."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

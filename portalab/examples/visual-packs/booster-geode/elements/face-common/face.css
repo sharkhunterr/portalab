@@ -1,0 +1,82 @@
+/* A common card: a frame of polished grey stone, a silver bezel, veined pale stone, an engraved title. (Its
+   hook: the card once turned, data-card-face.) The face turns in 3D: never its transform; a turned media card
+   is never redrawn — what moves, moves once, as it is revealed. */
+@font-face {
+  font-family: "Geode Cinzel";
+  src: url("Cinzel.woff2") format("woff2");
+  font-weight: 500 800;
+  font-display: swap;
+}
+/* the card: its frame of stone or cut gem, a bevel catching the light */
+[data-card-face="geode-common"] .mcard__card {
+  padding: 3cqi;
+  border-radius: 2.2cqi;
+  background: url("stone.svg") 0 0 / 200% auto, #4a4048;
+  box-shadow:
+    inset 0.5cqi 0.5cqi 0.6cqi rgba(255, 255, 255, 0.35),
+    inset -0.5cqi -0.5cqi 0.8cqi rgba(0, 0, 0, 0.35),
+    0 0 0 0.35cqi #1c1228,
+    0 1.4cqi 3cqi rgba(0, 0, 0, 0.5);
+}
+/* the body: polished pale stone in its bezel */
+[data-card-face="geode-common"] .mcard__body {
+  border-radius: 1.2cqi;
+  background: url("veins.svg") 0 0 / 100% 100%, #f1edf5;
+  box-shadow: 0 0 0 0.5cqi #c9c3cf, 0 0 0 0.8cqi #1c1228, inset 0 0.4cqi 1cqi rgba(28, 18, 40, 0.18);
+  color: #1c1228;
+}
+/* the title, engraved */
+[data-card-face="geode-common"] .mcard[data-rarity] .mcard__name {
+  font-family: "Geode Cinzel", var(--mcard-title);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  color: #1c1228;
+  text-shadow: 0 0.25cqi 0 rgba(255, 255, 255, 0.85), 0 -0.15cqi 0 rgba(28, 18, 40, 0.25);
+}
+[data-card-face="geode-common"] .mcard__genre {
+  border-radius: 99cqi;
+  background: linear-gradient(160deg, #5b5160, #1c1228);
+  color: #ffffff;
+  box-shadow: 0 0 0 0.3cqi #c9c3cf;
+  font-family: "Geode Cinzel", var(--mcard-title);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+[data-card-face="geode-common"] .mcard__emblem {
+  background: #1c1228;
+  color: #c9c3cf;
+}
+/* the art, set like a stone in its bezel */
+[data-card-face="geode-common"] .mcard__art {
+  border-radius: 0.8cqi;
+  box-shadow: 0 0 0 0.45cqi #c9c3cf, 0 0 0 0.8cqi #1c1228, 0 0.6cqi 1.4cqi rgba(28, 18, 40, 0.35);
+}
+[data-card-face="geode-common"] .mcard__badge,
+[data-card-face="geode-common"] .mcard__poster {
+  box-shadow: 0 0 0 0.4cqi #c9c3cf, 0 0 0 0.7cqi #1c1228;
+}
+[data-card-face="geode-common"] .mcard__strip {
+  border-radius: 0.5cqi;
+  background: linear-gradient(90deg, #1c1228, #5b5160);
+  color: #ffffff;
+}
+[data-card-face="geode-common"] .mcard__cost {
+  background: #5b5160;
+  color: #ffffff;
+  box-shadow: 0 0 0 0.3cqi #c9c3cf;
+}
+[data-card-face="geode-common"] .mcard__figures strong {
+  font-family: "Geode Cinzel", var(--mcard-title);
+  font-weight: 700;
+}
+/* the rarity: a cut stone */
+[data-card-face="geode-common"] .mcard__rarity {
+  border-radius: 0.6cqi;
+  background: linear-gradient(135deg, #ffffff 0 12%, #5b5160 12% 55%, #1c1228);
+  color: #ffffff;
+  box-shadow: 0 0 0 0.3cqi #c9c3cf;
+  font-family: "Geode Cinzel", var(--mcard-title);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}

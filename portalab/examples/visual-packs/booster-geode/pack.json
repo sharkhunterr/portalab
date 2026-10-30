@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "geode",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Géode — scène de cristal",
+    "en": "Geode — a crystal scene"
+  },
+  "descriptions": {
+    "fr": "Une ouverture de booster au cœur d'une géode, ses animations dessinées image par image dans EffectCraft et jouées en vidéo : une caverne tapissée de pointes d'améthyste ; une pierre brute traversée de fêlures de lumière qui éclate, sa coque volant en morceaux, et une couronne d'améthystes qui jaillit puis se brise en éclats ; des cartes serties comme des pierres — pierre polie, quartz bleu, améthyste, opale arc-en-ciel sertie d'or — révélées par des druses de quartz, un éventail d'améthystes ou — légendaire — une couronne de cristaux géants de toutes les gemmes et une ceinture d'éclats qui tourne autour d'elles.",
+    "en": "A booster opening inside a geode, its animations drawn frame by frame in EffectCraft and played as videos: a cavern lined with amethyst points; a rough stone cracked with light that bursts, its shell flying in pieces, and a crown of amethysts shooting out then shattering into shards; cards set like stones — polished stone, blue quartz, amethyst, rainbow opal set in gold — revealed by druses of quartz, a fan of amethysts or — legendary — a crown of giant crystals of every gem and a belt of shards orbiting them."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

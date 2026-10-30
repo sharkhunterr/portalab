@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "geode-legendary",
+  "names": {
+    "fr": "Couronne de cristaux",
+    "en": "Crystal crown"
+  },
+  "descriptions": {
+    "fr": "Dessinée dans EffectCraft, jouée en deux vidéos : des rayons prismatiques qui tournent, une couronne de cristaux géants de toutes les gemmes — améthyste, citrine, émeraude, quartz rose et bleu — qui jaillit tout autour de la carte, une ceinture d'éclats en orbite qui passe derrière puis devant elle, de grands éclats, puis tout se brise en éclats arc-en-ciel.",
+    "en": "Drawn in EffectCraft, played as two videos: prismatic rays turning, a crown of giant crystals of every gem — amethyst, citrine, emerald, rose and blue quartz — erupting all round the card, a belt of shards orbiting it, behind then over it, great glints, then all shattering into rainbow shards."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary",
+    "over": "over.mp4"
+  }
+}

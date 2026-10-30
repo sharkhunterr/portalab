@@ -1,0 +1,23 @@
+{
+  "type": "card_reveal",
+  "look": "geode-rare",
+  "names": {
+    "fr": "Druse de quartz",
+    "en": "Quartz druse"
+  },
+  "descriptions": {
+    "fr": "Dessinée dans EffectCraft, jouée en vidéo : des druses de quartz bleu jaillissent de derrière la carte, une onde de lumière, des éclats, puis tout se brise en paillettes.",
+    "en": "Drawn in EffectCraft, played as a video: druses of blue quartz shoot out from behind the card, a ring of light, glints, then all shatters into glitter."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "alpha": "side",
+    "css": [
+      "reveal.css"
+    ],
+    "stage": true,
+    "duration": 1.8,
+    "rarity": "rare"
+  }
+}

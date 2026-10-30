@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "geode-common",
+  "names": {
+    "fr": "Face commune",
+    "en": "Common face"
+  },
+  "descriptions": {
+    "fr": "Un cadre de pierre grise polie, un sertissage d'argent, un corps de pierre pâle veinée, un titre gravé.",
+    "en": "A frame of polished grey stone, a silver bezel, a body of veined pale stone, an engraved title."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

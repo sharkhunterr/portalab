@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "geode",
+  "names": {
+    "fr": "Dos de pierre",
+    "en": "Stone back"
+  },
+  "descriptions": {
+    "fr": "Pierre sombre, un cadre de facettes taillées et un liseré d'améthyste, une géode coupée en deux au centre.",
+    "en": "Dark stone, a frame of cut facets and an amethyst line, a geode cut in two in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

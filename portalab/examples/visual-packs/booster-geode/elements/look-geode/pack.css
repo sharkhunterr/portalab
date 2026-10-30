@@ -1,0 +1,119 @@
+/* The sealed pack (its hook: data-booster-look), a geode not yet opened: rough stone cut into an octagon,
+   chipped at a corner where amethyst breaks through, cracks of violet light pulsing through it; the work's art in a window polished through to the crystal, ringed with
+   amethyst and glowing; its name engraved; the card count on a cut gem; a glint at its corner. */
+@font-face {
+  font-family: "Geode Cinzel";
+  src: url("Cinzel.woff2") format("woff2");
+  font-weight: 500 800;
+  font-display: swap;
+}
+[data-booster-look="geode"] .booster-pack {
+  border-radius: 0;
+  clip-path: polygon(14% 0, 86% 0, 100% 9%, 100% 91%, 86% 100%, 14% 100%, 0 91%, 0 9%);
+  background:
+    url("crust.svg") 0 0 / 42% auto no-repeat,
+    radial-gradient(ellipse 70% 50% at 35% 25%, rgba(255, 255, 255, 0.16), transparent 70%),
+    url("stone.svg") 0 0 / 160% auto,
+    #4a4048;
+  box-shadow: inset 0 0 1.4rem rgba(0, 0, 0, 0.65);
+  filter: drop-shadow(0 1rem 1.6rem rgba(0, 0, 0, 0.6));
+}
+/* the window, polished through to the crystal */
+[data-booster-look="geode"] .booster-pack__art {
+  inset: 14% 12% 32%;
+  inline-size: 76%;
+  block-size: 54%;
+  border-radius: 0.3rem;
+  border: 3px solid #c9a2ff;
+  box-shadow: 0 0 0 4px #3d1270, 0 0 1.1rem 0.4rem rgba(168, 110, 255, 0.55), inset 0 0 0.8rem rgba(61, 18, 112, 0.6);
+  mask: none;
+  filter: saturate(1.1) contrast(1.05);
+}
+/* cracks of violet light, pulsing while it waits */
+[data-booster-look="geode"] .booster-pack__foil {
+  opacity: 1;
+  background: url("cracks.svg") center / 100% 100% no-repeat;
+  mix-blend-mode: screen;
+  animation: geode-pulse 3.6s ease-in-out infinite;
+}
+@keyframes geode-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+[data-booster-look="geode"] .booster-pack__stars {
+  opacity: 0;
+}
+[data-booster-look="geode"] .booster-pack__flap {
+  border: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.4), transparent);
+  box-shadow: none;
+}
+/* a pack with no art: the geode cut in two */
+[data-booster-look="geode"] .booster-pack__emblem {
+  inline-size: 74%;
+  aspect-ratio: 1;
+  background: url("geode.svg") center / contain no-repeat;
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-booster-look="geode"] .booster-pack__emblem svg {
+  opacity: 0;
+}
+/* its name, engraved in the stone */
+[data-booster-look="geode"] .booster-pack__name {
+  inset: auto 6% 12%;
+  font-family: "Geode Cinzel", serif;
+  font-weight: 800;
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  color: #e9e2ee;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 0.8rem rgba(168, 110, 255, 0.6);
+}
+[data-booster-look="geode"] .booster-pack__subtitle {
+  inset: auto 6% 5%;
+  color: #cfc6d6;
+  font-family: "Geode Cinzel", serif;
+  font-weight: 600;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.8);
+}
+/* the card count, on a cut gem */
+[data-booster-look="geode"] .booster-pack__count {
+  inset: 0.6rem 0.9rem auto auto;
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  padding: 0;
+  border-radius: 0;
+  background: url("gem.svg") center / contain no-repeat;
+  color: #ffffff;
+  font-family: "Geode Cinzel", serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-shadow: 0 1px 2px #120a1e;
+  box-shadow: none;
+}
+/* on the stage: a glint at the pack's corner now and then */
+[data-booster-look="geode"] .booster-stage__tear::after {
+  content: "";
+  position: absolute;
+  inset: -4% -8% auto auto;
+  z-index: 4;
+  inline-size: 24%;
+  aspect-ratio: 1;
+  pointer-events: none;
+  background: url("glint.svg") center / contain no-repeat;
+  animation: geode-flare 3.8s ease-in-out infinite;
+}
+@keyframes geode-flare {
+  0%, 62%, 100% { transform: scale(0) rotate(0deg); }
+  72% { transform: scale(1) rotate(30deg); }
+  86% { transform: scale(0.2) rotate(50deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="geode"] .booster-pack__foil,
+  [data-booster-look="geode"] .booster-stage__tear::after {
+    animation: none;
+  }
+}

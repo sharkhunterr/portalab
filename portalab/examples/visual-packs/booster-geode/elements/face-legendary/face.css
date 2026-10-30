@@ -1,0 +1,123 @@
+/* A legendary card: a frame of rainbow opal cut in facets, set in gold; as it lands, gold sweeps over it and a
+   glint crosses its art (its reveal brings the crown of crystals). (Its hook: the card once turned, data-card-
+   face.) The face turns in 3D: never its transform; a turned media card is never redrawn — what moves, moves
+   once, as it is revealed. */
+@font-face {
+  font-family: "Geode Cinzel";
+  src: url("Cinzel.woff2") format("woff2");
+  font-weight: 500 800;
+  font-display: swap;
+}
+/* the card: its frame of stone or cut gem, a bevel catching the light */
+[data-card-face="geode-legendary"] .mcard__card {
+  padding: 3cqi;
+  border-radius: 2.2cqi;
+  background: url("facets.svg") 0 0 / 100% 100%, conic-gradient(from 200deg at 40% 45%, #ffd6e8, #ffe9b0, #c8ffd9, #b8e4ff, #d9c4ff, #ffd6e8);
+  box-shadow:
+    inset 0.5cqi 0.5cqi 0.6cqi rgba(255, 255, 255, 0.35),
+    inset -0.5cqi -0.5cqi 0.8cqi rgba(0, 0, 0, 0.35),
+    0 0 0 0.35cqi #1c1228,
+    0 1.4cqi 3cqi rgba(0, 0, 0, 0.5);
+}
+/* the body: polished pale stone in its bezel */
+[data-card-face="geode-legendary"] .mcard__body {
+  border-radius: 1.2cqi;
+  background: url("veins.svg") 0 0 / 100% 100%, #f1edf5;
+  box-shadow: 0 0 0 0.5cqi #e2b04a, 0 0 0 0.8cqi #1c1228, inset 0 0.4cqi 1cqi rgba(28, 18, 40, 0.18);
+  color: #1c1228;
+}
+/* the title, engraved */
+[data-card-face="geode-legendary"] .mcard[data-rarity] .mcard__name {
+  font-family: "Geode Cinzel", var(--mcard-title);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  color: #1c1228;
+  text-shadow: 0 0.25cqi 0 rgba(255, 255, 255, 0.85), 0 -0.15cqi 0 rgba(28, 18, 40, 0.25);
+}
+[data-card-face="geode-legendary"] .mcard__genre {
+  border-radius: 99cqi;
+  background: linear-gradient(160deg, #b07a12, #1c1228);
+  color: #ffffff;
+  box-shadow: 0 0 0 0.3cqi #e2b04a;
+  font-family: "Geode Cinzel", var(--mcard-title);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+[data-card-face="geode-legendary"] .mcard__emblem {
+  background: #1c1228;
+  color: #e2b04a;
+}
+/* the art, set like a stone in its bezel */
+[data-card-face="geode-legendary"] .mcard__art {
+  border-radius: 0.8cqi;
+  box-shadow: 0 0 0 0.45cqi #e2b04a, 0 0 0 0.8cqi #1c1228, 0 0.6cqi 1.4cqi rgba(28, 18, 40, 0.35);
+}
+[data-card-face="geode-legendary"] .mcard__badge,
+[data-card-face="geode-legendary"] .mcard__poster {
+  box-shadow: 0 0 0 0.4cqi #e2b04a, 0 0 0 0.7cqi #1c1228;
+}
+[data-card-face="geode-legendary"] .mcard__strip {
+  border-radius: 0.5cqi;
+  background: linear-gradient(90deg, #1c1228, #b07a12);
+  color: #ffffff;
+}
+[data-card-face="geode-legendary"] .mcard__cost {
+  background: #b07a12;
+  color: #ffffff;
+  box-shadow: 0 0 0 0.3cqi #e2b04a;
+}
+[data-card-face="geode-legendary"] .mcard__figures strong {
+  font-family: "Geode Cinzel", var(--mcard-title);
+  font-weight: 700;
+}
+/* the rarity: a cut stone */
+[data-card-face="geode-legendary"] .mcard__rarity {
+  border-radius: 0.6cqi;
+  background: linear-gradient(135deg, #ffffff 0 12%, #b07a12 12% 55%, #1c1228);
+  color: #ffffff;
+  box-shadow: 0 0 0 0.3cqi #e2b04a;
+  font-family: "Geode Cinzel", var(--mcard-title);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+/* gold sweeping over it once as it lands */
+[data-card-face="geode-legendary"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 224, 154, 0.9) 48%, rgba(255, 255, 255, 0.95) 50%, rgba(226, 176, 74, 0.9) 52%, transparent 62%) 0 0 / 300% 300%;
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+  animation: geode-gold-legendary 1.6s ease-in-out 1s both;
+}
+@keyframes geode-gold-legendary {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 80% 80%; }
+}
+/* a glint crossing the art once — on its own small part, not the whole card */
+[data-card-face="geode-legendary"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(120deg, transparent 44%, rgba(255, 255, 255, 0.95) 46%, transparent 49%) -150% 0 / 250% 100% no-repeat;
+  animation: geode-glint-legendary 1.4s ease-in-out 1.7s both;
+}
+@keyframes geode-glint-legendary {
+  0% { background-position: -150% 0; }
+  100% { background-position: 250% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-face="geode-legendary"] .mcard__art::after {
+    animation: none;
+    opacity: 0;
+  }
+  [data-card-face="geode-legendary"] .booster-card__face::after {
+    animation: none;
+  }
+}
