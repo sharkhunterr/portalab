@@ -2,7 +2,8 @@
  * Issue 239: the member guide's screenshots, taken from a running portal and annotated — each element framed,
  * numbered, and when it says so a bubble with an arrow pointing at it. The shots are described in a JSON file
  * (``docs/member-guide/shots/<page>.json``, one per page): the page, the screen, what is done first, the part
- * kept and the marks.
+ * kept and the marks. A shot may name the API paths a page reads by POST (``"reads": ["/api/v1/search"]``);
+ * every other write is refused.
  * The interface is shown in the guide's language whatever the account's; nothing is changed on the portal.
  * By default only the content is kept (``main``), never the header nor the member's own panel.
  *
@@ -199,10 +200,14 @@ async function take(shot, last) {
     timeout: 120000,
   });
   const page = await context.newPage();
-  // nothing is changed on the portal: what the page would write (a view, a mission, a setting) is refused
-  await page.route("**/api/v1/**", (route) =>
-    route.request().method() === "GET" ? route.fallback() : route.fulfill({ status: 204, body: "" }),
-  );
+  // nothing is changed on the portal: what the page would write (a view, a mission, a setting) is refused —
+  // but the reads a page makes by POST (a search: its query in the body), when the shot names them
+  const reads = shot.reads ?? [];
+  await page.route("**/api/v1/**", (route) => {
+    const request = route.request();
+    const read = request.method() === "POST" && reads.some((path) => new URL(request.url()).pathname === path);
+    return request.method() === "GET" || read ? route.fallback() : route.fulfill({ status: 204, body: "" });
+  });
   // the guide's language, whatever the account's — only in this browser
   await page.route("**/api/v1/i18n/context", async (route) => {
     const response = await route.fetch();

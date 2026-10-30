@@ -3,7 +3,8 @@
  * Portalab release script (same flow as the sibling projects).
  *
  * - Checks that GITHUB_RELEASES.md opens with the notes of the version about to be released (`# vX.Y.Z`):
- *   those notes are the GitLab and GitHub release pages — write them first.
+ *   those notes are the GitLab and GitHub release pages — write them first, with their « Closed issues »
+ *   (`npm run release:issues` lists them by kind; v1.0.0, the first public release, has none).
  * - Bumps the version with standard-version (package.json, the frontend's package.json + lock, the
  *   backend's pyproject.toml + uv.lock + __version__), writes CHANGELOG.md, commits, tags `vX.Y.Z`.
  * - Pushes to GitLab with the tag: the tag pipeline validates, tests and builds; with --deploy it also
@@ -15,6 +16,7 @@
  *   npm run release:minor        # force the bump (patch | minor | major)
  *   npm run release:dry          # what would happen, nothing changed
  *   npm run release:notes        # print the notes the release pages will show
+ *   npm run release:issues       # the issues closed since the last tag, by kind, for the notes
  *
  * Options: --github --deploy --dry-run --skip-push --skip-notes-check --no-gitlab, patch|minor|major
  */
@@ -120,6 +122,13 @@ function main() {
       console.error(
         `\nx GITHUB_RELEASES.md must open with the notes of v${next} (found: ${notesVersion ? `v${notesVersion}` : 'none'}).\n` +
           `  Add a "# v${next}" block at the top (English, see the template in the file), commit it, then release again.`,
+      );
+      process.exit(1);
+    }
+    if (next !== '1.0.0' && !/^### Closed issues\s*$/m.test(notes)) {
+      console.error(
+        `\nx The notes of v${next} have no "### Closed issues" part.\n` +
+          '  Run `npm run release:issues`, rewrite its lines in English in the notes, commit, then release again.',
       );
       process.exit(1);
     }
