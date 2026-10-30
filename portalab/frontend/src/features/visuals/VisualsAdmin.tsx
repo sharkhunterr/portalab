@@ -247,6 +247,11 @@ function PackCard({
             HD
           </span>
         ) : null}
+        {summary?.video ? (
+          <span className="visuals-flag" data-flag="video">
+            {t("admin:visuals.video")}
+          </span>
+        ) : null}
         {summary?.script ? (
           <span className="visuals-flag" data-flag="script">
             {t("admin:visuals.script")}

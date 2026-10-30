@@ -23,6 +23,8 @@ export interface Summary {
   info: number;
   elements: number;
   hd: boolean;
+  /** issue 287: a part played as a video */
+  video?: boolean;
   script: boolean;
   publishable: boolean;
   security?: { blocking: number; warning: number; info: number };

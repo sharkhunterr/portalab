@@ -1,1021 +1,1129 @@
 {
-  "report": {
-    "summary": {
-      "blocking": 0,
-      "warning": 0,
-      "info": 13,
-      "elements": 12,
-      "hd": true,
-      "script": true,
-      "publishable": true,
-      "security": {
-        "blocking": 0,
-        "warning": 0,
-        "info": 1
-      }
-    },
-    "pack": {
-      "format": 1,
-      "id": "nordlys",
-      "version": "1.0.0",
-      "names": {
-        "fr": "Nordlys \u2014 aurores bor\u00e9ales",
-        "en": "Nordlys \u2014 northern lights"
-      },
-      "descriptions": {
-        "fr": "Un pack d'exemple : les aurores bor\u00e9ales du Grand Nord, en passage de niveau, cadres, nom runique, c\u00e9l\u00e9bration, ambiance de fjord, palette, titre, badge \u2014 et son pack et son booster.",
-        "en": "An example pack: the far north's lights as a level-up, frames, a runic name, a celebration, a fjord ambience, a palette, a title, a badge \u2014 with its pack and its booster."
-      },
-      "author": "Portalab (example)",
-      "license": "CC0-1.0 (code) \u00b7 OFL-1.1 (Uncial Antiqua)",
-      "homepage": "https://example.org/portalab-nordlys",
-      "elements": null
-    },
-    "items": [
-      {
-        "level": "info",
-        "code": "element.no_preview",
-        "category": "analysis",
-        "element": "ambient_fjord",
-        "params": {}
-      },
-      {
-        "level": "info",
-        "code": "element.no_preview",
-        "category": "analysis",
-        "element": "badge_nordlys",
-        "params": {}
-      },
-      {
-        "level": "info",
-        "code": "element.no_preview",
-        "category": "analysis",
-        "element": "booster_nordlys",
-        "params": {}
-      },
-      {
-        "level": "info",
-        "code": "element.no_preview",
-        "category": "analysis",
-        "element": "effect_nordlysglow",
-        "params": {}
-      },
-      {
-        "level": "info",
-        "code": "js.sandboxed",
-        "category": "security",
-        "element": "effect_nordlysglow",
-        "params": {}
-      },
-      {
-        "level": "info",
-        "code": "element.no_preview",
-        "category": "analysis",
-        "element": "frame_fjordring",
-        "params": {}
-      },
-      {
-        "level": "info",
-        "code": "element.no_preview",
-        "category": "analysis",
-        "element": "frame_nordlys",
-        "params": {}
-      },
-      {
-        "level": "info",
-        "code": "element.no_preview",
-        "category": "analysis",
-        "element": "theme_nordlys",
-        "params": {}
-      },
-      {
-        "level": "info",
-        "code": "theme.nav",
-        "category": "analysis",
-        "element": "theme_nordlys",
-        "params": {
-          "nav": ["orbit"]
-        }
-      },
-      {
-        "level": "info",
-        "code": "element.no_preview",
-        "category": "analysis",
-        "element": "name_nordrune",
-        "params": {}
-      },
-      {
-        "level": "info",
-        "code": "element.no_preview",
-        "category": "analysis",
-        "element": "ultimate_nordlys",
-        "params": {}
-      },
-      {
-        "level": "info",
-        "code": "element.no_preview",
-        "category": "analysis",
-        "element": "palette_nordlys",
-        "params": {}
-      },
-      {
-        "level": "info",
-        "code": "element.no_preview",
-        "category": "analysis",
-        "element": "title_aurora_wanderer",
-        "params": {}
-      }
-    ],
-    "elements": [
-      {
-        "folder": "elements/ambient-fjord",
-        "product": "ambient_fjord",
-        "type": "ambient",
-        "look": "fjord",
-        "kind": "glsl",
-        "folder_files": ["fjord.glsl"],
-        "contracts": [],
-        "free": false,
-        "hd": true,
-        "script": false,
-        "names": {
-          "fr": "Fjord sous l'aurore",
-          "en": "Fjord under the northern lights"
-        },
-        "descriptions": {
-          "fr": "Un fjord la nuit : les montagnes en silhouette, l'aurore qui ondule au-dessus et se refl\u00e8te dans l'eau calme, la neige qui tombe doucement.",
-          "en": "A fjord at night: the mountains in silhouette, the northern lights rippling above and mirrored in the still water, snow falling softly."
-        },
-        "economy": {
-          "price": 1200,
-          "rarity": "epic",
-          "level": 12,
-          "supply": null,
-          "collection": "ambients",
-          "icon": "telescope",
-          "repeatable": false,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {},
-        "render": {
-          "kind": "glsl",
-          "file": "fjord.glsl",
-          "css": [],
-          "stage": false,
-          "shape": 0,
-          "radius": null,
-          "reveal": null,
-          "duration": null,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": null,
-        "preview": null,
-        "replaces": false,
-        "bytes": 2525
-      },
-      {
-        "folder": "elements/badge-aurora",
-        "product": "badge_nordlys",
-        "type": "badge",
-        "look": null,
-        "kind": "data",
-        "folder_files": [],
-        "contracts": [],
-        "free": false,
-        "hd": false,
-        "script": false,
-        "names": {
-          "fr": "Badge Flocon d'aurore",
-          "en": "Aurora snowflake badge"
-        },
-        "descriptions": {
-          "fr": "Un flocon de givre qui brille sur votre profil.",
-          "en": "A frost snowflake shining on your profile."
-        },
-        "economy": {
-          "price": 220,
-          "rarity": "common",
-          "level": null,
-          "supply": null,
-          "collection": "badges",
-          "icon": "star",
-          "repeatable": false,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {
-          "label": "Aurora snowflake",
-          "icon": "snowflake",
-          "style": "frost"
-        },
-        "render": {
-          "kind": "data",
-          "file": null,
-          "css": [],
-          "stage": false,
-          "shape": 0,
-          "radius": null,
-          "reveal": null,
-          "duration": null,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": null,
-        "preview": null,
-        "replaces": false,
-        "bytes": 0
-      },
-      {
-        "folder": "elements/booster-nordlys",
-        "product": "booster_nordlys",
-        "type": "booster",
-        "look": null,
-        "kind": "data",
-        "folder_files": [],
-        "contracts": [],
-        "free": false,
-        "hd": false,
-        "script": false,
-        "names": {
-          "fr": "Booster Nordlys",
-          "en": "Nordlys booster"
-        },
-        "descriptions": {
-          "fr": "Trois looks de l'univers Nordlys tir\u00e9s au hasard, dont au moins un rare.",
-          "en": "Three looks of the Nordlys universe drawn at random, at least one rare."
-        },
-        "economy": {
-          "price": 450,
-          "rarity": "rare",
-          "level": null,
-          "supply": null,
-          "collection": "boosters",
-          "icon": "sparkles",
-          "repeatable": true,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {
-          "pool": "looks",
-          "packs": ["ultimate_nordlys"],
-          "cards": 3,
-          "guarantee": "rare",
-          "look": "winter"
-        },
-        "render": {
-          "kind": "data",
-          "file": null,
-          "css": [],
-          "stage": false,
-          "shape": 0,
-          "radius": null,
-          "reveal": null,
-          "duration": null,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": null,
-        "preview": null,
-        "replaces": false,
-        "bytes": 0
-      },
-      {
-        "folder": "elements/celebration-glow",
-        "product": "effect_nordlysglow",
-        "type": "effect",
-        "look": "nordlysglow",
-        "kind": "js",
-        "folder_files": ["glow.js"],
-        "contracts": [],
-        "free": false,
-        "hd": false,
-        "script": true,
-        "names": {
-          "fr": "Lucioles polaires",
-          "en": "Polar fireflies"
-        },
-        "descriptions": {
-          "fr": "Des centaines d'\u00e9tincelles vertes et violettes s'envolent de la r\u00e9compense et dessinent un voile d'aurore avant de s'\u00e9teindre.",
-          "en": "Hundreds of green and violet sparks fly out of the reward and draw a curtain of light before fading."
-        },
-        "economy": {
-          "price": 900,
-          "rarity": "epic",
-          "level": 9,
-          "supply": null,
-          "collection": "celebrations",
-          "icon": "party",
-          "repeatable": false,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {},
-        "render": {
-          "kind": "js",
-          "file": "glow.js",
-          "css": [],
-          "stage": false,
-          "shape": 0,
-          "radius": null,
-          "reveal": null,
-          "duration": 3.2,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": null,
-        "preview": null,
-        "replaces": false,
-        "bytes": 2806
-      },
-      {
-        "folder": "elements/frame-fjordring",
-        "product": "frame_fjordring",
-        "type": "avatar_frame",
-        "look": "fjordring",
-        "kind": "css",
-        "folder_files": ["ring.css"],
-        "contracts": [],
-        "free": false,
-        "hd": false,
-        "script": false,
-        "names": {
-          "fr": "Cadre anneau du fjord",
-          "en": "Fjord ring frame"
-        },
-        "descriptions": {
-          "fr": "Un anneau d'eau glac\u00e9e et d'aurore qui tourne lentement.",
-          "en": "A ring of icy water and northern lights turning slowly."
-        },
-        "economy": {
-          "price": 450,
-          "rarity": "rare",
-          "level": null,
-          "supply": null,
-          "collection": "profile",
-          "icon": "user",
-          "repeatable": false,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {},
-        "render": {
-          "kind": "css",
-          "file": null,
-          "css": ["ring.css"],
-          "stage": false,
-          "shape": 0,
-          "radius": null,
-          "reveal": null,
-          "duration": null,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": null,
-        "preview": null,
-        "replaces": false,
-        "bytes": 673
-      },
-      {
-        "folder": "elements/frame-nordlys",
-        "product": "frame_nordlys",
-        "type": "avatar_frame",
-        "look": "nordlys",
-        "kind": "glsl",
-        "folder_files": ["frame.glsl"],
-        "contracts": [],
-        "free": false,
-        "hd": true,
-        "script": false,
-        "names": {
-          "fr": "Cadre aurore bor\u00e9ale",
-          "en": "Northern lights frame"
-        },
-        "descriptions": {
-          "fr": "Un hexagone de glace parcouru par une aurore qui ondule autour de votre avatar.",
-          "en": "An ice hexagon with the northern lights rippling round your avatar."
-        },
-        "economy": {
-          "price": 1300,
-          "rarity": "epic",
-          "level": 14,
-          "supply": null,
-          "collection": "profile",
-          "icon": "user",
-          "repeatable": false,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {},
-        "render": {
-          "kind": "glsl",
-          "file": "frame.glsl",
-          "css": [],
-          "stage": false,
-          "shape": 1,
-          "radius": null,
-          "reveal": null,
-          "duration": null,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": null,
-        "preview": null,
-        "replaces": false,
-        "bytes": 814
-      },
-      {
-        "folder": "elements/interface-nordlys",
-        "product": "theme_nordlys",
-        "type": "theme",
-        "look": "nordlys",
-        "kind": "theme",
-        "folder_files": ["interface.json", "interface.css"],
-        "contracts": [],
-        "free": false,
-        "hd": false,
-        "script": false,
-        "names": {
-          "fr": "Interface Nordlys",
-          "en": "Nordlys interface"
-        },
-        "descriptions": {
-          "fr": "Une interface du Grand Nord : nuit polaire et vert d'aurore, titres en lettres onciales, la navigation en bulle autour de laquelle gravitent les rubriques, le fjord sous l'aurore derri\u00e8re, et le vocabulaire d'un village nordique (le refuge, la veill\u00e9e, le comptoir\u2026).",
-          "en": "A far-north interface: polar night and aurora green, headings in uncial letters, the navigation as a bubble with the sections orbiting it, the fjord under the northern lights behind, and a Nordic village's words (the lodge, the fireside, the trading post\u2026)."
-        },
-        "economy": {
-          "price": 1500,
-          "rarity": "epic",
-          "level": 10,
-          "supply": null,
-          "collection": "themes",
-          "icon": "palette",
-          "repeatable": false,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {},
-        "render": {
-          "kind": "theme",
-          "file": "interface.json",
-          "css": ["interface.css"],
-          "stage": false,
-          "shape": 0,
-          "radius": null,
-          "reveal": null,
-          "duration": null,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": null,
-        "preview": null,
-        "replaces": false,
-        "bytes": 4871
-      },
-      {
-        "folder": "elements/levelup-nordlys",
-        "product": "levelup_nordlys",
-        "type": "level_up",
-        "look": "nordlys",
-        "kind": "glsl",
-        "folder_files": ["scene.glsl", "card.css", "preview.svg"],
-        "contracts": [],
-        "free": false,
-        "hd": true,
-        "script": false,
-        "names": {
-          "fr": "Aurore bor\u00e9ale",
-          "en": "Northern lights"
-        },
-        "descriptions": {
-          "fr": "La nuit polaire : des voiles d'aurore verts et violets descendent en ondulant, un anneau de lumi\u00e8re s'ouvre et votre nouveau niveau appara\u00eet, des cristaux de givre scintillent.",
-          "en": "The polar night: green and violet curtains of light come down rippling, a ring of light opens and your new level appears, frost crystals glittering."
-        },
-        "economy": {
-          "price": 1600,
-          "rarity": "legendary",
-          "level": 20,
-          "supply": null,
-          "collection": "levels",
-          "icon": "trophy",
-          "repeatable": false,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {},
-        "render": {
-          "kind": "glsl",
-          "file": "scene.glsl",
-          "css": ["card.css"],
-          "stage": true,
-          "shape": 0,
-          "radius": null,
-          "reveal": 2.4,
-          "duration": null,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": null,
-        "preview": "preview.svg",
-        "replaces": false,
-        "bytes": 3192
-      },
-      {
-        "folder": "elements/name-nordrune",
-        "product": "name_nordrune",
-        "type": "name_style",
-        "look": "nordrune",
-        "kind": "css",
-        "folder_files": ["name.css"],
-        "contracts": [],
-        "free": false,
-        "hd": false,
-        "script": false,
-        "names": {
-          "fr": "Runes du Nord",
-          "en": "Northern runes"
-        },
-        "descriptions": {
-          "fr": "Votre nom en lettres onciales, givr\u00e9, une lueur d'aurore qui passe dessus.",
-          "en": "Your name in uncial letters, frosted, a glow of the northern lights sweeping over it."
-        },
-        "economy": {
-          "price": 380,
-          "rarity": "rare",
-          "level": null,
-          "supply": null,
-          "collection": "names",
-          "icon": "feather",
-          "repeatable": false,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {},
-        "render": {
-          "kind": "css",
-          "file": null,
-          "css": ["name.css"],
-          "stage": false,
-          "shape": 0,
-          "radius": null,
-          "reveal": null,
-          "duration": null,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": null,
-        "preview": null,
-        "replaces": false,
-        "bytes": 792
-      },
-      {
-        "folder": "elements/pack-nordlys",
-        "product": "ultimate_nordlys",
-        "type": "bundle",
-        "look": null,
-        "kind": "data",
-        "folder_files": [],
-        "contracts": [],
-        "free": false,
-        "hd": false,
-        "script": false,
-        "names": {
-          "fr": "Pack de th\u00e8me Nordlys",
-          "en": "Nordlys theme pack"
-        },
-        "descriptions": {
-          "fr": "Tout l'univers Nordlys : son interface et tout ce qui va avec \u2014 l'aurore en passage de niveau, les cadres, le nom runique, les lucioles polaires, le fjord, la palette, le titre et le badge.",
-          "en": "The whole Nordlys universe: its interface and everything that goes with it \u2014 the northern lights as a level-up, the frames, the runic name, the polar fireflies, the fjord, the palette, the title and the badge."
-        },
-        "economy": {
-          "price": 5200,
-          "rarity": "legendary",
-          "level": 20,
-          "supply": 10,
-          "collection": "ultimate",
-          "icon": "crown",
-          "repeatable": false,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {
-          "products": [
-            "theme_nordlys",
-            "levelup_nordlys",
-            "frame_nordlys",
-            "frame_fjordring",
-            "name_nordrune",
-            "effect_nordlysglow",
-            "ambient_fjord",
-            "palette_nordlys",
-            "title_aurora_wanderer",
-            "badge_nordlys"
-          ]
-        },
-        "render": {
-          "kind": "data",
-          "file": null,
-          "css": [],
-          "stage": false,
-          "shape": 0,
-          "radius": null,
-          "reveal": null,
-          "duration": null,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": null,
-        "preview": null,
-        "replaces": false,
-        "bytes": 0
-      },
-      {
-        "folder": "elements/palette-nordlys",
-        "product": "palette_nordlys",
-        "type": "palette",
-        "look": "nordlys",
-        "kind": "data",
-        "folder_files": [],
-        "contracts": [],
-        "free": false,
-        "hd": false,
-        "script": false,
-        "names": {
-          "fr": "Palette aurore",
-          "en": "Aurora palette"
-        },
-        "descriptions": {
-          "fr": "Le vert et le violet des aurores bor\u00e9ales sur n'importe quelle interface.",
-          "en": "The northern lights' green and violet over any interface."
-        },
-        "economy": {
-          "price": 250,
-          "rarity": "common",
-          "level": null,
-          "supply": null,
-          "collection": "palettes",
-          "icon": "palette",
-          "repeatable": false,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {},
-        "render": {
-          "kind": "data",
-          "file": null,
-          "css": [],
-          "stage": false,
-          "shape": 0,
-          "radius": null,
-          "reveal": null,
-          "duration": null,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": {
-          "dark": {
-            "accent": "#34d399",
-            "accentAlt": "#a78bfa",
-            "contrast": "#022c22"
-          },
-          "light": {
-            "accent": "#047857",
-            "accentAlt": "#6d28d9",
-            "contrast": "#ffffff"
-          }
-        },
-        "preview": null,
-        "replaces": false,
-        "bytes": 0
-      },
-      {
-        "folder": "elements/title-wanderer",
-        "product": "title_aurora_wanderer",
-        "type": "title",
-        "look": null,
-        "kind": "data",
-        "folder_files": [],
-        "contracts": [],
-        "free": false,
-        "hd": false,
-        "script": false,
-        "names": {
-          "fr": "Titre : Vagabond des aurores",
-          "en": "Title: Aurora wanderer"
-        },
-        "descriptions": {
-          "fr": "\u00ab Vagabond des aurores \u00bb sous votre nom.",
-          "en": "\u00ab Aurora wanderer \u00bb under your name."
-        },
-        "economy": {
-          "price": 300,
-          "rarity": "rare",
-          "level": null,
-          "supply": null,
-          "collection": "titles",
-          "icon": "trophy",
-          "repeatable": false,
-          "season": null,
-          "limit": null,
-          "featured": false,
-          "reward_only": false,
-          "contribution": null,
-          "sold": true
-        },
-        "payload": {
-          "label": "Aurora wanderer",
-          "style": "frost"
-        },
-        "render": {
-          "kind": "data",
-          "file": null,
-          "css": [],
-          "stage": false,
-          "shape": 0,
-          "radius": null,
-          "reveal": null,
-          "duration": null,
-          "nav": null,
-          "renderer": null,
-          "params": {},
-          "rarity": null,
-          "place": null
-        },
-        "palette": null,
-        "preview": null,
-        "replaces": false,
-        "bytes": 0
-      }
-    ]
+ "report": {
+  "summary": {
+   "blocking": 0,
+   "warning": 0,
+   "info": 13,
+   "elements": 12,
+   "hd": true,
+   "video": false,
+   "script": true,
+   "publishable": true,
+   "security": {
+    "blocking": 0,
+    "warning": 0,
+    "info": 1
+   }
   },
-  "elements": [
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "ambient_fjord",
-      "type": "ambient",
-      "look": "fjord",
-      "kind": "glsl",
-      "names": {
-        "fr": "Fjord sous l'aurore",
-        "en": "Fjord under the northern lights"
-      },
-      "file": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/ambient-fjord/fjord.glsl",
-      "stage": false,
-      "shape": 0
-    },
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "badge_nordlys",
-      "type": "badge",
-      "kind": "data",
-      "names": {
-        "fr": "Badge Flocon d'aurore",
-        "en": "Aurora snowflake badge"
-      },
-      "stage": false,
-      "shape": 0
-    },
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "booster_nordlys",
-      "type": "booster",
-      "kind": "data",
-      "names": {
-        "fr": "Booster Nordlys",
-        "en": "Nordlys booster"
-      },
-      "stage": false,
-      "shape": 0
-    },
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "effect_nordlysglow",
-      "type": "effect",
-      "look": "nordlysglow",
-      "kind": "js",
-      "names": {
-        "fr": "Lucioles polaires",
-        "en": "Polar fireflies"
-      },
-      "file": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/celebration-glow/glow.js",
-      "stage": false,
-      "shape": 0,
-      "duration": 3.2
-    },
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "frame_fjordring",
-      "type": "avatar_frame",
-      "look": "fjordring",
-      "kind": "css",
-      "names": {
-        "fr": "Cadre anneau du fjord",
-        "en": "Fjord ring frame"
-      },
-      "css": ["/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/frame-fjordring/ring.css"],
-      "stage": false,
-      "shape": 0
-    },
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "frame_nordlys",
-      "type": "avatar_frame",
-      "look": "nordlys",
-      "kind": "glsl",
-      "names": {
-        "fr": "Cadre aurore bor\u00e9ale",
-        "en": "Northern lights frame"
-      },
-      "file": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/frame-nordlys/frame.glsl",
-      "stage": false,
-      "shape": 1
-    },
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "theme_nordlys",
-      "type": "theme",
-      "look": "nordlys",
-      "kind": "theme",
-      "names": {
-        "fr": "Interface Nordlys",
-        "en": "Nordlys interface"
-      },
-      "file": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/interface-nordlys/interface.json",
-      "css": [
-        "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/interface-nordlys/interface.css"
-      ],
-      "stage": false,
-      "shape": 0
-    },
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "levelup_nordlys",
-      "type": "level_up",
-      "look": "nordlys",
-      "kind": "glsl",
-      "names": {
-        "fr": "Aurore bor\u00e9ale",
-        "en": "Northern lights"
-      },
-      "file": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/levelup-nordlys/scene.glsl",
-      "css": ["/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/levelup-nordlys/card.css"],
-      "stage": true,
-      "shape": 0,
-      "reveal": 2.4,
-      "preview": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/levelup-nordlys/preview.svg"
-    },
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "name_nordrune",
-      "type": "name_style",
-      "look": "nordrune",
-      "kind": "css",
-      "names": {
-        "fr": "Runes du Nord",
-        "en": "Northern runes"
-      },
-      "css": ["/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/name-nordrune/name.css"],
-      "stage": false,
-      "shape": 0
-    },
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "ultimate_nordlys",
-      "type": "bundle",
-      "kind": "data",
-      "names": {
-        "fr": "Pack de th\u00e8me Nordlys",
-        "en": "Nordlys theme pack"
-      },
-      "stage": false,
-      "shape": 0
-    },
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "palette_nordlys",
-      "type": "palette",
-      "look": "nordlys",
-      "kind": "data",
-      "names": {
-        "fr": "Palette aurore",
-        "en": "Aurora palette"
-      },
-      "stage": false,
-      "shape": 0,
-      "palette": {
-        "dark": {
-          "accent": "#34d399",
-          "accentAlt": "#a78bfa",
-          "contrast": "#022c22"
-        },
-        "light": {
-          "accent": "#047857",
-          "accentAlt": "#6d28d9",
-          "contrast": "#ffffff"
-        }
-      }
-    },
-    {
-      "pack": "nordlys",
-      "sha": "0123456789abcdef",
-      "product": "title_aurora_wanderer",
-      "type": "title",
-      "kind": "data",
-      "names": {
-        "fr": "Titre : Vagabond des aurores",
-        "en": "Title: Aurora wanderer"
-      },
-      "stage": false,
-      "shape": 0
+  "pack": {
+   "format": 1,
+   "id": "nordlys",
+   "version": "1.0.0",
+   "names": {
+    "fr": "Nordlys \u2014 aurores bor\u00e9ales",
+    "en": "Nordlys \u2014 northern lights"
+   },
+   "descriptions": {
+    "fr": "Un pack d'exemple : les aurores bor\u00e9ales du Grand Nord, en passage de niveau, cadres, nom runique, c\u00e9l\u00e9bration, ambiance de fjord, palette, titre, badge \u2014 et son pack et son booster.",
+    "en": "An example pack: the far north's lights as a level-up, frames, a runic name, a celebration, a fjord ambience, a palette, a title, a badge \u2014 with its pack and its booster."
+   },
+   "author": "Portalab (example)",
+   "license": "CC0-1.0 (code) \u00b7 OFL-1.1 (Uncial Antiqua)",
+   "homepage": "https://example.org/portalab-nordlys",
+   "elements": null
+  },
+  "items": [
+   {
+    "level": "info",
+    "code": "element.no_preview",
+    "category": "analysis",
+    "element": "ambient_fjord",
+    "params": {}
+   },
+   {
+    "level": "info",
+    "code": "element.no_preview",
+    "category": "analysis",
+    "element": "badge_nordlys",
+    "params": {}
+   },
+   {
+    "level": "info",
+    "code": "element.no_preview",
+    "category": "analysis",
+    "element": "booster_nordlys",
+    "params": {}
+   },
+   {
+    "level": "info",
+    "code": "element.no_preview",
+    "category": "analysis",
+    "element": "effect_nordlysglow",
+    "params": {}
+   },
+   {
+    "level": "info",
+    "code": "js.sandboxed",
+    "category": "security",
+    "element": "effect_nordlysglow",
+    "params": {}
+   },
+   {
+    "level": "info",
+    "code": "element.no_preview",
+    "category": "analysis",
+    "element": "frame_fjordring",
+    "params": {}
+   },
+   {
+    "level": "info",
+    "code": "element.no_preview",
+    "category": "analysis",
+    "element": "frame_nordlys",
+    "params": {}
+   },
+   {
+    "level": "info",
+    "code": "element.no_preview",
+    "category": "analysis",
+    "element": "theme_nordlys",
+    "params": {}
+   },
+   {
+    "level": "info",
+    "code": "theme.nav",
+    "category": "analysis",
+    "element": "theme_nordlys",
+    "params": {
+     "nav": [
+      "orbit"
+     ]
     }
+   },
+   {
+    "level": "info",
+    "code": "element.no_preview",
+    "category": "analysis",
+    "element": "name_nordrune",
+    "params": {}
+   },
+   {
+    "level": "info",
+    "code": "element.no_preview",
+    "category": "analysis",
+    "element": "ultimate_nordlys",
+    "params": {}
+   },
+   {
+    "level": "info",
+    "code": "element.no_preview",
+    "category": "analysis",
+    "element": "palette_nordlys",
+    "params": {}
+   },
+   {
+    "level": "info",
+    "code": "element.no_preview",
+    "category": "analysis",
+    "element": "title_aurora_wanderer",
+    "params": {}
+   }
+  ],
+  "elements": [
+   {
+    "folder": "elements/ambient-fjord",
+    "product": "ambient_fjord",
+    "type": "ambient",
+    "look": "fjord",
+    "kind": "glsl",
+    "folder_files": [
+     "fjord.glsl"
+    ],
+    "contracts": [],
+    "free": false,
+    "hd": true,
+    "video": false,
+    "script": false,
+    "names": {
+     "fr": "Fjord sous l'aurore",
+     "en": "Fjord under the northern lights"
+    },
+    "descriptions": {
+     "fr": "Un fjord la nuit : les montagnes en silhouette, l'aurore qui ondule au-dessus et se refl\u00e8te dans l'eau calme, la neige qui tombe doucement.",
+     "en": "A fjord at night: the mountains in silhouette, the northern lights rippling above and mirrored in the still water, snow falling softly."
+    },
+    "economy": {
+     "price": 1200,
+     "rarity": "epic",
+     "level": 12,
+     "supply": null,
+     "collection": "ambients",
+     "icon": "telescope",
+     "repeatable": false,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {},
+    "render": {
+     "kind": "glsl",
+     "file": "fjord.glsl",
+     "css": [],
+     "stage": false,
+     "shape": 0,
+     "radius": null,
+     "reveal": null,
+     "duration": null,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": null,
+    "preview": null,
+    "replaces": false,
+    "bytes": 2525
+   },
+   {
+    "folder": "elements/badge-aurora",
+    "product": "badge_nordlys",
+    "type": "badge",
+    "look": null,
+    "kind": "data",
+    "folder_files": [],
+    "contracts": [],
+    "free": false,
+    "hd": false,
+    "video": false,
+    "script": false,
+    "names": {
+     "fr": "Badge Flocon d'aurore",
+     "en": "Aurora snowflake badge"
+    },
+    "descriptions": {
+     "fr": "Un flocon de givre qui brille sur votre profil.",
+     "en": "A frost snowflake shining on your profile."
+    },
+    "economy": {
+     "price": 220,
+     "rarity": "common",
+     "level": null,
+     "supply": null,
+     "collection": "badges",
+     "icon": "star",
+     "repeatable": false,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {
+     "label": "Aurora snowflake",
+     "icon": "snowflake",
+     "style": "frost"
+    },
+    "render": {
+     "kind": "data",
+     "file": null,
+     "css": [],
+     "stage": false,
+     "shape": 0,
+     "radius": null,
+     "reveal": null,
+     "duration": null,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": null,
+    "preview": null,
+    "replaces": false,
+    "bytes": 0
+   },
+   {
+    "folder": "elements/booster-nordlys",
+    "product": "booster_nordlys",
+    "type": "booster",
+    "look": null,
+    "kind": "data",
+    "folder_files": [],
+    "contracts": [],
+    "free": false,
+    "hd": false,
+    "video": false,
+    "script": false,
+    "names": {
+     "fr": "Booster Nordlys",
+     "en": "Nordlys booster"
+    },
+    "descriptions": {
+     "fr": "Trois looks de l'univers Nordlys tir\u00e9s au hasard, dont au moins un rare.",
+     "en": "Three looks of the Nordlys universe drawn at random, at least one rare."
+    },
+    "economy": {
+     "price": 450,
+     "rarity": "rare",
+     "level": null,
+     "supply": null,
+     "collection": "boosters",
+     "icon": "sparkles",
+     "repeatable": true,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {
+     "pool": "looks",
+     "packs": [
+      "ultimate_nordlys"
+     ],
+     "cards": 3,
+     "guarantee": "rare",
+     "look": "winter"
+    },
+    "render": {
+     "kind": "data",
+     "file": null,
+     "css": [],
+     "stage": false,
+     "shape": 0,
+     "radius": null,
+     "reveal": null,
+     "duration": null,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": null,
+    "preview": null,
+    "replaces": false,
+    "bytes": 0
+   },
+   {
+    "folder": "elements/celebration-glow",
+    "product": "effect_nordlysglow",
+    "type": "effect",
+    "look": "nordlysglow",
+    "kind": "js",
+    "folder_files": [
+     "glow.js"
+    ],
+    "contracts": [],
+    "free": false,
+    "hd": false,
+    "video": false,
+    "script": true,
+    "names": {
+     "fr": "Lucioles polaires",
+     "en": "Polar fireflies"
+    },
+    "descriptions": {
+     "fr": "Des centaines d'\u00e9tincelles vertes et violettes s'envolent de la r\u00e9compense et dessinent un voile d'aurore avant de s'\u00e9teindre.",
+     "en": "Hundreds of green and violet sparks fly out of the reward and draw a curtain of light before fading."
+    },
+    "economy": {
+     "price": 900,
+     "rarity": "epic",
+     "level": 9,
+     "supply": null,
+     "collection": "celebrations",
+     "icon": "party",
+     "repeatable": false,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {},
+    "render": {
+     "kind": "js",
+     "file": "glow.js",
+     "css": [],
+     "stage": false,
+     "shape": 0,
+     "radius": null,
+     "reveal": null,
+     "duration": 3.2,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": null,
+    "preview": null,
+    "replaces": false,
+    "bytes": 2806
+   },
+   {
+    "folder": "elements/frame-fjordring",
+    "product": "frame_fjordring",
+    "type": "avatar_frame",
+    "look": "fjordring",
+    "kind": "css",
+    "folder_files": [
+     "ring.css"
+    ],
+    "contracts": [],
+    "free": false,
+    "hd": false,
+    "video": false,
+    "script": false,
+    "names": {
+     "fr": "Cadre anneau du fjord",
+     "en": "Fjord ring frame"
+    },
+    "descriptions": {
+     "fr": "Un anneau d'eau glac\u00e9e et d'aurore qui tourne lentement.",
+     "en": "A ring of icy water and northern lights turning slowly."
+    },
+    "economy": {
+     "price": 450,
+     "rarity": "rare",
+     "level": null,
+     "supply": null,
+     "collection": "profile",
+     "icon": "user",
+     "repeatable": false,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {},
+    "render": {
+     "kind": "css",
+     "file": null,
+     "css": [
+      "ring.css"
+     ],
+     "stage": false,
+     "shape": 0,
+     "radius": null,
+     "reveal": null,
+     "duration": null,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": null,
+    "preview": null,
+    "replaces": false,
+    "bytes": 673
+   },
+   {
+    "folder": "elements/frame-nordlys",
+    "product": "frame_nordlys",
+    "type": "avatar_frame",
+    "look": "nordlys",
+    "kind": "glsl",
+    "folder_files": [
+     "frame.glsl"
+    ],
+    "contracts": [],
+    "free": false,
+    "hd": true,
+    "video": false,
+    "script": false,
+    "names": {
+     "fr": "Cadre aurore bor\u00e9ale",
+     "en": "Northern lights frame"
+    },
+    "descriptions": {
+     "fr": "Un hexagone de glace parcouru par une aurore qui ondule autour de votre avatar.",
+     "en": "An ice hexagon with the northern lights rippling round your avatar."
+    },
+    "economy": {
+     "price": 1300,
+     "rarity": "epic",
+     "level": 14,
+     "supply": null,
+     "collection": "profile",
+     "icon": "user",
+     "repeatable": false,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {},
+    "render": {
+     "kind": "glsl",
+     "file": "frame.glsl",
+     "css": [],
+     "stage": false,
+     "shape": 1,
+     "radius": null,
+     "reveal": null,
+     "duration": null,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": null,
+    "preview": null,
+    "replaces": false,
+    "bytes": 814
+   },
+   {
+    "folder": "elements/interface-nordlys",
+    "product": "theme_nordlys",
+    "type": "theme",
+    "look": "nordlys",
+    "kind": "theme",
+    "folder_files": [
+     "interface.json",
+     "interface.css"
+    ],
+    "contracts": [],
+    "free": false,
+    "hd": false,
+    "video": false,
+    "script": false,
+    "names": {
+     "fr": "Interface Nordlys",
+     "en": "Nordlys interface"
+    },
+    "descriptions": {
+     "fr": "Une interface du Grand Nord : nuit polaire et vert d'aurore, titres en lettres onciales, la navigation en bulle autour de laquelle gravitent les rubriques, le fjord sous l'aurore derri\u00e8re, et le vocabulaire d'un village nordique (le refuge, la veill\u00e9e, le comptoir\u2026).",
+     "en": "A far-north interface: polar night and aurora green, headings in uncial letters, the navigation as a bubble with the sections orbiting it, the fjord under the northern lights behind, and a Nordic village's words (the lodge, the fireside, the trading post\u2026)."
+    },
+    "economy": {
+     "price": 1500,
+     "rarity": "epic",
+     "level": 10,
+     "supply": null,
+     "collection": "themes",
+     "icon": "palette",
+     "repeatable": false,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {},
+    "render": {
+     "kind": "theme",
+     "file": "interface.json",
+     "css": [
+      "interface.css"
+     ],
+     "stage": false,
+     "shape": 0,
+     "radius": null,
+     "reveal": null,
+     "duration": null,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": null,
+    "preview": null,
+    "replaces": false,
+    "bytes": 4871
+   },
+   {
+    "folder": "elements/levelup-nordlys",
+    "product": "levelup_nordlys",
+    "type": "level_up",
+    "look": "nordlys",
+    "kind": "glsl",
+    "folder_files": [
+     "scene.glsl",
+     "card.css",
+     "preview.svg"
+    ],
+    "contracts": [],
+    "free": false,
+    "hd": true,
+    "video": false,
+    "script": false,
+    "names": {
+     "fr": "Aurore bor\u00e9ale",
+     "en": "Northern lights"
+    },
+    "descriptions": {
+     "fr": "La nuit polaire : des voiles d'aurore verts et violets descendent en ondulant, un anneau de lumi\u00e8re s'ouvre et votre nouveau niveau appara\u00eet, des cristaux de givre scintillent.",
+     "en": "The polar night: green and violet curtains of light come down rippling, a ring of light opens and your new level appears, frost crystals glittering."
+    },
+    "economy": {
+     "price": 1600,
+     "rarity": "legendary",
+     "level": 20,
+     "supply": null,
+     "collection": "levels",
+     "icon": "trophy",
+     "repeatable": false,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {},
+    "render": {
+     "kind": "glsl",
+     "file": "scene.glsl",
+     "css": [
+      "card.css"
+     ],
+     "stage": true,
+     "shape": 0,
+     "radius": null,
+     "reveal": 2.4,
+     "duration": null,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": null,
+    "preview": "preview.svg",
+    "replaces": false,
+    "bytes": 3192
+   },
+   {
+    "folder": "elements/name-nordrune",
+    "product": "name_nordrune",
+    "type": "name_style",
+    "look": "nordrune",
+    "kind": "css",
+    "folder_files": [
+     "name.css"
+    ],
+    "contracts": [],
+    "free": false,
+    "hd": false,
+    "video": false,
+    "script": false,
+    "names": {
+     "fr": "Runes du Nord",
+     "en": "Northern runes"
+    },
+    "descriptions": {
+     "fr": "Votre nom en lettres onciales, givr\u00e9, une lueur d'aurore qui passe dessus.",
+     "en": "Your name in uncial letters, frosted, a glow of the northern lights sweeping over it."
+    },
+    "economy": {
+     "price": 380,
+     "rarity": "rare",
+     "level": null,
+     "supply": null,
+     "collection": "names",
+     "icon": "feather",
+     "repeatable": false,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {},
+    "render": {
+     "kind": "css",
+     "file": null,
+     "css": [
+      "name.css"
+     ],
+     "stage": false,
+     "shape": 0,
+     "radius": null,
+     "reveal": null,
+     "duration": null,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": null,
+    "preview": null,
+    "replaces": false,
+    "bytes": 792
+   },
+   {
+    "folder": "elements/pack-nordlys",
+    "product": "ultimate_nordlys",
+    "type": "bundle",
+    "look": null,
+    "kind": "data",
+    "folder_files": [],
+    "contracts": [],
+    "free": false,
+    "hd": false,
+    "video": false,
+    "script": false,
+    "names": {
+     "fr": "Pack de th\u00e8me Nordlys",
+     "en": "Nordlys theme pack"
+    },
+    "descriptions": {
+     "fr": "Tout l'univers Nordlys : son interface et tout ce qui va avec \u2014 l'aurore en passage de niveau, les cadres, le nom runique, les lucioles polaires, le fjord, la palette, le titre et le badge.",
+     "en": "The whole Nordlys universe: its interface and everything that goes with it \u2014 the northern lights as a level-up, the frames, the runic name, the polar fireflies, the fjord, the palette, the title and the badge."
+    },
+    "economy": {
+     "price": 5200,
+     "rarity": "legendary",
+     "level": 20,
+     "supply": 10,
+     "collection": "ultimate",
+     "icon": "crown",
+     "repeatable": false,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {
+     "products": [
+      "theme_nordlys",
+      "levelup_nordlys",
+      "frame_nordlys",
+      "frame_fjordring",
+      "name_nordrune",
+      "effect_nordlysglow",
+      "ambient_fjord",
+      "palette_nordlys",
+      "title_aurora_wanderer",
+      "badge_nordlys"
+     ]
+    },
+    "render": {
+     "kind": "data",
+     "file": null,
+     "css": [],
+     "stage": false,
+     "shape": 0,
+     "radius": null,
+     "reveal": null,
+     "duration": null,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": null,
+    "preview": null,
+    "replaces": false,
+    "bytes": 0
+   },
+   {
+    "folder": "elements/palette-nordlys",
+    "product": "palette_nordlys",
+    "type": "palette",
+    "look": "nordlys",
+    "kind": "data",
+    "folder_files": [],
+    "contracts": [],
+    "free": false,
+    "hd": false,
+    "video": false,
+    "script": false,
+    "names": {
+     "fr": "Palette aurore",
+     "en": "Aurora palette"
+    },
+    "descriptions": {
+     "fr": "Le vert et le violet des aurores bor\u00e9ales sur n'importe quelle interface.",
+     "en": "The northern lights' green and violet over any interface."
+    },
+    "economy": {
+     "price": 250,
+     "rarity": "common",
+     "level": null,
+     "supply": null,
+     "collection": "palettes",
+     "icon": "palette",
+     "repeatable": false,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {},
+    "render": {
+     "kind": "data",
+     "file": null,
+     "css": [],
+     "stage": false,
+     "shape": 0,
+     "radius": null,
+     "reveal": null,
+     "duration": null,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": {
+     "dark": {
+      "accent": "#34d399",
+      "accentAlt": "#a78bfa",
+      "contrast": "#022c22"
+     },
+     "light": {
+      "accent": "#047857",
+      "accentAlt": "#6d28d9",
+      "contrast": "#ffffff"
+     }
+    },
+    "preview": null,
+    "replaces": false,
+    "bytes": 0
+   },
+   {
+    "folder": "elements/title-wanderer",
+    "product": "title_aurora_wanderer",
+    "type": "title",
+    "look": null,
+    "kind": "data",
+    "folder_files": [],
+    "contracts": [],
+    "free": false,
+    "hd": false,
+    "video": false,
+    "script": false,
+    "names": {
+     "fr": "Titre : Vagabond des aurores",
+     "en": "Title: Aurora wanderer"
+    },
+    "descriptions": {
+     "fr": "\u00ab Vagabond des aurores \u00bb sous votre nom.",
+     "en": "\u00ab Aurora wanderer \u00bb under your name."
+    },
+    "economy": {
+     "price": 300,
+     "rarity": "rare",
+     "level": null,
+     "supply": null,
+     "collection": "titles",
+     "icon": "trophy",
+     "repeatable": false,
+     "season": null,
+     "limit": null,
+     "featured": false,
+     "reward_only": false,
+     "contribution": null,
+     "sold": true
+    },
+    "payload": {
+     "label": "Aurora wanderer",
+     "style": "frost"
+    },
+    "render": {
+     "kind": "data",
+     "file": null,
+     "css": [],
+     "stage": false,
+     "shape": 0,
+     "radius": null,
+     "reveal": null,
+     "duration": null,
+     "start": null,
+     "cycle": false,
+     "nav": null,
+     "renderer": null,
+     "params": {},
+     "rarity": null,
+     "place": null,
+     "alpha": "none",
+     "over": null
+    },
+    "palette": null,
+    "preview": null,
+    "replaces": false,
+    "bytes": 0
+   }
   ]
+ },
+ "elements": [
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "ambient_fjord",
+   "type": "ambient",
+   "look": "fjord",
+   "kind": "glsl",
+   "names": {
+    "fr": "Fjord sous l'aurore",
+    "en": "Fjord under the northern lights"
+   },
+   "file": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/ambient-fjord/fjord.glsl",
+   "stage": false,
+   "shape": 0,
+   "folder": "ambient-fjord"
+  },
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "badge_nordlys",
+   "type": "badge",
+   "kind": "data",
+   "names": {
+    "fr": "Badge Flocon d'aurore",
+    "en": "Aurora snowflake badge"
+   },
+   "stage": false,
+   "shape": 0,
+   "folder": "badge-aurora"
+  },
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "booster_nordlys",
+   "type": "booster",
+   "kind": "data",
+   "names": {
+    "fr": "Booster Nordlys",
+    "en": "Nordlys booster"
+   },
+   "stage": false,
+   "shape": 0,
+   "folder": "booster-nordlys"
+  },
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "effect_nordlysglow",
+   "type": "effect",
+   "look": "nordlysglow",
+   "kind": "js",
+   "names": {
+    "fr": "Lucioles polaires",
+    "en": "Polar fireflies"
+   },
+   "file": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/celebration-glow/glow.js",
+   "stage": false,
+   "shape": 0,
+   "duration": 3.2,
+   "folder": "celebration-glow"
+  },
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "frame_fjordring",
+   "type": "avatar_frame",
+   "look": "fjordring",
+   "kind": "css",
+   "names": {
+    "fr": "Cadre anneau du fjord",
+    "en": "Fjord ring frame"
+   },
+   "css": [
+    "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/frame-fjordring/ring.css"
+   ],
+   "stage": false,
+   "shape": 0,
+   "folder": "frame-fjordring"
+  },
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "frame_nordlys",
+   "type": "avatar_frame",
+   "look": "nordlys",
+   "kind": "glsl",
+   "names": {
+    "fr": "Cadre aurore bor\u00e9ale",
+    "en": "Northern lights frame"
+   },
+   "file": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/frame-nordlys/frame.glsl",
+   "stage": false,
+   "shape": 1,
+   "folder": "frame-nordlys"
+  },
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "theme_nordlys",
+   "type": "theme",
+   "look": "nordlys",
+   "kind": "theme",
+   "names": {
+    "fr": "Interface Nordlys",
+    "en": "Nordlys interface"
+   },
+   "file": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/interface-nordlys/interface.json",
+   "css": [
+    "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/interface-nordlys/interface.css"
+   ],
+   "stage": false,
+   "shape": 0,
+   "folder": "interface-nordlys"
+  },
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "levelup_nordlys",
+   "type": "level_up",
+   "look": "nordlys",
+   "kind": "glsl",
+   "names": {
+    "fr": "Aurore bor\u00e9ale",
+    "en": "Northern lights"
+   },
+   "file": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/levelup-nordlys/scene.glsl",
+   "css": [
+    "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/levelup-nordlys/card.css"
+   ],
+   "stage": true,
+   "shape": 0,
+   "reveal": 2.4,
+   "preview": "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/levelup-nordlys/preview.svg",
+   "folder": "levelup-nordlys"
+  },
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "name_nordrune",
+   "type": "name_style",
+   "look": "nordrune",
+   "kind": "css",
+   "names": {
+    "fr": "Runes du Nord",
+    "en": "Northern runes"
+   },
+   "css": [
+    "/api/v1/admin/visuals/files/nordlys/0123456789abcdef/elements/name-nordrune/name.css"
+   ],
+   "stage": false,
+   "shape": 0,
+   "folder": "name-nordrune"
+  },
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "ultimate_nordlys",
+   "type": "bundle",
+   "kind": "data",
+   "names": {
+    "fr": "Pack de th\u00e8me Nordlys",
+    "en": "Nordlys theme pack"
+   },
+   "stage": false,
+   "shape": 0,
+   "folder": "pack-nordlys"
+  },
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "palette_nordlys",
+   "type": "palette",
+   "look": "nordlys",
+   "kind": "data",
+   "names": {
+    "fr": "Palette aurore",
+    "en": "Aurora palette"
+   },
+   "stage": false,
+   "shape": 0,
+   "palette": {
+    "dark": {
+     "accent": "#34d399",
+     "accentAlt": "#a78bfa",
+     "contrast": "#022c22"
+    },
+    "light": {
+     "accent": "#047857",
+     "accentAlt": "#6d28d9",
+     "contrast": "#ffffff"
+    }
+   },
+   "folder": "palette-nordlys"
+  },
+  {
+   "pack": "nordlys",
+   "sha": "0123456789abcdef",
+   "product": "title_aurora_wanderer",
+   "type": "title",
+   "kind": "data",
+   "names": {
+    "fr": "Titre : Vagabond des aurores",
+    "en": "Title: Aurora wanderer"
+   },
+   "stage": false,
+   "shape": 0,
+   "folder": "title-wanderer"
+  }
+ ]
 }
