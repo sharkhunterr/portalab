@@ -1,11 +1,13 @@
 /* A legendary card turned (its hook: data-reveal), 3 s: as it turns, a gilded ink dragon coils round it — its
-   back half behind the card, its front half over it (``over``) — then soars away flinging its ink; then gold
-   cracks run out from the card across everything, soft gold rays, ink flung out, a great gold ensō drawn round
-   it, a storm of gold leaf, two great glints — drawn in EffectCraft, played as two videos (24 frames a second). */
-/* room for the effect: a layer 2.6 times the card, fading out towards its edges — never the outline of its box */
+   back half behind the card, its front half over it (``over``) — then soars away flinging its ink; then a
+   vermillion sun rises behind it between gold clouds, gold cracks run out from the card across everything, soft
+   gold rays, ink flung out, a great gold ensō drawn round it, a storm of gold leaf, two great glints — drawn in
+   EffectCraft, played as two videos (24 frames a second). */
+/* room for the effect: a layer 4.4 times the card — its sun, its clouds, its dragon soaring away — fading out
+   towards its edges, never the outline of its box */
 [data-reveal="sumi-legendary"] .booster-fx__scene {
-  inset: -80%;
-  width: 260%;
-  height: 260%;
+  inset: -170%;
+  width: 440%;
+  height: 440%;
   mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
 }
