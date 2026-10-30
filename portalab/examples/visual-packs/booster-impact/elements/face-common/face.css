@@ -1,0 +1,37 @@
+/* A common card (its hook: the card once turned, data-card-face): a clean comic frame, white-edged, the title
+   in outlined capitals. The face turns in 3D: never its transform. */
+@font-face {
+  font-family: "Impact Bangers";
+  src: url("Bangers.woff2") format("woff2");
+  font-display: swap;
+}
+/* the frame: its rim the rarity's colour, edged dark, glowing */
+[data-card-face="impact-common"] .mcard__card {
+  background: linear-gradient(160deg, #f4f0ff, #b9b2d6);
+  box-shadow: 0 0 0 0.6cqi #14051f, 0 0 0 1.2cqi #ffffff, 0 0 4cqi 1cqi rgba(255, 255, 255, 0.25);
+}
+[data-card-face="impact-common"] .booster-card__face:not([data-own]) {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px #14051f, 0 0 0.8rem rgba(255, 255, 255, 0.25);
+}
+/* the title, comic style: thick outlined capitals with a hard shadow */
+[data-card-face="impact-common"] .mcard__name {
+  font-family: "Impact Bangers", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ffffff;
+  -webkit-text-stroke: 1.5cqi #14051f;
+  paint-order: stroke fill;
+  text-shadow: 0.9cqi 0.9cqi 0 #ff2f9a;
+}
+[data-card-face="impact-common"] .booster-card__name {
+  font-family: "Impact Bangers", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ffffff;
+  -webkit-text-stroke: 1px #14051f;
+  paint-order: stroke fill;
+  text-shadow: 2px 2px 0 #ff2f9a;
+}

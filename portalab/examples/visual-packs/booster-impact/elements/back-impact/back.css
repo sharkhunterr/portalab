@@ -1,0 +1,38 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity: deep
+   violet edged with magenta, halftone falling from two corners, the emblem in a glowing frame, a glint
+   sliding across now and then. */
+[data-card-back="impact"] .booster-card__back {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0.7rem;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 60, 170, 0.5) 0 1px, transparent 1.6px) 0 0 / 7px 7px,
+    radial-gradient(ellipse at 50% 45%, #7d18c8 0%, #3c0a7a 48%, #1a0538 100%);
+  box-shadow:
+    inset 0 0 0 2px #ff4fc0,
+    inset 0 0 0 5px #1a0538,
+    inset 0 0 0 6px rgba(255, 79, 192, 0.55),
+    0 0 0.9rem rgba(255, 40, 160, 0.55);
+}
+/* the halftone only at the corners: the middle cleared by a soft violet veil */
+[data-card-back="impact"] .booster-card__back-pattern {
+  opacity: 1;
+  background: radial-gradient(ellipse at 50% 50%, #4a0d8e 0%, rgba(74, 13, 142, 0.85) 45%, transparent 75%);
+}
+[data-card-back="impact"] .booster-card__back::after {
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.35) 48%, rgba(255, 120, 210, 0.3) 52%, transparent 60%);
+  mix-blend-mode: screen;
+}
+/* the emblem */
+[data-card-back="impact"] .booster-card__back-sigil {
+  inline-size: 38%;
+  aspect-ratio: 3 / 4;
+  border: 0;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  background: linear-gradient(160deg, #ff4fc0, #9b1cf0);
+  box-shadow: 0 0 0 3px #1a0538, 0 0 0 5px #ff4fc0, 0 0 1.2rem rgba(255, 60, 170, 0.9);
+}
+[data-card-back="impact"] .booster-card__back-sigil svg {
+  filter: drop-shadow(0 0 0.3rem rgba(255, 255, 255, 0.9));
+}

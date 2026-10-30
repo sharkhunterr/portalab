@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "impact-epic",
+  "names": {
+    "fr": "Face épique",
+    "en": "Epic face"
+  },
+  "descriptions": {
+    "fr": "Un cadre magenta parcouru d'énergie verte, une holographie plus vive et des paillettes.",
+    "en": "A magenta frame running with green energy, a brighter holographic film and glitter."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "epic"
+  }
+}

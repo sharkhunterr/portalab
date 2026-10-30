@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "impact-common",
+  "names": {
+    "fr": "Face commune",
+    "en": "Common face"
+  },
+  "descriptions": {
+    "fr": "Un cadre BD net, le titre en lettres cernées, une trame discrète.",
+    "en": "A clean comic frame, the title in outlined letters, a light halftone."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "impact-rare",
+  "names": {
+    "fr": "Face rare",
+    "en": "Rare face"
+  },
+  "descriptions": {
+    "fr": "Un cadre cyan, le titre cerné, une holographie arc-en-ciel qui glisse sur la carte.",
+    "en": "A cyan frame, the outlined title, a rainbow holographic film sliding over the card."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "rare"
+  }
+}

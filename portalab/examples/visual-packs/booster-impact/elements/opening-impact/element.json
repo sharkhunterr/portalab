@@ -1,0 +1,21 @@
+{
+  "type": "booster_opening",
+  "look": "impact",
+  "names": {
+    "fr": "Explosion manga",
+    "en": "Manga burst"
+  },
+  "descriptions": {
+    "fr": "Le paquet tourne sur lui-même dans une explosion de rayons roses ; deux coups de pinceau blancs le tranchent, un éclair blanc — et les cartes jaillissent (HD).",
+    "en": "The pack spins in a burst of pink rays; two white brush slashes cut through it, a white flash — and the cards burst out (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "burst.glsl",
+    "css": [
+      "spin.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

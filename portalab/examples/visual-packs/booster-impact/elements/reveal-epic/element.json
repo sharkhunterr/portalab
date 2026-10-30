@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "impact-epic",
+  "names": {
+    "fr": "Coup de pinceau",
+    "en": "Brush slash"
+  },
+  "descriptions": {
+    "fr": "Deux coups de pinceau blancs, une explosion rose, des étincelles et un viseur qui s'allume.",
+    "en": "Two white brush slashes, a pink burst, sparks and a crosshair lighting up."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 2.4,
+    "rarity": "epic"
+  }
+}

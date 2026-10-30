@@ -1,0 +1,62 @@
+/* A rare card (its hook: the card once turned, data-card-face): a cyan frame, the outlined title, a rainbow
+   holographic film sliding over it. The face turns in 3D: never its transform. */
+@font-face {
+  font-family: "Impact Bangers";
+  src: url("Bangers.woff2") format("woff2");
+  font-display: swap;
+}
+/* the frame: its rim the rarity's colour, edged dark, glowing */
+[data-card-face="impact-rare"] .mcard__card {
+  background: linear-gradient(160deg, #7ff3ff, #1d8fd8 55%, #0b3f8a);
+  box-shadow: 0 0 0 0.6cqi #14051f, 0 0 0 1.2cqi #3fe0ff, 0 0 4cqi 1cqi rgba(63, 224, 255, 0.55);
+}
+[data-card-face="impact-rare"] .booster-card__face:not([data-own]) {
+  border-color: #3fe0ff;
+  box-shadow: 0 0 0 2px #14051f, 0 0 0.8rem rgba(63, 224, 255, 0.55);
+}
+/* the title, comic style: thick outlined capitals with a hard shadow */
+[data-card-face="impact-rare"] .mcard__name {
+  font-family: "Impact Bangers", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff36a;
+  -webkit-text-stroke: 1.5cqi #14051f;
+  paint-order: stroke fill;
+  text-shadow: 0.9cqi 0.9cqi 0 #1d8fd8;
+}
+[data-card-face="impact-rare"] .booster-card__name {
+  font-family: "Impact Bangers", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #fff36a;
+  -webkit-text-stroke: 1px #14051f;
+  paint-order: stroke fill;
+  text-shadow: 2px 2px 0 #1d8fd8;
+}
+/* the holographic film: a rainbow band sliding over the card as it catches the light */
+[data-card-face="impact-rare"] .booster-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image:
+    linear-gradient(115deg, transparent 20%, rgba(255, 60, 170, 0.9) 32%, rgba(255, 230, 60, 0.9) 40%, rgba(60, 255, 160, 0.9) 48%, rgba(60, 200, 255, 0.9) 56%, rgba(170, 80, 255, 0.9) 64%, transparent 78%);
+  background-size: 260% 260%;
+  mix-blend-mode: color-dodge;
+  opacity: 0.3;
+  animation: impact-holo-rare 6s ease-in-out infinite both;
+}
+@keyframes impact-holo-rare {
+  0%, 100% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+
+  [data-card-face="impact-rare"] .booster-card__face::after {
+    animation: none;
+  }
+}

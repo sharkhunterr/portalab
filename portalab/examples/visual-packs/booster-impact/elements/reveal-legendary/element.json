@@ -1,0 +1,19 @@
+{
+  "type": "card_reveal",
+  "look": "impact-legendary",
+  "names": {
+    "fr": "Mur binaire",
+    "en": "Binary wall"
+  },
+  "descriptions": {
+    "fr": "Un mur de chiffres binaires vert-jaune derrière la carte, des flammes d'énergie verte qui montent, une onde et un immense éclat à quatre branches (HD).",
+    "en": "A wall of green-yellow binary digits behind the card, green energy flames rising, a shockwave and a huge four-pointed glint (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "reveal.glsl",
+    "stage": true,
+    "duration": 3.0,
+    "rarity": "legendary"
+  }
+}

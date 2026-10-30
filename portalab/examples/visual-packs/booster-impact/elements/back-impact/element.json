@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "impact",
+  "names": {
+    "fr": "Dos néon",
+    "en": "Neon back"
+  },
+  "descriptions": {
+    "fr": "Un dos violet cerné de magenta, une trame, un éclat qui passe et l'emblème au centre.",
+    "en": "A violet back edged with magenta, halftone, a passing glint and the emblem in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

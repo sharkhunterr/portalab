@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "impact",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Impact — scène de booster manga",
+    "en": "Impact — an anime booster scene"
+  },
+  "descriptions": {
+    "fr": "Une ouverture de booster façon jeu de cartes à collectionner animé : une scène noire striée de traits de vitesse roses et blancs, de trames et d'étoiles ; le paquet qui tourne dans une explosion manga rose, tranché par des coups de pinceau blancs ; chaque carte révélée avec l'effet de sa rareté — éclat rose, étincelles, énergie verte, un mur de chiffres binaires et un grand éclat pour une légendaire — et les cartes elles-mêmes habillées pareil : titre BD cerné, holographie dès rare (HD).",
+    "en": "A booster opening like an animated trading card game's: a black stage streaked with pink and white speed lines, halftone dots and stars; the pack spinning in a pink manga burst, cut by white brush slashes; each card revealed with its rarity's effect — a pink burst, sparks, green energy, a wall of binary digits and a great glint for a legendary — and the cards themselves dressed alike: an outlined comic title, holographic foil from rare up (HD)."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

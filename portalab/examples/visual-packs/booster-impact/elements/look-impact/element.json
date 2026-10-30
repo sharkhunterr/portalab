@@ -1,0 +1,20 @@
+{
+  "type": "booster_look",
+  "look": "impact",
+  "names": {
+    "fr": "Paquet néon",
+    "en": "Neon pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet violet et magenta cerné de néon rose, son emblème qui brille, une trame et des éclats ; il respire en attendant d'être ouvert, des étoiles scintillent autour (HD).",
+    "en": "A violet and magenta pack edged with pink neon, its emblem glowing, halftone and glints; it breathes while it waits to be opened, stars twinkling around it (HD)."
+  },
+  "render": {
+    "kind": "glsl",
+    "file": "aura.glsl",
+    "css": [
+      "pack.css"
+    ],
+    "stage": true
+  }
+}
