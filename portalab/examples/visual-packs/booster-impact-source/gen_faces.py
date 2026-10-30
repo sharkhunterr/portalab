@@ -187,15 +187,6 @@ def face(rarity: str, p: dict) -> str:
 {h}::after {{
   z-index: 3;
 }}
-/* on a phone, the cards' row scrolls sideways and cuts what overflows it 5rem above and below a card: the
-   vortex has faded out before it */
-@media (max-width: 40rem) {{
-  {h}::before,
-  {h}::after {{
-    mask-image: radial-gradient(closest-side, #000 72%, transparent 100%), linear-gradient(to bottom, transparent calc(30.77% - 4.5rem), #000 calc(30.77% - 1.5rem), #000 calc(69.23% + 1.5rem), transparent calc(69.23% + 4.5rem));
-    mask-composite: intersect;
-  }}
-}}
 """
         css += f"""/* a great glint crossing the art now and then — on its own small part, not the whole card */
 {h} .mcard__art::after {{

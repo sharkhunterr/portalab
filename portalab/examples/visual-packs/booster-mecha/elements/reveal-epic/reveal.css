@@ -8,11 +8,3 @@
   height: 260%;
   mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
 }
-/* on a phone, the cards' row scrolls sideways and cuts what overflows it 5rem above and below a card: the
-   effect has faded out before it */
-@media (max-width: 40rem) {
-  [data-reveal="mecha-epic"] .booster-fx__scene {
-    mask-image: radial-gradient(closest-side, #000 72%, transparent 100%), linear-gradient(to bottom, transparent calc(30.77% - 4.5rem), #000 calc(30.77% - 1.5rem), #000 calc(69.23% + 1.5rem), transparent calc(69.23% + 4.5rem));
-    mask-composite: intersect;
-  }
-}
