@@ -178,14 +178,24 @@ def face(rarity: str, p: dict) -> str:
 {h}::after {{
   content: "";
   position: absolute;
-  inset: -40%;
+  inset: -80%;
   pointer-events: none;
   background: url("vortex-back.webp") 0 0 / 600% 300% no-repeat;
+  mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
   animation: impact-vortex-x 0.5s steps(6) 3 both, impact-vortex-y 1.5s steps(3) both;
 }}
 {h}::after {{
   z-index: 3;
   background-image: url("vortex-front.webp");
+}}
+/* on a phone, the cards' row scrolls sideways and cuts what overflows it 5rem above and below a card: the
+   vortex has faded out before it */
+@media (max-width: 40rem) {{
+  {h}::before,
+  {h}::after {{
+    mask-image: radial-gradient(closest-side, #000 72%, transparent 100%), linear-gradient(to bottom, transparent calc(30.77% - 4.5rem), #000 calc(30.77% - 1.5rem), #000 calc(69.23% + 1.5rem), transparent calc(69.23% + 4.5rem));
+    mask-composite: intersect;
+  }}
 }}
 @keyframes impact-vortex-x {{
   from {{ background-position-x: 0%; }}

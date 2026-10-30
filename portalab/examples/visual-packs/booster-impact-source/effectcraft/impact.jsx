@@ -163,49 +163,50 @@ function flames(L, cx, cy, hw, hh, amp, phase) {
 // --- the comps ----------------------------------------------------------------------------------------
 // the opening: 768 x 720, the pack at (384, 337), 240 x 355 — 32 frames (2.6 s), the last one empty
 if (ONLY === "opening") (function () {
-  var comp = app.project.items.addComp("opening", 768, 720, 1, 32 * F, 12);
-  var cx = 384, cy = 337, hw = 120, hh = 177;
+  var comp = app.project.items.addComp("opening", 1152, 1080, 1, 32 * F, 12);
+  var cx = 576, cy = 505, hw = 120, hh = 177;   // the pack at its real size, room all round
   for (var f = 0; f < 23; f++) {
     seed(100 + f);
     var grow = Math.min(1, (f + 2) / 12), L = frames(comp, "rays-" + f, f, f + 1);
-    speedLines(L, cx, cy, 70, 300 + f * 6, 520 + f * 8, 7, WHITE);
-    spikes(L, cx, cy, hw, hh, 16, 220 * grow, 70, WHITE, 6, 0.1);
-    spikes(L, cx, cy, hw, hh, 22, 330 * grow, 90, PINK, 8, 0);
+    speedLines(L, cx, cy, 80, 380 + f * 10, 760 + f * 12, 7, WHITE);
+    spikes(L, cx, cy, hw, hh, 16, 320 * grow, 70, WHITE, 6, 0.1);
+    spikes(L, cx, cy, hw, hh, 22, 480 * grow, 90, PINK, 8, 0);
   }
   for (var z = 1; z < 23; z++) { seed(300 + z); var Z = frames(comp, "zap-" + z, z, z + 1); var k = 1 + 0.2 * Math.min(1, z / 20); zaps(Z, cx, cy, hw * k, hh * k, 7, 14); }
   // two slashes crossing the box at frames 14 and 16, drawn in two frames, held, then gone
   seed(500);
   var s1 = [[14, 0.35], [15, 0.85], [16, 1.0], [17, 1.0]], s2 = [[16, 0.4], [17, 0.9], [18, 1.0], [19, 1.0]];
-  for (var i = 0; i < s1.length; i++) { var A = frames(comp, "slashA-" + i, s1[i][0], s1[i][0] + 1); slash(A, cx - 380 * (1 - s1[i][1]) / 2, cy + 20, 760 * s1[i][1], 95, -0.32, 1); }
-  for (var j = 0; j < s2.length; j++) { var B = frames(comp, "slashB-" + j, s2[j][0], s2[j][0] + 1); slash(B, cx + 380 * (1 - s2[j][1]) / 2, cy - 10, 760 * s2[j][1], 85, 0.28, -1); }
+  for (var i = 0; i < s1.length; i++) { var A = frames(comp, "slashA-" + i, s1[i][0], s1[i][0] + 1); slash(A, cx - 500 * (1 - s1[i][1]) / 2, cy + 20, 1000 * s1[i][1], 105, -0.32, 1); }
+  for (var j = 0; j < s2.length; j++) { var B = frames(comp, "slashB-" + j, s2[j][0], s2[j][0] + 1); slash(B, cx + 500 * (1 - s2[j][1]) / 2, cy - 10, 1000 * s2[j][1], 95, 0.28, -1); }
   // the comic explosion swelling over everything, then dissolving into halftone dots
-  var sizes = { 23: 260, 24: 520, 25: 900 };
+  var sizes = { 23: 360, 24: 720, 25: 1300 };
   for (var p = 23; p < 26; p++) { seed(700 + p); var P = frames(comp, "pow-" + p, p, p + 1); polys(P, [starVerts(cx, cy, 14, sizes[p], sizes[p] * 0.62, 0.25, 0)], WHITE, 12, false); }
   for (var d = 26; d < 31; d++) {
     var D = frames(comp, "dots-" + d, d, d + 1), rad = 30 * (1 - (d - 26) / 5), even = [], odd = [];
-    for (var gy = -9; gy <= 9; gy++) { var row = [[cx - 420 + (gy % 2 ? 21 : 0), cy + gy * 40], [cx + 420, cy + gy * 40]]; (gy % 2 ? odd : even).push(row); }
+    for (var gy = -14; gy <= 14; gy++) { var row = [[cx - 640 + (gy % 2 ? 21 : 0), cy + gy * 40], [cx + 640, cy + gy * 40]]; (gy % 2 ? odd : even).push(row); }
     dotted(D, even.concat(odd), rad, 42, WHITE, false);
   }
 })();
 
 // the reveals: 576 x 800, the card at the middle, 320 x 444
-function revealComp(name, count) { return app.project.items.addComp(name, 576, 800, 1, count * F, 12); }
-var RX = 288, RY = 400, RW = 160, RH = 222;
+// the card at its real size in the middle of a stage 2.6 times as large: room for the effects to spread
+function revealComp(name, count) { return app.project.items.addComp(name, 832, 1154, 1, count * F, 12); }
+var RX = 416, RY = 577, RW = 160, RH = 222;
 
 if (ONLY === "reveal-rare") (function () {  // rare, 1.8 s: 22 frames
   var comp = revealComp("reveal-rare", 22);
   for (var f = 0; f < 12; f++) {
     seed(1000 + f);
     var g = f < 3 ? (f + 1) / 3 : 1 - Math.max(0, f - 7) / 5, L = frames(comp, "burst-" + f, f, f + 1);
-    if (f < 8) speedLines(L, RX, RY, 48, 230 + f * 14, 380 + f * 14, 7, WHITE);
-    spikes(L, RX, RY, RW * 0.6, RH * 0.6, 14, 170 * g, 60, WHITE, 6, 0.12);
-    spikes(L, RX, RY, RW * 0.6, RH * 0.6, 18, 240 * g, 80, PINK, 8, 0);
+    if (f < 8) speedLines(L, RX, RY, 56, 300 + f * 22, 560 + f * 24, 7, WHITE);
+    spikes(L, RX, RY, RW * 0.6, RH * 0.6, 14, 250 * g, 60, WHITE, 6, 0.12);
+    spikes(L, RX, RY, RW * 0.6, RH * 0.6, 18, 360 * g, 80, PINK, 8, 0);
   }
-  for (var r = 2; r < 14; r++) { var R = frames(comp, "ring-" + r, r, r + 1), rad = 170 + (r - 2) * 22, dd = 22 * (1 - (r - 2) / 13);
+  for (var r = 2; r < 14; r++) { var R = frames(comp, "ring-" + r, r, r + 1), rad = 200 + (r - 2) * 32, dd = 22 * (1 - (r - 2) / 13);
     dotted(R, [circle(RX, RY, rad + 12, 1.15)], dd, Math.PI * 2 * rad / 40, CYAN, true);
     dotted(R, [circle(RX, RY, rad + 12, 1.15)], dd + 6, Math.PI * 2 * rad / 40, INK, true); }
   for (var s = 3; s < 16; s++) { seed(1200 + s); var S = frames(comp, "spark-" + s, s, s + 1), list = [];
-    for (var i = 0; i < 6; i++) { var a = between(0, Math.PI * 2), d = 230 + (s - 3) * 9 + between(0, 60); list.push([RX + Math.cos(a) * d, RY + Math.sin(a) * d * 1.2, between(8, 16) * (1 - (s - 3) / 14)]); }
+    for (var i = 0; i < 6; i++) { var a = between(0, Math.PI * 2), d = 260 + (s - 3) * 16 + between(0, 80); list.push([RX + Math.cos(a) * d, RY + Math.sin(a) * d * 1.2, between(8, 16) * (1 - (s - 3) / 14)]); }
     glints(S, list, WHITE); }
 })();
 
@@ -214,16 +215,16 @@ if (ONLY === "reveal-epic") (function () {  // epic, 2.4 s: 29 frames
   for (var f = 0; f < 16; f++) {
     seed(2000 + f);
     var g = f < 3 ? (f + 1) / 3 : 1 - Math.max(0, f - 10) / 6, L = frames(comp, "burst-" + f, f, f + 1);
-    speedLines(L, RX, RY, 56, 260 + f * 10, 400 + f * 10, 8, WHITE);
-    spikes(L, RX, RY, RW * 0.7, RH * 0.7, 16, 200 * g, 64, WHITE, 6, 0.1);
-    spikes(L, RX, RY, RW * 0.7, RH * 0.7, 22, 290 * g, 90, PINK, 9, 0);
+    speedLines(L, RX, RY, 64, 320 + f * 16, 600 + f * 18, 8, WHITE);
+    spikes(L, RX, RY, RW * 0.7, RH * 0.7, 16, 300 * g, 64, WHITE, 6, 0.1);
+    spikes(L, RX, RY, RW * 0.7, RH * 0.7, 22, 420 * g, 90, PINK, 9, 0);
   }
   for (var z = 0; z < 15; z++) { seed(2200 + z); zaps(frames(comp, "zap-" + z, z, z + 1), RX, RY, RW, RH, 7, 12); }
   for (var s = 2; s < 22; s++) { seed(2400); var S = frames(comp, "sparks-" + s, s, s + 1), wl = [], pl = [];
-    for (var i = 0; i < 10; i++) { var a = between(0, Math.PI * 2), sp = between(10, 20), d = 200 + (s - 2) * sp; (i % 2 ? wl : pl).push([RX + Math.cos(a) * d, RY + Math.sin(a) * d, between(10, 20) * (1 - (s - 2) / 22)]); }
+    for (var i = 0; i < 10; i++) { var a = between(0, Math.PI * 2), sp = between(10, 20), d = 230 + (s - 2) * sp * 1.5; (i % 2 ? wl : pl).push([RX + Math.cos(a) * d, RY + Math.sin(a) * d, between(10, 20) * (1 - (s - 2) / 22)]); }
     glints(S, wl, WHITE); glints(S, pl, PINK_L); }
   for (var c = 6; c < 24; c++) { var C = frames(comp, "cross-" + c, c, c + 1), k = c < 8 ? 1.4 - (c - 6) * 0.2 : 1;
-    var cx = 470, cy = 150, r = 42 * k, ring = [];
+    var cx = RX + 182, cy = RY - 250, r = 42 * k, ring = [];
     for (var q = 0; q <= 40; q++) ring.push([cx + Math.cos(q / 40 * Math.PI * 2) * r, cy + Math.sin(q / 40 * Math.PI * 2) * r]);
     var gr = group(C, "ring"); pathInto(gr, ring, true); strokeInto(gr, PINK, 5);
     var h1 = group(C, "h"); pathInto(h1, [[cx - r * 1.7, cy], [cx - r * 0.45, cy]], false); strokeInto(h1, PINK, 5);
@@ -240,7 +241,7 @@ function ribbonRuns(f, k, front) {
   var spin = f * 0.75, tight = f < 9 ? 1 - f / 9 : 0, blast = f < 9 ? 0 : (f - 9) / 6;
   // each ribbon its own pitch, reach and tilt: they cross, a whirlwind rather than a barber's pole
   var turns = [1.0, 1.45, 1.8][k], reach = [1.0, 1.12, 0.92][k], tilt = [0.24, -0.3, 0.12][k], dir = k === 1 ? -1 : 1;
-  var R = (185 + 120 * tight + 260 * blast) * reach, H = 2 * RH + 150, thin = Math.max(0.15, 1 - blast);
+  var R = (185 + 120 * tight + 380 * blast) * reach, H = 2 * RH + 150, thin = Math.max(0.15, 1 - blast);
   var pts = [], n = 64;
   for (var i = 0; i <= n; i++) {
     var u = i / n, th = dir * (spin + u * turns * Math.PI * 2) + k * Math.PI * 2 / 3;
@@ -291,9 +292,9 @@ if (ONLY === "legendary-back") (function () {  // under the card, 1.5 s: 18 fram
     seed(4300 + f);
     var L = frames(comp, "back-" + f, f, f + 1), g = Math.min(1, (f + 2) / 8);
     ribbons(L, f, false);
-    speedLines(L, RX, RY, 60, 300 + f * 8, 460 + f * 8, 8, WHITE);
-    spikes(L, RX, RY, RW, RH, 18, 150 * g, 70, WHITE, 6, 0.1);
-    spikes(L, RX, RY, RW, RH, 24, 230 * g, 90, PINK, 8, 0);
+    speedLines(L, RX, RY, 64, 360 + f * 14, 640 + f * 16, 8, WHITE);
+    spikes(L, RX, RY, RW, RH, 18, 240 * g, 70, WHITE, 6, 0.1);
+    spikes(L, RX, RY, RW, RH, 24, 360 * g, 90, PINK, 8, 0);
   }
 })();
 // the legendary's reveal, once it has landed, 2.5 s: 30 frames — the biggest burst, rings, great glints
@@ -302,21 +303,21 @@ if (ONLY === "reveal-legendary") (function () {
   for (var f = 0; f < 16; f++) {
     seed(4500 + f);
     var g = f < 3 ? (f + 1) / 3 : 1 - Math.max(0, f - 10) / 6, L = frames(comp, "burst-" + f, f, f + 1);
-    speedLines(L, RX, RY, 64, 280 + f * 10, 420 + f * 10, 9, WHITE);
-    spikes(L, RX, RY, RW, RH, 18, 170 * g, 70, WHITE, 6, 0.12);
-    spikes(L, RX, RY, RW, RH, 26, 260 * g, 95, PINK, 9, 0);
-    spikes(L, RX, RY, RW, RH, 12, 330 * g, 60, YELLOW, 7, 0.27);
+    speedLines(L, RX, RY, 72, 340 + f * 18, 640 + f * 20, 9, WHITE);
+    spikes(L, RX, RY, RW, RH, 18, 260 * g, 70, WHITE, 6, 0.12);
+    spikes(L, RX, RY, RW, RH, 26, 400 * g, 95, PINK, 9, 0);
+    spikes(L, RX, RY, RW, RH, 12, 500 * g, 60, YELLOW, 7, 0.27);
   }
   for (var r = 0; r < 14; r++) { var R = frames(comp, "rings-" + r, r, r + 1);
-    for (var k = 0; k < 2; k++) { var s = r - k * 4; if (s < 0) continue; var rad = 230 + s * 20, ring = circle(RX, RY, rad, 1.2);
+    for (var k = 0; k < 2; k++) { var s = r - k * 4; if (s < 0) continue; var rad = 260 + s * 30, ring = circle(RX, RY, rad, 1.2);
       var gi = group(R, "white"); pathInto(gi, ring, true); strokeInto(gi, k ? PINK : WHITE, 7);
       var go = group(R, "ink"); pathInto(go, ring, true); strokeInto(go, INK, 15); } }
   for (var s2 = 2; s2 < 22; s2++) { seed(4700); var S = frames(comp, "sparks-" + s2, s2, s2 + 1), wl = [], yl = [];
-    for (var i = 0; i < 12; i++) { var a = between(0, Math.PI * 2), d = 230 + (s2 - 2) * between(9, 18); (i % 2 ? wl : yl).push([RX + Math.cos(a) * d, RY + Math.sin(a) * d * 1.15, between(10, 20) * (1 - (s2 - 2) / 21)]); }
+    for (var i = 0; i < 12; i++) { var a = between(0, Math.PI * 2), d = 250 + (s2 - 2) * between(14, 28); (i % 2 ? wl : yl).push([RX + Math.cos(a) * d, RY + Math.sin(a) * d * 1.15, between(10, 20) * (1 - (s2 - 2) / 21)]); }
     glints(S, wl, WHITE); glints(S, yl, YELLOW); }
   var big = [[1, 0.5], [2, 1], [3, 0.85], [4, 0.6], [5, 0.4], [6, 0.2]], small = [[14, 0.5], [15, 1], [16, 0.7], [17, 0.4], [18, 0.2]];
-  for (var b = 0; b < big.length; b++) glints(frames(comp, "glintA-" + b, big[b][0], big[b][0] + 1), [[470, 150, 130 * big[b][1]]], WHITE);
-  for (var m = 0; m < small.length; m++) glints(frames(comp, "glintB-" + m, small[m][0], small[m][0] + 1), [[110, 650, 90 * small[m][1]]], YELLOW);
+  for (var b = 0; b < big.length; b++) glints(frames(comp, "glintA-" + b, big[b][0], big[b][0] + 1), [[RX + 182, RY - 250, 130 * big[b][1]]], WHITE);
+  for (var m = 0; m < small.length; m++) glints(frames(comp, "glintB-" + m, small[m][0], small[m][0] + 1), [[RX - 178, RY + 250, 90 * small[m][1]]], YELLOW);
 })();
 
 writeLn("comps " + app.project.numItems);
