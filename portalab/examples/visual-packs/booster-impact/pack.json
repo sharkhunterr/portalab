@@ -1,14 +1,14 @@
 {
   "format": 1,
   "id": "impact",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "names": {
     "fr": "Impact — scène de booster manga",
     "en": "Impact — an anime booster scene"
   },
   "descriptions": {
-    "fr": "Une ouverture de booster façon jeu de cartes animé, dessinée comme un comics : traits de vitesse et trames sur fond noir ; un paquet en aplats cernés d'encre qui tournoie dans des éclairs roses et des rayons manga, tranché par d'immenses coups de pinceau blancs, puis un flash qui se dissout en trame ; des cartes au lettrage BD, autocollants et holographie, révélées par une onde tramée, des rayons encrés et un coup de pinceau, ou — légendaire — mises en dalle sur un mur binaire dans un slime vert et des flammes toxiques.",
-    "en": "A booster opening like an animated trading card game's, drawn as a comic: speed lines and halftone on black; a pack in inked flat colours spinning in pink lightning and manga rays, cut by huge white brush slashes, then a flash dissolving into halftone; cards with comic lettering, stickers and holographic foil, revealed by a halftone wave, inked rays and a brush slash, or — legendary — slabbed on a binary wall in green goo and toxic flames."
+    "fr": "Une ouverture de booster façon jeu de cartes animé, dessinée comme un comics — ses animations faites image par image dans EffectCraft : traits de vitesse et trames sur fond noir ; un paquet en aplats cernés d'encre qui tournoie dans des éclairs roses et des rayons manga, tranché par d'immenses coups de pinceau blancs, puis un flash qui se dissout en trame ; des cartes au lettrage BD, autocollants et holographie, révélées par une onde tramée, des rayons encrés et un coup de pinceau, ou — légendaire — mises en dalle sur un mur binaire dans un slime vert et des flammes toxiques.",
+    "en": "A booster opening like an animated trading card game's, drawn as a comic — its animations made frame by frame in EffectCraft: speed lines and halftone on black; a pack in inked flat colours spinning in pink lightning and manga rays, cut by huge white brush slashes, then a flash dissolving into halftone; cards with comic lettering, stickers and holographic foil, revealed by a halftone wave, inked rays and a brush slash, or — legendary — slabbed on a binary wall in green goo and toxic flames."
   },
   "author": "Portalab (example)",
   "license": "CC0-1.0"

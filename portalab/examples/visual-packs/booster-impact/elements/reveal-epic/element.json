@@ -6,12 +6,15 @@
     "en": "Inked rays"
   },
   "descriptions": {
-    "fr": "Des rayons roses et blancs cernés d'encre éclatent derrière elle, des étoiles encrées s'envolent, un viseur s'allume à son coin.",
-    "en": "Inked pink and white rays burst behind it, inked four-pointed sparks fly off, a crosshair snaps on at its corner."
+    "fr": "Dessinée dans EffectCraft, image par image : rayons encrés, éclairs roses qui crépitent autour de la carte, éclats projetés, un viseur qui s'allume à son coin.",
+    "en": "Drawn in EffectCraft, frame by frame: inked rays, crackling pink lightning round the card, glints flying off, a crosshair snapping on at its corner."
   },
   "render": {
     "kind": "glsl",
-    "file": "reveal.glsl",
+    "file": "still.glsl",
+    "css": [
+      "reveal.css"
+    ],
     "stage": true,
     "duration": 2.4,
     "rarity": "epic"
