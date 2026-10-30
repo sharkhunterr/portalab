@@ -18,7 +18,7 @@
     "stage": true,
     "duration": 3.0,
     "rarity": "legendary",
-    "alpha": "stacked",
+    "alpha": "side",
     "over": "over.mp4"
   }
 }

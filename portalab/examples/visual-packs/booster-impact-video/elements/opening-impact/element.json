@@ -17,6 +17,6 @@
     ],
     "stage": true,
     "duration": 2.6,
-    "alpha": "stacked"
+    "alpha": "side"
   }
 }

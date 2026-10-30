@@ -153,11 +153,11 @@ class Render(BaseModel):
     # a widget option's script: shown instead of the widget's content, drawn over it (animations), or in the
     # region the widget keeps for it (``stage``: the daily wheel's face; the widget keeps its texts, controls)
     place: Literal["replace", "overlay", "stage"] | None = None
-    # issue 287: a video (a scene's backdrop plays it over and over, an opening or a reveal once) —
-    # ``stacked``: its upper half the picture, its lower half the transparency in grey (white: opaque), which
-    # Portalab puts back together as it plays; ``over``: a reveal's second video, played over the card (the
-    # first plays behind it)
-    alpha: Literal["none", "stacked"] = "none"
+    # issue 287: a video (a scene's backdrop plays it over and over, an opening or a reveal once) — its
+    # transparency beside its picture (``side``: in its right half) or under it (``stacked``: its lower half),
+    # in grey (white: opaque), which Portalab puts back together as it plays; ``over``: a reveal's second
+    # video, played over the card (the first plays behind it)
+    alpha: Literal["none", "side", "stacked"] = "none"
     over: str | None = None
 
     @field_validator("kind")

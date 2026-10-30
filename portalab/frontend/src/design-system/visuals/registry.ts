@@ -43,8 +43,8 @@ export interface ExternalElement {
   file: string | null;
   /** issue 287: a reveal's video played over the card (``file`` plays behind it) */
   over?: string | null;
-  /** issue 287: how a video holds its transparency (``stacked``: in its lower half) */
-  alpha?: "none" | "stacked" | null;
+  /** issue 287: how a video holds its transparency (``side``: in its right half, ``stacked``: its lower half) */
+  alpha?: "none" | "side" | "stacked" | null;
   css: string[];
   stage: boolean;
   shape: number;

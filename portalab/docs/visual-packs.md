@@ -146,11 +146,12 @@ A script part is told `{phase, rarity?, index?, count, reducedMotion}` — never
 **Video parts** (`kind: video`, issue 287) — a backdrop, an opening or a reveal may be a video (`.mp4` or
 `.webm`, checked by its first bytes), muted and played in the part's layer — a backdrop over and over, an
 opening or a reveal once, from its start; preloaded with the scene, never played when motion is reduced. Its
-layer is sized and masked by the part's own stylesheet, like a GPU stage's. `alpha: stacked`: the picture in
-the upper half (premultiplied: black where it is transparent), its transparency in grey in the lower half
-(white: opaque) — Portalab puts them back together
+layer is sized and masked by the part's own stylesheet, like a GPU stage's. `alpha: side` (or `stacked`): the
+picture in the left (upper) half — premultiplied: black where it is transparent —, its transparency in grey in
+the right (lower) half (white: opaque) — Portalab puts them back together
 as it plays, so an H.264 MP4 (the one format every browser, Safari and phones included, plays on its hardware
-decoder) can be transparent: frame-by-frame animations weigh far less than sprite sheets, and only one frame
+decoder) can be transparent — side by side, a tall layer's video stays within the 4K a phone decodes:
+frame-by-frame animations weigh far less than sprite sheets, and only one frame
 is decoded at a time. `examples/visual-packs/tools/alpha_video.py` makes one from PNG frames (ffmpeg).
 
 ## Widgets
