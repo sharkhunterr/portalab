@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "saloon",
+  "names": {
+    "fr": "Dos de planches",
+    "en": "Plank back"
+  },
+  "descriptions": {
+    "fr": "Planches et cuir, une étoile de shérif au centre.",
+    "en": "Planks and leather, a sheriff's star in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

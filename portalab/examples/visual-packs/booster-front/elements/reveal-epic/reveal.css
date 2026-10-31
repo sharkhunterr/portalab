@@ -1,0 +1,25 @@
+/* A epic card turned (its hook: data-reveal), staged over the whole screen (place: screen): the rarity's name
+   first, over the scene's screen, then the card face down, turning over — between this reveal's two videos
+   (behind it and over it). This stylesheet dresses the rarity's name Portalab writes. */
+@font-face {
+  font-family: "Genre Black Ops One";
+  src: url("BlackOpsOne.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-reveal="front-epic"] .booster-takeover__word {
+  font-family: "Genre Black Ops One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  scale: 0.78;
+  color: #e9e2c4;
+  -webkit-text-stroke: 0.06rem #1d200c;
+  paint-order: stroke fill;
+  text-shadow: 0.2rem 0.2rem 0 #1d200c, 0 0 1.6rem rgba(255, 160, 70, 0.6);
+}
+/* held upright, the name runs along the screen's height: smaller, so it fits */
+@media (max-aspect-ratio: 4 / 5) {
+  [data-reveal="front-epic"] .booster-takeover__word {
+    scale: 0.5;
+  }
+}

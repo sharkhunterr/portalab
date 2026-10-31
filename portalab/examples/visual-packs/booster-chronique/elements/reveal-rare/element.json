@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "chronique-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "Le sceau : un parchemin qui s'écrit ligne à ligne, un sceau de cire qui s'y imprime ; la carte en sort.",
+    "en": "The seal: a parchment writing itself line by line, a wax seal pressed onto it; the card comes out of it."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

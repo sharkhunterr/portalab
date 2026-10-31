@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "chronique",
+  "names": {
+    "fr": "Le sceau de cire",
+    "en": "The wax seal"
+  },
+  "descriptions": {
+    "fr": "Un sceau de cire frappe le paquet dans un éclat d'or ; un parchemin se déroule et l'emporte.",
+    "en": "A wax seal strikes the pack in a flash of gold; a parchment unrolls and takes it."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

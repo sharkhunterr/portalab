@@ -120,6 +120,24 @@ def emblem_concert():
                '<circle cx="50" cy="50" r="2.5" fill="#140b1f"/><path d="M14,30 A40,40 0 0,1 40,10" fill="none" stroke="#29e3ff" stroke-width="3" stroke-linecap="round"/>')
 
 
+def emblem_chronique():
+    return svg('<circle cx="50" cy="50" r="44" fill="#9e1a1f" stroke="#5c0c10" stroke-width="4"/>'
+               '<path d="M22,62 C18,44 24,28 36,20 M78,62 C82,44 76,28 64,20" fill="none" stroke="#e8c45a" stroke-width="5" stroke-linecap="round" stroke-dasharray="7 4"/>'
+               '<path d="M36,34 L64,34 L60,40 L60,64 L66,70 L34,70 L40,64 L40,40 Z" fill="#e8c45a"/>')
+
+
+def emblem_front():
+    return svg('<path d="M50,6 L90,22 L84,62 C78,78 64,88 50,94 C36,88 22,78 16,62 L10,22 Z" fill="#4a5320" stroke="#1d200c" stroke-width="4"/>'
+               '<path d="M50,24 L56,42 L76,42 L60,53 L66,72 L50,61 L34,72 L40,53 L24,42 L44,42 Z" fill="#e9e2c4"/>')
+
+
+def emblem_saloon():
+    return svg('<circle cx="50" cy="50" r="44" fill="#6b3f1d" stroke="#2c1608" stroke-width="4"/>'
+               '<path d="M50,12 L58,36 L84,36 L63,51 L71,76 L50,61 L29,76 L37,51 L16,36 L42,36 Z" fill="#f0c04a" stroke="#2c1608" stroke-width="2.5" stroke-linejoin="round"/>'
+               '<circle cx="50" cy="12" r="4" fill="#f0c04a"/><circle cx="84" cy="36" r="4" fill="#f0c04a"/><circle cx="16" cy="36" r="4" fill="#f0c04a"/><circle cx="71" cy="76" r="4" fill="#f0c04a"/><circle cx="29" cy="76" r="4" fill="#f0c04a"/>'
+               '<circle cx="50" cy="50" r="7" fill="#6b3f1d"/>')
+
+
 GENRES = {
     "blockbuster": dict(
         version="1.1.0",
@@ -512,6 +530,91 @@ GENRES = {
                "look": ("Paquet aux néons", "Neon pack", "Un paquet noir aux sillons de vinyle, une bande aux néons, l'image de l'œuvre comme une pochette d'album, son nom en néon, un vinyle en emblème.", "A black pack with a record's grooves, a neon band, the work's art like an album cover, its name in neon, a record as emblem."),
                "opening": ("Le diamant se pose", "Needle drop", "Un vinyle tourne sous le paquet, le bras se pose — il éclate en ondes sonores et en notes.", "A record spins under the pack, the tonearm drops — it bursts in sound waves and notes."),
                "back": ("Dos vinyle", "Record back", "Noir aux sillons, une bande aux néons, un vinyle au centre.", "Grooved black, a neon band, a record in the middle.")}),
+    "chronique": dict(
+        moments={
+            "rare": ("Le sceau : un parchemin qui s'écrit ligne à ligne, un sceau de cire qui s'y imprime ; la carte en sort.",
+                     "The seal: a parchment writing itself line by line, a wax seal pressed onto it; the card comes out of it."),
+            "epic": ("La mosaïque : une mosaïque qui se pose tesselle après tesselle autour d'un soleil, puis une couronne de laurier qui pousse autour de la carte entre deux colonnes de marbre.",
+                     "The mosaic: a mosaic laying itself tile by tile round a sun, then a laurel wreath growing round the card between two marble columns."),
+            "legendary": ("Le triomphe : un temple au lever du soleil, un aigle qui s'élève ; puis une couronne de laurier d'or, des bannières pourpres, des rayons de gloire et une pluie de pétales autour de la carte.",
+                          "The triumph: a temple at sunrise, an eagle rising; then a golden laurel wreath, crimson banners, rays of glory and a shower of petals round the card."),
+        },
+        family="drama", font=("Cinzel.woff2", "Genre Cinzel", "500 800"), ink="#3a1e0c", main="#9e1a1f", light="#e8c45a", dark="#f2e6c8", emblem=emblem_chronique,
+        names={"fr": "Chronique — histoire", "en": "Chronique — history"},
+        description={"fr": "Le booster Histoire, une chronique des grandes époques : chaque rareté son moment en plein écran — un parchemin scellé pour une rare, une mosaïque et sa couronne de laurier pour une épique, un triomphe antique pour une légendaire. Un paquet de parchemin cerclé de pourpre qu'un sceau de cire frappe avant qu'un parchemin le recouvre ; une salle de colonnes dans la lumière du soir.",
+                     "en": "The History booster, a chronicle of great eras: every rarity its own moment over the whole screen — a sealed parchment for a rare, a mosaic and its laurel wreath for an epic, an ancient triumph for a legendary. A parchment pack edged in crimson that a wax seal strikes before a parchment rolls over it; a hall of columns in the evening light."},
+        pack_bg="radial-gradient(ellipse at 50% 30%, rgba(255, 244, 214, 0.6), transparent 60%), linear-gradient(170deg, #efe0bd, #cfb385)",
+        pack_band="linear-gradient(180deg, #9e1a1f, #5c0c10)", face_bg="linear-gradient(170deg, #5c2a14, #24100a)",
+        upright="0.55",
+        word="scale: 0.8;\n  color: #f2e6c8;\n  -webkit-text-stroke: 0.08rem #3a1e0c;\n  paint-order: stroke fill;\n  letter-spacing: 0.08em;\n  text-shadow: 0.2rem 0.2rem 0 #9e1a1f, 0 0 1.6rem rgba(232, 196, 90, 0.8);",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  30% { transform: translateY(-2%) scale(1.02); }
+  36% { transform: translateY(1%) scale(0.97); filter: brightness(1.2); }
+  42% { transform: scale(1.04); filter: sepia(0.8) brightness(1.4); opacity: 1; }
+  56%, 100% { transform: scale(1.1); filter: sepia(1) brightness(2.5); opacity: 0; }
+}""",
+        parts={"backdrop": ("Salle des colonnes", "Hall of columns", "Une salle de colonnes de marbre à l'heure dorée, des rais de soleil entre elles, de la poussière qui danse dans la lumière, des bannières pourpres qui ondulent (vidéo en boucle).", "A hall of marble columns at golden hour, sunbeams between them, dust dancing in the light, crimson banners stirring (a looping video)."),
+               "look": ("Paquet de parchemin", "Parchment pack", "Un paquet de parchemin cerclé de pourpre, l'image de l'œuvre sous une arche, son nom gravé en capitales romaines, une couronne de laurier en emblème.", "A parchment pack edged in crimson, the work's art under an arch, its name carved in Roman capitals, a laurel wreath as emblem."),
+               "opening": ("Le sceau de cire", "The wax seal", "Un sceau de cire frappe le paquet dans un éclat d'or ; un parchemin se déroule et l'emporte.", "A wax seal strikes the pack in a flash of gold; a parchment unrolls and takes it."),
+               "back": ("Dos de parchemin", "Parchment back", "Parchemin cerclé de pourpre, une couronne de laurier au centre.", "Parchment edged in crimson, a laurel wreath in the middle.")}),
+    "front": dict(
+        moments={
+            "rare": ("La fusée éclairante : la nuit sur une tranchée, des fusées qui descendent en se balançant au-dessus des barbelés ; la carte arrive dans leur lumière.",
+                     "The flare: night over a trench, flares drifting down above the barbed wire; the card comes in their light."),
+            "epic": ("Le bombardement : des bombardiers en formation, les projecteurs qui se croisent, la DCA qui éclate ; puis les éclats de DCA tout autour de la carte.",
+                     "The bombing: bombers in formation, searchlights crossing, flak bursting; then flak bursting all round the card."),
+            "legendary": ("La victoire : des soldats qui plantent un drapeau sur une colline à l'aube ; puis le drapeau immense derrière la carte, des avions qui passent en traînées de couleur et le soleil qui se lève.",
+                          "Victory: soldiers raising a flag on a hill at dawn; then the flag huge behind the card, planes passing in trails of colour and the sun rising."),
+        },
+        family="action", font=("BlackOpsOne.woff2", "Genre Black Ops One", "400"), ink="#1d200c", main="#4a5320", light="#e9e2c4", dark="#b8452a", emblem=emblem_front,
+        names={"fr": "Front — guerre", "en": "Front — war"},
+        description={"fr": "Le booster Guerre, la ligne de front : chaque rareté son moment en plein écran — des fusées éclairantes sur une tranchée pour une rare, un bombardement de nuit pour une épique, la victoire à l'aube pour une légendaire. Un paquet kaki pochoiré que les projecteurs trouvent avant qu'il saute dans un nuage de poussière ; un champ de bataille au crépuscule.",
+                     "en": "The War booster, the front line: every rarity its own moment over the whole screen — flares over a trench for a rare, a night bombing for an epic, victory at dawn for a legendary. A stencilled khaki pack the searchlights find before it blows up in a cloud of dust; a battlefield at dusk."},
+        pack_bg="repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.06) 0 6px, transparent 6px 14px), linear-gradient(170deg, #6b7334, #3b4219)",
+        pack_band="linear-gradient(180deg, #2a2e12, #14160a)", face_bg="linear-gradient(170deg, #3b4219, #14160a)",
+        upright="0.5",
+        word="scale: 0.78;\n  color: #e9e2c4;\n  -webkit-text-stroke: 0.06rem #1d200c;\n  paint-order: stroke fill;\n  text-shadow: 0.2rem 0.2rem 0 #1d200c, 0 0 1.6rem rgba(255, 160, 70, 0.6);",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  36% { transform: translate(0, 0); }
+  38% { transform: translate(-1.5%, 1%); }
+  40% { transform: translate(1.5%, -1%); filter: brightness(1.5); }
+  42% { transform: translate(-1%, -1%); }
+  45% { transform: scale(1.08); filter: brightness(3) sepia(0.6); opacity: 1; }
+  54%, 100% { transform: scale(1.3); filter: brightness(4) blur(6px); opacity: 0; }
+}""",
+        parts={"backdrop": ("Champ de bataille", "Battlefield", "Un champ de bataille au crépuscule, la fumée qui roule sur les tranchées, des éclairs lointains, des projecteurs qui balaient le ciel et des braises qui montent (vidéo en boucle).", "A battlefield at dusk, smoke rolling over the trenches, distant flashes, searchlights sweeping the sky and embers rising (a looping video)."),
+               "look": ("Paquet pochoiré", "Stencilled pack", "Un paquet kaki rayé de camouflage, l'image de l'œuvre comme une photo de reportage, son nom au pochoir, un écusson étoilé en emblème.", "A khaki pack striped like camouflage, the work's art like a war photograph, its name stencilled, a starred badge as emblem."),
+               "opening": ("Repéré", "Spotted", "Trois projecteurs trouvent le paquet ; un éclair — il saute dans un nuage de poussière et de débris.", "Three searchlights find the pack; a flash — it blows up in a cloud of dust and debris."),
+               "back": ("Dos kaki", "Khaki back", "Kaki rayé, un écusson étoilé au centre.", "Striped khaki, a starred badge in the middle.")}),
+    "saloon": dict(
+        moments={
+            "rare": ("L'avis de recherche : une affiche « Wanted » clouée au mur de planches, qui frémit au vent ; la carte s'y révèle.",
+                     "The wanted poster: a « Wanted » poster nailed to a plank wall, fluttering in the wind; the card shows on it."),
+            "epic": ("Le duel : deux tireurs face à face à midi, un virevoltant qui roule ; puis des impacts de balles dans les planches et des étoiles de shérif qui tournent autour de la carte.",
+                     "The duel: two gunmen facing each other at high noon, a tumbleweed rolling; then bullet holes in the planks and sheriff's stars spinning round the card."),
+            "legendary": ("Le coucher de soleil : un cavalier qui traverse un immense soleil couchant entre les mesas et les cactus ; puis le grand soleil derrière la carte, ses rayons et un aigle qui tournoie.",
+                          "The sunset: a rider crossing a huge setting sun among the mesas and cacti; then the great sun behind the card, its rays and an eagle circling."),
+        },
+        family="action", font=("Rye.woff2", "Genre Rye", "400"), ink="#2c1608", main="#b5521f", light="#f0c04a", dark="#f2dfb8", emblem=emblem_saloon,
+        names={"fr": "Saloon — western", "en": "Saloon — western"},
+        description={"fr": "Le booster Western, la frontière : chaque rareté son moment en plein écran — un avis de recherche pour une rare, le duel de midi pour une épique, un cavalier dans le soleil couchant pour une légendaire. Un paquet de planches et de cuir que les portes battantes du saloon cachent avant de s'ouvrir sur la poussière ; le désert au couchant.",
+                     "en": "The Western booster, the frontier: every rarity its own moment over the whole screen — a wanted poster for a rare, the high-noon duel for an epic, a rider in the setting sun for a legendary. A pack of planks and leather that the saloon's swinging doors hide before opening on the dust; the desert at sunset."},
+        pack_bg="repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0 2px, transparent 2px 22px), linear-gradient(170deg, #8a5a30, #4a2b14)",
+        pack_band="linear-gradient(180deg, #f0c04a, #b5521f)", face_bg="linear-gradient(170deg, #6b3f1d, #2c1608)",
+        upright="0.55",
+        word="scale: 0.8;\n  color: #f2dfb8;\n  -webkit-text-stroke: 0.08rem #2c1608;\n  paint-order: stroke fill;\n  text-shadow: 0.25rem 0.25rem 0 #b5521f, 0 0 1.6rem rgba(240, 192, 74, 0.7);",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  40% { transform: rotate(0); filter: sepia(0.3); }
+  44% { transform: rotate(-2deg) scale(1.03); filter: sepia(0.6) brightness(1.3); opacity: 1; }
+  58%, 100% { transform: translateX(8%) rotate(4deg) scale(1.1); filter: sepia(1) brightness(1.8) blur(4px); opacity: 0; }
+}""",
+        parts={"backdrop": ("Désert au couchant", "Desert at sunset", "Le désert au couchant, un immense soleil qui descend derrière les mesas, la chaleur qui tremble, la poussière qui court au sol et un faucon qui tournoie (vidéo en boucle).", "The desert at sunset, a huge sun sinking behind the mesas, heat shimmering, dust running along the ground and a hawk circling (a looping video)."),
+               "look": ("Paquet de planches", "Plank pack", "Un paquet de planches et de cuir, l'image de l'œuvre sur un avis de recherche, son nom en lettres de saloon, une étoile de shérif en emblème.", "A pack of planks and leather, the work's art on a wanted poster, its name in saloon lettering, a sheriff's star as emblem."),
+               "opening": ("Les portes battantes", "Swinging doors", "Les portes battantes du saloon se referment devant le paquet ; elles se rouvrent en battant : il a disparu dans la poussière.", "The saloon's swinging doors close in front of the pack; they swing open again: it is gone in the dust."),
+               "back": ("Dos de planches", "Plank back", "Planches et cuir, une étoile de shérif au centre.", "Planks and leather, a sheriff's star in the middle.")}),
 }
 REVEAL = {
     "rare": ("Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
@@ -796,7 +899,8 @@ def write(key, g):
              "Chewy.woff2": "Chewy by Sideshow", "MochiyPopOne.woff2": "Mochiy Pop One by Fontworks", "SpecialElite.woff2": "Special Elite by Astigmatic",
              "IMFellEnglishSC.woff2": "IM Fell English SC by Igino Marini", "SpaceMono.woff2": "Space Mono by Colophon", "BebasNeue.woff2": "Bebas Neue by Dharma Type",
              "Anton.woff2": "Anton by Vernon Adams", "Creepster.woff2": "Creepster by Sideshow", "PlayfairDisplay.woff2": "Playfair Display by Claus Eggers Sørensen",
-             "CinzelDecorative.woff2": "Cinzel Decorative by Natanael Gama", "Orbitron.woff2": "Orbitron by Matt McInerney"}
+             "CinzelDecorative.woff2": "Cinzel Decorative by Natanael Gama", "Orbitron.woff2": "Orbitron by Matt McInerney",
+             "Cinzel.woff2": "Cinzel by Natanael Gama", "BlackOpsOne.woff2": "Black Ops One by James Grieshaber and Eben Sorkin", "Rye.woff2": "Rye by Nicole Fally"}
     (pack / "CREDITS.txt").write_text(f"""{g['names']['en']} — an example booster scene for Portalab (CC0-1.0), one of the genre scenes, every shader,
 stylesheet and drawing original.
 

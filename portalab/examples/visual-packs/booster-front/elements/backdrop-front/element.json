@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "front",
+  "names": {
+    "fr": "Champ de bataille",
+    "en": "Battlefield"
+  },
+  "descriptions": {
+    "fr": "Un champ de bataille au crépuscule, la fumée qui roule sur les tranchées, des éclairs lointains, des projecteurs qui balaient le ciel et des braises qui montent (vidéo en boucle).",
+    "en": "A battlefield at dusk, smoke rolling over the trenches, distant flashes, searchlights sweeping the sky and embers rising (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

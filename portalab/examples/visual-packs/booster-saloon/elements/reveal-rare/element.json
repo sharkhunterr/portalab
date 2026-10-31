@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "saloon-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "L'avis de recherche : une affiche « Wanted » clouée au mur de planches, qui frémit au vent ; la carte s'y révèle.",
+    "en": "The wanted poster: a « Wanted » poster nailed to a plank wall, fluttering in the wind; the card shows on it."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

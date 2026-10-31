@@ -1,0 +1,23 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: The saloon's swinging doors close in front of the pack; they swing open again: it is gone in the
+   dust. */
+[data-opening="saloon"] .booster-stage__tear .booster-pack {
+  animation: genre-fate 2.6s linear both;
+}
+@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  40% { transform: rotate(0); filter: sepia(0.3); }
+  44% { transform: rotate(-2deg) scale(1.03); filter: sepia(0.6) brightness(1.3); opacity: 1; }
+  58%, 100% { transform: translateX(8%) rotate(4deg) scale(1.1); filter: sepia(1) brightness(1.8) blur(4px); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="saloon"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="saloon"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

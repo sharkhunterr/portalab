@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "chronique",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Chronique — histoire",
+    "en": "Chronique — history"
+  },
+  "descriptions": {
+    "fr": "Le booster Histoire, une chronique des grandes époques : chaque rareté son moment en plein écran — un parchemin scellé pour une rare, une mosaïque et sa couronne de laurier pour une épique, un triomphe antique pour une légendaire. Un paquet de parchemin cerclé de pourpre qu'un sceau de cire frappe avant qu'un parchemin le recouvre ; une salle de colonnes dans la lumière du soir.",
+    "en": "The History booster, a chronicle of great eras: every rarity its own moment over the whole screen — a sealed parchment for a rare, a mosaic and its laurel wreath for an epic, an ancient triumph for a legendary. A parchment pack edged in crimson that a wax seal strikes before a parchment rolls over it; a hall of columns in the evening light."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

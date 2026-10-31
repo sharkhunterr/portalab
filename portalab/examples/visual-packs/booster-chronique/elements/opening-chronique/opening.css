@@ -1,0 +1,23 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: A wax seal strikes the pack in a flash of gold; a parchment unrolls and takes it. */
+[data-opening="chronique"] .booster-stage__tear .booster-pack {
+  animation: genre-fate 2.6s linear both;
+}
+@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  30% { transform: translateY(-2%) scale(1.02); }
+  36% { transform: translateY(1%) scale(0.97); filter: brightness(1.2); }
+  42% { transform: scale(1.04); filter: sepia(0.8) brightness(1.4); opacity: 1; }
+  56%, 100% { transform: scale(1.1); filter: sepia(1) brightness(2.5); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="chronique"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="chronique"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

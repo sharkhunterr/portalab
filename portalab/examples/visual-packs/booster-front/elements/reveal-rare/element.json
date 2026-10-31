@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "front-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "La fusée éclairante : la nuit sur une tranchée, des fusées qui descendent en se balançant au-dessus des barbelés ; la carte arrive dans leur lumière.",
+    "en": "The flare: night over a trench, flares drifting down above the barbed wire; the card comes in their light."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

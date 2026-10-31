@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "saloon",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Saloon — western",
+    "en": "Saloon — western"
+  },
+  "descriptions": {
+    "fr": "Le booster Western, la frontière : chaque rareté son moment en plein écran — un avis de recherche pour une rare, le duel de midi pour une épique, un cavalier dans le soleil couchant pour une légendaire. Un paquet de planches et de cuir que les portes battantes du saloon cachent avant de s'ouvrir sur la poussière ; le désert au couchant.",
+    "en": "The Western booster, the frontier: every rarity its own moment over the whole screen — a wanted poster for a rare, the high-noon duel for an epic, a rider in the setting sun for a legendary. A pack of planks and leather that the saloon's swinging doors hide before opening on the dust; the desert at sunset."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

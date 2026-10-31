@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "saloon",
+  "names": {
+    "fr": "Les portes battantes",
+    "en": "Swinging doors"
+  },
+  "descriptions": {
+    "fr": "Les portes battantes du saloon se referment devant le paquet ; elles se rouvrent en battant : il a disparu dans la poussière.",
+    "en": "The saloon's swinging doors close in front of the pack; they swing open again: it is gone in the dust."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

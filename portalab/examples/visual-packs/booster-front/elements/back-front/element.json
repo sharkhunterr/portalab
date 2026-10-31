@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "front",
+  "names": {
+    "fr": "Dos kaki",
+    "en": "Khaki back"
+  },
+  "descriptions": {
+    "fr": "Kaki rayé, un écusson étoilé au centre.",
+    "en": "Striped khaki, a starred badge in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuilds the genre scene packs (booster-blockbuster, -tenebres, -rideau, -arcanes, -hyperespace): their
+# Rebuilds the genre scene packs (booster-blockbuster, -tenebres, -rideau, -arcanes, -hyperespace and the others): their
 # stylesheets and manifests (gen_genres.py), their stages' looping videos (stages/<key>.glsl), and their
 # animations — built in EffectCraft (https://github.com/storytold/effectcraft, 0.18) on the manga toolkit, in
 # slices of frames side by side, at 1.33 times (SCALE), rendered at 24 fps and made into the videos their parts
@@ -12,11 +12,11 @@ core="$here/../booster-manga-source/effectcraft/core.jsx"
 cli="${EFFECTCRAFT:-effectcraft-cli}"
 work="${GENRES_WORK:-$(mktemp -d)}"
 [ -n "${GENRES_WORK:-}" ] || trap 'rm -rf "$work"' EXIT
-declare -A FAMILY=([blockbuster]=action [tenebres]=dark [rideau]=drama [arcanes]=fantasy [hyperespace]=sf [tresor]=adventure [reportage]=documentary [insomnie]=thriller [fourire]=comedy [crayon]=animation [scelles]=crime [idylle]=romance [brume]=mystery [concert]=music)
+declare -A FAMILY=([blockbuster]=action [tenebres]=dark [rideau]=drama [arcanes]=fantasy [hyperespace]=sf [tresor]=adventure [reportage]=documentary [insomnie]=thriller [fourire]=comedy [crayon]=animation [scelles]=crime [idylle]=romance [brume]=mystery [concert]=music [chronique]=history [front]=war [saloon]=western)
 declare -A LENGTH=([opening]=64 [reveal-rare]=76 [reveal-epic]=92 [reveal-legendary]=110 [over-rare]=76 [over-epic]=92 [over-legendary]=110)
 SLICE=16
 scale="${SCALE:-1.3334}"
-keys=("${1:-}"); [ -n "${1:-}" ] || keys=(blockbuster tenebres rideau arcanes hyperespace tresor reportage insomnie fourire crayon scelles idylle brume concert)
+keys=("${1:-}"); [ -n "${1:-}" ] || keys=(blockbuster tenebres rideau arcanes hyperespace tresor reportage insomnie fourire crayon scelles idylle brume concert chronique front saloon)
 shift || true
 comps=("$@"); [ ${#comps[@]} -gt 0 ] || comps=(opening reveal-rare reveal-epic reveal-legendary over-rare over-epic over-legendary)
 if [ $# -eq 0 ]; then

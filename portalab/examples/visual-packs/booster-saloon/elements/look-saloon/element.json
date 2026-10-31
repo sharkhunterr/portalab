@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "saloon",
+  "names": {
+    "fr": "Paquet de planches",
+    "en": "Plank pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet de planches et de cuir, l'image de l'œuvre sur un avis de recherche, son nom en lettres de saloon, une étoile de shérif en emblème.",
+    "en": "A pack of planks and leather, the work's art on a wanted poster, its name in saloon lettering, a sheriff's star as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}
