@@ -10,6 +10,7 @@ from sqlalchemy import Text, cast, func, or_, select
 
 from portalab.core.db import Database
 from portalab.modules.cards.editions import edition_of
+from portalab.modules.cards.family import genre_of
 from portalab.modules.cards.models import Card, CardSet, Copy, Pack
 
 PAGE = 48
@@ -26,6 +27,7 @@ def card_out(card: Card, card_set: CardSet, owned: dict[str, int] | None = None)
         "set_backdrop": card_set.backdrop,
         "set_poster": card_set.poster,
         "set_family": card_set.family,
+        "set_genre": genre_of((card_set.facts or {}).get("genres") or []),  # issue 295: its genre frame's
         "set_edition": edition_of(card_set.year),
         "set_facts": card_set.facts or {},
         "set_animated": card_set.animated,

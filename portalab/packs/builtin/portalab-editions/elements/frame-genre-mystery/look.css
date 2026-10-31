@@ -1,0 +1,151 @@
+/* Portalab — card_frame/genre-mystery: the mystery genre's frame (a work's main genre) — a detective's card arched like a keyhole, sea-green fog; the art in a magnifying glass's oval lens ringed with brass, the name in brass small capitals. Behind a cut-out character, a street lamp in the mist. */
+
+@font-face {
+  font-family: "Frame Playfair SC";
+  src: url("PlayfairDisplaySC.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+.mcard[data-frame="genre-mystery"] {
+  --g-font: "Frame Playfair SC", var(--mcard-title);
+  --g-bg: #16363b;
+  --g-bg2: #081416;
+  --g-text: #efe6cf;
+  --g-soft: #a9c3bd;
+  --g-accent: #c7a04a;
+  --g-on-accent: #081416;
+  --g-line: rgba(199, 160, 74, 0.35);
+  --g-box: rgba(8, 20, 22, 0.5);
+  filter: drop-shadow(0 0 2cqi var(--mcard-glow));
+}
+.mcard[data-frame="genre-mystery"] .mcard__card {
+  padding: 1.4cqi;
+  border-radius: 50% 50% 3cqi 3cqi / 8% 8% 3cqi 3cqi;
+  box-shadow: none;
+}
+.mcard[data-frame="genre-mystery"] .mcard__body {
+  gap: 1.3cqi;
+  padding: 4.6cqi 3.6cqi 2.8cqi;
+  border-radius: 50% 50% 2cqi 2cqi / 7% 7% 2cqi 2cqi;
+  background:
+    radial-gradient(ellipse 120% 30% at 50% 100%, rgba(169, 195, 189, 0.25), transparent 70%),
+    radial-gradient(ellipse 80% 20% at 20% 40%, rgba(169, 195, 189, 0.12), transparent 70%),
+    linear-gradient(180deg, var(--g-bg), var(--g-bg2));
+  box-shadow: inset 0 0 0 0.4cqi var(--g-accent);
+  color: var(--g-text);
+}
+.mcard[data-frame="genre-mystery"] .mcard__head {
+  justify-content: center;
+}
+.mcard[data-frame="genre-mystery"] .mcard__name {
+  font-family: var(--g-font);
+  font-weight: 700;
+  color: var(--g-text);
+  text-shadow: 0 0.25cqi 0 #081416;
+  flex: 0 1 auto;
+  zoom: 0.86; /* a wide face: the name keeps the room it was fitted for */
+  text-align: center;
+  color: var(--g-accent);
+}
+.mcard[data-frame="genre-mystery"] .mcard__genre {
+  background: var(--g-accent);
+  color: var(--g-on-accent);
+  font-size: 0;
+  padding: 0.5cqi;
+  border-radius: 50%;
+}
+.mcard[data-frame="genre-mystery"] .mcard__emblem {
+  background: none;
+  color: inherit;
+}
+.mcard[data-frame="genre-mystery"] .mcard__art {
+  margin: 1.2cqi 3cqi 1cqi;
+  border-radius: 50%;
+  background: #0d2226;
+  box-shadow:
+    0 0 0 1cqi var(--g-accent),
+    0 0 0 1.4cqi #6b5220,
+    0 0 0 1.8cqi var(--g-accent),
+    0 1cqi 3cqi rgba(0, 0, 0, 0.6);
+}
+/* a legendary's character stays in its window */
+.mcard[data-frame="genre-mystery"] .mcard__art[data-outgrown] {
+  overflow: hidden;
+}
+.mcard[data-frame="genre-mystery"] .mcard__art[data-cutout] .mcard__sky {
+  mask: none;
+  background:
+    radial-gradient(circle at 70% 25%, #fff3c4 0 4%, rgba(255, 220, 140, 0.45) 9%, transparent 30%),
+    radial-gradient(ellipse 120% 40% at 50% 100%, rgba(169, 195, 189, 0.4), transparent 70%),
+    linear-gradient(180deg, #24484d, #0d2226);
+}
+.mcard[data-frame="genre-mystery"] .mcard__strip {
+  background: none;
+  color: var(--g-soft);
+}
+.mcard[data-frame="genre-mystery"] .mcard__stage {
+  border-radius: 0.4cqi;
+  background: var(--g-text);
+  color: var(--g-bg2);
+  font-family: var(--g-font);
+  font-weight: 700;
+}
+.mcard[data-frame="genre-mystery"] .mcard__lower {
+  padding: 1.4cqi;
+  background: var(--g-box);
+  border-radius: 1.4cqi;
+  box-shadow: inset 0 0 0 0.3cqi var(--g-line);
+}
+.mcard[data-frame="genre-mystery"] .mcard__flavor {
+  color: var(--g-soft);
+  border-color: var(--g-line);
+}
+.mcard[data-frame="genre-mystery"] .mcard__foot {
+  color: var(--g-soft);
+}
+.mcard[data-frame="genre-mystery"] .mcard__poster {
+  border-radius: 0.4cqi;
+  box-shadow: 0 0 0 0.4cqi var(--g-text);
+}
+.mcard[data-frame="genre-mystery"] .mcard__work strong,
+.mcard[data-frame="genre-mystery"] .mcard__figures strong {
+  font-family: var(--g-font);
+  font-weight: 700;
+  color: var(--g-text);
+}
+.mcard[data-frame="genre-mystery"] .mcard__figures strong {
+  color: var(--g-accent);
+}
+.mcard[data-frame="genre-mystery"] .mcard__work small,
+.mcard[data-frame="genre-mystery"] .mcard__meta,
+.mcard[data-frame="genre-mystery"] .mcard__by,
+.mcard[data-frame="genre-mystery"] .mcard__figures li {
+  color: var(--g-soft);
+  border-color: var(--g-line);
+  opacity: 1;
+}
+.mcard[data-frame="genre-mystery"] .mcard__cost {
+  background: var(--g-accent);
+  color: var(--g-on-accent);
+}
+/* the rarity on a tag of its metal */
+.mcard[data-frame="genre-mystery"] .mcard__rarity {
+  background: var(--mcard-rim);
+  color: #1a1410;
+  box-shadow: 0 0 1.8cqi var(--mcard-glow);
+  border-radius: 0.4cqi;
+  font-family: var(--g-font);
+}
+.mcard[data-frame="genre-mystery"] .mcard__gem {
+  background: #1a1410;
+}
+/* the lens's glint */
+.mcard[data-frame="genre-mystery"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(ellipse 30% 18% at 30% 22%, rgba(255, 255, 255, 0.35), transparent 70%);
+}

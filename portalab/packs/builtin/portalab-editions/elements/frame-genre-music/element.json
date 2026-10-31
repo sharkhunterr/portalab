@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-music",
+  "names": {
+    "en": "Music — neon",
+    "fr": "Musique — néon"
+  },
+  "descriptions": {
+    "en": "The music genre's frame: a concert card with a pick-shaped notch at its foot, black scored with a vinyl's grooves; the art ringed with pink and cyan neon, an equaliser rising under it, the name in neon; behind a cut-out character, a stage's beams.",
+    "fr": "Le cadre du genre musique : une carte de concert, une encoche de médiator en bas, du noir strié des sillons d'un vinyle ; l'image cerclée de néons rose et cyan, un égaliseur qui monte sous elle, le nom en néon ; derrière un personnage détouré, les faisceaux d'une scène."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

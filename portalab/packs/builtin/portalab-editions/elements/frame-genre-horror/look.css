@@ -1,4 +1,4 @@
-/* Portalab — card_frame/genre-dark: the dark genre's frame, Ténèbres' world — a hull torn at its top and its foot,
+/* Portalab — card_frame/genre-horror: the horror genre's frame, Ténèbres' world — a hull torn at its top and its foot,
    in the rarity's metal, black with a blood-red fog; the art in a crooked window clawed through at its corner,
    the name dripping, the box under it torn too, the rarity on a blood seal. Behind a cut-out character, a red
    moon in the fog. */
@@ -8,7 +8,7 @@
   src: url("Creepster.woff2") format("woff2");
   font-display: swap;
 }
-.mcard[data-frame="genre-dark"] {
+.mcard[data-frame="genre-horror"] {
   --genre-black: #060304;
   --genre-night: #170608;
   --genre-blood: #c4101c;
@@ -17,7 +17,7 @@
   filter: drop-shadow(0 0 2cqi var(--mcard-glow));
 }
 /* torn at its top and its foot */
-.mcard[data-frame="genre-dark"] .mcard__card {
+.mcard[data-frame="genre-horror"] .mcard__card {
   padding: 1.2cqi;
   border-radius: 0;
   box-shadow: none;
@@ -30,7 +30,7 @@
     0 calc(100% - 2cqi)
   );
 }
-.mcard[data-frame="genre-dark"] .mcard__body {
+.mcard[data-frame="genre-horror"] .mcard__body {
   gap: 1.4cqi;
   padding: 4.2cqi 3.4cqi 3.6cqi;
   border-radius: 0;
@@ -49,7 +49,7 @@
   box-shadow: none;
   color: var(--genre-bone);
 }
-.mcard[data-frame="genre-dark"] .mcard__name {
+.mcard[data-frame="genre-horror"] .mcard__name {
   font-family: "Frame Creepster", var(--mcard-title);
   font-weight: 400;
   letter-spacing: 0.03em;
@@ -58,27 +58,27 @@
     0 0.3cqi 0 var(--genre-black),
     0 0 2cqi color-mix(in srgb, var(--genre-blood) 60%, transparent);
 }
-.mcard[data-frame="genre-dark"] .mcard__genre {
+.mcard[data-frame="genre-horror"] .mcard__genre {
   border-radius: 50% 50% 50% 0;
   background: var(--genre-blood);
   color: var(--genre-bone);
   transform: rotate(-4deg);
 }
-.mcard[data-frame="genre-dark"] .mcard__emblem {
+.mcard[data-frame="genre-horror"] .mcard__emblem {
   background: none;
   color: var(--genre-bone);
 }
 /* a crooked window, clawed through at its corner */
-.mcard[data-frame="genre-dark"] .mcard__art {
+.mcard[data-frame="genre-horror"] .mcard__art {
   margin: 0.6cqi 0.4cqi 0.4cqi;
   clip-path: polygon(0 1.6%, 99% 0, 100% 97%, 1% 100%);
   box-shadow: none;
   background: var(--genre-black);
 }
-.mcard[data-frame="genre-dark"] .mcard__art[data-outgrown] {
+.mcard[data-frame="genre-horror"] .mcard__art[data-outgrown] {
   overflow: hidden;
 }
-.mcard[data-frame="genre-dark"] .mcard__art::after {
+.mcard[data-frame="genre-horror"] .mcard__art::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -91,18 +91,18 @@
     linear-gradient(180deg, transparent 70%, rgba(6, 3, 4, 0.55));
   mask: linear-gradient(200deg, #000000 22%, transparent 40%);
 }
-.mcard[data-frame="genre-dark"] .mcard__art[data-cutout] .mcard__sky {
+.mcard[data-frame="genre-horror"] .mcard__art[data-cutout] .mcard__sky {
   mask: none;
   background:
     radial-gradient(circle at 72% 28%, #ffd1c4 0 7%, var(--genre-blood) 9%, transparent 15%),
     radial-gradient(ellipse 120% 40% at 50% 100%, rgba(239, 230, 220, 0.18), transparent 70%),
     linear-gradient(180deg, #2a0609, var(--genre-black) 80%);
 }
-.mcard[data-frame="genre-dark"] .mcard__strip {
+.mcard[data-frame="genre-horror"] .mcard__strip {
   background: none;
   color: var(--genre-soft);
 }
-.mcard[data-frame="genre-dark"] .mcard__stage {
+.mcard[data-frame="genre-horror"] .mcard__stage {
   border-radius: 0.4cqi;
   background: var(--genre-bone);
   color: var(--genre-black);
@@ -111,48 +111,48 @@
   letter-spacing: 0.1em;
 }
 /* the box under it, torn at its top */
-.mcard[data-frame="genre-dark"] .mcard__lower {
+.mcard[data-frame="genre-horror"] .mcard__lower {
   padding: 2.4cqi 1.6cqi 1.6cqi;
   background: rgba(239, 230, 220, 0.06);
   clip-path: polygon(0 1.4cqi, 9% 0, 18% 1.2cqi, 30% 0.2cqi, 42% 1.4cqi, 55% 0, 68% 1.2cqi, 80% 0.2cqi, 91% 1.4cqi, 100% 0.4cqi, 100% 100%, 0 100%);
 }
-.mcard[data-frame="genre-dark"] .mcard__poster {
+.mcard[data-frame="genre-horror"] .mcard__poster {
   border-radius: 0;
   box-shadow: 0 0 0 0.4cqi var(--genre-blood);
 }
-.mcard[data-frame="genre-dark"] .mcard__work strong,
-.mcard[data-frame="genre-dark"] .mcard__figures strong {
+.mcard[data-frame="genre-horror"] .mcard__work strong,
+.mcard[data-frame="genre-horror"] .mcard__figures strong {
   color: var(--genre-bone);
 }
-.mcard[data-frame="genre-dark"] .mcard__figures strong {
+.mcard[data-frame="genre-horror"] .mcard__figures strong {
   font-family: "Frame Creepster", var(--mcard-title);
   font-weight: 400;
   color: var(--genre-blood);
 }
-.mcard[data-frame="genre-dark"] .mcard__work small,
-.mcard[data-frame="genre-dark"] .mcard__meta,
-.mcard[data-frame="genre-dark"] .mcard__by,
-.mcard[data-frame="genre-dark"] .mcard__flavor,
-.mcard[data-frame="genre-dark"] .mcard__figures li {
+.mcard[data-frame="genre-horror"] .mcard__work small,
+.mcard[data-frame="genre-horror"] .mcard__meta,
+.mcard[data-frame="genre-horror"] .mcard__by,
+.mcard[data-frame="genre-horror"] .mcard__flavor,
+.mcard[data-frame="genre-horror"] .mcard__figures li {
   color: var(--genre-soft);
   border-color: rgba(196, 16, 28, 0.35);
   opacity: 1;
 }
-.mcard[data-frame="genre-dark"] .mcard__cost {
+.mcard[data-frame="genre-horror"] .mcard__cost {
   background: var(--genre-blood);
   color: var(--genre-bone);
 }
-.mcard[data-frame="genre-dark"] .mcard__foot {
+.mcard[data-frame="genre-horror"] .mcard__foot {
   color: var(--genre-soft);
 }
 /* the rarity on a seal of its metal, a drop of blood for its gem */
-.mcard[data-frame="genre-dark"] .mcard__rarity {
+.mcard[data-frame="genre-horror"] .mcard__rarity {
   border-radius: 1cqi 0.4cqi;
   background: var(--mcard-rim);
   box-shadow: 0 0 2cqi var(--mcard-glow);
   color: var(--genre-black);
   font-weight: 900;
 }
-.mcard[data-frame="genre-dark"] .mcard__gem {
+.mcard[data-frame="genre-horror"] .mcard__gem {
   background: var(--genre-blood);
 }

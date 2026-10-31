@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-animation",
+  "names": {
+    "en": "Animation — cartoon",
+    "fr": "Animation — dessin animé"
+  },
+  "descriptions": {
+    "en": "The animation genre's frame: a soft, bouncy shape like a cartoon character, a violet-to-mint gradient sprinkled with light bubbles; the art a cel outlined in white with an offset ink shadow, the name in round letters outlined in ink; behind a cut-out character, a cartoon sky.",
+    "fr": "Le cadre du genre animation : une forme molle comme un personnage de dessin animé, un dégradé violet et menthe semé de bulles de lumière ; l'image en cellule cernée de blanc et d'une ombre d'encre décalée, le nom en lettres rondes cernées d'encre ; derrière un personnage détouré, un ciel de dessin animé."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

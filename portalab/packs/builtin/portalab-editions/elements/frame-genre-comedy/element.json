@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-comedy",
+  "names": {
+    "en": "Comedy — confetti",
+    "fr": "Comédie — confettis"
+  },
+  "descriptions": {
+    "en": "The comedy genre's frame: a bouncing card with lopsided rounded corners, pink polka dots on sunshine yellow; the art a tilted, taped snapshot, the name in big round letters outlined in white; behind a cut-out character, a shower of confetti.",
+    "fr": "Le cadre du genre comédie : une carte qui rebondit, aux coins arrondis de travers, des pois roses sur un jaune soleil ; l'image en photo instantanée penchée et scotchée, le nom en grosses lettres rondes cernées de blanc ; derrière un personnage détouré, une pluie de confettis."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

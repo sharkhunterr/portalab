@@ -38,3 +38,62 @@ def family_of(genres: Sequence[str]) -> str:
     if strong:
         return next(f for f in FIRST if f in strong)
     return next((GENTLE[n] for n in names if n in GENTLE), "drama")
+
+
+# issue 295: a card's genre frame is its work's main genre (the first it is given), one frame each — a series'
+# combined genres taken as the film's they read as, the rare ones as the closest
+GENRES = (
+    "action",
+    "adventure",
+    "animation",
+    "comedy",
+    "crime",
+    "documentary",
+    "drama",
+    "family",
+    "fantasy",
+    "history",
+    "horror",
+    "music",
+    "mystery",
+    "romance",
+    "sf",
+    "thriller",
+    "war",
+    "western",
+)
+MAIN = {
+    "action": "action",
+    "action & adventure": "action",
+    "aventure": "adventure",
+    "animation": "animation",
+    "comédie": "comedy",
+    "crime": "crime",
+    "documentaire": "documentary",
+    "news": "documentary",
+    "reality": "documentary",
+    "talk": "documentary",
+    "drame": "drama",
+    "soap": "drama",
+    "téléfilm": "drama",
+    "familial": "family",
+    "kids": "family",
+    "fantastique": "fantasy",
+    "histoire": "history",
+    "horreur": "horror",
+    "musique": "music",
+    "mystère": "mystery",
+    "romance": "romance",
+    "science-fiction": "sf",
+    "science-fiction & fantastique": "sf",
+    "thriller": "thriller",
+    "guerre": "war",
+    "war & politics": "war",
+    "western": "western",
+}
+
+
+def genre_of(genres: Sequence[str]) -> str:
+    """The work's main genre: its first one known, drama when it has none."""
+    names = [g.strip().lower() for g in genres if g and g.strip()]
+    return next((MAIN[n] for n in names if n in MAIN), "drama")

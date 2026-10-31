@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-romance",
+  "names": {
+    "en": "Romance — lace",
+    "fr": "Romance — dentelle"
+  },
+  "descriptions": {
+    "en": "The romance genre's frame: a card with scalloped edges like lace, powder pink sprinkled with small hearts; the art under a round arch ringed with rose and gold, the name in flowing script; behind a cut-out character, a pink sunset with soft bokeh.",
+    "fr": "Le cadre du genre romance : une carte au bord festonné comme une dentelle, un rose poudré semé de petits cœurs ; l'image sous une arche ronde cerclée de rose et d'or, le nom en belle écriture ; derrière un personnage détouré, un coucher de soleil rose aux reflets flous."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

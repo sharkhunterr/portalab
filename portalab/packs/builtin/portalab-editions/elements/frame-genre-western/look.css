@@ -1,0 +1,144 @@
+/* Portalab — card_frame/genre-western: the western genre's frame (a work's main genre) — a nailed wanted poster, yellowed and burnt at the edges; the name in big saloon letters above the art, the art inside a double ink rule. Behind a cut-out character, the desert at sunset. */
+
+@font-face {
+  font-family: "Frame Rye";
+  src: url("Rye.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+.mcard[data-frame="genre-western"] {
+  --g-font: "Frame Rye", var(--mcard-title);
+  --g-bg: #ecd6a8;
+  --g-bg2: #d2ae6c;
+  --g-text: #3b2414;
+  --g-soft: #6b4a2c;
+  --g-accent: #8f2d1b;
+  --g-on-accent: #f7e8c8;
+  --g-line: rgba(59, 36, 20, 0.3);
+  --g-box: rgba(255, 248, 230, 0.35);
+  filter: drop-shadow(0 0 2cqi var(--mcard-glow));
+}
+.mcard[data-frame="genre-western"] .mcard__card {
+  padding: 1.4cqi;
+  border-radius: 0.6cqi;
+  box-shadow: none;
+  mask:
+    radial-gradient(circle 1.1cqi at 9% 2.6cqi, transparent 98%, #000000) 0 0 / 50% 100% no-repeat,
+    radial-gradient(circle 1.1cqi at 82% 2.6cqi, transparent 98%, #000000) 100% 0 / 50% 100% no-repeat;
+}
+.mcard[data-frame="genre-western"] .mcard__body {
+  gap: 1.3cqi;
+  padding: 4cqi 3.6cqi 2.8cqi;
+  border-radius: 0.4cqi;
+  background:
+    radial-gradient(ellipse at 50% 45%, var(--g-bg) 50%, var(--g-bg2) 80%, #8a5a2a 98%);
+  box-shadow: inset 0 0 2cqi rgba(80, 40, 10, 0.5);
+  color: var(--g-text);
+}
+.mcard[data-frame="genre-western"] .mcard__head {
+  justify-content: center;
+  border-block: 0.4cqi double var(--g-text);
+  padding-block: 0.6cqi;
+}
+.mcard[data-frame="genre-western"] .mcard__name {
+  font-family: var(--g-font);
+  font-weight: 400;
+  color: var(--g-text);
+  text-shadow: none;
+  flex: 0 1 auto;
+  zoom: 0.86; /* a wide face: the name keeps the room it was fitted for */
+  text-align: center;
+  text-transform: uppercase;
+}
+.mcard[data-frame="genre-western"] .mcard__genre {
+  background: var(--g-accent);
+  color: var(--g-on-accent);
+  font-size: 0;
+  padding: 0.5cqi;
+  border-radius: 50%;
+}
+.mcard[data-frame="genre-western"] .mcard__emblem {
+  background: none;
+  color: inherit;
+}
+.mcard[data-frame="genre-western"] .mcard__art {
+  margin: 1.4cqi 1.4cqi 1cqi;
+  border-radius: 0;
+  background: #c98a4b;
+  box-shadow:
+    0 0 0 0.6cqi var(--g-bg),
+    0 0 0 0.9cqi var(--g-text),
+    0 0 0 1.4cqi var(--g-bg),
+    0 0 0 1.6cqi var(--g-text);
+}
+/* a legendary's character stays in its window */
+.mcard[data-frame="genre-western"] .mcard__art[data-outgrown] {
+  overflow: hidden;
+}
+.mcard[data-frame="genre-western"] .mcard__art[data-cutout] .mcard__sky {
+  mask: none;
+  background:
+    radial-gradient(circle at 50% 78%, #fff1b8 0 9%, transparent 10%),
+    linear-gradient(180deg, #f08a4b 0%, #f7b267 55%, #d98b4a 72%, #9c5a2e 73%, #7a4322 100%);
+}
+.mcard[data-frame="genre-western"] .mcard__strip {
+  background: none;
+  color: var(--g-soft);
+}
+.mcard[data-frame="genre-western"] .mcard__stage {
+  border-radius: 0.4cqi;
+  background: var(--g-text);
+  color: var(--g-bg2);
+  font-family: var(--g-font);
+  font-weight: 400;
+}
+.mcard[data-frame="genre-western"] .mcard__lower {
+  padding: 1.4cqi;
+  background: var(--g-box);
+  border-radius: 0;
+  box-shadow: inset 0 0 0 0.3cqi var(--g-line);
+}
+.mcard[data-frame="genre-western"] .mcard__flavor {
+  color: var(--g-soft);
+  border-color: var(--g-line);
+}
+.mcard[data-frame="genre-western"] .mcard__foot {
+  color: var(--g-soft);
+}
+.mcard[data-frame="genre-western"] .mcard__poster {
+  border-radius: 0.4cqi;
+  box-shadow: 0 0 0 0.4cqi var(--g-text);
+}
+.mcard[data-frame="genre-western"] .mcard__work strong,
+.mcard[data-frame="genre-western"] .mcard__figures strong {
+  font-family: var(--g-font);
+  font-weight: 400;
+  color: var(--g-text);
+}
+.mcard[data-frame="genre-western"] .mcard__figures strong {
+  color: var(--g-accent);
+}
+.mcard[data-frame="genre-western"] .mcard__work small,
+.mcard[data-frame="genre-western"] .mcard__meta,
+.mcard[data-frame="genre-western"] .mcard__by,
+.mcard[data-frame="genre-western"] .mcard__figures li {
+  color: var(--g-soft);
+  border-color: var(--g-line);
+  opacity: 1;
+}
+.mcard[data-frame="genre-western"] .mcard__cost {
+  background: var(--g-accent);
+  color: var(--g-on-accent);
+}
+/* the rarity on a tag of its metal */
+.mcard[data-frame="genre-western"] .mcard__rarity {
+  background: var(--mcard-rim);
+  color: #1a1410;
+  box-shadow: 0 0 1.8cqi var(--mcard-glow);
+  border-radius: 0.2cqi;
+  font-family: var(--g-font);
+  font-size: 2.4cqi;
+}
+.mcard[data-frame="genre-western"] .mcard__gem {
+  background: #1a1410;
+}

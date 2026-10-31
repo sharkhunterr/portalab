@@ -45,6 +45,26 @@ export const EDITIONS = [
 export type Edition = (typeof EDITIONS)[number];
 
 export type Family = "sf" | "action" | "fantasy" | "family" | "drama" | "dark";
+/** Issue 295: a work's main genre — its genre frame's. */
+export type Genre =
+  | "action"
+  | "adventure"
+  | "animation"
+  | "comedy"
+  | "crime"
+  | "documentary"
+  | "drama"
+  | "family"
+  | "fantasy"
+  | "history"
+  | "horror"
+  | "music"
+  | "mystery"
+  | "romance"
+  | "sf"
+  | "thriller"
+  | "war"
+  | "western";
 export interface WorkFacts {
   rating?: number;
   votes?: number;
@@ -68,6 +88,7 @@ export interface MediaCard {
   set_poster?: string | null;
   /** the work's genre as the card's colour, and its figures printed on the card (frozen with its set) */
   set_family?: Family;
+  set_genre?: Genre;
   set_edition?: Edition | null;
   /** where the face is in each image (its reference: [x, y, its height] as fractions, null: none) */
   focus?: Record<string, [number, number, number?] | null>;

@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-documentary",
+  "names": {
+    "en": "Documentary — viewfinder",
+    "fr": "Documentaire — viseur"
+  },
+  "descriptions": {
+    "en": "The documentary genre's frame: a clapperboard with its striped band on top; the art in a camera viewfinder with its corner marks and a red recording dot, the name in a lab's monospace; behind a cut-out character, a studio's neutral grey.",
+    "fr": "Le cadre du genre documentaire : un clap de tournage, sa bande rayée en haut ; l'image dans un viseur de caméra, ses coins marqués, un point rouge d'enregistrement, le nom en machine à écrire de laboratoire ; derrière un personnage détouré, le gris neutre d'un studio."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

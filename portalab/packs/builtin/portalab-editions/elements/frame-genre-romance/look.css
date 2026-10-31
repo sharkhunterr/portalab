@@ -1,0 +1,149 @@
+/* Portalab — card_frame/genre-romance: the romance genre's frame (a work's main genre) — a card with scalloped edges like lace, powder pink with small hearts; the art under a round arch ringed with rose and gold, the name in flowing script. Behind a cut-out character, a pink sunset. */
+
+@font-face {
+  font-family: "Frame Great Vibes";
+  src: url("GreatVibes.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+.mcard[data-frame="genre-romance"] {
+  --g-font: "Frame Great Vibes", var(--mcard-title);
+  --g-bg: #ffe1e6;
+  --g-bg2: #ffc6d1;
+  --g-text: #7a1033;
+  --g-soft: #9c4a62;
+  --g-accent: #e8436b;
+  --g-on-accent: #ffffff;
+  --g-line: rgba(122, 16, 51, 0.2);
+  --g-box: rgba(255, 255, 255, 0.55);
+  filter: drop-shadow(0 0 2cqi var(--mcard-glow));
+}
+.mcard[data-frame="genre-romance"] .mcard__card {
+  padding: 2.2cqi;
+  border-radius: 0;
+  box-shadow: none;
+  mask:
+    radial-gradient(circle 1.7cqi at 1.7cqi 1.7cqi, #000000 97%, transparent) 0 0 / 3.4cqi 3.4cqi round,
+    linear-gradient(#000000 0 0) 1.7cqi 1.7cqi / calc(100% - 3.4cqi) calc(100% - 3.4cqi) no-repeat;
+}
+.mcard[data-frame="genre-romance"] .mcard__body {
+  gap: 1.3cqi;
+  padding: 3cqi 3.4cqi 2.8cqi;
+  border-radius: 2cqi;
+  background:
+    radial-gradient(circle, rgba(232, 67, 107, 0.18) 0.5cqi, transparent 0.6cqi) 0 0 / 4cqi 4cqi,
+    linear-gradient(170deg, var(--g-bg), var(--g-bg2));
+  box-shadow: inset 0 0 0 0.4cqi #ffffff, inset 0 0 0 0.7cqi #d9a441;
+  color: var(--g-text);
+}
+.mcard[data-frame="genre-romance"] .mcard__head {
+  justify-content: center;
+}
+.mcard[data-frame="genre-romance"] .mcard__name {
+  font-family: var(--g-font);
+  font-weight: 400;
+  color: var(--g-text);
+  text-shadow: 0 0.2cqi 0 #ffffff;
+  flex: 0 1 auto;
+  font-size: 1.35em;
+  line-height: 1.1;
+  text-align: center;
+}
+.mcard[data-frame="genre-romance"] .mcard__genre {
+  background: var(--g-accent);
+  color: var(--g-on-accent);
+  font-size: 0;
+  padding: 0.5cqi;
+  border-radius: 50%;
+}
+.mcard[data-frame="genre-romance"] .mcard__emblem {
+  background: none;
+  color: inherit;
+}
+.mcard[data-frame="genre-romance"] .mcard__art {
+  margin: 1cqi 2.4cqi 1cqi;
+  border-radius: 50% 50% 2cqi 2cqi / 30% 30% 2cqi 2cqi;
+  background: #ffd0da;
+  box-shadow:
+    0 0 0 0.8cqi #ffffff,
+    0 0 0 1.2cqi var(--g-accent),
+    0 0 0 1.5cqi #d9a441;
+}
+/* a legendary's character stays in its window */
+.mcard[data-frame="genre-romance"] .mcard__art[data-outgrown] {
+  overflow: hidden;
+}
+.mcard[data-frame="genre-romance"] .mcard__art[data-cutout] .mcard__sky {
+  mask: none;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.5) 0 4%, transparent 5%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0 6%, transparent 7%),
+    radial-gradient(circle at 65% 70%, rgba(255, 255, 255, 0.3) 0 3%, transparent 4%),
+    linear-gradient(180deg, #ff9eb5, #ffcfa8 70%, #ffe7c7);
+}
+.mcard[data-frame="genre-romance"] .mcard__strip {
+  background: none;
+  color: var(--g-soft);
+}
+.mcard[data-frame="genre-romance"] .mcard__stage {
+  border-radius: 0.4cqi;
+  background: var(--g-text);
+  color: var(--g-bg2);
+  font-family: var(--g-font);
+  font-weight: 400;
+}
+.mcard[data-frame="genre-romance"] .mcard__lower {
+  padding: 1.4cqi;
+  background: var(--g-box);
+  border-radius: 2cqi;
+  box-shadow: inset 0 0 0 0.3cqi rgba(232, 67, 107, 0.35);
+}
+.mcard[data-frame="genre-romance"] .mcard__flavor {
+  color: var(--g-soft);
+  border-color: var(--g-line);
+}
+.mcard[data-frame="genre-romance"] .mcard__foot {
+  color: var(--g-soft);
+}
+.mcard[data-frame="genre-romance"] .mcard__poster {
+  border-radius: 0.4cqi;
+  box-shadow: 0 0 0 0.4cqi var(--g-text);
+}
+.mcard[data-frame="genre-romance"] .mcard__work strong,
+.mcard[data-frame="genre-romance"] .mcard__figures strong {
+  font-family: var(--g-font);
+  font-weight: 400;
+  color: var(--g-text);
+}
+.mcard[data-frame="genre-romance"] .mcard__figures strong {
+  color: var(--g-accent);
+}
+.mcard[data-frame="genre-romance"] .mcard__work small,
+.mcard[data-frame="genre-romance"] .mcard__meta,
+.mcard[data-frame="genre-romance"] .mcard__by,
+.mcard[data-frame="genre-romance"] .mcard__figures li {
+  color: var(--g-soft);
+  border-color: var(--g-line);
+  opacity: 1;
+}
+.mcard[data-frame="genre-romance"] .mcard__cost {
+  background: var(--g-accent);
+  color: var(--g-on-accent);
+}
+/* the rarity on a tag of its metal */
+.mcard[data-frame="genre-romance"] .mcard__rarity {
+  background: var(--mcard-rim);
+  color: #1a1410;
+  box-shadow: 0 0 1.8cqi var(--mcard-glow);
+  border-radius: 999px;
+}
+.mcard[data-frame="genre-romance"] .mcard__gem {
+  background: #1a1410;
+}
+/* the script for the name only: what is read stays plain */
+.mcard[data-frame="genre-romance"] .mcard__stage,
+.mcard[data-frame="genre-romance"] .mcard__work strong,
+.mcard[data-frame="genre-romance"] .mcard__figures strong {
+  font-family: var(--mcard-title);
+  font-weight: 800;
+}

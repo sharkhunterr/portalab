@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-war",
+  "names": {
+    "en": "War — dog tag",
+    "fr": "Guerre — plaque"
+  },
+  "descriptions": {
+    "en": "The war genre's frame: a military dog tag with its notch at the side and its hole at the top, olive camouflage; the art in a riveted steel frame, the name stencilled on a band; behind a cut-out character, a smoky sky swept by searchlights.",
+    "fr": "Le cadre du genre guerre : une plaque d'identité militaire, son encoche sur le côté et son trou en haut, du camouflage olive ; l'image dans un cadre d'acier riveté, le nom au pochoir sur une bande ; derrière un personnage détouré, un ciel de fumée balayé par des projecteurs."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

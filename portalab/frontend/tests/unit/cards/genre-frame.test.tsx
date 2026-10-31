@@ -4,7 +4,7 @@ import type { MediaCard, Variant } from "../../../src/features/cards/api";
 import { VARIANTS } from "../../../src/features/cards/api";
 import { MediaCardView } from "../../../src/features/cards/MediaCardView";
 
-// Issue 295: a card's genre version — its genre's frame (a visual pack's card_frame), foil or not.
+// Issue 295: a card's genre version — its work's main genre's frame (a visual pack's card_frame), foil or not.
 const card = {
   id: "c1",
   set: "s1",
@@ -13,6 +13,7 @@ const card = {
   set_size: 14,
   set_kind: "movie",
   set_family: "fantasy",
+  set_genre: "adventure",
   set_edition: "bubble",
   year: 2001,
   number: 2,
@@ -33,11 +34,11 @@ function shown(variant: Variant) {
 }
 
 describe("a card's genre version", () => {
-  it("wears its genre's frame, foil or not", () => {
-    expect(shown("genre").dataset.frame).toBe("genre-fantasy");
+  it("wears its main genre's frame (not its colour's), foil or not", () => {
+    expect(shown("genre").dataset.frame).toBe("genre-adventure");
     expect(shown("genre").dataset.foil).toBeUndefined();
     const foil = shown("genre_foil");
-    expect(foil.dataset.frame).toBe("genre-fantasy");
+    expect(foil.dataset.frame).toBe("genre-adventure");
     expect(foil.dataset.foil).toBe("true");
   });
 
