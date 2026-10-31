@@ -60,7 +60,7 @@ import { Poster, SoonList } from "./SoonList";
  * watch. List: every request with its poster, state and dates (cancel while pending). Coming soon: what is
  * downloading or importing (with progress), and what has a release date.
  */
-const TABS = ["overview", "list", "soon"] as const;
+const TABS = ["list", "soon"] as const;
 const PERIODS = ["30d", "90d", "365d", "all"] as const;
 const GROUPS = ["available", "approved", "pending", "declined"] as const;
 const TONE: Record<string, Tone> = { available: "ok", approved: "info", pending: "warn", declined: "bad" };
@@ -530,12 +530,15 @@ function Soon() {
   );
 }
 
-export function RequestsPage() {
+/** #298: « My requests » lists them (and what comes soon); their figures are among the statistics (``stats``). */
+export function RequestsPage({ stats = false }: { stats?: boolean }) {
   const t = useT();
   const [params, setParams] = useSearchParams();
-  const tab = (TABS as readonly string[]).includes(params.get("tab") ?? "")
-    ? (params.get("tab") as string)
-    : "overview";
+  const tab = stats
+    ? "overview"
+    : (TABS as readonly string[]).includes(params.get("tab") ?? "")
+      ? (params.get("tab") as string)
+      : "list";
   const [period, setPeriod] = useState("365d");
   const insights = useRequestInsights(period);
   const data = insights.data;
@@ -546,12 +549,14 @@ export function RequestsPage() {
       title={t("media:requests.title")}
       description={t("media:myRequests.subtitle")}
       tabs={
-        <AdminTabs
-          label={t("media:requests.title")}
-          current={tab}
-          onChange={(next) => setParams(next === "overview" ? {} : { tab: next }, { replace: true })}
-          tabs={TABS.map((key) => ({ key, label: t(`media:myRequests.tabs.${key}`) }))}
-        />
+        stats ? undefined : (
+          <AdminTabs
+            label={t("media:requests.title")}
+            current={tab}
+            onChange={(next) => setParams(next === "list" ? {} : { tab: next }, { replace: true })}
+            tabs={TABS.map((key) => ({ key, label: t(`media:myRequests.tabs.${key}`) }))}
+          />
+        )
       }
     >
       {tab === "overview" ? (
@@ -572,8 +577,10 @@ export function RequestsPage() {
       {tab === "overview" && data ? (
         <RequestsSummary data={data} quota={quota as RequestQuota | undefined} />
       ) : null}
-      {insights.isPending ? <FunctionalState state="loading" /> : null}
-      {insights.isError ? <FunctionalState state="error" onRetry={() => insights.refetch()} /> : null}
+      {stats && insights.isPending ? <FunctionalState state="loading" /> : null}
+      {stats && insights.isError ? (
+        <FunctionalState state="error" onRetry={() => insights.refetch()} />
+      ) : null}
       {tab === "overview" && data ? <Overview data={data} /> : null}
       {tab === "list" ? <List /> : null}
       {tab === "soon" ? <Soon /> : null}

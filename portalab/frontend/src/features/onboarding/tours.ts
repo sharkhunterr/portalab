@@ -171,8 +171,8 @@ export const TOURS: readonly TourDef[] = [
     group: "play",
     route: "/cards",
     steps: [
-      { key: "stats", icon: "chart", targets: [".cards-stats"] },
-      { key: "packs", icon: "gift", targets: [".cards-packs"] },
+      { key: "stats", icon: "chart", targets: [".cards-summary"] },
+      { key: "packs", icon: "gift", targets: [".cards-callout", ".cards-packs"] },
       { key: "search", icon: "search", targets: [".cards-search"] },
       { key: "views", icon: "library", targets: [".cards-views"] },
       { key: "sets", icon: "layers", targets: [".cards-sets a"], click: true },
