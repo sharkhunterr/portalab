@@ -12,7 +12,10 @@ export type Variant =
   | "borderless_foil"
   | "hd"
   | "genre"
-  | "genre_foil";
+  | "genre_foil"
+  // issue 296: a booster's signature frame, foil or not (its look, as the booster names it)
+  | `signature:${string}`
+  | `signature_foil:${string}`;
 // from the most common version to the rarest
 export const VARIANTS: Variant[] = [
   "normal",
@@ -25,6 +28,12 @@ export const VARIANTS: Variant[] = [
   "borderless_foil",
   "hd",
 ];
+/** Issue 296: a version's own name and, for a booster's signature frame, that frame's look. */
+export function variantParts(variant: Variant): { base: string; signature: string | null } {
+  const [base = variant, signature] = variant.split(":");
+  return { base, signature: signature ?? null };
+}
+
 /** Issue 233: a card's edition — the medium of its work's era of release; issue 255: fourteen generations. */
 export const EDITIONS = [
   "nitrate",
@@ -65,6 +74,26 @@ export type Genre =
   | "thriller"
   | "war"
   | "western";
+export const GENRES: Genre[] = [
+  "action",
+  "adventure",
+  "animation",
+  "comedy",
+  "crime",
+  "documentary",
+  "drama",
+  "family",
+  "fantasy",
+  "history",
+  "horror",
+  "music",
+  "mystery",
+  "romance",
+  "sf",
+  "thriller",
+  "war",
+  "western",
+];
 export interface WorkFacts {
   rating?: number;
   votes?: number;

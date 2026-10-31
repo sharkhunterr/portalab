@@ -18,7 +18,7 @@ from portalab.capabilities.media_core import CARD_SOURCES, CardImage, CardPerson
 from portalab.core.db import Database
 from portalab.modules.cards.artwork import FanArt
 from portalab.modules.cards.generator import CardForge, plan, set_code
-from portalab.modules.cards.models import Card, CardSet, Copy
+from portalab.modules.cards.models import VARIANTS, Card, CardSet, Copy
 from portalab.modules.cards.packs import CardBoosterHandler, ContentBoosters, Packs, booster_of, variant_for
 from portalab.modules.cards.participant import CardsParticipant
 from portalab.modules.cards.rarity import Ranked, rarities
@@ -763,6 +763,49 @@ async def test_a_booster_guarantees_its_rarity(database: Database) -> None:
     if absent:
         ownership = OwnershipView(uuid4(), user, "absent", "card_booster", {"rarity": absent[0]})
         assert (await handler.activate(ownership)).state == "incompatible"
+
+
+async def test_a_genre_booster_and_a_booster_signature_frame(database: Database) -> None:
+    """Issue 296: a genre booster draws among the works of that main genre; a booster may sign its cards with
+    its own frame — on a card in its base frame only, a rarity booster's on the card it guarantees."""
+    capabilities = new_registry()
+    horror = replace(
+        work("Shining", 9000, "US", ["Jack", "Shelley", "Danny"]), genres=("Horreur", "Thriller")
+    )
+    thriller = replace(work("Seven", 8000, "US", ["Brad", "Morgan"]), genres=("Thriller", "Horreur"))
+    capabilities.provide(CARD_SOURCES, Sources([horror, thriller]), instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    async with database.session() as session:
+        genres = dict((await session.execute(select(CardSet.name, CardSet.genre))).all())
+    assert genres == {"Shining": "horror", "Seven": "thriller"}  # its first genre, not the strongest
+    user = uuid4()
+    async with database.unit_of_work() as uow:
+        await uow.session.execute(INSERT_USER, {"id": user, "login": f"u{user.hex[:8]}"})
+    packs = Packs(database, capabilities, rng=random.Random(5))  # noqa: S311 — deterministic test data
+    handler = CardBoosterHandler(packs)
+    assert booster_of({"genre": "horror", "signature": "Bad Look!", "cards": 3}) == {
+        "genre": "horror",
+        "cards": 3,
+    }
+    for attempt in range(12):
+        payload = {"genre": "horror", "signature": "tenebres", "cards": 3}
+        assert (
+            await handler.activate(OwnershipView(uuid4(), user, f"h{attempt}", "card_booster", payload))
+        ).state == "active"
+    async with database.session() as session:
+        drawn = (
+            await session.execute(
+                select(CardSet.name, Copy.variant)
+                .join(Card, Card.set_key == CardSet.key)
+                .join(Copy, Copy.card_id == Card.id)
+                .where(Copy.user_id == user)
+            )
+        ).all()
+    assert {name for name, _ in drawn} == {"Shining"}
+    signed = [v for _, v in drawn if v.startswith("signature")]
+    assert signed and all(v in ("signature:tenebres", "signature_foil:tenebres") for v in signed)
+    # the rest in its own versions
+    assert {v for _, v in drawn} - set(signed) <= set(VARIANTS)
 
 
 class Published:

@@ -2,6 +2,10 @@
    the very same card on a binder page, in a pack's reveal and opened big. Its rim is its rarity's metal, its
    body its work's genre colour printed light, the genre's emblem top right — the same
    for films, series, books and games. */
+/* issue 296: a booster's signature frame — its scene's card face hooks on this wrapper, which takes no room */
+.mcard-signature {
+  display: contents;
+}
 .mcard {
   --mcard-body: var(--card-family-drama);
   --mcard-accent: var(--card-family-drama-accent);

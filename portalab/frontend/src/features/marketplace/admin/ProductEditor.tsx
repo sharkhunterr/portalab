@@ -8,7 +8,7 @@ import { Dialog, DialogActions } from "../../../design-system/components/Overlay
 import { useTheme } from "../../../design-system/themes/ThemeProvider";
 import { looksOf, useLooks } from "../../../design-system/visuals/vocabulary";
 import { useT } from "../../../i18n/hooks/useT";
-import { EDITIONS } from "../../cards/api";
+import { EDITIONS, GENRES } from "../../cards/api";
 import type { Category, Product } from "../api";
 import {
   DEPARTMENTS,
@@ -76,6 +76,8 @@ const CHOICES: Record<string, Array<[value: string, label: string]>> = {
     f,
     `gamification:cards.family.${f}`,
   ]),
+  // issue 296: the works of a main genre (its genre frame's), favoured in it
+  "card_booster.genre": GENRES.map((g) => [g, `gamification:cards.genre.${g}`]),
   "card_booster.edition": EDITIONS.map((e) => [e, `gamification:cards.edition.${e}`]),
   // issue 255: one of its cards at this rarity
   "card_booster.rarity": ["rare", "epic", "legendary"].map((r) => [r, `gamification:cards.rarity.${r}`]),

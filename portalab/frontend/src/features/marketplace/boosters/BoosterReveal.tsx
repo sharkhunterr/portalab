@@ -267,7 +267,9 @@ function Card({
       data-duplicate={(state === "revealed" && card.duplicate) || undefined}
       data-outcome={state === "revealed" ? card.outcome : undefined}
       data-card-back={hookOf(back)}
-      data-card-face={state === "hidden" ? undefined : hookOf(face)}
+      // issue 296: a card of its own (a media card) shows the version it is kept in — a scene's face only when
+      // it is that booster's signature frame, which the card wears itself
+      data-card-face={state === "hidden" || card.face ? undefined : hookOf(face)}
       data-reveal={state === "revealed" ? hookOf(reveal) : undefined}
       data-settled={(state === "revealed" && (settled || reduced)) || undefined}
       style={{ "--i": index, "--offset": index - (total - 1) / 2 } as CSSProperties}
@@ -324,7 +326,7 @@ function Card({
           </span>
           <span className="booster-card__face" aria-hidden="true" data-own={card.face ? "" : undefined}>
             {/* a face drawn by the GPU (HD), under the art and the words — only once it turns */}
-            {state === "hidden" ? null : (
+            {state === "hidden" || card.face ? null : (
               <ScenePart
                 element={face}
                 className="booster-card__gpu"

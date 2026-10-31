@@ -76,3 +76,17 @@ def test_the_genres_version_is_drawn_for_every_card_the_more_often_the_rarer() -
     titles = [variant_for("epic", rng, "title", "vhs") for _ in range(6000)]
     assert all(not (v.startswith("genre") and ("showcase" in v or "borderless" in v)) for v in titles)
     assert {"genre", "genre_foil"} <= set(titles)
+
+
+def test_a_booster_favours_its_own_version() -> None:
+    # issue 296: a genre booster's genre version, an era booster's edition version, three times more often
+    rng = random.Random(13)  # noqa: S311 — a seeded draw, for the test
+    plain = [variant_for("common", rng, "cast", "vhs") for _ in range(6000)]
+    favoured = [variant_for("common", rng, "cast", "vhs", "genre") for _ in range(6000)]
+    era = [variant_for("common", rng, "cast", "vhs", "showcase") for _ in range(6000)]
+    count = lambda drawn, base: sum(v.startswith(base) for v in drawn)  # noqa: E731
+    assert count(favoured, "genre") > 2.4 * count(plain, "genre")
+    assert count(era, "showcase") > 2.4 * count(plain, "showcase")
+    # at most 3 in 5, however rare it is
+    legendaries = [variant_for("legendary", rng, "cast", None, "genre") for _ in range(4000)]
+    assert 2100 < count(legendaries, "genre") < 2700
