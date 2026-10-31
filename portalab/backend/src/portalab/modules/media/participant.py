@@ -14,6 +14,7 @@ from portalab.modules.media.insights.ingest import mark_days
 from portalab.modules.media.models import (
     Activity,
     BookPosition,
+    FeedNotified,
     FeedSeen,
     Follow,
     HistoryEntry,
@@ -204,6 +205,7 @@ class MediaParticipant:
                 TasteVerdict,
                 Follow,  # #299
                 FeedSeen,
+                FeedNotified,
             ):
                 await session.execute(delete(model).where(model.user_id == user_id))
             await session.execute(

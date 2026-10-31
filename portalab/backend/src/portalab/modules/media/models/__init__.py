@@ -445,6 +445,15 @@ class Follow(MediaBase):
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
 
+class FeedNotified(MediaBase):
+    """#299: when a member was last told what arrived in « Mon fil » — never twice for the same arrivals."""
+
+    __tablename__ = "feed_notified"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    notified_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
 class FeedSeen(MediaBase):
     """#299: when a member last opened « Mon fil » — what arrived since is unread."""
 

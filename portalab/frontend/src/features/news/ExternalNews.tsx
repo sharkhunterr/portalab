@@ -91,7 +91,9 @@ export function ExternalNews({
   enabled?: boolean;
 }) {
   const items = useSourceItems(asked, limit, enabled);
-  const shown = (Array.isArray(items.data) ? items.data : []).filter((item) => !category || item.category_id === category);
+  const shown = (Array.isArray(items.data) ? items.data : []).filter(
+    (item) => !category || item.category_id === category,
+  );
   if (!shown.length) return null;
   return (
     <section className="news-external" aria-label={heading}>

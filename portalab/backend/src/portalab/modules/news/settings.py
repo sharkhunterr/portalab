@@ -76,6 +76,24 @@ def declare_news_settings(catalog: SettingCatalog = default_catalog) -> None:
             owner=OWNER,
             description="Days the news sources' items are kept (pinned ones stay).",
         )
+    if "news.feeds.personalEnabled" not in known:  # #299: members' own sources in « Mon fil »
+        declare(
+            scope="global",
+            key="news.feeds.personalEnabled",
+            schema=bool,
+            default=True,
+            owner=OWNER,
+            description="Members may add their own news sources to « Mon fil ».",
+        )
+    if "news.feeds.personalMax" not in known:
+        declare(
+            scope="global",
+            key="news.feeds.personalMax",
+            schema=int,
+            default=20,
+            owner=OWNER,
+            description="How many sources of their own a member may follow.",
+        )
 
 
 declare_news_settings()

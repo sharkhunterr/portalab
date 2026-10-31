@@ -118,7 +118,8 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
-.feed-follows ul {
+.feed-follows ul,
+.feed-follows__list {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
@@ -155,4 +156,7 @@
   flex-wrap: wrap;
   align-items: end;
   gap: var(--space-3);
+}
+.feed-chip--follow[data-failing] {
+  border-color: var(--state-error-fg);
 }

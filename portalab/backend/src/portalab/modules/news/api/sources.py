@@ -3,15 +3,17 @@ them now, pin or hide an item; readers see the latest items, a source's, or thos
 person — each with its copied picture, never the site's own."""
 
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Query, Request, Response, status
 from pydantic import BaseModel, Field
 
+from portalab.core.authz_port import Principal
 from portalab.core.errors import NotFound, ValidationFailed
 from portalab.modules.news.api.router import CategoryManager, Module, Reader
 from portalab.modules.news.models import Feed, FeedItem
+from portalab.modules.news.sources.opml import NotOpml, read_opml, write_opml
 from portalab.modules.news.sources.service import SourceRefused
 
 router = APIRouter(prefix="/api/v1", tags=["news"])
@@ -158,8 +160,8 @@ async def source_items(
 
 
 @router.get("/news/sources/items/{item_id}/picture")
-async def source_picture(_: Reader, item_id: UUID, module: Module, request: Request) -> Response:
-    found = await module.sources.picture(item_id)
+async def source_picture(principal: Reader, item_id: UUID, module: Module, request: Request) -> Response:
+    found = await module.sources.picture(item_id, principal.acting_for or principal.user_id)
     if found is None:
         raise NotFound("No picture for this item.", code="news.picture_not_found")
     key, data = found
@@ -247,3 +249,118 @@ async def mark_item(_: CategoryManager, module: Module, item_id: UUID, body: Sou
     """Pin an item on « À la une », or hide it."""
     if not await module.sources.mark(item_id, pinned=body.pinned, hidden=body.hidden):
         raise NotFound("No such item.", code="news.item_not_found")
+
+
+class OpmlIn(BaseModel):
+    opml: str = Field(min_length=1, max_length=300_000)
+
+
+class OpmlImportOut(BaseModel):
+    added: int
+    skipped: int  # already there, or past the limit
+
+
+def _opml(title: str, feeds: list[Feed]) -> Response:
+    text = write_opml(title, [(f.name, f.url, f.site_url) for f in feeds])
+    return Response(
+        content=text,
+        media_type="text/x-opml",
+        headers={"Content-Disposition": 'attachment; filename="portalab-sources.opml"'},
+    )
+
+
+def _me(principal: Principal) -> UUID:
+    user = principal.acting_for or principal.user_id
+    assert user is not None
+    return user
+
+
+# --- a member's own sources (« Mon fil ») -----------------------------------------------------------------
+@router.get("/me/news/sources", response_model=NewsSourcesOut)
+async def my_sources(principal: Reader, module: Module) -> NewsSourcesOut:
+    """The sources I follow for my feed — mine alone."""
+    return NewsSourcesOut(
+        items=[_source(feed, count) for feed, count in await module.sources.mine(_me(principal))]
+    )
+
+
+@router.post("/me/news/sources", response_model=NewsSourceOut)
+async def follow_source(principal: Reader, module: Module, body: SourcePreviewIn) -> NewsSourceOut:
+    """Follow a source (a site's address will do) — read at once when nobody read it yet."""
+    try:
+        feed_id = await module.sources.subscribe(_me(principal), body.url)
+    except SourceRefused as exc:
+        raise ValidationFailed(str(exc), code="news.source_refused") from exc
+    for feed, count in await module.sources.mine(_me(principal)):
+        if feed.id == feed_id:
+            return _source(feed, count)
+    raise NotFound("No such source.", code="news.source_not_found")
+
+
+@router.delete("/me/news/sources/{source_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def unfollow_source(principal: Reader, module: Module, source_id: UUID) -> None:
+    await module.sources.unsubscribe(_me(principal), source_id)
+
+
+@router.get("/me/news/sources/items", response_model=SourceItemsOut)
+async def my_source_items(
+    principal: Reader, module: Module, limit: Annotated[int, Query(ge=1, le=100)] = 30
+) -> SourceItemsOut:
+    """The latest items of the sources I follow."""
+    rows = await module.sources.items(reader=_me(principal), limit=limit)
+    return SourceItemsOut(items=[_item(item, feed) for item, feed in rows])
+
+
+@router.get("/me/news/sources/opml")
+async def my_sources_opml(principal: Reader, module: Module) -> Response:
+    """My sources as an OPML list, for another reader."""
+    return _opml("Portalab — mes sources", [feed for feed, _ in await module.sources.mine(_me(principal))])
+
+
+@router.post("/me/news/sources/opml", response_model=OpmlImportOut)
+async def my_sources_import(principal: Reader, module: Module, body: OpmlIn) -> OpmlImportOut:
+    """Follow the sources of an OPML list (another reader's export) — read at the next sweep."""
+    try:
+        found = read_opml(body.opml)
+    except NotOpml as exc:
+        raise ValidationFailed(str(exc), code="news.not_opml") from exc
+    added = 0
+    for name, url in found:
+        try:
+            await module.sources.subscribe(_me(principal), url, read_now=False, name=name or None)
+            added += 1
+        except SourceRefused:
+            continue
+    return OpmlImportOut(added=added, skipped=len(found) - added)
+
+
+# --- the editors' sources as OPML -------------------------------------------------------------------------
+@router.get("/admin/news/sources/opml")
+async def sources_opml(_: CategoryManager, module: Module) -> Response:
+    return _opml("Portalab — sources", [feed for feed, _ in await module.sources.sources()])
+
+
+@router.post("/admin/news/sources/opml", response_model=OpmlImportOut)
+async def sources_import(_: CategoryManager, module: Module, body: OpmlIn) -> OpmlImportOut:
+    """Add the sources of an OPML list — each read at the next sweep."""
+    try:
+        found = read_opml(body.opml)
+    except NotOpml as exc:
+        raise ValidationFailed(str(exc), code="news.not_opml") from exc
+    added = 0
+    for name, url in found:
+        fields: dict[str, Any] = {
+            "name": name or url[:120],
+            "url": url,
+            "category_id": None,
+            "enabled": True,
+            "include_words": [],
+            "exclude_words": [],
+            "refresh_minutes": 60,
+        }
+        try:
+            await module.sources.save(None, fields)
+            added += 1
+        except SourceRefused:
+            continue
+    return OpmlImportOut(added=added, skipped=len(found) - added)

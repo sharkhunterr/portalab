@@ -8,6 +8,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { ExternalNews } from "../../news/ExternalNews";
+import { MySources } from "../../news/MySources";
 import { personPath, useCatalogFacets } from "../api";
 import { metadataImage } from "../detail/Enrichment";
 import { Poster } from "../MediaGrid";
@@ -257,6 +258,8 @@ export default function FeedPage() {
         </section>
       ) : null}
       {follows.isSuccess ? <Follows follows={mine} /> : null}
+      {/* #299: my own sources, read for me alone */}
+      <MySources />
     </section>
   );
 }

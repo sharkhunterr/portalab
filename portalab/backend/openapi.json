@@ -13412,6 +13412,39 @@
         "title": "OperationsOut",
         "type": "object"
       },
+      "OpmlImportOut": {
+        "properties": {
+          "added": {
+            "title": "Added",
+            "type": "integer"
+          },
+          "skipped": {
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "added",
+          "skipped"
+        ],
+        "title": "OpmlImportOut",
+        "type": "object"
+      },
+      "OpmlIn": {
+        "properties": {
+          "opml": {
+            "maxLength": 300000,
+            "minLength": 1,
+            "title": "Opml",
+            "type": "string"
+          }
+        },
+        "required": [
+          "opml"
+        ],
+        "title": "OpmlIn",
+        "type": "object"
+      },
       "OverviewOut": {
         "properties": {
           "activity": {
@@ -31276,6 +31309,65 @@
         ]
       }
     },
+    "/api/v1/admin/news/sources/opml": {
+      "get": {
+        "operationId": "sources_opml_api_v1_admin_news_sources_opml_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Sources Opml",
+        "tags": [
+          "news"
+        ]
+      },
+      "post": {
+        "description": "Add the sources of an OPML list \u2014 each read at the next sweep.",
+        "operationId": "sources_import_api_v1_admin_news_sources_opml_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpmlIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpmlImportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sources Import",
+        "tags": [
+          "news"
+        ]
+      }
+    },
     "/api/v1/admin/news/sources/preview": {
       "post": {
         "description": "What a source would bring \u2014 read now, nothing kept.",
@@ -45578,6 +45670,210 @@
         "summary": "My Navigation",
         "tags": [
           "shell"
+        ]
+      }
+    },
+    "/api/v1/me/news/sources": {
+      "get": {
+        "description": "The sources I follow for my feed \u2014 mine alone.",
+        "operationId": "my_sources_api_v1_me_news_sources_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsSourcesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Sources",
+        "tags": [
+          "news"
+        ]
+      },
+      "post": {
+        "description": "Follow a source (a site's address will do) \u2014 read at once when nobody read it yet.",
+        "operationId": "follow_source_api_v1_me_news_sources_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SourcePreviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsSourceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Follow Source",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/me/news/sources/items": {
+      "get": {
+        "description": "The latest items of the sources I follow.",
+        "operationId": "my_source_items_api_v1_me_news_sources_items_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceItemsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Source Items",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/me/news/sources/opml": {
+      "get": {
+        "description": "My sources as an OPML list, for another reader.",
+        "operationId": "my_sources_opml_api_v1_me_news_sources_opml_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Sources Opml",
+        "tags": [
+          "news"
+        ]
+      },
+      "post": {
+        "description": "Follow the sources of an OPML list (another reader's export) \u2014 read at the next sweep.",
+        "operationId": "my_sources_import_api_v1_me_news_sources_opml_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpmlIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpmlImportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Sources Import",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/me/news/sources/{source_id}": {
+      "delete": {
+        "operationId": "unfollow_source_api_v1_me_news_sources__source_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Source Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unfollow Source",
+        "tags": [
+          "news"
         ]
       }
     },

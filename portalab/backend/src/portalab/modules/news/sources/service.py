@@ -7,6 +7,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import Any
+from urllib.parse import urlsplit
 from uuid import UUID
 
 from sqlalchemy import delete, func, or_, select, update
@@ -21,7 +22,7 @@ from portalab.core.db import Database
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
 from portalab.core.uploads import UnsafeUpload, reencode_image
-from portalab.modules.news.models import Feed, FeedItem
+from portalab.modules.news.models import Feed, FeedItem, FeedSubscription
 from portalab.modules.news.sources.fetch import MAX_IMAGE, Fetched, FetchFailed, fetch
 from portalab.modules.news.sources.parse import NotAFeed, ParsedFeed, ParsedItem, announced, parse
 
@@ -29,6 +30,8 @@ log = get_logger(__name__)
 NAMESPACE = "news-feeds"
 ALLOW_PRIVATE = "news.feeds.allowPrivateHosts"
 RETENTION = "news.feeds.retentionDays"
+PERSONAL_ON = "news.feeds.personalEnabled"
+PERSONAL_MAX = "news.feeds.personalMax"
 PER_SOURCE = 200  # items kept per source at most
 IMAGES = 15  # new pictures copied per reading
 DUE_PER_SWEEP = 20
@@ -271,7 +274,18 @@ class FeedSources:
                     log.info("a news picture was not deleted")
 
     async def run_due(self) -> int:
-        """Every source due (the periodic sweep): read one after the other."""
+        """Every source due (the periodic sweep): read one after the other — the members' sources nobody
+        follows any more (a member gone) dropped first."""
+        followed = select(FeedSubscription.feed_id)
+        async with self.database.session() as session:
+            orphans = list(
+                (
+                    await session.execute(
+                        select(Feed.id).where(Feed.editorial.is_(False), Feed.id.not_in(followed))
+                    )
+                ).scalars()
+            )
+        await self._orphans(orphans)
         now = utc_now(self.clock)
         async with self.database.session() as session:
             due = list(
@@ -303,10 +317,18 @@ class FeedSources:
         people: Sequence[str] = (),
         hidden: bool = False,
         limit: int = 30,
+        reader: UUID | None = None,
     ) -> list[tuple[FeedItem, Feed]]:
         """The latest items (pinned first when nothing is asked for), of some sources, or naming some library
-        titles or people (any of them)."""
+        titles or people (any of them) — the editors' sources, or (``reader``) that member's own."""
         stmt = select(FeedItem, Feed).join(Feed, Feed.id == FeedItem.feed_id).where(Feed.enabled.is_(True))
+        if reader is None:
+            stmt = stmt.where(Feed.editorial.is_(True))
+        else:
+            stmt = stmt.join(
+                FeedSubscription,
+                (FeedSubscription.feed_id == Feed.id) & (FeedSubscription.user_id == reader),
+            )
         if not hidden:
             stmt = stmt.where(FeedItem.hidden.is_(False))
         if feeds:
@@ -321,9 +343,15 @@ class FeedSources:
             rows = (await session.execute(stmt.order_by(*order).limit(limit))).all()
         return [(item, feed) for item, feed in rows]
 
-    async def picture(self, item_id: UUID) -> tuple[str, bytes] | None:
+    async def picture(self, item_id: UUID, reader: UUID | None = None) -> tuple[str, bytes] | None:
+        """An item's picture — of an editors' source, or of one the reader follows."""
+        mine = select(FeedSubscription.feed_id).where(FeedSubscription.user_id == reader)
         async with self.database.session() as session:
-            key = await session.scalar(select(FeedItem.image_key).where(FeedItem.id == item_id))
+            key = await session.scalar(
+                select(FeedItem.image_key)
+                .join(Feed, Feed.id == FeedItem.feed_id)
+                .where(FeedItem.id == item_id, or_(Feed.editorial.is_(True), Feed.id.in_(mine)))
+            )
         if not key or self.blobs is None:
             return None
         return key, await self.blobs.get(key)
@@ -346,6 +374,7 @@ class FeedSources:
             rows = await session.execute(
                 select(Feed, func.coalesce(counts.c.n, 0))
                 .outerjoin(counts, counts.c.feed_id == Feed.id)
+                .where(Feed.editorial.is_(True))
                 .order_by(Feed.name)
             )
             return [(feed, int(n)) for feed, n in rows.all()]
@@ -357,10 +386,15 @@ class FeedSources:
         async with self.database.unit_of_work() as uow:
             session = uow.session
             clash = await session.scalar(
-                select(Feed.id).where(Feed.url == fields["url"], *((Feed.id != feed_id,) if feed_id else ()))
+                select(Feed).where(Feed.url == fields["url"], *((Feed.id != feed_id,) if feed_id else ()))
             )
-            if clash is not None:
+            if clash is not None and (clash.editorial or feed_id is not None):
                 raise SourceRefused("this source is already there")
+            if clash is not None:  # members follow it already: it becomes the editors' too
+                for key, value in fields.items():
+                    setattr(clash, key, value)
+                clash.editorial = True
+                return clash.id
             if feed_id is None:
                 row = Feed(**fields, created_at=now, next_run_at=now, status="never", failures=0)
                 session.add(row)
@@ -376,6 +410,18 @@ class FeedSources:
             return feed_id
 
     async def remove(self, feed_id: UUID) -> None:
+        """An editors' source taken away — kept for the members who follow it (off « À la une »)."""
+        async with self.database.session() as session:
+            followed = await session.scalar(
+                select(func.count()).select_from(FeedSubscription).where(FeedSubscription.feed_id == feed_id)
+            )
+        if followed:
+            async with self.database.unit_of_work() as uow:
+                await uow.session.execute(update(Feed).where(Feed.id == feed_id).values(editorial=False))
+            return
+        await self._drop(feed_id)
+
+    async def _drop(self, feed_id: UUID) -> None:
         async with self.database.unit_of_work() as uow:
             keys = {
                 k
@@ -399,3 +445,117 @@ class FeedSources:
                     await self.blobs.delete(key)
                 except Exception:
                     log.info("a news picture was not deleted")
+
+    # --- a member's own sources ----------------------------------------------------------------------
+    async def mine(self, user: UUID) -> list[tuple[Feed, int]]:
+        counts = select(FeedItem.feed_id, func.count().label("n")).group_by(FeedItem.feed_id).subquery()
+        async with self.database.session() as session:
+            rows = await session.execute(
+                select(Feed, func.coalesce(counts.c.n, 0))
+                .join(FeedSubscription, FeedSubscription.feed_id == Feed.id)
+                .outerjoin(counts, counts.c.feed_id == Feed.id)
+                .where(FeedSubscription.user_id == user)
+                .order_by(Feed.name)
+            )
+            return [(feed, int(n)) for feed, n in rows.all()]
+
+    async def subscribe(
+        self, user: UUID, url: str, *, read_now: bool = True, name: str | None = None
+    ) -> UUID:
+        """Follow a source for my « Mon fil » — the one already read for others when it is the same address,
+        else a new one (read at once). Within the portal's limit of sources per member."""
+        if not bool(await self._setting(PERSONAL_ON, True)):
+            raise SourceRefused("members' own sources are switched off")
+        limit = int(await self._setting(PERSONAL_MAX, 20))
+        async with self.database.session() as session:
+            count = await session.scalar(
+                select(func.count()).select_from(FeedSubscription).where(FeedSubscription.user_id == user)
+            )
+            known = await session.scalar(select(Feed.id).where(Feed.url == url))
+        if int(count or 0) >= limit:
+            raise SourceRefused(f"at most {limit} sources")
+        created = False
+        if known is None:
+            title, site = name, None
+            if read_now:  # the address checked, and a page announcing a feed: that feed
+                got, feed = await self.read(url)
+                assert feed is not None
+                url, title, site = got.url, title or feed.title, feed.site
+                async with self.database.session() as session:
+                    known = await session.scalar(select(Feed.id).where(Feed.url == url))
+            if known is None:
+                now = utc_now(self.clock)
+                async with self.database.unit_of_work() as uow:
+                    row = Feed(
+                        name=(title or host_of(url))[:120],
+                        url=url[:1000],
+                        site_url=(site or "")[:1000] or None,
+                        editorial=False,
+                        enabled=True,
+                        include_words=[],
+                        exclude_words=[],
+                        refresh_minutes=60,
+                        status="never",
+                        failures=0,
+                        next_run_at=now,
+                        created_at=now,
+                        updated_at=now,
+                    )
+                    uow.session.add(row)
+                    await uow.session.flush()
+                    known, created = row.id, True
+        async with self.database.unit_of_work() as uow:
+            await uow.session.execute(
+                insert(FeedSubscription)
+                .values(user_id=user, feed_id=known, created_at=utc_now(self.clock))
+                .on_conflict_do_nothing()
+            )
+        if created and read_now:
+            await self.refresh(known)
+        return known
+
+    async def unsubscribe(self, user: UUID, feed_id: UUID) -> None:
+        """Stop following a source: a members' one nobody follows any more goes, with its items."""
+        async with self.database.unit_of_work() as uow:
+            await uow.session.execute(
+                delete(FeedSubscription).where(
+                    FeedSubscription.user_id == user, FeedSubscription.feed_id == feed_id
+                )
+            )
+        await self._orphans([feed_id])
+
+    async def _orphans(self, feed_ids: Sequence[UUID]) -> None:
+        if not feed_ids:
+            return
+        followed = select(FeedSubscription.feed_id)
+        async with self.database.session() as session:
+            gone = list(
+                (
+                    await session.execute(
+                        select(Feed.id).where(
+                            Feed.id.in_(list(feed_ids)), Feed.editorial.is_(False), Feed.id.not_in(followed)
+                        )
+                    )
+                ).scalars()
+            )
+        for feed_id in gone:
+            await self._drop(feed_id)
+
+    async def forget(self, user: UUID) -> None:
+        """A member goes: their follows, and the sources nobody else follows."""
+        async with self.database.unit_of_work() as uow:
+            ids = list(
+                (
+                    await uow.session.execute(
+                        delete(FeedSubscription)
+                        .where(FeedSubscription.user_id == user)
+                        .returning(FeedSubscription.feed_id)
+                    )
+                ).scalars()
+            )
+        await self._orphans(ids)
+
+
+def host_of(url: str) -> str:
+    """A source's name when it gives none: its site's host."""
+    return urlsplit(url).hostname or url

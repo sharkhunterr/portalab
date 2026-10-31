@@ -172,6 +172,8 @@ class Feed(NewsBase):
     site_url: Mapped[str | None] = mapped_column(String(1000))
     category_id: Mapped[UUID | None] = mapped_column(ForeignKey("news.categories.id", ondelete="SET NULL"))
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    # #299: the editors' (on « À la une ») — else only members' own, read for their « Mon fil »
+    editorial: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, server_default="true")
     include_words: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
     exclude_words: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
     refresh_minutes: Mapped[int] = mapped_column(Integer, nullable=False, default=60)
@@ -211,3 +213,17 @@ class FeedItem(NewsBase):
     mentions: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False, default=list)
     pinned: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     hidden: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+
+class FeedSubscription(NewsBase):
+    """#299: a member's own source, for their « Mon fil » only — private (nobody else sees who reads what);
+    the same address read once for everyone who follows it."""
+
+    __tablename__ = "feed_subscriptions"
+    __table_args__ = (Index("ix_feed_subscriptions_feed", "feed_id"),)
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True, info=pii("preference"))
+    feed_id: Mapped[UUID] = mapped_column(ForeignKey("news.feeds.id", ondelete="CASCADE"), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(
+        TZDateTime, nullable=False, info=not_personal("when it was followed, deleted with the member")
+    )
