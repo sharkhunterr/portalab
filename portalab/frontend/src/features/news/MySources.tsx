@@ -20,7 +20,7 @@ function problem(error: unknown): string | null {
  * #299: my own sources in « Mon fil » — RSS or Atom feeds (a site's address will do) only I read, their
  * latest items, and my list as OPML to take to another reader or bring from one. Private.
  */
-export function MySources() {
+export function MySources({ items: listed = true }: { items?: boolean }) {
   const t = useT();
   const client = useQueryClient();
   const [url, setUrl] = useState("");
@@ -30,6 +30,7 @@ export function MySources() {
     queryFn: async () => (await api.GET("/api/v1/me/news/sources")).data?.items ?? [],
   });
   const items = useQuery({
+    enabled: listed,
     queryKey: [...KEY, "items"],
     queryFn: async () =>
       (await api.GET("/api/v1/me/news/sources/items", { params: { query: { limit: 20 } } })).data?.items ??
@@ -137,7 +138,7 @@ export function MySources() {
       </div>
       {note ? <p role="status">{note}</p> : null}
       {importing.isError ? <p role="alert">{problem(importing.error)}</p> : null}
-      {items.data?.length ? (
+      {listed && items.data?.length ? (
         <>
           <h3 className="news-page__section">{t("news:mine.items")}</h3>
           <ul className="news-external__list">

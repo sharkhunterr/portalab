@@ -146,9 +146,15 @@ def _atom_link(node: ET.Element) -> str:
     return fallback
 
 
+def _nested(node: ET.Element, tag: str) -> str:
+    """A nested element's text — a YouTube video's ``media:group/media:description``."""
+    found = node.find(f".//{tag}")
+    return "".join(found.itertext()).strip() if found is not None else ""
+
+
 def _atom_item(node: ET.Element, base: str) -> ParsedItem | None:
     link = _atom_link(node)
-    body = _text(node, "content") or _text(node, "summary")
+    body = _text(node, "content") or _text(node, "summary") or _nested(node, f"{MEDIA}description")
     title = plain(_text(node, "title"), TITLE)
     guid = _text(node, "id") or link or title
     if not title or not guid:

@@ -82,3 +82,18 @@ def test_only_public_addresses() -> None:
     assert is_public("93.184.216.34")
     for private in ("127.0.0.1", "192.168.1.87", "10.0.0.1", "::1", "::ffff:192.168.1.1", "169.254.169.254"):
         assert not is_public(private)
+
+
+YOUTUBE = b"""<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/"
+ xmlns="http://www.w3.org/2005/Atom"><title>Bandes-annonces</title>
+<entry><id>yt:video:abc</id><title>DUNE 3 Bande Annonce VF</title>
+<link rel="alternate" href="https://www.youtube.com/watch?v=abc"/><published>2026-10-31T10:00:00+00:00</published>
+<media:group><media:title>DUNE 3</media:title><media:thumbnail url="https://i1.ytimg.com/vi/abc/hqdefault.jpg"/>
+<media:description>La suite de la saga.</media:description></media:group></entry></feed>"""
+
+
+def test_a_youtube_channel() -> None:
+    (video,) = parse(YOUTUBE, "https://www.youtube.com/feeds/videos.xml?channel_id=x").items
+    assert video.link == "https://www.youtube.com/watch?v=abc" and video.summary == "La suite de la saga."
+    assert video.image == "https://i1.ytimg.com/vi/abc/hqdefault.jpg"
