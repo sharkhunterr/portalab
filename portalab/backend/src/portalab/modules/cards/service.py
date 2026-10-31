@@ -63,6 +63,7 @@ def _pack_look(
             "code": None,
             "year": None,
             "family": detail.get("family"),
+            "genre": detail.get("genre"),  # issue 296: a genre booster's main genre
             "edition": detail.get("edition"),
             "rarity": detail.get("rarity"),  # issue 255: the rarity it guarantees
             "poster": None,
