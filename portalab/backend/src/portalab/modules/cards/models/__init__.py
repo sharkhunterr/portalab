@@ -37,6 +37,8 @@ VARIANTS = (
     "genre",
     "genre_foil",
 )
+# issue 296: a copy in the signature frame of the booster it came from: its look, as the booster names it
+SIGNATURE_PATTERN = "^signature(_foil)?:[a-z0-9-]{1,32}$"
 
 
 class CardsBase(DeclarativeBase):
@@ -63,6 +65,9 @@ class CardSet(CardsBase):
     # the cards' colour by the work's genre (``family.py``) and its figures printed on them, frozen when the
     # set is made: rating, votes, budget, revenue, runtime, seasons, director
     family: Mapped[str] = mapped_column(String(12), nullable=False, default="drama", server_default="drama")
+    # issue 295: its main genre (``family.py``: the first of its genres that has a frame) — its genre frame's
+    # and its genre booster's
+    genre: Mapped[str] = mapped_column(String(16), nullable=False, default="drama", server_default="drama")
     facts: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict, server_default="{}")
     saga: Mapped[str | None] = mapped_column(String(200), info=not_personal("a saga's name"))
     # issue 234: the work's title drawn (an art site's HD logo), the best liked per language (``""``: none)
@@ -128,14 +133,15 @@ class Copy(CardsBase):
 
     __tablename__ = "copies"
     __table_args__ = (
-        CheckConstraint(f"variant IN {VARIANTS}", name="variant"),
+        # issue 296: or a booster's signature frame (``signature:<its look>``, foil or not)
+        CheckConstraint(f"variant IN {VARIANTS} OR variant ~ '{SIGNATURE_PATTERN}'", name="variant"),
         Index("ix_copies_user_card", "user_id", "card_id"),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
     user_id: Mapped[UUID] = mapped_column(nullable=False)  # FK identity.users (DB), CASCADE: erased with them
     card_id: Mapped[UUID] = mapped_column(ForeignKey("cards.cards.id", ondelete="CASCADE"), nullable=False)
-    variant: Mapped[str] = mapped_column(String(16), nullable=False)
+    variant: Mapped[str] = mapped_column(String(48), nullable=False)
     pack_id: Mapped[UUID | None] = mapped_column(ForeignKey("cards.packs.id", ondelete="SET NULL"))
     acquired_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 

@@ -480,6 +480,8 @@
   "cards.variant.normal": "Normal",
   "cards.variant.showcase": "{edition} edition",
   "cards.variant.showcase_foil": "{edition} edition foil",
+  "cards.variant.signature": "{frame} frame",
+  "cards.variant.signature_foil": "{frame} frame foil",
   "cards.view": "View",
   "cards.views.pool": "Every card",
   "cards.views.sets": "Sets",

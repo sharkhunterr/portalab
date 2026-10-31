@@ -19,7 +19,7 @@ from portalab.capabilities.media_core import CARD_SOURCES, CardPerson, CardWork
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
-from portalab.modules.cards.family import family_of
+from portalab.modules.cards.family import family_of, genre_of
 from portalab.modules.cards.models import Card, CardSet
 from portalab.modules.cards.rarity import Ranked, card_score, rarities, work_fame
 
@@ -205,6 +205,7 @@ class CardForge:
         current.backdrop = work.backdrop or next(iter(work.backdrops), None)
         current.animated = any(g.strip().lower() in ANIMATION for g in work.genres)
         current.family = family_of(work.genres)
+        current.genre = genre_of(work.genres)
         current.facts = {
             **dict(work.facts),
             **({"rating": round(work.vote_average, 1)} if work.vote_average else {}),

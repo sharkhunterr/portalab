@@ -4,7 +4,7 @@ import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import "@fontsource/barlow-condensed/latin-600.css";
 import "@fontsource/barlow-condensed/latin-700.css";
-import { artworkImage, cardImage, type MediaCard, type Variant } from "./api";
+import { artworkImage, cardImage, type MediaCard, type Variant, variantParts } from "./api";
 import { figuresOf, runtimeParts } from "./figures";
 import "./cards.css";
 
@@ -210,7 +210,9 @@ export function MediaCardView({
   const borderless =
     variant === "borderless" || variant === "borderless_foil" || (hd && card.kind === "title");
   const frameless = hd && card.kind !== "title";
-  const foil = variant === "foil" || variant.endsWith("_foil") || hd;
+  // issue 296: a booster's signature frame — its scene's card face, worn in the collection as at the opening
+  const { base: version, signature } = variantParts(variant);
+  const foil = version === "foil" || version.endsWith("_foil") || hd;
   // an actor's card shows their character in this work (once found); without one (issue 231), their portrait
   // with the work's poster in its box below — the poster stands in the window only when there is no portrait
   // either. The borderless alternative: another image of the character, else their portrait
@@ -297,7 +299,7 @@ export function MediaCardView({
   const genre = t(`gamification:cards.family.${family}`);
   // the name's room: the card's inner width, less the genre's chip (its emblem and its name)
   const room = 84 - 9 - genre.length * 2.1;
-  return (
+  const view = (
     <article
       className="mcard"
       data-size={size}
@@ -453,5 +455,13 @@ export function MediaCardView({
         ) : null}
       </div>
     </article>
+  );
+  // the scene's face hooks on an ancestor of the card (a wrapper that takes no room)
+  return signature ? (
+    <div className="mcard-signature" data-card-face={`${signature}-${card.rarity}`}>
+      {view}
+    </div>
+  ) : (
+    view
   );
 }

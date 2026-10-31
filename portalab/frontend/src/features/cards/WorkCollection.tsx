@@ -147,7 +147,7 @@ function useHand(size: number, start: number, reduced: boolean) {
   };
 }
 
-const copies = (card: MediaCard) => Object.values(card.owned).reduce((a, b) => a + (b ?? 0), 0);
+const copies = (card: MediaCard) => Object.values(card.owned).reduce<number>((a, b) => a + (b ?? 0), 0);
 
 /** Issue 234: a work's collection on its own page, as a hand of cards — fanned out, turning one at a time
  * (those I own in colour, the others dimmed), a tap opens one; beside it what the set holds and what I have
@@ -179,7 +179,7 @@ export function WorkCollection({ objectId }: { objectId: string }) {
   const owned = cards.filter((card) => best(card));
   const held_copies = cards.reduce((sum, card) => sum + copies(card), 0);
   const foils = cards.filter((card) =>
-    Object.entries(card.owned).some(([v, n]) => v.endsWith("foil") && n),
+    Object.entries(card.owned).some(([v, n]) => v.split(":")[0]?.endsWith("foil") && n),
   ).length;
   const percent = Math.round((data.owned / (data.size || 1)) * 100);
   return (

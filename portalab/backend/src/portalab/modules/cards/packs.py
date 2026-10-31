@@ -12,6 +12,7 @@ HD version — a character without the frame around it over the edition's animat
 and animated — always foil."""
 
 import random
+import re
 import secrets
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
@@ -30,7 +31,7 @@ from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.cards.editions import EDITIONS, edition_of
 from portalab.modules.cards.events import PACK_OPENED, SET_COMPLETED
-from portalab.modules.cards.family import FAMILIES
+from portalab.modules.cards.family import FAMILIES, GENRES
 from portalab.modules.cards.models import Card, CardSet, Copy, Pack
 
 WITHOUT_CARDS = ("progression", "none")  # issue 243: the welcome's answers without the cards
@@ -52,6 +53,13 @@ SHOWCASE = {"common": 1 / 30, "rare": 1 / 15, "epic": 1 / 8, "legendary": 1 / 5}
 # issue 295: the chance a copy is in its genre's version (its genre's frame), by the card's rarity — every
 # card has a genre; drawn when it is neither borderless nor in its edition's
 GENRE = {"common": 1 / 30, "rare": 1 / 15, "epic": 1 / 8, "legendary": 1 / 5}
+# issue 296: a booster's own frames — its genre's or its edition's version this many times more often in
+# it (at most FAVOURED_AT_MOST), and its signature frame on this share of its cards (a rarity booster's: on
+# the card it guarantees only)
+FAVOUR = 3
+FAVOURED_AT_MOST = 0.6
+SIGNATURE = 1 / 4
+SIGNATURE_LOOK = re.compile(r"^[a-z0-9-]{1,32}$")
 # issue 255: the chance a copy is in its edition's HD version — a legendary's only
 HD = {"legendary": 1 / 6}
 TRIAL_HD = 0.5
@@ -66,6 +74,9 @@ def _among(among: Mapping[str, Any]) -> list[Any]:
     family = among.get("family")
     if family in FAMILIES:
         out.append(CardSet.family == family)
+    genre = among.get("genre")
+    if genre in GENRES:
+        out.append(CardSet.genre == genre)
     kind = among.get("kind")
     if kind in WORK_KINDS:
         out.append(CardSet.kind == kind)
@@ -83,7 +94,7 @@ def _among(among: Mapping[str, Any]) -> list[Any]:
     return out
 
 
-BOOSTER_FIELDS = ("family", "edition", "kind", "cards", "rarity")
+BOOSTER_FIELDS = ("family", "genre", "edition", "kind", "cards", "rarity", "signature")
 # issue 255: a booster that guarantees a card of this rarity (one of its cards drawn at it)
 GUARANTEES = ("rare", "epic", "legendary")
 CARD_BOOSTER = "card_booster"
@@ -92,6 +103,11 @@ CARD_BOOSTER = "card_booster"
 def booster_of(payload: Mapping[str, Any]) -> dict[str, Any]:
     """A shop's booster's own: what it draws among, how many cards (3 to 10) and the rarity it guarantees."""
     out: dict[str, Any] = {k: payload[k] for k in ("family", "edition", "kind") if payload.get(k)}
+    # issue 296: the works of a main genre; the signature frame its cards may come in
+    if payload.get("genre") in GENRES:
+        out["genre"] = payload["genre"]
+    if isinstance(payload.get("signature"), str) and SIGNATURE_LOOK.match(payload["signature"]):
+        out["signature"] = payload["signature"]
     if payload.get("rarity") in GUARANTEES:
         out["rarity"] = payload["rarity"]
     try:
@@ -101,15 +117,33 @@ def booster_of(payload: Mapping[str, Any]) -> dict[str, Any]:
     return out
 
 
-def variant_for(rarity: str, rng: random.Random, kind: str = "title", edition: str | None = None) -> str:
+def _favoured(chance: float, favoured: bool) -> float:
+    return min(FAVOURED_AT_MOST, chance * FAVOUR) if favoured else chance
+
+
+def variant_for(
+    rarity: str,
+    rng: random.Random,
+    kind: str = "title",
+    edition: str | None = None,
+    favour: str | None = None,  # issue 296: "genre" or "showcase" — the version its booster favours
+) -> str:
     if edition is not None and rng.random() < HD.get(rarity, 0.0):
         return "hd"  # issue 255: foil already, its frame its edition's
     # the borderless alternative is a work's: its scene over the whole card (a person's card has none)
     borderless = kind == "title" and rng.random() < BORDERLESS.get(rarity, 0.0)
     # its edition's version: a work released some year (its edition known)
-    showcase = not borderless and edition is not None and rng.random() < SHOWCASE.get(rarity, 0.0)
+    showcase = (
+        not borderless
+        and edition is not None
+        and rng.random() < _favoured(SHOWCASE.get(rarity, 0.0), favour == "showcase")
+    )
     # issue 295: its genre's version
-    genre = not borderless and not showcase and rng.random() < GENRE.get(rarity, 0.0)
+    genre = (
+        not borderless
+        and not showcase
+        and rng.random() < _favoured(GENRE.get(rarity, 0.0), favour == "genre")
+    )
     foil = rng.random() < FOIL
     base = "borderless" if borderless else "showcase" if showcase else "genre" if genre else None
     if base:
@@ -213,6 +247,9 @@ class Packs:
             if pack_id is None:
                 return None  # given already
             drawn: list[UUID] = []
+            booster = among or {}
+            # issue 296: the version its booster favours — a genre booster its genre's, an era's its edition's
+            favour = "genre" if booster.get("genre") else "showcase" if booster.get("edition") else None
             for index in range(size):
                 # issue 234: a content's booster holds its work's cards only; issue 255: its first card drawn
                 # at the rarity it guarantees, before any other could take the only one there is
@@ -226,12 +263,28 @@ class Packs:
                     Copy(
                         user_id=user,
                         card_id=card.id,
-                        variant=variant_for(card.rarity, self.rng, card.kind, edition),
+                        variant=self._signed(
+                            variant_for(card.rarity, self.rng, card.kind, edition, favour),
+                            booster.get("signature"),
+                            index == 0 or not guarantee,
+                        ),
                         pack_id=pack_id,
                         acquired_at=now,
                     )
                 )
         return pack_id
+
+    def _signed(self, variant: str, signature: str | None, may: bool) -> str:
+        """Issue 296: a booster's signature frame — on a card in its base frame (foil or not), never over an
+        edition's, a genre's, a borderless or an HD version; a rarity booster's on the card it guarantees."""
+        if (
+            signature is None
+            or not may
+            or variant not in ("normal", "foil")
+            or self.rng.random() >= SIGNATURE
+        ):
+            return variant
+        return f"signature{'_foil' if variant == 'foil' else ''}:{signature}"
 
     # --- a trial pack (issue 229): to see the cards as they are drawn ------------------------------------
     async def trial(self, user: UUID, size: int = TRIAL_SIZE) -> UUID:
@@ -365,7 +418,7 @@ class Packs:
                 "cards": len(drawn),
                 "best": max((r for _, r, _ in drawn), key=rank.index, default="common"),
                 "legendary": sum(1 for _, r, _ in drawn if r == "legendary"),
-                "foil": sum(1 for _, _, v in drawn if v == "foil" or v.endswith("_foil")),
+                "foil": sum(1 for _, _, v in drawn if v == "foil" or v.split(":")[0].endswith("_foil")),
             },
             occurred_at=now,
             subject=subject,
