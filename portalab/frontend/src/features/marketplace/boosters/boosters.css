@@ -2407,7 +2407,8 @@
    Portalab's words, the pack's look */
 .booster-takeover__word {
   position: absolute;
-  inset-inline: -10%;
+  /* far wider than the screen, so a name longer than it stays centred on it */
+  inset-inline: -100%;
   top: calc(50% - 0.55em);
   z-index: 4;
   /* its slant: a little, on a wide screen; steep, along its height, on one held upright */
