@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "scelles",
+  "names": {
+    "fr": "Dos kraft",
+    "en": "Manila back"
+  },
+  "descriptions": {
+    "fr": "Papier kraft, ruban de police, un insigne au centre.",
+    "en": "Manila paper, police tape, a badge in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

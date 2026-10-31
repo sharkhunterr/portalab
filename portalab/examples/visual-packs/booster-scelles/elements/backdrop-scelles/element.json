@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "scelles",
+  "names": {
+    "fr": "Rue bouclée",
+    "en": "Cordoned street"
+  },
+  "descriptions": {
+    "fr": "Une rue de nuit bouclée, les gyrophares rouges et bleus sur l'asphalte mouillé, le ruban de police en haut, une silhouette à la craie au sol (vidéo en boucle).",
+    "en": "A street at night cordoned off, red and blue police lights on the wet asphalt, the tape across the top, a chalk outline on the ground (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

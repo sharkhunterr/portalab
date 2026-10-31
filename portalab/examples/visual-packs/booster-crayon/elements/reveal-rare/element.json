@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "crayon-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "L'esquisse : une feuille d'animateur, des cercles de construction au crayon bleu, un personnage esquissé dont les traits tremblent ; la carte se pose sur la feuille.",
+    "en": "The sketch: an animator's sheet, construction circles in blue pencil, a figure sketched with boiling lines; the card lands on the sheet."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

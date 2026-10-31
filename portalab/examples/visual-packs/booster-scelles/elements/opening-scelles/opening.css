@@ -1,0 +1,23 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: Police tape wraps round the pack under police lights; an evidence photo's flash — it is taken
+   away. */
+[data-opening="scelles"] .booster-stage__tear .booster-pack {
+  animation: genre-fate 2.6s linear both;
+}
+@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  40% { transform: scale(0.98); filter: brightness(1); }
+  44% { transform: scale(0.98); filter: brightness(6) grayscale(1); opacity: 1; }
+  50%, 100% { transform: scale(0.9) translateY(-30px); filter: brightness(6) grayscale(1); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="scelles"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="scelles"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

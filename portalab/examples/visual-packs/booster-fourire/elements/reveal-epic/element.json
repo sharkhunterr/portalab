@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "fourire-epic",
+  "names": {
+    "fr": "Révélation épique",
+    "en": "Epic reveal"
+  },
+  "descriptions": {
+    "fr": "La tarte : une tarte à la crème qui vole et s'écrase sur l'écran ; la crème dégouline, des étoiles tournent au-dessus de la carte.",
+    "en": "The pie: a cream pie flying and splatting the screen; cream drips, stars wheel above the card."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.8,
+    "rarity": "epic"
+  }
+}

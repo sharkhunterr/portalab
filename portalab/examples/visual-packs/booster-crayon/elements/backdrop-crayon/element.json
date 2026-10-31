@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "crayon",
+  "names": {
+    "fr": "Table lumineuse",
+    "en": "Light table"
+  },
+  "descriptions": {
+    "fr": "Une feuille d'animateur et son quadrillage bleu, des esquisses au crayon qui tremblent comme un dessin animé, des taches de couleur qui vont et viennent (vidéo en boucle).",
+    "en": "An animator's sheet and its blue grid, pencil sketches boiling like a cartoon, patches of colour coming and going (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

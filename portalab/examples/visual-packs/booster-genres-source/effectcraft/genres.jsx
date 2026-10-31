@@ -1143,7 +1143,277 @@ var GENRE_THRILLER = {
   }
 };
 
-var GENRE = { action: GENRE_ACTION, dark: GENRE_DARK, drama: GENRE_DRAMA, fantasy: GENRE_FANTASY, sf: GENRE_SF, adventure: GENRE_ADVENTURE, documentary: GENRE_DOC, thriller: GENRE_THRILLER }[GENRE_KEY];
+// ===== Fou rire — comedy: a party popper, a cream pie, the big show ======================================
+var COM = { yellow: [1, 0.82, 0.25], sun: [1, 0.7, 0.1], pink: [1, 0.31, 0.55], cyan: [0.24, 0.78, 1], green: [0.3, 0.85, 0.45], violet: [0.6, 0.4, 1], ink: [0.1, 0.08, 0.19], cream: [1, 0.98, 0.92], white: [1, 1, 1] };
+var PARTY = [COM.pink, COM.cyan, COM.yellow, COM.green, COM.violet];
+function dots(L, f, o, color, gap) {   // a field of polka dots drifting
+  var out = [], g = gap || 90;
+  for (var y = -60; y < 1180; y += g) for (var x = -60; x < 1180; x += g) { var off = (Math.floor((y + 60) / g) % 2) * g / 2; out.push(circle(x + off + (f * 2) % g, y, g * 0.18, 1, 12)); }
+  polys(L, out, color, o);
+}
+function confetti(L, f, n, base, cx, cy, spread, o, burst) {   // confetti thrown out (burst) or raining, in the party colours
+  seed(base); var groups = [[], [], [], [], []];
+  for (var i = 0; i < n; i++) {
+    var x, y, s = between(8, 16);
+    if (burst) { var a = between(-Math.PI, 0) * spread - Math.PI * (1 - spread) / 2, v = between(16, 34); x = cx + Math.cos(a) * v * f; y = cy + Math.sin(a) * v * f + 0.8 * f * f; }
+    else { x = between(-40, 1120) + Math.sin(f * 0.15 + i) * 30; y = -60 + ((f * between(8, 16) + between(0, 1200)) % 1260); }
+    groups[i % 5].push(place([[-s, -s * 0.4], [s, -s * 0.4], [s, s * 0.4], [-s, s * 0.4]], x, y, f * 0.3 + i, 1, Math.max(0.2, Math.abs(Math.cos(f * 0.3 + i)))));
+  }
+  for (var k = 0; k < 5; k++) polys(L, groups[k], PARTY[k], o);
+}
+function popper(cx, cy, s, ang) {   // a party popper's cone, striped
+  return { cone: place([[0, -0.25 * s], [1.0 * s, -0.04 * s], [1.0 * s, 0.04 * s], [0, 0.25 * s]], cx, cy, ang), band: place([[0.3 * s, -0.19 * s], [0.45 * s, -0.16 * s], [0.45 * s, 0.16 * s], [0.3 * s, 0.19 * s]], cx, cy, ang) };
+}
+function pie(cx, cy, r, tilt) {   // a cream pie seen from the side: the tin, the cream piled on it
+  return { tin: place([[-r, 0], [r, 0], [r * 0.85, r * 0.3], [-r * 0.85, r * 0.3]], cx, cy, tilt), cream: place(burst(0, -r * 0.1, 10, r * 1.05, r * 0.85, 0.1, 0, 0.45), cx, cy, tilt) };
+}
+function splat(cx, cy, r, base) {   // a splat of cream: a lumpy blob and drops round it
+  seed(base); var drops = []; for (var i = 0; i < 10; i++) { var a = between(0, Math.PI * 2), d = r * between(1.1, 1.6); drops.push(circle(cx + Math.cos(a) * d, cy + Math.sin(a) * d, r * between(0.08, 0.18), 1, 10)); }
+  return [burst(cx, cy, 14, r, r * 0.75, 0.25, base)].concat(drops);
+}
+function dizzy(cx, cy, r, f, n) {   // stars wheeling round a head
+  var out = []; for (var i = 0; i < n; i++) { var a = f * 0.2 + i * Math.PI * 2 / n; out.push(star5(cx + Math.cos(a) * r, cy + Math.sin(a) * r * 0.35, 26, f * 0.2 + i)); } return out;
+}
+function balloon(x, y, r) { return { body: circle(x, y, r, 1.2, 24), knot: [[x - 8, y + r * 1.2 + 10], [x + 8, y + r * 1.2 + 10], [x, y + r * 1.2 - 4]] }; }
+var COM_RARE = {
+  title: function (fr, f, u) {   // a party popper going off
+    var pp = popper(150, 900, 260, -0.8); polys(fr.main, [pp.band], COM.pink, 100); polys(fr.main, [pp.cone], COM.yellow, 100); lines(fr.main, [pp.cone], COM.ink, 6, 100, true);
+    if (f > 4) confetti(fr.top, f - 4, 70, 1400, 330, 700, 0.5, 100, true);
+    if (f > 4) { var streamers = []; for (var k = 0; k < 5; k++) { var pts = []; for (var i = 0; i <= 14; i++) { var t = i / 14 * Math.min(1, (f - 4) / 8); pts.push([330 + t * (300 + k * 120), 700 - t * (500 + k * 60) + Math.sin(t * 10 + k) * 40]); } streamers.push(pts); } for (var k2 = 0; k2 < 5; k2++) lines(fr.main, [streamers[k2]], PARTY[k2], 10, 100); }
+    dots(fr.main, f, 100, [1, 0.9, 0.45], 110);
+    polys(fr.main, [full()], COM.yellow, 100);
+  },
+  wipe: function (fr, v) { iris(fr, v < 0.5 ? 900 * (1 - ease(v * 2)) + 30 : 30 + 900 * ease(v * 2 - 1)); },
+  stage: function (fr, f, at, o) {
+    confetti(fr.main, f, 50, 1410, 0, 0, 0, o, false);
+    polys(fr.haze, [circle(C, C, 420, 1, 40)], COM.white, o * 0.6);
+    dots(fr.main, f, o, [1, 0.9, 0.45], 110);
+    polys(fr.main, [full()], COM.yellow, o);
+  },
+  over: function (fr, f, at) { if (at >= 0) confetti(fr.top, at, 30, 1420, C, C + 100, 0.7, fade(at, 24, 40) * 100, true); }
+};
+var COM_EPIC = {
+  title: function (fr, f, u) {   // a cream pie flying in an arc, whooshing
+    var t = f / 20, x = -200 + t * 1500, y = 700 - Math.sin(t * Math.PI) * 420, p = pie(x, y, 130, f * 0.25);
+    lines(fr.main, [[[x - 260, y + 30], [x - 140, y + 20]], [[x - 300, y - 30], [x - 160, y - 30]], [[x - 250, y - 80], [x - 150, y - 70]]], COM.ink, 8, 100);
+    polys(fr.main, [p.cream], COM.cream, 100); lines(fr.main, [p.cream], COM.ink, 5, 100, true); polys(fr.main, [p.tin], [0.75, 0.55, 0.3], 100);
+    dots(fr.main, f, 100, [1, 0.55, 0.7], 100);
+    polys(fr.main, [full()], COM.pink, 100);
+  },
+  wipe: function (fr, v) { polys(fr.top, splat(C, C, 100 + ease(v) * 900, 1430), COM.cream, 100); },
+  stage: function (fr, f, at, o) {   // cream dripping from the top, stars wheeling round the card, a spotlight
+    seed(1440); var pts = [[-60, -60], [1140, -60], [1140, 80]]; for (var x = 1140; x >= -60; x -= 60) { var len = 60 + between(0, 260) * ease((f - CARD_AT) / 20); pts.push([x, 80], [x - 15, 80 + len], [x - 30, 80 + len + 20], [x - 45, 80 + len], [x - 60, 80]); }
+    polys(fr.main, [pts], COM.cream, o);
+    polys(fr.top, dizzy(C, C - 270, 220, f, 5), COM.yellow, o); lines(fr.top, dizzy(C, C - 270, 220, f, 5), COM.ink, 4, o, true);
+    polys(fr.haze, [circle(C, C, 380, 1, 40)], COM.white, o * 0.7);
+    dots(fr.main, f, o, [1, 0.55, 0.7], 100);
+    polys(fr.main, [full()], COM.pink, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 8) polys(fr.top, splat(C + 140, C - 180, 30 + at * 6, 1450), COM.cream, fade(at, 4, 8) * 100);
+    bigGlint(fr, at, COM.yellow);
+  }
+};
+var COM_LEGENDARY = {
+  title: function (fr, f, u) {   // the big show: a spotlight, a brick wall, a microphone — and the crowd laughing (rays)
+    var bricks = []; for (var y = 0; y < 1140; y += 60) for (var x = -60; x < 1140; x += 120) bricks.push([[x + (y / 60 % 2) * 60, y], [x + 112 + (y / 60 % 2) * 60, y], [x + 112 + (y / 60 % 2) * 60, y + 52], [x + (y / 60 % 2) * 60, y + 52]]);
+    lines(fr.main, [[[C, 1140], [C, 520]]], COM.ink, 14, 100); polys(fr.main, [circle(C, 480, 50, 1.3, 20)], [0.3, 0.3, 0.35], 100);
+    polys(fr.glow, [[[C - 40, -60], [C + 40, -60], [C + 420, 1140], [C - 420, 1140]]], [1, 0.95, 0.8], 70);
+    polys(fr.main, bricks, [0.55, 0.2, 0.15], 100); polys(fr.main, [full()], [0.3, 0.1, 0.08], 100);
+  },
+  wipe: function (fr, v) { confetti(fr.top, v * 12, 160, 1460, C, 1140, 0.9, 100, true); polys(fr.top, [full()], COM.white, 100 * (1 - Math.abs(v * 2 - 1)) * 0.6); },
+  stage: function (fr, f, at, o) {   // confetti cannons, balloons rising, a rainbow sunburst turning
+    if (at >= 0) { confetti(fr.top, at, 70, 1470, 60, 1100, 0.35, fade(at, 40, 60) * o, true); confetti(fr.top, at, 70, 1471, 1020, 1100, 0.35, fade(at, 40, 60) * o, true); }
+    seed(1480); for (var i = 0; i < 12; i++) { var x = between(40, 1040), y = 1300 - (f - CARD_AT) * between(14, 24), r = between(40, 60), b = balloon(x, y, r); lines(fr.main, [[[x, y + r * 1.2 + 10], [x + Math.sin(f * 0.2 + i) * 20, y + r * 1.2 + 140]]], COM.ink, 2, o); polys(fr.main, [b.body, b.knot], PARTY[i % 5], o); polys(fr.main, [circle(x - r * 0.35, y - r * 0.5, r * 0.18, 1.3, 10)], COM.white, o * 0.7); }
+    confetti(fr.main, f, 60, 1490, 0, 0, 0, o, false);
+    var rays = []; for (var k = 0; k < 20; k++) { var a = (f - CARD_AT) * 0.015 + k * Math.PI / 10, w = 0.12; rays.push([[C, C], [C + Math.cos(a - w) * 1100, C + Math.sin(a - w) * 1100], [C + Math.cos(a + w) * 1100, C + Math.sin(a + w) * 1100]]); }
+    for (var k2 = 0; k2 < 5; k2++) { var some = []; for (var j = k2; j < rays.length; j += 5) some.push(rays[j]); polys(fr.main, some, PARTY[k2], o); }
+    polys(fr.main, [full()], COM.yellow, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0) confetti(fr.top, at, 50, 1495, C, C + 60, 0.8, fade(at, 24, 44) * 100, true);
+    if (at >= 2) polys(fr.top, dizzy(C, C - 280, 240, f, 6), COM.yellow, 100);
+    bigGlint(fr, at, COM.yellow);
+  }
+};
+var GENRE_COMEDY = {
+  rarities: { rare: COM_RARE, epic: COM_EPIC, legendary: COM_LEGENDARY },
+  opening: function (comp) {   // a cream pie flies in and splats the pack — confetti
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      if (f < 24) { var t = f / 24, x = -150 + t * (cx + 150), y = cy + 200 - Math.sin(t * Math.PI) * 260 + t * -200, p = pie(x, y, 120, f * 0.3); polys(fr.top, [p.cream], COM.cream, 100); lines(fr.top, [p.cream], COM.ink, 5, 100, true); polys(fr.top, [p.tin], [0.75, 0.55, 0.3], 100); }
+      if (f >= 24 && f < 50) polys(fr.top, splat(cx, cy, 150 + ease((f - 24) / 5) * 260, 1500), COM.cream, fade(f, 40, 50) * 100);
+      if (f >= 26) confetti(fr.top, f - 26, 90, 1510, cx, cy, 0.9, fade(f, 52, 63) * 100, true);
+    }
+  }
+};
+
+// ===== Crayonné — animation: a sketch, a flip book, the grand finale =====================================
+var ANI = { paper: [1, 0.97, 0.92], grid: [0.75, 0.84, 1], blue: [0.23, 0.42, 1], graphite: [0.36, 0.37, 0.42], violet: [0.48, 0.36, 1], mint: [0.18, 0.88, 0.7], orange: [1, 0.62, 0.11], red: [1, 0.3, 0.35], yellow: [1, 0.85, 0.2], sky: [0.55, 0.82, 1] };
+var RAINBOW = [ANI.red, ANI.orange, ANI.yellow, ANI.mint, ANI.blue, ANI.violet];
+function boil(pts, f, amp, base) {   // a drawn line boiling: redrawn a little off each frame
+  seed(base + Math.floor(f / 2)); var out = []; for (var i = 0; i < pts.length; i++) out.push([pts[i][0] + between(-amp, amp), pts[i][1] + between(-amp, amp)]); return out;
+}
+function sketchCircle(cx, cy, r, f, base) { var pts = []; for (var i = 0; i <= 36; i++) { var a = i / 36 * Math.PI * 2.1; pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); } return boil(pts, f, 6, base); }
+function paperGrid(L, o) { var g = []; for (var k = 0; k < 14; k++) { g.push([[-60, k * 90], [1140, k * 90]]); g.push([[k * 90, -60], [k * 90, 1140]]); } lines(L, g, ANI.grid, 2, o); }
+function bounceBall(f, x0, base) {   // a ball bouncing across, squashed on the ground: its positions this frame and the last ones
+  var out = [];
+  for (var k = 0; k < 5; k++) { var t = (f - k * 1.5) * 0.09, x = x0 + t * 260, ph = (t * 1.6) % 1, y = 900 - Math.abs(Math.sin(ph * Math.PI)) * 520 * Math.pow(0.85, Math.floor(t * 1.6)), sq = ph < 0.08 || ph > 0.92 ? 0.65 : 1.1; out.push({ x: x, y: y, sx: 1 / sq, sy: sq, a: k }); }
+  return out;
+}
+var ANI_RARE = {
+  title: function (fr, f, u) {   // an animator's sheet: construction circles in blue pencil, a figure sketched, boiling
+    lines(fr.main, [sketchCircle(C, 460, 150, f, 1600), sketchCircle(C, 700, 210, f, 1601), boil([[C - 300, 960], [C + 300, 960]], f, 4, 1602), boil([[C, 300], [C, 920]], f, 4, 1603)], ANI.blue, 5, 90);
+    lines(fr.main, [boil([[C - 120, 400], [C - 60, 360], [C + 60, 360], [C + 120, 420], [C + 100, 560], [C, 610], [C - 100, 560], [C - 120, 400]], f, 5, 1604)], ANI.graphite, 7, 100);
+    paperGrid(fr.main, 50);
+    polys(fr.main, [full()], ANI.paper, 100);
+  },
+  wipe: function (fr, v) {   // the next sheet laid over
+    var x = 1200 - ease(v) * 1300; polys(fr.top, [[[x, -60], [x + 1300, -60], [x + 1300, 1140], [x, 1140]]], ANI.paper, 100); lines(fr.top, [[[x, -60], [x, 1140]]], ANI.graphite, 4, 100);
+  },
+  stage: function (fr, f, at, o) {
+    lines(fr.main, [sketchCircle(C, C, 360, f, 1610), sketchCircle(C, C, 470, f, 1611)], ANI.blue, 4, o * 0.8);
+    paperGrid(fr.main, o * 0.5);
+    polys(fr.main, [full()], ANI.paper, o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 10) lines(fr.top, [sketchCircle(C, C, 260 + at * 12, f, 1620)], ANI.orange, 6, fade(at, 6, 10) * 100); }
+};
+var ANI_EPIC = {
+  title: function (fr, f, u) {   // a flip book: a ball bouncing, its in-betweens trailing
+    var bb = bounceBall(f, 80, 1630);
+    for (var k = bb.length - 1; k >= 0; k--) { var b = bb[k]; polys(fr.main, [place(circle(0, 0, 70, 1, 24), b.x, b.y, 0, b.sx, b.sy)], k ? ANI.grid : ANI.red, k ? 60 : 100); }
+    lines(fr.main, [[[-60, 975], [1140, 975]]], ANI.graphite, 5, 100);
+    var pages = []; for (var p = 0; p < 5; p++) { var t = ((f * 0.4 + p) % 5) / 5; pages.push([[1140, 1140], [1140 - 400 * t, 1140], [1140 - 300 * t, 1140 - 500 * t], [1140, 1140 - 400 * t]]); }
+    lines(fr.main, pages, ANI.graphite, 3, 50, true);
+    polys(fr.main, [full()], ANI.paper, 100);
+  },
+  wipe: function (fr, v) { var pages = []; for (var p = 0; p < 6; p++) { var t = clamp01(v * 1.6 - p * 0.1); pages.push([[1140, 1140], [1140 - 1600 * t, 1140], [1140 - 1300 * t, 1140 - 1700 * t], [1140, 1140 - 1600 * t]]); } polys(fr.top, pages, ANI.paper, 100); lines(fr.top, pages, ANI.graphite, 3, 100, true); },
+  stage: function (fr, f, at, o) {   // balls bouncing round the card in colour, their trails
+    for (var i = 0; i < 4; i++) { var bb = bounceBall(f - CARD_AT + i * 9, -100 + i * 40, 1640 + i); for (var k = bb.length - 1; k >= 0; k--) { var b = bb[k]; polys(fr.main, [place(circle(0, 0, 46, 1, 20), (b.x + i * 300) % 1300 - 100, b.y - i * 120, 0, b.sx, b.sy)], RAINBOW[(i * 2) % 6], k ? o * 0.35 : o); } }
+    paperGrid(fr.main, o * 0.4);
+    polys(fr.haze, [circle(C, C, 400, 1, 40)], ANI.sky, o * 0.5);
+    polys(fr.main, [full()], ANI.paper, o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 8) { var pops = []; for (var k = 0; k < 8; k++) { var a = k * Math.PI / 4; pops.push([[C + Math.cos(a) * (240 + at * 14), C + Math.sin(a) * (300 + at * 14)], [C + Math.cos(a) * (290 + at * 18), C + Math.sin(a) * (350 + at * 18)]]); } lines(fr.top, pops, ANI.graphite, 8, fade(at, 4, 8) * 100); } bigGlint(fr, at, ANI.orange); }
+};
+var ANI_LEGENDARY = {
+  title: function (fr, f, u) {   // cels sliding over each other in colour, a cartoon sky opening
+    for (var k = 0; k < 4; k++) { var x = -400 + ((f * (14 + k * 8) + k * 300) % 1600); polys(fr.main, [[[x, 180 + k * 200], [x + 700, 160 + k * 200], [x + 760, 330 + k * 200], [x + 40, 350 + k * 200]]], RAINBOW[k + 1], 85); }
+    polys(fr.main, [place(circle(0, 0, 140, 0.5, 30), 260 + f * 6, 220, 0), place(circle(0, 0, 100, 0.5, 30), 360 + f * 6, 200, 0)], [1, 1, 1], 100);
+    polys(fr.main, [full()], ANI.sky, 100);
+  },
+  wipe: function (fr, v) { iris(fr, 30 + ease(v) * 1000); },
+  stage: function (fr, f, at, o) {   // a rainbow behind the card, a cartoon sun turning, paint splashing, stars
+    var g = ease((f - CARD_AT) / 8);
+    for (var k = 0; k < 6; k++) lines(fr.main, [ring(C, C + 380, (620 - k * 50) * g + 40, 1, Math.PI, Math.PI * 2)], RAINBOW[k], 52, o);
+    var rays = []; for (var r = 0; r < 16; r++) { var a = f * 0.03 + r * Math.PI / 8, w = 0.09; rays.push([[C, C], [C + Math.cos(a - w) * 1100, C + Math.sin(a - w) * 1100], [C + Math.cos(a + w) * 1100, C + Math.sin(a + w) * 1100]]); }
+    polys(fr.main, rays, [1, 0.95, 0.6], o * 0.55);
+    if (at >= 0) { seed(1660); var splats = []; for (var i = 0; i < 8; i++) { var a2 = between(0, Math.PI * 2), d = 380 + between(0, 160); splats.push({ s: splat(C + Math.cos(a2) * d, C + Math.sin(a2) * d, 50 * ease(at / 4), 1661 + i), c: RAINBOW[i % 6] }); } for (var j = 0; j < splats.length; j++) polys(fr.main, splats[j].s, splats[j].c, o); }
+    seed(1670); var stars = []; for (var q = 0; q < 14; q++) { var a3 = between(0, Math.PI * 2), d3 = between(320, 520); stars.push(star5(C + Math.cos(a3 + f * 0.02) * d3, C + Math.sin(a3 + f * 0.02) * d3, between(16, 30), f * 0.1 + q)); }
+    polys(fr.top, stars, ANI.yellow, o); lines(fr.top, stars, ANI.graphite, 3, o, true);
+    polys(fr.main, [full()], ANI.sky, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 8) for (var k = 0; k < 3; k++) polys(fr.top, slash(-60, 760 - k * 40, 1140, 300 - k * 40, 18, ease((at - k) / 3), 0.4), RAINBOW[k * 2], fade(at, 4, 8) * 90);
+    bigGlint(fr, at, ANI.yellow);
+  }
+};
+var GENRE_ANIMATION = {
+  rarities: { rare: ANI_RARE, epic: ANI_EPIC, legendary: ANI_LEGENDARY },
+  opening: function (comp) {   // the pack scribbled over in pencil, coloured in a flash, rubbed out by an eraser
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      if (f < 30) { seed(1680 + Math.floor(f / 2)); var sc = []; for (var i = 0; i < Math.min(14, f); i++) { var y = cy - 220 + i * 32; sc.push([[cx - 160 + between(-20, 20), y], [cx + 160 + between(-20, 20), y + between(-14, 14)]]); } lines(fr.top, sc, ANI.graphite, 8, 100); }
+      if (f >= 24 && f < 30) polys(fr.top, [[[cx - 200, cy - 260], [cx + 200, cy - 260], [cx + 200, cy + 260], [cx - 200, cy + 260]]], RAINBOW[f % 6], 80);
+      if (f >= 30 && f < 50) { var x = cx - 300 + (f - 30) * 40; polys(fr.top, [place([[-70, -40], [70, -40], [70, 40], [-70, 40]], x, cy + Math.sin(f) * 40, 0.3)], [1, 0.6, 0.65], 100); polys(fr.top, [[[cx - 300, cy - 300], [x - 60, cy - 300], [x - 60, cy + 300], [cx - 300, cy + 300]]], ANI.paper, 100 * fade(f, 44, 50)); }
+    }
+  }
+};
+
+// ===== Scellés — crime: a clue, the board, the crime scene ===============================================
+var CRI = { night: [0.05, 0.06, 0.09], asphalt: [0.13, 0.13, 0.15], tape: [0.96, 0.77, 0], ink: [0.11, 0.1, 0.09], chalk: [0.92, 0.92, 0.9], cork: [0.66, 0.47, 0.28], manila: [0.85, 0.71, 0.42], red: [0.8, 0.1, 0.08], blue: [0.2, 0.42, 1], white: [1, 1, 1] };
+function tapeBand(y0, y1, offset) {   // a band of police tape across the screen: yellow, its black chevrons
+  var band = [[-200, y0 - 40], [1300, y1 - 40], [1300, y1 + 40], [-200, y0 + 40]], ang = Math.atan2(y1 - y0, 1500), marks = [];
+  for (var k = -4; k < 22; k++) { var x = -200 + k * 90 + (offset % 90), y = y0 + (y1 - y0) * (x + 200) / 1500; marks.push(place([[-20, -40], [10, -40], [40, 40], [10, 40]], x, y, ang)); }
+  return { band: band, marks: marks };
+}
+function fingerprint(cx, cy, r) { var out = []; for (var k = 1; k <= 9; k++) out.push(ring(cx, cy, r * k / 9, 1.35, -0.3 + k * 0.05, Math.PI * 2 - 0.6 + k * 0.03)); return out; }
+function chalkOutline(cx, cy, s) {   // a body's chalk outline on the ground
+  return [[cx - 0.2 * s, cy - 1.0 * s], [cx + 0.2 * s, cy - 1.0 * s], [cx + 0.25 * s, cy - 0.7 * s], [cx + 0.75 * s, cy - 0.9 * s], [cx + 0.8 * s, cy - 0.75 * s], [cx + 0.3 * s, cy - 0.45 * s], [cx + 0.35 * s, cy + 0.2 * s], [cx + 0.7 * s, cy + 1.0 * s], [cx + 0.5 * s, cy + 1.05 * s], [cx + 0.05 * s, cy + 0.35 * s], [cx - 0.35 * s, cy + 1.0 * s], [cx - 0.55 * s, cy + 0.95 * s], [cx - 0.3 * s, cy + 0.2 * s], [cx - 0.3 * s, cy - 0.4 * s], [cx - 0.85 * s, cy - 0.2 * s], [cx - 0.9 * s, cy - 0.35 * s], [cx - 0.25 * s, cy - 0.7 * s], [cx - 0.2 * s, cy - 1.0 * s]];
+}
+function marker(x, y, s) { return place([[-0.5 * s, 0], [0.5 * s, 0], [0.3 * s, -0.8 * s], [-0.3 * s, -0.8 * s]], x, y, 0); }
+var CRI_RARE = {
+  title: function (fr, f, u) {   // a fingerprint on a dark floor, a magnifying glass sweeping over it
+    var mx = C + 260 * Math.sin(f * 0.12), my = C + 80 * Math.cos(f * 0.1);
+    lines(fr.main, fingerprint(C, C, 300), [0.4, 0.42, 0.48], 7, 100);
+    polys(fr.main, [circle(mx, my, 170, 1, 40)], [0.9, 0.92, 1], 12); lines(fr.main, [ring(mx, my, 170, 1)], [0.7, 0.55, 0.3], 22, 100);
+    lines(fr.main, [[[mx + 120, my + 120], [mx + 300, my + 300]]], CRI.ink, 40, 100);
+    polys(fr.main, [full()], CRI.night, 100);
+  },
+  wipe: function (fr, v) { iris(fr, v < 0.5 ? 900 * (1 - ease(v * 2)) + 30 : 30 + 900 * ease(v * 2 - 1)); },
+  stage: function (fr, f, at, o) {
+    lines(fr.main, fingerprint(C, C, 520), [0.25, 0.27, 0.32], 9, o);
+    cone(fr.glow, C, 1.5708, 1300, 40, 380, [1, 0.95, 0.8], o * 0.4);
+    polys(fr.main, [full()], CRI.night, o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 5) polys(fr.top, [full()], CRI.white, 40 - at * 9); }
+};
+var CRI_EPIC = {
+  title: function (fr, f, u) {   // the investigation board: photos pinned, red strings joining them
+    seed(1720); var photos = [], pins = [], strings = [];
+    for (var i = 0; i < 7; i++) { var x = between(120, 960), y = between(180, 900), r = between(-0.2, 0.2); photos.push({ p: place([[-90, -70], [90, -70], [90, 70], [-90, 70]], x, y, r), x: x, y: y }); pins.push(circle(x, y - 60, 10, 1, 10)); }
+    for (var k = 0; k < 6; k++) strings.push(partOf([[[photos[k].x, photos[k].y - 60], [photos[k + 1].x, photos[k + 1].y - 60]]], ease((f - k * 2) / 4))[0] || [[0, 0], [0, 0]]);
+    lines(fr.top, strings, CRI.red, 5, 100);
+    for (var j = 0; j < photos.length; j++) { polys(fr.main, [photos[j].p], CRI.white, 100); }
+    polys(fr.top, pins, CRI.red, 100);
+    polys(fr.main, [full()], CRI.cork, 100);
+  },
+  wipe: function (fr, v) { lines(fr.top, [[[-60, -60 + v * 600], [1140, 1140 - v * 600]], [[-60, 1140 - v * 400], [1140, v * 400]]], CRI.red, 40 * (1 - Math.abs(v * 2 - 1)) + 4, 100); },
+  stage: function (fr, f, at, o) {   // the board round the card, every string now leading to it
+    seed(1730); var photos = [], strings = [], pins = [];
+    for (var i = 0; i < 10; i++) { var a = i / 10 * Math.PI * 2 + 0.3, x = C + Math.cos(a) * 430, y = C + Math.sin(a) * 430, r = between(-0.2, 0.2); photos.push(place([[-80, -62], [80, -62], [80, 62], [-80, 62]], x, y, r)); pins.push(circle(x, y - 54, 9, 1, 10)); strings.push(partOf([[[x, y - 54], [C, C]]], ease((f - CARD_AT - i) / 5))[0] || [[C, C], [C, C]]); }
+    lines(fr.main, strings, CRI.red, 5, o); polys(fr.main, pins, CRI.red, o); polys(fr.main, photos, CRI.white, o);
+    polys(fr.main, [full()], CRI.cork, o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 6) lines(fr.top, [ring(C, C, 240 + at * 20, 1.3)], CRI.red, 10, fade(at, 3, 6) * 100); bigGlint(fr, at, CRI.tape); }
+};
+var CRI_LEGENDARY = {
+  title: function (fr, f, u) {   // the crime scene: a chalk outline on wet asphalt, police lights, the tape
+    var tb = tapeBand(260, 160, f * 8); polys(fr.top, tb.marks, CRI.ink, 100); polys(fr.top, [tb.band], CRI.tape, 100);
+    lines(fr.main, [chalkOutline(C, 700, 260)], CRI.chalk, 9, 100);
+    polys(fr.haze, [circle(f % 8 < 4 ? 120 : 960, 300, 520, 1, 40)], (f % 8 < 4) ? CRI.red : CRI.blue, 100);
+    polys(fr.main, [full()], CRI.asphalt, 100);
+  },
+  wipe: function (fr, v) { var tb = tapeBand(-200 + v * 1500, -400 + v * 1500, 0); polys(fr.top, tb.marks, CRI.ink, 100); polys(fr.top, [tb.band], CRI.tape, 100); var t2 = tapeBand(1300 - v * 1500, 1100 - v * 1500, 40); polys(fr.top, t2.marks, CRI.ink, 100); polys(fr.top, [t2.band], CRI.tape, 100); },
+  stage: function (fr, f, at, o) {   // the tape crossing the screen, numbered markers, camera flashes, the lights
+    var t1 = tapeBand(220, 120, f * 6), t2 = tapeBand(980, 860, -f * 6);
+    polys(fr.top, t1.marks.concat(t2.marks), CRI.ink, o); polys(fr.top, [t1.band, t2.band], CRI.tape, o);
+    var ms = [[C - 380, 760], [C + 360, 700], [C - 300, 420], [C + 400, 380]]; var mk = []; for (var i = 0; i < ms.length; i++) mk.push(marker(ms[i][0], ms[i][1], 70));
+    polys(fr.main, mk, CRI.tape, o); lines(fr.main, mk, CRI.ink, 4, o, true);
+    if (at >= 0) { var flashes = [[C - 420, C - 250, 0], [C + 430, C + 160, 5], [C - 200, C + 380, 9], [C + 300, C - 330, 13]]; for (var j = 0; j < flashes.length; j++) { var t = at - flashes[j][2]; if (t >= 0 && t < 4) { polys(fr.glow, [circle(flashes[j][0], flashes[j][1], 160 - t * 30, 1, 24)], CRI.white, 100 - t * 25); polys(fr.top, glintPolys([[flashes[j][0], flashes[j][1], 60 - t * 12]]), CRI.white); } } }
+    lines(fr.main, [chalkOutline(C, C + 40, 330)], CRI.chalk, 10, o * 0.7);
+    polys(fr.haze, [circle(f % 8 < 4 ? 120 : 960, C, 560, 1.2, 40)], (f % 8 < 4) ? CRI.red : CRI.blue, o);
+    polys(fr.main, [full()], CRI.asphalt, o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 4) polys(fr.top, [full()], CRI.white, 60 - at * 15); bigGlint(fr, at, CRI.tape); }
+};
+var GENRE_CRIME = {
+  rarities: { rare: CRI_RARE, epic: CRI_EPIC, legendary: CRI_LEGENDARY },
+  opening: function (comp) {   // police tape wraps round the pack; an evidence photo's flash — it is taken away
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      if (f >= 4 && f < 40) { for (var k = 0; k < 3; k++) { var t = clamp01((f - 4 - k * 5) / 8); if (t <= 0) continue; var y = cy - 160 + k * 160, w = t * 1500, tb = tapeBand(y + 60, y - 60, f * 6); polys(fr.top, tb.marks, CRI.ink, 100 * fade(f, 34, 40)); polys(fr.top, [tb.band], CRI.tape, 100 * fade(f, 34, 40)); } }
+      if (f >= 28 && f < 32) polys(fr.top, [circle(cx, cy, 700, 1, 40)], CRI.white, 100 - (f - 28) * 25);
+      if (f >= 6 && f < 28 && f % 8 < 4) polys(fr.glow, [circle(cx - 420, cy - 300, 120, 1, 20)], CRI.red, 100);
+      if (f >= 6 && f < 28 && f % 8 >= 4) polys(fr.glow, [circle(cx + 420, cy - 300, 120, 1, 20)], CRI.blue, 100);
+    }
+  }
+};
+
+var GENRE = { action: GENRE_ACTION, dark: GENRE_DARK, drama: GENRE_DRAMA, fantasy: GENRE_FANTASY, sf: GENRE_SF, adventure: GENRE_ADVENTURE, documentary: GENRE_DOC, thriller: GENRE_THRILLER, comedy: GENRE_COMEDY, animation: GENRE_ANIMATION, crime: GENRE_CRIME }[GENRE_KEY];
 
 // --- the comps --------------------------------------------------------------------------------------------
 // a genre with a moment of its own per rarity gives it (``rarities``), else the same one for every rarity

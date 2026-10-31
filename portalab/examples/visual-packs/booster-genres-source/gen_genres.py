@@ -1,4 +1,4 @@
-"""Writes the genre scene packs (Blockbuster, Ténèbres, Rideau, Arcanes, Hyperespace, Trésor, Reportage, Insomnie) but for their videos
+"""Writes the genre scene packs (Blockbuster, Ténèbres, Rideau, Arcanes, Hyperespace, Trésor, Reportage, Insomnie, Fou rire, Crayonné, Scellés) but for their videos
 (build.sh): their emblems, stylesheets — the sealed pack, the back, the four faces, the opening, each rarity's
 reveal over the whole screen and the look of the rarity's name Portalab writes there — and every manifest.
 Fonts (SIL OFL, from Google Fonts) are copied from fonts/."""
@@ -84,6 +84,22 @@ def emblem_reportage():
 def emblem_insomnie():
     return svg('<circle cx="50" cy="50" r="40" fill="#121216" stroke="#e10600" stroke-width="4"/><circle cx="50" cy="50" r="22" fill="none" stroke="#f2f2f2" stroke-width="2.5"/>'
                '<path d="M50,4 V28 M50,72 V96 M4,50 H28 M72,50 H96" stroke="#e10600" stroke-width="4"/><circle cx="50" cy="50" r="4" fill="#e10600"/>')
+
+
+def emblem_fourire():
+    return svg('<circle cx="50" cy="50" r="46" fill="#ffd23f" stroke="#1b1430" stroke-width="4"/><circle cx="34" cy="40" r="6" fill="#1b1430"/><circle cx="66" cy="40" r="6" fill="#1b1430"/>'
+               '<path d="M24,56 Q50,92 76,56 Z" fill="#1b1430"/><path d="M34,70 Q50,82 66,70 Q50,76 34,70 Z" fill="#ff4f8b"/>')
+
+
+def emblem_crayon():
+    return svg('<path d="M16,84 L24,60 L74,10 L90,26 L40,76 Z" fill="#ff9f1c" stroke="#22183d" stroke-width="3.5" stroke-linejoin="round"/>'
+               '<path d="M16,84 L24,60 L40,76 Z" fill="#fff8ec" stroke="#22183d" stroke-width="3"/><path d="M16,84 L20,72 L28,80 Z" fill="#22183d"/>'
+               '<path d="M66,18 L82,34" stroke="#22183d" stroke-width="3"/><path d="M60,88 Q74,78 90,86" fill="none" stroke="#3b6cff" stroke-width="3" stroke-linecap="round"/>')
+
+
+def emblem_scelles():
+    return svg('<path d="M18,14 C34,8 66,8 82,14 C88,40 80,70 50,90 C20,70 12,40 18,14 Z" fill="#1d1a16" stroke="#f5c400" stroke-width="4"/>'
+               '<path d="M50,24 L56,40 L74,40 L60,50 L66,68 L50,58 L34,68 L40,50 L26,40 L44,40 Z" fill="#f5c400"/>')
 
 
 GENRES = {
@@ -315,6 +331,87 @@ GENRES = {
                "look": ("Dossier noir", "Black file", "Un paquet noir rayé par l'ombre d'un store, une bande rouge, l'image de l'œuvre en noir et blanc contrasté, son nom en capitales serrées, un viseur en emblème.", "A black pack striped by a blind's shadow, a red band, the work's art in high contrast, its name in tight capitals, a reticle as emblem."),
                "opening": ("Dans le viseur", "In the crosshairs", "Un viseur cherche le paquet et se verrouille ; un coup — il vole en éclats comme du verre.", "A reticle looks for the pack and locks on; a shot — it shatters like glass."),
                "back": ("Dos noir", "Black back", "Noir rayé, une bande rouge, un viseur au centre.", "Striped black, a red band, a reticle in the middle.")}),
+    "fourire": dict(
+        moments={
+            "rare": ("Le cotillon : un cotillon qui explose en serpentins et en confettis sur un fond à pois ; la carte arrive dans une pluie de confettis.",
+                     "The party popper: a popper bursting into streamers and confetti over polka dots; the card comes in a rain of confetti."),
+            "epic": ("La tarte : une tarte à la crème qui vole et s'écrase sur l'écran ; la crème dégouline, des étoiles tournent au-dessus de la carte.",
+                     "The pie: a cream pie flying and splatting the screen; cream drips, stars wheel above the card."),
+            "legendary": ("Le grand show : un micro sous la poursuite devant un mur de briques, un canon à confettis, puis des ballons qui montent et un soleil aux couleurs de la fête qui tourne derrière la carte.",
+                          "The big show: a microphone in the spotlight before a brick wall, a confetti cannon, then balloons rising and a sunburst in the party colours turning behind the card."),
+        },
+        family="family", font=("Chewy.woff2", "Genre Chewy", "400"), ink="#1b1430", main="#ff4f8b", light="#ffd23f", dark="#3ec6ff", emblem=emblem_fourire,
+        names={"fr": "Fou rire — comédie", "en": "Fou rire — comedy"},
+        description={"fr": "Le booster Comédie, un fou rire : chaque rareté son moment en plein écran — un cotillon pour une rare, une tarte à la crème pour une épique, le grand show pour une légendaire. Un paquet jaune à pois qu'une tarte à la crème vient écraser ; une scène de comédie sous les confettis.",
+                     "en": "The Comedy booster, a fit of laughter: every rarity its own moment over the whole screen — a party popper for a rare, a cream pie for an epic, the big show for a legendary. A polka-dot yellow pack splatted by a cream pie; a comedy stage under confetti."},
+        pack_bg="radial-gradient(circle, rgba(255, 255, 255, 0.45) 18%, transparent 20%) 0 0 / 22px 22px, linear-gradient(170deg, #ffd23f, #ffb800)",
+        pack_band="repeating-linear-gradient(90deg, #ff4f8b 0 14px, #3ec6ff 14px 28px, #4fd975 28px 42px)", face_bg="linear-gradient(170deg, #3b2a6b, #1b1430)",
+        upright="0.6",
+        word="color: #ffd23f;\n  -webkit-text-stroke: 0.22rem #1b1430;\n  paint-order: stroke fill;\n  text-shadow: 0.45rem 0.45rem 0 #ff4f8b;",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  36% { transform: none; }
+  40% { transform: scale(1.15, 0.8); filter: brightness(1.5); opacity: 1; }
+  46% { transform: scale(1.4, 0.5); filter: brightness(3); opacity: 0.6; }
+  52%, 100% { transform: scale(1.6, 0.3); filter: brightness(5); opacity: 0; }
+}""",
+        parts={"backdrop": ("Scène sous les confettis", "Confetti stage", "Un fond jaune soleil à pois qui défilent, une poursuite rose qui se balance, des confettis aux couleurs de la fête qui tombent (vidéo en boucle).", "A sunshine-yellow backdrop of drifting polka dots, a pink spotlight swaying, confetti in the party colours falling (a looping video)."),
+               "look": ("Paquet à pois", "Polka-dot pack", "Un paquet jaune à pois blancs, une bande arc-en-ciel, l'image de l'œuvre dans un cadre de BD, son nom en lettres rondes, un grand sourire en emblème.", "A yellow pack with white polka dots, a rainbow band, the work's art in a comic frame, its name in round letters, a big grin as emblem."),
+               "opening": ("La tarte", "The pie", "Une tarte à la crème arrive en cloche et s'écrase sur le paquet — confettis.", "A cream pie lobs in and splats the pack — confetti."),
+               "back": ("Dos à pois", "Polka-dot back", "Jaune à pois, une bande arc-en-ciel, un grand sourire au centre.", "Polka-dot yellow, a rainbow band, a big grin in the middle.")}),
+    "crayon": dict(
+        moments={
+            "rare": ("L'esquisse : une feuille d'animateur, des cercles de construction au crayon bleu, un personnage esquissé dont les traits tremblent ; la carte se pose sur la feuille.",
+                     "The sketch: an animator's sheet, construction circles in blue pencil, a figure sketched with boiling lines; the card lands on the sheet."),
+            "epic": ("Le folioscope : une balle qui rebondit, ses intervalles derrière elle, les pages qui se tournent ; des balles de couleur rebondissent autour de la carte.",
+                     "The flip book: a ball bouncing, its in-betweens trailing, the pages flipping; coloured balls bounce round the card."),
+            "legendary": ("Le grand final : des cellulos de couleur qui glissent, un ciel de dessin animé, puis un arc-en-ciel derrière la carte, un soleil qui tourne, des éclaboussures de peinture et des étoiles.",
+                          "The grand finale: coloured cels sliding, a cartoon sky, then a rainbow behind the card, a sun turning, paint splashes and stars."),
+        },
+        family="family", font=("MochiyPopOne.woff2", "Genre Mochiy", "400"), ink="#22183d", main="#7b5cff", light="#ff9f1c", dark="#2fe0b4", emblem=emblem_crayon,
+        names={"fr": "Crayonné — animation", "en": "Crayonné — animation"},
+        description={"fr": "Le booster Animation, de l'esquisse au dessin animé : chaque rareté son moment en plein écran — une esquisse pour une rare, un folioscope pour une épique, le grand final en couleurs pour une légendaire. Un paquet griffonné au crayon puis gommé ; une feuille d'animateur sur la table lumineuse.",
+                     "en": "The Animation booster, from the sketch to the cartoon: every rarity its own moment over the whole screen — a sketch for a rare, a flip book for an epic, the grand finale in colour for a legendary. A pack scribbled in pencil, then rubbed out; an animator's sheet on the light table."},
+        pack_bg="linear-gradient(rgba(59, 108, 255, 0.18) 1px, transparent 1px) 0 0 / 14px 14px, linear-gradient(90deg, rgba(59, 108, 255, 0.18) 1px, transparent 1px) 0 0 / 14px 14px, linear-gradient(170deg, #fffaf1, #f1e7d6)",
+        pack_band="linear-gradient(90deg, #ff4d5a, #ff9f1c, #ffd93a, #2fe0b4, #3b6cff, #7b5cff)", face_bg="linear-gradient(170deg, #3b2f78, #22183d)",
+        upright="0.55",
+        word="scale: 0.78;\n  color: #ffffff;\n  -webkit-text-stroke: 0.2rem #22183d;\n  paint-order: stroke fill;\n  text-shadow: 0.4rem 0.4rem 0 #7b5cff;",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; clip-path: inset(0 0 0 0); opacity: 1; }
+  46% { transform: none; filter: saturate(1.4); clip-path: inset(0 0 0 0); opacity: 1; }
+  76%, 100% { clip-path: inset(0 0 0 100%); opacity: 1; }
+}""",
+        parts={"backdrop": ("Table lumineuse", "Light table", "Une feuille d'animateur et son quadrillage bleu, des esquisses au crayon qui tremblent comme un dessin animé, des taches de couleur qui vont et viennent (vidéo en boucle).", "An animator's sheet and its blue grid, pencil sketches boiling like a cartoon, patches of colour coming and going (a looping video)."),
+               "look": ("Feuille d'animateur", "Animator's sheet", "Un paquet de papier quadrillé, une bande arc-en-ciel, l'image de l'œuvre comme un cellulo, son nom en lettres rondes cernées, un crayon en emblème.", "A pack of grid paper, a rainbow band, the work's art like a cel, its name in round outlined letters, a pencil as emblem."),
+               "opening": ("Gommé", "Rubbed out", "Le paquet griffonné au crayon, colorié d'un coup, puis effacé d'un coup de gomme.", "The pack scribbled over in pencil, coloured in a flash, then rubbed out with an eraser."),
+               "back": ("Dos quadrillé", "Grid back", "Papier quadrillé, une bande arc-en-ciel, un crayon au centre.", "Grid paper, a rainbow band, a pencil in the middle.")}),
+    "scelles": dict(
+        moments={
+            "rare": ("L'indice : une empreinte sur un sol sombre, une loupe qui la balaie ; la carte arrive sous une lampe torche, sur l'empreinte.",
+                     "The clue: a fingerprint on a dark floor, a magnifying glass sweeping it; the card comes under a torch, over the print."),
+            "epic": ("Le tableau d'enquête : des photos épinglées reliées par des fils rouges ; tous les fils finissent par mener à la carte.",
+                     "The investigation board: photos pinned, joined by red strings; every string ends up leading to the card."),
+            "legendary": ("La scène de crime : une silhouette à la craie sur l'asphalte mouillé, les gyrophares, le ruban de police, puis des plots numérotés et les flashs des photos d'indices autour de la carte.",
+                          "The crime scene: a chalk outline on wet asphalt, police lights, the tape, then numbered markers and evidence photos flashing round the card."),
+        },
+        family="dark", font=("SpecialElite.woff2", "Genre Special Elite", "400"), ink="#1d1a16", main="#f5c400", light="#b3261e", dark="#0d1220", emblem=emblem_scelles,
+        names={"fr": "Scellés — crime", "en": "Scellés — crime"},
+        description={"fr": "Le booster Crime, une enquête : chaque rareté son moment en plein écran — un indice sous la loupe pour une rare, le tableau d'enquête pour une épique, la scène de crime pour une légendaire. Un paquet comme une pochette à scellés, entouré du ruban de police et emporté dans le flash d'une photo d'indice ; une rue bouclée sous les gyrophares.",
+                     "en": "The Crime booster, an investigation: every rarity its own moment over the whole screen — a clue under the glass for a rare, the investigation board for an epic, the crime scene for a legendary. A pack like an evidence bag, wrapped in police tape and taken away in an evidence photo's flash; a street cordoned off under police lights."},
+        pack_bg="repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0 2px, transparent 2px 7px), linear-gradient(170deg, #dcb96f, #b8954f)",
+        pack_band="repeating-linear-gradient(135deg, #f5c400 0 12px, #1d1a16 12px 22px)", face_bg="linear-gradient(170deg, #1d2333, #0d1220)",
+        upright="0.55",
+        word="scale: 0.8;\n  color: #f5c400;\n  -webkit-text-stroke: 0.1rem #1d1a16;\n  paint-order: stroke fill;\n  text-shadow: 0.3rem 0.3rem 0 #1d1a16, 0 0 1.6rem rgba(245, 196, 0, 0.5);",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  40% { transform: scale(0.98); filter: brightness(1); }
+  44% { transform: scale(0.98); filter: brightness(6) grayscale(1); opacity: 1; }
+  50%, 100% { transform: scale(0.9) translateY(-30px); filter: brightness(6) grayscale(1); opacity: 0; }
+}""",
+        parts={"backdrop": ("Rue bouclée", "Cordoned street", "Une rue de nuit bouclée, les gyrophares rouges et bleus sur l'asphalte mouillé, le ruban de police en haut, une silhouette à la craie au sol (vidéo en boucle).", "A street at night cordoned off, red and blue police lights on the wet asphalt, the tape across the top, a chalk outline on the ground (a looping video)."),
+               "look": ("Pochette à scellés", "Evidence bag", "Un paquet de papier kraft comme une pochette à scellés, une bande de ruban de police, l'image de l'œuvre comme une photo d'indice, son nom tapé à la machine, un insigne en emblème.", "A manila pack like an evidence bag, a band of police tape, the work's art like an evidence photo, its name typewritten, a badge as emblem."),
+               "opening": ("Mis sous scellés", "Bagged", "Le ruban de police s'enroule autour du paquet sous les gyrophares ; le flash d'une photo d'indice — il est emporté.", "Police tape wraps round the pack under police lights; an evidence photo's flash — it is taken away."),
+               "back": ("Dos kraft", "Manila back", "Papier kraft, ruban de police, un insigne au centre.", "Manila paper, police tape, a badge in the middle.")}),
 }
 REVEAL = {
     "rare": ("Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
@@ -595,7 +692,8 @@ def write(key, g):
                               "face": {r: f"face-{r}" for r in RARITIES}, "reveal": {r: f"reveal-{r}" for r in ("rare", "epic", "legendary")}}}}, ensure_ascii=False, indent=2) + "\n")
     (pack / "pack.json").write_text(json.dumps({"format": 1, "id": key, "version": g.get("version", "1.0.0"), "names": g["names"], "descriptions": g["description"],
                                                 "author": "Portalab (example)", "license": "CC0-1.0"}, ensure_ascii=False, indent=2) + "\n")
-    fonts = {"IMFellEnglishSC.woff2": "IM Fell English SC by Igino Marini", "SpaceMono.woff2": "Space Mono by Colophon", "BebasNeue.woff2": "Bebas Neue by Dharma Type",
+    fonts = {"Chewy.woff2": "Chewy by Sideshow", "MochiyPopOne.woff2": "Mochiy Pop One by Fontworks", "SpecialElite.woff2": "Special Elite by Astigmatic",
+             "IMFellEnglishSC.woff2": "IM Fell English SC by Igino Marini", "SpaceMono.woff2": "Space Mono by Colophon", "BebasNeue.woff2": "Bebas Neue by Dharma Type",
              "Anton.woff2": "Anton by Vernon Adams", "Creepster.woff2": "Creepster by Sideshow", "PlayfairDisplay.woff2": "Playfair Display by Claus Eggers Sørensen",
              "CinzelDecorative.woff2": "Cinzel Decorative by Natanael Gama", "Orbitron.woff2": "Orbitron by Matt McInerney"}
     (pack / "CREDITS.txt").write_text(f"""{g['names']['en']} — an example booster scene for Portalab (CC0-1.0), one of the genre scenes, every shader,
