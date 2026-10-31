@@ -69,10 +69,20 @@ def emblem_hyperespace():
 
 GENRES = {
     "blockbuster": dict(
+        version="1.1.0",
+        # issue 296: each rarity its own moment
+        moments={
+            "rare": ("La poursuite : une route de nuit qui fonce vers l'écran, des phares, des traces de pneus ; la carte arrive dans les lignes de vitesse et se retourne dans une onde de choc.",
+                     "The chase: a night road rushing at the screen, headlights, skid marks; the card comes in the speed lines and turns over in a shockwave."),
+            "epic": ("L'explosion : l'écran coupé entre l'acier et le feu, puis une boule de feu, des débris et une onde de choc autour de la carte qui se retourne.",
+                     "The explosion: the screen cut between steel and fire, then a fireball, debris and a shockwave round the card as it turns over."),
+            "legendary": ("Le final : une ville en feu à l'horizon, deux chasseurs qui passent, puis des explosions en chaîne autour de la carte, des projecteurs dans un ciel rouge et deux entailles qui se croisent.",
+                          "The finale: a city burning on the horizon, two fighters screaming past, then explosions going off round the card, searchlights in a red sky and two crossing slashes."),
+        },
         family="action", font=("Anton.woff2", "Genre Anton", "400"), ink="#0d0f14", main="#ff6a00", light="#ffb31a", dark="#1a1d24", emblem=emblem_blockbuster,
         names={"fr": "Blockbuster — action", "en": "Blockbuster — action"},
-        description={"fr": "Le booster Action en grand spectacle : chaque rareté prend tout l'écran — un écran coupé d'acier et de feu traversé de barres de vitesse, puis la carte jetée de dos dans une boule de feu, des débris projetés, et au retournement une onde de choc et un grand reflet d'objectif. Un paquet d'acier brossé à bande de danger qui explose après un compte à rebours ; une ville de nuit sous les projecteurs.",
-                     "en": "The Action booster as a blockbuster: every rarity takes the whole screen — a screen cut in steel and fire crossed by speed bars, then the card flung in face down into a fireball, debris flying, and as it turns a shockwave and a great lens flare. A brushed steel pack with a hazard band that blows up after a countdown; a city at night under searchlights."},
+        description={"fr": "Le booster Action en grand spectacle, chaque rareté son moment en plein écran : une poursuite de nuit pour une rare, une explosion pour une épique, le final pour une légendaire — une ville en feu, des chasseurs, des explosions en chaîne. Un paquet d'acier brossé à bande de danger qui explose après un compte à rebours ; une ville de nuit sous les projecteurs.",
+                     "en": "The Action booster as a blockbuster, every rarity its own moment over the whole screen: a night chase for a rare, an explosion for an epic, the finale for a legendary — a city on fire, fighter jets, explosions going off one after another. A brushed-steel pack with a hazard band that blows up after a countdown; a city at night under searchlights."},
         pack_bg="repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 2px, transparent 2px 5px), linear-gradient(165deg, #5b6474, #2a2f3a 55%, #12151c)",
         pack_band="repeating-linear-gradient(135deg, #ff6a00 0 10px, #0d0f14 10px 20px)", face_bg="linear-gradient(170deg, #20242d, #0d0f14)",
         word="color: #ffffff;\n  -webkit-text-stroke: 0.3rem #0d0f14;\n  paint-order: stroke fill;\n  text-shadow: 0.5rem 0.5rem 0 #ff6a00;",
@@ -433,7 +443,7 @@ def write(key, g):
     word = {"rare": ("Rare", "Rare"), "epic": ("Épique", "Epic"), "legendary": ("Légendaire", "Legendary")}
     for r in ("rare", "epic", "legendary"):
         (E / f"reveal-{r}" / "reveal.css").write_text(reveal_css(key, g, r))
-        fr_d, en_d = REVEAL["rare"]
+        fr_d, en_d = g.get("moments", {}).get(r) or REVEAL["rare"]
         element(E / f"reveal-{r}", "card_reveal", f"{key}-{r}", {"fr": f"Révélation {word[r][0].lower()}", "en": f"{word[r][1]} reveal"}, {"fr": fr_d, "en": en_d},
                 {"kind": "video", "file": "reveal.mp4", "over": "over.mp4", "alpha": "side", "place": "screen", "css": ["reveal.css"], "duration": DURATION[r], "rarity": r})
     (E / f"scene-{key}").mkdir(parents=True, exist_ok=True)
@@ -444,7 +454,7 @@ def write(key, g):
         "render": {"kind": "data"},
         "payload": {"parts": {"booster_look": f"look-{key}", "backdrop": f"backdrop-{key}", "opening": f"opening-{key}", "back": {"common": f"back-{key}"},
                               "face": {r: f"face-{r}" for r in RARITIES}, "reveal": {r: f"reveal-{r}" for r in ("rare", "epic", "legendary")}}}}, ensure_ascii=False, indent=2) + "\n")
-    (pack / "pack.json").write_text(json.dumps({"format": 1, "id": key, "version": "1.0.0", "names": g["names"], "descriptions": g["description"],
+    (pack / "pack.json").write_text(json.dumps({"format": 1, "id": key, "version": g.get("version", "1.0.0"), "names": g["names"], "descriptions": g["description"],
                                                 "author": "Portalab (example)", "license": "CC0-1.0"}, ensure_ascii=False, indent=2) + "\n")
     fonts = {"Anton.woff2": "Anton by Vernon Adams", "Creepster.woff2": "Creepster by Sideshow", "PlayfairDisplay.woff2": "Playfair Display by Claus Eggers Sørensen",
              "CinzelDecorative.woff2": "Cinzel Decorative by Natanael Gama", "Orbitron.woff2": "Orbitron by Matt McInerney"}
