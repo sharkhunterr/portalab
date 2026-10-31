@@ -36,8 +36,11 @@ export function CardBoosters({ inventory = false }: { inventory?: boolean }) {
   const { locale } = useLocaleContext();
   const packs = usePacks().data ?? [];
   const open = useOpenPack();
-  // issue 243: the Mediacards boosters' own wrapper (the scene bound to their kind), apart from the looks'
-  const look = bindingOf(useSceneBindings(), "", CARD_BOOSTER)?.booster_look ?? undefined;
+  // issue 243: the Mediacards boosters' own wrapper (the scene bound to their kind), apart from the looks' —
+  // issue 293: a bought one's, the scene bound to its product, as in the shop
+  const bindings = useSceneBindings();
+  const lookOf = (pack: CardPack) =>
+    bindingOf(bindings, pack.look?.product ?? "", CARD_BOOSTER)?.booster_look ?? undefined;
   // kept while it is opened: the list loses it as soon as it is
   const [opening, setOpening] = useState<CardPack | null>(null);
   return (
@@ -54,7 +57,7 @@ export function CardBoosters({ inventory = false }: { inventory?: boolean }) {
                 <button
                   type="button"
                   className="cards-boosters__pack"
-                  data-booster-look={look}
+                  data-booster-look={lookOf(pack)}
                   onClick={() => setOpening(pack)}
                   aria-label={`${t("gamification:cards.pack.open")} — ${packName(t, pack)}`}
                 >
