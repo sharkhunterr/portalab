@@ -318,11 +318,16 @@ class FeedSources:
         hidden: bool = False,
         limit: int = 30,
         reader: UUID | None = None,
+        also: UUID | None = None,
     ) -> list[tuple[FeedItem, Feed]]:
         """The latest items (pinned first when nothing is asked for), of some sources, or naming some library
-        titles or people (any of them) — the editors' sources, or (``reader``) that member's own."""
+        titles or people (any of them) — the editors' sources (and, ``also``, the sources that member
+        follows), or (``reader``) that member's own only."""
         stmt = select(FeedItem, Feed).join(Feed, Feed.id == FeedItem.feed_id).where(Feed.enabled.is_(True))
-        if reader is None:
+        if reader is None and also is not None:
+            followed = select(FeedSubscription.feed_id).where(FeedSubscription.user_id == also)
+            stmt = stmt.where(or_(Feed.editorial.is_(True), Feed.id.in_(followed)))
+        elif reader is None:
             stmt = stmt.where(Feed.editorial.is_(True))
         else:
             stmt = stmt.join(

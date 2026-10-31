@@ -49844,7 +49844,7 @@
     },
     "/api/v1/news/sources/items": {
       "get": {
-        "description": "The latest news from elsewhere (pinned first), a source's, or those naming library titles (their\nids) or people (their names as the library credits them).",
+        "description": "The latest news from elsewhere (pinned first), a source's, or those naming library titles (their\nids) or people (their names as the library credits them) \u2014 of the editors' sources, and of mine when\na title or a person is asked for (\u00ab in the news \u00bb for what I follow, on a title's page\u2026).",
         "operationId": "source_items_api_v1_news_sources_items_get",
         "parameters": [
           {

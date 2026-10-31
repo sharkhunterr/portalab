@@ -148,6 +148,7 @@ async def test_members_follow_sources_of_their_own(
     sources.transport = httpx.MockTransport(site)
     sources.resolver = _addresses
     sources.blobs = FileSystemBlobStore(tmp_path / "news-blobs")
+    ct.ev.full.identity.capabilities.provide(MENTIONS, Library(), instance_ref="test-media", owner="test")
 
     await login(client, "rita")
     mine = await client.post("/api/v1/me/news/sources", json={"url": "https://news.example.org/"})
@@ -158,11 +159,17 @@ async def test_members_follow_sources_of_their_own(
     assert len(own) == 3 and (await client.get(own[0]["picture"])).status_code == 200
     # mine alone: not on « À la une », not in the editors' list, not another member's
     assert (await client.get("/api/v1/news/sources/items")).json()["items"] == []
+    # but « in the news » for a title I follow reads my sources too
+    about = (await client.get("/api/v1/news/sources/items", params={"title": "obj-dune"})).json()["items"]
+    assert [i["title"] for i in about] == ["Dune Part Two arrive en 4K"]
     exported = await client.get("/api/v1/me/news/sources/opml")
     assert "https://news.example.org/feed.xml" in exported.text and "opml" in exported.headers["content-type"]
 
     await login(client, "sam")
     assert (await client.get("/api/v1/me/news/sources/items")).json()["items"] == []
+    assert (await client.get("/api/v1/news/sources/items", params={"title": "obj-dune"})).json()[
+        "items"
+    ] == []
     assert (await client.get(own[0]["picture"])).status_code == 404  # nor its pictures
     imported = (await client.post("/api/v1/me/news/sources/opml", json={"opml": OPML})).json()
     assert imported == {"added": 2, "skipped": 0}  # the same address as rita's: read once for both
