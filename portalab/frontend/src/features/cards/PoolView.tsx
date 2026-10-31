@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { CheckboxField, SelectField, TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
-import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { type MediaCard, type Rarity, useCardPool } from "./api";
 import { Binder } from "./SetPage";
@@ -8,10 +8,10 @@ import { Binder } from "./SetPage";
 const RARITIES: Rarity[] = ["legendary", "epic", "rare", "common"];
 const KINDS: MediaCard["kind"][] = ["title", "cast", "director", "creator", "writer", "composer"];
 
-/** Issue 229: every card there is (the pool), the rarest first — by name, rarity, kind, country, or mine. */
+/** Issue 229: every card there is (the pool), the rarest first — by name, rarity, kind, country, or mine.
+ * #298: the site's own fields (as the media catalog), the rarities as pills. */
 export function PoolView() {
   const t = useT();
-  const format = useFormat();
   const [q, setQ] = useState("");
   const [rarity, setRarity] = useState<Rarity | "">("");
   const [kind, setKind] = useState<MediaCard["kind"] | "">("");
@@ -28,62 +28,60 @@ export function PoolView() {
     };
   return (
     <div className="ds-stack">
-      <div className="cards-filters">
-        <input
-          type="search"
-          value={q}
-          placeholder={t("gamification:cards.pool.search")}
-          aria-label={t("gamification:cards.pool.search")}
-          onChange={(event) => reset(setQ)(event.target.value)}
-        />
-        <select
-          value={rarity}
-          aria-label={t("gamification:cards.pool.rarity")}
-          onChange={(event) => reset(setRarity)(event.target.value as Rarity | "")}
-        >
-          <option value="">{t("gamification:cards.pool.anyRarity")}</option>
-          {RARITIES.map((r) => (
-            <option key={r} value={r}>
-              {t(`gamification:cards.rarity.${r}`)}
-            </option>
-          ))}
-        </select>
-        <select
-          value={kind}
-          aria-label={t("gamification:cards.pool.kind")}
-          onChange={(event) => reset(setKind)(event.target.value as MediaCard["kind"] | "")}
-        >
-          <option value="">{t("gamification:cards.pool.anyKind")}</option>
-          {KINDS.map((k) => (
-            <option key={k} value={k}>
-              {t(`gamification:cards.kind.${k}`)}
-            </option>
-          ))}
-        </select>
-        <select
-          value={country}
-          aria-label={t("gamification:cards.pool.country")}
-          onChange={(event) => reset(setCountry)(event.target.value)}
-        >
-          <option value="">{t("gamification:cards.pool.anyCountry")}</option>
-          {(pool.data?.countries ?? []).map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <label>
-          <input
-            type="checkbox"
-            checked={owned}
-            onChange={(event) => reset(setOwned)(event.target.checked)}
+      <search className="cards-pool">
+        <div className="cards-pool__bar">
+          <TextField
+            label={t("gamification:cards.pool.search")}
+            type="search"
+            value={q}
+            onChange={(event) => reset(setQ)(event.target.value)}
           />
-          {t("gamification:cards.pool.mine")}
-        </label>
-      </div>
-      <p className="admin-muted">
-        {t("gamification:cards.pool.count", { count: format.number(pool.data?.total ?? 0) })}
-      </p>
+          <SelectField
+            label={t("gamification:cards.pool.kind")}
+            value={kind}
+            onChange={(event) => reset(setKind)(event.target.value as MediaCard["kind"] | "")}
+          >
+            <option value="">{t("gamification:cards.pool.anyKind")}</option>
+            {KINDS.map((k) => (
+              <option key={k} value={k}>
+                {t(`gamification:cards.kind.${k}`)}
+              </option>
+            ))}
+          </SelectField>
+          <SelectField
+            label={t("gamification:cards.pool.country")}
+            value={country}
+            onChange={(event) => reset(setCountry)(event.target.value)}
+          >
+            <option value="">{t("gamification:cards.pool.anyCountry")}</option>
+            {(pool.data?.countries ?? []).map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </SelectField>
+        </div>
+        <fieldset className="cards-pool__rarities">
+          <legend className="visually-hidden">{t("gamification:cards.pool.rarity")}</legend>
+          {(["", ...RARITIES] as const).map((r) => (
+            <button
+              key={r || "any"}
+              type="button"
+              data-rarity={r || undefined}
+              aria-pressed={rarity === r}
+              onClick={() => reset(setRarity)(r)}
+            >
+              {r ? t(`gamification:cards.rarity.${r}`) : t("gamification:cards.pool.anyRarity")}
+            </button>
+          ))}
+        </fieldset>
+        <CheckboxField
+          label={t("gamification:cards.pool.mine")}
+          checked={owned}
+          onChange={(event) => reset(setOwned)(event.target.checked)}
+        />
+      </search>
+      <p className="admin-muted">{t("gamification:cards.pool.count", { count: pool.data?.total ?? 0 })}</p>
       <Binder cards={pool.data?.items ?? []} />
       {pages > 1 ? (
         <nav className="cards-pages" aria-label={t("gamification:cards.pages")}>

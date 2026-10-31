@@ -1210,31 +1210,6 @@
   font-weight: 700;
   color: var(--color-text);
 }
-.cards-callout {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
-  color: var(--color-text);
-  font-weight: 600;
-}
-.cards-callout > span {
-  flex: 1 1 12rem;
-}
-.cards-views__count {
-  min-inline-size: 1.4em;
-  padding: 0 var(--space-1);
-  border-radius: 999px;
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-  text-align: center;
-}
 .cards-views--small button {
   font-size: var(--font-size-sm);
 }
@@ -1476,4 +1451,53 @@
   .cards-boosters__pack {
     transition: none;
   }
+}
+
+/* #298: every card there is — the site's fields, the rarities as pills */
+.cards-pool {
+  display: grid;
+  gap: var(--space-3);
+}
+.cards-pool__bar {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(9rem, 1fr));
+  gap: var(--space-3);
+  align-items: end;
+}
+@media (max-width: 40rem) {
+  .cards-pool__bar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .cards-pool__bar > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+.cards-pool__rarities {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 0 var(--space-1);
+  border: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.cards-pool__rarities button {
+  flex: none;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-medium, 500);
+  cursor: pointer;
+}
+.cards-pool__rarities button[aria-pressed="true"] {
+  border-color: transparent;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.cards-pool__rarities button:focus-visible {
+  outline: var(--focus-ring-width, 2px) solid var(--color-focus);
+  outline-offset: 2px;
 }

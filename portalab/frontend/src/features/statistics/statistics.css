@@ -26,8 +26,9 @@
 }
 
 .stat-chart__summary {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
 }
 
 .stat-chart__trend {
@@ -48,4 +49,68 @@
 
 .wrapped__value {
   font-size: var(--font-size-lg);
+}
+
+/* #298: the figures first, small; what a total is made of, in sight */
+.statistics-kpis {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+}
+.statistics-kpis .stat-card {
+  padding: var(--space-3);
+}
+.statistics-kpis .stat-card__header h3 {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.statistics-kpis .stat-chart > .ds-button,
+.statistics-kpis .stat-chart > div[hidden] {
+  display: none;
+}
+.stat-breakdown {
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-3) 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+}
+.stat-breakdown li {
+  display: grid;
+  grid-template-columns: minmax(6rem, 1fr) minmax(4rem, 2fr) auto;
+  gap: var(--space-2);
+  align-items: center;
+}
+.stat-breakdown__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stat-breakdown__bar {
+  block-size: 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-border) 60%, transparent);
+  overflow: hidden;
+}
+.stat-breakdown__bar > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+}
+.stat-breakdown__value {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+.stat-breakdown__value small {
+  color: var(--color-text-muted);
+}
+.statistics-kpis .stat-card__header {
+  align-items: center;
+}
+.statistics-kpis .stat-card__header .ds-button {
+  flex: none;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
 }

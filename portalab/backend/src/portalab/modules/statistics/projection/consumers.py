@@ -43,7 +43,9 @@ def field_value(envelope: Envelope, name: str) -> Any:
         case "subject":
             return envelope.subject_id
         case "source":
-            return envelope.source_system
+            # #298: an event's own « source » (where a reward comes from: a rule, the daily, an achievement…)
+            # before the system that sent it — else every reward was « portalab »
+            return envelope.payload.get("source") or envelope.source_system
     return envelope.payload.get(name)
 
 

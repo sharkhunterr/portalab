@@ -186,6 +186,17 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "route": "/search",
         "required_permission": "search.use",
     },
+    {  # #298: my own figures on the portal (activity, visits, rewards…), apart from the community's
+        "key": "statistics.mine",
+        "owner": "module:statistics",
+        "kind": "entry",
+        "label_key": "nav.statistics_mine",
+        "icon": "activity",
+        "route": "/statistics/me",
+        "group": "stats",
+        "order_hint": 2,
+        "required_permission": "statistics.read",
+    },
     {
         "key": "statistics.page",
         "owner": "module:statistics",
@@ -194,7 +205,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "chart",
         "route": "/statistics",
         "group": "stats",
-        "order_hint": 3,
+        "order_hint": 4,
         "required_permission": "statistics.read",
     },
     {
@@ -239,7 +250,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "inbox",
         "route": "/media/requests/stats",
         "group": "stats",
-        "order_hint": 2,
+        "order_hint": 3,
         "required_permission": "media.request",
     },
     {

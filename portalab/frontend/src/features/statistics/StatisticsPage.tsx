@@ -19,7 +19,8 @@ const PERIODS: Array<{ value: string; kind: PeriodKind; days?: number }> = [
   { value: "year", kind: "year" },
 ];
 
-export function StatisticsPage() {
+/** #298: the community's and the portal's figures (``/statistics``), or mine (``/statistics/me``). */
+export function StatisticsPage({ mine = false }: { mine?: boolean }) {
   const t = useT();
   const headingId = useId();
   const catalog = useCatalog();
@@ -27,12 +28,28 @@ export function StatisticsPage() {
   const [period, setPeriod] = useState("30");
   const choice = PERIODS.find((p) => p.value === period) ?? PERIODS[1];
   const query = { period: choice?.kind ?? "last_n_days", ...(choice?.days ? { days: choice.days } : {}) };
-  const entries = catalog.data ?? [];
+  const entries = (catalog.data ?? []).filter((e) => (e.scope === "personal") === mine);
   const visible = entries.filter((e) => !hidden.includes(e.key));
+  // #298: the single figures first, small, then the charts
+  const figures = visible.filter((e) => e.viz === "number");
+  const charts = visible.filter((e) => e.viz !== "number");
+  const card = (entry: (typeof visible)[number]) => (
+    <StatCard
+      key={entry.key}
+      entry={entry}
+      query={query}
+      onHide={() => save.mutate([...hidden, entry.key])}
+    />
+  );
   const hiddenEntries = entries.filter((e) => hidden.includes(e.key));
   return (
     <section aria-labelledby={headingId} className="statistics-page">
-      <PageHeader titleId={headingId} level={2} icon="chart" title={t("statistics:title")} />
+      <PageHeader
+        titleId={headingId}
+        level={2}
+        icon="chart"
+        title={t(mine ? "statistics:mineTitle" : "statistics:title")}
+      />
       <SelectField
         label={t("statistics:period")}
         value={period}
@@ -49,16 +66,8 @@ export function StatisticsPage() {
       {catalog.data && entries.length === 0 ? (
         <FunctionalState state="no-data" label={t("statistics:empty")} />
       ) : null}
-      <div className="statistics-grid">
-        {visible.map((entry) => (
-          <StatCard
-            key={entry.key}
-            entry={entry}
-            query={query}
-            onHide={() => save.mutate([...hidden, entry.key])}
-          />
-        ))}
-      </div>
+      {figures.length ? <div className="statistics-kpis">{figures.map(card)}</div> : null}
+      <div className="statistics-grid">{charts.map(card)}</div>
       {hiddenEntries.length ? (
         <section className="ds-panel" aria-label={t("statistics:hidden")}>
           <h3>{t("statistics:hidden")}</h3>
