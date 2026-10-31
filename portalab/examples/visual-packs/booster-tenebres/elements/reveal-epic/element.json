@@ -6,8 +6,8 @@
     "en": "Epic reveal"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
-    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+    "fr": "Les griffes : trois griffes déchirent l'écran, le sang coule, des stores se ferment ; des corbeaux s'envolent, la foudre frappe et l'écran se fend autour de la carte.",
+    "en": "The claws: three claws rip the screen, blood runs, blinds close; crows burst away, lightning strikes and the screen cracks round the card."
   },
   "render": {
     "kind": "video",

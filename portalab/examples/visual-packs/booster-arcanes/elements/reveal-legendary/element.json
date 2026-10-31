@@ -6,8 +6,8 @@
     "en": "Legendary reveal"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
-    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+    "fr": "Le dragon : un dragon traverse la lune au-dessus des montagnes, son souffle d'or balaie l'écran, puis un dragon de lumière s'enroule autour de la carte, ailes déployées.",
+    "en": "The dragon: a dragon crosses the moon above the mountains, its golden breath sweeps the screen, then a dragon of light coils round the card, its wings spread."
   },
   "render": {
     "kind": "video",

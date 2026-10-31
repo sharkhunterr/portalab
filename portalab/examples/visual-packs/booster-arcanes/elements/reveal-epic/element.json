@@ -6,8 +6,8 @@
     "en": "Epic reveal"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
-    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+    "fr": "Le portail : des cercles de runes, un portail qui avale l'écran, puis des ailes de lumière qui se déploient derrière la carte.",
+    "en": "The portal: rune circles, a portal swallowing the screen, then wings of light unfolding behind the card."
   },
   "render": {
     "kind": "video",

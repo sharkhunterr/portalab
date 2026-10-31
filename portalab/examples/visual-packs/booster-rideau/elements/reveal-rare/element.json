@@ -6,8 +6,8 @@
     "en": "Rare reveal"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
-    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+    "fr": "La poursuite : une scène dans le noir, un projecteur qui cherche quelqu'un ; la lumière se ferme puis s'ouvre sur la carte, dans la poussière dorée.",
+    "en": "The spotlight: a dark stage, a spotlight looking for someone; the light closes, then opens on the card, in golden dust."
   },
   "render": {
     "kind": "video",

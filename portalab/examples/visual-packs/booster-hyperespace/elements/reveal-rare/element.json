@@ -6,8 +6,8 @@
     "en": "Rare reveal"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
-    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+    "fr": "Le scanner : un radar qui balaie l'espace à la recherche d'un signal ; la carte apparaît sur une grille holographique.",
+    "en": "The scanner: a radar sweeping space for a signal; the card appears over a holographic grid."
   },
   "render": {
     "kind": "video",

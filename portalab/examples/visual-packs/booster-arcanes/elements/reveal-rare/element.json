@@ -6,8 +6,8 @@
     "en": "Rare reveal"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
-    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+    "fr": "Les runes : un cercle de runes qui se trace dans la nuit et s'embrase ; la carte se pose au centre d'un anneau turquoise.",
+    "en": "The runes: a rune circle drawing itself in the night and flaring; the card lands in a turquoise ring."
   },
   "render": {
     "kind": "video",

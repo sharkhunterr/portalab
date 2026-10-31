@@ -6,8 +6,8 @@
     "en": "Legendary reveal"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
-    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+    "fr": "La lune de sang : une lune rouge entre des branches mortes, une nuée de corbeaux qui envahit l'écran, puis tourne autour de la carte sous la foudre et les griffes.",
+    "en": "The blood moon: a red moon between dead branches, a swarm of crows filling the screen, then wheeling round the card under lightning and claws."
   },
   "render": {
     "kind": "video",
