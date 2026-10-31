@@ -1473,6 +1473,7 @@
   }
 }
 .cards-pool__rarities {
+  min-inline-size: 0; /* a fieldset: never wider than the page */
   display: flex;
   gap: var(--space-2);
   margin: 0;

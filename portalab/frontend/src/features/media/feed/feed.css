@@ -357,3 +357,17 @@ a.feed-entry__title:hover {
 .feed-more {
   justify-self: start;
 }
+/* the rows that scroll sideways (the filters, « Bientôt ») never widen the page: a fieldset and a grid item
+   take their content's width unless told otherwise */
+.feed-page,
+.feed-section,
+.feed-section > *,
+.feed-filters,
+.feed-stream,
+.feed-entry,
+.feed-entry__card {
+  min-inline-size: 0;
+}
+.feed-page {
+  max-inline-size: 100%;
+}
