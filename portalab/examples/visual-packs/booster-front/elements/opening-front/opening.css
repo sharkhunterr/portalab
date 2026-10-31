@@ -1,0 +1,25 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: Three searchlights find the pack; a flash — it blows up in a cloud of dust and debris. */
+[data-opening="front"] .booster-stage__tear .booster-pack {
+  animation: genre-fate 2.6s linear both;
+}
+@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  36% { transform: translate(0, 0); }
+  38% { transform: translate(-1.5%, 1%); }
+  40% { transform: translate(1.5%, -1%); filter: brightness(1.5); }
+  42% { transform: translate(-1%, -1%); }
+  45% { transform: scale(1.08); filter: brightness(3) sepia(0.6); opacity: 1; }
+  54%, 100% { transform: scale(1.3); filter: brightness(4) blur(6px); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="front"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="front"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

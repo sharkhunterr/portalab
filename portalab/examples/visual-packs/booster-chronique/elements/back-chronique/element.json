@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "chronique",
+  "names": {
+    "fr": "Dos de parchemin",
+    "en": "Parchment back"
+  },
+  "descriptions": {
+    "fr": "Parchemin cerclé de pourpre, une couronne de laurier au centre.",
+    "en": "Parchment edged in crimson, a laurel wreath in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

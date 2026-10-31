@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "front",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Front — guerre",
+    "en": "Front — war"
+  },
+  "descriptions": {
+    "fr": "Le booster Guerre, la ligne de front : chaque rareté son moment en plein écran — des fusées éclairantes sur une tranchée pour une rare, un bombardement de nuit pour une épique, la victoire à l'aube pour une légendaire. Un paquet kaki pochoiré que les projecteurs trouvent avant qu'il saute dans un nuage de poussière ; un champ de bataille au crépuscule.",
+    "en": "The War booster, the front line: every rarity its own moment over the whole screen — flares over a trench for a rare, a night bombing for an epic, victory at dawn for a legendary. A stencilled khaki pack the searchlights find before it blows up in a cloud of dust; a battlefield at dusk."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

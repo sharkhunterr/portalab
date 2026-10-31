@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "saloon",
+  "names": {
+    "fr": "Désert au couchant",
+    "en": "Desert at sunset"
+  },
+  "descriptions": {
+    "fr": "Le désert au couchant, un immense soleil qui descend derrière les mesas, la chaleur qui tremble, la poussière qui court au sol et un faucon qui tournoie (vidéo en boucle).",
+    "en": "The desert at sunset, a huge sun sinking behind the mesas, heat shimmering, dust running along the ground and a hawk circling (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

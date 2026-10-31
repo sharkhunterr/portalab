@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "chronique",
+  "names": {
+    "fr": "Salle des colonnes",
+    "en": "Hall of columns"
+  },
+  "descriptions": {
+    "fr": "Une salle de colonnes de marbre à l'heure dorée, des rais de soleil entre elles, de la poussière qui danse dans la lumière, des bannières pourpres qui ondulent (vidéo en boucle).",
+    "en": "A hall of marble columns at golden hour, sunbeams between them, dust dancing in the light, crimson banners stirring (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

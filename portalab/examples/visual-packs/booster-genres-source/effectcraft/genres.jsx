@@ -1667,7 +1667,269 @@ var GENRE_MUSIC = {
   }
 };
 
-var GENRE = { action: GENRE_ACTION, dark: GENRE_DARK, drama: GENRE_DRAMA, fantasy: GENRE_FANTASY, sf: GENRE_SF, adventure: GENRE_ADVENTURE, documentary: GENRE_DOC, thriller: GENRE_THRILLER, comedy: GENRE_COMEDY, animation: GENRE_ANIMATION, crime: GENRE_CRIME, romance: GENRE_ROMANCE, mystery: GENRE_MYSTERY, music: GENRE_MUSIC }[GENRE_KEY];
+// ===== Chronique — history: a seal, a mosaic, the triumph ==================================================
+function glowOn(fr, list, color, o) { polys(fr.glow, list, color, o); polys(fr.main, list, color, o * 0.35); }   // a glow seen over the main layer's own background
+function beamOn(fr, x, ang, len, w0, w1, color, o) { beam(fr.glow, x, ang, len, w0, w1, color, o); beam(fr.main, x, ang, len, w0 * 0.7, w1 * 0.7, color, o * 0.3); }
+function coneOn(fr, x, ang, len, w0, w1, color, o) { cone(fr.haze, x, ang, len, w0, w1, color, o); cone(fr.main, x, ang, len, w0 * 0.7, w1 * 0.7, color, o * 0.3); }
+var HIS = { parch: [0.92, 0.85, 0.68], parch_d: [0.72, 0.6, 0.4], marble: [0.9, 0.87, 0.8], stone: [0.55, 0.52, 0.46], bronze: [0.66, 0.45, 0.17], gold: [1, 0.81, 0.35], wax: [0.62, 0.1, 0.12], crimson: [0.56, 0.11, 0.13], ink: [0.17, 0.14, 0.1], sky: [0.95, 0.75, 0.45] };
+function laurel(cx, cy, rx, ry, upto, leaf) {   // a laurel wreath: two branches of leaves meeting at the top
+  var out = [];
+  for (var side = -1; side <= 1; side += 2) for (var i = 0; i < 14 * clamp01(upto); i++) { var t = i / 14, a = Math.PI / 2 + side * (0.25 + t * 2.6), x = cx + Math.cos(a) * rx, y = cy + Math.sin(a) * ry; var dir = a + side * Math.PI / 2; for (var k = -1; k <= 1; k += 2) out.push(place([[0, 0], [leaf * 0.5, -leaf * 0.22], [leaf, 0], [leaf * 0.5, leaf * 0.22]], x, y, dir + k * 0.7)); }
+  return out;
+}
+function column(x, y0, y1, w) { var out = [[[x - w * 0.6, y0], [x + w * 0.6, y0], [x + w * 0.6, y0 + 30], [x - w * 0.6, y0 + 30]], [[x - w * 0.5, y0 + 30], [x + w * 0.5, y0 + 30], [x + w * 0.5, y1 - 30], [x - w * 0.5, y1 - 30]], [[x - w * 0.6, y1 - 30], [x + w * 0.6, y1 - 30], [x + w * 0.6, y1], [x - w * 0.6, y1]]]; return out; }
+function flutes(x, y0, y1, w) { var out = []; for (var k = -2; k <= 2; k++) out.push([[x + k * w * 0.18, y0 + 34], [x + k * w * 0.18, y1 - 34]]); return out; }
+function banner(x, y, w, h, f, k) {   // a long banner hanging and rippling
+  var pts = [[x - w / 2, y], [x + w / 2, y]]; for (var i = 0; i <= 10; i++) { var t = i / 10; pts.push([x + w / 2 + Math.sin(f * 0.2 + t * 4 + k) * 12 * t, y + t * h]); } pts.push([x, y + h - 50]); for (var j = 10; j >= 0; j--) { var t2 = j / 10; pts.push([x - w / 2 + Math.sin(f * 0.2 + t2 * 4 + k) * 12 * t2, y + t2 * h]); }
+  return pts;
+}
+function eagle(cx, cy, s, flap) {   // an eagle with spread wings, in silhouette: feathered tips, a fanned tail, a hooked beak
+  var w = Math.sin(flap) * 0.3, L = [[0, -0.1], [-0.3, -0.35], [-0.7, -0.5], [-1.15, -0.45], [-1.1, -0.3], [-1.0, -0.32], [-0.98, -0.18], [-0.85, -0.22], [-0.82, -0.08], [-0.68, -0.12], [-0.62, 0.0], [-0.45, -0.02], [-0.2, 0.12]];
+  var wl = [], wr = [];
+  for (var i = 0; i < L.length; i++) { var x = L[i][0] * s, y = (L[i][1] - w * Math.abs(L[i][0])) * s; wl.push([cx + x, cy + y]); wr.push([cx - x, cy + y]); }
+  return [wl, wr, place([[-0.14, -0.3], [0.14, -0.3], [0.17, 0.3], [-0.17, 0.3]], cx, cy, 0, s, s), place([[-0.12, 0.25], [0.12, 0.25], [0.26, 0.62], [0.08, 0.55], [0, 0.64], [-0.08, 0.55], [-0.26, 0.62]], cx, cy, 0, s, s),
+          place(circle(0, -0.38, 0.13, 1, 12), cx, cy, 0, s, s), place([[0.06, -0.44], [0.27, -0.38], [0.2, -0.3], [0.06, -0.32]], cx, cy, 0, s, s)];
+}
+var HIS_RARE = {
+  title: function (fr, f, u) {   // a parchment, a quill's lines, a wax seal pressed onto it
+    var lines2 = []; for (var k = 0; k < 9; k++) { var u2 = ease((f - k) / 4); if (u2 > 0) lines2.push([[160, 220 + k * 80], [160 + (760 - (k % 3) * 120) * u2, 220 + k * 80]]); }
+    lines(fr.main, lines2, HIS.ink, 4, 70);
+    var press = f < 14 ? 1 - ease(f / 14) : 0; polys(fr.main, [burst(780, 860, 18, 110 + press * 30, 96 + press * 26, 0.08, 0.2)], HIS.wax, 100); polys(fr.main, [circle(780, 860, 70, 1, 30)], [0.48, 0.06, 0.08], 100);
+    polys(fr.haze, [circle(C, C, 700, 1, 40)], HIS.parch_d, 70);
+    polys(fr.main, [full()], HIS.parch, 100);
+  },
+  wipe: function (fr, v) { var y = -60 + ease(v) * 1260; polys(fr.top, [[[-60, -60], [1140, -60], [1140, y], [-60, y]]], HIS.parch, 100); polys(fr.top, [[[-60, y - 20], [1140, y - 20], [1140, y + 30], [-60, y + 30]]], HIS.parch_d, 100); },
+  stage: function (fr, f, at, o) {
+    var open2 = ease((f - CARD_AT + 6) / 10), top2 = C - 60 - 260 * open2, bot2 = C + 60 + 260 * open2;
+    var rolls = [[[110, top2 - 26], [970, top2 - 26], [970, top2 + 26], [110, top2 + 26]], [[110, bot2 - 26], [970, bot2 - 26], [970, bot2 + 26], [110, bot2 + 26]]];
+    polys(fr.main, [burst(840, bot2 - 60, 16, 70, 60, 0.08, 0.3), circle(840, bot2 - 60, 44, 1, 24)], HIS.wax, o); polys(fr.main, rolls, HIS.parch_d, o); lines(fr.main, rolls, HIS.bronze, 4, o, true);
+    var writing = []; for (var k = 0; k < 9; k++) { var y = top2 + 70 + k * 56; if (y > bot2 - 50) break; writing.push([[150, y], [330 - (k % 3) * 30, y]]); writing.push([[750 + (k % 2) * 30, y], [930, y]]); } lines(fr.main, writing, HIS.ink, 4, o * 0.7);
+    polys(fr.main, [[[130, top2], [950, top2], [950, bot2], [130, bot2]]], HIS.parch, o);
+    polys(fr.main, [burst(C, C, 20, 430, 380, 0.06, 0.2)], HIS.wax, o * 0.25);
+    polys(fr.haze, [circle(C, C, 700, 1, 40)], HIS.parch_d, o * 0.7);
+    polys(fr.main, [full()], HIS.parch, o);
+  },
+  over: function (fr, f, at) { if (at >= 2) { seed(2112); var pts = []; for (var i = 0; i < 8; i++) { var a = between(0, Math.PI * 2), r = toEdge(a, 160, 222) + between(10, 80); pts.push([C + Math.cos(a) * r, C + Math.sin(a) * r]); } polys(fr.top, glintPolys(twinkle(pts, f, 2, 16)), HIS.gold); } }
+};
+var HIS_EPIC = {
+  title: function (fr, f, u) {   // a mosaic laying itself out tile by tile round a sun
+    var tiles = [[], [], [], []], cols = [HIS.crimson, HIS.gold, [0.18, 0.35, 0.45], HIS.marble];
+    for (var y = 0; y < 18; y++) for (var x = 0; x < 18; x++) { var cx2 = -30 + x * 64, cy2 = -30 + y * 64, d = Math.sqrt((cx2 - C) * (cx2 - C) + (cy2 - C) * (cy2 - C)); if (d / 40 > f * 1.2) continue; var ring2 = Math.floor(d / 120) % 4; tiles[ring2].push([[cx2 + 2, cy2 + 2], [cx2 + 60, cy2 + 2], [cx2 + 60, cy2 + 60], [cx2 + 2, cy2 + 60]]); }
+    for (var k = 0; k < 4; k++) polys(fr.main, tiles[k], cols[k], 100);
+    polys(fr.main, [full()], HIS.stone, 100);
+  },
+  wipe: function (fr, v) { var tiles = []; for (var y = 0; y < 18; y++) for (var x = 0; x < 18; x++) { var t = clamp01(v * 2.2 - (x + y) / 34); var cx2 = -30 + x * 64, cy2 = -30 + y * 64; tiles.push(place([[-32, -32 * t], [32, -32 * t], [32, 32 * t], [-32, 32 * t]], cx2 + 32, cy2 + 32, 0)); } polys(fr.top, tiles, HIS.marble, 100); },
+  stage: function (fr, f, at, o) {   // a laurel wreath growing round the card, marble columns at the sides
+    var lw = laurel(C, C + 20, 380, 470, ease((f - CARD_AT) / 14), 64); polys(fr.main, lw, [0.4, 0.5, 0.2], o); lines(fr.main, lw, [0.25, 0.32, 0.1], 2, o, true);
+    var cols2 = column(120, 60, 1100, 120).concat(column(960, 60, 1100, 120)); polys(fr.main, cols2, HIS.marble, o); lines(fr.main, flutes(120, 60, 1100, 120).concat(flutes(960, 60, 1100, 120)), HIS.stone, 3, o);
+    polys(fr.haze, [circle(C, C, 420, 1, 40)], HIS.gold, o * 0.6);
+    polys(fr.main, [full()], [0.36, 0.32, 0.27], o);
+  },
+  over: function (fr, f, at) { bigGlint(fr, at, HIS.gold); }
+};
+var HIS_LEGENDARY = {
+  title: function (fr, f, u) {   // the triumph: a temple's columns, crimson banners, an eagle rising at sunrise
+    polys(fr.top, eagle(C, 330 - f * 4, 200, f * 0.4), HIS.ink, 100);
+    for (var k = 0; k < 4; k++) { var x = 140 + k * 266; polys(fr.main, column(x, 380, 1100, 110), HIS.marble, 100); lines(fr.main, flutes(x, 380, 1100, 110), HIS.stone, 3, 100); }
+    polys(fr.main, [[[40, 380], [1040, 380], [C, 230]]], HIS.marble, 100);
+    var rays = []; for (var r = 0; r < 16; r++) { var a = -Math.PI + r * Math.PI / 15; rays.push([[C, 760], [C + Math.cos(a - 0.05) * 1200, 760 + Math.sin(a - 0.05) * 1200], [C + Math.cos(a + 0.05) * 1200, 760 + Math.sin(a + 0.05) * 1200]]); }
+    polys(fr.main, rays, HIS.gold, 30);
+    polys(fr.main, [full()], HIS.sky, 100);
+  },
+  wipe: function (fr, v) { polys(fr.top, [full()], HIS.gold, 100 * (1 - Math.abs(v * 2 - 1))); },
+  stage: function (fr, f, at, o) {   // a golden laurel, rays of glory, crimson banners, petals falling
+    var lw = laurel(C, C + 20, 420, 500, ease((f - CARD_AT) / 10), 74); polys(fr.main, lw, HIS.gold, o); lines(fr.main, lw, HIS.bronze, 3, o, true);
+    var bn = [banner(120, -60, 150, 900, f, 0), banner(960, -60, 150, 900, f, 2), banner(320, -60, 110, 560, f, 1), banner(760, -60, 110, 560, f, 3)]; polys(fr.main, bn, HIS.crimson, o); lines(fr.main, bn, HIS.gold, 5, o, true);
+    seed(2140); var petals = []; for (var i = 0; i < 40; i++) { var x = between(0, 1080) + Math.sin(f * 0.1 + i) * 30, y = -60 + ((f * between(6, 12) + between(0, 1200)) % 1260); petals.push(place([[0, 0], [14, -8], [28, 0], [14, 8]], x, y, f * 0.1 + i)); } polys(fr.top, petals, [0.8, 0.12, 0.15], o);
+    var rays = []; for (var r = 0; r < 24; r++) { var a = r * Math.PI / 12 + f * 0.01; rays.push([[C, C], [C + Math.cos(a - 0.06) * 1200, C + Math.sin(a - 0.06) * 1200], [C + Math.cos(a + 0.06) * 1200, C + Math.sin(a + 0.06) * 1200]]); }
+    polys(fr.main, rays, HIS.gold, o * 0.35);
+    polys(fr.main, [full()], [0.5, 0.25, 0.12], o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 8) polys(fr.top, slash(-60, 760, 1140, 300, 36, ease(at / 3), 0.4), HIS.gold, fade(at, 4, 8) * 90); bigGlint(fr, at, HIS.gold); }
+};
+var GENRE_HISTORY = {
+  rarities: { rare: HIS_RARE, epic: HIS_EPIC, legendary: HIS_LEGENDARY },
+  opening: function (comp) {   // a wax seal stamped on the pack, then a parchment rolling over it
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      if (f < 30) { var down = f < 14 ? ease(f / 14) : 1, r = 140 + (1 - down) * 120; polys(fr.top, [burst(cx, cy, 18, r, r * 0.88, 0.08, 0.2)], HIS.wax, 100 * fade(f, 26, 30)); polys(fr.top, [circle(cx, cy, r * 0.62, 1, 30)], [0.48, 0.06, 0.08], 100 * fade(f, 26, 30)); }
+      if (f >= 14 && f < 18) polys(fr.top, [circle(cx, cy, 500, 1, 30)], HIS.gold, 60 - (f - 14) * 15);
+      if (f >= 26 && f < 56) { var x = -60 + ease((f - 26) / 14) * 1300; polys(fr.top, [[[-60, cy - 400], [x, cy - 400], [x, cy + 400], [-60, cy + 400]]], HIS.parch, 100 * fade(f, 48, 56)); polys(fr.top, [[[x - 30, cy - 420], [x + 30, cy - 420], [x + 30, cy + 420], [x - 30, cy + 420]]], HIS.parch_d, 100 * fade(f, 48, 56)); }
+    }
+  }
+};
+
+// ===== Front — war: flares over a trench, the bombing, victory =============================================
+var WAR = { olive: [0.29, 0.33, 0.13], khaki: [0.76, 0.7, 0.5], dark: [0.12, 0.13, 0.07], smoke: [0.35, 0.35, 0.33], flare: [1, 0.85, 0.5], fire: [1, 0.5, 0.15], sky: [0.2, 0.22, 0.25], dawn: [0.98, 0.65, 0.35], red: [0.7, 0.12, 0.1], white: [0.95, 0.95, 0.92] };
+function wire(y, f) {   // barbed wire along the trench: a coil and its barbs
+  var coil = [], barbs = []; for (var x = -60; x <= 1140; x += 8) coil.push([x, y + Math.sin(x * 0.08) * 26]); for (var x2 = -60; x2 <= 1140; x2 += 40) { var yy = y + Math.sin(x2 * 0.08) * 26; barbs.push([[x2 - 8, yy - 8], [x2 + 8, yy + 8]]); barbs.push([[x2 - 8, yy + 8], [x2 + 8, yy - 8]]); }
+  return coil.length ? [coil].concat(barbs) : barbs;
+}
+function smokeCloud(L, cx, cy, r, base, color, o) { seed(base); var pf = puff(cx, cy, r, 8); polys(L, pf[0], color, o); polys(L, pf[1], [color[0] * 0.75, color[1] * 0.75, color[2] * 0.75], o); }
+function beam(L, x, ang, len, w0, w1, color, o) {   // a searchlight's beam from (x, 1140) along ang, up the screen
+  var c = Math.cos(ang), sn = Math.sin(ang);
+  polys(L, [[[x - w0, 1140], [x + w0, 1140], [x + c * len + sn * w1, 1140 + sn * len - c * w1], [x + c * len - sn * w1, 1140 + sn * len + c * w1]]], color, o);
+}
+function bomber(x, y, s) { return [place([[-1.0 * s, -0.08 * s], [1.0 * s, -0.06 * s], [1.1 * s, 0], [1.0 * s, 0.06 * s], [-1.0 * s, 0.08 * s]], x, y, 0), place([[0.1 * s, 0], [-0.25 * s, -0.95 * s], [-0.45 * s, -0.95 * s], [-0.25 * s, 0], [-0.45 * s, 0.95 * s], [-0.25 * s, 0.95 * s]], x, y, 0), place([[-0.85 * s, 0], [-1.0 * s, -0.35 * s], [-1.08 * s, -0.35 * s], [-1.0 * s, 0], [-1.08 * s, 0.35 * s], [-1.0 * s, 0.35 * s]], x, y, 0)]; }
+function flag(x, y, w, h, f) {   // a flag on its pole, waving: two bands
+  var top = [], mid = []; for (var i = 0; i <= 16; i++) { var t = i / 16, dy = Math.sin(f * 0.3 - t * 5) * 18 * t; top.push([x + t * w, y + dy]); mid.push([x + t * w, y + h / 2 + dy]); }
+  var bot = []; for (var j = 16; j >= 0; j--) { var t2 = j / 16; bot.push([x + t2 * w, y + h + Math.sin(f * 0.3 - t2 * 5) * 18 * t2]); }
+  var upper = top.concat(mid.slice().reverse()), lower = mid.concat(bot);
+  return { upper: upper, lower: lower, pole: [[x - 8, y - 20], [x + 4, y - 20], [x + 4, y + h * 3.2], [x - 8, y + h * 3.2]] };
+}
+var WAR_RARE = {
+  title: function (fr, f, u) {   // night over the trench: flares drifting down, their light swinging, barbed wire
+    for (var k = 0; k < 2; k++) { var t = f + k * 10, x = 300 + k * 480 + Math.sin(t * 0.2) * 40, y = 240 + t * 6; glowOn(fr, [circle(x, y, 140, 1, 24)], WAR.flare, 90); polys(fr.main, [circle(x, y, 14, 1, 12)], WAR.white, 100); lines(fr.main, [[[x, y], [x, y - 260]]], WAR.smoke, 6, 60); coneOn(fr, x, 1.5708, 1000, 60, 500, WAR.flare, 40); polys(fr.main, [circle(x, y, 260, 1, 30)], [0.3, 0.26, 0.18], 60); }
+    lines(fr.main, wire(740, f), [0.3, 0.3, 0.26], 4, 100);
+    polys(fr.main, [[[-60, 770], [200, 730], [500, 780], [800, 740], [1140, 770], [1140, 1140], [-60, 1140]]], WAR.dark, 100);
+    polys(fr.main, [full()], [0.08, 0.09, 0.1], 100);
+  },
+  wipe: function (fr, v) { smokeCloud(fr.top, C, C, 100 + ease(v) * 900, 2200, WAR.smoke, 100 * (1 - Math.abs(v * 2 - 1)) + 10); },
+  stage: function (fr, f, at, o) {
+    var fx = C + 300 * Math.sin(f * 0.05), fy = 260 + ((f - CARD_AT) * 3) % 120;
+    polys(fr.main, [circle(fx, fy, 12, 1, 12)], WAR.white, o); glowOn(fr, [circle(fx, fy, 200, 1, 24)], WAR.flare, o * 0.8);
+    smokeCloud(fr.main, 160, 780, 220, 2210, WAR.smoke, o * 0.7); smokeCloud(fr.main, 930, 800, 240, 2211, WAR.smoke, o * 0.7);
+    lines(fr.main, wire(830, f), [0.3, 0.3, 0.26], 4, o);
+    polys(fr.main, [[[-60, 850], [300, 820], [700, 860], [1140, 830], [1140, 1140], [-60, 1140]]], WAR.dark, o);
+    polys(fr.main, [circle(fx, fy, 700, 1, 40)], [0.24, 0.21, 0.15], o * 0.6);
+    polys(fr.main, [full()], [0.1, 0.11, 0.1], o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 5) polys(fr.top, [full()], WAR.flare, 30 - at * 6); }
+};
+var WAR_EPIC = {
+  title: function (fr, f, u) {   // bombers in formation, searchlights crossing, flak bursting
+    for (var i = 0; i < 5; i++) { var x = -300 + f * 40 + (i % 2) * 120 + i * 150, y = 260 + Math.abs(i - 2) * 70; polys(fr.main, bomber(x, y, 110), WAR.dark, 100); }
+    for (var k = 0; k < 3; k++) beamOn(fr, 200 + k * 340, -1.5708 + 0.4 * Math.sin(f * 0.1 + k * 2), 1400, 20, 160, WAR.white, 50);
+    seed(2220); for (var j = 0; j < 6; j++) { var t = (f + j * 4) % 16, x2 = between(100, 980), y2 = between(150, 600); if (t < 10) smokeCloud(fr.main, x2, y2, 30 + t * 6, 2221 + j, [0.15, 0.15, 0.15], 100 * fade(t, 6, 10)); }
+    polys(fr.main, [full()], WAR.sky, 100);
+  },
+  wipe: function (fr, v) { smokeCloud(fr.top, C, C, 100 + ease(v) * 1000, 2230, [0.4, 0.38, 0.33], 100 * (1 - Math.abs(v * 2 - 1)) + 10); },
+  stage: function (fr, f, at, o) {   // flak bursting round the card, searchlights sweeping
+    seed(2240); for (var j = 0; j < 10; j++) { var t = (f - CARD_AT + j * 3) % 20, a = between(0, Math.PI * 2), d = between(320, 520); if (t < 12) { if (t < 3) polys(fr.main, [burst(C + Math.cos(a) * d, C + Math.sin(a) * d, 10, 70, 30, 0.4, j)], WAR.flare, o); smokeCloud(fr.main, C + Math.cos(a) * d, C + Math.sin(a) * d, 40 + t * 7, 2241 + j, [0.18, 0.18, 0.18], o * fade(t, 6, 12)); if (t < 2) glowOn(fr, [circle(C + Math.cos(a) * d, C + Math.sin(a) * d, 90, 1, 20)], WAR.fire, o); } }
+    for (var k = 0; k < 3; k++) beamOn(fr, 200 + k * 340, -1.5708 + 0.5 * Math.sin(f * 0.09 + k * 2), 1300, 20, 180, WAR.white, o * 0.5);
+    seed(2245); var city = [[-60, 1140]]; for (var x = -60; x <= 1140; x += 40) { var h = between(40, 140); city.push([x, 860 - h]); city.push([x + 40, 860 - h]); } city.push([1140, 1140]); polys(fr.main, [city], [0.07, 0.07, 0.08], o);
+    glowOn(fr, [[[-60, 700], [1140, 700], [1140, 900], [-60, 900]]], WAR.fire, o * 0.7);
+    polys(fr.main, [[[-60, 640], [1140, 640], [1140, 900], [-60, 900]]], [0.45, 0.22, 0.12], o * 0.8);
+    polys(fr.main, [full()], WAR.sky, o);
+  },
+  over: function (fr, f, at) { sparksOut(fr.main, fr.glow, at - 2, 20, WAR.fire, 2250, 24); bigGlint(fr, at, WAR.flare); }
+};
+var WAR_LEGENDARY = {
+  title: function (fr, f, u) {   // victory at dawn: soldiers raising a flag on a hill
+    var fl = flag(C + 60, 260, 300, 160, f); polys(fr.main, [fl.upper], WAR.red, 100); polys(fr.main, [fl.lower], WAR.white, 100); polys(fr.main, [fl.pole], WAR.dark, 100);
+    for (var k = 0; k < 3; k++) polys(fr.main, [place([[-30, 0], [30, 0], [40, 180], [-40, 180]], C - 20 - k * 70, 780 + k * 30, -0.4), place(circle(0, -24, 24, 1, 12), C - 20 - k * 70, 780 + k * 30, 0)], WAR.dark, 100);
+    polys(fr.main, [[[-60, 1000], [300, 900], [C + 100, 800], [800, 880], [1140, 960], [1140, 1140], [-60, 1140]]], WAR.dark, 100);
+    glowOn(fr, [circle(C + 300, 820, 300, 1, 40)], WAR.dawn, 100);
+    polys(fr.main, [full()], [0.95, 0.6, 0.4], 100);
+  },
+  wipe: function (fr, v) { polys(fr.top, [full()], WAR.white, 100 * (1 - Math.abs(v * 2 - 1))); },
+  stage: function (fr, f, at, o) {   // the flag great behind the card, planes trailing coloured smoke, the sun rising
+    var fl = flag(140, 140, 820, 420, f); polys(fr.main, [fl.upper], WAR.red, o); polys(fr.main, [fl.lower], WAR.white, o); polys(fr.main, [fl.pole], WAR.dark, o);
+    for (var p = 0; p < 3; p++) { var t = f - CARD_AT - p * 3; if (t < 0) continue; var x = -200 + t * 60, y = 900 - p * 60 - t * 20; polys(fr.top, bomber(x, y, 60), WAR.dark, o); var trail = []; for (var i = 0; i < 20; i++) trail.push(circle(x - i * 40, y + i * 13, 14 + i * 1.5, 1, 10)); polys(fr.main, trail, [WAR.red, WAR.white, [0.2, 0.3, 0.7]][p], o * 0.8); }
+    var rays = []; for (var r = 0; r < 18; r++) { var a = -Math.PI + r * Math.PI / 17; rays.push([[C, 1100], [C + Math.cos(a - 0.05) * 1400, 1100 + Math.sin(a - 0.05) * 1400], [C + Math.cos(a + 0.05) * 1400, 1100 + Math.sin(a + 0.05) * 1400]]); }
+    polys(fr.main, rays, WAR.dawn, o * 0.4);
+    polys(fr.main, [full()], [0.92, 0.55, 0.35], o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 8) polys(fr.top, slash(-60, 760, 1140, 300, 36, ease(at / 3), 0.4), WAR.white, fade(at, 4, 8) * 90); bigGlint(fr, at, WAR.flare); }
+};
+var GENRE_WAR = {
+  rarities: { rare: WAR_RARE, epic: WAR_EPIC, legendary: WAR_LEGENDARY },
+  opening: function (comp) {   // searchlights find the pack, a flare — it blows up in a cloud of dust
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      if (f < 26) for (var k = 0; k < 3; k++) { var x0 = 180 + k * 400, a = Math.atan2(cy - 1100, cx - x0) * ease(f / 16) + (-1.5708) * (1 - ease(f / 16)); polys(fr.glow, [[[x0 - 14, 1100], [x0 + 14, 1100], [x0 + Math.cos(a) * 1300 + 120, 1100 + Math.sin(a) * 1300], [x0 + Math.cos(a) * 1300 - 120, 1100 + Math.sin(a) * 1300]]], WAR.white, 60); }
+      if (f >= 24 && f < 27) polys(fr.top, [circle(cx, cy, 700, 1, 40)], WAR.flare, 100 - (f - 24) * 33);
+      if (f >= 24) { smokeCloud(fr.top, cx, cy, 120 + ease((f - 24) / 10) * 380, 2260, [0.55, 0.5, 0.4], fade(f, 46, 63) * 100); seed(2261); var debris = []; for (var i = 0; i < 20; i++) { var a2 = between(-Math.PI, 0), d = 60 + (f - 24) * between(14, 28); debris.push(place([[-12, -8], [12, -6], [8, 10], [-10, 8]], cx + Math.cos(a2) * d, cy + Math.sin(a2) * d + (f - 24) * (f - 24) * 0.6, f * 0.3 + i)); } polys(fr.top, debris, WAR.dark, fade(f, 50, 63) * 100); }
+    }
+  }
+};
+
+// ===== Saloon — western: a wanted poster, the duel, riding into the sunset ================================
+var WES = { sand: [0.91, 0.78, 0.55], desert: [0.9, 0.6, 0.32], sun: [1, 0.78, 0.35], dusk: [0.75, 0.28, 0.18], wood: [0.42, 0.26, 0.14], wood_d: [0.28, 0.16, 0.08], paper: [0.93, 0.84, 0.64], ink: [0.23, 0.14, 0.08], gold: [1, 0.8, 0.3], sky: [0.98, 0.76, 0.42] };
+function planks(L, o) { var out = []; for (var k = 0; k < 10; k++) out.push([[-60, k * 124 - 60], [1140, k * 124 - 60], [1140, k * 124 + 58], [-60, k * 124 + 58]]); polys(L, out, WES.wood, o); }
+function plankLines(L, o) { var out = []; for (var k = 0; k < 10; k++) out.push([[-60, k * 124 + 60], [1140, k * 124 + 60]]); lines(L, out, WES.wood_d, 6, o); }
+function wanted(cx, cy, w, h, sway) { return { paper: place([[-w / 2, -h / 2], [w / 2, -h / 2], [w / 2, h / 2], [-w / 2, h / 2]], cx, cy, sway), frame: place([[-w * 0.36, -h * 0.2], [w * 0.36, -h * 0.2], [w * 0.36, h * 0.25], [-w * 0.36, h * 0.25]], cx, cy, sway), bars: [place([[-w * 0.4, -h * 0.4], [w * 0.4, -h * 0.4], [w * 0.4, -h * 0.3], [-w * 0.4, -h * 0.3]], cx, cy, sway), place([[-w * 0.3, h * 0.32], [w * 0.3, h * 0.32], [w * 0.3, h * 0.4], [-w * 0.3, h * 0.4]], cx, cy, sway)], nail: place(circle(0, -h * 0.47, 8, 1, 10), cx, cy, sway) }; }
+function cowboy(x, y, s, face) { return [place([[-0.35 * s, 0], [-0.3 * s, -1.4 * s], [0.3 * s, -1.4 * s], [0.35 * s, 0], [0.45 * s, 1.5 * s], [-0.45 * s, 1.5 * s]], x, y, 0), place(circle(0, -1.6 * s, 0.2 * s, 1.1, 12), x, y, 0), place([[-0.55 * s, -1.75 * s], [0.55 * s, -1.75 * s], [0.25 * s, -1.85 * s], [0.2 * s, -2.1 * s], [-0.2 * s, -2.1 * s], [-0.25 * s, -1.85 * s]], x, y, 0), place([[0.3 * face * s, -0.9 * s], [0.85 * face * s, -0.7 * s], [0.85 * face * s, -0.6 * s], [0.3 * face * s, -0.75 * s]], x, y, 0)]; }
+function cactus(x, y, s) { return [[[x - 0.15 * s, y], [x - 0.15 * s, y - 1.6 * s], [x + 0.15 * s, y - 1.6 * s], [x + 0.15 * s, y]], [[x - 0.15 * s, y - 0.8 * s], [x - 0.55 * s, y - 0.8 * s], [x - 0.55 * s, y - 1.3 * s], [x - 0.35 * s, y - 1.3 * s], [x - 0.35 * s, y - 1.0 * s], [x - 0.15 * s, y - 1.0 * s]], [[x + 0.15 * s, y - 0.6 * s], [x + 0.5 * s, y - 0.6 * s], [x + 0.5 * s, y - 1.1 * s], [x + 0.3 * s, y - 1.1 * s], [x + 0.3 * s, y - 0.8 * s], [x + 0.15 * s, y - 0.8 * s]]]; }
+function rider(x, y, s, f) {   // a horse at the gallop and its rider, in silhouette, facing right
+  var out = [place([[-0.8, -0.3], [0.45, -0.35], [0.8, -0.85], [1.0, -0.95], [1.3, -0.7], [1.2, -0.6], [0.95, -0.62], [0.75, -0.25], [0.65, 0.05], [-0.6, 0.1], [-0.85, -0.05]], x, y, 0, s, s),
+             place([[-0.8, -0.25], [-1.25, 0.1 + 0.08 * Math.sin(f * 0.8)], [-1.15, 0.2], [-0.78, -0.1]], x, y, 0, s, s),
+             place([[0.85, -0.9], [0.9, -1.08], [0.97, -0.92]], x, y, 0, s, s)];
+  var legs = [[0.5, 0], [0.35, 1.6], [-0.55, 3.1], [-0.7, 4.6]];
+  for (var i = 0; i < legs.length; i++) out.push(place([[-0.06, 0], [0.06, 0], [0.05, 0.7], [-0.05, 0.7]], x + legs[i][0] * s, y + 0.02 * s, 0.55 * Math.sin(f * 0.8 + legs[i][1]), s, s));
+  out.push(place([[-0.05, -0.35], [0.17, -0.35], [0.22, -1.0], [0.0, -1.0]], x, y, 0, s, s), place([[0.0, -0.35], [0.16, -0.35], [0.22, 0.02], [0.08, 0.02]], x, y, 0, s, s),
+           place(circle(0.11, -1.12, 0.12, 1, 12), x, y, 0, s, s), place([[-0.14, -1.2], [0.36, -1.2], [0.36, -1.24], [0.24, -1.26], [0.2, -1.42], [0.0, -1.42], [-0.04, -1.26], [-0.14, -1.24]], x, y, 0, s, s));
+  return out;
+}
+var WES_RARE = {
+  title: function (fr, f, u) {   // a wanted poster nailed to the wall, fluttering
+    var w = wanted(C, 540, 520, 700, Math.sin(f * 0.25) * 0.04);
+    polys(fr.main, [w.nail], [0.3, 0.3, 0.3], 100); polys(fr.main, w.bars, WES.ink, 100); polys(fr.main, [w.frame], [0.75, 0.62, 0.42], 100); polys(fr.main, [w.paper], WES.paper, 100);
+    plankLines(fr.main, 100); planks(fr.main, 100);
+    polys(fr.main, [full()], WES.wood, 100);
+  },
+  wipe: function (fr, v) { iris(fr, v < 0.5 ? 900 * (1 - ease(v * 2)) + 30 : 30 + 900 * ease(v * 2 - 1)); },
+  stage: function (fr, f, at, o) {
+    var w = wanted(C, C + 10, 480, 640, 0); polys(fr.main, [w.nail], [0.3, 0.3, 0.3], o); polys(fr.main, w.bars, WES.ink, o); polys(fr.main, [w.paper], WES.paper, o * 0.9);
+    plankLines(fr.main, o); planks(fr.main, o);
+    polys(fr.main, [full()], WES.wood, o);
+  },
+  over: function (fr, f, at) { if (at >= 2) { seed(2312); var pts = []; for (var i = 0; i < 6; i++) { var a = between(0, Math.PI * 2), r = toEdge(a, 160, 222) + between(10, 80); pts.push([C + Math.cos(a) * r, C + Math.sin(a) * r]); } polys(fr.top, glintPolys(twinkle(pts, f, 2, 16)), WES.gold); } }
+};
+var WES_EPIC = {
+  title: function (fr, f, u) {   // high noon: two gunmen facing each other down the street, a tumbleweed rolling
+    polys(fr.main, cowboy(230, 720, 130, 1).concat(cowboy(850, 720, 130, -1)), WES.ink, 100);
+    var tx = -100 + f * 50; polys(fr.main, [burst(tx, 900, 16, 70, 50, 0.4, f * 0.3)], [0.55, 0.42, 0.22], 100);
+    polys(fr.main, [[[-60, 860], [1140, 860], [1140, 1140], [-60, 1140]]], WES.desert, 100);
+    glowOn(fr, [circle(C, 160, 160, 1, 30)], WES.sun, 100); polys(fr.main, [circle(C, 160, 80, 1, 30)], [1, 0.95, 0.8], 100);
+    polys(fr.main, [full()], WES.sky, 100);
+  },
+  wipe: function (fr, v) { polys(fr.top, [burst(C + 200, C - 100, 12, 60 + ease(v) * 900, 30 + ease(v) * 500, 0.4, 0.3)], [1, 0.9, 0.6], 100 * (1 - Math.abs(v * 2 - 1)) + 20); },
+  stage: function (fr, f, at, o) {   // dust swirling, the wall behind riddled with bullet holes, sheriff's stars spinning
+    if (at >= -4) { var holes = [[C - 380, C - 300, -4], [C + 400, C - 200, -1], [C - 330, C + 260, 2], [C + 360, C + 320, 5], [C + 20, C - 480, 8], [C - 440, C + 20, 11]]; for (var i = 0; i < holes.length; i++) { var t = at - holes[i][2]; if (t < 0) continue; var h = bulletHole(holes[i][0], holes[i][1], 2320 + i); lines(fr.main, h.cracks, WES.wood_d, 3, o); polys(fr.main, [h.core], [0.06, 0.03, 0.02], o); polys(fr.main, [h.rim], [0.7, 0.5, 0.3], o); if (t < 3) glowOn(fr, [circle(holes[i][0], holes[i][1], 60, 1, 16)], WES.sun, o); } }
+    var stars = []; for (var k = 0; k < 4; k++) { var a = f * 0.04 + k * Math.PI / 2; stars.push(star5(C + Math.cos(a) * 470, C + Math.sin(a) * 470, 50, f * 0.15 + k, 0.5)); } polys(fr.main, stars, WES.gold, o); lines(fr.main, stars, WES.ink, 3, o, true);
+    plankLines(fr.main, o); planks(fr.main, o);
+    polys(fr.main, [full()], WES.wood, o);
+  },
+  over: function (fr, f, at) { bigGlint(fr, at, WES.gold); }
+};
+var WES_LEGENDARY = {
+  title: function (fr, f, u) {   // a rider crossing a huge setting sun among mesas and cacti
+    polys(fr.main, rider(-150 + f * 40, 760, 130, f), WES.ink, 100);
+    polys(fr.main, cactus(150, 900, 160).concat(cactus(920, 920, 130)), WES.ink, 100);
+    polys(fr.main, [[[-60, 860], [1140, 860], [1140, 1140], [-60, 1140]], [[620, 860], [660, 700], [880, 690], [920, 860]]], [0.45, 0.2, 0.12], 100);
+    glowOn(fr, [circle(C, 760, 380, 1, 48)], WES.sun, 80); polys(fr.main, [circle(C, 760, 300, 1, 64)], WES.sun, 100);
+    polys(fr.main, [[[-60, 300], [1140, 300], [1140, 860], [-60, 860]]], [0.95, 0.5, 0.25], 100);
+    polys(fr.main, [full()], WES.dusk, 100);
+  },
+  wipe: function (fr, v) { smokeCloud(fr.top, C, C + 200, 120 + ease(v) * 900, 2330, WES.sand, 100 * (1 - Math.abs(v * 2 - 1)) + 10); },
+  stage: function (fr, f, at, o) {   // the great sun behind the card, its rays, the desert in silhouette, an eagle circling
+    var rays = []; for (var r = 0; r < 20; r++) { var a = r * Math.PI / 10 + f * 0.01; rays.push([[C, C], [C + Math.cos(a - 0.07) * 1300, C + Math.sin(a - 0.07) * 1300], [C + Math.cos(a + 0.07) * 1300, C + Math.sin(a + 0.07) * 1300]]); }
+    polys(fr.main, cactus(140, 1100, 200).concat(cactus(960, 1080, 170)), WES.ink, o);
+    polys(fr.main, [[[-60, 980], [1140, 980], [1140, 1140], [-60, 1140]], [[-60, 980], [-60, 760], [220, 750], [260, 980]], [[800, 980], [840, 720], [1140, 730], [1140, 980]]], [0.3, 0.13, 0.08], o);
+    polys(fr.main, eagle(C + Math.cos(f * 0.05) * 420, 220 + Math.sin(f * 0.05) * 60, 70, f * 0.3), WES.ink, o);
+    glowOn(fr, [circle(C, C, 420 * ease((f - CARD_AT) / 6) + 60, 1, 48)], WES.sun, o); polys(fr.main, [circle(C, C, 360 * ease((f - CARD_AT) / 6) + 40, 1, 64)], WES.sun, o);
+    polys(fr.main, rays, [1, 0.6, 0.3], o * 0.4);
+    polys(fr.main, [full()], WES.dusk, o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 8) polys(fr.top, slash(-60, 760, 1140, 300, 34, ease(at / 3), 0.4), WES.gold, fade(at, 4, 8) * 90); sparksOut(fr.main, fr.glow, at - 2, 18, WES.gold, 2340, 22); bigGlint(fr, at, WES.gold); }
+};
+var GENRE_WESTERN = {
+  rarities: { rare: WES_RARE, epic: WES_EPIC, legendary: WES_LEGENDARY },
+  opening: function (comp) {   // a saloon's swinging doors close in front of the pack — they swing open: it is gone
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      var sw = f < 16 ? ease(f / 14) : f < 34 ? 1 : 1 - ease((f - 34) / 6) + Math.sin((f - 34) * 0.9) * 0.15 * fade(f, 40, 56);
+      if (f < 56) for (var side = -1; side <= 1; side += 2) { var w = 300 * clamp01(sw), x0 = cx + side * 320; var door = [[x0, cy - 280], [x0 - side * w, cy - 260], [x0 - side * w, cy + 220], [x0, cy + 240]]; polys(fr.top, [door], WES.wood, 100 * fade(f, 50, 56)); lines(fr.top, [door, [[x0, cy - 100], [x0 - side * w, cy - 90]], [[x0, cy + 60], [x0 - side * w, cy + 60]]], WES.wood_d, 8, 100 * fade(f, 50, 56)); }
+      if (f >= 34) smokeCloud(fr.main, cx, cy + 260, 60 + (f - 34) * 10, 2350, WES.sand, fade(f, 50, 63) * 80);
+    }
+  }
+};
+
+var GENRE = { action: GENRE_ACTION, dark: GENRE_DARK, drama: GENRE_DRAMA, fantasy: GENRE_FANTASY, sf: GENRE_SF, adventure: GENRE_ADVENTURE, documentary: GENRE_DOC, thriller: GENRE_THRILLER, comedy: GENRE_COMEDY, animation: GENRE_ANIMATION, crime: GENRE_CRIME, romance: GENRE_ROMANCE, mystery: GENRE_MYSTERY, music: GENRE_MUSIC, history: GENRE_HISTORY, war: GENRE_WAR, western: GENRE_WESTERN }[GENRE_KEY];
 
 // --- the comps --------------------------------------------------------------------------------------------
 // a genre with a moment of its own per rarity gives it (``rarities``), else the same one for every rarity

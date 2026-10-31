@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "front",
+  "names": {
+    "fr": "Paquet pochoiré",
+    "en": "Stencilled pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet kaki rayé de camouflage, l'image de l'œuvre comme une photo de reportage, son nom au pochoir, un écusson étoilé en emblème.",
+    "en": "A khaki pack striped like camouflage, the work's art like a war photograph, its name stencilled, a starred badge as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

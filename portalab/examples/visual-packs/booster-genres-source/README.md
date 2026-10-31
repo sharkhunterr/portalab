@@ -5,7 +5,8 @@ The genre scene packs Mediacards' genre boosters wear — [Blockbuster](../boost
 (Fantastique), [Hyperespace](../booster-hyperespace) (Science-fiction), [Trésor](../booster-tresor) (Aventure),
 [Reportage](../booster-reportage) (Documentaire), [Insomnie](../booster-insomnie) (Thriller), [Fou rire](../booster-fourire)
 (Comédie), [Crayonné](../booster-crayon) (Animation), [Scellés](../booster-scelles) (Crime), [Idylle](../booster-idylle)
-(Romance), [Brume](../booster-brume) (Mystère), [Concert](../booster-concert) (Musique) — built from one source: `./build.sh [key
+(Romance), [Brume](../booster-brume) (Mystère), [Concert](../booster-concert) (Musique), [Chronique](../booster-chronique)
+(Histoire), [Front](../booster-front) (Guerre), [Saloon](../booster-saloon) (Western) — built from one source: `./build.sh [key
 [comp…]]` (Python 3, Node with the frontend's dependencies, ffmpeg, and
 [EffectCraft](https://github.com/storytold/effectcraft) 0.18's `effectcraft-cli` given by `EFFECTCRAFT`;
 `GENRES_WORK=<folder>` keeps the renders, `JOBS` slices side by side).

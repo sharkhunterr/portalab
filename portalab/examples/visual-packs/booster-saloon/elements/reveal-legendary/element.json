@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "saloon-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "Le coucher de soleil : un cavalier qui traverse un immense soleil couchant entre les mesas et les cactus ; puis le grand soleil derrière la carte, ses rayons et un aigle qui tournoie.",
+    "en": "The sunset: a rider crossing a huge setting sun among the mesas and cacti; then the great sun behind the card, its rays and an eagle circling."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}

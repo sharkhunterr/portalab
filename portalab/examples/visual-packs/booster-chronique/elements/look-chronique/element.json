@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "chronique",
+  "names": {
+    "fr": "Paquet de parchemin",
+    "en": "Parchment pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet de parchemin cerclé de pourpre, l'image de l'œuvre sous une arche, son nom gravé en capitales romaines, une couronne de laurier en emblème.",
+    "en": "A parchment pack edged in crimson, the work's art under an arch, its name carved in Roman capitals, a laurel wreath as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

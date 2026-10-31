@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "chronique-epic",
+  "names": {
+    "fr": "Révélation épique",
+    "en": "Epic reveal"
+  },
+  "descriptions": {
+    "fr": "La mosaïque : une mosaïque qui se pose tesselle après tesselle autour d'un soleil, puis une couronne de laurier qui pousse autour de la carte entre deux colonnes de marbre.",
+    "en": "The mosaic: a mosaic laying itself tile by tile round a sun, then a laurel wreath growing round the card between two marble columns."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.8,
+    "rarity": "epic"
+  }
+}

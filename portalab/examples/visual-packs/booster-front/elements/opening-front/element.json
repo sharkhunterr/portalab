@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "front",
+  "names": {
+    "fr": "Repéré",
+    "en": "Spotted"
+  },
+  "descriptions": {
+    "fr": "Trois projecteurs trouvent le paquet ; un éclair — il saute dans un nuage de poussière et de débris.",
+    "en": "Three searchlights find the pack; a flash — it blows up in a cloud of dust and debris."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}
