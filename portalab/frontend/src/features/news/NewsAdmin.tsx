@@ -17,6 +17,7 @@ import { MarkdownEditor } from "../content/MarkdownEditor";
 import { type NewsEditor, useEditorial, useNewsActions, useReaders } from "./api";
 import { Cover } from "./cover";
 import { ChannelsPanel, useChannels } from "./NewsChannels";
+import { SourcesPanel } from "./NewsSources";
 import "./news.css";
 
 /**
@@ -435,7 +436,7 @@ function ArticleRow({ article, onEdit }: { article: NewsEditor; onEdit: () => vo
 }
 
 // the newsletters moved to « Newsletters & e-mail » (admin reorganisation, trial)
-const TABS = ["articles", "channels"] as const;
+const TABS = ["articles", "channels", "sources"] as const; // #299: news from elsewhere
 
 export function NewsAdmin() {
   const t = useT();
@@ -471,6 +472,7 @@ export function NewsAdmin() {
       }
     >
       {tab === "channels" ? <ChannelsPanel /> : null}
+      {tab === "sources" ? <SourcesPanel /> : null}
       {tab === "articles" ? (
         <>
           {editing ? (

@@ -7,6 +7,7 @@ import { EmptyState } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { ExternalNews } from "../../news/ExternalNews";
 import { personPath, useCatalogFacets } from "../api";
 import { metadataImage } from "../detail/Enrichment";
 import { Poster } from "../MediaGrid";
@@ -233,6 +234,16 @@ export default function FeedPage() {
           )}
         </section>
       ) : null}
+      {/* #299: what the news sources say of the people and series I follow */}
+      <ExternalNews
+        heading={t("news:external.forYou")}
+        limit={12}
+        enabled={mine.some((f) => f.kind !== "genre")}
+        asked={{
+          person: mine.filter((f) => f.kind === "person").map((f) => f.ref),
+          title: mine.filter((f) => f.kind === "title").map((f) => f.ref),
+        }}
+      />
       {upcoming.length ? (
         <section className="feed-section" aria-labelledby="feed-upcoming">
           <h2 id="feed-upcoming">

@@ -18,6 +18,7 @@ import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
 import { useCollectsCards } from "../../cards/collects";
 import { WorkCollection } from "../../cards/WorkCollection";
+import { ExternalNews } from "../../news/ExternalNews";
 import { PluginSlot } from "../../plugins/slots/PluginSlot";
 import { useListenInfo, useReadInfo } from "../books/api";
 import { useDiscoverTitle } from "../discover/api";
@@ -958,6 +959,8 @@ export function DetailPage() {
       </TitleHero>
       <LeavingNotice objectId={media.id} title={media.title} />
       <RequestJourney objectId={media.id} title={media.title} />
+      {/* #299: what the news sources say of it */}
+      <ExternalNews heading={t("news:external.aboutTitle")} asked={{ title: [media.id] }} />
       {metadata.data ? (
         <Enrichment objectId={media.id} />
       ) : details ? (

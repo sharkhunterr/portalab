@@ -2933,6 +2933,124 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/news/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sources */
+        get: operations["sources_api_v1_admin_news_sources_get"];
+        /**
+         * Save Source
+         * @description Add a source (read at once) or change one.
+         */
+        put: operations["save_source_api_v1_admin_news_sources_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/sources/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Admin Items
+         * @description The latest items, the hidden ones too (to bring them back).
+         */
+        get: operations["admin_items_api_v1_admin_news_sources_items_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/sources/items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Mark Item
+         * @description Pin an item on « À la une », or hide it.
+         */
+        put: operations["mark_item_api_v1_admin_news_sources_items__item_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/sources/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview
+         * @description What a source would bring — read now, nothing kept.
+         */
+        post: operations["preview_api_v1_admin_news_sources_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/sources/{source_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Source */
+        delete: operations["remove_source_api_v1_admin_news_sources__source_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/sources/{source_id}/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Source
+         * @description Read a source now.
+         */
+        post: operations["refresh_source_api_v1_admin_news_sources__source_id__refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/notifications/broadcast": {
         parameters: {
             query?: never;
@@ -9587,6 +9705,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/news/sources/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Source Items
+         * @description The latest news from elsewhere (pinned first), a source's, or those naming library titles (their
+         *     ids) or people (their names as the library credits them).
+         */
+        get: operations["source_items_api_v1_news_sources_items_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/news/sources/items/{item_id}/picture": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Source Picture */
+        get: operations["source_picture_api_v1_news_sources_items__item_id__picture_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/news/{slug}": {
         parameters: {
             query?: never;
@@ -15964,6 +16120,79 @@ export interface components {
              */
             publish_at: string;
         };
+        /** NewsSourceIn */
+        NewsSourceIn: {
+            /** Category Id */
+            category_id?: string | null;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
+             * Exclude Words
+             * @default []
+             */
+            exclude_words: string[];
+            /** Id */
+            id?: string | null;
+            /**
+             * Include Words
+             * @default []
+             */
+            include_words: string[];
+            /** Name */
+            name: string;
+            /**
+             * Refresh Minutes
+             * @default 60
+             */
+            refresh_minutes: number;
+            /** Url */
+            url: string;
+        };
+        /** NewsSourceOut */
+        NewsSourceOut: {
+            /** Category Id */
+            category_id: string | null;
+            /** Enabled */
+            enabled: boolean;
+            /** Exclude Words */
+            exclude_words: string[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Include Words */
+            include_words: string[];
+            /**
+             * Items
+             * @default 0
+             */
+            items: number;
+            /** Last Error */
+            last_error: string | null;
+            /** Last Run At */
+            last_run_at: string | null;
+            /** Name */
+            name: string;
+            /** Next Run At */
+            next_run_at: string | null;
+            /** Refresh Minutes */
+            refresh_minutes: number;
+            /** Site Url */
+            site_url: string | null;
+            /** Status */
+            status: string;
+            /** Url */
+            url: string;
+        };
+        /** NewsSourcesOut */
+        NewsSourcesOut: {
+            /** Items */
+            items: components["schemas"]["NewsSourceOut"][];
+        };
         /** NewsTranslationIn */
         NewsTranslationIn: {
             /** Body Md */
@@ -17673,12 +17902,109 @@ export interface components {
             /** Day */
             day: string;
         };
+        /** SourceItemMarkIn */
+        SourceItemMarkIn: {
+            /** Hidden */
+            hidden?: boolean | null;
+            /** Pinned */
+            pinned?: boolean | null;
+        };
+        /** SourceItemOut */
+        SourceItemOut: {
+            /** Category Id */
+            category_id: string | null;
+            /** Hidden */
+            hidden: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Link */
+            link: string;
+            /** Mentions */
+            mentions: components["schemas"]["SourceMention"][];
+            /** Picture */
+            picture: string | null;
+            /** Pinned */
+            pinned: boolean;
+            /**
+             * Published At
+             * Format: date-time
+             */
+            published_at: string;
+            /** Source */
+            source: string;
+            /**
+             * Source Id
+             * Format: uuid
+             */
+            source_id: string;
+            /** Summary */
+            summary: string;
+            /** Title */
+            title: string;
+        };
+        /** SourceItemsOut */
+        SourceItemsOut: {
+            /** Items */
+            items: components["schemas"]["SourceItemOut"][];
+        };
+        /** SourceMention */
+        SourceMention: {
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string;
+            /** Ref */
+            ref: string;
+            /** Route */
+            route: string;
+        };
         /** SourceOut */
         SourceOut: {
             /** Amount */
             amount: number;
             /** Source */
             source: string;
+        };
+        /** SourcePreviewIn */
+        SourcePreviewIn: {
+            /** Url */
+            url: string;
+        };
+        /** SourcePreviewItemOut */
+        SourcePreviewItemOut: {
+            /** Link */
+            link: string;
+            /** Mentions */
+            mentions: components["schemas"]["SourceMention"][];
+            /** Published At */
+            published_at: string | null;
+            /** Summary */
+            summary: string;
+            /** Title */
+            title: string;
+        };
+        /** SourcePreviewOut */
+        SourcePreviewOut: {
+            /** Items */
+            items: components["schemas"]["SourcePreviewItemOut"][];
+            /** Site */
+            site: string | null;
+            /** Title */
+            title: string;
+            /** Url */
+            url: string;
+        };
+        /** SourceRefreshOut */
+        SourceRefreshOut: {
+            /** Added */
+            added: number;
+            /** Last Error */
+            last_error: string | null;
+            /** Status */
+            status: string;
         };
         /** StatResultOut */
         StatResultOut: {
@@ -25123,6 +25449,217 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sources_api_v1_admin_news_sources_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NewsSourcesOut"];
+                };
+            };
+        };
+    };
+    save_source_api_v1_admin_news_sources_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NewsSourceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NewsSourceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_items_api_v1_admin_news_sources_items_get: {
+        parameters: {
+            query?: {
+                source?: string[];
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SourceItemsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mark_item_api_v1_admin_news_sources_items__item_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SourceItemMarkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_api_v1_admin_news_sources_preview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SourcePreviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SourcePreviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_source_api_v1_admin_news_sources__source_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_source_api_v1_admin_news_sources__source_id__refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SourceRefreshOut"];
                 };
             };
             /** @description Validation Error */
@@ -37293,6 +37830,71 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NewsCard"][];
+                };
+            };
+        };
+    };
+    source_items_api_v1_news_sources_items_get: {
+        parameters: {
+            query?: {
+                source?: string[];
+                title?: string[];
+                person?: string[];
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SourceItemsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    source_picture_api_v1_news_sources_items__item_id__picture_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

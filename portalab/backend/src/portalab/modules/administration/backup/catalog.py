@@ -73,6 +73,7 @@ TABLES: dict[str, Category] = {
     "notify.email_outbox": "transient",  # never send the former portal's e-mails again
     "plugins.error_stats": "transient",
     "search.index_state": "transient",  # the index is built again
+    "news.feed_items": "transient",  # #299: read again from the sources
     # the covers fetched from the services go with their files: left out, they are fetched again
     "media.images": "media",
     # the technical history: saved on request
@@ -99,6 +100,7 @@ FOLDERS: dict[str, Category] = {
     "blobs/cards": "media",  # the cards' images: fetched from the services, cut out, looked for again
     "blobs/media": "media",
     "blobs/media-metadata": "media",
+    "blobs/news-feeds": "transient",  # #299: the news sources' pictures (copied again when read)
     "cards": "transient",  # the cards' models (downloaded again when needed)
     "visuals": "data",
     "plugins": "data",

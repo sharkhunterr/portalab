@@ -57,5 +57,25 @@ def declare_news_settings(catalog: SettingCatalog = default_catalog) -> None:
             description="Newsletter channels I do not want to receive by e-mail.",
         )
 
+    # #299: the news sources — a source on the local network only when allowed; how long items are kept
+    if "news.feeds.allowPrivateHosts" not in known:
+        declare(
+            scope="global",
+            key="news.feeds.allowPrivateHosts",
+            schema=bool,
+            default=False,
+            owner=OWNER,
+            description="News sources may be on the local network (private addresses).",
+        )
+    if "news.feeds.retentionDays" not in known:
+        declare(
+            scope="global",
+            key="news.feeds.retentionDays",
+            schema=int,
+            default=30,
+            owner=OWNER,
+            description="Days the news sources' items are kept (pinned ones stay).",
+        )
+
 
 declare_news_settings()

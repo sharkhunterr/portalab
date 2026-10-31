@@ -7,6 +7,7 @@ import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { type NewsCard, useCategories, useFeatured, useNewsList } from "./api";
 import { Cover } from "./cover";
+import { ExternalNews } from "./ExternalNews";
 import "./news.css";
 import { UnreadDot } from "../dashboard/templates/Templates";
 
@@ -122,6 +123,8 @@ export function NewsPage() {
           ))}
         </ul>
       ) : null}
+      {/* #299: news from elsewhere — the sources the editors chose (a channel's when one is chosen) */}
+      <ExternalNews heading={t("news:external.title")} limit={24} category={category || null} />
     </section>
   );
 }

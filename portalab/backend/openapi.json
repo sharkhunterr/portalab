@@ -12441,6 +12441,222 @@
         "title": "NewsScheduleIn",
         "type": "object"
       },
+      "NewsSourceIn": {
+        "properties": {
+          "category_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "enabled": {
+            "default": true,
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "exclude_words": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30,
+            "title": "Exclude Words",
+            "type": "array"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "include_words": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30,
+            "title": "Include Words",
+            "type": "array"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "refresh_minutes": {
+            "default": 60,
+            "maximum": 1440.0,
+            "minimum": 15.0,
+            "title": "Refresh Minutes",
+            "type": "integer"
+          },
+          "url": {
+            "maxLength": 1000,
+            "minLength": 8,
+            "pattern": "^https?://",
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "url"
+        ],
+        "title": "NewsSourceIn",
+        "type": "object"
+      },
+      "NewsSourceOut": {
+        "properties": {
+          "category_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "exclude_words": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Exclude Words",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "include_words": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Include Words",
+            "type": "array"
+          },
+          "items": {
+            "default": 0,
+            "title": "Items",
+            "type": "integer"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "last_run_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "next_run_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Run At"
+          },
+          "refresh_minutes": {
+            "title": "Refresh Minutes",
+            "type": "integer"
+          },
+          "site_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Url"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url",
+          "site_url",
+          "category_id",
+          "enabled",
+          "include_words",
+          "exclude_words",
+          "refresh_minutes",
+          "status",
+          "last_error",
+          "last_run_at",
+          "next_run_at"
+        ],
+        "title": "NewsSourceOut",
+        "type": "object"
+      },
+      "NewsSourcesOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/NewsSourceOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "NewsSourcesOut",
+        "type": "object"
+      },
       "NewsTranslationIn": {
         "additionalProperties": false,
         "properties": {
@@ -17570,6 +17786,167 @@
         "title": "SourceDayOut",
         "type": "object"
       },
+      "SourceItemMarkIn": {
+        "properties": {
+          "hidden": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hidden"
+          },
+          "pinned": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pinned"
+          }
+        },
+        "title": "SourceItemMarkIn",
+        "type": "object"
+      },
+      "SourceItemOut": {
+        "properties": {
+          "category_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "hidden": {
+            "title": "Hidden",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "mentions": {
+            "items": {
+              "$ref": "#/components/schemas/SourceMention"
+            },
+            "title": "Mentions",
+            "type": "array"
+          },
+          "picture": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Picture"
+          },
+          "pinned": {
+            "title": "Pinned",
+            "type": "boolean"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "source_id": {
+            "format": "uuid",
+            "title": "Source Id",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source_id",
+          "source",
+          "category_id",
+          "title",
+          "summary",
+          "link",
+          "picture",
+          "published_at",
+          "mentions",
+          "pinned",
+          "hidden"
+        ],
+        "title": "SourceItemOut",
+        "type": "object"
+      },
+      "SourceItemsOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SourceItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "SourceItemsOut",
+        "type": "object"
+      },
+      "SourceMention": {
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "route": {
+            "title": "Route",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "ref",
+          "label",
+          "route"
+        ],
+        "title": "SourceMention",
+        "type": "object"
+      },
       "SourceOut": {
         "properties": {
           "amount": {
@@ -17586,6 +17963,134 @@
           "amount"
         ],
         "title": "SourceOut",
+        "type": "object"
+      },
+      "SourcePreviewIn": {
+        "properties": {
+          "url": {
+            "maxLength": 1000,
+            "minLength": 8,
+            "pattern": "^https?://",
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "SourcePreviewIn",
+        "type": "object"
+      },
+      "SourcePreviewItemOut": {
+        "properties": {
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "mentions": {
+            "items": {
+              "$ref": "#/components/schemas/SourceMention"
+            },
+            "title": "Mentions",
+            "type": "array"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "summary",
+          "link",
+          "published_at",
+          "mentions"
+        ],
+        "title": "SourcePreviewItemOut",
+        "type": "object"
+      },
+      "SourcePreviewOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SourcePreviewItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "site": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "title",
+          "site",
+          "items"
+        ],
+        "title": "SourcePreviewOut",
+        "type": "object"
+      },
+      "SourceRefreshOut": {
+        "properties": {
+          "added": {
+            "title": "Added",
+            "type": "integer"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "added",
+          "status",
+          "last_error"
+        ],
+        "title": "SourceRefreshOut",
         "type": "object"
       },
       "StatResultOut": {
@@ -30597,6 +31102,297 @@
           }
         },
         "summary": "Run Schedule",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/sources": {
+      "get": {
+        "operationId": "sources_api_v1_admin_news_sources_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsSourcesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Sources",
+        "tags": [
+          "news"
+        ]
+      },
+      "put": {
+        "description": "Add a source (read at once) or change one.",
+        "operationId": "save_source_api_v1_admin_news_sources_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewsSourceIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsSourceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save Source",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/sources/items": {
+      "get": {
+        "description": "The latest items, the hidden ones too (to bring them back).",
+        "operationId": "admin_items_api_v1_admin_news_sources_items_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "source",
+            "required": false,
+            "schema": {
+              "default": [],
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "maxItems": 50,
+              "title": "Source",
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceItemsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Admin Items",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/sources/items/{item_id}": {
+      "put": {
+        "description": "Pin an item on \u00ab \u00c0 la une \u00bb, or hide it.",
+        "operationId": "mark_item_api_v1_admin_news_sources_items__item_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SourceItemMarkIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Mark Item",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/sources/preview": {
+      "post": {
+        "description": "What a source would bring \u2014 read now, nothing kept.",
+        "operationId": "preview_api_v1_admin_news_sources_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SourcePreviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourcePreviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/sources/{source_id}": {
+      "delete": {
+        "operationId": "remove_source_api_v1_admin_news_sources__source_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Source Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Source",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/sources/{source_id}/refresh": {
+      "post": {
+        "description": "Read a source now.",
+        "operationId": "refresh_source_api_v1_admin_news_sources__source_id__refresh_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Source Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceRefreshOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refresh Source",
         "tags": [
           "news"
         ]
@@ -48745,6 +49541,136 @@
           }
         },
         "summary": "Featured",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/news/sources/items": {
+      "get": {
+        "description": "The latest news from elsewhere (pinned first), a source's, or those naming library titles (their\nids) or people (their names as the library credits them).",
+        "operationId": "source_items_api_v1_news_sources_items_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "source",
+            "required": false,
+            "schema": {
+              "default": [],
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "maxItems": 50,
+              "title": "Source",
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "title",
+            "required": false,
+            "schema": {
+              "default": [],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 100,
+              "title": "Title",
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "person",
+            "required": false,
+            "schema": {
+              "default": [],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 100,
+              "title": "Person",
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceItemsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Source Items",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/news/sources/items/{item_id}/picture": {
+      "get": {
+        "operationId": "source_picture_api_v1_news_sources_items__item_id__picture_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Source Picture",
         "tags": [
           "news"
         ]

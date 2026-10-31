@@ -28,6 +28,7 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.search import SearchRegistry, default_search
 from portalab.core.audit_port import AuditSink
 from portalab.core.authz_port import Authorizer
+from portalab.core.blobstore import BlobStore
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.periodic import register_periodic
@@ -52,11 +53,13 @@ from portalab.modules.news.newsletters import CATEGORY as NEWSLETTER_CATEGORY
 from portalab.modules.news.newsletters import Newsletters
 from portalab.modules.news.participant import NewsParticipant
 from portalab.modules.news.settings import SETTINGS, NewsConfig
+from portalab.modules.news.sources.service import FeedSources
 from portalab.modules.news.summary import NewsChanges
 
 OWNER = "module:news"
 SWEEP_JOB = "news.publish_sweep"
 NEWSLETTER_JOB = "news.newsletters"
+SOURCES_JOB = "news.sources"  # #299
 log = get_logger("portalab.news")
 
 
@@ -79,6 +82,7 @@ class NewsModule:
         actions: ActionRegistry = default_actions,
         observables: ObservableRegistry = default_observables,
         ai_tools: AIToolRegistry = default_ai_tools,
+        blobs: BlobStore | None = None,
     ) -> None:
         self.ai_tools = ai_tools  # issue 171: the assistant's tools
         self.database = database
@@ -99,6 +103,7 @@ class NewsModule:
         )
         self.newsletters = Newsletters(database, self.articles, capabilities, clock=clock)  # 027
         self.articles.newsletter = self.newsletters.email_article
+        self.sources = FeedSources(database, capabilities, blobs, clock=clock)  # #299: news from elsewhere
 
     def register(self) -> None:
         NewsAiTools(self.articles, self.clock).register(self.ai_tools)  # issue 171
@@ -169,11 +174,23 @@ class NewsModule:
         async def newsletters() -> None:
             await self.newsletters.run_due()
 
+        async def sources() -> None:  # #299: each source read on its own cadence
+            await self.sources.run_due()
+
         return [
             self.refresh_config,
             register_periodic(jobs, self.database, SWEEP_JOB, timedelta(minutes=1), sweep, owner=OWNER),
             register_periodic(
                 jobs, self.database, NEWSLETTER_JOB, timedelta(minutes=10), newsletters, owner=OWNER
+            ),
+            register_periodic(
+                jobs,
+                self.database,
+                SOURCES_JOB,
+                timedelta(minutes=5),
+                sources,
+                owner=OWNER,
+                timeout_seconds=280,
             ),
         ]
 
