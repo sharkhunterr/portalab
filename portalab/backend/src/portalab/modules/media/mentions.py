@@ -1,8 +1,11 @@
 """#299 — which library titles and people a text names (a news item's title and summary), for the news to
 link its items to the library: every run of one to six words of the text, folded, looked up as a work's title
 or a credited name. A title of a single short word (« Up », « Heat ») or a one-word name would match too much:
-only titles of two words or more, or of one long word, and people with two names or more."""
+only titles of two words or more, or of one long word, and people with two names or more. A one-word title
+(« Novembre », « Halloween ») is still a common word: only when the text quotes it, or a headline opens on it
+(« Nocturne : … »)."""
 
+import re
 from collections.abc import Sequence
 from urllib.parse import quote
 
@@ -25,6 +28,20 @@ def _runs(text: str) -> set[str]:
 
 def _title_ok(folded: str) -> bool:
     return " " in folded or len(folded) >= SHORTEST_WORD_TITLE
+
+
+# a title between quotes: French guillemets, curly double or single quotes, straight double or single ones
+_PAIRS = (("\u00ab", "\u00bb"), ("\u201c", "\u201d"), ("\u2018", "\u2019"), ('"', '"'), ("'", "'"))
+_QUOTED = re.compile("|".join(f"{o}\\s*([^{c}]{{1,120}}?)\\s*{c}" for o, c in _PAIRS))
+
+
+def _named(text: str) -> set[str]:
+    """What a text names explicitly (folded): its quoted words, and the words a headline opens on."""
+    found = {fold(next(g for g in m.groups() if g)) for m in _QUOTED.finditer(text)}
+    head = text.split(":", 1)[0] if ":" in text[:80] else ""
+    if head:
+        found.add(fold(head))
+    return found
 
 
 class LibraryMentions:
@@ -63,7 +80,8 @@ class LibraryMentions:
                 )
                 found_people = {folded: name for folded, name in rows.all()}
         out: list[list[Mention]] = []
-        for text_runs in runs:
+        for text, text_runs in zip(texts, runs, strict=True):
+            named = _named(text)
             mentions: list[Mention] = []
             matched: list[str] = []
             # the longest first: « star wars the last jedi », and then not « star wars » inside it
@@ -73,7 +91,7 @@ class LibraryMentions:
                 known = run in found_titles or run in found_people
                 if known and any(f" {run} " in f" {m} " for m in matched):
                     continue
-                if run in found_titles:
+                if run in found_titles and (" " in run or run in named):
                     object_id, title = found_titles[run]
                     matched.append(run)
                     if all(m.ref != object_id for m in mentions):
