@@ -423,6 +423,7 @@
   "cards.pack.kind.series": "Séries",
   "cards.pack.open": "Ouvrir",
   "cards.pack.opening": "Ouverture…",
+  "cards.pack.pile": "{count, plural, one {# paquet identique} other {# paquets identiques}}",
   "cards.pack.season": "Saison {season}",
   "cards.pack.title": "Paquet de « {name} »",
   "cards.pack.turn": "Retourner la carte",

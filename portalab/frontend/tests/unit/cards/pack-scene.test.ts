@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CardPack, PackLook } from "../../../src/features/cards/api";
+import { piles } from "../../../src/features/cards/CardBoosters";
 import { packBooster } from "../../../src/features/cards/packBooster";
 
 // Issue 293: a bought card booster opens in the scene bound to its product, as in the shop.
@@ -21,5 +22,23 @@ describe("a card booster's scene", () => {
 
   it("one given by watching: its own key, the kind's scene", () => {
     expect(packBooster(t, { ...pack, look: null }, "fr").key).toBe("cards:p1");
+  });
+});
+
+// Issue 297: the same boosters in one pile.
+describe("sealed packs in piles", () => {
+  it("piles the same product's, and the same content's season, apart", () => {
+    const shop = (id: string, product: string) =>
+      ({ ...pack, id, look: { product } as PackLook }) as CardPack;
+    const content = (id: string, set: string, season: number | null) =>
+      ({ ...pack, id, source: "content", set, look: { season } as PackLook }) as CardPack;
+    const got = piles([
+      shop("a", "sf"),
+      content("b", "dune", 1),
+      shop("c", "sf"),
+      content("d", "dune", 2),
+      shop("e", "fantasy"),
+    ]);
+    expect(got.map((pile) => pile.map((p) => p.id))).toEqual([["a", "c"], ["b"], ["d"], ["e"]]);
   });
 });
