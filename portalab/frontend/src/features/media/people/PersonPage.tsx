@@ -6,6 +6,7 @@ import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { ExternalNews } from "../../news/ExternalNews";
 import { imageUrl, MediaError, type Person, usePerson } from "../api";
 import { metadataImage } from "../detail/Enrichment";
 import { RequestDialog } from "../discover/RequestDialog";
@@ -153,6 +154,11 @@ function PersonView({ headingId, data }: { headingId: string; data: Person }) {
         </section>
       ) : null}
       {books ? null : knownFor}
+      {/* #299: what the news sources say of them */}
+      <ExternalNews
+        heading={t("news:external.aboutPerson", { name: data.name })}
+        asked={{ person: [data.name] }}
+      />
       {data.credits.map((credit) => (
         <section key={credit.role} className="media-row media-person__section">
           <h3>

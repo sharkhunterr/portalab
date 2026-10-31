@@ -261,7 +261,7 @@ def wire_platform(
     content.register()
     wiki = WikiModule(database, events, authz.audit, capabilities, authz.engine)
     wiki.register()
-    news = NewsModule(database, events, authz.audit, capabilities, authz.engine)
+    news = NewsModule(database, events, authz.audit, capabilities, authz.engine, blobs=context.blobs)
     news.register()
     calendar = CalendarModule(database, events, capabilities, authz.engine)
     calendar.register()

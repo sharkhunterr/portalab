@@ -9,4 +9,7 @@ LABELS = (
     read(f"{A}/news/categories", "News categories", "Les rubriques"),
     read(f"{A}/news/{{slug}}", "An article", "Un article"),
     action("POST", f"{A}/news/{{slug}}/read", "Mark an article read", "Marquer un article comme lu"),
+    # #299: news from elsewhere, and their pictures (the portal's copies)
+    read(f"{A}/news/sources/items", "News from elsewhere", "Les actualités d'ailleurs"),
+    read(f"{A}/news/sources/items/{{item_id}}/picture", "Their pictures", "Leurs images"),
 )

@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -154,3 +154,60 @@ class NewsletterSchedule(NewsBase):
     last_article_id: Mapped[UUID | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class Feed(NewsBase):
+    """#299: a source of news from elsewhere the editors chose (an RSS or Atom feed): read on its own
+    cadence, its items kept a while, filtered by words, shown on « À la une » and linked to the library."""
+
+    __tablename__ = "feeds"
+    __table_args__ = (
+        CheckConstraint("status IN ('never', 'ok', 'error')", name="status"),
+        Index("ix_feeds_due", "enabled", "next_run_at"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    name: Mapped[str] = mapped_column(String(120), nullable=False, info=not_personal("a source's name"))
+    url: Mapped[str] = mapped_column(String(1000), nullable=False, unique=True)
+    site_url: Mapped[str | None] = mapped_column(String(1000))
+    category_id: Mapped[UUID | None] = mapped_column(ForeignKey("news.categories.id", ondelete="SET NULL"))
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    include_words: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    exclude_words: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    refresh_minutes: Mapped[int] = mapped_column(Integer, nullable=False, default=60)
+    next_run_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    last_run_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    status: Mapped[str] = mapped_column(String(8), nullable=False, default="never")
+    last_error: Mapped[str | None] = mapped_column(String(300), info=not_personal("why the source failed"))
+    failures: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    etag: Mapped[str | None] = mapped_column(String(200), info=not_personal("the source's version tag"))
+    modified: Mapped[str | None] = mapped_column(String(80))
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class FeedItem(NewsBase):
+    """#299: one item a source published — its title, a short summary (plain text), its link and picture
+    (copied: browsers never call the site), the library titles and people it names; pinned or hidden by the
+    editors. Read again from the source when lost: never backed up."""
+
+    __tablename__ = "feed_items"
+    __table_args__ = (
+        Index("ix_feed_items_published", "published_at"),
+        Index("ix_feed_items_feed", "feed_id", "published_at"),
+        Index("ix_feed_items_mentions", "mentions", postgresql_using="gin"),
+        UniqueConstraint("feed_id", "guid"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    feed_id: Mapped[UUID] = mapped_column(ForeignKey("news.feeds.id", ondelete="CASCADE"), nullable=False)
+    guid: Mapped[str] = mapped_column(String(500), nullable=False)
+    link: Mapped[str] = mapped_column(String(1000), nullable=False)
+    title: Mapped[str] = mapped_column(String(300), nullable=False, info=not_personal("a news item's title"))
+    summary: Mapped[str] = mapped_column(String(600), nullable=False, default="")
+    image_key: Mapped[str | None] = mapped_column(String(200))
+    published_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    mentions: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False, default=list)
+    pinned: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    hidden: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)

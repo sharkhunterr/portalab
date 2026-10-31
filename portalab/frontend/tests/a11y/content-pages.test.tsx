@@ -59,6 +59,7 @@ describe("content pages", () => {
       if (url.pathname === "/api/v1/news/featured") return json(200, [card("hello", "Hello world", "c1")]);
       if (url.pathname === "/api/v1/news/categories")
         return json(200, [{ id: "c1", key: "events", name: "Events", enabled: true, position: 0 }]);
+      if (url.pathname === "/api/v1/news/sources/items") return json(200, { items: [] }); // #299
       asked.push(url.searchParams.get("category") ?? "");
       return json(200, {
         items: [card("hello", "Hello world", "c1"), card("other", "Other news")],

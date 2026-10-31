@@ -22,7 +22,7 @@ from portalab.capabilities.events import (
 )
 from portalab.capabilities.i18n import RESOLVER as I18N_RESOLVER
 from portalab.capabilities.i18n import LocaleContext
-from portalab.capabilities.media import ACTIVITY_HISTORY, DIGEST, LIBRARY, METADATA, REQUESTS
+from portalab.capabilities.media import ACTIVITY_HISTORY, DIGEST, LIBRARY, MENTIONS, METADATA, REQUESTS
 from portalab.capabilities.media_core import (
     CARD_SOURCES,
     CATALOG,
@@ -95,6 +95,7 @@ from portalab.modules.media.insights.stats import InsightsQuery
 from portalab.modules.media.insights.upcoming import Upcoming
 from portalab.modules.media.links.accounts import AccountMatching
 from portalab.modules.media.links.service import UserLinkService
+from portalab.modules.media.mentions import LibraryMentions
 from portalab.modules.media.models import MatchCandidate, PlaybackSession, SourceItem
 from portalab.modules.media.observability import log, metrics
 from portalab.modules.media.participant import MediaParticipant
@@ -406,6 +407,10 @@ class MediaModule:
         register_baseline(self.types, OWNER)
         if self.calendar.get(MediaReleaseCalendarSource.kind) is None:  # 027: releases in the calendar
             self.calendar.register(MediaReleaseCalendarSource(self.upcoming), owner=OWNER)
+        if not self.capabilities.system_providers(MENTIONS):  # #299: the news linked to the library
+            self.capabilities.provide(
+                MENTIONS, LibraryMentions(self.database), instance_ref="media", owner=OWNER
+            )
         if not self.capabilities.system_providers(DIGEST):  # 027: the newsletters' source
             self.capabilities.provide(
                 DIGEST,

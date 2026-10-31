@@ -1197,6 +1197,28 @@ class MediaDigest(Protocol):
     async def upcoming(self, until: date, limit: int) -> list[DigestItem]: ...
 
 
+MENTIONS = "media.mentions"
+
+
+@dataclass(frozen=True, slots=True)
+class Mention:
+    """#299: a library title or a person a text names — ``ref``: the title's object id, or the person's name
+    as the library credits them; ``route``: their page."""
+
+    kind: Literal["title", "person"]
+    ref: str
+    label: str
+    route: str
+
+
+@runtime_checkable
+class MediaMentions(Protocol):
+    """#299: which library titles and people each text names (a news item's title and summary) — read by
+    the portal's own media module, without a member's rights (the library's names are not personal)."""
+
+    async def mentions(self, texts: Sequence[str], limit: int = 6) -> list[list[Mention]]: ...
+
+
 def _spec(name: str, protocol: type[Any], description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=True, description=description
@@ -1231,4 +1253,5 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(
         DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
     ),
+    _spec(MENTIONS, MediaMentions, "The library titles and people a text names, for the news (#299)"),
 )
