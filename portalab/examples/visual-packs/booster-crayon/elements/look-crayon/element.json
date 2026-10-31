@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "crayon",
+  "names": {
+    "fr": "Feuille d'animateur",
+    "en": "Animator's sheet"
+  },
+  "descriptions": {
+    "fr": "Un paquet de papier quadrillé, une bande arc-en-ciel, l'image de l'œuvre comme un cellulo, son nom en lettres rondes cernées, un crayon en emblème.",
+    "en": "A pack of grid paper, a rainbow band, the work's art like a cel, its name in round outlined letters, a pencil as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

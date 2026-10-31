@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "fourire",
+  "names": {
+    "fr": "Paquet à pois",
+    "en": "Polka-dot pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet jaune à pois blancs, une bande arc-en-ciel, l'image de l'œuvre dans un cadre de BD, son nom en lettres rondes, un grand sourire en emblème.",
+    "en": "A yellow pack with white polka dots, a rainbow band, the work's art in a comic frame, its name in round letters, a big grin as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

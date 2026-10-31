@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "scelles",
+  "names": {
+    "fr": "Pochette à scellés",
+    "en": "Evidence bag"
+  },
+  "descriptions": {
+    "fr": "Un paquet de papier kraft comme une pochette à scellés, une bande de ruban de police, l'image de l'œuvre comme une photo d'indice, son nom tapé à la machine, un insigne en emblème.",
+    "en": "A manila pack like an evidence bag, a band of police tape, the work's art like an evidence photo, its name typewritten, a badge as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

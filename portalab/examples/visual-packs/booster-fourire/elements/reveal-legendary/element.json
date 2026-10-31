@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "fourire-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "Le grand show : un micro sous la poursuite devant un mur de briques, un canon à confettis, puis des ballons qui montent et un soleil aux couleurs de la fête qui tourne derrière la carte.",
+    "en": "The big show: a microphone in the spotlight before a brick wall, a confetti cannon, then balloons rising and a sunburst in the party colours turning behind the card."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}

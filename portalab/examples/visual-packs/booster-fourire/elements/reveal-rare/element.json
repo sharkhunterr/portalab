@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "fourire-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "Le cotillon : un cotillon qui explose en serpentins et en confettis sur un fond à pois ; la carte arrive dans une pluie de confettis.",
+    "en": "The party popper: a popper bursting into streamers and confetti over polka dots; the card comes in a rain of confetti."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

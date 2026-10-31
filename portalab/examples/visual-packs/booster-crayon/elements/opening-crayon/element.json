@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "crayon",
+  "names": {
+    "fr": "Gommé",
+    "en": "Rubbed out"
+  },
+  "descriptions": {
+    "fr": "Le paquet griffonné au crayon, colorié d'un coup, puis effacé d'un coup de gomme.",
+    "en": "The pack scribbled over in pencil, coloured in a flash, then rubbed out with an eraser."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

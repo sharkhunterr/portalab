@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "scelles",
+  "names": {
+    "fr": "Mis sous scellés",
+    "en": "Bagged"
+  },
+  "descriptions": {
+    "fr": "Le ruban de police s'enroule autour du paquet sous les gyrophares ; le flash d'une photo d'indice — il est emporté.",
+    "en": "Police tape wraps round the pack under police lights; an evidence photo's flash — it is taken away."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

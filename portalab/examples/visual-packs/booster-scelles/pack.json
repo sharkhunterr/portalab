@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "scelles",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Scellés — crime",
+    "en": "Scellés — crime"
+  },
+  "descriptions": {
+    "fr": "Le booster Crime, une enquête : chaque rareté son moment en plein écran — un indice sous la loupe pour une rare, le tableau d'enquête pour une épique, la scène de crime pour une légendaire. Un paquet comme une pochette à scellés, entouré du ruban de police et emporté dans le flash d'une photo d'indice ; une rue bouclée sous les gyrophares.",
+    "en": "The Crime booster, an investigation: every rarity its own moment over the whole screen — a clue under the glass for a rare, the investigation board for an epic, the crime scene for a legendary. A pack like an evidence bag, wrapped in police tape and taken away in an evidence photo's flash; a street cordoned off under police lights."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

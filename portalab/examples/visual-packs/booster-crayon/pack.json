@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "crayon",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Crayonné — animation",
+    "en": "Crayonné — animation"
+  },
+  "descriptions": {
+    "fr": "Le booster Animation, de l'esquisse au dessin animé : chaque rareté son moment en plein écran — une esquisse pour une rare, un folioscope pour une épique, le grand final en couleurs pour une légendaire. Un paquet griffonné au crayon puis gommé ; une feuille d'animateur sur la table lumineuse.",
+    "en": "The Animation booster, from the sketch to the cartoon: every rarity its own moment over the whole screen — a sketch for a rare, a flip book for an epic, the grand finale in colour for a legendary. A pack scribbled in pencil, then rubbed out; an animator's sheet on the light table."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "scelles-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "L'indice : une empreinte sur un sol sombre, une loupe qui la balaie ; la carte arrive sous une lampe torche, sur l'empreinte.",
+    "en": "The clue: a fingerprint on a dark floor, a magnifying glass sweeping it; the card comes under a torch, over the print."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

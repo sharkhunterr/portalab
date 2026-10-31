@@ -67,12 +67,14 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   and the rarity's name, written by Portalab, slammed across the screen first in big comic letters; a neon
   violet pack sliced by a beam of light; neon-framed cards; a neon stage as a looping video;
 - `booster-blockbuster/`, `booster-tenebres/`, `booster-rideau/`, `booster-arcanes/`, `booster-hyperespace/`,
-  `booster-tresor/`, `booster-reportage/`, `booster-insomnie/`: **a scene per Mediacards genre booster** (Action,
-  Horreur, Drame, Fantastique, Science-fiction, Aventure, Documentaire, Thriller), built together from
+  `booster-tresor/`, `booster-reportage/`, `booster-insomnie/`, `booster-fourire/`, `booster-crayon/`,
+  `booster-scelles/`: **a scene per Mediacards genre booster** (Action, Horreur, Drame, Fantastique,
+  Science-fiction, Aventure, Documentaire, Thriller, Comédie, Animation, Crime), built together from
   `booster-genres-source/`, each rarity its own moment over the whole screen in the genre's world — a chase, an
   explosion, the finale; a bulb, claws, a blood moon; a spotlight, the curtain, the ovation; runes, a portal, a
   dragon; a scope, the jump, a fleet; a treasure map, a sunken chest, an island; a viewfinder, a clapperboard,
-  the archive; a tail in the rain, a countdown, a manhunt ending in bullet holes in the card — each pack going
+  the archive; a tail in the rain, a countdown, a manhunt ending in bullet holes in the card; a party popper, a
+  cream pie, the big show; a sketch, a flip book, the grand finale; a clue, the board, the crime scene — each pack going
   its own way as it opens, its stage a looping video;
 - `booster-ed-nitrate/` … `booster-ed-glass/`: **a scene per media card edition** (the fourteen editions'
   boosters), built together from `booster-editions-source/`, each in its frame's era — a silent film's iris and

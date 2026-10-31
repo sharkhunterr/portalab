@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "fourire",
+  "names": {
+    "fr": "La tarte",
+    "en": "The pie"
+  },
+  "descriptions": {
+    "fr": "Une tarte à la crème arrive en cloche et s'écrase sur le paquet — confettis.",
+    "en": "A cream pie lobs in and splats the pack — confetti."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

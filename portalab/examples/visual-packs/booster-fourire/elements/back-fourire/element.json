@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "fourire",
+  "names": {
+    "fr": "Dos à pois",
+    "en": "Polka-dot back"
+  },
+  "descriptions": {
+    "fr": "Jaune à pois, une bande arc-en-ciel, un grand sourire au centre.",
+    "en": "Polka-dot yellow, a rainbow band, a big grin in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

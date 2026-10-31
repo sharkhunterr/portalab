@@ -1,0 +1,21 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: The pack scribbled over in pencil, coloured in a flash, then rubbed out with an eraser. */
+[data-opening="crayon"] .booster-stage__tear .booster-pack {
+  animation: genre-fate 2.6s linear both;
+}
+@keyframes genre-fate {
+  0% { transform: none; filter: none; clip-path: inset(0 0 0 0); opacity: 1; }
+  46% { transform: none; filter: saturate(1.4); clip-path: inset(0 0 0 0); opacity: 1; }
+  76%, 100% { clip-path: inset(0 0 0 100%); opacity: 1; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="crayon"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="crayon"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

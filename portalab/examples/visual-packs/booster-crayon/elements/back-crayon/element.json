@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "crayon",
+  "names": {
+    "fr": "Dos quadrillé",
+    "en": "Grid back"
+  },
+  "descriptions": {
+    "fr": "Papier quadrillé, une bande arc-en-ciel, un crayon au centre.",
+    "en": "Grid paper, a rainbow band, a pencil in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

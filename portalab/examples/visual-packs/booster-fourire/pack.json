@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "fourire",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Fou rire — comédie",
+    "en": "Fou rire — comedy"
+  },
+  "descriptions": {
+    "fr": "Le booster Comédie, un fou rire : chaque rareté son moment en plein écran — un cotillon pour une rare, une tarte à la crème pour une épique, le grand show pour une légendaire. Un paquet jaune à pois qu'une tarte à la crème vient écraser ; une scène de comédie sous les confettis.",
+    "en": "The Comedy booster, a fit of laughter: every rarity its own moment over the whole screen — a party popper for a rare, a cream pie for an epic, the big show for a legendary. A polka-dot yellow pack splatted by a cream pie; a comedy stage under confetti."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

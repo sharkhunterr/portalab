@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "fourire",
+  "names": {
+    "fr": "Scène sous les confettis",
+    "en": "Confetti stage"
+  },
+  "descriptions": {
+    "fr": "Un fond jaune soleil à pois qui défilent, une poursuite rose qui se balance, des confettis aux couleurs de la fête qui tombent (vidéo en boucle).",
+    "en": "A sunshine-yellow backdrop of drifting polka dots, a pink spotlight swaying, confetti in the party colours falling (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}
