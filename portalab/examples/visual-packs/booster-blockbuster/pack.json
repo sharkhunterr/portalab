@@ -1,14 +1,14 @@
 {
   "format": 1,
   "id": "blockbuster",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "names": {
     "fr": "Blockbuster — action",
     "en": "Blockbuster — action"
   },
   "descriptions": {
-    "fr": "Le booster Action en grand spectacle : chaque rareté prend tout l'écran — un écran coupé d'acier et de feu traversé de barres de vitesse, puis la carte jetée de dos dans une boule de feu, des débris projetés, et au retournement une onde de choc et un grand reflet d'objectif. Un paquet d'acier brossé à bande de danger qui explose après un compte à rebours ; une ville de nuit sous les projecteurs.",
-    "en": "The Action booster as a blockbuster: every rarity takes the whole screen — a screen cut in steel and fire crossed by speed bars, then the card flung in face down into a fireball, debris flying, and as it turns a shockwave and a great lens flare. A brushed steel pack with a hazard band that blows up after a countdown; a city at night under searchlights."
+    "fr": "Le booster Action en grand spectacle, chaque rareté son moment en plein écran : une poursuite de nuit pour une rare, une explosion pour une épique, le final pour une légendaire — une ville en feu, des chasseurs, des explosions en chaîne. Un paquet d'acier brossé à bande de danger qui explose après un compte à rebours ; une ville de nuit sous les projecteurs.",
+    "en": "The Action booster as a blockbuster, every rarity its own moment over the whole screen: a night chase for a rare, an explosion for an epic, the finale for a legendary — a city on fire, fighter jets, explosions going off one after another. A brushed-steel pack with a hazard band that blows up after a countdown; a city at night under searchlights."
   },
   "author": "Portalab (example)",
   "license": "CC0-1.0"

@@ -50,7 +50,60 @@ function fireball(L, glowL, hazeL, r, f, base, o) {   // layered flat fire: smok
   if (hazeL) polys(hazeL, [circle(C, C, r * 1.15, 1, 40)], ACT.fire, o * 0.9);
   for (var k = rings.length - 1; k >= 0; k--) polys(L, [burst(C, C, 16, r * rings[k][0], r * rings[k][0] * 0.82, 0.18, f * 0.03 + k)], rings[k][1], o);
 }
-var GENRE_ACTION = {
+// a fighter jet's silhouette along ang (its nose at x, y), and its two contrails behind it
+function jet(x, y, s, ang) {
+  var half = [[1, 0], [0.55, -0.07], [0.1, -0.1], [-0.25, -0.62], [-0.4, -0.62], [-0.3, -0.12], [-0.7, -0.12], [-0.85, -0.34], [-0.97, -0.34], [-0.92, 0]];
+  var shape = [], i;   // the upper half, then the lower one mirrored (ExtendScript has no Array.map)
+  for (i = 0; i < half.length; i++) shape.push([half[i][0] * s, half[i][1] * s]);
+  for (i = half.length - 2; i > 0; i--) shape.push([half[i][0] * s, -half[i][1] * s]);
+  return place(shape, x, y, ang);
+}
+function contrails(x, y, s, ang, len) {
+  var c = Math.cos(ang), sn = Math.sin(ang), out = [];
+  for (var k = -1; k <= 1; k += 2) { var bx = x - c * s * 0.9 - sn * k * s * 0.25, by = y - sn * s * 0.9 + c * k * s * 0.25; out.push([[bx, by], [bx - c * len, by - sn * len]]); }
+  return out;
+}
+function explosionAt(fr, x, y, r, f, base, o) {   // a flat fireball anywhere: smoky rim, orange, yellow, a white core
+  seed(base + Math.floor(f / 2));
+  polys(fr.haze, [circle(x, y, r * 1.25, 1, 32)], ACT.fire, o * 0.8);
+  polys(fr.main, [burst(x, y, 14, r * 0.45, r * 0.36, 0.2, f * 0.05)], ACT.core, o);
+  polys(fr.main, [burst(x, y, 14, r * 0.75, r * 0.6, 0.2, f * 0.05 + 1)], ACT.flame, o);
+  polys(fr.main, [burst(x, y, 14, r, r * 0.8, 0.22, f * 0.05 + 2)], ACT.fire, o * 0.95);
+}
+function embers(L, glowL, f, n, base, o) {   // embers rising and swaying, everywhere
+  seed(base); var list = [];
+  for (var i = 0; i < n; i++) { var x = between(-40, 1120) + Math.sin(f * 0.15 + i) * 20, y = 1120 - ((f * between(8, 18) + between(0, 1200)) % 1250), r = between(2.5, 6); list.push(circle(x, y, r, 1, 8)); }
+  polys(glowL, list, ACT.fire, o); polys(L, list, ACT.core, o);
+}
+// every rarity its own moment: a rare a car chase, an epic an explosion, a legendary the finale
+var ACTION_RARE = {
+  title: function (fr, f, u) {   // a night road rushing at the screen, headlights, speed lines
+    seed(90); polys(fr.top, streaks(C, C, 600, 600, 26, 1.5708, 420, 3), WHITE, 45);
+    var dashes = [];
+    for (var k = 0; k < 7; k++) { var t = (f * 0.09 + k / 7) % 1, d = t * t, y = 200 + d * 940, w = 3 + d * 34, l = 8 + d * 150; dashes.push([[C - w, y], [C + w, y], [C + w * 1.15, y + l], [C - w * 1.15, y + l]]); }
+    polys(fr.main, dashes, ACT.flame, 100);
+    for (var side = -1; side <= 1; side += 2) { polys(fr.haze, [circle(C + side * 230, 1010, 150, 0.6, 32)], ACT.core, 70); polys(fr.main, [circle(C + side * 230, 1010, 40, 0.6, 24)], WHITE, 100); }
+    polys(fr.main, [[[C - 24, 200], [C + 24, 200], [1140, 1140], [-60, 1140]]], ACT.steel, 100);
+    polys(fr.glow, [[[-60, 150], [1140, 150], [1140, 230], [-60, 230]]], ACT.fire, 50);
+    polys(fr.main, [full()], ACT.night, 100);
+  },
+  wipe: function (fr, v) {   // two black skid marks swerving across
+    polys(fr.top, slash(-60, 980, 1140, 120, 170, ease(v * 1.4), 0.8), ACT.night, 100);
+    polys(fr.top, slash(-60, 1240, 1140, 380, 170, ease(v * 1.4 - 0.15), 0.8), ACT.night, 100);
+  },
+  stage: function (fr, f, at, o) {
+    seed(95 + (f % 3)); polys(fr.main, concentration(C, C, 70, 900, 300, 7), WHITE, o * 0.22);
+    if (at >= 0) { var sw = 240 + at * 38; lines(fr.glow, [ring(C, C, sw, 1.2)], ACT.flame, 22, fade(at, 5, 12) * o); lines(fr.main, [ring(C, C, sw, 1.2)], WHITE, 5, fade(at, 5, 12) * o); }
+    sparksOut(fr.main, fr.glow, f - CARD_AT, 18, ACT.flame, 1400, 16);
+    polys(fr.haze, [circle(C, C + 380, 420, 0.4, 40)], ACT.fire, o * 0.6);
+    polys(fr.main, [full()], ACT.night, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 6) polys(fr.top, slash(-60, 700, 1140, 380, 34, ease(at / 3), 0.4), WHITE, fade(at, 3, 6) * 100);
+    sparksOut(fr.main, fr.glow, at - 2, 12, ACT.flame, 1520, 22);
+  }
+};
+var ACTION_EPIC = {
   title: function (fr, f, u) {
     var drift = u * 50;
     // three white speed bars rushing past, a shockwave, the screen cut in two — steel above, fire below
@@ -80,7 +133,67 @@ var GENRE_ACTION = {
     if (at >= 0 && at < 7) polys(fr.top, slash(-60, 760, 1140, 300, 48, ease(at / 3), 0.6), WHITE, fade(at, 3, 7) * 100);
     sparksOut(fr.main, fr.glow, at - 2, 26, ACT.flame, 1500, 26);
     bigGlint(fr, at, ACT.flame);
+  }
+};
+function skyline(base, top, seedBase) {   // a city's towers side by side, standing on base, their roofs from top down
+  seed(seedBase); var town = [[-60, 1140], [-60, base]], x = -60;
+  while (x < 1140) { var w = between(40, 95), h = top + between(0, (base - top) * 0.45); town.push([x, h]); town.push([x + w, h]); x += w; }
+  town.push([1140, base]); town.push([1140, 1140]);
+  return town;
+}
+function searchlights(L, f, o) {   // two beams sweeping a smoky sky from the city
+  var out = [];
+  for (var k = 0; k < 3; k++) { var ang = -1.5708 + 0.55 * Math.sin(f * 0.07 + k * 2.1), x = 180 + k * 360, y = 1000, c = Math.cos(ang), sn = Math.sin(ang); out.push([[x - 14, y], [x + 14, y], [x + c * 1300 + sn * 160, y + sn * 1300 - c * 160], [x + c * 1300 - sn * 160, y + sn * 1300 + c * 160]]); }
+  polys(L, out, [0.8, 0.85, 1], o);
+}
+var BOOMS = [[C - 330, C - 270, 150], [C + 350, C - 190, 170], [C - 300, C + 310, 160], [C + 320, C + 330, 150], [C - 20, C - 440, 190], [C + 20, C + 470, 170]];
+var ACTION_LEGENDARY = {
+  title: function (fr, f, u) {   // the finale: a city burning at the horizon, two fighters screaming past, letterboxed
+    polys(fr.top, [[[-60, -60], [1140, -60], [1140, 110], [-60, 110]], [[-60, 970], [1140, 970], [1140, 1140], [-60, 1140]]], ACT.night, 100);
+    for (var j = 0; j < 2; j++) { var t = f - j * 6; if (t < 0) continue; var x = -260 + t * 95, y = 330 + j * 150 - t * 6; polys(fr.main, [jet(x, y, 70 - j * 14, -0.06)], ACT.night, 100); lines(fr.glow, contrails(x, y, 70 - j * 14, -0.06, 700), WHITE, 10, 70); lines(fr.main, contrails(x, y, 70 - j * 14, -0.06, 700), WHITE, 3, 80); }
+    embers(fr.main, fr.glow, f, 40, 120, 100);
+    polys(fr.main, [skyline(780, 600, 130)], ACT.night, 100);
+    polys(fr.haze, [[[-60, 560], [1140, 560], [1140, 860], [-60, 860]]], ACT.fire, 100);
+    polys(fr.main, [[[-60, 600], [1140, 600], [1140, 800], [-60, 800]]], ACT.fire, 100);
+    polys(fr.main, [[[-60, 430], [1140, 430], [1140, 640], [-60, 640]]], [0.45, 0.1, 0.04], 100);
+    polys(fr.main, [full()], [0.1, 0.03, 0.03], 100);
   },
+  wipe: function (fr, v) {   // a nuclear-white flash rolling out, ringed in fire
+    var r = 40 + ease(v) * 1000;
+    polys(fr.top, [circle(C, C, r, 1, 48)], ACT.core, 100);
+    lines(fr.top, [ring(C, C, r, 1)], ACT.fire, 60, 100);
+  },
+  stage: function (fr, f, at, o) {
+    var g = ease((f - CARD_AT) / 6);
+    if (at >= 0) {   // a double shockwave, a long blue flare
+      for (var q = 0; q < 2; q++) { var sw = 260 + (at - q * 4) * 46; if (at < q * 4) continue; lines(fr.glow, [ring(C, C, sw, 1)], ACT.flame, 34, fade(at - q * 4, 6, 18) * o); lines(fr.main, [ring(C, C, sw, 1)], WHITE, 8, fade(at - q * 4, 6, 18) * o); }
+      var fl = fade(at, 14, 28) * o; polys(fr.top, [[[-60, C - 7], [C, C - 20], [1140, C - 7], [1140, C + 7], [C, C + 20], [-60, C + 7]]], [0.75, 0.9, 1], fl);
+      polys(fr.glow, [[[-60, C - 44], [1140, C - 44], [1140, C + 44], [-60, C + 44]]], [0.35, 0.55, 1], fl * 0.7);
+    }
+    for (var i = 0; i < BOOMS.length; i++) {   // explosions going off round the card, one after the other
+      var t = f - CARD_AT - 2 - i * 5; if (t < 0) continue;
+      explosionAt(fr, BOOMS[i][0], BOOMS[i][1], BOOMS[i][2] * ease(t / 5) * (1 + t * 0.01), f, 200 + i * 10, fade(t, 16, 30) * o);
+    }
+    if (at >= -6 && at < 18) { var tj = at + 6; var x = 1300 - tj * 70, y = 220 + tj * 9; polys(fr.top, [jet(x, y, 80, Math.PI + 0.12)], ACT.night, o); lines(fr.glow, contrails(x, y, 80, Math.PI + 0.12, 900), WHITE, 12, o * 0.7); lines(fr.main, contrails(x, y, 80, Math.PI + 0.12, 900), WHITE, 3, o); }
+    embers(fr.top, fr.glow, f, 60, 140, o);
+    // the city burning below, searchlights sweeping a blood-red sky — no wedges: the finale is a place
+    polys(fr.main, [skyline(1140, 700, 131)], ACT.night, o);
+    polys(fr.haze, [[[-60, 760], [1140, 760], [1140, 1000], [-60, 1000]]], ACT.fire, o);
+    searchlights(fr.glow, f, o * 0.35);
+    fireball(fr.main, fr.glow, fr.haze, 200 * g + (at >= 0 ? 60 * back(at / 5) : 0), f, 50, o * 0.9);
+    polys(fr.main, [[[-60, 640], [1140, 640], [1140, 1140], [-60, 1140]]], [0.55, 0.14, 0.04], o);
+    polys(fr.main, [[[-60, 300], [1140, 300], [1140, 700], [-60, 700]]], [0.3, 0.06, 0.04], o);
+    polys(fr.main, [full()], [0.09, 0.02, 0.03], o);
+  },
+  over: function (fr, f, at) {   // two slashes crossing, a hail of sparks
+    if (at >= 0 && at < 8) { polys(fr.top, slash(-60, 860, 1140, 220, 34, ease(at / 3), 0.6), WHITE, fade(at, 3, 7) * 70); polys(fr.top, slash(-60, 220, 1140, 860, 34, ease((at - 2) / 3), -0.6), ACT.core, fade(at, 4, 8) * 70); }
+    sparksOut(fr.main, fr.glow, at - 2, 40, ACT.flame, 1600, 30);
+    embers(fr.main, fr.glow, f, 30, 170, at >= 0 ? 100 : 0);
+    bigGlint(fr, at, ACT.flame);
+  }
+};
+var GENRE_ACTION = {
+  rarities: { rare: ACTION_RARE, epic: ACTION_EPIC, legendary: ACTION_LEGENDARY },
   opening: function (comp) {   // a countdown's rings closing on the pack, then it blows up: fireball, debris
     var cx = 576, cy = 505;
     for (var f = 0; f < 64; f++) {
@@ -364,21 +477,24 @@ var GENRE_SF = {
 var GENRE = { action: GENRE_ACTION, dark: GENRE_DARK, drama: GENRE_DRAMA, fantasy: GENRE_FANTASY, sf: GENRE_SF }[GENRE_KEY];
 
 // --- the comps --------------------------------------------------------------------------------------------
+// a genre with a moment of its own per rarity gives it (``rarities``), else the same one for every rarity
+function moment(rarity) { return GENRE.rarities ? GENRE.rarities[rarity] : GENRE; }
 function behind(rarity) {
-  var N = LENGTH[rarity], comp = square("reveal-" + rarity, N);
+  var N = LENGTH[rarity], comp = square("reveal-" + rarity, N), G = moment(rarity);
   for (var f = 0; f < N; f++) {
     var fr = frameOf(comp, f); if (!fr.main) continue;
     var o = fade(f, N - 12, N - 1) * 100, at = f - FACE_AT;
-    if (f < CARD_AT) GENRE.title(fr, f, f / CARD_AT);
-    if (f >= CARD_AT - 4 && f < CARD_AT + 4) GENRE.wipe(fr, (f - CARD_AT + 4) / 8);
+    if (f < CARD_AT) G.title(fr, f, f / CARD_AT);
+    if (f >= CARD_AT - 4 && f < CARD_AT + 4) G.wipe(fr, (f - CARD_AT + 4) / 8);
     if (f < CARD_AT - 1) continue;
     flash(fr, at);
-    GENRE.stage(fr, f, at, o);
+    G.stage(fr, f, at, o);
   }
 }
 function overCard(rarity) {
   var N = LENGTH[rarity], comp = square("over-" + rarity, N);
-  for (var f = 0; f < N; f++) { var fr = frameOf(comp, f); if (!fr.main) continue; GENRE.over(fr, f, f - FACE_AT + 3); }
+  var G = moment(rarity);
+  for (var f = 0; f < N; f++) { var fr = frameOf(comp, f); if (!fr.main) continue; G.over(fr, f, f - FACE_AT + 3); }
 }
 if (ONLY === "opening") GENRE.opening(newComp("opening", 1152, 1080, 64));
 if (ONLY.indexOf("reveal-") === 0) behind(ONLY.slice(7));

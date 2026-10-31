@@ -6,8 +6,8 @@
     "en": "Epic reveal"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
-    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+    "fr": "L'explosion : l'écran coupé entre l'acier et le feu, puis une boule de feu, des débris et une onde de choc autour de la carte qui se retourne.",
+    "en": "The explosion: the screen cut between steel and fire, then a fireball, debris and a shockwave round the card as it turns over."
   },
   "render": {
     "kind": "video",

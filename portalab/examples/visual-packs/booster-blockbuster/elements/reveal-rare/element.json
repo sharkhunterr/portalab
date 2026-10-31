@@ -6,8 +6,8 @@
     "en": "Rare reveal"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
-    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+    "fr": "La poursuite : une route de nuit qui fonce vers l'écran, des phares, des traces de pneus ; la carte arrive dans les lignes de vitesse et se retourne dans une onde de choc.",
+    "en": "The chase: a night road rushing at the screen, headlights, skid marks; the card comes in the speed lines and turns over in a shockwave."
   },
   "render": {
     "kind": "video",
