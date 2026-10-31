@@ -59,6 +59,10 @@ async def fetch(
     transport: httpx.AsyncBaseTransport | None = None,
 ) -> Fetched:
     headers = {"User-Agent": AGENT, "Accept": accept}
+    host = (httpx.URL(url).host or "").lower()
+    if host == "youtube.com" or host.endswith(".youtube.com"):
+        # YouTube shows Europe its consent page first: the « refused » answer, a cookie of YouTube's own
+        headers["Cookie"] = "SOCS=CAI"
     if etag:
         headers["If-None-Match"] = etag
     if modified:
