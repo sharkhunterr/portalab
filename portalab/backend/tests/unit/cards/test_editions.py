@@ -1,5 +1,5 @@
 """Issue 233: a card's edition — the medium of its work's era — and its edition's version drawn in packs.
-Issue 255: fourteen generations, and a legendary's HD version."""
+Issue 255: fourteen generations, and a legendary's HD version. Issue 295: its genre's version."""
 
 import random
 
@@ -35,20 +35,44 @@ def test_the_edition_follows_the_year_of_release() -> None:
 def test_the_editions_version_is_drawn_the_more_often_the_rarer() -> None:
     rng = random.Random(7)  # noqa: S311 — a seeded draw, for the test
     # no year of release, no edition: never its version
-    assert {variant_for("legendary", rng, "cast") for _ in range(2000)} <= {"normal", "foil"}
+    drawn = {variant_for("legendary", rng, "cast") for _ in range(2000)}
+    assert drawn <= {"normal", "foil", "genre", "genre_foil"}
     commons = [variant_for("common", rng, "cast", "vhs") for _ in range(6000)]
     legendaries = [variant_for("legendary", rng, "cast", "vhs") for _ in range(6000)]
-    assert set(commons) <= {"normal", "foil", "showcase", "showcase_foil"}
+    assert set(commons) <= {"normal", "foil", "showcase", "showcase_foil", "genre", "genre_foil"}
     assert 100 < sum(v.startswith("showcase") for v in commons) < 320  # about 1 in 30
     # a legendary: its HD version about 1 in 6, else its edition's about 1 in 5
     assert 850 < legendaries.count("hd") < 1150
     assert 850 < sum(v.startswith("showcase") for v in legendaries) < 1200
     # a work's borderless version is never its edition's at once
     titles = {variant_for("legendary", rng, "title", "disc") for _ in range(3000)}
-    assert titles == {"normal", "foil", "showcase", "showcase_foil", "borderless", "borderless_foil", "hd"}
+    assert titles == {
+        "normal",
+        "foil",
+        "showcase",
+        "showcase_foil",
+        "borderless",
+        "borderless_foil",
+        "hd",
+        "genre",
+        "genre_foil",
+    }
 
 
 def test_only_a_legendary_comes_in_hd() -> None:
     rng = random.Random(3)  # noqa: S311 — a seeded draw, for the test
     for rarity in ("common", "rare", "epic"):
         assert "hd" not in {variant_for(rarity, rng, "cast", "glass") for _ in range(3000)}
+
+
+def test_the_genres_version_is_drawn_for_every_card_the_more_often_the_rarer() -> None:
+    rng = random.Random(11)  # noqa: S311 — a seeded draw, for the test
+    # a work without a year has no edition, but always a genre
+    commons = [variant_for("common", rng, "cast") for _ in range(6000)]
+    legendaries = [variant_for("legendary", rng, "cast") for _ in range(6000)]
+    assert 100 < sum(v.startswith("genre") for v in commons) < 320  # about 1 in 30
+    assert 1000 < sum(v.startswith("genre") for v in legendaries) < 1400  # about 1 in 5
+    # never at once with its edition's version or the borderless one
+    titles = [variant_for("epic", rng, "title", "vhs") for _ in range(6000)]
+    assert all(not (v.startswith("genre") and ("showcase" in v or "borderless" in v)) for v in titles)
+    assert {"genre", "genre_foil"} <= set(titles)

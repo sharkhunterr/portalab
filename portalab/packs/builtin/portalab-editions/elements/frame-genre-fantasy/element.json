@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-fantasy",
+  "names": {
+    "en": "Fantasy — grimoire",
+    "fr": "Fantastique — grimoire"
+  },
+  "descriptions": {
+    "en": "The media cards' fantasy genre frame, in Arcanes' world: a hull with its corners cut like a grimoire's clasps in its rarity's metal, a night of violet runes, the art under an arch ringed in teal and gold, the name engraved above it; behind a cut-out character, a portal of light.",
+    "fr": "Le cadre du genre fantastique des cartes médias, dans l'univers des Arcanes : une coque aux coins coupés comme les fermoirs d'un grimoire dans le métal de sa rareté, une nuit de runes violettes, l'image sous une arche cerclée de turquoise et d'or, le nom gravé au-dessus ; derrière un personnage détouré, un portail de lumière."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

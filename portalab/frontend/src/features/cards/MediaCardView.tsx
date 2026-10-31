@@ -205,6 +205,8 @@ export function MediaCardView({
   // issue 255: a legendary's HD version, foil, in its edition's frame: a work borderless and animated, a
   // character without the frame around it, over its edition's animated backdrop spread over the whole card
   const hd = variant === "hd" && Boolean(edition);
+  // issue 295: its genre's version wears its genre's frame (a visual pack's ``card_frame`` too)
+  const genreFrame = variant === "genre" || variant === "genre_foil";
   const borderless =
     variant === "borderless" || variant === "borderless_foil" || (hd && card.kind === "title");
   const frameless = hd && card.kind !== "title";
@@ -304,7 +306,7 @@ export function MediaCardView({
       data-rarity={card.rarity}
       data-borderless={borderless || undefined}
       data-edition={edition ?? undefined}
-      data-frame={showcase || hd ? `edition-${edition}` : undefined}
+      data-frame={showcase || hd ? `edition-${edition}` : genreFrame ? `genre-${family}` : undefined}
       data-hd={hd || undefined}
       data-frameless={frameless || undefined}
       data-foil={foil || undefined}

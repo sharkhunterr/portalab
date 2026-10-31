@@ -43,11 +43,15 @@ TRIAL_SIZE = 6  # an administrator's trial pack: more cards, the special version
 TRIAL_FOIL = 0.4
 TRIAL_BORDERLESS = 0.5
 TRIAL_SHOWCASE = 0.5
+TRIAL_GENRE = 0.5
 FOIL = 1 / 8
 # the chance a copy is borderless (the full-art alternative), by the card's rarity
 BORDERLESS = {"common": 0.0, "rare": 1 / 40, "epic": 1 / 10, "legendary": 1 / 4}
 # the chance a copy is in its edition's version (issue 233), by the card's rarity
 SHOWCASE = {"common": 1 / 30, "rare": 1 / 15, "epic": 1 / 8, "legendary": 1 / 5}
+# issue 295: the chance a copy is in its genre's version (its genre's frame), by the card's rarity — every
+# card has a genre; drawn when it is neither borderless nor in its edition's
+GENRE = {"common": 1 / 30, "rare": 1 / 15, "epic": 1 / 8, "legendary": 1 / 5}
 # issue 255: the chance a copy is in its edition's HD version — a legendary's only
 HD = {"legendary": 1 / 6}
 TRIAL_HD = 0.5
@@ -104,8 +108,10 @@ def variant_for(rarity: str, rng: random.Random, kind: str = "title", edition: s
     borderless = kind == "title" and rng.random() < BORDERLESS.get(rarity, 0.0)
     # its edition's version: a work released some year (its edition known)
     showcase = not borderless and edition is not None and rng.random() < SHOWCASE.get(rarity, 0.0)
+    # issue 295: its genre's version
+    genre = not borderless and not showcase and rng.random() < GENRE.get(rarity, 0.0)
     foil = rng.random() < FOIL
-    base = "borderless" if borderless else "showcase" if showcase else None
+    base = "borderless" if borderless else "showcase" if showcase else "genre" if genre else None
     if base:
         return f"{base}_foil" if foil else base
     return "foil" if foil else "normal"
@@ -268,8 +274,9 @@ class Packs:
                     continue
                 borderless = card.kind == "title" and self.rng.random() < TRIAL_BORDERLESS
                 showcase = not borderless and edition is not None and self.rng.random() < TRIAL_SHOWCASE
+                genre = not borderless and not showcase and self.rng.random() < TRIAL_GENRE
                 foil = self.rng.random() < TRIAL_FOIL
-                base = "borderless" if borderless else "showcase" if showcase else None
+                base = "borderless" if borderless else "showcase" if showcase else "genre" if genre else None
                 variant = (f"{base}_foil" if foil else base) if base else ("foil" if foil else "normal")
                 session.add(
                     Copy(user_id=user, card_id=card.id, variant=variant, pack_id=pack_id, acquired_at=now)

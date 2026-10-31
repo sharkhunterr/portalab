@@ -1,0 +1,184 @@
+/* Portalab — card_frame/genre-sf: the science fiction genre's frame, Hyperespace's world — a ship's hull with
+   docking notches on its sides, in the rarity's metal, deep space and a grid; the art in a porthole ringed with
+   a dial, the name on the hull's bridge, the figures read out as a console, the rarity on a cyan readout. Behind
+   a cut-out character, a ringed planet among the stars. */
+
+@font-face {
+  font-family: "Frame Orbitron";
+  src: url("Orbitron.woff2") format("woff2");
+  font-weight: 400 900;
+  font-display: swap;
+}
+.mcard[data-frame="genre-sf"] {
+  --genre-space: #020617;
+  --genre-hull: #0b1838;
+  --genre-cyan: #4de8ff;
+  --genre-text: #e6f7ff;
+  --genre-soft: #9cb6cc;
+  filter: drop-shadow(0 0 2cqi var(--mcard-glow));
+}
+/* a hull: corners cut, docking notches on its sides */
+.mcard[data-frame="genre-sf"] .mcard__card {
+  padding: 1.2cqi;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(
+    5cqi 0, calc(100% - 5cqi) 0, 100% 5cqi, 100% 36%, calc(100% - 2cqi) 39%, calc(100% - 2cqi) 55%, 100% 58%,
+    100% calc(100% - 5cqi), calc(100% - 5cqi) 100%, 5cqi 100%, 0 calc(100% - 5cqi), 0 58%, 2cqi 55%, 2cqi 39%, 0 36%,
+    0 5cqi
+  );
+}
+.mcard[data-frame="genre-sf"] .mcard__body {
+  gap: 1.2cqi;
+  padding: 3cqi 4.6cqi 2.6cqi;
+  border-radius: 0;
+  clip-path: polygon(
+    4.6cqi 0, calc(100% - 4.6cqi) 0, 100% 4.6cqi, 100% 36.2%, calc(100% - 2cqi) 39.2%, calc(100% - 2cqi) 54.8%,
+    100% 57.8%, 100% calc(100% - 4.6cqi), calc(100% - 4.6cqi) 100%, 4.6cqi 100%, 0 calc(100% - 4.6cqi), 0 57.8%,
+    2cqi 54.8%, 2cqi 39.2%, 0 36.2%, 0 4.6cqi
+  );
+  background:
+    linear-gradient(rgba(77, 232, 255, 0.06) 0.25cqi, transparent 0.25cqi) 0 0 / 100% 5cqi,
+    linear-gradient(90deg, rgba(77, 232, 255, 0.06) 0.25cqi, transparent 0.25cqi) 0 0 / 5cqi 100%,
+    radial-gradient(ellipse at 50% 0%, var(--genre-hull), var(--genre-space) 70%);
+  box-shadow: none;
+  color: var(--genre-text);
+}
+.mcard[data-frame="genre-sf"] .mcard__head {
+  padding-inline: 1cqi;
+}
+.mcard[data-frame="genre-sf"] .mcard__name {
+  zoom: 0.72; /* a wide face: the name keeps the room it was fitted for */
+  font-family: "Frame Orbitron", var(--mcard-title);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--genre-text);
+  text-shadow: 0 0 2cqi color-mix(in srgb, var(--genre-cyan) 70%, transparent);
+}
+.mcard[data-frame="genre-sf"] .mcard__genre {
+  border-radius: 0;
+  background: none;
+  box-shadow: inset 0 0 0 0.3cqi var(--genre-cyan);
+  color: var(--genre-cyan);
+  font-family: "Frame Orbitron", var(--mcard-title);
+  font-size: 2.2cqi;
+  letter-spacing: 0.1em;
+}
+.mcard[data-frame="genre-sf"] .mcard__emblem {
+  background: none;
+  color: var(--genre-cyan);
+}
+/* the art in a porthole ringed with a dial */
+.mcard[data-frame="genre-sf"] .mcard__art {
+  margin: 1.6cqi 1.6cqi 1cqi;
+  border-radius: 12cqi;
+  background: var(--genre-space);
+  box-shadow:
+    0 0 0 0.5cqi var(--genre-cyan),
+    0 0 0 1.4cqi var(--genre-hull),
+    0 0 0 1.7cqi color-mix(in srgb, var(--genre-cyan) 50%, transparent),
+    0 0 3cqi color-mix(in srgb, var(--genre-cyan) 40%, transparent);
+}
+.mcard[data-frame="genre-sf"] .mcard__art[data-outgrown] {
+  overflow: hidden;
+}
+.mcard[data-frame="genre-sf"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(var(--genre-cyan), var(--genre-cyan)) 50% 0 / 0.33cqi 2.4cqi no-repeat,
+    linear-gradient(var(--genre-cyan), var(--genre-cyan)) 50% 100% / 0.33cqi 2.4cqi no-repeat,
+    linear-gradient(var(--genre-cyan), var(--genre-cyan)) 0 50% / 2.4cqi 0.33cqi no-repeat,
+    linear-gradient(var(--genre-cyan), var(--genre-cyan)) 100% 50% / 2.4cqi 0.33cqi no-repeat,
+    linear-gradient(180deg, rgba(77, 232, 255, 0.12), transparent 30%, transparent 70%, rgba(2, 6, 23, 0.5));
+}
+.mcard[data-frame="genre-sf"] .mcard__art[data-cutout] .mcard__sky {
+  mask: none;
+  background:
+    radial-gradient(ellipse 42% 9% at 30% 30%, transparent 62%, rgba(255, 220, 170, 0.7) 66%, transparent 74%),
+    radial-gradient(circle at 30% 30%, #ffcf8a 0 8%, #b45a2a 15%, transparent 16%),
+    radial-gradient(circle, #ffffff 0 0.2cqi, transparent 0.35cqi) 0 0 / 9cqi 11cqi,
+    radial-gradient(circle, #9fefff 0 0.15cqi, transparent 0.3cqi) 4cqi 5cqi / 13cqi 7cqi,
+    radial-gradient(ellipse at 70% 80%, #1b3a7a, var(--genre-space) 70%);
+}
+.mcard[data-frame="genre-sf"] .mcard__strip {
+  background: none;
+  color: var(--genre-soft);
+}
+.mcard[data-frame="genre-sf"] .mcard__stage {
+  border-radius: 0;
+  background: var(--genre-cyan);
+  color: var(--genre-space);
+  font-family: "Frame Orbitron", var(--mcard-title);
+  font-size: 2.2cqi;
+  letter-spacing: 0.14em;
+  clip-path: polygon(1.4cqi 0, calc(100% - 1.4cqi) 0, 100% 50%, calc(100% - 1.4cqi) 100%, 1.4cqi 100%, 0 50%);
+}
+/* the figures read out as a console */
+.mcard[data-frame="genre-sf"] .mcard__lower {
+  padding: 1.4cqi;
+  background: rgba(2, 6, 23, 0.6);
+  box-shadow:
+    inset 0 0 0 0.33cqi color-mix(in srgb, var(--genre-cyan) 45%, transparent),
+    inset 0 1.2cqi 2cqi -1.2cqi color-mix(in srgb, var(--genre-cyan) 35%, transparent);
+}
+.mcard[data-frame="genre-sf"] .mcard__poster {
+  border-radius: 0;
+  box-shadow: 0 0 0 0.33cqi var(--genre-cyan);
+}
+.mcard[data-frame="genre-sf"] .mcard__work strong {
+  font-family: "Frame Orbitron", var(--mcard-title);
+  font-weight: 700;
+  color: var(--genre-text);
+}
+.mcard[data-frame="genre-sf"] .mcard__figures strong {
+  font-family: "Frame Orbitron", var(--mcard-title);
+  font-weight: 700;
+  color: var(--genre-cyan);
+  text-shadow: 0 0 1.6cqi color-mix(in srgb, var(--genre-cyan) 60%, transparent);
+}
+.mcard[data-frame="genre-sf"] .mcard__figures li {
+  font-size: 2.8cqi;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.mcard[data-frame="genre-sf"] .mcard__work small,
+.mcard[data-frame="genre-sf"] .mcard__meta,
+.mcard[data-frame="genre-sf"] .mcard__by,
+.mcard[data-frame="genre-sf"] .mcard__flavor,
+.mcard[data-frame="genre-sf"] .mcard__figures li {
+  color: var(--genre-soft);
+  border-color: rgba(77, 232, 255, 0.18);
+  opacity: 1;
+}
+.mcard[data-frame="genre-sf"] .mcard__cost {
+  border-radius: 0;
+  background: none;
+  box-shadow: inset 0 0 0 0.3cqi var(--genre-cyan);
+  color: var(--genre-cyan);
+}
+.mcard[data-frame="genre-sf"] .mcard__foot {
+  padding-inline: 2cqi;
+  color: var(--genre-soft);
+  font-family: "Frame Orbitron", var(--mcard-title);
+  font-size: 2.4cqi;
+}
+/* the rarity on a readout of its metal */
+.mcard[data-frame="genre-sf"] .mcard__rarity {
+  border-radius: 0;
+  background: var(--mcard-rim);
+  box-shadow: 0 0 2cqi var(--mcard-glow);
+  color: var(--genre-space);
+  font-family: "Frame Orbitron", var(--mcard-title);
+  font-size: 2.4cqi;
+  font-weight: 800;
+  clip-path: polygon(1.2cqi 0, 100% 0, 100% calc(100% - 1.2cqi), calc(100% - 1.2cqi) 100%, 0 100%, 0 1.2cqi);
+}
+.mcard[data-frame="genre-sf"] .mcard__gem {
+  background: var(--genre-space);
+}

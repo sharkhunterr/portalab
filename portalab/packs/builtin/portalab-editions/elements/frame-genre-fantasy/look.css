@@ -1,0 +1,168 @@
+/* Portalab — card_frame/genre-fantasy: the fantasy genre's frame, Arcanes' world — a hull with its corners cut
+   like a grimoire's clasps in the rarity's metal, a night of violet runes, the art under a pointed arch ringed in
+   teal and gold, the name engraved on a plaque under it, the rarity on a gold seal. Behind a cut-out character, a
+   portal of light. */
+
+@font-face {
+  font-family: "Frame Cinzel";
+  src: url("CinzelDecorative.woff2") format("woff2");
+  font-weight: 900;
+  font-display: swap;
+}
+.mcard[data-frame="genre-fantasy"] {
+  --genre-night: #0a0720;
+  --genre-violet: #2a1866;
+  --genre-teal: #3ee8d8;
+  --genre-gold: #ffc83e;
+  --genre-text: #f4f0f8;
+  --genre-soft: #c9c0e8;
+  filter: drop-shadow(0 0 2cqi var(--mcard-glow));
+}
+.mcard[data-frame="genre-fantasy"] .mcard__card {
+  padding: 1.4cqi;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(
+    7cqi 0,
+    calc(100% - 7cqi) 0,
+    100% 7cqi,
+    100% calc(100% - 7cqi),
+    calc(100% - 7cqi) 100%,
+    7cqi 100%,
+    0 calc(100% - 7cqi),
+    0 7cqi
+  );
+}
+.mcard[data-frame="genre-fantasy"] .mcard__body {
+  gap: 1.2cqi;
+  padding: 3cqi 4.4cqi 2.6cqi;
+  border-radius: 0;
+  clip-path: polygon(
+    6.4cqi 0,
+    calc(100% - 6.4cqi) 0,
+    100% 6.4cqi,
+    100% calc(100% - 6.4cqi),
+    calc(100% - 6.4cqi) 100%,
+    6.4cqi 100%,
+    0 calc(100% - 6.4cqi),
+    0 6.4cqi
+  );
+  background:
+    radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--genre-teal) 18%, transparent), transparent 46%),
+    repeating-conic-gradient(from 0deg at 50% 32%, rgba(255, 255, 255, 0.035) 0deg 2deg, transparent 2deg 15deg),
+    linear-gradient(180deg, var(--genre-violet), var(--genre-night) 70%);
+  box-shadow:
+    inset 0 0 0 0.4cqi var(--genre-gold),
+    inset 0 0 0 0.9cqi var(--genre-night),
+    inset 0 0 0 1.2cqi color-mix(in srgb, var(--genre-teal) 70%, transparent);
+  color: var(--genre-text);
+}
+/* the name, centred and engraved; the genre a small medallion beside it */
+.mcard[data-frame="genre-fantasy"] .mcard__head {
+  justify-content: center;
+  padding-inline: 3cqi;
+}
+.mcard[data-frame="genre-fantasy"] .mcard__name {
+  flex: 0 1 auto;
+  zoom: 0.8; /* a wide face: the name keeps the room it was fitted for */
+  font-family: "Frame Cinzel", var(--mcard-title);
+  font-weight: 900;
+  text-align: center;
+  color: var(--genre-text);
+  text-shadow:
+    0 0 1.6cqi color-mix(in srgb, var(--genre-teal) 70%, transparent),
+    0.25cqi 0.25cqi 0 var(--genre-night);
+}
+.mcard[data-frame="genre-fantasy"] .mcard__genre {
+  padding: 0.6cqi;
+  border-radius: 50%;
+  background: var(--genre-night);
+  box-shadow: 0 0 0 0.4cqi var(--genre-gold);
+  color: var(--genre-teal);
+  font-size: 0;
+}
+.mcard[data-frame="genre-fantasy"] .mcard__emblem {
+  background: none;
+  color: var(--genre-teal);
+}
+/* the art under a pointed arch */
+.mcard[data-frame="genre-fantasy"] .mcard__art {
+  margin: 1cqi 2cqi 0.6cqi;
+  border-radius: 50% 50% 1.4cqi 1.4cqi / 24% 24% 1.4cqi 1.4cqi;
+  background: var(--genre-night);
+  box-shadow:
+    0 0 0 0.5cqi var(--genre-gold),
+    0 0 0 1cqi var(--genre-night),
+    0 0 0 1.4cqi var(--genre-teal),
+    0 0 3cqi color-mix(in srgb, var(--genre-teal) 45%, transparent);
+}
+/* a legendary's character stays under the arch */
+.mcard[data-frame="genre-fantasy"] .mcard__art[data-outgrown] {
+  overflow: hidden;
+}
+.mcard[data-frame="genre-fantasy"] .mcard__art[data-cutout] .mcard__sky {
+  mask: none;
+  background:
+    radial-gradient(circle at 50% 58%, color-mix(in srgb, var(--genre-teal) 70%, #ffffff) 0 6%, transparent 30%),
+    repeating-radial-gradient(circle at 50% 58%, transparent 0 4cqi, color-mix(in srgb, var(--genre-teal) 30%, transparent) 4cqi 4.4cqi),
+    radial-gradient(ellipse at 50% 58%, color-mix(in srgb, var(--genre-teal) 45%, var(--genre-violet)), var(--genre-night) 75%);
+}
+.mcard[data-frame="genre-fantasy"] .mcard__strip {
+  padding: 0 1cqi;
+  background: none;
+  color: var(--genre-soft);
+}
+.mcard[data-frame="genre-fantasy"] .mcard__stage {
+  border-radius: 0.6cqi;
+  background: var(--genre-teal);
+  color: var(--genre-night);
+  font-family: "Frame Cinzel", var(--mcard-title);
+  letter-spacing: 0.1em;
+}
+.mcard[data-frame="genre-fantasy"] .mcard__lower {
+  padding: 1.6cqi;
+  border-radius: 1.4cqi;
+  background: rgba(10, 7, 32, 0.6);
+  box-shadow: inset 0 0 0 0.33cqi color-mix(in srgb, var(--genre-gold) 60%, transparent);
+}
+.mcard[data-frame="genre-fantasy"] .mcard__poster {
+  border-radius: 0.8cqi;
+  box-shadow: 0 0 0 0.4cqi var(--genre-gold);
+}
+.mcard[data-frame="genre-fantasy"] .mcard__work strong,
+.mcard[data-frame="genre-fantasy"] .mcard__figures strong {
+  font-family: "Frame Cinzel", var(--mcard-title);
+  font-weight: 900;
+  color: var(--genre-text);
+}
+.mcard[data-frame="genre-fantasy"] .mcard__work small,
+.mcard[data-frame="genre-fantasy"] .mcard__meta,
+.mcard[data-frame="genre-fantasy"] .mcard__by,
+.mcard[data-frame="genre-fantasy"] .mcard__flavor,
+.mcard[data-frame="genre-fantasy"] .mcard__figures li {
+  color: var(--genre-soft);
+  border-color: color-mix(in srgb, var(--genre-gold) 30%, transparent);
+  opacity: 1;
+}
+.mcard[data-frame="genre-fantasy"] .mcard__cost {
+  background: var(--genre-teal);
+  color: var(--genre-night);
+}
+.mcard[data-frame="genre-fantasy"] .mcard__foot {
+  padding-inline: 2.4cqi;
+  color: var(--genre-soft);
+}
+/* the rarity on a seal of its metal */
+.mcard[data-frame="genre-fantasy"] .mcard__rarity {
+  border-radius: 0.6cqi;
+  background: var(--mcard-rim);
+  box-shadow:
+    0 0 0 0.33cqi var(--genre-night),
+    0 0 1.8cqi var(--mcard-glow);
+  color: var(--genre-night);
+  font-family: "Frame Cinzel", var(--mcard-title);
+  font-weight: 900;
+}
+.mcard[data-frame="genre-fantasy"] .mcard__gem {
+  background: var(--genre-night);
+}

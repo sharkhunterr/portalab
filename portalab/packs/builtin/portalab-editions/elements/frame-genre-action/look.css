@@ -1,0 +1,159 @@
+/* Portalab — card_frame/genre-action: the action genre's frame, Blockbuster's world — a hull cut on a slant like
+   a poster torn from a wall, in the rarity's metal, dark steel scored with hazard stripes; the art first, its
+   foot cut on the slant, the name slammed over it on an orange band, the rarity on a steel tag. Behind a cut-out
+   character, a blast. */
+
+@font-face {
+  font-family: "Frame Anton";
+  src: url("Anton.woff2") format("woff2");
+  font-display: swap;
+}
+.mcard[data-frame="genre-action"] {
+  --genre-steel: #0d0f14;
+  --genre-plate: #1b1f28;
+  --genre-fire: #ff6a00;
+  --genre-gold: #ffc83e;
+  --genre-text: #f6f3ee;
+  --genre-soft: #b9bcc6;
+  filter: drop-shadow(0 0 2cqi var(--mcard-glow));
+}
+.mcard[data-frame="genre-action"] .mcard__card {
+  padding: 1.4cqi;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(0 4cqi, 64% 0, 100% 0, 100% calc(100% - 4cqi), 36% 100%, 0 100%);
+}
+.mcard[data-frame="genre-action"] .mcard__body {
+  gap: 1.2cqi;
+  padding: 4.4cqi 3cqi 3cqi;
+  border-radius: 0;
+  clip-path: polygon(0 3.6cqi, 64% 0, 100% 0, 100% calc(100% - 3.6cqi), 36% 100%, 0 100%);
+  background:
+    repeating-linear-gradient(-45deg, rgba(255, 106, 0, 0.9) 0 1.6cqi, var(--genre-steel) 1.6cqi 3.2cqi) 0 0 / 100% 1.6cqi
+      no-repeat,
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.03) 0 0.33cqi, transparent 0.33cqi 1.8cqi),
+    linear-gradient(170deg, var(--genre-plate), var(--genre-steel) 60%);
+  box-shadow: none;
+  color: var(--genre-text);
+}
+/* the art first, the name slammed over its foot, then what it is and the box */
+.mcard[data-frame="genre-action"] .mcard__art {
+  order: 1;
+  margin: 0;
+  block-size: 66cqi;
+  clip-path: polygon(0 0, 100% 0, 100% 84%, 0 100%);
+  box-shadow: none;
+  background: var(--genre-steel);
+}
+.mcard[data-frame="genre-action"] .mcard__art[data-outgrown] {
+  overflow: hidden;
+}
+.mcard[data-frame="genre-action"] .mcard__head {
+  order: 2;
+  z-index: 3;
+  margin: -9cqi -3cqi 0;
+  padding: 1cqi 3cqi 1cqi 4cqi;
+  min-block-size: 0;
+  background: var(--genre-fire);
+  clip-path: polygon(0 18%, 100% 0, 100% 82%, 0 100%);
+  transform: rotate(-4deg);
+  color: var(--genre-steel);
+}
+.mcard[data-frame="genre-action"] .mcard__name {
+  font-family: "Frame Anton", var(--mcard-title);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: var(--genre-steel);
+  text-shadow: none;
+}
+.mcard[data-frame="genre-action"] .mcard__genre {
+  border-radius: 0;
+  background: var(--genre-steel);
+  color: var(--genre-fire);
+  font-family: "Frame Anton", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  transform: skewX(-10deg);
+}
+.mcard[data-frame="genre-action"] .mcard__emblem {
+  background: none;
+  color: var(--genre-fire);
+}
+.mcard[data-frame="genre-action"] .mcard__art[data-cutout] .mcard__sky {
+  mask: none;
+  background:
+    repeating-conic-gradient(from 0deg at 50% 70%, rgba(255, 200, 62, 0.35) 0deg 4deg, transparent 4deg 13deg),
+    radial-gradient(circle at 50% 70%, #fff2c0 0 6%, var(--genre-fire) 22%, #7a1e00 48%, var(--genre-steel) 78%);
+}
+.mcard[data-frame="genre-action"] .mcard__strip {
+  order: 3;
+  margin-block-start: 0.6cqi;
+  background: none;
+  color: var(--genre-soft);
+}
+.mcard[data-frame="genre-action"] .mcard__stage {
+  border-radius: 0;
+  background: var(--genre-text);
+  color: var(--genre-steel);
+  font-family: "Frame Anton", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  clip-path: polygon(1.2cqi 0, 100% 0, calc(100% - 1.2cqi) 100%, 0 100%);
+}
+.mcard[data-frame="genre-action"] .mcard__lower {
+  order: 4;
+  padding: 1.4cqi;
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0.6cqi 0 0 var(--genre-fire);
+}
+.mcard[data-frame="genre-action"] .mcard__flavor {
+  order: 5;
+  color: var(--genre-soft);
+  border-color: rgba(255, 106, 0, 0.4);
+}
+.mcard[data-frame="genre-action"] .mcard__foot {
+  order: 6;
+  color: var(--genre-soft);
+}
+.mcard[data-frame="genre-action"] .mcard__poster {
+  border-radius: 0;
+  box-shadow: 0 0 0 0.4cqi var(--genre-text);
+}
+.mcard[data-frame="genre-action"] .mcard__work strong,
+.mcard[data-frame="genre-action"] .mcard__figures strong {
+  font-family: "Frame Anton", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--genre-text);
+}
+.mcard[data-frame="genre-action"] .mcard__work small,
+.mcard[data-frame="genre-action"] .mcard__meta,
+.mcard[data-frame="genre-action"] .mcard__by,
+.mcard[data-frame="genre-action"] .mcard__figures li {
+  color: var(--genre-soft);
+  border-color: rgba(255, 255, 255, 0.14);
+  opacity: 1;
+}
+.mcard[data-frame="genre-action"] .mcard__figures strong {
+  color: var(--genre-fire);
+}
+.mcard[data-frame="genre-action"] .mcard__cost {
+  border-radius: 0;
+  background: var(--genre-fire);
+  color: var(--genre-steel);
+}
+/* the rarity on a steel tag in its metal, cut on the slant */
+.mcard[data-frame="genre-action"] .mcard__rarity {
+  border-radius: 0;
+  padding-inline: 1.6cqi 3cqi;
+  background: var(--mcard-rim);
+  box-shadow: 0 0 1.8cqi var(--mcard-glow);
+  color: var(--genre-steel);
+  font-family: "Frame Anton", var(--mcard-title);
+  font-weight: 400;
+  clip-path: polygon(1.4cqi 0, 100% 0, calc(100% - 1.4cqi) 100%, 0 100%);
+}
+.mcard[data-frame="genre-action"] .mcard__gem {
+  background: var(--genre-steel);
+}

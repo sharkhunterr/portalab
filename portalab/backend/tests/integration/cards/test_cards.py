@@ -126,9 +126,11 @@ def test_borderless_only_at_high_rarities() -> None:
     rng = random.Random(7)  # noqa: S311 — deterministic test data
     commons = {variant_for("common", rng) for _ in range(2000)}
     legendaries = [variant_for("legendary", rng) for _ in range(2000)]
-    assert commons <= {"normal", "foil"}
+    # issue 295: besides, every card may come in its genre's version
+    assert commons <= {"normal", "foil", "genre", "genre_foil"}
     # the borderless alternative is a work's only: never a person's card
-    assert {variant_for("legendary", rng, "cast") for _ in range(2000)} <= {"normal", "foil"}
+    people = [variant_for("legendary", rng, "cast") for _ in range(2000)]
+    assert not any(v.startswith("borderless") for v in people)
     assert 350 < sum(v.startswith("borderless") for v in legendaries) < 650
 
 
