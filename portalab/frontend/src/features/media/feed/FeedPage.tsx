@@ -5,15 +5,12 @@ import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { EmptyState } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
-import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import { ExternalNews } from "../../news/ExternalNews";
 import { MySources } from "../../news/MySources";
 import { personPath, useCatalogFacets } from "../api";
 import { metadataImage } from "../detail/Enrichment";
 import { Poster } from "../MediaGrid";
 import {
-  type FeedItem,
   type FeedUpcoming,
   type Follow,
   type FollowKind,
@@ -22,6 +19,7 @@ import {
   useFollowToggle,
   useMarkSeen,
 } from "./api";
+import { Timeline } from "./Timeline";
 import "./feed.css";
 
 const KIND_ICONS: Record<FollowKind, string> = { person: "user", title: "tv", genre: "tag" };
@@ -31,44 +29,6 @@ function followRoute(follow: Follow): string {
   if (follow.kind === "person") return personPath(follow.label);
   if (follow.kind === "title") return `/media/${follow.ref}`;
   return `/media/browse?genre=${encodeURIComponent(follow.ref)}`;
-}
-
-function Arrival({ item }: { item: FeedItem }) {
-  const t = useT();
-  const format = useFormat();
-  const ago = (Date.parse(item.at) - Date.now()) / 1000;
-  return (
-    <li className="feed-item" data-unread={item.unread || undefined}>
-      <Link to={`/media/${item.object_id}`} className="feed-item__link">
-        <Poster src={item.image_id ? `/api/v1/media/images/${item.image_id}` : null} kind={item.kind} />
-        <span className="feed-item__text">
-          <span className="feed-item__head">
-            {item.unread ? <span className="feed-item__new">{t("media:feed.new")}</span> : null}
-            <span className="feed-item__when">{format.relative(ago)}</span>
-          </span>
-          <strong className="feed-item__title">
-            {item.title}
-            {item.year ? ` (${item.year})` : ""}
-          </strong>
-          {item.units?.length ? (
-            <span className="feed-item__units">
-              {t("media:feed.units", { count: item.units.length, list: item.units.slice(-4).join(", ") })}
-            </span>
-          ) : (
-            <span className="feed-item__units">{t(`media:feed.arrived.${item.kind}`)}</span>
-          )}
-          <span className="feed-item__because">
-            {item.because.map((b) => (
-              <span key={`${b.kind}:${b.label}`} className="feed-chip">
-                <Icon name={KIND_ICONS[b.kind]} size={12} />
-                {b.label}
-              </span>
-            ))}
-          </span>
-        </span>
-      </Link>
-    </li>
-  );
 }
 
 function Coming({ credit }: { credit: FeedUpcoming }) {
@@ -211,7 +171,7 @@ export default function FeedPage() {
       />
       {feed.isPending ? <FunctionalState state="loading" /> : null}
       {feed.isError ? <FunctionalState state="error" onRetry={() => feed.refetch()} /> : null}
-      {loaded && !mine.length ? (
+      {loaded && !mine.length && !items.length ? (
         <EmptyState
           icon="rss"
           title={t("media:feed.empty")}
@@ -219,47 +179,28 @@ export default function FeedPage() {
           action={{ label: t("media:feed.toLibrary"), href: "/media" }}
         />
       ) : null}
-      {loaded && mine.length ? (
-        <section className="feed-section" aria-labelledby="feed-arrivals">
-          <h2 id="feed-arrivals">
-            <Icon name="sparkles" size={18} /> {t("media:feed.arrivals")}
-          </h2>
-          {items.length ? (
-            <ul className="feed-list">
-              {items.map((item) => (
-                <Arrival key={item.object_id} item={item} />
-              ))}
-            </ul>
-          ) : (
-            <p className="admin-muted">{t("media:feed.nothingYet")}</p>
-          )}
-        </section>
-      ) : null}
-      {/* #299: what the news sources say of the people and series I follow */}
-      <ExternalNews
-        heading={t("news:external.forYou")}
-        limit={12}
-        enabled={mine.some((f) => f.kind !== "genre")}
-        asked={{
-          person: mine.filter((f) => f.kind === "person").map((f) => f.ref),
-          title: mine.filter((f) => f.kind === "title").map((f) => f.ref),
-        }}
-      />
       {upcoming.length ? (
         <section className="feed-section" aria-labelledby="feed-upcoming">
           <h2 id="feed-upcoming">
             <Icon name="calendar" size={18} /> {t("media:feed.upcoming")}
           </h2>
-          <ul className="feed-list">
+          <ul className="feed-list feed-list--rail">
             {upcoming.map((credit) => (
               <Coming key={`${credit.kind}:${credit.tmdb_id}`} credit={credit} />
             ))}
           </ul>
         </section>
       ) : null}
-      {follows.isSuccess ? <Follows follows={mine} /> : null}
-      {/* #299: my own sources, read for me alone */}
-      <MySources />
+      {/* #299: one stream — the library's arrivals and every source's news, each with its source's colour */}
+      {loaded ? <Timeline arrivals={items} follows={mine} seenAt={feed.data?.seen_at} /> : null}
+      <details className="feed-manage">
+        <summary>
+          <Icon name="settings" size={16} /> {t("media:feed.manage")}
+        </summary>
+        {follows.isSuccess ? <Follows follows={mine} /> : null}
+        {/* #299: my own sources, read for me alone */}
+        <MySources items={false} />
+      </details>
     </section>
   );
 }
