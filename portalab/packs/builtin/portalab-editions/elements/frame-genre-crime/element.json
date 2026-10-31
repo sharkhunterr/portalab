@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-crime",
+  "names": {
+    "en": "Crime — case file",
+    "fr": "Crime — dossier"
+  },
+  "descriptions": {
+    "en": "The crime genre's frame: a manila case file with its tab; the art an evidence photo crossed by police tape, the name typed on a label, the rarity a red rubber stamp; behind a cut-out character, a mugshot's height chart.",
+    "fr": "Le cadre du genre crime : un dossier en papier kraft avec son onglet ; l'image en photo d'enquête trombonée, barrée d'un ruban de police, le nom tapé à la machine sur une étiquette, la rareté en coup de tampon rouge ; derrière un personnage détouré, la toise d'une photo d'identité judiciaire."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

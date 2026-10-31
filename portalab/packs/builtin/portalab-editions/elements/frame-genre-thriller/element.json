@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-thriller",
+  "names": {
+    "en": "Thriller — tension",
+    "fr": "Thriller — tension"
+  },
+  "descriptions": {
+    "en": "The thriller genre's frame: a card leaning forward, black barred by a blind's shadow; the art crossed by a red pulse line, the name in tight capitals behind a red bar; behind a cut-out character, a single lamp in the dark.",
+    "fr": "Le cadre du genre thriller : une carte penchée en avant, du noir rayé par l'ombre d'un store ; l'image en noir et blanc contrasté traversée d'un tracé de pouls rouge, le nom en capitales serrées derrière une barre rouge ; derrière un personnage détouré, une seule lampe dans le noir."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

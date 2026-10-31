@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-mystery",
+  "names": {
+    "en": "Mystery — magnifier",
+    "fr": "Mystère — loupe"
+  },
+  "descriptions": {
+    "en": "The mystery genre's frame: a detective's card, its top arched like a keyhole, a sea-green fog; the art in a magnifying glass's oval lens ringed with brass, the name in brass small capitals; behind a cut-out character, a street lamp's glow in the mist.",
+    "fr": "Le cadre du genre mystère : une carte de détective, le haut en arche d'une serrure, du brouillard vert d'eau ; l'image dans le verre ovale d'une loupe cerclée de laiton, le nom en petites capitales de laiton ; derrière un personnage détouré, la lueur d'un réverbère dans la brume."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

@@ -1,169 +1,177 @@
-/* Portalab — card_frame/genre-drama: the drama genre's frame, Rideau's world — a theatre's proscenium, its top an
-   arch in the rarity's metal, crimson velvet; the art on the stage between drawn curtains under a scalloped
-   valance, the name on a gold marquee under it, the rarity on a ticket. Behind a cut-out character, a
-   spotlight. */
+/* Portalab — card_frame/genre-drama: the drama genre's frame (a work's main genre) — a festival poster — espresso black with hollowed corners, the art in an ivory mat ringed with gold, the name in large italics under it between two gold rules. Behind a cut-out character, a warm stage light. */
 
 @font-face {
-  font-family: "Frame Playfair";
-  src: url("PlayfairDisplay.woff2") format("woff2");
-  font-style: italic;
+  font-family: "Frame Cormorant";
+  src: url("CormorantGaramond.woff2") format("woff2");
+  font-style: italic; font-weight: 600;
   font-display: swap;
 }
 .mcard[data-frame="genre-drama"] {
-  --genre-velvet: #1a0508;
-  --genre-crimson: #b50d22;
-  --genre-deep: #5c0612;
-  --genre-gold: #ffc83e;
-  --genre-cream: #fbf1dc;
-  --genre-soft: #e6c9c2;
+  --g-font: "Frame Cormorant", var(--mcard-title);
+  --g-bg: #16110f;
+  --g-bg2: #0b0807;
+  --g-text: #f3ead8;
+  --g-soft: #cdbfa6;
+  --g-accent: #c9a45c;
+  --g-on-accent: #16110f;
+  --g-line: rgba(201, 164, 92, 0.4);
+  --g-box: transparent;
   filter: drop-shadow(0 0 2cqi var(--mcard-glow));
 }
-/* a proscenium: the top an arch */
 .mcard[data-frame="genre-drama"] .mcard__card {
-  padding: 1.6cqi;
-  border-radius: 50% 50% 3cqi 3cqi / 11% 11% 3cqi 3cqi;
+  padding: 1.2cqi;
+  border-radius: 0;
+  box-shadow: none;
+  mask:
+    radial-gradient(circle at 0 0, transparent 5cqi, #000000 5.1cqi) 0 0 / 51% 51% no-repeat,
+    radial-gradient(circle at 100% 0, transparent 5cqi, #000000 5.1cqi) 100% 0 / 51% 51% no-repeat,
+    radial-gradient(circle at 0 100%, transparent 5cqi, #000000 5.1cqi) 0 100% / 51% 51% no-repeat,
+    radial-gradient(circle at 100% 100%, transparent 5cqi, #000000 5.1cqi) 100% 100% / 51% 51% no-repeat;
 }
 .mcard[data-frame="genre-drama"] .mcard__body {
-  gap: 1.2cqi;
-  padding: 5cqi 3.4cqi 2.6cqi;
-  border-radius: 50% 50% 2cqi 2cqi / 10% 10% 2cqi 2cqi;
+  gap: 1.3cqi;
+  padding: 4.6cqi 4.6cqi 3cqi;
+  border-radius: 0;
+  mask:
+    radial-gradient(circle at 0 0, transparent 4.2cqi, #000000 4.3cqi) 0 0 / 51% 51% no-repeat,
+    radial-gradient(circle at 100% 0, transparent 4.2cqi, #000000 4.3cqi) 100% 0 / 51% 51% no-repeat,
+    radial-gradient(circle at 0 100%, transparent 4.2cqi, #000000 4.3cqi) 0 100% / 51% 51% no-repeat,
+    radial-gradient(circle at 100% 100%, transparent 4.2cqi, #000000 4.3cqi) 100% 100% / 51% 51% no-repeat;
   background:
-    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.22) 0 1.4cqi, rgba(255, 255, 255, 0.03) 1.4cqi 2.6cqi, rgba(0, 0, 0, 0.22) 2.6cqi 4cqi),
-    linear-gradient(180deg, var(--genre-crimson), var(--genre-deep) 55%, var(--genre-velvet));
-  box-shadow: inset 0 0 0 0.5cqi var(--genre-gold), inset 0 0 3cqi rgba(0, 0, 0, 0.6);
-  color: var(--genre-cream);
-}
-/* the stage first, the marquee under it, then what it is and the box */
-.mcard[data-frame="genre-drama"] .mcard__art {
-  order: 1;
-  margin: 0.4cqi 0.6cqi 0;
-  block-size: 58cqi;
-  border-radius: 40% 40% 1cqi 1cqi / 14% 14% 1cqi 1cqi;
-  background: var(--genre-velvet);
-  box-shadow:
-    0 0 0 0.6cqi var(--genre-gold),
-    0 0 0 1.1cqi var(--genre-velvet);
-}
-.mcard[data-frame="genre-drama"] .mcard__art[data-outgrown] {
-  overflow: hidden;
-}
-/* the curtains drawn aside, the valance's scallops */
-.mcard[data-frame="genre-drama"] .mcard__art::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 100% 60% at 50% 0, transparent 97%, var(--genre-crimson) 98%) 0 0 / 9cqi 4cqi repeat-x,
-    linear-gradient(90deg, var(--genre-deep), var(--genre-crimson) 4%, var(--genre-deep) 8%, var(--genre-crimson) 11%, transparent 13%, transparent 87%, var(--genre-crimson) 89%, var(--genre-deep) 92%, var(--genre-crimson) 96%, var(--genre-deep));
-  mask: linear-gradient(180deg, #000000, #000000 55%, transparent 92%);
-}
-.mcard[data-frame="genre-drama"] .mcard__art[data-cutout] .mcard__sky {
-  mask: none;
-  background:
-    conic-gradient(from 160deg at 50% -10%, transparent 0deg, rgba(255, 244, 214, 0.5) 12deg, rgba(255, 244, 214, 0.5) 28deg, transparent 40deg),
-    radial-gradient(ellipse 60% 20% at 50% 96%, rgba(255, 244, 214, 0.55), transparent 70%),
-    linear-gradient(180deg, #120305, var(--genre-velvet));
+    radial-gradient(ellipse 80% 50% at 50% 30%, #2a1f1a, transparent 70%),
+    linear-gradient(180deg, var(--g-bg), var(--g-bg2));
+  box-shadow: none;
+  color: var(--g-text);
 }
 .mcard[data-frame="genre-drama"] .mcard__head {
   order: 2;
   justify-content: center;
-  margin-inline: 2cqi;
-  padding: 0.8cqi 2.6cqi;
+  gap: 2.4cqi;
   min-block-size: 0;
-  border-radius: 1.2cqi;
-  background:
-    radial-gradient(circle, #fff6d0 0 0.4cqi, transparent 0.6cqi) 0 50% / 2.6cqi 100% repeat-x,
-    linear-gradient(180deg, #ffe08a, var(--genre-gold) 45%, #b07a10);
-  box-shadow: 0 0.6cqi 1.4cqi rgba(0, 0, 0, 0.5);
-  color: var(--genre-velvet);
 }
 .mcard[data-frame="genre-drama"] .mcard__name {
-  flex: 0 1 auto;
-  font-family: "Frame Playfair", var(--mcard-title);
-  font-style: italic;
-  font-weight: 800;
-  text-align: center;
-  color: var(--genre-velvet);
+  font-family: var(--g-font);
+  font-style: italic; font-weight: 600;
+  color: var(--g-text);
   text-shadow: none;
+  flex: 0 1 auto;
+  font-size: 1.15em;
+  text-align: center;
+  letter-spacing: 0.01em;
 }
 .mcard[data-frame="genre-drama"] .mcard__genre {
-  background: var(--genre-velvet);
-  color: var(--genre-gold);
+  background: var(--g-accent);
+  color: var(--g-on-accent);
   font-size: 0;
-  padding: 0.5cqi;
+  padding: 0.4cqi;
+  border-radius: 50%;
 }
 .mcard[data-frame="genre-drama"] .mcard__emblem {
   background: none;
-  color: var(--genre-gold);
+  color: inherit;
+}
+.mcard[data-frame="genre-drama"] .mcard__art {
+  order: 1;
+  margin: 1.8cqi 1.8cqi 0.6cqi;
+  block-size: 60cqi;
+  border-radius: 0;
+  background: var(--g-bg2);
+  box-shadow:
+    0 0 0 1.6cqi var(--g-text),
+    0 0 0 1.9cqi var(--g-accent),
+    0 1.2cqi 3cqi rgba(0, 0, 0, 0.6);
+}
+/* a legendary's character stays in its window */
+.mcard[data-frame="genre-drama"] .mcard__art[data-outgrown] {
+  overflow: hidden;
+}
+.mcard[data-frame="genre-drama"] .mcard__art[data-cutout] .mcard__sky {
+  mask: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 20%, rgba(255, 214, 160, 0.55), transparent 70%),
+    linear-gradient(180deg, #3a2a20, var(--g-bg2) 85%);
 }
 .mcard[data-frame="genre-drama"] .mcard__strip {
   order: 3;
   background: none;
-  color: var(--genre-soft);
+  color: var(--g-soft);
 }
 .mcard[data-frame="genre-drama"] .mcard__stage {
-  background: var(--genre-cream);
-  color: var(--genre-deep);
-  font-family: "Frame Playfair", var(--mcard-title);
-  font-style: italic;
-  letter-spacing: 0.06em;
-  text-transform: none;
+  border-radius: 0.4cqi;
+  background: var(--g-text);
+  color: var(--g-bg2);
+  font-family: var(--g-font);
+  font-style: italic; font-weight: 600;
 }
 .mcard[data-frame="genre-drama"] .mcard__lower {
   order: 4;
   padding: 1.4cqi;
-  border-radius: 1.2cqi;
-  background: rgba(26, 5, 8, 0.55);
-  box-shadow: inset 0 0 0 0.33cqi color-mix(in srgb, var(--genre-gold) 55%, transparent);
+  background: var(--g-box);
+  background: none;
+  border-block-start: 0.3cqi solid var(--g-line);
+  border-radius: 0;
+  padding: 1.4cqi 0 0;
 }
 .mcard[data-frame="genre-drama"] .mcard__flavor {
   order: 5;
-  color: var(--genre-soft);
-  border-color: color-mix(in srgb, var(--genre-gold) 40%, transparent);
+  color: var(--g-soft);
+  border-color: var(--g-line);
 }
 .mcard[data-frame="genre-drama"] .mcard__foot {
   order: 6;
-  color: var(--genre-soft);
+  color: var(--g-soft);
 }
 .mcard[data-frame="genre-drama"] .mcard__poster {
-  border-radius: 0.6cqi;
-  box-shadow: 0 0 0 0.4cqi var(--genre-gold);
+  border-radius: 0.4cqi;
+  box-shadow: 0 0 0 0.4cqi var(--g-text);
 }
 .mcard[data-frame="genre-drama"] .mcard__work strong,
 .mcard[data-frame="genre-drama"] .mcard__figures strong {
-  font-family: "Frame Playfair", var(--mcard-title);
-  font-style: italic;
-  font-weight: 800;
-  color: var(--genre-cream);
+  font-family: var(--g-font);
+  font-style: italic; font-weight: 600;
+  color: var(--g-text);
+}
+.mcard[data-frame="genre-drama"] .mcard__figures strong {
+  color: var(--g-accent);
 }
 .mcard[data-frame="genre-drama"] .mcard__work small,
 .mcard[data-frame="genre-drama"] .mcard__meta,
 .mcard[data-frame="genre-drama"] .mcard__by,
 .mcard[data-frame="genre-drama"] .mcard__figures li {
-  color: var(--genre-soft);
-  border-color: color-mix(in srgb, var(--genre-gold) 30%, transparent);
+  color: var(--g-soft);
+  border-color: var(--g-line);
   opacity: 1;
 }
 .mcard[data-frame="genre-drama"] .mcard__cost {
-  background: var(--genre-gold);
-  color: var(--genre-velvet);
+  background: var(--g-accent);
+  color: var(--g-on-accent);
 }
-/* the rarity on a ticket of its metal, its ends notched */
+/* the rarity on a tag of its metal */
 .mcard[data-frame="genre-drama"] .mcard__rarity {
-  border-radius: 0;
-  padding-inline: 2.2cqi;
   background: var(--mcard-rim);
+  color: #1a1410;
   box-shadow: 0 0 1.8cqi var(--mcard-glow);
-  color: var(--genre-velvet);
-  font-family: "Frame Playfair", var(--mcard-title);
+  border-radius: 999px;
+  font-family: var(--g-font);
   font-style: italic;
-  font-weight: 800;
-  mask:
-    radial-gradient(circle at 0 50%, transparent 1cqi, #000000 1.1cqi) left / 51% 100% no-repeat,
-    radial-gradient(circle at 100% 50%, transparent 1cqi, #000000 1.1cqi) right / 51% 100% no-repeat;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
 }
 .mcard[data-frame="genre-drama"] .mcard__gem {
-  background: var(--genre-velvet);
+  background: #1a1410;
+}
+/* gold rules each side of the name */
+.mcard[data-frame="genre-drama"] .mcard__head::before,
+.mcard[data-frame="genre-drama"] .mcard__head::after {
+  content: "";
+  flex: 1;
+  block-size: 0.3cqi;
+  background: linear-gradient(90deg, transparent, var(--g-accent));
+}
+.mcard[data-frame="genre-drama"] .mcard__head::after {
+  background: linear-gradient(90deg, var(--g-accent), transparent);
+}
+.mcard[data-frame="genre-drama"] .mcard__genre {
+  order: 3;
 }

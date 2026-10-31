@@ -2,12 +2,12 @@
   "type": "card_frame",
   "look": "genre-drama",
   "names": {
-    "en": "Drama — proscenium",
-    "fr": "Drame — avant-scène"
+    "en": "Drama — festival",
+    "fr": "Drame — festival"
   },
   "descriptions": {
-    "en": "The media cards' drama genre frame, in Rideau's world: a theatre's proscenium with an arched top, crimson velvet, the art on the stage between drawn curtains under a valance, the name on a gold marquee below it, the rarity on a ticket; behind a cut-out character, a spotlight.",
-    "fr": "Le cadre du genre drame des cartes médias, dans l'univers de Rideau : l'avant-scène d'un théâtre au sommet en arche, du velours pourpre, l'image sur la scène entre deux rideaux sous un lambrequin, le nom sur une marquise dorée en dessous, la rareté sur un billet ; derrière un personnage détouré, une poursuite."
+    "en": "The drama genre's frame: a festival poster — espresso black with hollowed corners, the art in an ivory mat ringed with gold, the name in large italics under it between two gold rules; behind a cut-out character, a warm stage light.",
+    "fr": "Le cadre du genre drame : l'affiche d'un festival — un noir d'expresso aux coins creusés, l'image dans un passe-partout ivoire cerclé d'or, le nom en grandes italiques sous elle, entre deux filets d'or ; derrière un personnage détouré, une lumière chaude de scène."
   },
   "render": {
     "kind": "css",

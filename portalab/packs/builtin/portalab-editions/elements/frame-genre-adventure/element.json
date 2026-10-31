@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-adventure",
+  "names": {
+    "en": "Adventure — treasure map",
+    "fr": "Aventure — carte au trésor"
+  },
+  "descriptions": {
+    "en": "The adventure genre's frame: a treasure map with ragged edges, parchment ruled with meridians; the art in a roped cartouche, a compass rose at its corner, the name in old ink; behind a cut-out character, the sea at sunset.",
+    "fr": "Le cadre du genre aventure : une carte au trésor au bord déchiré, du parchemin quadrillé de méridiens ; l'image dans un cartouche cordé, une rose des vents à son coin, le nom à l'encre ancienne ; derrière un personnage détouré, la mer au couchant."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

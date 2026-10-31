@@ -50,7 +50,7 @@ export function CardSheet({ card }: { card: MediaCard }) {
             <figcaption>
               {t(`gamification:cards.variant.${variant}`, {
                 edition: card.set_edition ? t(`gamification:cards.edition.${card.set_edition}`) : "",
-                genre: t(`gamification:cards.family.${card.set_family ?? "drama"}`),
+                genre: t(`gamification:cards.genre.${card.set_genre ?? "drama"}`),
               })}{" "}
               · ×{card.owned[variant] ?? 0}
             </figcaption>

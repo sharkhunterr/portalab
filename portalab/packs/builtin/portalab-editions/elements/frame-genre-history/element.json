@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-history",
+  "names": {
+    "en": "History — tablet",
+    "fr": "Histoire — tablette"
+  },
+  "descriptions": {
+    "en": "The history genre's frame: a Roman tablet with dovetail ears, veined stone; the art under a stone arch, the name carved in Roman capitals, a laurel wreath at the foot; behind a cut-out character, a Mediterranean sky between two columns.",
+    "fr": "Le cadre du genre histoire : une tablette romaine aux oreilles en queue d'aronde, de la pierre veinée ; l'image sous un arc de pierre, le nom gravé en capitales romaines, une couronne de laurier en bas ; derrière un personnage détouré, un ciel méditerranéen entre deux colonnes."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

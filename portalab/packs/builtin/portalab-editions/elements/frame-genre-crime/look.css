@@ -1,0 +1,157 @@
+/* Portalab — card_frame/genre-crime: the crime genre's frame (a work's main genre) — a manila case file with its tab; the art an evidence photo crossed by police tape, the name typed on a label, the rarity a red rubber stamp. Behind a cut-out character, a mugshot's height chart. */
+
+@font-face {
+  font-family: "Frame Special Elite";
+  src: url("SpecialElite.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+.mcard[data-frame="genre-crime"] {
+  --g-font: "Frame Special Elite", var(--mcard-title);
+  --g-bg: #dcb96f;
+  --g-bg2: #c9a257;
+  --g-text: #1d1a16;
+  --g-soft: #4a4033;
+  --g-accent: #b3261e;
+  --g-on-accent: #fff8e6;
+  --g-line: rgba(29, 26, 22, 0.25);
+  --g-box: #f4ead0;
+  filter: drop-shadow(0 0 2cqi var(--mcard-glow));
+}
+.mcard[data-frame="genre-crime"] .mcard__card {
+  padding: 1.2cqi;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(0 0, 40% 0, 45% 4.2cqi, 100% 4.2cqi, 100% 100%, 0 100%);
+}
+.mcard[data-frame="genre-crime"] .mcard__body {
+  gap: 1.3cqi;
+  padding: 6cqi 3.4cqi 2.8cqi;
+  border-radius: 0;
+  clip-path: polygon(0 0, 39.6% 0, 44.6% 3.8cqi, 100% 3.8cqi, 100% 100%, 0 100%);
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.025) 0 0.3cqi, transparent 0.3cqi 1.2cqi),
+    linear-gradient(170deg, var(--g-bg), var(--g-bg2));
+  box-shadow: inset 0 0 2cqi rgba(80, 50, 10, 0.3);
+  color: var(--g-text);
+}
+.mcard[data-frame="genre-crime"] .mcard__head {
+  padding: 0.8cqi 2cqi;
+  min-block-size: 0;
+  background: #fff8e6;
+  box-shadow: 0 0.3cqi 0.6cqi rgba(0, 0, 0, 0.2);
+  transform: rotate(-0.8deg);
+}
+.mcard[data-frame="genre-crime"] .mcard__name {
+  font-family: var(--g-font);
+  font-weight: 400;
+  color: var(--g-text);
+  text-shadow: none;
+  letter-spacing: 0.01em;
+}
+.mcard[data-frame="genre-crime"] .mcard__genre {
+  background: var(--g-accent);
+  color: var(--g-on-accent);
+  border-radius: 0.2cqi;
+  background: var(--g-text);
+  color: #f5c400;
+}
+.mcard[data-frame="genre-crime"] .mcard__emblem {
+  background: none;
+  color: inherit;
+}
+.mcard[data-frame="genre-crime"] .mcard__art {
+  margin: 1.6cqi 2cqi 1cqi;
+  border-radius: 0;
+  background: #2b2b2b;
+  box-shadow:
+    0 0 0 1cqi #ffffff,
+    0.6cqi 1cqi 1.6cqi 1cqi rgba(0, 0, 0, 0.35);
+  transform: rotate(-1.2deg);
+}
+/* a legendary's character stays in its window */
+.mcard[data-frame="genre-crime"] .mcard__art[data-outgrown] {
+  overflow: hidden;
+}
+.mcard[data-frame="genre-crime"] .mcard__art[data-cutout] .mcard__sky {
+  mask: none;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 4.6cqi, rgba(255, 255, 255, 0.55) 4.6cqi 4.9cqi),
+    linear-gradient(180deg, #8d9399, #5b6167);
+}
+.mcard[data-frame="genre-crime"] .mcard__strip {
+  background: none;
+  color: var(--g-soft);
+}
+.mcard[data-frame="genre-crime"] .mcard__stage {
+  border-radius: 0.4cqi;
+  background: var(--g-text);
+  color: var(--g-bg2);
+  font-family: var(--g-font);
+  font-weight: 400;
+}
+.mcard[data-frame="genre-crime"] .mcard__lower {
+  padding: 1.4cqi;
+  background: var(--g-box);
+  border-radius: 0;
+  box-shadow: 0 0.3cqi 0.6cqi rgba(0, 0, 0, 0.2);
+}
+.mcard[data-frame="genre-crime"] .mcard__flavor {
+  color: var(--g-soft);
+  border-color: var(--g-line);
+}
+.mcard[data-frame="genre-crime"] .mcard__foot {
+  color: var(--g-soft);
+}
+.mcard[data-frame="genre-crime"] .mcard__poster {
+  border-radius: 0.4cqi;
+  box-shadow: 0 0 0 0.4cqi var(--g-text);
+}
+.mcard[data-frame="genre-crime"] .mcard__work strong,
+.mcard[data-frame="genre-crime"] .mcard__figures strong {
+  font-family: var(--g-font);
+  font-weight: 400;
+  color: var(--g-text);
+}
+.mcard[data-frame="genre-crime"] .mcard__figures strong {
+  color: var(--g-accent);
+}
+.mcard[data-frame="genre-crime"] .mcard__work small,
+.mcard[data-frame="genre-crime"] .mcard__meta,
+.mcard[data-frame="genre-crime"] .mcard__by,
+.mcard[data-frame="genre-crime"] .mcard__figures li {
+  color: var(--g-soft);
+  border-color: var(--g-line);
+  opacity: 1;
+}
+.mcard[data-frame="genre-crime"] .mcard__cost {
+  background: var(--g-accent);
+  color: var(--g-on-accent);
+}
+/* the rarity on a tag of its metal */
+.mcard[data-frame="genre-crime"] .mcard__rarity {
+  background: var(--mcard-rim);
+  color: #1a1410;
+  box-shadow: 0 0 1.8cqi var(--mcard-glow);
+  border-radius: 0.6cqi;
+  background: transparent;
+  color: var(--g-accent);
+  box-shadow: inset 0 0 0 0.45cqi var(--g-accent);
+  font-family: var(--g-font);
+  transform: rotate(-6deg);
+  mix-blend-mode: multiply;
+}
+.mcard[data-frame="genre-crime"] .mcard__gem {
+  background: var(--g-accent);
+}
+/* police tape across the photo's corner */
+.mcard[data-frame="genre-crime"] .mcard__art::after {
+  content: "";
+  position: absolute;
+  inset: auto -20% 12% -20%;
+  z-index: 3;
+  block-size: 5cqi;
+  background: repeating-linear-gradient(135deg, #f5c400 0 3cqi, #1d1a16 3cqi 4.4cqi);
+  box-shadow: 0 0.3cqi 0.8cqi rgba(0, 0, 0, 0.4);
+  transform: rotate(-12deg);
+}

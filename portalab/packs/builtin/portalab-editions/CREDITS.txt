@@ -3,11 +3,23 @@ The ornaments of these frames (assets/corner-*.svg, mini-*.svg, scroll-*.svg) we
 
 The genre frames' fonts, from Google Fonts (latin subset), embedded unmodified — each under the SIL Open Font
 License 1.1 (https://openfontlicense.org):
-- frame-genre-fantasy/CinzelDecorative.woff2 — Cinzel Decorative by Natanael Gama
 - frame-genre-action/Anton.woff2 — Anton by Vernon Adams
-- frame-genre-dark/Creepster.woff2 — Creepster by Sideshow
-- frame-genre-drama/PlayfairDisplay.woff2 — Playfair Display by Claus Eggers Sørensen
+- frame-genre-adventure/IMFellEnglishSC.woff2 — IM Fell English SC by Igino Marini
+- frame-genre-animation/MochiyPopOne.woff2 — Mochiy Pop One by Fontworks
+- frame-genre-comedy/Chewy.woff2 — Chewy by Sideshow
+- frame-genre-crime/SpecialElite.woff2 — Special Elite by Astigmatic
+- frame-genre-documentary/SpaceMono.woff2 — Space Mono by Colophon
+- frame-genre-drama/CormorantGaramond.woff2 — Cormorant Garamond by Christian Thalmann
 - frame-genre-family/DelaGothicOne.woff2 — Dela Gothic One by artakana
+- frame-genre-fantasy/CinzelDecorative.woff2 — Cinzel Decorative by Natanael Gama
+- frame-genre-history/Cinzel.woff2 — Cinzel by Natanael Gama
+- frame-genre-horror/Creepster.woff2 — Creepster by Sideshow
+- frame-genre-music/Monoton.woff2 — Monoton by Vernon Adams
+- frame-genre-mystery/PlayfairDisplaySC.woff2 — Playfair Display SC by Claus Eggers Sørensen
+- frame-genre-romance/GreatVibes.woff2 — Great Vibes by TypeSETit
 - frame-genre-sf/Orbitron.woff2 — Orbitron by Matt McInerney
+- frame-genre-thriller/BebasNeue.woff2 — Bebas Neue by Dharma Type
+- frame-genre-war/BlackOpsOne.woff2 — Black Ops One by James Grieshaber and Eben Sorkin
+- frame-genre-western/Rye.woff2 — Rye by Nicole Fally
 
 frame-genre-family/flames-gold.svg: drawn for the Shonen booster scene (examples/visual-packs/booster-shonen, CC0-1.0).

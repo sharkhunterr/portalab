@@ -1,0 +1,142 @@
+/* Portalab — card_frame/genre-history: the history genre's frame (a work's main genre) — a Roman tablet with dovetail ears, veined stone; the art under a stone arch, the name carved in Roman capitals. Behind a cut-out character, a Mediterranean sky between two columns. */
+
+@font-face {
+  font-family: "Frame Cinzel";
+  src: url("Cinzel.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+.mcard[data-frame="genre-history"] {
+  --g-font: "Frame Cinzel", var(--mcard-title);
+  --g-bg: #ddd5c4;
+  --g-bg2: #b9af9b;
+  --g-text: #2a241c;
+  --g-soft: #5c5245;
+  --g-accent: #a8742c;
+  --g-on-accent: #fff8ea;
+  --g-line: rgba(42, 36, 28, 0.25);
+  --g-box: rgba(255, 255, 255, 0.25);
+  filter: drop-shadow(0 0 2cqi var(--mcard-glow));
+}
+.mcard[data-frame="genre-history"] .mcard__card {
+  padding: 1.2cqi;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(5% 0, 95% 0, 95% 40%, 100% 34%, 100% 66%, 95% 60%, 95% 100%, 5% 100%, 5% 60%, 0 66%, 0 34%, 5% 40%);
+}
+.mcard[data-frame="genre-history"] .mcard__body {
+  gap: 1.3cqi;
+  padding: 3cqi 7cqi 2.8cqi;
+  border-radius: 0;
+  clip-path: polygon(5.4% 0, 94.6% 0, 94.6% 40.4%, 99.4% 34.8%, 99.4% 65.2%, 94.6% 59.6%, 94.6% 100%, 5.4% 100%, 5.4% 59.6%, 0.6% 65.2%, 0.6% 34.8%, 5.4% 40.4%);
+  background:
+    radial-gradient(ellipse 30% 8% at 30% 20%, rgba(255, 255, 255, 0.35), transparent 70%),
+    radial-gradient(ellipse 40% 10% at 70% 70%, rgba(0, 0, 0, 0.08), transparent 70%),
+    linear-gradient(170deg, var(--g-bg), var(--g-bg2));
+  box-shadow: inset 0 0 0 0.5cqi rgba(255, 255, 255, 0.35), inset 0 0 3cqi rgba(0, 0, 0, 0.25);
+  color: var(--g-text);
+}
+.mcard[data-frame="genre-history"] .mcard__head {
+  justify-content: center;
+}
+.mcard[data-frame="genre-history"] .mcard__name {
+  font-family: var(--g-font);
+  font-weight: 700;
+  color: var(--g-text);
+  text-shadow: 0 0.25cqi 0 rgba(255, 255, 255, 0.7), 0 -0.15cqi 0 rgba(0, 0, 0, 0.35);
+  flex: 0 1 auto;
+  zoom: 0.84; /* a wide face: the name keeps the room it was fitted for */
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+.mcard[data-frame="genre-history"] .mcard__genre {
+  background: var(--g-accent);
+  color: var(--g-on-accent);
+  font-size: 0;
+  padding: 0.5cqi;
+  border-radius: 50%;
+}
+.mcard[data-frame="genre-history"] .mcard__emblem {
+  background: none;
+  color: inherit;
+}
+.mcard[data-frame="genre-history"] .mcard__art {
+  margin: 1cqi 0.4cqi 1cqi;
+  border-radius: 50% 50% 0.6cqi 0.6cqi / 22% 22% 0.6cqi 0.6cqi;
+  background: #6f8fb0;
+  box-shadow:
+    0 0 0 1.2cqi #c9bfab,
+    0 0 0 1.5cqi #8e8576,
+    0 0.8cqi 1.6cqi rgba(0, 0, 0, 0.35);
+}
+/* a legendary's character stays in its window */
+.mcard[data-frame="genre-history"] .mcard__art[data-outgrown] {
+  overflow: hidden;
+}
+.mcard[data-frame="genre-history"] .mcard__art[data-cutout] .mcard__sky {
+  mask: none;
+  background:
+    linear-gradient(90deg, #e9e2d2 0 9%, rgba(0, 0, 0, 0.12) 9% 10%, transparent 10% 90%, rgba(0, 0, 0, 0.12) 90% 91%, #e9e2d2 91%),
+    linear-gradient(180deg, #4f86c6, #a8cbe8 70%, #f2e3c2);
+}
+.mcard[data-frame="genre-history"] .mcard__strip {
+  background: none;
+  color: var(--g-soft);
+}
+.mcard[data-frame="genre-history"] .mcard__stage {
+  border-radius: 0.4cqi;
+  background: var(--g-text);
+  color: var(--g-bg2);
+  font-family: var(--g-font);
+  font-weight: 700;
+}
+.mcard[data-frame="genre-history"] .mcard__lower {
+  padding: 1.4cqi;
+  background: var(--g-box);
+  border-radius: 0.4cqi;
+  box-shadow: inset 0 0 0 0.3cqi var(--g-line);
+}
+.mcard[data-frame="genre-history"] .mcard__flavor {
+  color: var(--g-soft);
+  border-color: var(--g-line);
+}
+.mcard[data-frame="genre-history"] .mcard__foot {
+  color: var(--g-soft);
+}
+.mcard[data-frame="genre-history"] .mcard__poster {
+  border-radius: 0.4cqi;
+  box-shadow: 0 0 0 0.4cqi var(--g-text);
+}
+.mcard[data-frame="genre-history"] .mcard__work strong,
+.mcard[data-frame="genre-history"] .mcard__figures strong {
+  font-family: var(--g-font);
+  font-weight: 700;
+  color: var(--g-text);
+}
+.mcard[data-frame="genre-history"] .mcard__figures strong {
+  color: var(--g-accent);
+}
+.mcard[data-frame="genre-history"] .mcard__work small,
+.mcard[data-frame="genre-history"] .mcard__meta,
+.mcard[data-frame="genre-history"] .mcard__by,
+.mcard[data-frame="genre-history"] .mcard__figures li {
+  color: var(--g-soft);
+  border-color: var(--g-line);
+  opacity: 1;
+}
+.mcard[data-frame="genre-history"] .mcard__cost {
+  background: var(--g-accent);
+  color: var(--g-on-accent);
+}
+/* the rarity on a tag of its metal */
+.mcard[data-frame="genre-history"] .mcard__rarity {
+  background: var(--mcard-rim);
+  color: #1a1410;
+  box-shadow: 0 0 1.8cqi var(--mcard-glow);
+  border-radius: 0.3cqi;
+  font-family: var(--g-font);
+  letter-spacing: 0.08em;
+}
+.mcard[data-frame="genre-history"] .mcard__gem {
+  background: #1a1410;
+}

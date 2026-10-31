@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-western",
+  "names": {
+    "en": "Western — wanted poster",
+    "fr": "Western — avis de recherche"
+  },
+  "descriptions": {
+    "en": "The western genre's frame: a nailed wanted poster, its paper yellowed and burnt at the edges, two nail holes at the top; the name in big saloon letters above the art, the art inside a double ink rule; behind a cut-out character, the desert at sunset.",
+    "fr": "Le cadre du genre western : un avis de recherche cloué, son papier jauni et brûlé aux bords, deux trous de clou en haut ; le nom en grandes lettres de saloon au-dessus de l'image, l'image cernée d'un double filet d'encre ; derrière un personnage détouré, le désert au soleil couchant."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}
