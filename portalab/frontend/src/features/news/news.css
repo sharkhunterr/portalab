@@ -629,3 +629,8 @@
   outline: var(--focus-ring-width, 2px) solid var(--color-focus);
   outline-offset: 2px;
 }
+.news-external > .news-page__section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
