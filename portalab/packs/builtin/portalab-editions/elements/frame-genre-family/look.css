@@ -1,0 +1,153 @@
+/* Portalab — card_frame/genre-family: the family genre's frame, Shonen's world — a comic page out of true, in the
+   rarity's metal, cream paper in halftone dots and ink; the art a tilted panel with speed lines round it, the
+   name in a speech bubble overlapping its corner, the rarity on a burst. Behind a cut-out character, a
+   sunburst of golden flames. */
+
+@font-face {
+  font-family: "Frame Dela Gothic";
+  src: url("DelaGothicOne.woff2") format("woff2");
+  font-display: swap;
+}
+.mcard[data-frame="genre-family"] {
+  --genre-ink: #14101a;
+  --genre-paper: #fffaf0;
+  --genre-sun: #ffc21e;
+  --genre-pop: #ff4f6d;
+  --genre-soft: #4a4250;
+  filter: drop-shadow(0 0 2cqi var(--mcard-glow));
+}
+/* a page out of true */
+.mcard[data-frame="genre-family"] .mcard__card {
+  padding: 1.6cqi;
+  border-radius: 1.6cqi;
+  box-shadow: none;
+  clip-path: polygon(1.4% 0, 100% 1.1%, 98.6% 100%, 0 98.9%);
+}
+.mcard[data-frame="genre-family"] .mcard__body {
+  gap: 1.6cqi;
+  padding: 3cqi 3.4cqi 2.8cqi;
+  border-radius: 1cqi;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--genre-sun) 55%, transparent) 0.35cqi, transparent 0.45cqi) 0 0 / 1.8cqi 1.8cqi,
+    var(--genre-paper);
+  box-shadow: inset 0 0 0 0.6cqi var(--genre-ink);
+  color: var(--genre-ink);
+}
+/* the art first, a tilted panel; the name in a bubble over its corner */
+.mcard[data-frame="genre-family"] .mcard__art {
+  order: 1;
+  margin: 1.4cqi 1.4cqi 0;
+  block-size: 64cqi;
+  border-radius: 0.4cqi;
+  transform: rotate(-1.6deg);
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%, rgba(20, 16, 26, 0.18) 0deg 1.2deg, transparent 1.2deg 7deg),
+    var(--genre-paper);
+  box-shadow:
+    0 0 0 0.7cqi var(--genre-ink),
+    1.2cqi 1.2cqi 0 0.7cqi var(--genre-ink);
+}
+.mcard[data-frame="genre-family"] .mcard__head {
+  order: 2;
+  z-index: 3;
+  align-self: flex-start;
+  max-inline-size: 86%;
+  margin: -11cqi 0 0 -0.6cqi;
+  padding: 1.4cqi 3.4cqi;
+  min-block-size: 0;
+  border-radius: 50% / 46%;
+  background: var(--genre-paper);
+  box-shadow: 0 0 0 0.6cqi var(--genre-ink);
+  transform: rotate(-3deg);
+}
+.mcard[data-frame="genre-family"] .mcard__name {
+  zoom: 0.82; /* a wide face: the name keeps the room it was fitted for */
+  font-family: "Frame Dela Gothic", var(--mcard-title);
+  font-weight: 400;
+  color: var(--genre-ink);
+  text-shadow: none;
+}
+.mcard[data-frame="genre-family"] .mcard__genre {
+  border-radius: 0.4cqi;
+  background: var(--genre-pop);
+  color: var(--genre-paper);
+  font-size: 0;
+  padding: 0.6cqi;
+  box-shadow: 0 0 0 0.4cqi var(--genre-ink);
+}
+.mcard[data-frame="genre-family"] .mcard__emblem {
+  background: none;
+  color: var(--genre-paper);
+}
+.mcard[data-frame="genre-family"] .mcard__art[data-cutout] .mcard__sky {
+  mask: none;
+  background:
+    url("flames-gold.svg") 50% 100% / 120% auto no-repeat,
+    repeating-conic-gradient(from 0deg at 50% 60%, var(--genre-sun) 0deg 8deg, #ffe27a 8deg 16deg);
+}
+.mcard[data-frame="genre-family"] .mcard__strip {
+  order: 3;
+  background: none;
+  color: var(--genre-soft);
+}
+.mcard[data-frame="genre-family"] .mcard__stage {
+  border-radius: 0.4cqi;
+  background: var(--genre-ink);
+  color: var(--genre-sun);
+  font-family: "Frame Dela Gothic", var(--mcard-title);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+.mcard[data-frame="genre-family"] .mcard__lower {
+  order: 4;
+  padding: 1.4cqi;
+  border-radius: 0.6cqi;
+  background: #ffffff;
+  box-shadow: 0 0 0 0.5cqi var(--genre-ink), 0.8cqi 0.8cqi 0 0.5cqi var(--genre-ink);
+}
+.mcard[data-frame="genre-family"] .mcard__flavor {
+  order: 5;
+  color: var(--genre-soft);
+  border-color: var(--genre-ink);
+}
+.mcard[data-frame="genre-family"] .mcard__foot {
+  order: 6;
+  color: var(--genre-soft);
+}
+.mcard[data-frame="genre-family"] .mcard__poster {
+  border-radius: 0.4cqi;
+  box-shadow: 0 0 0 0.5cqi var(--genre-ink);
+}
+.mcard[data-frame="genre-family"] .mcard__work strong,
+.mcard[data-frame="genre-family"] .mcard__figures strong {
+  font-family: "Frame Dela Gothic", var(--mcard-title);
+  font-weight: 400;
+  color: var(--genre-ink);
+}
+.mcard[data-frame="genre-family"] .mcard__work small,
+.mcard[data-frame="genre-family"] .mcard__meta,
+.mcard[data-frame="genre-family"] .mcard__by,
+.mcard[data-frame="genre-family"] .mcard__figures li {
+  color: var(--genre-soft);
+  border-color: rgba(20, 16, 26, 0.25);
+  opacity: 1;
+}
+.mcard[data-frame="genre-family"] .mcard__cost {
+  background: var(--genre-sun);
+  color: var(--genre-ink);
+  box-shadow: 0 0 0 0.3cqi var(--genre-ink);
+}
+/* the rarity on a burst of its metal */
+.mcard[data-frame="genre-family"] .mcard__rarity {
+  border-radius: 0.4cqi;
+  padding: 0.7cqi 2.4cqi;
+  background: var(--mcard-rim);
+  box-shadow: 0 0 0 0.45cqi var(--genre-ink), 0 0 1.8cqi var(--mcard-glow);
+  color: var(--genre-ink);
+  font-family: "Frame Dela Gothic", var(--mcard-title);
+  font-weight: 400;
+  transform: rotate(-2deg);
+}
+.mcard[data-frame="genre-family"] .mcard__gem {
+  background: var(--genre-ink);
+}

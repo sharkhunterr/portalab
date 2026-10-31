@@ -456,6 +456,8 @@
   "cards.variant.borderless": "Borderless",
   "cards.variant.borderless_foil": "Borderless foil",
   "cards.variant.foil": "Foil",
+  "cards.variant.genre": "{genre} frame",
+  "cards.variant.genre_foil": "{genre} frame foil",
   "cards.variant.hd": "{edition} edition HD",
   "cards.variant.normal": "Normal",
   "cards.variant.showcase": "{edition} edition",

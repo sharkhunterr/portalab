@@ -10,11 +10,15 @@ export type Variant =
   | "showcase_foil"
   | "borderless"
   | "borderless_foil"
-  | "hd";
+  | "hd"
+  | "genre"
+  | "genre_foil";
 // from the most common version to the rarest
 export const VARIANTS: Variant[] = [
   "normal",
   "foil",
+  "genre", // issue 295: its genre's frame
+  "genre_foil",
   "showcase",
   "showcase_foil",
   "borderless",

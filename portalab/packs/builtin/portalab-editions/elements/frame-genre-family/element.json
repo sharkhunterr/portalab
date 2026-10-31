@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-family",
+  "names": {
+    "en": "Family — comic page",
+    "fr": "Familial — planche de BD"
+  },
+  "descriptions": {
+    "en": "The media cards' family genre frame, in Shonen's world: a comic page out of true, cream paper in halftone and ink, the art in a tilted panel, the name in a speech bubble over its corner; behind a cut-out character, a sunburst of golden flames.",
+    "fr": "Le cadre du genre familial des cartes médias, dans l'univers de Shonen : une planche de BD de travers, du papier crème en trame et à l'encre, l'image dans une case penchée, le nom dans une bulle qui déborde sur son coin ; derrière un personnage détouré, un soleil de flammes dorées."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

@@ -456,6 +456,8 @@
   "cards.variant.borderless": "Sans bord",
   "cards.variant.borderless_foil": "Sans bord foil",
   "cards.variant.foil": "Foil",
+  "cards.variant.genre": "Cadre {genre}",
+  "cards.variant.genre_foil": "Cadre {genre} foil",
   "cards.variant.hd": "Édition {edition} HD",
   "cards.variant.normal": "Normale",
   "cards.variant.showcase": "Édition {edition}",

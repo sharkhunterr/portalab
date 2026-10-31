@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-sf",
+  "names": {
+    "en": "Science fiction — hull",
+    "fr": "Science-fiction — coque"
+  },
+  "descriptions": {
+    "en": "The media cards' science fiction genre frame, in Hyperespace's world: a ship's hull with docking notches on its sides, deep space and a grid, the art in a porthole ringed with a dial, the figures read out as a console; behind a cut-out character, a ringed planet.",
+    "fr": "Le cadre du genre science-fiction des cartes médias, dans l'univers d'Hyperespace : une coque de vaisseau aux encoches d'amarrage sur les côtés, l'espace profond et une grille, l'image dans un hublot cerclé d'un cadran, les chiffres lus comme une console ; derrière un personnage détouré, une planète à anneaux."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}

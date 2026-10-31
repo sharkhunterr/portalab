@@ -1,0 +1,18 @@
+{
+  "type": "card_frame",
+  "look": "genre-action",
+  "names": {
+    "en": "Action — poster",
+    "fr": "Action — affiche"
+  },
+  "descriptions": {
+    "en": "The media cards' action genre frame, in Blockbuster's world: a hull cut on a slant, dark steel with hazard stripes, the art first with its foot cut on the slant, the name slammed across it on an orange band; behind a cut-out character, a blast.",
+    "fr": "Le cadre du genre action des cartes médias, dans l'univers de Blockbuster : une coque coupée en biais, de l'acier sombre rayé de bandes de danger, l'image d'abord, le pied coupé en biais, le nom plaqué sur une bande orange en travers ; derrière un personnage détouré, une explosion."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "look.css"
+    ]
+  }
+}
