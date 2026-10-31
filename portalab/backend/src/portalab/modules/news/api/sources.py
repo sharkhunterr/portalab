@@ -146,7 +146,7 @@ def _item(item: FeedItem, feed: Feed) -> SourceItemOut:
 # --- readers ------------------------------------------------------------------------------------------
 @router.get("/news/sources/items", response_model=SourceItemsOut)
 async def source_items(
-    _: Reader,
+    principal: Reader,
     module: Module,
     source: Annotated[list[UUID], Query(max_length=50)] = [],  # noqa: B006 — FastAPI's list query
     title: Annotated[list[str], Query(max_length=100)] = [],  # noqa: B006
@@ -154,8 +154,10 @@ async def source_items(
     limit: Annotated[int, Query(ge=1, le=100)] = 30,
 ) -> SourceItemsOut:
     """The latest news from elsewhere (pinned first), a source's, or those naming library titles (their
-    ids) or people (their names as the library credits them)."""
-    rows = await module.sources.items(feeds=source, titles=title, people=person, limit=limit)
+    ids) or people (their names as the library credits them) — of the editors' sources, and of mine when
+    a title or a person is asked for (« in the news » for what I follow, on a title's page…)."""
+    mine = (principal.acting_for or principal.user_id) if (title or person) else None
+    rows = await module.sources.items(feeds=source, titles=title, people=person, limit=limit, also=mine)
     return SourceItemsOut(items=[_item(item, feed) for item, feed in rows])
 
 
