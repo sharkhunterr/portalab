@@ -172,6 +172,7 @@
   "retry": "Retry",
   "routeError": "This page could not be loaded.",
   "search": "Search",
+  "searchAdvanced": "Advanced search",
   "searchAsk": "Ask the assistant: “{query}”",
   "searchClear": "Clear",
   "searchClose": "Close the search",

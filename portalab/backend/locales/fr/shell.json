@@ -172,6 +172,7 @@
   "retry": "Réessayer",
   "routeError": "Cette page n'a pas pu être chargée.",
   "search": "Rechercher",
+  "searchAdvanced": "Recherche avancée",
   "searchAsk": "Demander à l'assistant : « {query} »",
   "searchClear": "Effacer",
   "searchClose": "Fermer la recherche",

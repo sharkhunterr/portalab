@@ -210,7 +210,7 @@ export const TOURS: readonly TourDef[] = [
     group: "play",
     route: "/community",
     steps: [
-      { key: "tabs", icon: "users", targets: [".community-tabs"] },
+      { key: "tabs", icon: "users", targets: [".hub-tabs"] },
       { key: "faces", icon: "smile", targets: [".community-faces"] },
       { key: "shelves", icon: "library", targets: [".community-shelf"] },
       done,
