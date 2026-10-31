@@ -29,6 +29,18 @@ function revealed(card: MediaCard): BoosterCard {
   };
 }
 
+/** Issue 297: sealed packs that are the same booster (the same product, or the same content and season) — one
+ * pile each, in the order the first of each came. */
+export function piles(packs: CardPack[]): CardPack[][] {
+  const out = new Map<string, CardPack[]>();
+  for (const pack of packs) {
+    const look = pack.look;
+    const key = [pack.source, look?.product ?? pack.set ?? "", look?.season ?? ""].join("|");
+    out.set(key, [...(out.get(key) ?? []), pack]);
+  }
+  return [...out.values()];
+}
+
 /** Issue 234: my sealed card boosters (a film watched, a season finished, one bought) — in my inventory and on
  * my cards' page, each as the shop's sealed boosters are; opened on the same stage. */
 export function CardBoosters({ inventory = false }: { inventory?: boolean }) {
@@ -52,19 +64,32 @@ export function CardBoosters({ inventory = false }: { inventory?: boolean }) {
             {inventory ? <Link to="/cards">{t("gamification:cards.toCollection")}</Link> : null}
           </h2>
           <ul className="cards-boosters">
-            {packs.map((pack) => (
-              <li key={pack.id}>
-                <button
-                  type="button"
-                  className="cards-boosters__pack"
-                  data-booster-look={lookOf(pack)}
-                  onClick={() => setOpening(pack)}
-                  aria-label={`${t("gamification:cards.pack.open")} — ${packName(t, pack)}`}
-                >
-                  <BoosterPack booster={packBooster(t, pack, locale)} />
-                </button>
-              </li>
-            ))}
+            {/* issue 297: the same boosters in one pile, how many on its badge — a tap opens the first */}
+            {piles(packs).map((pile) => {
+              const pack = pile[0] as CardPack;
+              return (
+                <li key={pack.id}>
+                  <button
+                    type="button"
+                    className="cards-boosters__pack"
+                    data-booster-look={lookOf(pack)}
+                    data-pile={pile.length > 1 || undefined}
+                    onClick={() => setOpening(pack)}
+                    aria-label={`${t("gamification:cards.pack.open")} — ${packName(t, pack)}${
+                      pile.length > 1 ? ` (${t("gamification:cards.pack.pile", { count: pile.length })})` : ""
+                    }`}
+                  >
+                    <BoosterPack booster={packBooster(t, pack, locale)} />
+                    {pile.length > 1 ? (
+                      <span className="cards-boosters__pile" aria-hidden="true">
+                        <Icon name="layers" size={14} />
+                        {pile.length}
+                      </span>
+                    ) : null}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </section>
       ) : null}
