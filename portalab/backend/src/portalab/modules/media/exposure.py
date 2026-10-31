@@ -36,6 +36,12 @@ LABELS = (
     action(
         "DELETE", f"{A}/me/media/taste/titles/{{object_id}}", "Take back your verdict", "Retirer votre avis"
     ),
+    # #299: « Mon fil » — what I follow, and what it brings
+    read(f"{A}/me/media/follows", "What you follow", "Ce que vous suivez"),
+    action("PUT", f"{A}/me/media/follows", "Follow someone or something", "Suivre une personne, un titre…"),
+    action("DELETE", f"{A}/me/media/follows", "Stop following", "Ne plus suivre"),
+    read(f"{A}/me/media/feed", "Your feed", "Votre fil"),
+    action("POST", f"{A}/me/media/feed/seen", "Mark your feed as read", "Marquer votre fil comme lu"),
     read(f"{A}/me/media/history", "Your watch history", "Votre historique"),
     read(f"{A}/me/media/now-playing", "What is playing now", "Ce qui joue en ce moment"),
     read(f"{A}/me/media/requests", "Your requests", "Vos demandes"),

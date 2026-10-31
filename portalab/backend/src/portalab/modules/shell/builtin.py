@@ -306,6 +306,17 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "order_hint": 30,
         "required_permission": "wiki.read",
     },
+    {  # #299: « Mon fil » — what the library brings for the people, titles and genres I follow
+        "key": "media.feed",
+        "owner": "module:media",
+        "kind": "entry",
+        "label_key": "nav.my_feed",
+        "icon": "rss",
+        "route": "/feed",
+        "group": "content",
+        "order_hint": 11,
+        "required_permission": "media.read",
+    },
     {
         "key": "calendar.page",
         "owner": "module:calendar",

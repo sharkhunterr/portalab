@@ -65,7 +65,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.core.visibility_port import VisibilityFilter
 from portalab.modules.media import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.media import settings as _settings  # noqa: F401 — declares settings
-from portalab.modules.media.attention import RequestsAttention
+from portalab.modules.media.attention import FeedAttention, RequestsAttention
 from portalab.modules.media.availability.service import AvailabilityService
 from portalab.modules.media.books.service import BookService
 from portalab.modules.media.cards import MediaCardSources
@@ -73,6 +73,7 @@ from portalab.modules.media.catalog import CatalogPort, CatalogQuery
 from portalab.modules.media.cleanup import CleanupService
 from portalab.modules.media.discovery.shelves import Discovery
 from portalab.modules.media.events import register_event_types
+from portalab.modules.media.feed import Feed
 from portalab.modules.media.fields.resolver import FieldResolver
 from portalab.modules.media.games import MediaGameSources
 from portalab.modules.media.history.projection import HistoryProjection
@@ -268,6 +269,7 @@ class MediaModule:
         self.discovery = Discovery(database, capabilities, self.history, lambda: self.config, clock=clock)
         # issue 190: each member's taste, and the recommendations made from it (with their reasons)
         self.taste = TasteService(database, capabilities, clock=clock)
+        self.feed = Feed(database, self.people, clock=clock)  # #299: « Mon fil »
         self.recommender = TasteRecommender(self.taste)
         self.history_reader = HistoryReader(database, visibility)
         # 027: Telemetra-style statistics, metadata enrichment and release calendars
@@ -395,6 +397,11 @@ class MediaModule:
                 RequestsAttention(self.database, self.authorizer),
                 instance_ref="media",
                 owner=OWNER,
+            )
+        if not any(p.instance_ref == "media.feed" for p in self.capabilities.system_providers(ATTENTION)):
+            # #299: what arrived for a member since they last read « Mon fil »
+            self.capabilities.provide(
+                ATTENTION, FeedAttention(self.feed), instance_ref="media.feed", owner=OWNER
             )
         register_baseline(self.types, OWNER)
         if self.calendar.get(MediaReleaseCalendarSource.kind) is None:  # 027: releases in the calendar

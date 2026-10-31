@@ -10,6 +10,7 @@ import { imageUrl, MediaError, type Person, usePerson } from "../api";
 import { metadataImage } from "../detail/Enrichment";
 import { RequestDialog } from "../discover/RequestDialog";
 import { PosterBadge, StatusBadge } from "../discover/StatusBadge";
+import { FollowButton } from "../feed/FollowButton";
 import { MediaGrid, Poster } from "../MediaGrid";
 import "../media.css";
 
@@ -103,7 +104,13 @@ function PersonView({ headingId, data }: { headingId: string; data: Person }) {
   ) : null;
   return (
     <section aria-labelledby={headingId} className="media-person">
-      <PageHeader titleId={headingId} level={2} icon="user" title={data.name} />
+      <PageHeader
+        titleId={headingId}
+        level={2}
+        icon="user"
+        title={data.name}
+        primary={<FollowButton kind="person" value={data.name} name={data.name} />}
+      />
       <div className="media-person__hero">
         <span className="media-person__portrait" aria-hidden="true">
           {data.portrait && !broken ? (
