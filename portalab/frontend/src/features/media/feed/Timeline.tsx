@@ -134,6 +134,11 @@ export function Timeline({
       [],
   });
   const editorial = useSourceItems({}, 60);
+  // the sources I follow: each has its filter, even one quiet lately
+  const followed = useQuery({
+    queryKey: ["news", "sources", "mine", "list"],
+    queryFn: async () => (await api.GET("/api/v1/me/news/sources")).data?.items ?? [],
+  });
   // one source chosen: its own latest items (the mixed ones above are the newest of all only)
   const picked = only !== "all" && only !== "mine" && only !== "server" ? only : null;
   const single = useQuery({
@@ -160,9 +165,9 @@ export function Timeline({
     ]) {
       news.set(item.id, item);
     }
-    const names = [...new Map([...news.values()].map((i) => [i.source_id, i.source])).entries()].sort(
-      (a, b) => a[1].localeCompare(b[1]),
-    );
+    const known = new Map([...news.values()].map((i) => [i.source_id, i.source]));
+    for (const source of Array.isArray(followed.data) ? followed.data : []) known.set(source.id, source.name);
+    const names = [...known.entries()].sort((a, b) => a[1].localeCompare(b[1]));
     const bySource = new Map<string, Source>(
       names.map(([id, label], index) => [id, { key: id, label, icon: "rss", color: colorOf(index) }]),
     );
@@ -189,7 +194,18 @@ export function Timeline({
     }
     out.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
     return { entries: out, sources: [server, ...bySource.values()] };
-  }, [arrivals, follows, seenAt, mine.data, editorial.data, picked, single.data, editorialOne.data, t]);
+  }, [
+    arrivals,
+    follows,
+    seenAt,
+    mine.data,
+    editorial.data,
+    followed.data,
+    picked,
+    single.data,
+    editorialOne.data,
+    t,
+  ]);
   const matching = entries.filter(
     (e) => only === "all" || (only === "mine" ? e.forMe : e.source.key === only),
   );
