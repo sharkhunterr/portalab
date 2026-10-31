@@ -22,7 +22,7 @@ async def test_rights_aware_navigation(sh: ShellHarness) -> None:
     await make_admin(sh.full, admin_id)
     plain_view = await sh.module.assembler.build(plain)
     admin_view = await sh.module.assembler.build(user(admin_id))
-    assert {"shell.home", "identity.account", "health.services"} <= labels(plain_view)
+    assert {"shell.home", "shell.settings", "health.services"} <= labels(plain_view)
     assert not any(
         key.startswith(("administration.", "authz.", "observability.")) for key in labels(plain_view)
     )

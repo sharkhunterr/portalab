@@ -69,7 +69,11 @@ async def test_sections_for_users_and_admins(sh: ShellHarness) -> None:
     assert not by_key["admin"]["entries"]  # every built-in admin entry has a topic
 
     personal = {e["key"] for e in view["personal"]}
-    assert {"identity.account", "ui.appearance", "i18n.language", "privacy.center"} <= personal
+    # #298: « Moi » — what is mine; the settings' pages are listed by « My settings », not one by one
+    assert {"shell.settings", "gamification.progression", "community.quests", "media.insights"} <= personal
+    assert not {"identity.account", "ui.appearance", "i18n.language", "privacy.center"} & personal
+    commands = {c["key"] for c in view["commands"]}
+    assert {"identity.account", "ui.appearance", "search.page", "support.incidents"} <= commands
     assert not any(e.startswith("identity.") for s in view["sections"] for e in entries(s))
     assert "groups" in view and any(g["key"] == "me" for g in view["groups"])  # 004 alias kept
 

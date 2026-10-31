@@ -185,6 +185,23 @@ function Brings({ view }: { view: CampaignView }) {
   );
 }
 
+/** #298: the campaigns running now among the community's events — nothing when none runs. */
+export function RunningCampaigns() {
+  const t = useT();
+  const active = useActiveCampaigns();
+  if (!active.data?.length) return null;
+  return (
+    <section className="ds-stack" aria-label={t("campaigns:page.title")}>
+      <h2>{t("campaigns:page.title")}</h2>
+      <div className="campaign-list">
+        {active.data.map((c) => (
+          <CampaignCard key={c.key} campaignKey={c.key} endsAt={c.ends_at} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ActiveList() {
   const t = useT();
   const active = useActiveCampaigns();

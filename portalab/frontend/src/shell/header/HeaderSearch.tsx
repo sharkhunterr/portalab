@@ -24,7 +24,8 @@ import { useShellStrings } from "../strings";
 /**
  * Search in the header (027): a field that answers while one types — the matching pages of the portal,
  * then the first results of each kind (titles, members, articles, tickets…) with a line of context, then
- * « all the results ». Nothing is listed before typing but the recent searches. Arrow keys move, Enter
+ * « all the results ». Nothing is listed before typing but the recent searches and the advanced search (#298:
+ * the search page has left the menu). Arrow keys move, Enter
  * opens, Escape closes; Ctrl/⌘ K and « / » focus it. On a phone the magnifier opens it over the header.
  */
 interface Suggestion {
@@ -159,6 +160,8 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
           route: `/search?q=${encodeURIComponent(entry.query)}`,
         });
       }
+      // #298: the search page is no longer in the menu — the field opens it, with its filters
+      out.push({ id: "all", group: "", icon: "sliders", title: t("shell:searchAdvanced"), route: "/search" });
       return out;
     }
     const object = resolution.data?.object;
@@ -218,8 +221,9 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
     out.push({
       id: "all",
       group: "",
-      icon: "search",
+      icon: "sliders",
       title: t("search:palette.searchFor", { query: q }),
+      detail: t("shell:searchAdvanced"),
       route: `/search?q=${encodeURIComponent(q)}`,
     });
     if (ai?.available && q.length >= 3) {
