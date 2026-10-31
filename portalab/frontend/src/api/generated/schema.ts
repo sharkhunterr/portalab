@@ -8285,7 +8285,7 @@ export interface paths {
         };
         /**
          * My Source Items
-         * @description The latest items of the sources I follow.
+         * @description The latest items of the sources I follow (or of some of them).
          */
         get: operations["my_source_items_api_v1_me_news_sources_items_get"];
         put?: never;
@@ -9821,7 +9821,8 @@ export interface paths {
         /**
          * Source Items
          * @description The latest news from elsewhere (pinned first), a source's, or those naming library titles (their
-         *     ids) or people (their names as the library credits them).
+         *     ids) or people (their names as the library credits them) — of the editors' sources, and of mine when
+         *     a title or a person is asked for (« in the news » for what I follow, on a title's page…).
          */
         get: operations["source_items_api_v1_news_sources_items_get"];
         put?: never;
@@ -35508,6 +35509,7 @@ export interface operations {
     my_source_items_api_v1_me_news_sources_items_get: {
         parameters: {
             query?: {
+                source?: string[];
                 limit?: number;
             };
             header?: never;
