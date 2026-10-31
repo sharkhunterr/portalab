@@ -79,12 +79,14 @@ SECTIONS: tuple[dict[str, object], ...] = (
     _section("content", "newspaper", 5, "news", "calendar", "content"),
     _section("media", "film", 10, "media"),
     _section("games", "gamepad", 20, "games", "cards"),  # issue 265; #298: the media cards with the games
-    _section("community", "users", 40, "community", "campaigns", "statistics"),
+    _section("community", "users", 40, "community", "campaigns"),
+    # #298: « Statistiques » — mine, my requests', the community's
+    _section("stats", "chart", 45, "statistics"),
     _section("marketplace", "shop", 50, "marketplace"),
     # « Aide » (#298): the guide, the wiki, tickets and feedback, and the services' status with its incidents
     _section("support", "lifebuoy", 60, "support", "health", "wiki"),
     _section("more", "more", 90),
-    # « Moi » (#298): what is mine — progression, quests, achievements, my statistics, my taste, settings
+    # « Moi » (#298): what is mine — progression, quests, achievements, settings
     _section(
         "me",
         "user",
@@ -188,11 +190,11 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "key": "statistics.page",
         "owner": "module:statistics",
         "kind": "entry",
-        "label_key": "nav.statistics",
+        "label_key": "nav.statistics_community",
         "icon": "chart",
         "route": "/statistics",
-        "group": "community",
-        "order_hint": 60,
+        "group": "stats",
+        "order_hint": 3,
         "required_permission": "statistics.read",
     },
     {
@@ -229,6 +231,17 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "order_hint": 24,
         "required_permission": "media.request",
     },
+    {  # #298: my requests in figures — the overview of « My requests », among the statistics
+        "key": "media.requests_stats",
+        "owner": "module:media",
+        "kind": "entry",
+        "label_key": "nav.media_requests_stats",
+        "icon": "inbox",
+        "route": "/media/requests/stats",
+        "group": "stats",
+        "order_hint": 2,
+        "required_permission": "media.request",
+    },
     {
         "key": "media.insights",
         "owner": "module:media",
@@ -236,8 +249,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "label_key": "nav.my_statistics",
         "icon": "chart",
         "route": "/media/insights",
-        "group": "me",
-        "order_hint": 4,
+        "group": "stats",
+        "order_hint": 1,
         "required_permission": "media.read",
     },
     {  # issue 190: what my taste is made of, the titles to judge, my lists
@@ -247,8 +260,8 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "label_key": "nav.media_taste",
         "icon": "heart",
         "route": "/media/taste",
-        "group": "me",
-        "order_hint": 5,
+        "group": "media",
+        "order_hint": 26,
         "required_permission": "media.read",
     },
     {
@@ -356,7 +369,9 @@ BUILTIN: tuple[dict[str, object], ...] = (
     {
         "key": "support.incidents",
         "owner": "module:support",
-        "kind": "command",
+        "kind": "entry",
+        "order_hint": 37,
+        "group": "support",
         "label_key": "nav.incidents",
         "icon": "alert",
         "route": "/incidents",

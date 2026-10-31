@@ -325,16 +325,3 @@ export function useOpenPack() {
     onSettled: () => void client.invalidateQueries({ queryKey: KEY }),
   });
 }
-
-/** Issue 229: an administrator's trial pack — six cards among the works whose characters were looked for. */
-export function useTrialPack() {
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async () => {
-      const { data, error } = await api.POST("/api/v1/admin/cards/packs/trial");
-      if (error || !data) throw error ?? new Error("trial");
-      return data;
-    },
-    onSettled: () => void client.invalidateQueries({ queryKey: KEY }),
-  });
-}

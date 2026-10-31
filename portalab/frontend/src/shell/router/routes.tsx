@@ -274,6 +274,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               element: <MediaRequests />,
               handle: h({ crumb: "My requests", requiredPermission: "media.request" }),
             },
+            {
+              // #298: my requests in figures, among the statistics
+              path: "requests/stats",
+              element: <MediaRequests stats />,
+              handle: h({ crumb: "Statistics", requiredPermission: "media.request" }),
+            },
             { path: "insights", element: <MediaInsights />, handle: h({ crumb: "Statistics" }) },
             { path: "taste", element: <MediaTaste />, handle: h({ crumb: "My taste" }) },
             {

@@ -334,12 +334,13 @@ describe("catalog and requests", () => {
     fireEvent.click(screen.getByRole("button", { name: "Remove the filter Author : Ted Chiang" }));
     await waitFor(() => expect(queries.at(-1)).not.toContain("author="));
     expect(queries.at(-1)).toContain("seen=unseen");
-    // the overview's card: the count, where they stand, the quota and the bought requests (#3)
-    renderAt("/media/requests", [{ path: "/media/requests", element: <RequestsPage /> }]);
+    // the overview's card: the count, where they stand, the quota and the bought requests (#3) — #298: among
+    // the statistics
+    renderAt("/media/requests/stats", [{ path: "/media/requests/stats", element: <RequestsPage stats /> }]);
     expect(await screen.findByText(/1 request bought in the shop/)).toBeTruthy();
     expect(screen.getByText(/2 left of/)).toBeTruthy();
     cleanup();
-    renderAt("/media/requests?tab=list", [{ path: "/media/requests", element: <RequestsPage /> }]);
+    renderAt("/media/requests", [{ path: "/media/requests", element: <RequestsPage /> }]); // the list first
     fireEvent.click(await screen.findByRole("button", { name: "Cancel: Arrival" }));
   });
 });

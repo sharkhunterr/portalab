@@ -1184,12 +1184,59 @@
   color: var(--color-text-muted);
 }
 
-/* an administrator's trial pack */
-.cards-trial {
+/* #298: where my collection stands, and the boosters waiting */
+.cards-summary {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+.cards-summary__main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  color: var(--color-text-muted);
+}
+.cards-summary__main strong {
+  color: var(--color-text);
+  font-size: var(--font-size-xl);
+}
+.cards-summary__main .requests-meter {
+  flex: 1 1 12rem;
+}
+.cards-summary__share {
+  font-weight: 700;
+  color: var(--color-text);
+}
+.cards-callout {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+  color: var(--color-text);
+  font-weight: 600;
+}
+.cards-callout > span {
+  flex: 1 1 12rem;
+}
+.cards-views__count {
+  min-inline-size: 1.4em;
+  padding: 0 var(--space-1);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-align: center;
+}
+.cards-views--small button {
+  font-size: var(--font-size-sm);
 }
 
 /* issue 234: a work's collection on its page */
