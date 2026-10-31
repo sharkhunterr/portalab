@@ -38,6 +38,7 @@ class MediaObject(MediaBase):
         CheckConstraint("status IN ('active', 'hidden', 'merged')", name="status"),
         Index("ix_objects_kind_title", "kind", "sort_title"),
         Index("ix_objects_parent", "parent_id", "position"),
+        Index("ix_objects_first_seen", "first_seen_at"),  # #299: what arrived lately
         Index(
             "ix_objects_search_text",
             "search_text",
@@ -425,6 +426,32 @@ class TasteVerdict(MediaBase):
     )
     verdict: Mapped[str] = mapped_column(String(8), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class Follow(MediaBase):
+    """#299: what a member follows for « Mon fil » — a person (by the name the library credits them under), a
+    title (a series, a saga's work: its object) or a genre. Private: nobody else ever sees it."""
+
+    __tablename__ = "follows"
+    __table_args__ = (
+        CheckConstraint("kind IN ('person', 'title', 'genre')", name="kind"),
+        Index("ix_follows_user", "user_id", "created_at"),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    kind: Mapped[str] = mapped_column(String(8), primary_key=True)
+    ref: Mapped[str] = mapped_column(String(200), primary_key=True, info=not_personal("a followed subject"))
+    label: Mapped[str] = mapped_column(String(200), nullable=False, info=not_personal("its name as shown"))
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class FeedSeen(MediaBase):
+    """#299: when a member last opened « Mon fil » — what arrived since is unread."""
+
+    __tablename__ = "feed_seen"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    seen_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
 
 class MediaRequest(MediaBase):

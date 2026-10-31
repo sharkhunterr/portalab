@@ -22,6 +22,7 @@ import { PluginSlot } from "../../plugins/slots/PluginSlot";
 import { useListenInfo, useReadInfo } from "../books/api";
 import { useDiscoverTitle } from "../discover/api";
 import { RequestDialog } from "../discover/RequestDialog";
+import { FollowButton } from "../feed/FollowButton";
 import { useMeasures } from "../insights/api";
 import { openBook, useListen } from "../listen/store";
 import { usePlayerInfo, useResetResume } from "../player/api";
@@ -952,6 +953,8 @@ export function DetailPage() {
         <PluginSlot name="media.actions" params={{ item: media.id }} />
         {/* issue 190: what I think of it — it shapes my recommendations */}
         {TASTED.includes(media.kind) ? <TasteButtons objectId={media.id} title={media.title} /> : null}
+        {/* #299: a series followed brings its new episodes into « Mon fil » */}
+        {media.kind === "series" ? <FollowButton kind="title" value={media.id} name={media.title} /> : null}
       </TitleHero>
       <LeavingNotice objectId={media.id} title={media.title} />
       <RequestJourney objectId={media.id} title={media.title} />

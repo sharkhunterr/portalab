@@ -7675,6 +7675,72 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/media/feed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Feed
+         * @description « Mon fil »: what the library brought lately for what I follow (each with why), what is coming from
+         *     the people I follow, and when I last read it.
+         */
+        get: operations["my_feed_api_v1_me_media_feed_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/media/feed/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Feed Seen
+         * @description I read my feed: what came until now is no longer unread.
+         */
+        post: operations["feed_seen_api_v1_me_media_feed_seen_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/media/follows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Follows
+         * @description What I follow — the most recent first.
+         */
+        get: operations["my_follows_api_v1_me_media_follows_get"];
+        /**
+         * Follow
+         * @description Follow a person (by the name the library credits them under), a title (its id) or a genre.
+         */
+        put: operations["follow_api_v1_me_media_follows_put"];
+        post?: never;
+        /** Unfollow */
+        delete: operations["unfollow_api_v1_me_media_follows_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/media/history": {
         parameters: {
             query?: never;
@@ -12383,6 +12449,16 @@ export interface components {
             /** Supply */
             supply?: number | null;
         };
+        /** Because */
+        Because: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "person" | "title" | "genre";
+            /** Label */
+            label: string;
+        };
         /** BonusOut */
         BonusOut: {
             /** Amount */
@@ -13670,6 +13746,87 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** FeedItemOut */
+        FeedItemOut: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Because */
+            because: components["schemas"]["Because"][];
+            /** Image Id */
+            image_id?: string | null;
+            /** Kind */
+            kind: string;
+            /**
+             * Object Id
+             * Format: uuid
+             */
+            object_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Units
+             * @default []
+             */
+            units: string[];
+            /**
+             * Unread
+             * @default false
+             */
+            unread: boolean;
+            /** Year */
+            year?: number | null;
+        };
+        /** FeedOut */
+        FeedOut: {
+            /**
+             * Follows
+             * @default 0
+             */
+            follows: number;
+            /** Items */
+            items: components["schemas"]["FeedItemOut"][];
+            /** Seen At */
+            seen_at?: string | null;
+            /** Upcoming */
+            upcoming: components["schemas"]["FeedUpcomingOut"][];
+        };
+        /** FeedUpcomingOut */
+        FeedUpcomingOut: {
+            /** Department */
+            department: string;
+            /** Image Id */
+            image_id: string | null;
+            /** Kind */
+            kind: string;
+            /** Object Id */
+            object_id: string | null;
+            /** Person */
+            person: string;
+            /** Poster */
+            poster: string | null;
+            /** Rating */
+            rating: number | null;
+            /** Role */
+            role: string | null;
+            /** Route */
+            route: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "available" | "requested" | "unavailable" | "missing";
+            /** Title */
+            title: string;
+            /** Tmdb Id */
+            tmdb_id: string;
+            /** Votes */
+            votes: number;
+            /** Year */
+            year: number | null;
+        };
         /** FeedbackConversionOut */
         FeedbackConversionOut: {
             /** Available */
@@ -13935,6 +14092,38 @@ export interface components {
         FlipIn: {
             /** Position */
             position: number;
+        };
+        /** FollowIn */
+        FollowIn: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "person" | "title" | "genre";
+            /** Ref */
+            ref: string;
+        };
+        /** FollowOut */
+        FollowOut: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "person" | "title" | "genre";
+            /** Label */
+            label: string;
+            /** Ref */
+            ref: string;
+            /**
+             * Since
+             * Format: date-time
+             */
+            since: string;
+        };
+        /** FollowsOut */
+        FollowsOut: {
+            /** Items */
+            items: components["schemas"]["FollowOut"][];
         };
         /** FoundOut */
         FoundOut: {
@@ -33816,6 +34005,127 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaContinueOut"][];
+                };
+            };
+        };
+    };
+    my_feed_api_v1_me_media_feed_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedOut"];
+                };
+            };
+        };
+    };
+    feed_seen_api_v1_me_media_feed_seen_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    my_follows_api_v1_me_media_follows_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowsOut"];
+                };
+            };
+        };
+    };
+    follow_api_v1_me_media_follows_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FollowIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unfollow_api_v1_me_media_follows_delete: {
+        parameters: {
+            query: {
+                kind: "person" | "title" | "genre";
+                ref: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

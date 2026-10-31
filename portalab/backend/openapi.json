@@ -2812,6 +2812,29 @@
         "title": "AvailabilityIn",
         "type": "object"
       },
+      "Because": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "person",
+              "title",
+              "genre"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "label"
+        ],
+        "title": "Because",
+        "type": "object"
+      },
       "BonusOut": {
         "properties": {
           "amount": {
@@ -6244,6 +6267,254 @@
         "title": "ExportOut",
         "type": "object"
       },
+      "FeedItemOut": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "because": {
+            "items": {
+              "$ref": "#/components/schemas/Because"
+            },
+            "title": "Because",
+            "type": "array"
+          },
+          "image_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Id"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "object_id": {
+            "format": "uuid",
+            "title": "Object Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "units": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "unread": {
+            "default": false,
+            "title": "Unread",
+            "type": "boolean"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "object_id",
+          "kind",
+          "title",
+          "at",
+          "because"
+        ],
+        "title": "FeedItemOut",
+        "type": "object"
+      },
+      "FeedOut": {
+        "properties": {
+          "follows": {
+            "default": 0,
+            "title": "Follows",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FeedItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "seen_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seen At"
+          },
+          "upcoming": {
+            "items": {
+              "$ref": "#/components/schemas/FeedUpcomingOut"
+            },
+            "title": "Upcoming",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "upcoming"
+        ],
+        "title": "FeedOut",
+        "type": "object"
+      },
+      "FeedUpcomingOut": {
+        "properties": {
+          "department": {
+            "title": "Department",
+            "type": "string"
+          },
+          "image_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Id"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "object_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Object Id"
+          },
+          "person": {
+            "title": "Person",
+            "type": "string"
+          },
+          "poster": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Poster"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          },
+          "route": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route"
+          },
+          "status": {
+            "enum": [
+              "available",
+              "requested",
+              "unavailable",
+              "missing"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "tmdb_id": {
+            "title": "Tmdb Id",
+            "type": "string"
+          },
+          "votes": {
+            "title": "Votes",
+            "type": "integer"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "tmdb_id",
+          "kind",
+          "title",
+          "year",
+          "role",
+          "department",
+          "poster",
+          "image_id",
+          "rating",
+          "votes",
+          "status",
+          "object_id",
+          "route",
+          "person"
+        ],
+        "title": "FeedUpcomingOut",
+        "type": "object"
+      },
       "FeedbackConversionOut": {
         "properties": {
           "available": {
@@ -7055,6 +7326,81 @@
           "position"
         ],
         "title": "FlipIn",
+        "type": "object"
+      },
+      "FollowIn": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "person",
+              "title",
+              "genre"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "ref": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "ref"
+        ],
+        "title": "FollowIn",
+        "type": "object"
+      },
+      "FollowOut": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "person",
+              "title",
+              "genre"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "since": {
+            "format": "date-time",
+            "title": "Since",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "ref",
+          "label",
+          "since"
+        ],
+        "title": "FollowOut",
+        "type": "object"
+      },
+      "FollowsOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FollowOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "FollowsOut",
         "type": "object"
       },
       "FoundOut": {
@@ -43449,6 +43795,154 @@
           }
         },
         "summary": "My Continue",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/feed": {
+      "get": {
+        "description": "\u00ab Mon fil \u00bb: what the library brought lately for what I follow (each with why), what is coming from\nthe people I follow, and when I last read it.",
+        "operationId": "my_feed_api_v1_me_media_feed_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Feed",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/feed/seen": {
+      "post": {
+        "description": "I read my feed: what came until now is no longer unread.",
+        "operationId": "feed_seen_api_v1_me_media_feed_seen_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Feed Seen",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/follows": {
+      "delete": {
+        "operationId": "unfollow_api_v1_me_media_follows_delete",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "person",
+                "title",
+                "genre"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unfollow",
+        "tags": [
+          "media"
+        ]
+      },
+      "get": {
+        "description": "What I follow \u2014 the most recent first.",
+        "operationId": "my_follows_api_v1_me_media_follows_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Follows",
+        "tags": [
+          "media"
+        ]
+      },
+      "put": {
+        "description": "Follow a person (by the name the library credits them under), a title (its id) or a genre.",
+        "operationId": "follow_api_v1_me_media_follows_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FollowIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Follow",
         "tags": [
           "media"
         ]

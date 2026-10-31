@@ -14,6 +14,8 @@ from portalab.modules.media.insights.ingest import mark_days
 from portalab.modules.media.models import (
     Activity,
     BookPosition,
+    FeedSeen,
+    Follow,
     HistoryEntry,
     MediaObject,
     MediaRequest,
@@ -166,6 +168,17 @@ class MediaParticipant:
                         {"title": title, "verdict": verdict.verdict, "at": verdict.updated_at.isoformat()},
                     )
                 )
+            for follow in (  # #299: what I follow for « Mon fil »
+                await session.execute(
+                    select(Follow).where(Follow.user_id == user_id).order_by(Follow.created_at)
+                )
+            ).scalars():
+                records.append(
+                    ExportRecord(
+                        "media.follow",
+                        {"kind": follow.kind, "name": follow.label, "at": follow.created_at.isoformat()},
+                    )
+                )
         return records
 
     async def erase(self, user_id: UUID, mode: ErasureMode) -> None:
@@ -189,6 +202,8 @@ class MediaParticipant:
                 RadioSitting,
                 BookPosition,
                 TasteVerdict,
+                Follow,  # #299
+                FeedSeen,
             ):
                 await session.execute(delete(model).where(model.user_id == user_id))
             await session.execute(

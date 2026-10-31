@@ -1,0 +1,158 @@
+/* #299: « Mon fil » — what arrived for what I follow, what is coming, and what I follow */
+.media-follow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: 2.25rem;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.media-follow[aria-pressed="true"] {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.media-follow:focus-visible {
+  outline: var(--focus-ring-width, 2px) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.feed-section {
+  display: grid;
+  gap: var(--space-3);
+}
+.feed-section > h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+.feed-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.feed-item__link {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.feed-item[data-unread] .feed-item__link {
+  border-color: var(--color-accent);
+}
+.feed-item__link:hover {
+  border-color: var(--color-accent);
+}
+.feed-item__link .media-card__poster {
+  inline-size: 4.5rem;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+.feed-item__text {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+.feed-item__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+.feed-item__new {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-weight: 700;
+}
+.feed-item__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.feed-item__units {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.feed-item__because {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.feed-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  color: var(--color-text);
+}
+.feed-follows {
+  display: grid;
+  gap: var(--space-2);
+}
+.feed-follows h3 {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.feed-follows ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.feed-chip--follow {
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+  background: var(--color-surface-raised);
+}
+.feed-chip--follow a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: inherit;
+  text-decoration: none;
+}
+.feed-chip--follow button {
+  display: inline-flex;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.feed-chip--follow button:hover {
+  color: var(--color-text);
+}
+.feed-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-3);
+}
