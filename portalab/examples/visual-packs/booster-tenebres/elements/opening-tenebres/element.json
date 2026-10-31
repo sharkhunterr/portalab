@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "tenebres",
+  "names": {
+    "fr": "Griffures",
+    "en": "Claws"
+  },
+  "descriptions": {
+    "fr": "Des griffes lacèrent le paquet par deux fois ; il se déchire et tombe, le sang éclabousse, des corbeaux s'envolent.",
+    "en": "Claws rip the pack twice; it tears and falls, blood spatters, crows burst away."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

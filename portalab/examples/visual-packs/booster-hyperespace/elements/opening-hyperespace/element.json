@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "hyperespace",
+  "names": {
+    "fr": "Téléportation",
+    "en": "Beam-up"
+  },
+  "descriptions": {
+    "fr": "Un faisceau de téléportation verrouille le paquet, des anneaux montent ; il est aspiré dans le faisceau, des fragments de lumière s'élèvent.",
+    "en": "A teleport beam locks on the pack, rings rising; it is drawn into the beam, fragments of light rising."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

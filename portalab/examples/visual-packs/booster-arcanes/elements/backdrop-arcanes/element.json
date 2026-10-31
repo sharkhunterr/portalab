@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "arcanes",
+  "names": {
+    "fr": "Aurores",
+    "en": "Auroras"
+  },
+  "descriptions": {
+    "fr": "Un ciel de nuit traversé d'aurores turquoise et violettes, des îles flottantes en silhouette, une lune, des étoiles et de la poussière dorée qui monte (vidéo en boucle).",
+    "en": "A night sky crossed by teal and violet auroras, floating islands in silhouette, a moon, stars and gold dust rising (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

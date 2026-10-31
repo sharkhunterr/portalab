@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "tenebres",
+  "names": {
+    "fr": "Cuir lacéré",
+    "en": "Clawed leather"
+  },
+  "descriptions": {
+    "fr": "Un paquet de cuir noir lacéré de griffures rouges, l'image de l'œuvre sous un cadre de fer, son nom en lettres dégoulinantes, une lune de sang et un corbeau en emblème.",
+    "en": "A black leather pack clawed red, the work's art under an iron frame, its name in dripping letters, a blood moon and a crow as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

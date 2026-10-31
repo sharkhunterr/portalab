@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "blockbuster",
+  "names": {
+    "fr": "Ville sous les projecteurs",
+    "en": "City under searchlights"
+  },
+  "descriptions": {
+    "fr": "Une ville de nuit en silhouettes, des projecteurs qui balaient le ciel, une lueur orange à l'horizon, des braises qui montent (vidéo en boucle).",
+    "en": "A city at night in silhouettes, searchlights sweeping the sky, an orange glow on the horizon, embers rising (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

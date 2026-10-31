@@ -1,0 +1,24 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: Three rings close on the pack like a countdown; it blows up in a fireball, debris flying. */
+[data-opening="blockbuster"] .booster-stage__tear .booster-pack {
+  animation: genre-fate 2.6s linear both;
+}
+@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  30% { transform: scale(1.02); }
+  34% { transform: translate(-2px, 1px) scale(1.04); }
+  37% { transform: translate(3px, -1px) scale(1.06); filter: brightness(1.4); opacity: 1; }
+  40% { transform: scale(1.35); filter: brightness(3.5); opacity: 0.8; }
+  44%, 100% { transform: scale(1.7); filter: brightness(5); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="blockbuster"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="blockbuster"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

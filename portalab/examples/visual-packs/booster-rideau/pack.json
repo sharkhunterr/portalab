@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "rideau",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Rideau — drame",
+    "en": "Rideau — drama"
+  },
+  "descriptions": {
+    "fr": "Le booster Drame, comme un soir de première : chaque rareté prend tout l'écran — un rideau de velours rouge, de la poussière d'or dans la lumière, le rideau s'ouvre, la carte arrive de dos sous un projecteur parmi des pétales, et au retournement des confettis d'or et des roses lancées. Un paquet de velours bordé d'or que le rideau emporte ; une salle de théâtre aux feux de la rampe.",
+    "en": "The Drama booster, like an opening night: every rarity takes the whole screen — a red velvet curtain, gold dust in the light, the curtain parts, the card comes face down under a spotlight among petals, and as it turns gold confetti and thrown roses. A velvet pack trimmed with gold that the curtain sweeps away; a theatre in the footlights."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

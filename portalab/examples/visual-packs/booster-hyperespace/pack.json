@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "hyperespace",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Hyperespace — science-fiction",
+    "en": "Hyperespace — science fiction"
+  },
+  "descriptions": {
+    "fr": "Le booster Science-fiction : chaque rareté prend tout l'écran — un saut en hyperespace, les étoiles étirées en traits, un éclair de saut, la carte arrive de dos devant une planète à anneau dans les nébuleuses, et au retournement l'onde du saut et un balayage d'hologramme. Une capsule blanche aux lueurs cyan téléportée dans un faisceau ; un ciel d'étoiles et de nébuleuses.",
+    "en": "The Science fiction booster: every rarity takes the whole screen — a jump to hyperspace, stars stretched into streaks, the jump's flash, the card comes face down before a ringed planet amid nebulas, and as it turns the jump's shockwave and a hologram's scan. A white capsule glowing cyan beamed away in a beam; a sky of stars and nebulas."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

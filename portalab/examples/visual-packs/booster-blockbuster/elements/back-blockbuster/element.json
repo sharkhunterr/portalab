@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "blockbuster",
+  "names": {
+    "fr": "Dos d'acier",
+    "en": "Steel back"
+  },
+  "descriptions": {
+    "fr": "Acier brossé, bande de danger, une explosion au centre.",
+    "en": "Brushed steel, a hazard band, an explosion in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

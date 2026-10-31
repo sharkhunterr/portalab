@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "rideau",
+  "names": {
+    "fr": "Dos de velours",
+    "en": "Velvet back"
+  },
+  "descriptions": {
+    "fr": "Velours rouge plissé, un liseré d'or, une rose au centre.",
+    "en": "Pleated red velvet, a gold line, a rose in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

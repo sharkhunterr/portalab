@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "hyperespace",
+  "names": {
+    "fr": "Nébuleuses",
+    "en": "Nebulas"
+  },
+  "descriptions": {
+    "fr": "Un ciel d'étoiles qui scintillent, des nébuleuses magenta et bleues qui dérivent, une planète à anneau qui tourne lentement, une étoile filante de temps en temps (vidéo en boucle).",
+    "en": "A sky of twinkling stars, magenta and blue nebulas drifting, a ringed planet turning slowly, now and then a shooting star (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

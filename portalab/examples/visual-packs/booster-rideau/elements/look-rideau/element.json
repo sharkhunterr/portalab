@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "rideau",
+  "names": {
+    "fr": "Paquet de velours",
+    "en": "Velvet pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet de velours rouge plissé bordé d'or, l'image de l'œuvre comme une affiche encadrée, son nom en italiques dorées, une rose en emblème.",
+    "en": "A pleated red velvet pack trimmed with gold, the work's art like a framed poster, its name in gold italics, a rose as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

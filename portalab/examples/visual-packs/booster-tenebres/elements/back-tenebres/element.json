@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "tenebres",
+  "names": {
+    "fr": "Dos de cuir",
+    "en": "Leather back"
+  },
+  "descriptions": {
+    "fr": "Cuir noir griffé de rouge, une lune de sang et un corbeau.",
+    "en": "Black leather clawed red, a blood moon and a crow."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

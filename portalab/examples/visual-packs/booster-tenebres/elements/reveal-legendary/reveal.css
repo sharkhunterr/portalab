@@ -1,0 +1,18 @@
+/* A legendary card turned (its hook: data-reveal), staged over the whole screen (place: screen): the rarity's
+   name first, over the scene's screen, then the card face down, turning over — between this reveal's two videos
+   (behind it and over it). This stylesheet dresses the rarity's name Portalab writes. */
+@font-face {
+  font-family: "Genre Creepster";
+  src: url("Creepster.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-reveal="tenebres-legendary"] .booster-takeover__word {
+  font-family: "Genre Creepster", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #c4101c;
+  -webkit-text-stroke: 0.2rem #060304;
+  paint-order: stroke fill;
+  text-shadow: 0 0.4rem 0 #060304, 0 0 2rem rgba(196, 16, 28, 0.8);
+}

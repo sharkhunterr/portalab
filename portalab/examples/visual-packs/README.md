@@ -66,6 +66,11 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   (orange bands cracked with lightning first, for a legendary); over it slashes of light, lightning and sparks —
   and the rarity's name, written by Portalab, slammed across the screen first in big comic letters; a neon
   violet pack sliced by a beam of light; neon-framed cards; a neon stage as a looping video;
+- `booster-blockbuster/`, `booster-tenebres/`, `booster-rideau/`, `booster-arcanes/`, `booster-hyperespace/`:
+  **a scene per Mediacards genre** (Action, Sombre, Drame, Fantastique, Science-fiction), built together from
+  `booster-genres-source/`, every rarity staged over the whole screen in the genre's world — steel and fire;
+  claw marks, crows and a blood moon; a velvet curtain and a spotlight; runes, a portal and wings of light;
+  hyperspace and a ringed planet — each pack going its own way as it opens, its stage a looping video;
 - `booster-sumi/` (`sumi`): **an opening in ink and gold, like Japanese lacquerware** — every animation drawn
   frame by frame in EffectCraft at 24 fps with a brush of bristles that lands heavy and runs dry, played as
   transparent videos (sources and `build.sh` in `booster-sumi-source/`), on a stage of black urushi lacquer where gold seigaiha waves rise and gold

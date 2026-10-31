@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "arcanes",
+  "names": {
+    "fr": "Dos runique",
+    "en": "Rune back"
+  },
+  "descriptions": {
+    "fr": "Indigo profond, un cercle de runes dorées et turquoise au centre.",
+    "en": "Deep indigo, a circle of gold and teal runes in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

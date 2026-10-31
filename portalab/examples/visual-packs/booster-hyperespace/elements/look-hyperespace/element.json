@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "hyperespace",
+  "names": {
+    "fr": "Capsule",
+    "en": "Capsule"
+  },
+  "descriptions": {
+    "fr": "Une capsule de panneaux blancs aux lueurs cyan, l'image de l'œuvre sur un écran, son nom en lettres techniques, une planète à anneau en emblème.",
+    "en": "A capsule of white panels glowing cyan, the work's art on a screen, its name in technical letters, a ringed planet as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

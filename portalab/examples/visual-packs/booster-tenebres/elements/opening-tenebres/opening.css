@@ -1,0 +1,24 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: Claws rip the pack twice; it tears and falls, blood spatters, crows burst away. */
+[data-opening="tenebres"] .booster-stage__tear .booster-pack {
+  animation: genre-fate 2.6s linear both;
+}
+@keyframes genre-fate {
+  0% { transform: none; filter: none; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); opacity: 1; }
+  20% { transform: translate(-2px, 0); }
+  26% { transform: translate(2px, 1px) rotate(1deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+  32% { transform: translate(0, 6px) rotate(-2deg); clip-path: polygon(0 0, 46% 0, 60% 30%, 40% 55%, 58% 100%, 0 100%); filter: brightness(0.8) sepia(0.4); opacity: 1; }
+  44% { transform: translate(-30px, 60px) rotate(-8deg); clip-path: polygon(0 0, 30% 0, 40% 30%, 25% 55%, 35% 100%, 0 100%); opacity: 0.6; }
+  52%, 100% { transform: translate(-60px, 160px) rotate(-14deg); clip-path: polygon(0 0, 30% 0, 40% 30%, 25% 55%, 35% 100%, 0 100%); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="tenebres"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="tenebres"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

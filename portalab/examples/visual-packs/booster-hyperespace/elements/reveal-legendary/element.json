@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "hyperespace-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
+    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}

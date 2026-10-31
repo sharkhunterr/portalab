@@ -1,0 +1,26 @@
+/* A epic card turned (its hook: data-reveal), staged over the whole screen (place: screen): the rarity's name
+   first, over the scene's screen, then the card face down, turning over — between this reveal's two videos
+   (behind it and over it). This stylesheet dresses the rarity's name Portalab writes. */
+@font-face {
+  font-family: "Genre Playfair";
+  src: url("PlayfairDisplay.woff2") format("woff2");
+  font-weight: 900;
+  font-display: swap;
+}
+[data-reveal="rideau-epic"] .booster-takeover__word {
+  font-family: "Genre Playfair", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+  scale: 0.8;
+  color: #f2c14e;
+  font-style: italic;
+  -webkit-text-stroke: 0.12rem #1a0508;
+  paint-order: stroke fill;
+  text-shadow: 0 0 2.4rem rgba(255, 230, 170, 0.6), 0.3rem 0.3rem 0 #1a0508;
+}
+/* held upright, the name runs along the screen's height: smaller, so it fits */
+@media (max-aspect-ratio: 4 / 5) {
+  [data-reveal="rideau-epic"] .booster-takeover__word {
+    scale: 0.6;
+  }
+}

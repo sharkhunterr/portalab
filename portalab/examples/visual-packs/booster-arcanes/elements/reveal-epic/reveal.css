@@ -1,0 +1,25 @@
+/* A epic card turned (its hook: data-reveal), staged over the whole screen (place: screen): the rarity's name
+   first, over the scene's screen, then the card face down, turning over — between this reveal's two videos
+   (behind it and over it). This stylesheet dresses the rarity's name Portalab writes. */
+@font-face {
+  font-family: "Genre Cinzel";
+  src: url("CinzelDecorative.woff2") format("woff2");
+  font-weight: 900;
+  font-display: swap;
+}
+[data-reveal="arcanes-epic"] .booster-takeover__word {
+  font-family: "Genre Cinzel", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+  scale: 0.66;
+  color: #ffd96a;
+  -webkit-text-stroke: 0.1rem #0a0720;
+  paint-order: stroke fill;
+  text-shadow: 0 0 2rem rgba(62, 232, 216, 0.9), 0 0 0.6rem rgba(255, 217, 106, 0.9);
+}
+/* held upright, the name runs along the screen's height: smaller, so it fits */
+@media (max-aspect-ratio: 4 / 5) {
+  [data-reveal="arcanes-epic"] .booster-takeover__word {
+    scale: 0.5;
+  }
+}

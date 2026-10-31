@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "rideau",
+  "names": {
+    "fr": "Le rideau tombe",
+    "en": "Curtain"
+  },
+  "descriptions": {
+    "fr": "Un projecteur trouve le paquet, des pétales tombent ; le rideau se referme sur lui, des confettis d'or éclatent.",
+    "en": "A spotlight finds the pack, petals fall; the curtain closes on it, gold confetti bursts."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}
