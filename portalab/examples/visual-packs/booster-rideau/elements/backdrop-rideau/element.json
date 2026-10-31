@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "rideau",
+  "names": {
+    "fr": "Feux de la rampe",
+    "en": "Footlights"
+  },
+  "descriptions": {
+    "fr": "Une salle de théâtre dans l'ombre, des rideaux de velours rouge sur les côtés, les feux de la rampe, un faisceau de lumière où danse la poussière (vidéo en boucle).",
+    "en": "A theatre in the dark, red velvet curtains at the sides, the footlights, a beam of light where dust dances (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

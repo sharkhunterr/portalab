@@ -1,0 +1,23 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity: Deep indigo,
+   a circle of gold and teal runes in the middle. */
+[data-card-back="arcanes"] .booster-card__back {
+  border: 0;
+  border-radius: 0.55rem;
+  background: radial-gradient(circle at 50% 42%, rgba(62, 232, 216, 0.25), transparent 45%), linear-gradient(170deg, #2a1c66, #140c3a 55%, #0a0720);
+  box-shadow: inset 0 0 0 3px #0a0720, inset 0 0 0 6px #3ee8d8, inset 0 0 0 8px #0a0720, 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+}
+[data-card-back="arcanes"] .booster-card__back-pattern {
+  opacity: 0;
+}
+[data-card-back="arcanes"] .booster-card__back-sigil {
+  inline-size: 60%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.7rem color-mix(in srgb, #3ee8d8 70%, transparent));
+}
+[data-card-back="arcanes"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

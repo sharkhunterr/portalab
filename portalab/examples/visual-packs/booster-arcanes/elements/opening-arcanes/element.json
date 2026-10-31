@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "arcanes",
+  "names": {
+    "fr": "Sceau de runes",
+    "en": "Rune seal"
+  },
+  "descriptions": {
+    "fr": "Un cercle de runes se trace et se referme sur le paquet ; il se dissout en poussière d'étoiles qui s'envole.",
+    "en": "A circle of runes draws itself and closes on the pack; it dissolves into stardust drifting away."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

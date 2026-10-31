@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "blockbuster",
+  "names": {
+    "fr": "Paquet d'acier",
+    "en": "Steel pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet d'acier brossé, une bande de danger orange et noire, l'image de l'œuvre dans un cadre riveté, son nom en lettres massives, une explosion en emblème.",
+    "en": "A brushed steel pack, an orange and black hazard band, the work's art in a riveted frame, its name in massive letters, an explosion as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

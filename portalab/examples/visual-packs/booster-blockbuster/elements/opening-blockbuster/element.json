@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "blockbuster",
+  "names": {
+    "fr": "Compte à rebours",
+    "en": "Countdown"
+  },
+  "descriptions": {
+    "fr": "Trois anneaux se referment sur le paquet comme un compte à rebours ; il explose en boule de feu, des débris projetés.",
+    "en": "Three rings close on the pack like a countdown; it blows up in a fireball, debris flying."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

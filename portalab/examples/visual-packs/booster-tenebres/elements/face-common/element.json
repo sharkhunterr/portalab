@@ -1,0 +1,19 @@
+{
+  "type": "card_face",
+  "look": "tenebres-common",
+  "names": {
+    "fr": "Face commune",
+    "en": "Common face"
+  },
+  "descriptions": {
+    "fr": "Un cadre au métal de sa rareté autour des couleurs de la scène, son lettrage celui de la scène.",
+    "en": "A frame in its rarity's metal round the scene's colours, its lettering the scene's."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "face.css"
+    ],
+    "rarity": "common"
+  }
+}

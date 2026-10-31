@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "arcanes",
+  "names": {
+    "fr": "Grimoire",
+    "en": "Grimoire"
+  },
+  "descriptions": {
+    "fr": "Un grimoire indigo, un cercle de runes dorées et turquoise, l'image de l'œuvre dans un médaillon, son nom en capitales ornées.",
+    "en": "An indigo grimoire, a circle of gold and teal runes, the work's art in a medallion, its name in ornate capitals."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

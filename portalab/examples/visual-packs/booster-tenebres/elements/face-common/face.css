@@ -1,0 +1,53 @@
+/* A common card of Ténèbres — darkness (its hook: the card once turned, data-card-face): a frame in the rarity's
+   metal round the scene's colours, its lettering the scene's. The face turns in 3D: never its transform; a
+   turned media card is never redrawn. */
+@font-face {
+  font-family: "Genre Creepster";
+  src: url("Creepster.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-card-face="tenebres-common"] .mcard__card {
+  padding: 3cqi;
+  border-radius: 2.4cqi;
+  background: linear-gradient(160deg, #8f8a99, #4c4856);
+  box-shadow: inset 0 0 0 0.4cqi rgba(255, 255, 255, 0.25), 0 0 0 0.5cqi #060304, 0 0 2.4cqi color-mix(in srgb, #8f8a99 50%, transparent);
+}
+[data-card-face="tenebres-common"] .mcard__body {
+  border-radius: 1.6cqi;
+  background: linear-gradient(170deg, #1e0b0e, #060304);
+  box-shadow: inset 0 0 0 0.5cqi #c4101c, inset 0 0 0 0.9cqi #060304;
+  color: #f4f0f8;
+}
+[data-card-face="tenebres-common"] .mcard[data-rarity] .mcard__name {
+  font-family: "Genre Creepster", var(--mcard-title);
+  font-weight: 400;
+  line-height: 1.15;
+  color: #ffffff;
+  text-shadow: 0 0 1.2cqi color-mix(in srgb, #c4101c 80%, transparent), 0.25cqi 0.25cqi 0 #060304;
+}
+[data-card-face="tenebres-common"] .mcard__genre,
+[data-card-face="tenebres-common"] .mcard__rarity,
+[data-card-face="tenebres-common"] .mcard__cost {
+  background: #c4101c;
+  color: #060304;
+  box-shadow: 0 0 0 0.3cqi #060304;
+  font-family: "Genre Creepster", var(--mcard-title);
+  font-weight: 400;
+}
+[data-card-face="tenebres-common"] .mcard__emblem {
+  background: #060304;
+  color: #c4101c;
+}
+[data-card-face="tenebres-common"] .mcard__art {
+  border-radius: 1cqi;
+  box-shadow: 0 0 0 0.4cqi #8f8a99, 0 0 0 0.8cqi #060304;
+}
+[data-card-face="tenebres-common"] .mcard__strip {
+  background: #c4101c;
+  color: #060304;
+}
+[data-card-face="tenebres-common"] .mcard__figures strong {
+  font-family: "Genre Creepster", var(--mcard-title);
+  font-weight: 400;
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "arcanes",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Arcanes — fantastique",
+    "en": "Arcanes — fantasy"
+  },
+  "descriptions": {
+    "fr": "Le booster Fantastique : chaque rareté prend tout l'écran — un grand cercle de runes dorées qui tourne dans l'indigo, il s'embrase en portail, la carte arrive de dos dans un vortex violet et turquoise parmi des pierres runiques en orbite, et au retournement de grandes ailes de lumière se déploient derrière elle. Un grimoire scellé de runes qui se dissout en poussière d'étoiles ; un ciel d'aurores et d'îles flottantes.",
+    "en": "The Fantasy booster: every rarity takes the whole screen — a great circle of gold runes turning in indigo, flaring into a portal, the card comes face down in a violet and teal vortex among orbiting rune stones, and as it turns great wings of light unfold behind it. A grimoire sealed with runes that dissolves into stardust; a sky of auroras and floating islands."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

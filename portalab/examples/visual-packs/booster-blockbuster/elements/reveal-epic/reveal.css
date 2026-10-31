@@ -1,0 +1,18 @@
+/* A epic card turned (its hook: data-reveal), staged over the whole screen (place: screen): the rarity's name
+   first, over the scene's screen, then the card face down, turning over — between this reveal's two videos
+   (behind it and over it). This stylesheet dresses the rarity's name Portalab writes. */
+@font-face {
+  font-family: "Genre Anton";
+  src: url("Anton.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-reveal="blockbuster-epic"] .booster-takeover__word {
+  font-family: "Genre Anton", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #ffffff;
+  -webkit-text-stroke: 0.3rem #0d0f14;
+  paint-order: stroke fill;
+  text-shadow: 0.5rem 0.5rem 0 #ff6a00;
+}

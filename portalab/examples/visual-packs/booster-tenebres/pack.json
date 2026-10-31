@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "tenebres",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Ténèbres — sombre",
+    "en": "Ténèbres — darkness"
+  },
+  "descriptions": {
+    "fr": "Le booster Sombre (horreur, crime, thrillers) : chaque rareté prend tout l'écran — trois griffures rouges déchirent un écran noir où coule le sang, des stores se ferment comme dans un polar, puis la carte arrive de dos parmi des corbeaux qui s'envolent, et au retournement un éclair, l'écran fêlé comme du verre. Un paquet de cuir noir lacéré ; une forêt brumeuse sous une lune de sang.",
+    "en": "The Dark booster (horror, crime, thrillers): every rarity takes the whole screen — three red claw marks tear a black screen running with blood, blinds close as in a thriller, then the card comes face down among crows bursting away, and as it turns a lightning strike, the screen cracked like glass. A clawed black leather pack; a misty forest under a blood moon."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

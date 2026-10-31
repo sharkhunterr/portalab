@@ -1,0 +1,23 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity: Pleated red
+   velvet, a gold line, a rose in the middle. */
+[data-card-back="rideau"] .booster-card__back {
+  border: 0;
+  border-radius: 0.55rem;
+  background: repeating-linear-gradient(90deg, #8e0716 0 10%, #5a0310 10% 20%), linear-gradient(180deg, transparent 80%, rgba(0, 0, 0, 0.4));
+  box-shadow: inset 0 0 0 3px #1a0508, inset 0 0 0 6px #b50d22, inset 0 0 0 8px #1a0508, 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+}
+[data-card-back="rideau"] .booster-card__back-pattern {
+  opacity: 0;
+}
+[data-card-back="rideau"] .booster-card__back-sigil {
+  inline-size: 60%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.7rem color-mix(in srgb, #b50d22 70%, transparent));
+}
+[data-card-back="rideau"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

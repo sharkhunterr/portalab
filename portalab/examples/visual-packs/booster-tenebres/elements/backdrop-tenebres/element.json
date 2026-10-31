@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "tenebres",
+  "names": {
+    "fr": "Lune de sang",
+    "en": "Blood moon"
+  },
+  "descriptions": {
+    "fr": "Une forêt brumeuse d'arbres nus sous une lune de sang voilée, la brume qui rampe, des éclairs au loin, des corbeaux qui passent (vidéo en boucle).",
+    "en": "A misty forest of bare trees under a veiled blood moon, mist creeping, lightning far off, crows passing (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

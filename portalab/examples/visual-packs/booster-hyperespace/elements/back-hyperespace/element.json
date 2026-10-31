@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "hyperespace",
+  "names": {
+    "fr": "Dos de capsule",
+    "en": "Capsule back"
+  },
+  "descriptions": {
+    "fr": "Panneaux sombres, lueurs cyan, une planète à anneau au centre.",
+    "en": "Dark panels, cyan glows, a ringed planet in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}
