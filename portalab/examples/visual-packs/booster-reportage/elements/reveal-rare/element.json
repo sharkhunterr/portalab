@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "reportage-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "Le viseur : à travers le viseur d'une caméra, ses repères, un REC qui clignote ; l'obturateur se ferme et s'ouvre sur la carte, cadrée.",
+    "en": "The viewfinder: through a camera's viewfinder, its marks, a blinking REC; the shutter closes and opens on the card, framed."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

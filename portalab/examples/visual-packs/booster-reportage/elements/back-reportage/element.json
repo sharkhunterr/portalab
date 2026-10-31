@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "reportage",
+  "names": {
+    "fr": "Dos de pellicule",
+    "en": "Film back"
+  },
+  "descriptions": {
+    "fr": "Métal sombre, une bande de clap, un clap au centre.",
+    "en": "Dark metal, a clapperboard's band, a clapperboard in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

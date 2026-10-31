@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "insomnie",
+  "names": {
+    "fr": "Dossier noir",
+    "en": "Black file"
+  },
+  "descriptions": {
+    "fr": "Un paquet noir rayé par l'ombre d'un store, une bande rouge, l'image de l'œuvre en noir et blanc contrasté, son nom en capitales serrées, un viseur en emblème.",
+    "en": "A black pack striped by a blind's shadow, a red band, the work's art in high contrast, its name in tight capitals, a reticle as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

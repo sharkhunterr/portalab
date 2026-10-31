@@ -1,4 +1,4 @@
-"""Writes the five genre scene packs (Blockbuster, Ténèbres, Rideau, Arcanes, Hyperespace) but for their videos
+"""Writes the genre scene packs (Blockbuster, Ténèbres, Rideau, Arcanes, Hyperespace, Trésor, Reportage, Insomnie) but for their videos
 (build.sh): their emblems, stylesheets — the sealed pack, the back, the four faces, the opening, each rarity's
 reveal over the whole screen and the look of the rarity's name Portalab writes there — and every manifest.
 Fonts (SIL OFL, from Google Fonts) are copied from fonts/."""
@@ -65,6 +65,25 @@ def emblem_hyperespace():
                '<circle cx="50" cy="50" r="26" fill="#2c3f8c"/><path d="M28,38 Q50,26 72,40 L70,46 Q50,34 30,44 Z" fill="#6f8cf0" opacity="0.8"/>'
                '<path d="M3,66 A47,13 -14 0 0 97,42" fill="none" stroke="#4de8ff" stroke-width="4" transform="rotate(0)"/>'
                '<circle cx="84" cy="18" r="2.5" fill="#ffffff"/><circle cx="14" cy="24" r="2" fill="#ffffff"/>')
+
+
+def emblem_tresor():
+    rose = "".join(f'<path d="{path([(50, 50), (50 + math.cos(a) * l, 50 + math.sin(a) * l), (50 + math.cos(a + 0.35) * 9, 50 + math.sin(a + 0.35) * 9)])}" fill="{c}"/>'
+                   for a, l, c in ((i * math.pi / 4 - math.pi / 2, 40 if i % 2 == 0 else 24, "#2b1a0a" if i % 2 == 0 else "#a8432a") for i in range(8)))
+    return svg(f'<circle cx="50" cy="50" r="47" fill="#ecd8a8" stroke="#6b4423" stroke-width="3"/>{rose}'
+               '<path d="M62,62 L82,82 M82,62 L62,82" stroke="#b3261e" stroke-width="6" stroke-linecap="round"/>')
+
+
+def emblem_reportage():
+    stripes = "".join(f'<path d="M{12 + k * 16},22 L{20 + k * 16},22 L{14 + k * 16},34 L{6 + k * 16},34 Z" fill="#f2f4f5"/>' for k in range(5))
+    return svg('<rect x="6" y="36" width="88" height="54" rx="4" fill="#15191c"/><rect x="6" y="20" width="88" height="16" fill="#15191c" transform="rotate(-10 6 36)"/>'
+               f'<g transform="rotate(-10 6 36)">{stripes}</g><path d="M14,52 H86 M14,68 H86 M50,52 V90" stroke="#f2f4f5" stroke-width="2.5"/>'
+               '<circle cx="80" cy="80" r="6" fill="#ff3b30"/>')
+
+
+def emblem_insomnie():
+    return svg('<circle cx="50" cy="50" r="40" fill="#121216" stroke="#e10600" stroke-width="4"/><circle cx="50" cy="50" r="22" fill="none" stroke="#f2f2f2" stroke-width="2.5"/>'
+               '<path d="M50,4 V28 M50,72 V96 M4,50 H28 M72,50 H96" stroke="#e10600" stroke-width="4"/><circle cx="50" cy="50" r="4" fill="#e10600"/>')
 
 
 GENRES = {
@@ -216,6 +235,86 @@ GENRES = {
                "look": ("Capsule", "Capsule", "Une capsule de panneaux blancs aux lueurs cyan, l'image de l'œuvre sur un écran, son nom en lettres techniques, une planète à anneau en emblème.", "A capsule of white panels glowing cyan, the work's art on a screen, its name in technical letters, a ringed planet as emblem."),
                "opening": ("Téléportation", "Beam-up", "Un faisceau de téléportation verrouille le paquet, des anneaux montent ; il est aspiré dans le faisceau, des fragments de lumière s'élèvent.", "A teleport beam locks on the pack, rings rising; it is drawn into the beam, fragments of light rising."),
                "back": ("Dos de capsule", "Capsule back", "Panneaux sombres, lueurs cyan, une planète à anneau au centre.", "Dark panels, cyan glows, a ringed planet in the middle.")}),
+    "tresor": dict(
+        moments={
+            "rare": ("La carte au trésor : un chemin en pointillés trouve sa route jusqu'à une croix sous une rose des vents ; la carte se pose sur la rose des vents.",
+                     "The treasure map: a dotted path finds its way to an X under a compass rose; the card lands on the compass rose."),
+            "epic": ("Le coffre englouti : la lumière tombe en rayons au fond de la mer, des bulles montent, puis le coffre s'ouvre derrière la carte dans un jaillissement d'or et de pièces.",
+                     "The sunken chest: light falls in shafts to the seabed, bubbles rise, then the chest opens behind the card in a burst of gold and coins."),
+            "legendary": ("L'île au trésor : un galion sur les vagues au soleil couchant, une vague géante qui s'abat, puis l'île, ses palmiers, une colonne de lumière dorée sur la carte, une pluie de pièces et la croix qui marque l'endroit.",
+                          "Treasure island: a galleon on the waves at sunset, a giant wave crashing, then the island, its palms, a column of golden light on the card, a rain of coins and the X that marks the spot."),
+        },
+        family="action", font=("IMFellEnglishSC.woff2", "Genre Fell", "400"), ink="#2b1a0a", main="#e0a33a", light="#f6e2b0", dark="#0f3b40", emblem=emblem_tresor,
+        names={"fr": "Trésor — aventure", "en": "Trésor — adventure"},
+        description={"fr": "Le booster Aventure, une chasse au trésor : chaque rareté son moment en plein écran — une carte au trésor pour une rare, un coffre englouti qui s'ouvre pour une épique, l'île au trésor au soleil couchant pour une légendaire. Un paquet de parchemin scellé de cire qui s'ouvre comme une carte, en pluie de pièces d'or ; la mer au couchant.",
+                     "en": "The Adventure booster, a treasure hunt: every rarity its own moment over the whole screen — a treasure map for a rare, a sunken chest opening for an epic, treasure island at sunset for a legendary. A parchment pack sealed with wax that opens like a map, in a rain of gold coins; the sea at sunset."},
+        pack_bg="radial-gradient(circle at 50% 45%, #f3e3bb, #ddc08a 60%, #a9844f)",
+        pack_band="linear-gradient(180deg, #a8432a, #6b2412)", face_bg="linear-gradient(170deg, #1d4a4f, #0a2226)",
+        upright="0.6",
+        word="scale: 0.85;\n  color: #f6e2b0;\n  -webkit-text-stroke: 0.18rem #2b1a0a;\n  paint-order: stroke fill;\n  text-shadow: 0.35rem 0.35rem 0 #a8432a, 0 0 2rem rgba(224, 163, 58, 0.7);",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  40% { transform: scale(1.02) rotate(-1deg); filter: sepia(0.3); }
+  46% { transform: scale(1.06); filter: brightness(2) sepia(0.6); opacity: 1; }
+  52%, 100% { transform: scale(1.3); filter: brightness(4) sepia(1); opacity: 0; }
+}""",
+        parts={"backdrop": ("Mer au couchant", "Sea at sunset", "La mer au soleil couchant, le soleil qui tremble sur les vagues, une île et ses palmiers en silhouette, des paillettes d'or qui montent (vidéo en boucle).", "The sea at sunset, the sun trembling on the waves, an island and its palms in silhouette, gold motes rising (a looping video)."),
+               "look": ("Parchemin", "Parchment", "Un paquet de parchemin, un sceau de cire rouge, l'image de l'œuvre comme une gravure, son nom en vieilles capitales, une rose des vents en emblème.", "A parchment pack, a red wax seal, the work's art like an engraving, its name in old capitals, a compass rose as emblem."),
+               "opening": ("La carte se déroule", "The map unrolls", "Une carte au trésor se déroule autour du paquet, un chemin en pointillés le trouve, une croix — il éclate en pièces d'or.", "A treasure map unrolls round the pack, a dotted path finds it, an X — it bursts into gold coins."),
+               "back": ("Dos de parchemin", "Parchment back", "Parchemin, sceau de cire, une rose des vents au centre.", "Parchment, a wax seal, a compass rose in the middle.")}),
+    "reportage": dict(
+        moments={
+            "rare": ("Le viseur : à travers le viseur d'une caméra, ses repères, un REC qui clignote ; l'obturateur se ferme et s'ouvre sur la carte, cadrée.",
+                     "The viewfinder: through a camera's viewfinder, its marks, a blinking REC; the shutter closes and opens on the card, framed."),
+            "epic": ("Le clap : le clap claque, un éclair, puis le compte à rebours de l'amorce tourne derrière la carte entre deux bandes de pellicule.",
+                     "The clapperboard: the clapper slams, a flash, then a film leader's countdown turns behind the card between two strips of film."),
+            "legendary": ("L'archive : deux bobines qui tournent, la pellicule qui défile, puis le faisceau du projecteur sur la carte, des rubans de pellicule qui l'entourent et des images qui s'envolent.",
+                          "The archive: two reels turning, the film running, then the projector's beam on the card, ribbons of film swirling round it and frames flying."),
+        },
+        family="drama", font=("SpaceMono.woff2", "Genre Space Mono", "700"), ink="#0b0d0f", main="#ffd60a", light="#ff3b30", dark="#1c2126", emblem=emblem_reportage,
+        names={"fr": "Reportage — documentaire", "en": "Reportage — documentary"},
+        description={"fr": "Le booster Documentaire, du tournage à l'archive : chaque rareté son moment en plein écran — le viseur d'une caméra pour une rare, le clap et l'amorce pour une épique, les bobines et le projecteur pour une légendaire. Un paquet comme une boîte à pellicule que le diaphragme d'une caméra avale ; une cabine de projection.",
+                     "en": "The Documentary booster, from the shoot to the archive: every rarity its own moment over the whole screen — a camera's viewfinder for a rare, the clapperboard and the leader for an epic, the reels and the projector for a legendary. A pack like a film can swallowed by a camera's iris; a projection booth."},
+        pack_bg="repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 6px), linear-gradient(165deg, #3a4148, #1c2126 60%, #0b0d0f)",
+        pack_band="repeating-linear-gradient(115deg, #f2f4f5 0 12px, #0b0d0f 12px 24px)", face_bg="linear-gradient(170deg, #22282d, #0b0d0f)",
+        upright="0.5",
+        word="scale: 0.7;\n  color: #f2f4f5;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n  -webkit-text-stroke: 0.1rem #0b0d0f;\n  paint-order: stroke fill;\n  text-shadow: 0.3rem 0.3rem 0 #ffd60a;",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; clip-path: circle(75% at 50% 50%); opacity: 1; }
+  30% { filter: brightness(1.1); clip-path: circle(75% at 50% 50%); }
+  44% { clip-path: circle(8% at 50% 50%); filter: brightness(1.6); opacity: 1; }
+  48%, 100% { clip-path: circle(0% at 50% 50%); opacity: 0; }
+}""",
+        parts={"backdrop": ("Cabine de projection", "Projection booth", "Une cabine de projection dans le noir, le faisceau du projecteur traversé de poussière, l'écran éclairé qui scintille, du grain de pellicule et une bande de film de chaque côté (vidéo en boucle).", "A projection booth in the dark, the projector's beam full of dust, the lit screen flickering, film grain and a strip of film on each side (a looping video)."),
+               "look": ("Boîte à pellicule", "Film can", "Un paquet de métal brossé comme une boîte à pellicule, une bande de clap, l'image de l'œuvre dans un cadre de viseur, son nom en machine à écrire, un clap en emblème.", "A brushed metal pack like a film can, a clapperboard's band, the work's art in a viewfinder's frame, its name typewritten, a clapperboard as emblem."),
+               "opening": ("Diaphragme", "Iris", "Le diaphragme d'une caméra se referme sur le paquet, un éclair — il a disparu, le diaphragme se rouvre.", "A camera's iris closes on the pack, a flash — it is gone, the iris opens again."),
+               "back": ("Dos de pellicule", "Film back", "Métal sombre, une bande de clap, un clap au centre.", "Dark metal, a clapperboard's band, a clapperboard in the middle.")}),
+    "insomnie": dict(
+        moments={
+            "rare": ("La filature : une rue de nuit sous la pluie, un réverbère, un homme en chapeau qui suit quelqu'un ; l'ombre d'un store passe sur la carte.",
+                     "The tail: a rainy street at night, a street lamp, a man in a hat following someone; a blind's shadow falls across the card."),
+            "epic": ("Le compte à rebours : les aiguilles d'une horloge qui s'emballent, un pouls sur un moniteur, puis des ondes rouges autour de la carte au rythme du cœur.",
+                     "The countdown: a clock's hands racing, a pulse on a monitor, then red waves round the card to the heartbeat."),
+            "legendary": ("La traque : les toits sous la pluie, le projecteur d'un hélicoptère, les gyrophares rouges et bleus, puis un viseur qui se verrouille sur la carte, du verre qui vole en éclats et cinq tirs qui laissent leurs impacts dans la carte.",
+                          "The hunt: rooftops in the rain, a helicopter's searchlight, red and blue police lights, then a reticle locking on the card, glass shattering and five shots leaving their bullet holes in the card."),
+        },
+        family="dark", font=("BebasNeue.woff2", "Genre Bebas", "400"), ink="#060607", main="#e10600", light="#f2f2f2", dark="#15151a", emblem=emblem_insomnie,
+        names={"fr": "Insomnie — thriller", "en": "Insomnie — thriller"},
+        description={"fr": "Le booster Thriller, une nuit sans sommeil : chaque rareté son moment en plein écran — une filature sous la pluie pour une rare, un compte à rebours au rythme du cœur pour une épique, une traque sous les gyrophares pour une légendaire. Un paquet noir barré d'une bande rouge qu'un viseur verrouille avant qu'il vole en éclats ; une ville sous la pluie et les néons.",
+                     "en": "The Thriller booster, a sleepless night: every rarity its own moment over the whole screen — a tail in the rain for a rare, a countdown to the heartbeat for an epic, a manhunt under police lights for a legendary. A black pack crossed by a red band that a reticle locks on before it shatters; a city in the rain and neon."},
+        pack_bg="repeating-linear-gradient(160deg, rgba(255, 255, 255, 0.04) 0 10px, transparent 10px 28px), linear-gradient(170deg, #22222a, #0a0a0c)",
+        pack_band="linear-gradient(180deg, #e10600, #7a0300)", face_bg="linear-gradient(170deg, #1a1a20, #060607)",
+        word="color: #f2f2f2;\n  letter-spacing: 0.06em;\n  -webkit-text-stroke: 0.12rem #060607;\n  paint-order: stroke fill;\n  text-shadow: -0.4rem 0 0 #e10600, 0 0 1.6rem rgba(225, 6, 0, 0.6);",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); opacity: 1; }
+  40% { transform: scale(1.02); filter: brightness(1.2); }
+  44% { transform: scale(1.05); filter: brightness(2.5); clip-path: polygon(0 0, 55% 0, 40% 45%, 70% 60%, 45% 100%, 0 100%); opacity: 1; }
+  56%, 100% { transform: translate(-40px, 120px) rotate(-12deg); clip-path: polygon(0 0, 55% 0, 40% 45%, 70% 60%, 45% 100%, 0 100%); opacity: 0; }
+}""",
+        parts={"backdrop": ("Ville sous la pluie", "City in the rain", "Une ville de nuit sous la pluie, des enseignes au néon rouge et bleu qui grésillent, des fenêtres allumées, la rue mouillée qui les reflète (vidéo en boucle).", "A city at night in the rain, red and blue neon signs buzzing, lit windows, the wet street mirroring them (a looping video)."),
+               "look": ("Dossier noir", "Black file", "Un paquet noir rayé par l'ombre d'un store, une bande rouge, l'image de l'œuvre en noir et blanc contrasté, son nom en capitales serrées, un viseur en emblème.", "A black pack striped by a blind's shadow, a red band, the work's art in high contrast, its name in tight capitals, a reticle as emblem."),
+               "opening": ("Dans le viseur", "In the crosshairs", "Un viseur cherche le paquet et se verrouille ; un coup — il vole en éclats comme du verre.", "A reticle looks for the pack and locks on; a shot — it shatters like glass."),
+               "back": ("Dos noir", "Black back", "Noir rayé, une bande rouge, un viseur au centre.", "Striped black, a red band, a reticle in the middle.")}),
 }
 REVEAL = {
     "rare": ("Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
@@ -496,7 +595,8 @@ def write(key, g):
                               "face": {r: f"face-{r}" for r in RARITIES}, "reveal": {r: f"reveal-{r}" for r in ("rare", "epic", "legendary")}}}}, ensure_ascii=False, indent=2) + "\n")
     (pack / "pack.json").write_text(json.dumps({"format": 1, "id": key, "version": g.get("version", "1.0.0"), "names": g["names"], "descriptions": g["description"],
                                                 "author": "Portalab (example)", "license": "CC0-1.0"}, ensure_ascii=False, indent=2) + "\n")
-    fonts = {"Anton.woff2": "Anton by Vernon Adams", "Creepster.woff2": "Creepster by Sideshow", "PlayfairDisplay.woff2": "Playfair Display by Claus Eggers Sørensen",
+    fonts = {"IMFellEnglishSC.woff2": "IM Fell English SC by Igino Marini", "SpaceMono.woff2": "Space Mono by Colophon", "BebasNeue.woff2": "Bebas Neue by Dharma Type",
+             "Anton.woff2": "Anton by Vernon Adams", "Creepster.woff2": "Creepster by Sideshow", "PlayfairDisplay.woff2": "Playfair Display by Claus Eggers Sørensen",
              "CinzelDecorative.woff2": "Cinzel Decorative by Natanael Gama", "Orbitron.woff2": "Orbitron by Matt McInerney"}
     (pack / "CREDITS.txt").write_text(f"""{g['names']['en']} — an example booster scene for Portalab (CC0-1.0), one of the genre scenes, every shader,
 stylesheet and drawing original.

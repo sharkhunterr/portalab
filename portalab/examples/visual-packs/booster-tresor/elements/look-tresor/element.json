@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "tresor",
+  "names": {
+    "fr": "Parchemin",
+    "en": "Parchment"
+  },
+  "descriptions": {
+    "fr": "Un paquet de parchemin, un sceau de cire rouge, l'image de l'œuvre comme une gravure, son nom en vieilles capitales, une rose des vents en emblème.",
+    "en": "A parchment pack, a red wax seal, the work's art like an engraving, its name in old capitals, a compass rose as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

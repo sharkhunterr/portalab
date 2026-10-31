@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "reportage",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Reportage — documentaire",
+    "en": "Reportage — documentary"
+  },
+  "descriptions": {
+    "fr": "Le booster Documentaire, du tournage à l'archive : chaque rareté son moment en plein écran — le viseur d'une caméra pour une rare, le clap et l'amorce pour une épique, les bobines et le projecteur pour une légendaire. Un paquet comme une boîte à pellicule que le diaphragme d'une caméra avale ; une cabine de projection.",
+    "en": "The Documentary booster, from the shoot to the archive: every rarity its own moment over the whole screen — a camera's viewfinder for a rare, the clapperboard and the leader for an epic, the reels and the projector for a legendary. A pack like a film can swallowed by a camera's iris; a projection booth."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

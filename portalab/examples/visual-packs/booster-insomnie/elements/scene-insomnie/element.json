@@ -1,0 +1,36 @@
+{
+  "type": "booster_scene",
+  "look": "insomnie",
+  "names": {
+    "fr": "Scène Insomnie",
+    "en": "Insomnie scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture, chaque rareté en plein écran. Les cartes tirées, leurs raretés et leurs noms restent ceux de Portalab.",
+    "en": "The whole opening, every rarity over the whole screen. The cards drawn, their rarities and names stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-insomnie",
+      "backdrop": "backdrop-insomnie",
+      "opening": "opening-insomnie",
+      "back": {
+        "common": "back-insomnie"
+      },
+      "face": {
+        "common": "face-common",
+        "rare": "face-rare",
+        "epic": "face-epic",
+        "legendary": "face-legendary"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

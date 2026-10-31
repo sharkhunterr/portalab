@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "tresor-epic",
+  "names": {
+    "fr": "Révélation épique",
+    "en": "Epic reveal"
+  },
+  "descriptions": {
+    "fr": "Le coffre englouti : la lumière tombe en rayons au fond de la mer, des bulles montent, puis le coffre s'ouvre derrière la carte dans un jaillissement d'or et de pièces.",
+    "en": "The sunken chest: light falls in shafts to the seabed, bubbles rise, then the chest opens behind the card in a burst of gold and coins."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.8,
+    "rarity": "epic"
+  }
+}

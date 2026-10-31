@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "tresor-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "La carte au trésor : un chemin en pointillés trouve sa route jusqu'à une croix sous une rose des vents ; la carte se pose sur la rose des vents.",
+    "en": "The treasure map: a dotted path finds its way to an X under a compass rose; the card lands on the compass rose."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

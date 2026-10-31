@@ -1,0 +1,19 @@
+/* A epic card turned (its hook: data-reveal), staged over the whole screen (place: screen): the rarity's name
+   first, over the scene's screen, then the card face down, turning over — between this reveal's two videos
+   (behind it and over it). This stylesheet dresses the rarity's name Portalab writes. */
+@font-face {
+  font-family: "Genre Bebas";
+  src: url("BebasNeue.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-reveal="insomnie-epic"] .booster-takeover__word {
+  font-family: "Genre Bebas", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #f2f2f2;
+  letter-spacing: 0.06em;
+  -webkit-text-stroke: 0.12rem #060607;
+  paint-order: stroke fill;
+  text-shadow: -0.4rem 0 0 #e10600, 0 0 1.6rem rgba(225, 6, 0, 0.6);
+}

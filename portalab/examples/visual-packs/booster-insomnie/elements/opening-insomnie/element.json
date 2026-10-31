@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "insomnie",
+  "names": {
+    "fr": "Dans le viseur",
+    "en": "In the crosshairs"
+  },
+  "descriptions": {
+    "fr": "Un viseur cherche le paquet et se verrouille ; un coup — il vole en éclats comme du verre.",
+    "en": "A reticle looks for the pack and locks on; a shot — it shatters like glass."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

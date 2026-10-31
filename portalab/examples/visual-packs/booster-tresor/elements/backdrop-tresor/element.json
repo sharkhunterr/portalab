@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "tresor",
+  "names": {
+    "fr": "Mer au couchant",
+    "en": "Sea at sunset"
+  },
+  "descriptions": {
+    "fr": "La mer au soleil couchant, le soleil qui tremble sur les vagues, une île et ses palmiers en silhouette, des paillettes d'or qui montent (vidéo en boucle).",
+    "en": "The sea at sunset, the sun trembling on the waves, an island and its palms in silhouette, gold motes rising (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

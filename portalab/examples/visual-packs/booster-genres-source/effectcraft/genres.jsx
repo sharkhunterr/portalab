@@ -763,7 +763,387 @@ var SF_LEGENDARY = {
 };
 GENRE_SF.rarities = { rare: SF_RARE, epic: GENRE_SF, legendary: SF_LEGENDARY };
 
-var GENRE = { action: GENRE_ACTION, dark: GENRE_DARK, drama: GENRE_DRAMA, fantasy: GENRE_FANTASY, sf: GENRE_SF }[GENRE_KEY];
+// ===== Trésor — adventure: a treasure map, a sunken chest, an island ======================================
+var ADV = { sea: [0.05, 0.22, 0.25], sea_l: [0.12, 0.42, 0.46], deep: [0.02, 0.09, 0.12], foam: [0.88, 0.95, 0.92], parch: [0.92, 0.84, 0.64], parch_d: [0.7, 0.55, 0.32], ink: [0.2, 0.11, 0.04], gold: [0.96, 0.72, 0.18], gold_l: [1, 0.9, 0.55], sun: [1, 0.78, 0.4], dusk: [0.62, 0.22, 0.3], sky: [0.98, 0.55, 0.32], wood: [0.36, 0.21, 0.1] };
+function compassRose(cx, cy, r, turn) {   // eight points, the four long ones split light and dark
+  var light = [], dark = [];
+  for (var i = 0; i < 8; i++) { var a = turn + i * Math.PI / 4, l = i % 2 ? r * 0.55 : r, w = r * 0.13; var tip = [cx + Math.cos(a) * l, cy + Math.sin(a) * l], s1 = [cx + Math.cos(a + Math.PI / 2) * w, cy + Math.sin(a + Math.PI / 2) * w], s2 = [cx + Math.cos(a - Math.PI / 2) * w, cy + Math.sin(a - Math.PI / 2) * w]; light.push([[cx, cy], tip, s1]); dark.push([[cx, cy], tip, s2]); }
+  return { light: light, dark: dark };
+}
+function trail(points, upto) {   // a dotted path drawn up to a share
+  var out = [], n = Math.max(2, Math.round(points.length * clamp01(upto)));
+  return [points.slice(0, n)];
+}
+function mapPath() { var pts = []; for (var i = 0; i <= 40; i++) { var t = i / 40; pts.push([120 + t * 840, 900 - t * 520 + Math.sin(t * 9) * 90]); } return pts; }
+function coins(f, n, base, cx, cy, speed, o) {   // gold coins thrown up and falling, turning (thin when edge-on)
+  seed(base); var out = [], lit = [];
+  for (var i = 0; i < n; i++) { var a = between(-Math.PI * 0.95, -Math.PI * 0.05), v = between(14, 30) * speed, t = f, x = cx + Math.cos(a) * v * t, y = cy + Math.sin(a) * v * t + 0.9 * t * t, r = between(14, 24), k = Math.max(0.12, Math.abs(Math.cos(t * 0.3 + i))); out.push(circle(x, y, r, k, 14)); lit.push(circle(x - r * 0.2, y - r * 0.2 * k, r * 0.45, k, 10)); }
+  return { coins: out, lit: lit };
+}
+function waves(f, y0, amp, n, phase) {   // a band of sea: its crest a running wave
+  var pts = [[-60, 1140]];
+  for (var x = -60; x <= 1140; x += 30) pts.push([x, y0 + Math.sin(x * 0.012 + f * 0.25 + phase) * amp + Math.sin(x * 0.031 - f * 0.4) * amp * 0.35]);
+  pts.push([1140, 1140]);
+  return [pts];
+}
+function galleon(x, y, s, roll) {   // a sailing ship in silhouette: hull, three masts, sails
+  var hull = place([[-1.2 * s, 0], [1.25 * s, 0], [0.95 * s, 0.35 * s], [-0.9 * s, 0.35 * s], [-1.3 * s, -0.25 * s]], x, y, roll), sails = [];
+  for (var m = -1; m <= 1; m++) { var mx = m * 0.6 * s, h = (m ? 1.1 : 1.45) * s; sails.push(place([[mx - 0.03 * s, 0], [mx + 0.03 * s, 0], [mx + 0.03 * s, -h], [mx - 0.03 * s, -h]], x, y, roll)); sails.push(place([[mx - 0.32 * s, -h * 0.25], [mx + 0.32 * s, -h * 0.3], [mx + 0.36 * s, -h * 0.85], [mx - 0.3 * s, -h * 0.8]], x, y, roll)); }
+  return [hull].concat(sails);
+}
+function palm(x, y, s, sway) {   // a palm tree: a leaning trunk, a crown of fronds
+  var out = [slash(x, y, x + 0.3 * s + sway * 20, y - 1.6 * s, 0.09 * s, 1, 0.4)[0]], top = [x + 0.3 * s + sway * 20, y - 1.6 * s];
+  for (var k = 0; k < 6; k++) { var a = -Math.PI / 2 + (k - 2.5) * 0.55 + sway * 0.1; out = out.concat(slash(top[0], top[1], top[0] + Math.cos(a) * 0.9 * s, top[1] + Math.sin(a) * 0.9 * s + 0.4 * s, 0.12 * s, 1, k < 3 ? 0.5 : -0.5)); }
+  return out;
+}
+var ADV_RARE = {
+  title: function (fr, f, u) {   // a treasure map: a dotted path finding its way to an X
+    var path = mapPath();
+    lines(fr.main, trail(path, f / 20), ADV.ink, 7, 100, false, [0.1, 22]);
+    if (f > 16) { var x = path[40][0], y = path[40][1], k = ease((f - 16) / 3); lines(fr.main, [[[x - 40 * k, y - 40 * k], [x + 40 * k, y + 40 * k]], [[x + 40 * k, y - 40 * k], [x - 40 * k, y + 40 * k]]], [0.7, 0.1, 0.06], 12, 100); }
+    var rose = compassRose(230, 260, 150, f * 0.02); polys(fr.main, rose.light, ADV.parch, 100); polys(fr.main, rose.dark, ADV.ink, 100);
+    lines(fr.main, [ring(230, 260, 160, 1), ring(230, 260, 172, 1)], ADV.ink, 3, 100);
+    var grid = []; for (var g = 0; g < 9; g++) { grid.push([[-60, g * 140], [1140, g * 140]]); grid.push([[g * 140, -60], [g * 140, 1140]]); }
+    lines(fr.main, grid, ADV.parch_d, 2, 45);
+    polys(fr.haze, [circle(C, C, 700, 1, 40)], ADV.parch_d, 60);
+    polys(fr.main, [full()], ADV.parch, 100);
+  },
+  wipe: function (fr, v) {   // the map rolls up
+    var y = 1140 - ease(v) * 1260; polys(fr.top, [[[-60, y], [1140, y], [1140, 1140], [-60, 1140]]], ADV.parch, 100); polys(fr.top, [[[-60, y - 30], [1140, y - 30], [1140, y + 10], [-60, y + 10]]], ADV.parch_d, 100);
+  },
+  stage: function (fr, f, at, o) {
+    var rose = compassRose(C, C, 520, f * 0.01); polys(fr.main, rose.light, ADV.parch, o * 0.5); polys(fr.main, rose.dark, ADV.parch_d, o * 0.5);
+    lines(fr.main, [ring(C, C, 530, 1), ring(C, C, 548, 1)], ADV.ink, 3, o * 0.6);
+    polys(fr.haze, [circle(C, C, 700, 1, 40)], ADV.parch_d, o * 0.7);
+    polys(fr.main, [full()], ADV.parch, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 2) { seed(1012); var pts = []; for (var i = 0; i < 10; i++) { var a = between(0, Math.PI * 2), r = toEdge(a, 160, 222) + between(10, 90); pts.push([C + Math.cos(a) * r, C + Math.sin(a) * r]); } polys(fr.top, glintPolys(twinkle(pts, f, 2, 18)), ADV.gold_l); }
+  }
+};
+var ADV_EPIC = {
+  title: function (fr, f, u) {   // under the sea: light falling in shafts, bubbles rising, a chest on the seabed
+    seed(1020); var bub = []; for (var i = 0; i < 30; i++) { var x = between(0, 1080) + Math.sin(f * 0.2 + i) * 12, y = 1100 - ((f * between(10, 22) + between(0, 1100)) % 1180); bub.push(circle(x, y, between(5, 16), 1, 12)); }
+    lines(fr.main, bub, ADV.foam, 3, 70);
+    var shafts = []; for (var k = 0; k < 5; k++) { var x0 = 120 + k * 210 + Math.sin(f * 0.05 + k) * 30; shafts.push([[x0 - 30, -60], [x0 + 30, -60], [x0 + 180, 1140], [x0 + 60, 1140]]); }
+    polys(fr.glow, shafts, ADV.sea_l, 60);
+    polys(fr.main, [place([[-150, 0], [150, 0], [140, -110], [-140, -110]], C, 930, 0), place([[-160, -100], [160, -100], [120, -190], [-120, -190]], C, 930, 0)], ADV.wood, 100);
+    lines(fr.main, [[[C - 150, 860], [C + 150, 860]], [[C, 740], [C, 930]]], ADV.gold, 8, 100);
+    polys(fr.main, [[[-60, 920], [1140, 960], [1140, 1140], [-60, 1140]]], [0.6, 0.52, 0.36], 100);
+    polys(fr.main, [full()], ADV.deep, 100);
+  },
+  wipe: function (fr, v) {   // a burst of bubbles fills the screen
+    seed(1025); var bub = []; for (var i = 0; i < 90; i++) { var x = between(-60, 1140), y = between(-60, 1140), r = between(20, 70) * ease(v * 1.4 - between(0, 0.4)); if (r > 2) bub.push(circle(x, y, r, 1, 16)); }
+    polys(fr.top, bub, ADV.foam, 100);
+  },
+  stage: function (fr, f, at, o) {   // the chest open behind the card: golden light, coins thrown out, bubbles
+    var g = ease((f - CARD_AT) / 6);
+    if (at >= 0) { var c = coins(at, 30, 1030, C, C + 260, 1, o); polys(fr.main, c.lit, ADV.gold_l, fade(at, 40, 60) * o); polys(fr.main, c.coins, ADV.gold, fade(at, 40, 60) * o); }
+    wedges(fr.main, 14, (f - CARD_AT) * 0.004, 300 + 900 * g, ADV.gold, null, o * 0.5, 0, 0.45);
+    polys(fr.haze, [circle(C, C + 100, 420 * g + 60, 1, 40)], ADV.gold, o);
+    seed(1031); var bub = []; for (var i = 0; i < 26; i++) { var x = between(0, 1080), y = 1100 - ((f * between(10, 22) + between(0, 1100)) % 1180); bub.push(circle(x, y, between(5, 14), 1, 12)); }
+    lines(fr.main, bub, ADV.foam, 3, o * 0.6);
+    polys(fr.main, [full()], ADV.deep, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0) { var c = coins(at + 4, 12, 1040, C, C + 140, 0.8, 100); polys(fr.top, c.lit, ADV.gold_l, fade(at, 30, 44) * 100); polys(fr.top, c.coins, ADV.gold, fade(at, 30, 44) * 100); }
+    bigGlint(fr, at, ADV.gold);
+  }
+};
+var ADV_LEGENDARY = {
+  title: function (fr, f, u) {   // a galleon riding the waves under a setting sun
+    polys(fr.main, waves(f, 760, 26, 0, 0), ADV.sea, 100);
+    polys(fr.main, waves(f, 720, 30, 0, 2), ADV.sea_l, 100);
+    polys(fr.main, galleon(C - 80 + f * 4, 700 + Math.sin(f * 0.25) * 14, 150, Math.sin(f * 0.2) * 0.06), ADV.ink, 100);
+    polys(fr.glow, [circle(C + 220, 620, 260, 1, 48)], ADV.sun, 80);
+    polys(fr.main, [circle(C + 220, 650, 190, 1, 64)], ADV.sun, 100);
+    polys(fr.main, [[[-60, 300], [1140, 300], [1140, 760], [-60, 760]]], ADV.sky, 100);
+    polys(fr.main, [full()], ADV.dusk, 100);
+  },
+  wipe: function (fr, v) {   // a great wave crashing over the screen
+    var x = 1200 - ease(v) * 1500, pts = [[1140, -60], [1140, 1140], [x, 1140]];
+    for (var k = 0; k <= 12; k++) { var t = k / 12; pts.push([x - 200 * Math.sin(t * Math.PI) + t * 300, 1140 - t * 1200]); }
+    polys(fr.top, [pts], ADV.sea_l, 100); lines(fr.top, [pts.slice(3)], ADV.foam, 40, 100);
+  },
+  stage: function (fr, f, at, o) {   // the treasure island at sunset: palms, a pillar of gold light, coins raining, the ship far off
+    var g = ease((f - CARD_AT) / 6);
+    if (at >= 0) { seed(1050); var rain = [], lit = []; for (var i = 0; i < 40; i++) { var x = between(0, 1080), y = -60 + ((at * between(14, 26) + between(0, 1200)) % 1250), r = between(12, 22), k = Math.max(0.15, Math.abs(Math.cos(at * 0.3 + i))); rain.push(circle(x, y, r, k, 12)); lit.push(circle(x - r * 0.2, y - r * 0.2 * k, r * 0.45, k, 8)); } polys(fr.top, lit, ADV.gold_l, fade(at, 50, 68) * o); polys(fr.main, rain, ADV.gold, fade(at, 50, 68) * o); }
+    polys(fr.main, palm(130, 900, 230, Math.sin(f * 0.1)).concat(palm(960, 920, 200, Math.sin(f * 0.1 + 1))), ADV.ink, o);
+    polys(fr.main, [[[-60, 880], [300, 820], [780, 830], [1140, 880], [1140, 1140], [-60, 1140]]], [0.45, 0.3, 0.12], o);
+    polys(fr.main, galleon(250 + f * 2, 740, 50, 0), ADV.ink, o * 0.8);
+    polys(fr.main, waves(f, 780, 10, 0, 1), ADV.sea, o);
+    polys(fr.haze, [[[C - 160 * g, -60], [C + 160 * g, -60], [C + 260 * g, 1140], [C - 260 * g, 1140]]], ADV.gold_l, o);
+    polys(fr.main, [[[C - 70 * g, -60], [C + 70 * g, -60], [C + 120 * g, 820], [C - 120 * g, 820]]], ADV.gold_l, o * 0.5);
+    polys(fr.glow, [circle(C, 700, 300 * g + 40, 1, 48)], ADV.sun, o);
+    polys(fr.main, [[[-60, 280], [1140, 280], [1140, 780], [-60, 780]]], ADV.sky, o);
+    polys(fr.main, [full()], ADV.dusk, o);
+  },
+  over: function (fr, f, at) {   // the X that marks the spot, drawn in gold over the card; coins and glints
+    if (at >= 0 && at < 9) { polys(fr.top, slash(C - 380, C - 420, C + 380, C + 420, 40, ease(at / 3), 0.2), ADV.gold_l, fade(at, 5, 9) * 90); polys(fr.top, slash(C + 380, C - 420, C - 380, C + 420, 40, ease((at - 2) / 3), -0.2), ADV.gold_l, fade(at, 6, 10) * 90); }
+    if (at >= 0) { var c = coins(at + 3, 16, 1060, C, C + 180, 1, 100); polys(fr.top, c.lit, ADV.gold_l, fade(at, 30, 44) * 100); polys(fr.top, c.coins, ADV.gold, fade(at, 30, 44) * 100); }
+    bigGlint(fr, at, ADV.gold);
+  }
+};
+var GENRE_ADVENTURE = {
+  rarities: { rare: ADV_RARE, epic: ADV_EPIC, legendary: ADV_LEGENDARY },
+  opening: function (comp) {   // the map unrolls round the pack, a dotted path finds it, an X — it bursts into gold
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      if (f < 30) { var w = ease(f / 8) * 520; polys(fr.main, [[[cx - w, cy - 380], [cx + w, cy - 380], [cx + w, cy + 380], [cx - w, cy + 380]]], ADV.parch, 80 * fade(f, 24, 30)); polys(fr.main, [[[cx - w - 20, cy - 380], [cx - w + 20, cy - 380], [cx - w + 20, cy + 380], [cx - w - 20, cy + 380]], [[cx + w - 20, cy - 380], [cx + w + 20, cy - 380], [cx + w + 20, cy + 380], [cx + w - 20, cy + 380]]], ADV.parch_d, 100 * fade(f, 24, 30)); }
+      if (f >= 6 && f < 30) { var pts = []; for (var i = 0; i <= 30; i++) { var t = i / 30; pts.push([cx - 460 + t * 460, cy + 300 - t * 300 + Math.sin(t * 8) * 60]); } lines(fr.top, trail(pts, (f - 6) / 14), ADV.ink, 7, 100 * fade(f, 26, 30), false, [0.1, 20]); }
+      if (f >= 18 && f < 32) { var k = ease((f - 18) / 4); lines(fr.top, [[[cx - 60 * k, cy - 60 * k], [cx + 60 * k, cy + 60 * k]], [[cx + 60 * k, cy - 60 * k], [cx - 60 * k, cy + 60 * k]]], [0.7, 0.1, 0.06], 16, 100 * fade(f, 28, 32)); }
+      if (f >= 30) { var c = coins(f - 30, 40, 1070, cx, cy, 1.2, 100); polys(fr.top, c.lit, ADV.gold_l, fade(f, 52, 63) * 100); polys(fr.top, c.coins, ADV.gold, fade(f, 52, 63) * 100); }
+      if (f >= 30 && f < 33) polys(fr.top, [circle(cx, cy, 600, 1, 40)], ADV.gold_l, 100 - (f - 30) * 33);
+    }
+  }
+};
+
+// ===== Reportage — documentary: a viewfinder, a clapperboard, the film's archive =========================
+var DOC = { black: [0.04, 0.05, 0.06], grey: [0.5, 0.55, 0.58], dim: [0.16, 0.18, 0.2], white: [0.95, 0.96, 0.97], yellow: [1, 0.84, 0.04], red: [1, 0.23, 0.19], sepia: [0.82, 0.7, 0.5] };
+function brackets(cx, cy, hw, hh, len) {   // a viewfinder's four corner marks
+  var out = [];
+  for (var sx = -1; sx <= 1; sx += 2) for (var sy = -1; sy <= 1; sy += 2) out.push([[cx + sx * hw, cy + sy * (hh - len)], [cx + sx * hw, cy + sy * hh], [cx + sx * (hw - len), cy + sy * hh]]);
+  return out;
+}
+function sprockets(x, f, speed) {   // a strip of film running down: its holes
+  var out = []; for (var k = -1; k < 14; k++) { var y = -60 + ((k * 90 + f * speed) % 1260); out.push([[x - 18, y], [x + 18, y], [x + 18, y + 50], [x - 18, y + 50]]); } return out;
+}
+function reel(cx, cy, r, turn) {   // a film reel: rim, hub, five round windows
+  var holes = []; for (var k = 0; k < 5; k++) { var a = turn + k * Math.PI * 2 / 5; holes.push(circle(cx + Math.cos(a) * r * 0.55, cy + Math.sin(a) * r * 0.55, r * 0.24, 1, 20)); }
+  return [circle(cx, cy, r, 1, 48)].concat(holes, [circle(cx, cy, r * 0.12, 1, 16)]);
+}
+function filmBand(pts, w, f) {   // a ribbon of film along a path, its frames marked
+  var band = ribbon(pts, w, 0, 0, 1), frames = [];
+  for (var i = 2; i < pts.length - 2; i += 3) { var p = pts[i]; frames.push(circle(p[0], p[1], w * 0.3, 1, 4)); }
+  return { band: band, frames: frames };
+}
+var DOC_RARE = {
+  title: function (fr, f, u) {   // through a camera's viewfinder: corner marks, a blinking REC, the focus breathing
+    lines(fr.main, brackets(C, C, 470, 310, 90), DOC.white, 8, 100);
+    var thirds = [[[C - 157, C - 300], [C - 157, C + 300]], [[C + 157, C - 300], [C + 157, C + 300]], [[C - 470, C - 103], [C + 470, C - 103]], [[C - 470, C + 103], [C + 470, C + 103]]];
+    lines(fr.main, thirds, DOC.white, 2, 30);
+    if (f % 12 < 8) polys(fr.main, [circle(140, 280, 22, 1, 20)], DOC.red, 100);
+    polys(fr.main, [[[190, 266], [330, 266], [330, 294], [190, 294]]], DOC.white, 100);
+    var bars = []; for (var k = 0; k < 8; k++) { var h = 20 + 40 * Math.abs(Math.sin(f * 0.5 + k)); bars.push([[760 + k * 26, 300], [776 + k * 26, 300], [776 + k * 26, 300 - h], [760 + k * 26, 300 - h]]); }
+    polys(fr.main, bars, DOC.yellow, 100);
+    lines(fr.main, [ring(C, C, 140 + 20 * Math.sin(f * 0.4), 1), [[C - 30, C], [C + 30, C]], [[C, C - 30], [C, C + 30]]], DOC.white, 4, 80);
+    polys(fr.main, [full()], DOC.dim, 100);
+  },
+  wipe: function (fr, v) {   // the shutter closing and opening
+    var h = (v < 0.5 ? ease(v * 2) : 1 - ease(v * 2 - 1)) * 620;
+    polys(fr.top, [[[-60, -60], [1140, -60], [1140, h - 60], [-60, h - 60]], [[-60, 1140 - h], [1140, 1140 - h], [1140, 1140], [-60, 1140]]], DOC.black, 100);
+  },
+  stage: function (fr, f, at, o) {
+    var k = at >= 0 ? 1 + 0.3 * fade(at, 0, 6) : 1.3;
+    lines(fr.main, brackets(C, C, 230 * k, 300 * k, 60), at >= 0 ? DOC.yellow : DOC.white, 7, o);
+    if (f % 12 < 8) polys(fr.main, [circle(140, 280, 20, 1, 20)], DOC.red, o);
+    lines(fr.main, [ring(C, C, 120 + 30 * Math.sin(f * 0.3), 1)], DOC.white, 3, o * 0.4);
+    lines(fr.main, brackets(C, C, 470, 310, 60), DOC.white, 4, o * 0.5);
+    polys(fr.main, [full()], DOC.dim, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 6) lines(fr.top, brackets(C, C, 200, 270, 50), DOC.yellow, 6, fade(at, 3, 6) * 100);
+  }
+};
+var DOC_EPIC = {
+  title: function (fr, f, u) {   // a clapperboard, its stick slamming shut
+    var shut = f < 10 ? 0.5 - 0.5 * ease(f / 10) : 0, cx = C, cy = C + 120;
+    var board = [[cx - 380, cy - 60], [cx + 380, cy - 60], [cx + 380, cy + 330], [cx - 380, cy + 330]];
+    var stick = place([[0, -10], [760, -10], [760, 70], [0, 70]], cx - 380, cy - 140, -shut);
+    var stripes = []; for (var k = 0; k < 8; k++) stripes.push(place([[k * 100, -10], [k * 100 + 50, -10], [k * 100 + 20, 70], [k * 100 - 30, 70]], cx - 380, cy - 140, -shut));
+    polys(fr.main, stripes, DOC.white, 100); polys(fr.main, [stick], DOC.black, 100);
+    lines(fr.main, [[[cx - 340, cy + 60], [cx + 340, cy + 60]], [[cx - 340, cy + 170], [cx + 340, cy + 170]], [[cx, cy + 60], [cx, cy + 330]]], DOC.white, 4, 100);
+    polys(fr.main, [board], DOC.black, 100);
+    if (f >= 10 && f < 13) polys(fr.top, [full()], WHITE, 60 - (f - 10) * 20);
+    polys(fr.main, [full()], DOC.grey, 100);
+  },
+  wipe: function (fr, v) { polys(fr.top, [full()], WHITE, 100 * (1 - Math.abs(v * 2 - 1))); },
+  stage: function (fr, f, at, o) {   // a film leader's countdown behind the card, the film running at the sides
+    var a = (f - CARD_AT) * 0.35;
+    polys(fr.main, [[[C, C], [C + Math.cos(-1.5708) * 900, C + Math.sin(-1.5708) * 900], [C + Math.cos(a - 1.5708) * 900, C + Math.sin(a - 1.5708) * 900]]], DOC.sepia, o * 0.35);
+    lines(fr.main, [ring(C, C, 330, 1), ring(C, C, 420, 1), [[-60, C], [1140, C]], [[C, -60], [C, 1140]]], DOC.white, 5, o * 0.8);
+    polys(fr.main, sprockets(60, f, 40).concat(sprockets(1020, f, 40)), DOC.dim, o);
+    polys(fr.main, [[[0, -60], [120, -60], [120, 1140], [0, 1140]], [[960, -60], [1080, -60], [1080, 1140], [960, 1140]]], DOC.black, o);
+    seed(1100 + f); var specks = []; for (var i = 0; i < 14; i++) specks.push(circle(between(0, 1080), between(0, 1080), between(2, 6), 1, 8)); polys(fr.main, specks, DOC.black, o * 0.6);
+    polys(fr.main, [full()], [0.36, 0.32, 0.26], o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 3) polys(fr.top, [full()], WHITE, 50 - at * 16);
+    seed(1110 + f); var scratches = []; for (var i = 0; i < 3; i++) { var x = between(100, 980); scratches.push([[x, -60], [x + between(-20, 20), 1140]]); } if (at >= 0) lines(fr.top, scratches, DOC.white, 2, 40);
+  }
+};
+var DOC_LEGENDARY = {
+  title: function (fr, f, u) {   // two reels turning, the film running between them
+    polys(fr.main, reel(300, 360, 230, f * 0.2), DOC.dim, 100, true);
+    polys(fr.main, reel(800, 330, 190, f * 0.24), DOC.dim, 100, true);
+    var pts = []; for (var i = 0; i <= 30; i++) { var t = i / 30; pts.push([300 + t * 500 + Math.sin(t * 3) * 40, 590 + t * 120 + Math.sin(t * 6 + f * 0.3) * 30]); }
+    lines(fr.main, [pts], DOC.black, 70, 100); lines(fr.main, [pts], DOC.sepia, 3, 100, false, [10, 18]);
+    polys(fr.glow, [circle(C, 900, 300, 0.5, 40)], DOC.sepia, 50);
+    polys(fr.main, [full()], [0.24, 0.21, 0.17], 100);
+  },
+  wipe: function (fr, v) {   // the projector's light coming on
+    polys(fr.top, [[[C - 20, -60], [C + 20, -60], [C + 900 * ease(v), 1140], [C - 900 * ease(v), 1140]]], [1, 0.95, 0.8], 100 * (1 - Math.abs(v * 2 - 1)) + 20);
+  },
+  stage: function (fr, f, at, o) {   // the projector's beam on the card, film ribbons swirling round it, frames flying
+    var g = ease((f - CARD_AT) / 6);
+    for (var k = 0; k < 3; k++) { var pts = []; for (var i = 0; i <= 40; i++) { var t = i / 40, a = t * Math.PI * 2.2 + f * 0.06 + k * 2.1, r = (330 + k * 90) * g + 40; pts.push([C + Math.cos(a) * r, C + Math.sin(a) * r * 0.75]); } lines(fr.main, [pts], DOC.black, 60, o); lines(fr.main, [pts], DOC.sepia, 3, o, false, [10, 18]); }
+    if (at >= 0) { seed(1130); var fl = []; for (var j = 0; j < 14; j++) { var a2 = between(0, Math.PI * 2), d = 260 + at * between(14, 28), s = 44; fl.push(place([[-s, -s * 0.75], [s, -s * 0.75], [s, s * 0.75], [-s, s * 0.75]], C + Math.cos(a2) * d, C + Math.sin(a2) * d, at * 0.1 + j)); } polys(fr.main, fl, DOC.sepia, fade(at, 30, 50) * o); }
+    polys(fr.glow, [[[C - 30, 1140], [C + 30, 1140], [C + 420, -60], [C - 420, -60]]], [1, 0.92, 0.75], o * 0.8);
+    polys(fr.main, [[[C - 20, 1140], [C + 20, 1140], [C + 360, -60], [C - 360, -60]]], [1, 0.92, 0.75], o * 0.14);
+    seed(1131); var dust = []; for (var d2 = 0; d2 < 40; d2++) dust.push([C + between(-300, 300), (between(0, 1080) - f * 2 + 1080) % 1080, between(2, 4)]);
+    polys(fr.top, glintPolys(twinkle(dust, f, 1, 6)), [1, 0.95, 0.8]);
+    polys(fr.main, reel(160, 160, 120, f * 0.2).concat(reel(920, 160, 120, f * 0.2)), DOC.dim, o, true);
+    polys(fr.main, [full()], [0.2, 0.17, 0.14], o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 8) polys(fr.top, slash(-60, 760, 1140, 300, 34, ease(at / 3), 0.4), [1, 0.95, 0.8], fade(at, 4, 8) * 80);
+    seed(1140 + f); var scratches = []; for (var i = 0; i < 4; i++) { var x = between(100, 980); scratches.push([[x, -60], [x + between(-20, 20), 1140]]); } if (at >= 0) lines(fr.top, scratches, DOC.white, 2, 35);
+    bigGlint(fr, at, DOC.sepia);
+  }
+};
+var GENRE_DOC = {
+  rarities: { rare: DOC_RARE, epic: DOC_EPIC, legendary: DOC_LEGENDARY },
+  opening: function (comp) {   // a camera's iris closing on the pack, a flash — it is gone, the iris opens
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      if (f >= 6 && f < 44) {
+        var close = f < 26 ? ease((f - 6) / 18) : 1 - ease((f - 30) / 12), r = 560 - 520 * close, blades = [];
+        for (var k = 0; k < 7; k++) { var a = k / 7 * Math.PI * 2 + close * 0.8; blades.push([[cx + Math.cos(a) * r, cy + Math.sin(a) * r], [cx + Math.cos(a) * 900, cy + Math.sin(a) * 900], [cx + Math.cos(a + 1.1) * 900, cy + Math.sin(a + 1.1) * 900], [cx + Math.cos(a + 0.9) * r, cy + Math.sin(a + 0.9) * r]]); }
+        polys(fr.top, blades, DOC.dim, 100 * fade(f, 40, 44)); lines(fr.top, blades, DOC.grey, 3, 100 * fade(f, 40, 44), true);
+      }
+      if (f >= 26 && f < 30) polys(fr.top, [circle(cx, cy, 700, 1, 40)], WHITE, 100 - (f - 26) * 25);
+      if (f < 26 && f % 10 < 6) polys(fr.main, [circle(cx - 400, cy - 330, 20, 1, 16)], DOC.red, 100);
+    }
+  }
+};
+
+// ===== Insomnie — thriller: a rainy night, a countdown, the hunt ==========================================
+var THR = { night: [0.04, 0.04, 0.06], street: [0.09, 0.09, 0.12], rain: [0.62, 0.68, 0.8], red: [0.88, 0.03, 0.02], red_l: [1, 0.3, 0.25], white: [0.95, 0.95, 0.95], blue: [0.2, 0.42, 1], lamp: [1, 0.85, 0.55] };
+function rain(L, f, n, base, o, slant) {
+  seed(base); var out = [];
+  for (var i = 0; i < n; i++) { var x = between(-100, 1180), y = -60 + ((f * between(50, 80) + between(0, 1200)) % 1260), l = between(40, 90); out.push([[x, y], [x + (slant || -0.2) * l, y + l]]); }
+  lines(L, out, THR.rain, 2, o);
+}
+function blinds(L, f, o, ang) {   // a venetian blind's shadow over the screen
+  var out = []; for (var k = -6; k < 14; k++) { var y = k * 90 + (f * 2) % 90; out.push(place([[-800, 0], [1800, 0], [1800, 38], [-800, 38]], C, y, ang || -0.18)); }
+  polys(L, out, BLACK, o);
+}
+function pulse(x0, f, y, amp) {   // a heart monitor's trace scrolling
+  var pts = [];
+  for (var x = -60; x <= 1140; x += 12) { var u = ((x - x0 + f * 24) % 360 + 360) % 360, h = u > 150 && u < 165 ? -amp : u > 165 && u < 180 ? amp * 0.6 : u > 180 && u < 190 ? -amp * 0.3 : 0; pts.push([x, y + h]); }
+  return pts;
+}
+function hatman(x, y, s) {   // a man in a hat and a long coat, in silhouette
+  return [place([[-0.45 * s, 0], [-0.32 * s, -1.5 * s], [-0.18 * s, -1.65 * s], [0.18 * s, -1.65 * s], [0.32 * s, -1.5 * s], [0.45 * s, 0], [0.55 * s, 1.6 * s], [-0.55 * s, 1.6 * s]], x, y, 0), place(circle(0, -1.85 * s, 0.22 * s, 1.1, 14), x, y, 0), place([[-0.4 * s, -2.0 * s], [0.4 * s, -2.0 * s], [0.25 * s, -2.08 * s], [0.22 * s, -2.3 * s], [-0.22 * s, -2.3 * s], [-0.25 * s, -2.08 * s]], x, y, 0)];
+}
+function reticle(cx, cy, r, turn) {
+  var out = [ring(cx, cy, r, 1), ring(cx, cy, r * 0.62, 1, 0.3, Math.PI - 0.3), ring(cx, cy, r * 0.62, 1, Math.PI + 0.3, Math.PI * 2 - 0.3)];
+  for (var k = 0; k < 4; k++) { var a = turn + k * Math.PI / 2; out.push([[cx + Math.cos(a) * r * 0.75, cy + Math.sin(a) * r * 0.75], [cx + Math.cos(a) * r * 1.25, cy + Math.sin(a) * r * 1.25]]); }
+  return out;
+}
+var THR_RARE = {
+  title: function (fr, f, u) {   // a rainy street at night, a lamp, a man in a hat following someone
+    rain(fr.top, f, 90, 1200, 70);
+    polys(fr.main, hatman(260 + f * 9, 720, 95), BLACK, 100);
+    lines(fr.main, [[[C + 260, 1140], [C + 260, 300]], [[C + 260, 300], [C + 200, 290]]], [0.15, 0.15, 0.18], 14, 100);
+    cone(fr.glow, C + 200, 1.62, 900, 20, 260, THR.lamp, 50); polys(fr.main, [circle(C + 200, 300, 18, 1, 14)], THR.lamp, 100);
+    polys(fr.main, [circle(C + 200, 1000, 300, 0.2, 40)], THR.lamp, 25);
+    polys(fr.main, [[[-60, 940], [1140, 940], [1140, 1140], [-60, 1140]]], THR.street, 100);
+    polys(fr.main, [full()], THR.night, 100);
+  },
+  wipe: function (fr, v) { blinds(fr.top, 0, 100 * (1 - Math.abs(v * 2 - 1)) + 10); },
+  stage: function (fr, f, at, o) {
+    rain(fr.top, f, 60, 1210, o * 0.5);
+    blinds(fr.main, f, o * 0.55);
+    polys(fr.haze, [circle(C, C, 420, 1, 40)], THR.red, o * 0.5);
+    polys(fr.main, [full()], THR.street, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 6) polys(fr.top, slash(-60, 600, 1140, 480, 22, ease(at / 3), 0.2), THR.red_l, fade(at, 3, 6) * 90);
+  }
+};
+var THR_EPIC = {
+  title: function (fr, f, u) {   // a clock's hands racing, a pulse on a monitor
+    var p = pulse(0, f, 860, 120); lines(fr.glow, [p], THR.red, 16, 90); lines(fr.main, [p], THR.red_l, 5, 100);
+    var ticks = []; for (var k = 0; k < 60; k++) { var a = k / 60 * Math.PI * 2, l = k % 5 ? 20 : 50; ticks.push([[C + Math.cos(a) * 330, 420 + Math.sin(a) * 330], [C + Math.cos(a) * (330 - l), 420 + Math.sin(a) * (330 - l)]]); }
+    lines(fr.main, ticks.concat([ring(C, 420, 350, 1)]), THR.white, 5, 100);
+    var ha = f * 0.6 - 1.5708, ma = f * 0.08 - 1.5708; lines(fr.main, [[[C, 420], [C + Math.cos(ha) * 280, 420 + Math.sin(ha) * 280]]], THR.red_l, 8, 100); lines(fr.main, [[[C, 420], [C + Math.cos(ma) * 190, 420 + Math.sin(ma) * 190]]], THR.white, 14, 100);
+    polys(fr.main, [full()], THR.night, 100);
+  },
+  wipe: function (fr, v) { polys(fr.top, [full()], THR.red, 100 * (1 - Math.abs(v * 2 - 1))); },
+  stage: function (fr, f, at, o) {
+    var p = pulse(200, f, C + 330, 160); lines(fr.glow, [p], THR.red, 18, o); lines(fr.main, [p], THR.red_l, 6, o);
+    if (at >= 0) for (var q = 0; q < 3; q++) { var t = at - q * 6; if (t < 0) continue; lines(fr.glow, [ring(C, C, 260 + t * 30, 1.2)], THR.red, 24, fade(t, 6, 14) * o); }
+    var ticks = []; for (var k = 0; k < 60; k++) { var a = k / 60 * Math.PI * 2 + f * 0.01, l = k % 5 ? 14 : 34; ticks.push([[C + Math.cos(a) * 470, C + Math.sin(a) * 470], [C + Math.cos(a) * (470 - l), C + Math.sin(a) * (470 - l)]]); }
+    lines(fr.main, ticks, THR.white, 4, o * 0.8);
+    polys(fr.main, [full()], THR.night, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 4) polys(fr.top, [full()], THR.red, 35 - at * 9);
+    bigGlint(fr, at, THR.red_l);
+  }
+};
+// the shots: when (after the card turned), where the bullet strikes the card, where it came from
+var SHOTS = [[8, C - 60, C - 110, -0.3], [11, C + 70, C - 30, 3.5], [13, C - 30, C + 90, 2.6], [17, C + 55, C + 150, -0.9], [20, C - 85, C + 20, 3.0]];
+function bulletHole(x, y, base) {   // a hole: its dark core, a pale chipped rim, cracks running out like a star
+  seed(base); var cracks = [], ring2 = [];
+  for (var k = 0; k < 8; k++) { var a = k / 8 * Math.PI * 2 + between(-0.2, 0.2), len = between(36, 92), pts = [[x + Math.cos(a) * 9, y + Math.sin(a) * 9]], px = pts[0][0], py = pts[0][1]; for (var j = 0; j < 4; j++) { a += between(-0.35, 0.35); px += Math.cos(a) * len / 4; py += Math.sin(a) * len / 4; pts.push([px, py]); } cracks.push(pts); }
+  for (var q = 0; q <= 10; q++) { var a2 = q / 10 * Math.PI * 2; ring2.push([x + Math.cos(a2) * between(24, 34), y + Math.sin(a2) * between(24, 34)]); }
+  return { cracks: cracks, ring: [ring2.slice(0, 6), ring2.slice(7, 11)], rim: circle(x, y, 13, 1, 14), core: circle(x, y, 8, 1, 12) };
+}
+function gunshot(fr, t, x, y, from, base) {   // a tracer from off screen, a flash and sparks on impact, the hole that stays
+  if (t < 0) return;
+  if (t < 2) { var sx = x + Math.cos(from) * 900, sy = y + Math.sin(from) * 900; lines(fr.glow, [[[sx, sy], [x, y]]], [1, 0.8, 0.4], 14, 100 - t * 40); lines(fr.top, [[[x + Math.cos(from) * (60 + t * 200), y + Math.sin(from) * (60 + t * 200)], [x + Math.cos(from) * (300 + t * 200), y + Math.sin(from) * (300 + t * 200)]]], [1, 0.95, 0.8], 5, 100 - t * 40); }
+  if (t < 3) { polys(fr.glow, [circle(x, y, 70 - t * 15, 1, 20)], [1, 0.75, 0.35], 100 - t * 30); polys(fr.top, [burst(x, y, 9, 46 - t * 10, 14, 0.3, base)], [1, 0.95, 0.75], 100 - t * 33); }
+  if (t < 6) { seed(base * 7); var sp = []; for (var k = 0; k < 10; k++) { var a = between(0, Math.PI * 2), d = 14 + t * between(12, 26); sp.push([[x + Math.cos(a) * d, y + Math.sin(a) * d], [x + Math.cos(a) * (d + 14), y + Math.sin(a) * (d + 14)]]); } lines(fr.top, sp, [1, 0.85, 0.5], 3, fade(t, 2, 6) * 100); }
+  var h = bulletHole(x, y, base), grow = ease((t + 1) / 3);
+  lines(fr.top, partOf(h.cracks, grow), [0.92, 0.94, 1], 2.4, 85);
+  if (t >= 1) lines(fr.top, h.ring, [0.92, 0.94, 1], 1.8, 60);
+  polys(fr.top, [h.core], [0.03, 0.03, 0.04], 100); polys(fr.top, [h.rim], [0.75, 0.75, 0.78], 100);   // the first drawn lies on top
+}
+var THR_LEGENDARY = {
+  title: function (fr, f, u) {   // the hunt: rooftops in the rain, a helicopter's searchlight, police lights
+    rain(fr.top, f, 120, 1220, 80, -0.35);
+    var sx = C + 380 * Math.sin(f * 0.1); polys(fr.glow, [[[C + 300, -60], [C + 340, -60], [sx + 180, 1140], [sx - 180, 1140]]], [0.85, 0.9, 1], 60);
+    polys(fr.main, [skyline(1140, 560, 1230)], BLACK, 100);
+    polys(fr.haze, [[[-60, 520], [1140, 520], [1140, 1140], [-60, 1140]]], (f % 8 < 4) ? THR.red : THR.blue, 100);
+    polys(fr.main, [[[-60, 300], [1140, 300], [1140, 900], [-60, 900]]], [0.12, 0.12, 0.2], 100);
+    polys(fr.main, [full()], THR.night, 100);
+  },
+  wipe: function (fr, v) { polys(fr.top, [full()], v < 0.5 ? THR.red : THR.blue, 100 * (1 - Math.abs(v * 2 - 1)) + 15); },
+  stage: function (fr, f, at, o) {   // the searchlight on the card, strobes, a reticle locking on it, glass flying
+    rain(fr.top, f, 100, 1240, o * 0.6, -0.35);
+    var lock = at >= 0 ? 1 : ease((f - CARD_AT) / 20), r = 700 - 420 * lock;
+    lines(fr.top, reticle(C, C, r, f * 0.05 * (1 - lock)), at >= 0 ? THR.red_l : THR.white, 5, o);
+    if (at >= 0) { seed(1250); var shards = []; for (var i = 0; i < 26; i++) { var a = between(0, Math.PI * 2), d = 220 + at * between(14, 34), s = between(14, 40); shards.push(place([[0, -s], [s * 0.5, s * 0.3], [-s * 0.4, s * 0.6]], C + Math.cos(a) * d, C + Math.sin(a) * d, at * 0.25 + i)); } polys(fr.top, shards, [0.8, 0.88, 1], fade(at, 30, 50) * o); lines(fr.top, shards, WHITE, 2, fade(at, 30, 50) * o, true); }
+    polys(fr.glow, [[[C - 40, -60], [C + 40, -60], [C + 330, 1140], [C - 330, 1140]]], [0.85, 0.9, 1], o * 0.45);
+    polys(fr.haze, [circle(f % 8 < 4 ? 150 : 930, C, 520, 1.2, 40)], (f % 8 < 4) ? THR.red : THR.blue, o);
+    polys(fr.main, [skyline(1140, 700, 1251)], BLACK, o);
+    polys(fr.main, [[[-60, 400], [1140, 400], [1140, 1000], [-60, 1000]]], [0.1, 0.1, 0.17], o);
+    polys(fr.main, [full()], THR.night, o);
+  },
+  over: function (fr, f, at) {   // locked on — then shots: tracers, sparks, and bullet holes left in the card
+    if (at >= 0 && at < 8) lines(fr.top, reticle(C, C, 300 - at * 10, 0), THR.red_l, 6, fade(at, 4, 8) * 100);
+    for (var i = 0; i < SHOTS.length; i++) gunshot(fr, at - SHOTS[i][0], SHOTS[i][1], SHOTS[i][2], SHOTS[i][3], 1290 + i);
+    bigGlint(fr, at, THR.red_l);
+  }
+};
+var GENRE_THRILLER = {
+  rarities: { rare: THR_RARE, epic: THR_EPIC, legendary: THR_LEGENDARY },
+  opening: function (comp) {   // a sniper's reticle finds the pack and locks; a shot — it shatters like glass
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      if (f < 30) { var lock = ease(f / 22), x = cx + (1 - lock) * 260 * Math.sin(f * 0.4), y = cy + (1 - lock) * 160 * Math.cos(f * 0.3); lines(fr.top, reticle(x, y, 380 - 160 * lock, 0), f > 22 ? THR.red_l : THR.white, 5, 100); }
+      if (f >= 28 && f < 31) polys(fr.top, [circle(cx, cy, 650, 1, 40)], WHITE, 100 - (f - 28) * 33);
+      if (f >= 30) { seed(1270); var shards = []; for (var i = 0; i < 40; i++) { var a = between(0, Math.PI * 2), d = 40 + (f - 30) * between(10, 30), s = between(16, 46); shards.push(place([[0, -s], [s * 0.5, s * 0.3], [-s * 0.4, s * 0.6]], cx + Math.cos(a) * d, cy + Math.sin(a) * d + (f - 30) * (f - 30) * 0.5, (f - 30) * 0.3 + i)); } polys(fr.top, shards, [0.8, 0.88, 1], fade(f, 50, 63) * 100); lines(fr.top, shards, WHITE, 2, fade(f, 50, 63) * 100, true); }
+    }
+  }
+};
+
+var GENRE = { action: GENRE_ACTION, dark: GENRE_DARK, drama: GENRE_DRAMA, fantasy: GENRE_FANTASY, sf: GENRE_SF, adventure: GENRE_ADVENTURE, documentary: GENRE_DOC, thriller: GENRE_THRILLER }[GENRE_KEY];
 
 // --- the comps --------------------------------------------------------------------------------------------
 // a genre with a moment of its own per rarity gives it (``rarities``), else the same one for every rarity

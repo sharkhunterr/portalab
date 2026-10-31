@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "insomnie-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "La traque : les toits sous la pluie, le projecteur d'un hélicoptère, les gyrophares rouges et bleus, puis un viseur qui se verrouille sur la carte, du verre qui vole en éclats et cinq tirs qui laissent leurs impacts dans la carte.",
+    "en": "The hunt: rooftops in the rain, a helicopter's searchlight, red and blue police lights, then a reticle locking on the card, glass shattering and five shots leaving their bullet holes in the card."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}

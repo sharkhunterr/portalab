@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "insomnie",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Insomnie — thriller",
+    "en": "Insomnie — thriller"
+  },
+  "descriptions": {
+    "fr": "Le booster Thriller, une nuit sans sommeil : chaque rareté son moment en plein écran — une filature sous la pluie pour une rare, un compte à rebours au rythme du cœur pour une épique, une traque sous les gyrophares pour une légendaire. Un paquet noir barré d'une bande rouge qu'un viseur verrouille avant qu'il vole en éclats ; une ville sous la pluie et les néons.",
+    "en": "The Thriller booster, a sleepless night: every rarity its own moment over the whole screen — a tail in the rain for a rare, a countdown to the heartbeat for an epic, a manhunt under police lights for a legendary. A black pack crossed by a red band that a reticle locks on before it shatters; a city in the rain and neon."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

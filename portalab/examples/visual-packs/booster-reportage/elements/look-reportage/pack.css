@@ -1,0 +1,81 @@
+/* The sealed pack (its hook: data-booster-look): A brushed metal pack like a film can, a clapperboard's band,
+   the work's art in a viewfinder's frame, its name typewritten, a clapperboard as emblem. */
+@font-face {
+  font-family: "Genre Space Mono";
+  src: url("SpaceMono.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+[data-booster-look="reportage"] .booster-pack {
+  border-radius: 0.5rem;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 6px), linear-gradient(165deg, #3a4148, #1c2126 60%, #0b0d0f);
+  box-shadow: inset 0 0 0 3px #0b0d0f, inset 0 0 0 6px #ffd60a, inset 0 0 0 8px #0b0d0f, 0 1rem 2rem rgba(0, 0, 0, 0.55), 0 0 1.4rem color-mix(in srgb, #ffd60a 40%, transparent);
+}
+[data-booster-look="reportage"] .booster-pack__art {
+  inset: 13% 10% 33%;
+  inline-size: 80%;
+  block-size: 54%;
+  border: 3px solid #0b0d0f;
+  border-radius: 0.3rem;
+  box-shadow: 0 0 0 3px #ff3b30, 0 0 0 6px #0b0d0f, 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+  mask: none;
+}
+[data-booster-look="reportage"] .booster-pack__foil {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.45) 48%, transparent 56%) -160% 0 / 200% 100% no-repeat;
+  animation: genre-sweep 4s ease-in-out infinite;
+}
+@keyframes genre-sweep {
+  0%, 55% { background-position: -160% 0; }
+  85%, 100% { background-position: 260% 0; }
+}
+[data-booster-look="reportage"] .booster-pack__stars {
+  opacity: 0;
+}
+[data-booster-look="reportage"] .booster-pack__flap {
+  border: 0;
+  background: repeating-linear-gradient(115deg, #f2f4f5 0 12px, #0b0d0f 12px 24px);
+  box-shadow: inset 0 -3px 0 #0b0d0f;
+}
+[data-booster-look="reportage"] .booster-pack__emblem {
+  inline-size: 62%;
+  aspect-ratio: 1;
+  background: url("emblem.svg") center / contain no-repeat;
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-booster-look="reportage"] .booster-pack__emblem svg {
+  opacity: 0;
+}
+[data-booster-look="reportage"] .booster-pack__name {
+  inset: auto 3% 11%;
+  font-family: "Genre Space Mono", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.05rem, 2.4vw, 1.5rem);
+  line-height: 1.05;
+  color: #ffffff;
+  -webkit-text-stroke: 4px #0b0d0f;
+  paint-order: stroke fill;
+  text-shadow: 0 0 1rem color-mix(in srgb, #ffd60a 70%, transparent);
+}
+[data-booster-look="reportage"] .booster-pack__count {
+  inset: 0.5rem 0.5rem auto auto;
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  padding: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  color: #ffffff;
+  font-family: "Genre Space Mono", sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-shadow: 0 1px 3px #000000;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="reportage"] .booster-pack__foil {
+    animation: none;
+  }
+}

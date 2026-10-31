@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "tresor",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Trésor — aventure",
+    "en": "Trésor — adventure"
+  },
+  "descriptions": {
+    "fr": "Le booster Aventure, une chasse au trésor : chaque rareté son moment en plein écran — une carte au trésor pour une rare, un coffre englouti qui s'ouvre pour une épique, l'île au trésor au soleil couchant pour une légendaire. Un paquet de parchemin scellé de cire qui s'ouvre comme une carte, en pluie de pièces d'or ; la mer au couchant.",
+    "en": "The Adventure booster, a treasure hunt: every rarity its own moment over the whole screen — a treasure map for a rare, a sunken chest opening for an epic, treasure island at sunset for a legendary. A parchment pack sealed with wax that opens like a map, in a rain of gold coins; the sea at sunset."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

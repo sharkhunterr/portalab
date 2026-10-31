@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "tresor-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "L'île au trésor : un galion sur les vagues au soleil couchant, une vague géante qui s'abat, puis l'île, ses palmiers, une colonne de lumière dorée sur la carte, une pluie de pièces et la croix qui marque l'endroit.",
+    "en": "Treasure island: a galleon on the waves at sunset, a giant wave crashing, then the island, its palms, a column of golden light on the card, a rain of coins and the X that marks the spot."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}

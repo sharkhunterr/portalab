@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "reportage-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "L'archive : deux bobines qui tournent, la pellicule qui défile, puis le faisceau du projecteur sur la carte, des rubans de pellicule qui l'entourent et des images qui s'envolent.",
+    "en": "The archive: two reels turning, the film running, then the projector's beam on the card, ribbons of film swirling round it and frames flying."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}
