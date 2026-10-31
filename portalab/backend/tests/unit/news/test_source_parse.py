@@ -100,3 +100,12 @@ def test_a_youtube_channel() -> None:
     (video,) = parse(YOUTUBE, "https://www.youtube.com/feeds/videos.xml?channel_id=x").items
     assert video.link == "https://www.youtube.com/watch?v=abc" and video.summary == "La suite de la saga."
     assert video.image == "https://i1.ytimg.com/vi/abc/hqdefault.jpg"
+
+
+def test_youtube_addresses_are_their_feeds() -> None:
+    from portalab.modules.news.sources.service import youtube_feed
+
+    channel = "https://www.youtube.com/channel/UCwXc5G-RAKu9oC2yO4cXmuw"
+    assert youtube_feed(channel).endswith("videos.xml?channel_id=UCwXc5G-RAKu9oC2yO4cXmuw")
+    assert youtube_feed("https://www.youtube.com/playlist?list=PL123").endswith("playlist_id=PL123")
+    assert youtube_feed("https://www.youtube.com/@allocine") == "https://www.youtube.com/@allocine"

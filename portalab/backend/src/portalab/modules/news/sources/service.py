@@ -3,6 +3,7 @@ new items kept with a copied picture and the library titles and people they name
 words, pruned after a while; and what « À la une », a title's page or « Mon fil » show of them."""
 
 import asyncio
+import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import timedelta
@@ -112,6 +113,7 @@ class FeedSources:
         self, url: str, etag: str | None = None, modified: str | None = None
     ) -> tuple[Fetched, ParsedFeed | None]:
         """The source at ``url`` (a page announcing a feed: that feed). ``None``: not changed since."""
+        url = youtube_feed(url)
         try:
             got = await self._fetch(url, etag=etag, modified=modified)
             if got.status == 304:
@@ -564,3 +566,16 @@ class FeedSources:
 def host_of(url: str) -> str:
     """A source's name when it gives none: its site's host."""
     return urlsplit(url).hostname or url
+
+
+_YT_CHANNEL = re.compile(r"^https?://(?:www\.|m\.)?youtube\.com/channel/(UC[\w-]{22})")
+_YT_PLAYLIST = re.compile(r"^https?://(?:www\.|m\.)?youtube\.com/playlist\?list=([\w-]+)")
+
+
+def youtube_feed(url: str) -> str:
+    """A YouTube channel's or playlist's address as its feed's (a handle, ``@name``: its page names it)."""
+    if found := _YT_CHANNEL.match(url):
+        return f"https://www.youtube.com/feeds/videos.xml?channel_id={found.group(1)}"
+    if found := _YT_PLAYLIST.match(url):
+        return f"https://www.youtube.com/feeds/videos.xml?playlist_id={found.group(1)}"
+    return url
