@@ -20,6 +20,7 @@ export function packName(t: Translate, pack: CardPack): string {
       : pack.set_name;
   }
   const among = [
+    look?.genre ? t(`gamification:cards.genre.${look.genre}`) : null,
     look?.family ? t(`gamification:cards.family.${look.family}`) : null,
     look?.kind ? t(`gamification:cards.pack.kind.${look.kind}`) : null,
     look?.edition ? t(`gamification:cards.edition.${look.edition}`) : null,
