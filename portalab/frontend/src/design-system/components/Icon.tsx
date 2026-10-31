@@ -239,6 +239,7 @@ import {
   Type,
   Umbrella,
   Undo2,
+  Upload,
   User,
   UserPlus,
   Users,
@@ -397,6 +398,7 @@ export const ICONS: Record<string, LucideIcon> = {
   tv: Tv,
   rss: Rss, // #299: « Mon fil »
   pin: Pin,
+  upload: Upload,
   external: ExternalLink,
   tag: Tag,
   leaf: Leaf,

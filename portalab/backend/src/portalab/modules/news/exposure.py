@@ -12,4 +12,6 @@ LABELS = (
     # #299: news from elsewhere, and their pictures (the portal's copies)
     read(f"{A}/news/sources/items", "News from elsewhere", "Les actualités d'ailleurs"),
     read(f"{A}/news/sources/items/{{item_id}}/picture", "Their pictures", "Leurs images"),
+    read(f"{A}/me/news/sources", "The sources you follow", "Les sources que vous suivez"),
+    read(f"{A}/me/news/sources/items", "News from your sources", "Les actualités de vos sources"),
 )

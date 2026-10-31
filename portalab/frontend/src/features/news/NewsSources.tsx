@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useState } from "react";
+import { type ChangeEvent, type FormEvent, useState } from "react";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
 import { AdminSection, FormActions, FormGrid, StatusBadge } from "../../design-system/admin/AdminKit";
@@ -338,8 +338,24 @@ function LatestItems() {
 
 export function SourcesPanel() {
   const t = useT();
+  const client = useQueryClient();
   const sources = useSources();
   const [adding, setAdding] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const importing = useMutation({
+    mutationFn: async (opml: string) => {
+      const { data, error } = await api.POST("/api/v1/admin/news/sources/opml", { body: { opml } });
+      if (error || !data) throw error;
+      return data;
+    },
+    onSuccess: (data) => setNote(t("news:mine.imported", { added: data.added, skipped: data.skipped })),
+    onSettled: () => void client.invalidateQueries({ queryKey: KEY }),
+  });
+  const pick = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (file) importing.mutate(await file.text());
+  };
   return (
     <>
       <AdminSection
@@ -347,22 +363,44 @@ export function SourcesPanel() {
         description={t("news:sources.hint")}
         icon="rss"
         actions={
-          <Dialog
-            open={adding}
-            onOpenChange={setAdding}
-            title={t("news:sources.new")}
-            closeLabel={t("news:admin.close")}
-            trigger={
-              <Button>
-                <Icon name="plus" size={16} />
-                {t("news:sources.new")}
-              </Button>
-            }
-          >
-            <SourceForm onDone={() => setAdding(false)} />
-          </Dialog>
+          <>
+            <a
+              className="ds-button ds-button--ghost"
+              href="/api/v1/admin/news/sources/opml"
+              download="portalab-sources.opml"
+            >
+              <Icon name="download" size={16} />
+              {t("news:sources.opmlExport")}
+            </a>
+            <label className="ds-button ds-button--ghost news-opml">
+              <Icon name="upload" size={16} />
+              {t("news:sources.opmlImport")}
+              <input
+                type="file"
+                accept=".opml,.xml,text/xml,text/x-opml"
+                className="visually-hidden"
+                onChange={pick}
+              />
+            </label>
+            <Dialog
+              open={adding}
+              onOpenChange={setAdding}
+              title={t("news:sources.new")}
+              closeLabel={t("news:admin.close")}
+              trigger={
+                <Button>
+                  <Icon name="plus" size={16} />
+                  {t("news:sources.new")}
+                </Button>
+              }
+            >
+              <SourceForm onDone={() => setAdding(false)} />
+            </Dialog>
+          </>
         }
       >
+        {note ? <p role="status">{note}</p> : null}
+        {importing.isError ? <p role="alert">{problem(importing.error)}</p> : null}
         {sources.data?.length === 0 ? (
           <EmptyState
             icon="rss"

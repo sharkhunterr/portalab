@@ -13,9 +13,10 @@ from sqlalchemy import case, delete, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import aliased
 
+from portalab.capabilities.notifications import CommunicationRequest, Notifications, Users
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
-from portalab.modules.media.models import Credit, FeedSeen, Follow, MediaObject, ObjectTag
+from portalab.modules.media.models import Credit, FeedNotified, FeedSeen, Follow, MediaObject, ObjectTag
 from portalab.modules.media.people import WORK, People, _credited
 
 Kind = Literal["person", "title", "genre"]
@@ -25,6 +26,7 @@ WINDOW = timedelta(days=45)  # how far back the feed reads
 LIMIT = 60
 GENRE_LIMIT = 30  # a genre brings much: its latest only
 MAX_FOLLOWS = 200
+CATEGORY = "media.feed"  # the notices of « Mon fil » (each member chooses where they go)
 
 
 class FollowRefused(ValueError):
@@ -235,3 +237,49 @@ class Feed:
             return 0
         since = await self.seen_at(user) or min(f.created_at for f in follows)
         return sum(1 for arrival in await self.arrivals(user, follows) if arrival.at > since)
+
+    # --- telling members ------------------------------------------------------------------------------
+    async def notify_due(self, notifier: Notifications) -> int:
+        """Tell each member who follows something what arrived for them since they were last told (and that
+        they have not read yet): one notice, grouped. Their preferences decide where it goes (« Mon fil »)."""
+        now = utc_now(self.clock)
+        async with self.database.session() as session:
+            users = list((await session.execute(select(Follow.user_id).distinct())).scalars())
+            rows = await session.execute(select(FeedNotified.user_id, FeedNotified.notified_at))
+            told: dict[UUID, datetime] = {user_id: at for user_id, at in rows.all()}
+        sent = 0
+        for user in users:
+            follows = await self.follows(user)
+            if not follows:
+                continue
+            seen = await self.seen_at(user)
+            since = max(
+                d for d in (told.get(user), seen, min(f.created_at for f in follows)) if d is not None
+            )
+            fresh = [a for a in await self.arrivals(user, follows) if a.at > since]
+            if fresh:
+                async with self.database.session() as session:
+                    title = await session.scalar(
+                        select(MediaObject.title).where(MediaObject.id == fresh[0].object_id)
+                    )
+                await notifier.send(
+                    CommunicationRequest(
+                        category=CATEGORY,
+                        template_key="media:notify.feed",
+                        audience=Users((user,)),
+                        dedup_key=f"media.feed:{user}:{fresh[0].at.isoformat()}",
+                        params={"count": len(fresh), "title": (title or "")[:200]},
+                        source="module",
+                        subject_ref=f"feed:{user}",
+                        required_permission="media.read",
+                        action_url="/feed",
+                    )
+                )
+                sent += 1
+            async with self.database.unit_of_work() as uow:
+                await uow.session.execute(
+                    insert(FeedNotified)
+                    .values(user_id=user, notified_at=now)
+                    .on_conflict_do_update(index_elements=[FeedNotified.user_id], set_={"notified_at": now})
+                )
+        return sent

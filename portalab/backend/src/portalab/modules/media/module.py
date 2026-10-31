@@ -39,7 +39,7 @@ from portalab.capabilities.media_core import (
     register_baseline,
 )
 from portalab.capabilities.navigation.attention import ATTENTION
-from portalab.capabilities.notifications import CategoryRegistry, declare_category, default_categories
+from portalab.capabilities.notifications import NOTIFY, CategoryRegistry, declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
     CheckResult,
@@ -180,6 +180,7 @@ CATEGORIES = (
     ("media.available", "media:category.available", ("portal", "email")),
     ("media.request_updated", "media:category.request_updated", ("portal",)),
     ("media.new_in_library", "media:category.new_in_library", ("portal",)),
+    ("media.feed", "media:category.feed", ("portal",)),  # #299: what arrived in « Mon fil »
 )
 
 
@@ -547,9 +548,17 @@ class MediaModule:
             while await self.radio.sweep():  # #259: the radio's too
                 pass
 
+        async def feed_notices() -> None:  # #299: what arrived in « Mon fil », told once
+            providers = self.capabilities.system_providers(NOTIFY)
+            if providers:
+                await self.feed.notify_due(providers[0].provider)
+
         return [
             self.start,
             register_periodic(jobs, self.database, POLL_JOB, timedelta(seconds=15), poll, owner=OWNER),
+            register_periodic(
+                jobs, self.database, "media.feed_notices", timedelta(minutes=30), feed_notices, owner=OWNER
+            ),
             register_periodic(
                 jobs,
                 self.database,

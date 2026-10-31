@@ -11,9 +11,12 @@ from typing import Any
 
 import httpx
 from PIL import Image
+from sqlalchemy import select
 
 from portalab.capabilities.media import MENTIONS, Mention
 from portalab.core.blobstore import FileSystemBlobStore
+from portalab.modules.news.models import Feed
+from portalab.modules.news.participant import NewsParticipant
 from tests.integration.content.conftest import ContentHarness
 from tests.integration.identity.helpers import login
 
@@ -129,3 +132,62 @@ async def test_sources_bring_news_from_elsewhere(
     assert (await client.delete(f"/api/v1/admin/news/sources/{saved['id']}")).status_code == 204
     assert (await client.get("/api/v1/news/sources/items")).json()["items"] == []
     assert not [p for p in (tmp_path / "news-blobs").rglob("*") if p.is_file()]  # its pictures too
+
+
+OPML = """<?xml version="1.0"?><opml version="2.0"><head><title>x</title></head><body>
+<outline text="Ciné"><outline type="rss" text="Écrans" xmlUrl="https://news.example.org/feed.xml"/>
+<outline type="rss" text="Autre" xmlUrl="https://other.example.org/rss"/></outline>
+<outline text="no feed"/><outline xmlUrl="javascript:alert(1)"/></body></opml>"""
+
+
+async def test_members_follow_sources_of_their_own(
+    ct: ContentHarness, client: httpx.AsyncClient, people: dict[str, Any], tmp_path: Path
+) -> None:
+    site = Site()
+    sources = ct.news.sources
+    sources.transport = httpx.MockTransport(site)
+    sources.resolver = _addresses
+    sources.blobs = FileSystemBlobStore(tmp_path / "news-blobs")
+
+    await login(client, "rita")
+    mine = await client.post("/api/v1/me/news/sources", json={"url": "https://news.example.org/"})
+    assert mine.status_code == 200, mine.text
+    source = mine.json()
+    assert source["name"] == "Écrans" and source["items"] == 3  # the page's feed, read at once
+    own = (await client.get("/api/v1/me/news/sources/items")).json()["items"]
+    assert len(own) == 3 and (await client.get(own[0]["picture"])).status_code == 200
+    # mine alone: not on « À la une », not in the editors' list, not another member's
+    assert (await client.get("/api/v1/news/sources/items")).json()["items"] == []
+    exported = await client.get("/api/v1/me/news/sources/opml")
+    assert "https://news.example.org/feed.xml" in exported.text and "opml" in exported.headers["content-type"]
+
+    await login(client, "sam")
+    assert (await client.get("/api/v1/me/news/sources/items")).json()["items"] == []
+    assert (await client.get(own[0]["picture"])).status_code == 404  # nor its pictures
+    imported = (await client.post("/api/v1/me/news/sources/opml", json={"opml": OPML})).json()
+    assert imported == {"added": 2, "skipped": 0}  # the same address as rita's: read once for both
+    assert {s["name"] for s in (await client.get("/api/v1/me/news/sources")).json()["items"]} == {
+        "Écrans",
+        "Autre",
+    }
+
+    await login(client, "boss")
+    assert (await client.get("/api/v1/admin/news/sources")).json()["items"] == []
+    # the editors add the same address: it becomes theirs too (members keep it)
+    body = {"name": "Écrans (rédaction)", "url": source["url"]}
+    promoted = (await client.put("/api/v1/admin/news/sources", json=body)).json()
+    assert promoted["id"] == source["id"]
+    assert len((await client.get("/api/v1/news/sources/items")).json()["items"]) == 3
+    # taken off « À la une »: the members who follow it keep it
+    assert (await client.delete(f"/api/v1/admin/news/sources/{source['id']}")).status_code == 204
+    assert (await client.get("/api/v1/news/sources/items")).json()["items"] == []
+    await login(client, "rita")
+    assert len((await client.get("/api/v1/me/news/sources/items")).json()["items"]) == 3
+
+    # rita stops following: sam still does; sam goes: the source nobody follows goes too
+    assert (await client.delete(f"/api/v1/me/news/sources/{source['id']}")).status_code == 204
+    assert (await client.get("/api/v1/me/news/sources")).json()["items"] == []
+    await NewsParticipant(ct.database).erase(people["sam"], "final")
+    await sources.run_due()
+    async with ct.database.session() as session:
+        assert (await session.execute(select(Feed))).first() is None

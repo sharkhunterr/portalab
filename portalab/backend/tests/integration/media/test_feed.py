@@ -13,6 +13,7 @@ from portalab.capabilities.media.testkit import library_record
 from portalab.core.time import FixedClock
 from portalab.modules.media.models import Follow, MediaObject
 from portalab.modules.media.participant import MediaParticipant
+from tests.integration.content.conftest import Outbox
 from tests.integration.identity.helpers import login
 from tests.integration.media.conftest import MediaHarness, users
 
@@ -94,3 +95,29 @@ async def test_my_feed_brings_what_i_follow(
     await MediaParticipant(media.database).erase(zoe, "final")
     async with media.database.session() as session:
         assert (await session.execute(select(Follow).where(Follow.user_id == zoe))).first() is None
+
+
+async def test_my_feed_tells_me_once_what_arrived(
+    app: FastAPI, media: MediaHarness, clock: FixedClock
+) -> None:
+    zoe = (await users(app, media, "zoe"))["zoe"]
+    library = media.service(1, "fake")
+    media.library(library)
+    await media.module.library.upsert(
+        [library_record("m1", title="Dune", year=2021, directors=["Denis Villeneuve"])], library
+    )
+    clock.advance(timedelta(minutes=-5))
+    await media.module.feed.follow(zoe, "person", "Denis Villeneuve")
+    clock.advance(timedelta(minutes=5))
+    outbox = Outbox()
+    assert await media.module.feed.notify_due(outbox) == 1
+    (notice,) = outbox.sent
+    assert notice.category == "media.feed" and notice.action_url == "/feed"
+    assert notice.params == {"count": 1, "title": "Dune"}
+    assert await media.module.feed.notify_due(outbox) == 0  # told already
+    clock.advance(timedelta(hours=1))
+    await media.module.library.upsert(
+        [library_record("m2", title="Blade Runner 2049", year=2017, directors=["Denis Villeneuve"])], library
+    )
+    assert await media.module.feed.notify_due(outbox) == 1
+    assert outbox.sent[-1].params == {"count": 1, "title": "Blade Runner 2049"}  # only what came since
