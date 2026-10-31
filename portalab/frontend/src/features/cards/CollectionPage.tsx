@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { AdminEmpty } from "../../design-system/admin/AdminKit";
-import { Button } from "../../design-system/components/Button";
+import { CountBadge } from "../../design-system/components/CountBadge";
 import { Icon } from "../../design-system/components/Icon";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { useFormat } from "../../i18n/format/useFormat";
@@ -126,8 +126,8 @@ function Sets() {
 
 /**
  * Issue 229: ``/cards`` — my media cards. #298: the collection first (where it stands, my sets, one search
- * for sets, people and cards), the boosters to open a view of their own (recalled at the top while some
- * wait), and every card there is to look for the ones I miss. The view is in the address (``?vue=``).
+ * for sets, people and cards), the boosters to open a view of their own (their count on its tab), and every
+ * card there is to look for the ones I miss. The view is in the address (``?vue=``).
  */
 export default function CollectionPage() {
   const t = useT();
@@ -142,21 +142,17 @@ export default function CollectionPage() {
     <div className="ds-stack">
       <PageHeader icon="layers" title={t("gamification:cards.title")} />
       {mine ? <Summary mine={mine} /> : null}
-      {packs.length && view !== "boosters" ? (
-        <div className="cards-callout">
-          <Icon name="gift" size={20} />
-          <span>{t("gamification:cards.packs", { count: packs.length })}</span>
-          <Button onClick={() => show("boosters")}>{t("gamification:cards.openThem")}</Button>
-        </div>
-      ) : null}
       <fieldset className="cards-views">
         <legend className="visually-hidden">{t("gamification:cards.view")}</legend>
         {VIEWS.map((key) => (
           <button key={key} type="button" aria-pressed={view === key} onClick={() => show(key)}>
             <Icon name={VIEW_ICONS[key]} size={16} />
             {t(`gamification:cards.views.${key}`)}
-            {key === "boosters" && packs.length ? (
-              <span className="cards-views__count">{packs.length}</span>
+            {key === "boosters" ? (
+              <CountBadge
+                count={packs.length}
+                label={t("gamification:cards.packs", { count: packs.length })}
+              />
             ) : null}
           </button>
         ))}

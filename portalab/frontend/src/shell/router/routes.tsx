@@ -255,6 +255,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           handle: h({ crumb: "Statistics", requiredPermission: "statistics.read" }),
           children: [
             { index: true, element: <Statistics /> },
+            { path: "me", element: <Statistics mine />, handle: h({ crumb: "Mine" }) },
             { path: "wrapped", element: <Wrapped />, handle: h({ crumb: "Recap" }) },
             {
               path: "wrapped/:snapshotId",
