@@ -1,0 +1,23 @@
+/* A rare card turned (its hook: data-reveal), staged over the whole screen (place: screen): the rarity's name
+   first, over the scene's screen, then the card face down, turning over — between this reveal's two videos
+   (behind it and over it). This stylesheet dresses the rarity's name Portalab writes. */
+@font-face {
+  font-family: "Genre Monoton";
+  src: url("Monoton.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-reveal="concert-rare"] .booster-takeover__word {
+  font-family: "Genre Monoton", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  scale: 0.7;
+  color: #ffffff;
+  text-shadow: 0 0 0.6rem #ff2fa8, 0 0 1.8rem #ff2fa8, 0 0 3rem #7a2cff;
+}
+/* held upright, the name runs along the screen's height: smaller, so it fits */
+@media (max-aspect-ratio: 4 / 5) {
+  [data-reveal="concert-rare"] .booster-takeover__word {
+    scale: 0.5;
+  }
+}

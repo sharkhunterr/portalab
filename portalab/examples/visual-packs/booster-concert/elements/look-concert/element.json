@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "concert",
+  "names": {
+    "fr": "Paquet aux néons",
+    "en": "Neon pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet noir aux sillons de vinyle, une bande aux néons, l'image de l'œuvre comme une pochette d'album, son nom en néon, un vinyle en emblème.",
+    "en": "A black pack with a record's grooves, a neon band, the work's art like an album cover, its name in neon, a record as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

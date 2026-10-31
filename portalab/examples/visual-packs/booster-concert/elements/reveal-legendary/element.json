@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "concert-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "Le stade : une foule et ses lumières, des projecteurs dans la fumée, un éclair, puis des lasers qui se croisent au-dessus de la carte, des gerbes d'étincelles et les mains levées.",
+    "en": "The stadium: a crowd and its lights, beams in the smoke, a flash, then lasers crossing above the card, fountains of sparks and raised hands."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}

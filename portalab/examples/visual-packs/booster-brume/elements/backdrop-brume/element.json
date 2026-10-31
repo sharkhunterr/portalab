@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "brume",
+  "names": {
+    "fr": "Rue dans la brume",
+    "en": "Street in the fog"
+  },
+  "descriptions": {
+    "fr": "Une rue victorienne perdue dans le brouillard, des becs de gaz qui y luisent, la brume qui dérive, une silhouette qui passe de temps en temps (vidéo en boucle).",
+    "en": "A Victorian street lost in fog, gas lamps glowing in it, the fog drifting, a figure passing now and then (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

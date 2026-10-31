@@ -1413,7 +1413,261 @@ var GENRE_CRIME = {
   }
 };
 
-var GENRE = { action: GENRE_ACTION, dark: GENRE_DARK, drama: GENRE_DRAMA, fantasy: GENRE_FANTASY, sf: GENRE_SF, adventure: GENRE_ADVENTURE, documentary: GENRE_DOC, thriller: GENRE_THRILLER, comedy: GENRE_COMEDY, animation: GENRE_ANIMATION, crime: GENRE_CRIME }[GENRE_KEY];
+// ===== Idylle — romance: a love letter, the ball, love at first sight =====================================
+var ROM = { blush: [1, 0.85, 0.88], rose: [0.91, 0.26, 0.42], rose_l: [1, 0.55, 0.65], wine: [0.48, 0.06, 0.2], gold: [0.85, 0.64, 0.25], gold_l: [1, 0.88, 0.6], dusk: [0.36, 0.12, 0.3], sun: [1, 0.72, 0.5], white: [1, 1, 1] };
+function hearts(f, n, base, rise, size) {   // little hearts floating up and swaying
+  seed(base); var out = [];
+  for (var i = 0; i < n; i++) { var x = between(-40, 1120) + Math.sin(f * 0.12 + i) * 30, y = 1140 - ((f * between(4, 9) * (rise || 1) + between(0, 1200)) % 1260); out.push(heart(x, y, between(14, 30) * (size || 1), Math.sin(f * 0.1 + i) * 0.3)); }
+  return out;
+}
+function envelope(cx, cy, s, open) {   // a letter: its body, its flap (open from 0 to 1), a heart seal
+  return { body: [[cx - s, cy - s * 0.6], [cx + s, cy - s * 0.6], [cx + s, cy + s * 0.6], [cx - s, cy + s * 0.6]], flap: [[cx - s, cy - s * 0.6], [cx + s, cy - s * 0.6], [cx, cy - s * 0.6 + s * 0.7 * (1 - 2 * open)]], seal: heart(cx, cy - s * 0.05 - s * 0.6 * open, s * 0.22, 0) };
+}
+function dancers(cx, cy, s, turn) {   // a couple waltzing, in silhouette: two figures close, a gown flaring
+  var sw = Math.sin(turn) * 0.3 * s;
+  return [place([[-0.15 * s, -1.6 * s], [0.05 * s, -1.6 * s], [0.12 * s, -0.7 * s], [0.75 * s + sw, 0.4 * s], [-0.65 * s + sw, 0.4 * s], [-0.2 * s, -0.7 * s]], cx - 0.2 * s, cy, 0), place(circle(0, -1.8 * s, 0.17 * s, 1.1, 12), cx - 0.25 * s, cy, 0),
+          place([[0.1 * s, -1.75 * s], [0.4 * s, -1.75 * s], [0.45 * s, 0.4 * s], [0.05 * s, 0.4 * s]], cx + 0.15 * s, cy, 0), place(circle(0, -1.95 * s, 0.17 * s, 1.1, 12), cx + 0.4 * s, cy, 0)];
+}
+function arrow(x0, y0, x1, y1, u) {   // Cupid's arrow flying from (x0, y0) to (x1, y1): shaft, head, fletching
+  var x = x0 + (x1 - x0) * u, y = y0 + (y1 - y0) * u, a = Math.atan2(y1 - y0, x1 - x0);
+  return { shaft: [[x - Math.cos(a) * 320, y - Math.sin(a) * 320], [x, y]], head: place([[0, 0], [-40, -18], [-40, 18]], x, y, a), fletch: [place([[-300, 0], [-340, -26], [-320, 0]], x, y, a), place([[-300, 0], [-340, 26], [-320, 0]], x, y, a)] };
+}
+var ROM_RARE = {
+  title: function (fr, f, u) {   // a love letter floating, opening, hearts rising out of it
+    var env = envelope(C, 560 + Math.sin(f * 0.2) * 20, 220, ease((f - 6) / 10));
+    polys(fr.top, hearts(f, 14, 1800, 1.4, 0.9), ROM.rose, 100);
+    polys(fr.main, [env.seal], ROM.rose, 100); polys(fr.main, [env.flap], [0.98, 0.9, 0.86], 100); lines(fr.main, [env.flap, env.body], ROM.wine, 4, 100, true); polys(fr.main, [env.body], [1, 0.96, 0.92], 100);
+    polys(fr.main, [full()], ROM.blush, 100);
+  },
+  wipe: function (fr, v) { polys(fr.top, [heart(C, C + 80, 30 + ease(v) * 1400, 0)], ROM.rose_l, 100 * (1 - Math.abs(v * 2 - 1)) + 10); },
+  stage: function (fr, f, at, o) {
+    polys(fr.main, hearts(f, 20, 1810, 1, 1), ROM.rose_l, o * 0.7);
+    polys(fr.haze, [circle(C, C, 420, 1, 40)], ROM.white, o * 0.7);
+    polys(fr.main, [full()], ROM.blush, o);
+  },
+  over: function (fr, f, at) { if (at >= 0) polys(fr.top, hearts(at, 8, 1820, 2, 0.8), ROM.rose, fade(at, 20, 34) * 100); }
+};
+var ROM_EPIC = {
+  title: function (fr, f, u) {   // the ball: a chandelier, a couple waltzing
+    polys(fr.main, dancers(C, 900, 210, f * 0.3), ROM.wine, 100);
+    seed(1830); var lamps = []; for (var i = 0; i < 16; i++) { var a = i / 16 * Math.PI; lamps.push([C + Math.cos(a) * 200, 180 + Math.sin(a) * 70, 8]); }
+    polys(fr.glow, glintPolys(twinkle(lamps, f, 1, 14)), ROM.gold_l); lines(fr.main, [ring(C, 180, 200, 0.35, 0, Math.PI), [[C, -60], [C, 120]]], ROM.gold, 6, 100);
+    polys(fr.glow, [circle(C, 800, 380, 0.6, 40)], ROM.gold_l, 50);
+    polys(fr.main, [full()], ROM.dusk, 100);
+  },
+  wipe: function (fr, v) { seed(1835); var pts = []; for (var i = 0; i < 90; i++) { var a = between(0, Math.PI * 2), d = ease(v) * 900 * between(0.4, 1.2); pts.push(place([[0, 0], [16, -10], [30, 0], [16, 10]], C + Math.cos(a) * d, C + Math.sin(a) * d, a + v * 6)); } polys(fr.top, pts, ROM.rose, 100); },
+  stage: function (fr, f, at, o) {   // petals whirling round the card, a ring of roses, sparkles
+    seed(1840); var petals = []; for (var i = 0; i < 50; i++) { var a = between(0, Math.PI * 2) + f * 0.04 * between(0.6, 1.4), d = between(280, 560); petals.push(place([[0, 0], [16, -10], [32, 0], [16, 10]], C + Math.cos(a) * d, C + Math.sin(a) * d * 0.8, a * 2 + f * 0.1)); }
+    polys(fr.main, petals, ROM.rose, o);
+    var roses = []; for (var r = 0; r < 14; r++) { var a2 = r / 14 * Math.PI * 2, x = C + Math.cos(a2) * 420, y = C + Math.sin(a2) * 480; roses.push(circle(x, y, 30, 1, 16)); roses.push(circle(x, y, 16, 1, 12)); }
+    polys(fr.main, roses, ROM.wine, o);
+    polys(fr.haze, [circle(C, C, 420, 1, 40)], ROM.gold_l, o * 0.6);
+    polys(fr.main, [full()], ROM.dusk, o);
+  },
+  over: function (fr, f, at) { if (at >= 2) { seed(1850); var pts = []; for (var i = 0; i < 14; i++) { var a = between(0, Math.PI * 2), r = toEdge(a, 160, 222) + between(10, 100); pts.push([C + Math.cos(a) * r, C + Math.sin(a) * r]); } polys(fr.top, glintPolys(twinkle(pts, f, 2, 20)), ROM.gold_l); } bigGlint(fr, at, ROM.gold_l); }
+};
+var ROM_LEGENDARY = {
+  title: function (fr, f, u) {   // love at first sight: a couple on a bridge at dusk, fireworks bursting into hearts
+    for (var k = 0; k < 3; k++) { var t = f - k * 6; if (t < 0) continue; var x = 260 + k * 280, y = 300 - k * 30, r = Math.min(1, t / 6) * 160; var sp = []; for (var j = 0; j < 14; j++) { var a = j / 14 * Math.PI * 2; sp.push(heart(x + Math.cos(a) * r, y + Math.sin(a) * r, 12, 0)); } polys(fr.glow, sp, k % 2 ? ROM.gold_l : ROM.rose_l, 100 * fade(t, 10, 16)); polys(fr.main, sp, k % 2 ? ROM.gold_l : ROM.rose_l, 100 * fade(t, 10, 16)); }
+    polys(fr.main, dancers(C + 120, 790, 120, 0).concat([[[-60, 800], [1140, 800], [1140, 1140], [-60, 1140]]]), [0.18, 0.04, 0.12], 100);
+    lines(fr.main, [ring(C, 1100, 520, 0.6, Math.PI, Math.PI * 2)], [0.18, 0.04, 0.12], 30, 100);
+    polys(fr.glow, [circle(C - 300, 780, 60, 1, 20)], ROM.gold_l, 100); lines(fr.main, [[[C - 300, 800], [C - 300, 680]]], [0.18, 0.04, 0.12], 10, 100);
+    polys(fr.main, [[[-60, 500], [1140, 500], [1140, 820], [-60, 820]]], ROM.sun, 100);
+    polys(fr.main, [full()], ROM.dusk, 100);
+  },
+  wipe: function (fr, v) { var s = ease(v); polys(fr.top, [heart(C - 300 * (1 - s), C, 900 * s + 40, -0.3 * (1 - s)), heart(C + 300 * (1 - s), C, 900 * s + 40, 0.3 * (1 - s))], ROM.rose, 100); },
+  stage: function (fr, f, at, o) {   // a golden heart behind the card, fireworks of hearts, a storm of petals
+    var g = ease((f - CARD_AT) / 6);
+    for (var k = 0; k < 6; k++) { var t = f - CARD_AT - k * 6; if (t < 0) continue; seed(1860 + k); var x = between(120, 960), y = between(160, 920), r = Math.min(1, t / 6) * 180; var sp = []; for (var j = 0; j < 16; j++) { var a = j / 16 * Math.PI * 2; sp.push(heart(x + Math.cos(a) * r, y + Math.sin(a) * r + t * 1.5, 13, 0)); } polys(fr.glow, sp, k % 2 ? ROM.gold_l : ROM.rose_l, o * fade(t, 10, 18)); polys(fr.main, sp, k % 2 ? ROM.gold_l : ROM.white, o * fade(t, 10, 18)); }
+    seed(1870); var petals = []; for (var i = 0; i < 70; i++) { var a2 = between(0, Math.PI * 2) + f * 0.05, d = between(250, 700); petals.push(place([[0, 0], [16, -10], [32, 0], [16, 10]], C + Math.cos(a2) * d, C + Math.sin(a2) * d * 0.8, a2 * 2 + f * 0.15)); }
+    polys(fr.main, petals, ROM.rose, o);
+    polys(fr.glow, [heart(C, C + 60, 520 * g + 40, 0)], ROM.gold, o); polys(fr.main, [heart(C, C + 60, 470 * g + 30, 0)], ROM.gold_l, o * 0.5);
+    polys(fr.main, [full()], ROM.dusk, o);
+  },
+  over: function (fr, f, at) {   // Cupid's arrow going through the card, a burst of hearts
+    if (at >= 0 && at < 14) { var ar = arrow(-200, C + 260, 1300, C - 260, ease(at / 6)); lines(fr.top, [ar.shaft], ROM.gold, 9, fade(at, 9, 14) * 100); polys(fr.top, [ar.head], ROM.gold_l, fade(at, 9, 14) * 100); polys(fr.top, ar.fletch, ROM.rose, fade(at, 9, 14) * 100); }
+    if (at >= 3) polys(fr.top, hearts(at - 3, 16, 1880, 2.2, 1.1), ROM.rose, fade(at, 24, 40) * 100);
+    bigGlint(fr, at, ROM.gold_l);
+  }
+};
+var GENRE_ROMANCE = {
+  rarities: { rare: ROM_RARE, epic: ROM_EPIC, legendary: ROM_LEGENDARY },
+  opening: function (comp) {   // hearts whirl round the pack, a great heart closes on it and bursts into petals
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      if (f < 30) { var hs = []; for (var i = 0; i < 12; i++) { var a = i / 12 * Math.PI * 2 + f * 0.15, d = 420 - f * 9; hs.push(heart(cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.8, 26, a)); } polys(fr.top, hs, ROM.rose, 100); }
+      if (f >= 18 && f < 32) polys(fr.top, [heart(cx, cy + 40, 700 - ease((f - 18) / 10) * 560, 0)], ROM.rose_l, 70);
+      if (f >= 30) { seed(1890); var petals = []; for (var j = 0; j < 60; j++) { var a2 = between(0, Math.PI * 2), d2 = 40 + (f - 30) * between(10, 26); petals.push(place([[0, 0], [16, -10], [32, 0], [16, 10]], cx + Math.cos(a2) * d2, cy + Math.sin(a2) * d2 + (f - 30) * (f - 30) * 0.3, a2 + f * 0.2)); } polys(fr.top, petals, ROM.rose, fade(f, 52, 63) * 100); }
+      if (f >= 30 && f < 33) polys(fr.top, [heart(cx, cy + 40, 260, 0)], ROM.white, 100 - (f - 30) * 33);
+    }
+  }
+};
+
+// ===== Brume — mystery: a lantern in the fog, the keyhole, the riddle =====================================
+var MYS = { fog: [0.66, 0.76, 0.74], night: [0.04, 0.1, 0.12], teal: [0.09, 0.21, 0.23], brass: [0.78, 0.63, 0.29], brass_l: [1, 0.86, 0.5], lamp: [1, 0.85, 0.5], ink: [0.02, 0.05, 0.06] };
+function fogBands(L, f, o, base) {   // drifting bands of fog
+  seed(base); var out = []; for (var i = 0; i < 7; i++) { var y = between(100, 1000), x = -400 + ((f * between(3, 7) + between(0, 1600)) % 1900), w = between(400, 800); out.push(circle(x, y, w, 0.12, 30)); } polys(L, out, MYS.fog, o);
+}
+function keyhole(cx, cy, s) { return [circle(cx, cy - 0.35 * s, 0.38 * s, 1, 30), [[cx - 0.2 * s, cy - 0.2 * s], [cx + 0.2 * s, cy - 0.2 * s], [cx + 0.34 * s, cy + 0.75 * s], [cx - 0.34 * s, cy + 0.75 * s]]]; }
+function gear(cx, cy, r, teeth, turn) {   // a cog: its toothed rim, a hub cut out
+  var v = []; for (var i = 0; i < teeth * 4; i++) { var a = turn + i / (teeth * 4) * Math.PI * 2, rr = (i % 4 < 2) ? r : r * 0.84; v.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]); }
+  return [v, circle(cx, cy, r * 0.32, 1, 20)];
+}
+function question(cx, cy, s, turn) {   // a question mark: its hook over the top (screen y down), its stem, its dot
+  var hook = []; for (var i = 0; i <= 18; i++) { var a = Math.PI + i / 18 * Math.PI * 1.45; hook.push([Math.cos(a) * 0.36 * s, -0.55 * s + Math.sin(a) * 0.36 * s]); } hook.push([0, -0.1 * s]); hook.push([0, 0.1 * s]);
+  return { hook: [place(hook, cx, cy, turn)], dot: place(circle(0, 0.36 * s, 0.09 * s, 1, 10), cx, cy, turn) };
+}
+var MYS_RARE = {
+  title: function (fr, f, u) {   // a lantern swaying in the fog
+    var sw = Math.sin(f * 0.18) * 0.5, lx = C + 260 + Math.sin(sw) * 300, ly = 60 + Math.cos(sw) * 300;
+    lines(fr.main, [[[C, -60], [lx, ly]]], MYS.ink, 4, 100);
+    polys(fr.glow, [circle(lx, ly + 40, 160, 1, 30)], MYS.lamp, 90); polys(fr.main, [[[lx - 34, ly], [lx + 34, ly], [lx + 28, ly + 90], [lx - 28, ly + 90]]], MYS.lamp, 100); lines(fr.main, [[[lx - 34, ly], [lx + 34, ly], [lx + 28, ly + 90], [lx - 28, ly + 90], [lx - 34, ly]]], MYS.ink, 6, 100);
+    fogBands(fr.main, f, 30, 1900); fogBands(fr.haze, f, 90, 1901);
+    polys(fr.main, [full()], MYS.night, 100);
+  },
+  wipe: function (fr, v) { polys(fr.top, [full()], MYS.fog, 100 * (1 - Math.abs(v * 2 - 1))); },
+  stage: function (fr, f, at, o) {   // the lantern hanging over the card, its light in the fog, the fog drifting past
+    var lx = C + Math.sin(f * 0.15) * 40, ly = 250;
+    lines(fr.main, [[[C, -60], [lx, ly]]], MYS.ink, 4, o);
+    polys(fr.glow, [circle(lx, ly + 40, 220, 1, 30)], MYS.lamp, o); polys(fr.main, [[[lx - 30, ly], [lx + 30, ly], [lx + 24, ly + 80], [lx - 24, ly + 80]]], MYS.lamp, o); lines(fr.main, [[[lx - 30, ly], [lx + 30, ly], [lx + 24, ly + 80], [lx - 24, ly + 80], [lx - 30, ly]]], MYS.ink, 6, o);
+    cone(fr.haze, lx, 1.5708, 1200, 40, 420, MYS.lamp, o * 0.5);
+    fogBands(fr.main, f, o * 0.35, 1910); fogBands(fr.haze, f + 40, o, 1911);
+    polys(fr.main, [full()], MYS.teal, o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 6) lines(fr.top, [ring(C, C, 240 + at * 16, 1.3)], MYS.brass_l, 6, fade(at, 3, 6) * 100); }
+};
+var MYS_EPIC = {
+  title: function (fr, f, u) {   // an ornate keyhole, a light moving behind it
+    polys(fr.main, keyhole(C, 600, 420), [1, 0.9, 0.6], 100);
+    polys(fr.glow, [circle(C + Math.sin(f * 0.2) * 60, 560, 160, 1, 30)], MYS.lamp, 100);
+    lines(fr.main, [ring(C, 450, 300, 1), ring(C, 450, 330, 1)], MYS.brass, 10, 100);
+    polys(fr.main, [full()], MYS.brass, 100);
+  },
+  wipe: function (fr, v) { var a = ease(v) * Math.PI / 2; polys(fr.top, [place([[-60, -24], [300, -24], [300, -60], [360, -60], [360, 60], [300, 60], [300, 24], [-60, 24]], C, C, a), circle(C - 120 * Math.cos(a), C - 120 * Math.sin(a), 110, 1, 24)], MYS.brass_l, 100 * (1 - Math.abs(v * 2 - 1)) + 10); },
+  stage: function (fr, f, at, o) {   // brass gears turning round the card, the lock opening
+    var gs = [[C - 360, C - 330, 160, 14, 1], [C + 380, C - 260, 200, 18, -1], [C - 330, C + 330, 190, 16, -1], [C + 360, C + 360, 150, 12, 1]];
+    for (var i = 0; i < gs.length; i++) { var g2 = gear(gs[i][0], gs[i][1], gs[i][2], gs[i][3], f * 0.04 * gs[i][4]); polys(fr.main, g2, MYS.brass, o, true); lines(fr.main, [g2[0]], MYS.ink, 4, o, true); }
+    fogBands(fr.haze, f, o * 0.6, 1920);
+    polys(fr.main, [full()], MYS.teal, o);
+  },
+  over: function (fr, f, at) { bigGlint(fr, at, MYS.brass_l); }
+};
+var MYS_LEGENDARY = {
+  title: function (fr, f, u) {   // a Victorian street at night: gas lamps, a figure in a cape fleeing, question marks drifting
+    seed(1930); for (var i = 0; i < 6; i++) { var q = question(between(80, 1000), 1100 - ((f * between(6, 12) + between(0, 1100)) % 1200), between(60, 110), between(-0.3, 0.3)); lines(fr.main, q.hook, MYS.brass_l, 12, 70); polys(fr.main, [q.dot], MYS.brass_l, 70); }
+    var x = 900 - f * 22; polys(fr.main, [place([[0, -150], [30, -150], [40, -100], [120, 60], [-80, 60], [-10, -100]], x, 820, 0), place(circle(0, -175, 26, 1, 12), x + 15, 820, 0), place([[-30, -200], [60, -200], [50, -210], [42, -250], [-12, -250], [-20, -210]], x, 820, 0)], MYS.ink, 100);
+    for (var k = 0; k < 3; k++) { var lx = 160 + k * 380; lines(fr.main, [[[lx, 1140], [lx, 420]]], MYS.ink, 12, 100); polys(fr.glow, [circle(lx, 400, 120, 1, 24)], MYS.lamp, 90); polys(fr.main, [[[lx - 28, 380], [lx + 28, 380], [lx + 22, 430], [lx - 22, 430]]], MYS.lamp, 100); }
+    fogBands(fr.haze, f, 90, 1931);
+    polys(fr.main, [full()], MYS.night, 100);
+  },
+  wipe: function (fr, v) { iris(fr, v < 0.5 ? 900 * (1 - ease(v * 2)) + 30 : 30 + 900 * ease(v * 2 - 1)); },
+  stage: function (fr, f, at, o) {   // the riddle solved: great gears, a magnifier sweeping, question marks whirling
+    var gs = [[C - 420, C - 380, 230, 18, 1], [C + 440, C - 300, 260, 22, -1], [C - 400, C + 380, 250, 20, -1], [C + 420, C + 420, 210, 16, 1], [C, C - 560, 180, 14, 1]];
+    for (var i = 0; i < gs.length; i++) { var g2 = gear(gs[i][0], gs[i][1], gs[i][2], gs[i][3], f * 0.05 * gs[i][4]); polys(fr.main, g2, MYS.brass, o, true); lines(fr.main, [g2[0]], MYS.ink, 4, o, true); }
+    seed(1940); for (var j = 0; j < 10; j++) { var a = between(0, Math.PI * 2) + f * 0.03, d = between(300, 480), q = question(C + Math.cos(a) * d, C + Math.sin(a) * d, between(50, 80), a); lines(fr.top, q.hook, MYS.brass_l, 9, o * 0.85); polys(fr.top, [q.dot], MYS.brass_l, o * 0.85); }
+    var mx = C + 300 * Math.cos(f * 0.08), my = C + 200 * Math.sin(f * 0.11); lines(fr.top, [ring(mx, my, 120, 1)], MYS.brass, 18, o); lines(fr.top, [[[mx + 85, my + 85], [mx + 210, my + 210]]], MYS.ink, 26, o); polys(fr.top, [circle(mx, my, 110, 1, 30)], [0.9, 1, 1], o * 0.12);
+    fogBands(fr.haze, f, o * 0.7, 1941);
+    polys(fr.main, [full()], MYS.teal, o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 8) lines(fr.top, [ring(C, C, 260, 1.3)], MYS.brass_l, 14, fade(at, 4, 8) * 100); bigGlint(fr, at, MYS.brass_l); }
+};
+var GENRE_MYSTERY = {
+  rarities: { rare: MYS_RARE, epic: MYS_EPIC, legendary: MYS_LEGENDARY },
+  opening: function (comp) {   // the pack seen through a keyhole closing on it; the fog takes it
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      if (f >= 6 && f < 36) { var s = 2400 - ease((f - 6) / 22) * 2200; polys(fr.top, [[[-60, -60], [1212, -60], [1212, 1140], [-60, 1140]]].concat(keyhole(cx, cy + 0.1 * s, s)), MYS.ink, 100 * fade(f, 32, 36), true); }
+      if (f >= 28) fogBands(fr.top, f, 100 * fade(f, 52, 63), 1950);
+    }
+  }
+};
+
+// ===== Concert — music: a note, the record, the stadium ===================================================
+var MUS = { black: [0.08, 0.04, 0.12], magenta: [1, 0.18, 0.66], cyan: [0.16, 0.89, 1], purple: [0.48, 0.17, 1], gold: [1, 0.8, 0.3], white: [1, 1, 1] };
+function note(x, y, s, two) {   // a note (or two beamed): heads, stems, a flag
+  var out = { heads: [place(circle(0, 0, 0.3 * s, 0.7, 14), x, y, -0.4)], stems: [[[x + 0.27 * s, y - 0.05 * s], [x + 0.27 * s, y - 1.3 * s]]] };
+  if (two) { out.heads.push(place(circle(0, 0, 0.3 * s, 0.7, 14), x + s, y - 0.2 * s, -0.4)); out.stems.push([[x + 1.27 * s, y - 0.25 * s], [x + 1.27 * s, y - 1.5 * s]]); out.beam = [[x + 0.27 * s, y - 1.3 * s], [x + 1.27 * s, y - 1.5 * s], [x + 1.27 * s, y - 1.3 * s], [x + 0.27 * s, y - 1.1 * s]]; }
+  else out.beam = [[x + 0.27 * s, y - 1.3 * s], [x + 0.65 * s, y - 0.9 * s], [x + 0.6 * s, y - 0.8 * s], [x + 0.27 * s, y - 1.05 * s]];
+  return out;
+}
+function drawNote(L, n, color, o) { polys(L, n.heads.concat([n.beam]), color, o); lines(L, n.stems, color, 0.1 * 60, o); }
+function vinyl(cx, cy, r, turn) {   // a record: its disc, grooves, label, a glint turning
+  return { disc: circle(cx, cy, r, 1, 60), grooves: [ring(cx, cy, r * 0.9, 1), ring(cx, cy, r * 0.78, 1), ring(cx, cy, r * 0.66, 1), ring(cx, cy, r * 0.54, 1)], label: circle(cx, cy, r * 0.32, 1, 30), hole: circle(cx, cy, r * 0.04, 1, 10), shine: [[cx, cy], [cx + Math.cos(turn) * r, cy + Math.sin(turn) * r], [cx + Math.cos(turn + 0.3) * r, cy + Math.sin(turn + 0.3) * r]] };
+}
+function eqBars(cx, cy, r, f, n) {   // an equaliser's bars round a circle, pulsing
+  var out = []; for (var i = 0; i < n; i++) { var a = i / n * Math.PI * 2, h = 40 + 120 * Math.abs(Math.sin(f * 0.5 + i * 0.7) * Math.sin(f * 0.23 + i * 0.3)), w = 0.035; out.push([[cx + Math.cos(a - w) * r, cy + Math.sin(a - w) * r], [cx + Math.cos(a - w) * (r + h), cy + Math.sin(a - w) * (r + h)], [cx + Math.cos(a + w) * (r + h), cy + Math.sin(a + w) * (r + h)], [cx + Math.cos(a + w) * r, cy + Math.sin(a + w) * r]]); } return out;
+}
+function crowd(f, y0) {   // heads and raised hands at the foot of the screen
+  var out = []; seed(2050);
+  for (var i = 0; i < 26; i++) { var x = -40 + i * 46 + between(-8, 8), y = y0 + between(-12, 12), up = Math.sin(f * 0.4 + i) * 20; out.push(circle(x, y, 24, 1.1, 12)); out.push([[x - 30, 1140], [x - 26, y + 20], [x + 26, y + 20], [x + 30, 1140]]); if (i % 2) out.push([[x + 10, y + 10], [x + 24, y - 90 - up], [x + 34, y - 88 - up], [x + 22, y + 10]]); }
+  return out;
+}
+var MUS_RARE = {
+  title: function (fr, f, u) {   // notes floating along a staff that waves
+    var staff = []; for (var k = 0; k < 5; k++) { var pts = []; for (var x = -60; x <= 1140; x += 30) pts.push([x, 420 + k * 40 + Math.sin(x * 0.006 + f * 0.2) * 60]); staff.push(pts); }
+    lines(fr.main, staff, MUS.white, 3, 70);
+    seed(2000); for (var i = 0; i < 6; i++) { var x2 = -100 + ((f * 18 + i * 220) % 1300), y2 = 520 + Math.sin(x2 * 0.006 + f * 0.2) * 60 - i % 3 * 40; drawNote(fr.main, note(x2, y2, 70, i % 2), [MUS.magenta, MUS.cyan, MUS.gold][i % 3], 100); }
+    polys(fr.main, [full()], MUS.black, 100);
+  },
+  wipe: function (fr, v) { lines(fr.top, [ring(C, C, 40 + ease(v) * 900, 1), ring(C, C, 20 + ease(v) * 700, 1)], MUS.cyan, 30, 100 * (1 - v) + 20); },
+  stage: function (fr, f, at, o) {
+    seed(2010); for (var i = 0; i < 10; i++) { var a = between(0, Math.PI * 2) + f * 0.02, d = between(300, 500); drawNote(fr.main, note(C + Math.cos(a) * d, C + Math.sin(a) * d, 50, i % 2), [MUS.magenta, MUS.cyan, MUS.gold][i % 3], o * 0.85); }
+    polys(fr.haze, [circle(C, C, 400, 1, 40)], MUS.purple, o * 0.6);
+    polys(fr.main, [full()], MUS.black, o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 8) lines(fr.top, [ring(C, C, 240 + at * 24, 1.3)], MUS.cyan, 8, fade(at, 4, 8) * 100); }
+};
+var MUS_EPIC = {
+  title: function (fr, f, u) {   // a record spinning, its glint turning
+    var v = vinyl(C, 560, 400, f * 0.25);
+    polys(fr.main, [v.hole], MUS.black, 100); polys(fr.main, [v.label], MUS.magenta, 100); polys(fr.main, [v.shine], MUS.white, 18); lines(fr.main, v.grooves, [0.2, 0.2, 0.24], 3, 100); polys(fr.main, [v.disc], [0.06, 0.06, 0.08], 100);
+    lines(fr.main, [[[1000, 140], [900, 360], [760, 420]]], [0.75, 0.75, 0.8], 14, 100);
+    polys(fr.main, [full()], MUS.purple, 100);
+  },
+  wipe: function (fr, v) { lines(fr.top, [ring(C, C, 40 + ease(v) * 900, 1)], MUS.magenta, 60 * (1 - v) + 10, 100); },
+  stage: function (fr, f, at, o) {   // an equaliser pulsing round the card, sound rings going out
+    polys(fr.main, eqBars(C, C, 330, f, 48), MUS.cyan, o);
+    if (at >= 0) for (var q = 0; q < 3; q++) { var t = (at - q * 4); if (t < 0) continue; lines(fr.glow, [ring(C, C, 320 + t * 30, 1.2)], MUS.magenta, 20, fade(t, 6, 14) * o); }
+    var v = vinyl(C, C, 330, f * 0.2); lines(fr.main, v.grooves, [0.2, 0.2, 0.26], 3, o); polys(fr.main, [v.disc], [0.06, 0.06, 0.08], o);
+    polys(fr.main, [full()], MUS.black, o);
+  },
+  over: function (fr, f, at) { bigGlint(fr, at, MUS.cyan); }
+};
+var MUS_LEGENDARY = {
+  title: function (fr, f, u) {   // a stadium: the crowd's lights, beams sweeping the smoke
+    polys(fr.main, crowd(f, 900), MUS.black, 100);
+    seed(2060); var lights = []; for (var i = 0; i < 80; i++) lights.push([between(0, 1080), between(760, 1000), between(2, 4)]); polys(fr.main, glintPolys(twinkle(lights, f, 1, 5)), MUS.gold);
+    for (var k = 0; k < 5; k++) cone(fr.glow, 120 + k * 210, 1.5708 + 0.5 * Math.sin(f * 0.12 + k), 1400, 20, 220, [MUS.magenta, MUS.cyan, MUS.purple][k % 3], 60);
+    polys(fr.main, [full()], [0.12, 0.06, 0.2], 100);
+  },
+  wipe: function (fr, v) { polys(fr.top, [full()], MUS.white, 100 * (1 - Math.abs(v * 2 - 1))); },
+  stage: function (fr, f, at, o) {   // lasers crossing over the card, fountains of sparks at the sides, the crowd
+    polys(fr.top, crowd(f, 840), MUS.black, o);
+    var lasers = []; for (var k = 0; k < 8; k++) { var a = -1.5708 + Math.sin(f * 0.1 + k) * 0.9; lasers.push([[k < 4 ? 80 : 1000, 1000], [(k < 4 ? 80 : 1000) + Math.cos(a) * 1600, 1000 + Math.sin(a) * 1600]]); }
+    lines(fr.glow, lasers, MUS.cyan, 16, o * 0.8); lines(fr.main, lasers, MUS.white, 3, o);
+    if (at >= -4) for (var side = 0; side < 2; side++) { seed(2070 + side + f); var sparks = []; for (var i = 0; i < 30; i++) { var x = (side ? 960 : 120) + between(-40, 40), h = between(100, 700); sparks.push(circle(x + between(-60, 60) * (h / 700), 1000 - h, between(3, 7), 1, 8)); } polys(fr.glow, sparks, MUS.gold, o); polys(fr.main, sparks, MUS.white, o); }
+    polys(fr.main, eqBars(C, C, 360, f, 40), MUS.magenta, o * 0.8);
+    polys(fr.haze, [circle(C, C, 500, 1, 40)], MUS.purple, o);
+    polys(fr.main, [full()], [0.1, 0.05, 0.16], o);
+  },
+  over: function (fr, f, at) { if (at >= 0 && at < 8) { polys(fr.top, slash(-60, 300, 1140, 760, 24, ease(at / 3), -0.3), MUS.magenta, fade(at, 4, 8) * 90); polys(fr.top, slash(1140, 300, -60, 760, 24, ease((at - 1) / 3), 0.3), MUS.cyan, fade(at, 5, 9) * 90); } sparksOut(fr.main, fr.glow, at - 2, 30, MUS.gold, 2080, 26); bigGlint(fr, at, MUS.cyan); }
+};
+var GENRE_MUSIC = {
+  rarities: { rare: MUS_RARE, epic: MUS_EPIC, legendary: MUS_LEGENDARY },
+  opening: function (comp) {   // a record spins under the pack, the needle drops — the pack bursts in sound waves
+    var cx = 576, cy = 505;
+    for (var f = 0; f < 64; f++) {
+      var fr = frameOf(comp, f); if (!fr.main) continue;
+      if (f < 30) { var v = vinyl(cx, cy, 380, f * 0.3); polys(fr.main, [v.shine], MUS.white, 15); lines(fr.main, v.grooves, [0.25, 0.25, 0.3], 3, 100); polys(fr.main, [v.disc], [0.06, 0.06, 0.08], 100 * fade(f, 26, 30)); var arm = f < 16 ? 0.4 * (1 - ease(f / 14)) : 0; lines(fr.top, [place([[0, 0], [-160, 260], [-260, 300]], cx + 420, cy - 360, arm)], [0.75, 0.75, 0.8], 14, 100 * fade(f, 26, 30)); }
+      if (f >= 24) for (var q = 0; q < 5; q++) { var t = f - 24 - q * 4; if (t < 0) continue; lines(fr.glow, [ring(cx, cy, 120 + t * 40, 1)], q % 2 ? MUS.cyan : MUS.magenta, 22, fade(t, 10, 20) * 100); lines(fr.top, [ring(cx, cy, 120 + t * 40, 1)], MUS.white, 4, fade(t, 10, 20) * 100); }
+      if (f >= 26) { seed(2090); for (var i = 0; i < 10; i++) { var a = between(0, Math.PI * 2), d = 60 + (f - 26) * between(10, 20); drawNote(fr.top, note(cx + Math.cos(a) * d, cy + Math.sin(a) * d, 46, i % 2), [MUS.magenta, MUS.cyan, MUS.gold][i % 3], fade(f, 52, 63) * 100); } }
+    }
+  }
+};
+
+var GENRE = { action: GENRE_ACTION, dark: GENRE_DARK, drama: GENRE_DRAMA, fantasy: GENRE_FANTASY, sf: GENRE_SF, adventure: GENRE_ADVENTURE, documentary: GENRE_DOC, thriller: GENRE_THRILLER, comedy: GENRE_COMEDY, animation: GENRE_ANIMATION, crime: GENRE_CRIME, romance: GENRE_ROMANCE, mystery: GENRE_MYSTERY, music: GENRE_MUSIC }[GENRE_KEY];
 
 // --- the comps --------------------------------------------------------------------------------------------
 // a genre with a moment of its own per rarity gives it (``rarities``), else the same one for every rarity

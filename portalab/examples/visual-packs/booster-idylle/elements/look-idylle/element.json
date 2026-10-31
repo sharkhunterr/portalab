@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "idylle",
+  "names": {
+    "fr": "Paquet noué",
+    "en": "Ribboned pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet rose semé de cœurs, noué d'un ruban, l'image de l'œuvre dans un médaillon, son nom en belle écriture, un cœur et la flèche de Cupidon en emblème.",
+    "en": "A pink pack sprinkled with hearts, tied with a ribbon, the work's art in a locket, its name in flowing script, a heart and Cupid's arrow as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

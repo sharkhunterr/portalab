@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "brume",
+  "names": {
+    "fr": "Paquet de laiton",
+    "en": "Brass pack"
+  },
+  "descriptions": {
+    "fr": "Un paquet vert d'eau cerclé de laiton, l'image de l'œuvre dans une loupe, son nom en petites capitales, une serrure en emblème.",
+    "en": "A sea-green pack ringed in brass, the work's art in a magnifier, its name in small capitals, a keyhole as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

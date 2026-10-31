@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "idylle",
+  "names": {
+    "fr": "Dos aux cœurs",
+    "en": "Heart back"
+  },
+  "descriptions": {
+    "fr": "Rose semé de cœurs, un ruban, un cœur au centre.",
+    "en": "Pink with hearts, a ribbon, a heart in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

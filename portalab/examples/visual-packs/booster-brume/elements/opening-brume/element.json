@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "brume",
+  "names": {
+    "fr": "La serrure",
+    "en": "The keyhole"
+  },
+  "descriptions": {
+    "fr": "On voit le paquet par le trou d'une serrure qui se referme sur lui ; la brume l'emporte.",
+    "en": "The pack seen through a keyhole closing on it; the fog takes it."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

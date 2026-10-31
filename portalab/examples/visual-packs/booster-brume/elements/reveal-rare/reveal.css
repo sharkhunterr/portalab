@@ -1,0 +1,25 @@
+/* A rare card turned (its hook: data-reveal), staged over the whole screen (place: screen): the rarity's name
+   first, over the scene's screen, then the card face down, turning over — between this reveal's two videos
+   (behind it and over it). This stylesheet dresses the rarity's name Portalab writes. */
+@font-face {
+  font-family: "Genre Playfair SC";
+  src: url("PlayfairDisplaySC.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+[data-reveal="brume-rare"] .booster-takeover__word {
+  font-family: "Genre Playfair SC", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  scale: 0.78;
+  color: #efe6cf;
+  -webkit-text-stroke: 0.08rem #081416;
+  paint-order: stroke fill;
+  text-shadow: 0.25rem 0.25rem 0 #c7a04a, 0 0 2rem rgba(169, 195, 189, 0.8);
+}
+/* held upright, the name runs along the screen's height: smaller, so it fits */
+@media (max-aspect-ratio: 4 / 5) {
+  [data-reveal="brume-rare"] .booster-takeover__word {
+    scale: 0.55;
+  }
+}

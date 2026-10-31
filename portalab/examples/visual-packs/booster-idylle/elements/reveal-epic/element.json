@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "idylle-epic",
+  "names": {
+    "fr": "Révélation épique",
+    "en": "Epic reveal"
+  },
+  "descriptions": {
+    "fr": "Le bal : un lustre, un couple qui valse, puis des pétales qui tourbillonnent et une couronne de roses autour de la carte.",
+    "en": "The ball: a chandelier, a couple waltzing, then petals whirling and a ring of roses round the card."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.8,
+    "rarity": "epic"
+  }
+}

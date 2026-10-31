@@ -1,0 +1,81 @@
+/* The sealed pack (its hook: data-booster-look): A black pack with a record's grooves, a neon band, the work's
+   art like an album cover, its name in neon, a record as emblem. */
+@font-face {
+  font-family: "Genre Monoton";
+  src: url("Monoton.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-booster-look="concert"] .booster-pack {
+  border-radius: 0.5rem;
+  background: repeating-radial-gradient(circle at 50% 120%, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 7px), linear-gradient(170deg, #241236, #0a0510);
+  box-shadow: inset 0 0 0 3px #140b1f, inset 0 0 0 6px #ff2fa8, inset 0 0 0 8px #140b1f, 0 1rem 2rem rgba(0, 0, 0, 0.55), 0 0 1.4rem color-mix(in srgb, #ff2fa8 40%, transparent);
+}
+[data-booster-look="concert"] .booster-pack__art {
+  inset: 13% 10% 33%;
+  inline-size: 80%;
+  block-size: 54%;
+  border: 3px solid #140b1f;
+  border-radius: 0.3rem;
+  box-shadow: 0 0 0 3px #29e3ff, 0 0 0 6px #140b1f, 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+  mask: none;
+}
+[data-booster-look="concert"] .booster-pack__foil {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.45) 48%, transparent 56%) -160% 0 / 200% 100% no-repeat;
+  animation: genre-sweep 4s ease-in-out infinite;
+}
+@keyframes genre-sweep {
+  0%, 55% { background-position: -160% 0; }
+  85%, 100% { background-position: 260% 0; }
+}
+[data-booster-look="concert"] .booster-pack__stars {
+  opacity: 0;
+}
+[data-booster-look="concert"] .booster-pack__flap {
+  border: 0;
+  background: linear-gradient(90deg, #ff2fa8, #7a2cff, #29e3ff);
+  box-shadow: inset 0 -3px 0 #140b1f;
+}
+[data-booster-look="concert"] .booster-pack__emblem {
+  inline-size: 62%;
+  aspect-ratio: 1;
+  background: url("emblem.svg") center / contain no-repeat;
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-booster-look="concert"] .booster-pack__emblem svg {
+  opacity: 0;
+}
+[data-booster-look="concert"] .booster-pack__name {
+  inset: auto 3% 11%;
+  font-family: "Genre Monoton", sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.05rem, 2.4vw, 1.5rem);
+  line-height: 1.05;
+  color: #ffffff;
+  -webkit-text-stroke: 4px #140b1f;
+  paint-order: stroke fill;
+  text-shadow: 0 0 1rem color-mix(in srgb, #ff2fa8 70%, transparent);
+}
+[data-booster-look="concert"] .booster-pack__count {
+  inset: 0.5rem 0.5rem auto auto;
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  padding: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  color: #ffffff;
+  font-family: "Genre Monoton", sans-serif;
+  font-weight: 400;
+  font-size: 0.85rem;
+  text-shadow: 0 1px 3px #000000;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="concert"] .booster-pack__foil {
+    animation: none;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "concert",
+  "names": {
+    "fr": "Dos vinyle",
+    "en": "Record back"
+  },
+  "descriptions": {
+    "fr": "Noir aux sillons, une bande aux néons, un vinyle au centre.",
+    "en": "Grooved black, a neon band, a record in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

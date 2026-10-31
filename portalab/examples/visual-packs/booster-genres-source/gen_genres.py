@@ -1,4 +1,4 @@
-"""Writes the genre scene packs (Blockbuster, Ténèbres, Rideau, Arcanes, Hyperespace, Trésor, Reportage, Insomnie, Fou rire, Crayonné, Scellés) but for their videos
+"""Writes the genre scene packs (Blockbuster, Ténèbres, Rideau, Arcanes, Hyperespace, Trésor, Reportage, Insomnie, Fou rire, Crayonné, Scellés, Idylle, Brume, Concert) but for their videos
 (build.sh): their emblems, stylesheets — the sealed pack, the back, the four faces, the opening, each rarity's
 reveal over the whole screen and the look of the rarity's name Portalab writes there — and every manifest.
 Fonts (SIL OFL, from Google Fonts) are copied from fonts/."""
@@ -100,6 +100,24 @@ def emblem_crayon():
 def emblem_scelles():
     return svg('<path d="M18,14 C34,8 66,8 82,14 C88,40 80,70 50,90 C20,70 12,40 18,14 Z" fill="#1d1a16" stroke="#f5c400" stroke-width="4"/>'
                '<path d="M50,24 L56,40 L74,40 L60,50 L66,68 L50,58 L34,68 L40,50 L26,40 L44,40 Z" fill="#f5c400"/>')
+
+
+def emblem_idylle():
+    return svg('<path d="M50,88 C10,62 6,30 26,18 C38,11 48,18 50,28 C52,18 62,11 74,18 C94,30 90,62 50,88 Z" fill="#e8436b" stroke="#7a1033" stroke-width="3.5"/>'
+               '<path d="M14,70 L86,26" stroke="#d9a441" stroke-width="4" stroke-linecap="round"/><path d="M86,26 L74,26 L80,36 Z" fill="#d9a441"/>'
+               '<path d="M14,70 L12,60 M14,70 L22,74" stroke="#d9a441" stroke-width="3"/>')
+
+
+def emblem_brume():
+    return svg('<circle cx="50" cy="50" r="46" fill="#16363b" stroke="#c7a04a" stroke-width="4"/>'
+               '<circle cx="50" cy="38" r="13" fill="#081416"/><path d="M44,44 L56,44 L62,76 L38,76 Z" fill="#081416"/>'
+               '<circle cx="50" cy="50" r="38" fill="none" stroke="#c7a04a" stroke-width="1.5" stroke-dasharray="3 5"/>')
+
+
+def emblem_concert():
+    return svg('<circle cx="50" cy="50" r="46" fill="#140b1f"/><circle cx="50" cy="50" r="40" fill="none" stroke="#2a1a3d" stroke-width="2"/>'
+               '<circle cx="50" cy="50" r="30" fill="none" stroke="#2a1a3d" stroke-width="2"/><circle cx="50" cy="50" r="14" fill="#ff2fa8"/>'
+               '<circle cx="50" cy="50" r="2.5" fill="#140b1f"/><path d="M14,30 A40,40 0 0,1 40,10" fill="none" stroke="#29e3ff" stroke-width="3" stroke-linecap="round"/>')
 
 
 GENRES = {
@@ -412,6 +430,88 @@ GENRES = {
                "look": ("Pochette à scellés", "Evidence bag", "Un paquet de papier kraft comme une pochette à scellés, une bande de ruban de police, l'image de l'œuvre comme une photo d'indice, son nom tapé à la machine, un insigne en emblème.", "A manila pack like an evidence bag, a band of police tape, the work's art like an evidence photo, its name typewritten, a badge as emblem."),
                "opening": ("Mis sous scellés", "Bagged", "Le ruban de police s'enroule autour du paquet sous les gyrophares ; le flash d'une photo d'indice — il est emporté.", "Police tape wraps round the pack under police lights; an evidence photo's flash — it is taken away."),
                "back": ("Dos kraft", "Manila back", "Papier kraft, ruban de police, un insigne au centre.", "Manila paper, police tape, a badge in the middle.")}),
+    "idylle": dict(
+        moments={
+            "rare": ("Le billet doux : une lettre qui flotte et s'ouvre, des cœurs qui s'en échappent ; la carte arrive parmi des cœurs, dans une lumière rose.",
+                     "The love letter: a letter floating and opening, hearts escaping it; the card comes among hearts, in a pink light."),
+            "epic": ("Le bal : un lustre, un couple qui valse, puis des pétales qui tourbillonnent et une couronne de roses autour de la carte.",
+                     "The ball: a chandelier, a couple waltzing, then petals whirling and a ring of roses round the card."),
+            "legendary": ("Le coup de foudre : un couple sur un pont au crépuscule sous des feux d'artifice en forme de cœurs, deux cœurs qui se rejoignent, un cœur d'or derrière la carte, et la flèche de Cupidon qui la traverse.",
+                          "Love at first sight: a couple on a bridge at dusk under fireworks bursting into hearts, two hearts meeting, a golden heart behind the card, and Cupid's arrow going through it."),
+        },
+        family="drama", font=("GreatVibes.woff2", "Genre Great Vibes", "400"), ink="#7a1033", main="#e8436b", light="#d9a441", dark="#ffd9df", emblem=emblem_idylle,
+        names={"fr": "Idylle — romance", "en": "Idylle — romance"},
+        description={"fr": "Le booster Romance, une histoire d'amour : chaque rareté son moment en plein écran — un billet doux pour une rare, le bal pour une épique, le coup de foudre pour une légendaire. Un paquet rose noué d'un ruban qu'un grand cœur referme avant qu'il éclate en pétales ; un crépuscule rose et ses cœurs.",
+                     "en": "The Romance booster, a love story: every rarity its own moment over the whole screen — a love letter for a rare, the ball for an epic, love at first sight for a legendary. A pink pack tied with a ribbon that a great heart closes on before it bursts into petals; a pink dusk and its hearts."},
+        pack_bg="radial-gradient(circle, rgba(232, 67, 107, 0.2) 2px, transparent 3px) 0 0 / 16px 16px, linear-gradient(170deg, #ffe1e6, #ffc0cc)",
+        pack_band="linear-gradient(180deg, #e8436b, #a01e44)", face_bg="linear-gradient(170deg, #5a1838, #2a0718)",
+        upright="0.6",
+        word="scale: 0.9;\n  color: #ffffff;\n  -webkit-text-stroke: 0.08rem #7a1033;\n  paint-order: stroke fill;\n  text-shadow: 0 0 1.4rem rgba(232, 67, 107, 0.9), 0.2rem 0.2rem 0 #7a1033;",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  40% { transform: scale(0.95); filter: saturate(1.3); }
+  47% { transform: scale(1.05); filter: brightness(2) saturate(1.6); opacity: 1; }
+  54%, 100% { transform: scale(1.3); filter: brightness(4); opacity: 0; }
+}""",
+        parts={"backdrop": ("Crépuscule rose", "Pink dusk", "Un crépuscule rose, des lumières floues qui dérivent, de petits cœurs qui montent, une lueur chaude à l'horizon (vidéo en boucle).", "A pink dusk, soft lights out of focus drifting, little hearts rising, a warm glow on the horizon (a looping video)."),
+               "look": ("Paquet noué", "Ribboned pack", "Un paquet rose semé de cœurs, noué d'un ruban, l'image de l'œuvre dans un médaillon, son nom en belle écriture, un cœur et la flèche de Cupidon en emblème.", "A pink pack sprinkled with hearts, tied with a ribbon, the work's art in a locket, its name in flowing script, a heart and Cupid's arrow as emblem."),
+               "opening": ("Le grand cœur", "The great heart", "Des cœurs tourbillonnent autour du paquet ; un grand cœur se referme sur lui et éclate en pétales.", "Hearts whirl round the pack; a great heart closes on it and bursts into petals."),
+               "back": ("Dos aux cœurs", "Heart back", "Rose semé de cœurs, un ruban, un cœur au centre.", "Pink with hearts, a ribbon, a heart in the middle.")}),
+    "brume": dict(
+        moments={
+            "rare": ("La lanterne : une lanterne qui se balance dans le brouillard ; la carte apparaît dans sa lueur.",
+                     "The lantern: a lantern swaying in the fog; the card appears in its glow."),
+            "epic": ("La serrure : une lumière qui passe derrière une serrure ouvragée, une clé qui tourne, puis des engrenages de laiton qui tournent autour de la carte.",
+                     "The keyhole: a light passing behind an ornate keyhole, a key turning, then brass gears turning round the card."),
+            "legendary": ("L'énigme : une rue victorienne sous les becs de gaz, une silhouette en cape qui s'enfuit, des points d'interrogation ; puis de grands engrenages, une loupe qui balaie et des points d'interrogation qui tourbillonnent autour de la carte.",
+                          "The riddle: a Victorian street under gas lamps, a caped figure fleeing, question marks; then great gears, a magnifier sweeping and question marks whirling round the card."),
+        },
+        family="dark", font=("PlayfairDisplaySC.woff2", "Genre Playfair SC", "700"), ink="#081416", main="#c7a04a", light="#efe6cf", dark="#16363b", emblem=emblem_brume,
+        names={"fr": "Brume — mystère", "en": "Brume — mystery"},
+        description={"fr": "Le booster Mystère, une énigme dans le brouillard : chaque rareté son moment en plein écran — une lanterne pour une rare, une serrure et ses engrenages pour une épique, l'énigme d'une rue victorienne pour une légendaire. Un paquet vert d'eau cerclé de laiton qu'une serrure referme avant que la brume l'emporte ; une rue dans le brouillard sous les becs de gaz.",
+                     "en": "The Mystery booster, a riddle in the fog: every rarity its own moment over the whole screen — a lantern for a rare, a keyhole and its gears for an epic, the riddle of a Victorian street for a legendary. A sea-green pack ringed in brass that a keyhole closes on before the fog takes it; a street in the fog under gas lamps."},
+        pack_bg="radial-gradient(ellipse at 50% 30%, rgba(169, 195, 189, 0.3), transparent 60%), linear-gradient(170deg, #24484d, #0d2226)",
+        pack_band="linear-gradient(180deg, #c7a04a, #7a5f22)", face_bg="linear-gradient(170deg, #1d3f44, #081416)",
+        upright="0.55",
+        word="scale: 0.78;\n  color: #efe6cf;\n  -webkit-text-stroke: 0.08rem #081416;\n  paint-order: stroke fill;\n  text-shadow: 0.25rem 0.25rem 0 #c7a04a, 0 0 2rem rgba(169, 195, 189, 0.8);",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  40% { filter: blur(0) brightness(1); opacity: 1; }
+  60%, 100% { transform: scale(1.05); filter: blur(10px) brightness(1.4) saturate(0.4); opacity: 0; }
+}""",
+        parts={"backdrop": ("Rue dans la brume", "Street in the fog", "Une rue victorienne perdue dans le brouillard, des becs de gaz qui y luisent, la brume qui dérive, une silhouette qui passe de temps en temps (vidéo en boucle).", "A Victorian street lost in fog, gas lamps glowing in it, the fog drifting, a figure passing now and then (a looping video)."),
+               "look": ("Paquet de laiton", "Brass pack", "Un paquet vert d'eau cerclé de laiton, l'image de l'œuvre dans une loupe, son nom en petites capitales, une serrure en emblème.", "A sea-green pack ringed in brass, the work's art in a magnifier, its name in small capitals, a keyhole as emblem."),
+               "opening": ("La serrure", "The keyhole", "On voit le paquet par le trou d'une serrure qui se referme sur lui ; la brume l'emporte.", "The pack seen through a keyhole closing on it; the fog takes it."),
+               "back": ("Dos de laiton", "Brass back", "Vert d'eau, un cercle de laiton, une serrure au centre.", "Sea green, a brass ring, a keyhole in the middle.")}),
+    "concert": dict(
+        moments={
+            "rare": ("La note : une portée qui ondule, des notes qui y défilent ; la carte arrive parmi les notes.",
+                     "The note: a staff rippling, notes running along it; the card comes among the notes."),
+            "epic": ("Le vinyle : un disque qui tourne, le bras qui se pose, puis un égaliseur qui pulse autour de la carte et des ondes sonores.",
+                     "The record: a disc spinning, the tonearm dropping, then an equaliser pulsing round the card and sound waves."),
+            "legendary": ("Le stade : une foule et ses lumières, des projecteurs dans la fumée, un éclair, puis des lasers qui se croisent au-dessus de la carte, des gerbes d'étincelles et les mains levées.",
+                          "The stadium: a crowd and its lights, beams in the smoke, a flash, then lasers crossing above the card, fountains of sparks and raised hands."),
+        },
+        family="drama", font=("Monoton.woff2", "Genre Monoton", "400"), ink="#140b1f", main="#ff2fa8", light="#29e3ff", dark="#7a2cff", emblem=emblem_concert,
+        names={"fr": "Concert — musique", "en": "Concert — music"},
+        description={"fr": "Le booster Musique, un concert : chaque rareté son moment en plein écran — des notes sur une portée pour une rare, un vinyle et son égaliseur pour une épique, un stade en feu pour une légendaire. Un paquet noir aux néons posé sur un vinyle qui tourne, qui éclate en ondes sonores ; une scène dans la fumée sous les projecteurs.",
+                     "en": "The Music booster, a concert: every rarity its own moment over the whole screen — notes on a staff for a rare, a record and its equaliser for an epic, a stadium on fire for a legendary. A black neon pack set on a spinning record that bursts in sound waves; a stage in the smoke under the lights."},
+        pack_bg="repeating-radial-gradient(circle at 50% 120%, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 7px), linear-gradient(170deg, #241236, #0a0510)",
+        pack_band="linear-gradient(90deg, #ff2fa8, #7a2cff, #29e3ff)", face_bg="linear-gradient(170deg, #2a1640, #0a0510)",
+        upright="0.5",
+        word="scale: 0.7;\n  color: #ffffff;\n  text-shadow: 0 0 0.6rem #ff2fa8, 0 0 1.8rem #ff2fa8, 0 0 3rem #7a2cff;",
+        fate="""@keyframes genre-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  38% { transform: scale(1); }
+  41% { transform: scale(1.06); filter: brightness(1.6) hue-rotate(30deg); }
+  44% { transform: scale(0.98); }
+  47% { transform: scale(1.12); filter: brightness(3) hue-rotate(60deg); opacity: 1; }
+  54%, 100% { transform: scale(1.5); filter: brightness(5); opacity: 0; }
+}""",
+        parts={"backdrop": ("Scène dans la fumée", "Stage in the smoke", "Une scène dans la fumée, des faisceaux de couleur qui balaient, un égaliseur qui luit au fond, la foule et ses mains levées en silhouette (vidéo en boucle).", "A stage in the smoke, coloured beams sweeping, an equaliser glowing at the back, the crowd and its raised hands in silhouette (a looping video)."),
+               "look": ("Paquet aux néons", "Neon pack", "Un paquet noir aux sillons de vinyle, une bande aux néons, l'image de l'œuvre comme une pochette d'album, son nom en néon, un vinyle en emblème.", "A black pack with a record's grooves, a neon band, the work's art like an album cover, its name in neon, a record as emblem."),
+               "opening": ("Le diamant se pose", "Needle drop", "Un vinyle tourne sous le paquet, le bras se pose — il éclate en ondes sonores et en notes.", "A record spins under the pack, the tonearm drops — it bursts in sound waves and notes."),
+               "back": ("Dos vinyle", "Record back", "Noir aux sillons, une bande aux néons, un vinyle au centre.", "Grooved black, a neon band, a record in the middle.")}),
 }
 REVEAL = {
     "rare": ("Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
@@ -692,7 +792,8 @@ def write(key, g):
                               "face": {r: f"face-{r}" for r in RARITIES}, "reveal": {r: f"reveal-{r}" for r in ("rare", "epic", "legendary")}}}}, ensure_ascii=False, indent=2) + "\n")
     (pack / "pack.json").write_text(json.dumps({"format": 1, "id": key, "version": g.get("version", "1.0.0"), "names": g["names"], "descriptions": g["description"],
                                                 "author": "Portalab (example)", "license": "CC0-1.0"}, ensure_ascii=False, indent=2) + "\n")
-    fonts = {"Chewy.woff2": "Chewy by Sideshow", "MochiyPopOne.woff2": "Mochiy Pop One by Fontworks", "SpecialElite.woff2": "Special Elite by Astigmatic",
+    fonts = {"GreatVibes.woff2": "Great Vibes by TypeSETit", "PlayfairDisplaySC.woff2": "Playfair Display SC by Claus Eggers Sørensen", "Monoton.woff2": "Monoton by Vernon Adams",
+             "Chewy.woff2": "Chewy by Sideshow", "MochiyPopOne.woff2": "Mochiy Pop One by Fontworks", "SpecialElite.woff2": "Special Elite by Astigmatic",
              "IMFellEnglishSC.woff2": "IM Fell English SC by Igino Marini", "SpaceMono.woff2": "Space Mono by Colophon", "BebasNeue.woff2": "Bebas Neue by Dharma Type",
              "Anton.woff2": "Anton by Vernon Adams", "Creepster.woff2": "Creepster by Sideshow", "PlayfairDisplay.woff2": "Playfair Display by Claus Eggers Sørensen",
              "CinzelDecorative.woff2": "Cinzel Decorative by Natanael Gama", "Orbitron.woff2": "Orbitron by Matt McInerney"}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "concert",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Concert — musique",
+    "en": "Concert — music"
+  },
+  "descriptions": {
+    "fr": "Le booster Musique, un concert : chaque rareté son moment en plein écran — des notes sur une portée pour une rare, un vinyle et son égaliseur pour une épique, un stade en feu pour une légendaire. Un paquet noir aux néons posé sur un vinyle qui tourne, qui éclate en ondes sonores ; une scène dans la fumée sous les projecteurs.",
+    "en": "The Music booster, a concert: every rarity its own moment over the whole screen — notes on a staff for a rare, a record and its equaliser for an epic, a stadium on fire for a legendary. A black neon pack set on a spinning record that bursts in sound waves; a stage in the smoke under the lights."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

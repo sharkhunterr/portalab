@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "concert",
+  "names": {
+    "fr": "Le diamant se pose",
+    "en": "Needle drop"
+  },
+  "descriptions": {
+    "fr": "Un vinyle tourne sous le paquet, le bras se pose — il éclate en ondes sonores et en notes.",
+    "en": "A record spins under the pack, the tonearm drops — it bursts in sound waves and notes."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

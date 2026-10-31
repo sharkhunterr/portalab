@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "brume",
+  "names": {
+    "fr": "Dos de laiton",
+    "en": "Brass back"
+  },
+  "descriptions": {
+    "fr": "Vert d'eau, un cercle de laiton, une serrure au centre.",
+    "en": "Sea green, a brass ring, a keyhole in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

@@ -1,0 +1,23 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity: Pink with
+   hearts, a ribbon, a heart in the middle. */
+[data-card-back="idylle"] .booster-card__back {
+  border: 0;
+  border-radius: 0.55rem;
+  background: radial-gradient(circle, rgba(232, 67, 107, 0.2) 2px, transparent 3px) 0 0 / 16px 16px, linear-gradient(170deg, #ffe1e6, #ffc0cc);
+  box-shadow: inset 0 0 0 3px #7a1033, inset 0 0 0 6px #e8436b, inset 0 0 0 8px #7a1033, 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+}
+[data-card-back="idylle"] .booster-card__back-pattern {
+  opacity: 0;
+}
+[data-card-back="idylle"] .booster-card__back-sigil {
+  inline-size: 60%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.7rem color-mix(in srgb, #e8436b 70%, transparent));
+}
+[data-card-back="idylle"] .booster-card__back-sigil svg {
+  opacity: 0;
+}
