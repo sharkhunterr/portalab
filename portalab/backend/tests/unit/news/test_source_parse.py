@@ -71,6 +71,9 @@ def test_a_page_announces_its_feed() -> None:
     page = b'<html><head><link rel="alternate" type="application/rss+xml" href="/rss.xml"></head></html>'
     assert announced(page, "https://example.org/blog/") == "https://example.org/rss.xml"
     assert announced(b"<html><head></head></html>", "https://example.org/") is None
+    link = b'<link rel="alternate" type="application/rss+xml" href="/feed">'
+    deep = b"<html>" + b"x" * 900_000 + link + b"</html>"
+    assert announced(deep, "https://www.youtube.com/@c") == "https://www.youtube.com/feed"  # far down
 
 
 def test_plain_text_is_short_and_clean() -> None:

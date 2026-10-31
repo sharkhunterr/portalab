@@ -60,7 +60,8 @@ def plain(text: str | None, limit: int = SUMMARY) -> str:
 
 def announced(page: bytes, base: str) -> str | None:
     """The feed a web page announces, if any."""
-    text = page[:200_000].decode("utf-8", errors="replace")
+    # the whole page (fetched within its limit): a YouTube channel's page names its feed far down
+    text = page.decode("utf-8", errors="replace")
     for tag in _ALTERNATE.findall(text):
         attrs = {k.lower(): v for k, v in _ATTR.findall(tag)}
         alternate = "alternate" in attrs.get("rel", "").lower()
