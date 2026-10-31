@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "idylle",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Idylle — romance",
+    "en": "Idylle — romance"
+  },
+  "descriptions": {
+    "fr": "Le booster Romance, une histoire d'amour : chaque rareté son moment en plein écran — un billet doux pour une rare, le bal pour une épique, le coup de foudre pour une légendaire. Un paquet rose noué d'un ruban qu'un grand cœur referme avant qu'il éclate en pétales ; un crépuscule rose et ses cœurs.",
+    "en": "The Romance booster, a love story: every rarity its own moment over the whole screen — a love letter for a rare, the ball for an epic, love at first sight for a legendary. A pink pack tied with a ribbon that a great heart closes on before it bursts into petals; a pink dusk and its hearts."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

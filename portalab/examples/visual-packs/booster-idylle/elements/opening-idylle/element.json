@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "idylle",
+  "names": {
+    "fr": "Le grand cœur",
+    "en": "The great heart"
+  },
+  "descriptions": {
+    "fr": "Des cœurs tourbillonnent autour du paquet ; un grand cœur se referme sur lui et éclate en pétales.",
+    "en": "Hearts whirl round the pack; a great heart closes on it and bursts into petals."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "brume-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "La lanterne : une lanterne qui se balance dans le brouillard ; la carte apparaît dans sa lueur.",
+    "en": "The lantern: a lantern swaying in the fog; the card appears in its glow."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

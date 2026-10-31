@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "brume",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Brume — mystère",
+    "en": "Brume — mystery"
+  },
+  "descriptions": {
+    "fr": "Le booster Mystère, une énigme dans le brouillard : chaque rareté son moment en plein écran — une lanterne pour une rare, une serrure et ses engrenages pour une épique, l'énigme d'une rue victorienne pour une légendaire. Un paquet vert d'eau cerclé de laiton qu'une serrure referme avant que la brume l'emporte ; une rue dans le brouillard sous les becs de gaz.",
+    "en": "The Mystery booster, a riddle in the fog: every rarity its own moment over the whole screen — a lantern for a rare, a keyhole and its gears for an epic, the riddle of a Victorian street for a legendary. A sea-green pack ringed in brass that a keyhole closes on before the fog takes it; a street in the fog under gas lamps."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

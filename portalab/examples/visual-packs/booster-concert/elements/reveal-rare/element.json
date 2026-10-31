@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "concert-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "La note : une portée qui ondule, des notes qui y défilent ; la carte arrive parmi les notes.",
+    "en": "The note: a staff rippling, notes running along it; the card comes among the notes."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

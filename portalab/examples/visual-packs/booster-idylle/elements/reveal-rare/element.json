@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "idylle-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "Le billet doux : une lettre qui flotte et s'ouvre, des cœurs qui s'en échappent ; la carte arrive parmi des cœurs, dans une lumière rose.",
+    "en": "The love letter: a letter floating and opening, hearts escaping it; the card comes among hearts, in a pink light."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

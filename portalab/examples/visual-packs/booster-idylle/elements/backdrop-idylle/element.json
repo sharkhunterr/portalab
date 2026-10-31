@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "idylle",
+  "names": {
+    "fr": "Crépuscule rose",
+    "en": "Pink dusk"
+  },
+  "descriptions": {
+    "fr": "Un crépuscule rose, des lumières floues qui dérivent, de petits cœurs qui montent, une lueur chaude à l'horizon (vidéo en boucle).",
+    "en": "A pink dusk, soft lights out of focus drifting, little hearts rising, a warm glow on the horizon (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "concert",
+  "names": {
+    "fr": "Scène dans la fumée",
+    "en": "Stage in the smoke"
+  },
+  "descriptions": {
+    "fr": "Une scène dans la fumée, des faisceaux de couleur qui balaient, un égaliseur qui luit au fond, la foule et ses mains levées en silhouette (vidéo en boucle).",
+    "en": "A stage in the smoke, coloured beams sweeping, an equaliser glowing at the back, the crowd and its raised hands in silhouette (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}
