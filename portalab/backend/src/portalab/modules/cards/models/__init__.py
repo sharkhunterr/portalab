@@ -17,7 +17,7 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from portalab.core.db import TZDateTime, schema_metadata
@@ -68,6 +68,10 @@ class CardSet(CardsBase):
     # issue 295: its main genre (``family.py``: the first of its genres that has a frame) — its genre frame's
     # and its genre booster's
     genre: Mapped[str] = mapped_column(String(16), nullable=False, default="drama", server_default="drama")
+    # issue 296: its themes (``family.py``), the most telling first — its theme booster's, its booster's scene
+    themes: Mapped[list[str]] = mapped_column(
+        ARRAY(String(16)), nullable=False, default=list, server_default="{}"
+    )
     facts: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict, server_default="{}")
     saga: Mapped[str | None] = mapped_column(String(200), info=not_personal("a saga's name"))
     # issue 234: the work's title drawn (an art site's HD logo), the best liked per language (``""``: none)

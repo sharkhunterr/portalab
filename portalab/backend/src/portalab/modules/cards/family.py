@@ -97,3 +97,30 @@ def genre_of(genres: Sequence[str]) -> str:
     """The work's main genre: its first one known, drama when it has none."""
     names = [g.strip().lower() for g in genres if g and g.strip()]
     return next((MAIN[n] for n in names if n in MAIN), "drama")
+
+
+# issue 296: the themes a theme booster draws among, the most telling first (a work's own theme, the scene its
+# booster opens in, is its first): Japanese animation, giant monsters and robots, samurai and ninjas, Japan
+THEMES = ("anime", "kaiju", "samurai", "japan")
+KAIJU = frozenset({"kaiju", "giant monster", "giant robot", "mecha", "godzilla"})
+SAMURAI = frozenset({"samurai", "ninja", "ronin", "yakuza", "katana", "shogun", "feudal japan", "jidaigeki"})
+# set in Japan: its keywords say so, or samurai, yakuzas do (a katana or a ninja may be anywhere)
+JAPAN = frozenset({"japan", "japanese", "anime", "japanese mythology", "post war japan"}) | (
+    SAMURAI - {"katana", "ninja"}
+)
+
+
+def themes_of(
+    countries: Sequence[str], languages: Sequence[str], keywords: Sequence[str], animated: bool
+) -> list[str]:
+    """A work's themes: Japanese when made in Japan in Japanese (a production country alone says little — a
+    Hollywood film co-produced there is not) or when its keywords set it there; the others by its keywords."""
+    words = {k.strip().casefold() for k in keywords if k and k.strip()}
+    japanese = "JP" in countries and any(lang.strip().casefold() == "japanese" for lang in languages)
+    found = {
+        "anime": "anime" in words or (japanese and animated),
+        "kaiju": bool(words & KAIJU),
+        "samurai": bool(words & SAMURAI),
+        "japan": japanese or bool(words & JAPAN),
+    }
+    return [theme for theme in THEMES if found[theme]]

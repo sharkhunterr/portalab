@@ -19,7 +19,7 @@ from portalab.capabilities.media_core import CARD_SOURCES, CardPerson, CardWork
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
-from portalab.modules.cards.family import family_of, genre_of
+from portalab.modules.cards.family import family_of, genre_of, themes_of
 from portalab.modules.cards.models import Card, CardSet
 from portalab.modules.cards.rarity import Ranked, card_score, rarities, work_fame
 
@@ -74,6 +74,11 @@ def set_code(title: str) -> str:
     return initials[:3].ljust(3, "X")
 
 
+def work_themes(work: CardWork) -> list[str]:
+    animated = any(g.strip().lower() in ANIMATION for g in work.genres)
+    return themes_of(work.countries, work.languages, work.keywords, animated)
+
+
 def fingerprint(work: CardWork) -> str:
     data = {
         "title": work.title,
@@ -88,6 +93,7 @@ def fingerprint(work: CardWork) -> str:
         "animated": any(g.strip().lower() in ANIMATION for g in work.genres),
         "genres": list(work.genres),
         "facts": sorted(work.facts.items()),
+        "themes": work_themes(work),  # issue 296
         # how the cards are made: v2 no image of the work on a person's, v3 the set's scene, v4 codes, v5 the
         # genre's colour and the work's figures, v6 its genres printed, v7 no gold body,
         # v8 a thriller dark on its own only
@@ -206,6 +212,7 @@ class CardForge:
         current.animated = any(g.strip().lower() in ANIMATION for g in work.genres)
         current.family = family_of(work.genres)
         current.genre = genre_of(work.genres)
+        current.themes = work_themes(work)
         current.facts = {
             **dict(work.facts),
             **({"rating": round(work.vote_average, 1)} if work.vote_average else {}),

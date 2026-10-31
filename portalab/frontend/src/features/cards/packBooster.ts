@@ -20,6 +20,7 @@ export function packName(t: Translate, pack: CardPack): string {
       : pack.set_name;
   }
   const among = [
+    look?.theme ? t(`gamification:cards.theme.${look.theme}`) : null,
     look?.genre ? t(`gamification:cards.genre.${look.genre}`) : null,
     look?.family ? t(`gamification:cards.family.${look.family}`) : null,
     look?.kind ? t(`gamification:cards.pack.kind.${look.kind}`) : null,
@@ -38,8 +39,9 @@ export function packBooster(t: Translate, pack: CardPack, locale: string): Boost
   const name = pack.set_name ?? packName(t, pack);
   return {
     ...demoBooster({ [locale]: name, en: name }, pack.count),
-    // issue 293: a bought one opens in the scene bound to its product (its kind's otherwise)
-    key: look?.product ?? `cards:${pack.id}`,
+    // issue 293: a bought one opens in the scene bound to its product (its kind's otherwise); issue 296: a
+    // work's own, in its theme booster's (``cards_theme_<theme>``)
+    key: look?.product ?? (look?.theme ? `cards_theme_${look.theme}` : `cards:${pack.id}`),
     sealed: 1,
     logo: artworkImage(logoFor(look?.logos ?? {}, locale)),
     // the art site's textless art of the work, else its poster

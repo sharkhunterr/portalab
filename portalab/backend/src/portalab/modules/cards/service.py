@@ -64,6 +64,7 @@ def _pack_look(
             "year": None,
             "family": detail.get("family"),
             "genre": detail.get("genre"),  # issue 296: a genre booster's main genre
+            "theme": detail.get("theme"),  # issue 296: a theme booster's theme
             "edition": detail.get("edition"),
             "rarity": detail.get("rarity"),  # issue 255: the rarity it guarantees
             "poster": None,
@@ -83,6 +84,8 @@ def _pack_look(
         "logos": card_set.logos or {},
         "art": art,
         "season": detail.get("season"),
+        # issue 296: its work's own theme — a content booster opens in its theme booster's scene
+        "theme": card_set.themes[0] if card_set.themes else None,
     }
 
 

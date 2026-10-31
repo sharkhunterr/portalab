@@ -23,6 +23,17 @@ describe("a card booster's scene", () => {
   it("one given by watching: its own key, the kind's scene", () => {
     expect(packBooster(t, { ...pack, look: null }, "fr").key).toBe("cards:p1");
   });
+
+  // Issue 296: a work of a theme opens in its theme booster's scene; a theme booster is named by its theme.
+  it("one given by watching a work of a theme: its theme booster's", () => {
+    const look = { family: "family", theme: "anime", product: null } as PackLook;
+    expect(packBooster(t, { ...pack, set_name: "One Piece", look }, "fr").key).toBe("cards_theme_anime");
+    const bought = { family: "", theme: "kaiju", product: "cards_theme_kaiju" } as unknown as PackLook;
+    expect(packBooster(t, { ...pack, look: bought }, "fr").names).toEqual({
+      fr: "gamification:cards.theme.kaiju",
+      en: "gamification:cards.theme.kaiju",
+    });
+  });
 });
 
 // Issue 297: the same boosters in one pile.

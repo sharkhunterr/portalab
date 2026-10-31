@@ -291,6 +291,7 @@ class CardWork:
     # runtime (minutes), seasons, its director's name
     facts: Mapping[str, Any] = field(default_factory=dict)
     overview: str | None = None  # issue 265: what it tells (the games' synopsis to guess from)
+    keywords: Sequence[str] = ()  # issue 296: the metadata's keywords (a theme booster's: kaiju, samurai…)
 
 
 @dataclass(frozen=True, slots=True)

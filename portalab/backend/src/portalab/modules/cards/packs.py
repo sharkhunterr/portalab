@@ -31,7 +31,7 @@ from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.cards.editions import EDITIONS, edition_of
 from portalab.modules.cards.events import PACK_OPENED, SET_COMPLETED
-from portalab.modules.cards.family import FAMILIES, GENRES
+from portalab.modules.cards.family import FAMILIES, GENRES, THEMES
 from portalab.modules.cards.models import Card, CardSet, Copy, Pack
 
 WITHOUT_CARDS = ("progression", "none")  # issue 243: the welcome's answers without the cards
@@ -77,6 +77,9 @@ def _among(among: Mapping[str, Any]) -> list[Any]:
     genre = among.get("genre")
     if genre in GENRES:
         out.append(CardSet.genre == genre)
+    theme = among.get("theme")
+    if theme in THEMES:  # issue 296: a theme booster's works
+        out.append(CardSet.themes.any(theme))
     kind = among.get("kind")
     if kind in WORK_KINDS:
         out.append(CardSet.kind == kind)
@@ -94,7 +97,7 @@ def _among(among: Mapping[str, Any]) -> list[Any]:
     return out
 
 
-BOOSTER_FIELDS = ("family", "genre", "edition", "kind", "cards", "rarity", "signature")
+BOOSTER_FIELDS = ("family", "genre", "theme", "edition", "kind", "cards", "rarity", "signature")
 # issue 255: a booster that guarantees a card of this rarity (one of its cards drawn at it)
 GUARANTEES = ("rare", "epic", "legendary")
 CARD_BOOSTER = "card_booster"
@@ -106,6 +109,8 @@ def booster_of(payload: Mapping[str, Any]) -> dict[str, Any]:
     # issue 296: the works of a main genre; the signature frame its cards may come in
     if payload.get("genre") in GENRES:
         out["genre"] = payload["genre"]
+    if payload.get("theme") in THEMES:  # the works of a theme (Japan, anime, kaiju, samurai)
+        out["theme"] = payload["theme"]
     if isinstance(payload.get("signature"), str) and SIGNATURE_LOOK.match(payload["signature"]):
         out["signature"] = payload["signature"]
     if payload.get("rarity") in GUARANTEES:
