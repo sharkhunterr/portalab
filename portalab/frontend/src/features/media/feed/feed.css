@@ -350,3 +350,10 @@ a.feed-entry__title:hover {
 .feed-manage[open] > summary {
   margin-block-end: var(--space-3);
 }
+.feed-entry__title .ds-icon {
+  display: inline;
+  vertical-align: baseline;
+}
+.feed-more {
+  justify-self: start;
+}

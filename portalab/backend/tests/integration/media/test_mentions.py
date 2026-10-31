@@ -22,6 +22,8 @@ async def test_a_text_names_library_titles_and_people(app: FastAPI, media: Media
             library_record("m4", title="Up", year=2009, directors=["Pete Docter"]),
             library_record("m5", title="Interstellar", year=2014),
             library_record("m6", title="Halloween", year=1978),
+            library_record("m7", title="Old Boy", year=2003),
+            library_record("m8", title="Hunger Games", year=2012),
         ],
         library,
     )
@@ -33,6 +35,8 @@ async def test_a_text_names_library_titles_and_people(app: FastAPI, media: Media
             "Rien à voir",
             "Les costumes d\u2019Halloween des stars",  # the holiday, not the film
             "Halloween : John Carpenter revient",  # a headline opening on it
+            "It follows a 12-year-old boy in Kabul",  # words of a sentence
+            "Hunger Games dans la vraie vie, et OLD BOY en 4K",  # two-word titles written as titles
         ]
     )
     labels = [[m.label for m in mentions] for mentions in found]
@@ -40,5 +44,6 @@ async def test_a_text_names_library_titles_and_people(app: FastAPI, media: Media
     assert labels[1] == ["Star Wars : Les Derniers Jedi", "Interstellar"]
     assert labels[2] == [] and labels[3] == []
     assert labels[4] == [] and labels[5] == ["Halloween"]
+    assert labels[6] == [] and sorted(labels[7]) == ["Hunger Games", "Old Boy"]
     person = found[0][1]
     assert person.kind == "person" and person.route == "/media/people/Denis%20Villeneuve"

@@ -12,6 +12,7 @@ import type { FeedItem, Follow } from "./api";
 /** #299: the theme's chart palette (as « My progression »'s sources): the server's arrivals keep the media
  * colour, each news source one of the others — a second round lightened; the name always beside it. */
 const SERVER = "var(--chart-3)";
+const PAGE = 40; // entries shown at first, then 40 more at a time
 const PALETTE = [1, 2, 4, 5, 7, 8, 9, 10].map((n) => `var(--chart-${n})`);
 
 interface Source {
@@ -125,6 +126,7 @@ export function Timeline({
   const t = useT();
   const format = useFormat();
   const [only, setOnly] = useState<string>("all");
+  const [count, setCount] = useState(PAGE);
   const mine = useQuery({
     queryKey: ["news", "sources", "mine", "items", 100],
     queryFn: async () =>
@@ -170,7 +172,10 @@ export function Timeline({
     out.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
     return { entries: out, sources: [server, ...bySource.values()] };
   }, [arrivals, follows, seenAt, mine.data, editorial.data, t]);
-  const shown = entries.filter((e) => only === "all" || (only === "mine" ? e.forMe : e.source.key === only));
+  const matching = entries.filter(
+    (e) => only === "all" || (only === "mine" ? e.forMe : e.source.key === only),
+  );
+  const shown = matching.slice(0, count);
   const today = new Date().toDateString();
   const yesterday = new Date(Date.now() - 86_400_000).toDateString();
   const dayOf = (at: string) => {
@@ -189,10 +194,24 @@ export function Timeline({
       </h2>
       <fieldset className="feed-filters">
         <legend className="visually-hidden">{t("media:feed.filter")}</legend>
-        <button type="button" aria-pressed={only === "all"} onClick={() => setOnly("all")}>
+        <button
+          type="button"
+          aria-pressed={only === "all"}
+          onClick={() => {
+            setOnly("all");
+            setCount(PAGE);
+          }}
+        >
           {t("media:feed.all")}
         </button>
-        <button type="button" aria-pressed={only === "mine"} onClick={() => setOnly("mine")}>
+        <button
+          type="button"
+          aria-pressed={only === "mine"}
+          onClick={() => {
+            setOnly("mine");
+            setCount(PAGE);
+          }}
+        >
           <Icon name="sparkles" size={14} />
           {t("media:feed.forMe")}
         </button>
@@ -201,7 +220,10 @@ export function Timeline({
             key={source.key}
             type="button"
             aria-pressed={only === source.key}
-            onClick={() => setOnly(only === source.key ? "all" : source.key)}
+            onClick={() => {
+              setOnly(only === source.key ? "all" : source.key);
+              setCount(PAGE);
+            }}
             style={{ "--badge": source.color } as CSSProperties}
             className="feed-filters__source"
           >
@@ -241,9 +263,17 @@ export function Timeline({
             );
           })}
         </ol>
-      ) : (
-        <p className="admin-muted">{t("media:feed.nothingYet")}</p>
-      )}
+      ) : null}
+      {matching.length > shown.length ? (
+        <button
+          type="button"
+          className="ds-button ds-button--secondary feed-more"
+          onClick={() => setCount(count + PAGE)}
+        >
+          {t("media:feed.more", { count: matching.length - shown.length })}
+        </button>
+      ) : null}
+      {shown.length ? null : <p className="admin-muted">{t("media:feed.nothingYet")}</p>}
     </section>
   );
 }

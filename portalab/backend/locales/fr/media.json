@@ -298,6 +298,7 @@
   "feed.kinds.person": "Personnes",
   "feed.kinds.title": "Séries",
   "feed.manage": "Gérer mon fil : ce que je suis, mes sources",
+  "feed.more": "Voir plus ({count} de plus)",
   "feed.new": "Nouveau",
   "feed.nothingYet": "Rien de nouveau ces dernières semaines pour ce que vous suivez.",
   "feed.server": "Sur le serveur",

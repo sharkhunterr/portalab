@@ -35,6 +35,22 @@ _PAIRS = (("\u00ab", "\u00bb"), ("\u201c", "\u201d"), ("\u2018", "\u2019"), ('"'
 _QUOTED = re.compile("|".join(f"{o}\\s*([^{c}]{{1,120}}?)\\s*{c}" for o, c in _PAIRS))
 
 
+def _cased(text: str, title: str) -> bool:
+    """A title of two words written as a title (« Old Boy », « OLD BOY »), not as words of a sentence
+    (« a 12-year-old boy », « it follows a boy »); one word is never enough (``_named`` decides)."""
+    words = title.split()
+    if len(words) != 2:
+        return False
+    pattern = r"\b" + r"[\s\-:.,']+".join(re.escape(w) for w in words) + r"\b"
+    for found in re.finditer(pattern, text, re.IGNORECASE):
+        if all(
+            t[:1].isupper() == w[:1].isupper() or t.isupper()
+            for t, w in zip(re.split(r"[\s\-:.,']+", found.group(0)), words, strict=False)
+        ):
+            return True
+    return False
+
+
 def _named(text: str) -> set[str]:
     """What a text names explicitly (folded): its quoted words, and the words a headline opens on."""
     found = {fold(next(g for g in m.groups() if g)) for m in _QUOTED.finditer(text)}
@@ -91,7 +107,9 @@ class LibraryMentions:
                 known = run in found_titles or run in found_people
                 if known and any(f" {run} " in f" {m} " for m in matched):
                     continue
-                if run in found_titles and (" " in run or run in named):
+                if run in found_titles and (
+                    run.count(" ") > 1 or run in named or _cased(text, found_titles[run][1])
+                ):
                     object_id, title = found_titles[run]
                     matched.append(run)
                     if all(m.ref != object_id for m in mentions):
