@@ -5,9 +5,10 @@ import { api } from "../../../api/client";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import { type SourceItem, useSourceItems } from "../../news/ExternalNews";
+import { MentionChip, type SourceItem, useSourceItems } from "../../news/ExternalNews";
 import { Poster } from "../MediaGrid";
 import type { FeedItem, Follow } from "./api";
+import { FollowedMark } from "./FollowedMark";
 
 /** #299: the theme's chart palette (as « My progression »'s sources): the server's arrivals keep the media
  * colour, each news source one of the others — a second round lightened; the name always beside it. */
@@ -64,9 +65,10 @@ function ArrivalEntry({ entry }: { entry: Entry }) {
         </span>
         <span className="feed-entry__chips">
           {item.because.map((b) => (
-            <span key={`${b.kind}:${b.label}`} className="feed-chip">
+            <span key={`${b.kind}:${b.label}`} className="feed-chip" data-followed="true">
               <Icon name={b.kind === "person" ? "user" : b.kind === "title" ? "tv" : "tag"} size={12} />
               {b.label}
+              <FollowedMark />
             </span>
           ))}
         </span>
@@ -97,10 +99,7 @@ function NewsEntry({ entry }: { entry: Entry }) {
         {item.mentions?.length ? (
           <span className="feed-entry__chips">
             {item.mentions.slice(0, 4).map((m) => (
-              <Link key={`${m.kind}:${m.ref}`} to={m.route} className="feed-chip">
-                <Icon name={m.kind === "person" ? "user" : "film"} size={12} />
-                {m.label}
-              </Link>
+              <MentionChip key={`${m.kind}:${m.ref}`} mention={m} />
             ))}
           </span>
         ) : null}

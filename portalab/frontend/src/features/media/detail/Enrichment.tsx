@@ -6,6 +6,8 @@ import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { personPath } from "../api";
+import { useFollowed } from "../feed/api";
+import { FollowedMark } from "../feed/FollowedMark";
 import { useMeasures } from "../insights/api";
 
 /**
@@ -211,6 +213,7 @@ export function EnrichedView({ data }: { data: Metadata }) {
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
+  const followed = useFollowed(); // #299: the people I follow, marked
   const cast = data.people.filter((p) => p.department === "cast");
   const crew = data.people.filter((p) => p.department !== "cast");
   const facts = [
@@ -271,6 +274,7 @@ export function EnrichedView({ data }: { data: Metadata }) {
                   <Link className="media-enriched__person" to={personPath(person.name)}>
                     <span className="media-enriched__portrait">
                       {src ? <img src={src} alt="" loading="lazy" /> : <Icon name="user" size={28} />}
+                      {followed.person(person.name) ? <FollowedMark on /> : null}
                     </span>
                     <strong>{person.name}</strong>
                   </Link>
@@ -291,6 +295,7 @@ export function EnrichedView({ data }: { data: Metadata }) {
                   <dt>{person.role ? job(t, person.role) : ""}</dt>
                   <dd>
                     <Link to={personPath(person.name)}>{person.name}</Link>
+                    {followed.person(person.name) ? <FollowedMark /> : null}
                   </dd>
                 </div>
               ))}

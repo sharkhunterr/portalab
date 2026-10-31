@@ -55,3 +55,18 @@ export function useMarkSeen() {
     onSettled: () => void client.invalidateQueries({ queryKey: ATTENTION }),
   });
 }
+
+function folded(name: string): string {
+  return name.normalize("NFD").replace(/[̀-ͯ]/g, "").toLocaleLowerCase().trim();
+}
+
+/** #299: whether I follow a person (by name, however it is written) or a title (by its id). */
+export function useFollowed() {
+  const follows = useFollows().data ?? [];
+  const people = new Set(follows.filter((f) => f.kind === "person").map((f) => folded(f.label)));
+  const titles = new Set(follows.filter((f) => f.kind === "title").map((f) => f.ref));
+  return {
+    person: (name: string) => people.has(folded(name)),
+    title: (id: string) => titles.has(id),
+  };
+}

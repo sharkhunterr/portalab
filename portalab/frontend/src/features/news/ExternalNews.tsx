@@ -6,6 +6,8 @@ import type { components } from "../../api/generated/schema";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
+import { useFollowed } from "../media/feed/api";
+import { FollowedMark } from "../media/feed/FollowedMark";
 import "./news.css";
 
 export type SourceItem = components["schemas"]["SourceItemOut"];
@@ -25,6 +27,21 @@ export function useSourceItems(asked: Asked = {}, limit = 12, enabled = true) {
       (await api.GET("/api/v1/news/sources/items", { params: { query: { ...asked, limit } } })).data?.items ??
       [],
   });
+}
+
+type Mention = SourceItem["mentions"][number];
+
+/** A library title or a person an item names — to their page; marked when I follow them (#299). */
+export function MentionChip({ mention }: { mention: Mention }) {
+  const followed = useFollowed();
+  const mine = mention.kind === "person" ? followed.person(mention.ref) : followed.title(mention.ref);
+  return (
+    <Link to={mention.route} className="feed-chip" data-followed={mine || undefined}>
+      <Icon name={mention.kind === "person" ? "user" : "film"} size={12} />
+      {mention.label}
+      {mine ? <FollowedMark /> : null}
+    </Link>
+  );
 }
 
 /** One item from elsewhere: the portal's copy of its picture, its source and date, its title (to the site),
@@ -60,10 +77,7 @@ export function SourceCard({ item, actions }: { item: SourceItem; actions?: Reac
         {item.mentions?.length ? (
           <span className="news-source-card__mentions">
             {item.mentions.slice(0, 4).map((m) => (
-              <Link key={`${m.kind}:${m.ref}`} to={m.route} className="feed-chip">
-                <Icon name={m.kind === "person" ? "user" : "film"} size={12} />
-                {m.label}
-              </Link>
+              <MentionChip key={`${m.kind}:${m.ref}`} mention={m} />
             ))}
           </span>
         ) : null}

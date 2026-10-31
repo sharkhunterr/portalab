@@ -371,3 +371,31 @@ a.feed-entry__title:hover {
 .feed-page {
   max-inline-size: 100%;
 }
+
+/* #299: what I follow, marked — a small badge (a chip's end, a portrait's corner) */
+.followed-mark {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.05rem;
+  block-size: 1.05rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  flex: none;
+}
+.followed-mark[data-on] {
+  position: absolute;
+  inset-block-end: var(--space-1);
+  inset-inline-end: var(--space-1);
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+.feed-chip[data-followed] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+/* the picture centred beside its text, whatever the text's length */
+.feed-entry__body {
+  align-items: center;
+}
