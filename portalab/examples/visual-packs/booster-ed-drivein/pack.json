@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-drivein",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Drive-in atomique — édition Drive-in",
+    "en": "Atomic drive-in — Drive-in edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition Drive-in (les années 1950) : chaque rareté prend tout l'écran — une nuit atomique, un grand atome turquoise, des étoiles Googie qui scintillent, une flèche d'ampoules qui clignotent, le faisceau du projecteur s'ouvre, la carte arrive sur le grand écran devant les voitures à ailerons, et au retournement une explosion d'étoiles et de boomerangs, du pop-corn qui saute. Un paquet crème et turquoise qui éclate en pop-corn.",
+    "en": "The Drive-in edition's booster (the 1950s): every rarity takes the whole screen — an atomic night, a great turquoise atom, Googie stars twinkling, an arrow of blinking bulbs, the projector's beam opens, the card comes onto the big screen before finned cars, and as it turns a burst of stars and boomerangs, popcorn popping. A cream and turquoise pack that bursts into popcorn."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

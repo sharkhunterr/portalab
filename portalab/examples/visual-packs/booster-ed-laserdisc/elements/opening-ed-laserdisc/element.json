@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-laserdisc",
+  "names": {
+    "fr": "Éclaté en formes",
+    "en": "Shape burst"
+  },
+  "descriptions": {
+    "fr": "Un gribouillis traverse le paquet ; il éclate en triangles, ronds et barres pastel.",
+    "en": "A squiggle runs across the pack; it bursts into pastel triangles, circles and bars."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

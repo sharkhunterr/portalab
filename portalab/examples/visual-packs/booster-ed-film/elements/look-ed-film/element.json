@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-film",
+  "names": {
+    "fr": "Affiche d'époque",
+    "en": "Period poster"
+  },
+  "descriptions": {
+    "fr": "Un paquet de papier vieilli, un soleil couchant en bandes, l'image de l'œuvre, son nom en lettres d'affiche, une bobine en emblème.",
+    "en": "An aged paper pack, a banded setting sun, the work's art, its name in poster letters, a reel as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

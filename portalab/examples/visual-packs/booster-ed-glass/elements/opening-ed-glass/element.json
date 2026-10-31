@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-glass",
+  "names": {
+    "fr": "Fonte",
+    "en": "Melt"
+  },
+  "descriptions": {
+    "fr": "Le paquet se trouble et fond en verre liquide ; des ondes courent, des gouttes tombent.",
+    "en": "The pack blurs and melts into liquid glass; ripples run, drops fall."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

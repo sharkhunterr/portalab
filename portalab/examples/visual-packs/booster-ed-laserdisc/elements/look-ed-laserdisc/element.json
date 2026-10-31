@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-laserdisc",
+  "names": {
+    "fr": "Papier Memphis",
+    "en": "Memphis paper"
+  },
+  "descriptions": {
+    "fr": "Un paquet de papier millimétré, un soleil jaune, une bande pastel, l'image de l'œuvre à ombre portée, son nom en capitales géométriques, un disque irisé en emblème.",
+    "en": "A graph paper pack, a yellow sun, a pastel band, the work's art with a solid shadow, its name in geometric capitals, an iridescent disc as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

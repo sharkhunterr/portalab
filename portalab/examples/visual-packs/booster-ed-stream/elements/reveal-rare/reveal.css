@@ -1,0 +1,48 @@
+/* A rare card turned (its hook: data-reveal), staged over the whole screen (place: screen) between this reveal's
+   two videos (behind the card and over it): The rarity shows at the foot like a HUD caption, its letters closing
+   in; the card materialises as a hologram, scanned from the foot up, and turns over. */
+@font-face {
+  font-family: "Edition Audiowide";
+  src: url("Audiowide.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+.booster-takeover[data-reveal="ed-stream-rare"] .booster-takeover__word {
+  font-family: "Edition Audiowide", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #ffffff;
+  -webkit-text-stroke: 0.06rem #33f2ff;
+  text-shadow: 0 0 1.4rem #33f2ff, 0.2rem 0 0 #ff2699, -0.2rem 0 0 #33f2ff;
+  --word-turn: 0deg;
+  top: auto;
+  bottom: 6%;
+  font-size: min(4.5vw, 5vh);
+  animation: ed-stream-hud var(--takeover-s) linear both;
+}
+/* a HUD's caption locking on */
+@keyframes ed-stream-hud {
+  0% { opacity: 0; letter-spacing: 1.6em; }
+  10% { opacity: 1; letter-spacing: 0.5em; }
+  12% { opacity: 0.3; }
+  14%, 92% { opacity: 1; letter-spacing: 0.5em; }
+  100% { opacity: 0; letter-spacing: 0.5em; }
+}
+/* the card's way in */
+.booster-takeover[data-reveal="ed-stream-rare"] .booster-takeover__card {
+  animation: ed-stream-card 0.55s linear var(--card-at) both;
+}
+@keyframes ed-stream-card {
+  0% { opacity: 0; clip-path: inset(100% -50% 0 -50%); filter: brightness(2.5) drop-shadow(0 0 1rem #33f2ff); transform: skewX(-8deg); }
+  50% { opacity: 1; clip-path: inset(40% -50% 0 -50%); transform: skewX(4deg); }
+  70% { clip-path: inset(0 -50% 0 -50%); filter: brightness(1.5) drop-shadow(0 0 0.6rem #33f2ff); transform: skewX(-2deg); }
+  76% { opacity: 0.5; }
+  80% { opacity: 1; }
+  100% { clip-path: inset(-50% -50% -50% -50%); filter: none; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-takeover[data-reveal="ed-stream-rare"] .booster-takeover__card,
+  .booster-takeover[data-reveal="ed-stream-rare"] .booster-takeover__word {
+    animation: none;
+  }
+}

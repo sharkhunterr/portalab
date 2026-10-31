@@ -1,0 +1,23 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: Balloons tied to the pack fill up; they carry it away into the sky. */
+[data-opening="ed-leather"] .booster-stage__tear .booster-pack {
+  animation: edition-fate 2.6s linear both;
+}
+@keyframes edition-fate {
+  0% { transform: none; opacity: 1; }
+  37% { transform: translateY(0) rotate(0); opacity: 1; }
+  45% { transform: translateY(-40%) rotate(-2deg); }
+  58% { transform: translateY(-134%) rotate(2deg); opacity: 1; }
+  70%, 100% { transform: translateY(-175%) rotate(3deg); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="ed-leather"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="ed-leather"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

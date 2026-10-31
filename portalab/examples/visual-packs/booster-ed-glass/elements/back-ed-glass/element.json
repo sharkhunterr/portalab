@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-glass",
+  "names": {
+    "fr": "Dos de verre",
+    "en": "Glass back"
+  },
+  "descriptions": {
+    "fr": "Verre dépoli sur une aurore, une goutte.",
+    "en": "Frosted glass over an aurora, a drop."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

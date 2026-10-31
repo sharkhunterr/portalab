@@ -1,0 +1,23 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: The projector flickers; the nitrate print catches fire, a hole burns through the pack, embers
+   flying. */
+[data-opening="ed-nitrate"] .booster-stage__tear .booster-pack {
+  animation: edition-fate 2.6s linear both;
+}
+@keyframes edition-fate {
+  0% { filter: none; opacity: 1; }
+  20% { filter: sepia(1) brightness(1.1); }
+  34% { filter: sepia(1) brightness(0.8); opacity: 1; }
+  46%, 100% { filter: sepia(1) brightness(0.2); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="ed-nitrate"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="ed-nitrate"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-zine",
+  "names": {
+    "fr": "Fanzine",
+    "en": "Zine"
+  },
+  "descriptions": {
+    "fr": "Un paquet photocopié, du surligneur, l'image de l'œuvre tramée, son nom au feutre, une étoile griffonnée et du scotch en emblème.",
+    "en": "A photocopied pack, a highlighter, the work's art in halftone, its name in marker, a scribbled star and tape as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

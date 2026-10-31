@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-noir",
+  "names": {
+    "fr": "Dossier kraft",
+    "en": "Kraft case file"
+  },
+  "descriptions": {
+    "fr": "Un dossier kraft barré de l'ombre des stores, l'image de l'œuvre en photo tirée, son nom tapé à la machine, un tampon rouge.",
+    "en": "A kraft case file crossed by the blinds' shadow, the work's art as a print, its name typed, a red stamp."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

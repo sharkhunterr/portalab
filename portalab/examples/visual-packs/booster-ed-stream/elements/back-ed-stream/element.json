@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-stream",
+  "names": {
+    "fr": "Dos holo",
+    "en": "Holo back"
+  },
+  "descriptions": {
+    "fr": "Grille néon, un bouton lecture.",
+    "en": "A neon grid, a play button."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-super8",
+  "names": {
+    "fr": "Op-art",
+    "en": "Op-art"
+  },
+  "descriptions": {
+    "fr": "Des anneaux op-art qui ondulent en violet, orange et rose autour d'un soleil aux rayons qui tournent, des bandes qui fondent en haut et en bas (vidéo en boucle).",
+    "en": "Op-art rings rippling in purple, orange and pink round a sun with turning rays, bands melting top and bottom (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

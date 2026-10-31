@@ -1,0 +1,30 @@
+{
+  "type": "booster_scene",
+  "look": "ed-nitrate",
+  "names": {
+    "fr": "Scène Intertitre",
+    "en": "Intertitle scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture, chaque rareté en plein écran. Les cartes tirées gardent le cadre de leur édition ; leurs raretés et leurs noms restent ceux de Portalab.",
+    "en": "The whole opening, every rarity over the whole screen. The cards drawn keep their edition's frame; their rarities and names stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-ed-nitrate",
+      "backdrop": "backdrop-ed-nitrate",
+      "opening": "opening-ed-nitrate",
+      "back": {
+        "common": "back-ed-nitrate"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

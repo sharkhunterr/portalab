@@ -1,0 +1,21 @@
+/* A legendary card turned (its hook: data-reveal), staged over the whole screen (place: screen) between this
+   reveal's two videos (behind the card and over it): No word: the card takes shape in a drop of liquid glass —
+   blurred, too big, it draws in and sharpens — then turns over. */
+.booster-takeover[data-reveal="ed-glass-legendary"] .booster-takeover__word {
+  display: none;
+}
+/* the card's way in */
+.booster-takeover[data-reveal="ed-glass-legendary"] .booster-takeover__card {
+  animation: ed-glass-card 0.55s cubic-bezier(0.2, 0.8, 0.3, 1) var(--card-at) both;
+}
+@keyframes ed-glass-card {
+  0% { opacity: 0; transform: scale(1.5); filter: blur(28px) saturate(2); }
+  60% { opacity: 1; transform: scale(0.97); filter: blur(2px) saturate(1.3); }
+  100% { transform: none; filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-takeover[data-reveal="ed-glass-legendary"] .booster-takeover__card,
+  .booster-takeover[data-reveal="ed-glass-legendary"] .booster-takeover__word {
+    animation: none;
+  }
+}

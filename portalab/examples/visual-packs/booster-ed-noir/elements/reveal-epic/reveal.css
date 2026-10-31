@@ -1,0 +1,22 @@
+/* An epic card turned (its hook: data-reveal), staged over the whole screen (place: screen) between this
+   reveal's two videos (behind the card and over it): No word: the case file is tossed on the desk — the card
+   slides in from the side, spins and stops under the lamp, amid the clues, then turns over. */
+.booster-takeover[data-reveal="ed-noir-epic"] .booster-takeover__word {
+  display: none;
+}
+/* the card's way in */
+.booster-takeover[data-reveal="ed-noir-epic"] .booster-takeover__card {
+  animation: ed-noir-card 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) var(--card-at) both;
+}
+@keyframes ed-noir-card {
+  0% { transform: translate(-120vw, 8vh) rotate(-38deg); }
+  70% { transform: translate(2vw, 0) rotate(5deg); }
+  85% { transform: translate(-0.6vw, 0) rotate(-1.5deg); }
+  100% { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-takeover[data-reveal="ed-noir-epic"] .booster-takeover__card,
+  .booster-takeover[data-reveal="ed-noir-epic"] .booster-takeover__word {
+    animation: none;
+  }
+}

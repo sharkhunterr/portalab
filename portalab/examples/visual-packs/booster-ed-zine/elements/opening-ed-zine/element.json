@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-zine",
+  "names": {
+    "fr": "Barré, déchiré",
+    "en": "Crossed out, torn"
+  },
+  "descriptions": {
+    "fr": "Le paquet est barré d'une croix au feutre rose ; il est déchiré en morceaux qui volent.",
+    "en": "The pack is crossed out in pink marker; it is torn into flying pieces."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

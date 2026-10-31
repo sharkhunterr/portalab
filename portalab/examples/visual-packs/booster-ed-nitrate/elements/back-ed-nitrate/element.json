@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-nitrate",
+  "names": {
+    "fr": "Dos Art déco",
+    "en": "Art Deco back"
+  },
+  "descriptions": {
+    "fr": "Laque noire, soleil sépia, filets d'argent.",
+    "en": "Black lacquer, a sepia sun, silver hairlines."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

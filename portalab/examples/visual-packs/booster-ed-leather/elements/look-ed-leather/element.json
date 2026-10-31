@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-leather",
+  "names": {
+    "fr": "Cuir cousu",
+    "en": "Stitched leather"
+  },
+  "descriptions": {
+    "fr": "Un paquet de cuir cousu, un hublot de ciel bleu, l'image de l'œuvre, son nom gravé, une montgolfière en emblème.",
+    "en": "A stitched leather pack, a porthole of blue sky, the work's art, its name pressed in, a hot-air balloon as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

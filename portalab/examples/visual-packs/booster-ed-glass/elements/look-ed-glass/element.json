@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-glass",
+  "names": {
+    "fr": "Verre dépoli",
+    "en": "Frosted glass"
+  },
+  "descriptions": {
+    "fr": "Un paquet de verre dépoli sur une aurore, un bord clair, l'image de l'œuvre vue à travers une lentille, son nom en lettres larges, une goutte de verre en emblème.",
+    "en": "A frosted glass pack over an aurora, a bright edge, the work's art seen through a lens, its name in wide letters, a drop of glass as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

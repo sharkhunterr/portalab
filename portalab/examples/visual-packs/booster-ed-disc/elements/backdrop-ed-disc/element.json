@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-disc",
+  "names": {
+    "fr": "Rosace",
+    "en": "Rose window"
+  },
+  "descriptions": {
+    "fr": "Un damas lie-de-vin, une rosace de vitrail qui luit dans l'ombre, sa lumière qui tombe en rayons, des braises qui montent, des volutes dorées dans les coins (vidéo en boucle).",
+    "en": "A wine damask, a stained-glass rose window glowing in the dark, its light falling in rays, embers rising, gold scrolls in the corners (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

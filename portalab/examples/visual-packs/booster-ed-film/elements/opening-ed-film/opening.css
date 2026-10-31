@@ -1,0 +1,23 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: A tear runs across the poster; it is ripped off, scraps of paper flying. */
+[data-opening="ed-film"] .booster-stage__tear .booster-pack {
+  animation: edition-fate 2.6s linear both;
+}
+@keyframes edition-fate {
+  0% { transform: none; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); opacity: 1; }
+  30% { transform: none; }
+  34% { transform: rotate(-3deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+  40% { transform: translate(-10%, -20%) rotate(-12deg); clip-path: polygon(0 0, 100% 0, 100% 40%, 0 70%); opacity: 1; }
+  50%, 100% { transform: translate(-30%, -60%) rotate(-25deg); clip-path: polygon(0 0, 100% 0, 100% 40%, 0 70%); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="ed-film"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="ed-film"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

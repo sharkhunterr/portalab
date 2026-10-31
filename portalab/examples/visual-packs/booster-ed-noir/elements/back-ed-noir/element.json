@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-noir",
+  "names": {
+    "fr": "Dos kraft",
+    "en": "Kraft back"
+  },
+  "descriptions": {
+    "fr": "Kraft rayé par les stores, un détective en silhouette.",
+    "en": "Kraft striped by the blinds, a detective in silhouette."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-glass",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Verre liquide — édition Verre",
+    "en": "Liquid glass — Glass edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition Verre liquide (aujourd'hui) : chaque rareté prend tout l'écran — les voiles d'une aurore sous des plaques de verre dépoli qui flottent, des gouttes de verre, une goutte liquide s'étale sur l'écran, la carte arrive derrière une grande lentille parmi des plaques en orbite, et au retournement des ondes qui courent sur le verre et un reflet qui le traverse. Un paquet qui fond en verre liquide.",
+    "en": "The Liquid glass edition's booster (today): every rarity takes the whole screen — an aurora's veils under floating plates of frosted glass, drops of glass, a liquid drop spreads over the screen, the card comes behind a great lens among orbiting plates, and as it turns ripples running over the glass and a glint crossing it. A pack that melts into liquid glass."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

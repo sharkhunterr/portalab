@@ -1,0 +1,30 @@
+{
+  "type": "booster_scene",
+  "look": "ed-leather",
+  "names": {
+    "fr": "Scène Cuir & lin",
+    "en": "Leather & linen scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture, chaque rareté en plein écran. Les cartes tirées gardent le cadre de leur édition ; leurs raretés et leurs noms restent ceux de Portalab.",
+    "en": "The whole opening, every rarity over the whole screen. The cards drawn keep their edition's frame; their rarities and names stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-ed-leather",
+      "backdrop": "backdrop-ed-leather",
+      "opening": "opening-ed-leather",
+      "back": {
+        "common": "back-ed-leather"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

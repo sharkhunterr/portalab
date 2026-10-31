@@ -1,0 +1,27 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: The pack glitches like a worn tape; it bursts into coloured pixels. */
+[data-opening="ed-vhs"] .booster-stage__tear .booster-pack {
+  animation: edition-fate 2.6s linear both;
+}
+@keyframes edition-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  16% { transform: none; }
+  18% { transform: translate(-6px, 0); filter: hue-rotate(60deg); }
+  20% { transform: translate(4px, 0); filter: none; }
+  26% { transform: none; filter: contrast(1.4); }
+  30% { transform: translate(-8px, 2px); filter: hue-rotate(-60deg); }
+  34% { transform: none; filter: none; }
+  37% { transform: scale(1.04); filter: brightness(2); opacity: 1; }
+  40%, 100% { transform: scale(1.15); filter: brightness(2); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="ed-vhs"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="ed-vhs"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

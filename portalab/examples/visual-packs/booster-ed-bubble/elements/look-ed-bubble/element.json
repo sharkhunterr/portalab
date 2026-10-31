@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-bubble",
+  "names": {
+    "fr": "Plastique translucide",
+    "en": "Translucent plastic"
+  },
+  "descriptions": {
+    "fr": "Un paquet de plastique bleu bonbon rayé, un reflet brillant, l'image de l'œuvre sur un écran arrondi, son nom en lettres rondes, une bulle en emblème.",
+    "en": "A striped candy-blue plastic pack, a glossy highlight, the work's art on a rounded screen, its name in round letters, a bubble as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

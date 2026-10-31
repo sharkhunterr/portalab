@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-film",
+  "names": {
+    "fr": "Affiche arrachée",
+    "en": "Torn poster"
+  },
+  "descriptions": {
+    "fr": "Une déchirure traverse l'affiche ; elle est arrachée, des lambeaux de papier volent.",
+    "en": "A tear runs across the poster; it is ripped off, scraps of paper flying."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

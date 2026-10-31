@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-leather",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Cuir & lin — édition Cuir & lin",
+    "en": "Leather & linen — Leather & linen edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition Cuir & lin (le skeuomorphisme) : chaque rareté prend tout l'écran — un ciel d'aquarelle, des nuages qui passent, des montgolfières qui montent, dans un cadre de cuir cousu aux rivets de laiton, la couverture de cuir se referme et se rouvre, la carte arrive parmi les montgolfières, et au retournement un lâcher de ballons et un ruban de satin. Un paquet de cuir emporté par des ballons.",
+    "en": "The Leather & linen edition's booster (skeuomorphism): every rarity takes the whole screen — a watercolour sky, clouds drifting, hot-air balloons rising, in a stitched leather rim with brass rivets, the leather cover closes and opens again, the card comes among the balloons, and as it turns a release of balloons and a satin ribbon. A leather pack carried off by balloons."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-stream",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Holo — édition Streaming",
+    "en": "Holo — Streaming edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition Streaming (la fin des années 2010) : chaque rareté prend tout l'écran — un sol de grille néon qui file vers une brume magenta, l'anneau de chargement qui tourne, des crochets d'interface, des parasites de temps en temps, une ligne de balayage descend, la carte arrive sur une plateforme holographique, et au retournement des anneaux d'hologramme qui montent. Un paquet qui se brouille et s'envole en voxels.",
+    "en": "The Streaming edition's booster (the late 2010s): every rarity takes the whole screen — a neon grid floor running to a magenta haze, the loading ring spinning, interface brackets, a glitch now and then, a scan line falls, the card comes onto a holographic platform, and as it turns hologram rings rising. A pack that glitches and is uploaded in voxels."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

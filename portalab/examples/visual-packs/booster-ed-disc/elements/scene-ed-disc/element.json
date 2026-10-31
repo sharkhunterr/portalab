@@ -1,0 +1,30 @@
+{
+  "type": "booster_scene",
+  "look": "ed-disc",
+  "names": {
+    "fr": "Scène Vitrail",
+    "en": "Stained glass scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture, chaque rareté en plein écran. Les cartes tirées gardent le cadre de leur édition ; leurs raretés et leurs noms restent ceux de Portalab.",
+    "en": "The whole opening, every rarity over the whole screen. The cards drawn keep their edition's frame; their rarities and names stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-ed-disc",
+      "backdrop": "backdrop-ed-disc",
+      "opening": "opening-ed-disc",
+      "back": {
+        "common": "back-ed-disc"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

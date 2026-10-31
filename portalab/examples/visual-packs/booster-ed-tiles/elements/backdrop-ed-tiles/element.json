@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-tiles",
+  "names": {
+    "fr": "Mosaïque plate",
+    "en": "Flat mosaic"
+  },
+  "descriptions": {
+    "fr": "Une mosaïque de tuiles plates en huit couleurs qui se retournent en vague, un soleil plat qui bat avec sa longue ombre (vidéo en boucle).",
+    "en": "A mosaic of flat tiles in eight colours turning over in a wave, a flat sun pulsing with its long shadow (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

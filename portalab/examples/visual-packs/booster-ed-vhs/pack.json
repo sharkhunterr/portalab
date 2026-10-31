@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-vhs",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Arcade — édition VHS",
+    "en": "Arcade — VHS edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition VHS (la fin des années 1980) : chaque rareté prend tout l'écran — un crépuscule en bandes de pixels sur une ville de pixels, un soleil rayé, les lignes de balayage et la bande de tracking de la cassette, l'écran se dissout en gros pixels, la carte arrive parmi des pièces qui tournent, et au retournement une explosion 8 bits. Un paquet de borne d'arcade qui se brouille et explose en pixels.",
+    "en": "The VHS edition's booster (the late 1980s): every rarity takes the whole screen — a dusk in pixel bands over a pixel city, a striped sun, scanlines and the tape's tracking band, the screen dissolves into big pixels, the card comes among spinning coins, and as it turns an 8-bit explosion. An arcade cabinet pack that glitches and bursts into pixels."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

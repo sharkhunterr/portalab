@@ -1,0 +1,30 @@
+{
+  "type": "booster_scene",
+  "look": "ed-super8",
+  "names": {
+    "fr": "Scène Psychédélique",
+    "en": "Psychedelic scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture, chaque rareté en plein écran. Les cartes tirées gardent le cadre de leur édition ; leurs raretés et leurs noms restent ceux de Portalab.",
+    "en": "The whole opening, every rarity over the whole screen. The cards drawn keep their edition's frame; their rarities and names stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-ed-super8",
+      "backdrop": "backdrop-ed-super8",
+      "opening": "opening-ed-super8",
+      "back": {
+        "common": "back-ed-super8"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

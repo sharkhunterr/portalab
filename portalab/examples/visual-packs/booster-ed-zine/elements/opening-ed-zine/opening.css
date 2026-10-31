@@ -1,0 +1,23 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: The pack is crossed out in pink marker; it is torn into flying pieces. */
+[data-opening="ed-zine"] .booster-stage__tear .booster-pack {
+  animation: edition-fate 2.6s linear both;
+}
+@keyframes edition-fate {
+  0% { transform: none; opacity: 1; }
+  12% { transform: none; }
+  30% { transform: rotate(-1deg); }
+  38% { transform: rotate(2deg) scale(1.02); opacity: 1; }
+  40%, 100% { transform: rotate(6deg) scale(0.9); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="ed-zine"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="ed-zine"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

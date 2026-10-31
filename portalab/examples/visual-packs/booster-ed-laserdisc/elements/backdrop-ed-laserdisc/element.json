@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-laserdisc",
+  "names": {
+    "fr": "Memphis",
+    "en": "Memphis"
+  },
+  "descriptions": {
+    "fr": "Une grille pastel qui file vers un soleil jaune, des confettis Memphis cerclés de noir qui dérivent et tournent, un disque irisé qui tourne dans un coin (vidéo en boucle).",
+    "en": "A pastel grid running off to a yellow sun, Memphis confetti ringed in black drifting and turning, an iridescent disc spinning in a corner (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

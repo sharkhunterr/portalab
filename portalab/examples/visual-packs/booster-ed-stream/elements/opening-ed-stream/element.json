@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-stream",
+  "names": {
+    "fr": "Téléversé",
+    "en": "Uploaded"
+  },
+  "descriptions": {
+    "fr": "Le paquet se brouille en bandes, l'image se replie en une ligne ; il s'envole en voxels de lumière.",
+    "en": "The pack glitches in bars, its picture collapses into a line; it is uploaded in voxels of light."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

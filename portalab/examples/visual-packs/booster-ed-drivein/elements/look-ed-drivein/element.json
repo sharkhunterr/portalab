@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-drivein",
+  "names": {
+    "fr": "Chrome et crème",
+    "en": "Chrome and cream"
+  },
+  "descriptions": {
+    "fr": "Un paquet crème barré d'une aile turquoise, une bande cerise, l'image de l'œuvre dans un écran de télévision arrondi, son nom en script, une étoile Googie et un atome en emblème.",
+    "en": "A cream pack crossed by a turquoise fin, a cherry band, the work's art in a rounded television screen, its name in script, a Googie star and an atom as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-super8",
+  "names": {
+    "fr": "Dos op-art",
+    "en": "Op-art back"
+  },
+  "descriptions": {
+    "fr": "Anneaux psychédéliques et une fleur.",
+    "en": "Psychedelic rings and a flower."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

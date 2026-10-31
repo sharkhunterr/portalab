@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-laserdisc",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Memphis — édition LaserDisc",
+    "en": "Memphis — LaserDisc edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition LaserDisc (le début des années 1980) : chaque rareté prend tout l'écran — des formes Memphis pastel cerclées de noir sur du papier millimétré, des gribouillis, un grand disque coloré roule sur l'écran, la carte arrive devant un disque irisé qui tourne parmi des confettis en orbite, et au retournement une explosion de confettis. Un paquet découpé en formes qui s'éparpillent.",
+    "en": "The LaserDisc edition's booster (the early 1980s): every rarity takes the whole screen — pastel Memphis shapes ringed in black on graph paper, squiggles, a giant coloured disc rolls across, the card comes before a spinning iridescent disc among orbiting confetti, and as it turns a burst of confetti. A pack cut into shapes that scatter."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

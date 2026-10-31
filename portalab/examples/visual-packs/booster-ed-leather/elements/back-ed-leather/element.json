@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-leather",
+  "names": {
+    "fr": "Dos de cuir",
+    "en": "Leather back"
+  },
+  "descriptions": {
+    "fr": "Cuir cousu, une montgolfière.",
+    "en": "Stitched leather, a hot-air balloon."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

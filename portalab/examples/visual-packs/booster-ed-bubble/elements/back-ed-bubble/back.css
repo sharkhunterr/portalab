@@ -1,0 +1,23 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity: Candy-blue
+   plastic, a bubble. */
+[data-card-back="ed-bubble"] .booster-card__back {
+  border: 0;
+  border-radius: 0.55rem;
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0 2px, transparent 2px 5px), radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.7), transparent 30%), linear-gradient(170deg, #80dbff, #1a8ae6 60%, #0a4ca8);
+  box-shadow: inset 0 0 0 3px #05224d, inset 0 0 0 6px #80dbff, inset 0 0 0 8px #05224d, 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+}
+[data-card-back="ed-bubble"] .booster-card__back-pattern {
+  opacity: 0;
+}
+[data-card-back="ed-bubble"] .booster-card__back-sigil {
+  inline-size: 60%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.7rem color-mix(in srgb, #80dbff 70%, transparent));
+}
+[data-card-back="ed-bubble"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

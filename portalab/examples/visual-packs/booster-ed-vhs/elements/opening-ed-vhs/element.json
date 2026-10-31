@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-vhs",
+  "names": {
+    "fr": "Game over",
+    "en": "Game over"
+  },
+  "descriptions": {
+    "fr": "Le paquet se brouille comme une cassette usée ; il explose en pixels de couleur.",
+    "en": "The pack glitches like a worn tape; it bursts into coloured pixels."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

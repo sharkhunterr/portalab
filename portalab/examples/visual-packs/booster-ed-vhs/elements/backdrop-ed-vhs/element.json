@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-vhs",
+  "names": {
+    "fr": "Crépuscule 8 bits",
+    "en": "8-bit dusk"
+  },
+  "descriptions": {
+    "fr": "Un crépuscule en bandes de pixels sur une ville de pixels aux fenêtres allumées, un soleil rayé, des étoiles qui clignotent, des lignes de balayage, la bande de tracking qui passe (vidéo en boucle).",
+    "en": "A dusk in pixel bands over a pixel city with lit windows, a striped sun, blinking stars, scanlines, the tracking band passing (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-film",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Affiche 70s — édition Pellicule",
+    "en": "70s poster — Film reel edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition Pellicule (les années 1970) : chaque rareté prend tout l'écran — l'amorce du compte à rebours sur du papier vieilli, son balayage qui tourne, la carte arrive devant un soleil couchant en bandes sous un ciel de trame, des bandes de pellicule qui défilent, et au retournement des rayons de soleil et des bouts d'affiche. Une affiche de papier arrachée en lambeaux.",
+    "en": "The Film reel edition's booster (the 1970s): every rarity takes the whole screen — the countdown leader on aged paper, its sweep going round, the card comes before a banded sunset under a halftone sky, strips of film running, and as it turns sun rays and scraps of poster. A paper poster torn to shreds."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

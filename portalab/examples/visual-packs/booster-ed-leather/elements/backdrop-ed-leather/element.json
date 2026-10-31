@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-leather",
+  "names": {
+    "fr": "Ciel d'aquarelle",
+    "en": "Watercolour sky"
+  },
+  "descriptions": {
+    "fr": "Un ciel d'aquarelle, des nuages doux qui passent, des montgolfières qui montent lentement, dans un cadre de cuir cousu aux rivets de laiton (vidéo en boucle).",
+    "en": "A watercolour sky, soft clouds drifting, hot-air balloons rising slowly, in a stitched leather rim with brass rivets (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

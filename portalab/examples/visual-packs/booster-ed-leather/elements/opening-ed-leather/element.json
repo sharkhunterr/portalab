@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-leather",
+  "names": {
+    "fr": "Lâcher de ballons",
+    "en": "Balloon lift"
+  },
+  "descriptions": {
+    "fr": "Des ballons attachés au paquet se gonflent ; ils l'emportent dans le ciel.",
+    "en": "Balloons tied to the pack fill up; they carry it away into the sky."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

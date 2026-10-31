@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-tiles",
+  "names": {
+    "fr": "Retournement",
+    "en": "Flip away"
+  },
+  "descriptions": {
+    "fr": "Le paquet se défait en une grille de tuiles qui se retournent et s'en vont, en vague.",
+    "en": "The pack comes apart in a grid of tiles turning over and away, in a wave."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

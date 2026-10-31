@@ -1,0 +1,24 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: A squiggle runs across the pack; it bursts into pastel triangles, circles and bars. */
+[data-opening="ed-laserdisc"] .booster-stage__tear .booster-pack {
+  animation: edition-fate 2.6s linear both;
+}
+@keyframes edition-fate {
+  0% { transform: none; opacity: 1; }
+  25% { transform: rotate(-3deg); }
+  30% { transform: rotate(3deg); }
+  35% { transform: rotate(-2deg) scale(1.05); }
+  38% { transform: scale(1.08); opacity: 1; }
+  40%, 100% { transform: scale(0) rotate(90deg); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="ed-laserdisc"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="ed-laserdisc"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

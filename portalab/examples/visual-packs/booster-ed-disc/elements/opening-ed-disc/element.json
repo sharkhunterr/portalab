@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-disc",
+  "names": {
+    "fr": "Vitrail brisé",
+    "en": "Shattered glass"
+  },
+  "descriptions": {
+    "fr": "La lumière inonde le paquet comme un vitrail ; il se brise en éclats de couleur sertis d'or.",
+    "en": "Light floods the pack like a window; it shatters into coloured shards set in gold."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

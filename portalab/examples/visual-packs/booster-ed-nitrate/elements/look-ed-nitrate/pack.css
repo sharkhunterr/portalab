@@ -1,0 +1,81 @@
+/* The sealed pack (its hook: data-booster-look): A black lacquer pack, a sepia Art Deco sun, silver hairlines,
+   the work's art in a silver frame, its name in Art Deco capitals. */
+@font-face {
+  font-family: "Edition Limelight";
+  src: url("Limelight.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-booster-look="ed-nitrate"] .booster-pack {
+  border-radius: 0.5rem;
+  background: repeating-conic-gradient(from 270deg at 50% 100%, #5c4026 0 7.5deg, #a8814f 7.5deg 15deg), linear-gradient(#0d0b09, #0d0b09);
+  box-shadow: inset 0 0 0 3px #0d0b09, inset 0 0 0 6px #dcd6cc, inset 0 0 0 8px #0d0b09, 0 1rem 2rem rgba(0, 0, 0, 0.55), 0 0 1.4rem color-mix(in srgb, #dcd6cc 40%, transparent);
+}
+[data-booster-look="ed-nitrate"] .booster-pack__art {
+  inset: 13% 10% 33%;
+  inline-size: 80%;
+  block-size: 54%;
+  border: 3px solid #0d0b09;
+  border-radius: 0.3rem;
+  box-shadow: 0 0 0 3px #c79a5c, 0 0 0 6px #0d0b09, 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+  mask: none;
+}
+[data-booster-look="ed-nitrate"] .booster-pack__foil {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.45) 48%, transparent 56%) -160% 0 / 200% 100% no-repeat;
+  animation: edition-sweep 4s ease-in-out infinite;
+}
+@keyframes edition-sweep {
+  0%, 55% { background-position: -160% 0; }
+  85%, 100% { background-position: 260% 0; }
+}
+[data-booster-look="ed-nitrate"] .booster-pack__stars {
+  opacity: 0;
+}
+[data-booster-look="ed-nitrate"] .booster-pack__flap {
+  border: 0;
+  background: linear-gradient(180deg, #dcd6cc, #8a857c);
+  box-shadow: inset 0 -3px 0 #0d0b09;
+}
+[data-booster-look="ed-nitrate"] .booster-pack__emblem {
+  inline-size: 62%;
+  aspect-ratio: 1;
+  background: url("emblem.svg") center / contain no-repeat;
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-booster-look="ed-nitrate"] .booster-pack__emblem svg {
+  opacity: 0;
+}
+[data-booster-look="ed-nitrate"] .booster-pack__name {
+  inset: auto 3% 11%;
+  font-family: "Edition Limelight", sans-serif;
+  font-weight: 400;
+  font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+  line-height: 1.1;
+  color: #ffffff;
+  -webkit-text-stroke: 4px #0d0b09;
+  paint-order: stroke fill;
+  text-shadow: 0 0 1rem color-mix(in srgb, #dcd6cc 70%, transparent);
+}
+[data-booster-look="ed-nitrate"] .booster-pack__count {
+  inset: 0.5rem 0.5rem auto auto;
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  padding: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  color: #ffffff;
+  font-family: "Edition Limelight", sans-serif;
+  font-weight: 400;
+  font-size: 0.8rem;
+  text-shadow: 0 1px 3px #000000;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="ed-nitrate"] .booster-pack__foil {
+    animation: none;
+  }
+}

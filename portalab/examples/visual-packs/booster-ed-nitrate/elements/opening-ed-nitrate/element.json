@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-nitrate",
+  "names": {
+    "fr": "Pellicule qui brûle",
+    "en": "Burning print"
+  },
+  "descriptions": {
+    "fr": "Le projecteur scintille ; la copie nitrate prend feu, un trou brûle le paquet de part en part, des braises s'envolent.",
+    "en": "The projector flickers; the nitrate print catches fire, a hole burns through the pack, embers flying."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

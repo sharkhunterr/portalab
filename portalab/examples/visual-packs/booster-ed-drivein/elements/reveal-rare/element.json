@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "ed-drivein-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "La rareté s'allume en haut de l'écran comme l'enseigne au néon du drive-in, et y reste ; la carte, projetée de loin sur le grand écran, grandit dans le faisceau et se retourne.",
+    "en": "The rarity lights up at the top of the screen like the drive-in's neon sign, and stays; the card, projected from afar on the big screen, grows in the beam and turns over."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

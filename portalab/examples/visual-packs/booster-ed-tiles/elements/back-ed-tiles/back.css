@@ -1,0 +1,23 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity: Flat
+   coloured tiles, no shadow. */
+[data-card-back="ed-tiles"] .booster-card__back {
+  border: 0;
+  border-radius: 0.55rem;
+  background: linear-gradient(90deg, #00aba8 0 48%, transparent 48% 52%, #f7941a 52%) 0 0 / 100% 33% no-repeat, linear-gradient(90deg, #e04d3d 0 48%, transparent 48% 52%, #2180c7 52%) 0 50% / 100% 30% no-repeat, linear-gradient(90deg, #8cc233 0 48%, transparent 48% 52%, #9954b8 52%) 0 100% / 100% 32% no-repeat, #1a1a1f;
+  box-shadow: inset 0 0 0 3px #1a1a1f, inset 0 0 0 6px #00aba8, inset 0 0 0 8px #1a1a1f, 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+}
+[data-card-back="ed-tiles"] .booster-card__back-pattern {
+  opacity: 0;
+}
+[data-card-back="ed-tiles"] .booster-card__back-sigil {
+  inline-size: 60%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.7rem color-mix(in srgb, #00aba8 70%, transparent));
+}
+[data-card-back="ed-tiles"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

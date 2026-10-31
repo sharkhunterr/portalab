@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-bubble",
+  "names": {
+    "fr": "Pluie de code",
+    "en": "Code rain"
+  },
+  "descriptions": {
+    "fr": "Un bleu bonbon profond sous de fines rayures, une pluie de code vert, des bulles brillantes qui montent en se balançant (vidéo en boucle).",
+    "en": "A deep candy blue under fine stripes, a rain of green code, glossy bubbles rising and swaying (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-glass",
+  "names": {
+    "fr": "Aurore sous verre",
+    "en": "Aurora under glass"
+  },
+  "descriptions": {
+    "fr": "Les voiles d'une aurore qui bougent sous des plaques de verre dépoli, chacune avec sa lumière en haut et son bord clair, un reflet qui les traverse (vidéo en boucle).",
+    "en": "An aurora's veils moving under plates of frosted glass, each with its light on top and its bright edge, a glint crossing them (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

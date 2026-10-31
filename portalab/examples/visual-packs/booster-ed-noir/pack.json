@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-noir",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Dossier noir — édition Noir",
+    "en": "Case file — Noir edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition Noir (le film noir) : chaque rareté prend tout l'écran — la lumière des stores sur le mur, la pluie, un détective en chapeau mou de dos, le dossier glisse sur l'écran, la carte arrive au milieu du tableau des indices reliés par un fil rouge, et au retournement un flash de magnésium, un tampon rouge et des photos jetées. Un dossier kraft tamponné qui part à la déchiqueteuse.",
+    "en": "The Noir edition's booster (film noir): every rarity takes the whole screen — the blinds' light on the wall, the rain, a detective in a fedora from behind, the case file slides across the screen, the card comes amid the board of clues tied by a red string, and as it turns a flashbulb, a red stamp and prints thrown down. A stamped kraft case file that goes through the shredder."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

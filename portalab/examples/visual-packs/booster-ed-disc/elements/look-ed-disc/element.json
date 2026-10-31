@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-disc",
+  "names": {
+    "fr": "Vitrail",
+    "en": "Stained glass"
+  },
+  "descriptions": {
+    "fr": "Un paquet lie-de-vin, une rosace de vitrail cerclée d'or, l'image de l'œuvre au centre, son nom en onciales, une rosace en emblème.",
+    "en": "A wine pack, a stained-glass rose window ringed in gold, the work's art in the middle, its name in uncials, a rose window as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

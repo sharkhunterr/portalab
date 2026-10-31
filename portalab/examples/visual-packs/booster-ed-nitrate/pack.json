@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-nitrate",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Intertitre — édition Nitrate",
+    "en": "Intertitle — Nitrate edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition Nitrate (le muet) : chaque rareté prend tout l'écran — un soleil Art déco sépia sous des filets d'argent, le scintillement du projecteur et les rayures de la copie, l'iris se ferme et se rouvre, la carte arrive de dos dans un cercle de lumière, et au retournement le faisceau éclate en rayons d'argent. Un paquet de laque noire filetée d'argent qui prend feu comme une pellicule nitrate.",
+    "en": "The Nitrate edition's booster (the silent era): every rarity takes the whole screen — a sepia Art Deco sun under silver hairlines, the projector's flicker and the print's scratches, the iris closes and opens again, the card comes face down in a circle of light, and as it turns the beam bursts into silver rays. A black lacquer pack ruled in silver that catches fire like a nitrate print."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}
