@@ -1,0 +1,24 @@
+/* An epic card turned (its hook: data-reveal), staged over the whole screen (place: screen) between this
+   reveal's two videos (behind the card and over it): No word: the card rises from the foot of the screen among
+   the bubbles, swaying, and turns over once there. */
+.booster-takeover[data-reveal="ed-bubble-epic"] .booster-takeover__word {
+  display: none;
+}
+/* the card's way in */
+.booster-takeover[data-reveal="ed-bubble-epic"] .booster-takeover__card {
+  animation: ed-bubble-card 0.55s ease-out var(--card-at) both;
+}
+@keyframes ed-bubble-card {
+  0% { opacity: 0; transform: translate(0, 70vh) scale(0.6); }
+  20% { opacity: 1; }
+  40% { transform: translate(-4vw, 35vh) scale(0.75) rotate(-6deg); }
+  70% { transform: translate(3vw, 6vh) scale(0.95) rotate(4deg); }
+  88% { transform: translate(-1vw, -1vh) scale(1.03) rotate(-1deg); }
+  100% { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-takeover[data-reveal="ed-bubble-epic"] .booster-takeover__card,
+  .booster-takeover[data-reveal="ed-bubble-epic"] .booster-takeover__word {
+    animation: none;
+  }
+}

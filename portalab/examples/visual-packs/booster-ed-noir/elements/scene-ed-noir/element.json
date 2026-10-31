@@ -1,0 +1,30 @@
+{
+  "type": "booster_scene",
+  "look": "ed-noir",
+  "names": {
+    "fr": "Scène Dossier noir",
+    "en": "Case file scene"
+  },
+  "descriptions": {
+    "fr": "Toute l'ouverture, chaque rareté en plein écran. Les cartes tirées gardent le cadre de leur édition ; leurs raretés et leurs noms restent ceux de Portalab.",
+    "en": "The whole opening, every rarity over the whole screen. The cards drawn keep their edition's frame; their rarities and names stay Portalab's."
+  },
+  "render": {
+    "kind": "data"
+  },
+  "payload": {
+    "parts": {
+      "booster_look": "look-ed-noir",
+      "backdrop": "backdrop-ed-noir",
+      "opening": "opening-ed-noir",
+      "back": {
+        "common": "back-ed-noir"
+      },
+      "reveal": {
+        "rare": "reveal-rare",
+        "epic": "reveal-epic",
+        "legendary": "reveal-legendary"
+      }
+    }
+  }
+}

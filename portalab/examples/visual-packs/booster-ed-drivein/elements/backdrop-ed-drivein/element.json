@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-drivein",
+  "names": {
+    "fr": "Séance en plein air",
+    "en": "Open-air show"
+  },
+  "descriptions": {
+    "fr": "Une nuit étoilée de l'ère atomique, le grand écran du drive-in éclairé par le faisceau, les voitures à ailerons et leurs feux rouges, une flèche d'ampoules qui clignotent (vidéo en boucle).",
+    "en": "A starry atomic-age night, the drive-in's big screen lit by the beam, finned cars and their red taillights, an arrow of chasing bulbs (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

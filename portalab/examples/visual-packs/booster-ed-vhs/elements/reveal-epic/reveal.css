@@ -1,0 +1,48 @@
+/* An epic card turned (its hook: data-reveal), staged over the whole screen (place: screen) between this
+   reveal's two videos (behind the card and over it): The rarity blinks at the top of the screen like an arcade
+   cabinet's text; the card switches on like an old TV set — a white line opening up, in steps — and turns over. */
+@font-face {
+  font-family: "Edition Press Start";
+  src: url("PressStart2P.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+.booster-takeover[data-reveal="ed-vhs-epic"] .booster-takeover__word {
+  font-family: "Edition Press Start", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #ffffff;
+  -webkit-text-stroke: 0;
+  text-shadow: 0.3rem 0 0 #ff40cc, -0.3rem 0 0 #33fff2, 0 0.3rem 0 #0a0917;
+  --word-turn: 0deg;
+  top: 6%;
+  font-size: min(5.4vw, 6vh);
+  letter-spacing: 0.06em;
+  animation: ed-vhs-blink var(--takeover-s) steps(1) both;
+}
+/* blinking, as on an arcade cabinet, then steady */
+@keyframes ed-vhs-blink {
+  0% { opacity: 0; }
+  4% { opacity: 1; }
+  10% { opacity: 0; }
+  16% { opacity: 1; }
+  22% { opacity: 0; }
+  28%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+/* the card's way in */
+.booster-takeover[data-reveal="ed-vhs-epic"] .booster-takeover__card {
+  animation: ed-vhs-card 0.5s steps(6) var(--card-at) both;
+}
+@keyframes ed-vhs-card {
+  0% { opacity: 0; transform: scale(1.4, 0.01); filter: brightness(5); }
+  25% { opacity: 1; transform: scale(1.2, 0.02); filter: brightness(5); }
+  60% { transform: scale(0.95, 1.05); filter: brightness(2) contrast(1.4); }
+  100% { transform: none; filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-takeover[data-reveal="ed-vhs-epic"] .booster-takeover__card,
+  .booster-takeover[data-reveal="ed-vhs-epic"] .booster-takeover__word {
+    animation: none;
+  }
+}

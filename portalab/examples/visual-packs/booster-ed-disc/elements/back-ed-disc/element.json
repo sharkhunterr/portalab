@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-disc",
+  "names": {
+    "fr": "Dos de vitrail",
+    "en": "Stained-glass back"
+  },
+  "descriptions": {
+    "fr": "Damas lie-de-vin, une rosace.",
+    "en": "Wine damask, a rose window."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

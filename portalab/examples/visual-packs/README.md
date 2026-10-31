@@ -71,6 +71,14 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   `booster-genres-source/`, every rarity staged over the whole screen in the genre's world — steel and fire;
   claw marks, crows and a blood moon; a velvet curtain and a spotlight; runes, a portal and wings of light;
   hyperspace and a ringed planet — each pack going its own way as it opens, its stage a looping video;
+- `booster-ed-nitrate/` … `booster-ed-glass/`: **a scene per media card edition** (the fourteen editions'
+  boosters), built together from `booster-editions-source/`, each in its frame's era — a silent film's iris and
+  Art Deco sun; a detective's board of clues under the blinds; an atomic drive-in; op-art rings; a 1970s sunset
+  and the countdown leader; Memphis confetti and a rainbow disc; an arcade's pixel dusk; a photocopied collage;
+  Y2K bubbles and code rain; a stained-glass rose window; balloons in a leather-framed sky; flat tiles turning
+  over; a holographic grid; an aurora under liquid glass — no card faces, so the cards keep their edition's
+  frame; each pack going its own way as it opens (burnt, shredded, popped, melted, torn, pixelated, lifted away…),
+  each card its own way in, and the rarity's name slammed, set as the era would (an intertitle, a neon sign…) or left out;
 - `booster-sumi/` (`sumi`): **an opening in ink and gold, like Japanese lacquerware** — every animation drawn
   frame by frame in EffectCraft at 24 fps with a brush of bristles that lands heavy and runs dry, played as
   transparent videos (sources and `build.sh` in `booster-sumi-source/`), on a stage of black urushi lacquer where gold seigaiha waves rise and gold

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-zine",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Photocopie — édition Fanzine",
+    "en": "Photocopy — Zine edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition Fanzine (le milieu des années 1990) : chaque rareté prend tout l'écran — un collage de bouts de pages photocopiés sur le noir du toner, du scotch, du surligneur, un cercle au feutre rose, la lumière du photocopieur passe, la carte arrive et le feutre l'entoure, et au retournement du scotch claqué sur ses coins et des étoiles griffonnées. Un paquet barré au feutre et déchiré en morceaux.",
+    "en": "The Zine edition's booster (the mid-1990s): every rarity takes the whole screen — a collage of photocopied scraps on black toner, tape, a highlighter, a pink marker loop, the copier's light passes, the card comes and the marker rings it, and as it turns tape slapped on its corners and scribbled stars. A pack crossed out in marker and torn to pieces."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

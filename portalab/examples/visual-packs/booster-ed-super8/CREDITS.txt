@@ -1,0 +1,8 @@
+Psychedelic — Super 8 edition — an example booster scene for Portalab (CC0-1.0), one of the edition scenes, every shader,
+stylesheet and drawing original.
+
+Font: Shrikhand by Jonny Pinhorn — SIL Open Font License 1.1 (https://openfontlicense.org), from Google Fonts (latin subset); embedded unmodified as Shrikhand.woff2.
+
+Animations (*.mp4): drawn and rendered with EffectCraft (Apache-2.0, https://github.com/storytold/effectcraft) on the
+manga toolkit (../booster-manga-source/effectcraft/core.jsx), made into videos with ffmpeg (../tools/alpha_video.py,
+../tools/stage_video.mjs); sources and build in ../booster-editions-source.

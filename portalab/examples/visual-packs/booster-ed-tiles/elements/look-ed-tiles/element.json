@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-tiles",
+  "names": {
+    "fr": "Tuiles",
+    "en": "Tiles"
+  },
+  "descriptions": {
+    "fr": "Un paquet de tuiles plates en couleurs vives sur fond sombre, sans ombre ni dégradé, l'image de l'œuvre en tuile, son nom en lettres fines, quatre tuiles en emblème.",
+    "en": "A pack of flat tiles in bright colours on a dark ground, no shadow nor gradient, the work's art as a tile, its name in thin letters, four tiles as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

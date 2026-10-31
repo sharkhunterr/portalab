@@ -1,0 +1,81 @@
+/* The sealed pack (its hook: data-booster-look): A pack of flat tiles in bright colours on a dark ground, no
+   shadow nor gradient, the work's art as a tile, its name in thin letters, four tiles as emblem. */
+@font-face {
+  font-family: "Edition Raleway";
+  src: url("Raleway.woff2") format("woff2");
+  font-weight: 200;
+  font-display: swap;
+}
+[data-booster-look="ed-tiles"] .booster-pack {
+  border-radius: 0.5rem;
+  background: linear-gradient(90deg, #00aba8 0 48%, transparent 48% 52%, #f7941a 52%) 0 0 / 100% 33% no-repeat, linear-gradient(90deg, #e04d3d 0 48%, transparent 48% 52%, #2180c7 52%) 0 50% / 100% 30% no-repeat, linear-gradient(90deg, #8cc233 0 48%, transparent 48% 52%, #9954b8 52%) 0 100% / 100% 32% no-repeat, #1a1a1f;
+  box-shadow: inset 0 0 0 3px #1a1a1f, inset 0 0 0 6px #00aba8, inset 0 0 0 8px #1a1a1f, 0 1rem 2rem rgba(0, 0, 0, 0.55), 0 0 1.4rem color-mix(in srgb, #00aba8 40%, transparent);
+}
+[data-booster-look="ed-tiles"] .booster-pack__art {
+  inset: 13% 10% 33%;
+  inline-size: 80%;
+  block-size: 54%;
+  border: 3px solid #1a1a1f;
+  border-radius: 0.3rem;
+  box-shadow: 0 0 0 3px #f7941a, 0 0 0 6px #1a1a1f, 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+  mask: none;
+}
+[data-booster-look="ed-tiles"] .booster-pack__foil {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.45) 48%, transparent 56%) -160% 0 / 200% 100% no-repeat;
+  animation: edition-sweep 4s ease-in-out infinite;
+}
+@keyframes edition-sweep {
+  0%, 55% { background-position: -160% 0; }
+  85%, 100% { background-position: 260% 0; }
+}
+[data-booster-look="ed-tiles"] .booster-pack__stars {
+  opacity: 0;
+}
+[data-booster-look="ed-tiles"] .booster-pack__flap {
+  border: 0;
+  background: linear-gradient(#00aba8, #00aba8);
+  box-shadow: inset 0 -3px 0 #1a1a1f;
+}
+[data-booster-look="ed-tiles"] .booster-pack__emblem {
+  inline-size: 62%;
+  aspect-ratio: 1;
+  background: url("emblem.svg") center / contain no-repeat;
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-booster-look="ed-tiles"] .booster-pack__emblem svg {
+  opacity: 0;
+}
+[data-booster-look="ed-tiles"] .booster-pack__name {
+  inset: auto 3% 11%;
+  font-family: "Edition Raleway", sans-serif;
+  font-weight: 200;
+  font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+  line-height: 1.1;
+  color: #ffffff;
+  -webkit-text-stroke: 4px #1a1a1f;
+  paint-order: stroke fill;
+  text-shadow: 0 0 1rem color-mix(in srgb, #00aba8 70%, transparent);
+}
+[data-booster-look="ed-tiles"] .booster-pack__count {
+  inset: 0.5rem 0.5rem auto auto;
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  padding: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  color: #ffffff;
+  font-family: "Edition Raleway", sans-serif;
+  font-weight: 200;
+  font-size: 0.8rem;
+  text-shadow: 0 1px 3px #000000;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="ed-tiles"] .booster-pack__foil {
+    animation: none;
+  }
+}

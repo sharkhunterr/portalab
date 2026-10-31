@@ -1,0 +1,81 @@
+/* The sealed pack (its hook: data-booster-look): A dark pack gridded in neon, a cyan and magenta band, the
+   work's art behind brackets, its name in technical letters, a play button as emblem. */
+@font-face {
+  font-family: "Edition Audiowide";
+  src: url("Audiowide.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+[data-booster-look="ed-stream"] .booster-pack {
+  border-radius: 0.5rem;
+  background: linear-gradient(180deg, transparent 0 60%, rgba(255, 38, 153, 0.5) 60% 62%, transparent 62%), repeating-linear-gradient(90deg, rgba(51, 242, 255, 0.25) 0 1px, transparent 1px 14px), repeating-linear-gradient(0deg, rgba(51, 242, 255, 0.25) 0 1px, transparent 1px 14px), linear-gradient(180deg, #120a33, #05051a);
+  box-shadow: inset 0 0 0 3px #05051a, inset 0 0 0 6px #33f2ff, inset 0 0 0 8px #05051a, 0 1rem 2rem rgba(0, 0, 0, 0.55), 0 0 1.4rem color-mix(in srgb, #33f2ff 40%, transparent);
+}
+[data-booster-look="ed-stream"] .booster-pack__art {
+  inset: 13% 10% 33%;
+  inline-size: 80%;
+  block-size: 54%;
+  border: 3px solid #05051a;
+  border-radius: 0.3rem;
+  box-shadow: 0 0 0 3px #ff2699, 0 0 0 6px #05051a, 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+  mask: none;
+}
+[data-booster-look="ed-stream"] .booster-pack__foil {
+  opacity: 1;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.45) 48%, transparent 56%) -160% 0 / 200% 100% no-repeat;
+  animation: edition-sweep 4s ease-in-out infinite;
+}
+@keyframes edition-sweep {
+  0%, 55% { background-position: -160% 0; }
+  85%, 100% { background-position: 260% 0; }
+}
+[data-booster-look="ed-stream"] .booster-pack__stars {
+  opacity: 0;
+}
+[data-booster-look="ed-stream"] .booster-pack__flap {
+  border: 0;
+  background: linear-gradient(90deg, #33f2ff, #ff2699);
+  box-shadow: inset 0 -3px 0 #05051a;
+}
+[data-booster-look="ed-stream"] .booster-pack__emblem {
+  inline-size: 62%;
+  aspect-ratio: 1;
+  background: url("emblem.svg") center / contain no-repeat;
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-booster-look="ed-stream"] .booster-pack__emblem svg {
+  opacity: 0;
+}
+[data-booster-look="ed-stream"] .booster-pack__name {
+  inset: auto 3% 11%;
+  font-family: "Edition Audiowide", sans-serif;
+  font-weight: 400;
+  font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+  line-height: 1.1;
+  color: #ffffff;
+  -webkit-text-stroke: 4px #05051a;
+  paint-order: stroke fill;
+  text-shadow: 0 0 1rem color-mix(in srgb, #33f2ff 70%, transparent);
+}
+[data-booster-look="ed-stream"] .booster-pack__count {
+  inset: 0.5rem 0.5rem auto auto;
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  padding: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  color: #ffffff;
+  font-family: "Edition Audiowide", sans-serif;
+  font-weight: 400;
+  font-size: 0.8rem;
+  text-shadow: 0 1px 3px #000000;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-booster-look="ed-stream"] .booster-pack__foil {
+    animation: none;
+  }
+}

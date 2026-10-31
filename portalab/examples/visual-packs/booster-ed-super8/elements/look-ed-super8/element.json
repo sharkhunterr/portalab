@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-super8",
+  "names": {
+    "fr": "Affiche de concert",
+    "en": "Concert poster"
+  },
+  "descriptions": {
+    "fr": "Un paquet d'anneaux psychédéliques, l'image de l'œuvre dans une fenêtre arrondie, son nom en lettres grasses penchées aux contours décalés, une fleur en emblème.",
+    "en": "A pack of psychedelic rings, the work's art in a rounded window, its name in fat slanted letters with offset outlines, a flower as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

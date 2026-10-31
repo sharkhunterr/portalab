@@ -1,0 +1,40 @@
+/* An epic card turned (its hook: data-reveal), staged over the whole screen (place: screen) between this
+   reveal's two videos (behind the card and over it): The leader's countdown, then the rarity as a seventies
+   poster's title; the card rises from the horizon like the sun and turns over. */
+@font-face {
+  font-family: "Edition Alfa Slab";
+  src: url("AlfaSlabOne.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+.booster-takeover[data-reveal="ed-film-epic"] .booster-takeover__word {
+  font-family: "Edition Alfa Slab", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #ffcc4d;
+  -webkit-text-stroke: 0.12rem #241a14;
+  paint-order: stroke fill;
+  text-shadow: 0.35rem 0.35rem 0 #e65430, 0.7rem 0.7rem 0 #241a14;
+  scale: 0.7;
+}
+/* held upright, the name runs along the screen's height: smaller, so it fits */
+@media (max-aspect-ratio: 4 / 5) {
+  .booster-takeover[data-reveal="ed-film-epic"] .booster-takeover__word {
+    scale: 0.56;
+  }
+}
+/* the card's way in */
+.booster-takeover[data-reveal="ed-film-epic"] .booster-takeover__card {
+  animation: ed-film-card 0.55s cubic-bezier(0.2, 0.8, 0.3, 1) var(--card-at) both;
+}
+@keyframes ed-film-card {
+  0% { transform: translateY(80vh); filter: saturate(1.6) brightness(1.3) hue-rotate(-15deg); }
+  80% { transform: translateY(-2vh); }
+  100% { transform: none; filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-takeover[data-reveal="ed-film-epic"] .booster-takeover__card,
+  .booster-takeover[data-reveal="ed-film-epic"] .booster-takeover__word {
+    animation: none;
+  }
+}

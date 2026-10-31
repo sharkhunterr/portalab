@@ -1,0 +1,26 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: Bulbs chase round the pack like a marquee; it bursts into popcorn and stars. */
+[data-opening="ed-drivein"] .booster-stage__tear .booster-pack {
+  animation: edition-fate 2.6s linear both;
+}
+@keyframes edition-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  10% { filter: brightness(1.15); }
+  16% { filter: none; }
+  22% { filter: brightness(1.15); }
+  28% { filter: none; }
+  34% { transform: scale(1.02); filter: brightness(1.2); }
+  37% { transform: scale(1.08); filter: brightness(1.8); opacity: 1; }
+  42%, 100% { transform: scale(0.2); filter: brightness(2); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="ed-drivein"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="ed-drivein"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

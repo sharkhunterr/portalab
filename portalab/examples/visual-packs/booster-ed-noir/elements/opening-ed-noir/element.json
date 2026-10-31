@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-noir",
+  "names": {
+    "fr": "Classé",
+    "en": "Case closed"
+  },
+  "descriptions": {
+    "fr": "Un tampon rouge s'abat sur le paquet ; il passe à la déchiqueteuse et retombe en lanières.",
+    "en": "A red stamp slams onto the pack; it goes through the shredder and falls in strips."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

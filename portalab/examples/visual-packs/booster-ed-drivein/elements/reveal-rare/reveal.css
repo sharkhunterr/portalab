@@ -1,0 +1,47 @@
+/* A rare card turned (its hook: data-reveal), staged over the whole screen (place: screen) between this reveal's
+   two videos (behind the card and over it): The rarity lights up at the top of the screen like the drive-in's
+   neon sign, and stays; the card, projected from afar on the big screen, grows in the beam and turns over. */
+@font-face {
+  font-family: "Edition Lobster";
+  src: url("Lobster.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+.booster-takeover[data-reveal="ed-drivein-rare"] .booster-takeover__word {
+  font-family: "Edition Lobster", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #e51a38;
+  -webkit-text-stroke: 0.12rem #fff2d6;
+  paint-order: stroke fill;
+  text-shadow: 0.3rem 0.3rem 0 #3fd6cc, 0 0 2rem rgba(255, 210, 120, 0.8);
+  --word-turn: 0deg;
+  top: 4%;
+  font-size: min(10vw, 11vh);
+  animation: ed-drivein-sign var(--takeover-s) linear both;
+}
+/* the neon sign sputters on, and stays lit */
+@keyframes ed-drivein-sign {
+  0% { opacity: 0; }
+  4% { opacity: 1; }
+  6% { opacity: 0.2; }
+  9% { opacity: 1; }
+  11% { opacity: 0.4; }
+  14%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+/* the card's way in */
+.booster-takeover[data-reveal="ed-drivein-rare"] .booster-takeover__card {
+  animation: ed-drivein-card 0.55s cubic-bezier(0.3, 0.9, 0.4, 1) var(--card-at) both;
+}
+@keyframes ed-drivein-card {
+  0% { opacity: 0; transform: translateY(-22vh) scale(0.08); filter: brightness(4) blur(4px); }
+  60% { opacity: 1; transform: translateY(1vh) scale(1.04); filter: brightness(1.6) blur(0); }
+  100% { transform: none; filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-takeover[data-reveal="ed-drivein-rare"] .booster-takeover__card,
+  .booster-takeover[data-reveal="ed-drivein-rare"] .booster-takeover__word {
+    animation: none;
+  }
+}

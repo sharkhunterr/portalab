@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-super8",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Psychédélique — édition Super 8",
+    "en": "Psychedelic — Super 8 edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition Super 8 (les années 1960) : chaque rareté prend tout l'écran — des anneaux op-art qui ondulent autour d'un soleil rayonnant, les couleurs qui fondent en haut et en bas, une goutte de lampe à lave envahit l'écran, la carte arrive parmi des fleurs qui tournent, et au retournement une gerbe de fleurs et les anneaux qui vibrent. Un paquet violet qui fond en coulures de couleur.",
+    "en": "The Super 8 edition's booster (the 1960s): every rarity takes the whole screen — op-art rings rippling round a radiating sun, the colours melting top and bottom, a lava-lamp blob swallows the screen, the card comes among turning flowers, and as it turns a spray of flowers and the rings shaking. A purple pack that melts in runs of colour."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

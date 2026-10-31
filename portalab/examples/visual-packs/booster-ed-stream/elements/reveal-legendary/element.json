@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "ed-stream-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "La rareté s'affiche en bas comme une légende de HUD, ses lettres se resserrant ; la carte se matérialise en hologramme, balayée de bas en haut, et se retourne.",
+    "en": "The rarity shows at the foot like a HUD caption, its letters closing in; the card materialises as a hologram, scanned from the foot up, and turns over."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}

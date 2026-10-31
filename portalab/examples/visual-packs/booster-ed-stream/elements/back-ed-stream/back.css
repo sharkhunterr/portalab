@@ -1,0 +1,23 @@
+/* Face down (its hook: the card, data-card-back), every card alike — a back never tells the rarity: A neon grid,
+   a play button. */
+[data-card-back="ed-stream"] .booster-card__back {
+  border: 0;
+  border-radius: 0.55rem;
+  background: linear-gradient(180deg, transparent 0 60%, rgba(255, 38, 153, 0.5) 60% 62%, transparent 62%), repeating-linear-gradient(90deg, rgba(51, 242, 255, 0.25) 0 1px, transparent 1px 14px), repeating-linear-gradient(0deg, rgba(51, 242, 255, 0.25) 0 1px, transparent 1px 14px), linear-gradient(180deg, #120a33, #05051a);
+  box-shadow: inset 0 0 0 3px #05051a, inset 0 0 0 6px #33f2ff, inset 0 0 0 8px #05051a, 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+}
+[data-card-back="ed-stream"] .booster-card__back-pattern {
+  opacity: 0;
+}
+[data-card-back="ed-stream"] .booster-card__back-sigil {
+  inline-size: 60%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  background: url("emblem.svg") center / contain no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.7rem color-mix(in srgb, #33f2ff 70%, transparent));
+}
+[data-card-back="ed-stream"] .booster-card__back-sigil svg {
+  opacity: 0;
+}

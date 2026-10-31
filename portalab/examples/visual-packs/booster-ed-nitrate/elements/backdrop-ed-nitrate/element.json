@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-nitrate",
+  "names": {
+    "fr": "Salle du muet",
+    "en": "Silent picture house"
+  },
+  "descriptions": {
+    "fr": "Un soleil Art déco sépia sous des filets d'argent à angles coupés, le faisceau du projecteur où passe la poussière, le scintillement et les rayures de la copie (vidéo en boucle).",
+    "en": "A sepia Art Deco sun under silver hairlines with cut corners, the projector's beam with dust drifting in it, the print's flicker and scratches (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

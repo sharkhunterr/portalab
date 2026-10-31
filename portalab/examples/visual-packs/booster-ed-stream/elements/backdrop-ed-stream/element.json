@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-stream",
+  "names": {
+    "fr": "Grille néon",
+    "en": "Neon grid"
+  },
+  "descriptions": {
+    "fr": "Un sol de grille néon qui file vers une brume magenta à l'horizon, un soleil violet de lignes, des particules qui montent, un faisceau de balayage, des parasites de temps en temps (vidéo en boucle).",
+    "en": "A neon grid floor running to a magenta haze on the horizon, a violet sun of lines, particles rising, a scan beam, a glitch now and then (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

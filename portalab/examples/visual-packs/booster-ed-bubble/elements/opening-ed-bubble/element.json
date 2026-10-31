@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-bubble",
+  "names": {
+    "fr": "Bulle",
+    "en": "Bubble"
+  },
+  "descriptions": {
+    "fr": "Une bulle se referme sur le paquet et l'emporte un peu vers le haut ; elle éclate en gouttelettes.",
+    "en": "A bubble closes round the pack and carries it up a little; it pops into droplets."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

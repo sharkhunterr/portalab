@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "ed-vhs-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "La rareté clignote en haut de l'écran comme le texte d'une borne d'arcade ; la carte s'allume comme un vieux téléviseur — une ligne blanche qui s'ouvre, par paliers — et se retourne.",
+    "en": "The rarity blinks at the top of the screen like an arcade cabinet's text; the card switches on like an old TV set — a white line opening up, in steps — and turns over."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}

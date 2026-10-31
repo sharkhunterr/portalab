@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-bubble",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Bulle Y2K — édition Bulle",
+    "en": "Y2K bubble — Bubble edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition Bulle (autour de l'an 2000) : chaque rareté prend tout l'écran — des bulles translucides qui montent devant une pluie de code vert, une bulle géante gonfle et éclate, la carte arrive devant un grand orbe bleu bonbon, et au retournement des bulles qui jaillissent et éclatent en gouttelettes. Un paquet de plastique translucide emporté dans une bulle qui éclate.",
+    "en": "The Bubble edition's booster (around 2000): every rarity takes the whole screen — translucent bubbles rising before a rain of green code, a giant bubble swells and pops, the card comes before a great candy-blue orb, and as it turns bubbles bursting out and popping into droplets. A translucent plastic pack carried off in a bubble that pops."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

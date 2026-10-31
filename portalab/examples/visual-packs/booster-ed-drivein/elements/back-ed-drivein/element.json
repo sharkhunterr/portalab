@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-drivein",
+  "names": {
+    "fr": "Dos atomique",
+    "en": "Atomic back"
+  },
+  "descriptions": {
+    "fr": "Crème et turquoise, une étoile Googie et un atome.",
+    "en": "Cream and turquoise, a Googie star and an atom."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-zine",
+  "names": {
+    "fr": "Dos photocopié",
+    "en": "Photocopied back"
+  },
+  "descriptions": {
+    "fr": "Papier photocopié, une étoile au feutre.",
+    "en": "Photocopied paper, a marker star."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

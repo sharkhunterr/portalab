@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "ed-tiles",
+  "version": "1.0.0",
+  "names": {
+    "fr": "Aplats — édition Tuiles",
+    "en": "Flat — Tiles edition"
+  },
+  "descriptions": {
+    "fr": "Le booster de l'édition Tuiles (le design plat) : chaque rareté prend tout l'écran — une mosaïque de tuiles plates qui se retournent en vague, un soleil plat qui bat avec sa longue ombre, les tuiles recouvrent l'écran et le découvrent, la carte arrive avec sa longue ombre, et au retournement des carrés de couleur projetés et des bandes plates qui balaient. Un paquet qui se défait en tuiles qui se retournent.",
+    "en": "The Tiles edition's booster (flat design): every rarity takes the whole screen — a mosaic of flat tiles turning over in a wave, a flat sun pulsing with its long shadow, the tiles cover the screen and uncover it, the card comes with its long shadow, and as it turns squares of colour flung out and flat stripes sweeping. A pack that comes apart in tiles turning over."
+  },
+  "author": "Portalab (example)",
+  "license": "CC0-1.0"
+}

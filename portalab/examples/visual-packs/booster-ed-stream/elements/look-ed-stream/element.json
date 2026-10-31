@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-stream",
+  "names": {
+    "fr": "Coque holo",
+    "en": "Holo hull"
+  },
+  "descriptions": {
+    "fr": "Un paquet sombre quadrillé de néon, une bande cyan et magenta, l'image de l'œuvre derrière des crochets, son nom en lettres techniques, un bouton lecture en emblème.",
+    "en": "A dark pack gridded in neon, a cyan and magenta band, the work's art behind brackets, its name in technical letters, a play button as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

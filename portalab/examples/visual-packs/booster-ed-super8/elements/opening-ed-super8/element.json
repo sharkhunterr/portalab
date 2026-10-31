@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-super8",
+  "names": {
+    "fr": "Ça fond",
+    "en": "Meltdown"
+  },
+  "descriptions": {
+    "fr": "Les couleurs du paquet tournent, des anneaux ondulent ; il fond en coulures roses, orange et violettes.",
+    "en": "The pack's colours turn, rings ripple out; it melts in pink, orange and purple runs."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

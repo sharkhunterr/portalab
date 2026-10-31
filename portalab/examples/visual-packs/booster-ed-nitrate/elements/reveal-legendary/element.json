@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "ed-nitrate-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "Un intertitre de film muet : la rareté, droite, sous les filets d'argent, qui scintille comme la copie ; puis la carte projetée, sépia, tremblant dans le couloir du projecteur, se retourne.",
+    "en": "A silent film's intertitle: the rarity, upright, under the silver hairlines, flickering like the print; then the card projected, sepia, weaving in the projector's gate, turns over."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}

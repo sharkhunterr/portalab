@@ -1,0 +1,25 @@
+/* A rare card turned (its hook: data-reveal), staged over the whole screen (place: screen) between this reveal's
+   two videos (behind the card and over it): No word: the card comes hanging from high above, as under a hot-air
+   balloon, swings, and turns over still swinging. */
+.booster-takeover[data-reveal="ed-leather-rare"] .booster-takeover__word {
+  display: none;
+}
+/* the card's way in */
+.booster-takeover[data-reveal="ed-leather-rare"] .booster-takeover__card {
+  transform-origin: 50% -60vh;
+  animation: ed-leather-card 0.9s ease-in-out var(--card-at) both;
+}
+@keyframes ed-leather-card {
+  0% { opacity: 0; transform: rotate(-38deg); }
+  10% { opacity: 1; }
+  35% { transform: rotate(16deg); }
+  58% { transform: rotate(-7deg); }
+  78% { transform: rotate(3deg); }
+  100% { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-takeover[data-reveal="ed-leather-rare"] .booster-takeover__card,
+  .booster-takeover[data-reveal="ed-leather-rare"] .booster-takeover__word {
+    animation: none;
+  }
+}

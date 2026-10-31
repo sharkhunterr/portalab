@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-bubble",
+  "names": {
+    "fr": "Dos translucide",
+    "en": "Translucent back"
+  },
+  "descriptions": {
+    "fr": "Plastique bleu bonbon, une bulle.",
+    "en": "Candy-blue plastic, a bubble."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

@@ -1,0 +1,41 @@
+/* An epic card turned (its hook: data-reveal), staged over the whole screen (place: screen) between this
+   reveal's two videos (behind the card and over it): The rarity scrawled big in marker; then the card is slapped
+   on the page like a sticker and stays askew, then turns over. */
+@font-face {
+  font-family: "Edition Marker";
+  src: url("PermanentMarker.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+.booster-takeover[data-reveal="ed-zine-epic"] .booster-takeover__word {
+  font-family: "Edition Marker", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #ff3388;
+  -webkit-text-stroke: 0.1rem #121212;
+  paint-order: stroke fill;
+  text-shadow: 0.25rem 0.25rem 0 #fff226, 0 0 1.2rem rgba(0, 0, 0, 0.8);
+  scale: 0.72;
+}
+/* held upright, the name runs along the screen's height: smaller, so it fits */
+@media (max-aspect-ratio: 4 / 5) {
+  .booster-takeover[data-reveal="ed-zine-epic"] .booster-takeover__word {
+    scale: 0.52;
+  }
+}
+/* the card's way in */
+.booster-takeover[data-reveal="ed-zine-epic"] .booster-takeover__card {
+  animation: ed-zine-card 0.45s linear var(--card-at) both;
+}
+@keyframes ed-zine-card {
+  0% { opacity: 0; transform: scale(2.6) rotate(-16deg); }
+  55% { opacity: 1; transform: scale(0.94) rotate(-2deg); }
+  75% { transform: scale(1.02) rotate(-4.5deg); }
+  100% { transform: rotate(-3.5deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-takeover[data-reveal="ed-zine-epic"] .booster-takeover__card,
+  .booster-takeover[data-reveal="ed-zine-epic"] .booster-takeover__word {
+    animation: none;
+  }
+}

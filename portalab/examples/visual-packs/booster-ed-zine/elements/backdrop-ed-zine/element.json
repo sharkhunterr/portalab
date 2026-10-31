@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-zine",
+  "names": {
+    "fr": "Collage photocopié",
+    "en": "Photocopied collage"
+  },
+  "descriptions": {
+    "fr": "Un collage de bouts de pages photocopiés qui bougent un peu à chaque copie, du surligneur, un cercle au feutre rose, le grain du toner, la lumière du photocopieur qui passe (vidéo en boucle).",
+    "en": "A collage of photocopied scraps shifting a little at each copy, a highlighter, a pink marker loop, the toner's grain, the copier's light passing (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

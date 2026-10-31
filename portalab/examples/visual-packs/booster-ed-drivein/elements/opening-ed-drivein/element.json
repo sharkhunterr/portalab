@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "ed-drivein",
+  "names": {
+    "fr": "Pop-corn",
+    "en": "Popcorn"
+  },
+  "descriptions": {
+    "fr": "Les ampoules font le tour du paquet comme une enseigne ; il éclate en pop-corn et en étoiles.",
+    "en": "Bulbs chase round the pack like a marquee; it bursts into popcorn and stars."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

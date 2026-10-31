@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-film",
+  "names": {
+    "fr": "Coucher de soleil 70s",
+    "en": "70s sunset"
+  },
+  "descriptions": {
+    "fr": "Le coucher de soleil d'une affiche des années 1970 : un soleil en bandes, un ciel de trame, le sol rayé, le grain du papier, des bandes de pellicule qui défilent en haut et en bas (vidéo en boucle).",
+    "en": "A 1970s poster's sunset: a banded sun, a halftone sky, striped ground, the paper's grain, strips of film running along top and foot (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

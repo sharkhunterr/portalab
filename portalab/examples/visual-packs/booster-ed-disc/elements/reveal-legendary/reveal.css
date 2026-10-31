@@ -1,0 +1,21 @@
+/* A legendary card turned (its hook: data-reveal), staged over the whole screen (place: screen) between this
+   reveal's two videos (behind the card and over it): No word: the card comes down slowly from above, in a
+   stained-glass light that settles, and turns over. */
+.booster-takeover[data-reveal="ed-disc-legendary"] .booster-takeover__word {
+  display: none;
+}
+/* the card's way in */
+.booster-takeover[data-reveal="ed-disc-legendary"] .booster-takeover__card {
+  animation: ed-disc-card 0.55s cubic-bezier(0.25, 0.7, 0.35, 1) var(--card-at) both;
+}
+@keyframes ed-disc-card {
+  0% { opacity: 0; transform: translateY(-45vh) scale(0.85); filter: brightness(3) blur(8px); }
+  70% { opacity: 1; transform: translateY(1vh) scale(1.01); filter: brightness(1.4) blur(0); }
+  100% { transform: none; filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-takeover[data-reveal="ed-disc-legendary"] .booster-takeover__card,
+  .booster-takeover[data-reveal="ed-disc-legendary"] .booster-takeover__word {
+    animation: none;
+  }
+}

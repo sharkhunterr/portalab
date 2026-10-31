@@ -1,0 +1,16 @@
+{
+  "type": "booster_backdrop",
+  "look": "ed-noir",
+  "names": {
+    "fr": "Bureau de nuit",
+    "en": "Office at night"
+  },
+  "descriptions": {
+    "fr": "Un bureau de détective la nuit, la lumière d'une enseigne à travers les stores qui glisse sur le mur, la pluie sur la vitre, la lampe de bureau, un fil rouge entre les indices, un éclair de temps en temps (vidéo en boucle).",
+    "en": "A detective's office at night, a sign's light through the blinds sliding on the wall, rain on the glass, the desk lamp, a red string between clues, lightning now and then (a looping video)."
+  },
+  "render": {
+    "kind": "video",
+    "file": "stage.mp4"
+  }
+}

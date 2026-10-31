@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-film",
+  "names": {
+    "fr": "Dos d'affiche",
+    "en": "Poster back"
+  },
+  "descriptions": {
+    "fr": "Papier vieilli, soleil couchant, une bobine.",
+    "en": "Aged paper, a setting sun, a reel."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-vhs",
+  "names": {
+    "fr": "Dos 8 bits",
+    "en": "8-bit back"
+  },
+  "descriptions": {
+    "fr": "Crépuscule en pixels, un soleil rayé.",
+    "en": "A pixel dusk, a striped sun."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

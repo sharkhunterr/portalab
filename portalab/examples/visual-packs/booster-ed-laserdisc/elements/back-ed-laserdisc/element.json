@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-laserdisc",
+  "names": {
+    "fr": "Dos Memphis",
+    "en": "Memphis back"
+  },
+  "descriptions": {
+    "fr": "Papier millimétré, formes pastel, un disque irisé.",
+    "en": "Graph paper, pastel shapes, an iridescent disc."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

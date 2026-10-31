@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "ed-noir-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "Pas de mot : le dossier est jeté sur le bureau — la carte glisse de côté, tournoie et s'arrête sous la lampe, au milieu des indices, puis se retourne.",
+    "en": "No word: the case file is tossed on the desk — the card slides in from the side, spins and stops under the lamp, amid the clues, then turns over."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}

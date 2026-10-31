@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-nitrate",
+  "names": {
+    "fr": "Laque et argent",
+    "en": "Lacquer and silver"
+  },
+  "descriptions": {
+    "fr": "Un paquet de laque noire, un soleil Art déco sépia, des filets d'argent, l'image de l'œuvre dans un cadre d'argent, son nom en capitales Art déco.",
+    "en": "A black lacquer pack, a sepia Art Deco sun, silver hairlines, the work's art in a silver frame, its name in Art Deco capitals."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "ed-super8-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "La rareté en lettres géantes sur l'affiche psychédélique ; puis la carte jaillit en spirale du tunnel de couleurs, ses teintes tournant, et se retourne.",
+    "en": "The rarity in huge letters over the psychedelic poster; then the card spirals out of the tunnel of colours, its hues turning, and turns over."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}

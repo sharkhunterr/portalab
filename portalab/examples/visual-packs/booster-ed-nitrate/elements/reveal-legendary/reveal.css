@@ -1,0 +1,53 @@
+/* A legendary card turned (its hook: data-reveal), staged over the whole screen (place: screen) between this
+   reveal's two videos (behind the card and over it): A silent film's intertitle: the rarity, upright, under the
+   silver hairlines, flickering like the print; then the card projected, sepia, weaving in the projector's gate,
+   turns over. */
+@font-face {
+  font-family: "Edition Limelight";
+  src: url("Limelight.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+.booster-takeover[data-reveal="ed-nitrate-legendary"] .booster-takeover__word {
+  font-family: "Edition Limelight", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #f2ece0;
+  -webkit-text-stroke: 0.1rem #0d0b09;
+  paint-order: stroke fill;
+  text-shadow: 0 0 0.2rem #0d0b09, 0.4rem 0.4rem 0 #5c4026, 0 0 2rem rgba(242, 236, 224, 0.5);
+  --word-turn: 0deg;
+  font-size: min(9vw, 13vh);
+  letter-spacing: 0.08em;
+  animation: ed-nitrate-title var(--card-at) linear both;
+}
+/* the intertitle, flickering on the screen */
+@keyframes ed-nitrate-title {
+  0% { opacity: 0; translate: 0 0.4%; }
+  8% { opacity: 0.7; }
+  12% { opacity: 1; translate: 0 -0.3%; }
+  30% { opacity: 0.8; }
+  34% { opacity: 1; translate: 0 0.2%; }
+  62% { opacity: 0.88; }
+  66%, 86% { opacity: 1; translate: 0 0; }
+  100% { opacity: 0; }
+}
+/* the card's way in */
+.booster-takeover[data-reveal="ed-nitrate-legendary"] .booster-takeover__card {
+  animation: ed-nitrate-card 0.55s linear var(--card-at) both;
+}
+@keyframes ed-nitrate-card {
+  0% { opacity: 0; filter: sepia(1) brightness(2.2); transform: translateY(1.5%); }
+  15% { opacity: 1; }
+  22% { opacity: 0.35; transform: translateY(-1%); }
+  30% { opacity: 1; transform: translateY(0.8%); }
+  45% { opacity: 0.6; }
+  55% { opacity: 1; filter: sepia(0.8) brightness(1.4); transform: translateY(-0.4%); }
+  100% { opacity: 1; filter: none; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booster-takeover[data-reveal="ed-nitrate-legendary"] .booster-takeover__card,
+  .booster-takeover[data-reveal="ed-nitrate-legendary"] .booster-takeover__word {
+    animation: none;
+  }
+}

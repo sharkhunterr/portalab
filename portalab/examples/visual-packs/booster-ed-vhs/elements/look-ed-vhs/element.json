@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "ed-vhs",
+  "names": {
+    "fr": "Borne d'arcade",
+    "en": "Arcade cabinet"
+  },
+  "descriptions": {
+    "fr": "Un paquet de crépuscule en bandes de pixels, une bande néon, l'image de l'œuvre sur un écran, son nom en lettres de jeu vidéo, un soleil de pixels en emblème.",
+    "en": "A pack of dusk in pixel bands, a neon band, the work's art on a screen, its name in video game letters, a pixel sun as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

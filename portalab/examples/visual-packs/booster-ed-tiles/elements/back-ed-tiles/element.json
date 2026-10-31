@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "ed-tiles",
+  "names": {
+    "fr": "Dos en tuiles",
+    "en": "Tiles back"
+  },
+  "descriptions": {
+    "fr": "Tuiles plates de couleur, sans ombre.",
+    "en": "Flat coloured tiles, no shadow."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

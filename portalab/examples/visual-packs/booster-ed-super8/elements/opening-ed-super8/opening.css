@@ -1,0 +1,23 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: The pack's colours turn, rings ripple out; it melts in pink, orange and purple runs. */
+[data-opening="ed-super8"] .booster-stage__tear .booster-pack {
+  animation: edition-fate 2.6s linear both;
+}
+@keyframes edition-fate {
+  0% { transform: none; filter: none; opacity: 1; }
+  20% { filter: hue-rotate(60deg); }
+  30% { transform: skewX(4deg); filter: hue-rotate(160deg); }
+  38% { transform: translateY(4%) scale(1.02, 1.1) skewX(-6deg); filter: hue-rotate(260deg); opacity: 1; }
+  48%, 100% { transform: translateY(40%) scale(0.9, 1.6); filter: hue-rotate(360deg); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="ed-super8"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="ed-super8"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

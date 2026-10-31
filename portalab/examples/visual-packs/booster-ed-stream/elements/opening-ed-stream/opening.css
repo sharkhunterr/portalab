@@ -1,0 +1,27 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: The pack glitches in bars, its picture collapses into a line; it is uploaded in voxels of light. */
+[data-opening="ed-stream"] .booster-stage__tear .booster-pack {
+  animation: edition-fate 2.6s linear both;
+}
+@keyframes edition-fate {
+  0% { transform: none; filter: none; clip-path: inset(0 0 0 0); opacity: 1; }
+  20% { transform: none; clip-path: inset(0 0 0 0); }
+  22% { transform: translate(-6px, 0); clip-path: inset(10% 0 60% 0); }
+  24% { transform: translate(5px, 0); clip-path: inset(40% 0 20% 0); }
+  26% { transform: none; clip-path: inset(0 0 0 0); }
+  30% { transform: translate(-3px, 0); }
+  34% { transform: none; filter: hue-rotate(90deg); clip-path: inset(0 0 0 0); opacity: 1; }
+  38% { clip-path: inset(48% 0 48% 0); filter: brightness(2); }
+  42%, 100% { clip-path: inset(50% 0 50% 0); filter: brightness(2); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="ed-stream"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="ed-stream"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

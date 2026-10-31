@@ -1,0 +1,24 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: A red stamp slams onto the pack; it goes through the shredder and falls in strips. */
+[data-opening="ed-noir"] .booster-stage__tear .booster-pack {
+  animation: edition-fate 2.6s linear both;
+}
+@keyframes edition-fate {
+  0% { transform: none; filter: none; clip-path: inset(0 0 0 0); opacity: 1; }
+  10% { transform: none; }
+  13% { transform: scale(0.97); filter: grayscale(1); }
+  18% { transform: none; filter: grayscale(1); }
+  36% { transform: translateY(0); filter: grayscale(1); clip-path: inset(0 0 0 0); opacity: 1; }
+  54%, 100% { transform: translateY(100%); filter: grayscale(1); clip-path: inset(0 0 100% 0); opacity: 1; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="ed-noir"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="ed-noir"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

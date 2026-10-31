@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "ed-zine-legendary",
+  "names": {
+    "fr": "Révélation légendaire",
+    "en": "Legendary reveal"
+  },
+  "descriptions": {
+    "fr": "La rareté griffonnée en grand au marqueur ; puis la carte est plaquée sur la page comme un autocollant et y reste de travers, puis se retourne.",
+    "en": "The rarity scrawled big in marker; then the card is slapped on the page like a sticker and stays askew, then turns over."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 4.6,
+    "rarity": "legendary"
+  }
+}

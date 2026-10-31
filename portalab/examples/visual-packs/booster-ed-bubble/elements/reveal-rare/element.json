@@ -1,0 +1,24 @@
+{
+  "type": "card_reveal",
+  "look": "ed-bubble-rare",
+  "names": {
+    "fr": "Révélation rare",
+    "en": "Rare reveal"
+  },
+  "descriptions": {
+    "fr": "Pas de mot : la carte monte du fond de l'écran dans les bulles, en se balançant, et se retourne une fois arrivée.",
+    "en": "No word: the card rises from the foot of the screen among the bubbles, swaying, and turns over once there."
+  },
+  "render": {
+    "kind": "video",
+    "file": "reveal.mp4",
+    "over": "over.mp4",
+    "alpha": "side",
+    "place": "screen",
+    "css": [
+      "reveal.css"
+    ],
+    "duration": 3.2,
+    "rarity": "rare"
+  }
+}
