@@ -99,6 +99,16 @@ GENRES = {
                "opening": ("Compte à rebours", "Countdown", "Trois anneaux se referment sur le paquet comme un compte à rebours ; il explose en boule de feu, des débris projetés.", "Three rings close on the pack like a countdown; it blows up in a fireball, debris flying."),
                "back": ("Dos d'acier", "Steel back", "Acier brossé, bande de danger, une explosion au centre.", "Brushed steel, a hazard band, an explosion in the middle.")}),
     "tenebres": dict(
+        version="1.1.0",
+        # issue 296: each rarity its own moment
+        moments={
+            "rare": ("L'ampoule : une ampoule nue qui grésille dans le noir ; à chaque coupure, quelqu'un s'est approché. La carte arrive sous l'ampoule, des yeux rouges l'observent au bord de la lumière.",
+                     "The bulb: a bare bulb flickering in the dark; each time it dies, someone has come closer. The card comes under the bulb, red eyes watching from the edge of its light."),
+            "epic": ("Les griffes : trois griffes déchirent l'écran, le sang coule, des stores se ferment ; des corbeaux s'envolent, la foudre frappe et l'écran se fend autour de la carte.",
+                     "The claws: three claws rip the screen, blood runs, blinds close; crows burst away, lightning strikes and the screen cracks round the card."),
+            "legendary": ("La lune de sang : une lune rouge entre des branches mortes, une nuée de corbeaux qui envahit l'écran, puis tourne autour de la carte sous la foudre et les griffes.",
+                          "The blood moon: a red moon between dead branches, a swarm of crows filling the screen, then wheeling round the card under lightning and claws."),
+        },
         family="dark", font=("Creepster.woff2", "Genre Creepster", "400"), ink="#060304", main="#c4101c", light="#ff4040", dark="#140508", emblem=emblem_tenebres,
         names={"fr": "Ténèbres — sombre", "en": "Ténèbres — darkness"},
         description={"fr": "Le booster Sombre (horreur, crime, thrillers) : chaque rareté prend tout l'écran — trois griffures rouges déchirent un écran noir où coule le sang, des stores se ferment comme dans un polar, puis la carte arrive de dos parmi des corbeaux qui s'envolent, et au retournement un éclair, l'écran fêlé comme du verre. Un paquet de cuir noir lacéré ; une forêt brumeuse sous une lune de sang.",
@@ -119,6 +129,16 @@ GENRES = {
                "opening": ("Griffures", "Claws", "Des griffes lacèrent le paquet par deux fois ; il se déchire et tombe, le sang éclabousse, des corbeaux s'envolent.", "Claws rip the pack twice; it tears and falls, blood spatters, crows burst away."),
                "back": ("Dos de cuir", "Leather back", "Cuir noir griffé de rouge, une lune de sang et un corbeau.", "Black leather clawed red, a blood moon and a crow.")}),
     "rideau": dict(
+        version="1.1.0",
+        # issue 296: each rarity its own moment
+        moments={
+            "rare": ("La poursuite : une scène dans le noir, un projecteur qui cherche quelqu'un ; la lumière se ferme puis s'ouvre sur la carte, dans la poussière dorée.",
+                     "The spotlight: a dark stage, a spotlight looking for someone; the light closes, then opens on the card, in golden dust."),
+            "epic": ("Le lever de rideau : le rideau s'ouvre, des roses et des confettis dorés sont lancés vers la carte sous la poursuite.",
+                     "The curtain rises: the curtain parts, roses and gold confetti are thrown towards the card under the spotlight."),
+            "legendary": ("L'ovation : le théâtre, ses balcons dorés et son lustre ; le grand rideau tombe, puis se relève sur une salle debout, des poursuites qui se croisent et une pluie de roses.",
+                          "The ovation: the theatre, its gilded balconies and chandelier; the great curtain falls, then rises on a standing house, crossing spotlights and a rain of roses."),
+        },
         family="drama", font=("PlayfairDisplay.woff2", "Genre Playfair", "900"), ink="#1a0508", main="#b50d22", light="#f2c14e", dark="#3a060c", emblem=emblem_rideau,
         names={"fr": "Rideau — drame", "en": "Rideau — drama"},
         description={"fr": "Le booster Drame, comme un soir de première : chaque rareté prend tout l'écran — un rideau de velours rouge, de la poussière d'or dans la lumière, le rideau s'ouvre, la carte arrive de dos sous un projecteur parmi des pétales, et au retournement des confettis d'or et des roses lancées. Un paquet de velours bordé d'or que le rideau emporte ; une salle de théâtre aux feux de la rampe.",
@@ -138,6 +158,16 @@ GENRES = {
                "opening": ("Le rideau tombe", "Curtain", "Un projecteur trouve le paquet, des pétales tombent ; le rideau se referme sur lui, des confettis d'or éclatent.", "A spotlight finds the pack, petals fall; the curtain closes on it, gold confetti bursts."),
                "back": ("Dos de velours", "Velvet back", "Velours rouge plissé, un liseré d'or, une rose au centre.", "Pleated red velvet, a gold line, a rose in the middle.")}),
     "arcanes": dict(
+        version="1.1.0",
+        # issue 296: each rarity its own moment
+        moments={
+            "rare": ("Les runes : un cercle de runes qui se trace dans la nuit et s'embrase ; la carte se pose au centre d'un anneau turquoise.",
+                     "The runes: a rune circle drawing itself in the night and flaring; the card lands in a turquoise ring."),
+            "epic": ("Le portail : des cercles de runes, un portail qui avale l'écran, puis des ailes de lumière qui se déploient derrière la carte.",
+                     "The portal: rune circles, a portal swallowing the screen, then wings of light unfolding behind the card."),
+            "legendary": ("Le dragon : un dragon traverse la lune au-dessus des montagnes, son souffle d'or balaie l'écran, puis un dragon de lumière s'enroule autour de la carte, ailes déployées.",
+                          "The dragon: a dragon crosses the moon above the mountains, its golden breath sweeps the screen, then a dragon of light coils round the card, its wings spread."),
+        },
         family="fantasy", font=("CinzelDecorative.woff2", "Genre Cinzel", "900"), ink="#0a0720", main="#3ee8d8", light="#ffd96a", dark="#140c3a", emblem=emblem_arcanes,
         names={"fr": "Arcanes — fantastique", "en": "Arcanes — fantasy"},
         description={"fr": "Le booster Fantastique : chaque rareté prend tout l'écran — un grand cercle de runes dorées qui tourne dans l'indigo, il s'embrase en portail, la carte arrive de dos dans un vortex violet et turquoise parmi des pierres runiques en orbite, et au retournement de grandes ailes de lumière se déploient derrière elle. Un grimoire scellé de runes qui se dissout en poussière d'étoiles ; un ciel d'aurores et d'îles flottantes.",
@@ -157,6 +187,16 @@ GENRES = {
                "opening": ("Sceau de runes", "Rune seal", "Un cercle de runes se trace et se referme sur le paquet ; il se dissout en poussière d'étoiles qui s'envole.", "A circle of runes draws itself and closes on the pack; it dissolves into stardust drifting away."),
                "back": ("Dos runique", "Rune back", "Indigo profond, un cercle de runes dorées et turquoise au centre.", "Deep indigo, a circle of gold and teal runes in the middle.")}),
     "hyperespace": dict(
+        version="1.1.0",
+        # issue 296: each rarity its own moment
+        moments={
+            "rare": ("Le scanner : un radar qui balaie l'espace à la recherche d'un signal ; la carte apparaît sur une grille holographique.",
+                     "The scanner: a radar sweeping space for a signal; the card appears over a holographic grid."),
+            "epic": ("Le saut : l'hyperespace, un éclair blanc, puis une planète à anneaux derrière la carte et une onde de choc.",
+                     "The jump: hyperspace, a white flash, then a ringed planet behind the card and a shockwave."),
+            "legendary": ("La flotte : un vaisseau géant surgit de l'hyperespace, puis une flotte entière sort autour de la carte, ses lasers croisés devant la planète.",
+                          "The fleet: a huge ship tears out of hyperspace, then a whole fleet drops out round the card, its lasers crossing before the planet."),
+        },
         family="sf", font=("Orbitron.woff2", "Genre Orbitron", "800"), ink="#020617", main="#4de8ff", light="#ff4dc4", dark="#0a1636", emblem=emblem_hyperespace,
         names={"fr": "Hyperespace — science-fiction", "en": "Hyperespace — science fiction"},
         description={"fr": "Le booster Science-fiction : chaque rareté prend tout l'écran — un saut en hyperespace, les étoiles étirées en traits, un éclair de saut, la carte arrive de dos devant une planète à anneau dans les nébuleuses, et au retournement l'onde du saut et un balayage d'hologramme. Une capsule blanche aux lueurs cyan téléportée dans un faisceau ; un ciel d'étoiles et de nébuleuses.",

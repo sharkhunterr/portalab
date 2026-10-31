@@ -6,8 +6,8 @@
     "en": "Epic reveal"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
-    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+    "fr": "Le lever de rideau : le rideau s'ouvre, des roses et des confettis dorés sont lancés vers la carte sous la poursuite.",
+    "en": "The curtain rises: the curtain parts, roses and gold confetti are thrown towards the card under the spotlight."
   },
   "render": {
     "kind": "video",

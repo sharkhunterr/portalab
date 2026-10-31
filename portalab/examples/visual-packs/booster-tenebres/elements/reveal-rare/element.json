@@ -6,8 +6,8 @@
     "en": "Rare reveal"
   },
   "descriptions": {
-    "fr": "Plein écran, joué en vidéo : d'abord la rareté en lettres géantes (écrite par Portalab) sur l'écran de l'univers, puis la carte arrive de dos et se retourne dans un éclair.",
-    "en": "Full screen, played as video: first the rarity in huge letters (written by Portalab) over the scene's screen, then the card comes face down and turns over in a flash."
+    "fr": "L'ampoule : une ampoule nue qui grésille dans le noir ; à chaque coupure, quelqu'un s'est approché. La carte arrive sous l'ampoule, des yeux rouges l'observent au bord de la lumière.",
+    "en": "The bulb: a bare bulb flickering in the dark; each time it dies, someone has come closer. The card comes under the bulb, red eyes watching from the edge of its light."
   },
   "render": {
     "kind": "video",

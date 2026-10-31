@@ -474,6 +474,295 @@ var GENRE_SF = {
   }
 };
 
+// ===== every rarity its own moment, for the four other genres (the epic is each genre's first moment) ========
+function iris(fr, r) {   // the screen black but a round hole
+  polys(fr.top, [full(), circle(C, C, Math.max(1, r), 1, 48)], BLACK, 100, true);
+}
+function cone(L, x, ang, len, w0, w1, color, o) {   // a light's cone from (x, -60) along ang
+  var c = Math.cos(ang), sn = Math.sin(ang);
+  polys(L, [[[x - w0, -60], [x + w0, -60], [x + c * len - sn * w1, -60 + sn * len + c * w1], [x + c * len + sn * w1, -60 + sn * len - c * w1]]], color, o);
+}
+// --- Ténèbres -------------------------------------------------------------------------------------------------
+function bulb(fr, x, y, on, o) {   // a bare bulb on its wire, its light cone when on
+  lines(fr.main, [[[x, -60], [x, y - 30]]], DARK.bone, 3, o);
+  polys(fr.main, [circle(x, y, 22, 1.25, 20)], on ? [1, 0.93, 0.7] : [0.25, 0.22, 0.2], o);
+  if (on) {
+    polys(fr.glow, [circle(x, y, 90, 1, 24)], [1, 0.85, 0.5], o * on);
+    cone(fr.haze, x, 1.5708, 1200, 30, 460, [1, 0.85, 0.55], o * on * 0.8);
+    cone(fr.main, x, 1.5708, 1200, 24, 380, [1, 0.88, 0.62], o * on * 0.34);
+    polys(fr.main, [circle(x, 960, 380, 0.22, 40)], [1, 0.88, 0.62], o * on * 0.45);
+  }
+}
+function flicker(f) { seed(990 + f); return rnd() < 0.18 ? 0 : rnd() < 0.3 ? 0.45 : 1; }
+function eyes(x, y, s, o) {   // two red eyes in the dark
+  return [place(circle(-s, 0, s * 0.45, 0.55, 12), x, y, 0), place(circle(s, 0, s * 0.45, 0.55, 12), x, y, 0)];
+}
+function figure(x, y, s) {   // someone standing at the back, in silhouette
+  return place([[-0.5 * s, 0], [-0.42 * s, -1.6 * s], [-0.25 * s, -1.9 * s], [0, -2.05 * s], [0.25 * s, -1.9 * s], [0.42 * s, -1.6 * s], [0.5 * s, 0], [0.7 * s, 2.6 * s], [-0.7 * s, 2.6 * s]], x, y, 0);
+}
+var DARK_RARE = {
+  title: function (fr, f, u) {   // a bare bulb flickering in the dark; each time it dies, someone has come closer
+    var on = flicker(f), near = 0.6 + u * 0.8;
+    bulb(fr, C - 120, 380, on, 100);
+    polys(fr.main, [figure(C + 230, 600 - near * 40, 70 * near)], [0.015, 0.01, 0.012], 100);
+    if (!on) { polys(fr.glow, eyes(C + 230, 600 - near * 40 - 125 * near, 14 * near), DARK.blood_l, 100); polys(fr.main, eyes(C + 230, 600 - near * 40 - 125 * near, 9 * near), [1, 0.3, 0.25], 100); }
+    if (on) polys(fr.main, [circle(C - 120, 1000, 420, 0.25, 40)], [0.28, 0.24, 0.2], 60);
+    polys(fr.main, [full()], DARK.black, 100);
+  },
+  wipe: function (fr, v) {   // the bulb bursts: dark closing in
+    iris(fr, 900 * (1 - ease(v)) + 40);
+  },
+  stage: function (fr, f, at, o) {   // the bulb over the card now; at the edge of its light, eyes, a figure
+    var on = f > CARD_AT + 2 ? flicker(f) * 0.9 + 0.1 : 0;
+    bulb(fr, C, 300, on, o);
+    for (var k = 0; k < 3; k++) { var x = [C - 380, C + 390, C + 300][k], y = [500, 420, 760][k], bl = (f + k * 7) % 23 < 2; if (!bl) { polys(fr.glow, eyes(x, y, 20), DARK.blood_l, o); polys(fr.main, eyes(x, y, 13), [1, 0.35, 0.3], o); } }
+    polys(fr.main, [figure(C - 360, 660, 75)], [0.015, 0.01, 0.012], o);
+    seed(345); var dust = []; for (var i = 0; i < 30; i++) dust.push([C + between(-380, 380), (between(0, 1080) + f * 3) % 1080, between(1.5, 3.5)]);
+    polys(fr.main, glintPolys(dust), DARK.bone, o * 0.5 * (on ? 1 : 0.2));
+    polys(fr.main, [full()], DARK.black, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 7) polys(fr.top, claws(ease(at / 3), C + 200, C - 120, 2.4, 380, 10), DARK.blood_l, fade(at, 4, 7) * 100);
+  }
+};
+function swarm(f, n, base, cx, cy, r0, spin) {   // crows wheeling round a centre
+  seed(base); var birds = [];
+  for (var i = 0; i < n; i++) { var a = between(0, Math.PI * 2) + f * spin * between(0.6, 1.2), d = r0 * between(0.7, 1.5); birds = birds.concat(crow(cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.75, between(26, 58), f * 0.9 + i, a + 1.5708)); }
+  return birds;
+}
+function branches(base) {   // a dead tree's branches reaching in from the sides
+  seed(base); var out = [];
+  for (var side = -1; side <= 1; side += 2) for (var k = 0; k < 4; k++) { var y = 120 + k * 230 + between(-40, 40), x0 = side < 0 ? -60 : 1140, len = between(260, 460); out = out.concat(slash(x0, y, x0 - side * len, y + between(-160, 60), between(16, 28), 1, side * 0.6)); }
+  return out;
+}
+var DARK_LEGENDARY = {
+  title: function (fr, f, u) {   // a blood moon, dead branches, a swarm of crows
+    polys(fr.main, branches(380), DARK.black, 100);
+    polys(fr.main, swarm(f, 22, 381, C, C - 40, 420, 0.04), DARK.black, 100);
+    polys(fr.haze, [circle(C, C - 40, 420, 1, 48)], DARK.blood, 100);
+    polys(fr.main, [circle(C, C - 40, 330, 1, 64)], [0.62, 0.05, 0.06], 100);
+    polys(fr.main, [circle(C - 60, C - 90, 330, 1, 64)], [0.75, 0.12, 0.1], 100);
+    polys(fr.main, [full()], [0.06, 0.01, 0.02], 100);
+  },
+  wipe: function (fr, v) {   // the crows fill the screen
+    seed(385); var birds = [];
+    for (var i = 0; i < 70; i++) { var x = between(-100, 1180), y = between(-100, 1180), s = between(60, 140) * ease(v * 1.3 - between(0, 0.4)); if (s > 4) birds = birds.concat(crow(x, y, s, i, between(-0.5, 0.5))); }
+    polys(fr.top, birds, BLACK, 100);
+  },
+  stage: function (fr, f, at, o) {
+    var g = ease((f - CARD_AT) / 6);
+    if (at >= -6 && at < 6) { seed(386 + f); var b = bolt(between(150, 930), -40, C + between(-80, 80), C - 220, 50, true); lines(fr.glow, b, [1, 0.6, 0.6], 18, at < 0 ? 40 : 100); lines(fr.top, b, WHITE, 4, at < 0 ? 40 : 100); }
+    if (at >= 0 && at < 12) polys(fr.top, claws(ease(at / 3), C, C, -0.7, 1100, 30), DARK.blood_l, fade(at, 6, 12) * 70);
+    polys(fr.main, swarm(f, 30, 387, C, C, 420 + 120 * g, 0.05), DARK.black, o);
+    polys(fr.main, branches(388), DARK.black, o);
+    polys(fr.haze, [circle(C, C, 520 * g + 80, 1, 48)], DARK.blood, o);
+    polys(fr.main, [circle(C, C, 420 * g + 40, 1, 64)], [0.62, 0.05, 0.06], o);
+    polys(fr.main, drips(f - CARD_AT, 12, 389, 380), DARK.blood, o);
+    polys(fr.main, [full()], [0.06, 0.01, 0.02], o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 8) polys(fr.top, claws(ease(at / 3), C, C, 2.3, 900, 22), DARK.blood_l, fade(at, 4, 8) * 100);
+    var birds = [];
+    for (var i = 0; i < 6; i++) { var t = f - FACE_AT - 1 - i * 3; if (t < 0) continue; birds = birds.concat(crow(C + (i % 2 ? 1 : -1) * (120 + t * 40), C + 140 - t * 30 - i * 30, 60 + i * 8, f * 0.9 + i, (i % 2 ? -0.4 : Math.PI + 0.4))); }
+    polys(fr.top, birds, BLACK, 100);
+    bigGlint(fr, at, DARK.blood_l);
+  }
+};
+GENRE_DARK.rarities = { rare: DARK_RARE, epic: GENRE_DARK, legendary: DARK_LEGENDARY };
+
+// --- Rideau ---------------------------------------------------------------------------------------------------
+var DRAMA_RARE = {
+  title: function (fr, f, u) {   // a dark stage: one spotlight looking for someone, dust in it
+    var x = C + 360 * Math.sin(f * 0.16), ang = 1.5708 + (x - C) / 2600;
+    cone(fr.glow, x, ang, 1300, 40, 260, DRA.light, 60); cone(fr.main, x, ang, 1300, 30, 200, DRA.light, 22);
+    polys(fr.main, [circle(x, 960, 230, 0.22, 40)], DRA.light, 35);
+    polys(fr.main, [[[-60, 940], [1140, 940], [1140, 1140], [-60, 1140]]], [0.12, 0.05, 0.04], 100);
+    polys(fr.main, [full()], DRA.dark, 100);
+  },
+  wipe: function (fr, v) {   // the light closes to a point, then opens on the card
+    iris(fr, v < 0.5 ? 900 * (1 - ease(v * 2)) + 30 : 30 + 900 * ease(v * 2 - 1));
+  },
+  stage: function (fr, f, at, o) {
+    var sp = 140 + 60 * ease((f - CARD_AT) / 6);
+    cone(fr.glow, C, 1.5708, 1300, 50, sp * 1.6, DRA.light, o * 0.55); cone(fr.main, C, 1.5708, 1300, 40, sp * 1.3, DRA.light, o * 0.18);
+    seed(510); var dust = []; for (var i = 0; i < 30; i++) dust.push([C + between(-sp, sp), (between(0, 1080) + f * 2) % 1080, between(2, 4)]);
+    polys(fr.top, glintPolys(twinkle(dust, f, 1, 8)), DRA.gold_l);
+    polys(fr.main, [full()], DRA.dark, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 2) { seed(511); var pts = []; for (var i = 0; i < 8; i++) { var a = between(0, Math.PI * 2), r = toEdge(a, 160, 222) + between(10, 80); pts.push([C + Math.cos(a) * r, C + Math.sin(a) * r]); } polys(fr.top, glintPolys(twinkle(pts, f, 2, 18)), DRA.gold_l); }
+  }
+};
+function audience(f, cheer) {   // a row of heads and raised arms at the foot of the screen
+  var out = []; seed(570);
+  for (var i = 0; i < 22; i++) { var x = -40 + i * 54 + between(-10, 10), y = 880 + between(-20, 20), r = between(30, 40); out.push(circle(x, y - r * 1.4, r * 0.7, 1.15, 14)); out.push([[x - r, 1140], [x - r * 0.9, y], [x + r * 0.9, y], [x + r, 1140]]); if (cheer && (i % 3 === 0)) { var lift = 60 + 30 * Math.sin(f * 0.6 + i); out.push([[x - 8, y], [x - 30, y - lift - 60], [x - 18, y - lift - 64], [x + 4, y]]); } }
+  return out;
+}
+var DRAMA_LEGENDARY = {
+  title: function (fr, f, u) {   // the theatre itself: tiers of gilded balconies, a chandelier, a full house
+    polys(fr.top, audience(f, false), DRA.dark, 100);
+    seed(560); var lamps = []; for (var t = 0; t < 3; t++) for (var i = 0; i < 16; i++) { var a = Math.PI * (0.08 + i / 15 * 0.84); lamps.push([C - Math.cos(a) * (360 + t * 150), 520 + t * 90 - Math.sin(a) * (120 + t * 40), 5 + t]); }
+    polys(fr.glow, glintPolys(twinkle(lamps, f, 1, 10)), DRA.gold_l);
+    for (var t2 = 0; t2 < 3; t2++) lines(fr.main, [ring(C, 520 + t2 * 90, 360 + t2 * 150, 0.33, Math.PI * 1.05, Math.PI * 1.95)], DRA.gold, 10, 100);
+    polys(fr.glow, glintPolys([[C, 300, 80]]), DRA.gold_l); polys(fr.main, [circle(C, 300, 46, 1.4, 20)], DRA.gold, 100); lines(fr.main, [[[C, -60], [C, 250]]], DRA.gold, 4, 100);
+    polys(fr.main, [full()], DRA.velvet_d, 100);
+  },
+  wipe: function (fr, v) {   // the great curtain comes down
+    var y = -1140 + ease(v) * 1200;
+    var folds = []; for (var i = 0; i < 12; i++) { var a = -60 + i * 100; folds.push([[a, -60], [a + 50, -60], [a + 55, y + 1140], [a - 5, y + 1120]]); }
+    polys(fr.top, folds, DRA.velvet_l, 100); polys(fr.top, [[[-60, -60], [1140, -60], [1140, y + 1140], [-60, y + 1140]]], DRA.velvet, 100);
+  },
+  stage: function (fr, f, at, o) {   // a standing ovation: the curtain up, spotlights crossing, roses raining
+    polys(fr.top, audience(f, true), DRA.dark, o);
+    if (at >= 0) { seed(580); var conf = []; for (var i = 0; i < 60; i++) { var a = between(-Math.PI, 0), d = 200 + at * between(14, 30), s = between(6, 13); conf.push(place([[-s, -s * 0.4], [s, -s * 0.4], [s, s * 0.4], [-s, s * 0.4]], C + Math.cos(a) * d, C + 200 + Math.sin(a) * d + at * at * 0.5, at * 0.3 + i, 1, Math.max(0.2, Math.abs(Math.cos(at * 0.3 + i))))); } polys(fr.main, conf, DRA.gold, fade(at, 50, 68) * o); }
+    petalsFall(fr.main, f, 40, 581, DRA.rose, 560);
+    for (var k = 0; k < 3; k++) { var ang = 1.5708 + 0.35 * Math.sin(f * 0.08 + k * 2.2); cone(fr.glow, 180 + k * 360, ang, 1400, 30, 220, DRA.light, o * 0.4); }
+    curtain(fr.main, -60, 200, 4, 0, 1); curtain(fr.main, 880, 1140, 4, 0, 1);
+    var folds = []; for (var i2 = 0; i2 < 12; i2++) folds.push(circle(-60 + i2 * 100 + 50, 230, 60, 0.6, 16));
+    polys(fr.main, folds, DRA.velvet_l, o); polys(fr.main, [[[-60, -60], [1140, -60], [1140, 250], [-60, 250]]], DRA.velvet, o);
+    polys(fr.main, [[[-60, 250], [1140, 250], [1140, 262], [-60, 262]]], DRA.gold, o);
+    polys(fr.main, [full()], DRA.dark, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 8) { polys(fr.top, slash(-60, 300, 1140, 760, 36, ease(at / 3), -0.5), DRA.gold_l, fade(at, 4, 8) * 90); polys(fr.top, slash(1140, 300, -60, 760, 36, ease((at - 2) / 3), 0.5), DRA.gold_l, fade(at, 5, 9) * 90); }
+    petalsFall(fr.top, f, 14, 590, DRA.rose, 600);
+    bigGlint(fr, at, DRA.gold);
+  }
+};
+GENRE_DRAMA.rarities = { rare: DRAMA_RARE, epic: GENRE_DRAMA, legendary: DRAMA_LEGENDARY };
+
+// --- Arcanes --------------------------------------------------------------------------------------------------
+var FANTASY_RARE = {
+  title: function (fr, f, u) {   // one rune circle drawing itself on the night, motes rising
+    var m = magicCircle(C, C, 400, 1, f * 0.02, 5), d = ease(f / 16), rings = [];
+    for (var i = 0; i < m.rings.length; i++) rings.push(m.rings[i].slice(0, Math.max(2, Math.round(m.rings[i].length * d))));
+    lines(fr.glow, rings, FAN.teal, 12, 90); lines(fr.main, rings, FAN.gold_l, 4, 100); if (d > 0.8) lines(fr.main, m.star, FAN.gold_l, 3, 100);
+    seed(711); var motes = []; for (var j = 0; j < 30; j++) motes.push([between(0, 1080), 1080 - ((f * between(4, 9) + between(0, 1080)) % 1080), between(3, 6)]);
+    polys(fr.top, glintPolys(motes), FAN.gold_l);
+    polys(fr.main, [full()], FAN.night, 100);
+  },
+  wipe: function (fr, v) {   // the circle flares out in a ring of light
+    var r = 60 + ease(v) * 900; lines(fr.top, [ring(C, C, r, 1)], FAN.gold_l, 40 * (1 - v) + 6, 100); polys(fr.top, [circle(C, C, r * 0.98, 1, 48)], FAN.night, 100 * (1 - v));
+  },
+  stage: function (fr, f, at, o) {
+    runeRing(fr, 320, f * 0.03, o * 0.8, FAN.teal);
+    polys(fr.haze, [circle(C, C, 380, 1, 40)], FAN.violet, o * 0.6);
+    polys(fr.main, [full()], FAN.night, o);
+  },
+  over: function (fr, f, at) {
+    seed(712); var motes = []; for (var i = 0; i < 12; i++) motes.push([C + between(-300, 300), 1000 - ((f * between(5, 10) + between(0, 1000)) % 1050), between(4, 8)]);
+    if (at >= 0) polys(fr.top, glintPolys(twinkle(motes, f, 4, 12)), FAN.gold_l);
+  }
+};
+function dragon(cx, cy, s, flap, ang) {   // a dragon's silhouette: a long body, a horned head, two great wings
+  var wing = Math.sin(flap) * 0.5, body = [], head;
+  for (var i = 0; i <= 12; i++) { var t = i / 12, w = (0.16 - t * 0.13) * s; body.push([(-1.4 + t * 2.4) * s, Math.sin(t * 4 + flap * 0.5) * 0.12 * s - w]); }
+  for (var j = 12; j >= 0; j--) { var t2 = j / 12, w2 = (0.16 - t2 * 0.13) * s; body.push([(-1.4 + t2 * 2.4) * s, Math.sin(t2 * 4 + flap * 0.5) * 0.12 * s + w2]); }
+  head = [[1.0 * s, -0.1 * s], [1.35 * s, -0.04 * s], [1.45 * s, 0.05 * s], [1.0 * s, 0.1 * s], [1.15 * s, -0.25 * s]];
+  var w1 = [[-0.2 * s, -0.05 * s], [-0.6 * s, (-0.9 - wing) * s], [-0.35 * s, (-0.62 - wing) * s], [-0.1 * s, (-1.0 - wing) * s], [0.05 * s, (-0.6 - wing) * s], [0.3 * s, (-0.85 - wing) * s], [0.3 * s, -0.1 * s]];
+  var w2 = [[-0.1 * s, 0.05 * s], [-0.45 * s, (0.5 + wing * 0.6) * s], [-0.15 * s, (0.4 + wing * 0.6) * s], [0.1 * s, (0.6 + wing * 0.6) * s], [0.25 * s, 0.1 * s]];
+  return [place(body, cx, cy, ang), place(head, cx, cy, ang), place(w1, cx, cy, ang), place(w2, cx, cy, ang)];
+}
+var FANTASY_LEGENDARY = {
+  title: function (fr, f, u) {   // a dragon crossing a great moon over mountains
+    polys(fr.main, dragon(-200 + f * 60, 420 - f * 6, 150, f * 0.7, -0.08), FAN.night, 100);
+    seed(770); var peaks = [[-60, 1140], [-60, 860]]; for (var x = -60; x < 1140; x += 90) peaks.push([x + 45, 860 - between(80, 260)], [x + 90, 860 - between(0, 60)]); peaks.push([1140, 1140]);
+    polys(fr.main, [peaks], [0.03, 0.02, 0.08], 100);
+    polys(fr.haze, [circle(C + 120, 420, 380, 1, 48)], FAN.teal, 70);
+    polys(fr.main, [circle(C + 120, 420, 300, 1, 64)], [0.85, 0.95, 1], 100);
+    polys(fr.main, [full()], FAN.indigo, 100);
+  },
+  wipe: function (fr, v) {   // a breath of golden fire sweeping the screen
+    var w = ease(v) * 1500; polys(fr.top, [[[-60, C - 60], [-60 + w, C - 60 - w * 0.6], [-60 + w * 1.1, C], [-60 + w, C + 60 + w * 0.6], [-60, C + 60]]], FAN.gold, 100);
+    polys(fr.top, [[[-60, C - 30], [-60 + w * 0.9, C - 30 - w * 0.35], [-60 + w, C], [-60 + w * 0.9, C + 30 + w * 0.35], [-60, C + 30]]], FAN.gold_l, 100);
+  },
+  stage: function (fr, f, at, o) {   // a dragon of light coiled round the card, its wings spread, runes turning
+    var g = ease((f - CARD_AT) / 6);
+    var coil = spiral(C, C, 260, 470 * g + 40, 1.6, 1.15, f * 0.05, 1, 0);
+    lines(fr.glow, [coil], FAN.teal, 70, o); lines(fr.main, [coil], FAN.gold, 30, o); lines(fr.main, [coil], FAN.gold_l, 10, o);
+    var tip = coil[coil.length - 1]; polys(fr.main, [circle(tip[0], tip[1], 34, 1, 16)], FAN.gold_l, o);
+    if (at >= 0) {
+      var open = back(at / 10), blades = [];
+      for (var side = -1; side <= 1; side += 2) for (var k = 0; k < 9; k++) { var right = -1.5 + (0.2 + k * 0.22) * open, ang = side > 0 ? right : Math.PI - right; blades.push(blade(C + side * 140, C - 200, (640 - k * 45) * Math.min(1, open * 1.2), 70 - k * 5, ang)); }
+      polys(fr.haze, blades, FAN.teal, o); polys(fr.main, blades, FAN.gold, o * 0.75);
+    }
+    runeRing(fr, 500, f * 0.02, o * 0.7); runeRing(fr, 380, -f * 0.03, o * 0.6, FAN.teal);
+    polys(fr.haze, [circle(C, C, 480 * g + 60, 1.2, 40)], FAN.violet, o);
+    polys(fr.main, [full()], FAN.night, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 8) { polys(fr.top, slash(1140, 820, -60, 260, 40, ease(at / 3), -0.5), FAN.gold_l, fade(at, 4, 8) * 90); polys(fr.top, slash(-60, 820, 1140, 260, 40, ease((at - 2) / 3), 0.5), FAN.teal, fade(at, 5, 9) * 80); }
+    seed(780); var motes = []; for (var i = 0; i < 40; i++) motes.push([C + between(-500, 500), 1100 - ((f * between(6, 14) + between(0, 1100)) % 1150), between(4, 10)]);
+    if (at >= 0) polys(fr.top, glintPolys(twinkle(motes, f, 4, 14)), FAN.gold_l);
+    bigGlint(fr, at, FAN.teal);
+  }
+};
+GENRE_FANTASY.rarities = { rare: FANTASY_RARE, epic: GENRE_FANTASY, legendary: FANTASY_LEGENDARY };
+
+// --- Hyperespace ----------------------------------------------------------------------------------------------
+function radar(fr, cx, cy, r, f, o) {   // a scope: rings, cross hairs, a sweeping beam, blips
+  var rings = []; for (var k = 1; k <= 4; k++) rings.push(ring(cx, cy, r * k / 4, 1));
+  lines(fr.main, rings.concat([[[cx - r, cy], [cx + r, cy]], [[cx, cy - r], [cx, cy + r]]]), SF.cyan, 2.5, o * 0.6);
+  var a = f * 0.18; polys(fr.glow, [[[cx, cy], [cx + Math.cos(a) * r, cy + Math.sin(a) * r], [cx + Math.cos(a - 0.5) * r, cy + Math.sin(a - 0.5) * r]]], SF.cyan, o * 0.7);
+  lines(fr.main, [[[cx, cy], [cx + Math.cos(a) * r, cy + Math.sin(a) * r]]], SF.white, 4, o);
+  seed(880); var blips = []; for (var i = 0; i < 7; i++) { var ba = between(0, Math.PI * 2), bd = between(0.2, 0.95) * r, lag = ((a - ba) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2); if (lag < 2.5) blips.push(circle(cx + Math.cos(ba) * bd, cy + Math.sin(ba) * bd, 9, 1, 10)); }
+  polys(fr.glow, blips, SF.cyan, o); polys(fr.main, blips, SF.white, o);
+}
+var SF_RARE = {
+  title: function (fr, f, u) {   // a ship's scope looking for something
+    radar(fr, C, C, 440, f, 100);
+    polys(fr.main, [full()], SF.space, 100);
+  },
+  wipe: function (fr, v) {   // a scan line sweeping down
+    var y = -60 + ease(v) * 1200; polys(fr.top, [[[-60, -60], [1140, -60], [1140, y], [-60, y]]], SF.space, 100); polys(fr.top, [[[-60, y - 8], [1140, y - 8], [1140, y + 8], [-60, y + 8]]], SF.cyan, 100);
+  },
+  stage: function (fr, f, at, o) {
+    var lines2 = []; for (var k = 0; k < 12; k++) { var y = 760 + k * k * 6; lines2.push([[-60, y], [1140, y]]); } for (var j = -8; j <= 8; j++) lines2.push([[C + j * 40, 760], [C + j * 260, 1140]]);
+    lines(fr.main, lines2, SF.cyan, 2, o * 0.5);
+    radar(fr, C, C, 330, f, o * 0.35);
+    polys(fr.main, [full()], SF.space, o);
+  },
+  over: function (fr, f, at) {
+    if (at >= 0 && at < 12) { var y = C - 260 + at * 50; polys(fr.top, [[[C - 230, y], [C + 230, y], [C + 230, y + 5], [C - 230, y + 5]]], SF.cyan, 70); }
+  }
+};
+function ship(x, y, s, ang) {   // a capital ship's wedge, its bridge, its engines' glow
+  return { hull: place([[s, 0], [-s * 0.6, -s * 0.42], [-s * 0.7, -s * 0.34], [-s * 0.7, s * 0.34], [-s * 0.6, s * 0.42]], x, y, ang), bridge: place([[-s * 0.35, -s * 0.06], [-s * 0.55, -s * 0.1], [-s * 0.55, s * 0.1], [-s * 0.35, s * 0.06]], x, y, ang), engines: [place(circle(-s * 0.72, -s * 0.18, s * 0.07, 1, 10), x, y, ang), place(circle(-s * 0.72, s * 0.18, s * 0.07, 1, 10), x, y, ang)] };
+}
+var FLEET = [[C - 360, C - 300, 150, 0.3], [C + 380, C - 260, 120, 2.6], [C - 400, C + 280, 110, -0.4], [C + 360, C + 320, 170, -2.7], [C, C - 470, 90, 1.6]];
+var SF_LEGENDARY = {
+  title: function (fr, f, u) {   // hyperspace, then a great ship tearing out of it
+    hyperspace(fr.main, fr.glow, f, 140, 890, 1 + u * 2);
+    var s = 60 + f * f * 1.4, sh = ship(C, C, s, 0.0);
+    if (f > 6) { polys(fr.main, [sh.hull], [0.55, 0.6, 0.7], 100); polys(fr.main, [sh.bridge], [0.3, 0.33, 0.4], 100); polys(fr.glow, sh.engines, SF.cyan, 100); }
+    polys(fr.main, [full()], SF.space, 100);
+  },
+  wipe: function (fr, v) { polys(fr.top, [circle(C, C, 1000 * (1 - Math.abs(v * 2 - 1)) + 10, 1, 48)], SF.white, 100); },
+  stage: function (fr, f, at, o) {   // a fleet dropping out of hyperspace round the card, lasers crossing, the planet behind
+    var g = ease((f - CARD_AT) / 6);
+    for (var i = 0; i < FLEET.length; i++) {
+      var t = f - CARD_AT - 1 - i * 4; if (t < 0) continue;
+      var arrive = ease(t / 4), sx = FLEET[i][0] - Math.cos(FLEET[i][3]) * 700 * (1 - arrive), sy = FLEET[i][1] - Math.sin(FLEET[i][3]) * 700 * (1 - arrive), sh = ship(sx, sy, FLEET[i][2], FLEET[i][3]);
+      if (arrive < 1) lines(fr.glow, [[[sx, sy], [sx - Math.cos(FLEET[i][3]) * 600, sy - Math.sin(FLEET[i][3]) * 600]]], SF.white, 30 * (1 - arrive), o);
+      polys(fr.main, [sh.bridge], [0.3, 0.33, 0.4], o); polys(fr.main, [sh.hull], [0.55, 0.6, 0.72], o); polys(fr.glow, sh.engines, SF.cyan, o);
+    }
+    if (at >= 0) { seed(895 + Math.floor(at / 3)); var beams = []; for (var k = 0; k < 4; k++) { var a = FLEET[k], b = FLEET[(k + 2) % 5]; beams.push([[a[0], a[1]], [b[0], b[1]]]); } lines(fr.glow, beams, (at % 6 < 3) ? SF.magenta : SF.cyan, 14, fade(at, 30, 50) * o); lines(fr.top, beams, SF.white, 3, fade(at, 30, 50) * o); }
+    if (at >= 0) { var sw = 250 + at * 45; lines(fr.glow, [ring(C, C, sw, 0.4)], SF.cyan, 26, fade(at, 8, 18) * o); lines(fr.main, [ring(C, C, sw, 0.4)], SF.white, 5, fade(at, 8, 18) * o); }
+    var pr = 400 * g; polys(fr.main, [place(circle(0, 0, pr * 1.75, 0.28, 72), C, C + 40, -0.25)], SF.cyan, o * 0.5);
+    polys(fr.main, [circle(C, C + 40, pr, 1, 64)], SF.planet, o);
+    seed(820); var stars = []; for (var j = 0; j < 90; j++) stars.push([between(0, 1080), between(0, 1080), between(1.5, 4)]);
+    polys(fr.main, glintPolys(twinkle(stars, f, 5, 6)), SF.white);
+    polys(fr.haze, [circle(C - 200, C - 260, 420, 0.7, 40)], SF.magenta, o * 0.45);
+    polys(fr.main, [full()], SF.space, o);
+  },
+  over: function (fr, f, at) {
+    sparksOut(fr.main, fr.glow, at - 2, 34, SF.cyan, 1850, 30);
+    if (at >= 0 && at < 8) polys(fr.top, slash(-60, 760, 1140, 300, 34, ease(at / 3), 0.5), SF.cyan, fade(at, 4, 8) * 80);
+    bigGlint(fr, at, SF.cyan);
+  }
+};
+GENRE_SF.rarities = { rare: SF_RARE, epic: GENRE_SF, legendary: SF_LEGENDARY };
+
 var GENRE = { action: GENRE_ACTION, dark: GENRE_DARK, drama: GENRE_DRAMA, fantasy: GENRE_FANTASY, sf: GENRE_SF }[GENRE_KEY];
 
 // --- the comps --------------------------------------------------------------------------------------------
