@@ -45737,9 +45737,24 @@
     },
     "/api/v1/me/news/sources/items": {
       "get": {
-        "description": "The latest items of the sources I follow.",
+        "description": "The latest items of the sources I follow (or of some of them).",
         "operationId": "my_source_items_api_v1_me_news_sources_items_get",
         "parameters": [
+          {
+            "in": "query",
+            "name": "source",
+            "required": false,
+            "schema": {
+              "default": [],
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "maxItems": 50,
+              "title": "Source",
+              "type": "array"
+            }
+          },
           {
             "in": "query",
             "name": "limit",

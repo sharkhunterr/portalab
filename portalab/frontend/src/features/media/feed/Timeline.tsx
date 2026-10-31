@@ -134,12 +134,30 @@ export function Timeline({
       [],
   });
   const editorial = useSourceItems({}, 60);
+  // one source chosen: its own latest items (the mixed ones above are the newest of all only)
+  const picked = only !== "all" && only !== "mine" && only !== "server" ? only : null;
+  const single = useQuery({
+    queryKey: ["news", "sources", "mine", "items", picked],
+    enabled: picked !== null,
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/me/news/sources/items", {
+          params: { query: { source: [picked as string], limit: 100 } },
+        })
+      ).data?.items ?? [],
+  });
+  const editorialOne = useSourceItems({ source: picked ? [picked] : [] }, 60, picked !== null);
   const { entries, sources } = useMemo(() => {
     const people = new Set(follows.filter((f) => f.kind === "person").map((f) => f.ref));
     const titles = new Set(follows.filter((f) => f.kind === "title").map((f) => f.ref));
     const since = seenAt ? Date.parse(seenAt) : null;
     const news = new Map<string, SourceItem>();
-    for (const item of [...(Array.isArray(mine.data) ? mine.data : []), ...(editorial.data ?? [])]) {
+    const extra = picked ? [...(single.data ?? []), ...(editorialOne.data ?? [])] : [];
+    for (const item of [
+      ...(Array.isArray(mine.data) ? mine.data : []),
+      ...(editorial.data ?? []),
+      ...extra,
+    ]) {
       news.set(item.id, item);
     }
     const names = [...new Map([...news.values()].map((i) => [i.source_id, i.source])).entries()].sort(
@@ -171,7 +189,7 @@ export function Timeline({
     }
     out.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
     return { entries: out, sources: [server, ...bySource.values()] };
-  }, [arrivals, follows, seenAt, mine.data, editorial.data, t]);
+  }, [arrivals, follows, seenAt, mine.data, editorial.data, picked, single.data, editorialOne.data, t]);
   const matching = entries.filter(
     (e) => only === "all" || (only === "mine" ? e.forMe : e.source.key === only),
   );

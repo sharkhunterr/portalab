@@ -306,10 +306,13 @@ async def unfollow_source(principal: Reader, module: Module, source_id: UUID) ->
 
 @router.get("/me/news/sources/items", response_model=SourceItemsOut)
 async def my_source_items(
-    principal: Reader, module: Module, limit: Annotated[int, Query(ge=1, le=100)] = 30
+    principal: Reader,
+    module: Module,
+    source: Annotated[list[UUID], Query(max_length=50)] = [],  # noqa: B006 — FastAPI's list query
+    limit: Annotated[int, Query(ge=1, le=100)] = 30,
 ) -> SourceItemsOut:
-    """The latest items of the sources I follow."""
-    rows = await module.sources.items(reader=_me(principal), limit=limit)
+    """The latest items of the sources I follow (or of some of them)."""
+    rows = await module.sources.items(feeds=source, reader=_me(principal), limit=limit)
     return SourceItemsOut(items=[_item(item, feed) for item, feed in rows])
 
 
