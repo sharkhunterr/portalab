@@ -94,6 +94,10 @@ export const GENRES: Genre[] = [
   "war",
   "western",
 ];
+/** Issue 296: a theme booster's works — Japanese animation, giant monsters and robots, samurai and ninjas,
+ * Japan (a work's own theme first, the most telling) */
+export type Theme = "anime" | "kaiju" | "samurai" | "japan";
+export const THEMES: Theme[] = ["japan", "anime", "kaiju", "samurai"];
 export interface WorkFacts {
   rating?: number;
   votes?: number;
@@ -187,6 +191,8 @@ export interface PackLook {
   rarity?: Rarity | null;
   /** issue 296: a genre booster's main genre */
   genre?: Genre | null;
+  /** issue 296: a theme booster's theme, or a content booster's work's own */
+  theme?: Theme | null;
 }
 
 export interface CardPack {

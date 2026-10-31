@@ -136,6 +136,7 @@ class MediaCardSources:
                     genres=_strings(data.get("genres")),
                     facts=_facts(data),
                     overview=str(data["overview"])[:1200] if data.get("overview") else None,
+                    keywords=_strings(data.get("keywords")),
                 )
             )
         return out

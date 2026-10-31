@@ -808,6 +808,58 @@ async def test_a_genre_booster_and_a_booster_signature_frame(database: Database)
     assert {v for _, v in drawn} - set(signed) <= set(VARIANTS)
 
 
+async def test_a_theme_booster_draws_the_works_of_its_theme(database: Database) -> None:
+    """Issue 296: a work's themes from where it comes from and its keywords, the most telling first — a theme
+    booster draws among them; a content booster shows its work's own theme (the scene it opens in)."""
+    capabilities = new_registry()
+    anime = replace(
+        work("Le Voyage de Chihiro", 9000, "JP", ["Chihiro", "Haku"]),
+        languages=["Japanese"],
+        genres=("Animation", "Fantastique"),
+        keywords=("spirit", "anime"),
+    )
+    kaiju = replace(
+        work("Godzilla Minus One", 8000, "JP", ["Koichi", "Noriko"]),
+        languages=["Japanese"],
+        keywords=("kaiju",),
+    )
+    elsewhere = replace(work("Pacific Rim", 7000, "US", ["Raleigh", "Mako"]), keywords=("giant robot",))
+    plain = work("Top Gun: Maverick", 11000, "US", ["Tom Cruise"])
+    sources = Sources([anime, kaiju, elsewhere, plain])
+    capabilities.provide(CARD_SOURCES, sources, instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    async with database.session() as session:
+        themes = dict((await session.execute(select(CardSet.name, CardSet.themes))).all())
+    assert themes == {
+        "Le Voyage de Chihiro": ["anime", "japan"],
+        "Godzilla Minus One": ["kaiju", "japan"],
+        "Pacific Rim": ["kaiju"],
+        "Top Gun: Maverick": [],
+    }
+    user = uuid4()
+    async with database.unit_of_work() as uow:
+        await uow.session.execute(INSERT_USER, {"id": user, "login": f"u{user.hex[:8]}"})
+    packs = Packs(database, capabilities, rng=random.Random(7))  # noqa: S311 — deterministic test data
+    handler = CardBoosterHandler(packs)
+    assert booster_of({"theme": "kaiju", "cards": 3}) == {"theme": "kaiju", "cards": 3}
+    assert booster_of({"theme": "western", "cards": 3}) == {"cards": 3}  # not a theme
+    for attempt in range(6):
+        payload = {"theme": "kaiju", "cards": 3}
+        assert (
+            await handler.activate(OwnershipView(uuid4(), user, f"k{attempt}", "card_booster", payload))
+        ).state == "active"
+    async with database.session() as session:
+        drawn = (
+            await session.execute(
+                select(CardSet.name)
+                .join(Card, Card.set_key == CardSet.key)
+                .join(Copy, Copy.card_id == Card.id)
+                .where(Copy.user_id == user)
+            )
+        ).scalars()
+        assert set(drawn) == {"Godzilla Minus One", "Pacific Rim"}
+
+
 class Published:
     def __init__(self) -> None:
         self.events: list[tuple[str, dict[str, Any], str | None]] = []

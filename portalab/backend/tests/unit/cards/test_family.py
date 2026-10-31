@@ -1,6 +1,6 @@
 """Issue 229: a card's colour by its work's genre."""
 
-from portalab.modules.cards.family import GENRES, MAIN, family_of, genre_of
+from portalab.modules.cards.family import GENRES, MAIN, family_of, genre_of, themes_of
 
 
 def test_a_works_colour() -> None:
@@ -29,3 +29,18 @@ def test_a_works_genre_frame_is_its_main_genre() -> None:
     assert genre_of(["Inconnu", "Western"]) == "western"
     assert genre_of([]) == "drama"
     assert set(MAIN.values()) == set(GENRES)
+
+
+def test_a_works_themes_say_where_it_comes_from_and_what_it_shows() -> None:
+    # issue 296: Japanese when made there in Japanese, anime when animated too
+    assert themes_of(["JP"], ["Japanese"], [], True) == ["anime", "japan"]
+    assert themes_of(["JP"], ["Japanese"], ["monster", "Kaiju"], False) == ["kaiju", "japan"]
+    # a production country alone is not enough: a Hollywood film co-produced in Japan
+    assert themes_of(["JP", "US"], ["English"], [], True) == []
+    # its keywords: giant monsters anywhere; samurai, ninjas set it in Japan, a katana alone does not
+    assert themes_of(["US"], ["English"], ["giant robot", "kaiju"], False) == ["kaiju"]
+    assert themes_of(["US"], ["English"], ["samurai", "ronin"], False) == ["samurai", "japan"]
+    assert themes_of(["US"], ["English"], ["katana"], False) == ["samurai"]
+    assert themes_of(["US"], ["English"], ["ninja", "new york city"], False) == ["samurai"]
+    assert themes_of(["US"], ["English"], ["japan", "yakuza"], False) == ["samurai", "japan"]
+    assert themes_of(["FR"], ["French"], ["paris, france"], False) == []

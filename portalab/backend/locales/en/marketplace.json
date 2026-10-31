@@ -720,6 +720,7 @@
   "admin.field.card_booster.family": "Colour (broad genre)",
   "admin.field.card_booster.signature": "Signature frame (the scene whose face is kept)",
   "admin.field.card_booster.genre": "Main genre",
+  "admin.field.card_booster.theme": "Theme (Japan, anime, kaiju, samurai)",
   "admin.field.card_booster.edition": "Edition (period)",
   "admin.field.card_booster.kind": "Films or series",
   "admin.field.card_booster.cards": "Cards per booster",

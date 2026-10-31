@@ -30,7 +30,8 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   (a scrolling pixel world, a cartridge, a console powering on, pixel coins and fireworks) and **a cyberpunk
   megacity in the rain** (holograms, flying cars, a data shard hacked, its ICE shattering, neon arcs). Every
   scene's effects fade out inside an ellipse of their layer, so its box never shows.
-- `booster-impact/` (`impact`): **an animated trading-card game's opening, drawn as a comic** — inked
+- `booster-impact/` (`impact`, the source `booster-impact-video/` is made from — import that one: this one,
+  26 MB of sprite sheets, would double it): **an animated trading-card game's opening, drawn as a comic** — inked
   outlines, flat cel colours, halftone and hard edges everywhere; its opening and reveals are anime impact
   frames made in [EffectCraft](https://github.com/storytold/effectcraft) and played from WebP sprite sheets
   at 24 fps (sources and `build.sh` in `booster-impact-source/`): speed lines and halftone corners on black; a pack in flat violet with graffiti
