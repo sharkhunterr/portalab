@@ -37,7 +37,8 @@ export function packBooster(t: Translate, pack: CardPack, locale: string): Boost
   const name = pack.set_name ?? packName(t, pack);
   return {
     ...demoBooster({ [locale]: name, en: name }, pack.count),
-    key: `cards:${pack.id}`,
+    // issue 293: a bought one opens in the scene bound to its product (its kind's otherwise)
+    key: look?.product ?? `cards:${pack.id}`,
     sealed: 1,
     logo: artworkImage(logoFor(look?.logos ?? {}, locale)),
     // the art site's textless art of the work, else its poster
