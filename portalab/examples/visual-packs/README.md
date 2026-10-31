@@ -66,11 +66,14 @@ data contracts of widgets, the analysis codes, the workflow). Complete examples:
   (orange bands cracked with lightning first, for a legendary); over it slashes of light, lightning and sparks —
   and the rarity's name, written by Portalab, slammed across the screen first in big comic letters; a neon
   violet pack sliced by a beam of light; neon-framed cards; a neon stage as a looping video;
-- `booster-blockbuster/`, `booster-tenebres/`, `booster-rideau/`, `booster-arcanes/`, `booster-hyperespace/`:
-  **a scene per Mediacards genre** (Action, Sombre, Drame, Fantastique, Science-fiction), built together from
-  `booster-genres-source/`, every rarity staged over the whole screen in the genre's world — steel and fire;
-  claw marks, crows and a blood moon; a velvet curtain and a spotlight; runes, a portal and wings of light;
-  hyperspace and a ringed planet — each pack going its own way as it opens, its stage a looping video;
+- `booster-blockbuster/`, `booster-tenebres/`, `booster-rideau/`, `booster-arcanes/`, `booster-hyperespace/`,
+  `booster-tresor/`, `booster-reportage/`, `booster-insomnie/`: **a scene per Mediacards genre booster** (Action,
+  Horreur, Drame, Fantastique, Science-fiction, Aventure, Documentaire, Thriller), built together from
+  `booster-genres-source/`, each rarity its own moment over the whole screen in the genre's world — a chase, an
+  explosion, the finale; a bulb, claws, a blood moon; a spotlight, the curtain, the ovation; runes, a portal, a
+  dragon; a scope, the jump, a fleet; a treasure map, a sunken chest, an island; a viewfinder, a clapperboard,
+  the archive; a tail in the rain, a countdown, a manhunt ending in bullet holes in the card — each pack going
+  its own way as it opens, its stage a looping video;
 - `booster-ed-nitrate/` … `booster-ed-glass/`: **a scene per media card edition** (the fourteen editions'
   boosters), built together from `booster-editions-source/`, each in its frame's era — a silent film's iris and
   Art Deco sun; a detective's board of clues under the blinds; an atomic drive-in; op-art rings; a 1970s sunset

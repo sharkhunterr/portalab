@@ -1,0 +1,18 @@
+{
+  "type": "booster_look",
+  "look": "reportage",
+  "names": {
+    "fr": "Boîte à pellicule",
+    "en": "Film can"
+  },
+  "descriptions": {
+    "fr": "Un paquet de métal brossé comme une boîte à pellicule, une bande de clap, l'image de l'œuvre dans un cadre de viseur, son nom en machine à écrire, un clap en emblème.",
+    "en": "A brushed metal pack like a film can, a clapperboard's band, the work's art in a viewfinder's frame, its name typewritten, a clapperboard as emblem."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "pack.css"
+    ]
+  }
+}

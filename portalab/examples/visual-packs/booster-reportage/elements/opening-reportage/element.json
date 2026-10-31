@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "reportage",
+  "names": {
+    "fr": "Diaphragme",
+    "en": "Iris"
+  },
+  "descriptions": {
+    "fr": "Le diaphragme d'une caméra se referme sur le paquet, un éclair — il a disparu, le diaphragme se rouvre.",
+    "en": "A camera's iris closes on the pack, a flash — it is gone, the iris opens again."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

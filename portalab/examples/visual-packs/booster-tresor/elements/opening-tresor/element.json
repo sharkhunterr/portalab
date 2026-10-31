@@ -1,0 +1,22 @@
+{
+  "type": "booster_opening",
+  "look": "tresor",
+  "names": {
+    "fr": "La carte se déroule",
+    "en": "The map unrolls"
+  },
+  "descriptions": {
+    "fr": "Une carte au trésor se déroule autour du paquet, un chemin en pointillés le trouve, une croix — il éclate en pièces d'or.",
+    "en": "A treasure map unrolls round the pack, a dotted path finds it, an X — it bursts into gold coins."
+  },
+  "render": {
+    "kind": "video",
+    "file": "opening.mp4",
+    "alpha": "side",
+    "css": [
+      "opening.css"
+    ],
+    "stage": true,
+    "duration": 2.6
+  }
+}

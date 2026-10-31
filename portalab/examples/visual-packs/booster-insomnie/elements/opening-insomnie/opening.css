@@ -1,0 +1,22 @@
+/* The opening (its hook: the scene's pack while it opens, data-opening), 2.6 s, drawn in EffectCraft and played
+   as a video: A reticle looks for the pack and locks on; a shot — it shatters like glass. */
+[data-opening="insomnie"] .booster-stage__tear .booster-pack {
+  animation: genre-fate 2.6s linear both;
+}
+@keyframes genre-fate {
+  0% { transform: none; filter: none; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); opacity: 1; }
+  40% { transform: scale(1.02); filter: brightness(1.2); }
+  44% { transform: scale(1.05); filter: brightness(2.5); clip-path: polygon(0 0, 55% 0, 40% 45%, 70% 60%, 45% 100%, 0 100%); opacity: 1; }
+  56%, 100% { transform: translate(-40px, 120px) rotate(-12deg); clip-path: polygon(0 0, 55% 0, 40% 45%, 70% 60%, 45% 100%, 0 100%); opacity: 0; }
+}
+/* room for the video: the pack at its size in the middle of a layer 4.8 pack-widths wide and 2.7 high, fading
+   out towards its edges */
+[data-opening="insomnie"] .booster-stage__opening {
+  inset: -85% -190%;
+  mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-opening="insomnie"] .booster-stage__tear .booster-pack {
+    animation: none;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "tresor",
+  "names": {
+    "fr": "Dos de parchemin",
+    "en": "Parchment back"
+  },
+  "descriptions": {
+    "fr": "Parchemin, sceau de cire, une rose des vents au centre.",
+    "en": "Parchment, a wax seal, a compass rose in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}

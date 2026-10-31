@@ -1,0 +1,19 @@
+{
+  "type": "card_back",
+  "look": "insomnie",
+  "names": {
+    "fr": "Dos noir",
+    "en": "Black back"
+  },
+  "descriptions": {
+    "fr": "Noir rayé, une bande rouge, un viseur au centre.",
+    "en": "Striped black, a red band, a reticle in the middle."
+  },
+  "render": {
+    "kind": "css",
+    "css": [
+      "back.css"
+    ],
+    "rarity": "common"
+  }
+}
