@@ -298,7 +298,7 @@
   "feed.kinds.person": "People",
   "feed.kinds.title": "Series",
   "feed.manage": "Manage my feed: what I follow, my sources",
-  "feed.more": "Show more ({count} more)",
+  "feed.more": "Show more ({count, plural, one {# more} other {# more}})",
   "feed.new": "New",
   "feed.nothingYet": "Nothing new these last weeks for what you follow.",
   "feed.server": "On the server",

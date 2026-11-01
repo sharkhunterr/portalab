@@ -51,7 +51,7 @@
   font-size: var(--font-size-lg);
 }
 
-/* #298: the figures first, small; what a total is made of, in sight */
+/* issue 298: the figures first, small; what a total is made of, in sight */
 .statistics-kpis {
   display: grid;
   gap: var(--space-3);

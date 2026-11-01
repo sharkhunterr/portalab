@@ -13,7 +13,13 @@ from sqlalchemy import delete, select
 from portalab.capabilities.privacy_participants import ErasureMode, ExportRecord
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
-from portalab.modules.marketplace.models import BoosterOpening, Equipped, ProjectFunding, ReserveItem
+from portalab.modules.marketplace.models import (
+    BoosterOpening,
+    Equipped,
+    ProjectFunding,
+    ReserveItem,
+    ReserveSeen,
+)
 
 
 class MarketplaceParticipant:
@@ -74,6 +80,7 @@ class MarketplaceParticipant:
             # #81: the boosters opened and the reserve go with it too (amounts stay in the ledger)
             await uow.session.execute(delete(BoosterOpening).where(BoosterOpening.user_id == user_id))
             await uow.session.execute(delete(ReserveItem).where(ReserveItem.user_id == user_id))
+            await uow.session.execute(delete(ReserveSeen).where(ReserveSeen.user_id == user_id))
             rows = (
                 await uow.session.execute(
                     select(ProjectFunding)

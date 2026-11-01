@@ -123,7 +123,7 @@ export function NewsPage() {
           ))}
         </ul>
       ) : null}
-      {/* #299: news from elsewhere — the sources the editors chose (a channel's when one is chosen) */}
+      {/* issue 299: news from elsewhere — the sources the editors chose (a channel's when one is chosen) */}
       <ExternalNews heading={t("news:external.title")} limit={24} category={category || null} />
     </section>
   );

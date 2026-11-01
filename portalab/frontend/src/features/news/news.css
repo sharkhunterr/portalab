@@ -510,7 +510,7 @@
   font-weight: var(--font-weight-bold);
 }
 
-/* #299: news from elsewhere — the portal's copy of each picture, its source, the library titles it names */
+/* issue 299: news from elsewhere — the portal's copy of each picture, its source, the library titles it names */
 .news-external {
   display: grid;
   gap: var(--space-3);

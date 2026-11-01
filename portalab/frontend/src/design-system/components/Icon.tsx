@@ -396,7 +396,7 @@ export const ICONS: Record<string, LucideIcon> = {
   disc: Disc3,
   radio: Radio,
   tv: Tv,
-  rss: Rss, // #299: « Mon fil »
+  rss: Rss, // issue 299: « Mon fil »
   pin: Pin,
   upload: Upload,
   external: ExternalLink,

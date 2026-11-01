@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
@@ -18,6 +18,7 @@ import {
   requestKey,
   useEarlyUnlock,
   useReserve,
+  useReserveSeen,
   useUseReserve,
 } from "../boosters/api";
 import { ProductArt } from "../catalog/ProductArt";
@@ -226,6 +227,12 @@ function Item({
 export default function ReservePage() {
   const t = useT();
   const reserve = useReserve();
+  const seen = useReserveSeen();
+  const loaded = reserve.isSuccess;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once per visit, when the reserve is shown
+  useEffect(() => {
+    if (loaded) seen.mutate();
+  }, [loaded]);
   const [done, setDone] = useState<{ name: string; ticket: boolean; unlocked?: boolean } | null>(null);
   const items = reserve.data ?? [];
   const collects = useCollectsCards(); // issue 243: not for a member who plays without the cards

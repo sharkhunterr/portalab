@@ -7305,6 +7305,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/marketplace/reserve/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reserve Seen
+         * @description #81: I opened my reserve — what came in is no longer new (its badge goes).
+         */
+        post: operations["reserve_seen_api_v1_marketplace_reserve_seen_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/reserve/{key}/unlock": {
         parameters: {
             query?: never;
@@ -33867,6 +33887,24 @@ export interface operations {
                         [key: string]: unknown;
                     }[];
                 };
+            };
+        };
+    };
+    reserve_seen_api_v1_marketplace_reserve_seen_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

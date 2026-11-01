@@ -4,7 +4,7 @@ import { type FollowKind, useFollows, useFollowToggle } from "./api";
 import "./feed.css";
 
 /**
- * #299: « Suivre » on a person's or a series' page — what it brings lands in « Mon fil ». Private: nobody
+ * issue 299: « Suivre » on a person's or a series' page — what it brings lands in « Mon fil ». Private: nobody
  * else ever sees what I follow. Pressing it again stops following.
  */
 export function FollowButton({ kind, value, name }: { kind: FollowKind; value: string; name: string }) {

@@ -954,12 +954,12 @@ export function DetailPage() {
         <PluginSlot name="media.actions" params={{ item: media.id }} />
         {/* issue 190: what I think of it — it shapes my recommendations */}
         {TASTED.includes(media.kind) ? <TasteButtons objectId={media.id} title={media.title} /> : null}
-        {/* #299: a series followed brings its new episodes into « Mon fil » */}
+        {/* issue 299: a series followed brings its new episodes into « Mon fil » */}
         {media.kind === "series" ? <FollowButton kind="title" value={media.id} name={media.title} /> : null}
       </TitleHero>
       <LeavingNotice objectId={media.id} title={media.title} />
       <RequestJourney objectId={media.id} title={media.title} />
-      {/* #299: what the news sources say of it */}
+      {/* issue 299: what the news sources say of it */}
       <ExternalNews heading={t("news:external.aboutTitle")} asked={{ title: [media.id] }} />
       {metadata.data ? (
         <Enrichment objectId={media.id} />

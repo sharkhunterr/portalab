@@ -436,7 +436,7 @@ function ArticleRow({ article, onEdit }: { article: NewsEditor; onEdit: () => vo
 }
 
 // the newsletters moved to « Newsletters & e-mail » (admin reorganisation, trial)
-const TABS = ["articles", "channels", "sources"] as const; // #299: news from elsewhere
+const TABS = ["articles", "channels", "sources"] as const; // issue 299: news from elsewhere
 
 export function NewsAdmin() {
   const t = useT();

@@ -403,7 +403,7 @@ class MediaModule:
         if not any(p.instance_ref == "media.feed" for p in self.capabilities.system_providers(ATTENTION)):
             # #299: what arrived for a member since they last read « Mon fil »
             self.capabilities.provide(
-                ATTENTION, FeedAttention(self.feed), instance_ref="media.feed", owner=OWNER
+                ATTENTION, FeedAttention(self.feed, self.capabilities), instance_ref="media.feed", owner=OWNER
             )
         register_baseline(self.types, OWNER)
         if self.calendar.get(MediaReleaseCalendarSource.kind) is None:  # 027: releases in the calendar

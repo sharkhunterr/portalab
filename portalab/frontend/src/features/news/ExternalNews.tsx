@@ -31,7 +31,7 @@ export function useSourceItems(asked: Asked = {}, limit = 12, enabled = true) {
 
 type Mention = SourceItem["mentions"][number];
 
-/** A library title or a person an item names — to their page; marked when I follow them (#299). */
+/** A library title or a person an item names — to their page; marked when I follow them (issue 299). */
 export function MentionChip({ mention }: { mention: Mention }) {
   const followed = useFollowed();
   const mine = mention.kind === "person" ? followed.person(mention.ref) : followed.title(mention.ref);
@@ -88,7 +88,7 @@ export function SourceCard({ item, actions }: { item: SourceItem; actions?: Reac
 }
 
 /**
- * #299: news from elsewhere — on « À la une » (a channel's when one is chosen), on a title's or a person's
+ * issue 299: news from elsewhere — on « À la une » (a channel's when one is chosen), on a title's or a person's
  * page (« in the news »), in « Mon fil » for what I follow. Nothing drawn when there is none.
  */
 export function ExternalNews({

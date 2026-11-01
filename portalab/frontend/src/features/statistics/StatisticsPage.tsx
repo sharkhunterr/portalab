@@ -19,7 +19,7 @@ const PERIODS: Array<{ value: string; kind: PeriodKind; days?: number }> = [
   { value: "year", kind: "year" },
 ];
 
-/** #298: the community's and the portal's figures (``/statistics``), or mine (``/statistics/me``). */
+/** issue 298: the community's and the portal's figures (``/statistics``), or mine (``/statistics/me``). */
 export function StatisticsPage({ mine = false }: { mine?: boolean }) {
   const t = useT();
   const headingId = useId();
@@ -30,7 +30,7 @@ export function StatisticsPage({ mine = false }: { mine?: boolean }) {
   const query = { period: choice?.kind ?? "last_n_days", ...(choice?.days ? { days: choice.days } : {}) };
   const entries = (catalog.data ?? []).filter((e) => (e.scope === "personal") === mine);
   const visible = entries.filter((e) => !hidden.includes(e.key));
-  // #298: the single figures first, small, then the charts
+  // issue 298: the single figures first, small, then the charts
   const figures = visible.filter((e) => e.viz === "number");
   const charts = visible.filter((e) => e.viz !== "number");
   const card = (entry: (typeof visible)[number]) => (

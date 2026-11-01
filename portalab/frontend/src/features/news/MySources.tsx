@@ -17,7 +17,7 @@ function problem(error: unknown): string | null {
 }
 
 /**
- * #299: my own sources in « Mon fil » — RSS or Atom feeds (a site's address will do) only I read, their
+ * issue 299: my own sources in « Mon fil » — RSS or Atom feeds (a site's address will do) only I read, their
  * latest items, and my list as OPML to take to another reader or bring from one. Private.
  */
 export function MySources({ items: listed = true }: { items?: boolean }) {

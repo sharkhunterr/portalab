@@ -6,7 +6,9 @@
 * ``CalendarSource`` registry — owners (News, Health maintenance, campaigns…) provide dated items with the
   permission applied at the source; the calendar owns no item;
 * ``support.knowledge`` / ``content.help`` ports — principal-bounded knowledge for Support, AI and the
-  contextual help slot.
+  contextual help slot;
+* ``news.source_items`` (#299) — how much the news sources a member reads published since a moment, for
+  « Mon fil »'s unread badge.
 Registries are owner-tagged: ``unregister(owner)`` removes every contribution of a module or plugin.
 """
 
@@ -16,6 +18,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Literal, Protocol, runtime_checkable
+from uuid import UUID
 
 from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.registry import CapabilitySpec
@@ -23,6 +26,7 @@ from portalab.core.authz_port import Principal
 
 KNOWLEDGE = "support.knowledge"
 HELP = "content.help"
+SOURCE_ITEMS = "news.source_items"
 LinkState = Literal["ok", "forbidden", "archived", "deleted", "unavailable"]
 ItemType = Literal[
     "event", "maintenance", "campaign", "community_event", "deadline", "publication", "incident"
@@ -185,6 +189,11 @@ class HelpResolver(Protocol):
     async def for_context(self, key: str, principal: Principal) -> Sequence[KnowledgeHit]: ...
 
 
+@runtime_checkable
+class SourceItems(Protocol):
+    async def published_since(self, user: UUID, since: datetime, limit: int = 99) -> int: ...
+
+
 def _spec(name: str, protocol: type[Any], description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=False, description=description
@@ -194,4 +203,5 @@ def _spec(name: str, protocol: type[Any], description: str) -> CapabilitySpec:
 SPECS: tuple[CapabilitySpec, ...] = (
     _spec(KNOWLEDGE, KnowledgeProvider, "Principal-bounded knowledge search (Wiki, 011)"),
     _spec(HELP, HelpResolver, "Contextual help pages for a UI key (Wiki, 011)"),
+    _spec(SOURCE_ITEMS, SourceItems, "What a member's news sources published lately, for their feed (#299)"),
 )

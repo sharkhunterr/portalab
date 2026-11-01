@@ -1184,7 +1184,7 @@
   color: var(--color-text-muted);
 }
 
-/* #298: where my collection stands, and the boosters waiting */
+/* issue 298: where my collection stands, and the boosters waiting */
 .cards-summary {
   display: grid;
   gap: var(--space-2);
@@ -1453,7 +1453,7 @@
   }
 }
 
-/* #298: every card there is — the site's fields, the rarities as pills */
+/* issue 298: every card there is — the site's fields, the rarities as pills */
 .cards-pool {
   display: grid;
   gap: var(--space-3);

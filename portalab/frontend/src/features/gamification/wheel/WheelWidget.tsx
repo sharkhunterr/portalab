@@ -251,6 +251,7 @@ export function WheelWidget({ payload, compact }: WidgetProps) {
         release.current?.();
         void client.invalidateQueries({ queryKey: ["gamification"] });
         void client.invalidateQueries({ queryKey: ["marketplace"] });
+        void client.invalidateQueries({ queryKey: ["shell", "attention"] }); // a booster in my reserve
       }, spinMs);
     },
     onError: () => {

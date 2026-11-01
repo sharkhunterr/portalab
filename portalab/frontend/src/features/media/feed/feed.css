@@ -1,4 +1,4 @@
-/* #299: « Mon fil » — what arrived for what I follow, what is coming, and what I follow */
+/* issue 299: « Mon fil » — what arrived for what I follow, what is coming, and what I follow */
 .media-follow {
   display: inline-flex;
   align-items: center;
@@ -161,7 +161,7 @@
   border-color: var(--state-error-fg);
 }
 
-/* #299: one stream — each entry with its source's badge, in the theme's chart palette */
+/* issue 299: one stream — each entry with its source's badge, in the theme's chart palette */
 .feed-badge {
   display: inline-flex;
   align-items: center;
@@ -372,7 +372,7 @@ a.feed-entry__title:hover {
   max-inline-size: 100%;
 }
 
-/* #299: what I follow, marked — a small badge (a chip's end, a portrait's corner) */
+/* issue 299: what I follow, marked — a small badge (a chip's end, a portrait's corner) */
 .followed-mark {
   display: inline-grid;
   place-items: center;

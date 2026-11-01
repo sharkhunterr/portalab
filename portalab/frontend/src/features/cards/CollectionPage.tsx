@@ -17,7 +17,7 @@ const VIEWS = ["collection", "boosters", "pool"] as const;
 type View = (typeof VIEWS)[number];
 const VIEW_ICONS: Record<View, string> = { collection: "layers", boosters: "gift", pool: "library" };
 
-/** #298: where my collection stands — the cards I have of all there are, the sets started, the copies. */
+/** issue 298: where my collection stands — the cards I have of all there are, the sets started, the copies. */
 function Summary({ mine }: { mine: CardsSummary }) {
   const t = useT();
   const format = useFormat();
@@ -125,7 +125,7 @@ function Sets() {
 }
 
 /**
- * Issue 229: ``/cards`` — my media cards. #298: the collection first (where it stands, my sets, one search
+ * Issue 229: ``/cards`` — my media cards. issue 298: the collection first (where it stands, my sets, one search
  * for sets, people and cards), the boosters to open a view of their own (their count on its tab), and every
  * card there is to look for the ones I miss. The view is in the address (``?vue=``).
  */
