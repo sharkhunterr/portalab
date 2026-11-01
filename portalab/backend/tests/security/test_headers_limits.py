@@ -62,6 +62,24 @@ async def test_rate_limit_per_session() -> None:
     assert codes[-1] == 429
 
 
+async def test_pictures_count_on_their_own_budget() -> None:
+    """#305: a page rich in pictures (posters, portraits, avatars) never spends the member's budget — a
+    reload's session check still answers — and the pictures have a budget of their own, four times larger."""
+    config = SecurityConfig(rate_limit_per_ip_per_minute=100, rate_limit_per_user_per_minute=2)
+    async with await _client(config) as client:
+        client.cookies.set("__Host-portalab_session", "abc")
+        pictures = [
+            "/api/v1/media/metadata-images?path=/a.jpg",
+            "/api/v1/media/images/01a10781-8e15-754c-8e92-273615b9458e",
+            "/api/v1/media/person/portrait?name=x",
+            "/api/v1/users/01a10781-8e15-754c-8e92-273615b9458e/avatar",
+        ]
+        codes = [(await client.get(pictures[i % 4])).status_code for i in range(8)]
+        assert 429 not in codes
+        assert (await client.get("/api/v1/me")).status_code != 429
+        assert (await client.get(pictures[0])).status_code == 429  # 2 x 4 pictures a minute
+
+
 def test_sliding_window() -> None:
     now = [0.0]
     limiter = SlidingWindowLimiter(2, window=60, clock=lambda: now[0])

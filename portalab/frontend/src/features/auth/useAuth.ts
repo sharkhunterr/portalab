@@ -21,7 +21,9 @@ export function useMe() {
         throw error;
       }
     },
-    retry: false,
+    // issue 305: too many requests (a page rich in pictures just before) — wait and ask again, never an error
+    retry: (count, error) => error instanceof ApiError && error.status === 429 && count < 5,
+    retryDelay: (count) => Math.min(1000 * 2 ** count, 10_000),
   });
 }
 

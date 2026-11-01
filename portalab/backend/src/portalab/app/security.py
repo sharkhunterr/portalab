@@ -9,6 +9,7 @@ import asyncio
 import hashlib
 import ipaddress
 import json
+import re
 import threading
 import time
 from collections import deque
@@ -142,6 +143,16 @@ EXEMPT_PATHS = frozenset({"/healthz", "/readyz"})
 # namespace): counting them would rate-limit a member who simply reloads a few pages (027).
 # 028: and the files of the live visual packs (immutable, fingerprinted, a page shows dozens of them)
 EXEMPT_GET_PREFIXES = ("/api/v1/i18n/catalogs/", "/api/v1/visuals/files/", "/api/v1/visuals/bundle/")
+# #305: the pictures a page shows (posters, backdrops, portraits, avatars) — dozens on a title's page: they
+# count on a budget of their own, four times the member's, so a page rich in pictures never spends the
+# budget of the calls that matter (a reload's session check answering « too many requests »)
+IMAGE_GET_PREFIXES = (
+    "/api/v1/media/metadata-images",
+    "/api/v1/media/images/",
+    "/api/v1/media/person/portrait",
+)
+IMAGE_GET = re.compile(r"^/api/v1/users/[^/]+/avatar$")
+IMAGE_BUDGET = 4
 SESSION_COOKIE_NAME = "__Host-portalab_session"
 log = get_logger("portalab.security")
 _ALERTS: set["asyncio.Task[None]"] = set()  # alerts on their way (kept until done)
@@ -295,6 +306,12 @@ class SlidingWindowLimiter:
             return None
 
 
+def _picture(scope: Scope, path: str) -> bool:
+    return scope.get("method") == "GET" and (
+        path.startswith(IMAGE_GET_PREFIXES) or bool(IMAGE_GET.match(path))
+    )
+
+
 def _session_key(scope: Scope) -> str | None:
     for name, value in scope.get("headers", ()):
         if name == b"cookie":
@@ -346,6 +363,7 @@ class SecurityMiddleware:
         self.max_body_bytes = max_body_bytes
         self.per_ip = SlidingWindowLimiter(per_ip_per_minute, clock=clock)
         self.per_user = SlidingWindowLimiter(per_user_per_minute, clock=clock)
+        self.images = SlidingWindowLimiter(per_user_per_minute * IMAGE_BUDGET, clock=clock)
         self.sign_in = SlidingWindowLimiter(sign_in_per_minute, clock=clock)
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
@@ -381,7 +399,13 @@ class SecurityMiddleware:
         if path in HEALTH_PATHS and not self._local(scope, self.health_networks):
             await self._refuse_anonymous(scope, send, keys, path)
             return
-        if path.startswith("/api/") and not exempt:
+        if path.startswith("/api/") and not exempt and _picture(scope, path):
+            wait = self.images.hit(f"images:{_session_key(scope) or client[0]}")
+            if wait is not None:
+                retry = str(max(1, int(wait + 0.999))).encode()
+                await _problem(send, 429, "rate_limited", "Too many requests", [(b"retry-after", retry)])
+                return
+        elif path.startswith("/api/") and not exempt:
             wait = self.per_ip.hit(f"ip:{client[0]}")
             if wait is None and path in SIGN_IN_PATHS and scope.get("method") == "POST":
                 wait = self.sign_in.hit(f"ip:{client[0]}")
