@@ -13,7 +13,10 @@ export function QuestBoard() {
   });
   return (
     <section aria-labelledby="community-quests" className="ds-stack">
-      <h2 id="community-quests">{t("community:quests.title")}</h2>
+      {/* issue 310: the page's own title says it already */}
+      <h2 id="community-quests" className="visually-hidden">
+        {t("community:quests.title")}
+      </h2>
       {quests.isError || quests.data?.state === "unavailable" ? (
         <FunctionalState state="unavailable" label={t("community:progress.unavailable")} />
       ) : null}

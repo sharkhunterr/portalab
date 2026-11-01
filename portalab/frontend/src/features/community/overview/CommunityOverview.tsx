@@ -121,7 +121,7 @@ function QuestsPanel() {
   };
   const shown = [...items].sort((a, b) => ratio(b) - ratio(a)).slice(0, 4);
   return (
-    <Panel icon="target" title={t("community:overview.quests")} more="/community/quests">
+    <Panel icon="target" title={t("community:overview.quests")} more="/games/quests">
       {quests.isError || quests.data?.state === "unavailable" ? (
         <FunctionalState state="unavailable" label={t("community:progress.unavailable")} />
       ) : null}
