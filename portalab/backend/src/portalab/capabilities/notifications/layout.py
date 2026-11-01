@@ -1,7 +1,11 @@
 """#320 — every e-mail the portal sends wears Portalab's look: the default theme's night palette (the brand's
-reference: ``portalab-dark``), the site's name beside its mark, a card under the accent-to-amber line, a clear
-action button, Plus Jakarta Sans where the mail client has it (a safe font otherwise). Tables and inline
-styles only — what mail clients keep —, every text escaped."""
+reference: ``portalab-dark``), the site's name beside its mark, a card under the line of the ring's blues, a
+clear action button, Plus Jakarta Sans titles and Inter text where the mail client has them (safe fonts
+otherwise). Tables and inline styles only — what mail clients keep —, every text escaped.
+
+#322: drawn without CSS gradients nor images (Gmail drops the former, and the latter need the portal reachable
+from the internet): the brand's icon told with cells — the portal ring in its blues, the rarities' points —
+and the ring's gradient as a line of stepped cells."""
 
 import re
 from collections.abc import Callable, Sequence
@@ -20,14 +24,18 @@ SOFT = "#c9cfdd"
 MUTED = "#a9b2c7"
 ACCENT = "#7f9cff"
 ON_ACCENT = "#0b0e17"
-AMBER = "#ffb547"
+HIGHLIGHT = "#a3b8ff"  # the ring's light end (the theme's focus)
+DEEP = "#3a55d0"  # the ring's deep end (the light theme's accent)
+AMBER = "#ffb547"  # the rarities, on the icon's ring: legendary, rare, epic
+RARE = "#5cb4ff"
 VIOLET = "#c48dff"
-FONT = "'Plus Jakarta Sans', 'Segoe UI', Helvetica, Arial, sans-serif"
+RING = (HIGHLIGHT, ACCENT, DEEP)
+TITLE_FONT = "'Plus Jakarta Sans', 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+FONT = "'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 FONT_LINK = (
-    '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800'
-    '&display=swap" rel="stylesheet">'
+    '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800'
+    '&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">'
 )
-GRADIENT = f"linear-gradient(90deg, {ACCENT}, {VIOLET} 55%, {AMBER})"
 URL = re.compile(r"(https?://[^\s<]+)")
 
 
@@ -57,10 +65,43 @@ async def site_brand(provider: Callable[[str], Any | None], portal: str, languag
     return Brand(name=name or "Portalab", portal=portal)
 
 
-def _style(size: int, *, weight: int = 400, color: str = TEXT, line: float = 1.55) -> str:
+def _style(
+    size: int, *, weight: int = 400, color: str = TEXT, line: float = 1.55, title: bool = False
+) -> str:
     return (
-        f"font-family:{FONT};font-size:{size}px;font-weight:{weight};line-height:{line};"
-        f"color:{color};margin:0"
+        f"font-family:{TITLE_FONT if title else FONT};font-size:{size}px;font-weight:{weight};"
+        f"line-height:{line};color:{color};margin:0"
+    )
+
+
+def _mix(a: str, b: str, share: float) -> str:
+    one = [int(a[i : i + 2], 16) for i in (1, 3, 5)]
+    two = [int(b[i : i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join(f"{round(x + (y - x) * share):02x}" for x, y in zip(one, two, strict=True))
+
+
+def ring_line(steps: int = 24, height: int = 4, colors: Sequence[str] = RING) -> str:
+    """The ring's gradient as a line of stepped cells — a gradient every mail client draws."""
+    cells = []
+    for index in range(steps):
+        at = index / (steps - 1) * (len(colors) - 1)
+        low = min(int(at), len(colors) - 2)
+        color = _mix(colors[low], colors[low + 1], at - low)
+        cells.append(
+            f'<td height="{height}" bgcolor="{color}" style="height:{height}px;line-height:{height}px;'
+            f'font-size:0;background:{color}">&nbsp;</td>'
+        )
+    return (
+        f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+        f'style="border-collapse:collapse"><tr>{"".join(cells)}</tr></table>'
+    )
+
+
+def rarities() -> str:
+    """The icon's points — legendary, rare, epic — before a line."""
+    return "".join(
+        f'<span style="color:{color};font-size:10px;letter-spacing:2px">●</span>'
+        for color in (AMBER, RARE, VIOLET)
     )
 
 
@@ -84,7 +125,7 @@ def button(label: str, href: str) -> str:
         f'<table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0 4px"><tr>'
         f'<td bgcolor="{ACCENT}" style="background:{ACCENT};border-radius:999px">'
         f'<a href="{escape(href)}" style="display:inline-block;padding:12px 24px;'
-        f"{_style(15, weight=700, color=ON_ACCENT)};"
+        f"{_style(15, weight=700, color=ON_ACCENT, title=True)};"
         f'text-decoration:none;border-radius:999px">{escape(label)} →</a></td></tr></table>'
     )
 
@@ -108,14 +149,20 @@ def code(value: str) -> str:
 
 
 def mark(brand: Brand) -> str:
-    """The site's mark: its initial on the brand's gradient (a plain accent where gradients are not drawn)."""
-    initial = escape((brand.name.strip() or "P")[0].upper())
+    """The brand's icon told with cells: the portal ring in its blue on the night tile, its amber point —
+    then the site's name."""
+    ring = (
+        f'<table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>'
+        f'<td width="14" height="14" style="width:14px;height:14px;border:3px solid {ACCENT};'
+        f'border-top-color:{HIGHLIGHT};border-bottom-color:{DEEP};border-radius:50%;font-size:0;line-height:0">'
+        "&nbsp;</td></tr></table>"
+    )
     return (
         f'<table role="presentation" cellpadding="0" cellspacing="0"><tr>'
-        f'<td width="36" height="36" align="center" valign="middle" bgcolor="{ACCENT}" style="'
-        f"width:36px;height:36px;border-radius:10px;background:{ACCENT};background-image:{GRADIENT};"
-        f'{_style(18, weight=800, color=ON_ACCENT, line=1)}">{initial}</td>'
-        f'<td style="padding-left:12px;{_style(17, weight=800, color=TEXT, line=1.2)}">'
+        f'<td width="40" height="40" align="center" valign="middle" bgcolor="{CARD}" style="width:40px;'
+        f'height:40px;border-radius:12px;background:{CARD};border:1px solid {BORDER}">{ring}</td>'
+        f'<td valign="top" style="padding:2px 0 0 0;color:{AMBER};font-size:9px;line-height:9px">●</td>'
+        f'<td style="padding-left:10px;{_style(18, weight=800, color=TEXT, line=1.2, title=True)}">'
         f"{escape(brand.name)}</td>"
         "</tr></table>"
     )
@@ -134,8 +181,8 @@ def dress(
 ) -> str:
     """An e-mail page in Portalab's look around ``body_html`` (already safe markup)."""
     head = (
-        f'<p style="{_style(12, weight=700, color=ACCENT)};letter-spacing:1.5px;text-transform:uppercase;'
-        f'margin:0 0 8px">{escape(kicker)}</p>'
+        f'<p style="{_style(12, weight=700, color=HIGHLIGHT)};letter-spacing:1.5px;text-transform:uppercase;'
+        f'margin:0 0 10px">{rarities()}&nbsp; {escape(kicker)}</p>'
         if kicker
         else ""
     )
@@ -161,10 +208,10 @@ def dress(
         f'<tr><td bgcolor="{CARD}" style="background:{CARD};border:1px solid {BORDER};border-radius:18px;'
         f'overflow:hidden">'
         f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
-        f'<tr><td height="4" bgcolor="{ACCENT}" style="height:4px;line-height:4px;font-size:0;'
-        f'background:{ACCENT};background-image:{GRADIENT}">&nbsp;</td></tr>'
+        f"<tr><td>{ring_line()}</td></tr>"
         f'<tr><td style="padding:28px 28px 26px;{_style(15, color=SOFT)}">{head}'
-        f'<h1 style="{_style(24, weight=800, color=TEXT, line=1.25)};margin:0 0 16px">{escape(title)}</h1>'
+        f'<h1 style="{_style(24, weight=800, color=TEXT, line=1.25, title=True)};margin:0 0 16px">'
+        f"{escape(title)}</h1>"
         f"{body_html}</td></tr></table></td></tr>"
         f'<tr><td align="center" style="padding:20px 16px 0;{_style(12, color=MUTED, line=1.7)}">'
         f"{'<br>'.join(footer)}</td></tr>"
