@@ -329,5 +329,8 @@
   "edition.headline": "The letter of {date}",
   "edition.kind.radio": "Radio",
   "edition.kind.podcast": "Podcasts",
-  "edition.kind.video": "Videos"
+  "edition.kind.video": "Videos",
+  "edition.admin.testMe": "Send me a test",
+  "edition.admin.testSent": "Test sent to your address only (when e-mail delivery is on).",
+  "edition.admin.testFailed": "The test could not be sent: is e-mail delivery set up?"
 }

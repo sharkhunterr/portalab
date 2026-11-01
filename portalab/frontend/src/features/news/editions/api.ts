@@ -109,6 +109,16 @@ export function useEditionActions() {
       },
       onSuccess: done,
     }),
+    // issue 317: the edition e-mailed to me alone
+    test: useMutation({
+      mutationFn: async (id: string) => {
+        const { data, error } = await api.POST("/api/v1/admin/news/newsletter-editions/{edition_id}/test", {
+          params: { path: { edition_id: id } },
+        });
+        if (error) throw error;
+        return Boolean((data as { sent?: boolean } | undefined)?.sent);
+      },
+    }),
     remove: useMutation({
       mutationFn: async (id: string) => {
         await api.DELETE("/api/v1/admin/news/newsletter-editions/{edition_id}", {

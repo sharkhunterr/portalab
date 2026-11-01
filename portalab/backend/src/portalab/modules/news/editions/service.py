@@ -3,6 +3,7 @@
 notice), kept as a snapshot and drawn once (HTML and text); a preview or a draft until published —
 then every member reads it in the portal — and e-mailed to the channel's subscribers when asked."""
 
+import re
 import secrets
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict
@@ -400,6 +401,34 @@ class Editions:
                 row.emailed_at = utc_now(self.clock)
                 row.recipients = len(users)
         return len(users)
+
+    # --- the real e-mail, to its reader alone (#317) ------------------------------------------------------
+    @staticmethod
+    def _absolute(html: str, base: str) -> str:
+        """The portal's own addresses made whole (an edition written without the portal's address)."""
+        return re.sub(r'(href|src)="/', rf'\1="{base}/', html) if base else html
+
+    async def send_test(self, edition: NewsletterEdition, user: UUID, base: str) -> bool:
+        """The edition to its reader alone, as the members would get it (each test a new e-mail)."""
+        notify = _provider(self.capabilities, NOTIFY)
+        if notify is None:
+            return False
+        html = edition.html if await self._portal() else self._absolute(edition.html, base)
+        await notify.send(
+            CommunicationRequest(
+                category=CATEGORY,
+                template_key="news:notify.newsletter",
+                audience=Users((user,)),
+                dedup_key=f"news.edition-test:{edition.id}:{secrets.token_hex(6)}",
+                params={"title": edition.title[:200], "channel": str(edition.data.get("site") or "")[:120]},
+                source="module",
+                subject_ref=f"news-edition:{edition.id}",
+                required_permission=NEWS_READ,
+                action_url=f"/news/editions/{edition.id}",
+                email_body={"subject": f"[Test] {edition.title}"[:200], "text": edition.text, "html": html},
+            )
+        )
+        return True
 
     async def picture(self, token: str, image_id: str) -> bytes | None:
         """A picture an edition shows, by the edition's token (mail clients carry no session) — only those."""

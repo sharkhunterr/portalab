@@ -31865,6 +31865,54 @@
         ]
       }
     },
+    "/api/v1/admin/news/newsletter-editions/{edition_id}/test": {
+      "post": {
+        "description": "#317: the edition e-mailed to me alone, as the members would get it.",
+        "operationId": "test_edition_api_v1_admin_news_newsletter_editions__edition_id__test_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "edition_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Edition Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "boolean"
+                  },
+                  "title": "Response Test Edition Api V1 Admin News Newsletter Editions  Edition Id  Test Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Test Edition",
+        "tags": [
+          "news"
+        ]
+      }
+    },
     "/api/v1/admin/news/newsletter-templates": {
       "get": {
         "description": "The built-in templates first (the interface names them in its language), then the news desk's own.",

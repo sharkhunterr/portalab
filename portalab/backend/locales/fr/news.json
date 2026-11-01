@@ -329,5 +329,8 @@
   "edition.headline": "La lettre du {date}",
   "edition.kind.radio": "Radio",
   "edition.kind.podcast": "Podcasts",
-  "edition.kind.video": "Vidéos"
+  "edition.kind.video": "Vidéos",
+  "edition.admin.testMe": "M’envoyer un test",
+  "edition.admin.testSent": "Test envoyé à votre adresse uniquement (si l’envoi d’e-mails est activé).",
+  "edition.admin.testFailed": "Le test n’a pas pu partir : l’envoi d’e-mails est-il configuré ?"
 }
