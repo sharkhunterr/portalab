@@ -242,4 +242,36 @@ describe("gamification", () => {
     ]);
     expect(document.querySelector("datalist option[value=movie]")).toBeTruthy();
   });
+
+  it("filters the quests by period, each filter with how many are left to do", () => {
+    const quest = (key: string, period: string, kind = "daily", completed = false) => ({
+      key,
+      kind,
+      label: key,
+      period,
+      completed,
+      steps: [{ current: 0, target: 1 }],
+      rewards: [],
+    });
+    show(
+      <QuestList
+        quests={[
+          quest("visit", "day", "daily", true),
+          quest("read", "day"),
+          quest("marathon", "week"),
+          quest("hundred", "none", "quest"),
+        ]}
+      />,
+    );
+    const week = screen.getByRole("button", { name: /^This week/ });
+    expect(week.textContent).toBe("This week1");
+    expect(screen.getByRole("button", { name: /^Today/ }).textContent).toBe("Today1");
+    expect(screen.queryByRole("button", { name: /^Challenges/ })).toBeNull(); // none: no filter
+    fireEvent.click(week);
+    expect(week.getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByText("marathon")).toBeTruthy();
+    expect(screen.queryByText("read")).toBeNull();
+    expect(screen.queryByText("hundred")).toBeNull();
+    localStorage.clear();
+  });
 });

@@ -196,22 +196,66 @@ function QuestCard({ quest, now }: { quest: QuestItem; now: number }) {
   );
 }
 
+/** issue 311: the filters — by when an objective starts again, then the quests done once and the dated
+ * challenges. */
+const FILTERS = ["all", "day", "week", "month", "once", "challenge"] as const;
+type Filter = (typeof FILTERS)[number];
+const STORED = "portalab.quests.filter";
+
+function filterOf(quest: QuestItem): Exclude<Filter, "all"> {
+  if (quest.period === "day" || quest.period === "week" || quest.period === "month") return quest.period;
+  return quest.kind === "challenge" ? "challenge" : "once";
+}
+
+function storedFilter(): Filter {
+  try {
+    const value = localStorage.getItem(STORED);
+    return FILTERS.includes(value as Filter) ? (value as Filter) : "all";
+  } catch {
+    return "all";
+  }
+}
+
 /**
  * Quest list (spec 013 T039; issue 307 redesign): those to do first — the closest deadline at the top, its
  * time left counted down — then those done, sealed « Done » with when they come back. Kind and state in
- * **text** (never color alone); texts in the interface's language when the quest has them.
+ * **text** (never color alone); texts in the interface's language when the quest has them. Issue 311:
+ * filtered by period (today, this week, this month), quests done once or challenges — each filter with
+ * how many are left to do; the choice is remembered on this device.
  */
 export function QuestList({ quests }: { quests: QuestItem[] }) {
   const t = useT();
   const now = useNow();
+  const [chosen, setChosen] = useState<Filter>(storedFilter);
   if (quests.length === 0) return <p>{t("gamification:quests.empty")}</p>;
-  const { open, done } = ordered(quests);
+  const present = FILTERS.filter((f) => f === "all" || quests.some((q) => filterOf(q) === f));
+  const filter = present.includes(chosen) ? chosen : "all";
+  const choose = (next: Filter) => {
+    setChosen(next);
+    try {
+      localStorage.setItem(STORED, next);
+    } catch {
+      // a private window keeps no choice: the filter still applies for now
+    }
+  };
+  const left = (f: Filter) => quests.filter((q) => !q.completed && (f === "all" || filterOf(q) === f)).length;
+  const { open, done } = ordered(filter === "all" ? quests : quests.filter((q) => filterOf(q) === filter));
   const groups: Array<[string, QuestItem[]]> = [
     ["open", open],
     ["done", done],
   ];
   return (
     <div className="quest-board">
+      {present.length > 2 ? (
+        <fieldset className="ds-subnav quest-filters" aria-label={t("gamification:quests.filter.label")}>
+          {present.map((f) => (
+            <button key={f} type="button" aria-pressed={filter === f} onClick={() => choose(f)}>
+              {t(`gamification:quests.filter.${f}`)}
+              <span className="quest-filters__count">{left(f)}</span>
+            </button>
+          ))}
+        </fieldset>
+      ) : null}
       {groups.map(([group, items]) =>
         items.length ? (
           <section key={group} className="quest-board__group" data-group={group}>
