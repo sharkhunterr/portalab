@@ -407,5 +407,15 @@
   "subscriptions.byChannel": "Désactivée avec sa chaîne « {channel} ».",
   "auto.subscribers": "{count, plural, =0 {aucun abonné} one {# abonné} other {# abonnés}}",
   "preview.live": "Aperçu en direct",
-  "preview.now": "Générer l’aperçu"
+  "preview.now": "Générer l’aperçu",
+  "auto.on": "Activée",
+  "auto.off": "Désactivée",
+  "auto.test": "M’envoyer un test",
+  "auto.everyDay": "Chaque jour à {hour} h",
+  "auto.every.weekly": "Chaque {day} à {hour} h",
+  "auto.every.monthly": "Chaque mois, le premier {day} à {hour} h",
+  "auto.portalOnly": "Dans le portail seulement",
+  "auto.failed": "Ça n’a pas marché, réessayez.",
+  "auto.deleteTitle": "Supprimer « {name} » ?",
+  "auto.deleteHint": "Elle ne partira plus. Les lettres qu’elle a déjà écrites restent dans l’historique."
 }
