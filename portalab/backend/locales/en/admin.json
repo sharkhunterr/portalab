@@ -2148,5 +2148,6 @@
   "email.saved": "Settings saved.",
   "email.saveFailed": "The settings could not be saved.",
   "email.testSent": "Test e-mail sent to your address: check your inbox (and spam).",
-  "email.testFailed": "The test failed ({detail}): check the server, port, security and account."
+  "email.testFailed": "The test failed ({detail}): check the server, port, security and account.",
+  "email.noAddress": "No test sent: your account has no e-mail address. Add it in Members & access (your account → Edit), then try again. The test goes to that address, and to it alone."
 }

@@ -75,9 +75,19 @@ export function EmailSettings() {
   const security = securityOf(Boolean(value("tls")), port);
   const preset = presetOf(host);
   const hasPassword = (settings.data?.[SMTP_PASSWORD]?.source ?? "default") !== "default";
+  // issue 319: a refused test says why (an account without an address above all), never silently
   const test = useMutation({
-    mutationFn: async () =>
-      (await api.POST("/api/v1/admin/notifications/email/test")).data as { outcome: string },
+    mutationFn: async () => {
+      const refused = (error: unknown) => ({
+        outcome: `refused:${(error as { code?: string } | null)?.code ?? "unknown"}`,
+      });
+      try {
+        const { data, error } = await api.POST("/api/v1/admin/notifications/email/test");
+        return error ? refused(error) : (data as { outcome: string });
+      } catch (error) {
+        return refused(error); // the client throws the API's refusals
+      }
+    },
   });
   const save = useMutation({
     mutationFn: async (andTest: boolean) => {
@@ -257,7 +267,11 @@ export function EmailSettings() {
           >
             {test.data.outcome === "sent"
               ? t("admin:email.testSent")
-              : t("admin:email.testFailed", { detail: test.data.outcome.replace(/^failed:/, "") })}
+              : test.data.outcome === "refused:notifications.no_address"
+                ? t("admin:email.noAddress")
+                : t("admin:email.testFailed", {
+                    detail: test.data.outcome.replace(/^(failed|refused):/, ""),
+                  })}
           </p>
         ) : null}
         <FormActions>
