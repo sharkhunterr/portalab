@@ -5,18 +5,20 @@ import { useT } from "../../../i18n/hooks/useT";
 import { type OwnershipRow, useOwnedActions } from "../api";
 import { RequestForm } from "./Requests";
 
-/** 027: a bought project launch — name the project and pitch it; it opens as a community proposal. */
+/** 027: a bought project launch — name the project, pitch it and say how much it needs (issue 304: a goal
+ * the administrators confirm or change when they open its funding); it opens as a community proposal. */
 function ProjectLaunchForm({ row }: { row: OwnershipRow }) {
   const t = useT();
   const { configure } = useOwnedActions();
   const [title, setTitle] = useState("");
   const [pitch, setPitch] = useState("");
+  const [goal, setGoal] = useState("");
   return (
     <form
       className="ds-stack project-launch"
       onSubmit={(event) => {
         event.preventDefault();
-        configure.mutate({ id: row.id, configuration: { title, pitch } });
+        configure.mutate({ id: row.id, configuration: { title, pitch, goal: Number(goal) } });
       }}
     >
       <p className="ds-field__hint">{t("marketplace:owned.launchHint")}</p>
@@ -37,7 +39,16 @@ function ProjectLaunchForm({ row }: { row: OwnershipRow }) {
           onChange={(e) => setPitch(e.target.value)}
         />
       </div>
-      <Button type="submit" disabled={!title.trim() || configure.isPending}>
+      <TextField
+        type="number"
+        min={1}
+        label={t("marketplace:owned.launchGoal")}
+        hint={t("marketplace:owned.launchGoalHint")}
+        value={goal}
+        required
+        onChange={(e) => setGoal(e.target.value)}
+      />
+      <Button type="submit" disabled={!title.trim() || !(Number(goal) > 0) || configure.isPending}>
         {t("marketplace:owned.launch")}
       </Button>
     </form>

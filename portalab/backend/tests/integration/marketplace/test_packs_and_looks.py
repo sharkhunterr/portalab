@@ -126,7 +126,9 @@ async def test_project_launch_opens_a_community_proposal(mk: MkHarness) -> None:
     badges = ReserveAttention(mk.database, mk.module.openings, mk.module.projects)
     assert (await badges.counts(ursula))[RESERVE] == 1
     done = await mk.module.activation.configure(
-        ursula, ownership.id, {"title": "Dark mode for the wiki", "pitch": "Reading at night."}
+        ursula,
+        ownership.id,
+        {"title": "Dark mode for the wiki", "pitch": "Reading at night.", "goal": "1500"},
     )
     assert done.state == "active"
     async with mk.database.session() as session:
@@ -134,14 +136,20 @@ async def test_project_launch_opens_a_community_proposal(mk: MkHarness) -> None:
             select(Project).where(Project.proposal_ref == f"purchase:{ownership.id}")
         )
     assert project is not None
-    assert (project.title, project.state, project.proposer_id) == (
+    assert (project.title, project.state, project.proposer_id, project.goal_amount) == (
         "Dark mode for the wiki",
         "proposal",
         mk.people["ursula"],
+        1500,  # #304: the goal its member proposes, until its funding opens
     )
     # my own fresh proposal is no news to me; it is to the others
     assert await badges.counts(ursula) == {RESERVE: 0, PROJECTS_NEW: 0}
     assert (await badges.counts(mk.p("ulrich")))[PROJECTS_NEW] == 1
+    # the administrators confirm it or change it when they open the funding — then it is frozen
+    opened = await mk.module.transition(mk.p("boss"), project.id, "open", rules={"goal_amount": 2000})
+    assert opened.goal_amount == 2000
+    await mk.module.projects.propose_goal(project.id, 10)
+    assert (await mk.module.projects.get(project.id)).goal_amount == 2000
     again = await mk.module.activation.activate(ownership.id)  # re-activation never opens a second project
     assert again.state == "active"
 

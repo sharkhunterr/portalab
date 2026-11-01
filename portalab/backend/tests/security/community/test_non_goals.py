@@ -15,6 +15,9 @@ FORBIDDEN = re.compile(
 
 # The 018 assistant's conversation messages are a user talking to the AI, not user-to-user messaging.
 ASSISTANT = "/api/v1/ai/"
+# #299: « Mon fil » follows works, people of their credits and genres — privately, a member to a subject
+# of the library, never a member to another member.
+MEDIA_FOLLOWS = "/api/v1/me/media/follows"
 
 
 def tokens(name: str) -> set[str]:
@@ -31,7 +34,7 @@ def test_openapi_paths_have_no_social_graph() -> None:
     schema = create_app(static_dir=None).openapi()
     community = [p for p in schema["paths"] if "/community" in p]
     assert community, "the community routes must be mounted"
-    assert offending([p for p in schema["paths"] if not p.startswith(ASSISTANT)]) == []
+    assert offending([p for p in schema["paths"] if not p.startswith((ASSISTANT, MEDIA_FOLLOWS))]) == []
     components = list(schema.get("components", {}).get("schemas", {}))
     assert offending([c for c in components if c.lower().startswith("community")]) == []
 

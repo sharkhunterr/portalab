@@ -67,7 +67,10 @@ export function Gathered({ project }: { project: Project }) {
     <div className="project-goal">
       <progress value={Math.min(gathered, goal)} max={goal} />
       <span>
-        {t("marketplace:projects.goal", { gathered: format.number(gathered), goal: format.number(goal) })}
+        {t(project.rules_frozen_at ? "marketplace:projects.goal" : "marketplace:projects.goalProposed", {
+          gathered: format.number(gathered),
+          goal: format.number(goal),
+        })}
       </span>
     </div>
   ) : null;

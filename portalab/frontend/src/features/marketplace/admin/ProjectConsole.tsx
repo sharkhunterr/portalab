@@ -65,11 +65,13 @@ const TABS: Record<string, readonly string[]> = {
  * move — the confirmation the server asks for. */
 function MoveButton({ project, move }: { project: Project; move: Move }) {
   const t = useT();
+  const format = useFormat();
   const admin = useProjectAdmin();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   // issue 304: opening the funding sets its goal and each member's cap — frozen from then on
-  const [goal, setGoal] = useState("");
+  const proposed = project.rules_frozen_at ? null : (project.totals.goal_amount ?? null);
+  const [goal, setGoal] = useState(proposed ? String(proposed) : "");
   const [cap, setCap] = useState("1000");
   const opening = move.action === "open";
   const [confirmation, setConfirmation] = useState<string | null>(null);
@@ -140,7 +142,11 @@ function MoveButton({ project, move }: { project: Project; move: Move }) {
             type="number"
             min={1}
             label={t("marketplace:console.goal")}
-            hint={t("marketplace:console.goalHint")}
+            hint={
+              proposed
+                ? t("marketplace:console.goalProposed", { goal: format.number(proposed) })
+                : t("marketplace:console.goalHint")
+            }
             value={goal}
             onChange={(e) => setGoal(e.target.value)}
           />

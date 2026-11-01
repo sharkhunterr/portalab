@@ -32,7 +32,16 @@ export function FundingProgress({ project, mine }: { project: Project; mine: num
         <Icon name="coins" size={22} />
         <strong>{format.number(gathered)}</strong>
         <CurrencyShort />
-        <span>{goal ? t("marketplace:funding.ofGoal", { goal: format.number(goal) }) : null}</span>
+        <span>
+          {goal
+            ? t(
+                project.rules_frozen_at ? "marketplace:funding.ofGoal" : "marketplace:funding.ofProposedGoal",
+                {
+                  goal: format.number(goal),
+                },
+              )
+            : null}
+        </span>
       </p>
       {goal ? <progress className="project-raised__bar" value={Math.min(gathered, goal)} max={goal} /> : null}
       <p className="project-raised__left" data-reached={left === 0 || undefined}>
