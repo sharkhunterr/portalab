@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, not_, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,7 +19,13 @@ from portalab.core.db import Database
 from portalab.core.errors import Conflict, NotFound, ValidationFailed
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
-from portalab.modules.marketplace.models import Project, ProjectFunding, ProjectNote, ProjectStateHistory
+from portalab.modules.marketplace.models import (
+    Project,
+    ProjectFunding,
+    ProjectNote,
+    ProjectsSeen,
+    ProjectStateHistory,
+)
 from portalab.modules.marketplace.observability import metrics
 from portalab.modules.marketplace.projects.rules import parse_rules
 from portalab.modules.marketplace.projects.state import accepts_funding, accepts_votes, allowed
@@ -181,6 +187,37 @@ class Projects:
                     )
                 ).scalars()
             )
+
+    # --- what is new to a member (#303) -----------------------------------------------------------------
+    async def unseen(self, user: UUID) -> int:
+        """The projects added or moved on since I last opened them (all of them, never opened) — an idea
+        waits for its moderation, and my own project just proposed is no news to me."""
+        seen = select(ProjectsSeen.seen_at).where(ProjectsSeen.user_id == user).scalar_subquery()
+        async with self.database.session() as session:
+            count = await session.scalar(
+                select(func.count())
+                .select_from(Project)
+                .where(
+                    Project.state != "idea",
+                    or_(seen.is_(None), Project.updated_at > seen),
+                    not_(and_(Project.proposer_id == user, Project.state == "proposal")),
+                )
+            )
+        return int(count or 0)
+
+    async def mark_seen(self, user: UUID) -> datetime | None:
+        """I opened the projects: nothing is new any more. Returns when I had last looked before."""
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            before = await uow.session.scalar(
+                select(ProjectsSeen.seen_at).where(ProjectsSeen.user_id == user)
+            )
+            await uow.session.execute(
+                insert(ProjectsSeen)
+                .values(user_id=user, seen_at=now)
+                .on_conflict_do_update(index_elements=[ProjectsSeen.user_id], set_={"seen_at": now})
+            )
+        return before
 
     # --- transitions ---------------------------------------------------------------------------------
     async def _history(

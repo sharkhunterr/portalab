@@ -326,3 +326,12 @@ class ReserveSeen(MarketplaceBase):
 
     user_id: Mapped[UUID] = mapped_column(primary_key=True)
     seen_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class ProjectsSeen(MarketplaceBase):
+    """#303: when a member last opened the community projects — what was added or moved since is new."""
+
+    __tablename__ = "projects_seen"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    seen_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

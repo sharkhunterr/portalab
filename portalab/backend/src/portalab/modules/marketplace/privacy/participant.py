@@ -17,6 +17,7 @@ from portalab.modules.marketplace.models import (
     BoosterOpening,
     Equipped,
     ProjectFunding,
+    ProjectsSeen,
     ReserveItem,
     ReserveSeen,
 )
@@ -81,6 +82,7 @@ class MarketplaceParticipant:
             await uow.session.execute(delete(BoosterOpening).where(BoosterOpening.user_id == user_id))
             await uow.session.execute(delete(ReserveItem).where(ReserveItem.user_id == user_id))
             await uow.session.execute(delete(ReserveSeen).where(ReserveSeen.user_id == user_id))
+            await uow.session.execute(delete(ProjectsSeen).where(ProjectsSeen.user_id == user_id))
             rows = (
                 await uow.session.execute(
                     select(ProjectFunding)

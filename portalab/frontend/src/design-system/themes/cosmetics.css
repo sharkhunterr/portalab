@@ -419,6 +419,15 @@
   clip-path: var(--frame-clip, none);
   border-radius: var(--frame-radius, 50%);
 }
+/* issue 303: a framed avatar in a list (a feed, a widget) is its frame at half the size of a large one —
+   the rings and glows a pack draws in pixels around the avatar shrink with it, instead of tripling a small
+   avatar */
+.avatar-frame[data-frame][data-size="sm"] {
+  zoom: 0.5;
+}
+.avatar-frame[data-frame][data-size="sm"] > .ds-avatar {
+  --avatar-size: 3.5rem;
+}
 .avatar-frame[data-fx-frame][data-fx-failed] {
   background: conic-gradient(from 0deg, #f97316, #a855f7, #22d3ee, #f97316);
 }

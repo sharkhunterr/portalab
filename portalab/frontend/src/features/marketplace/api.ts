@@ -49,6 +49,15 @@ export function useFund(projectId: string) {
   });
 }
 
+/** issue 303: I opened the projects — their badge goes; returns when I had last looked (null: never). */
+export function useProjectsSeen() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async () => (await api.POST("/api/v1/marketplace/projects/seen")).data?.previous ?? null,
+    onSettled: () => void client.invalidateQueries({ queryKey: ["shell", "attention"] }),
+  });
+}
+
 export type AdminAction = "promote" | "open" | "validate" | "transition" | "abandon" | "reject";
 
 export function useProjectAdmin() {
@@ -122,6 +131,7 @@ export function useAcquire(key: string) {
       ).data as OwnershipRow,
     onSuccess: () => {
       void client.invalidateQueries({ queryKey: KEY });
+      void client.invalidateQueries({ queryKey: ["shell", "attention"] }); // issue 303: a form to fill waits
       // 027: a bought look (or a pack's) is worn at once, the theme's own included
       void client.invalidateQueries({ queryKey: ["ui", "notification-looks"] });
     },
@@ -137,7 +147,10 @@ export function usePurchases() {
 
 export function useOwnedActions() {
   const client = useQueryClient();
-  const refresh = () => client.invalidateQueries({ queryKey: KEY });
+  const refresh = () => {
+    void client.invalidateQueries({ queryKey: ["shell", "attention"] }); // issue 303: the reserve's badge
+    return client.invalidateQueries({ queryKey: KEY });
+  };
   return {
     configure: useMutation({
       mutationFn: async ({ id, configuration }: { id: string; configuration: Record<string, unknown> }) =>
