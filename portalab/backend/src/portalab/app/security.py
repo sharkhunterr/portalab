@@ -129,6 +129,8 @@ SECURITY_HEADERS: tuple[tuple[bytes, bytes], ...] = (
         b"default-src 'self'; script-src 'self' https://www.gstatic.com/cv/js/sender/ "
         b"https://www.gstatic.com/cast/sdk/libs/ https://www.gstatic.com/eureka/clank/; style-src 'self'; "
         b"img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; media-src 'self' blob:; "
+        # #315: « Mon fil » plays a YouTube video in place — its privacy-enhanced player, loaded on a click
+        b"frame-src 'self' https://www.youtube-nocookie.com; "
         b"object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
     ),
     (b"strict-transport-security", b"max-age=31536000; includeSubDomains"),

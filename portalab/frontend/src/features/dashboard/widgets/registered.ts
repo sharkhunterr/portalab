@@ -12,6 +12,7 @@ import "../../marketplace/widget";
 import "../../support/incidents/widget";
 import "../../support/tickets/widget";
 import "../../campaigns/widget";
+import "../../news/MyFeedWidget"; // issue 315: « Mon fil »
 import "./discover";
 import "./downloads";
 import "./leaving";

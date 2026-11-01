@@ -195,5 +195,11 @@
   "widget.featured.description": "Articles highlighted by the editors.",
   "widget.featured.title": "Featured news",
   "widget.latest.description": "The most recent articles.",
-  "widget.latest.title": "Latest news"
+  "widget.latest.title": "Latest news",
+  "widget.myFeed.title": "My feed",
+  "widget.myFeed.description": "The latest news from your sources: articles, videos, podcasts. YouTube videos play in place.",
+  "widget.myFeed.all": "All my feed",
+  "video.play": "Play “{title}” here",
+  "video.close": "Close the video “{title}”",
+  "video.onYouTube": "Watch “{title}” on YouTube (new tab)"
 }

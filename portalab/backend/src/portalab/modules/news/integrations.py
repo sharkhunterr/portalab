@@ -1,6 +1,7 @@
 """News integrations (T019, T022, T025, T034): the ``news`` search provider (008), widgets
-``news.featured|latest`` (009), the ``news`` link resolver, the ``news`` calendar source (publications;
-scheduled ones for editors only) and the 019 action ``content.publish`` (runs as the author's principal)."""
+``news.featured|latest|my_feed`` (009; #315), the ``news`` link resolver, the ``news`` calendar source
+(publications; scheduled ones for editors only) and the 019 action ``content.publish`` (runs as the author's
+principal)."""
 
 import time
 from collections.abc import Mapping, Sequence
@@ -27,6 +28,8 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.news.articles import ArticleService
 from portalab.modules.news.models import Article
 from portalab.modules.news.permissions import NEWS_PUBLISH, NEWS_READ
+from portalab.modules.news.sources.kinds import source_kind
+from portalab.modules.news.sources.service import FeedSources
 
 OWNER = "module:news"
 
@@ -159,6 +162,55 @@ LATEST = with_styles(  # 027 (#31): the list, or « carousel » — one article 
     ),
     "carousel",
 )
+
+
+# #315: « Mon fil » on the dashboard — from one line (the latest news) to a wall of cards
+MY_FEED = WidgetDefinition(
+    key="news.my_feed",
+    owner=OWNER,
+    title_key="news:widget.myFeed.title",
+    description_key="news:widget.myFeed.description",
+    icon="rss",
+    required_permission=NEWS_READ,
+    size=SizeLimits(default=Size(6, 4), min=Size(3, 1), max=Size(12, 8)),
+    refresh=Refresh(mode="interval", interval_s=900),
+    stale_after_s=1800,
+    component_id="news.my_feed",
+)
+MY_FEED_ITEMS = 24  # what the largest block shows; the smaller ones leave the rest out
+
+
+class MyFeedWidget:
+    """#315: « Mon fil »'s latest news — the editors' sources and the member's own, newest first."""
+
+    def __init__(self, sources: FeedSources, clock: Clock | None = None) -> None:
+        self.sources = sources
+        self.clock = clock
+
+    async def load(
+        self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
+    ) -> WidgetPayload:
+        if principal.user_id is None:
+            return WidgetPayload("no-data", as_of=utc_now(self.clock))
+        rows, _, feeds = await self.sources.timeline(principal.user_id, limit=MY_FEED_ITEMS)
+        if not rows:
+            return WidgetPayload("no-data", as_of=utc_now(self.clock))
+        order = {feed.id: index for index, feed in enumerate(feeds)}  # each source its colour, as « Mon fil »
+        items = [
+            {
+                "id": str(item.id),
+                "title": item.title,
+                "summary": item.summary[:280],
+                "link": item.link,
+                "source": feed.name,
+                "source_kind": source_kind(feed.url),
+                "source_index": order.get(feed.id, len(order)),
+                "picture": f"/api/v1/news/sources/items/{item.id}/picture" if item.image_key else None,
+                "published_at": item.published_at.isoformat(),
+            }
+            for item, feed in rows
+        ]
+        return WidgetPayload("available", as_of=utc_now(self.clock), data={"items": items})
 
 
 class NewsWidget:
