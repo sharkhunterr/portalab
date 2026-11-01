@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 // Issue 325: an automatic newsletter is a self-writing edition on its cadence — its name for the news desk,
@@ -72,5 +72,81 @@ describe("issue 325 — automatic newsletters", () => {
       contents: ["stats"],
     });
     expect(String(saved[0]?.subject)).toContain("{semaine}");
+  });
+
+  it("issue 328 — a card switched in place, tested to me, deleted once confirmed", async () => {
+    const puts: Array<Record<string, unknown>> = [];
+    const calls: string[] = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/admin/news/newsletters/s1" && request.method === "PUT") {
+        puts.push((await request.json()) as Record<string, unknown>);
+        return json(200, {});
+      }
+      if (path === "/api/v1/admin/news/newsletters/s1" && request.method === "DELETE") {
+        calls.push("delete");
+        return new Response(null, { status: 204 });
+      }
+      if (path === "/api/v1/admin/news/newsletters")
+        return json(200, [
+          {
+            id: "s1",
+            name: "Friday letter",
+            subject: "{site} — week {semaine}",
+            category_id: "c1",
+            kind: "edition",
+            media_kinds: [],
+            cadence: "weekly",
+            weekday: 4,
+            hour: 18,
+            language: "en",
+            email: true,
+            enabled: true,
+            template_key: "portalab",
+            notice: null,
+            contents: null,
+            charts: null,
+            days: null,
+            subscribers: 3,
+            last_run_at: null,
+            next_run_at: null,
+            last_article_id: null,
+          },
+        ]);
+      if (path === "/api/v1/admin/news/categories")
+        return json(200, [{ id: "c1", key: "lettre", name: "La lettre", newsletter: true, enabled: true }]);
+      if (path === "/api/v1/admin/news/newsletter-templates") return json(200, []);
+      if (path === "/api/v1/admin/news/newsletter-contents")
+        return json(200, { contents: ["stats"], defaults: ["stats"], charts: [], chart_defaults: [] });
+      if (path === "/api/v1/admin/news/newsletter-editions/preview") {
+        calls.push("preview");
+        return json(200, { id: "e1" });
+      }
+      if (path === "/api/v1/admin/news/newsletter-editions/e1/test") {
+        calls.push("test");
+        return json(200, { sent: true });
+      }
+      return json(404, {});
+    };
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <AutomaticNewsletters />
+      </QueryClientProvider>,
+    );
+    const toggle = await screen.findByRole("checkbox", { name: "On" });
+    fireEvent.click(toggle);
+    await waitFor(() => expect(puts).toHaveLength(1));
+    expect(puts[0]).toMatchObject({ name: "Friday letter", enabled: false });
+    expect(puts[0]).not.toHaveProperty("subscribers");
+    expect(puts[0]).not.toHaveProperty("id");
+
+    fireEvent.click(screen.getByRole("button", { name: /Send me a test/ }));
+    await waitFor(() => expect(calls).toEqual(["preview", "test"]));
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+    const dialog = await screen.findByRole("dialog");
+    expect(calls).not.toContain("delete");
+    fireEvent.click(within(dialog).getByRole("button", { name: /Delete/ }));
+    await waitFor(() => expect(calls).toContain("delete"));
   });
 });

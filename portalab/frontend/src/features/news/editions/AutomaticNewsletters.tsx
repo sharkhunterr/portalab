@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useId, useRef, useState } from "react";
 import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
-import { AdminSection, FormActions, FormGrid, StatusBadge } from "../../../design-system/admin/AdminKit";
+import { AdminSection, FormGrid, StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import {
   CheckboxField,
@@ -11,9 +11,12 @@ import {
   TextField,
 } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
+import { Dialog, DialogActions } from "../../../design-system/components/Overlays";
 import { EmptyState } from "../../../design-system/components/Placeholders";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
+import { Switch } from "../../account/SettingsKit";
 import { useChannels } from "../NewsChannels";
 import { templateName, useContents, useEditionActions, usePreview, useTemplates } from "./api";
 import { ContentPicker } from "./ContentPicker";
@@ -55,6 +58,38 @@ function blank(category: string): ScheduleIn {
   };
 }
 
+/** What the server takes back of a newsletter it gave (issue 328: its subscribers are not part of it). */
+function input(schedule: Schedule): ScheduleIn {
+  const {
+    id: _id,
+    last_run_at: _l,
+    next_run_at: _n,
+    last_article_id: _a,
+    subscribers: _s,
+    ...rest
+  } = schedule;
+  return { ...rest, kind: "edition" };
+}
+
+/** The edition a newsletter would write now, asked for a preview. */
+function ask(values: ScheduleIn, defaults: ScheduleIn["contents"] | undefined) {
+  return {
+    template_key: values.template_key ?? "portalab",
+    days: values.days ?? CADENCE_DAYS[values.cadence] ?? 7,
+    language: values.language,
+    notice: values.notice ?? null,
+    category_id: values.category_id || null,
+    contents: values.contents ?? defaults ?? null,
+    charts: values.charts ?? null,
+    subject: values.subject ?? null,
+  };
+}
+
+/** A weekday's name in the interface's language (issue 328: not the browser's — no « Every vendredi »). */
+function weekday(day: number, language: string): string {
+  return new Date(2024, 0, 1 + day).toLocaleDateString(language, { weekday: "long" });
+}
+
 /**
  * issue 325: one automatic newsletter, set in the order it is thought — its name (for the news desk) and its
  * e-mail's subject (with variables), when it goes out and over how many days, its template, what it tells
@@ -67,11 +102,9 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
   const templates = useTemplates();
   const offered = useContents();
   const letters = (channels.data ?? []).filter((c) => c.newsletter && c.enabled);
-  const [values, setValues] = useState<ScheduleIn>(() => {
-    if (!schedule) return blank(letters[0]?.id ?? "");
-    const { id: _id, last_run_at: _l, next_run_at: _n, last_article_id: _a, ...rest } = schedule;
-    return { ...rest, kind: "edition" };
-  });
+  const [values, setValues] = useState<ScheduleIn>(() =>
+    schedule ? input(schedule) : blank(letters[0]?.id ?? ""),
+  );
   const set = <K extends keyof ScheduleIn>(key: K, value: ScheduleIn[K]) =>
     setValues({ ...values, [key]: value });
   const category = values.category_id || letters[0]?.id || "";
@@ -81,19 +114,11 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
   const [shown, setShown] = useState<string | null>(null);
   const timer = useRef<number | undefined>(undefined);
   const subjectId = useId();
-  const ask = () => ({
-    template_key: values.template_key ?? "portalab",
-    days,
-    language: values.language,
-    notice: values.notice ?? null,
-    category_id: category || null,
-    contents: values.contents ?? offered.data?.defaults ?? null,
-    charts: values.charts ?? null,
-    subject: values.subject ?? null,
-  });
+  const interfaceLanguage = useLocaleContext().language;
+  const asked = () => ask({ ...values, category_id: category }, offered.data?.defaults);
   const [live, setLive] = useLivePreview();
   const write = (then?: (id: string) => void) =>
-    preview.mutate(ask(), {
+    preview.mutate(asked(), {
       onSuccess: (edition) => {
         setShown(edition.id);
         then?.(edition.id);
@@ -108,7 +133,7 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
   }, [values, offered.data, live]);
   const save = useMutation({
     mutationFn: async () => {
-      const body = { ...values, kind: "edition" as const, category_id: category, contents: ask().contents };
+      const body = { ...values, kind: "edition" as const, category_id: category, contents: asked().contents };
       const { error } = schedule
         ? await api.PUT("/api/v1/admin/news/newsletters/{schedule_id}", {
             params: { path: { schedule_id: schedule.id } },
@@ -128,8 +153,6 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
     const at = field?.selectionStart ?? text.length;
     set("subject", `${text.slice(0, at)}{${variable}}${text.slice(at)}`);
   };
-  const weekday = (day: number) =>
-    new Date(2024, 0, 1 + day).toLocaleDateString(undefined, { weekday: "long" });
   return (
     <div className="edition-editor">
       <form
@@ -201,7 +224,7 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
               >
                 {WEEKDAYS.map((day) => (
                   <option key={day} value={day}>
-                    {weekday(day)}
+                    {weekday(day, interfaceLanguage)}
                   </option>
                 ))}
               </SelectField>
@@ -304,10 +327,8 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
             {t(test.data ? "news:edition.admin.testSent" : "news:edition.admin.testFailed")}
           </p>
         ) : null}
-        <FormActions>
-          <Button variant="ghost" onClick={onDone}>
-            {t("news:edition.admin.cancel")}
-          </Button>
+        {/* issue 328: in its dialog, the actions sit in the footer, beside « Cancel » */}
+        <DialogActions>
           <Button
             variant="secondary"
             disabled={test.isPending || preview.isPending}
@@ -320,7 +341,7 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
             <Icon name="check" size={16} />
             {t("news:auto.save")}
           </Button>
-        </FormActions>
+        </DialogActions>
       </form>
       <div className="edition-editor__preview" aria-busy={preview.isPending || undefined}>
         <PreviewSwitch live={live} onLive={setLive} onPreview={() => write()} busy={preview.isPending} />
@@ -335,13 +356,173 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
 }
 
 /**
- * issue 325: the automatic newsletters — each a self-writing edition on its cadence (its name, its e-mail's
- * subject, its next run), run now or set; no drafts: what they write is in the history below.
+ * issue 328: one automatic newsletter as a card — its name and its e-mail's subject, switched on or off in
+ * place, what it is (when, where, with which template, to how many), and three actions: a test to me, its
+ * settings (in a dialog), its deletion (confirmed).
  */
-export function AutomaticNewsletters() {
+function NewsletterCard({
+  schedule,
+  channel,
+  look,
+  onEdit,
+}: {
+  schedule: Schedule;
+  channel: string;
+  look: string;
+  onEdit: () => void;
+}) {
   const t = useT();
   const format = useFormat();
   const client = useQueryClient();
+  const offered = useContents();
+  const preview = usePreview();
+  const { test } = useEditionActions();
+  const [confirming, setConfirming] = useState(false);
+  const interfaceLanguage = useLocaleContext().language;
+  const toggle = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      const { error } = await api.PUT("/api/v1/admin/news/newsletters/{schedule_id}", {
+        params: { path: { schedule_id: schedule.id } },
+        body: { ...input(schedule), enabled },
+      });
+      if (error) throw error;
+    },
+    onSettled: () => void client.invalidateQueries({ queryKey: KEY }),
+  });
+  const remove = useMutation({
+    mutationFn: async () => {
+      const { error } = await api.DELETE("/api/v1/admin/news/newsletters/{schedule_id}", {
+        params: { path: { schedule_id: schedule.id } },
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setConfirming(false);
+      void client.invalidateQueries({ queryKey: KEY });
+    },
+  });
+  // the letter it would write now, e-mailed to me alone
+  const sendTest = () =>
+    preview.mutate(ask(input(schedule), offered.data?.defaults), {
+      onSuccess: (edition) => test.mutate(edition.id),
+    });
+  const enabled = toggle.isPending ? Boolean(toggle.variables) : schedule.enabled;
+  const hour = String(schedule.hour).padStart(2, "0");
+  const when =
+    schedule.cadence === "daily"
+      ? t("news:auto.everyDay", { hour })
+      : t(`news:auto.every.${schedule.cadence}`, {
+          day: weekday(schedule.weekday ?? 0, interfaceLanguage),
+          hour,
+        });
+  const testing = preview.isPending || test.isPending;
+  return (
+    <li className="auto-letter" data-off={!enabled || undefined}>
+      <div className="auto-letter__head">
+        <span className="auto-letter__icon" aria-hidden="true">
+          <Icon name="sparkles" size={20} />
+        </span>
+        <span className="auto-letter__title">
+          <strong>{schedule.name}</strong>
+          {schedule.subject ? (
+            <span className="auto-letter__subject">
+              <Icon name="mail" size={14} />
+              {schedule.subject}
+            </span>
+          ) : null}
+        </span>
+        <Switch
+          label={t(enabled ? "news:auto.on" : "news:auto.off")}
+          checked={enabled}
+          disabled={toggle.isPending}
+          onChange={(e) => toggle.mutate(e.target.checked)}
+        />
+      </div>
+      <ul className="auto-letter__facts">
+        <li>
+          <Icon name="calendar" size={14} />
+          {when}
+        </li>
+        <li>
+          <Icon name="newspaper" size={14} />
+          {channel}
+        </li>
+        <li>
+          <Icon name="palette" size={14} />
+          {look}
+        </li>
+        <li>
+          <Icon name={schedule.email ? "users" : "home"} size={14} />
+          {schedule.email
+            ? t("news:auto.subscribers", { count: schedule.subscribers ?? 0 }) // issue 326
+            : t("news:auto.portalOnly")}
+        </li>
+        {enabled && schedule.next_run_at ? (
+          <li>
+            <Icon name="clock" size={14} />
+            {t("news:newsletters.next", { when: format.dateTime(schedule.next_run_at) })}
+          </li>
+        ) : null}
+        {schedule.kind !== "edition" ? (
+          <li>
+            <StatusBadge tone="neutral">{t("news:auto.former")}</StatusBadge>
+          </li>
+        ) : null}
+      </ul>
+      <div className="auto-letter__actions">
+        <Button variant="secondary" disabled={testing} onClick={sendTest}>
+          <Icon name={testing ? "spinner" : "mail"} size={16} />
+          {t("news:auto.test")}
+        </Button>
+        <Button variant="secondary" onClick={onEdit}>
+          <Icon name="sliders" size={16} />
+          {t("news:edit")}
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t("news:newsletters.delete")}
+          onClick={() => setConfirming(true)}
+        >
+          <Icon name="trash" size={16} />
+        </Button>
+        {test.isSuccess ? (
+          <span role="status" className="auto-letter__note" data-tone={test.data ? "ok" : "warn"}>
+            {t(test.data ? "news:edition.admin.testSent" : "news:edition.admin.testFailed")}
+          </span>
+        ) : null}
+        {preview.isError || test.isError || toggle.isError ? (
+          <span role="alert" className="auto-letter__note" data-tone="warn">
+            {t("news:auto.failed")}
+          </span>
+        ) : null}
+      </div>
+      <Dialog
+        trigger={null}
+        open={confirming}
+        onOpenChange={setConfirming}
+        title={t("news:auto.deleteTitle", { name: schedule.name })}
+        description={t("news:auto.deleteHint")}
+        closeLabel={t("news:edition.admin.cancel")}
+        footer={
+          <Button variant="danger" disabled={remove.isPending} onClick={() => remove.mutate()}>
+            <Icon name="trash" size={16} />
+            {t("news:newsletters.delete")}
+          </Button>
+        }
+      >
+        {null}
+      </Dialog>
+    </li>
+  );
+}
+
+/**
+ * issue 325: the automatic newsletters — each a self-writing edition on its cadence; no drafts: what they
+ * write is in the history below. Issue 328: as cards, set in a dialog.
+ */
+export function AutomaticNewsletters() {
+  const t = useT();
   const channels = useChannels();
   const templates = useTemplates();
   const schedules = useQuery({
@@ -349,38 +530,9 @@ export function AutomaticNewsletters() {
     queryFn: async () => ((await api.GET("/api/v1/admin/news/newsletters")).data ?? []) as Schedule[],
   });
   const [editing, setEditing] = useState<Schedule | "new" | null>(null);
-  const [ran, setRan] = useState<Record<string, string>>({});
-  const run = useMutation({
-    mutationFn: async (id: string) =>
-      (
-        await api.POST("/api/v1/admin/news/newsletters/{schedule_id}/run", {
-          params: { path: { schedule_id: id } },
-        })
-      ).data as { edition: string | null; article: unknown },
-    onSuccess: (done, id) => {
-      setRan({ ...ran, [id]: done.edition ? t("news:auto.ran") : t("news:newsletters.nothing") });
-      void client.invalidateQueries({ queryKey: KEY });
-      void client.invalidateQueries({ queryKey: ["news", "editions"] });
-    },
-  });
-  const remove = useMutation({
-    mutationFn: async (id: string) =>
-      api.DELETE("/api/v1/admin/news/newsletters/{schedule_id}", { params: { path: { schedule_id: id } } }),
-    onSuccess: () => void client.invalidateQueries({ queryKey: KEY }),
-  });
   const names = new Map((channels.data ?? []).map((c) => [c.id, c.name]));
   const looks = new Map((templates.data ?? []).map((tpl) => [tpl.key, templateName(t, tpl)]));
   const hasChannel = (channels.data ?? []).some((c) => c.newsletter && c.enabled);
-  if (editing)
-    return (
-      <AdminSection
-        icon="sparkles"
-        title={editing === "new" ? t("news:newsletters.new") : editing.name}
-        span="full"
-      >
-        <NewsletterEditor schedule={editing === "new" ? null : editing} onDone={() => setEditing(null)} />
-      </AdminSection>
-    );
   return (
     <AdminSection
       icon="sparkles"
@@ -402,65 +554,33 @@ export function AutomaticNewsletters() {
           action={{ label: t("news:newsletters.new"), onSelect: () => setEditing("new") }}
         />
       ) : null}
-      <ul className="news-channels">
+      <ul className="auto-letters">
         {(schedules.data ?? []).map((schedule) => (
-          <li key={schedule.id} className="news-channel" data-disabled={!schedule.enabled || undefined}>
-            <span className="news-channel__icon" aria-hidden="true">
-              <Icon name="sparkles" size={20} />
-            </span>
-            <span className="news-channel__text">
-              <strong>{schedule.name}</strong>
-              {schedule.subject ? <span className="edition-subject">✉ {schedule.subject}</span> : null}
-              <span className="admin-muted">
-                {names.get(schedule.category_id) ?? "—"} · {looks.get(schedule.template_key ?? "") ?? "—"} ·{" "}
-                {t(`news:newsletters.cadences.${schedule.cadence}`)}
-                {schedule.next_run_at
-                  ? ` · ${t("news:newsletters.next", { when: format.dateTime(schedule.next_run_at) })}`
-                  : ""}
-              </span>
-              {ran[schedule.id] ? (
-                <span role="status" className="services-admin__ok">
-                  {ran[schedule.id]}
-                </span>
-              ) : null}
-            </span>
-            <span className="news-channel__badges">
-              {schedule.email ? (
-                <StatusBadge tone="ok">
-                  <Icon name="mail" size={12} />{" "}
-                  {schedule.subscribers != null
-                    ? t("news:auto.subscribers", { count: schedule.subscribers }) // issue 326
-                    : t("news:channels.byEmail")}
-                </StatusBadge>
-              ) : null}
-              {!schedule.enabled ? (
-                <StatusBadge tone="warn">{t("news:channels.disabled")}</StatusBadge>
-              ) : null}
-              {schedule.kind !== "edition" ? (
-                <StatusBadge tone="neutral">{t("news:auto.former")}</StatusBadge>
-              ) : null}
-            </span>
-            <span className="news-channel__actions">
-              <Button variant="secondary" disabled={run.isPending} onClick={() => run.mutate(schedule.id)}>
-                <Icon name="send" size={14} />
-                {t("news:auto.runNow")}
-              </Button>
-              <Button variant="ghost" onClick={() => setEditing(schedule)}>
-                <Icon name="settings" size={16} />
-                {t("news:edit")}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label={t("news:newsletters.delete")}
-                onClick={() => remove.mutate(schedule.id)}
-              >
-                <Icon name="trash" size={16} />
-              </Button>
-            </span>
-          </li>
+          <NewsletterCard
+            key={schedule.id}
+            schedule={schedule}
+            channel={names.get(schedule.category_id) ?? "—"}
+            look={looks.get(schedule.template_key ?? "") ?? "—"}
+            onEdit={() => setEditing(schedule)}
+          />
         ))}
       </ul>
+      <Dialog
+        trigger={null}
+        open={editing !== null}
+        onOpenChange={(open) => (open ? null : setEditing(null))}
+        title={editing === "new" || !editing ? t("news:newsletters.new") : editing.name}
+        closeLabel={t("news:edition.admin.cancel")}
+        size="full"
+      >
+        {editing ? (
+          <NewsletterEditor
+            key={editing === "new" ? "new" : editing.id}
+            schedule={editing === "new" ? null : editing}
+            onDone={() => setEditing(null)}
+          />
+        ) : null}
+      </Dialog>
     </AdminSection>
   );
 }

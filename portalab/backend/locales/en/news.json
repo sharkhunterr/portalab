@@ -407,5 +407,15 @@
   "subscriptions.byChannel": "Off with its channel « {channel} ».",
   "auto.subscribers": "{count, plural, =0 {no subscriber} one {# subscriber} other {# subscribers}}",
   "preview.live": "Live preview",
-  "preview.now": "Generate the preview"
+  "preview.now": "Generate the preview",
+  "auto.on": "On",
+  "auto.off": "Off",
+  "auto.test": "Send me a test",
+  "auto.everyDay": "Every day at {hour}:00",
+  "auto.every.weekly": "Every {day} at {hour}:00",
+  "auto.every.monthly": "Monthly, the first {day} at {hour}:00",
+  "auto.portalOnly": "In the portal only",
+  "auto.failed": "That did not work, try again.",
+  "auto.deleteTitle": "Delete “{name}”?",
+  "auto.deleteHint": "It will not go out any more. The letters it already wrote stay in the history."
 }

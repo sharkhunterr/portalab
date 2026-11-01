@@ -331,3 +331,104 @@
   gap: var(--space-2);
   margin-block-end: var(--space-2);
 }
+
+/* issue 328: the automatic newsletters as cards — switched in place, set in a dialog */
+.auto-letters {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.auto-letter {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+.auto-letter[data-off] .auto-letter__icon,
+.auto-letter[data-off] .auto-letter__title,
+.auto-letter[data-off] .auto-letter__facts {
+  opacity: 0.6;
+}
+.auto-letter__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.auto-letter__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+}
+.auto-letter__title {
+  display: grid;
+  flex: 1;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+.auto-letter__title strong {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+}
+.auto-letter__subject {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  min-inline-size: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+.auto-letter__subject svg {
+  flex: none;
+}
+.auto-letter__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.auto-letter__facts > li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.auto-letter__facts > li:has(.status-badge) {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.auto-letter__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block-start: var(--space-3);
+  border-block-start: 1px solid var(--color-border);
+}
+.auto-letter__note {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.auto-letter__note[data-tone="ok"] {
+  color: var(--color-accent);
+}
+.auto-letter__note[data-tone="warn"] {
+  color: var(--state-error-fg);
+}
