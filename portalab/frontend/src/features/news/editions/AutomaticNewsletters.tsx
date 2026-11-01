@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useId, useRef, useState } from "react";
 import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
@@ -18,16 +18,25 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import { Switch } from "../../account/SettingsKit";
 import { useChannels } from "../NewsChannels";
-import { templateName, useContents, useEditionActions, usePreview, useTemplates } from "./api";
+import {
+  SCHEDULES,
+  type Schedule,
+  templateName,
+  useContents,
+  useEditionActions,
+  usePreview,
+  useSchedules,
+  useTemplates,
+} from "./api";
 import { ContentPicker } from "./ContentPicker";
 import { EditionFrame } from "./EditionsPage";
 import { PreviewSwitch, useLivePreview } from "./PreviewSwitch";
+import { TemplatePicker } from "./TemplatePicker";
 import "./editions.css";
 
-type Schedule = components["schemas"]["NewsletterScheduleOut"];
 type ScheduleIn = components["schemas"]["NewsletterScheduleIn"];
 
-const KEY = ["admin", "news", "newsletters"] as const;
+const KEY = SCHEDULES;
 const CADENCE_DAYS: Record<string, number> = { daily: 1, weekly: 7, monthly: 30 };
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 // the e-mail subject's variables, offered as chips (the server also reads their English names)
@@ -99,7 +108,6 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
   const t = useT();
   const client = useQueryClient();
   const channels = useChannels();
-  const templates = useTemplates();
   const offered = useContents();
   const letters = (channels.data ?? []).filter((c) => c.newsletter && c.enabled);
   const [values, setValues] = useState<ScheduleIn>(() =>
@@ -254,19 +262,21 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
         <fieldset className="email-setup__block">
           <legend>
             <span className="email-setup__step">3</span>
+            {t("news:auto.look")}
+          </legend>
+          {/* issue 329: its own template, chosen by sight */}
+          <p className="admin-muted">{t("news:auto.lookHint")}</p>
+          <TemplatePicker
+            value={values.template_key ?? "portalab"}
+            onChange={(key) => set("template_key", key)}
+          />
+        </fieldset>
+
+        <fieldset className="email-setup__block">
+          <legend>
+            <span className="email-setup__step">4</span>
             {t("news:auto.what")}
           </legend>
-          <SelectField
-            label={t("news:edition.admin.template")}
-            value={values.template_key ?? "portalab"}
-            onChange={(e) => set("template_key", e.target.value)}
-          >
-            {(templates.data ?? []).map((tpl) => (
-              <option key={tpl.key} value={tpl.key}>
-                {templateName(t, tpl)}
-              </option>
-            ))}
-          </SelectField>
           <ContentPicker
             value={values.contents ?? null}
             onChange={(contents) => set("contents", contents)}
@@ -285,7 +295,7 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
 
         <fieldset className="email-setup__block">
           <legend>
-            <span className="email-setup__step">4</span>
+            <span className="email-setup__step">5</span>
             {t("news:auto.where")}
           </legend>
           <FormGrid>
@@ -525,10 +535,7 @@ export function AutomaticNewsletters() {
   const t = useT();
   const channels = useChannels();
   const templates = useTemplates();
-  const schedules = useQuery({
-    queryKey: KEY,
-    queryFn: async () => ((await api.GET("/api/v1/admin/news/newsletters")).data ?? []) as Schedule[],
-  });
+  const schedules = useSchedules();
   const [editing, setEditing] = useState<Schedule | "new" | null>(null);
   const names = new Map((channels.data ?? []).map((c) => [c.id, c.name]));
   const looks = new Map((templates.data ?? []).map((tpl) => [tpl.key, templateName(t, tpl)]));

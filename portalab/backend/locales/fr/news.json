@@ -306,7 +306,7 @@
   "edition.admin.livePreview": "Aperçu en direct, avec les vraies données des 7 derniers jours",
   "edition.admin.editTemplate": "Template de lettre",
   "edition.admin.templates": "Templates",
-  "edition.admin.templatesHint": "Le visuel et l’ordre des sections. Dupliquez un template intégré pour créer le vôtre.",
+  "edition.admin.templatesHint": "Le visuel et l’ordre des sections. Chaque newsletter automatique choisit le sien ; dupliquez un template intégré pour créer le vôtre.",
   "edition.admin.builtin": "Intégré",
   "edition.admin.copy": "copie",
   "edition.admin.duplicate": "Dupliquer",
@@ -417,5 +417,10 @@
   "auto.portalOnly": "Dans le portail seulement",
   "auto.failed": "Ça n’a pas marché, réessayez.",
   "auto.deleteTitle": "Supprimer « {name} » ?",
-  "auto.deleteHint": "Elle ne partira plus. Les lettres qu’elle a déjà écrites restent dans l’historique."
+  "auto.deleteHint": "Elle ne partira plus. Les lettres qu’elle a déjà écrites restent dans l’historique.",
+  "auto.look": "Son apparence",
+  "auto.lookHint": "Le template de cette newsletter : chacune a le sien.",
+  "auto.usedBy": "Utilisé par : {names}",
+  "auto.usedByNone": "Utilisé par aucune newsletter automatique",
+  "auto.inUse": "Une newsletter automatique l’utilise : choisissez-en un autre pour elle avant de le supprimer."
 }

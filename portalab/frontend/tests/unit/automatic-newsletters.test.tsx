@@ -18,6 +18,8 @@ vi.mock("../../src/api/client", async (importOriginal) => {
 import { AutomaticNewsletters } from "../../src/features/news/editions/AutomaticNewsletters";
 import { json } from "../support/fake-api";
 
+const palette = () => ({ background: "#000", surface: "#111", accent: "#7f9cff", text: "#fff" });
+
 describe("issue 325 — automatic newsletters", () => {
   it("writes one with its name and its subject's variables", async () => {
     const saved: Array<Record<string, unknown>> = [];
@@ -31,7 +33,11 @@ describe("issue 325 — automatic newsletters", () => {
       if (path === "/api/v1/admin/news/newsletters") return json(200, []);
       if (path === "/api/v1/admin/news/categories")
         return json(200, [{ id: "c1", key: "lettre", name: "La lettre", newsletter: true, enabled: true }]);
-      if (path === "/api/v1/admin/news/newsletter-templates") return json(200, []);
+      if (path === "/api/v1/admin/news/newsletter-templates")
+        return json(200, [
+          { key: "portalab", builtin: true, definition: { name: "Portalab", palette: palette() } },
+          { key: "cine", builtin: false, definition: { name: "Ciné", palette: palette() } },
+        ]);
       if (path === "/api/v1/admin/news/newsletter-contents")
         return json(200, {
           contents: ["stats", "movies"],
@@ -62,13 +68,15 @@ describe("issue 325 — automatic newsletters", () => {
     expect(previews).toBe(0);
     fireEvent.click(screen.getByRole("button", { name: /Generate the preview/ }));
     await waitFor(() => expect(previews).toBe(1));
+    // issue 329: its own template, picked by sight
+    fireEvent.click(await screen.findByRole("radio", { name: /Ciné/ }));
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(saved).toHaveLength(1));
     expect(saved[0]).toMatchObject({
       name: "Friday letter",
       kind: "edition",
       category_id: "c1",
-      template_key: "portalab",
+      template_key: "cine",
       contents: ["stats"],
     });
     expect(String(saved[0]?.subject)).toContain("{semaine}");
