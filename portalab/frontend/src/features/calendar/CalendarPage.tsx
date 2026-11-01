@@ -155,7 +155,8 @@ export function CalendarPage() {
   const { from, to, days } = useMemo(() => range(view, anchor, firstDay), [view, anchor, firstDay]);
   const calendar = useCalendar(from, to);
   const reminders = useReminders();
-  const [picked, setPicked] = useState<string | null>(null);
+  // issue 302: today's detail is open on arrival, as after « Today »
+  const [picked, setPicked] = useState<string | null>(() => dayKey(new Date(), timeZone));
   // issue 237: the legend filters the kinds shown
   const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
   const toggle = (category: string) =>
@@ -197,7 +198,13 @@ export function CalendarPage() {
             <Button variant="ghost" size="icon" aria-label={t("calendar:next")} onClick={() => move(1)}>
               <Icon name="chevron-right" size={18} />
             </Button>
-            <Button variant="secondary" onClick={() => setAnchor(dayKey(new Date(), timeZone))}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setAnchor(today);
+                setPicked(today);
+              }}
+            >
               {t("calendar:today")}
             </Button>
           </div>
