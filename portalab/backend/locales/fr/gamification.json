@@ -946,5 +946,13 @@
   "widget.progress.streak": "{days, plural, one {# jour} other {# jours}} d’affilée",
   "widget.progress.title": "Ma progression",
   "widget.wheel.description": "Une fois par jour, faites tourner la roue : des coins, de l’XP, un booster découverte… sans rien à perdre.",
-  "widget.wheel.title": "Roue de la fortune"
+  "widget.wheel.title": "Roue de la fortune",
+  "quests.kind.discovery": "Découverte",
+  "quests.validated": "Validé",
+  "quests.left": "Plus que {time}",
+  "quests.until": "Jusqu’au {date}",
+  "quests.backIn": "De retour dans {time}",
+  "quests.backOn": "De retour le {date}",
+  "quests.group.open": "{count, plural, one {# à faire} other {# à faire}}",
+  "quests.group.done": "{count, plural, one {# validé} other {# validés}}"
 }

@@ -946,5 +946,13 @@
   "widget.progress.streak": "{days, plural, one {# day} other {# days}} in a row",
   "widget.progress.title": "My progression",
   "widget.wheel.description": "Once a day, spin the wheel: coins, XP, a discovery booster… with nothing to lose.",
-  "widget.wheel.title": "Wheel of fortune"
+  "widget.wheel.title": "Wheel of fortune",
+  "quests.kind.discovery": "Discovery",
+  "quests.validated": "Done",
+  "quests.left": "{time} left",
+  "quests.until": "Until {date}",
+  "quests.backIn": "Back in {time}",
+  "quests.backOn": "Back on {date}",
+  "quests.group.open": "{count, plural, one {# to do} other {# to do}}",
+  "quests.group.done": "{count, plural, one {# done} other {# done}}"
 }

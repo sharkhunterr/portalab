@@ -100,3 +100,30 @@ async def test_a_mission_as_shipped_before_is_brought_up_to_date(gm: GamHarness)
             ).all()
         )
     assert latest == {"discover_profile": "any", "discover_dashboard": "all"}  # the admin's kept
+
+
+async def test_a_mission_gains_its_french_texts(gm: GamHarness) -> None:
+    """#307: a mission as the previous release shipped it (English only) gains its French texts at start;
+    a member reads them through ``translations``, with when a periodic objective starts again."""
+    from portalab.modules.gamification.quests.discovery import SUPERSEDED
+
+    await gm.module.quests.save(SYSTEM, "discover_tour", SUPERSEDED["discover_tour"][-1])
+    await gm.module.quests.ensure_discovery()
+    await gm.module.quests.save(
+        SYSTEM,
+        "daily_visit",
+        {
+            "kind": "daily",
+            "label": "Daily visit",
+            "period": "day",
+            "steps": [{"kind": "event_count", "event_type": "user.signed_in", "count": 1}],
+            "translations": {"fr": {"label": "Visite du jour"}},
+        },
+    )
+    gm.clock.advance(timedelta(minutes=1))
+    mine = {q["key"]: q for q in await gm.module.quests.mine(gm.people["ursula"])}
+    assert mine["discover_tour"]["translations"]["fr"]["label"] == "Faites le tour"
+    assert mine["discover_tour"]["complete_on"] == "any"
+    assert mine["discover_tour"]["resets_at"] is None
+    assert mine["daily_visit"]["translations"] == {"fr": {"label": "Visite du jour", "description": ""}}
+    assert mine["daily_visit"]["resets_at"] is not None

@@ -13,7 +13,7 @@ printed or logged.
 
 import os
 import secrets
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import timedelta
 from pathlib import Path
@@ -386,6 +386,15 @@ QUESTS: dict[str, dict[str, Any]] = {
     },
 }
 
+# #307: their texts in French too; the quests as published before them are brought up to date
+_UNTRANSLATED_QUESTS = QUESTS
+_FRENCH_QUESTS = {
+    "daily_visit": {"label": "Visite du jour", "description": "Passez sur le portail aujourd'hui."},
+    "weekly_regular": {"label": "Fidèle de la semaine", "description": "Passez trois jours cette semaine."},
+    "explorer": {"label": "Explorateur", "description": "Revenez cinq jours pour tout découvrir."},
+}
+QUESTS = {key: {**raw, "translations": {"fr": _FRENCH_QUESTS[key]}} for key, raw in QUESTS.items()}
+
 RULES: dict[str, dict[str, Any]] = {}
 # #109: a visit earns its XP through the daily visit (once a day); the former sign-in bonus (each sign-in,
 # then capped to a day) is retired where it is still as the demo published it
@@ -399,8 +408,8 @@ RETIRED_RULES: dict[str, list[dict[str, Any]]] = {
         },
     ],
 }
-# the quests as the demo published them before (#109): given a new version where nobody changed them
-FORMER_QUESTS: dict[str, dict[str, Any]] = {
+# the quests as the demo published them before (#109, #307): given a new version where nobody changed them
+_FIRST_QUESTS: dict[str, dict[str, Any]] = {
     "daily_visit": {
         "kind": "daily",
         "label": "Daily visit",
@@ -427,6 +436,9 @@ FORMER_QUESTS: dict[str, dict[str, Any]] = {
         "steps": [{"kind": "event_count", "event_type": "user.signed_in", "count": 5}],
         "rewards": [{"value": "xp", "amount": 80}, {"value": "coins", "amount": 20}],
     },
+}
+FORMER_QUESTS: dict[str, tuple[dict[str, Any], ...]] = {
+    key: (_FIRST_QUESTS[key], _UNTRANSLATED_QUESTS[key]) for key in _UNTRANSLATED_QUESTS
 }
 
 
@@ -635,7 +647,7 @@ class DemoSeeder:
             await gamification.achievements.save(self.admin, key, raw)  # new definition or new version
             made += 1
         for key, raw in QUESTS.items():
-            if await self._quest_kept(key, FORMER_QUESTS.get(key)):
+            if await self._quest_kept(key, FORMER_QUESTS.get(key, ())):
                 continue
             await gamification.quests.save(self.admin, key, raw)
             made += 1
@@ -871,15 +883,15 @@ class DemoSeeder:
             await campaigns.reconciler.run()
         return f"{made} campaigns created"
 
-    async def _quest_kept(self, key: str, former: dict[str, Any] | None) -> bool:
-        """A quest stays as it is — unless it is still the one the demo published before (#109)."""
+    async def _quest_kept(self, key: str, formers: Sequence[dict[str, Any]]) -> bool:
+        """A quest stays as it is — unless it is still one the demo published before (#109, #307)."""
         stored = await self._scalar(
             "SELECT definition FROM gamification.quests WHERE key = :k ORDER BY version DESC LIMIT 1", k=key
         )
         if stored is None:
             return False
         try:
-            return former is None or parse_quest(stored) != parse_quest(former)
+            return parse_quest(stored) not in [parse_quest(former) for former in formers]
         except ValueError:
             return True
 
@@ -889,7 +901,7 @@ class DemoSeeder:
         today = utc_now().date()
         formers = demo_economy.former_quests(today)
         for key, raw in demo_economy.quests(today).items():
-            if await self._quest_kept(key, formers.get(key)):
+            if await self._quest_kept(key, [formers[key]] if key in formers else []):
                 continue
             await gamification.quests.save(self.admin, key, raw)
             made += 1

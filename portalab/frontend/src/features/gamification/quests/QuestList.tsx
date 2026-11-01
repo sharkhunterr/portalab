@@ -1,6 +1,8 @@
-import { Progress } from "../../../design-system/components/Content";
+import { useEffect, useState } from "react";
+import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import "../gamification.css";
 
 /** A quest, daily objective or challenge as both the 013 and 012 APIs describe it. */
@@ -9,6 +11,7 @@ export interface QuestItem {
   kind: "quest" | "daily" | "challenge" | string;
   label: string;
   description?: string | null;
+  icon?: string | null;
   period?: string | null;
   ends_at?: string | null;
   completed: boolean;
@@ -16,61 +19,213 @@ export interface QuestItem {
   rewards: Array<{ value: string; amount: number }>;
   /** 027: what it gives from the shop (a sealed booster…), by name. */
   gifts?: string[];
+  /** issue 307: its texts in other interface languages. */
+  translations?: Record<string, { label: string; description?: string }> | null;
+  /** issue 307: when a daily, weekly or monthly objective starts again. */
+  resets_at?: string | null;
+  /** issue 121: done by any one of its steps (its guided tour or the thing itself). */
+  complete_on?: "all" | "any" | string | null;
+}
+
+/** issue 307: a quest's label and description in the interface's language, else as written. */
+export function useQuestText() {
+  const { language } = useLocaleContext();
+  return (quest: QuestItem) => {
+    const text = quest.translations?.[language] ?? quest.translations?.[language.split("-")[0] ?? ""];
+    return text
+      ? { label: text.label, description: text.description ?? "" }
+      : { label: quest.label, description: quest.description ?? "" };
+  };
+}
+
+/** The time now, again each minute — so the countdowns move. */
+function useNow(): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  return now;
+}
+
+const MINUTE = 60_000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+/** Beyond a week, a date says it better than a count of days. */
+const COUNTDOWN = 7 * DAY;
+/** Under three hours left, the countdown is underlined. */
+const URGENT = 3 * HOUR;
+
+/** « 5 h 12 min », « 2 j 4 h », « 12 min »: the two largest units of a duration, in the locale. */
+function useDuration() {
+  const { locale } = useLocaleContext();
+  return (ms: number) => {
+    const unit = (value: number, name: "day" | "hour" | "minute") =>
+      new Intl.NumberFormat(locale, { style: "unit", unit: name, unitDisplay: "short" }).format(value);
+    const total = Math.max(Math.ceil(ms / MINUTE), 1);
+    const days = Math.floor(total / 1440);
+    const hours = Math.floor((total % 1440) / 60);
+    const minutes = total % 60;
+    if (days) return hours ? `${unit(days, "day")} ${unit(hours, "hour")}` : unit(days, "day");
+    if (hours) return minutes ? `${unit(hours, "hour")} ${unit(minutes, "minute")}` : unit(hours, "hour");
+    return unit(minutes, "minute");
+  };
+}
+
+/** Where a quest stands as one bar: any one step done is enough when it completes on any of them. */
+function progressOf(quest: QuestItem): Array<{ current: number; target: number }> {
+  if (quest.completed) return [{ current: 1, target: 1 }];
+  if (quest.complete_on === "any" && quest.steps.length > 1) {
+    const best = [...quest.steps].sort((a, b) => b.current / b.target - a.current / a.target)[0];
+    return best ? [best] : [];
+  }
+  return quest.steps;
+}
+
+/** The moment a quest still to do closes: its period's end or its window's, whichever comes first. */
+function deadlineOf(quest: QuestItem): number | null {
+  const ends = [quest.resets_at, quest.ends_at].filter(Boolean).map((at) => Date.parse(at as string));
+  return ends.length ? Math.min(...ends) : null;
+}
+
+/** issue 307: the ones to do first, the closest deadline at the top; the done ones after, back soonest first. */
+function ordered(quests: QuestItem[]): { open: QuestItem[]; done: QuestItem[] } {
+  const by = (at: (q: QuestItem) => number | null) => (a: QuestItem, b: QuestItem) =>
+    (at(a) ?? Number.POSITIVE_INFINITY) - (at(b) ?? Number.POSITIVE_INFINITY);
+  return {
+    open: quests.filter((q) => !q.completed).sort(by(deadlineOf)),
+    done: quests.filter((q) => q.completed).sort(by((q) => (q.resets_at ? Date.parse(q.resets_at) : null))),
+  };
+}
+
+function QuestTime({ quest, now }: { quest: QuestItem; now: number }) {
+  const t = useT();
+  const format = useFormat();
+  const duration = useDuration();
+  if (quest.completed) {
+    if (!quest.resets_at) return null;
+    const left = Date.parse(quest.resets_at) - now;
+    return (
+      <p className="quest-card__time" data-tone="next">
+        <Icon name="sync" size={14} />
+        {left > COUNTDOWN
+          ? t("gamification:quests.backOn", { date: format.date(quest.resets_at) })
+          : t("gamification:quests.backIn", { time: duration(left) })}
+      </p>
+    );
+  }
+  const deadline = deadlineOf(quest);
+  if (deadline === null) return null;
+  const left = deadline - now;
+  return (
+    <p className="quest-card__time" data-tone={left < URGENT ? "urgent" : "left"}>
+      <Icon name="hourglass" size={14} />
+      {left > COUNTDOWN
+        ? t("gamification:quests.until", { date: format.date(new Date(deadline)) })
+        : t("gamification:quests.left", { time: duration(left) })}
+    </p>
+  );
+}
+
+function QuestCard({ quest, now }: { quest: QuestItem; now: number }) {
+  const t = useT();
+  const format = useFormat();
+  const text = useQuestText()(quest);
+  const kind =
+    quest.kind === "daily" && quest.period && quest.period !== "day" ? `daily_${quest.period}` : quest.kind;
+  return (
+    <li className="quest-card" id={quest.key} data-state={quest.completed ? "completed" : "open"}>
+      <div className="quest-card__head">
+        <span className="quest-card__icon" aria-hidden="true">
+          <Icon name={quest.completed ? "check" : (quest.icon ?? "target")} size={18} />
+        </span>
+        <span className="quest-card__kind">{t(`gamification:quests.kind.${kind}`)}</span>
+        {quest.completed ? (
+          <span className="quest-card__seal">
+            <Icon name="badge-check" size={14} />
+            {t("gamification:quests.validated")}
+          </span>
+        ) : null}
+      </div>
+      <h4 className="quest-card__title">{text.label}</h4>
+      {text.description ? <p className="quest-card__text">{text.description}</p> : null}
+      {progressOf(quest).map((step, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: steps are positional
+        <div key={index} className="quest-card__progress">
+          <span
+            className="ds-bar"
+            role="progressbar"
+            aria-label={t("gamification:achievements.progress", step)}
+            aria-valuemin={0}
+            aria-valuemax={step.target}
+            aria-valuenow={Math.min(step.current, step.target)}
+          >
+            <span
+              className="ds-bar__fill"
+              style={{
+                inlineSize: `${Math.round((Math.min(step.current, step.target) / step.target) * 100)}%`,
+              }}
+            />
+          </span>
+          {quest.completed ? null : (
+            <span className="quest-card__count">
+              {format.number(Math.min(step.current, step.target))} / {format.number(step.target)}
+            </span>
+          )}
+        </div>
+      ))}
+      {quest.rewards.length || quest.gifts?.length ? (
+        <p className="quest-card__rewards">
+          {quest.rewards.map((reward) => (
+            <span key={reward.value} className="quest-card__reward" data-value={reward.value}>
+              {t("gamification:quests.reward", {
+                amount: reward.amount,
+                value: t(`gamification:value.${reward.value}`),
+              })}
+            </span>
+          ))}
+          {(quest.gifts ?? []).map((gift) => (
+            <span key={gift} className="quest-card__reward" data-value="gift">
+              {t("gamification:quests.gift", { gift })}
+            </span>
+          ))}
+        </p>
+      ) : null}
+      <QuestTime quest={quest} now={now} />
+    </li>
+  );
 }
 
 /**
- * Quest list (spec 013 T039): kind and state in **text** (never color alone), step progress, rewards, and
- * the end of a time-boxed challenge.
+ * Quest list (spec 013 T039; issue 307 redesign): those to do first — the closest deadline at the top, its
+ * time left counted down — then those done, sealed « Done » with when they come back. Kind and state in
+ * **text** (never color alone); texts in the interface's language when the quest has them.
  */
 export function QuestList({ quests }: { quests: QuestItem[] }) {
   const t = useT();
-  const format = useFormat();
+  const now = useNow();
   if (quests.length === 0) return <p>{t("gamification:quests.empty")}</p>;
+  const { open, done } = ordered(quests);
+  const groups: Array<[string, QuestItem[]]> = [
+    ["open", open],
+    ["done", done],
+  ];
   return (
-    <ul className="gamification-grid">
-      {quests.map((quest) => (
-        <li key={quest.key} className="ds-card ds-stack" data-state={quest.completed ? "completed" : "open"}>
-          <h3>{quest.label}</h3>
-          <p className="ds-badge">
-            {t(
-              `gamification:quests.kind.${
-                quest.kind === "daily" && quest.period && quest.period !== "day"
-                  ? `daily_${quest.period}`
-                  : quest.kind
-              }`,
-            )}{" "}
-            · {t(quest.completed ? "gamification:quests.completed" : "gamification:quests.open")}
-          </p>
-          {quest.description ? <p>{quest.description}</p> : null}
-          {quest.steps.map((step, index) => (
-            <Progress
-              // biome-ignore lint/suspicious/noArrayIndexKey: steps are positional
-              key={index}
-              value={step.current}
-              max={step.target}
-              label={t("gamification:achievements.progress", step)}
-            />
-          ))}
-          {quest.rewards.length || quest.gifts?.length ? (
-            <p className="gamification-meta">
-              {[
-                ...quest.rewards.map((reward) =>
-                  t("gamification:quests.reward", {
-                    amount: reward.amount,
-                    value: t(`gamification:value.${reward.value}`),
-                  }),
-                ),
-                ...(quest.gifts ?? []).map((gift) => t("gamification:quests.gift", { gift })),
-              ].join(" · ")}
-            </p>
-          ) : null}
-          {quest.ends_at ? (
-            <p className="gamification-meta">
-              {t("gamification:quests.endsAt", { date: format.dateTime(quest.ends_at) })}
-            </p>
-          ) : null}
-        </li>
-      ))}
-    </ul>
+    <div className="quest-board">
+      {groups.map(([group, items]) =>
+        items.length ? (
+          <section key={group} className="quest-board__group" data-group={group}>
+            <h3 className="quest-board__title">
+              {t(`gamification:quests.group.${group}`, { count: items.length })}
+            </h3>
+            <ul className="quest-grid">
+              {items.map((quest) => (
+                <QuestCard key={quest.key} quest={quest} now={now} />
+              ))}
+            </ul>
+          </section>
+        ) : null,
+      )}
+    </div>
   );
 }

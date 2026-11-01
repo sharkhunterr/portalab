@@ -3,7 +3,7 @@
 Created when the module starts if their key was never used, so a fresh portal has them; an administrator
 may then change or retire them like any quest (a retired one is not created again). Issue 121: each is done
 by following its guided tour **or** by doing the thing (``complete_on: any``); a mission still as an earlier
-release shipped it (``SUPERSEDED``) is brought up to date at start."""
+release shipped it (``SUPERSEDED``) is brought up to date at start (#307: so it gains its French texts)."""
 
 from typing import Any
 
@@ -265,5 +265,49 @@ DISCOVERY: dict[str, dict[str, Any]] = {
     },
 }
 
+# #307: their texts in French too — a member reads the missions in their interface's language
+FRENCH: dict[str, dict[str, str]] = {
+    "discover_profile": {
+        "label": "Personnalisez votre profil",
+        "description": "Suivez sa visite guidée, ajoutez une photo ou changez votre nom.",
+    },
+    "discover_tour": {
+        "label": "Faites le tour",
+        "description": "Une minute pour voir où se trouve chaque chose.",
+    },
+    "discover_dashboard": {
+        "label": "Arrangez votre tableau de bord",
+        "description": "Suivez sa visite guidée, ou ajoutez, déplacez ou redimensionnez un widget.",
+    },
+    "discover_request": {
+        "label": "Demandez un titre",
+        "description": "Suivez sa visite guidée, ou demandez un titre absent de la bibliothèque.",
+    },
+    "discover_request_status": {
+        "label": "Suivez une demande",
+        "description": "Voyez où en est une demande sur la page du titre.",
+    },
+    "discover_stats": {
+        "label": "Consultez vos statistiques",
+        "description": "Ce que vous avez regardé, lu et joué, en graphiques.",
+    },
+    "discover_ticket": {
+        "label": "Contactez le support",
+        "description": "Suivez sa visite guidée, ou ouvrez un ticket : une question, un problème, une idée.",
+    },
+    "discover_shop": {
+        "label": "Faites-vous plaisir",
+        "description": "Suivez sa visite guidée, ou offrez-vous quelque chose dans la boutique.",
+    },
+    "discover_assistant": {
+        "label": "Rencontrez l'assistant",
+        "description": "Suivez sa visite guidée, ou posez-lui une première question.",
+    },
+}
+_V2 = DISCOVERY
+DISCOVERY = {key: {**raw, "translations": {"fr": FRENCH[key]}} for key, raw in _V2.items()}
+
 # what earlier releases shipped, per key — replaced at start when an administrator never changed it
-SUPERSEDED: dict[str, tuple[dict[str, Any], ...]] = {key: (_V1[key],) for key in _V1}
+SUPERSEDED: dict[str, tuple[dict[str, Any], ...]] = {
+    key: tuple(old for old in (_V1.get(key), _V2[key]) if old is not None) for key in _V2
+}

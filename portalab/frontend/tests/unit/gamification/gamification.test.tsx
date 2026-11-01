@@ -21,6 +21,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 import { AchievementGrid } from "../../../src/features/gamification/achievements/Grid";
 import { AnomalyQueue } from "../../../src/features/gamification/admin/AnomalyQueue";
 import ProgressionPage from "../../../src/features/gamification/progression/ProgressionPage";
+import { QuestList } from "../../../src/features/gamification/quests/QuestList";
 import { json } from "../../support/fake-api";
 
 const PROGRESSION = {
@@ -94,8 +95,66 @@ describe("gamification", () => {
     expect(screen.getByText("-10 Coins")).toBeTruthy();
     expect(await screen.findByText("You are not ranked yet.")).toBeTruthy();
     expect(await screen.findByText("Listen today")).toBeTruthy();
-    expect(screen.getByText("Daily objective · In progress")).toBeTruthy();
+    expect(screen.getByText("Daily objective")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "1 to do" })).toBeTruthy();
     expect(screen.getByText("+10 Coins")).toBeTruthy();
+  });
+
+  it("seals a done quest, says when it comes back, and counts down the time left of one to do", () => {
+    const now = Date.parse("2026-11-01T10:00:00Z");
+    vi.useFakeTimers({ now, toFake: ["Date"] });
+    try {
+      show(
+        <QuestList
+          quests={[
+            {
+              key: "visit",
+              kind: "daily",
+              label: "Daily visit",
+              completed: true,
+              steps: [{ current: 1, target: 1 }],
+              rewards: [],
+              resets_at: "2026-11-01T23:00:00Z",
+              translations: { de: { label: "Täglicher Besuch" } },
+            },
+            {
+              key: "tour",
+              kind: "discovery",
+              label: "Take the tour",
+              completed: false,
+              complete_on: "any",
+              steps: [
+                { current: 0, target: 1 },
+                { current: 1, target: 2 },
+              ],
+              rewards: [],
+            },
+            {
+              key: "double",
+              kind: "daily",
+              label: "Double feature",
+              completed: false,
+              steps: [{ current: 1, target: 2 }],
+              rewards: [],
+              resets_at: "2026-11-01T12:30:00Z",
+            },
+          ]}
+        />,
+      );
+      expect(screen.getByRole("heading", { name: "1 done" })).toBeTruthy();
+      expect(screen.getByRole("heading", { name: "2 to do" })).toBeTruthy();
+      // a translation in another language than the interface's leaves the text as written
+      expect(screen.getByText("Daily visit")).toBeTruthy();
+      expect(screen.getByText("Done")).toBeTruthy();
+      expect(screen.getByText(/^Back in 13 hr/)).toBeTruthy();
+      expect(screen.getByText(/^2 hr 30 min left$/)).toBeTruthy();
+      // done by any one of its steps: a single bar, the furthest one
+      const tour = document.getElementById("tour");
+      expect(tour?.querySelectorAll("[role=progressbar]")).toHaveLength(1);
+      expect(tour?.textContent).toContain("1 / 2");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("labels achievement states in text and keeps hidden ones hidden", () => {

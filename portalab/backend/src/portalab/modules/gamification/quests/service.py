@@ -36,7 +36,7 @@ from portalab.modules.gamification.modifiers.rewards import RewardBonuses, boost
 from portalab.modules.gamification.notify import Note
 from portalab.modules.gamification.observability import log, metrics
 from portalab.modules.gamification.quests.definition import QuestDefinition, parse_quest
-from portalab.modules.gamification.quests.periods import period_key
+from portalab.modules.gamification.quests.periods import period_end, period_key
 from portalab.modules.gamification.rules.definition import matches
 
 CACHE_SECONDS = 10.0
@@ -50,6 +50,9 @@ class QuestVersion:
     effective_from: datetime
     ends_at: datetime | None = None
     source_ref: str = ""
+    # #307: the first version counting as this one does — a progress made since still holds (a new version
+    # that only changes texts, icon or rewards keeps where members stand)
+    counts_since: int = 0
 
     def open_at(self, at: datetime) -> bool:
         return (
@@ -57,6 +60,18 @@ class QuestVersion:
             and (self.ends_at is None or at < self.ends_at)
             and self.definition.open_at(at)
         )
+
+
+def _counting(definition: QuestDefinition) -> tuple[Any, ...]:
+    """#307: what decides a quest's progress — its texts, icon and rewards do not."""
+    return (
+        definition.kind,
+        definition.period,
+        definition.window,
+        definition.steps,
+        definition.complete_on,
+        definition.requires,
+    )
 
 
 class QuestNotFound(NotFound):
@@ -160,18 +175,26 @@ class Quests:
         if self._own and time.monotonic() - self._own[0] < CACHE_SECONDS:
             return self._own[1]
         async with self.database.session() as session:
-            latest = select(Quest.key, func.max(Quest.version).label("v")).group_by(Quest.key).subquery()
-            rows = (
-                await session.execute(
-                    select(Quest)
-                    .join(latest, (Quest.key == latest.c.key) & (Quest.version == latest.c.v))
-                    .where(Quest.status == "active")
+            rows = (await session.execute(select(Quest).order_by(Quest.key, Quest.version.desc()))).scalars()
+            versions: dict[str, list[Quest]] = {}
+            for r in rows:
+                versions.setdefault(r.key, []).append(r)
+        found: list[QuestVersion] = []
+        for history in versions.values():
+            latest = history[0]
+            if latest.status != "active":
+                continue
+            definition = QuestDefinition.model_validate(latest.definition)
+            since = latest.version
+            for older in history[1:]:
+                if _counting(QuestDefinition.model_validate(older.definition)) != _counting(definition):
+                    break
+                since = older.version
+            found.append(
+                QuestVersion(
+                    latest.key, latest.version, definition, latest.effective_from, counts_since=since
                 )
-            ).scalars()
-            found = [
-                QuestVersion(r.key, r.version, QuestDefinition.model_validate(r.definition), r.effective_from)
-                for r in rows
-            ]
+            )
         self._own = (time.monotonic(), found)
         return found
 
@@ -280,8 +303,9 @@ class Quests:
         if row is None or row.completed_at is not None:
             return []
         counts = list(row.counts)[: len(steps)] + [0] * max(0, len(steps) - len(row.counts))
-        if row.version != quest.version:
-            counts, row.version = [0] * len(steps), quest.version
+        if row.version < (quest.counts_since or quest.version):
+            counts = [0] * len(steps)
+        row.version = quest.version
         for index in hits:
             counts[index] = min(counts[index] + 1, steps[index].count)
         row.counts, row.updated_at = counts, now
@@ -374,11 +398,13 @@ class Quests:
         for quest in open_quests:
             period = period_key(quest.definition.period, now, timezone)
             row = rows.get((quest.key, period))
-            counts = list(row.counts) if row and row.version == quest.version else []
+            counts = list(row.counts) if row and row.version >= (quest.counts_since or quest.version) else []
+            end = period_end(quest.definition.period, now, timezone)
             out.append(
                 {
                     **self.describe(quest),
                     "period_key": period,
+                    "resets_at": end.isoformat() if end else None,  # #307: when it starts again
                     "completed_at": row.completed_at.isoformat() if row and row.completed_at else None,
                     "steps": [
                         {
@@ -410,6 +436,8 @@ class Quests:
             ),
             "rewards": [r.model_dump() for r in definition.rewards],
             "gifts": [u.label for u in definition.unlocks],  # 027: what it gives from the shop (a booster…)
+            "complete_on": definition.complete_on,
+            "translations": {lang: text.model_dump() for lang, text in definition.translations.items()},
         }
 
     async def catalog(self) -> list[dict[str, Any]]:

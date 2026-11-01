@@ -268,3 +268,27 @@ async def test_a_quest_gives_a_booster_and_counts_only_who_wears_the_interface(g
         assert given == [(str(ursula), "booster_christmas")]
     finally:
         caps.system_providers = original  # type: ignore[method-assign]
+
+
+async def test_a_new_version_that_only_rewords_keeps_where_members_stand(gm: GamHarness) -> None:
+    """#307: translating or rewording a quest keeps members' progress; changing what counts restarts it."""
+    marathon = quest("quest", steps=[{**PLAY, "count": 3}])
+    await gm.module.quests.save(SYSTEM, "marathon", marathon)
+    gm.clock.advance(timedelta(minutes=1))
+    user = gm.people["ursula"]
+    await gm.emit(user)
+
+    async def done() -> int:
+        gm.module.quests._own = None
+        gm.clock.advance(timedelta(minutes=1))
+        mine = {q["key"]: q for q in await gm.module.quests.mine(user)}
+        return int(mine["marathon"]["steps"][0]["current"])
+
+    assert await done() == 1
+    reworded = {**marathon, "label": "Marathon", "translations": {"fr": {"label": "Marathon"}}}
+    await gm.module.quests.save(SYSTEM, "marathon", reworded)
+    assert await done() == 1
+    await gm.emit(user)
+    assert await done() == 2  # counted on, on the new version
+    await gm.module.quests.save(SYSTEM, "marathon", {**reworded, "steps": [{**PLAY, "count": 5}]})
+    assert await done() == 0
