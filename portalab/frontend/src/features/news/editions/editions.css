@@ -322,3 +322,12 @@
   color: var(--color-text);
   font-size: var(--font-size-sm);
 }
+
+/* issue 327: the preview, live or on demand */
+.edition-preview-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block-end: var(--space-2);
+}

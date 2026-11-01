@@ -1236,8 +1236,8 @@
   "setting.notifications.categoryPolicy.label": "Rules per category",
   "setting.notifications.coalesceWindowSeconds.hint": "Time during which repeated notifications about one subject merge into one, in seconds.",
   "setting.notifications.coalesceWindowSeconds.label": "Grouping window",
-  "setting.notifications.digest.defaultMode.hint": "E-mail digest members get by default: off, daily or weekly.",
-  "setting.notifications.digest.defaultMode.label": "Default e-mail digest",
+  "setting.notifications.digest.defaultMode.hint": "For members who chose nothing: their e-mail notifications one by one (off), or gathered in a daily or weekly digest. Nothing to do with the automatic newsletters.",
+  "setting.notifications.digest.defaultMode.label": "E-mail digest of notifications (default)",
   "setting.notifications.email.digest.hint": "This member's e-mail digest: off, daily or weekly.",
   "setting.notifications.email.digest.label": "E-mail digest",
   "setting.notifications.email.enabled.hint": "Send notifications by e-mail through the SMTP server.",
@@ -2155,5 +2155,8 @@
   "email.stateOn": "Sending e-mails is on",
   "email.stateOff": "Sending e-mails is off: no newsletter goes out by e-mail",
   "email.stateHint": "The sending server (SMTP), the sender and the test are set in Configuration → Communication.",
-  "email.setUp": "Set up sending"
+  "email.setUp": "Set up sending",
+  "setting.notifications.digest.defaultMode.choice.off": "Off (one by one)",
+  "setting.notifications.digest.defaultMode.choice.daily": "Daily digest",
+  "setting.notifications.digest.defaultMode.choice.weekly": "Weekly digest"
 }

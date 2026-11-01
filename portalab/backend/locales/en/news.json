@@ -277,7 +277,7 @@
   "edition.admin.template": "Template",
   "edition.admin.notice": "Message shown on top",
   "edition.admin.noticeHint": "A planned maintenance, important news… (optional)",
-  "edition.admin.noPreview": "The preview will show here.",
+  "edition.admin.noPreview": "No preview: generate it, or switch the live preview on.",
   "edition.admin.sectionKind": "Section",
   "edition.admin.up": "Move up",
   "edition.admin.down": "Move down",
@@ -405,5 +405,7 @@
   "subscriptions.automatic": "Automatic newsletters",
   "subscriptions.channels": "Channels",
   "subscriptions.byChannel": "Off with its channel « {channel} ».",
-  "auto.subscribers": "{count, plural, =0 {no subscriber} one {# subscriber} other {# subscribers}}"
+  "auto.subscribers": "{count, plural, =0 {no subscriber} one {# subscriber} other {# subscribers}}",
+  "preview.live": "Live preview",
+  "preview.now": "Generate the preview"
 }
