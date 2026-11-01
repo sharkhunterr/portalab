@@ -6,6 +6,7 @@ import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { ApiError, DataRegion } from "../../state/regions";
+import { EMAIL_KEYS, EmailSettings, SMTP_PASSWORD } from "./communication/EmailSettings";
 import META from "./settings-meta.json";
 import { Toggles } from "./Toggles";
 
@@ -118,6 +119,9 @@ function useAdvancedMode(): [boolean, (on: boolean) => void] {
     },
   ];
 }
+
+/** Issue 319: the e-mail transport is set in one form (in « Communication »), not setting by setting. */
+const TRANSPORT = new Set<string>([...Object.values(EMAIL_KEYS), SMTP_PASSWORD]);
 
 export type { SettingItem };
 
@@ -365,7 +369,9 @@ function SettingsExplorer({
     [settings],
   );
   // a member's own preference (the portal's value only their default) is for the advanced mode too
-  const visible = portal.filter((item) => advanced || (!isAdvanced(item.key) && !item.user_overridable));
+  const visible = portal.filter(
+    (item) => advanced || (!isAdvanced(item.key) && !item.user_overridable && !TRANSPORT.has(item.key)),
+  );
   const counts = useMemo(() => {
     const out = new Map<string, number>();
     for (const item of visible) out.set(groupOf(item.key), (out.get(groupOf(item.key)) ?? 0) + 1);
@@ -420,6 +426,7 @@ function SettingsExplorer({
         {!needle && tab !== "all" ? (
           <p className="admin-muted settings-explorer__lead">{t(`admin:config.groupHint.${tab}`)}</p>
         ) : null}
+        {!needle && tab === "communication" && !advanced ? <EmailSettings /> : null}
         {shown.length ? (
           <ul className="setting-cards">
             {shown.map((item) => (

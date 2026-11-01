@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../../api/client";
-import { AdminGrid, AdminPage, AdminStats } from "../../../design-system/admin/AdminKit";
+import { AdminPage, AdminStats } from "../../../design-system/admin/AdminKit";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { EditionsAdmin } from "../../news/editions/EditionsAdmin";
@@ -55,13 +55,12 @@ export default function NewslettersAdmin() {
           },
         ]}
       />
+      {/* issue 319: how the e-mails go out, first — nothing is sent before it is set up */}
+      <EmailSettings />
       {/* issue 316: the self-writing editions, their templates and their history */}
       <EditionsAdmin />
       <NewslettersPanel />
-      <AdminGrid>
-        <EmailSettings />
-        <DigestDefault />
-      </AdminGrid>
+      <DigestDefault />
       <Deliveries status={status.data} />
     </AdminPage>
   );
