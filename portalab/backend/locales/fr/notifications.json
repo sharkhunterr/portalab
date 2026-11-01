@@ -787,5 +787,15 @@
   "universe.weather.windGusts": "Vent {speed} km/h, rafales {gusts}",
   "universe.weather.windy": "Venteux",
   "verification.body": "Votre code de confirmation : {token} (valable jusqu’au {expires}).",
-  "verification.subject": "Confirmez votre compte Portalab"
+  "verification.subject": "Confirmez votre compte Portalab",
+  "email.open": "Ouvrir dans {site}",
+  "email.note": "Vous recevez cet e-mail selon vos préférences de notification.",
+  "email.manage": "Gérer mes notifications",
+  "email.digest": "Votre résumé",
+  "email.account": "Votre compte",
+  "email.verificationNote": "Si vous n’êtes pas à l’origine de cette demande, ignorez simplement cet e-mail.",
+  "email.testKicker": "Test d’envoi",
+  "email.testTitle": "Les e-mails de {site} fonctionnent",
+  "email.testBody": "Bonne nouvelle : cet e-mail de test est bien arrivé.\n\nLes notifications et les lettres de {site} partiront avec cette allure.",
+  "email.testNote": "Envoyé depuis les réglages d’envoi des e-mails, à votre adresse uniquement."
 }

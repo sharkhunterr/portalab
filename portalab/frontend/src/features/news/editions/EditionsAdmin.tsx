@@ -270,7 +270,7 @@ function TemplateEditor({
             value={definition.header ?? "banner"}
             onChange={(e) => set("header", e.target.value as Definition["header"])}
           >
-            {(["banner", "centered", "minimal"] as const).map((header) => (
+            {(["brand", "banner", "centered", "minimal"] as const).map((header) => (
               <option key={header} value={header}>
                 {t(`news:edition.header.${header}`)}
               </option>
@@ -281,7 +281,7 @@ function TemplateEditor({
             value={definition.font ?? "sans"}
             onChange={(e) => set("font", e.target.value as Definition["font"])}
           >
-            {(["sans", "serif", "rounded", "mono"] as const).map((font) => (
+            {(["brand", "sans", "serif", "rounded", "mono"] as const).map((font) => (
               <option key={font} value={font}>
                 {t(`news:edition.font.${font}`)}
               </option>
@@ -457,7 +457,7 @@ function NewEdition() {
   const channels = useChannels();
   const preview = usePreview();
   const { create } = useEditionActions();
-  const [ask, setAsk] = useState<EditionAsk>({ template_key: "classic", days: 7, language: language() });
+  const [ask, setAsk] = useState<EditionAsk>({ template_key: "portalab", days: 7, language: language() });
   const [shown, setShown] = useState<string | null>(null);
   const letters = (channels.data ?? []).filter((c) => c.newsletter && c.enabled);
   const body = { ...ask, category_id: ask.category_id || letters[0]?.id || null };

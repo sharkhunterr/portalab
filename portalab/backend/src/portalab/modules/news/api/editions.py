@@ -73,6 +73,16 @@ class EditionOut(BaseModel):
     recipients: int
 
 
+def _framed(row: NewsletterEdition) -> Response:
+    """The edition's page in the portal: its links and pictures on the portal itself (the e-mail keeps the
+    public address — a portal reached otherwise, on the local network, still shows its pictures)."""
+    html = row.html
+    portal = str((row.data or {}).get("portal") or "").rstrip("/")
+    if portal:
+        html = html.replace(f'="{portal}/', '="/')
+    return Response(html, media_type="text/html; charset=utf-8", headers=PAGE_HEADERS)
+
+
 def _edition(row: NewsletterEdition) -> EditionOut:
     return EditionOut(
         id=row.id,
@@ -189,8 +199,7 @@ async def delete_edition(principal: Publisher, edition_id: UUID, module: Module)
 )
 async def draft_page(principal: Publisher, edition_id: UUID, module: Module) -> Response:
     """Any edition's page — a preview, a draft — for the news desk."""
-    row = await module.editions.get(edition_id)
-    return Response(row.html, media_type="text/html; charset=utf-8", headers=PAGE_HEADERS)
+    return _framed(await module.editions.get(edition_id))
 
 
 @router.post("/admin/news/newsletter-editions/{edition_id}/test", dependencies=NewslettersOn)
@@ -226,8 +235,7 @@ async def edition(principal: Reader, edition_id: UUID, module: Module) -> Editio
 @router.get("/news/editions/{edition_id}/page", response_class=Response, dependencies=NewslettersOn)
 async def edition_page(principal: Reader, edition_id: UUID, module: Module) -> Response:
     """The edition as it was e-mailed — the portal frames it."""
-    row = await _published(module, edition_id)
-    return Response(row.html, media_type="text/html; charset=utf-8", headers=PAGE_HEADERS)
+    return _framed(await _published(module, edition_id))
 
 
 @router.get("/newsletters/pictures/{token}/{image_id}", include_in_schema=False)

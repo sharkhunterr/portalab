@@ -288,7 +288,7 @@ function ScheduleForm({ schedule, onDone }: { schedule?: Schedule; onDone: () =>
           // issue 316: an edition is drawn with a template
           <SelectField
             label={t("news:edition.admin.template")}
-            value={values.template_key ?? "classic"}
+            value={values.template_key ?? "portalab"}
             onChange={(e) => set("template_key", e.target.value)}
           >
             {(templates.data ?? []).map((tpl) => (

@@ -17,6 +17,7 @@ from sqlalchemy import delete, select
 from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.media import DIGEST, EDITION, DigestItem
 from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, Users
+from portalab.capabilities.notifications.layout import site_brand
 from portalab.core.db import Database
 from portalab.core.errors import NotFound, ValidationFailed
 from portalab.core.logging import get_logger
@@ -267,7 +268,9 @@ class Editions:
             if found is None:
                 raise ValidationFailed("This channel does not exist.", code="news.invalid_category")
             channel = found.name
-        brand = template.brand or channel or "Portalab"
+        # #320: the name over the title — the template's, else the site's own
+        site = await site_brand(lambda name: _provider(self.capabilities, name), "", language)
+        brand = template.brand or site.name or channel or "Portalab"
         snapshot = await self.collect(template, days=days, language=language, notice=notice, brand=brand)
         edition_id = UUID(int=0)
         token = secrets.token_urlsafe(32)

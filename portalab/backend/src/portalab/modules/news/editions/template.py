@@ -11,8 +11,8 @@ Color = Field(pattern=r"^#[0-9a-fA-F]{6}$")
 SectionKind = Literal["notice", "stats", "top", "additions", "releases", "upcoming", "articles"]
 Layout = Literal["grid", "list", "hero", "compact"]
 MediaGroup = Literal["movie", "series", "book", "game", "album"]
-Font = Literal["sans", "serif", "rounded", "mono"]
-Header = Literal["banner", "centered", "minimal"]
+Font = Literal["brand", "sans", "serif", "rounded", "mono"]  # #320: « brand », Plus Jakarta Sans
+Header = Literal["brand", "banner", "centered", "minimal"]  # #320: « brand », as the portal's e-mails
 TITLED = ("top", "additions", "releases", "upcoming", "articles")  # the sections that list titles
 
 
@@ -51,6 +51,16 @@ class TemplateDefinition(BaseModel):
     sections: list[Section] = Field(min_length=1, max_length=12)
 
 
+# #320: the portal's own night palette (portalab-dark), as its e-mails
+PORTALAB = Palette(
+    background="#0b0e17",
+    surface="#161b2b",
+    text="#eef1f8",
+    muted="#a9b2c7",
+    accent="#7f9cff",
+    accent_text="#0b0e17",
+    border="#2b3349",
+)
 LIGHT = Palette(
     background="#f4f5f7",
     surface="#ffffff",
@@ -81,6 +91,25 @@ PAPER = Palette(
 
 # the built-in templates: Ghostarr's newsletter (posters in a grid), a night magazine, a newspaper of lines
 BUILTIN: dict[str, TemplateDefinition] = {
+    # #320: the default — Portalab's look, the one of its e-mails
+    "portalab": TemplateDefinition(
+        name="Portalab",
+        description="L'allure du portail : nuit, accent bleu et ambre, les affiches à l'honneur.",
+        palette=PORTALAB,
+        font="brand",
+        radius=16,
+        header="brand",
+        sections=[
+            Section(kind="notice"),
+            Section(kind="stats"),
+            Section(kind="top", layout="hero", columns=3, limit=4),
+            Section(kind="additions", media=["movie"], layout="grid", columns=3, limit=6),
+            Section(kind="additions", media=["series"], layout="grid", columns=3, limit=6),
+            Section(kind="additions", media=["book", "game", "album"], layout="list", limit=6),
+            Section(kind="upcoming", layout="compact", limit=8),
+            Section(kind="articles", layout="list", limit=3),
+        ],
+    ),
     "classic": TemplateDefinition(
         name="Classique",
         description="Les chiffres de la période puis les ajouts en grilles d'affiches, type par type.",

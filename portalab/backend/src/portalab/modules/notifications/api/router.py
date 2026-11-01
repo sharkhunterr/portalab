@@ -16,12 +16,14 @@ from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.notifications import AllAuthenticated, CommunicationRequest, EmailMessage
+from portalab.capabilities.notifications.layout import dress, paragraphs
 from portalab.capabilities.search.fts import decode_cursor, encode_cursor
 from portalab.core.audit_port import AuditRecord
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.errors import NotFound, Unavailable, ValidationFailed
 from portalab.core.time import utc_now
+from portalab.modules.notifications.channels.look import brand, words
 from portalab.modules.notifications.fanout.merge import rewards_of
 from portalab.modules.notifications.models import Announcement, Communication, Delivery, Notification
 from portalab.modules.notifications.module import NotificationsModule
@@ -767,10 +769,20 @@ async def email_test(principal: Manager, module: Module) -> dict[str, str]:
     address = await module.email.address(principal.user_id)
     if not address:
         raise ValidationFailed("Your account has no e-mail address.", code="notifications.no_address")
+    ctx = await module.fanout.locale(principal.user_id)
+    site = await brand(module.fanout._provider, module.config.portal_url, ctx.language)
+    title = words(module.fanout._provider, "notifications:email.testTitle", ctx, {"site": site.name})
+    body = words(module.fanout._provider, "notifications:email.testBody", ctx, {"site": site.name})
+    html = dress(  # #320: the test shows the e-mails' real look
+        site,
+        title=title,
+        body_html=paragraphs(body),
+        kicker=words(module.fanout._provider, "notifications:email.testKicker", ctx),
+        note=words(module.fanout._provider, "notifications:email.testNote", ctx),
+        language=ctx.language,
+    )
     try:
-        await module.email.transport.send(
-            EmailMessage(address, "Portalab e-mail test", "E-mail delivery works.")
-        )
+        await module.email.transport.send(EmailMessage(address, title, body, html))
         outcome = "sent"
     except Exception as exc:
         outcome = f"failed:{type(exc).__name__}"

@@ -292,7 +292,7 @@
   "edition.admin.key": "Identifiant",
   "edition.admin.keyHint": "Lettres minuscules, chiffres et tirets.",
   "edition.admin.brand": "Nom en en-tête",
-  "edition.admin.brandHint": "Sinon, le nom de la chaîne.",
+  "edition.admin.brandHint": "Sinon, le nom du site.",
   "edition.admin.tagline": "Accroche",
   "edition.admin.header": "En-tête",
   "edition.admin.font": "Police",
@@ -332,5 +332,10 @@
   "edition.kind.video": "Vidéos",
   "edition.admin.testMe": "M’envoyer un test",
   "edition.admin.testSent": "Test envoyé à votre adresse uniquement (si l’envoi d’e-mails est activé).",
-  "edition.admin.testFailed": "Le test n’a pas pu partir : l’envoi d’e-mails est-il configuré ?"
+  "edition.admin.testFailed": "Le test n’a pas pu partir : l’envoi d’e-mails est-il configuré ?",
+  "newsletter.read": "Lire dans le portail",
+  "edition.template.portalab.name": "Portalab",
+  "edition.template.portalab.description": "L’allure du portail : nuit, accent bleu et ambre, les affiches à l’honneur — comme ses e-mails.",
+  "edition.font.brand": "Portalab (Plus Jakarta Sans)",
+  "edition.header.brand": "Portalab (logo et carte)"
 }
