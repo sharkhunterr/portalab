@@ -6,6 +6,7 @@ import { TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { SourceCard } from "./ExternalNews";
+import { sourceIcon } from "./sourceKind";
 import "./news.css";
 
 const KEY = ["news", "sources", "mine"] as const;
@@ -98,7 +99,7 @@ export function MySources({ items: listed = true }: { items?: boolean }) {
               data-failing={source.status === "error" || undefined}
             >
               <span>
-                <Icon name="rss" size={14} />
+                <Icon name={sourceIcon(source.kind)} size={14} />
                 {source.name}
               </span>
               <button

@@ -9,6 +9,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { useFollowed } from "../media/feed/api";
 import { FollowedMark } from "../media/feed/FollowedMark";
 import "./news.css";
+import { sourceIcon } from "./sourceKind";
 
 export type SourceItem = components["schemas"]["SourceItemOut"];
 
@@ -66,6 +67,7 @@ export function SourceCard({ item, actions }: { item: SourceItem; actions?: Reac
       <span className="news-source-card__text">
         <span className="news-source-card__meta">
           {item.pinned ? <Icon name="pin" size={12} /> : null}
+          <Icon name={sourceIcon(item.source_kind)} size={12} />
           {item.source} · {format.relative(ago)}
         </span>
         <a href={item.link} target="_blank" rel="noopener noreferrer" className="news-source-card__title">

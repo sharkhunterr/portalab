@@ -12,6 +12,7 @@ import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { SourceCard } from "./ExternalNews";
 import { useChannels } from "./NewsChannels";
+import { sourceIcon } from "./sourceKind";
 
 /**
  * issue 299: the news sources — RSS or Atom feeds (a site's address will do: its feed is found), previewed before
@@ -230,7 +231,7 @@ function SourceRow({ source }: { source: Source }) {
   return (
     <li className="news-channel" data-disabled={!source.enabled || undefined}>
       <span className="news-channel__icon" aria-hidden="true">
-        <Icon name="rss" size={20} />
+        <Icon name={sourceIcon(source.kind)} size={20} />
       </span>
       <span className="news-channel__text">
         <strong>{source.name}</strong>

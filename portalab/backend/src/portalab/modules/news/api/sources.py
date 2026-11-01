@@ -13,6 +13,7 @@ from portalab.core.authz_port import Principal
 from portalab.core.errors import NotFound, ValidationFailed
 from portalab.modules.news.api.router import CategoryManager, Module, Reader
 from portalab.modules.news.models import Feed, FeedItem
+from portalab.modules.news.sources.kinds import SourceKind, source_kind
 from portalab.modules.news.sources.opml import NotOpml, read_opml, write_opml
 from portalab.modules.news.sources.service import SourceRefused
 
@@ -34,6 +35,7 @@ class NewsSourceOut(BaseModel):
     id: UUID
     name: str
     url: str
+    kind: SourceKind = "rss"  # its icon: a YouTube channel, a podcast…
     site_url: str | None
     category_id: UUID | None
     enabled: bool
@@ -62,6 +64,7 @@ class SourceItemOut(BaseModel):
     id: UUID
     source_id: UUID
     source: str
+    source_kind: SourceKind = "rss"
     category_id: UUID | None
     title: str
     summary: str
@@ -112,6 +115,7 @@ def _source(feed: Feed, count: int = 0) -> NewsSourceOut:
         id=feed.id,
         name=feed.name,
         url=feed.url,
+        kind=source_kind(feed.url),
         site_url=feed.site_url,
         category_id=feed.category_id,
         enabled=feed.enabled,
@@ -131,6 +135,7 @@ def _item(item: FeedItem, feed: Feed) -> SourceItemOut:
         id=item.id,
         source_id=feed.id,
         source=feed.name,
+        source_kind=source_kind(feed.url),
         category_id=feed.category_id,
         title=item.title,
         summary=item.summary,
@@ -314,6 +319,40 @@ async def my_source_items(
     """The latest items of the sources I follow (or of some of them)."""
     rows = await module.sources.items(feeds=source, reader=_me(principal), limit=limit)
     return SourceItemsOut(items=[_item(item, feed) for item, feed in rows])
+
+
+class TimelineSource(BaseModel):
+    id: UUID
+    name: str
+    kind: SourceKind
+
+
+class TimelineOut(BaseModel):
+    items: list[SourceItemOut]
+    total: int
+    sources: list[TimelineSource]
+
+
+@router.get("/me/news/timeline", response_model=TimelineOut)
+async def my_timeline(
+    principal: Reader,
+    module: Module,
+    source: Annotated[list[UUID], Query(max_length=50)] = [],  # noqa: B006 — FastAPI's list query
+    title: Annotated[list[str], Query(max_length=200)] = [],  # noqa: B006
+    person: Annotated[list[str], Query(max_length=200)] = [],  # noqa: B006
+    offset: Annotated[int, Query(ge=0, le=10_000)] = 0,
+    limit: Annotated[int, Query(ge=1, le=100)] = 20,
+) -> TimelineOut:
+    """« Mon fil »'s news a page at a time (#299): the editors' sources and mine, newest first — of
+    some sources, or naming the titles and people I follow (« for me »); how many in all, and my sources."""
+    rows, total, sources = await module.sources.timeline(
+        _me(principal), feeds=source, titles=title, people=person, offset=offset, limit=limit
+    )
+    return TimelineOut(
+        items=[_item(item, feed) for item, feed in rows],
+        total=total,
+        sources=[TimelineSource(id=feed.id, name=feed.name, kind=source_kind(feed.url)) for feed in sources],
+    )
 
 
 @router.get("/me/news/sources/opml")

@@ -159,6 +159,14 @@ async def test_members_follow_sources_of_their_own(
     assert source["name"] == "Écrans" and source["items"] == 3  # the page's feed, read at once
     own = (await client.get("/api/v1/me/news/sources/items")).json()["items"]
     assert len(own) == 3 and (await client.get(own[0]["picture"])).status_code == 200
+    # « Mon fil », a page at a time: how many in all, and my sources (each its filter)
+    first = (await client.get("/api/v1/me/news/timeline", params={"limit": 2})).json()
+    assert first["total"] == 3 and [i["id"] for i in first["items"]] == [i["id"] for i in own[:2]]
+    assert [s["name"] for s in first["sources"]] == ["Écrans"]
+    last = (await client.get("/api/v1/me/news/timeline", params={"limit": 2, "offset": 2})).json()
+    assert [i["id"] for i in last["items"]] == [own[2]["id"]]
+    about = {"title": "obj-dune"}
+    assert (await client.get("/api/v1/me/news/timeline", params=about)).json()["total"] == 1
     # mine alone: not on « À la une », not in the editors' list, not another member's
     assert (await client.get("/api/v1/news/sources/items")).json()["items"] == []
     # but « in the news » for a title I follow reads my sources too
