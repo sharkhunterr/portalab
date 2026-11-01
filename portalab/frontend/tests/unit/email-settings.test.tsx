@@ -69,4 +69,23 @@ describe("issue 319 — sending e-mails", () => {
       enabled: true,
     });
   });
+
+  it("says why a test was refused: the account has no address", async () => {
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/admin/config") return json(200, { settings: SETTINGS });
+      if (path === "/api/v1/admin/notifications/email") return json(200, {});
+      if (path === "/api/v1/admin/notifications/email/test")
+        return json(422, { code: "notifications.no_address", status: 422, title: "No address" });
+      return json(404, {});
+    };
+    render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <EmailSettings />
+      </QueryClientProvider>,
+    );
+    await screen.findByDisplayValue("localhost"); // the settings are there: sending is on
+    fireEvent.click(screen.getByRole("button", { name: /Save and send me a test/ }));
+    expect(await screen.findByText(/your account has no e-mail address/)).toBeInTheDocument();
+  });
 });
