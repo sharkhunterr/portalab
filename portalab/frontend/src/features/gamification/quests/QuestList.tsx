@@ -83,13 +83,13 @@ function progressOf(quest: QuestItem): Array<{ current: number; target: number }
 }
 
 /** The moment a quest still to do closes: its period's end or its window's, whichever comes first. */
-function deadlineOf(quest: QuestItem): number | null {
+export function deadlineOf(quest: QuestItem): number | null {
   const ends = [quest.resets_at, quest.ends_at].filter(Boolean).map((at) => Date.parse(at as string));
   return ends.length ? Math.min(...ends) : null;
 }
 
 /** issue 307: the ones to do first, the closest deadline at the top; the done ones after, back soonest first. */
-function ordered(quests: QuestItem[]): { open: QuestItem[]; done: QuestItem[] } {
+export function ordered(quests: QuestItem[]): { open: QuestItem[]; done: QuestItem[] } {
   const by = (at: (q: QuestItem) => number | null) => (a: QuestItem, b: QuestItem) =>
     (at(a) ?? Number.POSITIVE_INFINITY) - (at(b) ?? Number.POSITIVE_INFINITY);
   return {
