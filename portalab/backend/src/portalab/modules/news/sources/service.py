@@ -369,6 +369,42 @@ class FeedSources:
             rows = (await session.execute(stmt.order_by(*order).limit(limit))).all()
         return [(item, feed) for item, feed in rows]
 
+    async def timeline(
+        self,
+        user: UUID,
+        *,
+        feeds: Sequence[UUID] = (),
+        titles: Sequence[str] = (),
+        people: Sequence[str] = (),
+        offset: int = 0,
+        limit: int = 20,
+    ) -> tuple[list[tuple[FeedItem, Feed]], int, list[Feed]]:
+        """« Mon fil »'s news, a page at a time: the editors' sources and the member's own, newest first (no
+        pinning: a timeline), of some sources or naming some titles or people; how many in all, and every
+        source the member reads (each its filter, even one quiet lately)."""
+        followed = select(FeedSubscription.feed_id).where(FeedSubscription.user_id == user)
+        readable = (Feed.enabled.is_(True), or_(Feed.editorial.is_(True), Feed.id.in_(followed)))
+        stmt = (
+            select(FeedItem, Feed)
+            .join(Feed, Feed.id == FeedItem.feed_id)
+            .where(*readable, FeedItem.hidden.is_(False))
+        )
+        if feeds:
+            stmt = stmt.where(FeedItem.feed_id.in_(list(feeds)))
+        named = [{"kind": "title", "ref": t} for t in titles] + [{"kind": "person", "ref": p} for p in people]
+        if named:
+            stmt = stmt.where(or_(*(FeedItem.mentions.contains([n]) for n in named)))
+        async with self.database.session() as session:
+            total = await session.scalar(select(func.count()).select_from(stmt.subquery()))
+            rows = (
+                await session.execute(
+                    stmt.order_by(FeedItem.published_at.desc(), FeedItem.id).offset(offset).limit(limit)
+                )
+            ).all()
+            listed = await session.execute(select(Feed).where(*readable).order_by(Feed.name))
+            sources = list(listed.scalars())
+        return [(item, feed) for item, feed in rows], int(total or 0), sources
+
     async def picture(self, item_id: UUID, reader: UUID | None = None) -> tuple[str, bytes] | None:
         """An item's picture — of an editors' source, or of one the reader follows."""
         mine = select(FeedSubscription.feed_id).where(FeedSubscription.user_id == reader)

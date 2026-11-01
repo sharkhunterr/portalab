@@ -12560,6 +12560,18 @@
             "title": "Items",
             "type": "integer"
           },
+          "kind": {
+            "default": "rss",
+            "enum": [
+              "youtube",
+              "video",
+              "podcast",
+              "reddit",
+              "rss"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
           "last_error": {
             "anyOf": [
               {
@@ -17910,6 +17922,18 @@
             "title": "Source Id",
             "type": "string"
           },
+          "source_kind": {
+            "default": "rss",
+            "enum": [
+              "youtube",
+              "video",
+              "podcast",
+              "reddit",
+              "rss"
+            ],
+            "title": "Source Kind",
+            "type": "string"
+          },
           "summary": {
             "title": "Summary",
             "type": "string"
@@ -20689,6 +20713,66 @@
           "contribution"
         ],
         "title": "TimelineDayOut",
+        "type": "object"
+      },
+      "TimelineOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SourceItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineSource"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "sources"
+        ],
+        "title": "TimelineOut",
+        "type": "object"
+      },
+      "TimelineSource": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "youtube",
+              "video",
+              "podcast",
+              "reddit",
+              "rss"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind"
+        ],
+        "title": "TimelineSource",
         "type": "object"
       },
       "ToggleIn": {
@@ -45902,6 +45986,107 @@
           }
         },
         "summary": "Unfollow Source",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/me/news/timeline": {
+      "get": {
+        "description": "\u00ab Mon fil \u00bb's news a page at a time (#299): the editors' sources and mine, newest first \u2014 of\nsome sources, or naming the titles and people I follow (\u00ab for me \u00bb); how many in all, and my sources.",
+        "operationId": "my_timeline_api_v1_me_news_timeline_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "source",
+            "required": false,
+            "schema": {
+              "default": [],
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "maxItems": 50,
+              "title": "Source",
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "title",
+            "required": false,
+            "schema": {
+              "default": [],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 200,
+              "title": "Title",
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "person",
+            "required": false,
+            "schema": {
+              "default": [],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 200,
+              "title": "Person",
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 10000,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimelineOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Timeline",
         "tags": [
           "news"
         ]

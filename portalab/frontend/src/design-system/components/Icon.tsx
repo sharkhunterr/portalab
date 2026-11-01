@@ -53,6 +53,7 @@ import {
   ChevronUp,
   Circle,
   CircleDashed,
+  CirclePlay,
   Clapperboard,
   Clock,
   Cloud,
@@ -175,6 +176,7 @@ import {
   Play,
   Plug,
   Plus,
+  Podcast,
   Popcorn,
   Puzzle,
   Pyramid,
@@ -258,6 +260,7 @@ import {
 import { useSiteLook } from "../site/SiteLook";
 import { useTheme } from "../themes/ThemeProvider";
 import { ZODIAC_ICONS } from "./constellationIcons";
+import { SOURCE_ICONS } from "./sourceIcons";
 
 /**
  * ``Icon`` (spec 027 R15): declarations (navigation, widgets, sections, themes) reference icons by a
@@ -456,6 +459,10 @@ export const ICONS: Record<string, LucideIcon> = {
   locate: LocateFixed,
   // issue 130: the constellations of the zodiac
   ...ZODIAC_ICONS,
+  // issue 299: a news source's kind
+  ...SOURCE_ICONS,
+  podcast: Podcast,
+  "circle-play": CirclePlay,
   lightning: CloudLightning,
   droplets: Droplets,
   wind: Wind,

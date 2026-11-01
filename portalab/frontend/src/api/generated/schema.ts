@@ -8357,6 +8357,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/news/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Timeline
+         * @description « Mon fil »'s news a page at a time (#299): the editors' sources and mine, newest first — of
+         *     some sources, or naming the titles and people I follow (« for me »); how many in all, and my sources.
+         */
+        get: operations["my_timeline_api_v1_me_news_timeline_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/newsletters": {
         parameters: {
             query?: never;
@@ -16298,6 +16319,12 @@ export interface components {
              * @default 0
              */
             items: number;
+            /**
+             * Kind
+             * @default rss
+             * @enum {string}
+             */
+            kind: "youtube" | "video" | "podcast" | "reddit" | "rss";
             /** Last Error */
             last_error: string | null;
             /** Last Run At */
@@ -18079,6 +18106,12 @@ export interface components {
              * Format: uuid
              */
             source_id: string;
+            /**
+             * Source Kind
+             * @default rss
+             * @enum {string}
+             */
+            source_kind: "youtube" | "video" | "podcast" | "reddit" | "rss";
             /** Summary */
             summary: string;
             /** Title */
@@ -19047,6 +19080,30 @@ export interface components {
             day: string;
             /** Xp */
             xp: number;
+        };
+        /** TimelineOut */
+        TimelineOut: {
+            /** Items */
+            items: components["schemas"]["SourceItemOut"][];
+            /** Sources */
+            sources: components["schemas"]["TimelineSource"][];
+            /** Total */
+            total: number;
+        };
+        /** TimelineSource */
+        TimelineSource: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "youtube" | "video" | "podcast" | "reddit" | "rss";
+            /** Name */
+            name: string;
         };
         /** ToggleIn */
         ToggleIn: {
@@ -35646,6 +35703,41 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_timeline_api_v1_me_news_timeline_get: {
+        parameters: {
+            query?: {
+                source?: string[];
+                title?: string[];
+                person?: string[];
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimelineOut"];
+                };
             };
             /** @description Validation Error */
             422: {

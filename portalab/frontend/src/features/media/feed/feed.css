@@ -354,8 +354,32 @@ a.feed-entry__title:hover {
   display: inline;
   vertical-align: baseline;
 }
-.feed-more {
-  justify-self: start;
+/* a page turned: the stream's top in sight, below the sticky header */
+.feed-section[aria-labelledby="feed-stream"] {
+  scroll-margin-block-start: calc(var(--header-height, 4rem) + var(--space-4));
+}
+/* the stream's pages: the first, the last, the current one and its neighbours */
+.feed-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+}
+.feed-pager .ds-button {
+  min-inline-size: 2.5rem;
+  justify-content: center;
+}
+.feed-pager .ds-button[aria-current="page"] {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.feed-pager__gap {
+  padding-inline: var(--space-1);
+  color: var(--color-text-muted);
+}
+.feed-stream[aria-busy] {
+  opacity: 0.6;
 }
 /* the rows that scroll sideways (the filters, « Bientôt ») never widen the page: a fieldset and a grid item
    take their content's width unless told otherwise */
