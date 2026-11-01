@@ -7,16 +7,271 @@
   list-style: none;
 }
 
-.project-timeline {
+/* issue 304: a project's page — its way as a row of steps, its funding beside the way to contribute, who
+   backs it, the notes left along the way */
+.project-page {
+  --tone: var(--color-accent);
+}
+.project-page[data-state="released"] {
+  --tone: var(--state-available-fg);
+}
+.project-page:is([data-state="rejected"], [data-state="abandoned"]) {
+  --tone: var(--state-error-fg);
+}
+.project-page__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+}
+.project-page__meta a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.project-page :is(.project-journey, .project-raised, .project-fund, .project-funders, .project-notes) {
   display: grid;
-  gap: 0.25rem;
+  gap: var(--space-3);
+  min-inline-size: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+.project-page h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+.project-journey__steps {
+  display: flex;
+  margin: 0;
+  padding: var(--space-1) 0 var(--space-2);
+  overflow-x: auto;
+  list-style: none;
+  scroll-snap-type: x proximity;
+}
+.project-journey__steps li {
+  position: relative;
+  display: grid;
+  flex: 1 0 6rem;
+  justify-items: center;
+  gap: var(--space-1);
+  padding-inline: var(--space-1);
+  text-align: center;
+  scroll-snap-align: start;
+}
+/* the line between two steps, behind their dots: lit up to the current one */
+.project-journey__steps li + li::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 1.05rem;
+  inset-inline: -50% 50%;
+  z-index: 0;
+  block-size: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
+}
+.project-journey__steps li:is([data-step="done"], [data-step="current"])::before {
+  background: var(--tone);
+}
+.project-journey__dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+.project-journey__steps li[data-step="done"] .project-journey__dot {
+  border-color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 22%, var(--color-surface));
+  color: var(--tone);
+}
+.project-journey__steps li[data-step="current"] .project-journey__dot {
+  border-color: var(--tone);
+  background: var(--tone);
+  color: var(--color-accent-contrast);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--tone) 25%, transparent);
+}
+.project-journey__name {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.project-journey__steps li[data-step="todo"] .project-journey__name {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+.project-journey__date {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.project-page__funding {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+.project-raised__amount {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.project-raised__amount > .ds-icon {
+  align-self: center;
+  color: var(--tone);
+}
+.project-raised__amount strong {
+  color: var(--color-text);
+  font-size: var(--font-size-2xl);
+  line-height: 1;
+}
+.project-raised__bar {
+  inline-size: 100%;
+  block-size: 0.75rem;
+  accent-color: var(--tone);
+}
+.project-raised__left {
+  margin: 0;
+  font-weight: 600;
+}
+.project-raised__left[data-reached] {
+  color: var(--state-available-fg);
+}
+.project-raised__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+.project-raised__facts > div {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.project-raised__facts dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.project-raised__facts dd {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+}
+.project-fund__quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.project-fund__quick button {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.project-fund__quick button[aria-pressed="true"] {
+  border-color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 20%, var(--color-surface));
+}
+.project-fund__closed {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.project-fund__rules summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.project-fund__rules ul {
+  margin: var(--space-2) 0 0;
+  padding-inline-start: var(--space-5);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.project-funders ol {
+  display: grid;
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
-
-.project-timeline li[aria-current="step"] {
-  font-weight: 600;
+.project-funders li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.project-funders li[data-me] {
+  box-shadow: inset 0 0 0 1px var(--tone);
+}
+.project-funders__who {
+  display: grid;
+  flex: 1;
+  min-inline-size: 0;
+}
+.project-funders__who small {
+  color: var(--color-text-muted);
+}
+.project-funders__you {
+  justify-self: start;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--tone);
+  color: var(--color-accent-contrast);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+.project-funders__amount {
+  display: inline-flex;
+  gap: var(--space-1);
+  font-weight: var(--font-weight-bold);
+}
+.project-funders__empty {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.project-notes ul {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.project-notes li {
+  padding-inline-start: var(--space-3);
+  border-inline-start: 3px solid var(--tone);
+}
+.project-notes p {
+  margin: var(--space-1) 0 0;
+}
+.project-notes__step {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 
 .project-notice {
@@ -1468,4 +1723,10 @@ a.mk-kpi__link:hover {
 .shop-carousel__slide:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
+}
+/* issue 304: opening a project's funding — its goal and each member's cap side by side */
+.project-admin__rules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: var(--space-3);
 }

@@ -10215,6 +10215,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/funders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Project Funders
+         * @description #304: who backs the project and with how much, the largest first.
+         */
+        get: operations["project_funders_api_v1_projects__project_id__funders_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/quests/catalog": {
         parameters: {
             query?: never;
@@ -17240,6 +17260,25 @@ export interface components {
             acknowledged: boolean;
             /** Amount */
             amount: number;
+        };
+        /** ProjectFunderOut */
+        ProjectFunderOut: {
+            /** Amount */
+            amount: number;
+            /**
+             * Me
+             * @default false
+             */
+            me: boolean;
+            /** Name */
+            name?: string | null;
+            /**
+             * Since
+             * Format: date-time
+             */
+            since: string;
+            /** User Id */
+            user_id?: string | null;
         };
         /** ProjectFundingOut */
         ProjectFundingOut: {
@@ -38967,6 +39006,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectFundingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    project_funders_api_v1_projects__project_id__funders_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectFunderOut"][];
                 };
             };
             /** @description Validation Error */

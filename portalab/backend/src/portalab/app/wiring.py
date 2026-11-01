@@ -285,7 +285,9 @@ def wire_platform(
         database, events, authz.audit, capabilities, authz.engine, visibility=privacy.filter
     )
     community.register()
-    marketplace = MarketplaceModule(database, events, authz.audit, capabilities, authz.engine)
+    marketplace = MarketplaceModule(
+        database, events, authz.audit, capabilities, authz.engine, visibility=privacy.filter
+    )
     marketplace.register()
     visuals = VisualsModule(
         database, events, authz.audit, capabilities, root=data_dir / "visuals", authorizer=authz.engine

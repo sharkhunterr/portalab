@@ -24,7 +24,7 @@ export const STATE_ICON: Record<string, string> = {
   idea: "lightbulb",
   proposal: "message",
   open: "coins",
-  validation: "check",
+  validation: "hourglass",
   development: "wrench",
   beta: "bolt",
   released: "rocket",

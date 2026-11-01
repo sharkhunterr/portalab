@@ -6,8 +6,8 @@ product types, versioned products, atomic acquisition with named conditions, act
 revocation, quota products (no paid priority), entitlements and integrations."""
 
 from collections.abc import Mapping
-from dataclasses import replace
-from datetime import timedelta
+from dataclasses import dataclass, replace
+from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -19,6 +19,7 @@ from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.dashboard import ENTITLEMENTS, WidgetRegistry, default_widgets
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
 from portalab.capabilities.identity_directory import ACCOUNTS as IDENTITY_ACCOUNTS
+from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.identity_provider import PROVISIONING
 from portalab.capabilities.marketplace import GIFTS, LIFECYCLE, ProductTypeRegistry, default_product_types
 from portalab.capabilities.navigation.attention import ATTENTION
@@ -46,6 +47,7 @@ from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.permissions import PermissionRegistry, default_permissions
 from portalab.core.time import Clock
+from portalab.core.visibility_port import OwnerOnlyVisibility, Redacted, VisibilityFilter
 from portalab.modules.marketplace import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.marketplace.activation.service import Activation
 from portalab.modules.marketplace.attention import ReserveAttention, ShopAttention
@@ -103,6 +105,18 @@ class MarketplaceGifts:
         return True
 
 
+PROGRESSION = "progression"  # #304: « public » or « anonymous » in the community, as on the leaderboard
+
+
+@dataclass(frozen=True, slots=True)
+class ProjectFunder:
+    user_id: UUID | None  # None: anonymous (or an erased account)
+    name: str | None
+    amount: int
+    since: datetime
+    me: bool
+
+
 class MarketplaceModule:
     def __init__(
         self,
@@ -121,8 +135,10 @@ class MarketplaceModule:
         tools: AIToolRegistry = default_ai_tools,
         sections: SectionRegistry = default_sections,
         permissions: PermissionRegistry = default_permissions,
+        visibility: VisibilityFilter | None = None,
     ) -> None:
         self.database = database
+        self.visibility = visibility or OwnerOnlyVisibility()  # #304: who backs a project, as each allows
         self.audit = audit
         self.capabilities = capabilities
         self.authorizer = authorizer
@@ -394,6 +410,24 @@ class MarketplaceModule:
                 self.config = replace(self.config, **values)
         except Exception:
             log.warning("marketplace configuration not refreshed")
+
+    async def project_funders(self, viewer: Principal, project_id: UUID) -> list[ProjectFunder]:
+        """#304: who backs a project and with how much — a member who keeps their progression to themselves
+        (the leaderboard's rule) is there without their name."""
+        await self.projects.get(project_id)
+        me = viewer.acting_for or viewer.user_id
+        directory = self.capabilities.system_providers(DIRECTORY)
+        out: list[ProjectFunder] = []
+        for user, amount, at in await self.projects.funders(project_id):
+            named = user == me or not isinstance(
+                await self.visibility.filter(viewer, user, PROGRESSION, None, True), Redacted
+            )
+            name = None
+            if named and directory:
+                summary = await directory[0].provider.get_user_summary(user)
+                name = summary.display_name if summary is not None else None
+            out.append(ProjectFunder(user if name else None, name, amount, at, user == me))
+        return out
 
     async def transition(
         self,
