@@ -19,11 +19,13 @@ from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.i18n import RENDERER, RESOLVER, LocaleContext
 from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.notifications import EmailMessage, EmailTransport
+from portalab.capabilities.notifications.layout import button, code, dress, items_list, paragraphs
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.queue import enqueue
 from portalab.core.time import Clock, utc_now
+from portalab.modules.notifications.channels.look import brand, words
 from portalab.modules.notifications.models import Communication, Delivery, DigestState, EmailOutbox
 from portalab.modules.notifications.observability import log, metrics
 from portalab.modules.notifications.settings import DIGEST, SMTP_PASSWORD, NotificationsConfig
@@ -216,12 +218,33 @@ class EmailChannel:
                 continue
             ctx = await self._locale(user)
             lines = [self._title(communication, ctx) for _, communication in items]
+            subject = self._title_key("notifications:digest.subject", ctx, len(lines))
+            site = await brand(self._provider, self.config().portal_url, ctx.language)
+            center = site.link("/notifications")
             try:
                 await self.transport.send(
                     EmailMessage(
                         address,
-                        self._title_key("notifications:digest.subject", ctx, len(lines)),
+                        subject,
                         "\n".join(f"• {line}" for line in lines),
+                        dress(  # #320: the digest in Portalab's look
+                            site,
+                            title=subject,
+                            body_html=items_list(lines)
+                            + (
+                                button(
+                                    words(
+                                        self._provider, "notifications:email.open", ctx, {"site": site.name}
+                                    ),
+                                    center,
+                                )
+                                if center.startswith("http")
+                                else ""
+                            ),
+                            kicker=words(self._provider, "notifications:email.digest", ctx),
+                            note=words(self._provider, "notifications:email.note", ctx),
+                            language=ctx.language,
+                        ),
                     )
                 )
             except Exception as exc:
@@ -290,7 +313,16 @@ class EmailVerificationChannel:
             if renderer
             else token
         )
+        site = await brand(self.channel._provider, self.channel.config().portal_url, ctx.language)
+        html = dress(  # #320: in Portalab's look, the code standing out
+            site,
+            title=subject,
+            body_html=paragraphs(text.replace(token, "").strip()) + code(token),
+            kicker=words(self.channel._provider, "notifications:email.account", ctx),
+            note=words(self.channel._provider, "notifications:email.verificationNote", ctx),
+            language=ctx.language,
+        )
         try:
-            await self.channel.transport.send(EmailMessage(address, subject, text))
+            await self.channel.transport.send(EmailMessage(address, subject, text, html))
         except Exception as exc:
             log.warning("verification e-mail not sent", extra={"error": type(exc).__name__})

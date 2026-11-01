@@ -292,7 +292,7 @@
   "edition.admin.key": "Identifier",
   "edition.admin.keyHint": "Lowercase letters, digits and dashes.",
   "edition.admin.brand": "Name in the header",
-  "edition.admin.brandHint": "Else the channel's name.",
+  "edition.admin.brandHint": "Else the site's name.",
   "edition.admin.tagline": "Tagline",
   "edition.admin.header": "Header",
   "edition.admin.font": "Font",
@@ -332,5 +332,10 @@
   "edition.kind.video": "Videos",
   "edition.admin.testMe": "Send me a test",
   "edition.admin.testSent": "Test sent to your address only (when e-mail delivery is on).",
-  "edition.admin.testFailed": "The test could not be sent: is e-mail delivery set up?"
+  "edition.admin.testFailed": "The test could not be sent: is e-mail delivery set up?",
+  "newsletter.read": "Read it in the portal",
+  "edition.template.portalab.name": "Portalab",
+  "edition.template.portalab.description": "The portal's look: night, blue and amber accents, posters first — as its e-mails.",
+  "edition.font.brand": "Portalab (Plus Jakarta Sans)",
+  "edition.header.brand": "Portalab (mark and card)"
 }

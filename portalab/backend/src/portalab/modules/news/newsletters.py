@@ -10,7 +10,6 @@ retries and opt-outs stay in one place; links point to the portal's public addre
 import re
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime, timedelta
-from html import escape
 from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -22,6 +21,7 @@ from portalab.capabilities.i18n import RENDERER, LocaleContext
 from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.media import DIGEST, DigestItem
 from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, Users
+from portalab.capabilities.notifications.layout import ACCENT, SOFT, Brand, button, dress, site_brand
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
@@ -62,18 +62,29 @@ def _provider(capabilities: CapabilityRegistry, name: str) -> Any | None:
     return providers[0].provider if providers else None
 
 
-def email_html(title: str, body_html: str, portal: str, channel: str, unsubscribe: str) -> str:
-    """A plain, mail-client friendly page around the article (inline styles only)."""
+def email_html(
+    title: str,
+    body_html: str,
+    portal: str,
+    channel: str,
+    unsubscribe: str,
+    *,
+    brand: Brand | None = None,
+    read: tuple[str, str] | None = None,
+    language: str = "en",
+) -> str:
+    """#320: the article as an e-mail in Portalab's look — its channel over its title, the article itself,
+    the way to read it in the portal and to unsubscribe."""
     absolute = re.sub(r'(href|src)="/', rf'\1="{portal}/', body_html) if portal else body_html
-    return (
-        '<!doctype html><html><body style="margin:0;padding:0;background:#f4f5f7">'
-        '<div style="max-width:640px;margin:0 auto;padding:24px;font-family:Arial,Helvetica,sans-serif;'
-        'color:#16181d;line-height:1.55">'
-        f'<p style="margin:0 0 4px;color:#6b7280;font-size:13px">{escape(channel)}</p>'
-        f'<h1 style="margin:0 0 16px;font-size:24px">{escape(title)}</h1>'
-        f'<div style="background:#ffffff;border-radius:12px;padding:20px">{absolute}</div>'
-        f'<p style="margin:16px 0 0;color:#6b7280;font-size:12px">{unsubscribe}</p>'
-        "</div></body></html>"
+    # the article's own markup keeps its words readable on the night card: its links in the accent
+    absolute = re.sub(r"<a ", f'<a style="color:{ACCENT}" ', absolute)
+    return dress(
+        brand or Brand(portal=portal),
+        title=title,
+        body_html=f'<div style="color:{SOFT}">{absolute}</div>' + (button(*read) if read else ""),
+        kicker=channel,
+        note=unsubscribe,
+        language=language,
     )
 
 
@@ -111,6 +122,9 @@ class Newsletters:
         self.capabilities = capabilities
         self.clock = clock
         self.editions: Any = None  # #316: the self-writing editions (set by the module)
+
+    def _provider_of(self, name: str) -> Any | None:
+        return _provider(self.capabilities, name)
 
     # --- settings ------------------------------------------------------------------------------------
     async def _setting(self, key: str, default: Any, user: UUID | None = None) -> Any:
@@ -222,7 +236,14 @@ class Newsletters:
                         "subject": row.title[:200],
                         "text": f"{row.title}\n\n{row.plain_text}\n\n{link}\n\n{unsubscribe}"[:100_000],
                         "html": email_html(
-                            row.title, row.rendered_html, portal, category.name, escape(unsubscribe)
+                            row.title,
+                            row.rendered_html,
+                            portal,
+                            category.name,
+                            unsubscribe,
+                            brand=await site_brand(self._provider_of, portal, language),
+                            read=(self._t("newsletter.read", language), link) if portal else None,
+                            language=language,
                         ),
                     },
                 )
@@ -249,7 +270,7 @@ class Newsletters:
         if category is None or not category.enabled:
             raise ValidationFailed("This channel does not exist.", code="news.invalid_category")
         if values.get("kind") == "edition" and self.editions is not None:  # #316: drawn with a template
-            await self.editions.template(str(values.get("template_key") or "classic"))
+            await self.editions.template(str(values.get("template_key") or "portalab"))
 
     async def save_schedule(self, schedule_id: UUID | None, values: Mapping[str, Any]) -> NewsletterSchedule:
         now = utc_now(self.clock)
@@ -342,7 +363,7 @@ class Newsletters:
             return None
         if schedule.kind == "edition" and self.editions is not None:
             edition = await self.editions.create(
-                schedule.template_key or "classic",
+                schedule.template_key or "portalab",
                 days=CADENCES.get(schedule.cadence, 7),
                 language=schedule.language,
                 notice=schedule.notice,

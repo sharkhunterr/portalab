@@ -11670,6 +11670,20 @@
         "title": "MembersDetailOut",
         "type": "object"
       },
+      "MembersEmailIn": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "title": "MembersEmailIn",
+        "type": "object"
+      },
       "MembersProgressOut": {
         "properties": {
           "members": {
@@ -20204,6 +20218,7 @@
           "font": {
             "default": "sans",
             "enum": [
+              "brand",
               "sans",
               "serif",
               "rounded",
@@ -20215,6 +20230,7 @@
           "header": {
             "default": "banner",
             "enum": [
+              "brand",
               "banner",
               "centered",
               "minimal"
@@ -32788,6 +32804,52 @@
           }
         },
         "summary": "Email Test",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/admin/notifications/members/email": {
+      "put": {
+        "description": "#318: e-mail notifications switched off (or back on) in every member's own preferences at once \u2014\nthe members who manage notifications keep theirs; mandatory and locked channels stay as they are; off,\nthe e-mail digest goes off too. Each member may change theirs again afterwards.",
+        "operationId": "members_email_api_v1_admin_notifications_members_email_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembersEmailIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Members Email Api V1 Admin Notifications Members Email Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Members Email",
         "tags": [
           "notifications"
         ]

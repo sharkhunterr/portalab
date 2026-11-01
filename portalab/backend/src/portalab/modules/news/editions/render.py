@@ -7,12 +7,14 @@ from collections.abc import Callable, Mapping, Sequence
 from html import escape
 from typing import Any
 
+from portalab.capabilities.notifications.layout import AMBER, FONT, FONT_LINK, VIOLET
 from portalab.modules.news.editions.template import Section, TemplateDefinition
 
 Words = Callable[[str, Mapping[str, Any] | None], str]
 WIDTH = 600
 PAD = 24
 FONTS = {
+    "brand": FONT,  # #320: Plus Jakarta Sans where the mail client has it
     "sans": "'Helvetica Neue', Helvetica, Arial, sans-serif",
     "serif": "Georgia, 'Times New Roman', Times, serif",
     "rounded": "'Trebuchet MS', 'Segoe UI', Verdana, sans-serif",
@@ -123,6 +125,35 @@ class Drawing:
         title = escape(str(self.snap.get("headline") or self.snap.get("title") or ""))
         period = escape(str(self.snap.get("period_label") or ""))
         tagline = escape(self.tpl.tagline)
+        if (
+            self.tpl.header == "brand"
+        ):  # #320: as the portal's e-mails — its mark and name, a card under a line
+            initial = escape((str(self.snap.get("site") or "P").strip() or "P")[0].upper())
+            gradient = f"linear-gradient(90deg, {self.p.accent}, {VIOLET} 55%, {AMBER})"
+            return (
+                f'<tr><td style="padding:0 4px 18px"><table role="presentation" cellpadding="0" '
+                f'cellspacing="0"><tr><td width="36" height="36" align="center" valign="middle" '
+                f'bgcolor="{self.p.accent}" style="width:36px;height:36px;border-radius:10px;'
+                f"background:{self.p.accent};background-image:{gradient};"
+                f'{self.text_style(18, weight=800, color=self.p.accent_text, line=1)}">{initial}</td>'
+                f'<td style="padding-left:12px;{self.text_style(17, weight=800, line=1.2)}">{site}</td>'
+                "</tr></table></td></tr>"
+                f'<tr><td style="padding:0 0 16px"><table role="presentation" width="100%" cellpadding="0" '
+                f'cellspacing="0" style="border-collapse:separate;background:{self.p.surface};'
+                f'border:1px solid {self.p.border};border-radius:{self.r}px;overflow:hidden">'
+                f'<tr><td height="4" bgcolor="{self.p.accent}" style="height:4px;line-height:4px;font-size:0;'
+                f'background:{self.p.accent};background-image:{gradient}">&nbsp;</td></tr>'
+                f'<tr><td style="padding:26px {PAD}px">'
+                f'<p style="{self.text_style(12, weight=700, color=self.p.accent)};letter-spacing:1.5px;'
+                f'text-transform:uppercase">{period}</p>'
+                f'<p style="{self.text_style(28, weight=800, line=1.2)};margin-top:8px">{title}</p>'
+                + (
+                    f'<p style="{self.text_style(15, color=self.p.muted)};margin-top:8px">{tagline}</p>'
+                    if tagline
+                    else ""
+                )
+                + "</td></tr></table></td></tr>"
+            )
         if self.tpl.header == "banner":
             return (
                 f'<tr><td style="padding:0 0 16px"><table role="presentation" width="100%" cellpadding="0" '
@@ -384,7 +415,8 @@ class Drawing:
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
             f'<meta name="color-scheme" content="{scheme}"><meta name="supported-color-schemes" '
             f'content="{scheme}"><title>{escape(str(self.snap.get("title") or ""))}</title>'
-            '<base target="_top"></head>'
+            '<base target="_top">'
+            f"{FONT_LINK if self.tpl.font == 'brand' else ''}</head>"
             f'<body style="margin:0;padding:0;background:{self.p.background};-webkit-text-size-adjust:100%">'
             '<div style="display:none;max-height:0;overflow:hidden">'
             f"{escape(str(self.snap.get('preheader') or ''))}"

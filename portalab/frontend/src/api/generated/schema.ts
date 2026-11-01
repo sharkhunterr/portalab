@@ -3309,6 +3309,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/notifications/members/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Members Email
+         * @description #318: e-mail notifications switched off (or back on) in every member's own preferences at once —
+         *     the members who manage notifications keep theirs; mandatory and locked channels stay as they are; off,
+         *     the e-mail digest goes off too. Each member may change theirs again afterwards.
+         */
+        put: operations["members_email_api_v1_admin_notifications_members_email_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/notifications/status": {
         parameters: {
             query?: never;
@@ -16214,6 +16236,11 @@ export interface components {
             /** Members */
             members: components["schemas"]["MemberDetailOut"][];
         };
+        /** MembersEmailIn */
+        MembersEmailIn: {
+            /** Enabled */
+            enabled: boolean;
+        };
         /** MembersProgressOut */
         MembersProgressOut: {
             /** Members */
@@ -19136,13 +19163,13 @@ export interface components {
              * @default sans
              * @enum {string}
              */
-            font: "sans" | "serif" | "rounded" | "mono";
+            font: "brand" | "sans" | "serif" | "rounded" | "mono";
             /**
              * Header
              * @default banner
              * @enum {string}
              */
-            header: "banner" | "centered" | "minimal";
+            header: "brand" | "banner" | "centered" | "minimal";
             /** Name */
             name: string;
             palette: components["schemas"]["Palette"];
@@ -26845,6 +26872,41 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    members_email_api_v1_admin_notifications_members_email_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MembersEmailIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

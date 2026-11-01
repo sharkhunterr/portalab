@@ -25,12 +25,14 @@ from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.i18n import RENDERER, RESOLVER, LocaleContext
 from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.notifications import CategoryRegistry
+from portalab.capabilities.notifications.layout import button, dress, paragraphs
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.db import Database
 from portalab.core.jobs.queue import enqueue
 from portalab.core.live import publish_live
 from portalab.core.time import Clock, utc_now
+from portalab.modules.notifications.channels.look import brand, words
 from portalab.modules.notifications.fanout.merge import merged
 from portalab.modules.notifications.models import Communication, Delivery, EmailOutbox, Notification
 from portalab.modules.notifications.observability import log, metrics
@@ -163,7 +165,7 @@ class FanOut:
         elif not config.email_enabled:
             await self._record(communication, user, "email", "suppressed", "policy")
         else:
-            await self._email(communication, user, title, body, now)
+            await self._email(communication, user, title, body, now, ctx)
         return reached
 
     async def _allowed(self, user: UUID, permission: str) -> bool:
@@ -267,7 +269,34 @@ class FanOut:
             metrics.increment("notifications.delivered.portal")
             return row.id
 
-    async def _email(self, communication: Communication, user: UUID, title: str, body: str, now: Any) -> None:
+    async def _dressed(self, communication: Communication, ctx: LocaleContext, title: str, body: str) -> str:
+        """#320: a notification's e-mail in Portalab's look — its category, its words, the way to it."""
+        config = self.config()
+        site = await brand(self._provider, config.portal_url, ctx.language)
+        category = self.categories.get(communication.category)
+        action = (
+            button(
+                words(self._provider, "notifications:email.open", ctx, {"site": site.name}), site.link(route)
+            )
+            if (route := communication.action_url) and site.link(route).startswith("http")
+            else ""
+        )
+        manage = site.link("/settings/notifications")
+        return dress(
+            site,
+            title=title,
+            body_html=paragraphs(body) + action,
+            kicker=words(self._provider, category.label_key, ctx) if category else None,
+            note=words(self._provider, "notifications:email.note", ctx),
+            manage=(words(self._provider, "notifications:email.manage", ctx), manage)
+            if manage.startswith("http")
+            else None,
+            language=ctx.language,
+        )
+
+    async def _email(
+        self, communication: Communication, user: UUID, title: str, body: str, now: Any, ctx: LocaleContext
+    ) -> None:
         contact = self._provider(CONTACT)
         address = await contact.email_of(user) if contact is not None else None
         if not address:
@@ -289,7 +318,7 @@ class FanOut:
                     to_hash=address_hash(address),
                     subject=str(own.get("subject") or title)[:200],
                     body_text=str(own.get("text") or f"{title}\n\n{body}{link}").strip(),
-                    body_html=own.get("html") or None,
+                    body_html=own.get("html") or await self._dressed(communication, ctx, title, body),
                     next_attempt_at=now,
                     attempts=0,
                 )

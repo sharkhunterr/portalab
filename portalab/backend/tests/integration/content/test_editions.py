@@ -80,8 +80,9 @@ async def test_editions(
 
     # the built-in templates, then one of the news desk's own (the built-in ones cannot change)
     listed = (await client.get("/api/v1/admin/news/newsletter-templates")).json()
-    assert [t["key"] for t in listed] == ["classic", "midnight", "gazette"]
-    classic = listed[0]["definition"]
+    # #320: Portalab first
+    assert [t["key"] for t in listed] == ["portalab", "classic", "midnight", "gazette"]
+    classic = listed[1]["definition"]
     assert (
         await client.put("/api/v1/admin/news/newsletter-templates/classic", json=classic)
     ).status_code == 422
