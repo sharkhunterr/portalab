@@ -2149,5 +2149,11 @@
   "email.saveFailed": "The settings could not be saved.",
   "email.testSent": "Test e-mail sent to your address: check your inbox (and spam).",
   "email.testFailed": "The test failed ({detail}): check the server, port, security and account.",
-  "email.noAddress": "No test sent: your account has no e-mail address. Add it in Members & access (your account → Edit), then try again. The test goes to that address, and to it alone."
+  "email.noAddress": "No test sent: your account has no e-mail address. Add it in Members & access (your account → Edit), then try again. The test goes to that address, and to it alone.",
+  "email.sentCount": "E-mails sent",
+  "email.failedCount": "E-mails failed",
+  "email.stateOn": "Sending e-mails is on",
+  "email.stateOff": "Sending e-mails is off: no newsletter goes out by e-mail",
+  "email.stateHint": "The sending server (SMTP), the sender and the test are set in Configuration → Communication.",
+  "email.setUp": "Set up sending"
 }

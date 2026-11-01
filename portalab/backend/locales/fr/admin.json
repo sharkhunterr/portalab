@@ -2149,5 +2149,11 @@
   "email.saveFailed": "Les réglages n’ont pas pu être enregistrés.",
   "email.testSent": "E-mail de test envoyé à votre adresse : vérifiez votre boîte (et les indésirables).",
   "email.testFailed": "Le test a échoué ({detail}) : vérifiez le serveur, le port, la sécurité et le compte.",
-  "email.noAddress": "Aucun test envoyé : votre compte n’a pas d’adresse e-mail. Ajoutez-la dans Membres & accès (votre compte → Modifier), puis réessayez. Le test part à cette adresse, et uniquement à elle."
+  "email.noAddress": "Aucun test envoyé : votre compte n’a pas d’adresse e-mail. Ajoutez-la dans Membres & accès (votre compte → Modifier), puis réessayez. Le test part à cette adresse, et uniquement à elle.",
+  "email.sentCount": "E-mails envoyés",
+  "email.failedCount": "E-mails en échec",
+  "email.stateOn": "L’envoi des e-mails est activé",
+  "email.stateOff": "L’envoi des e-mails est désactivé : aucune lettre ne part par e-mail",
+  "email.stateHint": "Le serveur d’envoi (SMTP), l’expéditeur et le test se règlent dans Configuration → Communication.",
+  "email.setUp": "Régler l’envoi"
 }
