@@ -29,6 +29,7 @@ from portalab.core.errors import NotFound, ValidationFailed
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
 from portalab.modules.news.articles import ArticleInput, ArticleService
+from portalab.modules.news.editions.template import DEFAULT_CONTENTS
 from portalab.modules.news.models import Article, Category, NewsletterEdition, NewsletterSchedule
 from portalab.modules.news.permissions import NEWS_READ
 from portalab.modules.news.settings import NEWSLETTER_ON
@@ -364,13 +365,15 @@ class Newsletters:
         if schedule.kind == "edition" and self.editions is not None:
             edition = await self.editions.create(
                 schedule.template_key or "portalab",
-                days=CADENCES.get(schedule.cadence, 7),
+                days=schedule.days or CADENCES.get(schedule.cadence, 7),
                 language=schedule.language,
                 notice=schedule.notice,
                 category_id=schedule.category_id,
                 schedule_id=schedule.id,
-                contents=schedule.contents,
+                # #325: no choice saved — the usual contents, as the form shows them
+                contents=schedule.contents if schedule.contents is not None else DEFAULT_CONTENTS,
                 charts=schedule.charts,
+                subject=schedule.subject,
             )
             edition = await self.editions.publish(edition.id, email=schedule.email)
             async with self.database.unit_of_work() as uow:

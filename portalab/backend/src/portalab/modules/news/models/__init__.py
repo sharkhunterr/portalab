@@ -159,6 +159,9 @@ class NewsletterSchedule(NewsBase):
     contents: Mapped[list[str] | None] = mapped_column(JSONB, info=not_personal("an edition's contents"))
     # #324: the statistics' charts switched on; none: the usual ones
     charts: Mapped[list[str] | None] = mapped_column(JSONB, info=not_personal("an edition's charts"))
+    # #325: its e-mail's subject (with its variables), and the days it tells (else its cadence's)
+    subject: Mapped[str | None] = mapped_column(String(200), info=not_personal("an edition's subject"))
+    days: Mapped[int | None] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 

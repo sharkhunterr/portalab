@@ -5,8 +5,8 @@ import { AdminPage, AdminStats } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { AutomaticNewsletters } from "../../news/editions/AutomaticNewsletters";
 import { EditionsAdmin } from "../../news/editions/EditionsAdmin";
-import { NewslettersPanel } from "../../news/NewsChannels";
 import { Deliveries, type Status } from "./AnnouncementsAdmin";
 import { DigestDefault } from "./EmailSettings";
 import "../admin.css";
@@ -79,9 +79,9 @@ export default function NewslettersAdmin() {
       />
       {/* issue 321: how the e-mails go out is set in Configuration — here, where it stands and the way there */}
       <EmailState enabled={Boolean(status.data?.email_enabled)} />
-      {/* issue 316: the self-writing editions, their templates and their history */}
+      {/* issue 325: the automatic newsletters write the self-writing editions — then their history, templates */}
+      <AutomaticNewsletters />
       <EditionsAdmin />
-      <NewslettersPanel />
       <DigestDefault />
       <Deliveries status={status.data} />
     </AdminPage>

@@ -294,3 +294,31 @@
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--color-accent) 6%, transparent);
 }
+
+/* issue 325: an automatic newsletter's subject and its variables */
+.edition-variables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.edition-variable {
+  padding: 0 var(--space-2);
+  border: 1px dashed var(--color-accent);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-accent);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.edition-variable:hover,
+.edition-variable:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+.edition-subject {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}

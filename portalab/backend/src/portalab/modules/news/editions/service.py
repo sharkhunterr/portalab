@@ -12,7 +12,7 @@ from typing import Any
 from uuid import UUID
 
 from pydantic import ValidationError
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 
 from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.media import DIGEST, EDITION, DigestItem
@@ -38,6 +38,42 @@ from portalab.modules.news.settings import NEWSLETTER_ON
 LIMIT = 60  # titles asked of the library per section, before each section keeps its own number
 PREVIEW_KEEP = timedelta(days=1)
 log = get_logger("portalab.news")
+
+
+# #325: what an e-mail's subject may say — each variable, in English and in French
+VARIABLES = {
+    "site": "site",
+    "date": "date",
+    "day": "day",
+    "jour": "day",
+    "week": "week",
+    "semaine": "week",
+    "month": "month",
+    "mois": "month",
+    "year": "year",
+    "année": "year",
+    "annee": "year",
+    "period": "period",
+    "période": "period",
+    "periode": "period",
+    "number": "number",
+    "numéro": "number",
+    "numero": "number",
+    "channel": "channel",
+    "chaîne": "channel",
+    "chaine": "channel",
+}
+VARIABLE = re.compile(r"\{([^{}]{1,12})\}")
+
+
+def subject_of(pattern: str, values: Mapping[str, str]) -> str:
+    """The subject with its variables replaced — an unknown one stays as written (never code)."""
+
+    def one(match: re.Match[str]) -> str:
+        name = VARIABLES.get(match.group(1).strip().lower())
+        return values.get(name, match.group(0)) if name else match.group(0)
+
+    return " ".join(VARIABLE.sub(one, pattern).split())[:200]
 
 
 class TemplateNotFound(NotFound):
@@ -285,6 +321,46 @@ class Editions:
             "genres": [{"name": g["name"], "hours": hours(g["seconds"])} for g in period.get("genres") or []],
         }
 
+    async def _variables(
+        self,
+        now: datetime,
+        language: str,
+        days: int,
+        *,
+        brand: str,
+        channel: str | None,
+        schedule_id: UUID | None,
+        period: Mapping[str, Any],
+    ) -> dict[str, str]:
+        """#325: the subject's variables — the site, the day (long and short), the ISO week, the month, the
+        year, the period, the edition's number (its schedule's), the channel."""
+        local = now.astimezone(await self.newsletters._zone()).date()
+        number = 1
+        if schedule_id is not None:
+            async with self.database.session() as session:
+                number += int(
+                    await session.scalar(
+                        select(func.count())
+                        .select_from(NewsletterEdition)
+                        .where(
+                            NewsletterEdition.schedule_id == schedule_id,
+                            NewsletterEdition.status == "published",
+                        )
+                    )
+                    or 0
+                )
+        return {
+            "site": brand,
+            "date": self._day(local, language, "d MMMM y"),
+            "day": self._day(local, language, "d MMM"),
+            "week": str(local.isocalendar().week),
+            "month": self._day(local, language, "MMMM"),
+            "year": str(local.year),
+            "period": str(period.get("period_label") or ""),
+            "number": str(number),
+            "channel": channel or "",
+        }
+
     async def _articles(self, since: datetime, limit: int, language: str) -> list[dict[str, Any]]:
         """The news desk's articles of the period, the ones every member may read."""
         async with self.database.session() as session:
@@ -326,6 +402,7 @@ class Editions:
         definition: TemplateDefinition | None = None,
         contents: Sequence[str] | None = None,
         charts: Sequence[str] | None = None,
+        subject: str | None = None,
     ) -> NewsletterEdition:
         """Write an edition (a preview of an unsaved template when ``definition`` is given) — #323: telling
         the ``contents`` asked, in the template's look (else the template's own sections)."""
@@ -347,6 +424,22 @@ class Editions:
         edition_id = UUID(int=0)
         token = secrets.token_urlsafe(32)
         title = self.newsletters._t("edition.title", language, {"site": brand, "date": snapshot["day"]})
+        if subject and subject.strip():  # #325: the subject the news desk wrote, its variables filled
+            title = (
+                subject_of(
+                    subject,
+                    await self._variables(
+                        now,
+                        language,
+                        days,
+                        brand=brand,
+                        channel=channel,
+                        schedule_id=schedule_id,
+                        period=snapshot,
+                    ),
+                )
+                or title
+            )
         headline = self.newsletters._t("edition.headline", language, {"date": snapshot["day"]})
         snapshot.update(
             {"title": title, "headline": headline, "portal": await self._portal(), "token": token}
