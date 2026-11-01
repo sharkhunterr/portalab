@@ -550,11 +550,16 @@ function History() {
   const t = useT();
   const format = useFormat();
   const editions = useAdminEditions();
-  const { publish, remove } = useEditionActions();
+  const { publish, remove, test } = useEditionActions();
   const [open, setOpen] = useState<string | null>(null);
   const items = editions.data ?? [];
   return (
     <AdminSection icon="list" title={t("news:edition.admin.history")} span="full">
+      {test.isSuccess ? (
+        <p role="status">{t(test.data ? "news:edition.admin.testSent" : "news:edition.admin.testFailed")}</p>
+      ) : test.isError ? (
+        <p role="alert">{t("news:edition.admin.testFailed")}</p>
+      ) : null}
       {items.length ? (
         <ul className="edition-history">
           {items.map((edition) => (
@@ -581,6 +586,11 @@ function History() {
                   >
                     <Icon name="eye" size={16} />
                     {t("news:edition.admin.read")}
+                  </Button>
+                  {/* issue 317: the real e-mail, without the members — to me alone */}
+                  <Button variant="ghost" disabled={test.isPending} onClick={() => test.mutate(edition.id)}>
+                    <Icon name="mail" size={16} />
+                    {t("news:edition.admin.testMe")}
                   </Button>
                   {edition.status !== "published" ? (
                     <Button variant="ghost" onClick={() => publish.mutate({ id: edition.id, email: false })}>

@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Path, Response, status
+from fastapi import APIRouter, Path, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from portalab.core.authorization import public
@@ -191,6 +191,18 @@ async def draft_page(principal: Publisher, edition_id: UUID, module: Module) -> 
     """Any edition's page — a preview, a draft — for the news desk."""
     row = await module.editions.get(edition_id)
     return Response(row.html, media_type="text/html; charset=utf-8", headers=PAGE_HEADERS)
+
+
+@router.post("/admin/news/newsletter-editions/{edition_id}/test", dependencies=NewslettersOn)
+async def test_edition(
+    principal: Publisher, edition_id: UUID, module: Module, request: Request
+) -> dict[str, bool]:
+    """#317: the edition e-mailed to me alone, as the members would get it."""
+    if principal.user_id is None:
+        raise NotFound("No account.", code="news.no_account")
+    row = await module.editions.get(edition_id)
+    base = str(request.base_url).rstrip("/")
+    return {"sent": await module.editions.send_test(row, principal.user_id, base)}
 
 
 # --- editions (the members) ---------------------------------------------------------------------------

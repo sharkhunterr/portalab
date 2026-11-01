@@ -2971,6 +2971,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/news/newsletter-editions/{edition_id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Edition
+         * @description #317: the edition e-mailed to me alone, as the members would get it.
+         */
+        post: operations["test_edition_api_v1_admin_news_newsletter_editions__edition_id__test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/news/newsletter-templates": {
         parameters: {
             query?: never;
@@ -26123,6 +26143,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EditionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_edition_api_v1_admin_news_newsletter_editions__edition_id__test_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                edition_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: boolean;
+                    };
                 };
             };
             /** @description Validation Error */

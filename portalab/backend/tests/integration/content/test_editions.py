@@ -140,6 +140,14 @@ async def test_editions(
     mail = mails[0].email_body["html"]
     assert "<table" in mail and "Dune &lt;3&gt;" in mail
 
+    # #317: the real e-mail without the members — a test to me alone
+    tested = await client.post(f"/api/v1/admin/news/newsletter-editions/{draft['id']}/test")
+    assert tested.json() == {"sent": True}
+    [test] = [r for r in ct.outbox.sent if r.dedup_key.startswith(f"news.edition-test:{draft['id']}")]
+    assert test.audience.ids == (people["boss"],)  # type: ignore[attr-defined]
+    assert test.email_body is not None and test.email_body["subject"].startswith("[Test]")
+    assert 'src="http' in test.email_body["html"]  # the pictures' whole address, for a mail client
+
     # the members read it in the portal; its pictures answer by its token, and only its own
     await login(client, "rita")
     assert [e["id"] for e in (await client.get("/api/v1/news/editions")).json()] == [draft["id"]]
