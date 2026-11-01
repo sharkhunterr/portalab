@@ -973,5 +973,6 @@
   "games.quests.next": "Next: {label}",
   "games.quests.allDone": "All done, well played!",
   "games.quests.see": "See the quests",
-  "games.campaign.see": "See"
+  "games.campaign.see": "See",
+  "sources.projects": "Community projects"
 }

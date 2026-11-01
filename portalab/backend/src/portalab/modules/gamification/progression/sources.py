@@ -29,7 +29,7 @@ ACTIONS = (
     ("media.leaving", "rescue"),  # issue 228: a title about to be deleted, watched
     ("media.", "media"),
     ("marketplace.", "shop"),
-    ("project.", "shop"),
+    ("project.", "projects"),  # #314: backing a community project is not shopping
     ("ticket.", "support"),
     ("feedback.", "support"),
     ("user.signed_in", "visits"),
@@ -160,6 +160,8 @@ async def sources(database: Database, user: UUID, value: str, since: datetime, z
             action = "achievements"
         elif kind == "level_reward":
             action = "levels"
+        elif kind == "community_funding":
+            action = "projects"  # #314: Coins reserved for a project, or given back
         else:
             action = "other"
         for source, amount in split(kind, int(delta), int(base or 0), modifiers or {}, action).items():

@@ -15,6 +15,7 @@ from sqlalchemy.orm import aliased
 
 from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
+from portalab.capabilities.marketplace import LIFECYCLE
 from portalab.capabilities.media_core import CATALOG as MEDIA_CATALOG
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
@@ -810,6 +811,8 @@ def _source(
         return "achievements"
     if source_kind == "level_reward":
         return "levels"
+    if source_kind == "community_funding":
+        return "projects"  # #314: Coins reserved for a community project, used or given back
     if source_kind == "marketplace" or (delta < 0 and kind in ("spend", "reserve_consume")):
         return "shop"
     if source_kind == "manual":
@@ -967,6 +970,9 @@ async def _operations(
     )
     others = {other for _, other in contexts.values() if other} if team else set()
     names = await _names(module, {t.user_id for t, _ in rows} | others)
+    projects = await _projects(
+        module, {t.source_ref for t, _ in rows if t.source_kind == "community_funding" and t.source_ref}
+    )
     items: list[OperationOut] = []
     for t, running_after in rows:
         after_it = int(running_after or 0)
@@ -997,6 +1003,7 @@ async def _operations(
                 label=str(
                     definitions.get((t.rule_key or "", t.rule_version or 0), {}).get("label")
                     or _label_of(labels, t.source_ref, t.rule_key)
+                    or projects.get(t.source_ref or "")
                     or ""
                 )
                 or None,
@@ -1098,6 +1105,25 @@ def _reckoning(
         multiplier=round(multiplier, 4),
         capped=int(row.delta) < math.floor(base * multiplier),
     )
+
+
+async def _projects(module: Any, refs: set[str]) -> dict[str, str]:
+    """#314: the community projects funded, by their titles (« project:<id> » in the ledger)."""
+    try:
+        lifecycle = module.capabilities.system_providers(LIFECYCLE)
+    except Exception:
+        lifecycle = []  # no marketplace on this portal
+    out: dict[str, str] = {}
+    if not lifecycle:
+        return out
+    for ref in refs:
+        try:
+            summary = await lifecycle[0].provider.funding_summary(ref.removeprefix("project:"))
+        except Exception:
+            summary = None  # the project is gone: the source alone shows
+        if summary is not None and summary.title:
+            out[ref] = summary.title
+    return out
 
 
 async def _works(module: Any, viewer: Principal, objects: set[str]) -> dict[str, WorkOut]:

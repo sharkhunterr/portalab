@@ -121,6 +121,7 @@ class Projects:
             totals["consumed"],
             totals["funders"],
             project.goal_amount,
+            project.title,
         )
 
     async def totals(self, session: AsyncSession, project_id: UUID) -> dict[str, int]:

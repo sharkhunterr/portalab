@@ -87,3 +87,18 @@ async def test_funders_largest_first_each_as_they_allow(mk: MkHarness, client: A
     ]
     assert funders[1]["user_id"] is None  # anonymous: nothing that leads to them
     assert (await client.get(f"/api/v1/projects/{funders[0]['user_id']}/funders")).status_code == 404
+
+
+async def test_a_funding_shows_in_my_journal_as_a_community_project(
+    mk: MkHarness, client: AsyncClient
+) -> None:
+    """#314: Coins reserved for a project sit in my journal under the community projects, by its title."""
+    project = await mk.project("A lighter for the cellar", open_with=RULES)
+    await mk.coins("ursula", 150)
+    await mk.module.fundings.fund(mk.p("ursula"), project, 60, acknowledged=True, request_key="j")
+    await login(client, "ursula")
+    items = (await client.get("/api/v1/me/progression/operations")).json()["items"]
+    reserved = [i for i in items if i["source_kind"] == "community_funding"]
+    assert [(i["source"], i["label"], i["delta"]) for i in reserved] == [
+        ("projects", "A lighter for the cellar", -60)
+    ]

@@ -973,5 +973,6 @@
   "games.quests.next": "Prochaine : {label}",
   "games.quests.allDone": "Toutes validées, bravo !",
   "games.quests.see": "Voir les quêtes",
-  "games.campaign.see": "Voir"
+  "games.campaign.see": "Voir",
+  "sources.projects": "Projets communautaires"
 }

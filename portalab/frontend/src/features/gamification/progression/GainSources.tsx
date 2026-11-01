@@ -35,6 +35,7 @@ export const SOURCES: Record<string, { color: string; icon: string }> = {
   campaigns: { color: "var(--chart-9)", icon: "star" },
   achievements: { color: "var(--chart-5)", icon: "trophy" },
   shop: { color: "var(--chart-6)", icon: "shop" },
+  projects: { color: "color-mix(in oklab, var(--chart-6) 50%, var(--chart-5))", icon: "lightbulb" }, // issue 314
   support: { color: "var(--chart-4)", icon: "lifebuoy" },
   visits: { color: "var(--chart-10)", icon: "home" },
   levels: { color: "var(--chart-7)", icon: "gift" },
