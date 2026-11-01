@@ -7285,6 +7285,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/marketplace/projects/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Projects Seen
+         * @description #303: I opened the community projects — what was added or moved on is no longer new.
+         */
+        post: operations["projects_seen_api_v1_marketplace_projects_seen_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/reserve": {
         parameters: {
             query?: never;
@@ -17388,6 +17408,11 @@ export interface components {
             reason?: string | null;
             /** Version */
             version?: number | null;
+        };
+        /** ProjectsSeenOut */
+        ProjectsSeenOut: {
+            /** Previous */
+            previous?: string | null;
         };
         /** PurgeIn */
         PurgeIn: {
@@ -33921,6 +33946,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    projects_seen_api_v1_marketplace_projects_seen_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectsSeenOut"];
                 };
             };
         };

@@ -280,9 +280,12 @@ class MarketplaceModule:
             )
         if not any(
             p.instance_ref == "marketplace.reserve" for p in self.capabilities.system_providers(ATTENTION)
-        ):  # #81: what came into a member's reserve since they last opened it
+        ):  # #81: what came into a member's reserve since they last opened it (#303: and the new projects)
             self.capabilities.provide(
-                ATTENTION, ReserveAttention(self.openings), instance_ref="marketplace.reserve", owner=OWNER
+                ATTENTION,
+                ReserveAttention(self.database, self.openings, self.projects),
+                instance_ref="marketplace.reserve",
+                owner=OWNER,
             )
         register_event_types(self.event_types)
         if not self.capabilities.system_providers(LIFECYCLE):

@@ -351,7 +351,7 @@ function BuyBar({ product }: { product: Product }) {
         <Icon name="check" size={16} />
         {t(`marketplace:purchase.done.${acquire.data?.state ?? "active"}`)}
         {acquire.data?.state === "needs_configuration" ? (
-          <Link to="/marketplace/owned">{t("marketplace:owned.configure")}</Link>
+          <Link to="/marketplace/reserve">{t("marketplace:owned.configure")}</Link>
         ) : null}
       </p>
     );

@@ -129,6 +129,19 @@ async def list_projects(_: Reader, module: Module, state: str | None = None) -> 
     return [await project_out(module, p) for p in await module.projects.all(state)]
 
 
+class ProjectsSeenOut(BaseModel):
+    previous: datetime | None = None  # when I had last opened them: what changed after is new to me
+
+
+@router.post("/marketplace/projects/seen", response_model=ProjectsSeenOut)
+async def projects_seen(principal: Reader, module: Module) -> ProjectsSeenOut:
+    """#303: I opened the community projects — what was added or moved on is no longer new."""
+    user = principal.acting_for or principal.user_id
+    if user is None:
+        return ProjectsSeenOut()
+    return ProjectsSeenOut(previous=await module.projects.mark_seen(user))
+
+
 @router.get("/projects/{project_id}", response_model=ProjectOut)
 async def get_project(_: Reader, project_id: UUID, module: Module) -> ProjectOut:
     return await project_out(module, await module.projects.get(project_id), detail=True)

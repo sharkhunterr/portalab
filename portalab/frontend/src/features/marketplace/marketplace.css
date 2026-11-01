@@ -640,6 +640,100 @@
   justify-self: start;
 }
 
+/* issue 303: the key figures in one line, what moved since my last visit, each card's way in words and
+   its goal; the administrators' console reuses the cards with its decisions */
+.projects-figures {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.projects-figures > div {
+  display: grid;
+  flex: none;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+}
+.projects-figures dt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.projects-figures dd {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+}
+.project-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.project-card[data-fresh] {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  box-shadow:
+    var(--shadow-1),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+.project-card__fresh {
+  padding: 0.1rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+.project-progress {
+  display: grid;
+  gap: var(--space-1);
+}
+.project-progress__label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.project-goal {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+}
+.project-goal progress {
+  inline-size: 100%;
+  block-size: 0.5rem;
+  accent-color: var(--tone);
+}
+.project-admin__date {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.project-admin__moves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-block-start: var(--space-2);
+  border-block-start: 1px solid var(--color-border);
+}
+.project-admin__moves [data-tone="danger"] {
+  color: var(--state-error-fg);
+}
+.project-admin__confirm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--state-error-bg);
+  color: var(--state-error-fg);
+}
+
 /* 027: the shop window widget */
 .shop-window {
   display: grid;
@@ -898,21 +992,20 @@
   border-color: var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
-.owned-todo {
-  display: grid;
-  grid-template-columns: 6rem minmax(0, 1fr);
-  gap: var(--space-4);
-  padding: var(--space-4);
+/* issue 303: what waits for its form is completed in the reserve — a word and the way there */
+.owned-todo-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
   border: 1px solid color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface-raised));
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-raised));
 }
-.owned-todo h3 {
-  margin: 0;
-}
-.owned-todo .product-art {
-  aspect-ratio: 1;
-  border-radius: var(--radius-md);
+.owned-todo-link > span {
+  flex: 1 1 14rem;
 }
 .owned-grid {
   display: grid;

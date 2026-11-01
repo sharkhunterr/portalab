@@ -3,6 +3,8 @@ abandon need ``projects.manage``, a confirmation where Coins move, and are audit
 history and emits ``project.status_changed`` (dedup ``(project, seq)``); validation is the Admin's gate,
 informed by (never bound to) votes or funding."""
 
+from datetime import timedelta
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import text
@@ -89,3 +91,28 @@ async def test_register_and_transitions(mk: MkHarness, client: AsyncClient) -> N
     assert [
         p["title"] for p in (await client.get("/api/v1/projects", params={"state": "rejected"})).json()
     ] == ["Rejected idea"]
+
+
+async def test_new_projects_badge(mk: MkHarness, client: AsyncClient) -> None:
+    """#303: the projects added or moved on since a member last opened them are new to them — an idea
+    waiting for its moderation and their own fresh proposal are not."""
+    ursula, ulrich = mk.people["ursula"], mk.people["ulrich"]
+    projects = mk.module.projects
+    project = await mk.project("Dark mode")  # ursula's, promoted to a proposal
+    await mk.module.transition(mk.p("boss"), project, "proposal")
+    await mk.project("Shared playlists", open_with=RULES)
+    await projects.register("proposal-idea", ulrich, "Just an idea")
+    assert await projects.unseen(ulrich) == 2 and await projects.unseen(ursula) == 1
+    await login(client, "ulrich")
+    first = await client.post("/api/v1/marketplace/projects/seen")
+    assert first.status_code == 200 and first.json()["previous"] is None
+    assert await projects.unseen(ulrich) == 0
+    mk.clock.advance(timedelta(minutes=5))
+    await login(client, "boss")
+    assert (
+        await client.post(f"/api/v1/admin/projects/{project}/open", json={"rules": RULES})
+    ).status_code == 200
+    assert await projects.unseen(ulrich) == 1 and await projects.unseen(ursula) == 2  # it moved on
+    await login(client, "ulrich")
+    again = (await client.post("/api/v1/marketplace/projects/seen")).json()
+    assert again["previous"] is not None and await projects.unseen(ulrich) == 0

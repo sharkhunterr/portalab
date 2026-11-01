@@ -15630,6 +15630,24 @@
         "title": "ProjectValidateIn",
         "type": "object"
       },
+      "ProjectsSeenOut": {
+        "properties": {
+          "previous": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          }
+        },
+        "title": "ProjectsSeenOut",
+        "type": "object"
+      },
       "PurgeIn": {
         "additionalProperties": false,
         "properties": {
@@ -43530,6 +43548,28 @@
         "summary": "Acquire",
         "tags": [
           "marketplace"
+        ]
+      }
+    },
+    "/api/v1/marketplace/projects/seen": {
+      "post": {
+        "description": "#303: I opened the community projects \u2014 what was added or moved on is no longer new.",
+        "operationId": "projects_seen_api_v1_marketplace_projects_seen_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectsSeenOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Projects Seen",
+        "tags": [
+          "projects"
         ]
       }
     },

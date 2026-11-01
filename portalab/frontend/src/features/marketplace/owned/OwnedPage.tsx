@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import { Button } from "../../../design-system/components/Button";
-import { TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { type Column, Table } from "../../../design-system/components/Layout";
 import { CurrencyShort } from "../../../design-system/site/SiteLook";
@@ -21,71 +21,7 @@ import { ProductArt } from "../catalog/ProductArt";
 import "../marketplace.css";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { productTypeLabel } from "../typeLabel";
-import { MyRequests, RequestForm } from "./Requests";
-
-/** 027: a bought project launch — name the project and pitch it; it opens as a community proposal. */
-function ProjectLaunchForm({ row }: { row: OwnershipRow }) {
-  const t = useT();
-  const { configure } = useOwnedActions();
-  const [title, setTitle] = useState("");
-  const [pitch, setPitch] = useState("");
-  return (
-    <form
-      className="ds-stack project-launch"
-      onSubmit={(event) => {
-        event.preventDefault();
-        configure.mutate({ id: row.id, configuration: { title, pitch } });
-      }}
-    >
-      <p className="ds-field__hint">{t("marketplace:owned.launchHint")}</p>
-      <TextField
-        label={t("marketplace:owned.launchTitle")}
-        value={title}
-        required
-        maxLength={200}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <div className="ds-field">
-        <label htmlFor={`pitch-${row.id}`}>{t("marketplace:owned.launchPitch")}</label>
-        <textarea
-          id={`pitch-${row.id}`}
-          rows={4}
-          maxLength={2000}
-          value={pitch}
-          onChange={(e) => setPitch(e.target.value)}
-        />
-      </div>
-      <Button type="submit" disabled={!title.trim() || configure.isPending}>
-        {t("marketplace:owned.launch")}
-      </Button>
-    </form>
-  );
-}
-
-function NeedsConfiguration({ row }: { row: OwnershipRow }) {
-  const t = useT();
-  const { configure } = useOwnedActions();
-  const [value, setValue] = useState("");
-  if (row.product_type === "project_launch") return <ProjectLaunchForm row={row} />;
-  if (row.product_type === "special_request") return <RequestForm row={row} />; // 027: a film in 4K…
-  return (
-    <form
-      className="ds-stack--row"
-      onSubmit={(event) => {
-        event.preventDefault();
-        configure.mutate({ id: row.id, configuration: { value } });
-      }}
-    >
-      <TextField
-        label={t("marketplace:owned.configureLabel")}
-        value={value}
-        required
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <Button type="submit">{t("marketplace:owned.configure")}</Button>
-    </form>
-  );
-}
+import { MyRequests } from "./Requests";
 
 /** 027: which shelf a bought product sits on (the shop's own departments: theme packs apart from packs). */
 function departmentKey(row: OwnershipRow, product: Product | undefined, departments: Department[]): string {
@@ -178,23 +114,14 @@ export default function OwnedPage() {
       </dl>
 
       {todo.length ? (
-        <section aria-labelledby="owned-todo" className="ds-stack">
-          <h2 id="owned-todo" className="owned__heading">
-            <Icon name="sparkles" size={18} /> {t("marketplace:owned.todo")}
-          </h2>
-          {todo.map((row) => {
-            const product = byKey.get(row.product_key);
-            return (
-              <article key={row.id} className="owned-todo">
-                {product ? <ProductArt product={product} size="mini" /> : null}
-                <div className="ds-stack">
-                  <h3>{row.product_name}</h3>
-                  <NeedsConfiguration row={row} />
-                </div>
-              </article>
-            );
-          })}
-        </section>
+        // issue 303: what waits for its form is completed in my reserve, where its badge is
+        <p className="owned-todo-link" role="status">
+          <Icon name="sparkles" size={18} />
+          <span>{t("marketplace:owned.todoInReserve", { count: todo.length })}</span>
+          <Link className="ds-button ds-button--primary" to="/marketplace/reserve">
+            {t("marketplace:owned.toReserve")}
+          </Link>
+        </p>
       ) : null}
 
       <MyRequests />
