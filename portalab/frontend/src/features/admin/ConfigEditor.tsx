@@ -331,7 +331,11 @@ export function useSettings() {
 export function ConfigEditor() {
   const t = useT();
   const [query, setQuery] = useState("");
-  const [tab, setTab] = useState<string>("general");
+  // issue 321: the area asked in the address (« ?area=communication » from Newsletters & e-mail)
+  const [tab, setTab] = useState<string>(() => {
+    const asked = new URLSearchParams(window.location.search).get("area");
+    return GROUPS.some(([key]) => key === asked) ? (asked as string) : "general";
+  });
   return (
     <DataRegion<SettingItem[]>
       label={t("admin:config.settings")}

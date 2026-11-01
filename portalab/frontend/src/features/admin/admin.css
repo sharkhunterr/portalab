@@ -1135,3 +1135,27 @@
 .email-setup__tip {
   margin: 0;
 }
+
+/* issue 321: where sending e-mails stands, and the way to its settings */
+.email-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-inline-start: 4px solid var(--color-text-muted);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+}
+.email-state[data-on] {
+  border-inline-start-color: var(--state-available-fg);
+}
+.email-state__text {
+  display: grid;
+  flex: 1 1 16rem;
+  gap: var(--space-1);
+}
+.email-state__text small {
+  color: var(--color-text-muted);
+}
