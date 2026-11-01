@@ -52,6 +52,7 @@ class FundingSummary:
     consumed: int
     funders: int
     goal_amount: int | None = None
+    title: str | None = None  # #314: what the journals name a funding by
 
 
 @runtime_checkable

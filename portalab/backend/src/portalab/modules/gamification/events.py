@@ -58,6 +58,7 @@ class RulePublished(BaseModel):
     rule: str
     version: int
 
+
 GOAL_TYPES = frozenset({"quest.completed", "achievement.unlocked", "user.level_up"})
 
 

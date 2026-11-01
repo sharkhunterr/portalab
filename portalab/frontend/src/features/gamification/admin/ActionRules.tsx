@@ -44,7 +44,7 @@ const OWNER_ICONS: Record<string, string> = {
 export function ownerIcon(eventType: string): string {
   const head = eventType.split(".")[0] ?? "";
   if (head === "ticket" || head === "feedback" || head === "incident") return "lifebuoy";
-  if (head === "project") return "shop";
+  if (head === "project") return "lightbulb"; // issue 314: the community projects
   return OWNER_ICONS[head] ?? "zap";
 }
 
