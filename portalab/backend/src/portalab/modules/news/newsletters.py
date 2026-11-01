@@ -167,24 +167,107 @@ class Newsletters:
         value = await self._setting(OPT_OUT, [], user)
         return {str(v) for v in value} if isinstance(value, list) else set()
 
-    async def subscriptions(self, user: UUID) -> list[dict[str, Any]]:
+    # --- #326: the automatic newsletters, each subscribed until left --------------------------------------
+    @staticmethod
+    def auto_key(schedule_id: UUID) -> str:
+        """An automatic newsletter's key among a member's subscriptions (« auto:<id> »)."""
+        return f"auto:{schedule_id}"
+
+    async def automatic(self) -> list[NewsletterSchedule]:
+        """The automatic newsletters members receive: editions, switched on, e-mailed."""
+        async with self.database.session() as session:
+            return list(
+                (
+                    await session.execute(
+                        select(NewsletterSchedule)
+                        .where(
+                            NewsletterSchedule.kind == "edition",
+                            NewsletterSchedule.enabled.is_(True),
+                            NewsletterSchedule.email.is_(True),
+                        )
+                        .order_by(NewsletterSchedule.name)
+                    )
+                ).scalars()
+            )
+
+    def when(self, schedule: NewsletterSchedule, language: str) -> str:
+        """« every Friday at 18:00 »: when a newsletter goes out, in the member's language."""
+        try:
+            from babel.dates import get_day_names
+
+            day = str(get_day_names("wide", locale=language)[schedule.weekday])
+        except Exception:
+            day = str(schedule.weekday)
+        return self._t(
+            f"subscriptions.when.{schedule.cadence}", language, {"day": day, "hour": schedule.hour}
+        )
+
+    async def received(self, user: UUID, schedule: NewsletterSchedule, out: set[str] | None = None) -> bool:
+        """Whether a member receives an automatic newsletter: neither it nor its channel left."""
+        left = out if out is not None else await self.opted_out(user)
+        async with self.database.session() as session:
+            category = await session.get(Category, schedule.category_id)
+        return self.auto_key(schedule.id) not in left and (category is None or category.key not in left)
+
+    async def subscribers(self, schedule: NewsletterSchedule) -> int:
+        contact = _provider(self.capabilities, CONTACT)
+        if contact is None:
+            return 0
+        return sum([1 for u in await contact.active_user_ids() if await self.received(u, schedule)])
+
+    async def language_of(self, user: UUID) -> str:
+        """A member's interface language, else the portal's."""
+        own = await self._setting("i18n.language", None, user)
+        return str(own or await self._setting("i18n.defaultLanguage", "en") or "en")
+
+    async def subscriptions(self, user: UUID, language: str | None = None) -> list[dict[str, Any]]:
+        language = language or await self.language_of(user)
         out = await self.opted_out(user)
-        return [
+        channels = await self.channels()
+        names = {c.id: c for c in channels}
+        automatic = []
+        for schedule in await self.automatic():
+            channel = names.get(schedule.category_id)
+            async with self.database.session() as session:
+                latest = await session.scalar(
+                    select(NewsletterEdition.title)
+                    .where(
+                        NewsletterEdition.schedule_id == schedule.id, NewsletterEdition.status == "published"
+                    )
+                    .order_by(NewsletterEdition.published_at.desc())
+                    .limit(1)
+                )
+            automatic.append(
+                {
+                    "key": self.auto_key(schedule.id),
+                    "kind": "automatic",
+                    "name": latest or (channel.name if channel else schedule.name),
+                    "description": self.when(schedule, language),
+                    "icon": "sparkles",
+                    "channel": channel.key if channel else None,
+                    # leaving the channel leaves its newsletters too
+                    "subscribed": self.auto_key(schedule.id) not in out
+                    and (channel is None or channel.key not in out),
+                }
+            )
+        return automatic + [
             {
                 "key": c.key,
+                "kind": "channel",
                 "name": c.name,
                 "description": c.description,
                 "icon": c.icon,
+                "channel": None,
                 "subscribed": c.key not in out,
             }
-            for c in await self.channels()
+            for c in channels
         ]
 
     async def set_subscriptions(self, principal: Principal, changes: Mapping[str, bool]) -> None:
         user = principal.acting_for or principal.user_id
         if user is None:
             raise NotFound()
-        known = {c.key for c in await self.channels()}
+        known = {c.key for c in await self.channels()} | {self.auto_key(s.id) for s in await self.automatic()}
         out = await self.opted_out(user)
         for key, subscribed in changes.items():
             if key not in known:

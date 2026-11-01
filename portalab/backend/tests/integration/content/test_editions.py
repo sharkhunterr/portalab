@@ -197,7 +197,7 @@ async def test_editions(
     editions = (await client.get("/api/v1/admin/news/newsletter-editions")).json()
     assert {e["template_key"] for e in editions} == {"classic", "gazette"}
     unknown = {**schedule.json(), "template_key": "nope"}
-    for field in ("id", "last_run_at", "next_run_at", "last_article_id"):
+    for field in ("id", "last_run_at", "next_run_at", "last_article_id", "subscribers"):
         unknown.pop(field, None)
     assert (await client.post("/api/v1/admin/news/newsletters", json=unknown)).status_code == 404
 
@@ -309,3 +309,58 @@ async def test_an_automatic_newsletter_has_its_name_and_its_subject(
         run = (await client.post(f"/api/v1/admin/news/newsletters/{schedule['id']}/run")).json()
         edition = (await client.get(f"/api/v1/news/editions/{run['edition']}")).json()
         assert edition["title"] == f"Hebdo n°{number} — semaine {week}" and edition["days"] == 14
+
+
+async def test_members_are_subscribed_to_each_newsletter_until_they_leave_it(
+    client: httpx.AsyncClient, ct: ContentHarness, people: dict[str, UUID], clock: FixedClock
+) -> None:
+    """#326: every member receives each automatic newsletter until they leave it — one without the others,
+    or all of a channel by leaving the channel; the news desk sees how many receive each one."""
+    library = _Library(clock.now().date())
+    capabilities = ct.ev.full.identity.capabilities
+    capabilities.provide(DIGEST, library, instance_ref="test-subs", owner="test")
+    capabilities.provide(EDITION, library, instance_ref="test-subs", owner="test")
+    await login(client, "boss")
+    await client.put(
+        "/api/v1/admin/news/categories", json={"key": "club", "name": "Club", "newsletter": True}
+    )
+    async with ct.database.session() as session:
+        channel = await session.scalar(select(Category).where(Category.key == "club"))
+    assert channel is not None
+
+    async def newsletter(name: str, cadence: str) -> str:
+        made = await client.post(
+            "/api/v1/admin/news/newsletters",
+            json={"name": name, "category_id": str(channel.id), "cadence": cadence, "weekday": 4, "hour": 18},
+        )
+        assert made.status_code == 201, made.text
+        return str(made.json()["id"])
+
+    weekly, monthly = await newsletter("Hebdo", "weekly"), await newsletter("Mensuel", "monthly")
+    counts = {
+        s["name"]: s["subscribers"] for s in (await client.get("/api/v1/admin/news/newsletters")).json()
+    }
+    everyone = counts["Hebdo"]
+    assert everyone and counts["Mensuel"] == everyone  # everyone, by default
+
+    await login(client, "rita")
+    mine = {s["key"]: s for s in (await client.get("/api/v1/me/newsletters")).json()}
+    assert mine[f"auto:{weekly}"]["subscribed"] and mine[f"auto:{weekly}"]["kind"] == "automatic"
+    assert mine[f"auto:{weekly}"]["description"]  # when it goes out (the harness speaks in keys)
+    left = await client.put("/api/v1/me/newsletters", json={"changes": {f"auto:{weekly}": False}})
+    assert left.status_code == 200
+    mine = {s["key"]: s["subscribed"] for s in left.json()}
+    assert mine[f"auto:{weekly}"] is False and mine[f"auto:{monthly}"] is True  # one left, not the other
+
+    await login(client, "boss")
+    counts = {
+        s["name"]: s["subscribers"] for s in (await client.get("/api/v1/admin/news/newsletters")).json()
+    }
+    assert counts == {"Hebdo": everyone - 1, "Mensuel": everyone}
+    run = (await client.post(f"/api/v1/admin/news/newsletters/{weekly}/run")).json()
+    [mail] = [r for r in ct.outbox.sent if r.dedup_key == f"news.edition:{run['edition']}"]
+    assert people["rita"] not in mail.audience.ids and people["eddie"] in mail.audience.ids  # type: ignore[attr-defined]
+
+    await login(client, "eddie")  # leaving the channel leaves its newsletters too
+    left = await client.put("/api/v1/me/newsletters", json={"changes": {"club": False}})
+    assert {s["key"]: s["subscribed"] for s in left.json()}[f"auto:{monthly}"] is False

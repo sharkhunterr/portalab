@@ -513,7 +513,12 @@ class Drawing:
             f'<tr><td align="center" style="padding:12px 0 8px">{see}'
             f'<p style="{self.text_style(12, color=self.p.muted)};margin-top:8px">'
             f"{escape(self.t('edition.footer', {'site': site, 'date': str(self.snap.get('day') or '')}))}"
-            f'<br><a href="{escape(unsubscribe)}" style="color:{self.p.muted}">'
+            + (
+                f"<br>{escape(self.t('edition.footerWhen', {'when': str(self.snap['when'])}))}"
+                if self.snap.get("when")
+                else ""
+            )
+            + f'<br><a href="{escape(unsubscribe)}" style="color:{self.p.muted}">'
             f"{escape(self.t('edition.unsubscribe', None))}</a></p></td></tr>"
         )
 

@@ -421,7 +421,10 @@ export function AutomaticNewsletters() {
             <span className="news-channel__badges">
               {schedule.email ? (
                 <StatusBadge tone="ok">
-                  <Icon name="mail" size={12} /> {t("news:channels.byEmail")}
+                  <Icon name="mail" size={12} />{" "}
+                  {schedule.subscribers != null
+                    ? t("news:auto.subscribers", { count: schedule.subscribers }) // issue 326
+                    : t("news:channels.byEmail")}
                 </StatusBadge>
               ) : null}
               {!schedule.enabled ? (
