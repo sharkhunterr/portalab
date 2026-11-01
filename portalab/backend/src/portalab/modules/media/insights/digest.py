@@ -5,7 +5,7 @@ calendars) — one entry per work, a new episode naming its series. #316: each w
 and the pictures an edition shows."""
 
 from dataclasses import replace
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -16,10 +16,12 @@ from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.discovery.recent import Recent, recent_releases, recently_added
 from portalab.modules.media.images.service import ImageService
+from portalab.modules.media.insights.enrich import MetadataEnricher
 from portalab.modules.media.insights.stats import InsightsQuery
 from portalab.modules.media.insights.upcoming import Upcoming
-from portalab.modules.media.models import MediaObject
-from portalab.modules.media.providers.insight_widgets import details, posters
+from portalab.modules.media.models import MediaObject, MediaRequest
+from portalab.modules.media.providers.insight_widgets import details, posters, with_posters
+from portalab.modules.media.requests.insights import kind_of, lookup_of
 
 PERIODS = ((7, "7d"), (30, "30d"), (90, "90d"), (365, "365d"))
 
@@ -129,10 +131,19 @@ class LibraryEdition:
     """``media.edition`` (#316): the period's figures for everyone (never who watched what), its most watched
     works as cards, and the pictures an edition shows."""
 
-    def __init__(self, database: Database, insights: InsightsQuery, images: ImageService) -> None:
+    def __init__(
+        self,
+        database: Database,
+        insights: InsightsQuery,
+        images: ImageService,
+        enricher: MetadataEnricher | None = None,
+        clock: Clock | None = None,
+    ) -> None:
         self.database = database
         self.insights = insights
         self.images = images
+        self.enricher = enricher
+        self.clock = clock
 
     async def period(self, days: int, *, top: int) -> dict[str, Any]:
         key = next((name for length, name in PERIODS if days <= length), "365d")
@@ -168,8 +179,68 @@ class LibraryEdition:
         }
 
     async def picture(self, image_id: str) -> bytes | None:
+        """A portal image by its id — #323: or, « t-<file> », a title's poster from the metadata provider (a
+        request not in the library yet)."""
         try:
+            if image_id.startswith("t-"):
+                if self.enricher is None:
+                    return None
+                return await self.enricher.image(f"/{image_id[2:]}", "w342")
             _, data = await self.images.content(UUID(image_id))
         except Exception:
             return None  # gone, or never was
         return data
+
+    async def requests(self, days: int, limit: int) -> list[DigestItem]:
+        """#323: what members asked for over the period, the latest first — each with its poster (the
+        library's, else the metadata provider's) and its state."""
+        since = utc_now(self.clock) - timedelta(days=days)
+        async with self.database.session() as session:
+            rows = list(
+                (
+                    await session.execute(
+                        select(MediaRequest)
+                        .where(MediaRequest.requested_at >= since)
+                        .order_by(MediaRequest.requested_at.desc())
+                        .limit(limit)
+                    )
+                ).scalars()
+            )
+        cards = await with_posters(
+            self.database,
+            self.enricher,
+            [
+                {
+                    "id": str(r.object_id) if r.object_id else None,
+                    "title": str(r.external_ref.get("title") or "?"),
+                    "kind": kind_of(r),
+                    "state": r.state,
+                    "at": r.requested_at.date().isoformat(),
+                    "_lookup": lookup_of(r),
+                }
+                for r in rows
+            ],
+            detailed=True,
+        )
+        out = []
+        for card in cards:
+            poster = card.get("poster_ref")
+            picture = card.get("image_id") or (
+                f"t-{str(poster).lstrip('/')}" if poster and str(poster).startswith("/") else None
+            )
+            out.append(
+                DigestItem(
+                    str(card["title"]),
+                    "series" if card["kind"] in ("tv", "series") else str(card["kind"]),
+                    str(card["at"]),
+                    card.get("route") or "/media/requests",
+                    str(card["state"]),
+                    object_id=card.get("id"),
+                    picture=picture,
+                    year=card.get("year"),
+                    genres=tuple(str(g) for g in (card.get("genres") or [])[:3]),
+                    overview=card.get("overview"),
+                    rating=card.get("rating"),
+                )
+            )
+        return out

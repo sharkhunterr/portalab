@@ -8,12 +8,14 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 Color = Field(pattern=r"^#[0-9a-fA-F]{6}$")
-SectionKind = Literal["notice", "stats", "top", "additions", "releases", "upcoming", "articles"]
+SectionKind = Literal[
+    "notice", "stats", "top", "additions", "requests", "releases", "tv", "upcoming", "articles"
+]  # #323: « requests » (the period's requests) and « tv » (the series' episodes airing)
 Layout = Literal["grid", "list", "hero", "compact"]
-MediaGroup = Literal["movie", "series", "book", "game", "album"]
+MediaGroup = Literal["movie", "series", "book", "audiobook", "game", "album"]  # #323: audiobooks apart
 Font = Literal["brand", "sans", "serif", "rounded", "mono"]  # #320: « brand », Plus Jakarta Sans
 Header = Literal["brand", "banner", "centered", "minimal"]  # #320: « brand », as the portal's e-mails
-TITLED = ("top", "additions", "releases", "upcoming", "articles")  # the sections that list titles
+TITLED = ("top", "additions", "requests", "releases", "tv", "upcoming", "articles")  # they list titles
 
 
 class Palette(BaseModel):
@@ -33,7 +35,7 @@ class Section(BaseModel):
     layout: Layout = "grid"
     columns: int = Field(default=3, ge=2, le=4)
     limit: int = Field(default=8, ge=1, le=24)
-    media: list[MediaGroup] = Field(default_factory=list, max_length=5)  # empty: every kind
+    media: list[MediaGroup] = Field(default_factory=list, max_length=6)  # empty: every kind
     title: str | None = Field(default=None, max_length=80)  # else its kind's (and media's) own
     overview: bool = True  # the titles' overviews, where the display has room
 
@@ -159,3 +161,120 @@ BUILTIN: dict[str, TemplateDefinition] = {
         ],
     ),
 }
+
+
+# --- #323: what an edition tells, as options ---------------------------------------------------------------
+Content = Literal[
+    "notice",
+    "stats",
+    "top",
+    "movies",
+    "series",
+    "books",
+    "audiobooks",
+    "games",
+    "music",
+    "requests",
+    "releases",
+    "tv",
+    "upcoming",
+    "articles",
+]
+CONTENTS: tuple[Content, ...] = (
+    "notice",
+    "stats",
+    "top",
+    "movies",
+    "series",
+    "books",
+    "audiobooks",
+    "games",
+    "music",
+    "requests",
+    "releases",
+    "tv",
+    "upcoming",
+    "articles",
+)
+DEFAULT_CONTENTS: tuple[Content, ...] = (
+    "notice",
+    "stats",
+    "top",
+    "movies",
+    "series",
+    "books",
+    "audiobooks",
+    "games",
+    "requests",
+    "tv",
+    "upcoming",
+)
+# each content: the kind of section it is, and of which kinds of titles
+ADDITIONS: dict[str, MediaGroup] = {
+    "movies": "movie",
+    "series": "series",
+    "books": "book",
+    "audiobooks": "audiobook",
+    "games": "game",
+    "music": "album",
+}
+NOT_SERIES: list[MediaGroup] = [
+    "movie",
+    "book",
+    "audiobook",
+    "game",
+    "album",
+]  # « coming soon » beside the TV
+
+
+def compose(template: TemplateDefinition, contents: list[str] | tuple[str, ...]) -> TemplateDefinition:
+    """The template's look with the contents asked, in their order: each takes the template's own section for
+    it (its display, number, title) when it has one, else a section in the template's manner."""
+    own = template.sections
+    titled = [s for s in own if s.kind in ("additions", "top", "releases", "requests")]
+    manner = titled[0] if titled else Section(kind="additions")
+
+    def found(kind: str, group: str | None = None) -> Section | None:
+        for section in own:
+            if section.kind != kind:
+                continue
+            if group is None or not section.media or group in section.media:
+                return section
+        return None
+
+    sections: list[Section] = []
+    for content in CONTENTS:
+        if content not in contents:
+            continue
+        if content in ADDITIONS:
+            group = ADDITIONS[content]
+            base = found("additions", group)
+            sections.append(
+                (base or manner).model_copy(
+                    update={
+                        "kind": "additions",
+                        "media": [group],
+                        "title": base.title if base and base.media == [group] else None,
+                    }
+                )
+            )
+        elif content == "upcoming":
+            base = found("upcoming")
+            media = NOT_SERIES if "tv" in contents else []
+            sections.append(
+                (base or Section(kind="upcoming", layout="compact", limit=10)).model_copy(
+                    update={"media": media}
+                )
+            )
+        elif content == "tv":
+            base = found("tv")
+            sections.append(base or Section(kind="tv", layout="compact", limit=12, media=["series"]))
+        elif content in ("notice", "stats"):
+            sections.append(found(content) or Section(kind=content))
+        else:
+            base = found(content)
+            default = manner.model_copy(update={"kind": content, "media": [], "title": None})
+            if content == "articles":
+                default = Section(kind="articles", layout="list", limit=4)
+            sections.append(base or default)
+    return template.model_copy(update={"sections": sections or own})

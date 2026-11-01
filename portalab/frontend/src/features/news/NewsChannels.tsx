@@ -11,7 +11,8 @@ import { EmptyState } from "../../design-system/components/Placeholders";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { ApiError } from "../../state/regions";
-import { templateName, useTemplates } from "./editions/api";
+import { templateName, useContents, useTemplates } from "./editions/api";
+import { ContentPicker } from "./editions/ContentPicker";
 
 /**
  * Channels and automatic newsletters (027): the news desk's categories are channels — described, with an
@@ -213,6 +214,7 @@ function ScheduleForm({ schedule, onDone }: { schedule?: Schedule; onDone: () =>
   const client = useQueryClient();
   const channels = useChannels();
   const templates = useTemplates();
+  const offered = useContents();
   const [values, setValues] = useState<ScheduleIn>(
     schedule ?? {
       name: "",
@@ -231,7 +233,12 @@ function ScheduleForm({ schedule, onDone }: { schedule?: Schedule; onDone: () =>
     setValues({ ...values, [key]: value });
   const save = useMutation({
     mutationFn: async () => {
-      const body = { ...values, category_id: values.category_id || channels.data?.[0]?.id || "" };
+      const body = {
+        ...values,
+        category_id: values.category_id || channels.data?.[0]?.id || "",
+        // issue 323: an edition tells the usual contents until others are chosen
+        contents: values.kind === "edition" ? (values.contents ?? offered.data?.defaults ?? null) : null,
+      };
       return schedule
         ? api.PUT("/api/v1/admin/news/newsletters/{schedule_id}", {
             params: { path: { schedule_id: schedule.id } },
@@ -339,6 +346,10 @@ function ScheduleForm({ schedule, onDone }: { schedule?: Schedule; onDone: () =>
           <option value="en">English</option>
         </SelectField>
       </FormGrid>
+      {values.kind === "edition" ? (
+        // issue 323: what its editions tell
+        <ContentPicker value={values.contents ?? null} onChange={(contents) => set("contents", contents)} />
+      ) : null}
       {values.kind === "edition" ? (
         <TextAreaField
           label={t("news:edition.admin.notice")}

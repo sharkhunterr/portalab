@@ -5254,6 +5254,30 @@
         "title": "ContentResolvedLinkOut",
         "type": "object"
       },
+      "ContentsOut": {
+        "properties": {
+          "contents": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Contents",
+            "type": "array"
+          },
+          "defaults": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Defaults",
+            "type": "array"
+          }
+        },
+        "required": [
+          "contents",
+          "defaults"
+        ],
+        "title": "ContentsOut",
+        "type": "object"
+      },
       "CreateIn": {
         "additionalProperties": false,
         "properties": {
@@ -5986,6 +6010,37 @@
               }
             ],
             "title": "Category Id"
+          },
+          "contents": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "notice",
+                    "stats",
+                    "top",
+                    "movies",
+                    "series",
+                    "books",
+                    "audiobooks",
+                    "games",
+                    "music",
+                    "requests",
+                    "releases",
+                    "tv",
+                    "upcoming",
+                    "articles"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 14,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contents"
           },
           "days": {
             "default": 7,
@@ -12894,6 +12949,37 @@
             "title": "Category Id",
             "type": "string"
           },
+          "contents": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "notice",
+                    "stats",
+                    "top",
+                    "movies",
+                    "series",
+                    "books",
+                    "audiobooks",
+                    "games",
+                    "music",
+                    "requests",
+                    "releases",
+                    "tv",
+                    "upcoming",
+                    "articles"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 14,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contents"
+          },
           "email": {
             "default": true,
             "title": "Email",
@@ -13003,6 +13089,37 @@
             "format": "uuid",
             "title": "Category Id",
             "type": "string"
+          },
+          "contents": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "notice",
+                    "stats",
+                    "top",
+                    "movies",
+                    "series",
+                    "books",
+                    "audiobooks",
+                    "games",
+                    "music",
+                    "requests",
+                    "releases",
+                    "tv",
+                    "upcoming",
+                    "articles"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 14,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contents"
           },
           "email": {
             "default": true,
@@ -15113,6 +15230,37 @@
               }
             ],
             "title": "Category Id"
+          },
+          "contents": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "notice",
+                    "stats",
+                    "top",
+                    "movies",
+                    "series",
+                    "books",
+                    "audiobooks",
+                    "games",
+                    "music",
+                    "requests",
+                    "releases",
+                    "tv",
+                    "upcoming",
+                    "articles"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 14,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contents"
           },
           "days": {
             "default": 7,
@@ -17657,7 +17805,9 @@
               "stats",
               "top",
               "additions",
+              "requests",
               "releases",
+              "tv",
               "upcoming",
               "articles"
             ],
@@ -17688,12 +17838,13 @@
                 "movie",
                 "series",
                 "book",
+                "audiobook",
                 "game",
                 "album"
               ],
               "type": "string"
             },
-            "maxItems": 5,
+            "maxItems": 6,
             "title": "Media",
             "type": "array"
           },
@@ -31644,6 +31795,28 @@
           }
         },
         "summary": "Put Category",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/newsletter-contents": {
+      "get": {
+        "description": "#323: what an edition may tell, in its order, and what is switched on by default.",
+        "operationId": "contents_api_v1_admin_news_newsletter_contents_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Contents",
         "tags": [
           "news"
         ]

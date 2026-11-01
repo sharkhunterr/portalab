@@ -1216,6 +1216,9 @@ class MediaEdition(Protocol):
 
     async def picture(self, image_id: str) -> bytes | None: ...
 
+    # #323: the requests of the period, the latest first — ``detail`` their state
+    async def requests(self, days: int, limit: int) -> list[DigestItem]: ...
+
 
 MENTIONS = "media.mentions"
 

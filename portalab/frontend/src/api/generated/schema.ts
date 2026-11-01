@@ -2879,6 +2879,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/news/newsletter-contents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Contents
+         * @description #323: what an edition may tell, in its order, and what is switched on by default.
+         */
+        get: operations["contents_api_v1_admin_news_newsletter_contents_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/news/newsletter-editions": {
         parameters: {
             query?: never;
@@ -13932,6 +13952,13 @@ export interface components {
             /** Url */
             url: string | null;
         };
+        /** ContentsOut */
+        ContentsOut: {
+            /** Contents */
+            contents: string[];
+            /** Defaults */
+            defaults: string[];
+        };
         /** CreateIn */
         CreateIn: {
             /**
@@ -14205,6 +14232,8 @@ export interface components {
         EditionIn: {
             /** Category Id */
             category_id?: string | null;
+            /** Contents */
+            contents?: ("notice" | "stats" | "top" | "movies" | "series" | "books" | "audiobooks" | "games" | "music" | "requests" | "releases" | "tv" | "upcoming" | "articles")[] | null;
             /**
              * Days
              * @default 7
@@ -16698,6 +16727,8 @@ export interface components {
              * Format: uuid
              */
             category_id: string;
+            /** Contents */
+            contents?: ("notice" | "stats" | "top" | "movies" | "series" | "books" | "audiobooks" | "games" | "music" | "requests" | "releases" | "tv" | "upcoming" | "articles")[] | null;
             /**
              * Email
              * @default true
@@ -16749,6 +16780,8 @@ export interface components {
              * Format: uuid
              */
             category_id: string;
+            /** Contents */
+            contents?: ("notice" | "stats" | "top" | "movies" | "series" | "books" | "audiobooks" | "games" | "music" | "requests" | "releases" | "tv" | "upcoming" | "articles")[] | null;
             /**
              * Email
              * @default true
@@ -17452,6 +17485,8 @@ export interface components {
         PreviewIn: {
             /** Category Id */
             category_id?: string | null;
+            /** Contents */
+            contents?: ("notice" | "stats" | "top" | "movies" | "series" | "books" | "audiobooks" | "games" | "music" | "requests" | "releases" | "tv" | "upcoming" | "articles")[] | null;
             /**
              * Days
              * @default 7
@@ -18299,7 +18334,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "notice" | "stats" | "top" | "additions" | "releases" | "upcoming" | "articles";
+            kind: "notice" | "stats" | "top" | "additions" | "requests" | "releases" | "tv" | "upcoming" | "articles";
             /**
              * Layout
              * @default grid
@@ -18312,7 +18347,7 @@ export interface components {
              */
             limit: number;
             /** Media */
-            media?: ("movie" | "series" | "book" | "game" | "album")[];
+            media?: ("movie" | "series" | "book" | "audiobook" | "game" | "album")[];
             /**
              * Overview
              * @default true
@@ -26000,6 +26035,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    contents_api_v1_admin_news_newsletter_contents_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentsOut"];
                 };
             };
         };
