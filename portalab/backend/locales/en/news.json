@@ -371,5 +371,12 @@
   "edition.admin.contents": "Contents",
   "edition.admin.contentsHint": "What the newsletter tells. The template gives the look; a content without a section in the template takes its default display.",
   "edition.admin.contentsTemplate": "The template's own",
-  "edition.admin.contentsDefault": "Back to the default contents"
+  "edition.admin.contentsDefault": "Back to the default contents",
+  "edition.chart.figures": "Key figures",
+  "edition.chart.activity": "Time watched per day",
+  "edition.chart.kinds": "By kind",
+  "edition.chart.weekdays": "By day of the week",
+  "edition.chart.hours": "By hour",
+  "edition.chart.genres": "Most watched genres",
+  "edition.admin.charts": "Statistics charts"
 }

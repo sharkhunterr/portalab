@@ -74,7 +74,7 @@ def _style(
     )
 
 
-def _mix(a: str, b: str, share: float) -> str:
+def mix(a: str, b: str, share: float) -> str:
     one = [int(a[i : i + 2], 16) for i in (1, 3, 5)]
     two = [int(b[i : i + 2], 16) for i in (1, 3, 5)]
     return "#" + "".join(f"{round(x + (y - x) * share):02x}" for x, y in zip(one, two, strict=True))
@@ -86,7 +86,7 @@ def ring_line(steps: int = 24, height: int = 4, colors: Sequence[str] = RING) ->
     for index in range(steps):
         at = index / (steps - 1) * (len(colors) - 1)
         low = min(int(at), len(colors) - 2)
-        color = _mix(colors[low], colors[low + 1], at - low)
+        color = mix(colors[low], colors[low + 1], at - low)
         cells.append(
             f'<td height="{height}" bgcolor="{color}" style="height:{height}px;line-height:{height}px;'
             f'font-size:0;background:{color}">&nbsp;</td>'

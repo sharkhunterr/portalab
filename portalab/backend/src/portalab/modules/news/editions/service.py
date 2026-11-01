@@ -23,7 +23,13 @@ from portalab.core.errors import NotFound, ValidationFailed
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
 from portalab.modules.news.editions.render import render
-from portalab.modules.news.editions.template import BUILTIN, Section, TemplateDefinition, compose
+from portalab.modules.news.editions.template import (
+    BUILTIN,
+    DEFAULT_CHARTS,
+    Section,
+    TemplateDefinition,
+    compose,
+)
 from portalab.modules.news.models import Article, Category, NewsletterEdition, NewsletterTemplate
 from portalab.modules.news.newsletters import CATEGORY, PORTAL_URL, Newsletters, _provider
 from portalab.modules.news.permissions import NEWS_READ
@@ -158,7 +164,8 @@ class Editions:
         period: dict[str, Any] = {}
         if source is not None and any(s.kind in ("stats", "top") for s in template.sections):
             try:
-                period = await source.period(days, top=tops)
+                zone = await self.newsletters._zone()  # #324: the hours of the day, the portal's own
+                period = await source.period(days, top=tops, tz=str(zone))
             except Exception:
                 log.warning("edition figures unavailable")
         cache: dict[str, list[DigestItem]] = {}
@@ -215,6 +222,8 @@ class Editions:
                 **totals,
                 "previous": period.get("previous") or {},
                 "by_kind": period.get("by_kind") or [],
+                # #324: what the charts draw, their labels in the edition's language
+                **self._charts(period, language),
             }
             if totals
             else None
@@ -240,6 +249,40 @@ class Editions:
                 language,
                 {"count": count, "hours": round(float(totals.get("seconds") or 0) / 3600)},
             ),
+        }
+
+    def _charts(self, period: Mapping[str, Any], language: str) -> dict[str, Any]:
+        """#324: the charts' series in hours, with their labels (a few dates, the days, some hours)."""
+        points = (period.get("timeline") or {}).get("points") or []
+        count = len(points)
+        marks = {0, count // 2, count - 1} if count else set()
+        try:
+            from babel.dates import get_day_names
+
+            days = get_day_names("abbreviated", locale=language)
+            weekday_names = [str(days[i]) for i in range(7)]
+        except Exception:
+            weekday_names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+        def hours(seconds: float) -> float:
+            return round(float(seconds) / 3600, 1)
+
+        return {
+            "activity": {
+                "values": [hours(p["seconds"]) for p in points],
+                "labels": [
+                    self._day(p["date"], language) if i in marks else "" for i, p in enumerate(points)
+                ],
+            },
+            "weekdays": {
+                "values": [hours(s) for s in period.get("weekdays") or []],
+                "labels": weekday_names,
+            },
+            "hours": {
+                "values": [hours(s) for s in period.get("hours") or []],
+                "labels": [f"{h} h" if h % 6 == 0 else "" for h in range(24)],
+            },
+            "genres": [{"name": g["name"], "hours": hours(g["seconds"])} for g in period.get("genres") or []],
         }
 
     async def _articles(self, since: datetime, limit: int, language: str) -> list[dict[str, Any]]:
@@ -282,6 +325,7 @@ class Editions:
         created_by: UUID | None = None,
         definition: TemplateDefinition | None = None,
         contents: Sequence[str] | None = None,
+        charts: Sequence[str] | None = None,
     ) -> NewsletterEdition:
         """Write an edition (a preview of an unsaved template when ``definition`` is given) — #323: telling
         the ``contents`` asked, in the template's look (else the template's own sections)."""
@@ -337,6 +381,7 @@ class Editions:
             edition_id = row.id
             snapshot["page"] = f"/news/editions/{edition_id}"
             snapshot["contents"] = list(contents) if contents is not None else None
+            snapshot["charts"] = list(charts) if charts is not None else list(DEFAULT_CHARTS)  # #324
             row.data = snapshot
             row.html, row.text = render(
                 template, snapshot, lambda key, args: self.newsletters._t(key, language, args)

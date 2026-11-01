@@ -8,12 +8,16 @@ from html import escape
 from typing import Any
 
 from portalab.capabilities.notifications.layout import (
+    AMBER,
     FONT,
     FONT_LINK,
     HIGHLIGHT,
+    RARE,
     TITLE_FONT,
+    VIOLET,
     Brand,
     mark,
+    mix,
     rarities,
     ring_line,
 )
@@ -203,15 +207,113 @@ class Drawing:
             f'<p style="{self.text_style(15)};margin-top:6px">{body}</p></td></tr></table></td></tr>'
         )
 
-    def stats(self) -> str:
-        figures = self.snap.get("stats")
-        if not figures or not figures.get("plays"):
-            return ""
+    # --- #324: the statistics as charts, drawn with cells (no script nor SVG in a mail client) ------------
+    def shade(self, share: float) -> str:
+        """The accent toward the card's colour (a softer bar)."""
+        return mix(self.p.accent, self.p.surface, share)
+
+    def number(self, value: float) -> str:
+        """A figure written in the edition's language (« 13,8 » in French)."""
+        try:
+            from babel.numbers import format_decimal
+
+            return str(format_decimal(value, "#,##0.#", locale=str(self.snap.get("language") or "en")))
+        except Exception:
+            return f"{value:g}"
+
+    def share(self, part: float, whole: float) -> str:
+        percent = part / whole * 100 if whole else 0
+        return "< 1 %" if 0 < percent < 1 else f"{round(percent)} %"
+
+    def subheading(self, key: str) -> str:
+        return (
+            f'<p style="{self.text_style(13, weight=700, color=self.p.muted)};letter-spacing:1px;'
+            f'text-transform:uppercase;margin:22px 0 10px">{escape(self.t(f"edition.chart.{key}", None))}</p>'
+        )
+
+    def columns(self, values: Sequence[float], labels: Sequence[str], *, height: int = 110) -> str:
+        """Vertical bars, the tallest ``height`` pixels, each labelled when it has a label; the peak named."""
+        top = max(values, default=0) or 1
+        peak = values.index(max(values)) if values and max(values) > 0 else -1
+        bars = []
+        for index, value in enumerate(values):
+            size = max(2, round(value / top * height)) if value > 0 else 2
+            color = self.p.accent if index == peak else (self.shade(0.25) if value > 0 else self.p.border)
+            bars.append(
+                f'<td valign="bottom" align="center" style="padding:0 1px;height:{height + 18}px">'
+                + (
+                    f'<p style="{self.text_style(10, weight=700, color=self.p.accent, line=1.2)};'
+                    f'margin-bottom:3px">{self.number(value)}&nbsp;h</p>'
+                    if index == peak
+                    else ""
+                )
+                + f'<div style="height:{size}px;line-height:{size}px;font-size:0;background:{color};'
+                f'border-radius:3px 3px 0 0">&nbsp;</div></td>'
+            )
+        names = "".join(
+            f'<td align="center" style="padding-top:6px;{self.text_style(10, color=self.p.muted, line=1.2)};'
+            f'white-space:nowrap">{escape(label)}</td>'
+            for label in labels
+        )
+        return (
+            f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+            f'style="table-layout:fixed;border-bottom:1px solid {self.p.border}">'
+            f"<tr>{''.join(bars)}</tr></table>"
+            '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+            f'style="table-layout:fixed"><tr>{names}</tr></table>'
+        )
+
+    def rows_of_bars(self, rows: Sequence[tuple[str, float, str]], colors: Sequence[str]) -> str:
+        """Horizontal bars: a name, its bar (its share of the largest), its figure."""
+        top = max((value for _, value, _ in rows), default=0) or 1
+        out = []
+        for index, (name, value, figure) in enumerate(rows):
+            share = max(2, round(value / top * 100))
+            color = colors[index % len(colors)]
+            out.append(
+                f'<tr><td width="30%" style="padding:5px 10px 5px 0;{self.text_style(13, line=1.3)}">'
+                f"{escape(name)}</td>"
+                '<td style="padding:5px 0"><table role="presentation" width="100%" cellpadding="0" '
+                'cellspacing="0">'
+                f'<tr><td width="{share}%" height="12" bgcolor="{color}" style="height:12px;font-size:0;'
+                f'line-height:0;background:{color};border-radius:6px">&nbsp;</td>'
+                f'<td style="font-size:0">&nbsp;</td></tr></table></td>'
+                f'<td width="22%" align="right" style="padding:5px 0 5px 10px;'
+                f'{self.text_style(13, weight=700, color=self.p.text, line=1.3)};white-space:nowrap">'
+                f"{escape(figure)}</td></tr>"
+            )
+        return (
+            f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{"".join(out)}</table>'
+        )
+
+    def figures(self, figures: Mapping[str, Any]) -> str:
+        before = figures.get("previous") or {}
+
+        def trend(now: float, then: float) -> str:
+            if not then:
+                return ""
+            change = round((now - then) / then * 100)
+            dark = self.p.background.lower() < "#808080"  # readable on the template's own cards
+            color = ("#8fe0b0" if dark else "#1f7a4d") if change >= 0 else ("#ffadb3" if dark else "#b42335")
+            arrow = "▲" if change >= 0 else "▼"
+            return (
+                f'<p style="{self.text_style(11, weight=700, color=color)};margin-top:2px">'
+                f"{arrow} {abs(change)} %</p>"
+            )
+
         tiles = [
-            ("plays", f"{int(figures['plays']):,}".replace(",", " ")),
-            ("hours", f"{round(float(figures.get('seconds') or 0) / 3600):,}".replace(",", " ")),
-            ("members", str(figures.get("members") or "—")),
-            ("works", str(figures.get("works") or "—")),
+            (
+                "plays",
+                f"{int(figures['plays']):,}".replace(",", " "),
+                trend(float(figures["plays"]), float(before.get("plays") or 0)),
+            ),
+            (
+                "hours",
+                f"{round(float(figures.get('seconds') or 0) / 3600):,}".replace(",", " "),
+                trend(float(figures.get("seconds") or 0), float(before.get("seconds") or 0)),
+            ),
+            ("members", str(figures.get("members") or "—"), ""),
+            ("works", str(figures.get("works") or "—"), ""),
         ]
         width = (WIDTH - 2 * PAD - 2) // 4
         cells = "".join(
@@ -219,32 +321,49 @@ class Drawing:
             f'padding:6px 4px;box-sizing:border-box;text-align:center">'
             f'<p style="{self.text_style(26, weight=800, color=self.p.accent, line=1.1)}">{escape(value)}</p>'
             f'<p style="{self.text_style(12, color=self.p.muted)};margin-top:4px">'
-            f"{escape(self.t(f'edition.stats.{key}', None))}</p></div>"
-            for key, value in tiles
+            f"{escape(self.t(f'edition.stats.{key}', None))}</p>{change}</div>"
+            for key, value, change in tiles
         )
-        trend = ""
-        before = float((figures.get("previous") or {}).get("seconds") or 0)
-        if before > 0:
-            change = round((float(figures.get("seconds") or 0) - before) / before * 100)
-            trend = (
-                f'<p style="{self.text_style(13, color=self.p.muted)};margin-top:12px;text-align:center">'
-                f"{escape(self.t('edition.stats.trend', {'change': f'{change:+d} %'}))}</p>"
-            )
-        kinds = [
-            f"{self.kind(k['kind'])} {round(float(k['seconds']) / 3600)} h"
-            for k in (figures.get("by_kind") or [])[:5]
-            if float(k.get("seconds") or 0) >= 1800
-        ]
-        by_kind = (
-            f'<p style="{self.text_style(13, color=self.p.muted)};margin-top:6px;text-align:center">'
-            f"{escape(' · '.join(kinds))}</p>"
-            if kinds
-            else ""
-        )
-        return self.block(
-            self.heading(self.t("edition.section.stats", None))
-            + f'<div style="font-size:0;text-align:center">{cells}</div>{trend}{by_kind}'
-        )
+        return f'<div style="font-size:0;text-align:center">{cells}</div>'
+
+    def stats(self) -> str:
+        figures = self.snap.get("stats")
+        if not figures or not figures.get("plays"):
+            return ""
+        charts = list(self.snap.get("charts") or ["figures", "activity", "kinds"])
+        parts: list[str] = []
+        palette = [self.p.accent, AMBER, RARE, VIOLET, "#8fe0b0", "#f7b2d6"]
+        for chart in charts:
+            if chart == "figures":
+                parts.append(self.figures(figures))
+            elif chart == "kinds":
+                total = sum(float(k.get("seconds") or 0) for k in figures.get("by_kind") or []) or 1
+                rows = [
+                    (
+                        self.kind(k["kind"]),
+                        float(k["seconds"]),
+                        f"{round(float(k['seconds']) / 3600)} h · {self.share(float(k['seconds']), total)}",
+                    )
+                    for k in (figures.get("by_kind") or [])[:6]
+                    if float(k.get("seconds") or 0) >= 600
+                ]
+                if rows:
+                    parts.append(self.subheading("kinds") + self.rows_of_bars(rows, palette))
+            elif chart == "genres":
+                rows = [
+                    (g["name"], float(g["hours"]), f"{self.number(float(g['hours']))} h")
+                    for g in figures.get("genres") or []
+                ]
+                if rows:
+                    parts.append(self.subheading("genres") + self.rows_of_bars(rows, [self.p.accent]))
+            elif chart in ("activity", "weekdays", "hours"):
+                series = figures.get(chart) or {}
+                values = [float(v) for v in series.get("values") or []]
+                if any(values):
+                    parts.append(self.subheading(chart) + self.columns(values, series.get("labels") or []))
+        if not parts:
+            return ""
+        return self.block(self.heading(self.t("edition.section.stats", None)) + "".join(parts))
 
     # --- the sections of titles ---------------------------------------------------------------------
     def kind(self, kind: str | None) -> str:

@@ -535,7 +535,12 @@ function NewEdition() {
               ))}
             </SelectField>
           </FormGrid>
-          <ContentPicker value={ask.contents} onChange={(contents) => setAsk({ ...ask, contents })} />
+          <ContentPicker
+            value={ask.contents}
+            onChange={(contents) => setAsk({ ...ask, contents })}
+            charts={ask.charts}
+            onCharts={(charts) => setAsk({ ...ask, charts })}
+          />
           <TextAreaField
             label={t("news:edition.admin.notice")}
             hint={t("news:edition.admin.noticeHint")}

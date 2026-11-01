@@ -145,9 +145,11 @@ class LibraryEdition:
         self.enricher = enricher
         self.clock = clock
 
-    async def period(self, days: int, *, top: int) -> dict[str, Any]:
+    async def period(self, days: int, *, top: int, tz: str = "UTC") -> dict[str, Any]:
         key = next((name for length, name in PERIODS if days <= length), "365d")
-        data = await self.insights.overview(period=key, category="all", user=None, manager=False, top=top)
+        data = await self.insights.overview(
+            period=key, category="all", user=None, manager=False, top=top, tz=tz
+        )
         works = [w for w in data["top_works"] if w.get("id")][:top]
         cards = await described(
             self.database,
@@ -164,10 +166,29 @@ class LibraryEdition:
             ],
         )
         plays = {str(w["id"]): w for w in works}
+        # #324: what the charts draw — the time watched per day (or week), per weekday and hour, the genres
+        weekdays = [0.0] * 7
+        hours = [0.0] * 24
+        for cell in data.get("heatmap") or []:
+            weekdays[(int(cell["weekday"]) - 1) % 7] += float(cell["seconds"])
+            hours[int(cell["hour"]) % 24] += float(cell["seconds"])
+        timeline = data.get("timeline") or {}
         return {
             "totals": data["totals"],
             "previous": data["previous"],
             "by_kind": data["by_kind"],
+            "timeline": {
+                "unit": timeline.get("unit", "day"),
+                "points": [
+                    {"date": p["date"], "seconds": float(sum((p.get("seconds") or {}).values()))}
+                    for p in timeline.get("points") or []
+                ],
+            },
+            "weekdays": weekdays,
+            "hours": hours,
+            "genres": [
+                {"name": g["name"], "seconds": float(g["seconds"])} for g in (data.get("genres") or [])[:6]
+            ],
             "top": [
                 {
                     "item": card,

@@ -13954,6 +13954,10 @@ export interface components {
         };
         /** ContentsOut */
         ContentsOut: {
+            /** Chart Defaults */
+            chart_defaults: string[];
+            /** Charts */
+            charts: string[];
             /** Contents */
             contents: string[];
             /** Defaults */
@@ -14232,6 +14236,8 @@ export interface components {
         EditionIn: {
             /** Category Id */
             category_id?: string | null;
+            /** Charts */
+            charts?: ("figures" | "activity" | "kinds" | "weekdays" | "hours" | "genres")[] | null;
             /** Contents */
             contents?: ("notice" | "stats" | "top" | "movies" | "series" | "books" | "audiobooks" | "games" | "music" | "requests" | "releases" | "tv" | "upcoming" | "articles")[] | null;
             /**
@@ -16727,6 +16733,8 @@ export interface components {
              * Format: uuid
              */
             category_id: string;
+            /** Charts */
+            charts?: ("figures" | "activity" | "kinds" | "weekdays" | "hours" | "genres")[] | null;
             /** Contents */
             contents?: ("notice" | "stats" | "top" | "movies" | "series" | "books" | "audiobooks" | "games" | "music" | "requests" | "releases" | "tv" | "upcoming" | "articles")[] | null;
             /**
@@ -16780,6 +16788,8 @@ export interface components {
              * Format: uuid
              */
             category_id: string;
+            /** Charts */
+            charts?: ("figures" | "activity" | "kinds" | "weekdays" | "hours" | "genres")[] | null;
             /** Contents */
             contents?: ("notice" | "stats" | "top" | "movies" | "series" | "books" | "audiobooks" | "games" | "music" | "requests" | "releases" | "tv" | "upcoming" | "articles")[] | null;
             /**
@@ -17485,6 +17495,8 @@ export interface components {
         PreviewIn: {
             /** Category Id */
             category_id?: string | null;
+            /** Charts */
+            charts?: ("figures" | "activity" | "kinds" | "weekdays" | "hours" | "genres")[] | null;
             /** Contents */
             contents?: ("notice" | "stats" | "top" | "movies" | "series" | "books" | "audiobooks" | "games" | "music" | "requests" | "releases" | "tv" | "upcoming" | "articles")[] | null;
             /**
