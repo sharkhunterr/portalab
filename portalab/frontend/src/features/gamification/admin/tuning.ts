@@ -93,11 +93,11 @@ export const UNLOCK_KINDS = [
 ] as const; // biome-ignore format: a list
 
 export interface QuestDefinition {
-  kind: "quest" | "daily" | "challenge";
+  kind: "quest" | "daily" | "challenge" | "discovery";
   label: string;
   description?: string | undefined;
   icon?: string | null | undefined;
-  period?: "none" | "day" | "week" | undefined;
+  period?: "none" | "day" | "week" | "month" | undefined;
   window?: { starts_at: string; ends_at: string } | null | undefined;
   steps: EventCount[];
   /** Issue 121: done when every step is (``all``, the default) or any one of them. */
@@ -124,11 +124,14 @@ export function actionLabel(t: Translate, name: string): string {
 /** Durations are counted per minute in forms; events carry seconds. */
 export const PER_MINUTE_FIELDS = new Set(["duration_s", "position_s", "watched_s"]);
 
-export function useEventTypes() {
+/** The actions a rule may reward; issue 309: with ``goals``, also what an achievement or a quest may count of
+ * the progression itself (a quest done, an achievement unlocked, a level reached). */
+export function useEventTypes(goals = false) {
   return useQuery({
-    queryKey: [...KEY, "event-types"],
+    queryKey: [...KEY, "event-types", goals],
     queryFn: async () =>
-      ((await api.GET("/api/v1/admin/gamification/event-types")).data ?? []) as EventTypeInfo[],
+      ((await api.GET("/api/v1/admin/gamification/event-types", { params: { query: { goals } } })).data ??
+        []) as EventTypeInfo[],
     staleTime: 5 * 60_000,
   });
 }

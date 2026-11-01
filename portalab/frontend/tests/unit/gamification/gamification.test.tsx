@@ -20,6 +20,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 
 import { AchievementGrid } from "../../../src/features/gamification/achievements/Grid";
 import { AnomalyQueue } from "../../../src/features/gamification/admin/AnomalyQueue";
+import { StepFilters } from "../../../src/features/gamification/admin/StepFilters";
 import ProgressionPage from "../../../src/features/gamification/progression/ProgressionPage";
 import { QuestList } from "../../../src/features/gamification/quests/QuestList";
 import { json } from "../../support/fake-api";
@@ -201,5 +202,44 @@ describe("gamification", () => {
     fireEvent.change(screen.getByLabelText("Decision reason"), { target: { value: "Bot traffic" } });
     fireEvent.click(reject);
     await waitFor(() => expect(posts).toEqual(["/api/v1/admin/economy/anomalies/f1/reject"]));
+  });
+
+  it("lets a step count only some of its action's events, with the values it knows suggested", () => {
+    const changes: unknown[] = [];
+    show(
+      <StepFilters
+        filter={[{ field: "minutes", op: "gte", value: 15 }]}
+        type={{
+          name: "media.radio_listened",
+          owner: "module:media",
+          fields: [
+            { name: "minutes", numeric: true },
+            { name: "kind", numeric: false },
+          ],
+        }}
+        suggestions={{ kind: [["movie", "Films"]] }}
+        onChange={(next) => changes.push(next)}
+      />,
+    );
+    expect(screen.getByText("Only if")).toBeTruthy();
+    fireEvent.change(screen.getByDisplayValue("15"), { target: { value: "30" } });
+    expect(changes.at(-1)).toEqual([{ field: "minutes", op: "gte", value: 30 }]);
+    fireEvent.click(screen.getByRole("button", { name: "Add a condition" }));
+    const fields = screen.getAllByLabelText("Attribute") as HTMLSelectElement[];
+    fireEvent.change(fields[1] as HTMLSelectElement, { target: { value: "kind" } });
+    fireEvent.change(
+      (screen.getAllByLabelText("Comparison") as HTMLSelectElement[])[1] as HTMLSelectElement,
+      {
+        target: { value: "in" },
+      },
+    );
+    fireEvent.change((screen.getAllByLabelText("Value") as HTMLInputElement[])[1] as HTMLInputElement, {
+      target: { value: "movie, episode" },
+    });
+    expect(changes.at(-1)).toEqual([
+      { field: "minutes", op: "gte", value: 30 },
+      { field: "kind", op: "in", value: ["movie", "episode"] },
+    ]);
+    expect(document.querySelector("datalist option[value=movie]")).toBeTruthy();
   });
 });

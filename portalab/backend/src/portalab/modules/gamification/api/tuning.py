@@ -21,7 +21,7 @@ from portalab.core.authz_port import Principal
 from portalab.core.errors import Unavailable
 from portalab.core.time import utc_now
 from portalab.modules.gamification.api.me import Me, Module, _me
-from portalab.modules.gamification.events import OWN_TYPES
+from portalab.modules.gamification.events import GOAL_TYPES, OWN_TYPES
 from portalab.modules.gamification.models import (
     Achievement,
     GainContext,
@@ -74,11 +74,13 @@ class EventTypeOut(BaseModel):
 
 
 @router.get("/admin/gamification/event-types", response_model=list[EventTypeOut])
-async def event_types(_: Manager, module: Module) -> list[EventTypeOut]:
-    """Every action a rule may reward, with the attributes a rule may test or count."""
+async def event_types(_: Manager, module: Module, goals: bool = False) -> list[EventTypeOut]:
+    """Every action a rule may reward, with the attributes a rule may test or count; with ``goals`` (#309),
+    also what achievements and quests may count of the progression itself — never a rule's, which would
+    feed on its own grants."""
     out: list[EventTypeOut] = []
     for event_type in module.event_types.all():
-        if event_type.name in OWN_TYPES:
+        if event_type.name in OWN_TYPES and not (goals and event_type.name in GOAL_TYPES):
             continue
         schema_fields = event_type.schema.model_fields if event_type.schema else {}
         fields = [

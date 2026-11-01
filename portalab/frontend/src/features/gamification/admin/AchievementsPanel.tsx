@@ -15,6 +15,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { type Translate, useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import type { Value } from "../api";
+import { PLAY_KINDS, playName, StepFilters } from "./StepFilters";
 import {
   type AchievementDefinition,
   actionLabel,
@@ -50,6 +51,45 @@ const ICONS = [
   "heart",
   "rocket",
   "target",
+  // issue 309: what objectives are about — watching, listening, asking, playing, the portal itself
+  "popcorn",
+  "clapperboard",
+  "book-open",
+  "headphones",
+  "radio",
+  "music",
+  "gamepad",
+  "joystick",
+  "dices",
+  "search",
+  "bell",
+  "bot",
+  "lightbulb",
+  "bug",
+  "lifebuoy",
+  "inbox",
+  "gift",
+  "hourglass",
+  "calendar",
+  "compass",
+  "landmark",
+  "library",
+  "sparkles",
+  "tree",
+  "snowflake",
+  "users",
+];
+const GAMES = [
+  "blindtest",
+  "casting",
+  "cinemot",
+  "higher_lower",
+  "memories",
+  "memory",
+  "poster",
+  "synopsis",
+  "timeline",
+  "whowatched",
 ];
 const KINDS: Criterion["kind"][] = ["event_count", "level_at_least", "value_at_least", "statistic_at_least"];
 
@@ -113,6 +153,19 @@ function ActionSelect({
   );
 }
 
+/** issue 309: the values a step's condition may name — kinds of play, games, quests, achievements. */
+function useSuggestions(): Record<string, Array<[string, string]>> {
+  const t = useT();
+  const quests = useQuestAdmin().query.data ?? [];
+  const achievements = useAchievementAdmin().query.data ?? [];
+  return {
+    kind: PLAY_KINDS.map(([raw]) => [raw, playName(t, raw)]),
+    game: GAMES.map((game) => [game, t(`gamification:games.game.${game}.name`)]),
+    quest: quests.map((q) => [q.key, q.definition.label]),
+    achievement: achievements.map((a) => [a.key, a.definition.label]),
+  };
+}
+
 function CriterionEditor({
   criterion,
   types,
@@ -127,6 +180,7 @@ function CriterionEditor({
   stepsOnly?: boolean;
 }) {
   const t = useT();
+  const suggestions = useSuggestions();
   return (
     <div className="gam-criterion">
       {!stepsOnly ? (
@@ -147,7 +201,7 @@ function CriterionEditor({
           <ActionSelect
             value={criterion.event_type}
             types={types}
-            onChange={(v) => onChange({ ...criterion, event_type: v })}
+            onChange={(v) => onChange({ ...criterion, event_type: v, filter: [] })}
           />
           <TextField
             label={t("gamification:admin.criterion.count")}
@@ -155,6 +209,13 @@ function CriterionEditor({
             min={1}
             value={String(criterion.count)}
             onChange={(e) => onChange({ ...criterion, count: Number(e.target.value) })}
+          />
+          <StepFilters
+            key={criterion.event_type}
+            filter={criterion.filter}
+            type={types.find((type) => type.name === criterion.event_type)}
+            suggestions={suggestions}
+            onChange={(filter) => onChange({ ...criterion, filter })}
           />
         </>
       ) : null}
@@ -496,10 +557,14 @@ function QuestForm({
           value={def.kind}
           onChange={(e) => {
             const kind = e.target.value as QuestDefinition["kind"];
-            patch({ kind, period: kind === "daily" ? "day" : kind === "challenge" ? "none" : def.period });
+            patch({
+              kind,
+              period: kind === "daily" ? "day" : kind === "quest" ? def.period : "none",
+              ...(kind === "discovery" ? { window: null } : {}),
+            });
           }}
         >
-          {(["daily", "quest", "challenge"] as const).map((kind) => (
+          {(["daily", "quest", "challenge", "discovery"] as const).map((kind) => (
             <option key={kind} value={kind}>
               {t(`gamification:admin.quest.kinds.${kind}`)}
             </option>
@@ -674,7 +739,7 @@ function presets(t: Translate): Array<{ key: string; definition: AchievementDefi
 export function AchievementsPanel() {
   const t = useT();
   const { query, retire } = useAchievementAdmin();
-  const types = useEventTypes();
+  const types = useEventTypes(true);
   const [open, setOpen] = useState<string | null>(null);
   const [preset, setPreset] = useState<{ key: string; definition: AchievementDefinition } | null>(null);
   const [category, setCategory] = useState("all");
@@ -821,7 +886,7 @@ export function QuestsPanel() {
   const t = useT();
   const format = useFormat();
   const { query, retire } = useQuestAdmin();
-  const types = useEventTypes();
+  const types = useEventTypes(true);
   const [open, setOpen] = useState<string | null>(null);
   const typeList = types.data ?? [];
   return (

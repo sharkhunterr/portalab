@@ -58,6 +58,8 @@ class RulePublished(BaseModel):
     rule: str
     version: int
 
+GOAL_TYPES = frozenset({"quest.completed", "achievement.unlocked", "user.level_up"})
+
 
 def register_event_types(registry: EventTypeRegistry) -> None:
     for name, schema, aggregatable, visibility in (
@@ -79,6 +81,9 @@ def register_event_types(registry: EventTypeRegistry) -> None:
                     schema=schema,
                     open_payload=False,
                     aggregatable=aggregatable,
+                    # #309: what a quest or an achievement may test of the progression itself (the quest
+                    # done, the achievement unlocked, the level reached) — never a reward rule's action
+                    rewardable=aggregatable if name in GOAL_TYPES else frozenset(),
                     automatable=name
                     in ("user.level_up", "achievement.unlocked", "quest.completed", "reward.granted"),
                     visibility_class=visibility,  # type: ignore[arg-type]
