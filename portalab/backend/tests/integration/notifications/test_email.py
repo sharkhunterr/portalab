@@ -10,6 +10,7 @@ from email import message_from_bytes
 from typing import Any
 from uuid import UUID
 
+import httpx
 import pytest
 from aiosmtpd.controller import Controller
 from fastapi import FastAPI
@@ -18,7 +19,8 @@ from sqlalchemy import text
 from portalab.capabilities.notifications import CommunicationRequest, EmailMessage, Users, declare_category
 from portalab.modules.notifications.channels.email import SmtpTransport
 from portalab.modules.notifications.settings import NotificationsConfig
-from tests.integration.identity.helpers import create_user, module_of
+from tests.authz_fixtures import make_admin
+from tests.integration.identity.helpers import create_user, login, module_of
 from tests.integration.notifications.conftest import NotifyHarness
 
 pytestmark = pytest.mark.integration
@@ -141,3 +143,37 @@ async def test_smtp_adapter() -> None:
     parsed = message_from_bytes(envelope.content)
     assert parsed["Subject"] == "Subject injected"  # no header injection
     assert parsed.is_multipart()
+
+
+async def test_members_email_switched_off_but_the_administrators(
+    app: FastAPI, client: httpx.AsyncClient, notify: NotifyHarness
+) -> None:
+    """#318: one action switches the e-mails off in every member's own preferences — the administrators keep
+    theirs, a mandatory channel stays; the members' digest goes off; each may change theirs again."""
+    declare_category(
+        "media.new",
+        "module:media",
+        "media:category",
+        default_channels=("portal", "email"),
+        registry=notify.categories,
+    )
+    boss = await create_user(module_of(app), "boss")
+    await make_admin(notify.ev.full, boss)
+    await create_user(module_of(app), "alex")
+    await login(client, "boss")
+    done = await client.put("/api/v1/admin/notifications/members/email", json={"enabled": False})
+    assert done.status_code == 200 and done.json() == {"changed": 1, "kept": 1}
+    await login(client, "alex")
+    mine = (await client.get("/api/v1/me/notification-preferences")).json()
+    media = next(c for c in mine["categories"] if c["key"] == "media.new")
+    assert media["channels"]["email"]["enabled"] is False and media["channels"]["portal"]["enabled"] is True
+    assert mine["digest"] == "off"
+    await login(client, "boss")
+    own = (await client.get("/api/v1/me/notification-preferences")).json()
+    assert (
+        next(c for c in own["categories"] if c["key"] == "media.new")["channels"]["email"]["enabled"] is True
+    )
+    await login(client, "alex")  # a plain member cannot do it
+    assert (
+        await client.put("/api/v1/admin/notifications/members/email", json={"enabled": True})
+    ).status_code == 403

@@ -14,6 +14,7 @@ from sqlalchemy import and_, delete, func, select, update
 
 from portalab.capabilities.administration import CONFIG_WRITER_CAPABILITY
 from portalab.capabilities.config import CAPABILITY as CONFIG
+from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.notifications import AllAuthenticated, CommunicationRequest, EmailMessage
 from portalab.capabilities.search.fts import decode_cursor, encode_cursor
 from portalab.core.audit_port import AuditRecord
@@ -716,6 +717,48 @@ async def put_email(principal: Manager, body: EmailConfigIn, module: Module) -> 
         )
     await module.refresh_config()
     return {"enabled": module.config.email_enabled, "host": module.config.smtp_host, "password": "********"}
+
+
+class MembersEmailIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    enabled: bool
+
+
+@router.put("/admin/notifications/members/email")
+async def members_email(principal: Manager, body: MembersEmailIn, module: Module) -> dict[str, int]:
+    """#318: e-mail notifications switched off (or back on) in every member's own preferences at once —
+    the members who manage notifications keep theirs; mandatory and locked channels stay as they are; off,
+    the e-mail digest goes off too. Each member may change theirs again afterwards."""
+    contacts = module.capabilities.system_providers(CONTACT)
+    writers = module.capabilities.system_providers(CONFIG_WRITER_CAPABILITY)
+    if not contacts or not writers:
+        raise Unavailable("Preferences are not available.", code="admin.unavailable")
+    writer = writers[0].provider
+    policies = module.config.category_policy or {}
+    changed = kept = 0
+    for user in await contacts[0].provider.active_user_ids():
+        if await module.fanout._allowed(user, NOTIFICATIONS_MANAGE):
+            kept += 1  # an administrator keeps their own
+            continue
+        current = await _setting(module, PREFERENCES, user, {}) or {}
+        merged = {key: dict(channels) for key, channels in current.items()}
+        for category in module.categories.all():
+            email = decide(category, current, policies.get(category.key, {})).get("email")
+            if email is not None and not email.mandatory and not email.locked:
+                merged[category.key] = {**merged.get(category.key, {}), "email": body.enabled}
+        acting = Principal(user_id=principal.user_id, acting_for=user, session_id=principal.session_id)
+        await writer.set_user(acting, PREFERENCES, merged)
+        if not body.enabled:
+            await writer.set_user(acting, DIGEST, "off")
+        changed += 1
+    await _audit(
+        module,
+        principal,
+        "notifications.members_email",
+        "preferences",
+        {"enabled": body.enabled, "members": changed, "kept": kept},
+    )
+    return {"changed": changed, "kept": kept}
 
 
 @router.post("/admin/notifications/email/test")
