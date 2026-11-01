@@ -19,18 +19,37 @@ import {
   templateAbout,
   templateName,
   useAdminEditions,
+  useContents,
   useDeleteTemplate,
   useEditionActions,
   usePreview,
   useSaveTemplate,
   useTemplates,
 } from "./api";
+import { ContentPicker } from "./ContentPicker";
 import { EditionFrame } from "./EditionsPage";
 import "./editions.css";
 
-const KINDS: Section["kind"][] = ["notice", "stats", "top", "additions", "releases", "upcoming", "articles"];
+const KINDS: Section["kind"][] = [
+  "notice",
+  "stats",
+  "top",
+  "additions",
+  "requests",
+  "releases",
+  "tv",
+  "upcoming",
+  "articles",
+];
 const LAYOUTS: NonNullable<Section["layout"]>[] = ["grid", "list", "hero", "compact"];
-const MEDIA: NonNullable<Section["media"]>[number][] = ["movie", "series", "book", "game", "album"];
+const MEDIA: NonNullable<Section["media"]>[number][] = [
+  "movie",
+  "series",
+  "book",
+  "audiobook",
+  "game",
+  "album",
+];
 const COLORS: Array<keyof Definition["palette"]> = [
   "background",
   "surface",
@@ -40,7 +59,7 @@ const COLORS: Array<keyof Definition["palette"]> = [
   "accent_text",
   "border",
 ];
-const TITLED = new Set(["top", "additions", "releases", "upcoming", "articles"]);
+const TITLED = new Set(["top", "additions", "requests", "releases", "tv", "upcoming", "articles"]);
 const PERIODS = [1, 7, 14, 30];
 
 function language(): string {
@@ -460,7 +479,12 @@ function NewEdition() {
   const [ask, setAsk] = useState<EditionAsk>({ template_key: "portalab", days: 7, language: language() });
   const [shown, setShown] = useState<string | null>(null);
   const letters = (channels.data ?? []).filter((c) => c.newsletter && c.enabled);
-  const body = { ...ask, category_id: ask.category_id || letters[0]?.id || null };
+  const contents = useContents();
+  const body = {
+    ...ask,
+    category_id: ask.category_id || letters[0]?.id || null,
+    contents: ask.contents ?? contents.data?.defaults ?? null, // issue 323: the usual ones, until chosen
+  };
   return (
     <AdminSection
       icon="mail"
@@ -511,6 +535,7 @@ function NewEdition() {
               ))}
             </SelectField>
           </FormGrid>
+          <ContentPicker value={ask.contents} onChange={(contents) => setAsk({ ...ask, contents })} />
           <TextAreaField
             label={t("news:edition.admin.notice")}
             hint={t("news:edition.admin.noticeHint")}

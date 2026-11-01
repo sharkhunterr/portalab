@@ -23,9 +23,9 @@ from portalab.core.errors import NotFound, ValidationFailed
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
 from portalab.modules.news.editions.render import render
-from portalab.modules.news.editions.template import BUILTIN, Section, TemplateDefinition
+from portalab.modules.news.editions.template import BUILTIN, Section, TemplateDefinition, compose
 from portalab.modules.news.models import Article, Category, NewsletterEdition, NewsletterTemplate
-from portalab.modules.news.newsletters import CATEGORY, GROUPS, PORTAL_URL, Newsletters, _provider
+from portalab.modules.news.newsletters import CATEGORY, PORTAL_URL, Newsletters, _provider
 from portalab.modules.news.permissions import NEWS_READ
 from portalab.modules.news.settings import NEWSLETTER_ON
 
@@ -44,8 +44,19 @@ class EditionNotFound(NotFound):
     default_title = "Newsletter edition not found"
 
 
+# the kinds of titles each group gathers — #323: the audiobooks apart from the books
+GROUPS: dict[str, tuple[str, ...]] = {
+    "movie": ("movie",),
+    "series": ("series", "episode", "season"),
+    "book": ("book",),
+    "audiobook": ("audiobook",),
+    "game": ("game",),
+    "album": ("album", "track"),
+}
+
+
 def _kinds(media: Sequence[str]) -> set[str]:
-    return {kind for key, kinds in GROUPS if key in media for kind in kinds}
+    return {kind for group in media for kind in GROUPS.get(group, ())}
 
 
 class Editions:
@@ -128,8 +139,10 @@ class Editions:
     def _title(self, section: Section, language: str) -> str:
         if section.title:
             return section.title
+        if section.kind == "additions" and len(section.media) == 1:  # #323: « Nouveaux films »…
+            return self.newsletters._t(f"edition.heading.{section.media[0]}", language)
         base = self.newsletters._t(f"edition.section.{section.kind}", language)
-        if not section.media:
+        if not section.media or section.kind in ("tv", "upcoming"):
             return base
         names = ", ".join(self.newsletters._t(f"edition.group.{m}", language) for m in section.media)
         return f"{base} · {names}"
@@ -150,7 +163,8 @@ class Editions:
                 log.warning("edition figures unavailable")
         cache: dict[str, list[DigestItem]] = {}
 
-        async def titles(kind: str) -> list[DigestItem]:
+        async def titles(asked: str) -> list[DigestItem]:
+            kind = "upcoming" if asked == "tv" else asked  # the TV programme reads the same calendar
             if kind not in cache:
                 if digest is None:
                     cache[kind] = []
@@ -158,7 +172,13 @@ class Editions:
                     cache[kind] = await digest.additions(now - timedelta(days=days), LIMIT)
                 elif kind == "releases":
                     cache[kind] = await digest.releases(today - timedelta(days=days), today, LIMIT)
-                else:
+                elif kind == "requests":  # #323: what members asked for
+                    try:
+                        cache[kind] = await source.requests(days, LIMIT) if source is not None else []
+                    except Exception:
+                        log.warning("edition requests unavailable")
+                        cache[kind] = []
+                else:  # « upcoming », and « tv »: the same calendar
                     cache[kind] = await digest.upcoming(today + timedelta(days=days), LIMIT)
             return cache[kind]
 
@@ -166,12 +186,16 @@ class Editions:
         pictures: set[str] = set()
         for section in template.sections:
             items: list[dict[str, Any]] = []
-            if section.kind in ("additions", "releases", "upcoming"):
+            if section.kind in ("additions", "releases", "upcoming", "requests", "tv"):
                 found = await titles(section.kind)
-                if section.media:
-                    wanted = _kinds(section.media)
+                media = ["series"] if section.kind == "tv" else section.media  # #323: the episodes airing
+                if media:
+                    wanted = _kinds(media)
                     found = [i for i in found if i.kind in wanted]
                 items = [self._item(i, language) for i in found[: section.limit]]
+                if section.kind == "requests":  # each request says where it stands
+                    for item in items:
+                        item["detail"] = self.newsletters._t(f"edition.request.{item['detail']}", language)
             elif section.kind == "top":
                 ranked = period.get("top") or []
                 if section.media:
@@ -257,9 +281,13 @@ class Editions:
         status: str = "draft",
         created_by: UUID | None = None,
         definition: TemplateDefinition | None = None,
+        contents: Sequence[str] | None = None,
     ) -> NewsletterEdition:
-        """Write an edition (a preview of an unsaved template when ``definition`` is given)."""
+        """Write an edition (a preview of an unsaved template when ``definition`` is given) — #323: telling
+        the ``contents`` asked, in the template's look (else the template's own sections)."""
         template = definition or await self.template(template_key)
+        if contents is not None:
+            template = compose(template, list(contents))
         now = utc_now(self.clock)
         channel = None
         if category_id is not None:
@@ -308,6 +336,7 @@ class Editions:
             await session.flush()
             edition_id = row.id
             snapshot["page"] = f"/news/editions/{edition_id}"
+            snapshot["contents"] = list(contents) if contents is not None else None
             row.data = snapshot
             row.html, row.text = render(
                 template, snapshot, lambda key, args: self.newsletters._t(key, language, args)

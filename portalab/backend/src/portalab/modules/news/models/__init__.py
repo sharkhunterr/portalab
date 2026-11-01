@@ -155,6 +155,8 @@ class NewsletterSchedule(NewsBase):
     # #316: a self-writing edition — drawn with this template, with this notice on top (a maintenance…)
     template_key: Mapped[str | None] = mapped_column(String(64), info=not_personal("an edition's template"))
     notice: Mapped[str | None] = mapped_column(Text, info=not_personal("an edition's notice"))
+    # #323: what its editions tell (the contents switched on); none: the template's own sections
+    contents: Mapped[list[str] | None] = mapped_column(JSONB, info=not_personal("an edition's contents"))
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 

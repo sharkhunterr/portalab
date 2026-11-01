@@ -48,7 +48,13 @@ class _Library:
         return self.items[:limit]
 
     async def upcoming(self, until: date, limit: int) -> list[DigestItem]:
-        return []
+        return [
+            DigestItem("Andor", "series", until.isoformat(), "/media/b", "S03E01"),
+            DigestItem("Mickey 17", "movie", until.isoformat(), "/media/c"),
+        ]
+
+    async def requests(self, days: int, limit: int) -> list[DigestItem]:
+        return [DigestItem("Arcane", "series", "2026-10-30", "/media/d", "approved", picture="t-arcane.jpg")]
 
     async def period(self, days: int, *, top: int) -> dict[str, Any]:
         return {
@@ -59,7 +65,7 @@ class _Library:
         }
 
     async def picture(self, image_id: str) -> bytes | None:
-        return b"\xff\xd8poster" if image_id in (POSTER, OTHER) else None
+        return b"\xff\xd8poster" if image_id in (POSTER, OTHER, "t-arcane.jpg") else None
 
 
 async def test_editions(
@@ -187,3 +193,35 @@ async def test_editions(
     for field in ("id", "last_run_at", "next_run_at", "last_article_id"):
         unknown.pop(field, None)
     assert (await client.post("/api/v1/admin/news/newsletters", json=unknown)).status_code == 404
+
+
+async def test_an_edition_tells_the_contents_switched_on(
+    client: httpx.AsyncClient, ct: ContentHarness, people: dict[str, UUID], clock: FixedClock
+) -> None:
+    """#323: the contents switched on, in their order, each in the template's manner — the films and the
+    series apart, the requests with their state, the TV programme (the series' episodes airing) beside what
+    comes soon (the rest); a content switched off is not there."""
+    library = _Library(clock.now().date())
+    capabilities = ct.ev.full.identity.capabilities
+    capabilities.provide(DIGEST, library, instance_ref="test-contents", owner="test")
+    capabilities.provide(EDITION, library, instance_ref="test-contents", owner="test")
+    await login(client, "boss")
+    offered = (await client.get("/api/v1/admin/news/newsletter-contents")).json()
+    assert offered["contents"][:3] == ["notice", "stats", "top"] and "tv" in offered["defaults"]
+    preview = await client.post(
+        "/api/v1/admin/news/newsletter-editions/preview",
+        json={"template_key": "gazette", "contents": ["movies", "requests", "tv", "upcoming"], "days": 7},
+    )
+    assert preview.status_code == 200
+    html = (await client.get(f"/api/v1/admin/news/newsletter-editions/{preview.json()['id']}/page")).text
+    assert "Dune" in html and "Arcane" in html  # the films, the requests
+    assert html.index("Dune") < html.index("Arcane") < html.index("S03E01") < html.index("Mickey 17")
+    assert (
+        "S02E05" not in html
+    )  # the series' arrivals are switched off (Andor shows on the TV programme only)
+    assert "La période en chiffres" not in html and "The period in figures" not in html  # no statistics
+    bad = await client.post(
+        "/api/v1/admin/news/newsletter-editions/preview",
+        json={"template_key": "gazette", "contents": ["weather"]},
+    )
+    assert bad.status_code == 422

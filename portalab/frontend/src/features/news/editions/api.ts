@@ -65,6 +65,23 @@ export interface EditionAsk {
   notice?: string | null;
   category_id?: string | null;
   definition?: Definition | null;
+  /** issue 323: what it tells (none: the template's own sections). */
+  contents?: Content[] | null;
+}
+
+export type Content = NonNullable<components["schemas"]["EditionIn"]["contents"]>[number];
+
+/** issue 323: what an edition may tell, in its order, and what is on by default. */
+export function useContents() {
+  return useQuery({
+    queryKey: ["admin", "news", "edition-contents"],
+    staleTime: Number.POSITIVE_INFINITY,
+    queryFn: async () =>
+      (await api.GET("/api/v1/admin/news/newsletter-contents")).data as {
+        contents: Content[];
+        defaults: Content[];
+      },
+  });
 }
 
 /** A preview — of a saved template, or of one being written — whose page the news desk frames. */

@@ -430,7 +430,7 @@ class MediaModule:
         if not self.capabilities.system_providers(EDITION):  # #316: the self-writing newsletters' figures
             self.capabilities.provide(
                 EDITION,
-                LibraryEdition(self.database, self.insights, self.images),
+                LibraryEdition(self.database, self.insights, self.images, self.enricher, self.clock),
                 instance_ref="media",
                 owner=OWNER,
             )
