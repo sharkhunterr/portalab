@@ -960,5 +960,12 @@
   "admin.quest.filters": "Only if",
   "action.quest_completed": "Quest or objective done",
   "action.achievement_unlocked": "Achievement unlocked",
-  "action.user_level_up": "Level reached"
+  "action.user_level_up": "Level reached",
+  "quests.filter.label": "Filter the quests",
+  "quests.filter.all": "All",
+  "quests.filter.day": "Today",
+  "quests.filter.week": "This week",
+  "quests.filter.month": "This month",
+  "quests.filter.once": "Quests",
+  "quests.filter.challenge": "Challenges"
 }

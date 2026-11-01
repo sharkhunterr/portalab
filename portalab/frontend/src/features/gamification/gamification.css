@@ -2132,3 +2132,17 @@
   inline-size: 100%;
   min-inline-size: 0;
 }
+
+/* issue 311: the quest filters, each with how many are left to do */
+.quest-filters__count {
+  min-inline-size: 1.4rem;
+  padding: 0 0.35rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.quest-filters button[aria-pressed="true"] .quest-filters__count {
+  background: color-mix(in srgb, var(--color-accent-contrast) 25%, transparent);
+}
