@@ -195,7 +195,10 @@ SETUP_PATHS = frozenset(p for p in ANONYMOUS_PATHS if p.startswith("/api/v1/admi
 SIGN_IN_PATHS = (
     frozenset({"/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/verify"}) | SETUP_PATHS
 )
-ANONYMOUS_PREFIXES = ("/api/v1/media/remote/",)  # a casting device's stream, by its ticket
+ANONYMOUS_PREFIXES = (
+    "/api/v1/media/remote/",  # a casting device's stream, by its ticket
+    "/api/v1/newsletters/pictures/",  # #316: an e-mailed edition's pictures, by the edition's token
+)
 # issue 157: the terms of use, on the sign-in page — only while the administrators offer them there
 SIGN_IN_TERMS_PATH = "/api/v1/auth/terms"
 ANONYMOUS_CATALOGS = frozenset({"auth", "common", "errors"})  # the sign-in page's words

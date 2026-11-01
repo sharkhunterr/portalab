@@ -3,6 +3,7 @@ import { api } from "../../../api/client";
 import { AdminGrid, AdminPage, AdminStats } from "../../../design-system/admin/AdminKit";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { EditionsAdmin } from "../../news/editions/EditionsAdmin";
 import { NewslettersPanel } from "../../news/NewsChannels";
 import { Deliveries, type Status } from "./AnnouncementsAdmin";
 import { DigestDefault, EmailSettings } from "./EmailSettings";
@@ -54,6 +55,8 @@ export default function NewslettersAdmin() {
           },
         ]}
       />
+      {/* issue 316: the self-writing editions, their templates and their history */}
+      <EditionsAdmin />
       <NewslettersPanel />
       <AdminGrid>
         <EmailSettings />

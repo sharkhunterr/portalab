@@ -29,7 +29,7 @@ from portalab.core.errors import NotFound, ValidationFailed
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
 from portalab.modules.news.articles import ArticleInput, ArticleService
-from portalab.modules.news.models import Article, Category, NewsletterSchedule
+from portalab.modules.news.models import Article, Category, NewsletterEdition, NewsletterSchedule
 from portalab.modules.news.permissions import NEWS_READ
 from portalab.modules.news.settings import NEWSLETTER_ON
 
@@ -37,7 +37,7 @@ OPT_OUT = "news.newsletter.optOut"
 CATEGORY = "news.newsletter"
 PORTAL_URL = "notifications.email.portalUrl"
 ZONE = "i18n.defaultTimeZone"
-KINDS = ("releases", "additions", "upcoming")
+KINDS = ("releases", "additions", "upcoming", "edition")  # #316: « edition » — drawn with a template
 CADENCES = {"daily": 1, "weekly": 7, "monthly": 30}
 GROUPS = (
     ("movie", ("movie",)),
@@ -110,6 +110,7 @@ class Newsletters:
         self.articles = articles
         self.capabilities = capabilities
         self.clock = clock
+        self.editions: Any = None  # #316: the self-writing editions (set by the module)
 
     # --- settings ------------------------------------------------------------------------------------
     async def _setting(self, key: str, default: Any, user: UUID | None = None) -> Any:
@@ -247,6 +248,8 @@ class Newsletters:
         category = await session.get(Category, values.get("category_id"))
         if category is None or not category.enabled:
             raise ValidationFailed("This channel does not exist.", code="news.invalid_category")
+        if values.get("kind") == "edition" and self.editions is not None:  # #316: drawn with a template
+            await self.editions.template(str(values.get("template_key") or "classic"))
 
     async def save_schedule(self, schedule_id: UUID | None, values: Mapping[str, Any]) -> NewsletterSchedule:
         now = utc_now(self.clock)
@@ -326,8 +329,9 @@ class Newsletters:
             lines.append("")
         return title[:200], summary[:600], "\n".join(lines).strip()
 
-    async def generate(self, schedule_id: UUID, *, force: bool = False) -> Article | None:
-        """Write, publish (and e-mail) one newsletter; nothing is written when there is nothing to tell."""
+    async def generate(self, schedule_id: UUID, *, force: bool = False) -> Article | NewsletterEdition | None:
+        """Write, publish (and e-mail) one newsletter; nothing is written when there is nothing to tell.
+        #316: an « edition » schedule writes an edition with its template instead of an article."""
         now = utc_now(self.clock)
         zone = await self._zone()
         async with self.database.session() as session:
@@ -336,6 +340,22 @@ class Newsletters:
             raise ScheduleNotFound("This newsletter schedule does not exist.")
         if not force and (not schedule.enabled or (schedule.next_run_at and schedule.next_run_at > now)):
             return None
+        if schedule.kind == "edition" and self.editions is not None:
+            edition = await self.editions.create(
+                schedule.template_key or "classic",
+                days=CADENCES.get(schedule.cadence, 7),
+                language=schedule.language,
+                notice=schedule.notice,
+                category_id=schedule.category_id,
+                schedule_id=schedule.id,
+            )
+            edition = await self.editions.publish(edition.id, email=schedule.email)
+            async with self.database.unit_of_work() as uow:
+                row = await uow.session.get(NewsletterSchedule, schedule_id, with_for_update=True)
+                if row is not None:
+                    row.last_run_at = now
+                    row.next_run_at = next_run(row.cadence, row.weekday, row.hour, now, zone)
+            return edition  # type: ignore[no-any-return]
         items = await self._items(schedule, now)
         article: Article | None = None
         if items:

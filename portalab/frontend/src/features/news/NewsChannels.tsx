@@ -4,13 +4,14 @@ import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
 import { AdminSection, FormActions, FormGrid, StatusBadge } from "../../design-system/admin/AdminKit";
 import { Button } from "../../design-system/components/Button";
-import { CheckboxField, SelectField, TextField } from "../../design-system/components/Field";
+import { CheckboxField, SelectField, TextAreaField, TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
 import { Dialog } from "../../design-system/components/Overlays";
 import { EmptyState } from "../../design-system/components/Placeholders";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { ApiError } from "../../state/regions";
+import { templateName, useTemplates } from "./editions/api";
 
 /**
  * Channels and automatic newsletters (027): the news desk's categories are channels — described, with an
@@ -211,6 +212,7 @@ function ScheduleForm({ schedule, onDone }: { schedule?: Schedule; onDone: () =>
   const t = useT();
   const client = useQueryClient();
   const channels = useChannels();
+  const templates = useTemplates();
   const [values, setValues] = useState<ScheduleIn>(
     schedule ?? {
       name: "",
@@ -276,12 +278,26 @@ function ScheduleForm({ schedule, onDone }: { schedule?: Schedule; onDone: () =>
           value={values.kind}
           onChange={(e) => set("kind", e.target.value as ScheduleIn["kind"])}
         >
-          {(["releases", "additions", "upcoming"] as const).map((kind) => (
+          {(["edition", "releases", "additions", "upcoming"] as const).map((kind) => (
             <option key={kind} value={kind}>
               {t(`news:newsletters.kinds.${kind}`)}
             </option>
           ))}
         </SelectField>
+        {values.kind === "edition" ? (
+          // issue 316: an edition is drawn with a template
+          <SelectField
+            label={t("news:edition.admin.template")}
+            value={values.template_key ?? "classic"}
+            onChange={(e) => set("template_key", e.target.value)}
+          >
+            {(templates.data ?? []).map((tpl) => (
+              <option key={tpl.key} value={tpl.key}>
+                {templateName(t, tpl)}
+              </option>
+            ))}
+          </SelectField>
+        ) : null}
         <SelectField
           label={t("news:newsletters.cadence")}
           value={values.cadence}
@@ -323,30 +339,42 @@ function ScheduleForm({ schedule, onDone }: { schedule?: Schedule; onDone: () =>
           <option value="en">English</option>
         </SelectField>
       </FormGrid>
-      <fieldset className="news-kinds">
-        <legend>{t("news:newsletters.mediaKinds")}</legend>
-        {MEDIA_KINDS.map((kind) => {
-          const checked = (values.media_kinds ?? []).includes(kind);
-          return (
-            <label key={kind} className="service-picker__item" data-checked={checked || undefined}>
-              <input
-                type="checkbox"
-                checked={checked}
-                onChange={() =>
-                  set(
-                    "media_kinds",
-                    checked
-                      ? (values.media_kinds ?? []).filter((k) => k !== kind)
-                      : [...(values.media_kinds ?? []), kind],
-                  )
-                }
-              />
-              {t(`news:newsletters.mediaKind.${kind}`)}
-            </label>
-          );
-        })}
-        <span className="admin-muted">{t("news:newsletters.mediaKindsHint")}</span>
-      </fieldset>
+      {values.kind === "edition" ? (
+        <TextAreaField
+          label={t("news:edition.admin.notice")}
+          hint={t("news:edition.admin.noticeHint")}
+          rows={2}
+          maxLength={2000}
+          value={values.notice ?? ""}
+          onChange={(e) => set("notice", e.target.value || null)}
+        />
+      ) : null}
+      {values.kind === "edition" ? null : (
+        <fieldset className="news-kinds">
+          <legend>{t("news:newsletters.mediaKinds")}</legend>
+          {MEDIA_KINDS.map((kind) => {
+            const checked = (values.media_kinds ?? []).includes(kind);
+            return (
+              <label key={kind} className="service-picker__item" data-checked={checked || undefined}>
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() =>
+                    set(
+                      "media_kinds",
+                      checked
+                        ? (values.media_kinds ?? []).filter((k) => k !== kind)
+                        : [...(values.media_kinds ?? []), kind],
+                    )
+                  }
+                />
+                {t(`news:newsletters.mediaKind.${kind}`)}
+              </label>
+            );
+          })}
+          <span className="admin-muted">{t("news:newsletters.mediaKindsHint")}</span>
+        </fieldset>
+      )}
       <CheckboxField
         label={t("news:newsletters.email")}
         checked={values.email ?? true}
