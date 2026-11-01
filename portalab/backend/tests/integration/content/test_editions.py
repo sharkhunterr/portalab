@@ -266,3 +266,46 @@ async def test_the_statistics_draw_the_charts_switched_on(
     assert "edition.chart.activity" in usual and "edition.chart.kinds" in usual
     assert "edition.chart.hours" not in usual
     assert "▲ 20 %" in usual  # the time watched, against the previous period
+
+
+async def test_an_automatic_newsletter_has_its_name_and_its_subject(
+    client: httpx.AsyncClient, ct: ContentHarness, people: dict[str, UUID], clock: FixedClock
+) -> None:
+    """#325: an automatic newsletter is a self-writing edition on its cadence — its name for the news desk,
+    its e-mail's subject with variables (the week, the edition's number…), its period; run, it publishes."""
+    library = _Library(clock.now().date())
+    capabilities = ct.ev.full.identity.capabilities
+    capabilities.provide(DIGEST, library, instance_ref="test-auto", owner="test")
+    capabilities.provide(EDITION, library, instance_ref="test-auto", owner="test")
+    await login(client, "boss")
+    await client.put(
+        "/api/v1/admin/news/categories", json={"key": "hebdo", "name": "Hebdo", "newsletter": True}
+    )
+    async with ct.database.session() as session:
+        channel = await session.scalar(select(Category).where(Category.key == "hebdo"))
+    assert channel is not None
+    week = clock.now().date().isocalendar().week
+    made = await client.post(
+        "/api/v1/admin/news/newsletters",
+        json={
+            "name": "Lettre du vendredi (interne)",
+            "subject": "{chaîne} n°{numéro} — semaine {semaine}",
+            "category_id": str(channel.id),
+            "template_key": "portalab",
+            "contents": ["movies"],
+            "cadence": "weekly",
+            "days": 14,
+            "email": False,
+        },
+    )
+    assert made.status_code == 201, made.text
+    schedule = made.json()
+    assert (
+        schedule["kind"] == "edition"
+        and schedule["days"] == 14
+        and schedule["subject"].startswith("{chaîne}")
+    )
+    for number in (1, 2):
+        run = (await client.post(f"/api/v1/admin/news/newsletters/{schedule['id']}/run")).json()
+        edition = (await client.get(f"/api/v1/news/editions/{run['edition']}")).json()
+        assert edition["title"] == f"Hebdo n°{number} — semaine {week}" and edition["days"] == 14

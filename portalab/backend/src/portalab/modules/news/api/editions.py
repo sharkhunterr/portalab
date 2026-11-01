@@ -56,6 +56,7 @@ class EditionIn(BaseModel):
     category_id: UUID | None = None
     contents: list[Content] | None = Field(default=None, max_length=14)  # #323: what it tells
     charts: list[Chart] | None = Field(default=None, max_length=6)  # #324: its statistics' charts
+    subject: str | None = Field(default=None, max_length=200)  # #325: its e-mail's subject, with variables
 
 
 class PreviewIn(EditionIn):
@@ -174,6 +175,7 @@ async def preview(principal: Publisher, body: PreviewIn, module: Module) -> Edit
         definition=body.definition,
         contents=body.contents,
         charts=body.charts,
+        subject=body.subject,
     )
     return _edition(row)
 
@@ -194,6 +196,7 @@ async def create_edition(principal: Publisher, body: EditionIn, module: Module) 
         created_by=principal.user_id,
         contents=body.contents,
         charts=body.charts,
+        subject=body.subject,
     )
     return _edition(row)
 

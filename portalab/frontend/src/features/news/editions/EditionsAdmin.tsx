@@ -1,32 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { AdminSection, FormActions, FormGrid, StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import {
-  CheckboxField,
-  SelectField,
-  TextAreaField,
-  TextField,
-} from "../../../design-system/components/Field";
+import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import { useChannels } from "../NewsChannels";
 import {
   type Definition,
-  type EditionAsk,
   type Section,
   type Template,
   templateAbout,
   templateName,
   useAdminEditions,
-  useContents,
   useDeleteTemplate,
   useEditionActions,
   usePreview,
   useSaveTemplate,
   useTemplates,
 } from "./api";
-import { ContentPicker } from "./ContentPicker";
 import { EditionFrame } from "./EditionsPage";
 import "./editions.css";
 
@@ -60,7 +51,6 @@ const COLORS: Array<keyof Definition["palette"]> = [
   "border",
 ];
 const TITLED = new Set(["top", "additions", "requests", "releases", "tv", "upcoming", "articles"]);
-const PERIODS = [1, 7, 14, 30];
 
 function language(): string {
   return (typeof document !== "undefined" && document.documentElement.lang.split("-")[0]) || "fr";
@@ -469,112 +459,6 @@ function Templates() {
   );
 }
 
-/** issue 316: an edition by hand — its template, period, channel and notice; previewed, then kept as a draft. */
-function NewEdition() {
-  const t = useT();
-  const templates = useTemplates();
-  const channels = useChannels();
-  const preview = usePreview();
-  const { create } = useEditionActions();
-  const [ask, setAsk] = useState<EditionAsk>({ template_key: "portalab", days: 7, language: language() });
-  const [shown, setShown] = useState<string | null>(null);
-  const letters = (channels.data ?? []).filter((c) => c.newsletter && c.enabled);
-  const contents = useContents();
-  const body = {
-    ...ask,
-    category_id: ask.category_id || letters[0]?.id || null,
-    contents: ask.contents ?? contents.data?.defaults ?? null, // issue 323: the usual ones, until chosen
-  };
-  return (
-    <AdminSection
-      icon="mail"
-      title={t("news:edition.admin.new")}
-      description={t("news:edition.admin.newHint")}
-      span="full"
-    >
-      <div className="edition-editor">
-        <form
-          className="admin-form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            create.mutate(body, { onSuccess: () => setShown(null) });
-          }}
-        >
-          <FormGrid>
-            <SelectField
-              label={t("news:edition.admin.template")}
-              value={ask.template_key}
-              onChange={(e) => setAsk({ ...ask, template_key: e.target.value })}
-            >
-              {(templates.data ?? []).map((tpl) => (
-                <option key={tpl.key} value={tpl.key}>
-                  {templateName(t, tpl)}
-                </option>
-              ))}
-            </SelectField>
-            <SelectField
-              label={t("news:edition.admin.period")}
-              value={String(ask.days)}
-              onChange={(e) => setAsk({ ...ask, days: Number(e.target.value) })}
-            >
-              {PERIODS.map((days) => (
-                <option key={days} value={days}>
-                  {t("news:edition.admin.days", { count: days })}
-                </option>
-              ))}
-            </SelectField>
-            <SelectField
-              label={t("news:newsletters.channel")}
-              value={body.category_id ?? ""}
-              onChange={(e) => setAsk({ ...ask, category_id: e.target.value })}
-            >
-              {letters.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </SelectField>
-          </FormGrid>
-          <ContentPicker
-            value={ask.contents}
-            onChange={(contents) => setAsk({ ...ask, contents })}
-            charts={ask.charts}
-            onCharts={(charts) => setAsk({ ...ask, charts })}
-          />
-          <TextAreaField
-            label={t("news:edition.admin.notice")}
-            hint={t("news:edition.admin.noticeHint")}
-            rows={2}
-            maxLength={2000}
-            value={ask.notice ?? ""}
-            onChange={(e) => setAsk({ ...ask, notice: e.target.value || null })}
-          />
-          <FormActions>
-            <Button
-              variant="secondary"
-              disabled={preview.isPending}
-              onClick={() => preview.mutate(body, { onSuccess: (edition) => setShown(edition.id) })}
-            >
-              <Icon name="eye" size={16} />
-              {t("news:edition.admin.preview")}
-            </Button>
-            <Button type="submit" disabled={create.isPending}>
-              <Icon name="plus" size={16} />
-              {t("news:edition.admin.createDraft")}
-            </Button>
-          </FormActions>
-          {create.isSuccess ? <p role="status">{t("news:edition.admin.draftCreated")}</p> : null}
-        </form>
-        {shown ? (
-          <div className="edition-editor__preview">
-            <Preview id={shown} title={t("news:edition.admin.preview")} />
-          </div>
-        ) : null}
-      </div>
-    </AdminSection>
-  );
-}
-
 /** issue 316: every edition written — drafts to read, publish (and e-mail) or delete; what was sent. */
 function History() {
   const t = useT();
@@ -622,12 +506,6 @@ function History() {
                     <Icon name="mail" size={16} />
                     {t("news:edition.admin.testMe")}
                   </Button>
-                  {edition.status !== "published" ? (
-                    <Button variant="ghost" onClick={() => publish.mutate({ id: edition.id, email: false })}>
-                      <Icon name="newspaper" size={16} />
-                      {t("news:edition.admin.publish")}
-                    </Button>
-                  ) : null}
                   {!edition.emailed_at ? (
                     <Button onClick={() => publish.mutate({ id: edition.id, email: true })}>
                       <Icon name="send" size={16} />
@@ -656,15 +534,14 @@ function History() {
 }
 
 /**
- * issue 316: the self-writing newsletters, after Ghostarr's principle with the portal's data — an edition by
- * hand (previewed with the real data), the templates (look and sections) and every edition written.
+ * issue 316: the self-writing newsletters, after Ghostarr's principle with the portal's data — every edition
+ * written and the templates (look and sections); issue 325: they are written by the automatic newsletters.
  */
 export function EditionsAdmin() {
   return (
     <>
-      <NewEdition />
-      <Templates />
       <History />
+      <Templates />
     </>
   );
 }

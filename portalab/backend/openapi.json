@@ -6106,6 +6106,18 @@
             ],
             "title": "Notice"
           },
+          "subject": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
           "template_key": {
             "pattern": "^[a-z0-9][a-z0-9_-]{1,62}$",
             "title": "Template Key",
@@ -13042,6 +13054,19 @@
             ],
             "title": "Contents"
           },
+          "days": {
+            "anyOf": [
+              {
+                "maximum": 90.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days"
+          },
           "email": {
             "default": true,
             "title": "Email",
@@ -13060,6 +13085,7 @@
             "type": "integer"
           },
           "kind": {
+            "default": "edition",
             "enum": [
               "releases",
               "additions",
@@ -13107,6 +13133,18 @@
             ],
             "title": "Notice"
           },
+          "subject": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
           "template_key": {
             "anyOf": [
               {
@@ -13130,7 +13168,6 @@
         "required": [
           "name",
           "category_id",
-          "kind",
           "cadence"
         ],
         "title": "NewsletterScheduleIn",
@@ -13206,6 +13243,19 @@
             ],
             "title": "Contents"
           },
+          "days": {
+            "anyOf": [
+              {
+                "maximum": 90.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days"
+          },
           "email": {
             "default": true,
             "title": "Email",
@@ -13229,6 +13279,7 @@
             "type": "string"
           },
           "kind": {
+            "default": "edition",
             "enum": [
               "releases",
               "additions",
@@ -13312,6 +13363,18 @@
             ],
             "title": "Notice"
           },
+          "subject": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
           "template_key": {
             "anyOf": [
               {
@@ -13335,7 +13398,6 @@
         "required": [
           "name",
           "category_id",
-          "kind",
           "cadence",
           "id",
           "last_run_at",
@@ -15404,6 +15466,18 @@
               }
             ],
             "title": "Notice"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
           },
           "template_key": {
             "pattern": "^[a-z0-9][a-z0-9_-]{1,62}$",

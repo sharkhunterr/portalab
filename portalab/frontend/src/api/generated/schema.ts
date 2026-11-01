@@ -14252,6 +14252,8 @@ export interface components {
             language: string;
             /** Notice */
             notice?: string | null;
+            /** Subject */
+            subject?: string | null;
             /** Template Key */
             template_key: string;
         };
@@ -16737,6 +16739,8 @@ export interface components {
             charts?: ("figures" | "activity" | "kinds" | "weekdays" | "hours" | "genres")[] | null;
             /** Contents */
             contents?: ("notice" | "stats" | "top" | "movies" | "series" | "books" | "audiobooks" | "games" | "music" | "requests" | "releases" | "tv" | "upcoming" | "articles")[] | null;
+            /** Days */
+            days?: number | null;
             /**
              * Email
              * @default true
@@ -16754,6 +16758,7 @@ export interface components {
             hour: number;
             /**
              * Kind
+             * @default edition
              * @enum {string}
              */
             kind: "releases" | "additions" | "upcoming" | "edition";
@@ -16768,6 +16773,8 @@ export interface components {
             name: string;
             /** Notice */
             notice?: string | null;
+            /** Subject */
+            subject?: string | null;
             /** Template Key */
             template_key?: string | null;
             /**
@@ -16792,6 +16799,8 @@ export interface components {
             charts?: ("figures" | "activity" | "kinds" | "weekdays" | "hours" | "genres")[] | null;
             /** Contents */
             contents?: ("notice" | "stats" | "top" | "movies" | "series" | "books" | "audiobooks" | "games" | "music" | "requests" | "releases" | "tv" | "upcoming" | "articles")[] | null;
+            /** Days */
+            days?: number | null;
             /**
              * Email
              * @default true
@@ -16814,6 +16823,7 @@ export interface components {
             id: string;
             /**
              * Kind
+             * @default edition
              * @enum {string}
              */
             kind: "releases" | "additions" | "upcoming" | "edition";
@@ -16834,6 +16844,8 @@ export interface components {
             next_run_at: string | null;
             /** Notice */
             notice?: string | null;
+            /** Subject */
+            subject?: string | null;
             /** Template Key */
             template_key?: string | null;
             /**
@@ -17512,6 +17524,8 @@ export interface components {
             language: string;
             /** Notice */
             notice?: string | null;
+            /** Subject */
+            subject?: string | null;
             /** Template Key */
             template_key: string;
         };

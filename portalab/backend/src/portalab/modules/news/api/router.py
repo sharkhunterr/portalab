@@ -191,7 +191,7 @@ class NewsletterScheduleIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: str = Field(min_length=1, max_length=120)
     category_id: UUID
-    kind: Literal["releases", "additions", "upcoming", "edition"]
+    kind: Literal["releases", "additions", "upcoming", "edition"] = "edition"  # #325: an edition by default
     media_kinds: list[Literal["movie", "series", "book", "game", "album"]] = Field(default_factory=list)
     cadence: Literal["daily", "weekly", "monthly"]
     weekday: int = Field(default=0, ge=0, le=6)
@@ -203,6 +203,8 @@ class NewsletterScheduleIn(BaseModel):
     notice: str | None = Field(default=None, max_length=2000)
     contents: list[Content] | None = Field(default=None, max_length=14)  # #323: what its editions tell
     charts: list[Chart] | None = Field(default=None, max_length=6)  # #324: its statistics' charts
+    subject: str | None = Field(default=None, max_length=200)  # #325: its e-mail's subject, with variables
+    days: int | None = Field(default=None, ge=1, le=90)  # #325: the days it tells (else its cadence's)
 
 
 class NewsletterScheduleOut(NewsletterScheduleIn):
@@ -235,6 +237,8 @@ def _schedule_out(row: Any) -> NewsletterScheduleOut:
         notice=row.notice,
         contents=row.contents,
         charts=row.charts,
+        subject=row.subject,
+        days=row.days,
         last_run_at=row.last_run_at,
         next_run_at=row.next_run_at,
         last_article_id=row.last_article_id,
