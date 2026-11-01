@@ -5256,6 +5256,20 @@
       },
       "ContentsOut": {
         "properties": {
+          "chart_defaults": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Chart Defaults",
+            "type": "array"
+          },
+          "charts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Charts",
+            "type": "array"
+          },
           "contents": {
             "items": {
               "type": "string"
@@ -5273,7 +5287,9 @@
         },
         "required": [
           "contents",
-          "defaults"
+          "defaults",
+          "charts",
+          "chart_defaults"
         ],
         "title": "ContentsOut",
         "type": "object"
@@ -6010,6 +6026,29 @@
               }
             ],
             "title": "Category Id"
+          },
+          "charts": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "figures",
+                    "activity",
+                    "kinds",
+                    "weekdays",
+                    "hours",
+                    "genres"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 6,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charts"
           },
           "contents": {
             "anyOf": [
@@ -12949,6 +12988,29 @@
             "title": "Category Id",
             "type": "string"
           },
+          "charts": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "figures",
+                    "activity",
+                    "kinds",
+                    "weekdays",
+                    "hours",
+                    "genres"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 6,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charts"
+          },
           "contents": {
             "anyOf": [
               {
@@ -13089,6 +13151,29 @@
             "format": "uuid",
             "title": "Category Id",
             "type": "string"
+          },
+          "charts": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "figures",
+                    "activity",
+                    "kinds",
+                    "weekdays",
+                    "hours",
+                    "genres"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 6,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charts"
           },
           "contents": {
             "anyOf": [
@@ -15230,6 +15315,29 @@
               }
             ],
             "title": "Category Id"
+          },
+          "charts": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "figures",
+                    "activity",
+                    "kinds",
+                    "weekdays",
+                    "hours",
+                    "genres"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 6,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charts"
           },
           "contents": {
             "anyOf": [

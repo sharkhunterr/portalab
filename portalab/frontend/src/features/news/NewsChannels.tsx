@@ -238,6 +238,7 @@ function ScheduleForm({ schedule, onDone }: { schedule?: Schedule; onDone: () =>
         category_id: values.category_id || channels.data?.[0]?.id || "",
         // issue 323: an edition tells the usual contents until others are chosen
         contents: values.kind === "edition" ? (values.contents ?? offered.data?.defaults ?? null) : null,
+        charts: values.kind === "edition" ? (values.charts ?? null) : null, // issue 324: none, the usual ones
       };
       return schedule
         ? api.PUT("/api/v1/admin/news/newsletters/{schedule_id}", {
@@ -348,7 +349,12 @@ function ScheduleForm({ schedule, onDone }: { schedule?: Schedule; onDone: () =>
       </FormGrid>
       {values.kind === "edition" ? (
         // issue 323: what its editions tell
-        <ContentPicker value={values.contents ?? null} onChange={(contents) => set("contents", contents)} />
+        <ContentPicker
+          value={values.contents ?? null}
+          onChange={(contents) => set("contents", contents)}
+          charts={values.charts ?? null}
+          onCharts={(charts) => set("charts", charts)}
+        />
       ) : null}
       {values.kind === "edition" ? (
         <TextAreaField

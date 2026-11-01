@@ -56,11 +56,18 @@ class _Library:
     async def requests(self, days: int, limit: int) -> list[DigestItem]:
         return [DigestItem("Arcane", "series", "2026-10-30", "/media/d", "approved", picture="t-arcane.jpg")]
 
-    async def period(self, days: int, *, top: int) -> dict[str, Any]:
+    async def period(self, days: int, *, top: int, tz: str = "UTC") -> dict[str, Any]:
         return {
             "totals": {"plays": 42, "seconds": 36_000.0, "members": 5, "works": 12},
             "previous": {"seconds": 30_000.0},
-            "by_kind": [{"kind": "movie", "plays": 10, "seconds": 20_000.0}],
+            "by_kind": [
+                {"kind": "movie", "plays": 10, "seconds": 20_000.0},
+                {"kind": "episode", "plays": 30, "seconds": 16_000.0},
+            ],
+            "timeline": {"unit": "day", "points": [{"date": "2026-10-30", "seconds": 7200.0}]},
+            "weekdays": [0.0, 0.0, 0.0, 3600.0, 7200.0, 0.0, 0.0],
+            "hours": [0.0] * 20 + [10_800.0, 0.0, 0.0, 0.0],
+            "genres": [{"name": "Science-fiction", "seconds": 9000.0}],
             "top": [{"item": self.items[1], "plays": 9, "seconds": 18_000.0}],
         }
 
@@ -225,3 +232,37 @@ async def test_an_edition_tells_the_contents_switched_on(
         json={"template_key": "gazette", "contents": ["weather"]},
     )
     assert bad.status_code == 422
+
+
+async def test_the_statistics_draw_the_charts_switched_on(
+    client: httpx.AsyncClient, ct: ContentHarness, people: dict[str, UUID], clock: FixedClock
+) -> None:
+    """#324: the statistics as the charts chosen — drawn with cells (no script, no SVG), the peak named —,
+    the others left out; the usual ones by default."""
+    library = _Library(clock.now().date())
+    capabilities = ct.ev.full.identity.capabilities
+    capabilities.provide(DIGEST, library, instance_ref="test-charts", owner="test")
+    capabilities.provide(EDITION, library, instance_ref="test-charts", owner="test")
+    await login(client, "boss")
+    offered = (await client.get("/api/v1/admin/news/newsletter-contents")).json()
+    assert offered["charts"][0] == "figures" and offered["chart_defaults"] == ["figures", "activity", "kinds"]
+
+    async def page(**ask: Any) -> str:
+        made = await client.post(
+            "/api/v1/admin/news/newsletter-editions/preview",
+            json={"template_key": "portalab", "contents": ["stats"], "language": "fr", **ask},
+        )
+        assert made.status_code == 200, made.text
+        return (await client.get(f"/api/v1/admin/news/newsletter-editions/{made.json()['id']}/page")).text
+
+    chosen = await page(charts=["kinds", "hours"])
+    # (the harness speaks in the words' keys)
+    assert "edition.chart.kinds" in chosen and "edition.chart.hours" in chosen and "3&nbsp;h" in chosen
+    assert (
+        "edition.chart.activity" not in chosen and "edition.stats.plays" not in chosen
+    )  # nor activity nor figures
+    assert "<svg" not in chosen and "<script" not in chosen
+    usual = await page()
+    assert "edition.chart.activity" in usual and "edition.chart.kinds" in usual
+    assert "edition.chart.hours" not in usual
+    assert "▲ 20 %" in usual  # the time watched, against the previous period

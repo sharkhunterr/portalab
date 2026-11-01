@@ -18,7 +18,7 @@ from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.errors import Conflict, Forbidden, NotFound, Unavailable
 from portalab.modules.news.articles import ArticleInput, ArticleNotFound
-from portalab.modules.news.editions.template import Content
+from portalab.modules.news.editions.template import Chart, Content
 from portalab.modules.news.models import Article, Category
 from portalab.modules.news.module import NewsModule
 from portalab.modules.news.permissions import (
@@ -202,6 +202,7 @@ class NewsletterScheduleIn(BaseModel):
     template_key: str | None = Field(default=None, pattern=r"^[a-z0-9][a-z0-9_-]{1,62}$")  # #316: editions
     notice: str | None = Field(default=None, max_length=2000)
     contents: list[Content] | None = Field(default=None, max_length=14)  # #323: what its editions tell
+    charts: list[Chart] | None = Field(default=None, max_length=6)  # #324: its statistics' charts
 
 
 class NewsletterScheduleOut(NewsletterScheduleIn):
@@ -233,6 +234,7 @@ def _schedule_out(row: Any) -> NewsletterScheduleOut:
         template_key=row.template_key,
         notice=row.notice,
         contents=row.contents,
+        charts=row.charts,
         last_run_at=row.last_run_at,
         next_run_at=row.next_run_at,
         last_article_id=row.last_article_id,

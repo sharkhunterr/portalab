@@ -371,5 +371,12 @@
   "edition.admin.contents": "Contenus",
   "edition.admin.contentsHint": "Ce que la lettre raconte. Le template donne l’allure ; un contenu sans section dans le template prend son affichage par défaut.",
   "edition.admin.contentsTemplate": "Ceux du template",
-  "edition.admin.contentsDefault": "Revenir aux contenus par défaut"
+  "edition.admin.contentsDefault": "Revenir aux contenus par défaut",
+  "edition.chart.figures": "Chiffres clés",
+  "edition.chart.activity": "Temps regardé par jour",
+  "edition.chart.kinds": "Par type",
+  "edition.chart.weekdays": "Selon le jour de la semaine",
+  "edition.chart.hours": "Selon l’heure",
+  "edition.chart.genres": "Genres les plus regardés",
+  "edition.admin.charts": "Graphiques des statistiques"
 }

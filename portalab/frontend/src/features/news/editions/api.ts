@@ -67,7 +67,11 @@ export interface EditionAsk {
   definition?: Definition | null;
   /** issue 323: what it tells (none: the template's own sections). */
   contents?: Content[] | null;
+  /** issue 324: its statistics' charts (none: the usual ones). */
+  charts?: Chart[] | null;
 }
+
+export type Chart = NonNullable<components["schemas"]["EditionIn"]["charts"]>[number];
 
 export type Content = NonNullable<components["schemas"]["EditionIn"]["contents"]>[number];
 
@@ -80,6 +84,8 @@ export function useContents() {
       (await api.GET("/api/v1/admin/news/newsletter-contents")).data as {
         contents: Content[];
         defaults: Content[];
+        charts: Chart[];
+        chart_defaults: Chart[];
       },
   });
 }

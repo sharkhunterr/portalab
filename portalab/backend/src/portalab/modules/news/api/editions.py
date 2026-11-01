@@ -13,7 +13,15 @@ from pydantic import BaseModel, ConfigDict, Field
 from portalab.core.authorization import public
 from portalab.core.errors import NotFound
 from portalab.modules.news.api.router import Module, NewslettersOn, Publisher, Reader
-from portalab.modules.news.editions.template import CONTENTS, DEFAULT_CONTENTS, Content, TemplateDefinition
+from portalab.modules.news.editions.template import (
+    CHARTS,
+    CONTENTS,
+    DEFAULT_CHARTS,
+    DEFAULT_CONTENTS,
+    Chart,
+    Content,
+    TemplateDefinition,
+)
 from portalab.modules.news.models import NewsletterEdition
 
 router = APIRouter(prefix="/api/v1", tags=["news"])
@@ -47,6 +55,7 @@ class EditionIn(BaseModel):
     notice: str | None = Field(default=None, max_length=2000)
     category_id: UUID | None = None
     contents: list[Content] | None = Field(default=None, max_length=14)  # #323: what it tells
+    charts: list[Chart] | None = Field(default=None, max_length=6)  # #324: its statistics' charts
 
 
 class PreviewIn(EditionIn):
@@ -135,12 +144,19 @@ async def delete_template(
 class ContentsOut(BaseModel):
     contents: list[str]
     defaults: list[str]
+    charts: list[str]  # #324: the statistics' charts, and the usual ones
+    chart_defaults: list[str]
 
 
 @router.get("/admin/news/newsletter-contents", response_model=ContentsOut, dependencies=NewslettersOn)
 async def contents(principal: Publisher) -> ContentsOut:
     """#323: what an edition may tell, in its order, and what is switched on by default."""
-    return ContentsOut(contents=list(CONTENTS), defaults=list(DEFAULT_CONTENTS))
+    return ContentsOut(
+        contents=list(CONTENTS),
+        defaults=list(DEFAULT_CONTENTS),
+        charts=list(CHARTS),
+        chart_defaults=list(DEFAULT_CHARTS),
+    )
 
 
 # --- editions (the news desk) --------------------------------------------------------------------------
@@ -157,6 +173,7 @@ async def preview(principal: Publisher, body: PreviewIn, module: Module) -> Edit
         created_by=principal.user_id,
         definition=body.definition,
         contents=body.contents,
+        charts=body.charts,
     )
     return _edition(row)
 
@@ -176,6 +193,7 @@ async def create_edition(principal: Publisher, body: EditionIn, module: Module) 
         category_id=body.category_id,
         created_by=principal.user_id,
         contents=body.contents,
+        charts=body.charts,
     )
     return _edition(row)
 

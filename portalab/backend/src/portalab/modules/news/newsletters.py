@@ -370,6 +370,7 @@ class Newsletters:
                 category_id=schedule.category_id,
                 schedule_id=schedule.id,
                 contents=schedule.contents,
+                charts=schedule.charts,
             )
             edition = await self.editions.publish(edition.id, email=schedule.email)
             async with self.database.unit_of_work() as uow:

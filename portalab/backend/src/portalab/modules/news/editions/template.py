@@ -278,3 +278,9 @@ def compose(template: TemplateDefinition, contents: list[str] | tuple[str, ...])
                 default = Section(kind="articles", layout="list", limit=4)
             sections.append(base or default)
     return template.model_copy(update={"sections": sections or own})
+
+
+# --- #324: the statistics' charts, as options ---------------------------------------------------------------
+Chart = Literal["figures", "activity", "kinds", "weekdays", "hours", "genres"]
+CHARTS: tuple[Chart, ...] = ("figures", "activity", "kinds", "weekdays", "hours", "genres")
+DEFAULT_CHARTS: tuple[Chart, ...] = ("figures", "activity", "kinds")
