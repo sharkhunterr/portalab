@@ -968,5 +968,10 @@
   "quests.filter.month": "This month",
   "quests.filter.once": "Quests",
   "quests.filter.challenge": "Challenges",
-  "quests.summary": "Quests done"
+  "quests.summary": "Quests done",
+  "games.quests.today": "{count, plural, =0 {Nothing left today} one {# daily quest to do} other {# daily quests to do}}",
+  "games.quests.next": "Next: {label}",
+  "games.quests.allDone": "All done, well played!",
+  "games.quests.see": "See the quests",
+  "games.campaign.see": "See"
 }

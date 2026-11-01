@@ -8,7 +8,9 @@ import { PageHeader } from "../../design-system/components/PageHeader";
 import { Skeleton } from "../../design-system/components/Placeholders";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
+import { useActiveCampaigns } from "../campaigns/api";
 import type { WidgetPayload } from "../dashboard/api";
+import { ordered, type QuestItem, useQuestText } from "../gamification/quests/QuestList";
 import { WheelWidget } from "../gamification/wheel/WheelWidget";
 import { imageUrl } from "../media/api";
 import { type ChallengeItem, GAME_ICONS, gamesLeft, type HubGame, useChallenge, useGamesHub } from "./api";
@@ -74,6 +76,108 @@ function Cinemot({ status }: { status: { status: string; won: boolean } | null }
       </Button>
     </article>
   );
+}
+
+/** Issue 313: a reminder of the quests — how many are done, today's still to do, the next one to close —
+ * leading to their tab. */
+function QuestReminder() {
+  const t = useT();
+  const format = useFormat();
+  const text = useQuestText();
+  const quests = useQuery({
+    queryKey: ["community", "quests"],
+    retry: false,
+    queryFn: async () => (await api.GET("/api/v1/community/quests")).data,
+  });
+  const items = (quests.data?.state === "unavailable"
+    ? []
+    : (quests.data?.items ?? [])) as unknown as QuestItem[];
+  if (!items.length) return null;
+  const { open, done } = ordered(items);
+  const today = open.filter((q) => q.period === "day").length;
+  const next = open[0];
+  return (
+    <RouterLink
+      to="/games/quests"
+      className="games-reminder"
+      data-reminder="quests"
+      data-complete={open.length === 0 || undefined}
+    >
+      <span className="games-reminder__icon" aria-hidden="true">
+        <Icon name={open.length ? "target" : "trophy"} size={20} />
+      </span>
+      <span className="games-reminder__body">
+        <span className="games-reminder__head">
+          <b>{t("gamification:quests.summary")}</b>
+          <span>
+            {format.number(done.length)} / {format.number(items.length)}
+          </span>
+        </span>
+        <span className="ds-bar" aria-hidden="true">
+          <span
+            className="ds-bar__fill"
+            style={{ inlineSize: `${Math.round((done.length / items.length) * 100)}%` }}
+          />
+        </span>
+        <span className="games-muted">
+          {open.length
+            ? [
+                t("gamification:games.quests.today", { count: today }),
+                next ? t("gamification:games.quests.next", { label: text(next).label }) : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")
+            : t("gamification:games.quests.allDone")}
+        </span>
+      </span>
+      <span className="games-reminder__more">
+        {t("gamification:games.quests.see")}
+        <Icon name="chevron-right" size={16} />
+      </span>
+    </RouterLink>
+  );
+}
+
+/** Issue 313: the campaigns running now — what they boost (each boost once) and until when — each leading to its page. */
+function CampaignReminders() {
+  const t = useT();
+  const format = useFormat();
+  const active = useActiveCampaigns();
+  return (active.data ?? []).map((campaign) => (
+    <RouterLink
+      key={campaign.key}
+      to={`/campaigns/${campaign.key}`}
+      className="games-reminder"
+      data-reminder="campaign"
+    >
+      <span className="games-reminder__icon" aria-hidden="true">
+        <Icon name="star" size={20} />
+      </span>
+      <span className="games-reminder__body">
+        <span className="games-reminder__head">
+          <b>{campaign.name}</b>
+          {campaign.ends_at ? (
+            <span>{t("campaigns:banner.ends", { date: format.date(campaign.ends_at) })}</span>
+          ) : null}
+        </span>
+        <span className="games-muted">
+          {campaign.boosts.length
+            ? [
+                ...new Set(
+                  campaign.boosts.map(
+                    (boost) => `×${boost.factor} ${t(`gamification:value.${boost.value}`)}`,
+                  ),
+                ),
+              ].join(" · ")
+            : t("campaigns:banner.label")}
+        </span>
+      </span>
+      <span className="games-reminder__more">
+        {t("gamification:games.campaign.see")}
+        <Icon name="chevron-right" size={16} />
+      </span>
+    </RouterLink>
+  ));
 }
 
 const CHALLENGE_ICONS: Record<string, string> = {
@@ -245,7 +349,9 @@ function JoinBox() {
 }
 
 /**
- * Issue 265: the games page — today (the wheel, the day's title, the week's challenge), the games to play
+ * Issue 265: the games page — today (the wheel, the day's title, a reminder of the quests and
+ * the running campaigns — issue 313 — the
+ * week's challenge), the games to play
  * alone or together, the parties to join with their code, and each game's board.
  */
 export default function GamesPage() {
@@ -272,6 +378,10 @@ export default function GamesPage() {
             <div className="games-today__grid">
               <Wheel />
               {games.some((g) => g.key === "cinemot") ? <Cinemot status={hub.data.cinemot} /> : null}
+            </div>
+            <div className="games-reminders">
+              <QuestReminder />
+              <CampaignReminders />
             </div>
           </section>
 

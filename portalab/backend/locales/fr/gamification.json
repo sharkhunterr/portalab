@@ -968,5 +968,10 @@
   "quests.filter.month": "Ce mois-ci",
   "quests.filter.once": "Quêtes",
   "quests.filter.challenge": "Défis",
-  "quests.summary": "Quêtes validées"
+  "quests.summary": "Quêtes validées",
+  "games.quests.today": "{count, plural, =0 {Rien à faire aujourd’hui} one {# quête du jour à faire} other {# quêtes du jour à faire}}",
+  "games.quests.next": "Prochaine : {label}",
+  "games.quests.allDone": "Toutes validées, bravo !",
+  "games.quests.see": "Voir les quêtes",
+  "games.campaign.see": "Voir"
 }
