@@ -175,6 +175,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { index: true, element: <Games /> },
             { path: "play/:game", element: <GameSolo />, handle: h({ crumb: "A game" }) },
             { path: "cinemot", element: <GameCinemot />, handle: h({ crumb: "The day's title" }) },
+            // issue 310: the quests — reading, playing, asking — among the games
+            {
+              path: "quests",
+              element: <Community view="quests" />,
+              handle: h({ crumb: "Quests", requiredPermission: "community.read" }),
+            },
             { path: "party", element: <GameParties />, handle: h({ crumb: "Play together" }) },
             { path: "party/:code", element: <GameParty />, handle: h({ crumb: "A party" }) },
           ],
@@ -239,7 +245,8 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               element: <Community view="achievements" />,
               handle: h({ crumb: "Achievements" }),
             },
-            { path: "quests", element: <Community view="quests" />, handle: h({ crumb: "Quests" }) },
+            // issue 310: the quests moved to the games; the links already shared still lead there
+            { path: "quests", loader: () => redirect("/games/quests") },
             { path: "events", element: <Community view="events" />, handle: h({ crumb: "Events" }) },
             { path: "proposals", element: <Community view="proposals" />, handle: h({ crumb: "Proposals" }) },
             {

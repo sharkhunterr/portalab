@@ -70,7 +70,8 @@ async def test_sections_for_users_and_admins(sh: ShellHarness) -> None:
 
     personal = {e["key"] for e in view["personal"]}
     # #298: « Moi » — what is mine; the settings' pages are listed by « My settings », not one by one
-    assert {"shell.settings", "gamification.progression", "community.quests"} <= personal
+    assert {"shell.settings", "gamification.progression"} <= personal
+    assert "community.quests" in {e["key"] for e in by_key["games"]["entries"]}  # #310: among the games
     stats = {e["key"] for e in by_key["stats"]["entries"]}  # #298: mine, my requests', the community's
     assert {"media.insights", "media.requests_stats", "statistics.page"} <= stats
     assert not {"identity.account", "ui.appearance", "i18n.language", "privacy.center"} & personal

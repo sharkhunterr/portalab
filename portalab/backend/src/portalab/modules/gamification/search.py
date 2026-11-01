@@ -71,7 +71,7 @@ class GamificationSearchProvider:
                     kind=self.kind,
                     id=f"quest:{quest.key}",
                     title=quest.definition.label,
-                    url_ref=f"/community/quests#{quest.key}",
+                    url_ref=f"/games/quests#{quest.key}",  # #310: among the games
                     facets={"type": "quest", "subtype": quest.definition.kind},
                 )
                 out.append((item, quest.definition.description))

@@ -585,14 +585,14 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "community.read",
     },
     {
-        "key": "community.quests",
+        "key": "community.quests",  # #310: the quests — reading, playing, asking — among the games
         "owner": "module:community",
         "kind": "entry",
         "label_key": "nav.community_quests",
         "icon": "target",
-        "route": "/community/quests",
-        "group": "me",
-        "order_hint": 2,
+        "route": "/games/quests",
+        "group": "games",
+        "order_hint": 15,
         "required_permission": "community.read",
     },
     {
