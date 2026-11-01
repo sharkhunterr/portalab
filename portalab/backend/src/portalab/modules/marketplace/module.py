@@ -208,10 +208,15 @@ class MarketplaceModule:
             return False
         return True
 
-    async def _launch_project(self, user: UUID, ownership: UUID, title: str, pitch: str) -> None:
-        """027: a ``project_launch`` purchase opens a community project as a proposal (once)."""
+    async def _launch_project(
+        self, user: UUID, ownership: UUID, title: str, pitch: str, goal: int | None = None
+    ) -> None:
+        """027: a ``project_launch`` purchase opens a community project as a proposal (once) — #304: with the
+        goal its member proposes, which the administrators confirm or change when they open its funding."""
         project = await self.projects.register(f"purchase:{ownership}", user, title)
         if project.state == "idea":
+            if goal is not None:
+                await self.projects.propose_goal(project.id, goal)
             await self.transition(SYSTEM_PRINCIPAL, project.id, "proposal", note=pitch or None)
 
     def _identity_provider(self) -> Any:

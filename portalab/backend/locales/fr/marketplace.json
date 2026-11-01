@@ -409,7 +409,7 @@
   "projects.gathered": "Coins rassemblés",
   "projects.intro": "Les idées des membres, financées ensemble en Coins : votez, contribuez, suivez leur avancée.",
   "projects.launch": "Lancer un projet",
-  "projects.launchHint": "Lancez votre projet depuis la boutique : titre, pitch, et la communauté peut le financer.",
+  "projects.launchHint": "Lancez votre projet depuis la boutique : un titre, un pitch, l'objectif à atteindre, et la communauté peut le financer.",
   "projects.launchTitle": "Une idée de fonctionnalité ?",
   "projects.propose": "En proposer un",
   "projects.stage.all": "Tous",
@@ -891,5 +891,10 @@
   "funders.empty": "Personne n'a encore contribué : soyez le premier !",
   "console.goal": "Objectif (facultatif)",
   "console.goalHint": "Montant à réunir, affiché aux membres.",
-  "console.cap": "Plafond par membre"
+  "console.cap": "Plafond par membre",
+  "owned.launchGoal": "Objectif à atteindre",
+  "owned.launchGoalHint": "Combien de Coins le projet doit réunir. Les administrateurs le confirment, ou l'ajustent, en ouvrant son financement.",
+  "projects.goalProposed": "{gathered} sur {goal} (objectif proposé)",
+  "funding.ofProposedGoal": "sur un objectif proposé de {goal}",
+  "console.goalProposed": "Proposé par le membre : {goal}. Gardez-le ou ajustez-le."
 }

@@ -409,7 +409,7 @@
   "projects.gathered": "Coins gathered",
   "projects.intro": "Members' ideas, funded together with Coins: vote, contribute, follow how they progress.",
   "projects.launch": "Launch a project",
-  "projects.launchHint": "Launch your project from the shop: a title, a pitch, and the community can fund it.",
+  "projects.launchHint": "Launch your project from the shop: a title, a pitch, the goal to reach, and the community can fund it.",
   "projects.launchTitle": "A feature idea?",
   "projects.propose": "Propose one",
   "projects.stage.all": "All",
@@ -891,5 +891,10 @@
   "funders.empty": "Nobody has contributed yet: be the first!",
   "console.goal": "Goal (optional)",
   "console.goalHint": "The amount to gather, shown to members.",
-  "console.cap": "Cap per member"
+  "console.cap": "Cap per member",
+  "owned.launchGoal": "Goal to reach",
+  "owned.launchGoalHint": "How many Coins the project needs. The administrators confirm it, or adjust it, when they open its funding.",
+  "projects.goalProposed": "{gathered} of {goal} (proposed goal)",
+  "funding.ofProposedGoal": "of a proposed {goal} goal",
+  "console.goalProposed": "Proposed by the member: {goal}. Keep it or adjust it."
 }

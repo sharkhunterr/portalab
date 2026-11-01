@@ -210,6 +210,14 @@ class Projects:
                 ).scalars()
             )
 
+    async def propose_goal(self, project_id: UUID, goal: int) -> None:
+        """#304: the goal proposed for a project not open yet — shown as proposed; the funding rules set at
+        its opening confirm or change it, and freeze it."""
+        async with self.database.unit_of_work() as uow:
+            project = await uow.session.get(Project, project_id, with_for_update=True)
+            if project is not None and project.rules_frozen_at is None:
+                project.goal_amount = goal
+
     # --- what is new to a member (#303) -----------------------------------------------------------------
     async def unseen(self, user: UUID) -> int:
         """The projects added or moved on since I last opened them (all of them, never opened) — an idea

@@ -100,10 +100,13 @@ export function ProjectPage() {
           <Icon name={STATE_ICON[data.state] ?? "lightbulb"} size={14} />
           {t(`marketplace:state.${data.state}`)}
         </span>
-        <Link to={`/community/proposals/${data.proposal_ref}`}>
-          {t("marketplace:project.proposal")}
-          <Icon name="chevron-right" size={14} />
-        </Link>
+        {/* issue 304: a project launched from the shop has no community proposal (its pitch is its first note) */}
+        {data.proposal_ref.startsWith("purchase:") ? null : (
+          <Link to={`/community/proposals/${data.proposal_ref}`}>
+            {t("marketplace:project.proposal")}
+            <Icon name="chevron-right" size={14} />
+          </Link>
+        )}
       </p>
       <Timeline project={data} />
       <div className="project-page__funding">

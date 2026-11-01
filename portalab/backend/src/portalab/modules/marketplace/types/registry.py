@@ -202,12 +202,21 @@ class BundleHandler(Owned):
         return ActivationResult("active")
 
 
+def _goal(raw: Any) -> int | None:
+    """#304: the goal a member proposes for their project — a whole amount, else none."""
+    try:
+        goal = int(raw)
+    except (TypeError, ValueError):
+        return None
+    return goal if 1 <= goal <= 1_000_000_000 else None
+
+
 class ProjectLaunchHandler(Owned):
     """``project_launch`` (027): buying it launches a community project for something the member wants —
-    they name it and pitch it (the owner's configuration ``title`` and ``pitch``), then it starts as a
-    proposal the community funds. Not refundable once launched."""
+    they name it, pitch it and say how much it needs (the owner's configuration ``title``, ``pitch`` and
+    ``goal``, #304), then it starts as a proposal the community funds. Not refundable once launched."""
 
-    def __init__(self, launch: Callable[[UUID, UUID, str, str], Awaitable[None]] | None) -> None:
+    def __init__(self, launch: Callable[[UUID, UUID, str, str, int | None], Awaitable[None]] | None) -> None:
         self.launch = launch
 
     async def activate(self, ownership: OwnershipView) -> ActivationResult:
@@ -221,6 +230,7 @@ class ProjectLaunchHandler(Owned):
             ownership.id,
             title[:200],
             str(ownership.configuration.get("pitch") or "")[:2000],
+            _goal(ownership.configuration.get("goal")),
         )
         return ActivationResult("active")
 
@@ -425,7 +435,7 @@ def register_builtin_types(
     config: Callable[[], Any],
     *,
     bundle_grant: Callable[[UUID, str, str], Awaitable[bool]] | None = None,
-    project_launch: Callable[[UUID, UUID, str, str], Awaitable[None]] | None = None,
+    project_launch: Callable[[UUID, UUID, str, str, int | None], Awaitable[None]] | None = None,
     requests: Any | None = None,
     booster_seal: Callable[[UUID, str, str], Awaitable[None]] | None = None,
 ) -> None:
