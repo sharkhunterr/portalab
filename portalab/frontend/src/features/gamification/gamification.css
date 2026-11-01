@@ -2103,3 +2103,32 @@
   background: color-mix(in srgb, var(--state-partial-fg) 22%, transparent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--state-partial-fg) 60%, transparent);
 }
+
+/* issue 309: a step's conditions, under its action and count, across the whole row */
+.gam-step-filters {
+  order: 1;
+  flex: 1 1 100%;
+  display: grid;
+  gap: var(--space-2);
+  padding-inline-start: var(--space-3);
+  border-inline-start: 2px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+.gam-step-filters__title {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+.gam-step-filters > .ds-button {
+  justify-self: start;
+}
+/* issue 309: on a phone, a field never grows wider than its row — an action's menu holds long names */
+.gam-fieldset > *,
+.gam-criterion > .ds-field,
+.gam-condition > .ds-field {
+  min-inline-size: 0;
+}
+.gam-criterion select,
+.gam-condition select {
+  inline-size: 100%;
+  min-inline-size: 0;
+}

@@ -954,5 +954,11 @@
   "quests.backIn": "Back in {time}",
   "quests.backOn": "Back on {date}",
   "quests.group.open": "{count, plural, one {# to do} other {# to do}}",
-  "quests.group.done": "{count, plural, one {# done} other {# done}}"
+  "quests.group.done": "{count, plural, one {# done} other {# done}}",
+  "admin.quest.kinds.discovery": "Discovery",
+  "admin.quest.amongHint": "Several values, separated by commas.",
+  "admin.quest.filters": "Only if",
+  "action.quest_completed": "Quest or objective done",
+  "action.achievement_unlocked": "Achievement unlocked",
+  "action.user_level_up": "Level reached"
 }

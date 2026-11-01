@@ -1352,7 +1352,8 @@ export interface paths {
         };
         /**
          * Event Types
-         * @description Every action a rule may reward, with the attributes a rule may test or count.
+         * @description Every action a rule may reward, with the attributes a rule may test or count; with ``goals``, also
+         *     what achievements and quests may count of the progression itself.
          */
         get: operations["event_types_api_v1_admin_gamification_event_types_get"];
         put?: never;
@@ -22541,7 +22542,9 @@ export interface operations {
     };
     event_types_api_v1_admin_gamification_event_types_get: {
         parameters: {
-            query?: never;
+            query?: {
+                goals?: boolean;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -22555,6 +22558,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EventTypeOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

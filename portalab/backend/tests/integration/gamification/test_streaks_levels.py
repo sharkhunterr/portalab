@@ -83,6 +83,11 @@ async def test_tuning_api(gm: GamHarness, client: AsyncClient) -> None:
     assert {"name": "minutes", "numeric": True} in played["fields"]
     assert {"name": "genre", "numeric": False} in played["fields"]
     assert not any(t["name"] == "user.level_up" for t in types)
+    # #309: achievements and quests may also count the progression itself (a quest done twenty days…)
+    goals = (await client.get("/api/v1/admin/gamification/event-types?goals=true")).json()
+    done = next(t for t in goals if t["name"] == "quest.completed")
+    assert {"name": "quest", "numeric": False} in done["fields"]
+    assert not any(t["name"] == "reward.granted" for t in goals)
 
     saved = await client.put(
         "/api/v1/admin/gamification/streak", json={**STREAK, "tiers": STREAK["tiers"][::-1]}

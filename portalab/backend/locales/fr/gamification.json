@@ -954,5 +954,11 @@
   "quests.backIn": "De retour dans {time}",
   "quests.backOn": "De retour le {date}",
   "quests.group.open": "{count, plural, one {# à faire} other {# à faire}}",
-  "quests.group.done": "{count, plural, one {# validé} other {# validés}}"
+  "quests.group.done": "{count, plural, one {# validé} other {# validés}}",
+  "admin.quest.kinds.discovery": "Découverte",
+  "admin.quest.amongHint": "Plusieurs valeurs séparées par des virgules.",
+  "admin.quest.filters": "Seulement si",
+  "action.quest_completed": "Quête ou objectif accompli",
+  "action.achievement_unlocked": "Succès débloqué",
+  "action.user_level_up": "Niveau atteint"
 }

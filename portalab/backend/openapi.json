@@ -26585,8 +26585,20 @@
     },
     "/api/v1/admin/gamification/event-types": {
       "get": {
-        "description": "Every action a rule may reward, with the attributes a rule may test or count.",
+        "description": "Every action a rule may reward, with the attributes a rule may test or count; with ``goals``, also\nwhat achievements and quests may count of the progression itself.",
         "operationId": "event_types_api_v1_admin_gamification_event_types_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "goals",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Goals",
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -26601,6 +26613,16 @@
               }
             },
             "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
           }
         },
         "summary": "Event Types",

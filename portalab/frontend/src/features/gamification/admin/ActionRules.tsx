@@ -16,6 +16,7 @@ import { ApiError } from "../../../state/regions";
 import { GameRuleBuilder, gameRuleChips, useProposedGameRules } from "../../games/RewardRules";
 import { type RewardRule, useRuleAdmin, useRules, type Value } from "../api";
 import { SimulationPanel } from "./SimulationPanel";
+import { OPS, PLAY_KINDS, parseValue, playName } from "./StepFilters";
 import {
   actionLabel,
   type Condition,
@@ -39,19 +40,6 @@ const OWNER_ICONS: Record<string, string> = {
   campaigns: "flame",
   games: "dices", // issue 265: the games page
 };
-const OPS: Condition["op"][] = ["eq", "ne", "in", "gt", "gte", "lt", "lte"];
-// issue 160: the kinds a play may be — picked as chips for the playback actions, shown by their names
-const PLAY_KINDS: Array<[raw: string, source: string]> = [
-  ["episode", "episode"],
-  ["movie", "movie"],
-  ["live", "live"],
-  ["book", "book"],
-  ["audiobook", "audiobook"],
-  ["track", "music"],
-  ["game", "game"],
-];
-const playName = (t: (key: string) => string, raw: string) =>
-  t(`gamification:sources.${PLAY_KINDS.find(([kind]) => kind === raw)?.[1] ?? "media"}`);
 
 export function ownerIcon(eventType: string): string {
   const head = eventType.split(".")[0] ?? "";
@@ -184,17 +172,6 @@ function fromRows(rows: Record<Value, GrantRow>): RuleGrant[] {
     if (grant.amount || grant.per_unit) out.push(grant);
   }
   return out;
-}
-
-function parseValue(raw: string, numeric: boolean, op: Condition["op"]): Condition["value"] {
-  const one = (text: string) =>
-    numeric && text.trim() !== "" && !Number.isNaN(Number(text)) ? Number(text) : text.trim();
-  if (op === "in")
-    return raw
-      .split(",")
-      .map(one)
-      .filter((v) => v !== "");
-  return one(raw);
 }
 
 function RuleForm({
