@@ -1,0 +1,180 @@
+"""#316 — self-writing newsletter editions: built-in and own templates; a preview of a template being
+written, drawn as an e-mail page (escaped, its palette, its sections in order); a draft published then
+e-mailed once; members read the published editions only, framed by the portal; an edition's pictures
+answer by its token alone, and only those it shows; an « edition » schedule writes and publishes one."""
+
+from datetime import date, datetime, timedelta
+from typing import Any
+from uuid import UUID
+
+import httpx
+import pytest
+from sqlalchemy import select
+
+from portalab.capabilities.media import DIGEST, EDITION, DigestItem
+from portalab.core.time import FixedClock
+from portalab.modules.news.models import Category
+from tests.integration.content.conftest import ContentHarness
+from tests.integration.identity.helpers import login
+
+pytestmark = pytest.mark.integration
+
+POSTER = "0190aaaa-0000-7000-8000-000000000001"
+OTHER = "0190aaaa-0000-7000-8000-000000000002"
+
+
+class _Library:
+    def __init__(self, today: date) -> None:
+        self.items = [
+            DigestItem(
+                "Dune <3>",
+                "movie",
+                (today - timedelta(days=2)).isoformat(),
+                "/media/a",
+                object_id="0190bbbb-0000-7000-8000-00000000000a",
+                picture=POSTER,
+                year=2026,
+                genres=("Science-fiction",),
+                overview="Le désert, encore.",
+                rating=8.1,
+            ),
+            DigestItem("Andor", "series", (today - timedelta(days=1)).isoformat(), "/media/b", "S02E05"),
+        ]
+
+    async def releases(self, since: date, until: date, limit: int) -> list[DigestItem]:
+        return []
+
+    async def additions(self, since: datetime, limit: int) -> list[DigestItem]:
+        return self.items[:limit]
+
+    async def upcoming(self, until: date, limit: int) -> list[DigestItem]:
+        return []
+
+    async def period(self, days: int, *, top: int) -> dict[str, Any]:
+        return {
+            "totals": {"plays": 42, "seconds": 36_000.0, "members": 5, "works": 12},
+            "previous": {"seconds": 30_000.0},
+            "by_kind": [{"kind": "movie", "plays": 10, "seconds": 20_000.0}],
+            "top": [{"item": self.items[1], "plays": 9, "seconds": 18_000.0}],
+        }
+
+    async def picture(self, image_id: str) -> bytes | None:
+        return b"\xff\xd8poster" if image_id in (POSTER, OTHER) else None
+
+
+async def test_editions(
+    client: httpx.AsyncClient, ct: ContentHarness, people: dict[str, UUID], clock: FixedClock
+) -> None:
+    library = _Library(clock.now().date())
+    capabilities = ct.ev.full.identity.capabilities
+    capabilities.provide(DIGEST, library, instance_ref="test-editions", owner="test")
+    capabilities.provide(EDITION, library, instance_ref="test-editions", owner="test")
+    await login(client, "boss")
+    await client.put(
+        "/api/v1/admin/news/categories",
+        json={"key": "lettre", "name": "La lettre", "newsletter": True},
+    )
+    async with ct.database.session() as session:
+        channel = await session.scalar(select(Category).where(Category.key == "lettre"))
+    assert channel is not None
+
+    # the built-in templates, then one of the news desk's own (the built-in ones cannot change)
+    listed = (await client.get("/api/v1/admin/news/newsletter-templates")).json()
+    assert [t["key"] for t in listed] == ["classic", "midnight", "gazette"]
+    classic = listed[0]["definition"]
+    assert (
+        await client.put("/api/v1/admin/news/newsletter-templates/classic", json=classic)
+    ).status_code == 422
+    own = {
+        **classic,
+        "name": "Ma lettre",
+        "brand": "Xeno <portal>",
+        "palette": {**classic["palette"], "accent": "#123456"},
+        "sections": [
+            {"kind": "notice"},
+            {"kind": "top", "layout": "list", "limit": 3},
+            {"kind": "additions", "layout": "grid", "columns": 2, "media": ["movie"]},
+        ],
+    }
+    saved = await client.put("/api/v1/admin/news/newsletter-templates/ma-lettre", json=own)
+    assert saved.status_code == 200
+    bad = {**own, "palette": {**own["palette"], "text": "red; background:url(x)"}}
+    assert (await client.put("/api/v1/admin/news/newsletter-templates/bad", json=bad)).status_code == 422
+
+    # a preview of the template as it is being written
+    preview = await client.post(
+        "/api/v1/admin/news/newsletter-editions/preview",
+        json={"template_key": "ma-lettre", "definition": own, "notice": "Maintenance <samedi>", "days": 7},
+    )
+    assert preview.status_code == 200 and preview.json()["status"] == "preview"
+    page = await client.get(f"/api/v1/admin/news/newsletter-editions/{preview.json()['id']}/page")
+    assert page.status_code == 200 and "frame-ancestors 'self'" in page.headers["content-security-policy"]
+    html = page.text
+    assert "#123456" in html and "Xeno &lt;portal&gt;" in html and "Maintenance &lt;samedi&gt;" in html
+    assert "Dune &lt;3&gt;" in html and "<3>" not in html and "Andor" in html  # the top, then the films
+    assert html.index("Maintenance") < html.index("Andor") < html.index("Dune")
+    assert "Science-fiction" in html and "8.1" in html
+
+    # a draft, then published and e-mailed once to the channel's subscribers
+    draft = (
+        await client.post(
+            "/api/v1/admin/news/newsletter-editions",
+            json={"template_key": "classic", "category_id": str(channel.id)},
+        )
+    ).json()
+    assert draft["status"] == "draft"
+    await login(client, "rita")
+    assert (await client.get("/api/v1/news/editions")).json() == []
+    assert (await client.get(f"/api/v1/news/editions/{draft['id']}/page")).status_code == 404
+    await login(client, "boss")
+    sent = await client.post(
+        f"/api/v1/admin/news/newsletter-editions/{draft['id']}/publish", json={"email": True}
+    )
+    assert sent.json()["status"] == "published" and sent.json()["recipients"] > 0
+    again = await client.post(
+        f"/api/v1/admin/news/newsletter-editions/{draft['id']}/publish", json={"email": True}
+    )
+    assert again.status_code == 200
+    mails = [r for r in ct.outbox.sent if r.dedup_key == f"news.edition:{draft['id']}"]
+    assert len(mails) == 1 and mails[0].email_body is not None
+    mail = mails[0].email_body["html"]
+    assert "<table" in mail and "Dune &lt;3&gt;" in mail
+
+    # the members read it in the portal; its pictures answer by its token, and only its own
+    await login(client, "rita")
+    assert [e["id"] for e in (await client.get("/api/v1/news/editions")).json()] == [draft["id"]]
+    shown = await client.get(f"/api/v1/news/editions/{draft['id']}/page")
+    assert shown.status_code == 200 and shown.headers["x-frame-options"] == "SAMEORIGIN"
+    start = shown.text.index("/api/v1/newsletters/pictures/")
+    address = shown.text[start : shown.text.index('"', start)]
+    await client.post("/api/v1/auth/logout")
+    anonymous = httpx.AsyncClient(transport=client._transport, base_url=str(client.base_url))
+    picture = await anonymous.get(address)
+    assert picture.status_code == 200 and picture.content.startswith(b"\xff\xd8")
+    assert (await anonymous.get(address.replace(POSTER, OTHER))).status_code == 404
+    assert (await anonymous.get(address.replace(address.split("/")[-2], "x" * 43))).status_code == 404
+
+    # an « edition » schedule writes and publishes its edition
+    await login(client, "boss")
+    schedule = await client.post(
+        "/api/v1/admin/news/newsletters",
+        json={
+            "name": "La lettre du vendredi",
+            "category_id": str(channel.id),
+            "kind": "edition",
+            "template_key": "gazette",
+            "cadence": "weekly",
+            "weekday": 4,
+            "hour": 18,
+            "email": False,
+        },
+    )
+    assert schedule.status_code == 201 and schedule.json()["template_key"] == "gazette"
+    run = (await client.post(f"/api/v1/admin/news/newsletters/{schedule.json()['id']}/run")).json()
+    assert run["article"] is None and run["edition"]
+    editions = (await client.get("/api/v1/admin/news/newsletter-editions")).json()
+    assert {e["template_key"] for e in editions} == {"classic", "gazette"}
+    unknown = {**schedule.json(), "template_key": "nope"}
+    for field in ("id", "last_run_at", "next_run_at", "last_article_id"):
+        unknown.pop(field, None)
+    assert (await client.post("/api/v1/admin/news/newsletters", json=unknown)).status_code == 404

@@ -131,7 +131,7 @@ class NewsletterSchedule(NewsBase):
 
     __tablename__ = "newsletter_schedules"
     __table_args__ = (
-        CheckConstraint("kind IN ('releases', 'additions', 'upcoming')", name="kind"),
+        CheckConstraint("kind IN ('releases', 'additions', 'upcoming', 'edition')", name="kind"),
         CheckConstraint("cadence IN ('daily', 'weekly', 'monthly')", name="cadence"),
         CheckConstraint("weekday BETWEEN 0 AND 6 AND hour BETWEEN 0 AND 23", name="when"),
     )
@@ -152,8 +152,60 @@ class NewsletterSchedule(NewsBase):
     last_run_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     next_run_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     last_article_id: Mapped[UUID | None] = mapped_column()
+    # #316: a self-writing edition — drawn with this template, with this notice on top (a maintenance…)
+    template_key: Mapped[str | None] = mapped_column(String(64), info=not_personal("an edition's template"))
+    notice: Mapped[str | None] = mapped_column(Text, info=not_personal("an edition's notice"))
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class NewsletterTemplate(NewsBase):
+    """#316: an edition's template written by the news desk (the built-in ones live in the code): its look —
+    palette, font, header — and its sections, each with its display, order and number of titles."""
+
+    __tablename__ = "newsletter_templates"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    definition: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, nullable=False, info=not_personal("a template's look and sections")
+    )
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class NewsletterEdition(NewsBase):
+    """#316: one edition of a self-writing newsletter — what it told (a snapshot), drawn once as an e-mail
+    that the portal shows as it is; a preview or a draft until published (then readable by every member) and
+    e-mailed when asked. Its pictures are reachable by its token alone (mail clients carry no session)."""
+
+    __tablename__ = "newsletter_editions"
+    __table_args__ = (
+        CheckConstraint("status IN ('preview', 'draft', 'published')", name="status"),
+        UniqueConstraint("token", name="uq_newsletter_editions_token"),
+        Index("ix_newsletter_editions_published", "status", "published_at"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    schedule_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("news.newsletter_schedules.id", ondelete="SET NULL")
+    )
+    category_id: Mapped[UUID | None] = mapped_column(ForeignKey("news.categories.id", ondelete="SET NULL"))
+    template_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    title: Mapped[str] = mapped_column(String(200), nullable=False, info=not_personal("an edition's title"))
+    language: Mapped[str] = mapped_column(String(16), nullable=False)
+    days: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String(10), nullable=False)
+    data: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, nullable=False, info=not_personal("what an edition told: titles and the period's figures")
+    )
+    html: Mapped[str] = mapped_column(Text, nullable=False, info=not_personal("an edition as an e-mail"))
+    text: Mapped[str] = mapped_column(Text, nullable=False, info=not_personal("an edition as plain text"))
+    token: Mapped[str] = mapped_column(String(64), nullable=False, info=not_personal("an edition's token"))
+    created_by: Mapped[UUID | None] = mapped_column()
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    published_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    emailed_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    recipients: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
 
 class Feed(NewsBase):

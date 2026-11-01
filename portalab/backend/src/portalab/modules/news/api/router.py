@@ -190,7 +190,7 @@ class NewsletterScheduleIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: str = Field(min_length=1, max_length=120)
     category_id: UUID
-    kind: Literal["releases", "additions", "upcoming"]
+    kind: Literal["releases", "additions", "upcoming", "edition"]
     media_kinds: list[Literal["movie", "series", "book", "game", "album"]] = Field(default_factory=list)
     cadence: Literal["daily", "weekly", "monthly"]
     weekday: int = Field(default=0, ge=0, le=6)
@@ -198,6 +198,8 @@ class NewsletterScheduleIn(BaseModel):
     language: str = Field(default="fr", max_length=16)
     email: bool = True
     enabled: bool = True
+    template_key: str | None = Field(default=None, pattern=r"^[a-z0-9][a-z0-9_-]{1,62}$")  # #316: editions
+    notice: str | None = Field(default=None, max_length=2000)
 
 
 class NewsletterScheduleOut(NewsletterScheduleIn):
@@ -226,6 +228,8 @@ def _schedule_out(row: Any) -> NewsletterScheduleOut:
         language=row.language,
         email=row.email,
         enabled=row.enabled,
+        template_key=row.template_key,
+        notice=row.notice,
         last_run_at=row.last_run_at,
         next_run_at=row.next_run_at,
         last_article_id=row.last_article_id,
@@ -537,8 +541,11 @@ async def delete_schedule(principal: Publisher, schedule_id: UUID, module: Modul
 @router.post("/admin/news/newsletters/{schedule_id}/run", dependencies=NewslettersOn)
 async def run_schedule(principal: Publisher, schedule_id: UUID, module: Module) -> dict[str, Any]:
     """Write the newsletter now (« preview » it in the news desk); nothing when there is nothing to tell."""
-    article = await module.newsletters.generate(schedule_id, force=True)
-    return {"article": _editor(article).model_dump(mode="json") if article else None}
+    written = await module.newsletters.generate(schedule_id, force=True)
+    if isinstance(written, Article):
+        return {"article": _editor(written).model_dump(mode="json"), "edition": None}
+    # #316: an « edition » schedule writes an edition
+    return {"article": None, "edition": str(written.id) if written is not None else None}
 
 
 @router.post("/admin/news/articles/{article_id}/{action}", response_model=NewsEditorOut)

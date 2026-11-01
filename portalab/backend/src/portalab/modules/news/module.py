@@ -40,6 +40,7 @@ from portalab.modules.news import permissions as _permissions  # noqa: F401 — 
 from portalab.modules.news import settings as _settings  # noqa: F401 — declares settings
 from portalab.modules.news.ai_tools import NewsAiTools
 from portalab.modules.news.articles import PUBLISH_JOB, ArticleService
+from portalab.modules.news.editions.service import Editions
 from portalab.modules.news.events import register_event_types
 from portalab.modules.news.integrations import (
     FEATURED,
@@ -106,6 +107,8 @@ class NewsModule:
         )
         self.newsletters = Newsletters(database, self.articles, capabilities, clock=clock)  # 027
         self.articles.newsletter = self.newsletters.email_article
+        self.editions = Editions(database, self.newsletters, clock=clock)  # #316: self-writing editions
+        self.newsletters.editions = self.editions
         self.sources = FeedSources(database, capabilities, blobs, clock=clock)  # #299: news from elsewhere
 
     def register(self) -> None:

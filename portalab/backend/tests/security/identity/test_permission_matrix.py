@@ -28,6 +28,7 @@ PUBLIC_ROUTES = {
     "/api/v1/auth/oidc/callback",
     "/api/v1/terms",  # 027: the terms of use in force (the sign-in page links them)
     "/api/v1/media/remote/{ticket}/session/{path:path}",  # 027 (#11): a cast device's stream
+    "/api/v1/newsletters/pictures/{token}/{image_id}",  # #316: an e-mailed edition's pictures
 }
 
 EXPECTED_PERMISSIONS = {

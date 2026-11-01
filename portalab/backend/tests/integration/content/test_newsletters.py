@@ -96,7 +96,7 @@ async def test_newsletters(
     assert created.status_code == 201 and created.json()["next_run_at"] is not None
     schedule = created.json()["id"]
     empty = await client.post(f"/api/v1/admin/news/newsletters/{schedule}/run")
-    assert empty.json() == {"article": None}
+    assert empty.json() == {"article": None, "edition": None}
     today = clock.now().date()
     digest.items = [
         DigestItem("Dune 3", "movie", (today - timedelta(days=2)).isoformat(), "/media/a"),

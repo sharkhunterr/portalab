@@ -5972,6 +5972,172 @@
         "title": "EconomyTransactionPage",
         "type": "object"
       },
+      "EditionIn": {
+        "additionalProperties": false,
+        "properties": {
+          "category_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "days": {
+            "default": 7,
+            "maximum": 90.0,
+            "minimum": 1.0,
+            "title": "Days",
+            "type": "integer"
+          },
+          "language": {
+            "default": "fr",
+            "maxLength": 16,
+            "title": "Language",
+            "type": "string"
+          },
+          "notice": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notice"
+          },
+          "template_key": {
+            "pattern": "^[a-z0-9][a-z0-9_-]{1,62}$",
+            "title": "Template Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template_key"
+        ],
+        "title": "EditionIn",
+        "type": "object"
+      },
+      "EditionOut": {
+        "properties": {
+          "category_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "emailed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Emailed At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "language": {
+            "title": "Language",
+            "type": "string"
+          },
+          "preheader": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preheader"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "recipients": {
+            "title": "Recipients",
+            "type": "integer"
+          },
+          "schedule_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule Id"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "template_key": {
+            "title": "Template Key",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "template_key",
+          "status",
+          "language",
+          "days",
+          "preheader",
+          "category_id",
+          "schedule_id",
+          "created_at",
+          "published_at",
+          "emailed_at",
+          "recipients"
+        ],
+        "title": "EditionOut",
+        "type": "object"
+      },
       "EmailConfigIn": {
         "additionalProperties": false,
         "properties": {
@@ -12735,7 +12901,8 @@
             "enum": [
               "releases",
               "additions",
-              "upcoming"
+              "upcoming",
+              "edition"
             ],
             "title": "Kind",
             "type": "string"
@@ -12765,6 +12932,30 @@
             "minLength": 1,
             "title": "Name",
             "type": "string"
+          },
+          "notice": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notice"
+          },
+          "template_key": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z0-9][a-z0-9_-]{1,62}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Key"
           },
           "weekday": {
             "default": 0,
@@ -12825,7 +13016,8 @@
             "enum": [
               "releases",
               "additions",
-              "upcoming"
+              "upcoming",
+              "edition"
             ],
             "title": "Kind",
             "type": "string"
@@ -12891,6 +13083,30 @@
               }
             ],
             "title": "Next Run At"
+          },
+          "notice": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notice"
+          },
+          "template_key": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z0-9][a-z0-9_-]{1,62}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Key"
           },
           "weekday": {
             "default": 0,
@@ -13580,6 +13796,57 @@
           "pages"
         ],
         "title": "PagesOut",
+        "type": "object"
+      },
+      "Palette": {
+        "additionalProperties": false,
+        "properties": {
+          "accent": {
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "title": "Accent",
+            "type": "string"
+          },
+          "accent_text": {
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "title": "Accent Text",
+            "type": "string"
+          },
+          "background": {
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "title": "Background",
+            "type": "string"
+          },
+          "border": {
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "title": "Border",
+            "type": "string"
+          },
+          "muted": {
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "title": "Muted",
+            "type": "string"
+          },
+          "surface": {
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "title": "Surface",
+            "type": "string"
+          },
+          "text": {
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "background",
+          "surface",
+          "text",
+          "muted",
+          "accent",
+          "accent_text",
+          "border"
+        ],
+        "title": "Palette",
         "type": "object"
       },
       "PartyIn": {
@@ -14816,6 +15083,68 @@
           }
         },
         "title": "PresentationIn",
+        "type": "object"
+      },
+      "PreviewIn": {
+        "additionalProperties": false,
+        "properties": {
+          "category_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "days": {
+            "default": 7,
+            "maximum": 90.0,
+            "minimum": 1.0,
+            "title": "Days",
+            "type": "integer"
+          },
+          "definition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TemplateDefinition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "language": {
+            "default": "fr",
+            "maxLength": 16,
+            "title": "Language",
+            "type": "string"
+          },
+          "notice": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notice"
+          },
+          "template_key": {
+            "pattern": "^[a-z0-9][a-z0-9_-]{1,62}$",
+            "title": "Template Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template_key"
+        ],
+        "title": "PreviewIn",
         "type": "object"
       },
       "PrivacyInventory": {
@@ -17298,6 +17627,86 @@
         "title": "SecretIn",
         "type": "object"
       },
+      "Section": {
+        "additionalProperties": false,
+        "properties": {
+          "columns": {
+            "default": 3,
+            "maximum": 4.0,
+            "minimum": 2.0,
+            "title": "Columns",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "notice",
+              "stats",
+              "top",
+              "additions",
+              "releases",
+              "upcoming",
+              "articles"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "layout": {
+            "default": "grid",
+            "enum": [
+              "grid",
+              "list",
+              "hero",
+              "compact"
+            ],
+            "title": "Layout",
+            "type": "string"
+          },
+          "limit": {
+            "default": 8,
+            "maximum": 24.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "media": {
+            "items": {
+              "enum": [
+                "movie",
+                "series",
+                "book",
+                "game",
+                "album"
+              ],
+              "type": "string"
+            },
+            "maxItems": 5,
+            "title": "Media",
+            "type": "array"
+          },
+          "overview": {
+            "default": true,
+            "title": "Overview",
+            "type": "boolean"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "Section",
+        "type": "object"
+      },
       "SeenIn": {
         "additionalProperties": false,
         "properties": {
@@ -19775,6 +20184,104 @@
           "verdict"
         ],
         "title": "TasteVerdictOut",
+        "type": "object"
+      },
+      "TemplateDefinition": {
+        "additionalProperties": false,
+        "properties": {
+          "brand": {
+            "default": "",
+            "maxLength": 60,
+            "title": "Brand",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "maxLength": 240,
+            "title": "Description",
+            "type": "string"
+          },
+          "font": {
+            "default": "sans",
+            "enum": [
+              "sans",
+              "serif",
+              "rounded",
+              "mono"
+            ],
+            "title": "Font",
+            "type": "string"
+          },
+          "header": {
+            "default": "banner",
+            "enum": [
+              "banner",
+              "centered",
+              "minimal"
+            ],
+            "title": "Header",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "palette": {
+            "$ref": "#/components/schemas/Palette"
+          },
+          "radius": {
+            "default": 12,
+            "maximum": 24.0,
+            "minimum": 0.0,
+            "title": "Radius",
+            "type": "integer"
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/Section"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Sections",
+            "type": "array"
+          },
+          "tagline": {
+            "default": "",
+            "maxLength": 160,
+            "title": "Tagline",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "palette",
+          "sections"
+        ],
+        "title": "TemplateDefinition",
+        "type": "object"
+      },
+      "TemplateOut": {
+        "properties": {
+          "builtin": {
+            "title": "Builtin",
+            "type": "boolean"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/TemplateDefinition"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "builtin",
+          "definition"
+        ],
+        "title": "TemplateOut",
         "type": "object"
       },
       "TermsAdminOut": {
@@ -22738,6 +23245,18 @@
           "boosters"
         ],
         "title": "DayOut",
+        "type": "object"
+      },
+      "portalab__modules__news__api__editions__PublishIn": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "default": false,
+            "title": "Email",
+            "type": "boolean"
+          }
+        },
+        "title": "PublishIn",
         "type": "object"
       },
       "portalab__modules__plugins__api__confined__ConfirmIn": {
@@ -26585,7 +27104,7 @@
     },
     "/api/v1/admin/gamification/event-types": {
       "get": {
-        "description": "Every action a rule may reward, with the attributes a rule may test or count; with ``goals``, also\nwhat achievements and quests may count of the progression itself.",
+        "description": "Every action a rule may reward, with the attributes a rule may test or count; with ``goals`` (#309),\nalso what achievements and quests may count of the progression itself \u2014 never a rule's, which would\nfeed on its own grants.",
         "operationId": "event_types_api_v1_admin_gamification_event_types_get",
         "parameters": [
           {
@@ -31109,6 +31628,351 @@
           }
         },
         "summary": "Put Category",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/newsletter-editions": {
+      "get": {
+        "operationId": "all_editions_api_v1_admin_news_newsletter_editions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EditionOut"
+                  },
+                  "title": "Response All Editions Api V1 Admin News Newsletter Editions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "All Editions",
+        "tags": [
+          "news"
+        ]
+      },
+      "post": {
+        "operationId": "create_edition_api_v1_admin_news_newsletter_editions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Edition",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/newsletter-editions/preview": {
+      "post": {
+        "description": "What the template would write now \u2014 its page at ``\u2026/{id}/page`` (kept until the next preview).",
+        "operationId": "preview_api_v1_admin_news_newsletter_editions_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/newsletter-editions/{edition_id}": {
+      "delete": {
+        "operationId": "delete_edition_api_v1_admin_news_newsletter_editions__edition_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "edition_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Edition Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Edition",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/newsletter-editions/{edition_id}/page": {
+      "get": {
+        "description": "Any edition's page \u2014 a preview, a draft \u2014 for the news desk.",
+        "operationId": "draft_page_api_v1_admin_news_newsletter_editions__edition_id__page_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "edition_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Edition Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Draft Page",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/newsletter-editions/{edition_id}/publish": {
+      "post": {
+        "operationId": "publish_edition_api_v1_admin_news_newsletter_editions__edition_id__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "edition_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Edition Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/portalab__modules__news__api__editions__PublishIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Publish Edition",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/newsletter-templates": {
+      "get": {
+        "description": "The built-in templates first (the interface names them in its language), then the news desk's own.",
+        "operationId": "templates_api_v1_admin_news_newsletter_templates_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TemplateOut"
+                  },
+                  "title": "Response Templates Api V1 Admin News Newsletter Templates Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Templates",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/admin/news/newsletter-templates/{key}": {
+      "delete": {
+        "operationId": "delete_template_api_v1_admin_news_newsletter_templates__key__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9_-]{1,62}$",
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Template",
+        "tags": [
+          "news"
+        ]
+      },
+      "put": {
+        "operationId": "put_template_api_v1_admin_news_newsletter_templates__key__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9_-]{1,62}$",
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateDefinition"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Template",
         "tags": [
           "news"
         ]
@@ -50136,6 +51000,111 @@
           }
         },
         "summary": "Categories",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/news/editions": {
+      "get": {
+        "operationId": "editions_api_v1_news_editions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EditionOut"
+                  },
+                  "title": "Response Editions Api V1 News Editions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Editions",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/news/editions/{edition_id}": {
+      "get": {
+        "operationId": "edition_api_v1_news_editions__edition_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "edition_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Edition Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edition",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/news/editions/{edition_id}/page": {
+      "get": {
+        "description": "The edition as it was e-mailed \u2014 the portal frames it.",
+        "operationId": "edition_page_api_v1_news_editions__edition_id__page_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "edition_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Edition Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edition Page",
         "tags": [
           "news"
         ]

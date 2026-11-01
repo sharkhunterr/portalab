@@ -36,6 +36,7 @@ ALLOW_LISTED = {
     "/api/v1/i18n/public/languages",  # issue 246: the arrival wizard and sign-in in the visitor's language
     "/api/v1/i18n/public/catalogs/{namespace}",
     "/api/v1/media/remote/{ticket}/session/{path:path}",  # 027 (#11): a cast device's stream
+    "/api/v1/newsletters/pictures/{token}/{image_id}",  # #316: an e-mailed edition's pictures
     "/api/v1/admin/first-run",  # spec 020: public only until the sole Admin exists
     "/api/v1/admin/first-run/import",  # issue 247: the arrival wizard brings a backup in (until set up)
     "/api/v1/admin/first-run/import/upload",

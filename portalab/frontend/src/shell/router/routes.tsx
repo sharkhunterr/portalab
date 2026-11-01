@@ -60,6 +60,10 @@ const MediaRequestsAdmin = lazy(() => import("../../features/admin/media/Request
 const NewsPage = lazy(() => import("../../features/news/NewsPage"));
 const Article = lazy(() => import("../../features/news/ArticlePage"));
 const NewsAdmin = lazy(() => import("../../features/news/NewsAdmin"));
+const Editions = lazy(() => import("../../features/news/editions/EditionsPage")); // issue 316
+const Edition = lazy(() =>
+  import("../../features/news/editions/EditionsPage").then((m) => ({ default: m.EditionPage })),
+);
 const WikiHome = lazy(() => import("../../features/wiki/WikiHome"));
 const WikiPage = lazy(() => import("../../features/wiki/PageView"));
 const WikiEditor = lazy(() => import("../../features/wiki/PageEditor"));
@@ -338,6 +342,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           handle: h({ crumb: "News", requiredPermission: "news.read" }),
           children: [
             { index: true, element: <NewsPage /> },
+            { path: "editions", element: <Editions />, handle: h({ crumb: "Newsletters" }) },
+            {
+              path: "editions/:editionId",
+              element: <Edition />,
+              handle: h({ crumb: "Newsletter", existenceSensitive: true }),
+            },
             {
               path: ":slug",
               element: <Article />,

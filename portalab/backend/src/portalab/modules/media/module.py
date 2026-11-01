@@ -22,7 +22,15 @@ from portalab.capabilities.events import (
 )
 from portalab.capabilities.i18n import RESOLVER as I18N_RESOLVER
 from portalab.capabilities.i18n import LocaleContext
-from portalab.capabilities.media import ACTIVITY_HISTORY, DIGEST, LIBRARY, MENTIONS, METADATA, REQUESTS
+from portalab.capabilities.media import (
+    ACTIVITY_HISTORY,
+    DIGEST,
+    EDITION,
+    LIBRARY,
+    MENTIONS,
+    METADATA,
+    REQUESTS,
+)
 from portalab.capabilities.media_core import (
     CARD_SOURCES,
     CATALOG,
@@ -84,7 +92,7 @@ from portalab.modules.media.insights.aggregate import JOB as AGGREGATE_JOB
 from portalab.modules.media.insights.aggregate import ActivityAggregator
 from portalab.modules.media.insights.calendar_source import MediaReleaseCalendarSource
 from portalab.modules.media.insights.deep import DeepInsights
-from portalab.modules.media.insights.digest import LibraryDigest
+from portalab.modules.media.insights.digest import LibraryDigest, LibraryEdition
 from portalab.modules.media.insights.enrich import JOB as ENRICH_JOB
 from portalab.modules.media.insights.enrich import MetadataEnricher
 from portalab.modules.media.insights.ingest import JOB as ACTIVITY_JOB
@@ -416,6 +424,13 @@ class MediaModule:
             self.capabilities.provide(
                 DIGEST,
                 LibraryDigest(self.database, self.upcoming, self.clock),
+                instance_ref="media",
+                owner=OWNER,
+            )
+        if not self.capabilities.system_providers(EDITION):  # #316: the self-writing newsletters' figures
+            self.capabilities.provide(
+                EDITION,
+                LibraryEdition(self.database, self.insights, self.images),
                 instance_ref="media",
                 owner=OWNER,
             )

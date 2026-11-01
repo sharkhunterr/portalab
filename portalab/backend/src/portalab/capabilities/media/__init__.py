@@ -1184,6 +1184,13 @@ class DigestItem:
     date: str  # ISO day
     route: str  # portal route (``/media/<id>`` or ``/media/insights``)
     detail: str | None = None  # « S02E05 », a release type…
+    # #316: what an edition's card tells of it — its picture (a portal image id), year, genres, overview
+    object_id: str | None = None
+    picture: str | None = None
+    year: int | None = None
+    genres: tuple[str, ...] = ()
+    overview: str | None = None
+    rating: float | None = None
 
 
 @runtime_checkable
@@ -1195,6 +1202,19 @@ class MediaDigest(Protocol):
     async def additions(self, since: datetime, limit: int) -> list[DigestItem]: ...
 
     async def upcoming(self, until: date, limit: int) -> list[DigestItem]: ...
+
+
+EDITION = "media.edition"
+
+
+@runtime_checkable
+class MediaEdition(Protocol):
+    """#316: what a self-writing newsletter tells beyond the titles — the period's figures (plays, hours,
+    members, by kind) and its most watched works — and the pictures it shows, by their portal id."""
+
+    async def period(self, days: int, *, top: int) -> dict[str, Any]: ...
+
+    async def picture(self, image_id: str) -> bytes | None: ...
 
 
 MENTIONS = "media.mentions"
@@ -1253,5 +1273,6 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(
         DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
     ),
+    _spec(EDITION, MediaEdition, "A newsletter edition's figures, most watched works and pictures (#316)"),
     _spec(MENTIONS, MediaMentions, "The library titles and people a text names, for the news (#299)"),
 )

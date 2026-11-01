@@ -1352,8 +1352,9 @@ export interface paths {
         };
         /**
          * Event Types
-         * @description Every action a rule may reward, with the attributes a rule may test or count; with ``goals``, also
-         *     what achievements and quests may count of the progression itself.
+         * @description Every action a rule may reward, with the attributes a rule may test or count; with ``goals`` (#309),
+         *     also what achievements and quests may count of the progression itself — never a rule's, which would
+         *     feed on its own grants.
          */
         get: operations["event_types_api_v1_admin_gamification_event_types_get"];
         put?: never;
@@ -2873,6 +2874,136 @@ export interface paths {
         put: operations["put_category_api_v1_admin_news_categories_put"];
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/newsletter-editions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** All Editions */
+        get: operations["all_editions_api_v1_admin_news_newsletter_editions_get"];
+        put?: never;
+        /** Create Edition */
+        post: operations["create_edition_api_v1_admin_news_newsletter_editions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/newsletter-editions/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview
+         * @description What the template would write now — its page at ``…/{id}/page`` (kept until the next preview).
+         */
+        post: operations["preview_api_v1_admin_news_newsletter_editions_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/newsletter-editions/{edition_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Edition */
+        delete: operations["delete_edition_api_v1_admin_news_newsletter_editions__edition_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/newsletter-editions/{edition_id}/page": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Draft Page
+         * @description Any edition's page — a preview, a draft — for the news desk.
+         */
+        get: operations["draft_page_api_v1_admin_news_newsletter_editions__edition_id__page_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/newsletter-editions/{edition_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish Edition */
+        post: operations["publish_edition_api_v1_admin_news_newsletter_editions__edition_id__publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/newsletter-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Templates
+         * @description The built-in templates first (the interface names them in its language), then the news desk's own.
+         */
+        get: operations["templates_api_v1_admin_news_newsletter_templates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/news/newsletter-templates/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put Template */
+        put: operations["put_template_api_v1_admin_news_newsletter_templates__key__put"];
+        post?: never;
+        /** Delete Template */
+        delete: operations["delete_template_api_v1_admin_news_newsletter_templates__key__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -9856,6 +9987,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/news/editions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Editions */
+        get: operations["editions_api_v1_news_editions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/news/editions/{edition_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Edition */
+        get: operations["edition_api_v1_news_editions__edition_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/news/editions/{edition_id}/page": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Edition Page
+         * @description The edition as it was e-mailed — the portal frames it.
+         */
+        get: operations["edition_page_api_v1_news_editions__edition_id__page_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/news/featured": {
         parameters: {
             query?: never;
@@ -13974,6 +14159,60 @@ export interface components {
             /** Next Cursor */
             next_cursor: string | null;
         };
+        /** EditionIn */
+        EditionIn: {
+            /** Category Id */
+            category_id?: string | null;
+            /**
+             * Days
+             * @default 7
+             */
+            days: number;
+            /**
+             * Language
+             * @default fr
+             */
+            language: string;
+            /** Notice */
+            notice?: string | null;
+            /** Template Key */
+            template_key: string;
+        };
+        /** EditionOut */
+        EditionOut: {
+            /** Category Id */
+            category_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Days */
+            days: number;
+            /** Emailed At */
+            emailed_at: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Language */
+            language: string;
+            /** Preheader */
+            preheader: string | null;
+            /** Published At */
+            published_at: string | null;
+            /** Recipients */
+            recipients: number;
+            /** Schedule Id */
+            schedule_id: string | null;
+            /** Status */
+            status: string;
+            /** Template Key */
+            template_key: string;
+            /** Title */
+            title: string;
+        };
         /** EmailConfigIn */
         EmailConfigIn: {
             /** Enabled */
@@ -16431,7 +16670,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "releases" | "additions" | "upcoming";
+            kind: "releases" | "additions" | "upcoming" | "edition";
             /**
              * Language
              * @default fr
@@ -16441,6 +16680,10 @@ export interface components {
             media_kinds?: ("movie" | "series" | "book" | "game" | "album")[];
             /** Name */
             name: string;
+            /** Notice */
+            notice?: string | null;
+            /** Template Key */
+            template_key?: string | null;
             /**
              * Weekday
              * @default 0
@@ -16483,7 +16726,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "releases" | "additions" | "upcoming";
+            kind: "releases" | "additions" | "upcoming" | "edition";
             /**
              * Language
              * @default fr
@@ -16499,6 +16742,10 @@ export interface components {
             name: string;
             /** Next Run At */
             next_run_at: string | null;
+            /** Notice */
+            notice?: string | null;
+            /** Template Key */
+            template_key?: string | null;
             /**
              * Weekday
              * @default 0
@@ -16725,6 +16972,23 @@ export interface components {
         PagesOut: {
             /** Pages */
             pages: number[];
+        };
+        /** Palette */
+        Palette: {
+            /** Accent */
+            accent: string;
+            /** Accent Text */
+            accent_text: string;
+            /** Background */
+            background: string;
+            /** Border */
+            border: string;
+            /** Muted */
+            muted: string;
+            /** Surface */
+            surface: string;
+            /** Text */
+            text: string;
         };
         /** PartyIn */
         PartyIn: {
@@ -17136,6 +17400,26 @@ export interface components {
             rarity: "common" | "rare" | "epic" | "legendary";
             /** Season */
             season?: ("valentine" | "spring" | "summer" | "halloween" | "christmas") | null;
+        };
+        /** PreviewIn */
+        PreviewIn: {
+            /** Category Id */
+            category_id?: string | null;
+            /**
+             * Days
+             * @default 7
+             */
+            days: number;
+            definition?: components["schemas"]["TemplateDefinition"] | null;
+            /**
+             * Language
+             * @default fr
+             */
+            language: string;
+            /** Notice */
+            notice?: string | null;
+            /** Template Key */
+            template_key: string;
         };
         /** PrivacyInventory */
         PrivacyInventory: {
@@ -17956,6 +18240,39 @@ export interface components {
             confirmation?: string | null;
             /** Value */
             value: string;
+        };
+        /** Section */
+        Section: {
+            /**
+             * Columns
+             * @default 3
+             */
+            columns: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "notice" | "stats" | "top" | "additions" | "releases" | "upcoming" | "articles";
+            /**
+             * Layout
+             * @default grid
+             * @enum {string}
+             */
+            layout: "grid" | "list" | "hero" | "compact";
+            /**
+             * Limit
+             * @default 8
+             */
+            limit: number;
+            /** Media */
+            media?: ("movie" | "series" | "book" | "game" | "album")[];
+            /**
+             * Overview
+             * @default true
+             */
+            overview: boolean;
+            /** Title */
+            title?: string | null;
         };
         /** SeenIn */
         SeenIn: {
@@ -18781,6 +19098,54 @@ export interface components {
             object_id: string | null;
             /** Verdict */
             verdict: ("like" | "dislike" | "later") | null;
+        };
+        /** TemplateDefinition */
+        TemplateDefinition: {
+            /**
+             * Brand
+             * @default
+             */
+            brand: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /**
+             * Font
+             * @default sans
+             * @enum {string}
+             */
+            font: "sans" | "serif" | "rounded" | "mono";
+            /**
+             * Header
+             * @default banner
+             * @enum {string}
+             */
+            header: "banner" | "centered" | "minimal";
+            /** Name */
+            name: string;
+            palette: components["schemas"]["Palette"];
+            /**
+             * Radius
+             * @default 12
+             */
+            radius: number;
+            /** Sections */
+            sections: components["schemas"]["Section"][];
+            /**
+             * Tagline
+             * @default
+             */
+            tagline: string;
+        };
+        /** TemplateOut */
+        TemplateOut: {
+            /** Builtin */
+            builtin: boolean;
+            definition: components["schemas"]["TemplateDefinition"];
+            /** Key */
+            key: string;
         };
         /** TermsAdminOut */
         TermsAdminOut: {
@@ -19823,6 +20188,14 @@ export interface components {
             grants: number;
             /** Purchases */
             purchases: number;
+        };
+        /** PublishIn */
+        portalab__modules__news__api__editions__PublishIn: {
+            /**
+             * Email
+             * @default false
+             */
+            email: boolean;
         };
         /** ConfirmIn */
         portalab__modules__plugins__api__confined__ConfirmIn: {
@@ -25572,6 +25945,269 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["NewsCategoryOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    all_editions_api_v1_admin_news_newsletter_editions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditionOut"][];
+                };
+            };
+        };
+    };
+    create_edition_api_v1_admin_news_newsletter_editions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_api_v1_admin_news_newsletter_editions_preview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_edition_api_v1_admin_news_newsletter_editions__edition_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                edition_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    draft_page_api_v1_admin_news_newsletter_editions__edition_id__page_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                edition_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_edition_api_v1_admin_news_newsletter_editions__edition_id__publish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                edition_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["portalab__modules__news__api__editions__PublishIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    templates_api_v1_admin_news_newsletter_templates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateOut"][];
+                };
+            };
+        };
+    };
+    put_template_api_v1_admin_news_newsletter_templates__key__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TemplateDefinition"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_template_api_v1_admin_news_newsletter_templates__key__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -38375,6 +39011,86 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NewsCategoryOut"][];
+                };
+            };
+        };
+    };
+    editions_api_v1_news_editions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditionOut"][];
+                };
+            };
+        };
+    };
+    edition_api_v1_news_editions__edition_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                edition_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edition_page_api_v1_news_editions__edition_id__page_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                edition_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
