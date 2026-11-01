@@ -2548,6 +2548,102 @@
     {
       "definition": {
         "complete_on": "all",
+        "description": "Du 19 décembre au 3 janvier : six films et dix épisodes.",
+        "icon": "tree",
+        "kind": "challenge",
+        "label": "Marathon des fêtes",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 250
+          },
+          {
+            "value": "coins",
+            "amount": 80
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "movie"
+              }
+            ],
+            "count": 6
+          },
+          {
+            "kind": "event_count",
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "episode"
+              }
+            ],
+            "count": 10
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": {
+          "starts_at": "2026-12-18T23:00:00Z",
+          "ends_at": "2027-01-03T23:00:00Z"
+        }
+      },
+      "key": "challenge_holidays_2026"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Huit films en novembre.",
+        "icon": "film",
+        "kind": "challenge",
+        "label": "Novembre cinéphile",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 150
+          },
+          {
+            "value": "coins",
+            "amount": 50
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "movie"
+              }
+            ],
+            "count": 8
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": {
+          "starts_at": "2026-10-31T23:00:00Z",
+          "ends_at": "2026-11-30T23:00:00Z"
+        }
+      },
+      "key": "challenge_november_2026"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
         "description": "Deux lectures dans la journée.",
         "icon": "clapperboard",
         "kind": "daily",
@@ -2606,6 +2702,136 @@
         }
       },
       "key": "daily_episode"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Jouez à un jeu de la page Jeux.",
+        "icon": "gamepad",
+        "kind": "daily",
+        "label": "Une partie par jour",
+        "period": "day",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 15
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "games.played",
+            "filter": [],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "daily_game"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Lisez une de vos notifications.",
+        "icon": "bell",
+        "kind": "daily",
+        "label": "Boîte aux lettres",
+        "period": "day",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 5
+          },
+          {
+            "value": "coins",
+            "amount": 5
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "notification.read",
+            "filter": [],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "daily_inbox"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Écoutez la radio au moins un quart d'heure d'affilée.",
+        "icon": "radio",
+        "kind": "daily",
+        "label": "La radio en fond",
+        "period": "day",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 10
+          },
+          {
+            "value": "coins",
+            "amount": 5
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "media.radio_listened",
+            "filter": [
+              {
+                "field": "minutes",
+                "op": "gte",
+                "value": 15
+              }
+            ],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "daily_radio"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Faites une recherche dans le portail.",
+        "icon": "search",
+        "kind": "daily",
+        "label": "Fouineur du jour",
+        "period": "day",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 10
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "search.performed",
+            "filter": [],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "daily_search"
     },
     {
       "definition": {
@@ -3173,6 +3399,353 @@
     {
       "definition": {
         "complete_on": "all",
+        "description": "Ce mois-ci : un film, un épisode, un livre ou livre audio, et une heure de radio d'affilée.",
+        "icon": "sparkles",
+        "kind": "daily",
+        "label": "Éclectique",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 150
+          },
+          {
+            "value": "coins",
+            "amount": 40
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "movie"
+              }
+            ],
+            "count": 1
+          },
+          {
+            "kind": "event_count",
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "episode"
+              }
+            ],
+            "count": 1
+          },
+          {
+            "kind": "event_count",
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "in",
+                "value": [
+                  "book",
+                  "audiobook"
+                ]
+              }
+            ],
+            "count": 1
+          },
+          {
+            "kind": "event_count",
+            "event_type": "media.radio_listened",
+            "filter": [
+              {
+                "field": "minutes",
+                "op": "gte",
+                "value": 60
+              }
+            ],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "monthly_eclectic"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Jouez au casting, à la scène floutée et au blind test ce mois-ci.",
+        "icon": "dices",
+        "kind": "daily",
+        "label": "Tour des jeux",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 80
+          },
+          {
+            "value": "coins",
+            "amount": 20
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "games.played",
+            "filter": [
+              {
+                "field": "game",
+                "op": "eq",
+                "value": "casting"
+              }
+            ],
+            "count": 1
+          },
+          {
+            "kind": "event_count",
+            "event_type": "games.played",
+            "filter": [
+              {
+                "field": "game",
+                "op": "eq",
+                "value": "poster"
+              }
+            ],
+            "count": 1
+          },
+          {
+            "kind": "event_count",
+            "event_type": "games.played",
+            "filter": [
+              {
+                "field": "game",
+                "op": "eq",
+                "value": "blindtest"
+              }
+            ],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "monthly_games_tour"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Proposez une idée pour améliorer le portail.",
+        "icon": "lightbulb",
+        "kind": "daily",
+        "label": "Idée lumineuse",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 40
+          },
+          {
+            "value": "coins",
+            "amount": 10
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "feedback.submitted",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "feature_request"
+              }
+            ],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "monthly_idea"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Regardez un titre qui va bientôt quitter la bibliothèque.",
+        "icon": "hourglass",
+        "kind": "daily",
+        "label": "Avant qu'il ne parte",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 60
+          },
+          {
+            "value": "coins",
+            "amount": 20
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "media.leaving_watched",
+            "filter": [],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "monthly_leaving"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Soutenez un projet de la communauté.",
+        "icon": "heart",
+        "kind": "daily",
+        "label": "Mécène",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 50
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "project.funding_added",
+            "filter": [],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "monthly_patron"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Passez sur le portail vingt jours dans le mois.",
+        "icon": "landmark",
+        "kind": "daily",
+        "label": "Pilier du portail",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 150
+          },
+          {
+            "value": "coins",
+            "amount": 40
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "quest.completed",
+            "filter": [
+              {
+                "field": "quest",
+                "op": "eq",
+                "value": "daily_visit"
+              }
+            ],
+            "count": 20
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "monthly_pillar"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Regardez un titre que vous aviez demandé, une fois arrivé.",
+        "icon": "gift",
+        "kind": "daily",
+        "label": "Promesse tenue",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 80
+          },
+          {
+            "value": "coins",
+            "amount": 20
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "media.request_watched",
+            "filter": [],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "monthly_promise"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Terminez une saison entière d'une série.",
+        "icon": "trophy",
+        "kind": "daily",
+        "label": "Saison bouclée",
+        "period": "month",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 100
+          },
+          {
+            "value": "coins",
+            "amount": 25
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "media.season_finished",
+            "filter": [],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "monthly_season"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
         "description": "Un achat dans la boutique ce mois-ci.",
         "icon": "shop",
         "kind": "daily",
@@ -3235,6 +3808,156 @@
         }
       },
       "key": "monthly_voice"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Signalez un bug au support.",
+        "icon": "bug",
+        "kind": "quest",
+        "label": "Chasseur de bugs",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 50
+          },
+          {
+            "value": "coins",
+            "amount": 15
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "ticket.created",
+            "filter": [
+              {
+                "field": "type",
+                "op": "eq",
+                "value": "bug"
+              }
+            ],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "quest_bug_hunter"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Faites dix demandes de films ou de séries.",
+        "icon": "library",
+        "kind": "quest",
+        "label": "Curateur",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 200
+          },
+          {
+            "value": "coins",
+            "amount": 60
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "media.request_created",
+            "filter": [],
+            "count": 10
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "quest_curator"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Regardez cent films jusqu'au bout.",
+        "icon": "clapperboard",
+        "kind": "quest",
+        "label": "Cent films",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 500
+          },
+          {
+            "value": "coins",
+            "amount": 150
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "movie"
+              }
+            ],
+            "count": 100
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "quest_hundred_movies"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Ouvrez un booster qui contient une carte légendaire.",
+        "icon": "crown",
+        "kind": "quest",
+        "label": "Main légendaire",
+        "period": "none",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 100
+          },
+          {
+            "value": "coins",
+            "amount": 30
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "cards.pack_opened",
+            "filter": [
+              {
+                "field": "legendary",
+                "op": "gte",
+                "value": 1
+              }
+            ],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "quest_legend"
     },
     {
       "definition": {
@@ -3317,6 +4040,68 @@
     {
       "definition": {
         "complete_on": "all",
+        "description": "Obtenez une réponse de l'assistant cette semaine.",
+        "icon": "bot",
+        "kind": "daily",
+        "label": "Une question à l'assistant",
+        "period": "week",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 20
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "ai.answered",
+            "filter": [],
+            "count": 1
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "weekly_assistant"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Jouez trois parties cette semaine.",
+        "icon": "joystick",
+        "kind": "daily",
+        "label": "Joueur de la semaine",
+        "period": "week",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 40
+          },
+          {
+            "value": "coins",
+            "amount": 10
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "games.played",
+            "filter": [],
+            "count": 3
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "weekly_gamer"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
         "description": "Cinq lectures cette semaine.",
         "icon": "flame",
         "kind": "daily",
@@ -3348,6 +4133,84 @@
         }
       },
       "key": "weekly_marathon"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Regardez deux films jusqu'au bout cette semaine.",
+        "icon": "popcorn",
+        "kind": "daily",
+        "label": "Soirée cinéma",
+        "period": "week",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 50
+          },
+          {
+            "value": "coins",
+            "amount": 10
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "movie"
+              }
+            ],
+            "count": 2
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "weekly_movie_night"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Réussissez « Une lecture par jour » cinq jours dans la semaine.",
+        "icon": "flame",
+        "kind": "daily",
+        "label": "Sans faute",
+        "period": "week",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 80
+          },
+          {
+            "value": "coins",
+            "amount": 20
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "quest.completed",
+            "filter": [
+              {
+                "field": "quest",
+                "op": "eq",
+                "value": "daily_episode"
+              }
+            ],
+            "count": 5
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "weekly_no_miss"
     },
     {
       "definition": {
@@ -3425,6 +4288,45 @@
         }
       },
       "key": "weekly_regular_visits"
+    },
+    {
+      "definition": {
+        "complete_on": "all",
+        "description": "Terminez cinq épisodes cette semaine.",
+        "icon": "tv",
+        "kind": "daily",
+        "label": "Épisodes à la chaîne",
+        "period": "week",
+        "requires": [],
+        "rewards": [
+          {
+            "value": "xp",
+            "amount": 40
+          },
+          {
+            "value": "coins",
+            "amount": 10
+          }
+        ],
+        "steps": [
+          {
+            "kind": "event_count",
+            "event_type": "media.playback_finished",
+            "filter": [
+              {
+                "field": "kind",
+                "op": "eq",
+                "value": "episode"
+              }
+            ],
+            "count": 5
+          }
+        ],
+        "translations": {},
+        "unlocks": [],
+        "window": null
+      },
+      "key": "weekly_series"
     },
     {
       "definition": {
