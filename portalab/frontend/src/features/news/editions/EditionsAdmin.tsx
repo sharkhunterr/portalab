@@ -19,6 +19,7 @@ import {
   useTemplates,
 } from "./api";
 import { EditionFrame } from "./EditionsPage";
+import { PreviewSwitch, useLivePreview } from "./PreviewSwitch";
 import "./editions.css";
 
 const KINDS: Section["kind"][] = [
@@ -223,17 +224,19 @@ function TemplateEditor({
     setDefinition({ ...definition, [field]: value });
   const sections = definition.sections;
   const setSections = (next: Section[]) => set("sections", next);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a preview a moment after each change
+  const [live, setLive] = useLivePreview();
+  const write = () =>
+    preview.mutate(
+      { template_key: key || "draft", days: 7, language: language(), definition, notice: null },
+      { onSuccess: (edition) => setShown(edition.id) },
+    );
+  // biome-ignore lint/correctness/useExhaustiveDependencies: issue 327 — live, a preview a moment after each change
   useEffect(() => {
+    if (!live) return;
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => {
-      preview.mutate(
-        { template_key: key || "draft", days: 7, language: language(), definition, notice: null },
-        { onSuccess: (edition) => setShown(edition.id) },
-      );
-    }, 700);
+    timer.current = window.setTimeout(write, 700);
     return () => window.clearTimeout(timer.current);
-  }, [definition]);
+  }, [definition, live]);
   const valid = /^[a-z0-9][a-z0-9_-]{1,62}$/.test(key) && definition.name.trim().length > 0;
   return (
     <div className="edition-editor">
@@ -365,9 +368,7 @@ function TemplateEditor({
         </FormActions>
       </form>
       <div className="edition-editor__preview" aria-busy={preview.isPending || undefined}>
-        <p className="admin-muted">
-          <Icon name="eye" size={14} /> {t("news:edition.admin.livePreview")}
-        </p>
+        <PreviewSwitch live={live} onLive={setLive} onPreview={write} busy={preview.isPending} />
         <Preview id={shown} title={definition.name} />
       </div>
     </div>

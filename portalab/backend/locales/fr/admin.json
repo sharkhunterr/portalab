@@ -1236,8 +1236,8 @@
   "setting.notifications.categoryPolicy.label": "Règles par catégorie",
   "setting.notifications.coalesceWindowSeconds.hint": "Durée pendant laquelle les notifications répétées sur un même sujet sont regroupées, en secondes.",
   "setting.notifications.coalesceWindowSeconds.label": "Fenêtre de regroupement",
-  "setting.notifications.digest.defaultMode.hint": "Récapitulatif par e-mail reçu par défaut par les membres : aucun, quotidien ou hebdomadaire.",
-  "setting.notifications.digest.defaultMode.label": "Récapitulatif par e-mail par défaut",
+  "setting.notifications.digest.defaultMode.hint": "Pour les membres qui n’ont rien choisi : leurs notifications par e-mail une par une (désactivé), ou regroupées dans un résumé quotidien ou hebdomadaire. Rien à voir avec les newsletters automatiques.",
+  "setting.notifications.digest.defaultMode.label": "Résumé des notifications par e-mail (par défaut)",
   "setting.notifications.email.digest.hint": "Récapitulatif par e-mail de ce membre : aucun, quotidien ou hebdomadaire.",
   "setting.notifications.email.digest.label": "Récapitulatif par e-mail",
   "setting.notifications.email.enabled.hint": "Envoie les notifications par e-mail via le serveur SMTP.",
@@ -2155,5 +2155,8 @@
   "email.stateOn": "L’envoi des e-mails est activé",
   "email.stateOff": "L’envoi des e-mails est désactivé : aucune lettre ne part par e-mail",
   "email.stateHint": "Le serveur d’envoi (SMTP), l’expéditeur et le test se règlent dans Configuration → Communication.",
-  "email.setUp": "Régler l’envoi"
+  "email.setUp": "Régler l’envoi",
+  "setting.notifications.digest.defaultMode.choice.off": "Désactivé (une par une)",
+  "setting.notifications.digest.defaultMode.choice.daily": "Résumé quotidien",
+  "setting.notifications.digest.defaultMode.choice.weekly": "Résumé hebdomadaire"
 }

@@ -21,6 +21,7 @@ import { json } from "../support/fake-api";
 describe("issue 325 — automatic newsletters", () => {
   it("writes one with its name and its subject's variables", async () => {
     const saved: Array<Record<string, unknown>> = [];
+    let previews = 0;
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;
       if (path === "/api/v1/admin/news/newsletters" && request.method === "POST") {
@@ -38,7 +39,10 @@ describe("issue 325 — automatic newsletters", () => {
           charts: ["figures"],
           chart_defaults: ["figures"],
         });
-      if (path === "/api/v1/admin/news/newsletter-editions/preview") return json(200, { id: "e1" });
+      if (path === "/api/v1/admin/news/newsletter-editions/preview") {
+        previews += 1;
+        return json(200, { id: "e1" });
+      }
       return json(404, {});
     };
     render(
@@ -53,6 +57,11 @@ describe("issue 325 — automatic newsletters", () => {
     fireEvent.change(screen.getByLabelText("E-mail subject"), { target: { value: "Week " } });
     fireEvent.click(screen.getByRole("button", { name: "{semaine}" }));
     await screen.findByRole("checkbox", { name: /Statistics/ }); // the contents offered are there
+    // issue 327: no preview written while typing — the live preview is off by default
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    expect(previews).toBe(0);
+    fireEvent.click(screen.getByRole("button", { name: /Generate the preview/ }));
+    await waitFor(() => expect(previews).toBe(1));
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(saved).toHaveLength(1));
     expect(saved[0]).toMatchObject({

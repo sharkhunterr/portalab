@@ -18,6 +18,7 @@ import { useChannels } from "../NewsChannels";
 import { templateName, useContents, useEditionActions, usePreview, useTemplates } from "./api";
 import { ContentPicker } from "./ContentPicker";
 import { EditionFrame } from "./EditionsPage";
+import { PreviewSwitch, useLivePreview } from "./PreviewSwitch";
 import "./editions.css";
 
 type Schedule = components["schemas"]["NewsletterScheduleOut"];
@@ -90,14 +91,21 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
     charts: values.charts ?? null,
     subject: values.subject ?? null,
   });
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a preview a moment after each change
+  const [live, setLive] = useLivePreview();
+  const write = (then?: (id: string) => void) =>
+    preview.mutate(ask(), {
+      onSuccess: (edition) => {
+        setShown(edition.id);
+        then?.(edition.id);
+      },
+    });
+  // biome-ignore lint/correctness/useExhaustiveDependencies: issue 327 — live, a preview a moment after each change
   useEffect(() => {
+    if (!live) return;
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => {
-      preview.mutate(ask(), { onSuccess: (edition) => setShown(edition.id) });
-    }, 800);
+    timer.current = window.setTimeout(() => write(), 800);
     return () => window.clearTimeout(timer.current);
-  }, [values, offered.data]);
+  }, [values, offered.data, live]);
   const save = useMutation({
     mutationFn: async () => {
       const body = { ...values, kind: "edition" as const, category_id: category, contents: ask().contents };
@@ -302,8 +310,8 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
           </Button>
           <Button
             variant="secondary"
-            disabled={!shown || test.isPending}
-            onClick={() => shown && test.mutate(shown)}
+            disabled={test.isPending || preview.isPending}
+            onClick={() => (live && shown ? test.mutate(shown) : write((id) => test.mutate(id)))}
           >
             <Icon name="mail" size={16} />
             {t("news:edition.admin.testMe")}
@@ -315,9 +323,7 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
         </FormActions>
       </form>
       <div className="edition-editor__preview" aria-busy={preview.isPending || undefined}>
-        <p className="admin-muted">
-          <Icon name="eye" size={14} /> {t("news:auto.preview")}
-        </p>
+        <PreviewSwitch live={live} onLive={setLive} onPreview={() => write()} busy={preview.isPending} />
         {shown ? (
           <EditionFrame src={`/api/v1/admin/news/newsletter-editions/${shown}/page`} title={values.name} />
         ) : (

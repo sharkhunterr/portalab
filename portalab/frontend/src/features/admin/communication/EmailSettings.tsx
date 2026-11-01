@@ -14,7 +14,6 @@ interface Setting {
   source?: string;
 }
 
-const DIGEST_DEFAULT = "notifications.digest.defaultMode";
 export const EMAIL_KEYS = {
   enabled: "notifications.email.enabled",
   sender: "notifications.email.from",
@@ -290,56 +289,6 @@ export function EmailSettings() {
           </Button>
         </FormActions>
       </form>
-    </AdminSection>
-  );
-}
-
-export function DigestDefault() {
-  const t = useT();
-  const client = useQueryClient();
-  const current = useQuery({
-    queryKey: ["admin", "notifications", "digest"],
-    retry: false,
-    queryFn: async () => {
-      const all = ((await api.GET("/api/v1/admin/config")).data as unknown as { settings: Setting[] })
-        .settings;
-      return String(all.find((s) => s.key === DIGEST_DEFAULT)?.value ?? "off");
-    },
-  });
-  const save = useMutation({
-    mutationFn: async (mode: string) =>
-      api.PUT("/api/v1/admin/config", {
-        body: {
-          changes: [{ key: DIGEST_DEFAULT, value: mode, scope: "global", scope_ref: "", unset: false }],
-          reason: "newsletter",
-        },
-      }),
-    onSuccess: () => void client.invalidateQueries({ queryKey: ["admin", "notifications", "digest"] }),
-  });
-  return (
-    <AdminSection
-      title={t("admin:announce.newsletter")}
-      description={t("admin:announce.newsletterHint")}
-      icon="newspaper"
-    >
-      <fieldset className="ds-subnav" aria-label={t("admin:announce.newsletter")}>
-        {(["off", "daily", "weekly"] as const).map((mode) => (
-          <button
-            key={mode}
-            type="button"
-            aria-pressed={current.data === mode}
-            onClick={() => save.mutate(mode)}
-          >
-            {t(`admin:announce.digest.${mode}`)}
-          </button>
-        ))}
-      </fieldset>
-      <p className="admin-muted">{t("admin:announce.newsletterNote")}</p>
-      {save.isSuccess ? (
-        <p role="status" className="services-admin__ok">
-          {t("admin:config.applied")}
-        </p>
-      ) : null}
     </AdminSection>
   );
 }

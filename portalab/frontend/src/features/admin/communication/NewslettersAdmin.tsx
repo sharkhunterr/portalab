@@ -8,7 +8,6 @@ import { useT } from "../../../i18n/hooks/useT";
 import { AutomaticNewsletters } from "../../news/editions/AutomaticNewsletters";
 import { EditionsAdmin } from "../../news/editions/EditionsAdmin";
 import { Deliveries, type Status } from "./AnnouncementsAdmin";
-import { DigestDefault } from "./EmailSettings";
 import "../admin.css";
 
 /**
@@ -82,7 +81,6 @@ export default function NewslettersAdmin() {
       {/* issue 325: the automatic newsletters write the self-writing editions — then their history, templates */}
       <AutomaticNewsletters />
       <EditionsAdmin />
-      <DigestDefault />
       <Deliveries status={status.data} />
     </AdminPage>
   );

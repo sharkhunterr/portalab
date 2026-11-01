@@ -277,7 +277,7 @@
   "edition.admin.template": "Template",
   "edition.admin.notice": "Message à afficher en haut",
   "edition.admin.noticeHint": "Une maintenance prévue, une info importante… (facultatif)",
-  "edition.admin.noPreview": "L’aperçu s’affichera ici.",
+  "edition.admin.noPreview": "Pas d’aperçu : générez-le, ou activez l’aperçu en direct.",
   "edition.admin.sectionKind": "Section",
   "edition.admin.up": "Monter",
   "edition.admin.down": "Descendre",
@@ -405,5 +405,7 @@
   "subscriptions.automatic": "Lettres automatiques",
   "subscriptions.channels": "Chaînes",
   "subscriptions.byChannel": "Désactivée avec sa chaîne « {channel} ».",
-  "auto.subscribers": "{count, plural, =0 {aucun abonné} one {# abonné} other {# abonnés}}"
+  "auto.subscribers": "{count, plural, =0 {aucun abonné} one {# abonné} other {# abonnés}}",
+  "preview.live": "Aperçu en direct",
+  "preview.now": "Générer l’aperçu"
 }
