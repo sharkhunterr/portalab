@@ -267,8 +267,12 @@ describe("gamification", () => {
     expect(week.textContent).toBe("This week1");
     expect(screen.getByRole("button", { name: /^Today/ }).textContent).toBe("Today1");
     expect(screen.queryByRole("button", { name: /^Challenges/ })).toBeNull(); // none: no filter
+    // issue 312: how many are done out of how many, as a bar
+    expect(document.querySelector(".quest-summary__count")?.textContent).toBe("1 / 4");
+    expect(screen.getByRole("progressbar", { name: "Quests done" }).getAttribute("aria-valuenow")).toBe("1");
     fireEvent.click(week);
     expect(week.getAttribute("aria-pressed")).toBe("true");
+    expect(document.querySelector(".quest-summary__count")?.textContent).toBe("0 / 1");
     expect(screen.getByText("marathon")).toBeTruthy();
     expect(screen.queryByText("read")).toBeNull();
     expect(screen.queryByText("hundred")).toBeNull();

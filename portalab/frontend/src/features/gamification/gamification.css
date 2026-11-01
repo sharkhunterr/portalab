@@ -2146,3 +2146,30 @@
 .quest-filters button[aria-pressed="true"] .quest-filters__count {
   background: color-mix(in srgb, var(--color-accent-contrast) 25%, transparent);
 }
+
+/* issue 312: how many quests are done out of how many, above the board */
+.quest-summary {
+  --tone: var(--color-accent);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 0.4rem 0.75rem;
+}
+.quest-summary[data-complete] {
+  --tone: var(--state-available-fg);
+}
+.quest-summary__label {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+.quest-summary__count {
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+.quest-summary__bar {
+  grid-column: 1 / -1;
+  block-size: 0.65rem;
+}
+.quest-summary__bar .ds-bar__fill {
+  background: var(--tone);
+}

@@ -225,6 +225,7 @@ function storedFilter(): Filter {
  */
 export function QuestList({ quests }: { quests: QuestItem[] }) {
   const t = useT();
+  const format = useFormat();
   const now = useNow();
   const [chosen, setChosen] = useState<Filter>(storedFilter);
   if (quests.length === 0) return <p>{t("gamification:quests.empty")}</p>;
@@ -256,10 +257,32 @@ export function QuestList({ quests }: { quests: QuestItem[] }) {
           ))}
         </fieldset>
       ) : null}
+      {/* issue 312: where the board stands — how many are done out of how many, as a bar */}
+      <div className="quest-summary" data-complete={open.length === 0 || undefined}>
+        <span className="quest-summary__label">{t("gamification:quests.summary")}</span>
+        <strong className="quest-summary__count">
+          {format.number(done.length)} / {format.number(open.length + done.length)}
+        </strong>
+        <span
+          className="ds-bar quest-summary__bar"
+          role="progressbar"
+          aria-label={t("gamification:quests.summary")}
+          aria-valuemin={0}
+          aria-valuemax={open.length + done.length}
+          aria-valuenow={done.length}
+        >
+          <span
+            className="ds-bar__fill"
+            style={{
+              inlineSize: `${Math.round((done.length / Math.max(open.length + done.length, 1)) * 100)}%`,
+            }}
+          />
+        </span>
+      </div>
       {groups.map(([group, items]) =>
         items.length ? (
           <section key={group} className="quest-board__group" data-group={group}>
-            <h3 className="quest-board__title">
+            <h3 className={group === "open" ? "visually-hidden" : "quest-board__title"}>
               {t(`gamification:quests.group.${group}`, { count: items.length })}
             </h3>
             <ul className="quest-grid">
