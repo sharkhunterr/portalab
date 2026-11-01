@@ -7,7 +7,16 @@ from collections.abc import Callable, Mapping, Sequence
 from html import escape
 from typing import Any
 
-from portalab.capabilities.notifications.layout import AMBER, FONT, FONT_LINK, VIOLET
+from portalab.capabilities.notifications.layout import (
+    FONT,
+    FONT_LINK,
+    HIGHLIGHT,
+    TITLE_FONT,
+    Brand,
+    mark,
+    rarities,
+    ring_line,
+)
 from portalab.modules.news.editions.template import Section, TemplateDefinition
 
 Words = Callable[[str, Mapping[str, Any] | None], str]
@@ -125,28 +134,20 @@ class Drawing:
         title = escape(str(self.snap.get("headline") or self.snap.get("title") or ""))
         period = escape(str(self.snap.get("period_label") or ""))
         tagline = escape(self.tpl.tagline)
-        if (
-            self.tpl.header == "brand"
-        ):  # #320: as the portal's e-mails — its mark and name, a card under a line
-            initial = escape((str(self.snap.get("site") or "P").strip() or "P")[0].upper())
-            gradient = f"linear-gradient(90deg, {self.p.accent}, {VIOLET} 55%, {AMBER})"
+        if self.tpl.header == "brand":
+            # #320, #322: as the portal's e-mails — its mark and name, a card under the ring's blues
             return (
-                f'<tr><td style="padding:0 4px 18px"><table role="presentation" cellpadding="0" '
-                f'cellspacing="0"><tr><td width="36" height="36" align="center" valign="middle" '
-                f'bgcolor="{self.p.accent}" style="width:36px;height:36px;border-radius:10px;'
-                f"background:{self.p.accent};background-image:{gradient};"
-                f'{self.text_style(18, weight=800, color=self.p.accent_text, line=1)}">{initial}</td>'
-                f'<td style="padding-left:12px;{self.text_style(17, weight=800, line=1.2)}">{site}</td>'
-                "</tr></table></td></tr>"
+                f'<tr><td style="padding:0 4px 18px">{mark(Brand(str(self.snap.get("site") or "Portalab")))}'
+                "</td></tr>"
                 f'<tr><td style="padding:0 0 16px"><table role="presentation" width="100%" cellpadding="0" '
                 f'cellspacing="0" style="border-collapse:separate;background:{self.p.surface};'
                 f'border:1px solid {self.p.border};border-radius:{self.r}px;overflow:hidden">'
-                f'<tr><td height="4" bgcolor="{self.p.accent}" style="height:4px;line-height:4px;font-size:0;'
-                f'background:{self.p.accent};background-image:{gradient}">&nbsp;</td></tr>'
+                f"<tr><td>{ring_line()}</td></tr>"
                 f'<tr><td style="padding:26px {PAD}px">'
-                f'<p style="{self.text_style(12, weight=700, color=self.p.accent)};letter-spacing:1.5px;'
-                f'text-transform:uppercase">{period}</p>'
-                f'<p style="{self.text_style(28, weight=800, line=1.2)};margin-top:8px">{title}</p>'
+                f'<p style="{self.text_style(12, weight=700, color=HIGHLIGHT)};letter-spacing:1.5px;'
+                f'text-transform:uppercase">{rarities()}&nbsp; {period}</p>'
+                f'<p style="{self.text_style(28, weight=800, line=1.2)};font-family:{TITLE_FONT};'
+                f'margin-top:8px">{title}</p>'
                 + (
                     f'<p style="{self.text_style(15, color=self.p.muted)};margin-top:8px">{tagline}</p>'
                     if tagline
