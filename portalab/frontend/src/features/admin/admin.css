@@ -1086,3 +1086,52 @@
 .member-card__link-account .accounts-picker__select {
   flex: 1;
 }
+
+/* issue 319: sending e-mails, set up in its order — the switch, then numbered blocks */
+.email-setup {
+  display: grid;
+  gap: var(--space-4);
+}
+.email-setup__switch {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+}
+.email-setup__switch[data-on] {
+  border-color: var(--state-available-fg);
+}
+.email-setup__switch p {
+  margin: 0;
+}
+.email-setup__block {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  min-inline-size: 0;
+}
+.email-setup__block legend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+  font-weight: var(--font-weight-bold);
+}
+.email-setup__step {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.5rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-size: var(--font-size-sm);
+}
+.email-setup__tip {
+  margin: 0;
+}

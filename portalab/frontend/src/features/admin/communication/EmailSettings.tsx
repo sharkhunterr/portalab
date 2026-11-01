@@ -1,23 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { api } from "../../../api/client";
-import { AdminSection, FormActions, FormGrid } from "../../../design-system/admin/AdminKit";
+import { AdminSection, FormActions, FormGrid, StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import { CheckboxField, TextField } from "../../../design-system/components/Field";
+import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
+import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import "../admin.css";
 
-/**
- * E-mail (SMTP) transport (notifications 010; 027: in the System page) — sender, server, port, TLS and
- * account (the password is write-only), with a test e-mail sent to yourself.
- */
 interface Setting {
   key: string;
   value: unknown;
+  source?: string;
 }
 
 const DIGEST_DEFAULT = "notifications.digest.defaultMode";
-const EMAIL_KEYS = {
+export const EMAIL_KEYS = {
   enabled: "notifications.email.enabled",
   sender: "notifications.email.from",
   portal: "notifications.email.portalUrl",
@@ -26,7 +24,34 @@ const EMAIL_KEYS = {
   tls: "notifications.email.smtp.tls",
   username: "notifications.email.smtp.username",
 } as const;
+export const SMTP_PASSWORD = "notifications.email.smtp.password";
 
+type Security = "none" | "starttls" | "ssl";
+/** The usual providers: their server, port and security (issue 319). */
+const PRESETS: Record<string, { host: string; port: number; security: Security }> = {
+  gmail: { host: "smtp.gmail.com", port: 587, security: "starttls" },
+  outlook: { host: "smtp.office365.com", port: 587, security: "starttls" },
+  ovh: { host: "ssl0.ovh.net", port: 465, security: "ssl" },
+  brevo: { host: "smtp-relay.brevo.com", port: 587, security: "starttls" },
+  local: { host: "localhost", port: 25, security: "none" },
+};
+const PORTS: Record<Security, number> = { none: 25, starttls: 587, ssl: 465 };
+
+/** The server's own rule: TLS on port 465 is SSL/TLS from the start, elsewhere STARTTLS. */
+function securityOf(tls: boolean, port: number): Security {
+  return !tls ? "none" : port === 465 ? "ssl" : "starttls";
+}
+
+function presetOf(host: string): string {
+  return Object.entries(PRESETS).find(([, preset]) => preset.host === host)?.[0] ?? "custom";
+}
+
+/**
+ * E-mail sending (notifications 010; issue 319 redesign): one form, in the order it is set up — sending on or
+ * off, the server (a provider's preset, or its address, port and security), the account (its password
+ * write-only), the sender, the portal's address for the links and pictures — saved together, then tested
+ * with what was just saved.
+ */
 export function EmailSettings() {
   const t = useT();
   const client = useQueryClient();
@@ -36,107 +61,193 @@ export function EmailSettings() {
     queryFn: async () => {
       const all = ((await api.GET("/api/v1/admin/config")).data as unknown as { settings: Setting[] })
         .settings;
-      return Object.fromEntries(all.map((s) => [s.key, s.value]));
+      return Object.fromEntries(all.map((s) => [s.key, s]));
     },
   });
-  const [draft, setDraft] = useState<Record<string, unknown> | null>(null);
+  const [draft, setDraft] = useState<Record<string, unknown>>({});
   const [password, setPassword] = useState("");
-  const value = (key: keyof typeof EMAIL_KEYS) => (draft ?? {})[key] ?? settings.data?.[EMAIL_KEYS[key]];
-  const set = (key: keyof typeof EMAIL_KEYS, v: unknown) => setDraft({ ...(draft ?? {}), [key]: v });
-  const save = useMutation({
-    mutationFn: async () =>
-      api.PUT("/api/v1/admin/notifications/email", {
-        body: {
-          enabled: Boolean(value("enabled")),
-          sender: String(value("sender") ?? ""),
-          portal_url: String(value("portal") ?? ""),
-          host: String(value("host") ?? ""),
-          port: Number(value("port") ?? 587),
-          tls: Boolean(value("tls")),
-          username: String(value("username") ?? ""),
-          password: password || null,
-        },
-      }),
-    onSuccess: () => {
-      setPassword("");
-      setDraft(null);
-      void client.invalidateQueries({ queryKey: ["admin", "notifications"] });
-    },
-  });
+  const value = (key: keyof typeof EMAIL_KEYS) =>
+    key in draft ? draft[key] : settings.data?.[EMAIL_KEYS[key]]?.value;
+  const set = (patch: Partial<Record<keyof typeof EMAIL_KEYS, unknown>>) => setDraft({ ...draft, ...patch });
+  const enabled = Boolean(value("enabled"));
+  const host = String(value("host") ?? "");
+  const port = Number(value("port") ?? 587);
+  const security = securityOf(Boolean(value("tls")), port);
+  const preset = presetOf(host);
+  const hasPassword = (settings.data?.[SMTP_PASSWORD]?.source ?? "default") !== "default";
   const test = useMutation({
     mutationFn: async () =>
       (await api.POST("/api/v1/admin/notifications/email/test")).data as { outcome: string },
   });
+  const save = useMutation({
+    mutationFn: async (andTest: boolean) => {
+      const { error } = await api.PUT("/api/v1/admin/notifications/email", {
+        body: {
+          enabled,
+          sender: String(value("sender") ?? ""),
+          portal_url: String(value("portal") ?? ""),
+          host,
+          port,
+          tls: security !== "none",
+          username: String(value("username") ?? ""),
+          password: password || null,
+        },
+      });
+      if (error) throw error;
+      return andTest;
+    },
+    onSuccess: (andTest) => {
+      setPassword("");
+      setDraft({});
+      void client.invalidateQueries({ queryKey: ["admin", "notifications"] });
+      void client.invalidateQueries({ queryKey: ["admin", "config"] });
+      if (andTest) test.mutate();
+    },
+  });
   return (
     <AdminSection
-      title={t("admin:announce.email")}
-      description={t("admin:announce.emailHint")}
-      icon="message"
+      title={t("admin:email.title")}
+      description={t("admin:email.intro")}
+      icon="mail"
+      actions={
+        <StatusBadge tone={enabled ? "ok" : "neutral"}>
+          {enabled ? t("admin:email.on") : t("admin:email.off")}
+        </StatusBadge>
+      }
+      span="full"
     >
       <form
-        className="admin-form"
+        className="admin-form email-setup"
         onSubmit={(event) => {
           event.preventDefault();
-          save.mutate();
+          save.mutate(false);
         }}
       >
-        <CheckboxField
-          label={t("admin:announce.emailEnabled")}
-          checked={Boolean(value("enabled"))}
-          onChange={(e) => set("enabled", e.target.checked)}
-        />
-        <FormGrid>
-          <TextField
-            label={t("admin:announce.sender")}
-            value={String(value("sender") ?? "")}
-            onChange={(e) => set("sender", e.target.value)}
+        <div className="email-setup__switch" data-on={enabled || undefined}>
+          <CheckboxField
+            label={t("admin:email.enabled")}
+            checked={enabled}
+            onChange={(e) => set({ enabled: e.target.checked })}
           />
-          <TextField
-            label={t("admin:announce.portalUrl")}
-            hint={t("admin:announce.portalUrlHint")}
-            type="url"
-            placeholder="https://portal.example.org"
-            value={String(value("portal") ?? "")}
-            onChange={(e) => set("portal", e.target.value)}
-          />
-          <TextField
-            label={t("admin:announce.host")}
-            value={String(value("host") ?? "")}
-            onChange={(e) => set("host", e.target.value)}
-          />
-          <TextField
-            label={t("admin:announce.port")}
-            type="number"
-            value={String(value("port") ?? 587)}
-            onChange={(e) => set("port", Number(e.target.value))}
-          />
-          <TextField
-            label={t("admin:announce.username")}
-            value={String(value("username") ?? "")}
-            onChange={(e) => set("username", e.target.value)}
-          />
-          <TextField
-            label={t("admin:services.access.account")}
-            hint={t("admin:services.writeOnly.hint")}
-            type="password"
-            autoComplete="off"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </FormGrid>
-        <CheckboxField
-          label={t("admin:announce.tls")}
-          checked={Boolean(value("tls"))}
-          onChange={(e) => set("tls", e.target.checked)}
-        />
-        {save.isSuccess ? (
-          <p role="status" className="services-admin__ok">
-            {t("admin:config.applied")}
-          </p>
-        ) : null}
+          <p className="admin-muted">{t(enabled ? "admin:email.enabledHint" : "admin:email.offHint")}</p>
+        </div>
+
+        <fieldset className="email-setup__block">
+          <legend>
+            <span className="email-setup__step">1</span>
+            {t("admin:email.server")}
+          </legend>
+          <FormGrid>
+            <SelectField
+              label={t("admin:email.provider")}
+              value={preset}
+              onChange={(e) => {
+                const chosen = PRESETS[e.target.value];
+                if (chosen) set({ host: chosen.host, port: chosen.port, tls: chosen.security !== "none" });
+              }}
+            >
+              <option value="custom">{t("admin:email.preset.custom")}</option>
+              {Object.keys(PRESETS).map((key) => (
+                <option key={key} value={key}>
+                  {t(`admin:email.preset.${key}`)}
+                </option>
+              ))}
+            </SelectField>
+            <TextField
+              label={t("admin:email.host")}
+              placeholder="smtp.example.org"
+              required={enabled}
+              value={host}
+              onChange={(e) => set({ host: e.target.value.trim() })}
+            />
+            <SelectField
+              label={t("admin:email.security")}
+              value={security}
+              onChange={(e) => {
+                const next = e.target.value as Security;
+                // a usual port follows the security chosen; a port of one's own stays
+                const usual = Object.values(PORTS).includes(port);
+                set({ tls: next !== "none", ...(usual ? { port: PORTS[next] } : {}) });
+              }}
+            >
+              {(["starttls", "ssl", "none"] as const).map((option) => (
+                <option key={option} value={option}>
+                  {t(`admin:email.securityChoice.${option}`)}
+                </option>
+              ))}
+            </SelectField>
+            <TextField
+              label={t("admin:email.port")}
+              type="number"
+              min={1}
+              max={65535}
+              value={String(port)}
+              onChange={(e) => set({ port: Number(e.target.value) })}
+            />
+          </FormGrid>
+          {preset !== "custom" ? (
+            <p className="admin-muted email-setup__tip">{t(`admin:email.presetTip.${preset}`)}</p>
+          ) : null}
+        </fieldset>
+
+        <fieldset className="email-setup__block">
+          <legend>
+            <span className="email-setup__step">2</span>
+            {t("admin:email.account")}
+          </legend>
+          <FormGrid>
+            <TextField
+              label={t("admin:email.username")}
+              hint={t("admin:email.usernameHint")}
+              autoComplete="off"
+              value={String(value("username") ?? "")}
+              onChange={(e) => set({ username: e.target.value.trim() })}
+            />
+            <TextField
+              label={t("admin:email.password")}
+              hint={hasPassword ? t("admin:email.passwordKept") : t("admin:email.passwordHint")}
+              placeholder={hasPassword ? "••••••••" : ""}
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </FormGrid>
+        </fieldset>
+
+        <fieldset className="email-setup__block">
+          <legend>
+            <span className="email-setup__step">3</span>
+            {t("admin:email.from")}
+          </legend>
+          <FormGrid>
+            <TextField
+              label={t("admin:email.sender")}
+              hint={t("admin:email.senderHint")}
+              type="email"
+              placeholder="portail@example.org"
+              required={enabled}
+              value={String(value("sender") ?? "")}
+              onChange={(e) => set({ sender: e.target.value.trim() })}
+            />
+            <TextField
+              label={t("admin:email.portalUrl")}
+              hint={t("admin:email.portalUrlHint")}
+              type="url"
+              placeholder="https://portail.example.org"
+              value={String(value("portal") ?? "")}
+              onChange={(e) => set({ portal: e.target.value.trim() })}
+            />
+          </FormGrid>
+        </fieldset>
+
         {save.isError ? (
           <p role="alert" className="services-admin__ko">
-            {t("admin:announce.failed")}
+            {t("admin:email.saveFailed")}
+          </p>
+        ) : save.isSuccess && !test.isPending && !test.data ? (
+          <p role="status" className="services-admin__ok">
+            {t("admin:email.saved")}
           </p>
         ) : null}
         {test.data ? (
@@ -145,16 +256,23 @@ export function EmailSettings() {
             className={test.data.outcome === "sent" ? "services-admin__ok" : "services-admin__ko"}
           >
             {test.data.outcome === "sent"
-              ? t("admin:announce.testSent")
-              : t("admin:announce.testFailed", { detail: test.data.outcome })}
+              ? t("admin:email.testSent")
+              : t("admin:email.testFailed", { detail: test.data.outcome.replace(/^failed:/, "") })}
           </p>
         ) : null}
         <FormActions>
-          <Button type="button" variant="secondary" onClick={() => test.mutate()} disabled={test.isPending}>
-            {t("admin:announce.test")}
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={save.isPending || test.isPending || !enabled}
+            onClick={() => save.mutate(true)}
+          >
+            <Icon name="send" size={16} />
+            {t("admin:email.saveAndTest")}
           </Button>
           <Button type="submit" disabled={save.isPending}>
-            {t("admin:announce.saveEmail")}
+            <Icon name="check" size={16} />
+            {t("admin:email.save")}
           </Button>
         </FormActions>
       </form>
