@@ -24,6 +24,11 @@ async def test_security_headers_on_every_response() -> None:
         for path in ("/healthz", "/api/v1/stream", "/api/v1/nope"):
             response = await client.get(path)
             assert "frame-ancestors 'none'" in response.headers["content-security-policy"]
+            # #315: frames from the portal itself and YouTube's privacy-enhanced player only
+            assert (
+                "frame-src 'self' https://www.youtube-nocookie.com;"
+                in response.headers["content-security-policy"]
+            )
             assert response.headers["x-content-type-options"] == "nosniff"
             assert response.headers["strict-transport-security"].startswith("max-age=")
             assert response.headers["referrer-policy"] == "no-referrer"

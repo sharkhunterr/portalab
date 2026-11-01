@@ -14,6 +14,7 @@ import httpx
 from PIL import Image
 from sqlalchemy import select
 
+from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.media import MENTIONS, Mention
 from portalab.core.blobstore import FileSystemBlobStore
 from portalab.modules.news.models import Feed
@@ -167,6 +168,14 @@ async def test_members_follow_sources_of_their_own(
     assert [i["id"] for i in last["items"]] == [own[2]["id"]]
     about = {"title": "obj-dune"}
     assert (await client.get("/api/v1/me/news/timeline", params=about)).json()["total"] == 1
+    # #315: « Mon fil » on the dashboard — the same news, newest first, each with its source
+    registered = ct.news.widgets.get("news.my_feed")
+    assert registered is not None
+    widget = await registered.provider.load(ct.p("rita"), {}, LocaleContext())
+    assert widget.state == "available" and widget.data is not None
+    assert [(i["id"], i["source"], i["source_index"]) for i in widget.data["items"]] == [
+        (i["id"], "Écrans", 0) for i in own
+    ]
     # mine alone: not on « À la une », not in the editors' list, not another member's
     assert (await client.get("/api/v1/news/sources/items")).json()["items"] == []
     # but « in the news » for a title I follow reads my sources too

@@ -1,0 +1,142 @@
+/* issue 315: « Mon fil » on the dashboard — rows in a narrow block, cards in a wide one */
+.my-feed {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.my-feed__item {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-inline-start: 3px solid var(--badge);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  min-inline-size: 0;
+}
+.my-feed__picture {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--badge) 15%, var(--color-surface));
+  color: var(--badge);
+}
+.my-feed__picture img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.my-feed__picture .youtube-cover__button {
+  inline-size: 1.8rem;
+}
+.my-feed__text {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+.my-feed__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+.my-feed__meta .feed-badge {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-inline-size: 0;
+}
+.my-feed__when {
+  flex: none;
+  margin-inline-start: auto;
+}
+.my-feed__close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.my-feed__close:hover,
+.my-feed__close:focus-visible {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+.my-feed__title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-weight: 700;
+  color: var(--color-text);
+  text-decoration: none;
+}
+.my-feed__title:hover,
+.my-feed__title:focus-visible {
+  text-decoration: underline;
+}
+.my-feed__summary {
+  display: none;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+/* a video playing takes the whole width, its texts under it */
+.my-feed__item[data-playing] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-column: 1 / -1;
+}
+
+/* a block wide enough: the summary beside the picture */
+@container (min-width: 30rem) {
+  .my-feed__item {
+    grid-template-columns: 7rem minmax(0, 1fr);
+  }
+  .my-feed__summary {
+    display: -webkit-box;
+  }
+}
+/* a wide block: cards, the picture above — as many columns as fit */
+@container (min-width: 44rem) {
+  .my-feed {
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: var(--space-3);
+  }
+  .my-feed__item {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    align-items: start;
+    border-inline-start-width: 1px;
+    border-block-start: 3px solid var(--badge);
+  }
+  .my-feed__picture {
+    aspect-ratio: 16 / 9;
+  }
+  .my-feed__picture .youtube-cover__button {
+    inline-size: 2.6rem;
+  }
+}
+/* a low block (two rows): titles on one line, no summary */
+@container (max-height: 9rem) {
+  .my-feed__title {
+    -webkit-line-clamp: 1;
+  }
+  .my-feed__summary {
+    display: none;
+  }
+}

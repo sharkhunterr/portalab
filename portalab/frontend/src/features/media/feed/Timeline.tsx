@@ -7,6 +7,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { MentionChip, type SourceItem } from "../../news/ExternalNews";
 import { sourceIcon } from "../../news/sourceKind";
+import { PlayCover, YouTubePlayer, youtubeId } from "../../news/YouTube";
 import { Poster } from "../MediaGrid";
 import type { FeedItem, Follow } from "./api";
 import { FollowedMark } from "./FollowedMark";
@@ -34,7 +35,7 @@ interface Entry {
   news?: SourceItem;
 }
 
-function colorOf(index: number): string {
+export function colorOf(index: number): string {
   const base = PALETTE[index % PALETTE.length] as string;
   return index < PALETTE.length ? base : `color-mix(in oklab, ${base} 60%, white)`;
 }
@@ -81,31 +82,48 @@ function ArrivalEntry({ entry }: { entry: Entry }) {
 function NewsEntry({ entry }: { entry: Entry }) {
   const t = useT();
   const item = entry.news as SourceItem;
+  // issue 315: a YouTube video plays here, its picture its play button
+  const video = youtubeId(item.link);
+  const [playing, setPlaying] = useState(false);
   return (
-    <div className="feed-entry__body">
-      <span className="feed-entry__picture" aria-hidden="true">
-        {item.picture ? (
-          <img src={item.picture} alt="" loading="lazy" />
+    <>
+      <div className="feed-entry__body">
+        {video ? (
+          <PlayCover
+            className="feed-entry__picture"
+            picture={item.picture}
+            title={item.title}
+            link={item.link}
+            playing={playing}
+            onToggle={() => setPlaying(!playing)}
+          />
         ) : (
-          <Icon name="newspaper" size={26} />
-        )}
-      </span>
-      <span className="feed-entry__text">
-        <a href={item.link} target="_blank" rel="noopener noreferrer" className="feed-entry__title">
-          {item.title}
-          <Icon name="external" size={12} />
-          <span className="visually-hidden">{t("news:external.opensSite")}</span>
-        </a>
-        {item.summary ? <span className="feed-entry__summary">{item.summary}</span> : null}
-        {item.mentions?.length ? (
-          <span className="feed-entry__chips">
-            {item.mentions.slice(0, 4).map((m) => (
-              <MentionChip key={`${m.kind}:${m.ref}`} mention={m} />
-            ))}
+          <span className="feed-entry__picture" aria-hidden="true">
+            {item.picture ? (
+              <img src={item.picture} alt="" loading="lazy" />
+            ) : (
+              <Icon name="newspaper" size={26} />
+            )}
           </span>
-        ) : null}
-      </span>
-    </div>
+        )}
+        <span className="feed-entry__text">
+          <a href={item.link} target="_blank" rel="noopener noreferrer" className="feed-entry__title">
+            {item.title}
+            <Icon name="external" size={12} />
+            <span className="visually-hidden">{t("news:external.opensSite")}</span>
+          </a>
+          {item.summary ? <span className="feed-entry__summary">{item.summary}</span> : null}
+          {item.mentions?.length ? (
+            <span className="feed-entry__chips">
+              {item.mentions.slice(0, 4).map((m) => (
+                <MentionChip key={`${m.kind}:${m.ref}`} mention={m} />
+              ))}
+            </span>
+          ) : null}
+        </span>
+      </div>
+      {playing && video ? <YouTubePlayer id={video} title={item.title} /> : null}
+    </>
   );
 }
 

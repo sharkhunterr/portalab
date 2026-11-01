@@ -44,6 +44,8 @@ from portalab.modules.news.events import register_event_types
 from portalab.modules.news.integrations import (
     FEATURED,
     LATEST,
+    MY_FEED,
+    MyFeedWidget,
     NewsCalendarSource,
     NewsLinkResolver,
     NewsSearchProvider,
@@ -127,6 +129,8 @@ class NewsModule:
                 self.widgets.register(
                     definition, NewsWidget(self.articles, featured, self.clock), owner=OWNER
                 )
+        if self.widgets.get(MY_FEED.key) is None:
+            self.widgets.register(MY_FEED, MyFeedWidget(self.sources, self.clock), owner=OWNER)
         if not any(p.kind == "news" for p in self.widgets.summaries()):  # 027: since your last visit
             self.widgets.register_summary(NewsChanges(self.articles), owner=OWNER)
         if self.categories.get("news.published") is None:

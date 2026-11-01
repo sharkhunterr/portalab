@@ -1,0 +1,54 @@
+/* issue 315: a YouTube video played in place, and its picture as its play button */
+.youtube-player {
+  position: relative;
+  inline-size: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.youtube-player iframe {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+}
+.youtube-cover {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--badge, var(--color-accent)) 15%, var(--color-surface));
+  color: inherit;
+  cursor: pointer;
+}
+.youtube-cover img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.youtube-cover__button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 2.4rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  box-shadow: var(--shadow-2);
+  transition: transform var(--motion-duration-fast) var(--motion-easing);
+}
+.youtube-cover:hover .youtube-cover__button,
+.youtube-cover:focus-visible .youtube-cover__button {
+  transform: scale(1.1);
+}
+.youtube-cover:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+}

@@ -195,5 +195,11 @@
   "widget.featured.description": "Les articles mis en avant par la rédaction.",
   "widget.featured.title": "À la une",
   "widget.latest.description": "Les articles les plus récents.",
-  "widget.latest.title": "Dernières actualités"
+  "widget.latest.title": "Dernières actualités",
+  "widget.myFeed.title": "Mon fil",
+  "widget.myFeed.description": "Les dernières actualités de vos sources : articles, vidéos, podcasts. Les vidéos YouTube se lisent sur place.",
+  "widget.myFeed.all": "Tout mon fil",
+  "video.play": "Lire « {title} » ici",
+  "video.close": "Fermer la vidéo « {title} »",
+  "video.onYouTube": "Voir « {title} » sur YouTube (nouvel onglet)"
 }
