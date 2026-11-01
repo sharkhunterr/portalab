@@ -7,6 +7,7 @@ reward, an achievement) waits sealed in the reserve and opens for free; a booste
 season's booster is on sale in its weeks only; the reserve booster fills the reserve (items stack, never
 a duplicate), using an item grants it as a purchase would; Discovery opens three times per member."""
 
+from datetime import timedelta
 from typing import Any
 
 from httpx import AsyncClient
@@ -222,6 +223,11 @@ async def test_the_reserve(mk: MkHarness, client: AsyncClient) -> None:
     }
     assert reserve == {"plus_3": 2, "plus_5": 2, "plus_10": 2}
     assert not quota.units  # kept, not used yet
+    # what came in is new until I open my reserve: its badge on the navigation
+    assert await mk.module.openings.unseen(mk.people["ursula"]) == 3
+    assert (await client.post("/api/v1/marketplace/reserve/seen")).status_code == 204
+    assert await mk.module.openings.unseen(mk.people["ursula"]) == 0
+    mk.clock.advance(timedelta(minutes=1))
 
     used = await client.post("/api/v1/marketplace/reserve/plus_5/use", headers={"Idempotency-Key": "u"})
     assert used.status_code == 201 and used.json()["state"] == "active"
@@ -235,6 +241,9 @@ async def test_the_reserve(mk: MkHarness, client: AsyncClient) -> None:
         i["product"]["key"]: i["quantity"] for i in (await client.get("/api/v1/marketplace/reserve")).json()
     }
     assert reserve == {"plus_3": 2, "plus_10": 2} and quota.units[mk.people["ursula"]] == 10
+    assert await mk.module.openings.unseen(mk.people["ursula"]) == 0  # used: nothing came in
+    await client.post("/api/v1/marketplace/boosters/booster_reserve/open")
+    assert await mk.module.openings.unseen(mk.people["ursula"]) == 3
     # someone else's reserve is their own
     await login(client, "vera")
     assert (await client.get("/api/v1/marketplace/reserve")).json() == []

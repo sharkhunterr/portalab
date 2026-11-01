@@ -589,7 +589,7 @@ a.media-card__link:focus-visible .media-card__frame {
   scroll-snap-align: start;
 }
 .media-enriched__portrait {
-  position: relative; /* #299: the « followed » mark in its corner */
+  position: relative; /* issue 299: the « followed » mark in its corner */
   display: grid;
   place-items: center;
   aspect-ratio: 2 / 3;

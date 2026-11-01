@@ -189,6 +189,12 @@ async def reserve(principal: Reader, module: Module) -> list[dict[str, Any]]:
     ]
 
 
+@router.post("/marketplace/reserve/seen", status_code=204)
+async def reserve_seen(principal: Reader, module: Module) -> None:
+    """#81: I opened my reserve — what came in is no longer new (its badge goes)."""
+    await module.openings.mark_seen(_me(principal))
+
+
 @router.post("/marketplace/reserve/{key}/use", status_code=201)
 async def use(
     principal: Buyer,

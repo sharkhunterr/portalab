@@ -10,7 +10,7 @@ import { Poster } from "../MediaGrid";
 import type { FeedItem, Follow } from "./api";
 import { FollowedMark } from "./FollowedMark";
 
-/** #299: the theme's chart palette (as « My progression »'s sources): the server's arrivals keep the media
+/** issue 299: the theme's chart palette (as « My progression »'s sources): the server's arrivals keep the media
  * colour, each news source one of the others — a second round lightened; the name always beside it. */
 const SERVER = "var(--chart-3)";
 const PAGE = 40; // entries shown at first, then 40 more at a time
@@ -109,7 +109,7 @@ function NewsEntry({ entry }: { entry: Entry }) {
 }
 
 /**
- * « Mon fil » (#299) as one stream: what the library brought for what I follow and what every source
+ * « Mon fil » (issue 299) as one stream: what the library brought for what I follow and what every source
  * published — the editors' and mine —, newest first, day by day, each with its source's coloured badge;
  * filtered to what is for me, or to one source. What came after I last read it is marked new.
  */

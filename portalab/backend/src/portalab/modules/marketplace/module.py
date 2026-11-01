@@ -48,7 +48,7 @@ from portalab.core.permissions import PermissionRegistry, default_permissions
 from portalab.core.time import Clock
 from portalab.modules.marketplace import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.marketplace.activation.service import Activation
-from portalab.modules.marketplace.attention import ShopAttention
+from portalab.modules.marketplace.attention import ReserveAttention, ShopAttention
 from portalab.modules.marketplace.availability.service import Availability
 from portalab.modules.marketplace.eligibility.service import Eligibility
 from portalab.modules.marketplace.entitlements.reader import (
@@ -277,6 +277,12 @@ class MarketplaceModule:
                 ShopAttention(self.database, self.authorizer),
                 instance_ref="marketplace",
                 owner=OWNER,
+            )
+        if not any(
+            p.instance_ref == "marketplace.reserve" for p in self.capabilities.system_providers(ATTENTION)
+        ):  # #81: what came into a member's reserve since they last opened it
+            self.capabilities.provide(
+                ATTENTION, ReserveAttention(self.openings), instance_ref="marketplace.reserve", owner=OWNER
             )
         register_event_types(self.event_types)
         if not self.capabilities.system_providers(LIFECYCLE):

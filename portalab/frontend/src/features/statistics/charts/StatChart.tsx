@@ -8,7 +8,7 @@ import type { StatResult } from "../api";
 
 type Cell = StatResult["breakdown"][number];
 
-/** #298: a breakdown's value in words — its translation (a media kind, a state, a reward's source…), an
+/** issue 298: a breakdown's value in words — its translation (a media kind, a state, a reward's source…), an
  * achievement's name, else the value made readable. */
 function dimText(t: Translate, names: Map<string, string>, dims: Record<string, string>): string {
   return Object.entries(dims)
@@ -22,7 +22,7 @@ function dimText(t: Translate, names: Map<string, string>, dims: Record<string, 
     .join(" · ");
 }
 
-/** #298: what the total is made of, in sight (not only in the data table) — the largest first, with its
+/** issue 298: what the total is made of, in sight (not only in the data table) — the largest first, with its
  * share drawn as a bar and written as a number. */
 function Breakdown({ cells, total, names }: { cells: Cell[]; total: number; names: Map<string, string> }) {
   const t = useT();
@@ -61,7 +61,7 @@ export function StatChart({ result, viz, title }: { result: StatResult; viz: str
   const tableId = useId();
   const [table, setTable] = useState(false);
   const series = result.series.map((point) => ({ day: String(point.day), value: Number(point.value ?? 0) }));
-  // #298: the days as the language writes them (« 5 oct. »), not as ISO dates
+  // issue 298: the days as the language writes them (« 5 oct. »), not as ISO dates
   const day = (value: string) => {
     const leaf = format.dayMonth(value);
     return `${leaf.day} ${leaf.month}`;
@@ -77,7 +77,7 @@ export function StatChart({ result, viz, title }: { result: StatResult; viz: str
   return (
     <figure className="stat-chart">
       <figcaption>
-        {/* #298: the figure, big — the card's heading already names it */}
+        {/* issue 298: the figure, big — the card's heading already names it */}
         <p className="stat-chart__summary">
           <span aria-hidden="true">{result.value === null ? "—" : format.number(result.value)}</span>
           <span className="visually-hidden">{summary}</span>

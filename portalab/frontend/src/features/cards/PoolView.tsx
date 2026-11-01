@@ -9,7 +9,7 @@ const RARITIES: Rarity[] = ["legendary", "epic", "rare", "common"];
 const KINDS: MediaCard["kind"][] = ["title", "cast", "director", "creator", "writer", "composer"];
 
 /** Issue 229: every card there is (the pool), the rarest first — by name, rarity, kind, country, or mine.
- * #298: the site's own fields (as the media catalog), the rarities as pills. */
+ * issue 298: the site's own fields (as the media catalog), the rarities as pills. */
 export function PoolView() {
   const t = useT();
   const [q, setQ] = useState("");

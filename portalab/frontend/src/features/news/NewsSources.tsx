@@ -14,7 +14,7 @@ import { SourceCard } from "./ExternalNews";
 import { useChannels } from "./NewsChannels";
 
 /**
- * #299: the news sources — RSS or Atom feeds (a site's address will do: its feed is found), previewed before
+ * issue 299: the news sources — RSS or Atom feeds (a site's address will do: its feed is found), previewed before
  * they are added, read on their cadence; their latest items, to pin on « À la une » or hide.
  */
 type Source = components["schemas"]["NewsSourceOut"];

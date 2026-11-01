@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
 
-/** « Mon fil » API hooks (#299): what I follow (private), and what it brings. */
+/** « Mon fil » API hooks (issue 299): what I follow (private), and what it brings. */
 export type Follow = components["schemas"]["FollowOut"];
 export type FollowKind = Follow["kind"];
 export type Feed = components["schemas"]["FeedOut"];
@@ -60,7 +60,7 @@ function folded(name: string): string {
   return name.normalize("NFD").replace(/[̀-ͯ]/g, "").toLocaleLowerCase().trim();
 }
 
-/** #299: whether I follow a person (by name, however it is written) or a title (by its id). */
+/** issue 299: whether I follow a person (by name, however it is written) or a title (by its id). */
 export function useFollowed() {
   const follows = useFollows().data ?? [];
   const people = new Set(follows.filter((f) => f.kind === "person").map((f) => folded(f.label)));

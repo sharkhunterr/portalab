@@ -6,7 +6,7 @@ import asyncio
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 from urllib.parse import urlsplit
 from uuid import UUID
@@ -311,6 +311,25 @@ class FeedSources:
         return added
 
     # --- what is shown ------------------------------------------------------------------------------
+    async def published_since(self, user: UUID, since: datetime, limit: int = 99) -> int:
+        """What the editors' sources and the member's own published after ``since`` (dates ahead were brought
+        back to when they were read) — « Mon fil »'s unread news, counted up to ``limit``."""
+        followed = select(FeedSubscription.feed_id).where(FeedSubscription.user_id == user)
+        fresh = (
+            select(FeedItem.id)
+            .join(Feed, Feed.id == FeedItem.feed_id)
+            .where(
+                Feed.enabled.is_(True),
+                or_(Feed.editorial.is_(True), Feed.id.in_(followed)),
+                FeedItem.hidden.is_(False),
+                FeedItem.published_at > since,
+            )
+            .limit(limit)
+        )
+        async with self.database.session() as session:
+            count = await session.scalar(select(func.count()).select_from(fresh.subquery()))
+        return int(count or 0)
+
     async def items(
         self,
         *,

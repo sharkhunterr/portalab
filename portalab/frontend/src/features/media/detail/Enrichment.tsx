@@ -213,7 +213,7 @@ export function EnrichedView({ data }: { data: Metadata }) {
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
-  const followed = useFollowed(); // #299: the people I follow, marked
+  const followed = useFollowed(); // issue 299: the people I follow, marked
   const cast = data.people.filter((p) => p.department === "cast");
   const crew = data.people.filter((p) => p.department !== "cast");
   const facts = [

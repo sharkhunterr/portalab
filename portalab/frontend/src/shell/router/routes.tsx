@@ -50,7 +50,7 @@ const MediaDiscover = lazy(() => import("../../features/media/discover/DiscoverP
 const MediaDiscoverTitle = lazy(() => import("../../features/media/discover/DiscoverTitlePage"));
 const MediaPerson = lazy(() => import("../../features/media/people/PersonPage"));
 const MediaInsights = lazy(() => import("../../features/media/insights/InsightsPage"));
-const MediaFeed = lazy(() => import("../../features/media/feed/FeedPage")); // #299
+const MediaFeed = lazy(() => import("../../features/media/feed/FeedPage")); // issue 299
 const MediaTaste = lazy(() => import("../../features/media/taste/TastePage")); // issue 190
 const MediaAccounts = lazy(() => import("../../features/media/links/LinksSettings"));
 const MediaAdmin = lazy(() => import("../../features/media/admin/MatchingScreen"));
@@ -161,7 +161,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           ],
         },
         {
-          // #299: « Mon fil » — what the library brings for what I follow
+          // issue 299: « Mon fil » — what the library brings for what I follow
           path: "feed",
           element: <MediaFeed />,
           handle: h({ crumb: "My feed", requiredPermission: "media.read" }),
@@ -283,7 +283,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               handle: h({ crumb: "My requests", requiredPermission: "media.request" }),
             },
             {
-              // #298: my requests in figures, among the statistics
+              // issue 298: my requests in figures, among the statistics
               path: "requests/stats",
               element: <MediaRequests stats />,
               handle: h({ crumb: "Statistics", requiredPermission: "media.request" }),

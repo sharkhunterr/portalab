@@ -143,7 +143,7 @@ function Follows({ follows }: { follows: Follow[] }) {
 }
 
 /**
- * « Mon fil » (#299): what the library brought lately for the people, series and genres I follow — each with
+ * « Mon fil » (issue 299): what the library brought lately for the people, series and genres I follow — each with
  * why, the unread marked —, what is announced for the people I follow, and what I follow. Opening it reads it.
  */
 export default function FeedPage() {
@@ -191,14 +191,14 @@ export default function FeedPage() {
           </ul>
         </section>
       ) : null}
-      {/* #299: one stream — the library's arrivals and every source's news, each with its source's colour */}
+      {/* issue 299: one stream — the library's arrivals and every source's news, each with its source's colour */}
       {loaded ? <Timeline arrivals={items} follows={mine} seenAt={feed.data?.seen_at} /> : null}
       <details className="feed-manage">
         <summary>
           <Icon name="settings" size={16} /> {t("media:feed.manage")}
         </summary>
         {follows.isSuccess ? <Follows follows={mine} /> : null}
-        {/* #299: my own sources, read for me alone */}
+        {/* issue 299: my own sources, read for me alone */}
         <MySources items={false} />
       </details>
     </section>

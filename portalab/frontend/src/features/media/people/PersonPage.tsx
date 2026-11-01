@@ -154,7 +154,7 @@ function PersonView({ headingId, data }: { headingId: string; data: Person }) {
         </section>
       ) : null}
       {books ? null : knownFor}
-      {/* #299: what the news sources say of them */}
+      {/* issue 299: what the news sources say of them */}
       <ExternalNews
         heading={t("news:external.aboutPerson", { name: data.name })}
         asked={{ person: [data.name] }}

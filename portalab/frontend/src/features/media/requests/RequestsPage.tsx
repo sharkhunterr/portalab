@@ -530,7 +530,7 @@ function Soon() {
   );
 }
 
-/** #298: « My requests » lists them (and what comes soon); their figures are among the statistics (``stats``). */
+/** issue 298: « My requests » lists them (and what comes soon); their figures are among the statistics (``stats``). */
 export function RequestsPage({ stats = false }: { stats?: boolean }) {
   const t = useT();
   const [params, setParams] = useSearchParams();

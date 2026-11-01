@@ -43476,6 +43476,21 @@
         ]
       }
     },
+    "/api/v1/marketplace/reserve/seen": {
+      "post": {
+        "description": "#81: I opened my reserve \u2014 what came in is no longer new (its badge goes).",
+        "operationId": "reserve_seen_api_v1_marketplace_reserve_seen_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Reserve Seen",
+        "tags": [
+          "marketplace-boosters"
+        ]
+      }
+    },
     "/api/v1/marketplace/reserve/{key}/unlock": {
       "post": {
         "description": "#131: spend a level pass of my reserve on an item I hold but may not wear yet \u2014 usable at once.",

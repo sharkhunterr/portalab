@@ -6,6 +6,7 @@ items and pictures along."""
 
 import io
 from collections.abc import Sequence
+from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,7 @@ from portalab.modules.news.models import Feed
 from portalab.modules.news.participant import NewsParticipant
 from tests.integration.content.conftest import ContentHarness
 from tests.integration.identity.helpers import login
+from tests.integration.privacy.conftest import NOW
 
 FEED = """<?xml version="1.0"?>
 <rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title>Écrans</title>
@@ -162,6 +164,10 @@ async def test_members_follow_sources_of_their_own(
     # but « in the news » for a title I follow reads my sources too
     about = (await client.get("/api/v1/news/sources/items", params={"title": "obj-dune"})).json()["items"]
     assert [i["title"] for i in about] == ["Dune Part Two arrive en 4K"]
+    # what they published since I last read « Mon fil »: its badge
+    assert await sources.published_since(people["rita"], NOW - timedelta(days=1)) == 3
+    assert await sources.published_since(people["rita"], NOW) == 0  # read since
+    assert await sources.published_since(people["sam"], NOW - timedelta(days=1)) == 0
     exported = await client.get("/api/v1/me/news/sources/opml")
     assert "https://news.example.org/feed.xml" in exported.text and "opml" in exported.headers["content-type"]
 

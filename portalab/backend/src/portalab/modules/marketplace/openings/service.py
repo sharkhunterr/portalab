@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -46,6 +46,7 @@ from portalab.modules.marketplace.models import (
     Product,
     ProductVersion,
     ReserveItem,
+    ReserveSeen,
 )
 from portalab.modules.marketplace.observability import log, metrics
 from portalab.modules.marketplace.products.service import Catalog, ProductNotFound
@@ -451,12 +452,13 @@ class Openings:
 
     async def _stock(self, session: AsyncSession, user: UUID, product: UUID, delta: int) -> None:
         now = utc_now(self.clock)
+        received = {"received_at": now} if delta > 0 else {}  # what came in, not what was used
         statement = insert(ReserveItem).values(
-            user_id=user, product_id=product, quantity=delta, updated_at=now
+            user_id=user, product_id=product, quantity=delta, updated_at=now, **received
         )
         statement = statement.on_conflict_do_update(
             index_elements=[ReserveItem.user_id, ReserveItem.product_id],
-            set_={"quantity": ReserveItem.quantity + delta, "updated_at": now},
+            set_={"quantity": ReserveItem.quantity + delta, "updated_at": now, **received},
         )
         await session.execute(statement)
 
@@ -621,6 +623,30 @@ class Openings:
                 .order_by(Product.key)
             )
             return [(product, version, int(quantity)) for product, version, quantity in rows.all()]
+
+    async def unseen(self, user: UUID) -> int:
+        """The items that came into my reserve since I last opened it (all of them, never opened)."""
+        seen = select(ReserveSeen.seen_at).where(ReserveSeen.user_id == user).scalar_subquery()
+        async with self.database.session() as session:
+            count = await session.scalar(
+                select(func.count())
+                .select_from(ReserveItem)
+                .where(
+                    ReserveItem.user_id == user,
+                    ReserveItem.quantity > 0,
+                    or_(seen.is_(None), ReserveItem.received_at > seen),
+                )
+            )
+        return int(count or 0)
+
+    async def mark_seen(self, user: UUID) -> None:
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            await uow.session.execute(
+                insert(ReserveSeen)
+                .values(user_id=user, seen_at=now)
+                .on_conflict_do_update(index_elements=[ReserveSeen.user_id], set_={"seen_at": now})
+            )
 
     async def use(self, actor: Principal, key: str, request_key: str) -> Ownership:
         """Take one item out of the reserve and grant it — it activates as a purchase would."""

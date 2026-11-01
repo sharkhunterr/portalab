@@ -146,6 +146,17 @@ export function useReserve() {
   });
 }
 
+/** issue 81: I opened my reserve — what came in is no longer new (the navigation's badge goes). */
+export function useReserveSeen() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      await api.POST("/api/v1/marketplace/reserve/seen");
+    },
+    onSettled: () => void client.invalidateQueries({ queryKey: ["shell", "attention"] }),
+  });
+}
+
 /** Using an item of my reserve: granted now, it takes effect as if bought. */
 export function useUseReserve() {
   const client = useQueryClient();

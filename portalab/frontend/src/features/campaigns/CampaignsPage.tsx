@@ -185,7 +185,7 @@ function Brings({ view }: { view: CampaignView }) {
   );
 }
 
-/** #298: the campaigns running now among the community's events — nothing when none runs. */
+/** issue 298: the campaigns running now among the community's events — nothing when none runs. */
 export function RunningCampaigns() {
   const t = useT();
   const active = useActiveCampaigns();

@@ -8,6 +8,7 @@ from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.automation_actions import ActionRegistry, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.content import (
+    SOURCE_ITEMS,
     CalendarSourceRegistry,
     LinkResolverRegistry,
     default_calendar_sources,
@@ -112,6 +113,9 @@ class NewsModule:
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
             if not any(p.instance_ref == "news" for p in self.capabilities.system_providers(capability)):
                 self.capabilities.provide(capability, participant, instance_ref="news", owner=OWNER)
+        if not any(p.instance_ref == "news" for p in self.capabilities.system_providers(SOURCE_ITEMS)):
+            # #299: what the sources published, for « Mon fil »'s unread badge
+            self.capabilities.provide(SOURCE_ITEMS, self.sources, instance_ref="news", owner=OWNER)
         if self.resolvers.get("news") is None:
             self.resolvers.register(NewsLinkResolver(self.articles), owner=OWNER)
         if self.calendar.get("news") is None:

@@ -49,7 +49,7 @@ export default function CommunityPage({
   if (view === "proposal") return <ProposalDetail />;
   return (
     <div className="ds-stack community-page">
-      {/* #298: the pages are the navigation's tabs (a single bar); the overview introduces the community */}
+      {/* issue 298: the pages are the navigation's tabs (a single bar); the overview introduces the community */}
       {view === "discover" ? (
         <PageHeader icon="users" title={t("community:title")} context={t("community:intro")} />
       ) : (

@@ -316,3 +316,13 @@ class ReserveItem(MarketplaceBase):
     product_id: Mapped[UUID] = mapped_column(ForeignKey("marketplace.products.id"), primary_key=True)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    received_at: Mapped[datetime | None] = mapped_column(TZDateTime)  # the last one that came in
+
+
+class ReserveSeen(MarketplaceBase):
+    """#81: when a member last opened their reserve — what came in since is new (the navigation's badge)."""
+
+    __tablename__ = "reserve_seen"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    seen_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
