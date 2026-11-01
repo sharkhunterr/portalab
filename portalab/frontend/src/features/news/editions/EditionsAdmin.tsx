@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { AdminSection, FormActions, FormGrid, StatusBadge } from "../../../design-system/admin/AdminKit";
+import { AdminSection, FormGrid, StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
+import { Dialog, DialogActions } from "../../../design-system/components/Overlays";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import {
   type Definition,
   type Section,
-  type Template,
   templateAbout,
   templateName,
   useAdminEditions,
@@ -16,10 +16,12 @@ import {
   useEditionActions,
   usePreview,
   useSaveTemplate,
+  useSchedules,
   useTemplates,
 } from "./api";
 import { EditionFrame } from "./EditionsPage";
 import { PreviewSwitch, useLivePreview } from "./PreviewSwitch";
+import { Swatches } from "./TemplatePicker";
 import "./editions.css";
 
 const KINDS: Section["kind"][] = [
@@ -357,15 +359,13 @@ function TemplateEditor({
           </Button>
         </fieldset>
         {save.isError ? <p role="alert">{t("news:edition.admin.saveFailed")}</p> : null}
-        <FormActions>
-          <Button variant="ghost" onClick={onDone}>
-            {t("news:edition.admin.cancel")}
-          </Button>
+        {/* issue 329: in its dialog, beside « Cancel » */}
+        <DialogActions>
           <Button type="submit" disabled={!valid || !sections.length || save.isPending}>
             <Icon name="check" size={16} />
             {t("news:edition.admin.save")}
           </Button>
-        </FormActions>
+        </DialogActions>
       </form>
       <div className="edition-editor__preview" aria-busy={preview.isPending || undefined}>
         <PreviewSwitch live={live} onLive={setLive} onPreview={write} busy={preview.isPending} />
@@ -375,30 +375,18 @@ function TemplateEditor({
   );
 }
 
-function Swatches({ template }: { template: Template }) {
-  const p = template.definition.palette;
-  return (
-    <span className="edition-swatches" aria-hidden="true">
-      {[p.background, p.surface, p.accent, p.text].map((color, index) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: four fixed swatches
-        <span key={index} style={{ background: color }} />
-      ))}
-    </span>
-  );
-}
-
-/** issue 316: the templates — the built-in ones to copy, the news desk's own to change. */
+/**
+ * issue 316: the templates — the built-in ones to copy, the news desk's own to change. Issue 329: each
+ * automatic newsletter has its own; every template says which ones use it, and is set in a dialog.
+ */
 function Templates() {
   const t = useT();
   const templates = useTemplates();
+  const schedules = useSchedules();
   const remove = useDeleteTemplate();
   const [editing, setEditing] = useState<{ definition: Definition; key: string | null } | null>(null);
-  if (editing)
-    return (
-      <AdminSection icon="palette" title={t("news:edition.admin.editTemplate")} span="full">
-        <TemplateEditor start={editing.definition} startKey={editing.key} onDone={() => setEditing(null)} />
-      </AdminSection>
-    );
+  const users = (key: string) =>
+    (schedules.data ?? []).filter((s) => (s.template_key ?? "portalab") === key).map((s) => s.name);
   return (
     <AdminSection
       icon="palette"
@@ -413,9 +401,17 @@ function Templates() {
             <span className="edition-templates__text">
               <strong>{templateName(t, template)}</strong>
               <small>{templateAbout(t, template)}</small>
-              {template.builtin ? (
-                <StatusBadge tone="neutral">{t("news:edition.admin.builtin")}</StatusBadge>
-              ) : null}
+              <span className="edition-templates__badges">
+                {template.builtin ? (
+                  <StatusBadge tone="neutral">{t("news:edition.admin.builtin")}</StatusBadge>
+                ) : null}
+                <span className="edition-templates__users">
+                  <Icon name="sparkles" size={12} />
+                  {users(template.key).length
+                    ? t("news:auto.usedBy", { names: users(template.key).join(", ") })
+                    : t("news:auto.usedByNone")}
+                </span>
+              </span>
             </span>
             <span className="edition-templates__actions">
               <Button
@@ -446,6 +442,8 @@ function Templates() {
                     variant="ghost"
                     size="icon"
                     aria-label={t("news:edition.admin.remove")}
+                    disabled={users(template.key).length > 0}
+                    title={users(template.key).length ? t("news:auto.inUse") : undefined}
                     onClick={() => remove.mutate(template.key)}
                   >
                     <Icon name="trash" size={16} />
@@ -456,6 +454,23 @@ function Templates() {
           </li>
         ))}
       </ul>
+      <Dialog
+        trigger={null}
+        open={editing !== null}
+        onOpenChange={(open) => (open ? null : setEditing(null))}
+        title={editing?.definition.name || t("news:edition.admin.editTemplate")}
+        closeLabel={t("news:edition.admin.cancel")}
+        size="full"
+      >
+        {editing ? (
+          <TemplateEditor
+            key={editing.key ?? "new"}
+            start={editing.definition}
+            startKey={editing.key}
+            onDone={() => setEditing(null)}
+          />
+        ) : null}
+      </Dialog>
     </AdminSection>
   );
 }

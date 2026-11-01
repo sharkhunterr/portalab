@@ -306,7 +306,7 @@
   "edition.admin.livePreview": "Live preview, with the real data of the last 7 days",
   "edition.admin.editTemplate": "Newsletter template",
   "edition.admin.templates": "Templates",
-  "edition.admin.templatesHint": "The look and the order of the sections. Duplicate a built-in template to make your own.",
+  "edition.admin.templatesHint": "The look and the order of the sections. Each automatic newsletter picks its own; duplicate a built-in template to make yours.",
   "edition.admin.builtin": "Built-in",
   "edition.admin.copy": "copy",
   "edition.admin.duplicate": "Duplicate",
@@ -417,5 +417,10 @@
   "auto.portalOnly": "In the portal only",
   "auto.failed": "That did not work, try again.",
   "auto.deleteTitle": "Delete “{name}”?",
-  "auto.deleteHint": "It will not go out any more. The letters it already wrote stay in the history."
+  "auto.deleteHint": "It will not go out any more. The letters it already wrote stay in the history.",
+  "auto.look": "Its look",
+  "auto.lookHint": "This newsletter’s template: each one has its own.",
+  "auto.usedBy": "Used by: {names}",
+  "auto.usedByNone": "Used by no automatic newsletter",
+  "auto.inUse": "An automatic newsletter uses it: pick another one for it before deleting this one."
 }

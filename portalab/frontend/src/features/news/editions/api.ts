@@ -7,9 +7,11 @@ export type Template = components["schemas"]["TemplateOut"];
 export type Definition = components["schemas"]["TemplateDefinition"];
 export type Section = components["schemas"]["Section"];
 export type Edition = components["schemas"]["EditionOut"];
+export type Schedule = components["schemas"]["NewsletterScheduleOut"];
 
 const TEMPLATES = ["admin", "news", "edition-templates"] as const;
 const EDITIONS = ["news", "editions"] as const;
+export const SCHEDULES = ["admin", "news", "newsletters"] as const;
 
 /** A template's name: the built-in ones in the interface's language. */
 export function templateName(t: (key: string) => string, template: Template): string {
@@ -24,6 +26,14 @@ export function templateAbout(t: (key: string) => string, template: Template): s
   return about.startsWith("news:") || about.startsWith("edition.")
     ? (template.definition.description ?? "")
     : about;
+}
+
+/** issue 325: the automatic newsletters (each with its own template — issue 329). */
+export function useSchedules() {
+  return useQuery({
+    queryKey: SCHEDULES,
+    queryFn: async () => ((await api.GET("/api/v1/admin/news/newsletters")).data ?? []) as Schedule[],
+  });
 }
 
 export function useTemplates() {

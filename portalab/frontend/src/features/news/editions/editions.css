@@ -432,3 +432,60 @@
 .auto-letter__note[data-tone="warn"] {
   color: var(--state-error-fg);
 }
+
+/* issue 329: each automatic newsletter's own template, chosen by sight; who uses each template */
+.template-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--space-2);
+}
+.template-pick {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+.template-pick input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.template-pick[data-chosen] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+}
+.template-pick[data-chosen] > svg {
+  flex: none;
+  color: var(--color-accent);
+}
+.template-pick:has(input:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.template-pick__text {
+  display: grid;
+  flex: 1;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+.template-pick__text small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.edition-templates__badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.edition-templates__users {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
