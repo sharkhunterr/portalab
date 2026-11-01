@@ -138,9 +138,7 @@
   line-height: 1;
 }
 .project-raised__bar {
-  inline-size: 100%;
   block-size: 0.75rem;
-  accent-color: var(--tone);
 }
 .project-raised__left {
   margin: 0;
@@ -960,9 +958,32 @@
   font-size: var(--font-size-sm);
 }
 .project-goal progress {
-  inline-size: 100%;
   block-size: 0.5rem;
-  accent-color: var(--tone);
+}
+/* issue 306: the bar toward a project's goal in the theme's colours — a quiet track, filled with the
+   project's tone (the accent while it gathers) in a soft glow — never the browser's own */
+:is(.project-raised__bar, .project-goal progress) {
+  appearance: none;
+  inline-size: 100%;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 12%, transparent);
+  color: var(--tone);
+}
+:is(.project-raised__bar, .project-goal progress)::-webkit-progress-bar {
+  border-radius: var(--radius-pill);
+  background: transparent;
+}
+:is(.project-raised__bar, .project-goal progress)::-webkit-progress-value {
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 55%, var(--color-surface)), var(--tone));
+  box-shadow: 0 0 0.6rem color-mix(in srgb, var(--tone) 60%, transparent);
+}
+:is(.project-raised__bar, .project-goal progress)::-moz-progress-bar {
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 55%, var(--color-surface)), var(--tone));
+  box-shadow: 0 0 0.6rem color-mix(in srgb, var(--tone) 60%, transparent);
 }
 .project-admin__date {
   color: var(--color-text-muted);
