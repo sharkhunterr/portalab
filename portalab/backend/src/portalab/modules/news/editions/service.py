@@ -30,7 +30,13 @@ from portalab.modules.news.editions.template import (
     TemplateDefinition,
     compose,
 )
-from portalab.modules.news.models import Article, Category, NewsletterEdition, NewsletterTemplate
+from portalab.modules.news.models import (
+    Article,
+    Category,
+    NewsletterEdition,
+    NewsletterSchedule,
+    NewsletterTemplate,
+)
 from portalab.modules.news.newsletters import CATEGORY, PORTAL_URL, Newsletters, _provider
 from portalab.modules.news.permissions import NEWS_READ
 from portalab.modules.news.settings import NEWSLETTER_ON
@@ -473,6 +479,10 @@ class Editions:
             await session.flush()
             edition_id = row.id
             snapshot["page"] = f"/news/editions/{edition_id}"
+            if schedule_id is not None:  # #326: when it goes out, at the foot of the e-mail
+                schedule = await session.get(NewsletterSchedule, schedule_id)
+                if schedule is not None:
+                    snapshot["when"] = self.newsletters.when(schedule, language)
             snapshot["contents"] = list(contents) if contents is not None else None
             snapshot["charts"] = list(charts) if charts is not None else list(DEFAULT_CHARTS)  # #324
             row.data = snapshot
@@ -541,11 +551,14 @@ class Editions:
                 category = await session.get(Category, edition.category_id)
             if category is not None:
                 channel_key, channel_name = category.key, category.name
-        users = [
-            u
-            for u in await contact.active_user_ids()
-            if channel_key is None or channel_key not in await self.newsletters.opted_out(u)
-        ]
+        users = []
+        for user in await contact.active_user_ids():
+            left = await self.newsletters.opted_out(user)
+            if channel_key is not None and channel_key in left:
+                continue  # the channel left
+            if edition.schedule_id is not None and self.newsletters.auto_key(edition.schedule_id) in left:
+                continue  # #326: this newsletter left
+            users.append(user)
         if users:
             await notify.send(
                 CommunicationRequest(

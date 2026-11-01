@@ -210,6 +210,7 @@ class NewsletterScheduleIn(BaseModel):
 class NewsletterScheduleOut(NewsletterScheduleIn):
     model_config = ConfigDict(extra="ignore")
     id: UUID
+    subscribers: int | None = None  # #326: the members it is e-mailed to
     last_run_at: datetime | None
     next_run_at: datetime | None
     last_article_id: UUID | None
@@ -495,7 +496,7 @@ async def put_category(principal: CategoryManager, body: NewsCategoryIn, module:
 # --- newsletters (027) -----------------------------------------------------------------------------------
 @router.get("/me/newsletters")
 async def my_newsletters(principal: Reader, module: Module, request: Request) -> list[dict[str, Any]]:
-    """The channels sent by e-mail, and whether I receive each one."""
+    """The automatic newsletters (#326) and the channels sent by e-mail, and whether I receive each one."""
     user = principal.acting_for or principal.user_id
     if not await switched_on(request.app.state.capabilities, NEWSLETTER_ON):
         return []
@@ -513,7 +514,13 @@ async def set_my_newsletters(
 
 @router.get("/admin/news/newsletters", response_model=list[NewsletterScheduleOut], dependencies=NewslettersOn)
 async def schedules(principal: Publisher, module: Module) -> list[NewsletterScheduleOut]:
-    return [_schedule_out(row) for row in await module.newsletters.schedules()]
+    out = []
+    for row in await module.newsletters.schedules():
+        item = _schedule_out(row)
+        if row.kind == "edition" and row.email:  # #326: how many members receive it
+            item.subscribers = await module.newsletters.subscribers(row)
+        out.append(item)
+    return out
 
 
 @router.post(

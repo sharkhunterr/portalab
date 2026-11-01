@@ -238,7 +238,7 @@
   "edition.open": "Voir la fiche",
   "edition.see": "Lire dans {site}",
   "edition.footer": "Envoyé par {site} · {date}",
-  "edition.unsubscribe": "Se désabonner de ces e-mails",
+  "edition.unsubscribe": "Se désabonner de cette lettre",
   "edition.empty": "Rien de neuf cette fois-ci : à la prochaine !",
   "newsletters.kinds.edition": "Édition (avec un template)",
   "edition.template.classic.name": "Classique",
@@ -397,5 +397,13 @@
   "auto.preview": "Aperçu en direct, avec les vraies données",
   "auto.runNow": "Envoyer maintenant",
   "auto.ran": "Lettre écrite et publiée (envoyée par e-mail si c’est activé).",
-  "auto.former": "Ancien format"
+  "auto.former": "Ancien format",
+  "subscriptions.when.daily": "chaque jour à {hour} h",
+  "subscriptions.when.weekly": "chaque {day} à {hour} h",
+  "subscriptions.when.monthly": "le premier {day} du mois à {hour} h",
+  "edition.footerWhen": "Cette lettre part {when}.",
+  "subscriptions.automatic": "Lettres automatiques",
+  "subscriptions.channels": "Chaînes",
+  "subscriptions.byChannel": "Désactivée avec sa chaîne « {channel} ».",
+  "auto.subscribers": "{count, plural, =0 {aucun abonné} one {# abonné} other {# abonnés}}"
 }

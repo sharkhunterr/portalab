@@ -8601,7 +8601,7 @@ export interface paths {
         };
         /**
          * My Newsletters
-         * @description The channels sent by e-mail, and whether I receive each one.
+         * @description The automatic newsletters (#326) and the channels sent by e-mail, and whether I receive each one.
          */
         get: operations["my_newsletters_api_v1_me_newsletters_get"];
         /** Set My Newsletters */
@@ -16846,6 +16846,8 @@ export interface components {
             notice?: string | null;
             /** Subject */
             subject?: string | null;
+            /** Subscribers */
+            subscribers?: number | null;
             /** Template Key */
             template_key?: string | null;
             /**

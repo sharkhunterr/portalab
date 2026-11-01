@@ -13375,6 +13375,17 @@
             ],
             "title": "Subject"
           },
+          "subscribers": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subscribers"
+          },
           "template_key": {
             "anyOf": [
               {
@@ -47532,7 +47543,7 @@
     },
     "/api/v1/me/newsletters": {
       "get": {
-        "description": "The channels sent by e-mail, and whether I receive each one.",
+        "description": "The automatic newsletters (#326) and the channels sent by e-mail, and whether I receive each one.",
         "operationId": "my_newsletters_api_v1_me_newsletters_get",
         "responses": {
           "200": {
