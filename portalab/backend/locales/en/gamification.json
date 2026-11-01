@@ -967,5 +967,6 @@
   "quests.filter.week": "This week",
   "quests.filter.month": "This month",
   "quests.filter.once": "Quests",
-  "quests.filter.challenge": "Challenges"
+  "quests.filter.challenge": "Challenges",
+  "quests.summary": "Quests done"
 }
