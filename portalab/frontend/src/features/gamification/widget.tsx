@@ -11,7 +11,7 @@ import { BoostTag, GainsNow, useMyStreak } from "./boost";
 
 export { useMyStreak };
 
-import type { QuestItem } from "./quests/QuestList";
+import { type QuestItem, useQuestText } from "./quests/QuestList";
 import "./gamification.css";
 
 const VALUE_ICON: Record<string, string> = { xp: "sparkles", coins: "coins", contribution: "heart" };
@@ -216,13 +216,14 @@ function Objective({ quest }: { quest: QuestItem }) {
   const t = useT();
   const format = useFormat();
   const { current, target, ratio } = progressOf(quest);
+  const text = useQuestText()(quest);
   return (
     <li className="daily-objective" data-done={quest.completed || undefined}>
       <span className="daily-objective__check" aria-hidden="true">
         <Icon name={quest.completed ? "check" : "target"} size={16} />
       </span>
       <span className="daily-objective__body">
-        <span className="daily-objective__label">{quest.label}</span>
+        <span className="daily-objective__label">{text.label}</span>
         <span className="daily-objective__bar" aria-hidden="true">
           <span style={{ inlineSize: `${Math.round(ratio * 100)}%` }} />
         </span>

@@ -473,7 +473,10 @@ function QuestForm({
         event.preventDefault();
         setError(null);
         const span = def.window?.starts_at && def.window.ends_at ? def.window : null;
-        const definition = { ...def, window: span };
+        // issue 307: texts rewritten here are the ones every member reads — no older translation over them
+        const rewritten =
+          item && (def.label !== item.definition.label || def.description !== item.definition.description);
+        const definition = { ...def, window: span, ...(rewritten ? { translations: {} } : {}) };
         save.mutate({ key, definition }, { onSuccess: onDone, onError: fail });
       }}
     >

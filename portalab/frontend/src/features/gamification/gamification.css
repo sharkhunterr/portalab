@@ -1974,3 +1974,132 @@
   font-size: var(--font-size-sm);
   font-variant-numeric: tabular-nums;
 }
+
+/* issue 307: the quest board — those to do, then those done, each card stating its state in words and
+   colour, its time left or when it comes back */
+.quest-board {
+  display: grid;
+  gap: 1.5rem;
+}
+.quest-board__group {
+  display: grid;
+  gap: 0.75rem;
+}
+.quest-board__title {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+}
+.quest-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+}
+.quest-card {
+  --tone: var(--color-accent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-inline-size: 0;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+.quest-card[data-state="completed"] {
+  --tone: var(--state-available-fg);
+  border-color: color-mix(in srgb, var(--tone) 55%, var(--color-border));
+  background: color-mix(in srgb, var(--tone) 9%, var(--color-surface-raised));
+}
+.quest-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.quest-card__icon {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tone) 18%, transparent);
+  color: var(--tone);
+}
+.quest-card[data-state="completed"] .quest-card__icon {
+  background: var(--tone);
+  color: var(--color-surface);
+}
+.quest-card__kind {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+.quest-card__seal {
+  margin-inline-start: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--tone);
+  color: var(--color-surface);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.quest-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.quest-card__text {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.quest-card__progress {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.quest-card__progress .ds-bar__fill {
+  background: var(--tone);
+}
+.quest-card__count {
+  flex: none;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+.quest-card__rewards {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.quest-card__reward {
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  font-size: 0.8rem;
+}
+.quest-card[data-state="completed"] .quest-card__reward {
+  background: color-mix(in srgb, var(--tone) 16%, transparent);
+}
+.quest-card__time {
+  margin: auto 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: flex-start;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+  color: var(--color-text);
+}
+.quest-card__time[data-tone="urgent"] {
+  background: color-mix(in srgb, var(--state-partial-fg) 22%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--state-partial-fg) 60%, transparent);
+}

@@ -103,6 +103,8 @@ export interface QuestDefinition {
   /** Issue 121: done when every step is (``all``, the default) or any one of them. */
   complete_on?: "all" | "any" | undefined;
   rewards?: Reward[] | undefined;
+  /** Issue 307: its texts in other interface languages (the shipped ones in French). */
+  translations?: Record<string, { label: string; description?: string }> | undefined;
 }
 
 export interface Versioned<T> {

@@ -9,7 +9,23 @@ from portalab.core.authz_port import Principal
 from portalab.modules.community.achievements.view import CatalogView, catalog
 from portalab.modules.community.observability import log, metrics
 
-FIELDS = ("key", "kind", "label", "description", "icon", "period", "period_key", "starts_at", "ends_at")
+FIELDS = (
+    "key",
+    "kind",
+    "label",
+    "description",
+    "icon",
+    "period",
+    "period_key",
+    "starts_at",
+    "ends_at",
+    # #307: its texts in other languages, when it starts again, how it completes, when it was done
+    "translations",
+    "resets_at",
+    "complete_on",
+    "completed_at",
+    "gifts",
+)
 
 
 class QuestsView:

@@ -6,11 +6,12 @@
 * ``discovery`` (027) — a new member's first steps (fill the profile, take the tour…): once, no window.
 Steps reuse the achievements' ``event_count`` criterion; rewards go through the ledger. ``complete_on``:
 ``all`` steps (the default) or ``any`` one of them (issue 121: a first step is done by its guided tour or by
-doing the thing)."""
+doing the thing). #307: ``translations`` gives the label and description in other interface languages
+(``{"fr": {"label": …, "description": …}}``); a member reads the one of their language, else ``label``."""
 
 from collections.abc import Mapping
 from datetime import datetime
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError, model_validator
 
@@ -45,6 +46,17 @@ class SettingIn(BaseModel):
     values: list[str] = Field(min_length=1, max_length=50)
 
 
+class QuestText(BaseModel):
+    """#307: a quest's texts in another language."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    label: str = Field(min_length=1, max_length=120)
+    description: str = Field(default="", max_length=400)
+
+
+Language = Annotated[str, Field(pattern=r"^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$")]
+
+
 class QuestDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     kind: QuestKind
@@ -60,6 +72,7 @@ class QuestDefinition(BaseModel):
     unlocks: list[Unlock] = Field(default_factory=list, max_length=3)
     # 027: who it counts for (all must hold when the event comes): e.g. members wearing a Christmas interface
     requires: list[SettingIn] = Field(default_factory=list, max_length=3)
+    translations: dict[Language, QuestText] = Field(default_factory=dict, max_length=10)  # #307
 
     @model_validator(mode="after")
     def _coherent(self) -> "QuestDefinition":

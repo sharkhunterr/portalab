@@ -2635,7 +2635,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Visite du jour",
+            "description": "Passez sur le portail aujourd'hui."
+          }
+        }
       },
       "key": "daily_visit"
     },
@@ -2679,7 +2685,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Rencontrez l'assistant",
+            "description": "Suivez sa visite guidée, ou posez-lui une première question."
+          }
+        }
       },
       "key": "discover_assistant"
     },
@@ -2729,7 +2741,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Arrangez votre tableau de bord",
+            "description": "Suivez sa visite guidée, ou ajoutez, déplacez ou redimensionnez un widget."
+          }
+        }
       },
       "key": "discover_dashboard"
     },
@@ -2773,7 +2791,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Personnalisez votre profil",
+            "description": "Suivez sa visite guidée, ajoutez une photo ou changez votre nom."
+          }
+        }
       },
       "key": "discover_profile"
     },
@@ -2817,7 +2841,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Demandez un titre",
+            "description": "Suivez sa visite guidée, ou demandez un titre absent de la bibliothèque."
+          }
+        }
       },
       "key": "discover_request"
     },
@@ -2855,7 +2885,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Suivez une demande",
+            "description": "Voyez où en est une demande sur la page du titre."
+          }
+        }
       },
       "key": "discover_request_status"
     },
@@ -2895,7 +2931,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Faites-vous plaisir",
+            "description": "Suivez sa visite guidée, ou offrez-vous quelque chose dans la boutique."
+          }
+        }
       },
       "key": "discover_shop"
     },
@@ -2933,7 +2975,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Consultez vos statistiques",
+            "description": "Ce que vous avez regardé, lu et joué, en graphiques."
+          }
+        }
       },
       "key": "discover_stats"
     },
@@ -2977,7 +3025,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Contactez le support",
+            "description": "Suivez sa visite guidée, ou ouvrez un ticket : une question, un problème, une idée."
+          }
+        }
       },
       "key": "discover_ticket"
     },
@@ -3027,7 +3081,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Faites le tour",
+            "description": "Une minute pour voir où se trouve chaque chose."
+          }
+        }
       },
       "key": "discover_tour"
     },
@@ -3065,7 +3125,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Explorateur",
+            "description": "Revenez cinq jours pour tout découvrir."
+          }
+        }
       },
       "key": "explorer"
     },
@@ -3313,7 +3379,13 @@
           }
         ],
         "unlocks": [],
-        "window": null
+        "window": null,
+        "translations": {
+          "fr": {
+            "label": "Fidèle de la semaine",
+            "description": "Passez trois jours cette semaine."
+          }
+        }
       },
       "key": "weekly_regular"
     },
