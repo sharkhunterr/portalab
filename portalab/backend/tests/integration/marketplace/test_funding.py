@@ -68,3 +68,22 @@ async def test_concurrent_fundings_stay_consistent(mk: MkHarness) -> None:
     assert len(succeeded) == 2 and await mk.balance("ulrich") == 20
     summary = await mk.module.projects.funding_summary(str(project))
     assert summary is not None and summary.reserved == 80 and summary.funders == 1
+
+
+async def test_funders_largest_first_each_as_they_allow(mk: MkHarness, client: AsyncClient) -> None:
+    """#304: who backs a project, the largest first, each member's fundings added up — another member who
+    has not made their progression public is there without their name."""
+    project = await mk.project(open_with=RULES)
+    await mk.coins("ulrich", 100)
+    await mk.coins("ursula", 150)
+    for key in ("a", "b"):
+        await mk.module.fundings.fund(mk.p("ulrich"), project, 40, acknowledged=True, request_key=key)
+    await mk.module.fundings.fund(mk.p("ursula"), project, 100, acknowledged=True, request_key="c")
+    await login(client, "ursula")
+    funders = (await client.get(f"/api/v1/projects/{project}/funders")).json()
+    assert [(f["amount"], f["me"], f["name"] is not None) for f in funders] == [
+        (100, True, True),
+        (80, False, False),
+    ]
+    assert funders[1]["user_id"] is None  # anonymous: nothing that leads to them
+    assert (await client.get(f"/api/v1/projects/{funders[0]['user_id']}/funders")).status_code == 404

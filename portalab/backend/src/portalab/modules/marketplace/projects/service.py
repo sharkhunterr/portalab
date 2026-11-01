@@ -147,6 +147,28 @@ class Projects:
         )
         return {"reserved": reserved, "consumed": consumed, "funders": funders}
 
+    async def funders(self, project_id: UUID) -> list[tuple[UUID, int, datetime]]:
+        """#304: who backs the project — each member's Coins still reserved or used for it, and when they
+        first gave — the largest first."""
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(ProjectFunding.user_id, ProjectFunding.tranches, ProjectFunding.created_at).where(
+                        ProjectFunding.project_id == project_id,
+                        ProjectFunding.status != "destroyed_on_deletion",
+                    )
+                )
+            ).all()
+        given: dict[UUID, tuple[int, datetime]] = {}
+        for user, tranches, at in rows:
+            amount = sum(int(t["amount"]) for t in tranches if t["status"] in ("reserved", "consumed"))
+            if amount:
+                before = given.get(user)
+                given[user] = (amount + (before[0] if before else 0), min(at, before[1]) if before else at)
+        return sorted(
+            ((user, amount, at) for user, (amount, at) in given.items()), key=lambda f: (-f[1], f[2])
+        )
+
     # --- reads ---------------------------------------------------------------------------------------
     async def get(self, project_id: UUID) -> Project:
         async with self.database.session() as session:

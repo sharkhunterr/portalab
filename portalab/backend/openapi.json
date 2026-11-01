@@ -15133,6 +15133,53 @@
         "title": "ProjectFundIn",
         "type": "object"
       },
+      "ProjectFunderOut": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "me": {
+            "default": false,
+            "title": "Me",
+            "type": "boolean"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "since": {
+            "format": "date-time",
+            "title": "Since",
+            "type": "string"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          }
+        },
+        "required": [
+          "amount",
+          "since"
+        ],
+        "title": "ProjectFunderOut",
+        "type": "object"
+      },
       "ProjectFundingOut": {
         "properties": {
           "amount": {
@@ -51066,6 +51113,54 @@
           }
         },
         "summary": "Fund Project",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/funders": {
+      "get": {
+        "description": "#304: who backs the project and with how much, the largest first.",
+        "operationId": "project_funders_api_v1_projects__project_id__funders_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectFunderOut"
+                  },
+                  "title": "Response Project Funders Api V1 Projects  Project Id  Funders Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Project Funders",
         "tags": [
           "projects"
         ]

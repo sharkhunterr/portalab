@@ -129,6 +129,23 @@ async def list_projects(_: Reader, module: Module, state: str | None = None) -> 
     return [await project_out(module, p) for p in await module.projects.all(state)]
 
 
+class ProjectFunderOut(BaseModel):
+    user_id: UUID | None = None  # none for a member who stays anonymous
+    name: str | None = None
+    amount: int
+    since: datetime
+    me: bool = False
+
+
+@router.get("/projects/{project_id}/funders", response_model=list[ProjectFunderOut])
+async def project_funders(principal: Reader, project_id: UUID, module: Module) -> list[ProjectFunderOut]:
+    """#304: who backs the project and with how much, the largest first."""
+    return [
+        ProjectFunderOut(user_id=f.user_id, name=f.name, amount=f.amount, since=f.since, me=f.me)
+        for f in await module.project_funders(principal, project_id)
+    ]
+
+
 class ProjectsSeenOut(BaseModel):
     previous: datetime | None = None  # when I had last opened them: what changed after is new to me
 

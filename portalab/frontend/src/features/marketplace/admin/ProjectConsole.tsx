@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { AdminEmpty, AdminPage } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
+import { TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
@@ -67,6 +68,10 @@ function MoveButton({ project, move }: { project: Project; move: Move }) {
   const admin = useProjectAdmin();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
+  // issue 304: opening the funding sets its goal and each member's cap — frozen from then on
+  const [goal, setGoal] = useState("");
+  const [cap, setCap] = useState("1000");
+  const opening = move.action === "open";
   const [confirmation, setConfirmation] = useState<string | null>(null);
   const label = t(`marketplace:console.${move.label}`);
   const run = () =>
@@ -76,6 +81,14 @@ function MoveButton({ project, move }: { project: Project; move: Move }) {
         action: move.action,
         body: {
           ...move.body,
+          ...(opening
+            ? {
+                rules: {
+                  max_funding_per_user: Number(cap) || 1000,
+                  ...(Number(goal) > 0 ? { goal_amount: Number(goal) } : {}),
+                },
+              }
+            : {}),
           reason: reason.trim() || undefined,
           version: project.version,
           confirmation: confirmation ?? undefined,
@@ -121,6 +134,26 @@ function MoveButton({ project, move }: { project: Project; move: Move }) {
         </Button>
       }
     >
+      {opening ? (
+        <div className="project-admin__rules">
+          <TextField
+            type="number"
+            min={1}
+            label={t("marketplace:console.goal")}
+            hint={t("marketplace:console.goalHint")}
+            value={goal}
+            onChange={(e) => setGoal(e.target.value)}
+          />
+          <TextField
+            type="number"
+            min={1}
+            label={t("marketplace:console.cap")}
+            value={cap}
+            required
+            onChange={(e) => setCap(e.target.value)}
+          />
+        </div>
+      ) : null}
       <div className="ds-field">
         <label htmlFor={`reason-${project.id}-${move.label}`}>{t("marketplace:console.reason")}</label>
         <textarea

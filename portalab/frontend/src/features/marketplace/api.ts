@@ -19,6 +19,21 @@ export function useProjects(state?: string) {
   });
 }
 
+export type ProjectFunder = components["schemas"]["ProjectFunderOut"];
+
+/** issue 304: who backs a project, the largest first (a member who stays anonymous without their name). */
+export function useProjectFunders(projectId: string) {
+  return useQuery({
+    queryKey: [...KEY, "project", projectId, "funders"],
+    queryFn: async () =>
+      ((
+        await api.GET("/api/v1/projects/{project_id}/funders", {
+          params: { path: { project_id: projectId } },
+        })
+      ).data ?? []) as ProjectFunder[],
+  });
+}
+
 export function useProject(projectId: string) {
   return useQuery({
     queryKey: [...KEY, "project", projectId],
