@@ -170,6 +170,9 @@ async def test_editions(
     assert [e["id"] for e in (await client.get("/api/v1/news/editions")).json()] == [draft["id"]]
     shown = await client.get(f"/api/v1/news/editions/{draft['id']}/page")
     assert shown.status_code == 200 and shown.headers["x-frame-options"] == "SAMEORIGIN"
+    # #335: shown whole in its article, it shares the portal's origin — so never a script in it
+    policy = shown.headers["content-security-policy"]
+    assert "default-src 'none'" in policy and "script-src" not in policy and "allow-scripts" not in policy
     start = shown.text.index("/api/v1/newsletters/pictures/")
     address = shown.text[start : shown.text.index('"', start)]
     await client.post("/api/v1/auth/logout")

@@ -8,6 +8,10 @@
   border-radius: var(--radius-lg);
   background: var(--color-surface);
 }
+/* issue 335: as tall as the letter once measured */
+.edition-frame[data-fit] {
+  overflow: hidden;
+}
 .edition-page__back {
   display: inline-flex;
   align-items: center;
