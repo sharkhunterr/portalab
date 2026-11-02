@@ -94,7 +94,8 @@ class HistoryRewards:
             rows = (
                 (
                     await session.execute(
-                        select(Activity).where(
+                        select(Activity)
+                        .where(
                             Activity.user_id.is_not(None),
                             Activity.counted.is_(True),
                             Activity.started_at >= now - MAX_AGE,
@@ -103,6 +104,7 @@ class HistoryRewards:
                             # #190: a game played is no film watched — its minutes are no watching time
                             Activity.kind != "game",
                         )
+                        .order_by(Activity.started_at)  # #343: told in the order they were watched
                     )
                 )
                 .scalars()
@@ -163,6 +165,7 @@ class HistoryRewards:
         finished: their ``media.playback_finished``, once (its dedup key), without minutes."""
         since = datetime.fromisoformat(str(payload["since"]))
         published = 0
+        found: list[tuple[Any, ...]] = []  # #343: told in the order they were watched
         async with self.database.unit_of_work() as uow:
             session = uow.session
             lives = (
@@ -180,17 +183,18 @@ class HistoryRewards:
             for live in lives:
                 if not await self._ends_now(live.kind, live.object_id, live.max_position_s, live.duration_s):
                     continue
-                published += await self._finished_late(
-                    session,
-                    live.user_id,
-                    live.object_id,
-                    live.kind,
-                    live.service_id,
-                    live.session_key,
-                    live.max_position_s,
-                    live.duration_s,
-                    live.last_event_at,
-                    f"{EVENT}:{live.session_key}",  # the live watch's own key: never twice
+                found.append(
+                    (
+                        live.user_id,
+                        live.object_id,
+                        live.kind,
+                        live.service_id,
+                        live.session_key,
+                        live.max_position_s,
+                        live.duration_s,
+                        live.last_event_at,
+                        f"{EVENT}:{live.session_key}",  # the live watch's own key: never twice
+                    )
                 )
             plays = (
                 await session.execute(
@@ -215,18 +219,21 @@ class HistoryRewards:
                     continue
                 if await self._seen_live(session, row, await self._credits(row.object_id)):
                     continue  # the live session's verdict, looked at above
-                published += await self._finished_late(
-                    session,
-                    row.user_id,
-                    row.object_id,
-                    row.kind,
-                    row.service_id,
-                    f"history:{row.ref}",
-                    position,
-                    row.duration_s,
-                    row.stopped_at,
-                    f"{EVENT}:history:{row.service_id}:{row.ref}",
+                found.append(
+                    (
+                        row.user_id,
+                        row.object_id,
+                        row.kind,
+                        row.service_id,
+                        f"history:{row.ref}",
+                        position,
+                        row.duration_s,
+                        row.stopped_at,
+                        f"{EVENT}:history:{row.service_id}:{row.ref}",
+                    )
                 )
+            for finish in sorted(found, key=lambda f: f[7]):
+                published += await self._finished_late(session, *finish)
         if published:
             metrics.increment("media.playback.finished_on_review", published)
         return published

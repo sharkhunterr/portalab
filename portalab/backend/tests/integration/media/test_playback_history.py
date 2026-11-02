@@ -282,7 +282,7 @@ async def test_season_finished(app: FastAPI, media: MediaHarness, clock: FixedCl
 
     from portalab.modules.media.models import MediaObject
 
-    people = await users(app, media, "alex")
+    people = await users(app, media, "alex", "sam")
     svc = media.service(1)
     await media.module.library.upsert(
         [
@@ -299,14 +299,14 @@ async def test_season_finished(app: FastAPI, media: MediaHarness, clock: FixedCl
             for o in (await session.execute(select(MediaObject))).scalars()
         }
 
-    async def finish(episode: str) -> None:
+    async def finish(episode: str, who: str = "alex", hours_ago: float = 0) -> None:
         await media.module.history.apply(
             event_id=uuid4(),
             event_type="media.playback_finished",
-            user=people["alex"],
+            user=people[who],
             object_id=objects[episode].id,
             payload={"position_s": 2900, "duration_s": 3000, "session": str(uuid4()), "kind": "episode"},
-            occurred_at=clock.now(),
+            occurred_at=clock.now() - timedelta(hours=hours_ago),
             live=True,
         )
 
@@ -320,3 +320,15 @@ async def test_season_finished(app: FastAPI, media: MediaHarness, clock: FixedCl
     assert name == "media.season_finished" and subject == str(people["alex"])
     assert payload["object"] == str(objects["season"].id) and payload["episodes"] == 2
     assert payload["series"] == str(objects["series"].id)
+    # #343: told late and out of order (the second episode first), the season is finished at its last episode
+    await finish("episode2", "sam", hours_ago=1)
+    await finish("episode1", "sam", hours_ago=12)
+    async with media.database.session() as session:
+        at = await session.scalar(
+            text(
+                "SELECT occurred_at FROM events.events"
+                " WHERE type = 'media.season_finished' AND subject_id = :u"
+            ),
+            {"u": str(people["sam"])},
+        )
+    assert at == clock.now() - timedelta(hours=1)
