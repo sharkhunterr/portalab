@@ -54,6 +54,15 @@ async def test_service_links_give_each_service_its_state_and_address() -> None:
         ("Media", "operational", "https://plex.lan", "/services/s1"),
         ("Books", "unavailable", None, "/services/s2"),
     ]
+    # issue 333: the services chosen, in the order chosen (an unknown one ignored)
+    chosen = await ServiceLinksProvider(capabilities, Authorizer()).load(  # type: ignore[arg-type]
+        ALLOWED, {"services": ["s2", "gone", "s1"]}, LocaleContext()
+    )
+    assert [i["name"] for i in chosen.data["items"]] == ["Books", "Media"]
+    only = await ServiceLinksProvider(capabilities, Authorizer()).load(  # type: ignore[arg-type]
+        ALLOWED, {"services": ["s2"]}, LocaleContext()
+    )
+    assert [i["name"] for i in only.data["items"]] == ["Books"]
 
 
 async def test_a_switched_off_service_is_not_watched() -> None:

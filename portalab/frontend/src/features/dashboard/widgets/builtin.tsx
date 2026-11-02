@@ -209,7 +209,11 @@ function ServicesCompact({ payload }: WidgetProps) {
   );
 }
 
-/** Service links (027): the configured services as tiles — open the service, see its state at a glance. */
+/**
+ * Service links (027): the configured services as tiles — open the service, see its state at a glance.
+ * Issue 333: the services chosen, in the order chosen (the widget's settings); each tile in its state's
+ * colour; tiles in a wide block, rows in a narrow column, pills on a single row.
+ */
 function ServiceLinks({ payload }: WidgetProps) {
   const t = useT();
   const items =
@@ -244,7 +248,7 @@ function ServiceLinks({ payload }: WidgetProps) {
           </>
         );
         return (
-          <li key={item.id}>
+          <li key={item.id} className="has-tone" data-tone={HEALTH_TONES[item.state] ?? "neutral"}>
             {item.link ? (
               <a
                 href={item.link}
