@@ -9,7 +9,9 @@ from datetime import datetime, timedelta
 from portalab.capabilities.media import SourcePlayback
 
 ACTIVE = ("playing", "paused", "buffering")
-CREDITS_LEEWAY_S = 30.0  # a position is read every few seconds: stopping as the credits begin still counts
+# a position is read every few seconds, a history rounds its percentages, a marker may come a little early:
+# a play stopped in the last shot before the end credits is finished (#342: two minutes, it was 30 s)
+CREDITS_LEEWAY_S = 120.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,7 +46,11 @@ def on_update(
 
 
 def reached_end(
-    position: float, duration: float | None, threshold: float | None, credits: float | None = None
+    position: float,
+    duration: float | None,
+    threshold: float | None,
+    credits: float | None = None,
+    leeway: float = CREDITS_LEEWAY_S,
 ) -> bool:
     """#101: the play reached its end — its end credits when the media server knows where they begin (a film
     stopped minutes before them is not finished, however long the credits), else the kind's threshold;
@@ -52,7 +58,7 @@ def reached_end(
     if threshold is None:
         return False
     if credits is not None and credits > 0 and (not duration or credits < duration):
-        return position >= credits - CREDITS_LEEWAY_S
+        return position >= credits - leeway
     share = percent(position, duration)
     return share is not None and share >= threshold
 

@@ -6,10 +6,15 @@ listen to — unless the live watch followed that play to its end: its verdict s
 (#101: a history rounds its percentages — 89.5 % read as 90 — and its minutes were the live watch's too).
 Only the plays the portal lived: #341 — those after the member linked that account (``WINDOW`` of grace
 before, #102), however late the catch-up, at most ``MAX_AGE`` back; without a link, the last ``WINDOW``.
-An old history imported later never turns into XP."""
+An old history imported later never turns into XP.
+
+#342: the end credits' leeway grew (30 s → 2 min) — ``review_endings`` looks once at the plays judged
+abandoned since then: one that now reaches its end gets its ``media.playback_finished``, its minutes not
+counted twice (``watched_s`` 0: its abandoned play gave them)."""
 
 from collections.abc import Awaitable, Callable
-from datetime import timedelta
+from datetime import datetime, timedelta
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import and_, func, select
@@ -22,6 +27,9 @@ from portalab.modules.media.models import Activity, PlaybackSession, UserLink
 from portalab.modules.media.observability import metrics
 from portalab.modules.media.playback.normalizer import percent, reached_end
 from portalab.modules.media.playback.poller import HISTORY
+
+REVIEW_JOB = "media.endings_review"
+FORMER_LEEWAY_S = 30.0  # #342: the end credits' leeway before
 
 WINDOW = timedelta(hours=48)  # a play's grace before its account was linked — without a link, its age
 MAX_AGE = timedelta(days=30)  # #341: a catch-up never reaches further back
@@ -136,6 +144,127 @@ class HistoryRewards:
         if published:
             metrics.increment("media.playback.finished_from_history", published)
         return published
+
+    async def _ends_now(
+        self, kind: str, object_id: UUID | None, position: float, duration: float | None
+    ) -> bool:
+        """#342: the play reaches its end now, not with the former leeway."""
+        credits = await self._credits(object_id) if duration else None
+        if credits is None:
+            return False  # the kind's threshold decides: unchanged
+        threshold = self.threshold(kind)
+        return reached_end(position, duration, threshold, credits) and not reached_end(
+            position, duration, threshold, credits, FORMER_LEEWAY_S
+        )
+
+    async def review_endings(self, payload: dict[str, Any]) -> int:
+        """#342 (job, queued once): the films and episodes judged abandoned since ``payload["since"]`` that
+        reach their end credits now — followed live, or read from a history and not followed — are
+        finished: their ``media.playback_finished``, once (its dedup key), without minutes."""
+        since = datetime.fromisoformat(str(payload["since"]))
+        published = 0
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            lives = (
+                await session.execute(
+                    select(PlaybackSession).where(
+                        PlaybackSession.ended.is_(True),
+                        PlaybackSession.state == "stopped",
+                        PlaybackSession.user_id.is_not(None),
+                        PlaybackSession.kind.in_(("movie", "episode")),
+                        PlaybackSession.updated_at >= since,
+                        PlaybackSession.session_key.not_like(f"%{HISTORY}%"),
+                    )
+                )
+            ).scalars()
+            for live in lives:
+                if not await self._ends_now(live.kind, live.object_id, live.max_position_s, live.duration_s):
+                    continue
+                published += await self._finished_late(
+                    session,
+                    live.user_id,
+                    live.object_id,
+                    live.kind,
+                    live.service_id,
+                    live.session_key,
+                    live.max_position_s,
+                    live.duration_s,
+                    live.last_event_at,
+                    f"{EVENT}:{live.session_key}",  # the live watch's own key: never twice
+                )
+            plays = (
+                await session.execute(
+                    select(Activity).where(
+                        Activity.rewarded_at.is_not(None),
+                        Activity.counted.is_(True),
+                        Activity.user_id.is_not(None),
+                        Activity.kind.in_(("movie", "episode")),
+                        Activity.stopped_at >= since,
+                        Activity.duration_s.is_not(None),
+                        # the portal's own player: its live sessions said it
+                        Activity.external_user_id.not_like("portal:%"),
+                    )
+                )
+            ).scalars()
+            for row in plays:
+                share = row.progress if row.progress is not None else percent(row.watched_s, row.duration_s)
+                if share is None or not row.duration_s or row.stopped_at is None:
+                    continue
+                position = share * row.duration_s
+                if not await self._ends_now(row.kind, row.object_id, position, row.duration_s):
+                    continue
+                if await self._seen_live(session, row, await self._credits(row.object_id)):
+                    continue  # the live session's verdict, looked at above
+                published += await self._finished_late(
+                    session,
+                    row.user_id,
+                    row.object_id,
+                    row.kind,
+                    row.service_id,
+                    f"history:{row.ref}",
+                    position,
+                    row.duration_s,
+                    row.stopped_at,
+                    f"{EVENT}:history:{row.service_id}:{row.ref}",
+                )
+        if published:
+            metrics.increment("media.playback.finished_on_review", published)
+        return published
+
+    async def _finished_late(
+        self,
+        session: AsyncSession,
+        user: UUID | None,
+        object_id: UUID | None,
+        kind: str,
+        service: UUID,
+        play: str,
+        position: float,
+        duration: float | None,
+        at: datetime,
+        dedup: str,
+    ) -> int:
+        result = await self.events.publish(
+            session,
+            EVENT,
+            {
+                "object": str(object_id) if object_id else None,
+                "kind": kind,
+                "state_seq": 0,
+                "service": str(service),
+                "session": play,
+                "position_s": round(position, 1),
+                "duration_s": duration,
+                "percent": percent(position, duration),
+                "occurred_at": at.isoformat(),
+                "watched_s": 0.0,  # its minutes: its abandoned play gave them
+            },
+            occurred_at=at,
+            subject=SubjectRef("user", str(user)),
+            source="media",
+            dedup_key=dedup,
+        )
+        return 0 if result.duplicate else 1
 
     async def _seen_live(self, session: AsyncSession, row: Activity, credits: float | None) -> bool:
         """The live watch followed this play: it finished it within ``NEARBY``, or it followed it to its
