@@ -6,7 +6,7 @@ import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { type NewsCard, useCategories, useFeatured, useNewsList } from "./api";
-import { Cover } from "./cover";
+import { Cover, channelHues, channelStyle } from "./cover";
 import { ExternalNews } from "./ExternalNews";
 import "./news.css";
 import { UnreadDot } from "../dashboard/templates/Templates";
@@ -17,6 +17,7 @@ import { UnreadDot } from "../dashboard/templates/Templates";
  * card is one link (its title), the cover is decorative.
  */
 type Categories = Map<string, string>;
+type Hues = Map<string, number>;
 
 function categoryName(categories: Categories, id: string | null | undefined, fallback: string): string {
   return (id && categories.get(id)) || fallback;
@@ -25,10 +26,12 @@ function categoryName(categories: Categories, id: string | null | undefined, fal
 function ArticleCard({
   item,
   categories,
+  hues,
   hero = false,
 }: {
   item: NewsCard;
   categories: Categories;
+  hues: Hues;
   hero?: boolean;
 }) {
   const t = useT();
@@ -37,7 +40,12 @@ function ArticleCard({
   const age = item.published_at ? (Date.parse(item.published_at) - Date.now()) / 1000 : null;
   return (
     <article className="news-card" data-hero={hero || undefined} data-unread={item.unread || undefined}>
-      <Cover seed={item.category_id ?? item.slug} label={category} size={hero ? "lg" : "md"} />
+      <Cover
+        seed={item.category_id ?? item.slug}
+        label={category}
+        hue={item.category_id ? hues.get(item.category_id) : undefined}
+        size={hero ? "lg" : "md"}
+      />
       <div className="news-card__body">
         {hero ? <span className="news-card__kicker">{t("news:featured")}</span> : null}
         <h3 className="news-card__title">
@@ -63,6 +71,7 @@ export function NewsPage() {
   const categories = useCategories();
   const list = useNewsList(category || undefined);
   const names: Categories = new Map((categories.data ?? []).map((c) => [c.id, c.name]));
+  const hues = channelHues(categories.data ?? []); // issue 338: each channel its colour
   const [hero, ...others] = featured.data ?? [];
   return (
     <section aria-labelledby={headingId} className="news-page">
@@ -75,12 +84,12 @@ export function NewsPage() {
       />
       {hero && !category ? (
         <section aria-label={t("news:featured")} className="news-featured">
-          <ArticleCard item={hero} categories={names} hero />
+          <ArticleCard item={hero} categories={names} hues={hues} hero />
           {others.length ? (
             <ul className="news-featured__side">
               {others.slice(0, 3).map((item) => (
                 <li key={item.id}>
-                  <ArticleCard item={item} categories={names} />
+                  <ArticleCard item={item} categories={names} hues={hues} />
                 </li>
               ))}
             </ul>
@@ -99,6 +108,7 @@ export function NewsPage() {
               aria-pressed={category === c.key}
               onClick={() => setCategory(c.key)}
             >
+              <span className="news-channel-dot" style={channelStyle(hues.get(c.id))} aria-hidden="true" />
               {c.name}
             </button>
           ))}
@@ -118,7 +128,7 @@ export function NewsPage() {
         <ul className="news-grid" aria-label={t("news:latest")}>
           {list.data.items.map((item) => (
             <li key={item.id}>
-              <ArticleCard item={item} categories={names} />
+              <ArticleCard item={item} categories={names} hues={hues} />
             </li>
           ))}
         </ul>
