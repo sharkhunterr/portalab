@@ -94,6 +94,7 @@ class ArticleInput:
     notify_on_publish: bool = False
     language: str = "en"
     email_on_publish: bool = False  # 027: e-mailed to the channel's subscribers when published
+    edition_id: UUID | None = None  # #335: the newsletter letter it shows
 
 
 class ArticleService:
@@ -175,6 +176,7 @@ class ArticleService:
                 audience=audience,
                 notify_on_publish=data.notify_on_publish,
                 email_on_publish=data.email_on_publish,
+                edition_id=data.edition_id,
                 version=1,
                 search_vector=self._vector(data.title, data.summary, rendered.text),
                 created_at=now,

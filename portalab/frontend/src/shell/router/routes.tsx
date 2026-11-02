@@ -60,7 +60,6 @@ const MediaRequestsAdmin = lazy(() => import("../../features/admin/media/Request
 const NewsPage = lazy(() => import("../../features/news/NewsPage"));
 const Article = lazy(() => import("../../features/news/ArticlePage"));
 const NewsAdmin = lazy(() => import("../../features/news/NewsAdmin"));
-const Editions = lazy(() => import("../../features/news/editions/EditionsPage")); // issue 316
 const Edition = lazy(() =>
   import("../../features/news/editions/EditionsPage").then((m) => ({ default: m.EditionPage })),
 );
@@ -342,7 +341,8 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           handle: h({ crumb: "News", requiredPermission: "news.read" }),
           children: [
             { index: true, element: <NewsPage /> },
-            { path: "editions", element: <Editions />, handle: h({ crumb: "Newsletters" }) },
+            // issue 335: no list of letters of its own — a letter published in the portal is a news
+            { path: "editions", loader: () => redirect("/news") },
             {
               path: "editions/:editionId",
               element: <Edition />,

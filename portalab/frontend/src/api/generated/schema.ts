@@ -16429,6 +16429,8 @@ export interface components {
             archived: boolean;
             /** Category Id */
             category_id: string | null;
+            /** Edition Id */
+            edition_id?: string | null;
             /** Html */
             html: string;
             /**

@@ -523,12 +523,15 @@ class Editions:
             row = await uow.session.get(NewsletterEdition, edition_id, with_for_update=True)
             if row is None or row.status == "preview":
                 raise EditionNotFound("This edition does not exist.")
-            if visible and row.status != "published":
+            published = visible and row.status != "published"
+            if published:
                 row.status = "published"
                 row.published_at = now
             elif not visible and row.status == "draft":
                 row.status = "sent"
         edition = await self.get(edition_id)
+        if published:
+            await self.newsletters.announce(edition)  # #335: in the news, as an article
         if email and edition.emailed_at is None:
             await self.email(edition)
             edition = await self.get(edition_id)

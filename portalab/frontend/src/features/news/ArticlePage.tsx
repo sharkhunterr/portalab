@@ -8,6 +8,7 @@ import { useT } from "../../i18n/hooks/useT";
 import { SafeHtml } from "../content/SafeHtml";
 import { useArticle, useCategories, useMarkRead } from "./api";
 import { Cover, readingMinutes } from "./cover";
+import { EditionFrame } from "./editions/EditionsPage";
 import "./news.css";
 
 /**
@@ -62,10 +63,17 @@ export function ArticlePage() {
       </div>
       {data.archived ? <p role="note">{t("news:archived")}</p> : null}
       {data.translation_missing ? <p role="note">{t("news:notTranslated")}</p> : null}
-      {data.summary ? <p className="news-article__lead">{data.summary}</p> : null}
-      <div className="news-article__body">
-        <SafeHtml html={data.html} />
-      </div>
+      {data.edition_id ? (
+        // issue 335: a newsletter's letter, shown itself — a news as the others
+        <EditionFrame src={`/api/v1/news/editions/${data.edition_id}/page`} title={data.title} />
+      ) : (
+        <>
+          {data.summary ? <p className="news-article__lead">{data.summary}</p> : null}
+          <div className="news-article__body">
+            <SafeHtml html={data.html} />
+          </div>
+        </>
+      )}
     </article>
   );
 }

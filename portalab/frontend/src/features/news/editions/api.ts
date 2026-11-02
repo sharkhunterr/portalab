@@ -163,13 +163,6 @@ export function useEditionActions() {
   };
 }
 
-export function useEditions() {
-  return useQuery({
-    queryKey: [...EDITIONS, "published"],
-    queryFn: async () => ((await api.GET("/api/v1/news/editions")).data ?? []) as Edition[],
-  });
-}
-
 export function useEdition(id: string) {
   return useQuery({
     queryKey: [...EDITIONS, id],

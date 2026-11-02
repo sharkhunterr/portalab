@@ -306,17 +306,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "order_hint": 30,
         "required_permission": "wiki.read",
     },
-    {  # #316: the self-writing newsletters' editions, read in the portal as they were e-mailed
-        "key": "news.editions",
-        "owner": "module:news",
-        "kind": "entry",
-        "label_key": "nav.news_editions",
-        "icon": "mail",
-        "route": "/news/editions",
-        "group": "content",
-        "order_hint": 12,
-        "required_permission": "news.read",
-    },
+    # #335: no « Letters » entry — a letter published in the portal is a news among the others
     {  # #299: « Mon fil » — what the library brings for the people, titles and genres I follow
         "key": "media.feed",
         "owner": "module:media",

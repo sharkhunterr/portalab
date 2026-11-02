@@ -12150,6 +12150,18 @@
             ],
             "title": "Category Id"
           },
+          "edition_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edition Id"
+          },
           "html": {
             "title": "Html",
             "type": "string"

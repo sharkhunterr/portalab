@@ -455,7 +455,7 @@ class Newsletters:
             # #332: published in the portal (its letter, and an article in its channel's news), e-mailed,
             # or both
             edition = await self.editions.publish(edition.id, email=schedule.email, visible=schedule.publish)
-            announced = await self._announce(schedule, edition) if schedule.publish else None
+            announced = await self._article_of(edition.id)
             async with self.database.unit_of_work() as uow:
                 row = await uow.session.get(NewsletterSchedule, schedule_id, with_for_update=True)
                 if row is not None:
@@ -524,15 +524,16 @@ class Newsletters:
         announced = None
         if schedule.publish:
             edition = await self.editions.publish(edition.id, email=False)
-            announced = await self._announce(schedule, edition)
+            announced = await self._article_of(edition.id)
         sent = await self.editions.send_test(edition, user, base)
         return edition, announced, sent
 
-    async def _announce(self, schedule: NewsletterSchedule, edition: NewsletterEdition) -> Article | None:
-        """#332: the letter in its channel's news — an article saying what it tells, leading to it."""
+    async def announce(self, edition: NewsletterEdition) -> Article | None:
+        """#332: a letter published in the portal is in its channel's news — #335: an article showing the
+        letter itself, as any news."""
         try:
             summary = str((edition.data or {}).get("preheader") or "")
-            read = self._t("newsletter.readLetter", schedule.language)
+            read = self._t("newsletter.readLetter", edition.language)
             body = f"{summary}\n\n[**{read} →**](/news/editions/{edition.id})".strip()
             draft = await self.articles.create(
                 None,
@@ -540,15 +541,22 @@ class Newsletters:
                     title=edition.title[:200],
                     body_md=body,
                     summary=summary[:600],
-                    category_id=schedule.category_id,
-                    language=schedule.language,
+                    category_id=edition.category_id,
+                    language=edition.language,
                     email_on_publish=False,  # the letter itself is the e-mail
+                    edition_id=edition.id,
                 ),
             )
             return await self.articles.transition(None, draft.id, "publish")
         except Exception:
-            log.warning("automatic newsletter not announced in the news")
+            log.warning("newsletter letter not announced in the news")
             return None
+
+    async def _article_of(self, edition_id: UUID) -> Article | None:
+        async with self.database.session() as session:
+            return await session.scalar(  # type: ignore[no-any-return]
+                select(Article).where(Article.edition_id == edition_id).order_by(Article.created_at.desc())
+            )
 
     async def run_due(self) -> int:
         if not await self._setting(NEWSLETTER_ON, True):
