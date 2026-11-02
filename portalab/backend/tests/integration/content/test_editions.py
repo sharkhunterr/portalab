@@ -364,3 +364,62 @@ async def test_members_are_subscribed_to_each_newsletter_until_they_leave_it(
     await login(client, "eddie")  # leaving the channel leaves its newsletters too
     left = await client.put("/api/v1/me/newsletters", json={"changes": {"club": False}})
     assert {s["key"]: s["subscribed"] for s in left.json()}[f"auto:{monthly}"] is False
+
+
+async def test_an_automatic_newsletter_is_published_in_the_news_e_mailed_or_both(
+    client: httpx.AsyncClient, ct: ContentHarness, people: dict[str, UUID], clock: FixedClock
+) -> None:
+    """#332: published, its letter is readable in the portal and an article in its channel's news leads to
+    it; e-mailed only, it is « sent » — never in the portal, no page, no article; never neither."""
+    library = _Library(clock.now().date())
+    capabilities = ct.ev.full.identity.capabilities
+    capabilities.provide(DIGEST, library, instance_ref="test-where", owner="test")
+    capabilities.provide(EDITION, library, instance_ref="test-where", owner="test")
+    await login(client, "boss")
+    await client.put(
+        "/api/v1/admin/news/categories", json={"key": "gazette", "name": "Gazette", "newsletter": True}
+    )
+    async with ct.database.session() as session:
+        channel = await session.scalar(select(Category).where(Category.key == "gazette"))
+    assert channel is not None
+
+    async def newsletter(name: str, *, publish: bool, email: bool) -> httpx.Response:
+        return await client.post(
+            "/api/v1/admin/news/newsletters",
+            json={
+                "name": name,
+                "category_id": str(channel.id),
+                "cadence": "weekly",
+                "publish": publish,
+                "email": email,
+            },
+        )
+
+    nowhere = await newsletter("Nulle part", publish=False, email=False)
+    assert nowhere.status_code == 422 and nowhere.json()["code"] == "news.newsletter_goes_nowhere"
+
+    published = (await newsletter("Dans les actus", publish=True, email=False)).json()
+    assert published["publish"] is True
+    run = (await client.post(f"/api/v1/admin/news/newsletters/{published['id']}/run")).json()
+    letter = (await client.get(f"/api/v1/news/editions/{run['edition']}")).json()
+    news = (await client.get("/api/v1/news", params={"category": "gazette"})).json()["items"]
+    [article] = [n for n in news if n["title"] == letter["title"]]
+    assert article["status"] == "published"
+    body = (await client.get(f"/api/v1/news/{article['slug']}")).json()["html"]
+    assert f"/news/editions/{run['edition']}" in body  # the article leads to the letter
+
+    mailed = (await newsletter("Par e-mail", publish=False, email=True)).json()
+    run = (await client.post(f"/api/v1/admin/news/newsletters/{mailed['id']}/run")).json()
+    assert (await client.get(f"/api/v1/news/editions/{run['edition']}")).status_code == 404
+    [sent] = [
+        e
+        for e in (await client.get("/api/v1/admin/news/newsletter-editions")).json()
+        if e["id"] == run["edition"]
+    ]
+    assert sent["status"] == "sent" and sent["emailed_at"] is not None
+    page = (await client.get(f"/api/v1/admin/news/newsletter-editions/{run['edition']}/page")).text
+    assert f"/news/editions/{run['edition']}" not in page  # no « read it in the portal » link
+    [mail] = [r for r in ct.outbox.sent if r.dedup_key == f"news.edition:{run['edition']}"]
+    assert mail.action_url is None
+    news = (await client.get("/api/v1/news", params={"category": "gazette"})).json()["items"]
+    assert len(news) == 1  # no article for the letter e-mailed only

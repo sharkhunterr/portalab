@@ -198,6 +198,7 @@ class NewsletterScheduleIn(BaseModel):
     hour: int = Field(default=9, ge=0, le=23)
     language: str = Field(default="fr", max_length=16)
     email: bool = True
+    publish: bool = True  # #332: published in the portal's news (with ``email``: either, or both)
     enabled: bool = True
     template_key: str | None = Field(default=None, pattern=r"^[a-z0-9][a-z0-9_-]{1,62}$")  # #316: editions
     notice: str | None = Field(default=None, max_length=2000)
@@ -233,6 +234,7 @@ def _schedule_out(row: Any) -> NewsletterScheduleOut:
         hour=row.hour,
         language=row.language,
         email=row.email,
+        publish=row.publish,
         enabled=row.enabled,
         template_key=row.template_key,
         notice=row.notice,

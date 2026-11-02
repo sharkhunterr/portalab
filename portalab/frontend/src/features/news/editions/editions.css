@@ -489,3 +489,8 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
 }
+.auto-letter__switches {
+  display: grid;
+  gap: var(--space-3);
+  margin-block-start: var(--space-3);
+}

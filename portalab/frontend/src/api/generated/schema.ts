@@ -16773,6 +16773,11 @@ export interface components {
             name: string;
             /** Notice */
             notice?: string | null;
+            /**
+             * Publish
+             * @default true
+             */
+            publish: boolean;
             /** Subject */
             subject?: string | null;
             /** Template Key */
@@ -16844,6 +16849,11 @@ export interface components {
             next_run_at: string | null;
             /** Notice */
             notice?: string | null;
+            /**
+             * Publish
+             * @default true
+             */
+            publish: boolean;
             /** Subject */
             subject?: string | null;
             /** Subscribers */

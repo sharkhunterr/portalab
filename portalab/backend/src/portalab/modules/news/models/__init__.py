@@ -149,6 +149,10 @@ class NewsletterSchedule(NewsBase):
         Boolean, nullable=False, default=True, info=not_personal("whether the newsletter is e-mailed")
     )
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    # #332: its letters published in the portal (« Letters », and an article in its channel's news)
+    publish: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, info=not_personal("whether the newsletter is published")
+    )
     last_run_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     next_run_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     last_article_id: Mapped[UUID | None] = mapped_column()
@@ -187,7 +191,8 @@ class NewsletterEdition(NewsBase):
 
     __tablename__ = "newsletter_editions"
     __table_args__ = (
-        CheckConstraint("status IN ('preview', 'draft', 'published')", name="status"),
+        # #332: « sent » — e-mailed only, never published in the portal
+        CheckConstraint("status IN ('preview', 'draft', 'published', 'sent')", name="status"),
         UniqueConstraint("token", name="uq_newsletter_editions_token"),
         Index("ix_newsletter_editions_published", "status", "published_at"),
     )
