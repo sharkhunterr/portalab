@@ -6,6 +6,7 @@ import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
+import { useSite } from "../../../shell/site/site";
 import "../admin.css";
 
 interface Setting {
@@ -17,6 +18,7 @@ interface Setting {
 export const EMAIL_KEYS = {
   enabled: "notifications.email.enabled",
   sender: "notifications.email.from",
+  senderName: "notifications.email.fromName",
   portal: "notifications.email.portalUrl",
   host: "notifications.email.smtp.host",
   port: "notifications.email.smtp.port",
@@ -53,6 +55,7 @@ function presetOf(host: string): string {
  */
 export function EmailSettings() {
   const t = useT();
+  const site = useSite();
   const client = useQueryClient();
   const settings = useQuery({
     queryKey: ["admin", "notifications", "email"],
@@ -94,6 +97,7 @@ export function EmailSettings() {
         body: {
           enabled,
           sender: String(value("sender") ?? ""),
+          sender_name: String(value("senderName") ?? ""),
           portal_url: String(value("portal") ?? ""),
           host,
           port,
@@ -238,6 +242,15 @@ export function EmailSettings() {
               required={enabled}
               value={String(value("sender") ?? "")}
               onChange={(e) => set({ sender: e.target.value.trim() })}
+            />
+            {/* issue 339: the name shown instead of the address */}
+            <TextField
+              label={t("admin:email.senderName")}
+              hint={t("admin:email.senderNameHint")}
+              placeholder={site.name}
+              maxLength={100}
+              value={String(value("senderName") ?? "")}
+              onChange={(e) => set({ senderName: e.target.value })}
             />
             <TextField
               label={t("admin:email.portalUrl")}

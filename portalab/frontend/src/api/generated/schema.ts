@@ -14326,6 +14326,8 @@ export interface components {
             portal_url?: string | null;
             /** Sender */
             sender: string;
+            /** Sender Name */
+            sender_name?: string | null;
             /**
              * Tls
              * @default false

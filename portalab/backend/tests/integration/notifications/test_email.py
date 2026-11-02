@@ -7,6 +7,7 @@ import asyncio
 import dataclasses
 import socket
 from email import message_from_bytes
+from email.policy import default
 from typing import Any
 from uuid import UUID
 
@@ -17,7 +18,7 @@ from fastapi import FastAPI
 from sqlalchemy import text
 
 from portalab.capabilities.notifications import CommunicationRequest, EmailMessage, Users, declare_category
-from portalab.modules.notifications.channels.email import SmtpTransport
+from portalab.modules.notifications.channels.email import SmtpTransport, sender
 from portalab.modules.notifications.settings import NotificationsConfig
 from tests.authz_fixtures import make_admin
 from tests.integration.identity.helpers import create_user, login, module_of
@@ -132,7 +133,10 @@ async def test_smtp_adapter() -> None:
         async def no_password() -> str:
             return ""
 
-        transport = SmtpTransport(lambda: config, no_password)
+        async def named() -> str:
+            return "Xénoportal"
+
+        transport = SmtpTransport(lambda: config, no_password, named)
         await transport.send(EmailMessage("alex@example.test", "Subject\ninjected", "Hello", "<p>Hello</p>"))
         await asyncio.sleep(0)
     finally:
@@ -143,6 +147,16 @@ async def test_smtp_adapter() -> None:
     parsed = message_from_bytes(envelope.content)
     assert parsed["Subject"] == "Subject injected"  # no header injection
     assert parsed.is_multipart()
+    # #339: the sender's name, as mail clients show it
+    named = message_from_bytes(envelope.content, policy=default)
+    assert str(named["From"]) == "Xénoportal <portalab@localhost>"
+
+
+def test_sender_name() -> None:
+    """#339: a name with the address; none (or an address it cannot carry): the bare address."""
+    assert str(sender("  Xeno   portal ", "a@b.test")) == "Xeno portal <a@b.test>"
+    assert sender("", "a@b.test") == "a@b.test"
+    assert sender("Xeno", "not an address") == "not an address"
 
 
 async def test_members_email_switched_off_but_the_administrators(

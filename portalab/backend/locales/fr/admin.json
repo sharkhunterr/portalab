@@ -2141,6 +2141,8 @@
   "email.from": "Expéditeur et liens",
   "email.sender": "Adresse d’expédition",
   "email.senderHint": "L’adresse « De » des e-mails. Beaucoup de fournisseurs exigent celle du compte.",
+  "email.senderName": "Nom d’expéditeur",
+  "email.senderNameHint": "Le nom que les messageries affichent à la place de l’adresse ; vide, le nom du site. L’image de l’expéditeur vient du compte d’envoi (sa photo de profil Google pour Gmail), pas de l’e-mail.",
   "email.portalUrl": "Adresse publique du portail",
   "email.portalUrlHint": "Pour les liens et les images des e-mails ; elle doit être joignable par les destinataires.",
   "email.save": "Enregistrer",
