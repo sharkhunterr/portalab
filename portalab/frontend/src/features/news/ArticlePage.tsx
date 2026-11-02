@@ -65,7 +65,7 @@ export function ArticlePage() {
       {data.translation_missing ? <p role="note">{t("news:notTranslated")}</p> : null}
       {data.edition_id ? (
         // issue 335: a newsletter's letter, shown itself — a news as the others
-        <EditionFrame src={`/api/v1/news/editions/${data.edition_id}/page`} title={data.title} />
+        <EditionFrame src={`/api/v1/news/editions/${data.edition_id}/page`} title={data.title} fit />
       ) : (
         <>
           {data.summary ? <p className="news-article__lead">{data.summary}</p> : null}

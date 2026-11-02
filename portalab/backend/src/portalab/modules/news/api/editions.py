@@ -29,11 +29,13 @@ router = APIRouter(prefix="/api/v1", tags=["news"])
 KEY = r"^[a-z0-9][a-z0-9_-]{1,62}$"
 # the edition's page in the portal: its own styles and the pictures only, no script, no form, framed by the
 # portal alone; its links open in the portal (or apart)
+# #335: never a script (``default-src 'none'``, no ``allow-scripts``) — so the portal may share its origin to
+# measure the letter and show it whole, as any news
 PAGE_HEADERS = {
     "Content-Security-Policy": (
         "default-src 'none'; img-src 'self' https: data:; style-src 'unsafe-inline'; base-uri 'none'; "
         "form-action 'none'; frame-ancestors 'self'; sandbox allow-popups allow-popups-to-escape-sandbox "
-        "allow-top-navigation-by-user-activation"
+        "allow-top-navigation-by-user-activation allow-same-origin"
     ),
     "X-Frame-Options": "SAMEORIGIN",
     "Cache-Control": "private, no-store",
