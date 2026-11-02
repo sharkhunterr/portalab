@@ -13,16 +13,46 @@ export function hueOf(seed: string): number {
   return hash;
 }
 
-export function coverStyle(seed: string): CSSProperties {
-  const hue = hueOf(seed);
+export function coverStyle(seed: string, hue = hueOf(seed)): CSSProperties {
   return { "--cover-hue": String(hue), "--cover-mix": String(30 + (hue % 50)) } as CSSProperties;
 }
 
-export function Cover({ seed, label, size = "md" }: { seed: string; label?: string; size?: "md" | "lg" }) {
+/**
+ * Issue 338: each channel its colour — the theme's accent turned by a hue of its own, spread by their order
+ * (the golden angle: neighbours never look alike), the same on its badge, its cover and its chip.
+ */
+export function channelHues(channels: readonly { id: string; position?: number }[]): Map<string, number> {
+  const ordered = [...channels].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  return new Map(ordered.map((c, index) => [c.id, Math.round((index * 137.508) % 360)]));
+}
+
+export function channelStyle(hue: number | undefined): CSSProperties | undefined {
+  return hue === undefined ? undefined : ({ "--channel-hue": String(hue) } as CSSProperties);
+}
+
+export function Cover({
+  seed,
+  label,
+  hue,
+  size = "md",
+}: {
+  seed: string;
+  label?: string;
+  hue?: number | undefined;
+  size?: "md" | "lg";
+}) {
   return (
-    <span className="news-cover" data-size={size} style={coverStyle(seed)} aria-hidden="true">
+    <span className="news-cover" data-size={size} style={coverStyle(seed, hue)} aria-hidden="true">
       <Icon name="newspaper" size={size === "lg" ? 44 : 28} />
-      {label ? <span className="news-cover__label">{label}</span> : null}
+      {label ? (
+        <span
+          className="news-cover__label"
+          data-channel={hue !== undefined || undefined}
+          style={channelStyle(hue)}
+        >
+          {label}
+        </span>
+      ) : null}
     </span>
   );
 }

@@ -69,6 +69,24 @@
   font-weight: var(--font-weight-medium);
   backdrop-filter: blur(4px);
 }
+/* issue 338: each channel its colour — the theme's accent, turned by the channel's own hue */
+.news-cover__label[data-channel] {
+  background: oklch(from var(--color-accent) l c calc(h + var(--channel-hue)));
+  color: var(--color-accent-contrast);
+  backdrop-filter: none;
+}
+.news-card__kicker[data-channel] {
+  color: oklch(from var(--color-accent) l c calc(h + var(--channel-hue)));
+}
+.news-channel-dot {
+  display: inline-block;
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  margin-inline-end: var(--space-1);
+  border-radius: 50%;
+  background: oklch(from var(--color-accent) l c calc(h + var(--channel-hue, 0)));
+  vertical-align: middle;
+}
 
 /* cards */
 .news-card {

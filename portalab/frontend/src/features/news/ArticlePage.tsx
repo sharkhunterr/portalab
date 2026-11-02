@@ -7,7 +7,7 @@ import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { SafeHtml } from "../content/SafeHtml";
 import { useArticle, useCategories, useMarkRead } from "./api";
-import { Cover, readingMinutes } from "./cover";
+import { Cover, channelHues, channelStyle, readingMinutes } from "./cover";
 import { EditionFrame } from "./editions/EditionsPage";
 import "./news.css";
 
@@ -38,6 +38,7 @@ export function ArticlePage() {
   const category =
     (categories.data ?? []).find((c) => c.id === data.category_id)?.name ?? t("news:uncategorized");
   const text = data.html.replace(/<[^>]+>/g, " ");
+  const hue = data.category_id ? channelHues(categories.data ?? []).get(data.category_id) : undefined;
   return (
     <article aria-labelledby={headingId} className="news-article">
       <Link to="/news" className="news-article__back">
@@ -45,9 +46,15 @@ export function ArticlePage() {
         {t("news:back")}
       </Link>
       <div className="news-article__hero">
-        <Cover seed={data.category_id ?? data.slug} size="lg" />
+        <Cover seed={data.category_id ?? data.slug} hue={hue} size="lg" />
         <div className="news-article__heading">
-          <span className="news-card__kicker">{category}</span>
+          <span
+            className="news-card__kicker"
+            data-channel={hue !== undefined || undefined}
+            style={channelStyle(hue)}
+          >
+            {category}
+          </span>
           <PageHeader
             titleId={headingId}
             level={2}
