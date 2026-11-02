@@ -20,6 +20,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.media.models import Activity, PlaybackSession, UserLink
 from portalab.modules.media.observability import metrics
 from portalab.modules.media.playback.normalizer import percent, reached_end
+from portalab.modules.media.playback.poller import HISTORY
 
 WINDOW = timedelta(hours=48)
 NEARBY = timedelta(hours=6)  # a live session this close to the play is the same play
@@ -126,7 +127,9 @@ class HistoryRewards:
         """The live watch followed this play: it finished it within ``NEARBY``, or it followed it to its
         stop (its session ran alongside and ended normally) — it published that play's event already.
         Only a session that ended once its account was linked published anything (#102: a link attributes
-        the account's past sessions to the member afterwards, silently — their plays count from history)."""
+        the account's past sessions to the member afterwards, silently — their plays count from history).
+        #340: a play another history recorded (Plex's own, without its minutes) was not followed: only its
+        end reached stands for it."""
         start = row.started_at - NEARBY
         end = (row.stopped_at or row.started_at) + NEARBY
         began, stopped = row.started_at - ALONGSIDE, (row.stopped_at or row.started_at) + ALONGSIDE
@@ -153,6 +156,11 @@ class HistoryRewards:
         ).scalars()
         return any(
             reached_end(live.max_position_s, live.duration_s, self.threshold(live.kind), credits)
-            or (live.state == "stopped" and live.started_at <= stopped and live.updated_at >= began)
+            or (
+                live.state == "stopped"
+                and HISTORY not in live.session_key
+                and live.started_at <= stopped
+                and live.updated_at >= began
+            )
             for live in lives
         )

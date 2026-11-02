@@ -195,3 +195,24 @@ async def test_the_live_verdict_stands_and_the_end_credits_decide(app: FastAPI, 
         "Into the credits": "media.playback_finished",
         "Before the link": "media.playback_finished",
     }
+
+
+async def test_a_play_from_another_history_is_no_play_followed(app: FastAPI, media: MediaHarness) -> None:
+    """#340: Plex's own history leaves a stopped session without minutes beside the play — Tautulli's play of
+    it is no play the live watch followed: it counts."""
+    people = await users(app, media, "noe")
+    noe = people["noe"]
+    film = await _film(media, "Deadlock")
+    start, stop = NOW - timedelta(hours=3), NOW - timedelta(hours=1)
+    row = _activity(noe, 3, 1.0, title="Deadlock")
+    row.object_id, row.started_at, row.stopped_at = film, start, stop
+    history = _live(noe, film, f"{LIVE}:history:870805:{stop.isoformat()}", stop, stop, 0.0)
+    history.duration_s = None
+    async with media.database.unit_of_work() as uow:
+        uow.session.add_all([_link(noe, LIVE, NOW - timedelta(days=30)), row, history])
+    rewards = HistoryRewards(
+        media.database, media.module.history.events, media.module.threshold, clock=FixedClock(NOW)
+    )
+    assert await rewards.run() == 1
+    await media.dispatch()
+    assert [e[0] for e in await media.events("media.playback")] == ["media.playback_finished"]
