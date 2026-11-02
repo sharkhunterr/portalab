@@ -390,7 +390,7 @@
   "auto.when": "When",
   "auto.what": "What it tells",
   "auto.where": "Where it goes",
-  "auto.email": "E-mail it to the channel's subscribers",
+  "auto.email": "E-mail it to the subscribers",
   "auto.enabled": "On: it goes out by itself at the planned time",
   "auto.save": "Save",
   "auto.saveFailed": "The newsletter could not be saved.",
@@ -414,7 +414,6 @@
   "auto.everyDay": "Every day at {hour}:00",
   "auto.every.weekly": "Every {day} at {hour}:00",
   "auto.every.monthly": "Monthly, the first {day} at {hour}:00",
-  "auto.portalOnly": "In the portal only",
   "auto.failed": "That did not work, try again.",
   "auto.deleteTitle": "Delete “{name}”?",
   "auto.deleteHint": "It will not go out any more. The letters it already wrote stay in the history.",
@@ -422,5 +421,10 @@
   "auto.lookHint": "This newsletter’s template: each one has its own.",
   "auto.usedBy": "Used by: {names}",
   "auto.usedByNone": "Used by no automatic newsletter",
-  "auto.inUse": "An automatic newsletter uses it: pick another one for it before deleting this one."
+  "auto.inUse": "An automatic newsletter uses it: pick another one for it before deleting this one.",
+  "newsletter.readLetter": "Read the letter",
+  "auto.publish": "Publish in the portal’s news (the letter, and an article in its channel)",
+  "auto.nowhere": "Pick at least one: the news, e-mail, or both.",
+  "auto.inNews": "In the news",
+  "edition.status.sent": "E-mailed only"
 }

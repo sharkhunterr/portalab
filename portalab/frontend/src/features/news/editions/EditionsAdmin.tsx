@@ -505,7 +505,9 @@ function History() {
                       : ""}
                   </small>
                 </span>
-                <StatusBadge tone={edition.status === "published" ? "ok" : "neutral"}>
+                <StatusBadge
+                  tone={edition.status === "published" || edition.status === "sent" ? "ok" : "neutral"}
+                >
                   {t(`news:edition.status.${edition.status}`)}
                 </StatusBadge>
                 <span className="edition-history__actions">

@@ -4,12 +4,7 @@ import { api } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
 import { AdminSection, FormGrid, StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
-import {
-  CheckboxField,
-  SelectField,
-  TextAreaField,
-  TextField,
-} from "../../../design-system/components/Field";
+import { SelectField, TextAreaField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog, DialogActions } from "../../../design-system/components/Overlays";
 import { EmptyState } from "../../../design-system/components/Placeholders";
@@ -59,6 +54,7 @@ function blank(category: string): ScheduleIn {
     hour: 18,
     language: language(),
     email: true,
+    publish: true,
     enabled: true,
     notice: null,
     contents: null,
@@ -123,6 +119,7 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
   const timer = useRef<number | undefined>(undefined);
   const subjectId = useId();
   const interfaceLanguage = useLocaleContext().language;
+  const nowhere = !(values.publish ?? true) && !(values.email ?? true);
   const asked = () => ask({ ...values, category_id: category }, offered.data?.defaults);
   const [live, setLive] = useLivePreview();
   const write = (then?: (id: string) => void) =>
@@ -319,16 +316,29 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
               <option value="en">English</option>
             </SelectField>
           </FormGrid>
-          <CheckboxField
-            label={t("news:auto.email")}
-            checked={values.email ?? true}
-            onChange={(e) => set("email", e.target.checked)}
-          />
-          <CheckboxField
-            label={t("news:auto.enabled")}
-            checked={values.enabled ?? true}
-            onChange={(e) => set("enabled", e.target.checked)}
-          />
+          {/* issue 332: in the portal's news, by e-mail, or both */}
+          <div className="auto-letter__switches">
+            <Switch
+              label={t("news:auto.publish")}
+              checked={values.publish ?? true}
+              onChange={(e) => set("publish", e.target.checked)}
+            />
+            <Switch
+              label={t("news:auto.email")}
+              checked={values.email ?? true}
+              onChange={(e) => set("email", e.target.checked)}
+            />
+            {nowhere ? (
+              <p role="alert" className="auto-letter__note" data-tone="warn">
+                {t("news:auto.nowhere")}
+              </p>
+            ) : null}
+            <Switch
+              label={t("news:auto.enabled")}
+              checked={values.enabled ?? true}
+              onChange={(e) => set("enabled", e.target.checked)}
+            />
+          </div>
         </fieldset>
 
         {save.isError ? <p role="alert">{t("news:auto.saveFailed")}</p> : null}
@@ -347,7 +357,7 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
             <Icon name="mail" size={16} />
             {t("news:edition.admin.testMe")}
           </Button>
-          <Button type="submit" disabled={save.isPending || !category || !values.name.trim()}>
+          <Button type="submit" disabled={save.isPending || !category || !values.name.trim() || nowhere}>
             <Icon name="check" size={16} />
             {t("news:auto.save")}
           </Button>
@@ -461,12 +471,19 @@ function NewsletterCard({
           <Icon name="palette" size={14} />
           {look}
         </li>
-        <li>
-          <Icon name={schedule.email ? "users" : "home"} size={14} />
-          {schedule.email
-            ? t("news:auto.subscribers", { count: schedule.subscribers ?? 0 }) // issue 326
-            : t("news:auto.portalOnly")}
-        </li>
+        {/* issue 332: where it goes — the portal's news, e-mail (to how many — issue 326), or both */}
+        {(schedule.publish ?? true) ? (
+          <li>
+            <Icon name="megaphone" size={14} />
+            {t("news:auto.inNews")}
+          </li>
+        ) : null}
+        {schedule.email ? (
+          <li>
+            <Icon name="mail" size={14} />
+            {t("news:auto.subscribers", { count: schedule.subscribers ?? 0 })}
+          </li>
+        ) : null}
         {enabled && schedule.next_run_at ? (
           <li>
             <Icon name="clock" size={14} />

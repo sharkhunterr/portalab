@@ -232,9 +232,10 @@ class Newsletters:
                 latest = await session.scalar(
                     select(NewsletterEdition.title)
                     .where(
-                        NewsletterEdition.schedule_id == schedule.id, NewsletterEdition.status == "published"
+                        NewsletterEdition.schedule_id == schedule.id,
+                        NewsletterEdition.status.in_(("published", "sent")),  # #332: e-mailed only too
                     )
-                    .order_by(NewsletterEdition.published_at.desc())
+                    .order_by(NewsletterEdition.created_at.desc())
                     .limit(1)
                 )
             automatic.append(
@@ -355,6 +356,10 @@ class Newsletters:
             raise ValidationFailed("This channel does not exist.", code="news.invalid_category")
         if values.get("kind") == "edition" and self.editions is not None:  # #316: drawn with a template
             await self.editions.template(str(values.get("template_key") or "portalab"))
+            if not values.get("publish", True) and not values.get("email", True):  # #332: it goes somewhere
+                raise ValidationFailed(
+                    "A newsletter is published, e-mailed, or both.", code="news.newsletter_goes_nowhere"
+                )
 
     async def save_schedule(self, schedule_id: UUID | None, values: Mapping[str, Any]) -> NewsletterSchedule:
         now = utc_now(self.clock)
@@ -457,13 +462,19 @@ class Newsletters:
                 contents=schedule.contents if schedule.contents is not None else DEFAULT_CONTENTS,
                 charts=schedule.charts,
                 subject=schedule.subject,
+                page=schedule.publish,
             )
-            edition = await self.editions.publish(edition.id, email=schedule.email)
+            # #332: published in the portal (its letter, and an article in its channel's news), e-mailed,
+            # or both
+            edition = await self.editions.publish(edition.id, email=schedule.email, visible=schedule.publish)
+            announced = await self._announce(schedule, edition) if schedule.publish else None
             async with self.database.unit_of_work() as uow:
                 row = await uow.session.get(NewsletterSchedule, schedule_id, with_for_update=True)
                 if row is not None:
                     row.last_run_at = now
                     row.next_run_at = next_run(row.cadence, row.weekday, row.hour, now, zone)
+                    if announced is not None:
+                        row.last_article_id = announced.id
             return edition  # type: ignore[no-any-return]
         items = await self._items(schedule, now)
         article: Article | None = None
@@ -489,6 +500,28 @@ class Newsletters:
                 if article is not None:
                     row.last_article_id = article.id
         return article
+
+    async def _announce(self, schedule: NewsletterSchedule, edition: NewsletterEdition) -> Article | None:
+        """#332: the letter in its channel's news — an article saying what it tells, leading to it."""
+        try:
+            summary = str((edition.data or {}).get("preheader") or "")
+            read = self._t("newsletter.readLetter", schedule.language)
+            body = f"{summary}\n\n[**{read} →**](/news/editions/{edition.id})".strip()
+            draft = await self.articles.create(
+                None,
+                ArticleInput(
+                    title=edition.title[:200],
+                    body_md=body,
+                    summary=summary[:600],
+                    category_id=schedule.category_id,
+                    language=schedule.language,
+                    email_on_publish=False,  # the letter itself is the e-mail
+                ),
+            )
+            return await self.articles.transition(None, draft.id, "publish")
+        except Exception:
+            log.warning("automatic newsletter not announced in the news")
+            return None
 
     async def run_due(self) -> int:
         if not await self._setting(NEWSLETTER_ON, True):

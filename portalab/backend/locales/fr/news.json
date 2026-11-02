@@ -390,7 +390,7 @@
   "auto.when": "Quand",
   "auto.what": "Ce qu’elle raconte",
   "auto.where": "Où elle va",
-  "auto.email": "L’envoyer par e-mail aux abonnés de la chaîne",
+  "auto.email": "Envoyer par e-mail aux abonnés",
   "auto.enabled": "Active : elle part toute seule à l’heure prévue",
   "auto.save": "Enregistrer",
   "auto.saveFailed": "La newsletter n’a pas pu être enregistrée.",
@@ -414,7 +414,6 @@
   "auto.everyDay": "Chaque jour à {hour} h",
   "auto.every.weekly": "Chaque {day} à {hour} h",
   "auto.every.monthly": "Chaque mois, le premier {day} à {hour} h",
-  "auto.portalOnly": "Dans le portail seulement",
   "auto.failed": "Ça n’a pas marché, réessayez.",
   "auto.deleteTitle": "Supprimer « {name} » ?",
   "auto.deleteHint": "Elle ne partira plus. Les lettres qu’elle a déjà écrites restent dans l’historique.",
@@ -422,5 +421,10 @@
   "auto.lookHint": "Le template de cette newsletter : chacune a le sien.",
   "auto.usedBy": "Utilisé par : {names}",
   "auto.usedByNone": "Utilisé par aucune newsletter automatique",
-  "auto.inUse": "Une newsletter automatique l’utilise : choisissez-en un autre pour elle avant de le supprimer."
+  "auto.inUse": "Une newsletter automatique l’utilise : choisissez-en un autre pour elle avant de le supprimer.",
+  "newsletter.readLetter": "Lire la lettre",
+  "auto.publish": "Publier dans les actualités du portail (la lettre, et un article dans sa chaîne)",
+  "auto.nowhere": "Choisissez au moins une destination : les actualités, l’e-mail, ou les deux.",
+  "auto.inNews": "Dans les actualités",
+  "edition.status.sent": "Envoyée par e-mail"
 }

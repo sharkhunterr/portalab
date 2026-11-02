@@ -70,8 +70,15 @@ describe("issue 325 — automatic newsletters", () => {
     await waitFor(() => expect(previews).toBe(1));
     // issue 329: its own template, picked by sight
     fireEvent.click(await screen.findByRole("radio", { name: /Ciné/ }));
+    // issue 332: in the news, by e-mail, or both — never neither
+    fireEvent.click(screen.getByRole("checkbox", { name: /Publish in the portal/ }));
+    fireEvent.click(screen.getByRole("checkbox", { name: /E-mail it/ }));
+    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
+    expect(screen.getByRole("alert")).toHaveTextContent(/at least one/);
+    fireEvent.click(screen.getByRole("checkbox", { name: /E-mail it/ }));
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(saved).toHaveLength(1));
+    expect(saved[0]).toMatchObject({ publish: false, email: true });
     expect(saved[0]).toMatchObject({
       name: "Friday letter",
       kind: "edition",

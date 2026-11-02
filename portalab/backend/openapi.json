@@ -13133,6 +13133,11 @@
             ],
             "title": "Notice"
           },
+          "publish": {
+            "default": true,
+            "title": "Publish",
+            "type": "boolean"
+          },
           "subject": {
             "anyOf": [
               {
@@ -13362,6 +13367,11 @@
               }
             ],
             "title": "Notice"
+          },
+          "publish": {
+            "default": true,
+            "title": "Publish",
+            "type": "boolean"
           },
           "subject": {
             "anyOf": [

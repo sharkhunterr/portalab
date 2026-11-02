@@ -350,7 +350,7 @@ class Editions:
                         .select_from(NewsletterEdition)
                         .where(
                             NewsletterEdition.schedule_id == schedule_id,
-                            NewsletterEdition.status == "published",
+                            NewsletterEdition.status.in_(("published", "sent")),  # #332: e-mailed only too
                         )
                     )
                     or 0
@@ -409,6 +409,7 @@ class Editions:
         contents: Sequence[str] | None = None,
         charts: Sequence[str] | None = None,
         subject: str | None = None,
+        page: bool = True,
     ) -> NewsletterEdition:
         """Write an edition (a preview of an unsaved template when ``definition`` is given) — #323: telling
         the ``contents`` asked, in the template's look (else the template's own sections)."""
@@ -478,7 +479,8 @@ class Editions:
             session.add(row)
             await session.flush()
             edition_id = row.id
-            snapshot["page"] = f"/news/editions/{edition_id}"
+            if page:  # #332: a letter e-mailed only has no page in the portal
+                snapshot["page"] = f"/news/editions/{edition_id}"
             if schedule_id is not None:  # #326: when it goes out, at the foot of the e-mail
                 schedule = await session.get(NewsletterSchedule, schedule_id)
                 if schedule is not None:
@@ -513,16 +515,19 @@ class Editions:
         async with self.database.session() as session:
             return list((await session.execute(stmt.limit(limit))).scalars())
 
-    async def publish(self, edition_id: UUID, *, email: bool) -> NewsletterEdition:
-        """Readable by every member from now on; e-mailed once when asked."""
+    async def publish(self, edition_id: UUID, *, email: bool, visible: bool = True) -> NewsletterEdition:
+        """Readable by every member from now on; e-mailed once when asked. #332: ``visible=False`` — e-mailed
+        only (« sent »), never in the portal."""
         now = utc_now(self.clock)
         async with self.database.unit_of_work() as uow:
             row = await uow.session.get(NewsletterEdition, edition_id, with_for_update=True)
             if row is None or row.status == "preview":
                 raise EditionNotFound("This edition does not exist.")
-            if row.status != "published":
+            if visible and row.status != "published":
                 row.status = "published"
                 row.published_at = now
+            elif not visible and row.status == "draft":
+                row.status = "sent"
         edition = await self.get(edition_id)
         if email and edition.emailed_at is None:
             await self.email(edition)
@@ -570,7 +575,8 @@ class Editions:
                     source="module",
                     subject_ref=f"news-edition:{edition.id}",
                     required_permission=NEWS_READ,
-                    action_url=f"/news/editions/{edition.id}",
+                    # #332: a letter e-mailed only has no page in the portal
+                    action_url=f"/news/editions/{edition.id}" if edition.data.get("page") else None,
                     email_body={
                         "subject": edition.title[:200],
                         "text": edition.text[:100_000],
