@@ -394,9 +394,6 @@ function NewsletterCard({
   const t = useT();
   const format = useFormat();
   const client = useQueryClient();
-  const offered = useContents();
-  const preview = usePreview();
-  const { test } = useEditionActions();
   const [confirming, setConfirming] = useState(false);
   const interfaceLanguage = useLocaleContext().language;
   const toggle = useMutation({
@@ -421,11 +418,18 @@ function NewsletterCard({
       void client.invalidateQueries({ queryKey: KEY });
     },
   });
-  // the letter it would write now, e-mailed to me alone
-  const sendTest = () =>
-    preview.mutate(ask(input(schedule), offered.data?.defaults), {
-      onSuccess: (edition) => test.mutate(edition.id),
-    });
+  // the letter it would write now, e-mailed to me alone — issue 334: and published in the news when it goes
+  // there
+  const test = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await api.POST("/api/v1/admin/news/newsletters/{schedule_id}/test", {
+        params: { path: { schedule_id: schedule.id } },
+      });
+      if (error) throw error;
+      return data as { sent: boolean; article: string | null };
+    },
+    onSuccess: () => void client.invalidateQueries({ queryKey: ["news"] }),
+  });
   const enabled = toggle.isPending ? Boolean(toggle.variables) : schedule.enabled;
   const hour = String(schedule.hour).padStart(2, "0");
   const when =
@@ -435,7 +439,6 @@ function NewsletterCard({
           day: weekday(schedule.weekday ?? 0, interfaceLanguage),
           hour,
         });
-  const testing = preview.isPending || test.isPending;
   return (
     <li className="auto-letter" data-off={!enabled || undefined}>
       <div className="auto-letter__head">
@@ -497,8 +500,8 @@ function NewsletterCard({
         ) : null}
       </ul>
       <div className="auto-letter__actions">
-        <Button variant="secondary" disabled={testing} onClick={sendTest}>
-          <Icon name={testing ? "spinner" : "mail"} size={16} />
+        <Button variant="secondary" disabled={test.isPending} onClick={() => test.mutate()}>
+          <Icon name={test.isPending ? "spinner" : "mail"} size={16} />
           {t("news:auto.test")}
         </Button>
         <Button variant="secondary" onClick={onEdit}>
@@ -513,12 +516,13 @@ function NewsletterCard({
         >
           <Icon name="trash" size={16} />
         </Button>
-        {test.isSuccess ? (
-          <span role="status" className="auto-letter__note" data-tone={test.data ? "ok" : "warn"}>
-            {t(test.data ? "news:edition.admin.testSent" : "news:edition.admin.testFailed")}
+        {test.data ? (
+          <span role="status" className="auto-letter__note" data-tone={test.data.sent ? "ok" : "warn"}>
+            {t(test.data.sent ? "news:edition.admin.testSent" : "news:edition.admin.testFailed")}
+            {test.data.article ? ` ${t("news:auto.testPublished")}` : ""}
           </span>
         ) : null}
-        {preview.isError || test.isError || toggle.isError ? (
+        {test.isError || toggle.isError ? (
           <span role="alert" className="auto-letter__note" data-tone="warn">
             {t("news:auto.failed")}
           </span>

@@ -426,5 +426,6 @@
   "auto.publish": "Publier dans les actualités du portail (la lettre, et un article dans sa chaîne)",
   "auto.nowhere": "Choisissez au moins une destination : les actualités, l’e-mail, ou les deux.",
   "auto.inNews": "Dans les actualités",
-  "edition.status.sent": "Envoyée par e-mail"
+  "edition.status.sent": "Envoyée par e-mail",
+  "auto.testPublished": "La lettre est aussi publiée dans les actualités."
 }

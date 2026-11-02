@@ -32615,6 +32615,52 @@
         ]
       }
     },
+    "/api/v1/admin/news/newsletters/{schedule_id}/test": {
+      "post": {
+        "description": "#334: the letter e-mailed to me alone \u2014 and published in the news when the newsletter goes there.",
+        "operationId": "test_schedule_api_v1_admin_news_newsletters__schedule_id__test_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "schedule_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Schedule Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Test Schedule Api V1 Admin News Newsletters  Schedule Id  Test Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Test Schedule",
+        "tags": [
+          "news"
+        ]
+      }
+    },
     "/api/v1/admin/news/sources": {
       "get": {
         "operationId": "sources_api_v1_admin_news_sources_get",

@@ -133,13 +133,10 @@ describe("issue 325 — automatic newsletters", () => {
       if (path === "/api/v1/admin/news/newsletter-templates") return json(200, []);
       if (path === "/api/v1/admin/news/newsletter-contents")
         return json(200, { contents: ["stats"], defaults: ["stats"], charts: [], chart_defaults: [] });
-      if (path === "/api/v1/admin/news/newsletter-editions/preview") {
-        calls.push("preview");
-        return json(200, { id: "e1" });
-      }
-      if (path === "/api/v1/admin/news/newsletter-editions/e1/test") {
+      // issue 334: one test — e-mailed to me, published in the news when the letter goes there
+      if (path === "/api/v1/admin/news/newsletters/s1/test") {
         calls.push("test");
-        return json(200, { sent: true });
+        return json(200, { sent: true, edition: "e1", article: "a1" });
       }
       return json(404, {});
     };
@@ -156,7 +153,8 @@ describe("issue 325 — automatic newsletters", () => {
     expect(puts[0]).not.toHaveProperty("id");
 
     fireEvent.click(screen.getByRole("button", { name: /Send me a test/ }));
-    await waitFor(() => expect(calls).toEqual(["preview", "test"]));
+    await waitFor(() => expect(calls).toEqual(["test"]));
+    expect(await screen.findByRole("status")).toHaveTextContent(/also published in the news/);
 
     fireEvent.click(screen.getByRole("button", { name: "Delete" }));
     const dialog = await screen.findByRole("dialog");
