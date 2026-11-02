@@ -16,6 +16,7 @@ from portalab.capabilities.content import (
 )
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
+from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.notifications import CategoryRegistry, declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
@@ -40,6 +41,7 @@ from portalab.modules.news import permissions as _permissions  # noqa: F401 — 
 from portalab.modules.news import settings as _settings  # noqa: F401 — declares settings
 from portalab.modules.news.ai_tools import NewsAiTools
 from portalab.modules.news.articles import PUBLISH_JOB, ArticleService
+from portalab.modules.news.attention import NewsAttention
 from portalab.modules.news.editions.service import Editions
 from portalab.modules.news.events import register_event_types
 from portalab.modules.news.integrations import (
@@ -121,6 +123,11 @@ class NewsModule:
         if not any(p.instance_ref == "news" for p in self.capabilities.system_providers(SOURCE_ITEMS)):
             # #299: what the sources published, for « Mon fil »'s unread badge
             self.capabilities.provide(SOURCE_ITEMS, self.sources, instance_ref="news", owner=OWNER)
+        if not any(p.instance_ref == "news" for p in self.capabilities.system_providers(ATTENTION)):
+            # #336: the articles a member has not opened yet, on « Headlines »
+            self.capabilities.provide(
+                ATTENTION, NewsAttention(self.articles), instance_ref="news", owner=OWNER
+            )
         if self.resolvers.get("news") is None:
             self.resolvers.register(NewsLinkResolver(self.articles), owner=OWNER)
         if self.calendar.get("news") is None:

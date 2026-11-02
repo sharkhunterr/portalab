@@ -1,5 +1,5 @@
 """#48 — who read what: opening a published article is remembered once; the listing, the featured news
-and the widget say which ones this member has not read; the editors see who read it and who has not;
+and the widget say which ones this member has not read (#336: « Headlines »'s badge counts them); the editors see who read it and who has not;
 a member's reads are exported with their data and erased with them."""
 
 from uuid import UUID
@@ -9,6 +9,7 @@ import pytest
 
 from portalab.capabilities.i18n import LocaleContext
 from portalab.modules.news.articles import ArticleInput
+from portalab.modules.news.attention import NewsAttention
 from portalab.modules.news.integrations import NewsWidget
 from portalab.modules.news.participant import NewsParticipant
 from tests.integration.content.conftest import ContentHarness
@@ -30,6 +31,9 @@ async def test_reads(client: httpx.AsyncClient, ct: ContentHarness, people: dict
     await login(client, "rita")
     unread = {i["title"]: i["unread"] for i in (await client.get("/api/v1/news")).json()["items"]}
     assert unread == {"First": True, "Second": True}
+    # #336: « Headlines »'s badge — the articles she has not opened yet, never a draft
+    badge = NewsAttention(articles)
+    assert await badge.counts(ct.p("rita")) == {"news.page": 2}
     for _ in range(2):
         assert (await client.post(f"/api/v1/news/{first.slug}/read")).status_code == 204
     assert (await client.post(f"/api/v1/news/{draft.slug}/read")).status_code == 404  # not hers to see
@@ -38,6 +42,7 @@ async def test_reads(client: httpx.AsyncClient, ct: ContentHarness, people: dict
 
     widget = await NewsWidget(articles, featured=False).load(ct.p("rita"), {}, LocaleContext())
     assert widget.data is not None and widget.data["unread"] == 1
+    assert await badge.counts(ct.p("rita")) == {"news.page": 1}
 
     shown = await articles.readers(boss, first.id)
     assert [r["user_id"] for r in shown["read"]] == [str(people["rita"])]

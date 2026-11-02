@@ -114,7 +114,7 @@ export function useNewsActions() {
   return { save, publish, schedule, lifecycle, feature };
 }
 
-/** #48: the member opened an article — remembered once; the unread dots go away. */
+/** #48: the member opened an article — remembered once; the unread dots (and issue 336's badge) go away. */
 export function useMarkRead() {
   const client = useQueryClient();
   return useMutation({
@@ -124,6 +124,7 @@ export function useMarkRead() {
     onSuccess: async () => {
       await client.invalidateQueries({ queryKey: KEY });
       await client.invalidateQueries({ queryKey: ["dashboard"] });
+      await client.invalidateQueries({ queryKey: ["shell", "attention"] }); // issue 336: the badge
     },
   });
 }
