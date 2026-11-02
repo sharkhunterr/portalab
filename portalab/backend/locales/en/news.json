@@ -204,7 +204,6 @@
   "video.onYouTube": "Watch “{title}” on YouTube (new tab)",
   "edition.title": "{site} — the letter of {date}",
   "edition.period": "From {start} to {end}",
-  "edition.preheader": "{count, plural, =0 {The period's news} one {# new title} other {# new titles}} · {hours} h watched",
   "edition.section.notice": "Good to know",
   "edition.section.stats": "The period in figures",
   "edition.section.top": "Most watched",
@@ -420,5 +419,13 @@
   "auto.nowhere": "Pick at least one: the news, e-mail, or both.",
   "auto.inNews": "In the news",
   "edition.status.sent": "E-mailed only",
-  "auto.testPublished": "The letter is also published in the news."
+  "auto.testPublished": "The letter is also published in the news.",
+  "edition.pre.stats": "{count, plural, one {# h watched} other {# h watched}}",
+  "edition.pre.new": "{count, plural, one {# new title} other {# new titles}}",
+  "edition.pre.upcoming": "{count, plural, one {# upcoming release} other {# upcoming releases}}",
+  "edition.pre.tv": "{count, plural, one {# episode on air} other {# episodes on air}}",
+  "edition.pre.top": "{count, plural, one {the most watched title} other {the # most watched titles}}",
+  "edition.pre.requests": "{count, plural, one {# request} other {# requests}}",
+  "edition.pre.articles": "{count, plural, one {# news item} other {# news items}}",
+  "edition.pre.none": "The period's news"
 }
