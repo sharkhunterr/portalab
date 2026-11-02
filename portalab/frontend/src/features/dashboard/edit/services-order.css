@@ -1,0 +1,80 @@
+/* issue 333: the services a widget shows, ticked and moved (grip or arrows) */
+.services-order {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  border: 0;
+}
+.services-order legend {
+  margin-block-end: var(--space-1);
+  font-weight: var(--font-weight-semibold);
+}
+.services-order__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.services-order__list {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.services-order__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.services-order__row[data-off] {
+  opacity: 0.6;
+}
+.services-order__row[data-dragging] {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-2);
+}
+.services-order__grip {
+  display: grid;
+  place-items: center;
+  inline-size: var(--target-min);
+  block-size: var(--target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: grab;
+  touch-action: none;
+}
+.services-order__grip:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+.services-order__row[data-dragging] .services-order__grip {
+  cursor: grabbing;
+}
+.services-order__name {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  cursor: pointer;
+}
+.services-order__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--tone) 18%, transparent);
+  color: var(--tone);
+}
+.services-order__moves {
+  display: inline-flex;
+}

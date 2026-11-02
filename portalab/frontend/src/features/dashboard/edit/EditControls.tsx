@@ -16,6 +16,7 @@ import { externalLooks, useExternalRevision } from "../../../design-system/visua
 import { useT } from "../../../i18n/hooks/useT";
 import type { Change, Instance } from "../api";
 import { addonsFor } from "../widgets/pack/WidgetAddons";
+import { type OrderedService, ServicesOrder } from "./ServicesOrder";
 
 /**
  * Edit controls of one widget (spec 009 T019; 027): moving and resizing are done on the grid itself (drag
@@ -83,12 +84,13 @@ export function ConfigDialog({
   // 027: a setting offering the services (« which service ») lists them by name
   const services = useQuery({
     queryKey: ["services", "health", "names"],
-    enabled: open && Object.values(properties).some((p) => p["x-options"] === "services"),
+    enabled:
+      open && Object.values(properties).some((p) => String(p["x-options"] ?? "").startsWith("services")),
     staleTime: 60_000,
     queryFn: async () =>
       (
         (await api.GET("/api/v1/services/health")).data as unknown as {
-          items: Array<{ id: string; name: string }>;
+          items: OrderedService[];
         }
       ).items,
   });
@@ -197,6 +199,17 @@ export function ConfigDialog({
       >
         {Object.entries(properties).map(([name, schema]) => {
           const value = draft[name];
+          // issue 333: the services shown and their order (quick access)
+          if (schema["x-options"] === "services-order")
+            return (
+              <ServicesOrder
+                key={name}
+                label={label(`${base}.${name}`, name)}
+                value={Array.isArray(value) ? (value as string[]) : []}
+                services={services.data ?? []}
+                onChange={(next) => setDraft({ ...draft, [name]: next })}
+              />
+            );
           if (schema["x-options"] === "services")
             return (
               <SelectField

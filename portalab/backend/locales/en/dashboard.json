@@ -388,5 +388,11 @@
   "widget.value.title": "Value",
   "widget.welcome.description": "Next steps to make the portal yours.",
   "widget.welcome.title": "Welcome",
-  "widgetEmpty": "Nothing here yet."
+  "widgetEmpty": "Nothing here yet.",
+  "field.services": "Services shown, in their order",
+  "servicesOrder.hint": "Tick the services to show and move them by their grip (or the arrows). With no choice, every service shows in the usual order, those added later too.",
+  "servicesOrder.drag": "Move {name}",
+  "servicesOrder.up": "Move {name} up",
+  "servicesOrder.down": "Move {name} down",
+  "servicesOrder.all": "Every service, in the usual order"
 }

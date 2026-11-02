@@ -86,6 +86,22 @@ SERVICE_LINKS = WidgetDefinition(
     description_key="dashboard:widget.links.description",
     icon="link",
     required_permission=SERVICES_READ,
+    config_schema={
+        "type": "object",
+        # issue 333: the services shown, in their order (« x-options: services-order »: the settings list
+        # them all to tick and to move); none chosen: every service, in the usual order
+        "properties": {
+            "services": {
+                "type": "array",
+                "items": {"type": "string", "maxLength": 64},
+                "maxItems": 100,
+                "uniqueItems": True,
+                "x-options": "services-order",
+            }
+        },
+        "additionalProperties": False,
+    },
+    config_defaults={"services": []},
     size=SizeLimits(default=Size(6, 3), min=Size(3, 1), max=Size(12, 6)),
     refresh=Refresh(mode="event", events=(STATUS_CHANGED,)),
     stale_after_s=600,
@@ -523,6 +539,10 @@ class ServiceLinksProvider(ServicesSummaryProvider):
             for service in services
             if watched(service)
         ]
+        chosen = [str(x) for x in config.get("services") or []]
+        if chosen:  # issue 333: the services chosen, in the order chosen
+            by_key = {str(item["id"]): item for item in items}
+            items = [by_key[key] for key in chosen if key in by_key]
         if not items:
             return WidgetPayload("no-data", as_of=utc_now(self.clock))
         return WidgetPayload("available", as_of=utc_now(self.clock), data={"items": items})

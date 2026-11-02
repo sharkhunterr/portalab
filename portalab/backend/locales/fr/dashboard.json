@@ -388,5 +388,11 @@
   "widget.value.title": "Valeur",
   "widget.welcome.description": "Les prochaines étapes pour vous approprier le portail.",
   "widget.welcome.title": "Bienvenue",
-  "widgetEmpty": "Rien pour le moment."
+  "widgetEmpty": "Rien pour le moment.",
+  "field.services": "Services affichés, dans leur ordre",
+  "servicesOrder.hint": "Cochez les services à afficher et déplacez-les par la poignée (ou les flèches). Sans choix, tous les services s’affichent dans l’ordre habituel, y compris ceux ajoutés plus tard.",
+  "servicesOrder.drag": "Déplacer {name}",
+  "servicesOrder.up": "Monter {name}",
+  "servicesOrder.down": "Descendre {name}",
+  "servicesOrder.all": "Tous les services, dans l’ordre habituel"
 }

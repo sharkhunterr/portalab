@@ -263,6 +263,7 @@
   min-block-size: 0;
   overflow: hidden;
   container-type: size; /* 027: widgets size their content to the block (cqw / cqh) */
+  container-name: widget-body; /* issue 333: asked by name past the containers inside a widget */
 }
 .widget-frame__body li[data-overflow] {
   visibility: hidden;
@@ -2225,6 +2226,11 @@ button.dash-lock {
 .widget-links[data-filled] a {
   align-content: center;
 }
+/* issue 333: the services past the block take no row (their gaps would squeeze the rows shown) — measured
+   again unfilled, they come back */
+.widget-links[data-filled] > li[data-overflow] {
+  display: none;
+}
 .widget-links[data-filled] .widget-links__icon {
   inline-size: clamp(2.6rem, 40cqh, 4rem);
   block-size: clamp(2.6rem, 40cqh, 4rem);
@@ -2490,4 +2496,82 @@ html[data-motion="none"] .widget-shuffle__track {
 }
 .dashboard-page[data-lanes] {
   max-inline-size: none;
+}
+
+/* issue 333: quick access — each tile in its state's colour (its border, its tint, its icon: the design
+   system's « has-tone »); rows in a narrow column; the state's word only where the tile has room for it */
+.widget-links > li > :is(a, span) {
+  border-color: color-mix(in srgb, var(--tone) 45%, var(--color-border));
+  background: color-mix(in srgb, var(--tone) 9%, transparent);
+}
+.widget-links > li > a:hover {
+  border-color: var(--tone);
+}
+.widget-links__icon {
+  background: color-mix(in srgb, var(--tone, var(--color-accent)) 18%, transparent);
+  color: var(--tone, var(--color-accent));
+}
+.widget-links__state {
+  color: var(--tone, var(--color-text-muted));
+  font-weight: var(--font-weight-semibold);
+}
+@container widget-cell (max-width: 20rem) {
+  .widget-links {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .widget-links > li > :is(a, span) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    justify-items: start;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    text-align: start;
+  }
+  .widget-links__icon,
+  .widget-links[data-filled] .widget-links__icon {
+    inline-size: 2rem;
+    block-size: 2rem;
+  }
+  .widget-links__external {
+    position: static;
+  }
+  .widget-links__state {
+    display: none;
+  }
+}
+/* a low block (two rows): short tiles — the icon beside the name, the colour says the state */
+@container widget-body (max-height: 7.5rem) {
+  .widget-links {
+    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  }
+  .widget-links > li > a,
+  .widget-links > li > span {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    text-align: start;
+  }
+  .widget-links__icon,
+  .widget-links[data-filled] .widget-links__icon {
+    inline-size: clamp(1.25rem, calc(100cqh - 0.35rem), 2rem);
+    block-size: clamp(1.25rem, calc(100cqh - 0.35rem), 2rem);
+  }
+  .widget-links__icon svg {
+    inline-size: 70%;
+    block-size: 70%;
+  }
+  .widget-links__dot {
+    inline-size: 0.55rem;
+    block-size: 0.55rem;
+  }
+  .widget-links > li > a,
+  .widget-links > li > span {
+    min-block-size: 2.25rem;
+    padding-block: 0;
+  }
+  .widget-links__state {
+    display: none;
+  }
 }
