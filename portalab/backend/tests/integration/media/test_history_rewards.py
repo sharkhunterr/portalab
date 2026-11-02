@@ -216,3 +216,41 @@ async def test_a_play_from_another_history_is_no_play_followed(app: FastAPI, med
     assert await rewards.run() == 1
     await media.dispatch()
     assert [e[0] for e in await media.events("media.playback")] == ["media.playback_finished"]
+
+
+async def test_the_catch_up_reaches_back_to_the_account_s_link(app: FastAPI, media: MediaHarness) -> None:
+    """#341: an outage of days loses no play lived after the account's link (48 h of grace before it), at most
+    30 days back; without a link, only the last 48 hours."""
+    people = await users(app, media, "eva")
+    eva = people["eva"]
+    history = uuid4()
+
+    def play(title: str, days: float, *, service: UUID = history) -> Activity:
+        row = _activity(eva, 24 * days, 1.0, title=title)
+        row.service_id = service
+        return row
+
+    async with media.database.unit_of_work() as uow:
+        uow.session.add_all(
+            [
+                _link(eva, history, NOW - timedelta(days=10)),
+                play("After the link", 5),
+                play("Just before the link", 11),
+                play("Long before the link", 13),
+                play("Unlinked account, old", 5, service=uuid4()),
+                play("Unlinked account, recent", 1, service=uuid4()),
+            ]
+        )
+    rewards = HistoryRewards(
+        media.database, media.module.history.events, media.module.threshold, clock=FixedClock(NOW)
+    )
+    assert await rewards.run() == 3
+    later = HistoryRewards(
+        media.database,
+        media.module.history.events,
+        media.module.threshold,
+        clock=FixedClock(NOW + timedelta(days=40)),
+    )
+    async with media.database.unit_of_work() as uow:
+        uow.session.add(play("Forgotten for 31 days", -9))
+    assert await later.run() == 0  # 31 days back: too far

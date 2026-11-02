@@ -4,14 +4,15 @@ server marks them, else the kind's threshold — #101) or ``media.playback_aband
 the minutes watched) is published for it — the events the progression rules, quests and the play streak
 listen to — unless the live watch followed that play to its end: its verdict stands then, finished or not
 (#101: a history rounds its percentages — 89.5 % read as 90 — and its minutes were the live watch's too).
-Only recent plays (``WINDOW``): an old history imported later never turns into XP, the progression stays
-the one the portal lived."""
+Only the plays the portal lived: #341 — those after the member linked that account (``WINDOW`` of grace
+before, #102), however late the catch-up, at most ``MAX_AGE`` back; without a link, the last ``WINDOW``.
+An old history imported later never turns into XP."""
 
 from collections.abc import Awaitable, Callable
 from datetime import timedelta
 from uuid import UUID
 
-from sqlalchemy import and_, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.core.db import Database
@@ -22,7 +23,8 @@ from portalab.modules.media.observability import metrics
 from portalab.modules.media.playback.normalizer import percent, reached_end
 from portalab.modules.media.playback.poller import HISTORY
 
-WINDOW = timedelta(hours=48)
+WINDOW = timedelta(hours=48)  # a play's grace before its account was linked — without a link, its age
+MAX_AGE = timedelta(days=30)  # #341: a catch-up never reaches further back
 NEARBY = timedelta(hours=6)  # a live session this close to the play is the same play
 ALONGSIDE = timedelta(minutes=10)  # #101: a live session followed to its stop during the play is that play
 EVENT = "media.playback_finished"
@@ -68,6 +70,17 @@ class HistoryRewards:
         is reached, else ``abandoned`` with the minutes watched."""
         now = utc_now(self.clock)
         published = 0
+        # #341: when that account was linked to the member (none: the play's age decides)
+        linked = (
+            select(func.min(UserLink.created_at))
+            .where(
+                UserLink.service_id == Activity.service_id,
+                UserLink.external_user_id == Activity.external_user_id,
+                UserLink.user_id == Activity.user_id,
+            )
+            .correlate(Activity)
+            .scalar_subquery()
+        )
         async with self.database.unit_of_work() as uow:
             session = uow.session
             rows = (
@@ -76,7 +89,8 @@ class HistoryRewards:
                         select(Activity).where(
                             Activity.user_id.is_not(None),
                             Activity.counted.is_(True),
-                            Activity.started_at >= now - WINDOW,
+                            Activity.started_at >= now - MAX_AGE,
+                            Activity.started_at >= func.coalesce(linked, now) - WINDOW,
                             Activity.rewarded_at.is_(None),
                             # #190: a game played is no film watched — its minutes are no watching time
                             Activity.kind != "game",
