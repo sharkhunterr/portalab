@@ -270,7 +270,6 @@ class Editions:
             if totals
             else None
         )
-        count = sum(len(s["items"]) for s in sections if s["kind"] in ("additions", "releases"))
         start = today - timedelta(days=days)
         return {
             "site": brand,
@@ -286,12 +285,25 @@ class Editions:
                 language,
                 {"start": self._day(start, language), "end": self._day(today, language)},
             ),
-            "preheader": self.newsletters._t(
-                "edition.preheader",
-                language,
-                {"count": count, "hours": round(float(totals.get("seconds") or 0) / 3600)},
-            ),
+            "preheader": self._preheader(sections, totals, language),
         }
+
+    def _preheader(self, sections: list[dict[str, Any]], totals: Mapping[str, Any], language: str) -> str:
+        """#337: what this letter tells, in its order — its figures, its new titles, what comes… — never what
+        it does not show (a letter of upcoming releases says nothing of the hours watched)."""
+        counts: dict[str, int] = {}
+        for section in sections:
+            kind = "new" if section["kind"] in ("additions", "releases") else section["kind"]
+            if kind == "stats":
+                counts[kind] = round(float(totals.get("seconds") or 0) / 3600)
+            elif kind in ("new", "upcoming", "tv", "top", "requests", "articles"):
+                counts[kind] = counts.get(kind, 0) + len(section["items"])
+        parts = [
+            self.newsletters._t(f"edition.pre.{kind}", language, {"count": count})
+            for kind, count in counts.items()
+            if count
+        ][:3]
+        return " · ".join(parts) or self.newsletters._t("edition.pre.none", language)
 
     def _charts(self, period: Mapping[str, Any], language: str) -> dict[str, Any]:
         """#324: the charts' series in hours, with their labels (a few dates, the days, some hours)."""

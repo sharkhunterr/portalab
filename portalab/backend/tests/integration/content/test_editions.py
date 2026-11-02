@@ -226,6 +226,9 @@ async def test_an_edition_tells_the_contents_switched_on(
         json={"template_key": "gazette", "contents": ["movies", "requests", "tv", "upcoming"], "days": 7},
     )
     assert preview.status_code == 200
+    # #337: its subtitle says what it tells — never the hours watched of a letter without its figures
+    told = preview.json()["preheader"]  # (the harness speaks in keys)
+    assert told == "edition.pre.new · edition.pre.requests · edition.pre.tv"  # three at most, in its order
     html = (await client.get(f"/api/v1/admin/news/newsletter-editions/{preview.json()['id']}/page")).text
     assert "Dune" in html and "Arcane" in html  # the films, the requests
     assert html.index("Dune") < html.index("Arcane") < html.index("S03E01") < html.index("Mickey 17")

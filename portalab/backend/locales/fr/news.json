@@ -204,7 +204,6 @@
   "video.onYouTube": "Voir « {title} » sur YouTube (nouvel onglet)",
   "edition.title": "{site} — la lettre du {date}",
   "edition.period": "Du {start} au {end}",
-  "edition.preheader": "{count, plural, =0 {Les nouvelles de la période} one {# nouveauté} other {# nouveautés}} · {hours} h regardées",
   "edition.section.notice": "À savoir",
   "edition.section.stats": "La période en chiffres",
   "edition.section.top": "Les plus regardés",
@@ -420,5 +419,13 @@
   "auto.nowhere": "Choisissez au moins une destination : les actualités, l’e-mail, ou les deux.",
   "auto.inNews": "Dans les actualités",
   "edition.status.sent": "Envoyée par e-mail",
-  "auto.testPublished": "La lettre est aussi publiée dans les actualités."
+  "auto.testPublished": "La lettre est aussi publiée dans les actualités.",
+  "edition.pre.stats": "{count, plural, one {# h regardée} other {# h regardées}}",
+  "edition.pre.new": "{count, plural, one {# nouveauté} other {# nouveautés}}",
+  "edition.pre.upcoming": "{count, plural, one {# sortie à venir} other {# sorties à venir}}",
+  "edition.pre.tv": "{count, plural, one {# épisode à l’antenne} other {# épisodes à l’antenne}}",
+  "edition.pre.top": "{count, plural, one {le titre le plus regardé} other {les # titres les plus regardés}}",
+  "edition.pre.requests": "{count, plural, one {# demande} other {# demandes}}",
+  "edition.pre.articles": "{count, plural, one {# actualité} other {# actualités}}",
+  "edition.pre.none": "Les nouvelles de la période"
 }
