@@ -254,3 +254,52 @@ async def test_the_catch_up_reaches_back_to_the_account_s_link(app: FastAPI, med
     async with media.database.unit_of_work() as uow:
         uow.session.add(play("Forgotten for 31 days", -9))
     assert await later.run() == 0  # 31 days back: too far
+
+
+async def test_the_plays_in_the_last_minutes_before_the_credits_are_finished_on_review(
+    app: FastAPI, media: MediaHarness
+) -> None:
+    """#342: two minutes before the end credits finish a play (it was 30 s) — the review publishes the finish
+    of the plays judged abandoned that reach it now, followed live or read from a history, once, without
+    minutes."""
+    people = await users(app, media, "tom")
+    tom = people["tom"]
+    titles = ("Live, a minute short", "Live, long before", "History, a minute short", "Threshold only")
+    films = {title: await _film(media, title) for title in titles}
+    start, stop = NOW - timedelta(hours=5), NOW - timedelta(hours=3)
+
+    def played(title: str, progress: float) -> Activity:
+        row = _activity(tom, 5, progress, title=title)
+        row.object_id, row.started_at, row.stopped_at, row.duration_s = films[title], start, stop, 8700.0
+        row.rewarded_at = stop  # judged then: abandoned
+        return row
+
+    async with media.database.unit_of_work() as uow:
+        uow.session.add_all(
+            [
+                _link(tom, LIVE, NOW - timedelta(days=30)),
+                _live(tom, films["Live, a minute short"], "live-short", start, stop, 8050.0),
+                _live(tom, films["Live, long before"], "live-long", start, stop, 7500.0),
+                played("History, a minute short", 0.93),
+                played("Threshold only", 0.95),  # no credits marker: the 90 % threshold decided already
+            ]
+        )
+    credits = {films[t]: 8136.0 for t in titles[:3]}
+
+    async def credits_start(object_id: UUID) -> float | None:
+        return credits.get(object_id)
+
+    rewards = HistoryRewards(
+        media.database,
+        media.module.history.events,
+        media.module.threshold,
+        credits=credits_start,
+        clock=FixedClock(NOW),
+    )
+    since = {"since": (NOW - timedelta(days=1)).isoformat()}
+    assert await rewards.review_endings(since) == 2
+    assert await rewards.review_endings(since) == 0  # once
+    await media.dispatch()
+    named = {v: k for k, v in films.items()}
+    finished = {named[UUID(e[1]["object"])]: e[1]["watched_s"] for e in await media.events("media.playback")}
+    assert finished == {"Live, a minute short": 0.0, "History, a minute short": 0.0}

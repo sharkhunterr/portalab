@@ -98,7 +98,7 @@ from portalab.modules.media.insights.enrich import MetadataEnricher
 from portalab.modules.media.insights.ingest import JOB as ACTIVITY_JOB
 from portalab.modules.media.insights.ingest import ActivityIngestor
 from portalab.modules.media.insights.portal import PortalActivity
-from portalab.modules.media.insights.rewards import HistoryRewards
+from portalab.modules.media.insights.rewards import REVIEW_JOB, HistoryRewards
 from portalab.modules.media.insights.stats import InsightsQuery
 from portalab.modules.media.insights.upcoming import Upcoming
 from portalab.modules.media.links.accounts import AccountMatching
@@ -536,6 +536,17 @@ class MediaModule:
     def register_jobs(self, jobs: JobRegistry) -> list[Any]:
         jobs.register(
             IMAGE_JOB, self.images.run, idempotency="image ref checked before fetching", owner=OWNER
+        )
+
+        async def review(payload: dict[str, Any]) -> None:
+            await self.history_rewards.review_endings(payload)
+
+        jobs.register(  # #342: queued once by a migration
+            REVIEW_JOB,
+            review,
+            idempotency="each finish published once (its dedup key)",
+            timeout_seconds=600,
+            owner=OWNER,
         )
 
         async def poll() -> None:
