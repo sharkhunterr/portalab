@@ -157,7 +157,8 @@ class HistoryProjection:
         return state == "finished"
 
     async def _season(self, session: AsyncSession, user: UUID, episode: UUID, occurred_at: datetime) -> None:
-        """Issue 234: an episode finished — its season too when every episode of it is."""
+        """Issue 234: an episode finished — its season too when every episode of it is (#343: at its last
+        episode's finish)."""
         item = await session.get(MediaObject, episode)
         if item is None or item.kind != "episode" or item.parent_id is None:
             return
@@ -174,17 +175,19 @@ class HistoryProjection:
                 )
             ).scalars()
         )
-        done = await session.scalar(
-            select(func.count())
-            .select_from(UserProgress)
-            .where(
-                UserProgress.user_id == user,
-                UserProgress.object_id.in_(episodes),
-                UserProgress.state == "finished",
+        done, last = (
+            await session.execute(
+                select(func.count(), func.max(UserProgress.finished_at)).where(
+                    UserProgress.user_id == user,
+                    UserProgress.object_id.in_(episodes),
+                    UserProgress.state == "finished",
+                )
             )
-        )
+        ).one()
         if not episodes or int(done or 0) < len(episodes):
             return
+        # #343: finished when its last episode was — however late, and in whatever order, they are told
+        occurred_at = last or occurred_at
         await self.events.publish(
             session,
             "media.season_finished",
