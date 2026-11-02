@@ -2141,6 +2141,8 @@
   "email.from": "Sender and links",
   "email.sender": "Sender address",
   "email.senderHint": "The e-mails' “From” address. Many providers require the account's own.",
+  "email.senderName": "Sender name",
+  "email.senderNameHint": "The name mail clients show instead of the address; empty, the site's name. The sender's picture comes from the sending account (its Google profile photo for Gmail), not from the e-mail.",
   "email.portalUrl": "Portal's public address",
   "email.portalUrlHint": "For the e-mails' links and pictures; recipients must be able to reach it.",
   "email.save": "Save",

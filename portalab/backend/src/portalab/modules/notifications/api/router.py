@@ -177,6 +177,7 @@ class EmailConfigIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     enabled: bool
     sender: str = Field(min_length=3, max_length=200)
+    sender_name: str | None = Field(default=None, max_length=100)  # #339: None keeps the stored one
     host: str = Field(min_length=1, max_length=200)
     port: int = Field(ge=1, le=65535)
     tls: bool = False
@@ -713,6 +714,10 @@ async def put_email(principal: Manager, body: EmailConfigIn, module: Module) -> 
         await writer.set_global(principal, SETTINGS[field], value, reason="e-mail transport")
     if body.password is not None:
         await writer.set_global(principal, SMTP_PASSWORD, body.password, reason="e-mail transport")
+    if body.sender_name is not None:
+        await writer.set_global(
+            principal, SETTINGS["email_from_name"], " ".join(body.sender_name.split()), reason="e-mail sender"
+        )
     if body.portal_url is not None:
         await writer.set_global(
             principal, SETTINGS["portal_url"], body.portal_url.rstrip("/"), reason="e-mail links"

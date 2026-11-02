@@ -6294,6 +6294,18 @@
             "title": "Sender",
             "type": "string"
           },
+          "sender_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender Name"
+          },
           "tls": {
             "default": false,
             "title": "Tls",

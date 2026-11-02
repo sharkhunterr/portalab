@@ -9,6 +9,7 @@ import asyncio
 from collections import defaultdict
 from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta
+from email.headerregistry import Address
 from email.message import EmailMessage as MimeMessage
 from typing import Any
 from uuid import UUID
@@ -19,7 +20,7 @@ from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.i18n import RENDERER, RESOLVER, LocaleContext
 from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.notifications import EmailMessage, EmailTransport
-from portalab.capabilities.notifications.layout import button, code, dress, items_list, paragraphs
+from portalab.capabilities.notifications.layout import button, code, dress, items_list, paragraphs, site_brand
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
@@ -35,19 +36,38 @@ BASE_BACKOFF = 30
 MAX_BACKOFF = 3600
 
 
+async def _unnamed() -> str:
+    return ""
+
+
+def sender(name: str, address: str) -> str | Address:
+    """#339: ``Name <address>`` — the bare address when there is no name, or an address it cannot carry."""
+    name = " ".join(name.split())[:100]
+    if not name:
+        return address
+    try:
+        return Address(display_name=name, addr_spec=address)
+    except (ValueError, IndexError):
+        return address
+
+
 class SmtpTransport:
     def __init__(
-        self, config: Callable[[], NotificationsConfig], password: Callable[[], Awaitable[str]]
+        self,
+        config: Callable[[], NotificationsConfig],
+        password: Callable[[], Awaitable[str]],
+        name: Callable[[], Awaitable[str]] = _unnamed,
     ) -> None:
         self.config = config
         self.password = password
+        self.name = name
 
     async def send(self, message: EmailMessage) -> None:
         import aiosmtplib
 
         config = self.config()
         mime = MimeMessage()
-        mime["From"] = config.email_from
+        mime["From"] = sender(await self.name(), config.email_from)
         mime["To"] = message.to
         mime["Subject"] = message.subject.replace("\n", " ")[:200]
         mime.set_content(message.text)
@@ -86,7 +106,9 @@ class EmailChannel:
         self.capabilities = capabilities
         self.config = config
         self.clock = clock
-        self.transport: EmailTransport = transport or SmtpTransport(config, self.smtp_password)
+        self.transport: EmailTransport = transport or SmtpTransport(
+            config, self.smtp_password, self.sender_name
+        )
 
     def _provider(self, name: str) -> Any | None:
         try:
@@ -103,6 +125,10 @@ class EmailChannel:
             return str((await reader.get(SMTP_PASSWORD)).value or "")
         except Exception:
             return ""
+
+    async def sender_name(self) -> str:
+        """#339: the name the e-mails come from — the one set, else the site's own name."""
+        return self.config().email_from_name.strip() or (await site_brand(self._provider, "", "en")).name
 
     async def address(self, user: UUID) -> str | None:
         contact = self._provider(CONTACT)
