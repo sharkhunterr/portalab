@@ -566,6 +566,22 @@ async def run_schedule(principal: Publisher, schedule_id: UUID, module: Module) 
     return {"article": None, "edition": str(written.id) if written is not None else None}
 
 
+@router.post("/admin/news/newsletters/{schedule_id}/test", dependencies=NewslettersOn)
+async def test_schedule(
+    principal: Publisher, schedule_id: UUID, module: Module, request: Request
+) -> dict[str, Any]:
+    """#334: the letter e-mailed to me alone — and published in the news when the newsletter goes there."""
+    if principal.user_id is None:
+        raise NotFound("No account.", code="news.no_account")
+    base = str(request.base_url).rstrip("/")
+    edition, article, sent = await module.newsletters.try_out(schedule_id, principal.user_id, base)
+    return {
+        "sent": sent,
+        "edition": str(edition.id),
+        "article": str(article.id) if article is not None else None,
+    }
+
+
 @router.post("/admin/news/articles/{article_id}/{action}", response_model=NewsEditorOut)
 async def publication(
     principal: Publisher,

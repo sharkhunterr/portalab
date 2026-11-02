@@ -451,19 +451,7 @@ class Newsletters:
         if not force and (not schedule.enabled or (schedule.next_run_at and schedule.next_run_at > now)):
             return None
         if schedule.kind == "edition" and self.editions is not None:
-            edition = await self.editions.create(
-                schedule.template_key or "portalab",
-                days=schedule.days or CADENCES.get(schedule.cadence, 7),
-                language=schedule.language,
-                notice=schedule.notice,
-                category_id=schedule.category_id,
-                schedule_id=schedule.id,
-                # #325: no choice saved — the usual contents, as the form shows them
-                contents=schedule.contents if schedule.contents is not None else DEFAULT_CONTENTS,
-                charts=schedule.charts,
-                subject=schedule.subject,
-                page=schedule.publish,
-            )
+            edition = await self._write(schedule)
             # #332: published in the portal (its letter, and an article in its channel's news), e-mailed,
             # or both
             edition = await self.editions.publish(edition.id, email=schedule.email, visible=schedule.publish)
@@ -500,6 +488,45 @@ class Newsletters:
                 if article is not None:
                     row.last_article_id = article.id
         return article
+
+    async def _write(
+        self, schedule: NewsletterSchedule, *, status: str = "draft", by: UUID | None = None
+    ) -> NewsletterEdition:
+        """The edition an « edition » schedule writes now, in its template."""
+        assert self.editions is not None
+        return await self.editions.create(  # type: ignore[no-any-return]
+            schedule.template_key or "portalab",
+            days=schedule.days or CADENCES.get(schedule.cadence, 7),
+            language=schedule.language,
+            notice=schedule.notice,
+            category_id=schedule.category_id,
+            schedule_id=schedule.id,
+            # #325: no choice saved — the usual contents, as the form shows them
+            contents=schedule.contents if schedule.contents is not None else DEFAULT_CONTENTS,
+            charts=schedule.charts,
+            subject=schedule.subject,
+            page=schedule.publish,
+            status=status,
+            created_by=by,
+        )
+
+    async def try_out(
+        self, schedule_id: UUID, user: UUID, base: str
+    ) -> tuple[NewsletterEdition, Article | None, bool]:
+        """#334: the test — the letter it would write now, e-mailed to me alone; published in the news too
+        (its letter and its article) when it goes there. Never to the subscribers; its next run stays."""
+        async with self.database.session() as session:
+            schedule = await session.get(NewsletterSchedule, schedule_id)
+        if schedule is None or schedule.kind != "edition" or self.editions is None:
+            raise ScheduleNotFound("This newsletter schedule does not exist.")
+        # e-mailed only: a preview, kept out of the history
+        edition = await self._write(schedule, status="draft" if schedule.publish else "preview", by=user)
+        announced = None
+        if schedule.publish:
+            edition = await self.editions.publish(edition.id, email=False)
+            announced = await self._announce(schedule, edition)
+        sent = await self.editions.send_test(edition, user, base)
+        return edition, announced, sent
 
     async def _announce(self, schedule: NewsletterSchedule, edition: NewsletterEdition) -> Article | None:
         """#332: the letter in its channel's news — an article saying what it tells, leading to it."""

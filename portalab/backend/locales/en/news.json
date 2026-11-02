@@ -426,5 +426,6 @@
   "auto.publish": "Publish in the portal’s news (the letter, and an article in its channel)",
   "auto.nowhere": "Pick at least one: the news, e-mail, or both.",
   "auto.inNews": "In the news",
-  "edition.status.sent": "E-mailed only"
+  "edition.status.sent": "E-mailed only",
+  "auto.testPublished": "The letter is also published in the news."
 }

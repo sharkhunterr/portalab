@@ -423,3 +423,20 @@ async def test_an_automatic_newsletter_is_published_in_the_news_e_mailed_or_both
     assert mail.action_url is None
     news = (await client.get("/api/v1/news", params={"category": "gazette"})).json()["items"]
     assert len(news) == 1  # no article for the letter e-mailed only
+
+    # #334: the test of a newsletter going to the news publishes it there too — to me alone by e-mail
+    before = (await client.get("/api/v1/admin/news/newsletters")).json()
+    tested = (await client.post(f"/api/v1/admin/news/newsletters/{published['id']}/test")).json()
+    assert tested["sent"] is True and tested["article"] is not None
+    letter = (await client.get(f"/api/v1/news/editions/{tested['edition']}")).json()
+    news = (await client.get("/api/v1/news", params={"category": "gazette"})).json()["items"]
+    assert len([n for n in news if n["title"] == letter["title"]]) == 2  # the run's, the test's
+    assert [r for r in ct.outbox.sent if r.dedup_key.startswith(f"news.edition-test:{tested['edition']}")]
+    assert not [r for r in ct.outbox.sent if r.dedup_key == f"news.edition:{tested['edition']}"]
+    after = (await client.get("/api/v1/admin/news/newsletters")).json()
+    assert [s["next_run_at"] for s in after] == [s["next_run_at"] for s in before]  # its next run stays
+
+    # e-mailed only, the test stays out of the portal
+    tested = (await client.post(f"/api/v1/admin/news/newsletters/{mailed['id']}/test")).json()
+    assert tested["sent"] is True and tested["article"] is None
+    assert (await client.get(f"/api/v1/news/editions/{tested['edition']}")).status_code == 404
