@@ -482,6 +482,29 @@ class ArticleService:
             )
             return set(rows.scalars())
 
+    async def unread(self, viewer: Principal) -> int:
+        """#336: the published articles this member may read and has not opened yet — the unread dots
+        (#48), counted (the latest hundred at most: the badge says « 99+ » beyond)."""
+        if viewer.user_id is None:
+            return 0
+        opened = select(ArticleRead.article_id).where(
+            ArticleRead.user_id == viewer.user_id, ArticleRead.article_id == Article.id
+        )
+        async with self.database.session() as session:
+            rows = (
+                (
+                    await session.execute(
+                        select(Article)
+                        .where(Article.status == "published", ~opened.exists())
+                        .order_by(Article.published_at.desc())
+                        .limit(100)
+                    )
+                )
+                .scalars()
+                .all()
+            )
+        return len([r for r in rows if await self.readable(r, viewer)])
+
     async def read_counts(self, article_ids: Sequence[UUID]) -> dict[UUID, int]:
         if not article_ids:
             return {}
