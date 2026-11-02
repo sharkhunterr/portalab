@@ -54,6 +54,111 @@
 
 ---
 
+# v1.1.0
+
+## Portalab v1.1.0 — newsletters that write themselves, a feed of your own
+
+Newsletters now write themselves from what happened on the server and land in members' inboxes in
+Portalab's own look. Each member gets a news feed of the channels they follow. Quests are richer and easier
+to follow, and booster openings have new scenes, in video and over the whole screen. Plays are rewarded
+reliably again.
+
+### Highlights
+
+- **Automatic newsletters** — editions that write themselves from what arrived, what was watched and what
+  is coming, built on visual templates. Each one has its own name, e-mail subject, contents and charts, and
+  each can be switched on or off. Preview the real e-mail without sending it, then publish it as a news
+  item, send it by e-mail, or both. Members are subscribed by default and can unsubscribe from each one.
+- **E-mails in Portalab's look** — every e-mail keeps its art direction, Gmail included. It is sent under a
+  sender name rather than a bare address. The administrator can turn off e-mails to members while keeping
+  their own.
+- **Headlines and My feed** — the administrator's front page plus each member's own feed of followed
+  channels. You can set up RSS sources, give each channel its own colour, see unread badges, page through
+  older items and play YouTube videos in place. My feed also comes as a dashboard widget.
+- **Quests and achievements** — new goals on using the portal, plays, requests, games and support. They
+  have conditions per step, translated texts and a clear done state, with the time left until the next
+  reset. Quests now appear on the Games page, with filters, a progress bar and a reminder in Today's games.
+- **Boosters and cards** — new opening scenes: the genre and edition scenes for Mediacards, Impact, Sumi,
+  Géode, a manga universe and Apothéose. They can be played as video or revealed over the whole screen.
+  Identical boosters are stacked with a count, and a booster opens in its own product's scene.
+- **Community projects and the reserve** — a project page shows who backed it, what is still needed and a
+  timeline. Unread badges mark what arrived in the reserve.
+- **Quick access widget** — pick the services it shows and their order. Each one is coloured by its state,
+  and the widget adapts to its size.
+
+### Closed issues
+
+#### Fixed
+
+- Plays were no longer rewarded after Plex restarted: Plex reused session keys, and plays from its history
+  were taken for live ones. The missed plays have been rewarded since (#340)
+- A finished season was dated by the episode that triggered it; it is now dated by its last episode (#343)
+- A card booster bought from the shop opened in the default scene instead of its product's (#293)
+- Refreshing a page full of images showed « Error » instead of the portal (#305)
+- Backing a community project showed as « Other » in the journals (#314)
+- The calendar shows today's content without a click (#302)
+- The goal bar of a project uses the theme's colours (#306)
+- Goals: texts are translated, the done state is readable, and the time left and next reset are shown (#307)
+- The e-mail (SMTP) settings are gathered in one clear form (#319)
+- The SMTP form no longer appears twice, and the misleading « Delivered » count is gone (#321)
+- E-mails keep Portalab's art direction in Gmail (#322)
+- Newsletters page: the live preview is on demand, and the misleading « Newsletter » digest block is
+  gone (#327)
+- A newsletter's subtitle follows its content (#337)
+
+#### New
+
+- Automatic newsletters: editions that write themselves, built on templates (#316)
+- See an edition's real e-mail without sending it to members (#317)
+- Turn off e-mails to members while administrators keep theirs (#318)
+- E-mails in Portalab's art direction, and a Portalab newsletter template (#320)
+- An edition's contents can each be switched on and off (#323)
+- An edition's statistics as charts, each to switch on (#324)
+- Each automatic newsletter has a name and an e-mail subject (#325)
+- Members are subscribed to each automatic newsletter by default and can unsubscribe one by one (#326)
+- Automatic newsletters shown as cards with a switch, Test / Edit / Delete, and editing in a window (#328)
+- Each automatic newsletter has its own template, chosen visually, and each template says who uses it (#329)
+- Publish an automatic newsletter as a news item, send it by e-mail, or both (#332)
+- Testing an automatic newsletter also publishes it as news when that option is on (#334)
+- A published newsletter is an ordinary news item, no longer duplicated in the Newsletters tab (#335)
+- E-mails go out under a sender name instead of the bare address (#339)
+- My feed: a dashboard widget, and YouTube videos played in place (#315)
+- My feed: news pages, and an icon for each source type (YouTube, podcast…) (#301)
+- Unread badges on My feed's news and on what arrives in the reserve (#300)
+- An unread news badge on « Headlines » (#336)
+- A colour for each news channel (#338)
+- Quick access widget: choose and order the services, coloured by state, adapting to its size (#333)
+- Mediacards boosters: a scene for each genre and rarity, with five new genre scenes in video (#291)
+- Booster scenes for the 14 Mediacards editions (#292)
+- Identical boosters are stacked in the reserve and on the cards page, with a count badge (#297)
+- Projects and reserve: badges, the form in a window, a new look for « My reserve » (#303)
+- A project's page shows who backed it, what is still needed and a horizontal timeline (#304)
+- New goals on using the portal, plays, requests, games and support (#308)
+- Goals editor: conditions per step, progress actions, a Discovery type and more icons (#309)
+- Quests on the Games page (#310)
+- Filters on the quests page (#311)
+- Quests show a done / total progress bar instead of « 29 to do » (#312)
+- A quest reminder in Today's games (#313)
+- Plays are caught up from the moment an account was linked, not only from the last 48 hours (#341)
+- A film or episode stopped in the last two minutes before its end credits counts as finished, and
+  earlier plays have been reviewed (#342)
+
+#### Improved
+
+- News: Headlines (administrators) and My feed (members), with follows, configurable RSS sources and
+  unread items (#299)
+
+### Upgrading
+
+- Migrations run with `docker compose run --rm migrate` (cards, marketplace, media and news). The upgrade
+  queues one review of the past 30 days of plays. That review grants the finish bonuses missed under the
+  old end-credits rule, without counting any watch minute twice.
+- A visual pack may now weigh up to 40 MB.
+- Optional: set a sender name under *Communication → E-mail*. Without one, e-mails go out under the site's
+  name.
+
+---
+
 # v1.0.0
 
 ## Portalab v1.0.0 — the front door of your homelab
