@@ -85,6 +85,43 @@ async def test_playback_lifecycle(app: FastAPI, media: MediaHarness, clock: Fixe
     assert unlinked == 1
 
 
+async def test_a_restarted_server_s_session_keys_name_new_plays(
+    app: FastAPI, media: MediaHarness, clock: FixedClock
+) -> None:
+    """#340: Plex restarted numbers its sessions from 1 again — a key naming a play ended long ago (or another
+    title) is a new play, followed like any other; the same title listed a moment after its end is not."""
+    people = await users(app, media, "ines")
+    plex = media.service(1, "plex")
+    link = await media.module.links.claim(people["ines"], plex.service_id, "ines")
+    await media.module.links.verify(None, link.id, None)
+    fake = media.playback(plex)
+    fake.play("1", external_user_id="ines", kind="episode", title="Lanterns", duration_s=3000)
+    await media.module.poller.poll(plex.service_id, fake)
+    fake.stop("1")
+    await media.module.poller.poll(plex.service_id, fake)
+    clock.advance(timedelta(minutes=2))  # listed again a moment: that play, ended
+    fake.play("1", external_user_id="ines", kind="episode", title="Lanterns", duration_s=3000)
+    await media.module.poller.poll(plex.service_id, fake)
+    fake.stop("1")
+    await media.module.poller.poll(plex.service_id, fake)
+    clock.advance(timedelta(days=2))  # the server restarted: its key 1 is another play
+    fake.play("1", external_user_id="ines", kind="episode", title="Deadlock", duration_s=3000)
+    await media.module.poller.poll(plex.service_id, fake)
+    clock.advance(timedelta(minutes=50))
+    fake.play("1", position_s=2950)
+    await media.module.poller.poll(plex.service_id, fake)
+    assert len(await media.module.poller.now_playing(people["ines"])) == 1
+    fake.stop("1")
+    await media.module.poller.poll(plex.service_id, fake)
+    assert await kinds(media) == [
+        "media.playback_started",
+        "media.playback_abandoned",
+        "media.playback_started",
+        "media.playback_progressed",
+        "media.playback_finished",
+    ]
+
+
 async def test_a_film_is_finished_at_its_end_credits(app: FastAPI, media: MediaHarness) -> None:
     """#101: where the media server marks the end credits, a film stopped before them is not finished —
     even past the 90 % threshold — and one stopped as they begin is."""

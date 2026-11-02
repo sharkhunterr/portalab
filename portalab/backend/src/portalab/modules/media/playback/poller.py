@@ -8,7 +8,9 @@ normalizes sessions into ``media.playback_sessions`` and publishes throttled pla
 * a source that stops answering marks its sessions ``stale``; after ``staleTimeoutSeconds`` they are
   ``interrupted`` with ``media.playback_error`` (never ``finished``);
 * activity of accounts without a verified link is stored as unlinked and never attributed or published;
-* events carry ids and counters, the linked user as private subject, dedup ``(session, state_seq)``.
+* events carry ids and counters, the linked user as private subject, dedup ``(session, state_seq)``;
+* #340: a media server restarted numbers its sessions anew (Plex: from 1) — a key naming a play that ended
+  a while ago, or another title, is a new play, its key told apart by its start.
 """
 
 import asyncio
@@ -17,7 +19,7 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.media import (
@@ -39,6 +41,8 @@ from portalab.modules.media.playback.normalizer import ACTIVE, on_end, on_update
 from portalab.modules.media.settings import MediaConfig
 
 JOB = "media.playback_poll"
+REUSED = timedelta(minutes=30)  # #340: a key ended longer ago than this names another play
+HISTORY = ":history:"  # the sessions of a play read from a history, not followed live
 
 
 class PlaybackPoller:
@@ -115,14 +119,40 @@ class PlaybackPoller:
             return
         seen: set[str] = set()
         for report in reports:
-            session_key = f"{service_id}:{report.session_key}"[:300]
-            seen.add(session_key)
             try:
+                session_key = await self._key(service_id, report, now)
+                seen.add(session_key)
                 await self._report(service_id, session_key, report, now)
             except Exception:
                 log.warning("playback session not recorded")
         await self._end_missing(service_id, seen, now)
         await self._recent(service_id, provider, now)
+
+    async def _key(self, service_id: UUID, report: SourcePlayback, now: datetime) -> str:
+        """#340: the play's own key — the source's, unless a play that ended already bears it: the same
+        title still listed a moment keeps it (and stays ended), anything else is a new play."""
+        base = f"{service_id}:{report.session_key}"[:280]
+        async with self.database.session() as session:
+            last = await session.scalar(
+                select(PlaybackSession)
+                .where(
+                    or_(
+                        PlaybackSession.session_key == base,
+                        PlaybackSession.session_key.startswith(f"{base}#", autoescape=True),
+                    )
+                )
+                .order_by(PlaybackSession.started_at.desc())
+                .limit(1)
+            )
+        if last is None:
+            return base
+        same = (last.title or "", last.subtitle or "") == (
+            (report.title or "")[:500],
+            (report.subtitle or "")[:500],
+        )
+        if not last.ended or (same and now - last.updated_at < REUSED):
+            return last.session_key
+        return f"{base}#{now:%Y%m%dT%H%M%S}"
 
     async def _resolve_object(
         self, session: AsyncSession, service_id: UUID, item: str | None, ids: Any
@@ -329,7 +359,7 @@ class PlaybackPoller:
                     uow.session, service_id, item.item_external_id, item.ids
                 )
                 ref = item.item_external_id or item.title[:40]
-                key = f"{service_id}:history:{ref}:{item.occurred_at.isoformat()}"
+                key = f"{service_id}{HISTORY}{ref}:{item.occurred_at.isoformat()}"
                 if await uow.session.get(PlaybackSession, key[:300]) is not None:
                     continue
                 row = PlaybackSession(
