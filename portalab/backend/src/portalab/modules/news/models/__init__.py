@@ -74,6 +74,10 @@ class Article(NewsBase):
         info=not_personal("whether the article is e-mailed on publication"),
     )
     emailed_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    # #335: a newsletter's letter published in the news — the article shows the letter itself
+    edition_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("news.newsletter_editions.id", ondelete="SET NULL")
+    )
     publish_seq: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     version: Mapped[int] = mapped_column(Integer, nullable=False)
     search_vector: Mapped[Any] = mapped_column(TSVECTOR, nullable=True)

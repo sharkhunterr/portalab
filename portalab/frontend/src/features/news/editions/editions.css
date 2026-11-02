@@ -19,52 +19,6 @@
   color: var(--color-text);
 }
 
-.editions-list {
-  display: grid;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.editions-list__card {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-raised);
-  color: var(--color-text);
-  text-decoration: none;
-}
-.editions-list__card:hover,
-.editions-list__card:focus-visible {
-  border-color: var(--color-accent);
-}
-.editions-list li[data-latest] .editions-list__card {
-  box-shadow: 0 0 0 1px var(--color-accent);
-}
-.editions-list__icon {
-  display: grid;
-  place-items: center;
-  flex: none;
-  inline-size: 2.5rem;
-  aspect-ratio: 1;
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
-  color: var(--color-accent);
-}
-.editions-list__text {
-  display: grid;
-  flex: 1;
-  gap: var(--space-1);
-  min-inline-size: 0;
-}
-.editions-list__text span,
-.editions-list__text small {
-  color: var(--color-text-muted);
-}
-
 /* the news desk: a form beside its preview (under it on a phone) */
 .edition-editor {
   display: grid;

@@ -149,6 +149,9 @@ async def test_editions(
         f"/api/v1/admin/news/newsletter-editions/{draft['id']}/publish", json={"email": True}
     )
     assert again.status_code == 200
+    # #335: published, the letter is a news — once, however often it is published
+    news = (await client.get("/api/v1/news")).json()["items"]
+    assert len([n for n in news if n["title"] == sent.json()["title"]]) == 1
     mails = [r for r in ct.outbox.sent if r.dedup_key == f"news.edition:{draft['id']}"]
     assert len(mails) == 1 and mails[0].email_body is not None
     mail = mails[0].email_body["html"]
@@ -405,8 +408,9 @@ async def test_an_automatic_newsletter_is_published_in_the_news_e_mailed_or_both
     news = (await client.get("/api/v1/news", params={"category": "gazette"})).json()["items"]
     [article] = [n for n in news if n["title"] == letter["title"]]
     assert article["status"] == "published"
-    body = (await client.get(f"/api/v1/news/{article['slug']}")).json()["html"]
-    assert f"/news/editions/{run['edition']}" in body  # the article leads to the letter
+    shown = (await client.get(f"/api/v1/news/{article['slug']}")).json()
+    assert f"/news/editions/{run['edition']}" in shown["html"]  # the article leads to the letter
+    assert shown["edition_id"] == run["edition"]  # #335: and shows it, as any news
 
     mailed = (await newsletter("Par e-mail", publish=False, email=True)).json()
     run = (await client.post(f"/api/v1/admin/news/newsletters/{mailed['id']}/run")).json()

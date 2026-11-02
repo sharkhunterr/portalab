@@ -81,6 +81,7 @@ class NewsArticleOut(NewsCard):
     is_translation: bool
     translation_missing: bool
     archived: bool
+    edition_id: UUID | None = None  # #335: the newsletter letter it shows, in place of its body
 
 
 class NewsEditorOut(NewsCard):
@@ -359,6 +360,7 @@ async def article(
         is_translation=translation is not None,
         translation_missing=bool(lang and lang != row.language and translation is None),
         archived=row.status == "archived",
+        edition_id=row.edition_id,
     )
 
 
