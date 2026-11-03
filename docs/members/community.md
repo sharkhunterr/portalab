@@ -6,18 +6,18 @@ Portalab's community is deliberately simple: there are no friends, followers, li
 
 ## Finding your way
 
-Open **Community** (`/community`) from the menu. Its tabs are **Discover**, **Leaderboards**, **Quests**, **Achievements**, **Members** and **Proposals**.
+Open **Community** from the menu. The section's entries are also the tabs of a single bar at the top of each page: **Overview** (`/community`), **Members**, **Leaderboards**, **Events**, **Proposals** and **Projects**.
 
-**Discover** gives an overview:
+**Overview** introduces the community:
 
-- the leaderboard's podium and your place;
-- **My quests** and the **Campaigns running**;
-- the **Latest activity**;
-- shelves such as **New members**, **Proposals needing support**, **Recent achievements** and **Highlights**.
+- the **Leaderboard**'s podium and your place;
+- **My quests**, which leads to **Games → Quests**;
+- the **Latest activity** and the **Campaigns running**;
+- shelves such as **New members**, **Proposals needing support** and **Recent achievements**.
 
-Quests, achievements and leaderboards are explained in [Playing on the portal](gamification.md).
+Quests, achievements and leaderboards are explained in [Playing on the portal](gamification.md). Quests now live in the **Games** section (`/community/quests` takes you to `/games/quests`), and your achievements are in the **Me** menu, under your avatar.
 
-![The community's Discover tab](../../assets/screenshots/community.jpg)
+![The community's overview](../../assets/screenshots/community.jpg)
 
 ## Members and profiles
 
@@ -57,13 +57,13 @@ For finer control, the **Privacy center** (`/privacy`) lets you choose who sees 
 
 ## The activity feed
 
-The feed shows what happens, day by day: a level reached, an achievement unlocked, a quest completed, a project proposed. Open it from **Latest activity** on the Discover tab (`/community/feed`), or add the **Community activity** widget to your home page.
+The feed shows what happens, day by day: a level reached, an achievement unlocked, a quest completed, a project proposed. Open it from **Latest activity** on the Overview (`/community/feed`), or add the **Community activity** widget to your home page.
 
 A hidden achievement appears as "a secret achievement". A member who chose to be anonymous appears as "An anonymous member", and a member who turns private disappears from the feed at once.
 
 ## Community events
 
-**Community events** (`/community/events`) lists the upcoming events meant for you. An event has a title, a description, a start and an end (or **All day**), a reference time zone and an audience: **Everyone**, **Members** or **Selected roles**. A cancelled event stays listed as **Cancelled**.
+**Events** (`/community/events`) lists the upcoming events meant for you. The campaigns running right now are shown above them. An event has a title, a description, a start and an end (or **All day**), a reference time zone and an audience: **Everyone**, **Members** or **Selected roles**. A cancelled event stays listed as **Cancelled**.
 
 Events also appear in the calendar, where you can ask for a reminder. Moderators create, edit and cancel them with **New event**.
 
@@ -91,21 +91,60 @@ A **Project** proposal becomes a community project: its progress and funding are
 
 ## News
 
-**News** (`/news`), in the **Discover** section of the menu, brings "What's new on the portal, straight from the team".
+The **News** section of the menu has two pages: **Headlines**, what the team publishes for everyone, and **My feed**, made for you alone. Both carry a badge in the menu with what you have not read yet.
 
-- The **Featured** articles come first, then the **Latest news** as cards with their category and date.
-- The category bar filters one subject; **All categories** shows everything again.
-- A dot marks an article you have not read yet.
-- An article shows its category, date and reading time ("3 min read"). If it is not translated into your language, the portal says so.
+### Headlines
 
-### Being told of new articles
+**Headlines** (`/news`) brings "What's new on the portal, straight from the team".
 
-- Depending on the team's choice, a new article can reach you as a notification ("New article: …").
-- Some news channels are **newsletters**, also sent by e-mail. Choose which ones you receive in **Notification preferences**, under **Newsletters by e-mail**. They stay readable in the news anyway.
-- The portal can also write **automatic newsletters** from the media services (new in the library, recent releases, upcoming releases), published in a channel and optionally e-mailed.
-- The **E-mail digest** in the same preferences groups your e-mails into a daily or weekly summary, or sends each one.
+- The **Featured** articles come first, then the **Latest news** as cards with their channel and date.
+- Each channel has its own colour, the same on its cards, its label and its filter. The channel bar filters one subject; **All categories** shows everything again.
+- A dot marks an article you have not read yet; the badge on **Headlines** in the menu counts them and goes down as soon as you open one.
+- An article shows its channel, date and reading time ("3 min read"). If it is not translated into your language, the portal says so.
+- **On the web**, at the bottom, gathers the latest items of the sites the team follows (film, series or games news…). The same items also appear on the pages of the titles and people they name (**In the news**).
 
-The **Latest news** and **Featured news** widgets bring articles to your home page.
+### My feed
+
+**My feed** (`/feed`) is "Everything that comes, mixed: the server and each source, in its colour". Nobody else sees what you follow.
+
+![My feed: the server and every source, each in its colour](../../assets/screenshots/my-feed.jpg)
+
+It mixes, newest first and day by day (**Today**, **Yesterday**, then the date):
+
+- what the library brought for what you follow (**On the server**): a new film, a new series, new episodes, with the people, series or genres that make it yours;
+- the items of the sources the team set up for everyone;
+- the items of your own sources (see below).
+
+Each source has its colour and its badge, with an icon for its kind (a YouTube channel, a podcast, a site…). Use the filters at the top:
+
+- **All**: everything;
+- **For me**: only what concerns what you follow — the library's arrivals, and the news items that name a person or a series you follow;
+- one source: only its items (select it again to see everything).
+
+What arrived since you last opened the page is marked **New**, and the badge on **My feed** in the menu counts it. The feed shows a page at a time; use the page numbers at the bottom. A YouTube video plays right in the feed: select its picture (**Play "…" here**), or open it on YouTube in a new tab.
+
+**Coming soon**, at the top, lists what is announced for the people you follow, with where it stands: **Available**, **Requested**, **Not available yet** or **Not on the server**.
+
+#### Choosing what you follow
+
+- On a person's page (an actor, a director, an author…) or a series' page, select **Follow**; **Following** means it is in your feed. Select it again to stop.
+- In **Manage my feed: what I follow, my sources**, at the bottom of the page, **What I follow** lists your people, series and genres; the cross stops following one. **Follow a genre** adds a genre of the library.
+- **My sources** adds your own RSS or Atom feeds: type **A feed's or a site's address** (a blog, a YouTube channel, a forum…), then **Follow**. Their items only show in your feed. **Export (OPML)** and **Import an OPML file** move your list to or from another reader.
+
+New arrivals for what you follow can also reach you as a notification ("New in your feed: …"), in the **My feed: what arrives for what I follow** category of your [notification preferences](personalization.md#notification-preferences). The **My feed** widget brings the latest items to your home page, YouTube videos included.
+
+### Newsletters
+
+The team can send news by e-mail, in the portal's own look:
+
+- **Automatic newsletters** write themselves on a schedule from the portal's data: the period in figures and charts, the most watched titles, what arrived in the library, the new requests, what is out or coming soon, the TV programme, the latest articles. Depending on the team's choice, each letter is published as an ordinary article in its channel (**Read the letter** shows it whole), sent by e-mail, or both.
+- Some news channels are **newsletters** too: their articles can be e-mailed to you.
+
+You are subscribed to every newsletter by default, and you leave them one by one in **Notification preferences**, card **Newsletters by e-mail** (see [Personalization](personalization.md#notification-preferences)). Every newsletter e-mail ends with **Unsubscribe from this newsletter**, which leads there. Newsletters stay readable in the news anyway.
+
+Depending on the team's choice, a new article can also reach you as a notification ("New article: …"). The **E-mail digest** in your notification preferences groups your notification e-mails into a daily or weekly summary, or sends each one; it has nothing to do with the newsletters.
+
+The **Latest news**, **Featured news** and **My feed** widgets bring the news to your home page.
 
 ![The news page](../../assets/screenshots/news.jpg)
 
@@ -137,7 +176,7 @@ The **Calendar** (`/calendar`) shows what is coming, day by day. Depending on yo
 - maintenance windows and incidents;
 - news publications.
 
-Use **Previous**, **Next** and **Today** to move, and choose a view: **Month**, **Week** or **List**. The categories act as filters (select one to hide or show it; **Show all** brings them all back). Times follow your time zone and the first day of the week chosen in **Language & region**. Select an item's title to open its page.
+Today's detail is open when you arrive and after **Today**: no click needed to see what is on. Use **Previous**, **Next** and **Today** to move, and choose a view: **Month**, **Week** or **List**. The categories act as filters (select one to hide or show it; **Show all** brings them all back). Times follow your time zone and the first day of the week chosen in **Language & region**. Select an item's title to open its page.
 
 ### Reminders
 

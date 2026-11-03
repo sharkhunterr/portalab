@@ -69,7 +69,7 @@ A visual pack brings looks from outside: an interface (possibly with its own nav
 Three **Sources**:
 
 - the **Inbox**: drop folders or `.zip` files in the inbox folder on the server, then **Read the inbox**;
-- **Upload a .zip** (40 MB at most);
+- **Upload a .zip** (40 MB at most; a single file inside holds 5 MB at most — the inbox and GitHub have the same limits);
 - **From GitHub**: a repository's address; its latest release (or default branch) is imported. **Check for updates** compares versions and never installs on its own.
 
 ### The six steps
@@ -84,6 +84,19 @@ Each version goes through six steps; the next opens only when nothing blocks.
 | **Test** | Every element drawn as members would see it: **Try** it on yourself (this page only), **Measure** it (compiled, frames per second, scripts started). |
 | **Review** | The economy of each element (**Price (Coins)** or reward only, **Rarity**, **Level required**, **Copies**, sold in the shop or given to everyone for widgets), and the confirmations: scripts, a look taken over from another pack, the data each widget asks for, the boosters a scene dresses. |
 | **Validation** | **Validate and publish**: the elements become shop products (or are offered) and the looks go live within moments. Or **Reject** with a reason. |
+
+### Booster scenes, videos and full-screen reveals
+
+A **Booster scene** dresses a booster's opening: a backdrop, the sealed pack, the cards' back, the opening and each rarity's reveal.
+
+- **Video parts**: a backdrop, an opening or a card's reveal may be a video (MP4 or WebM, checked by its first bytes), muted — a backdrop loops, an opening or a reveal plays once — and never played when a member reduces motion. A video can carry its transparency beside or under its picture, which every browser and phone plays on its hardware decoder; a reveal may bring a second video played over the card. Packs and elements that play a video carry a **video** badge.
+- **Full-screen reveals**: a card's reveal may take the whole screen — the rarity's name first, huge and translated by Portalab, then the card flung to the middle face down and turning over. It ends with its videos or on a tap.
+- **Durations**: an opening lasts 4 s at most, a reveal 3 s (5 s over the whole screen); a longer scene is a blocking finding at **Analysis**. The **Test** step plays them (**Try the scene « … »**).
+- **Which boosters wear it**: in the **Review** step, **Booster scenes** gives the scene to **Every looks booster** (without a scene of its own), **Every Mediacards booster**, **One booster** (**The booster's product key**), or **None for now**. "A scene dresses the opening of the boosters it is given to." Looks boosters can also pick theirs in **Shop → Boosters** (see [Gamification and economy](gamification-and-economy.md#mediacards)).
+
+The example packs Portalab ships ([`portalab/examples/visual-packs/`](../../portalab/examples/visual-packs/)) hold a scene for each card genre, each of the fourteen card editions and each theme, among them Impact, Sumi, Géode, Apothéose and a manga universe (Shōnen, Magical girl, Ninja, Mecha). The recommended install of the setup assistant installs them and binds each to its booster.
+
+### Pack safety
 
 A pack's scripts run isolated: they can never reach the member's account, session or data, use the network, read the browser's storage or touch the page around them. A pack that holds JavaScript asks you to confirm you checked it.
 
@@ -146,11 +159,11 @@ Plugin authors: see the [plugin authoring guide](../../portalab/docs/plugin-auth
 - **Save as a new version**, then **Activate**: its values are computed from the whole event history. **Rebuild** recomputes everything under the latest version (otherwise earlier days keep their values).
 - Aggregates never show groups smaller than the privacy threshold (5 members by default).
 
-Statistics can be sold in the shop (product type **Statistic**) and shown in widgets. See [Statistics](../members/statistics.md) for the members' side.
+Members find the statistics of personal scope in **Statistics → My activity** (`/statistics/me`) and the others in **Statistics → Community** (`/statistics`); a breakdown is written under its chart, each part with its share. Statistics can be sold in the shop (product type **Statistic**) and shown in widgets. See [Statistics](../members/statistics.md) for the members' side.
 
 ## Navigation
 
-The menu is built from sections (Home, Media, Discover, Community, Games, Marketplace, Support…) and only shows what each member may open.
+The members' menu is built from sections arranged by intent — **Home**, **News**, **Media**, **Games**, **Community**, **Statistics**, **Marketplace** and **Help** — plus the personal **Me** menu under the avatar (**My progression**, **Achievements**, **My settings**). It only shows what each member may open. In **Community**, the section's entries are also the single bar of tabs of its pages. The search page is not in the menu: the header's search field offers **Advanced search**. Some entries carry a badge of what is new for the member (**Headlines**, **My feed**, **My reserve**, **Projects**).
 
 - Each theme chooses its menu per device (sidebar, top bar, rail, orbit, bottom bar, drawer); an interface from a visual pack can even bring a navigation of its own. If it fails, a built-in navigation takes over, and the Administration always keeps its own.
 - In Configuration (group General): *Navigation layout* (groups, order and pinned entries) and *Let members reorder navigation*.

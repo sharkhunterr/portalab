@@ -19,7 +19,7 @@ The currency's name ("Coins" by default), its short name and icon are set in **A
 
 The **Game** step of the setup assistant offers three starts:
 
-- **The recommended install**: a complete game and shop, ready to play (gain rules, achievements, quests, campaigns, level steps, the shop's products and Portalab's visual packs);
+- **The recommended install**: a complete game and shop, ready to play (gain rules, achievements, some fifty quests and objectives, campaigns, level steps, the shop's products — the whole Mediacards booster range included, with its scenes — and Portalab's visual packs);
 - **The recommended install, adjusted**: the same start, then you change what you like in tabs (Gains and streak, Levels and unlocks, Achievements, Quests, Campaigns, Settings);
 - **Set everything myself**: an empty game (the basic curve and discovery missions) built screen by screen.
 
@@ -76,15 +76,22 @@ All multipliers combine (rule, streak, boost, campaign) up to the **Maximum comb
 
 Each achievement has a category, an icon, rewards (XP, Coins, Contribution) and up to four **Products given** from the shop (a look, or a sealed booster to open from the reserve). **Secret** keeps it invisible until unlocked. Ready-made **Card achievements** cover the collections: first booster, 25 boosters (Collector), a legendary pull, a complete collection, several series (Binge collector), ten collections (Archivist).
 
-**Quests** come in three types:
+**Quests** come in four types:
 
 | Type | Behaviour |
 |---|---|
 | **Objective** | Renews **Every day**, **Every week** or **Every month**. |
 | **Quest** | Steps over counted actions, **Once** or renewed. |
 | **Challenge** | Offered only between its **Starts** and **Ends** dates; only actions inside the window count. |
+| **Discovery** | A first step for new members (a guided tour, a first request…), rewarded once. |
 
-Steps are counted actions; **Done when** is **every step is done** or **any one step is done**. Completion happens once per member and period.
+Steps are counted actions; **Done when** is **every step is done** or **any one step is done**. Completion happens once per member and period. An objective can be about any action members make: signing in, searching, reading notifications, the radio, plays, a title about to leave watched, a requested title watched by another member, the games, the assistant, feedback and bug reports, boosters opened, project contributions…
+
+- **Only if**: each step (of a quest or an achievement) can say which events it counts, with conditions — an **Attribute**, a **Comparison** (=, ≠, one of, >, ≥, <, ≤) and a **Value**, the known values suggested (kinds of play, games, quests, achievements). For example "a film", "the blind test", "a quarter of an hour at least". For **one of**, separate the values with commas.
+- **The progression's own actions**: quests and achievements may count **Quest or objective done**, **Achievement unlocked** and **Level reached** (a weekly "complete five objectives", for example). Reward rules never see them.
+- More icons say what each objective is about.
+
+Members find their quests in **Games → Quests**, filtered by period and with their time left, and a reminder under **Today's games** (see [Playing on the portal](../members/gamification.md#quests-and-objectives)). Quest and achievement texts are shown in the member's interface language when they have a translation.
 
 ## Abuse control
 
@@ -144,15 +151,26 @@ What the games give is set with the other gain rules (**Gamification → Gains �
 
 ## Mediacards
 
-Mediacards are generated automatically from the library: each film and series gets its set (the title, its makers, up to ten characters), refreshed as the library changes, with rarities ranked per country of production.
+Mediacards are generated automatically from the library: each film and series gets its set (the title, its makers, up to ten characters), refreshed as the library changes, with rarities ranked per country of production. Each work also keeps its **main genre** (its first genre that has a frame) and its **themes** (Japan, anime, kaiju, samurai, from its production and its keywords).
 
-- **Giving boosters**: a gain rule's **Content boosters** (0 to 3) gives boosters of the content concerned, once per member and content (presets *Booster of a film watched to the end* and *Booster of a finished season*). A member receives at most a limited number of content boosters a day.
-- **Selling boosters**: in **Shop → Catalogue**, a product of type **Mediacards booster** chooses a **Genre**, an **Edition (period)**, **Films or series**, the **Cards per booster** (3, 5, 8 or 10) and a **Guaranteed rarity**.
-- **Their look**: **Shop → Boosters → Mediacards boosters' scene** chooses the wrapper and opening of every Mediacards booster, bought or earned.
+- **Versions**: besides foil, borderless and the fourteen era editions, each card may come in its main genre's **frame** — eighteen frames, from Action to Western (from 1 in 30 for a common to 1 in 5 for a legendary, never together with an edition's version or a borderless one) — and in a booster's **signature frame** (below). What members see at the opening is the version they keep.
+- **Giving boosters**: a gain rule's **Content boosters** (0 to 3) gives boosters of the content concerned, once per member and content (presets *Booster of a film watched to the end* and *Booster of a finished season*). A member receives at most a limited number of content boosters a day. A content booster opens in its work's theme scene when one is bound to it, else in its kind's.
+- **Selling boosters**: in **Shop → Catalogue**, a product of type **Mediacards booster** chooses:
+
+  | Field | Effect |
+  |---|---|
+  | **Main genre** | Draws among that genre's works; the genre frame comes three times more often (at most 3 cards in 5). |
+  | **Theme (Japan, anime, kaiju, samurai)** | Draws among that theme's works. |
+  | **Edition (period)** | Draws among that era's works; the edition's version comes more often. |
+  | **Colour (broad genre)**, **Films or series** | Narrow the draw further. |
+  | **Cards per booster**, **Guaranteed rarity** | 3, 5, 8 or 10 cards; a rarity booster guarantees one card of that rarity. |
+  | **Signature frame (the scene whose face is kept)** | One card in four that comes in its base frame takes the scene's frame and keeps it (in a rarity booster, the card it guarantees) — never over an edition, a genre frame, a borderless or an HD version. |
+
+  The recommended install brings the whole range: eighteen genre boosters, three rarity boosters (**Rare**, **Epic**, **Legendary**), fourteen edition boosters and four theme boosters (**Japan**, **Anime**, **Kaiju and robots**, **Samurai and ninjas**), each bound to its own opening scene from the example visual packs Portalab ships.
+- **Their look**: each Mediacards booster opens in the scene bound to it (a visual pack's **Review** step, **Booster scenes** → **One booster**, with **The booster's product key**); the others fall back on **Shop → Boosters → Mediacards boosters' scene**, "The wrapper and the opening of every Mediacards booster, bought or earned by watching; they never take the looks boosters' scene." A booster bought in the shop waits in the member's reserve and opens in its product's scene.
 - **Character pictures** (Configuration): *Characters from the video* (stills taken from the film by the media server), *Face check for characters*, *Web search for characters* (a self-hosted SearXNG, off by default), *Cut-out characters*.
-- Administrators get a **Trial booster (6 cards)** button on the Mediacards page to check how cards look.
 
-Members who chose to play without the cards never see them nor receive card boosters.
+Identical sealed boosters are piled in members' reserves and on their Mediacards page, with their count on a badge. Members who chose to play without the cards never see them nor receive card boosters.
 
 ## The shop
 
@@ -196,15 +214,17 @@ Visual products mostly come from visual packs, whose review step sets their pric
 
 A change makes a new version; past openings keep theirs. To offer a booster as a reward, give it from a level tier or an achievement.
 
+These are the looks boosters. The Mediacards boosters (genre, rarity, edition and theme boosters) are products of the **Catalogue** (see [Mediacards](#mediacards)); the same page sets the **Mediacards boosters' scene** they all fall back on.
+
 ### Orders to handle
 
 Some purchases are fulfilled by hand: a **special request** (a film in 4K, Dolby Atmos, languages…) or a **service access**. Each one has a deadline. **Start** it, then **Mark as done**, or **Decline and refund** (write why in the **Note for the member** first). For a service access, **Approve the access**, optionally with **Create the account automatically** in the identity provider. The member follows each step in **My purchases** and is notified.
 
 ### Community projects
 
-**Community projects** (`/admin/projects`) moves projects through their lifecycle: **Promote to proposal**, **Open votes and funding**, **Close funding and validate**, **Approve for development**, **Move to beta**, **Release**, **Reject**, **Abandon**, each with an optional public reason. Decisions that move members' Coins (approval, rejection, abandonment, release) ask for a confirmation. Validation is your decision, informed by votes and funding but never bound to them.
+**Community projects** (`/admin/projects`, "Community projects: validate, fund, deliver or cancel them.") shows the projects as cards in three tabs, **To decide**, **Running** and **Over**, and moves them through their lifecycle: **Promote to proposal**, **Open votes and funding**, **Close funding and validate**, **Approve for development**, **Move to beta**, **Release**, **Reject**, **Abandon**, each in its own window with an optional public reason ("shown to members in the project's history"). Decisions that move members' Coins (approval, rejection, abandonment, release) ask for a confirmation. Validation is your decision, informed by votes and funding but never bound to them.
 
-Funding rules are frozen when a project opens: when reserved Coins are used (at release, or a percentage at each milestone), the minimum and maximum per member, an optional goal. A rejected or abandoned project releases every reservation in full. Settings: *Default funding rules*, *Minimum funding*, *Maximum funding per member*.
+Funding rules are frozen when a project opens: when reserved Coins are used (at release, or a percentage at each milestone), the minimum and the **Cap per member**, and an optional **Goal** ("The amount to gather, shown to members."). A member who launches a project from the shop proposes its goal; **Open votes and funding** comes with it filled in ("Proposed by the member: …. Keep it or adjust it."). Members see on the project's page who backs it, what is left to gather and its steps as a timeline; the **Projects** entry of their menu counts the projects added or moved on since they last looked. A rejected or abandoned project releases every reservation in full. Settings: *Default funding rules*, *Minimum funding*, *Maximum funding per member*.
 
 Proposals waiting for moderation are in **Support → Moderation** (see [Content and communication](content.md#community-moderation)).
 

@@ -73,11 +73,11 @@ reliably again.
 ![Automatic newsletters, each on its own cadence and template](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.1.0/assets/screenshots/automatic-newsletters.jpg)
 
 - **E-mails in Portalab's look** — every e-mail keeps its art direction, Gmail included. It is sent under a
-  sender name rather than a bare address. The administrator can turn off e-mails to members while keeping
-  their own.
+  sender name rather than a bare address. Through the API, the administrator can turn off e-mails to
+  members while keeping their own.
 - **Headlines and My feed** — the administrator's front page plus each member's own feed of followed
-  channels. You can set up RSS sources, give each channel its own colour, see unread badges, page through
-  older items and play YouTube videos in place. My feed also comes as a dashboard widget.
+  channels. Administrators set up the RSS sources. Each channel gets its own colour, unread items are
+  badged, older items come in pages and YouTube videos play in place. My feed also comes as a dashboard widget.
 
 ![My feed: the server and every followed source, each in its colour](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.1.0/assets/screenshots/my-feed.jpg)
 
@@ -125,7 +125,7 @@ reliably again.
 
 - Automatic newsletters: editions that write themselves, built on templates (#316)
 - See an edition's real e-mail without sending it to members (#317)
-- Turn off e-mails to members while administrators keep theirs (#318)
+- Turn off e-mails to members while administrators keep theirs, through the API for now (#318)
 - E-mails in Portalab's art direction, and a Portalab newsletter template (#320)
 - An edition's contents can each be switched on and off (#323)
 - An edition's statistics as charts, each to switch on (#324)

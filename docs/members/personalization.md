@@ -2,7 +2,7 @@
 
 Make the portal yours: arrange your home dashboard, pick an interface and its looks, set up your profile, language, notifications and privacy, link your media accounts and choose whether you want to play.
 
-All your settings are gathered in **My settings** (`/settings`), at the top of the **My account** section of the menu. The page is organised by intent — **Profile**, **Appearance**, **Language & region**, **Notifications**, **Linked accounts**, **Privacy** and **Play** — and **Search a setting** finds one by name or by a related word (*password*, *dark*, *time zone*, *e-mail*…). On a computer the list of pages stays on the left; on a phone the list is the page.
+All your settings are gathered in **My settings** (`/settings`), in the **Me** menu under your avatar (with **My progression** and **Achievements**). The page is organised by intent — **Profile**, **Appearance**, **Language & region**, **Notifications**, **Linked accounts**, **Privacy** and **Play** — and **Search a setting** finds one by name or by a related word (*password*, *dark*, *time zone*, *e-mail*…). On a computer the list of pages stays on the left; on a phone the list is the page.
 
 ## Your dashboard
 
@@ -49,11 +49,15 @@ The catalog only lists the widgets you may use, and only those whose service you
 | Taste and statistics | **For you**, **Like it or not**, **My statistics**, **Statistic** |
 | Progression | **My progression**, **Daily objectives**, **Wheel of fortune**, **Progress bar**, **Progress column**, **Value** |
 | Community | **Community activity**, **Leaderboard**, **Community projects**, **Active campaigns** |
-| News and dates | **Latest news**, **Featured news**, **Calendar**, **Upcoming** |
+| News and dates | **Latest news**, **Featured news**, **My feed**, **Calendar**, **Upcoming** |
 | Shop | **Marketplace** |
 | Services | **Services**, **Services (compact)**, **Service status**, **Quick access**, **Open incidents**, **Storage**, **Chart**, **Server**, **Containers** |
 | Help | **My tickets**, **Since your last visit**, **Welcome** |
 | Practical | **Clock**, **Note**, **Countdown**, **Shortcut**, **Separator** |
+
+**My feed** shows the latest items of your sources — articles, videos, podcasts — each in its source's colour; a YouTube video plays in the widget itself, and **All my feed** opens the page (see [Community](community.md#my-feed)).
+
+**Quick access** opens the portal's services in one click, each tile in its state's colour (border, tint, icon and word). In its settings, **Services shown, in their order** lists every service: tick the ones to show and move them by their grip (or the arrows). With no choice, every service shows in the usual order, those added later too. The widget adapts to its size: tiles in a wide block, the icon beside the name in a low one, rows in a narrow column, pills on a single row; the state's word shows only where there is room.
 
 Some server widgets (**Server**, **Containers**, and some **Chart** series) are sold in the shop with a Contribution minimum. Visual packs can also bring widgets of their own.
 
@@ -176,8 +180,12 @@ Notifications are grouped by theme, one card each: **Account & security**, **Med
 
 Changes save at once (*Preferences saved.*). A line marked **Required** or *Set by your administrator* cannot be switched off — for example your account's security alerts.
 
-- **E-mail digest**: **Send each e-mail**, **Daily digest** or **Weekly digest**.
-- **Newsletters by e-mail** (when your portal sends some): choose the channels you receive by e-mail; they stay readable in the news anyway. Every newsletter e-mail has an unsubscribe link that leads here.
+- **E-mail digest**: **Send each e-mail**, **Daily digest** or **Weekly digest** (your notification e-mails only, not the newsletters).
+- **Newsletters by e-mail** (when your portal sends some): "Choose the channels you receive by e-mail. They stay readable in the news anyway." You are subscribed to each one until you switch it off, one by one:
+  - **Automatic newsletters**: each newsletter that writes itself, named by its latest letter, with when it goes out (*Every Monday at 8:00*);
+  - **Channels**: the news channels sent by e-mail. Switching a channel off also stops the automatic newsletters published in it (*Off with its channel « … »*).
+
+  Every newsletter e-mail ends with **Unsubscribe from this newsletter**, which leads to this card.
 
 How to read and manage the notifications themselves is in [support.md](support.md#notifications).
 
@@ -207,7 +215,7 @@ The link appears under **Linked accounts** as **Waiting for verification**. **No
 
 ## Guided tours
 
-**Guided tours** (`/guide`, in the Support section) shows every feature on the real pages. Start with *New here? Start here* — **The portal in one minute** — then pick any tour: **Arrange your dashboard**, **Watch and read**, **Ask for a title**, **Follow a request**, **Read your statistics**, **Your profile and your look**, **Your progression**, **The shop**, **Mediacards**, **The community**, **The calendar**, **The assistant**, **Ask the support**, **Service status**…
+**Guided tours** (`/guide`, **Guide** in the Help section) shows every feature on the real pages. Start with *New here? Start here* — **The portal in one minute** — then pick any tour: **Arrange your dashboard**, **Watch and read**, **Ask for a title**, **Follow a request**, **Read your statistics**, **Your profile and your look**, **Your progression**, **The shop**, **Mediacards**, **The news**, **Games and quests**, **My reserve**, **Community projects**, **The community**, **The calendar**, **The assistant**, **Ask the support**, **Service status**…
 
 Each tour shows its number of steps; **Start**, **Next**, **Back**, **Skip** or **Leave the tour**. Tours you finished are marked **Seen** and can be replayed with **See again**.
 
