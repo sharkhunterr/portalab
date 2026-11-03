@@ -153,7 +153,12 @@ export function WelcomeFlow() {
                 <Home titleId={titleId} first={!welcomedAt} onBack={back} onNext={next} />
               ) : null}
               {step === "notify" ? (
-                <Notify titleId={titleId} nav={<Nav onBack={back} onNext={next} />} />
+                <Notify
+                  titleId={titleId}
+                  first={!welcomedAt}
+                  onNext={next}
+                  renderNav={(go) => <Nav onBack={back} onNext={go} />}
+                />
               ) : null}
               {step === "style" ? <Style titleId={titleId} onBack={back} onNext={next} /> : null}
               {step === "ready" ? (

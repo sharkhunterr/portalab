@@ -357,7 +357,7 @@ describe("welcome: how to be told", () => {
     show(
       <DialogPrimitive.Root open>
         <DialogPrimitive.Content aria-describedby={undefined}>
-          <Notify titleId="t" nav={null} />
+          <Notify titleId="t" first={false} onNext={() => undefined} renderNav={() => null} />
         </DialogPrimitive.Content>
       </DialogPrimitive.Root>,
     );
@@ -371,5 +371,58 @@ describe("welcome: how to be told", () => {
         "community.reply": { portal: true, email: false },
       },
     });
+  });
+
+  it("a first visit takes « The essentials », recommended, unless the member sets something else", async () => {
+    const sent: unknown[] = [];
+    const next = vi.fn();
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/me/notification-preferences" && request.method === "PUT") {
+        sent.push(await request.json());
+        return json(200, { categories: [], digest: "daily" });
+      }
+      if (path === "/api/v1/me/notification-preferences")
+        return json(200, {
+          digest: "off",
+          categories: [
+            {
+              key: "community.reply",
+              label_key: "x",
+              channels: {
+                portal: { enabled: false, mandatory: false, locked: false },
+                email: { enabled: true, mandatory: false, locked: false },
+              },
+            },
+          ],
+        });
+      return json(404, {});
+    };
+    show(
+      <DialogPrimitive.Root open>
+        <DialogPrimitive.Content aria-describedby={undefined}>
+          <Notify
+            titleId="t"
+            first
+            onNext={next}
+            renderNav={(go) => (
+              <button type="button" onClick={go}>
+                Go on
+              </button>
+            )}
+          />
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Root>,
+    );
+    await screen.findByRole("table");
+    expect(screen.getByRole("radio", { name: /The essentials/ })).toHaveProperty("checked", true);
+    expect(screen.getByText("Recommended")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Go on" }));
+    await waitFor(() => expect(sent).toHaveLength(1));
+    expect(sent[0]).toEqual({
+      digest: "daily",
+      preferences: { "community.reply": { portal: true, email: false } },
+    });
+    expect(next).toHaveBeenCalled();
   });
 });

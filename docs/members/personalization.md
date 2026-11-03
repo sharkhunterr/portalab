@@ -234,7 +234,7 @@ Each tour shows its number of steps; **Start**, **Next**, **Back**, **Skip** or 
 | **Just the media** | Watch, read and request, without the game: no cards, games or quests in your menu. Your profile is anonymous. |
 | **Passive** | XP and levels from what you watch, read or request; quests, achievements and leaderboards. Your profile is public, only to the portal's members. |
 | **Collector** | On top, the Mediacards: boosters as you watch, a collection to complete. |
-| **Keen** | On top, the day's mini-games, the week's challenges and parties with others. |
+| **Keen** (recommended) | On top, the day's mini-games, the week's challenges and parties with others. No obligation to play: everything is simply within reach. |
 
 Below **Collector**, the Mediacards leave the menu, the titles' pages, the shop and the reserve, and watching no longer gives a Mediacards booster; the looks boosters stay. **Today's games** and **Play together** only show in the menu at **Keen**, and **Quests** leaves it at **Just the media**.
 

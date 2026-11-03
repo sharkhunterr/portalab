@@ -3,6 +3,9 @@ import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { PLAY, PLAY_FEATURES, type Play, playIndex } from "./play";
 
+/** Issue 347: the notch the portal recommends — every feature within reach, none forced on the member. */
+const RECOMMENDED: Play = "full";
+
 /**
  * Issue 347: the play gauge — a slider from « just the media » to « keen », each notch named under it, and
  * what the chosen one brings: every feature from its notch on is ticked, the others shown greyed out.
@@ -47,6 +50,9 @@ export function PlayScale({
             >
               <Icon name={stop.icon} size={18} />
               <span>{t(`onboarding:play.${stop.key}`)}</span>
+              {stop.key === RECOMMENDED ? (
+                <span className="play-scale__badge">{t("onboarding:recommended")}</span>
+              ) : null}
             </button>
           </li>
         ))}
@@ -57,6 +63,9 @@ export function PlayScale({
           <strong>{t(`onboarding:play.${value}`)}</strong>
         </p>
         <p className="play-scale__hint">{t(`onboarding:play.${value}Hint`)}</p>
+        {value === RECOMMENDED ? (
+          <p className="play-scale__note">{t("onboarding:play.recommendedNote")}</p>
+        ) : null}
         <ul className="play-scale__features">
           {PLAY_FEATURES.map((feature) => {
             const on = playIndex(feature.from) <= at;

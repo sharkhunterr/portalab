@@ -1319,6 +1319,7 @@ button.first-steps__start:focus-visible {
 }
 
 .onboarding-notify__icon {
+  display: inline-flex;
   margin-inline-end: var(--space-2);
   vertical-align: -0.15em;
 }
@@ -1344,4 +1345,20 @@ button.first-steps__start:focus-visible {
 .onboarding-chip[data-off] {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* issue 347: the recommended choice — a small badge, and a word on the play gauge's notch */
+.play-scale__badge,
+.onboarding-tile__badge {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.play-scale__note {
+  margin: 0;
+  font-size: var(--font-size-sm);
 }
