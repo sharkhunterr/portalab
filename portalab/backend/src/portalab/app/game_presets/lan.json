@@ -2493,6 +2493,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2026-12-24T23:00:00Z",
@@ -2537,6 +2538,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2026-12-20T23:00:00Z",
@@ -2556,17 +2558,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 250
+            "amount": 250,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 80
+            "amount": 80,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 6,
             "event_type": "media.playback_finished",
             "filter": [
               {
@@ -2575,10 +2577,10 @@
                 "value": "movie"
               }
             ],
-            "count": 6
+            "kind": "event_count"
           },
           {
-            "kind": "event_count",
+            "count": 10,
             "event_type": "media.playback_finished",
             "filter": [
               {
@@ -2587,14 +2589,14 @@
                 "value": "episode"
               }
             ],
-            "count": 10
+            "kind": "event_count"
           }
         ],
         "translations": {},
         "unlocks": [],
         "window": {
-          "starts_at": "2026-12-18T23:00:00Z",
-          "ends_at": "2027-01-03T23:00:00Z"
+          "ends_at": "2027-01-03T23:00:00Z",
+          "starts_at": "2026-12-18T23:00:00Z"
         }
       },
       "key": "challenge_holidays_2026"
@@ -2610,17 +2612,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 150
+            "amount": 150,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 50
+            "amount": 50,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 8,
             "event_type": "media.playback_finished",
             "filter": [
               {
@@ -2629,14 +2631,14 @@
                 "value": "movie"
               }
             ],
-            "count": 8
+            "kind": "event_count"
           }
         ],
         "translations": {},
         "unlocks": [],
         "window": {
-          "starts_at": "2026-10-31T23:00:00Z",
-          "ends_at": "2026-11-30T23:00:00Z"
+          "ends_at": "2026-11-30T23:00:00Z",
+          "starts_at": "2026-10-31T23:00:00Z"
         }
       },
       "key": "challenge_november_2026"
@@ -2664,6 +2666,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-12-31T23:00:00Z",
@@ -2695,6 +2698,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-12-31T23:00:00Z",
@@ -2714,16 +2718,16 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 15
+            "amount": 15,
+            "value": "xp"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "games.played",
             "filter": [],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -2743,20 +2747,20 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 5
+            "amount": 5,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 5
+            "amount": 5,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "notification.read",
             "filter": [],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -2776,17 +2780,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 10
+            "amount": 10,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 5
+            "amount": 5,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "media.radio_listened",
             "filter": [
               {
@@ -2795,7 +2799,7 @@
                 "value": 15
               }
             ],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -2815,16 +2819,16 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 10
+            "amount": 10,
+            "value": "xp"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "search.performed",
             "filter": [],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -2860,14 +2864,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Visite du jour",
-            "description": "Passez sur le portail aujourd'hui."
+            "description": "Passez sur le portail aujourd’hui.",
+            "label": "Visite du jour"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "daily_visit"
     },
@@ -2910,14 +2914,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Rencontrez l'assistant",
-            "description": "Suivez sa visite guidée, ou posez-lui une première question."
+            "description": "Suivez sa visite guidée, ou posez-lui une première question.",
+            "label": "Rencontrez l’assistant"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "discover_assistant"
     },
@@ -2966,14 +2970,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Arrangez votre tableau de bord",
-            "description": "Suivez sa visite guidée, ou ajoutez, déplacez ou redimensionnez un widget."
+            "description": "Suivez sa visite guidée, ou ajoutez, déplacez ou redimensionnez un widget.",
+            "label": "Arrangez votre tableau de bord"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "discover_dashboard"
     },
@@ -3016,14 +3020,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Personnalisez votre profil",
-            "description": "Suivez sa visite guidée, ajoutez une photo ou changez votre nom."
+            "description": "Suivez sa visite guidée, ajoutez une photo ou changez votre nom.",
+            "label": "Personnalisez votre profil"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "discover_profile"
     },
@@ -3066,14 +3070,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Demandez un titre",
-            "description": "Suivez sa visite guidée, ou demandez un titre absent de la bibliothèque."
+            "description": "Suivez sa visite guidée, ou demandez un titre absent de la bibliothèque.",
+            "label": "Demandez un titre"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "discover_request"
     },
@@ -3110,14 +3114,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Suivez une demande",
-            "description": "Voyez où en est une demande sur la page du titre."
+            "description": "Voyez où en est une demande sur la page du titre.",
+            "label": "Suivez une demande"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "discover_request_status"
     },
@@ -3156,14 +3160,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Faites-vous plaisir",
-            "description": "Suivez sa visite guidée, ou offrez-vous quelque chose dans la boutique."
+            "description": "Suivez sa visite guidée, ou offrez-vous quelque chose dans la boutique.",
+            "label": "Faites-vous plaisir"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "discover_shop"
     },
@@ -3200,14 +3204,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Consultez vos statistiques",
-            "description": "Ce que vous avez regardé, lu et joué, en graphiques."
+            "description": "Ce que vous avez regardé, lu et joué, en graphiques.",
+            "label": "Consultez vos statistiques"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "discover_stats"
     },
@@ -3250,14 +3254,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Contactez le support",
-            "description": "Suivez sa visite guidée, ou ouvrez un ticket : une question, un problème, une idée."
+            "description": "Suivez sa visite guidée, ou ouvrez un ticket : une question, un problème, une idée.",
+            "label": "Contactez le support"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "discover_ticket"
     },
@@ -3306,14 +3310,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Faites le tour",
-            "description": "Une minute pour voir où se trouve chaque chose."
+            "description": "Une minute pour voir où se trouve chaque chose.",
+            "label": "Faites le tour"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "discover_tour"
     },
@@ -3350,14 +3354,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Explorateur",
-            "description": "Revenez cinq jours pour tout découvrir."
+            "description": "Revenez cinq jours pour tout découvrir.",
+            "label": "Explorateur"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "explorer"
     },
@@ -3388,6 +3392,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-12-31T23:00:00Z",
@@ -3407,17 +3412,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 150
+            "amount": 150,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 40
+            "amount": 40,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "media.playback_finished",
             "filter": [
               {
@@ -3426,10 +3431,10 @@
                 "value": "movie"
               }
             ],
-            "count": 1
+            "kind": "event_count"
           },
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "media.playback_finished",
             "filter": [
               {
@@ -3438,10 +3443,10 @@
                 "value": "episode"
               }
             ],
-            "count": 1
+            "kind": "event_count"
           },
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "media.playback_finished",
             "filter": [
               {
@@ -3453,10 +3458,10 @@
                 ]
               }
             ],
-            "count": 1
+            "kind": "event_count"
           },
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "media.radio_listened",
             "filter": [
               {
@@ -3465,7 +3470,7 @@
                 "value": 60
               }
             ],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3485,17 +3490,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 80
+            "amount": 80,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 20
+            "amount": 20,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "games.played",
             "filter": [
               {
@@ -3504,10 +3509,10 @@
                 "value": "casting"
               }
             ],
-            "count": 1
+            "kind": "event_count"
           },
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "games.played",
             "filter": [
               {
@@ -3516,10 +3521,10 @@
                 "value": "poster"
               }
             ],
-            "count": 1
+            "kind": "event_count"
           },
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "games.played",
             "filter": [
               {
@@ -3528,7 +3533,7 @@
                 "value": "blindtest"
               }
             ],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3548,17 +3553,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 40
+            "amount": 40,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 10
+            "amount": 10,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "feedback.submitted",
             "filter": [
               {
@@ -3567,7 +3572,7 @@
                 "value": "feature_request"
               }
             ],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3587,20 +3592,20 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 60
+            "amount": 60,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 20
+            "amount": 20,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "media.leaving_watched",
             "filter": [],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3620,16 +3625,16 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 50
+            "amount": 50,
+            "value": "xp"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "project.funding_added",
             "filter": [],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3649,17 +3654,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 150
+            "amount": 150,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 40
+            "amount": 40,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 20,
             "event_type": "quest.completed",
             "filter": [
               {
@@ -3668,7 +3673,7 @@
                 "value": "daily_visit"
               }
             ],
-            "count": 20
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3688,20 +3693,20 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 80
+            "amount": 80,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 20
+            "amount": 20,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "media.request_watched",
             "filter": [],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3721,20 +3726,20 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 100
+            "amount": 100,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 25
+            "amount": 25,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "media.season_finished",
             "filter": [],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3766,6 +3771,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-12-31T23:00:00Z",
@@ -3801,6 +3807,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-12-31T23:00:00Z",
@@ -3820,17 +3827,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 50
+            "amount": 50,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 15
+            "amount": 15,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "ticket.created",
             "filter": [
               {
@@ -3839,7 +3846,7 @@
                 "value": "bug"
               }
             ],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3859,20 +3866,20 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 200
+            "amount": 200,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 60
+            "amount": 60,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 10,
             "event_type": "media.request_created",
             "filter": [],
-            "count": 10
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3892,17 +3899,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 500
+            "amount": 500,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 150
+            "amount": 150,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 100,
             "event_type": "media.playback_finished",
             "filter": [
               {
@@ -3911,7 +3918,7 @@
                 "value": "movie"
               }
             ],
-            "count": 100
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3931,17 +3938,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 100
+            "amount": 100,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 30
+            "amount": 30,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "cards.pack_opened",
             "filter": [
               {
@@ -3950,7 +3957,7 @@
                 "value": 1
               }
             ],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -3986,6 +3993,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-06-20T22:00:00Z",
@@ -4029,6 +4037,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-09-21T22:00:00Z",
@@ -4048,16 +4057,16 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 20
+            "amount": 20,
+            "value": "xp"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 1,
             "event_type": "ai.answered",
             "filter": [],
-            "count": 1
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -4077,20 +4086,20 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 40
+            "amount": 40,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 10
+            "amount": 10,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 3,
             "event_type": "games.played",
             "filter": [],
-            "count": 3
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -4126,6 +4135,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-12-31T23:00:00Z",
@@ -4145,17 +4155,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 50
+            "amount": 50,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 10
+            "amount": 10,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 2,
             "event_type": "media.playback_finished",
             "filter": [
               {
@@ -4164,7 +4174,7 @@
                 "value": "movie"
               }
             ],
-            "count": 2
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -4184,17 +4194,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 80
+            "amount": 80,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 20
+            "amount": 20,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 5,
             "event_type": "quest.completed",
             "filter": [
               {
@@ -4203,7 +4213,7 @@
                 "value": "daily_episode"
               }
             ],
-            "count": 5
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -4241,14 +4251,14 @@
             "kind": "event_count"
           }
         ],
-        "unlocks": [],
-        "window": null,
         "translations": {
           "fr": {
-            "label": "Fidèle de la semaine",
-            "description": "Passez trois jours cette semaine."
+            "description": "Passez trois jours cette semaine.",
+            "label": "Fidèle de la semaine"
           }
-        }
+        },
+        "unlocks": [],
+        "window": null
       },
       "key": "weekly_regular"
     },
@@ -4281,6 +4291,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-12-31T23:00:00Z",
@@ -4300,17 +4311,17 @@
         "requires": [],
         "rewards": [
           {
-            "value": "xp",
-            "amount": 40
+            "amount": 40,
+            "value": "xp"
           },
           {
-            "value": "coins",
-            "amount": 10
+            "amount": 10,
+            "value": "coins"
           }
         ],
         "steps": [
           {
-            "kind": "event_count",
+            "count": 5,
             "event_type": "media.playback_finished",
             "filter": [
               {
@@ -4319,7 +4330,7 @@
                 "value": "episode"
               }
             ],
-            "count": 5
+            "kind": "event_count"
           }
         ],
         "translations": {},
@@ -4351,6 +4362,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-12-31T23:00:00Z",
@@ -4386,6 +4398,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-03-19T23:00:00Z",
@@ -4421,6 +4434,7 @@
             "kind": "event_count"
           }
         ],
+        "translations": {},
         "unlocks": [],
         "window": {
           "ends_at": "2027-10-05T22:00:00Z",
@@ -4500,6 +4514,229 @@
         ]
       },
       "key": "feedback_request"
+    },
+    {
+      "definition": {
+        "boosters": 0,
+        "event_type": "games.board_ranked",
+        "grants": [
+          {
+            "amount": 50,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 20,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Sur le podium d'un jeu, la semaine finie",
+        "limits": {
+          "caps": [],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": [
+          {
+            "field": "period",
+            "op": "eq",
+            "value": "week"
+          },
+          {
+            "field": "rank",
+            "op": "lte",
+            "value": 3
+          }
+        ]
+      },
+      "key": "games_board_week"
+    },
+    {
+      "definition": {
+        "boosters": 0,
+        "event_type": "games.challenge_completed",
+        "grants": [
+          {
+            "amount": 150,
+            "per_unit": null,
+            "value": "xp"
+          },
+          {
+            "amount": 50,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Un défi de la semaine (jeu, film, livre, livre audio)",
+        "limits": {
+          "caps": [],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": []
+      },
+      "key": "games_challenge"
+    },
+    {
+      "definition": {
+        "boosters": 0,
+        "event_type": "games.played",
+        "grants": [
+          {
+            "amount": 20,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Le ciné-mot du jour trouvé",
+        "limits": {
+          "caps": [],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": [
+          {
+            "field": "game",
+            "op": "eq",
+            "value": "cinemot"
+          },
+          {
+            "field": "won",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "key": "games_cinemot"
+    },
+    {
+      "definition": {
+        "boosters": 0,
+        "event_type": "games.played",
+        "grants": [
+          {
+            "amount": 25,
+            "per_unit": null,
+            "value": "coins"
+          },
+          {
+            "amount": 25,
+            "per_unit": null,
+            "value": "xp"
+          }
+        ],
+        "label": "Une partie à plusieurs gagnée",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 75,
+              "period": "day",
+              "value": "coins"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": [
+          {
+            "field": "mode",
+            "op": "eq",
+            "value": "party"
+          },
+          {
+            "field": "rank",
+            "op": "eq",
+            "value": 1
+          },
+          {
+            "field": "players",
+            "op": "gte",
+            "value": 2
+          }
+        ]
+      },
+      "key": "games_party_win"
+    },
+    {
+      "definition": {
+        "boosters": 0,
+        "event_type": "games.played",
+        "grants": [
+          {
+            "amount": 10,
+            "per_unit": {
+              "factor": 0.02,
+              "field": "score",
+              "max": 30
+            },
+            "value": "xp"
+          }
+        ],
+        "label": "Une partie jouée",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 200,
+              "period": "day",
+              "value": "xp"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": {
+            "factor": 0.85,
+            "kind": "geometric",
+            "period": "day",
+            "steps": []
+          }
+        },
+        "multiplier": 1.0,
+        "predicate": []
+      },
+      "key": "games_played"
+    },
+    {
+      "definition": {
+        "boosters": 0,
+        "event_type": "games.played",
+        "grants": [
+          {
+            "amount": 10,
+            "per_unit": null,
+            "value": "coins"
+          }
+        ],
+        "label": "Une partie gagnée seul",
+        "limits": {
+          "caps": [
+            {
+              "max_amount": 50,
+              "period": "day",
+              "value": "coins"
+            }
+          ],
+          "cooldown_seconds": 0,
+          "diminishing": null
+        },
+        "multiplier": 1.0,
+        "predicate": [
+          {
+            "field": "won",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "field": "mode",
+            "op": "eq",
+            "value": "solo"
+          }
+        ]
+      },
+      "key": "games_won"
     },
     {
       "definition": {
@@ -4787,6 +5024,7 @@
     },
     {
       "definition": {
+        "boosters": 0,
         "event_type": "media.radio_listened",
         "grants": [
           {
@@ -5106,15 +5344,46 @@
     "collections": [],
     "packs": [
       "abysses",
+      "apotheose",
+      "arcanes",
+      "blockbuster",
       "briques",
+      "brume",
       "celeste",
+      "chronique",
       "cinema",
+      "concert",
+      "crayon",
+      "ed-bubble",
+      "ed-disc",
+      "ed-drivein",
+      "ed-film",
+      "ed-glass",
+      "ed-laserdisc",
+      "ed-leather",
+      "ed-nitrate",
+      "ed-noir",
+      "ed-stream",
+      "ed-super8",
+      "ed-tiles",
+      "ed-vhs",
+      "ed-zine",
+      "fourire",
+      "front",
+      "geode",
       "halloween-scene",
       "horreur",
+      "hyperespace",
+      "idylle",
+      "impact-video",
+      "insomnie",
+      "magical",
       "maree",
+      "mecha",
       "mediacards",
       "messenger-bubbles",
       "neon2077",
+      "ninja",
       "noel",
       "nordlys",
       "odyssee",
@@ -5205,9 +5474,17 @@
       "portalab-upsidedown",
       "portalab-vhs",
       "portalab-wizard",
+      "reportage",
       "retro",
+      "rideau",
       "rouages",
-      "ruee-vers-l-or"
+      "ruee-vers-l-or",
+      "saloon",
+      "scelles",
+      "shonen",
+      "sumi",
+      "tenebres",
+      "tresor"
     ],
     "products": [
       {
@@ -5464,552 +5741,8 @@
         "config_required": false,
         "contribution": null,
         "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 2003 à 2008 (édition DVD).",
-          "en": "5 cards drawn among the films and series released 2003 to 2008 (DVD edition)."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_edition_disc",
-        "level": null,
-        "limit": null,
-        "names": {
-          "fr": "Booster Édition DVD",
-          "en": "DVD edition booster"
-        },
-        "payload": {
-          "cards": 5,
-          "edition": "disc"
-        },
-        "price": 50,
-        "rarity": "rare",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 1970 à 1979 (édition Pellicule).",
-          "en": "5 cards drawn among the films and series released 1970 to 1979 (Film reel edition)."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_edition_film",
-        "level": null,
-        "limit": null,
-        "names": {
-          "fr": "Booster Édition Pellicule",
-          "en": "Film reel edition booster"
-        },
-        "payload": {
-          "cards": 5,
-          "edition": "film"
-        },
-        "price": 50,
-        "rarity": "rare",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 2017 à 2021 (édition Streaming).",
-          "en": "5 cards drawn among the films and series released 2017 to 2021 (Streaming edition)."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_edition_stream",
-        "level": null,
-        "limit": null,
-        "names": {
-          "fr": "Booster Édition Streaming",
-          "en": "Streaming edition booster"
-        },
-        "payload": {
-          "cards": 5,
-          "edition": "stream"
-        },
-        "price": 50,
-        "rarity": "rare",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 1986 à 1992 (édition VHS).",
-          "en": "5 cards drawn among the films and series released 1986 to 1992 (VHS edition)."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_edition_vhs",
-        "level": null,
-        "limit": null,
-        "names": {
-          "fr": "Booster Édition VHS",
-          "en": "VHS edition booster"
-        },
-        "payload": {
-          "cards": 5,
-          "edition": "vhs"
-        },
-        "price": 50,
-        "rarity": "rare",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "en": "3 cards drawn among the library's « Action » films and series.",
-          "fr": "3 cartes tirées parmi les films et séries « Action » de la bibliothèque."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_genre_action",
-        "level": null,
-        "limit": null,
-        "names": {
-          "en": "Action booster",
-          "fr": "Booster Action"
-        },
-        "payload": {
-          "cards": 3,
-          "family": "action"
-        },
-        "price": 30,
-        "rarity": "common",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "en": "3 cards drawn among the library's « Dark » films and series.",
-          "fr": "3 cartes tirées parmi les films et séries « Sombre » de la bibliothèque."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_genre_dark",
-        "level": null,
-        "limit": null,
-        "names": {
-          "en": "Dark booster",
-          "fr": "Booster Sombre"
-        },
-        "payload": {
-          "cards": 3,
-          "family": "dark"
-        },
-        "price": 30,
-        "rarity": "common",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "en": "3 cards drawn among the library's « Drama » films and series.",
-          "fr": "3 cartes tirées parmi les films et séries « Drame » de la bibliothèque."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_genre_drama",
-        "level": null,
-        "limit": null,
-        "names": {
-          "en": "Drama booster",
-          "fr": "Booster Drame"
-        },
-        "payload": {
-          "cards": 3,
-          "family": "drama"
-        },
-        "price": 30,
-        "rarity": "common",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "en": "3 cards drawn among the library's « Family » films and series.",
-          "fr": "3 cartes tirées parmi les films et séries « Familial » de la bibliothèque."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_genre_family",
-        "level": null,
-        "limit": null,
-        "names": {
-          "en": "Family booster",
-          "fr": "Booster Familial"
-        },
-        "payload": {
-          "cards": 3,
-          "family": "family"
-        },
-        "price": 30,
-        "rarity": "common",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "en": "3 cards drawn among the library's « Fantasy » films and series.",
-          "fr": "3 cartes tirées parmi les films et séries « Fantastique » de la bibliothèque."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_genre_fantasy",
-        "level": null,
-        "limit": null,
-        "names": {
-          "en": "Fantasy booster",
-          "fr": "Booster Fantastique"
-        },
-        "payload": {
-          "cards": 3,
-          "family": "fantasy"
-        },
-        "price": 30,
-        "rarity": "common",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "en": "3 cards drawn among the library's « Science fiction » films and series.",
-          "fr": "3 cartes tirées parmi les films et séries « Science-fiction » de la bibliothèque."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_genre_sf",
-        "level": null,
-        "limit": null,
-        "names": {
-          "en": "Science fiction booster",
-          "fr": "Booster Science-fiction"
-        },
-        "payload": {
-          "cards": 3,
-          "family": "sf"
-        },
-        "price": 30,
-        "rarity": "common",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis jusqu'en 1929 (édition Nitrate).",
-          "en": "5 cards drawn among the films and series released up to 1929 (Nitrate edition)."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_edition_nitrate",
-        "level": null,
-        "limit": null,
-        "names": {
-          "fr": "Booster Édition Nitrate",
-          "en": "Nitrate edition booster"
-        },
-        "payload": {
-          "cards": 5,
-          "edition": "nitrate"
-        },
-        "price": 50,
-        "rarity": "rare",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 1930 à 1949 (édition Noir).",
-          "en": "5 cards drawn among the films and series released 1930 to 1949 (Noir edition)."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_edition_noir",
-        "level": null,
-        "limit": null,
-        "names": {
-          "fr": "Booster Édition Noir",
-          "en": "Noir edition booster"
-        },
-        "payload": {
-          "cards": 5,
-          "edition": "noir"
-        },
-        "price": 50,
-        "rarity": "rare",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 1950 à 1959 (édition Drive-in).",
-          "en": "5 cards drawn among the films and series released 1950 to 1959 (Drive-in edition)."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_edition_drivein",
-        "level": null,
-        "limit": null,
-        "names": {
-          "fr": "Booster Édition Drive-in",
-          "en": "Drive-in edition booster"
-        },
-        "payload": {
-          "cards": 5,
-          "edition": "drivein"
-        },
-        "price": 50,
-        "rarity": "rare",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 1960 à 1969 (édition Super 8).",
-          "en": "5 cards drawn among the films and series released 1960 to 1969 (Super 8 edition)."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_edition_super8",
-        "level": null,
-        "limit": null,
-        "names": {
-          "fr": "Booster Édition Super 8",
-          "en": "Super 8 edition booster"
-        },
-        "payload": {
-          "cards": 5,
-          "edition": "super8"
-        },
-        "price": 50,
-        "rarity": "rare",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 1980 à 1985 (édition LaserDisc).",
-          "en": "5 cards drawn among the films and series released 1980 to 1985 (LaserDisc edition)."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_edition_laserdisc",
-        "level": null,
-        "limit": null,
-        "names": {
-          "fr": "Booster Édition LaserDisc",
-          "en": "LaserDisc edition booster"
-        },
-        "payload": {
-          "cards": 5,
-          "edition": "laserdisc"
-        },
-        "price": 50,
-        "rarity": "rare",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 1993 à 1997 (édition Fanzine).",
-          "en": "5 cards drawn among the films and series released 1993 to 1997 (Zine edition)."
-        },
-        "featured": false,
-        "icon": "layers",
-        "key": "cards_edition_zine",
-        "level": null,
-        "limit": null,
-        "names": {
-          "fr": "Booster Édition Fanzine",
-          "en": "Zine edition booster"
-        },
-        "payload": {
-          "cards": 5,
-          "edition": "zine"
-        },
-        "price": 50,
-        "rarity": "rare",
-        "refund_policy": {
-          "percent": 0,
-          "refundable": false,
-          "window_days": 0
-        },
-        "repeatable": true,
-        "reward_only": false,
-        "season": null,
-        "supply": null,
-        "type": "card_booster"
-      },
-      {
-        "collection": "boosters",
-        "config_required": false,
-        "contribution": null,
-        "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 1998 à 2002 (édition Bulle).",
-          "en": "5 cards drawn among the films and series released 1998 to 2002 (Bubble edition)."
+          "en": "5 cards drawn among the films and series released 1998 to 2002 (Bubble edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1998 à 2002 (édition Bulle)."
         },
         "featured": false,
         "icon": "layers",
@@ -6017,8 +5750,8 @@
         "level": null,
         "limit": null,
         "names": {
-          "fr": "Booster Édition Bulle",
-          "en": "Bubble edition booster"
+          "en": "Bubble edition booster",
+          "fr": "Booster Édition Bulle"
         },
         "payload": {
           "cards": 5,
@@ -6042,21 +5775,21 @@
         "config_required": false,
         "contribution": null,
         "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 2009 à 2012 (édition Cuir & lin).",
-          "en": "5 cards drawn among the films and series released 2009 to 2012 (Leather & linen edition)."
+          "en": "5 cards drawn among the films and series released 2003 to 2008 (DVD edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 2003 à 2008 (édition DVD)."
         },
         "featured": false,
         "icon": "layers",
-        "key": "cards_edition_leather",
+        "key": "cards_edition_disc",
         "level": null,
         "limit": null,
         "names": {
-          "fr": "Booster Édition Cuir & lin",
-          "en": "Leather & linen edition booster"
+          "en": "DVD edition booster",
+          "fr": "Booster Édition DVD"
         },
         "payload": {
           "cards": 5,
-          "edition": "leather"
+          "edition": "disc"
         },
         "price": 50,
         "rarity": "rare",
@@ -6076,21 +5809,21 @@
         "config_required": false,
         "contribution": null,
         "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis de 2013 à 2016 (édition Tuiles).",
-          "en": "5 cards drawn among the films and series released 2013 to 2016 (Tiles edition)."
+          "en": "5 cards drawn among the films and series released 1950 to 1959 (Drive-in edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1950 à 1959 (édition Drive-in)."
         },
         "featured": false,
         "icon": "layers",
-        "key": "cards_edition_tiles",
+        "key": "cards_edition_drivein",
         "level": null,
         "limit": null,
         "names": {
-          "fr": "Booster Édition Tuiles",
-          "en": "Tiles edition booster"
+          "en": "Drive-in edition booster",
+          "fr": "Booster Édition Drive-in"
         },
         "payload": {
           "cards": 5,
-          "edition": "tiles"
+          "edition": "drivein"
         },
         "price": 50,
         "rarity": "rare",
@@ -6110,8 +5843,42 @@
         "config_required": false,
         "contribution": null,
         "descriptions": {
-          "fr": "5 cartes tirées parmi les films et séries sortis depuis 2022 (édition Verre liquide).",
-          "en": "5 cards drawn among the films and series released since 2022 (Liquid glass edition)."
+          "en": "5 cards drawn among the films and series released 1970 to 1979 (Film reel edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1970 à 1979 (édition Pellicule)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_film",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Film reel edition booster",
+          "fr": "Booster Édition Pellicule"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "film"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released since 2022 (Liquid glass edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis depuis 2022 (édition Verre liquide)."
         },
         "featured": false,
         "icon": "layers",
@@ -6119,8 +5886,8 @@
         "level": null,
         "limit": null,
         "names": {
-          "fr": "Booster Édition Verre liquide",
-          "en": "Liquid glass edition booster"
+          "en": "Liquid glass edition booster",
+          "fr": "Booster Édition Verre liquide"
         },
         "payload": {
           "cards": 5,
@@ -6144,23 +5911,23 @@
         "config_required": false,
         "contribution": null,
         "descriptions": {
-          "fr": "5 cartes tirées dans toute la bibliothèque, dont au moins une rare.",
-          "en": "5 cards drawn from the whole library, at least one of them rare."
+          "en": "5 cards drawn among the films and series released 1980 to 1985 (LaserDisc edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1980 à 1985 (édition LaserDisc)."
         },
         "featured": false,
         "icon": "layers",
-        "key": "cards_rarity_rare",
+        "key": "cards_edition_laserdisc",
         "level": null,
         "limit": null,
         "names": {
-          "fr": "Booster Rare",
-          "en": "Rare booster"
+          "en": "LaserDisc edition booster",
+          "fr": "Booster Édition LaserDisc"
         },
         "payload": {
           "cards": 5,
-          "rarity": "rare"
+          "edition": "laserdisc"
         },
-        "price": 80,
+        "price": 50,
         "rarity": "rare",
         "refund_policy": {
           "percent": 0,
@@ -6178,8 +5945,892 @@
         "config_required": false,
         "contribution": null,
         "descriptions": {
-          "fr": "5 cartes tirées dans toute la bibliothèque, dont au moins une épique.",
-          "en": "5 cards drawn from the whole library, at least one of them epic."
+          "en": "5 cards drawn among the films and series released 2009 to 2012 (Leather & linen edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 2009 à 2012 (édition Cuir & lin)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_leather",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Leather & linen edition booster",
+          "fr": "Booster Édition Cuir & lin"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "leather"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released up to 1929 (Nitrate edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis jusqu'en 1929 (édition Nitrate)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_nitrate",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Nitrate edition booster",
+          "fr": "Booster Édition Nitrate"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "nitrate"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released 1930 to 1949 (Noir edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1930 à 1949 (édition Noir)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_noir",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Noir edition booster",
+          "fr": "Booster Édition Noir"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "noir"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released 2017 to 2021 (Streaming edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 2017 à 2021 (édition Streaming)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_stream",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Streaming edition booster",
+          "fr": "Booster Édition Streaming"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "stream"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released 1960 to 1969 (Super 8 edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1960 à 1969 (édition Super 8)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_super8",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Super 8 edition booster",
+          "fr": "Booster Édition Super 8"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "super8"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released 2013 to 2016 (Tiles edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 2013 à 2016 (édition Tuiles)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_tiles",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Tiles edition booster",
+          "fr": "Booster Édition Tuiles"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "tiles"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released 1986 to 1992 (VHS edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1986 à 1992 (édition VHS)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_vhs",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "VHS edition booster",
+          "fr": "Booster Édition VHS"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "vhs"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn among the films and series released 1993 to 1997 (Zine edition).",
+          "fr": "5 cartes tirées parmi les films et séries sortis de 1993 à 1997 (édition Fanzine)."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_edition_zine",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Zine edition booster",
+          "fr": "Booster Édition Fanzine"
+        },
+        "payload": {
+          "cards": 5,
+          "edition": "zine"
+        },
+        "price": 50,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Action »; the Action frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Action » ; le cadre Action y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_action",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Action booster",
+          "fr": "Booster Action"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "action"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Adventure »; the Adventure frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Aventure » ; le cadre Aventure y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_adventure",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Adventure booster",
+          "fr": "Booster Aventure"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "adventure"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Animation »; the Animation frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Animation » ; le cadre Animation y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_animation",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Animation booster",
+          "fr": "Booster Animation"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "animation"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Comedy »; the Comedy frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Comédie » ; le cadre Comédie y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_comedy",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Comedy booster",
+          "fr": "Booster Comédie"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "comedy"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Crime »; the Crime frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Crime » ; le cadre Crime y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_crime",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Crime booster",
+          "fr": "Booster Crime"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "crime"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Horror »; the Horror frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Horreur » ; le cadre Horreur y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_dark",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Horror booster",
+          "fr": "Booster Horreur"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "horror"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Documentary »; the Documentary frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Documentaire » ; le cadre Documentaire y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_documentary",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Documentary booster",
+          "fr": "Booster Documentaire"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "documentary"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Drama »; the Drama frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Drame » ; le cadre Drame y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_drama",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Drama booster",
+          "fr": "Booster Drame"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "drama"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Family »; the Family frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Familial » ; le cadre Familial y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_family",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Family booster",
+          "fr": "Booster Familial"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "family"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Fantasy »; the Fantasy frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Fantastique » ; le cadre Fantastique y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_fantasy",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Fantasy booster",
+          "fr": "Booster Fantastique"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "fantasy"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « History »; the History frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Histoire » ; le cadre Histoire y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_history",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "History booster",
+          "fr": "Booster Histoire"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "history"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Music »; the Music frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Musique » ; le cadre Musique y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_music",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Music booster",
+          "fr": "Booster Musique"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "music"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Mystery »; the Mystery frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Mystère » ; le cadre Mystère y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_mystery",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Mystery booster",
+          "fr": "Booster Mystère"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "mystery"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Romance »; the Romance frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Romance » ; le cadre Romance y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_romance",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Romance booster",
+          "fr": "Booster Romance"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "romance"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Science fiction »; the Science fiction frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Science-fiction » ; le cadre Science-fiction y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_sf",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Science fiction booster",
+          "fr": "Booster Science-fiction"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "sf"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Thriller »; the Thriller frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Thriller » ; le cadre Thriller y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_thriller",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Thriller booster",
+          "fr": "Booster Thriller"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "thriller"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « War »; the War frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Guerre » ; le cadre Guerre y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_war",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "War booster",
+          "fr": "Booster Guerre"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "war"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series whose main genre is « Western »; the Western frame comes three times more often in it.",
+          "fr": "3 cartes tirées parmi les films et séries dont le genre principal est « Western » ; le cadre Western y sort trois fois plus souvent."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_genre_western",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Western booster",
+          "fr": "Booster Western"
+        },
+        "payload": {
+          "cards": 3,
+          "genre": "western"
+        },
+        "price": 30,
+        "rarity": "common",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn from the whole library, at least one of them epic. — the Impact signature frame on the guaranteed card, one time in four.",
+          "fr": "5 cartes tirées dans toute la bibliothèque, dont au moins une épique. — cadre de signature Impact sur la carte garantie, une fois sur quatre."
         },
         "featured": false,
         "icon": "layers",
@@ -6187,12 +6838,13 @@
         "level": null,
         "limit": null,
         "names": {
-          "fr": "Booster Épique",
-          "en": "Epic booster"
+          "en": "Epic booster",
+          "fr": "Booster Épique"
         },
         "payload": {
           "cards": 5,
-          "rarity": "epic"
+          "rarity": "epic",
+          "signature": "impact-video"
         },
         "price": 180,
         "rarity": "epic",
@@ -6212,8 +6864,8 @@
         "config_required": false,
         "contribution": null,
         "descriptions": {
-          "fr": "5 cartes tirées dans toute la bibliothèque, dont au moins une légendaire.",
-          "en": "5 cards drawn from the whole library, at least one of them legendary."
+          "en": "5 cards drawn from the whole library, at least one of them legendary. — the Apothéose signature frame on the guaranteed card, one time in four.",
+          "fr": "5 cartes tirées dans toute la bibliothèque, dont au moins une légendaire. — cadre de signature Apothéose sur la carte garantie, une fois sur quatre."
         },
         "featured": true,
         "icon": "layers",
@@ -6221,15 +6873,191 @@
         "level": null,
         "limit": null,
         "names": {
-          "fr": "Booster Légendaire",
-          "en": "Legendary booster"
+          "en": "Legendary booster",
+          "fr": "Booster Légendaire"
         },
         "payload": {
           "cards": 5,
-          "rarity": "legendary"
+          "rarity": "legendary",
+          "signature": "apotheose"
         },
         "price": 450,
         "rarity": "legendary",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "5 cards drawn from the whole library, at least one of them rare. — the Géode signature frame on the guaranteed card, one time in four.",
+          "fr": "5 cartes tirées dans toute la bibliothèque, dont au moins une rare. — cadre de signature Géode sur la carte garantie, une fois sur quatre."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_rarity_rare",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Rare booster",
+          "fr": "Booster Rare"
+        },
+        "payload": {
+          "cards": 5,
+          "rarity": "rare",
+          "signature": "geode"
+        },
+        "price": 80,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the anime: Japanese animation — the Shōnen signature frame, one time in four.",
+          "fr": "3 cartes tirées parmi les animes : l'animation japonaise — cadre de signature Shōnen, une fois sur quatre."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_theme_anime",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Anime booster",
+          "fr": "Booster Anime"
+        },
+        "payload": {
+          "cards": 3,
+          "signature": "shonen",
+          "theme": "anime"
+        },
+        "price": 30,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the Japanese films and series, or those set in Japan — the Sumi signature frame, one time in four.",
+          "fr": "3 cartes tirées parmi les films et séries japonais ou qui se passent au Japon — cadre de signature Sumi, une fois sur quatre."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_theme_japan",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Japan booster",
+          "fr": "Booster Japon"
+        },
+        "payload": {
+          "cards": 3,
+          "signature": "sumi",
+          "theme": "japan"
+        },
+        "price": 30,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series of giant monsters and giant robots — the Mecha signature frame, one time in four.",
+          "fr": "3 cartes tirées parmi les films et séries de monstres géants et de robots géants — cadre de signature Mecha, une fois sur quatre."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_theme_kaiju",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Kaiju and robots booster",
+          "fr": "Booster Kaijū et robots"
+        },
+        "payload": {
+          "cards": 3,
+          "signature": "mecha",
+          "theme": "kaiju"
+        },
+        "price": 30,
+        "rarity": "rare",
+        "refund_policy": {
+          "percent": 0,
+          "refundable": false,
+          "window_days": 0
+        },
+        "repeatable": true,
+        "reward_only": false,
+        "season": null,
+        "supply": null,
+        "type": "card_booster"
+      },
+      {
+        "collection": "boosters",
+        "config_required": false,
+        "contribution": null,
+        "descriptions": {
+          "en": "3 cards drawn among the films and series of samurai, ninjas and yakuza — the Ninja signature frame, one time in four.",
+          "fr": "3 cartes tirées parmi les films et séries de samouraïs, de ninjas et de yakuzas — cadre de signature Ninja, une fois sur quatre."
+        },
+        "featured": false,
+        "icon": "layers",
+        "key": "cards_theme_samurai",
+        "level": null,
+        "limit": null,
+        "names": {
+          "en": "Samurai and ninjas booster",
+          "fr": "Booster Samouraïs et ninjas"
+        },
+        "payload": {
+          "cards": 3,
+          "signature": "ninja",
+          "theme": "samurai"
+        },
+        "price": 30,
+        "rarity": "rare",
         "refund_policy": {
           "percent": 0,
           "refundable": false,
@@ -6274,6 +7102,162 @@
       "card_booster": {
         "look": "mediacards",
         "pack": "mediacards"
+      },
+      "cards_edition_bubble": {
+        "look": "ed-bubble",
+        "pack": "ed-bubble"
+      },
+      "cards_edition_disc": {
+        "look": "ed-disc",
+        "pack": "ed-disc"
+      },
+      "cards_edition_drivein": {
+        "look": "ed-drivein",
+        "pack": "ed-drivein"
+      },
+      "cards_edition_film": {
+        "look": "ed-film",
+        "pack": "ed-film"
+      },
+      "cards_edition_glass": {
+        "look": "ed-glass",
+        "pack": "ed-glass"
+      },
+      "cards_edition_laserdisc": {
+        "look": "ed-laserdisc",
+        "pack": "ed-laserdisc"
+      },
+      "cards_edition_leather": {
+        "look": "ed-leather",
+        "pack": "ed-leather"
+      },
+      "cards_edition_nitrate": {
+        "look": "ed-nitrate",
+        "pack": "ed-nitrate"
+      },
+      "cards_edition_noir": {
+        "look": "ed-noir",
+        "pack": "ed-noir"
+      },
+      "cards_edition_stream": {
+        "look": "ed-stream",
+        "pack": "ed-stream"
+      },
+      "cards_edition_super8": {
+        "look": "ed-super8",
+        "pack": "ed-super8"
+      },
+      "cards_edition_tiles": {
+        "look": "ed-tiles",
+        "pack": "ed-tiles"
+      },
+      "cards_edition_vhs": {
+        "look": "ed-vhs",
+        "pack": "ed-vhs"
+      },
+      "cards_edition_zine": {
+        "look": "ed-zine",
+        "pack": "ed-zine"
+      },
+      "cards_genre_action": {
+        "look": "blockbuster",
+        "pack": "blockbuster"
+      },
+      "cards_genre_adventure": {
+        "look": "tresor",
+        "pack": "tresor"
+      },
+      "cards_genre_animation": {
+        "look": "crayon",
+        "pack": "crayon"
+      },
+      "cards_genre_comedy": {
+        "look": "fourire",
+        "pack": "fourire"
+      },
+      "cards_genre_crime": {
+        "look": "scelles",
+        "pack": "scelles"
+      },
+      "cards_genre_dark": {
+        "look": "tenebres",
+        "pack": "tenebres"
+      },
+      "cards_genre_documentary": {
+        "look": "reportage",
+        "pack": "reportage"
+      },
+      "cards_genre_drama": {
+        "look": "rideau",
+        "pack": "rideau"
+      },
+      "cards_genre_family": {
+        "look": "magical",
+        "pack": "magical"
+      },
+      "cards_genre_fantasy": {
+        "look": "arcanes",
+        "pack": "arcanes"
+      },
+      "cards_genre_history": {
+        "look": "chronique",
+        "pack": "chronique"
+      },
+      "cards_genre_music": {
+        "look": "concert",
+        "pack": "concert"
+      },
+      "cards_genre_mystery": {
+        "look": "brume",
+        "pack": "brume"
+      },
+      "cards_genre_romance": {
+        "look": "idylle",
+        "pack": "idylle"
+      },
+      "cards_genre_sf": {
+        "look": "hyperespace",
+        "pack": "hyperespace"
+      },
+      "cards_genre_thriller": {
+        "look": "insomnie",
+        "pack": "insomnie"
+      },
+      "cards_genre_war": {
+        "look": "front",
+        "pack": "front"
+      },
+      "cards_genre_western": {
+        "look": "saloon",
+        "pack": "saloon"
+      },
+      "cards_rarity_epic": {
+        "look": "impact-video",
+        "pack": "impact-video"
+      },
+      "cards_rarity_legendary": {
+        "look": "apotheose",
+        "pack": "apotheose"
+      },
+      "cards_rarity_rare": {
+        "look": "geode",
+        "pack": "geode"
+      },
+      "cards_theme_anime": {
+        "look": "shonen",
+        "pack": "shonen"
+      },
+      "cards_theme_japan": {
+        "look": "sumi",
+        "pack": "sumi"
+      },
+      "cards_theme_kaiju": {
+        "look": "mecha",
+        "pack": "mecha"
+      },
+      "cards_theme_samurai": {
+        "look": "ninja",
+        "pack": "ninja"
       }
     }
   },
