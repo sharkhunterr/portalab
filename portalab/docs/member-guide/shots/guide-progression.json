@@ -73,5 +73,79 @@
         "pad": 4
       }
     ]
+  },
+  {
+    "name": "progression-quetes",
+    "page": "guide-progression",
+    "route": "/games/quests",
+    "height": 1000,
+    "settle": 3000,
+    "before": [
+      {
+        "css": ".ai-fab{display:none!important}"
+      },
+      {
+        "waitFor": ".quest-summary",
+        "wait": 2500
+      }
+    ],
+    "maxHeight": 760,
+    "marks": [
+      {
+        "target": ".quest-filters",
+        "pad": 4
+      },
+      {
+        "target": ".quest-summary",
+        "pad": 4
+      },
+      {
+        "target": ".quest-card",
+        "pad": 4
+      },
+      {
+        "target": ".quest-card__time",
+        "pad": 3
+      }
+    ]
+  },
+  {
+    "name": "progression-jeux",
+    "page": "guide-progression",
+    "route": "/games",
+    "height": 1400,
+    "settle": 4000,
+    "before": [
+      {
+        "css": ".ai-fab{display:none!important}"
+      },
+      {
+        "waitFor": ".games-today",
+        "wait": 3000
+      }
+    ],
+    "maxHeight": 1300,
+    "marks": [
+      {
+        "target": ".games-today__wheel",
+        "pad": 4
+      },
+      {
+        "target": ".games-today__cinemot",
+        "pad": 4
+      },
+      {
+        "target": ".games-reminder[data-reminder=\"quests\"]",
+        "pad": 4
+      },
+      {
+        "target": ".games-challenges",
+        "pad": 4
+      },
+      {
+        "target": ".games-grid > li",
+        "pad": 4
+      }
+    ]
   }
 ]

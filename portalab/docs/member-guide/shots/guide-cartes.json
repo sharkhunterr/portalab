@@ -4,22 +4,22 @@
     "page": "guide-cartes",
     "route": "/cards",
     "height": 900,
-    "maxHeight": 640,
+    "maxHeight": 760,
     "marks": [
+      {
+        "target": ".cards-summary",
+        "pad": 3
+      },
+      {
+        "target": ".cards-views:not(.cards-views--small)",
+        "pad": 3
+      },
       {
         "target": ".cards-search",
         "pad": 3
       },
       {
-        "target": ".cards-stats",
-        "pad": 3
-      },
-      {
-        "target": ".cards-views",
-        "pad": 3
-      },
-      {
-        "target": ".cards-filters label",
+        "target": ".cards-views--small",
         "pad": 3
       },
       {
@@ -31,8 +31,8 @@
     ],
     "before": [
       {
-        "css": ".cards-trial{display:none!important}",
-        "wait": 800
+        "waitFor": ".cards-sets li",
+        "wait": 1500
       }
     ]
   },
@@ -229,6 +229,35 @@
         "side": "top",
         "shift": 220,
         "gap": 50
+      }
+    ]
+  },
+  {
+    "name": "cartes-a-ouvrir",
+    "page": "guide-cartes",
+    "route": "/cards?vue=boosters",
+    "height": 1000,
+    "settle": 5000,
+    "before": [
+      {
+        "waitFor": ".cards-boosters__pack",
+        "wait": 2500
+      }
+    ],
+    "maxHeight": 640,
+    "marks": [
+      {
+        "target": ".cards-boosters__pack",
+        "label": "Un booster : touchez-le pour l'ouvrir",
+        "side": "right",
+        "gap": 40
+      },
+      {
+        "target": ".cards-boosters__pile",
+        "label": "Des boosters identiques : combien dans la pile",
+        "side": "bottom",
+        "gap": 30,
+        "pad": 3
       }
     ]
   }

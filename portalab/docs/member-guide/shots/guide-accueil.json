@@ -158,5 +158,36 @@
       10,
       320
     ]
+  },
+  {
+    "name": "accueil-acces-rapides",
+    "page": "guide-accueil",
+    "route": "/",
+    "height": 1000,
+    "settle": 20000,
+    "before": [
+      {
+        "waitFor": ".widget-links li",
+        "scroll": ".widget-frame:has(.widget-links)",
+        "wait": 2000
+      }
+    ],
+    "clip": ".widget-frame:has(.widget-links)",
+    "margin": [
+      16,
+      16,
+      16,
+      16
+    ],
+    "marks": [
+      {
+        "target": ".widget-links li",
+        "pad": 3
+      },
+      {
+        "target": ".widget-links__dot",
+        "pad": 3
+      }
+    ]
   }
 ]

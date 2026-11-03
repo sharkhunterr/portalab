@@ -26,6 +26,41 @@
     ]
   },
   {
+    "name": "actualites-fil",
+    "page": "guide-actualites",
+    "route": "/feed",
+    "height": 1100,
+    "settle": 6000,
+    "before": [
+      {
+        "waitFor": ".feed-filters",
+        "wait": 2500
+      }
+    ],
+    "maxHeight": 900,
+    "marks": [
+      {
+        "target": ".feed-list--rail",
+        "pad": 4
+      },
+      {
+        "target": ".feed-filters",
+        "pad": 4
+      },
+      {
+        "target": ".feed-entry__card",
+        "pad": 4
+      },
+      {
+        "target": ".feed-entry .feed-item__new",
+        "pad": 3,
+        "label": "Arrivé depuis votre dernière visite",
+        "side": "right",
+        "gap": 40
+      }
+    ]
+  },
+  {
     "name": "actualites-calendrier",
     "page": "guide-actualites",
     "route": "/calendar",

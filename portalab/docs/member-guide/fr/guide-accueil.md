@@ -71,10 +71,27 @@ Le catalogue ne montre que les widgets que vous pouvez utiliser. Selon votre por
 | Thème | Exemples |
 |---|---|
 | Médias | « Reprendre », « Derniers ajouts », « Prochaines sorties », « Mes demandes », « Bientôt supprimés », « Au hasard », « Mur d'affiches » |
-| Progression | « Ma progression », « Objectifs du jour », « Barre de progression », « Valeur » |
+| Progression | « Ma progression », « Objectifs du jour », « Roue de la fortune », « Barre de progression », « Valeur » |
 | Communauté | « Activité de la communauté », « Classement », « Projets de la communauté » |
-| Infos | « Dernières actualités », « À la une », « Calendrier », « À venir », « Incidents en cours » |
-| Pratique | « Horloge », « Note », « Compte à rebours », « Raccourci », « Séparateur », « Mes tickets » |
+| Infos | « Mon fil », « Dernières actualités », « À la une », « Calendrier », « À venir », « Incidents en cours » |
+| Pratique | « Accès rapides », « Horloge », « Note », « Compte à rebours », « Raccourci », « Séparateur », « Mes tickets » |
+
+### Le widget « Accès rapides »
+
+« Accès rapides » montre les services du portail, leur état et un lien direct vers chacun.
+
+![Le widget « Accès rapides » : un service (1) et la couleur de son état (2)](shot:accueil-acces-rapides)
+
+1. **Un service** : touchez-le pour l'ouvrir.
+2. **Son état**, en couleur.
+
+La couleur suit l'état du service : « Opérationnel », « Dégradé », « Maintenance », « Indisponible »… Le widget s'adapte à sa taille : des tuiles dans un grand bloc, des lignes dans une colonne étroite, des pastilles sur une seule rangée.
+
+Dans ses « Réglages », cochez les services à afficher et déplacez-les par leur poignée (ou avec les flèches) pour choisir leur ordre. Sans choix, « Tous les services, dans l'ordre habituel » s'affichent, y compris ceux ajoutés plus tard.
+
+### Le widget « Mon fil »
+
+« Mon fil » montre les dernières actualités de vos sources : articles, vidéos, podcasts. Les vidéos YouTube s'y lisent sur place, et « Tout mon fil » ouvre la page. Voir [Actualités, calendrier et wiki](portalab://wiki/guide-actualites).
 
 ## Régler un widget
 

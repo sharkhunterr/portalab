@@ -10,12 +10,12 @@ Dépenser la monnaie du portail (Coins) : choisir un produit, l'acheter, ouvrir 
 ## La monnaie du portail
 
 - La boutique fonctionne avec la monnaie du portail. Son nom dépend de votre portail : par défaut, ce sont des **Coins**.
-- Les Coins se gagnent uniquement sur le portail (lectures, demandes, quêtes, succès, niveaux…), **jamais avec de l'argent réel**. Voir [XP, niveaux, séries et succès](portalab://wiki/guide-progression).
+- Les Coins se gagnent uniquement sur le portail (lectures, demandes, quêtes, succès, niveaux…), **jamais avec de l'argent réel**. Voir [Progression, quêtes et jeux](portalab://wiki/guide-progression).
 - Votre solde s'affiche dans l'en-tête et sur [Ma progression](/progression).
 
 ## Trouver un produit
 
-Ouvrez [la boutique](/marketplace). Son accueil met en avant ce qui peut vous intéresser.
+Ouvrez la rubrique **Boutique** du menu : ses onglets sont « Vitrine », « Mes achats » et « Ma réserve ». L'accueil de la [vitrine](/marketplace) met en avant ce qui peut vous intéresser.
 
 ![L'accueil de la boutique : le solde, la recherche, les rayons, la une et les sélections, numérotés](shot:boutique-accueil)
 
@@ -23,7 +23,7 @@ Ouvrez [la boutique](/marketplace). Son accueil met en avant ce qui peut vous in
 2. **La recherche** : « Rechercher un produit ».
 3. **Les rayons** : **Interfaces**, **Profil**, **Notifications et effets**, **Fonctionnalités**, **Packs** et **Boosters**. Un rayon ouvert montre ses étagères.
 4. **À la une** : les produits mis en avant, un à la fois.
-5. **Les sélections** : « En promotion », « À ta portée », « Bientôt épuisés », « Boosters à ouvrir » et « Gratuits ». « Tout voir » montre toute la sélection.
+5. **Les sélections** : « En promotion », « À ta portée », « Bientôt épuisés », « Boosters de looks à ouvrir », « Boosters Mediacards » et « Gratuits ». « Tout voir » montre toute la sélection.
 
 ![Un rayon de la boutique : ses étagères, le tri, les filtres et un produit, numérotés](shot:boutique-rayon)
 
@@ -59,7 +59,7 @@ En plus des looks, la boutique propose (selon votre portail) :
 - **Sauvetage** : sauve un titre que le nettoyage de la médiathèque allait supprimer, avec « Sauver ce titre » sur sa fiche. Voir [Titres bientôt supprimés](portalab://wiki/guide-bientot-supprime).
 - **Gel de série** : un jour manqué est couvert automatiquement, votre série continue.
 - **Boost d'XP** : plus d'XP pendant un temps, dans la limite du portail. Acheté pendant un autre boost, il démarre à la fin de celui-ci.
-- **Demande spéciale** : une demande traitée à la main par les administrateurs. Vous remplissez un court formulaire après l'achat.
+- **Demande spéciale** : une demande traitée à la main par les administrateurs. Vous remplissez un court formulaire après l'achat, dans « Ma réserve ».
 - **Accès à un service** : un administrateur valide l'accès et votre compte est créé.
 - **Lancement de projet** : votre idée devient une proposition financée par les membres. Voir [Communauté](portalab://wiki/guide-communaute).
 - **Widgets**, **options de widget** et **statistiques** en plus.
@@ -85,24 +85,37 @@ Ce que vous tirez :
 - Certains boosters ont un nombre d'ouvertures limité. Les boosters de saison ne sont en vente que pendant leur période.
 - Un look au-dessus de votre niveau est à vous, mais « Verrouillé » jusqu'à ce que vous atteigniez le niveau ou la Contribution demandés.
 - « Mes dernières ouvertures », en bas du rayon « Boosters », liste vos tirages récents.
-- Les « Boosters Mediacards », sur leur propre étagère du même rayon, donnent des cartes de films et de séries pour votre collection, dans leur emballage à eux. Voir [Les Mediacards](portalab://wiki/guide-cartes).
+- Les « Boosters Mediacards », sur leur propre étagère du même rayon, donnent des cartes de films et de séries pour votre collection : boosters de genre, d'édition, de rareté ou de thème, selon votre portail. Chacun s'ouvre sur la scène de son produit. Voir [Les Mediacards](portalab://wiki/guide-cartes).
 
 ## Ma réserve
 
-[Ma réserve](/marketplace/reserve) garde les objets gagnés dans les boosters. Ils s'additionnent et **n'expirent pas**.
+[Ma réserve](/marketplace/reserve) garde « Les objets gagnés dans les boosters, à utiliser quand vous voulez. Ils n'expirent pas. » Ce que vous avez en plusieurs exemplaires s'additionne (« ×2 », « ×3 »…).
 
-- **Utiliser un objet** : touchez « Utiliser », puis « Utiliser maintenant ». Il prend effet comme un achat. S'il faut remplir un formulaire, il vous attend dans « Mes achats ».
-- **Ouvrir un booster offert** (récompense de niveau ou de succès) : touchez « Ouvrir ». Il ne coûte rien.
-- **En attente de niveau** : vos looks verrouillés, avec le niveau attendu.
-- **Passe-droit** : choisissez un look en attente et touchez « Débloquer ». Il devient portable tout de suite.
+La page est rangée par ce que chaque objet attend. En haut, une barre mène à chaque partie, avec son nombre.
+
+![Ma réserve : la barre des parties et leur nombre (1), un objet de la réserve (2)](shot:boutique-reserve)
+
+1. **La barre** : touchez une partie pour y aller.
+2. **Un objet** : son image, son nombre et son nom. Touchez-le pour ouvrir sa fenêtre.
+
+Les parties :
+
+- **« À compléter »** : les achats qui attendent vos choix, par exemple un lancement de projet ou une demande spéciale. Touchez-en un : son formulaire s'ouvre dans une fenêtre (« Compléter « … » »). Pour un lancement de projet, saisissez le titre, le pitch et l'objectif, puis « Lancer le projet ».
+- **« À ouvrir »** : vos boosters scellés, offerts (récompense de niveau ou de succès) ou achetés, et vos boosters Mediacards. Touchez-en un : il s'ouvre sur sa scène, sans rien coûter. Les boosters identiques sont rangés en une pile.
+- **« À utiliser »** : vos objets (demandes en plus, gels de série, boosts, sauvetages, passe-droits…). Touchez-en un pour voir ce qu'il fait, puis « Utiliser maintenant ». Il prend effet comme un achat. S'il faut ensuite remplir un formulaire, il vous attend dans « À compléter ».
+- **« En attente de niveau »** : vos looks verrouillés, avec le niveau attendu (« attend le niveau … »).
+
+**Passe-droit** : touchez-le, choisissez un look en attente et touchez « Débloquer ». Il devient portable tout de suite.
+
+Dans le menu, un badge sur « Ma réserve » signale ce qui y est arrivé depuis votre dernière visite, ou un achat qui attend son formulaire. Ouvrir la réserve efface les nouveautés.
 
 ## Mes achats
 
-[Mes achats](/marketplace/owned) réunit ce que vous avez acheté ou reçu, et vos demandes.
+[Mes achats](/marketplace/owned) réunit « Ce que vous avez acheté ou reçu, ce qui vous attend et vos demandes. »
 
-- **À compléter** : les produits à régler. Pour un lancement de projet, saisissez le titre et le pitch, puis « Lancer le projet ». Pour une demande spéciale, remplissez le formulaire, puis « Envoyer ma demande ».
-- **Ma collection** : tout ce que vous possédez, avec une recherche.
+- **En haut**, vos chiffres : « Dans votre collection », « Coins dépensés » et « À compléter ». Si un achat attend son formulaire, « Compléter » vous emmène dans [Ma réserve](/marketplace/reserve).
 - **Mes demandes** : « En attente », « En cours », « Traitée » ou « Refusée — Coins rendus ».
+- **Ma collection** : tout ce que vous possédez, avec une recherche et un filtre par rayon.
 - **Rembourser** : quand le produit le permet, « Rembourser (jusqu'au …) » reste disponible jusqu'à la date indiquée.
 
 > [!WARNING]

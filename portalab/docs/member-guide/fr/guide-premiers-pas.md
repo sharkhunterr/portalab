@@ -60,30 +60,38 @@ Le centre de contrôle a sa propre page d'aide : [Centre de contrôle](portalab:
 
 ### Le menu personnel
 
-Cliquez sur votre photo pour ouvrir le « Menu personnel » :
+Cliquez sur votre photo pour ouvrir le « Menu personnel ». C'est la rubrique **Moi** du portail :
 
 - « Profil » : votre profil, tel que les autres le voient ;
-- « Ma progression » : niveau, XP, succès ;
-- vos pages personnelles, par exemple « Compte », « Apparence », « Langue et région », « Préférences de notification », « Confidentialité » ou « Comptes médias » (selon votre portail) ;
+- « Ma progression » : niveau, XP, quêtes et succès ;
+- « Succès » : tous les succès du portail et votre avancée ;
+- « Mes paramètres » : tous vos réglages (compte, apparence, langue et région, notifications, comptes liés, confidentialité, jeu) ;
 - « Se déconnecter ».
 
 Le détail de ces réglages est dans [Compte, apparence et confidentialité](portalab://wiki/guide-compte).
 
 ## Le menu et ses rubriques
 
-Le menu regroupe tout le portail par rubriques. Selon votre portail et vos droits, vous y verrez notamment :
+Le menu regroupe tout le portail par rubriques. Selon votre portail et vos droits, vous y verrez :
 
-- **Accueil** : votre tableau de bord ;
-- **Médias** : la médiathèque, « Faire une demande », « Mes demandes », « Statistiques » ;
-- **Découvrir** : « Actualités », « Wiki », « Calendrier », « Recherche », « Statistiques » ;
-- **Communauté** : les membres, l'activité, la progression, les campagnes ;
-- **Boutique** : le catalogue, « Mes achats », « Ma réserve », « Projets de la communauté » ;
-- **Support** : « Assistance », « Avis », « Incidents », « Services », « Visites guidées » ;
-- **Mon compte** : vos réglages personnels.
+| Rubrique | Ses pages |
+|---|---|
+| **Accueil** | votre tableau de bord |
+| **Actualités** | « À la une », « Mon fil », « Calendrier » |
+| **Médias** | « Bibliothèque », « Demander un titre », « Mes demandes », « Mes goûts » |
+| **Jeux** | « Jeux du jour », « Quêtes », « Jouer à plusieurs », « Mediacards » |
+| **Communauté** | « Aperçu », « Membres », « Classements », « Événements », « Propositions », « Projets » |
+| **Statistiques** | « Mes médias », « Mon activité », « Mes demandes », « Communauté » |
+| **Boutique** | « Vitrine », « Mes achats », « Ma réserve » |
+| **Aide** | « Guide », « Wiki », « Assistance », « Avis », « État des services », « Incidents » |
 
-Vous ne voyez que les pages auxquelles vous avez accès. Quand une rubrique contient plusieurs pages, des **onglets** apparaissent en haut du contenu pour passer de l'une à l'autre. Le fil d'Ariane, au-dessus, rappelle où vous êtes ; en bas de certaines pages, « Voir aussi » propose des pages proches.
+Vos pages personnelles (« Ma progression », « Succès », « Mes paramètres ») sont dans le menu personnel, derrière votre photo.
 
-![Le menu et ses rubriques (1), le fil d'Ariane (2) et les onglets de la rubrique Découvrir (3)](shot:premiers-menu)
+Vous ne voyez que les pages auxquelles vous avez accès. Une rubrique s'ouvre sur sa première page ; ses autres pages sont des **onglets**, en haut du contenu, pour passer de l'une à l'autre. Le fil d'Ariane, au-dessus, rappelle où vous êtes ; en bas de certaines pages, « Voir aussi » propose des pages proches.
+
+Un **badge** à côté d'une rubrique ou d'une page compte ce qui vous attend : les articles « À la une » que vous n'avez pas lus, les nouveautés de « Mon fil », ce qui est arrivé dans « Ma réserve »…
+
+![Le menu et ses rubriques (1), le fil d'Ariane (2) et les onglets de la rubrique Actualités (3)](shot:premiers-menu)
 
 > [!TIP]
 > La place du menu dépend de votre thème : colonne sur le côté, barre en haut, panneau qui s'ouvre… Si vous ne le trouvez pas, cherchez le bouton « Ouvrir la navigation » (trois traits).
@@ -99,9 +107,9 @@ La recherche de l'en-tête répond pendant que vous tapez :
 1. Cliquez dans « Rechercher ou aller à… », ou appuyez sur **Ctrl K** (⌘ K sur Mac) ou sur **/** depuis n'importe quelle page.
 2. Tapez quelques lettres. Les pages du portail qui correspondent s'affichent d'abord, puis les premiers résultats de chaque sorte : titres, personnes, articles, pages du wiki, tickets…
 3. Utilisez les flèches pour vous déplacer, **Entrée** pour ouvrir, **Échap** pour fermer.
-4. Le dernier choix, « Rechercher « … » », ouvre la page [Recherche](/search) avec tous les résultats et des filtres.
+4. Le dernier choix, « Rechercher « … » », ouvre la page de recherche avec tous les résultats et des filtres.
 
-Avant de taper, la liste montre vos « Recherches récentes ». Les titres qu'on peut demander apparaissent aussi : c'est un bon moyen de [demander un titre](portalab://wiki/guide-demandes). Si l'assistant est disponible et que vous tapez une question, la recherche vous propose « Demander à l'assistant : « … » » (voir [L'assistant](portalab://wiki/guide-assistant)).
+Avant de taper, la liste montre vos « Recherches récentes » et « Recherche avancée » : la [page de recherche](/search), avec ses filtres. Elle n'est plus dans le menu, mais toujours à un clic depuis ce champ. Parmi les résultats, les titres qu'on peut demander apparaissent aussi : c'est un bon moyen de [demander un titre](portalab://wiki/guide-demandes). Si l'assistant est disponible et que vous tapez une question, la recherche vous propose « Demander à l'assistant : « … » » (voir [L'assistant](portalab://wiki/guide-assistant)).
 
 ### Les raccourcis clavier
 
@@ -123,7 +131,7 @@ Une visite guidée éclaire un élément de l'écran à la fois, sur les vraies 
 - « Suivant » passe à l'étape suivante ; sur certaines étapes, « Fais-le » fait l'action pour vous.
 - Les flèches du clavier avancent ou reculent, **Échap** quitte la visite.
 
-Toutes les visites sont sur la page [Visites guidées](/guide), rangées par thème : « Pour commencer », « Médias », « Jouer et partager », « Aide ». Pour chacune, vous voyez son nombre d'étapes, si vous l'avez déjà vue (« Vue ») et la récompense qu'elle rapporte encore. « Lancer » démarre une visite, « Revoir » la relance. La première, « Le portail en une minute », montre le niveau, la recherche, les notifications, la navigation et le tableau de bord.
+Toutes les visites sont sur la page [Visites guidées](/guide) (« Guide », dans la rubrique Aide), rangées par thème : « Pour commencer », « Médias », « Jouer et partager », « Aide ». Pour chacune, vous voyez son nombre d'étapes, si vous l'avez déjà vue (« Vue ») et la récompense qu'elle rapporte encore. « Lancer » démarre une visite, « Revoir » la relance. La première, « Le portail en une minute », montre le niveau, la recherche, les notifications, la navigation et le tableau de bord.
 
 ![La page Visites guidées : les écrans de bienvenue (1), la première visite (2) et une visite d'un thème (3)](shot:premiers-visites)
 

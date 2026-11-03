@@ -82,7 +82,7 @@
   {
     "name": "demandes-mes-demandes",
     "page": "guide-demandes",
-    "route": "/media/requests",
+    "route": "/media/requests/stats",
     "height": 900,
     "settle": 14000,
     "before": [
@@ -97,10 +97,6 @@
     ],
     "maxHeight": 440,
     "marks": [
-      {
-        "target": ".admin-page__tabs fieldset",
-        "pad": 4
-      },
       {
         "target": ".requests-toolbar__period",
         "pad": 4
@@ -119,12 +115,11 @@
     "settle": 14000,
     "before": [
       {
-        "click": ".admin-page__tabs button:nth-of-type(2)",
         "waitFor": ".requests-row a",
         "wait": 2000
       },
       {
-        "follow": ".requests-row a"
+        "follow": ".requests-row:not(:has-text(\"Disponible\")) a"
       },
       {
         "waitFor": ".media-journey",
@@ -157,7 +152,7 @@
         "pad": 3
       },
       {
-        "target": ".media-journey__head button",
+        "target": ".media-journey__head button:has([data-icon=\"sparkles\"])",
         "label": "Demander à l'assistant",
         "side": "left",
         "gap": 40

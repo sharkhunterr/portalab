@@ -10,10 +10,10 @@ Les réponses rapides aux questions les plus courantes. Chaque réponse renvoie 
 ## Bien démarrer
 
 **Comment chercher rapidement quelque chose ?**
-Appuyez sur Ctrl K (⌘ K sur Mac) ou sur « / » depuis n'importe quelle page, tapez quelques lettres, puis Entrée. « Rechercher « … » » ouvre tous les résultats avec des filtres. Voir [Premiers pas](portalab://wiki/guide-premiers-pas).
+Appuyez sur Ctrl K (⌘ K sur Mac) ou sur « / » depuis n'importe quelle page, tapez quelques lettres, puis Entrée. « Rechercher « … » » ouvre tous les résultats avec des filtres ; avant de taper, « Recherche avancée » ouvre la page de recherche. Voir [Premiers pas](portalab://wiki/guide-premiers-pas).
 
 **Où revoir une visite guidée ?**
-Sur la page [Visites guidées](/guide), dans la rubrique Support : « Lancer » démarre une visite, « Revoir » la relance.
+Sur la page [Visites guidées](/guide) (« Guide », dans la rubrique Aide) : « Lancer » démarre une visite, « Revoir » la relance.
 
 **Comment changer les widgets de mon accueil ?**
 Cliquez sur « Personnaliser », puis « Ajouter un widget » pour en ajouter, la roue crantée pour les régler, la corbeille pour en retirer. Terminez par « Enregistrer ». Voir [L'accueil et ses widgets](portalab://wiki/guide-accueil).
@@ -30,12 +30,12 @@ C'est le centre de contrôle. Le cœur veut dire que tout va bien ; les autres i
 Ouvrez le centre de contrôle : les annonces en cours y restent, même fermées. Certaines annonces ne peuvent pas être fermées, par choix de l'administrateur.
 
 **Comment recevoir moins d'e-mails ?**
-Dans les préférences de notification, éteignez « Par e-mail » sur les lignes voulues, ou choisissez « Résumé quotidien » ou « Résumé hebdomadaire ». Les newsletters se désabonnent dans « Newsletters par e-mail ». Voir [Notifications](portalab://wiki/guide-notifications).
+Dans les préférences de notification, éteignez « Par e-mail » sur les lignes voulues, ou choisissez « Résumé quotidien » ou « Résumé hebdomadaire ». Les newsletters se désabonnent une par une dans « Newsletters par e-mail », ou avec « Se désabonner de cette lettre » en bas de l'e-mail. Voir [Notifications](portalab://wiki/guide-notifications).
 
 ## Médias et demandes
 
 **Comment demander un film qui n'est pas dans la médiathèque ?**
-Ouvrez « Faire une demande » dans la section Médias, cherchez le titre, ouvrez sa fiche et cliquez sur « Demander ». Pour une série, choisissez les saisons. Voir [Demander un titre](portalab://wiki/guide-demandes).
+Ouvrez « Demander un titre » dans la rubrique Médias, cherchez le titre, ouvrez sa fiche et cliquez sur « Demander ». Pour une série, choisissez les saisons. Voir [Demander un titre](portalab://wiki/guide-demandes).
 
 **Je n'ai plus de demandes, que faire ?**
 Attendez qu'une demande revienne (la date s'affiche dans « Mon quota de demandes »), ou achetez des demandes en plus dans la boutique. Elles ne servent qu'une fois votre quota épuisé.
@@ -43,8 +43,14 @@ Attendez qu'une demande revienne (la date s'affiche dans « Mon quota de demande
 **Ma demande a été refusée : est-ce que je perds ma demande achetée ?**
 Non. Une demande achetée vous est rendue si la demande est refusée, si le service la refuse ou s'il ne répond pas.
 
+**Comment être prévenu de ce qui arrive avec un acteur ou une série ?**
+Touchez « Suivre » sur sa page : ce qui arrive avec lui apparaît dans [Mon fil](/feed), et « Pour moi » ne garde que ce qui vous concerne. Voir [Actualités, calendrier et wiki](portalab://wiki/guide-actualites).
+
+**J'ai arrêté un film pendant le générique : est-il compté comme vu ?**
+Oui, s'il est arrêté dans les deux dernières minutes avant le générique de fin (quand le serveur multimédia sait où il commence). Voir [Progression, quêtes et jeux](portalab://wiki/guide-progression).
+
 **Où en est le titre que j'ai demandé ?**
-Sur sa fiche, l'encadré « Où en est ce titre » montre chaque étape, de « Demandé » à « Disponible », et « Demander à l'assistant » vous l'explique. La liste complète est dans « Mes demandes ».
+Sur sa fiche, l'encadré « Où en est ce titre » montre chaque étape, de « Demandé » à « Disponible », et « Demander à l'assistant » vous l'explique. La liste complète est dans « Mes demandes », rubrique Médias.
 
 **Un titre que j'aime va être supprimé, puis-je le garder ?**
 Oui. Sur sa fiche, cliquez sur « Sauver ce titre » dans l'encadré « Bientôt supprimé ». Il vous faut un sauvetage, acheté dans la boutique (produits « Sauvetage ») ou gagné dans un booster. Le titre est sauvé pour tout le monde, pour de bon. Voir [Titres bientôt supprimés](portalab://wiki/guide-bientot-supprime).
@@ -53,7 +59,7 @@ Oui. Sur sa fiche, cliquez sur « Sauver ce titre » dans l'encadré « Bientôt
 Selon votre portail, le lecteur a besoin de votre compte du serveur multimédia. Liez-le dans « Comptes médias » : votre progression et votre historique restent les vôtres. Voir [Compte et réglages](portalab://wiki/guide-compte).
 
 **Pourquoi mes statistiques sont vides ?**
-Elles apparaissent quand un service de la médiathèque remonte vos lectures et que vos comptes médias sont liés et vérifiés. Voir [Mes statistiques](portalab://wiki/guide-statistiques).
+Elles apparaissent quand un service de la médiathèque remonte vos lectures et que vos comptes médias sont liés et vérifiés. Voir [Mes statistiques et mon récap](portalab://wiki/guide-statistiques).
 
 **Où trouver mon récap ?**
 Une notification « Votre bilan … est prêt » vous prévient à la fin de la période. Elle ouvre le récap, que vous parcourez avec « Précédent » et « Suivant ».
@@ -61,7 +67,10 @@ Une notification « Votre bilan … est prêt » vous prévient à la fin de la 
 ## Boutique et progression
 
 **Peut-on acheter des Coins avec de l'argent réel ?**
-Non. Les Coins se gagnent uniquement sur le portail : lectures, demandes, quêtes, succès, niveaux. Voir [Progression](portalab://wiki/guide-progression).
+Non. Les Coins se gagnent uniquement sur le portail : lectures, demandes, jeux, quêtes, succès, niveaux. Voir [Progression, quêtes et jeux](portalab://wiki/guide-progression).
+
+**Où sont les quêtes ?**
+Dans la rubrique **Jeux** du menu, page « Quêtes ». « Jeux du jour » rappelle aussi où vous en êtes. Voir [Progression, quêtes et jeux](portalab://wiki/guide-progression).
 
 **Que se passe-t-il si je tire un look que je possède déjà dans un booster ?**
 C'est un doublon : il vous rend des Coins selon sa rareté. Le montant est indiqué sur la fiche du booster. Voir [La boutique](portalab://wiki/guide-boutique).
@@ -70,7 +79,7 @@ C'est un doublon : il vous rend des Coins selon sa rareté. Le montant est indiq
 Il demande un niveau ou une Contribution que vous n'avez pas encore. Il est déjà à vous et devient utilisable dès que vous les atteignez, ou tout de suite avec un passe-droit depuis « Ma réserve ».
 
 **Les objets de ma réserve expirent-ils ?**
-Non. Ils s'additionnent et attendent que vous touchiez « Utiliser ».
+Non. Ils s'additionnent et attendent dans « Ma réserve » : touchez un objet, puis « Utiliser maintenant ».
 
 **Puis-je me faire rembourser un achat ?**
 Seulement si le produit le permet : « Rembourser (jusqu'au …) » apparaît alors dans « Mes achats ». Une demande spéciale ou un accès refusé vous rend vos Coins.

@@ -2,14 +2,14 @@
 slug: guide-medias
 title: Regarder, lire, écouter
 position: 4
-help_keys: [media, media.browse, media.detail, media.detail.watch, media.detail.read]
+help_keys: [media, media.browse, media.detail, media.detail.watch, media.detail.read, media.taste]
 tags: [guide, médias, lecteur]
 ---
 Trouver un titre dans la médiathèque, lire sa fiche, et le regarder, le lire ou l'écouter sans quitter le portail.
 
 ## La page Médias
 
-Ouvrez **Médias** dans le menu (section « Médias »). La page d'accueil des médias vous propose :
+Ouvrez la rubrique **Médias** du menu : ses onglets sont « Bibliothèque », « Demander un titre », « Mes demandes » et « Mes goûts ». La « Bibliothèque », page d'accueil des médias, vous propose :
 
 - **« Parcourir le catalogue »** pour chercher dans toute la médiathèque ;
 - **« Demander un média »** pour demander un titre qui manque (voir [Demander un titre](portalab://wiki/guide-demandes)) ;
@@ -41,6 +41,9 @@ Cliquez sur une affiche pour ouvrir la fiche du titre. En haut, vous trouvez l'a
 - **« Disponible »** quand le titre est dans la médiathèque. Sinon, l'étape où en est sa demande (par exemple « En attente de validation » ou « Téléchargement 40 % »), ou **« Indisponible »** ;
 - **« En cours · 35 % »** si vous l'avez commencé (ou l'épisode en cours pour une série) ;
 - **« Déjà vu »**, **« Déjà lu »**, **« Déjà écouté »** ou **« Déjà joué »** si vous l'avez terminé.
+
+> [!TIP]
+> Inutile de regarder tout le générique : quand le serveur multimédia sait où il commence, un film ou un épisode arrêté dans les deux dernières minutes avant le générique de fin compte comme terminé, pour vos statistiques comme pour vos récompenses. Une saison est terminée quand tous ses épisodes sont vus, à la date du dernier.
 
 ![Le haut de la fiche d'un film : ses badges, et les boutons pour le regarder](shot:medias-fiche)
 
@@ -101,9 +104,20 @@ Sur la fiche d'un livre audio, **« Écouter »** (ou **« Reprendre »**) lance
 > [!NOTE]
 > Votre position est toujours gardée dans le portail. Si le service de la bibliothèque ne la connaît pas, liez votre compte pour la synchroniser.
 
+## Mes goûts
+
+[Mes goûts](/media/taste), dans la rubrique Médias : « Ce que vous regardez, écoutez, lisez et jouez, et ce que vous en dites, fait vos recommandations. »
+
+- **« Dites ce qui vous plaît »** : des titres à juger, l'un après l'autre. Glissez à droite pour « J'aime », à gauche pour « Pas pour moi », ou « Passer ».
+- **« Pour vous »** : vos recommandations, par « Type de titre ».
+- **« Pour changer »** : « Bien notés, loin de vos habitudes — et peut-être pour vous. »
+- **« Ce qui vous plaît »** : les genres, les personnes, les sagas et les thèmes qui reviennent dans vos goûts.
+- **« Mes listes »** : « J'aime », « Pas pour moi » et « À voir plus tard ».
+- **« Mes données »** : « Utiliser mon historique » (décoché, seuls vos avis comptent) et « Oublier mes avis ».
+
 ## Lier vos comptes médias
 
-Ouvrez [Comptes médias](/settings/media-accounts) (dans « Mon compte »). Lier vos comptes permet au portail de savoir que votre activité sur ces services est la vôtre : historique, reprise, statistiques, recommandations et, selon votre portail, le lecteur.
+Ouvrez [Comptes médias](/settings/media-accounts) (dans [Mes paramètres](/settings), « Comptes liés »). Lier vos comptes permet au portail de savoir que votre activité sur ces services est la vôtre : historique, reprise, statistiques, recommandations et, selon votre portail, le lecteur.
 
 1. Dans **« Lier un compte »**, choisissez le service.
 2. Indiquez le nom ou le numéro de votre compte sur ce service, puis cliquez sur **« Lier le compte »**.

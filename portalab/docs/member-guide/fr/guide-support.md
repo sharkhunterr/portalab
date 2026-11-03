@@ -7,7 +7,7 @@ tags: [guide, support, tickets, avis]
 ---
 Demander de l'aide avec un ticket, suivre vos demandes, donner votre avis à l'équipe et savoir si un problème est déjà connu.
 
-Dans le menu, tout se trouve dans la section **Support** : « Assistance » (vos tickets), « Avis », « Incidents » et « Visites guidées ».
+Dans le menu, tout se trouve dans la rubrique **Aide** : « Guide » (les visites guidées), « Wiki », « Assistance » (vos tickets), « Avis », « État des services » et « Incidents ».
 
 ## Avant d'ouvrir un ticket
 

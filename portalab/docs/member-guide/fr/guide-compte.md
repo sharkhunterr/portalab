@@ -7,7 +7,7 @@ tags: [guide, compte, apparence, confidentialité]
 ---
 Gérer votre profil, choisir l'apparence du portail, régler la langue et la région, contrôler ce que les autres voient de vous et lier vos comptes médias.
 
-Tous ces réglages sont réunis dans [Mes paramètres](/settings), en tête de la section **Mon compte** du menu. La page est rangée par intention : « Profil », « Apparence », « Langue et région », « Notifications », « Comptes liés », « Confidentialité » et « Jeu ».
+Tous ces réglages sont réunis dans [Mes paramètres](/settings), dans votre menu personnel (derrière votre photo, rubrique **Moi**). La page est rangée par intention : « Profil », « Apparence », « Langue et région », « Notifications », « Comptes liés », « Confidentialité » et « Jeu ».
 
 - Sur ordinateur, la liste des pages reste à gauche de la page ouverte.
 - Sur téléphone, la liste est la page : touchez un thème pour l'ouvrir, puis « Mes paramètres » pour revenir.
