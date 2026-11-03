@@ -98,6 +98,23 @@ export const TOURS: readonly TourDef[] = [
     ],
   },
   {
+    // issue 344: the news — the team's headlines, then my feed: what comes, the sources, what I follow
+    key: "news",
+    icon: "newspaper",
+    group: "start",
+    route: "/news",
+    steps: [
+      { key: "featured", icon: "sparkles", targets: [".news-featured"] },
+      { key: "channels", icon: "palette", targets: [".news-page fieldset.ds-subnav"] },
+      { key: "latest", icon: "newspaper", targets: [".news-grid"] },
+      { key: "upcoming", icon: "calendar", route: "/feed", targets: [".feed-list--rail"] },
+      { key: "filters", icon: "rss", targets: [".feed-filters"] },
+      { key: "stream", icon: "list", targets: [".feed-stream"] },
+      { key: "follows", icon: "settings", targets: [".feed-manage"] },
+      done,
+    ],
+  },
+  {
     key: "media",
     icon: "film",
     group: "media",
@@ -106,7 +123,12 @@ export const TOURS: readonly TourDef[] = [
       { key: "hero", icon: "sparkles", targets: [".media-hero"] },
       { key: "rows", icon: "film", targets: [".media-row"] },
       { key: "kinds", icon: "apps", targets: [".media-kinds"] },
-      { key: "browse", icon: "search", route: "/media/browse", targets: [".media-filters"] },
+      {
+        key: "browse",
+        icon: "search",
+        route: "/media/browse",
+        targets: [".catalog__search", ".catalog__kinds"],
+      },
       { key: "card", icon: "play", targets: [".media-card"] },
       done,
     ],
@@ -118,7 +140,7 @@ export const TOURS: readonly TourDef[] = [
     route: "/media/browse",
     mission: "discover_request",
     steps: [
-      { key: "find", icon: "search", targets: [".media-filters"] },
+      { key: "find", icon: "search", targets: [".catalog__search", ".catalog__kinds"] },
       { key: "search", icon: "search", targets: ["[data-tour='search']", ".header-search", ".shell-search"] },
       { key: "open", icon: "film", targets: [".media-card"] },
       done,
@@ -131,8 +153,14 @@ export const TOURS: readonly TourDef[] = [
     route: "/media/requests",
     mission: "discover_request_status",
     steps: [
-      { key: "overview", icon: "chart", targets: [".requests-funnel", ".admin-stats"] },
-      { key: "list", icon: "list", targets: [".requests-row a"], click: true },
+      // issue 344: the figures are « My requests » in the Statistics section; the list is the section's page
+      {
+        key: "overview",
+        icon: "chart",
+        route: "/media/requests/stats",
+        targets: [".requests-funnel", ".admin-stats"],
+      },
+      { key: "list", icon: "list", route: "/media/requests", targets: [".requests-row a"], click: true },
       { key: "journey", icon: "clock", targets: [".media-journey"] },
       { key: "badge", icon: "check", targets: [".media-badges"] },
       done,
@@ -165,6 +193,23 @@ export const TOURS: readonly TourDef[] = [
     ],
   },
   {
+    // issue 344: today's games, their reminders, then the quests — filters, how many are done, time left
+    key: "games",
+    icon: "game",
+    group: "play",
+    route: "/games",
+    steps: [
+      { key: "today", icon: "calendar", targets: [".games-today"] },
+      { key: "reminders", icon: "bell", targets: [".games-reminders"] },
+      { key: "games", icon: "game", targets: [".games-grid"] },
+      { key: "together", icon: "users", targets: [".games-together"] },
+      { key: "quests", icon: "target", route: "/games/quests", targets: [".quest-summary"] },
+      { key: "filters", icon: "list", targets: [".quest-board .ds-subnav"] },
+      { key: "quest", icon: "clock", targets: [".quest-card"] },
+      done,
+    ],
+  },
+  {
     // issue 238: the media cards — my collection, my boosters, a set's binder, the shop's card boosters
     key: "cards",
     icon: "layers",
@@ -172,9 +217,9 @@ export const TOURS: readonly TourDef[] = [
     route: "/cards",
     steps: [
       { key: "stats", icon: "chart", targets: [".cards-summary"] },
-      { key: "packs", icon: "gift", targets: [".cards-callout", ".cards-packs"] },
-      { key: "search", icon: "search", targets: [".cards-search"] },
+      // issue 344: the boosters to open are a view of their own (« To open »), beside the collection
       { key: "views", icon: "library", targets: [".cards-views"] },
+      { key: "search", icon: "search", targets: [".cards-search"] },
       { key: "sets", icon: "layers", targets: [".cards-sets a"], click: true },
       { key: "binder", icon: "star", targets: [".cards-binder"] },
       {
@@ -201,6 +246,32 @@ export const TOURS: readonly TourDef[] = [
       { key: "picks", icon: "flame", targets: [".vitrine-rail"] },
       { key: "product", icon: "gift", targets: [".vitrine-tile"] },
       { key: "coins", icon: "coins", targets: [".shell-progress__coins", ".shell-progress"] },
+      done,
+    ],
+  },
+  {
+    // issue 344: what boosters and gifts left me — to open, waiting for my level, the card packs piled up
+    key: "reserve",
+    icon: "gift",
+    group: "play",
+    route: "/marketplace/reserve",
+    steps: [
+      { key: "jump", icon: "list", targets: [".reserve-jump"] },
+      { key: "open", icon: "gift", targets: [".reserve-tiles"] },
+      { key: "packs", icon: "layers", targets: [".reserve-rail"] },
+      done,
+    ],
+  },
+  {
+    // issue 344: the community's projects — what they raised, one project, launching one's own
+    key: "projects",
+    icon: "target",
+    group: "play",
+    route: "/projects",
+    steps: [
+      { key: "figures", icon: "chart", targets: [".projects-figures"] },
+      { key: "project", icon: "target", targets: [".project-card"] },
+      { key: "launch", icon: "plus", targets: [".project-launch-cta"] },
       done,
     ],
   },
