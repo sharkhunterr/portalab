@@ -4989,6 +4989,27 @@
               }
             ]
           },
+          "profiles": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "none",
+                    "progression",
+                    "collector",
+                    "full"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 4,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profiles"
+          },
           "resize": {
             "default": false,
             "title": "Resize",
@@ -17279,29 +17300,6 @@
         "title": "RequestDecisionIn",
         "type": "object"
       },
-      "ResetIn": {
-        "additionalProperties": false,
-        "properties": {
-          "confirm": {
-            "maxLength": 120,
-            "minLength": 1,
-            "title": "Confirm",
-            "type": "string"
-          },
-          "password": {
-            "maxLength": 1024,
-            "minLength": 1,
-            "title": "Password",
-            "type": "string"
-          }
-        },
-        "required": [
-          "confirm",
-          "password"
-        ],
-        "title": "ResetIn",
-        "type": "object"
-      },
       "ResolveIn": {
         "additionalProperties": false,
         "properties": {
@@ -23500,6 +23498,29 @@
         "title": "WrappedDefinitionIn",
         "type": "object"
       },
+      "portalab__modules__administration__api__backups__ResetIn": {
+        "additionalProperties": false,
+        "properties": {
+          "confirm": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Confirm",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "confirm",
+          "password"
+        ],
+        "title": "ResetIn",
+        "type": "object"
+      },
       "portalab__modules__administration__api__routes__PolicyIn": {
         "additionalProperties": false,
         "properties": {
@@ -23582,6 +23603,40 @@
           "name"
         ],
         "title": "ConfirmIn",
+        "type": "object"
+      },
+      "portalab__modules__dashboard__api__router__ResetIn": {
+        "additionalProperties": false,
+        "description": "#347: a dashboard made to the member's tastes (said at the welcome); none: the default one.",
+        "properties": {
+          "tastes": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "watch",
+                    "releases",
+                    "news",
+                    "requests",
+                    "play",
+                    "stats",
+                    "services",
+                    "community",
+                    "radio"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 16,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tastes"
+          }
+        },
+        "title": "ResetIn",
         "type": "object"
       },
       "portalab__modules__gamification__api__tuning__DayOut": {
@@ -36929,7 +36984,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetIn"
+                "$ref": "#/components/schemas/portalab__modules__administration__api__backups__ResetIn"
               }
             }
           },
@@ -41978,7 +42033,7 @@
     },
     "/api/v1/dashboard/reset": {
       "post": {
-        "description": "027: back to the default dashboard (the starter layout and the pinned widgets).",
+        "description": "027: back to the default dashboard (the starter layout and the pinned widgets); #347: to taste.",
         "operationId": "reset_api_v1_dashboard_reset_post",
         "parameters": [
           {
@@ -41999,6 +42054,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/portalab__modules__dashboard__api__router__ResetIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "content": {

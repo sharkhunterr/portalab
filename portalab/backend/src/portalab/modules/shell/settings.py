@@ -23,7 +23,8 @@ SETTINGS: tuple[tuple[str, Any, Any, bool, str], ...] = (
     ("shell.welcome.dismissedAt", str | None, None, True, "When you dismissed the welcome card."),
     ("shell.onboarding.welcomedAt", str | None, None, True, "When you went through the welcome."),
     ("shell.onboarding.interests", list[str], [], True, "What you came for (films, series, books…)."),
-    ("shell.onboarding.play", str | None, None, True, "Whether you play: all, without the cards, or not."),
+    ("shell.onboarding.play", str | None, None, True, "How far you play: none to full."),
+    ("shell.onboarding.tastes", list[str] | None, None, True, "What you want on your home."),
     ("shell.onboarding.stepsHiddenAt", str | None, None, True, "When you put the first steps away."),
     ("shell.onboarding.toursSeen", list[str], [], True, "The guided tours you saw to the end."),
     # issue 248: the last level-up you saw celebrated ({level, at}) — one reached while away waits for you

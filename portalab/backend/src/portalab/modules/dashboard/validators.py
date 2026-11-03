@@ -7,6 +7,9 @@ from portalab.modules.dashboard.arrangement import VIEW_COLUMNS
 from portalab.modules.dashboard.gateway.gateway import config_errors
 from portalab.modules.dashboard.settings import POLICIES, POLICY_CLASSES, STARTER
 
+# #347: the welcome's play gauge, from no game to all of it
+PLAY_PROFILES = ("none", "progression", "collector", "full")
+
 
 class DashboardValidators:
     def __init__(self, registry: WidgetRegistry) -> None:
@@ -61,9 +64,14 @@ class DashboardValidators:
             if not isinstance(entry, dict) or not self._known(str(entry.get("widget_key", ""))):
                 errors.append(f"entry {index}: unknown widget")
                 continue
-            extra = set(entry) - {"widget_key", "x", "y", "w", "h", "roles", "config", "tablet", "phone"}
+            known = {"widget_key", "x", "y", "w", "h", "roles", "profiles", "config", "tablet", "phone"}
+            extra = set(entry) - known
             if extra:
                 errors.append(f"entry {index}: unknown fields {sorted(extra)}")
+            # #347: the play profiles it is shown to
+            profiles = entry.get("profiles", [])
+            if not isinstance(profiles, list) or not set(profiles) <= set(PLAY_PROFILES):
+                errors.append(f"entry {index}: « profiles » are among {', '.join(PLAY_PROFILES)}")
             # issue 250: its place on a computer, as the administrator put it (else it flows in order)
             if ("x" in entry) != ("y" in entry):
                 errors.append(f"entry {index}: « x » and « y » go together")

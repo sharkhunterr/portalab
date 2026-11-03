@@ -1,6 +1,6 @@
 # Personalization
 
-Make the portal yours: arrange your home dashboard, pick an interface and its looks, set up your profile, language, notifications and privacy, link your media accounts and choose whether you want to play.
+Make the portal yours: arrange your home dashboard, pick an interface and its looks, set up your profile, language, notifications and privacy, link your media accounts and choose how far you want to play.
 
 All your settings are gathered in **My settings** (`/settings`), in the **Me** menu under your avatar (with **My progression** and **Achievements**). The page is organised by intent — **Profile**, **Appearance**, **Language & region**, **Notifications**, **Linked accounts**, **Privacy** and **Play** — and **Search a setting** finds one by name or by a related word (*password*, *dark*, *time zone*, *e-mail*…). On a computer the list of pages stays on the left; on a phone the list is the page.
 
@@ -10,7 +10,9 @@ Your home page greets you by name (*Good morning*, *Good afternoon*, *Good eveni
 
 ![The home dashboard and its widgets](../../assets/screenshots/home.jpg)
 
-> **Note** — Your first dashboard is the one your administrator prepared. You can change it as you like, except the widgets they imposed.
+> **Note** — Your first dashboard is the one your administrator prepared for your play profile (see [Play](#play)). You can change it as you like, except the widgets they imposed.
+
+At your first sign-in, the welcome's **Your portal, to your taste** screen asks what you like. **What are you here for?** lists films, series, books, audiobooks, magazines, manga, comics and retro video games, for the portal to put forward what you like. **On your home** lists **Resume and discover**, **The latest releases**, **News about my favourites**, **My requests**, **Play**, **Statistics**, **Service status**, **The community** and **The radio**. All but **Statistics**, **The community** and **The radio** are ticked at first (**Play** only if you play). **Play** is greyed out at **Just the media**: raise the play gauge to add it. **Make my home with these choices**, ticked on a first visit, starts from the dashboard the team prepared for your play profile, keeps the widgets of what you ticked, adds those it lacks and leaves out those of what you did not tick; you can move everything afterwards. When you see the welcome again later, the box is unticked: ticking it replaces your current arrangement.
 
 ### Arrange and resize
 
@@ -24,7 +26,7 @@ Your home page greets you by name (*Good morning*, *Good afternoon*, *Good eveni
 While customising:
 
 - **Auto fit** fills the gaps between widgets;
-- **Default** goes back to the starting dashboard (you are asked to confirm, since your widgets and their arrangement are replaced);
+- **Default** goes back to the starting dashboard, the one of your play profile (you are asked to confirm, since your widgets and their arrangement are replaced);
 - **One layout per screen** lets you arrange **Computer**, **Tablet** and **Phone** separately. Off, tablet and phone follow the computer's layout.
 
 If your dashboard changed on another device while you were arranging it, the portal reloads it and tells you.
@@ -47,13 +49,15 @@ The catalog only lists the widgets you may use, and only those whose service you
 | Media | **Continue**, **Now playing**, **Recently added**, **New in the library**, **Recent releases**, **Upcoming releases**, **Next releases**, **Top of the week**, **Playing on the server**, **Downloads in progress**, **Leaving soon**, **Shuffle**, **Poster wall**, **Living wall**, **A year ago**, **Radio** |
 | Requests | **My requests**, **My requests coming soon**, **Recently requested** |
 | Taste and statistics | **For you**, **Like it or not**, **My statistics**, **Statistic** |
-| Progression | **My progression**, **Daily objectives**, **Wheel of fortune**, **Progress bar**, **Progress column**, **Value** |
+| Progression | **My progression**, **Daily objectives**, **Wheel of fortune**, **My Mediacards**, **Progress bar**, **Progress column**, **Value** |
 | Community | **Community activity**, **Leaderboard**, **Community projects**, **Active campaigns** |
 | News and dates | **Latest news**, **Featured news**, **My feed**, **Calendar**, **Upcoming** |
-| Shop | **Marketplace** |
+| Shop | **Marketplace**, **My reserve** |
 | Services | **Services**, **Services (compact)**, **Service status**, **Quick access**, **Open incidents**, **Storage**, **Chart**, **Server**, **Containers** |
 | Help | **My tickets**, **Since your last visit**, **Welcome** |
 | Practical | **Clock**, **Note**, **Countdown**, **Shortcut**, **Separator** |
+
+**My reserve** counts what waits in your reserve — to complete, to open, to use, waiting for its level — shows the first items (identical ones stacked, with how many), says what came in since you last opened it, and leads to the page. **My Mediacards** shows where your collection stands (cards held out of all there are, sets started, copies) and your boosters to open, which lead to the **To open** view of your Mediacards; it stays empty if you do not collect the Mediacards. On a single row, or in a low block, both show their figures only.
 
 **My feed** shows the latest items of your sources — articles, videos, podcasts — each in its source's colour; a YouTube video plays in the widget itself, and **All my feed** opens the page (see [Community](community.md#my-feed)).
 
@@ -150,6 +154,8 @@ Only what you own is offered; **See in the shop** shows the rest. See [community
 
 ### My presence in the community
 
+Your play gauge sets it too: **Just the media** makes you anonymous, the other notches public (see [Play](#play)).
+
 - **Public**: the portal's members, and only them, see your name and avatar in the leaderboards, the activity and the directory.
 - **Anonymous**: other members see you nowhere. In the leaderboards you still count, with no name, avatar or link.
 
@@ -221,15 +227,20 @@ Each tour shows its number of steps; **Start**, **Next**, **Back**, **Skip** or 
 
 ## Play
 
-**Play** (`/settings/play`) asks again the welcome screen's *Do you want to play?* — change your mind whenever you like:
+**Play** (`/settings/play`) shows again the welcome's **How far do you want to play?** gauge — change your mind whenever you like. Slide it: each notch adds to the one before.
 
-| Choice | What you get |
+| Notch | What it brings |
 |---|---|
-| **Yes, all of it** | Progression, the shop and the Mediacards. Your profile is public, only to the portal's members. |
-| **Yes, without the cards** | Progression and the shop, without the Mediacards: they leave the menu, the titles' pages and the shop, and watching no longer gives a Mediacards booster. The looks boosters stay. |
-| **No, I am here for the media** | Your profile is anonymous and the Mediacards are hidden. |
+| **Just the media** | Watch, read and request, without the game: no cards, games or quests in your menu. Your profile is anonymous. |
+| **Passive** | XP and levels from what you watch, read or request; quests, achievements and leaderboards. Your profile is public, only to the portal's members. |
+| **Collector** | On top, the Mediacards: boosters as you watch, a collection to complete. |
+| **Keen** | On top, the day's mini-games, the week's challenges and parties with others. |
+
+Below **Collector**, the Mediacards leave the menu, the titles' pages, the shop and the reserve, and watching no longer gives a Mediacards booster; the looks boosters stay. **Today's games** and **Play together** only show in the menu at **Keen**, and **Quests** leaves it at **Just the media**.
 
 The choice saves at once. **Set who sees what more finely, in privacy** opens the privacy centre. See [gamification.md](gamification.md) for what playing brings.
+
+The **This profile's dashboard** card offers the dashboard the team prepared for your notch: **Take my profile's dashboard** replaces your current arrangement with it, and *Dashboard updated* confirms.
 
 ---
 

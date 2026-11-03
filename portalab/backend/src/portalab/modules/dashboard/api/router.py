@@ -15,6 +15,7 @@ from portalab.modules.dashboard.module import DashboardModule
 from portalab.modules.dashboard.overlay.overlay import EffectiveInstance
 from portalab.modules.dashboard.permissions import DASHBOARD_MANAGE, SELF
 from portalab.modules.dashboard.service.service import ArrangedItem, LayoutItem
+from portalab.modules.dashboard.tastes import Taste
 
 router = APIRouter(prefix="/api/v1", tags=["dashboard"])
 
@@ -362,14 +363,25 @@ async def put_layout(principal: User, body: LayoutIn, module: Module, if_match: 
     )
 
 
+class ResetIn(BaseModel):
+    """#347: a dashboard made to the member's tastes (said at the welcome); none: the default one."""
+
+    model_config = ConfigDict(extra="forbid")
+    tastes: list[Taste] | None = Field(default=None, max_length=16)
+
+
 @router.post("/dashboard/reset", response_model=VersionOut)
 async def reset(
     principal: User,
     module: Module,
     if_match: IfMatch = None,
+    body: ResetIn | None = None,
 ) -> VersionOut:
-    """027: back to the default dashboard (the starter layout and the pinned widgets)."""
-    return VersionOut(layout_version=await module.service.reset(principal, if_match=version_of(if_match)))
+    """027: back to the default dashboard (the starter layout and the pinned widgets); #347: to taste."""
+    tastes = frozenset(body.tastes) if body and body.tastes is not None else None
+    return VersionOut(
+        layout_version=await module.service.reset(principal, if_match=version_of(if_match), tastes=tastes)
+    )
 
 
 @router.post("/dashboard/starter")
@@ -505,6 +517,10 @@ class CompositionItemIn(BaseModel):
     tablet: PlaceIn | None = None
     phone: PlaceIn | None = None
     roles: list[str] | None = None
+    # #347: the play profiles a free widget is shown to (none: every member)
+    profiles: list[Literal["none", "progression", "collector", "full"]] | None = Field(
+        default=None, max_length=4
+    )
 
 
 class CompositionIn(BaseModel):

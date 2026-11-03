@@ -37,6 +37,9 @@ import "../dashboard.css";
  * switched off for everyone. One save writes it all (``PUT /admin/dashboard/composition``).
  */
 type Lock = "free" | "always" | "locked";
+/** Issue 347: the welcome's play gauge — a free widget may be shown to some of its profiles only. */
+const PROFILES = ["none", "progression", "collector", "full"] as const;
+type Profile = (typeof PROFILES)[number];
 type Place = { x: number; y: number; w: number; h: number };
 interface Composed extends Place {
   widget_key: string;
@@ -47,6 +50,7 @@ interface Composed extends Place {
   tablet?: Place;
   phone?: Place;
   roles?: string[];
+  profiles?: Profile[] | undefined;
 }
 interface Composition {
   items: Composed[];
@@ -246,6 +250,44 @@ function LockButton({ lock, onChange }: { lock: Lock; onChange: (next: Lock) => 
   );
 }
 
+/** Issue 347: the play profiles a free widget is shown to — none ticked: every member. */
+function ProfilesPicker({
+  value,
+  out,
+  onChange,
+}: {
+  value: readonly Profile[];
+  out: boolean;
+  onChange: (next: Profile[]) => void;
+}) {
+  const t = useT();
+  return (
+    <details className="dash-profiles" data-preview-out={out || undefined}>
+      <summary title={t("dashboard:compose.profilesHint")}>
+        <Icon name="users" size={14} />
+        <span className="dash-profiles__label">
+          {value.length
+            ? t("dashboard:compose.profilesSome", { count: value.length })
+            : t("dashboard:compose.profilesAll")}
+        </span>
+      </summary>
+      <fieldset>
+        <legend>{t("dashboard:compose.profiles")}</legend>
+        {PROFILES.map((profile) => (
+          <CheckboxField
+            key={profile}
+            label={t(`onboarding:play.${profile}`)}
+            checked={value.includes(profile)}
+            onChange={(event) =>
+              onChange(PROFILES.filter((p) => (p === profile ? event.target.checked : value.includes(p))))
+            }
+          />
+        ))}
+      </fieldset>
+    </details>
+  );
+}
+
 export default function DashboardAdmin() {
   const t = useT();
   const client = useQueryClient();
@@ -269,6 +311,8 @@ export default function DashboardAdmin() {
   });
   const composer = useComposer(saved.data);
   const [done, setDone] = useState(false);
+  // issue 347: the dashboard as one play profile gets it — the others' widgets shown faded
+  const [seenAs, setSeenAs] = useState<Profile | "">("");
   const save = useMutation({
     mutationFn: async (composition: Composition) =>
       (
@@ -374,6 +418,18 @@ export default function DashboardAdmin() {
             ))}
           </SelectField>
         ) : null}
+        <SelectField
+          label={t("dashboard:compose.seenAs")}
+          value={seenAs}
+          onChange={(event) => setSeenAs(event.target.value as Profile | "")}
+        >
+          <option value="">{t("dashboard:compose.profilesAll")}</option>
+          {PROFILES.map((profile) => (
+            <option key={profile} value={profile}>
+              {t(`onboarding:play.${profile}`)}
+            </option>
+          ))}
+        </SelectField>
         <Button variant="secondary" onClick={composer.autofit}>
           <Icon name="maximize" size={16} />
           {t("dashboard:autofit")}
@@ -417,6 +473,17 @@ export default function DashboardAdmin() {
                       lock={item.lock}
                       onChange={(lock) => composer.update(item.widget_key, { lock })}
                     />
+                    {item.lock === "free" ? (
+                      <ProfilesPicker
+                        value={item.profiles ?? []}
+                        out={Boolean(seenAs && item.profiles?.length && !item.profiles.includes(seenAs))}
+                        onChange={(profiles) =>
+                          composer.update(item.widget_key, {
+                            profiles: profiles.length ? profiles : undefined,
+                          })
+                        }
+                      />
+                    ) : null}
                     <ConfigDialog
                       key={JSON.stringify(item.config)}
                       instance={instance}

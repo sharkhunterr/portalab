@@ -16,25 +16,30 @@ import { ApiError } from "../../state/regions";
 import { PalettePicker } from "../appearance/PalettePicker";
 import { ME_KEY, type Me, useMe } from "../auth/useAuth";
 import { completeStep, MISSIONS_KEY, startTour, useWelcome, WELCOME_EVENT } from "./api";
-import { PLAY, type Play, usePlay } from "./play";
+import { PlayScale } from "./PlayScale";
+import { type Play, TASTES, tastesFor, usePlay, useProfileDashboard } from "./play";
+import { Accounts, Notify } from "./WelcomeSteps";
 import "../appearance/notification-looks.css";
 import "./onboarding.css";
 
 /**
- * The welcome (#7; new version, issue 243): a member's first visit opens five short screens — hello (with the
- * portal's own words), a face and a name, what they came for, whether they play, a look — then everything
- * they can set later and the one-minute tour. Every screen can be skipped and nothing is required; once
+ * The welcome (#7; new version, issue 243): a member's first visit opens short screens — hello (with the
+ * portal's own words), a face and a name, their media accounts, how far they play, their portal to their taste
+ * (what they came for, their home made with it), how they are told, a look (issue 347) — then everything they can set later and
+ * the one-minute tour. Every screen can be skipped and nothing is required; once
  * seen (``shell.onboarding.welcomedAt``) it never opens by itself again, on any device, and the guided tours
  * page brings it back. An administrator can turn it off.
  */
-const STEPS = ["hello", "profile", "interests", "play", "style", "ready"] as const;
+const STEPS = ["hello", "profile", "accounts", "play", "home", "notify", "style", "ready"] as const;
 type Step = (typeof STEPS)[number];
 
 const ART: Record<Step, string> = {
   hello: "sparkles",
   profile: "user",
-  interests: "heart",
+  accounts: "link",
+  home: "heart",
   play: "gamepad",
+  notify: "bell",
   style: "palette",
   ready: "rocket",
 };
@@ -139,8 +144,17 @@ export function WelcomeFlow() {
               {step === "profile" && me.data ? (
                 <Profile titleId={titleId} me={me.data} onBack={back} onNext={next} />
               ) : null}
-              {step === "interests" ? <Interests titleId={titleId} onBack={back} onNext={next} /> : null}
+              {step === "accounts" ? (
+                <Accounts titleId={titleId} nav={<Nav onBack={back} onNext={next} />} />
+              ) : null}
+
               {step === "play" ? <PlayChoice titleId={titleId} onBack={back} onNext={next} /> : null}
+              {step === "home" ? (
+                <Home titleId={titleId} first={!welcomedAt} onBack={back} onNext={next} />
+              ) : null}
+              {step === "notify" ? (
+                <Notify titleId={titleId} nav={<Nav onBack={back} onNext={next} />} />
+              ) : null}
               {step === "style" ? <Style titleId={titleId} onBack={back} onNext={next} /> : null}
               {step === "ready" ? (
                 <Ready
@@ -405,18 +419,54 @@ function Style({ titleId, onBack, onNext }: { titleId: string; onBack: () => voi
   );
 }
 
-function Interests({ titleId, onBack, onNext }: { titleId: string; onBack: () => void; onNext: () => void }) {
+/**
+ * Issue 347: « your portal to your taste » — what the member watches and reads (kept for the portal to use
+ * later), what they want on their home (each taste brings its widgets), and their home made with it: the
+ * dashboard the administrator prepared for their play profile, to these tastes (at once on a first visit,
+ * nothing to lose; asked otherwise, it replaces their arrangement).
+ */
+function Home({
+  titleId,
+  first,
+  onBack,
+  onNext,
+}: {
+  titleId: string;
+  first: boolean;
+  onBack: () => void;
+  onNext: () => void;
+}) {
   const t = useT();
+  const { saved: play } = usePlay();
   const [saved, setSaved] = useShellPreference<string[]>("shell.onboarding.interests", []);
+  const [savedTastes, setTastes] = useShellPreference<string[] | null>("shell.onboarding.tastes", null);
   const [chosen, setChosen] = useState<string[]>(() =>
     saved.filter((key) => INTERESTS.some((interest) => interest.key === key)),
   );
+  const player = (play ?? "full") !== "none";
+  const [tastes, setTastesChosen] = useState<string[]>(() =>
+    (savedTastes ?? tastesFor(play ?? "full")).filter((key) => key !== "play" || player),
+  );
+  const [arrange, setArrange] = useState(first);
+  const dashboard = useProfileDashboard();
   const toggle = (key: string) =>
     setChosen((current) => (current.includes(key) ? current.filter((k) => k !== key) : [...current, key]));
+  const flip = (key: string) =>
+    setTastesChosen((current) =>
+      current.includes(key) ? current.filter((k) => k !== key) : [...current, key],
+    );
+  const go = async () => {
+    if (chosen.join() !== saved.join()) setSaved(chosen);
+    if (chosen.length) void completeStep("interests").catch(() => undefined);
+    if (tastes.join() !== (savedTastes ?? []).join()) setTastes(tastes);
+    if (arrange) await dashboard.mutateAsync(tastes);
+    onNext();
+  };
   return (
     <>
-      <DialogPrimitive.Title id={titleId}>{t("onboarding:interests.title")}</DialogPrimitive.Title>
-      <p className="onboarding-welcome__lead">{t("onboarding:interests.lead")}</p>
+      <DialogPrimitive.Title id={titleId}>{t("onboarding:home.title")}</DialogPrimitive.Title>
+      <p className="onboarding-welcome__lead">{t("onboarding:home.lead")}</p>
+      <h3 className="onboarding-welcome__part">{t("onboarding:interests.title")}</h3>
       <fieldset className="onboarding-chips">
         <legend className="visually-hidden">{t("onboarding:interests.title")}</legend>
         {INTERESTS.map((interest) => (
@@ -435,15 +485,46 @@ function Interests({ titleId, onBack, onNext }: { titleId: string; onBack: () =>
           </label>
         ))}
       </fieldset>
-      <p className="onboarding-welcome__hint">{t("onboarding:interests.later")}</p>
-      <Nav
-        onBack={onBack}
-        onNext={() => {
-          if (chosen.join() !== saved.join()) setSaved(chosen);
-          if (chosen.length) void completeStep("interests").catch(() => undefined);
-          onNext();
-        }}
-      />
+      <h3 className="onboarding-welcome__part">{t("onboarding:home.tastes")}</h3>
+      <fieldset className="onboarding-chips">
+        <legend className="visually-hidden">{t("onboarding:home.tastes")}</legend>
+        {TASTES.map((taste) => {
+          const off = taste.key === "play" && !player;
+          return (
+            <label
+              key={taste.key}
+              className="onboarding-chip"
+              data-on={tastes.includes(taste.key) || undefined}
+              data-off={off || undefined}
+              title={off ? t("onboarding:home.playOff") : undefined}
+            >
+              <input
+                type="checkbox"
+                checked={tastes.includes(taste.key)}
+                disabled={off}
+                onChange={() => flip(taste.key)}
+              />
+              <Icon name={taste.icon} size={18} />
+              <span>{t(`onboarding:home.taste.${taste.key}`)}</span>
+            </label>
+          );
+        })}
+      </fieldset>
+      <label className="onboarding-check">
+        <input type="checkbox" checked={arrange} onChange={(event) => setArrange(event.target.checked)} />
+        <span className="onboarding-check__text">
+          <strong>{t("onboarding:home.arrange")}</strong>
+          <span className="onboarding-check__hint">
+            {t(first ? "onboarding:home.arrangeHint" : "onboarding:home.arrangeReplace")}
+          </span>
+        </span>
+      </label>
+      {dashboard.error ? (
+        <p className="onboarding-welcome__problem" role="alert">
+          {t("onboarding:play.error")}
+        </p>
+      ) : null}
+      <Nav onBack={onBack} onNext={() => void go().catch(() => undefined)} />
     </>
   );
 }
@@ -458,64 +539,28 @@ function PlayChoice({
   onNext: () => void;
 }) {
   const t = useT();
-  const { saved, save } = usePlay(onNext);
-  const [chosen, setChosen] = useState<Play | null>(saved);
-  const player = chosen === "full" || chosen === "progression";
+  const { saved, save } = usePlay();
+  const [chosen, setChosen] = useState<Play>(saved ?? "full");
+  const player = chosen !== "none";
+  const go = async () => {
+    if (chosen !== saved) await save.mutateAsync(chosen);
+    onNext();
+  };
   return (
     <>
       <DialogPrimitive.Title id={titleId}>{t("onboarding:play.title")}</DialogPrimitive.Title>
       <p className="onboarding-welcome__lead">{t("onboarding:play.lead")}</p>
-      <ul className="onboarding-highlights onboarding-highlights--compact">
-        <li>
-          <Icon name="trophy" size={18} />
-          <span>{t("onboarding:play.level")}</span>
-        </li>
-        <li>
-          <Icon name="shop" size={18} />
-          <span>{t("onboarding:play.shop")}</span>
-        </li>
-        <li>
-          <Icon name="layers" size={18} />
-          <span>{t("onboarding:play.cards")}</span>
-        </li>
-      </ul>
-      <fieldset className="onboarding-play">
-        <legend className="visually-hidden">{t("onboarding:play.title")}</legend>
-        {PLAY.map((choice) => (
-          <label
-            key={choice.key}
-            className="onboarding-play__choice"
-            data-current={chosen === choice.key || undefined}
-          >
-            <input
-              type="radio"
-              name="onboarding-play"
-              value={choice.key}
-              checked={chosen === choice.key}
-              onChange={() => setChosen(choice.key)}
-            />
-            <span className="onboarding-play__icon" aria-hidden="true">
-              <Icon name={choice.icon} size={20} />
-            </span>
-            <span className="onboarding-play__text">
-              <strong>{t(`onboarding:play.${choice.key}`)}</strong>
-              <span>{t(`onboarding:play.${choice.key}Hint`)}</span>
-            </span>
-          </label>
-        ))}
-      </fieldset>
-      {chosen ? (
-        <p className="onboarding-welcome__hint" data-tone={player ? "public" : "anonymous"}>
-          <Icon name={player ? "users" : "hide"} size={16} />
-          {t(player ? "onboarding:play.public" : "onboarding:play.anonymous")}
-        </p>
-      ) : null}
+      <PlayScale value={chosen} onChange={setChosen} disabled={save.isPending} />
+      <p className="onboarding-welcome__hint" data-tone={player ? "public" : "anonymous"}>
+        <Icon name={player ? "users" : "hide"} size={16} />
+        {t(player ? "onboarding:play.public" : "onboarding:play.anonymous")}
+      </p>
       {save.error ? (
         <p className="onboarding-welcome__problem" role="alert">
           {t("onboarding:play.error")}
         </p>
       ) : null}
-      <Nav onBack={onBack} onNext={() => (chosen && chosen !== saved ? save.mutate(chosen) : onNext())} />
+      <Nav onBack={onBack} onNext={() => void go().catch(() => undefined)} />
     </>
   );
 }

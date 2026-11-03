@@ -2,7 +2,7 @@
 
 Tune how members progress and what they can spend: gain rules, levels, streaks, achievements, quests, abuse control, campaigns, mini-games, Mediacards, the shop and community projects.
 
-The whole game is optional and configurable. Each member can opt out of it (see [Playing on the portal](../members/gamification.md#choosing-to-play)), and every value, rule and product below is yours to change. Coins are never bought with real money: there is no payment of any kind in Portalab, and no product can buy priority in the request queue.
+The whole game is optional and configurable. Each member chooses how far they play, from **Just the media** (no game at all) to **Keen** (see [Playing on the portal](../members/gamification.md#choosing-to-play)), and every value, rule and product below is yours to change. Coins are never bought with real money: there is no payment of any kind in Portalab, and no product can buy priority in the request queue.
 
 ## Where things are
 
@@ -170,7 +170,7 @@ Mediacards are generated automatically from the library: each film and series ge
 - **Their look**: each Mediacards booster opens in the scene bound to it (a visual pack's **Review** step, **Booster scenes** → **One booster**, with **The booster's product key**); the others fall back on **Shop → Boosters → Mediacards boosters' scene**, "The wrapper and the opening of every Mediacards booster, bought or earned by watching; they never take the looks boosters' scene." A booster bought in the shop waits in the member's reserve and opens in its product's scene.
 - **Character pictures** (Configuration): *Characters from the video* (stills taken from the film by the media server), *Face check for characters*, *Web search for characters* (a self-hosted SearXNG, off by default), *Cut-out characters*.
 
-Identical sealed boosters are piled in members' reserves and on their Mediacards page, with their count on a badge. Members who chose to play without the cards never see them nor receive card boosters.
+Identical sealed boosters are piled in members' reserves and on their Mediacards page, with their count on a badge. Members whose play gauge is below **Collector** (**Just the media** or **Passive**) never see them nor receive card boosters by watching.
 
 ## The shop
 

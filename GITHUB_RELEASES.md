@@ -94,6 +94,10 @@ reliably again.
 
 ![Genre boosters waiting in the reserve, stacked with a count](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.1.0/assets/screenshots/booster-range.jpg)
 
+- **A welcome that sets the portal up** — new members link their media accounts, then pick how far they play
+  on a four-notch gauge: just the media, passive, collector or keen. They tick what they want on their home
+  and how they want to be told. Their dashboard is made with it, from the one the administrator prepared for
+  their play profile. Two new widgets, My reserve and My Mediacards, come with it.
 - **A clearer member menu** — arranged by intent: News, Media, Games, Community, Shop, Help, Statistics and
   Me.
 - **Community projects and the reserve** — a project page shows who backed it, what is still needed and a
@@ -153,6 +157,9 @@ reliably again.
 - Quests on the Games page (#310)
 - Filters on the quests page (#311)
 - Quests show a done / total progress bar instead of « 29 to do » (#312)
+- The welcome sets the portal up: media accounts, a four-notch play gauge, a home made to the member's
+  tastes from the administrator's dashboard for their play profile, notifications and e-mails; new My
+  reserve and My Mediacards widgets (#347)
 - A quest reminder in Today's games (#313)
 - Booster scenes can play video: MP4 or WebM with transparency, looping backdrops, and an effect played over
   the card (#287)

@@ -6,13 +6,18 @@ Everything you do on the portal can make you progress: watching a film, finishin
 
 ## Choosing to play
 
-The first time you sign in, the welcome asks **"Do you want to play?"**. You can change the answer at any time in **My settings → Play** (`/settings/play`).
+The first time you sign in, the welcome asks **"How far do you want to play?"** with a four-notch gauge: slide it, each notch adds to the one before. You can change it at any time in **My settings → Play** (`/settings/play`).
 
-| Choice | What you get |
+| Notch | What it brings |
 |---|---|
-| **Yes, all of it** | Progression, the shop and the Mediacards. Your profile is public, only to the portal's members. |
-| **Yes, without the cards** | Progression and the shop, without the Mediacards: they leave the menu, the titles' pages and the shop, and watching no longer gives a Mediacards booster. The looks boosters stay. |
-| **No, I am here for the media** | Watching and reading, without the game: your profile is anonymous and the Mediacards are hidden. |
+| **Just the media** | Watch, read and request, without the game: no cards, games or quests in your menu. Your profile is anonymous. |
+| **Passive** | The game plays itself: what you watch, read or request earns you XP and levels you up, plus quests, achievements, leaderboards and a profile the members see. Your profile is public, only to the portal's members. |
+| **Collector** | On top, the Mediacards: boosters as you watch, a collection to complete. |
+| **Keen** | The whole game: on top, the day's mini-games, the week's challenges and parties with others. |
+
+Below **Collector**, the Mediacards leave the menu, the titles' pages, the shop and the reserve, and watching no longer gives a Mediacards booster; the looks boosters stay. In the menu, **Today's games** and **Play together** only show at **Keen**, **Mediacards** from **Collector**, and **Quests** from **Passive**.
+
+Your home follows your notch too: your first dashboard is the one the team prepared for your play profile (see [Personalization](personalization.md#your-dashboard)), and **Take my profile's dashboard**, on the **Play** page, gives you the one of a new notch.
 
 For finer control, the same page links to the privacy centre, where you decide who sees each kind of data (see [Community](community.md#your-profile-and-your-presence)).
 

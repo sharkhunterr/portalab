@@ -1620,6 +1620,66 @@ button.dash-lock {
     white-space: nowrap;
   }
 }
+/* issue 347: the play profiles a free widget is shown to — a pill like the lock, its ticks in a small panel */
+.dash-profiles {
+  position: relative;
+}
+.dash-profiles > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: 2rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  list-style: none;
+  cursor: pointer;
+}
+.dash-profiles > summary::-webkit-details-marker {
+  display: none;
+}
+.dash-profiles[open] > summary {
+  border-color: var(--color-accent);
+}
+.dash-profiles > fieldset {
+  position: absolute;
+  inset-block-start: calc(100% + var(--space-1));
+  inset-inline-end: 0;
+  z-index: 3;
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 12rem;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-2);
+}
+.dash-profiles legend {
+  padding: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+@container widget-cell (max-width: 26rem) {
+  .dash-profiles__label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+/* « seen as » a profile: the widgets it does not get, faded */
+.dashboard-compose .widget-frame:has(.dash-profiles[data-preview-out]) {
+  opacity: 0.35;
+}
 .dash-locks {
   list-style: none;
   margin: 0;

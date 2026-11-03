@@ -63,6 +63,7 @@ def read(
                 "lock": "always" if cls in ("mandatory", "locked") else "free",
                 **{view: dict(entry[view]) for view in VIEWS if isinstance(entry.get(view), Mapping)},
                 **({"roles": list(entry["roles"])} if entry.get("roles") else {}),
+                **({"profiles": list(entry["profiles"])} if entry.get("profiles") else {}),
             }
         )
     # what a first visit gets without a place of its own: the widgets offered by default, the mandatory ones
@@ -122,6 +123,8 @@ def write(
                 **({"config": own} if own else {}),
                 **{view: {k: int(item[view][k]) for k in PLACE} for view in VIEWS if item.get(view)},
                 **({"roles": list(item["roles"])} if item.get("roles") else {}),
+                # #347: a free widget shown only to the members of these play profiles
+                **({"profiles": list(item["profiles"])} if item.get("profiles") and lock == "free" else {}),
             }
         )
     placed = {str(i["widget_key"]) for i in items}

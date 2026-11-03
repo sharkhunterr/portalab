@@ -394,5 +394,10 @@
   "servicesOrder.drag": "Move {name}",
   "servicesOrder.up": "Move {name} up",
   "servicesOrder.down": "Move {name} down",
-  "servicesOrder.all": "Every service, in the usual order"
+  "servicesOrder.all": "Every service, in the usual order",
+  "compose.profiles": "Shown to these play profiles",
+  "compose.profilesHint": "The play profiles this widget is shown to; none ticked: every member.",
+  "compose.profilesAll": "Every member",
+  "compose.profilesSome": "{count, plural, one {# profile} other {# profiles}}",
+  "compose.seenAs": "Seen as"
 }

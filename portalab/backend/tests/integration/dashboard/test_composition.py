@@ -112,3 +112,73 @@ async def test_composition_refused_whole(
     twice = {"items": [{"widget_key": "t.one", "x": 0, "y": 0, "w": 4, "h": 2}] * 2}
     assert (await client.put("/api/v1/admin/dashboard/composition", json=twice)).status_code == 422
     assert (dash.module.config.widget_policies, dash.module.config.starter_layout) == before
+
+
+async def test_a_play_profile_s_own_dashboard(
+    app: FastAPI, client: httpx.AsyncClient, dash: DashboardHarness
+) -> None:
+    """#347: a free widget the administrator shows to some play profiles only — a member of another profile
+    starts without it; one who did not answer plays it all."""
+    for key in ("t.all", "t.cards", "t.games"):
+        dash.registry.register(definition(key), FakeWidget())
+    dash.module.config = replace(dash.module.config, widget_policies={}, starter_layout=[])
+    boss = await create_user(module_of(app), "boss")
+    await make_admin(dash.full, boss)
+    await login(client, "boss")
+    composition = {
+        "items": [
+            {"widget_key": "t.all", "x": 0, "y": 0, "w": 4, "h": 2},
+            {"widget_key": "t.cards", "x": 4, "y": 0, "w": 4, "h": 2, "profiles": ["collector", "full"]},
+            {"widget_key": "t.games", "x": 8, "y": 0, "w": 4, "h": 2, "profiles": ["full"]},
+        ],
+        "disabled": [],
+    }
+    saved = await client.put("/api/v1/admin/dashboard/composition", json=composition)
+    assert saved.status_code == 200, saved.text
+    back = {i["widget_key"]: i for i in saved.json()["items"]}
+    assert back["t.cards"]["profiles"] == ["collector", "full"] and "profiles" not in back["t.all"]
+    wrong = {"items": [{**composition["items"][0], "profiles": ["nope"]}], "disabled": []}
+    assert (await client.put("/api/v1/admin/dashboard/composition", json=wrong)).status_code == 422
+
+    async def started(login_name: str, play: str | None) -> set[str]:
+        await create_user(module_of(app), login_name)
+        await login(client, login_name)
+        if play is not None:
+            put = await client.put("/api/v1/me/preferences", json={"shell.onboarding.play": play})
+            assert put.status_code == 200, put.text
+        return {i["widget_key"] for i in (await client.get("/api/v1/dashboard")).json()["instances"]}
+
+    assert await started("cleo", "collector") == {"t.all", "t.cards"}
+    assert await started("pat", "progression") == {"t.all"}
+    assert await started("sam", None) == {"t.all", "t.cards", "t.games"}
+
+
+async def test_a_dashboard_made_to_the_member_s_tastes(
+    app: FastAPI, client: httpx.AsyncClient, dash: DashboardHarness
+) -> None:
+    """#347: the welcome's « your portal to your taste » — the starter's widgets of the tastes not chosen left
+    out, the chosen tastes' widgets it lacks added, a widget of no taste kept; no tastes: the default one."""
+    for key in ("media.continue", "gamification.progress", "t.clock", "news.my_feed", "news.featured"):
+        dash.registry.register(definition(key), FakeWidget())
+    dash.module.config = replace(
+        dash.module.config,
+        widget_policies={},
+        starter_layout=[
+            {"widget_key": "media.continue", "x": 0, "y": 0, "w": 4, "h": 2},
+            {"widget_key": "gamification.progress", "x": 4, "y": 0, "w": 4, "h": 2},
+            {"widget_key": "t.clock", "x": 8, "y": 0, "w": 4, "h": 2},
+        ],
+    )
+    await create_user(module_of(app), "alex")
+    await login(client, "alex")
+
+    async def keys() -> set[str]:
+        return {i["widget_key"] for i in (await client.get("/api/v1/dashboard")).json()["instances"]}
+
+    assert await keys() == {"media.continue", "gamification.progress", "t.clock"}
+    made = await client.post("/api/v1/dashboard/reset", json={"tastes": ["watch", "news"]})
+    assert made.status_code == 200, made.text
+    assert await keys() == {"media.continue", "t.clock", "news.my_feed", "news.featured"}
+    assert (await client.post("/api/v1/dashboard/reset", json={"tastes": ["nope"]})).status_code == 422
+    assert (await client.post("/api/v1/dashboard/reset")).status_code == 200
+    assert await keys() == {"media.continue", "gamification.progress", "t.clock"}

@@ -11,7 +11,7 @@ Les Mediacards, les cartes de collection des films et des séries du portail : c
 > La visite guidée « Mediacards », sur la page [Visites guidées](/guide), vous montre tout cela en une minute.
 
 > [!NOTE]
-> Vous ne collectionnez pas ? Si vous avez répondu « Oui, sans les cartes » ou « Non » à « Tu veux jouer ? », les Mediacards sont cachées : le menu, la fiche des titres, la boutique et la réserve ne les montrent plus, et regarder ne donne plus de booster Mediacards. Les boosters de looks, la progression et la boutique restent.
+> Vous ne collectionnez pas ? Les Mediacards arrivent au cran « Collectionneur » de la jauge « Jusqu'où veux-tu jouer ? » (écran de bienvenue, ou [Mes paramètres → Jeu](/settings/play)). À « Juste les médias » ou à « Passif », elles sont cachées : le menu, la fiche des titres, la boutique et la réserve ne les montrent plus, et regarder ne donne plus de booster Mediacards. Les boosters de looks et la boutique restent ; à « Passif », la progression aussi.
 
 ## Le principe
 

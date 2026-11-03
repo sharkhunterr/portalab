@@ -14,6 +14,7 @@ from uuid import UUID
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.dashboard import RegisteredWidget, WidgetDefinition, WidgetRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
@@ -48,6 +49,10 @@ from portalab.modules.dashboard.overlay.overlay import (
     policy_class,
 )
 from portalab.modules.dashboard.settings import DashboardConfig
+from portalab.modules.dashboard.tastes import TASTES, wanted
+
+# #347: the welcome's play gauge, which the starter dashboard follows
+PLAY_SETTING = "shell.onboarding.play"
 
 
 class PolicyLocked(Conflict):
@@ -884,23 +889,29 @@ class DashboardService:
             return await self._bump(session, board, principal)
 
     # --- starter -------------------------------------------------------------------------------------
-    async def reset(self, principal: Principal, *, if_match: int | None = None) -> int:
+    async def reset(
+        self, principal: Principal, *, if_match: int | None = None, tastes: frozenset[str] | None = None
+    ) -> int:
         """027: back to the default dashboard — every widget of mine (and my per-screen places) goes, the
-        starter layout is applied again; pinned widgets come back at their place."""
+        starter layout is applied again; pinned widgets come back at their place. #347: made to the member's
+        tastes when they are given."""
         user = _user(principal)
         async with self.database.unit_of_work() as uow:
             board = await self._board_for_update(uow.session, user, if_match)
             await uow.session.execute(delete(WidgetInstance).where(WidgetInstance.user_id == user))
             board.starter_applied_at = None
             board.layout_mode = "shared"  # one layout for every screen, like a first visit
-        await self.apply_starter(principal, again=True)
+        await self.apply_starter(principal, again=True, tastes=tastes)
         async with self.database.session() as session:
             refreshed = await session.get(UserDashboard, user)
         return int(refreshed.layout_version) if refreshed else 0
 
-    async def apply_starter(self, principal: Principal, *, again: bool = False) -> bool:
+    async def apply_starter(
+        self, principal: Principal, *, again: bool = False, tastes: frozenset[str] | None = None
+    ) -> bool:
         """Apply the starter layout once (idempotent); filtered by permission, policy and availability. A
-        failing widget definition never blocks the others."""
+        failing widget definition never blocks the others. #347: to the member's tastes — the widgets of the
+        tastes not chosen left out, those of the chosen ones it lacks added (never a pinned one removed)."""
         user = _user(principal)
         layout = self.config().starter_layout
         policies = self.config().widget_policies
@@ -918,6 +929,7 @@ class DashboardService:
             if isinstance(entry, dict) and ("tablet" in entry or "phone" in entry)
         }
         roles_ok = await self._roles(principal)
+        profile = await self._profile(principal)
         pinned = [
             {"widget_key": key, "w": pin[2], "h": pin[3]}
             for key in sorted(policies)
@@ -928,9 +940,15 @@ class DashboardService:
                 key = str(entry.get("widget_key", ""))
                 widget = widgets.get(key)
                 roles = entry.get("roles")
+                kept = entry in pinned or policy_class(policies, key) == "mandatory"
+                if not kept and not wanted(tastes, key):
+                    continue
                 if widget is None or policy_class(policies, key) == "disabled":
                     continue
                 if roles and not (set(roles) & roles_ok):
+                    continue
+                profiles = entry.get("profiles")
+                if profiles and profile not in profiles:  # #347: the dashboard of the member's play profile
                     continue
                 if not await self.gateway.allowed(widget, principal):
                     continue
@@ -944,9 +962,22 @@ class DashboardService:
                 chosen.append((widget, size.w, size.h, values, at))
             except Exception:
                 log.warning("starter entry skipped")
+        # #347: the chosen tastes' widgets the starter lacks, in their taste's order
+        missing = [key for taste in sorted(tastes or ()) for key in TASTES.get(taste, ())]
+        for key in missing:
+            widget = widgets.get(key)
+            if (
+                widget is not None
+                and policy_class(policies, key) != "disabled"
+                and all(c[0].definition.key != key for c in chosen)
+                and await self.gateway.allowed(widget, principal)
+            ):
+                size = widget.definition.size.default
+                chosen.append((widget, size.w, size.h, dict(widget.definition.config_defaults), None))
         for key, widget in sorted(widgets.items()):
             if (
                 policy_class(policies, key) == "default"
+                and wanted(tastes, key)
                 and all(c[0].definition.key != key for c in chosen)
                 and await self.gateway.allowed(widget, principal)
             ):
@@ -1028,6 +1059,19 @@ class DashboardService:
         except Exception:
             log.warning("roles unavailable for the starter dashboard")
         return {"user"}
+
+    async def _profile(self, principal: Principal) -> str:
+        """#347: the member's play profile (the welcome's play gauge); unanswered, they play it all."""
+        try:
+            providers = self.conditions.capabilities.system_providers(CONFIG)
+            user = principal.acting_for or principal.user_id
+            if providers and user is not None:
+                value = (await providers[0].provider.get(PLAY_SETTING, user_id=user)).value
+                if isinstance(value, str) and value:
+                    return value
+        except Exception:
+            log.warning("play profile unavailable for the starter dashboard")
+        return "full"
 
     async def stored_config(self, principal: Principal, instance_id: UUID) -> tuple[str, dict[str, Any]]:
         async with self.database.session() as session:

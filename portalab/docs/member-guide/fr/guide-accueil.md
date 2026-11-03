@@ -16,7 +16,7 @@ Pour un nouveau membre, la carte « Premiers pas » propose aussi quelques missi
 Le widget « Depuis votre dernière visite » résume ce qui a changé pour vous : une demande disponible, une réponse sur un ticket, des nouveautés dans la bibliothèque ou dans la boutique, ce que vous avez gagné… « Marquer comme vu » ou « Tout marquer comme vu » le vide.
 
 > [!NOTE]
-> Votre premier tableau de bord est celui que l'administrateur a préparé. Vous pouvez ensuite le modifier comme vous voulez, sauf les widgets qu'il a imposés.
+> Votre premier tableau de bord est celui que l'administrateur a préparé pour votre niveau de jeu, composé avec ce que vous avez coché à l'écran de bienvenue « Ton portail à ton goût ». Vous pouvez ensuite le modifier comme vous voulez, sauf les widgets qu'il a imposés. Si vous changez de niveau de jeu, « Prendre le tableau de bord de mon profil », dans [Mes paramètres → Jeu](/settings/play), vous donne celui du nouveau niveau.
 
 ## Personnaliser le tableau de bord
 
@@ -41,7 +41,7 @@ Le widget « Depuis votre dernière visite » résume ce qui a changé pour vous
 Pendant la personnalisation, la barre « Disposition » propose aussi :
 
 - « Ajuster automatiquement » : comble les trous entre les widgets ;
-- « Par défaut » : revient au tableau de bord de départ. Le portail vous demande de confirmer, car vos widgets et leur disposition sont remplacés.
+- « Par défaut » : revient au tableau de bord de départ, celui de votre niveau de jeu. Le portail vous demande de confirmer, car vos widgets et leur disposition sont remplacés.
 
 ### Une disposition par écran
 
@@ -71,7 +71,8 @@ Le catalogue ne montre que les widgets que vous pouvez utiliser. Selon votre por
 | Thème | Exemples |
 |---|---|
 | Médias | « Reprendre », « Derniers ajouts », « Prochaines sorties », « Mes demandes », « Bientôt supprimés », « Au hasard », « Mur d'affiches » |
-| Progression | « Ma progression », « Objectifs du jour », « Roue de la fortune », « Barre de progression », « Valeur » |
+| Progression | « Ma progression », « Objectifs du jour », « Roue de la fortune », « Mes Mediacards », « Barre de progression », « Valeur » |
+| Boutique | « Boutique », « Ma réserve » |
 | Communauté | « Activité de la communauté », « Classement », « Projets de la communauté » |
 | Infos | « Mon fil », « Dernières actualités », « À la une », « Calendrier », « À venir », « Incidents en cours » |
 | Pratique | « Accès rapides », « Horloge », « Note », « Compte à rebours », « Raccourci », « Séparateur », « Mes tickets » |
@@ -92,6 +93,14 @@ Dans ses « Réglages », cochez les services à afficher et déplacez-les par l
 ### Le widget « Mon fil »
 
 « Mon fil » montre les dernières actualités de vos sources : articles, vidéos, podcasts. Les vidéos YouTube s'y lisent sur place, et « Tout mon fil » ouvre la page. Voir [Actualités, calendrier et wiki](portalab://wiki/guide-actualites).
+
+### Les widgets « Ma réserve » et « Mes Mediacards »
+
+« Ma réserve » compte ce qui attend dans votre réserve : « À compléter », « À ouvrir », « À utiliser », « En attente de niveau ». Elle montre les premiers objets (les objets identiques empilés, avec leur nombre) et combien sont arrivés depuis votre dernière visite. « Ma réserve », en haut du widget, ouvre la page. Voir [Ma réserve](portalab://wiki/guide-boutique).
+
+« Mes Mediacards » montre où en est votre collection : les cartes que vous avez sur toutes celles qui existent, les extensions commencées, les exemplaires. Vos boosters à ouvrir s'y empilent comme sur la page et mènent à son onglet « À ouvrir ». Si vous ne collectionnez pas les Mediacards, le widget reste vide. Voir [Les Mediacards](portalab://wiki/guide-cartes).
+
+Sur une seule rangée, ou dans un bloc bas, les deux widgets ne montrent que leurs nombres.
 
 ## Régler un widget
 

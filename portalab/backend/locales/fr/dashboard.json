@@ -394,5 +394,10 @@
   "servicesOrder.drag": "Déplacer {name}",
   "servicesOrder.up": "Monter {name}",
   "servicesOrder.down": "Descendre {name}",
-  "servicesOrder.all": "Tous les services, dans l’ordre habituel"
+  "servicesOrder.all": "Tous les services, dans l’ordre habituel",
+  "compose.profiles": "Montré aux profils de joueur",
+  "compose.profilesHint": "Les profils de joueur à qui ce widget est montré ; aucun coché : tous les membres.",
+  "compose.profilesAll": "Tous les membres",
+  "compose.profilesSome": "{count, plural, one {# profil} other {# profils}}",
+  "compose.seenAs": "Voir comme"
 }
