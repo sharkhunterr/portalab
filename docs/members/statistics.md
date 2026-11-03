@@ -2,14 +2,18 @@
 
 What you watched, listened to, read and played — your time, your favourite titles, your habits — and the recap that sums up a period.
 
-The portal has two pages called **Statistics** in the menu:
+Everything is in the **Statistics** section of the menu:
 
-| Page | Where | What it holds |
+| Entry | Page | What it holds |
 |---|---|---|
-| **Media statistics** (`/media/insights`) | Media section, or **My statistics** on the Media page | Your plays, time and habits, or the whole server's |
-| **Portal statistics** (`/statistics`) | Discover section | Statistics your administrator chose for you, and your **recap** |
+| **My media** | `/media/insights` (also **My statistics** on the library's page) | Your plays, time and habits, or the whole server's |
+| **My activity** | `/statistics/me` | Your own figures on the portal, apart from the community's |
+| **My requests** | `/media/requests/stats` | Your requests in figures |
+| **Community** | `/statistics` | The community's and the portal's statistics your administrator chose |
 
-## Media statistics
+## My media
+
+**My media** opens the media statistics (the page is titled **Statistics**).
 
 ![Media statistics: Me or Whole server, the categories, the tabs and the four key figures](../../assets/screenshots/statistics.jpg)
 
@@ -31,7 +35,7 @@ The portal has two pages called **Statistics** in the menu:
 | Live TV | Overview · Playback · Profile |
 | Music, Books, Audiobooks | Overview · Profile |
 | Radio, Games | Overview |
-| Requests | Your request figures (the same as the Overview of [My requests](media.md#my-requests)) |
+| Requests | Your request figures (the same as **Statistics → [My requests](media.md#my-requests)**) |
 
 ### Overview
 
@@ -76,12 +80,18 @@ Depending on your portal, some statistics are unlocked in the shop with the port
 
 A locked tab or card shows a padlock, *This statistic unlocks in the shop.* and **See in the shop**. See [gamification.md](gamification.md) for the shop.
 
-## Portal statistics
+## My activity and Community
 
-Open **Statistics** in the Discover section (`/statistics`). It shows the statistics your administrator set up for you — for example **My sign-ins**, **Days I came by**, **My activity**, **What I finished**, **Requests made** or **Active members**. They vary from one portal to another.
+The portal's own statistics are split in two pages, built the same way:
+
+- **My activity** (`/statistics/me`): your own figures — for example **My sign-ins**, **Days I came by**, **My activity** or **What I finished**;
+- **Community** (`/statistics`): the community's and the portal's — for example **Requests made** or **Active members**.
+
+They vary from one portal to another, since your administrator chooses them.
 
 - Choose the **Period**: **Last 7 days**, **Last 30 days**, **This week**, **This month** or **This year**.
-- Each card shows a chart, its value in words, and its trend against the previous period (*Up 12 (8 %) versus the previous period*).
+- Each card shows its figure, a chart and its trend against the previous period (*Up 12 (8 %) versus the previous period*). The cards with a single figure come first, in a row of their own.
+- When a total is made of parts (media kinds, request states, reward sources, ticket types, achievements…), the breakdown is written under its chart: each part in words, with its share.
 - **Show the data table** shows the figures as a table.
 - **Hide** removes a card you do not care about; it moves to **Hidden statistics**, where **Show** brings it back.
 
@@ -94,7 +104,7 @@ A card can be locked; it tells you how to unlock it: earn an achievement, reach 
 The recap sums up a finished period, one statistic at a time.
 
 1. When it is ready, a notification tells you: *Your recap … is ready*.
-2. Open it: the recap page (**Statistics → Recap**, `/statistics/wrapped`) shows *Your recap: [start] – [end]*.
+2. Open it: the recap page (`/statistics/wrapped`) shows *Your recap: [start] – [end]*.
 3. Move with **Previous** and **Next**. Nothing advances on its own: you go at your own pace.
 
 Your recap is personal: only you see it. *No recap yet.* means none has been generated for you so far. Recap notifications are set in the **Recaps** category of your [notification preferences](personalization.md#notification-preferences).

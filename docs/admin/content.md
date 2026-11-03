@@ -1,6 +1,6 @@
 # Content and communication
 
-Run the news desk, the wiki, newsletters and e-mail, the terms of use, announcements and banners, community moderation, and the support settings and feedback.
+Run the news desk and its outside sources, the wiki, newsletters and e-mail, the terms of use, announcements and banners, community moderation, and the support settings and feedback.
 
 ## Where things are
 
@@ -10,6 +10,7 @@ Run the news desk, the wiki, newsletters and e-mail, the terms of use, announcem
 | **Members & access** | **Terms of use** (`/admin/terms`) |
 | **Support** | **Support settings** (`/admin/support`), **Moderation** (`/admin/community/moderation`) |
 | **Operations** | **Maintenance** (`/admin/maintenance`) |
+| **System** | **Configuration** (`/admin/configuration`), group **Communication**: sending e-mails |
 
 ## Who does what
 
@@ -38,7 +39,18 @@ Raw HTML is disabled. Saving text that looks like a password or a key shows a wa
 
 ## The news desk
 
-**News** ("Write, schedule and feature the portal's articles") has two tabs, **Articles** and **Channels**.
+**News** ("Write, schedule and feature the portal's articles") has three tabs, **Articles**, **Channels** and **External sources**. The automatic newsletters are on **Newsletters & e-mail** (below).
+
+### Headlines and My feed
+
+Members read the news on two pages of the **News** section of their menu:
+
+| Page | What it shows | What feeds it |
+|---|---|---|
+| **Headlines** (`/news`) | The team's articles, by channel; then **On the web** | The **Articles** you publish; the **External sources** |
+| **My feed** (`/feed`) | One stream per member, each source in its colour, with a **For me** filter | What the library brings for what the member follows (people, series, genres), the **External sources**, and the member's own sources |
+
+Both carry an unread badge in the members' menu. A member's follows and own sources are private: nobody else sees them. See [Community](../members/community.md#news) for the members' side.
 
 ### Writing an article
 
@@ -58,18 +70,71 @@ At most *Featured articles* (3 by default) are featured at once, by priority the
 
 Channels are the news sections. Each has a **Name**, a **Description**, an **Icon** and can be switched off. **Newsletter: send by e-mail** makes it a newsletter channel: its articles can be e-mailed to subscribed members, and each member can unsubscribe from the channels they choose (in their notification preferences). Every newsletter e-mail carries an unsubscribe link.
 
+Each channel has its own colour, the same on its articles' covers, its label and its filter chip on **Headlines**. You do not pick it: it is the theme's accent turned by a hue of the channel's own, spread by the channels' order so that neighbours never look alike.
+
+### External sources
+
+**External sources** are "RSS or Atom feeds of film, series, games sites… read on their cadence: their items show on « Headlines » (under « On the web ») and on the pages of the titles and people they name". They also show in every member's **My feed**, each source with its colour and its kind's icon.
+
+1. **Add a source**, then type the **Feed or site address**: "A site's address will do: its feed is found." A YouTube channel's or playlist's address works too. **Preview** shows what it finds ("« … »: 12 items found").
+2. Give it a **Name** and, optionally, a **Channel**: its items then also show when members filter **Headlines** on that channel.
+3. Choose **Read every** (from 15 minutes to 24 hours), and optionally **Only items containing** and **Leave out items containing** ("Words separated by commas (empty: everything).").
+4. **Source on**, then **Save**.
+
+Each source shows when it was last read (or **Failing**, or **Never read**), its number of items, **Read now**, **Edit**, and the bin to remove it (select it again to confirm). **Latest items** lets you **Pin** an item at the top of **Headlines**, or **Hide** it. **Export (OPML)** and **Import (OPML)** move a list of sources at once.
+
+Members can add their own sources in **My feed** (**My sources**); those are read for them alone.
+
 ## Newsletters and e-mail
 
-**Newsletters & e-mail** gathers "everything that goes out by e-mail".
+**Newsletters & e-mail** gathers "Everything that goes out by e-mail": whether sending e-mails is on (with **Set up sending**, which leads to the e-mail settings), the **Automatic newsletters**, the **Newsletters written**, the newsletter **Templates**, and the deliveries (**E-mails sent**, **E-mails failed**).
 
-![Newsletters & e-mail](../../assets/screenshots/admin-newsletters.jpg)
+![Automatic newsletters, each on its own cadence and template](../../assets/screenshots/automatic-newsletters.jpg)
 
-- **Automatic newsletters**: the portal writes a newsletter on a schedule from the media services, publishes it in a channel and e-mails it when asked. For each one choose a **Name**, a **Channel**, the **Content** (**New in the library**, **Recent releases** or **Upcoming releases**), the **Media kinds** (films, series, music, books, games; none ticked: all), the **Frequency** (every day, week or month), the **Day**, the **Hour**, the **Language**, and **Also send it by e-mail**. **Generate now** writes one at once; when there is nothing new, nothing is written. Create a channel first.
-- **Newsletter (default digest)**: a summary e-mail of what happened (news, requests, events), **Off**, **Daily** or **Weekly**, for members who did not choose their own rhythm.
-- **E-mail**: **Send e-mails**, the **SMTP server**, **Port**, **Encrypted connection (TLS)**, **SMTP user**, **Sender address** and the **Public address of the portal** (used for links in e-mails and unsubscribing). **Send me a test** checks the settings.
-- **Deliveries**: how many e-mails were delivered and failed.
+### Automatic newsletters
 
-The *Newsletters* setting switches the whole feature off: nothing is sent and its screens disappear.
+"Each automatic newsletter writes its letter on its own, on its cadence, from the portal's data: figures, what arrived, requests, the programme…" Create a newsletter channel first (**News → Channels**, **Newsletter: send by e-mail**).
+
+Each automatic newsletter is a card: its name, when it goes out (*Every Monday at 8:00*), **In the news** when it is published there, its number of subscribers, the next run, and a switch to turn it **On** or **Off** in place, with **Send me a test**, **Edit** and **Delete** (the letters it already wrote stay in the history).
+
+**New automatic newsletter** (or **Edit**) opens a window, in the order it is thought:
+
+| Part | What you set |
+|---|---|
+| **Name and subject** | The **Name** ("To tell it apart here; members do not see it.") and the **E-mail subject**, also the letter's title in the portal. Click a variable to insert it: `{site}`, `{date}`, `{semaine}`, `{mois}`, `{année}`, `{période}`, `{numéro}`, `{chaîne}`; their English names — `{day}`, `{week}`, `{month}`, `{year}`, `{period}`, `{number}`, `{channel}` — work too. |
+| **When** | The **Frequency** (**Every day**, **Every week** or **Every month**), the **Day**, the **Hour**, and the **Period** it tells (the last 24 h, 7, 14, 30 or 90 days). |
+| **Its look** | Its template, chosen by sight: each one a card with its colours, its name and what it shows. |
+| **What it tells** | The **Contents**, each switched on or off: **Message (good to know)**, **Statistics**, **Most watched**, **New movies**, **New series**, **New books**, **New audiobooks**, **New video games**, **New music**, **New requests**, **Out now**, **TV programme**, **Coming soon**, **Articles**. While the statistics are on, the **Statistics charts** to draw: **Key figures**, **Time watched per day**, **By kind**, **By day of the week**, **By hour**, **Most watched genres**. **Back to the default contents** resets them; a content the template has no section for takes its default display. A **Message shown on top** is optional ("A planned maintenance, important news…"). |
+| **Where it goes** | The **Channel** and the **Language**, then **Publish in the portal’s news (the letter, and an article in its channel)** and/or **E-mail it to the subscribers** — at least one of them — and **On: it goes out by itself at the planned time**. |
+
+Beside the form, the letter shows as members will get it, with the real data: switch **Live preview** on, or **Generate the preview** on demand.
+
+A letter published in the news is an ordinary article of its channel, with the channel's colour; read in the portal, it shows whole. When there is nothing new to tell, nothing is written.
+
+**Send me a test** sends the real e-mail to your own address only, never to the members ("Test sent to your address only (when e-mail delivery is on)."). When the newsletter publishes in the news, the test letter is published there too.
+
+Members are subscribed to each automatic newsletter by default and unsubscribe from it one by one, in their notification preferences (**Newsletters by e-mail**); leaving a channel also leaves the newsletters published in it. Newsletters made before the self-writing editions (*New in the library*, *Recent releases*, *Upcoming releases*) are marked **Former format**.
+
+### Newsletters written and templates
+
+- **Newsletters written** lists every letter with its date, its period, how many members received it, and its state (**Preview**, **Draft**, **Published**, **E-mailed only**): **Read** it, **Send me a test**, **Send by e-mail** if it was not e-mailed yet, or delete it.
+- **Templates**: "The look and the order of the sections. Each automatic newsletter picks its own; duplicate a built-in template to make yours." The built-in ones are **Classic**, **Midnight**, **Gazette** and **Portalab** (the portal's own look). Each template says who uses it (*Used by: …*); one in use cannot be deleted. Its editor sets the **Template name**, **Identifier**, **Name in the header**, **Tagline**, **Header**, **Font**, **Card corners (px)**, **Colours**, and the **Sections, in order** (each with its **Display**, **Columns**, **Number of titles**, an optional title, its kinds and **Show the overviews**), with a live preview on the real data of the last 7 days.
+
+### Sending e-mails
+
+E-mails are set up in one form, **Sending e-mails**, in **System → Configuration**, group **Communication** (the setup assistant offers it too): "Set it up in order, save, then send yourself a test."
+
+- **Send e-mails**: off, no e-mail goes out — no notification, no newsletter, no test. You can set everything up before switching it on.
+- **Sending server (SMTP)**: a **Provider** preset (**Gmail**, **Outlook / Microsoft 365**, **OVH**, **Brevo**, **Server on this machine**, or **Other / custom**, each with its tip), the **Server address**, the **Security** (**STARTTLS (port 587, recommended)**, **SSL/TLS (port 465)**, **None (port 25, local network)**) and the **Port**.
+- **Account**: the **User** and the **Password** (never shown again once saved).
+- **Sender and links**: the **Sender address** (the e-mails' "From"), the **Sender name** ("The name mail clients show instead of the address; empty, the site's name.") and the **Portal's public address** (for the e-mails' links and pictures; recipients must be able to reach it).
+- **Save**, or **Save and send me a test**. The test goes to your own account's e-mail address only; a refused test says why.
+
+Every e-mail — notifications, announcements, newsletters — goes out in Portalab's look (Gmail included), under the sender name.
+
+**Switching the members' e-mails off.** To stop e-mail notifications for every member at once, call `PUT /api/v1/admin/notifications/members/email` with `{"enabled": false}` (`true` turns them back on). It switches the e-mail channel off in every member's own preferences and turns their e-mail digest off; the members who manage notifications (the administrators) keep theirs, required and locked channels stay as they are, and each member may switch theirs back on afterwards. The change is audited. There is no button for it in the administration yet.
+
+The default rhythm of the notification digest, for members who chose none, is the *E-mail digest of notifications (default)* setting; it has nothing to do with the newsletters. The *Newsletters* setting switches the whole newsletter feature off: nothing is sent and its screens disappear.
 
 ## The wiki
 

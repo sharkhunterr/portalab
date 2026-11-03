@@ -2,11 +2,11 @@
 
 Find a title, see where it stands, ask for what is missing, follow your request all the way to the library, and watch, read or listen without leaving the portal.
 
-Everything here lives in the **Media** section of the menu: **Media**, **Make a request**, **My requests**, **Statistics** and **My taste**. What you see depends on the services your portal connects (Plex, Jellyfin, Seerr, Sonarr/Radarr, Grimmory, RomM, a radio…): a feature without its service simply does not appear.
+Everything here lives in the **Media** section of the menu: **Library**, **Request a title**, **My requests** and **My taste**. Your figures are in the **Statistics** section (see [Statistics](statistics.md)). What you see depends on the services your portal connects (Plex, Jellyfin, Seerr, Sonarr/Radarr, Grimmory, RomM, a radio…): a feature without its service simply does not appear.
 
-## The Media page
+## The library
 
-Open **Media** (`/media`). The page greets you with *What are we watching today?* and gives you:
+Open **Library** (`/media`). The page greets you with *What are we watching today?* and gives you:
 
 - **Browse the catalog** to search the whole library;
 - **Request a title** to ask for something the library does not have (see [Asking for a title](#asking-for-a-title));
@@ -15,7 +15,7 @@ Open **Media** (`/media`). The page greets you with *What are we watching today?
 - rows of posters you scroll sideways;
 - **Browse by kind**: films, series, books, audiobooks, music, games.
 
-![The Media page: the catalog and request shortcuts, then rows of posters](../../assets/screenshots/media.jpg)
+![The library: the catalog and request shortcuts, then rows of posters](../../assets/screenshots/media.jpg)
 
 | Row | What it shows |
 |---|---|
@@ -89,13 +89,13 @@ When your portal uses a library cleanup tool (Maintainerr), some titles are sche
 
 **Save this title** spends one rescue: the title leaves the deletion list for good, for everyone, and all its scheduled seasons with it. A spent rescue is not given back. If you have none, **Buy a rescue** opens the shop's **Rescue** products (see [gamification.md](gamification.md)). If the cleanup tool does not answer, you see *The rescue did not go through. Try again later.* and your rescue is not used.
 
-The **Leaving soon** row on the Media page and the **Leaving soon** widget list every title about to go.
+The **Leaving soon** row of the library and the **Leaving soon** widget list every title about to go.
 
 ## Asking for a title
 
-Open **Make a request** (`/media/discover`), or **Request a title** on the Media page.
+Open **Request a title** in the menu, or on the library's page: the **Ask for a title** page (`/media/discover`).
 
-![Make a request: the search and a badge on each poster](../../assets/screenshots/discover.jpg)
+![Ask for a title: the search and a badge on each poster](../../assets/screenshots/discover.jpg)
 
 - Type in **Search a film or a series**: you also find titles the library does not have.
 - Or browse the rows: **Trending**, **Popular films**, **Popular series**, **Upcoming films**, **Upcoming series**.
@@ -116,7 +116,7 @@ You can also ask from a library title that is not available yet: **Request** rep
 
 ### Your request quota
 
-**My request quota** (on Make a request, and at the top of My requests) shows how many requests you have left:
+**My request quota** (on Ask for a title, and at the top of **Statistics → My requests**) shows how many requests you have left:
 
 - when your account on the request service (Seerr) is linked, **its** limits apply: a number of films and a number of series, every so many days. The portal tells you when one comes back (*one comes back on …*);
 - otherwise the portal gives you a number of requests for today, this week or this month.
@@ -176,11 +176,12 @@ Once the title has arrived, the box folds into one line — *Available · since 
 
 ## My requests
 
-Open **My requests** (`/media/requests`). The page has three tabs and a **Period**.
+Open **My requests** (`/media/requests`). The page has two tabs:
 
-- **Overview**: your figures over the period, **My requests' status**, **What became of them**, **My rank as a requester** (anonymous), **Requests over time**, **Time to availability**, **Most watched among requested**, **Genres requested and watched**, and **The audience of your requests** (how many other members watched them — a number, never who). Some cards unlock in the shop, depending on your portal.
 - **List**: every request, with **Search a request** and the filters **Pending**, **In progress**, **Available** and **Declined**. Each line shows its stage: *Waiting for approval*, *Out on …*, *Looking for a release*, *Downloading 60%*, *Importing*, *Import blocked*, *Available*…
 - **Coming soon**: what is downloading, importing or has a release date.
+
+Your requests in figures are in the **Statistics** section, under **My requests** (`/media/requests/stats`), with a **Period**: your quota, **My requests' status**, **What became of them**, **My rank as a requester** (anonymous), **Requests over time**, **Time to availability**, **Most watched among requested**, **Genres requested and watched**, and **The audience of your requests** (how many other members watched them — a number, never who). Some cards unlock in the shop, depending on your portal.
 
 **Cancel** a request while it is still pending, from the list or with **Cancel the request** on the title's page. If an administrator declines it, a notification tells you, with their reason when they gave one.
 
@@ -199,7 +200,7 @@ On an available film or episode, **Watch** opens the portal's player full screen
 - **Chapters**;
 - **Play the next episode automatically**.
 
-**Skip intro** and **Skip credits** appear when the media server knows them. At the end of an episode, **Up next** offers **Play next episode** — or **Watch the credits**. **Playback info** tells you whether the stream is direct or converted.
+**Skip intro** and **Skip credits** appear when the media server knows them. A film or an episode stopped in the last two minutes before its end credits counts as watched to the end. At the end of an episode, **Up next** offers **Play next episode** — or **Watch the credits**. **Playback info** tells you whether the stream is direct or converted.
 
 ### Casting and devices
 
@@ -243,7 +244,7 @@ On an audiobook, **Listen** (or **Resume**) starts playback in a bar at the bott
 
 ## The radio
 
-When your portal has a radio (SUB/WAVE), it shows on the Media page and in the **Radio** widget.
+When your portal has a radio (SUB/WAVE), it shows on the library's page and in the **Radio** widget.
 
 - **Listen** tunes in live; **Stop** ends it. The card shows the track on air, its cover, the host (*with …*) and the number of listeners.
 - **Open the radio player** shows **Coming up** and **Played recently**.

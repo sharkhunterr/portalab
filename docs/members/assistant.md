@@ -92,11 +92,11 @@ One search covers every part of the portal you have access to: media, people, pa
 
 ### Quick search in the header
 
-Click the search field in the header, or press **Ctrl + K** (**⌘ K** on a Mac) or **/** anywhere. Results come as you type, grouped by kind, with **Pages** of the portal and your **Recent searches**. Choose *Search for “…”* for the full results page. **Ctrl + Shift + K** opens the command palette (pages and actions); press **?** to see every keyboard shortcut.
+Click the search field in the header, or press **Ctrl + K** (**⌘ K** on a Mac) or **/** anywhere. Results come as you type, grouped by kind, with **Pages** of the portal and your **Recent searches**. Choose *Search for “…”* for the full results page, or **Advanced search**, offered as soon as the field is focused, to open the search page with its filters. **Ctrl + Shift + K** opens the command palette (pages and actions); press **?** to see every keyboard shortcut.
 
 ### The search page
 
-**Search** (`/search`) shows every result, grouped by kind — **Media**, **People**, **Ask for it**, **Pages**, **Wiki**, **News**, **Calendar**, **Tickets**, **Incidents**, **Services**, **Statistics**, **Achievements and quests**, **Feedback**…
+**Search** (`/search`) is no longer in the menu: open it from the header's field. It shows every result, grouped by kind — **Media**, **People**, **Ask for it**, **Pages**, **Wiki**, **News**, **Calendar**, **Tickets**, **Incidents**, **Services**, **Statistics**, **Achievements and quests**, **Feedback**…
 
 ![Search results grouped by kind, with filters and the assistant's analysis](../../assets/screenshots/search.jpg)
 

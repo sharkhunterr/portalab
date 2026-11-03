@@ -50,6 +50,8 @@ Depending on your portal's rules, these actions can earn XP, Coins or Contributi
 - playing mini-games, completing the week's challenges;
 - completing a quest, unlocking an achievement, reaching a level.
 
+A film or an episode counts as finished when you stop it in the last two minutes before its end credits: no need to sit through them. A season counts as finished when its last episode is, and is dated by that episode, whatever order you watched in.
+
 Some actions have a cap per day, or a delay between two gains. Rewards that look unusual (too many in an hour, too many Coins in a day) can be held for an administrator's review before they are credited.
 
 ## Levels
@@ -72,19 +74,27 @@ An **XP boost** from the shop multiplies the XP you earn for a while. The runnin
 
 ## Quests and objectives
 
-Your open quests are on **My progression** and in **Community → Quests** (`/community/quests`):
+Your quests are in **Games → Quests** (`/games/quests`), and the open ones also on **My progression**:
 
 | Kind | What it is |
 |---|---|
 | **Daily objective**, **Weekly objective**, **Monthly objective** | Comes back every period. |
 | **Quest** | One or more steps to complete. |
-| **Challenge** | Time-boxed ("Ends …"): only what you do inside its window counts. |
+| **Challenge** | Time-boxed: only what you do inside its window counts. |
+| **Discovery** | A first step on the portal, rewarded once. |
 
-Each quest shows its steps, your progress and its reward (for example "+25 XP"). Once done it is marked **Completed** and the reward is credited. New members also get **first steps**, discovery missions on the home page, each rewarded once.
+![Quests in the Games section: the filters and the progress bar](../../assets/screenshots/games-quests.jpg)
+
+- **Filters**: **All**, **Today**, **This week**, **This month**, **Quests** (done once) and **Challenges**, each with how many are left to do. Your choice is remembered on this device.
+- **Quests done**: a bar of how many are done out of how many, for the filter chosen.
+- The quests to do come first, the closest deadline at the top, each with its time left ("5 h 12 min left", or "Until …" beyond a week). Under three hours, the countdown is underlined.
+- Each quest shows its steps, your progress and its reward (for example "+25 XP"). Once done it is sealed **Done**, the reward is credited, and an objective says when it comes back ("Back in …" or "Back on …").
+
+Objectives can be about any part of the portal: signing in, searching, reading your notifications, the radio, films and series, a title about to leave, a title you asked for being watched, the games, the assistant, your ideas and bug reports, boosters, projects, or even other quests done. New members also get **first steps**, discovery missions on the home page, each rewarded once.
 
 ## Achievements
 
-An achievement unlocks **once**, when all its conditions are met: watching a number of films, reaching a level, a running total of XP… Find them on **My progression** or in **Community → Achievements** (`/community/achievements`).
+An achievement unlocks **once**, when all its conditions are met: watching a number of films, reaching a level, a running total of XP… Find them on **My progression** or in **Achievements** (`/community/achievements`), in the **Me** menu under your avatar.
 
 - They are grouped into **Unlocked**, **In progress** and **The others**, with your overall count ("… of … unlocked").
 - Filter by category (Community, Content, Events, Progression, Purchases, Service usage, Other) and sort by **Rarity**, **Recently unlocked** or **Name**.
@@ -103,7 +113,7 @@ If you chose an anonymous presence, you still count in the leaderboards, with no
 
 ## Campaigns
 
-A **campaign** is a special period (Halloween, Christmas, a themed week…) when some actions earn more. **Campaigns** (`/campaigns`) lists the ones running, with **What it brings you**, when it ends and its **Next periods**. A campaign can bring:
+A **campaign** is a special period (Halloween, Christmas, a themed week…) when some actions earn more. The ones running are shown at the top of **Community → Events**, under **Today's games**, and on **Campaigns** (`/campaigns`), which lists them with **What it brings you**, when it ends and its **Next periods**. A campaign can bring:
 
 - **boosts**: for example ×2 XP on horror films, or when you finish an episode;
 - **shop discounts** on some products or departments (the usual price stays shown);
@@ -114,7 +124,7 @@ The calendar shows campaigns too, and a notification can tell you when one start
 
 ## Mini-games
 
-**Games** (`/games`) holds games drawn from the server's own library: alone, every day, or together. Your portal decides which games are open, how many you may start alone each day, and what they reward.
+The **Games** section of the menu holds **Today's games** (`/games`), **Quests**, **Play together** and **Mediacards**. **Today's games** are drawn from the server's own library: alone, every day, or together. Your portal decides which games are open, how many you may start alone each day, and what they reward.
 
 | Game | How it plays |
 |---|---|
@@ -129,8 +139,10 @@ The calendar shows campaigns too, and a notification can tell you when one start
 | **Memory** | Find the pairs among your own Mediacards (or posters when you own too few). |
 | **Who watched it?** | Together only: which of the players watched this title? Only among players who agreed in their settings. |
 
-Also on the games page:
+Also on **Today's games**:
 
+- **Quests done**: how many of your quests are done out of all, today's still to do ("2 daily quests to do") and the next one to close; **See the quests** opens **Games → Quests**. When everything is done: "All done, well played!".
+- A row per running campaign, with its boosts and its end; **See** opens it.
 - **This week's challenges**: a video game to play, a film to watch through, a book and an audiobook to get on with, for extra XP. Your services and the portal's player report progress on their own; nothing to declare.
 - **Boards**: the best scores of each game for the week, the month or all time.
 - **The daily wheel**: one spin a day. The segments (Coins, XP, a product…) are set by your administrators; a product won waits in your reserve. The **Wheel of fortune** widget puts it on your home page.
@@ -153,7 +165,7 @@ Every film and series on the portal has its own **set**, with a three-letter cod
 
 When a title arrives on the portal, its set appears. If a title leaves, the cards you hold stay yours.
 
-Each card shows its name, the title's genre (Sci-fi, Action, Fantasy, Family, Drama or Dark, which also gives its colour), its picture, what it is (Film, Series, Director, Character…), the title's figures (Audience rating, Votes, Box office or Seasons), its number in the set and its rarity.
+Each card shows its name, the title's broad genre (Sci-fi, Action, Fantasy, Family, Drama or Dark, which also gives its colour), its picture, what it is (Film, Series, Director, Character…), the title's figures (Audience rating, Votes, Box office or Seasons), its number in the set and its rarity.
 
 ### Rarities and versions
 
@@ -182,14 +194,30 @@ A copy can come in a special version:
 | Streaming | 2017–2021 |
 | Liquid glass | since 2022 |
 
+Two more versions frame the card differently:
+
+- **… frame** (genre): the card in the frame of its title's main genre, foil or not — from about one in 30 for a common to one in 5 for a legendary. There are eighteen: Action, Adventure, Animation, Comedy, Crime, Documentary, Drama, Family, Fantasy, History, Horror, Music, Mystery, Romance, Science fiction, Thriller, War and Western, each with its own shape (a treasure map, a case file, a wanted poster…). A card never has a genre frame together with its edition's version or the borderless one.
+- **Signature frame**: some boosters sign their cards with their opening scene's frame (for example "Apothéose frame"). About one card in four that came in the base frame takes it; in a rarity booster, the card it guarantees. Never over an edition, a genre frame, a borderless or an HD version.
+
+What you see when a card turns over at the opening is the version you keep: a signed card wears its frame in your collection too.
+
 ### Getting cards: boosters
 
 Cards come in **boosters**, sealed packs drawn at random by rarity.
 
-- **By watching**: depending on your portal's rules, a film watched to the end or a season finished gives you a booster of that title (three cards, never twice the same while others are left). Each film or season gives one once, and the number of boosters received per day is limited.
-- **In the shop**: the **Boosters** department, **Mediacards boosters** shelf, sells boosters by genre, edition, films or series (3 to 10 cards, sometimes with a guaranteed rarity).
+- **By watching**: depending on your portal's rules, a film watched to the end or a season finished gives you a booster of that title (three cards, never twice the same while others are left). Each film or season gives one once, and the number of boosters received per day is limited. A title with a strong theme opens in that theme's scene (a Japanese anime in a manga scene, for example).
+- **In the shop**: the **Boosters** department, **Mediacards boosters** shelf (3 to 10 cards, sometimes with a guaranteed rarity). Depending on your portal, the range holds:
 
-Boosters waiting for you are shown at the top of **Mediacards** ("… packs to open") and in **My reserve**.
+| Booster | What it draws |
+|---|---|
+| **Genre boosters** (eighteen, from **Action booster** to **Western booster**) | Titles of that main genre; the genre frame comes three times more often. |
+| **Rarity boosters**: **Rare**, **Epic**, **Legendary** | A guaranteed rarity, signed with its scene's frame. |
+| **Edition boosters** (fourteen, from **Nitrate edition booster** to **Liquid glass edition booster**) | Titles of that era; the edition's version comes more often. |
+| **Theme boosters**: **Japan**, **Anime**, **Kaiju and robots**, **Samurai and ninjas** | Titles of that theme, signed with their scene's frame. |
+
+Each booster opens in its own scene — some play a video, some stage the rarest cards over the whole screen. A booster bought in the shop waits in **My reserve** and opens in its product's scene, as in the shop.
+
+Boosters waiting for you are counted on the **To open** view of **Mediacards** and wait in **My reserve**. Identical boosters (the same product, or the same title and season) make one pile, with their number on a badge ("×3"): a tap opens the first.
 
 ### Opening a booster
 
@@ -201,22 +229,23 @@ A card you already have is not lost: it is one more copy, counted in your duplic
 
 ### My Mediacards
 
-**Mediacards** (`/cards`), in the Community section of the menu, gathers your collection.
+**Mediacards** (`/cards`), in the **Games** section of the menu, opens on your collection.
 
-- **Search** "Find a film, a series, an actor, a character…" finds sets, cards and people.
-- Your figures: different cards owned out of all the portal's, sets started, copies.
-- Two views: **Sets** (by film and series, with **Started only**) and **Every card** (filter by kind, rarity and country, or **Mine only**).
+- At the top, where it stands: the different cards you own out of all the portal's (with its share), the sets started and your copies.
+- Three views: **My collection**, **To open** (your boosters, their count on its tab) and **Every card**.
+- **My collection**: **My sets** (the ones you started) or **All sets**, as posters with how far each one is, and one **Search** — "Find a film, a series, an actor, a character…" — for sets, people and cards.
+- **Every card**: every card there is, to look for the ones you miss: filter by kind, rarity and country, or **Mine only**.
 - Open a set to see its binder: cards you own in colour, the others greyed, with "×2", "×3"… for copies. Open a card to see all its versions. For a person, "All of …'s cards" shows their cards across every title.
 
 On a film or series page, the **Card collection** section fans out its cards, with your progress, your cards by rarity, your copies, duplicates and foils, and **See the whole collection**.
 
 Depending on your portal, achievements reward collectors: a first booster, 25 boosters opened, a legendary pull, a complete collection, several series or ten titles completed.
 
-![My Mediacards: search, figures, the two views and a set](../../assets/screenshots/cards.jpg)
+![A set's binder: the cards owned in colour, the others greyed](../../assets/screenshots/cards.jpg)
 
 ## The shop
 
-The shop (`/marketplace`) is where you spend Coins, which are earned only on the portal, never with real money. Its home, the **Spotlight**, shows your balance and how many items are **within reach**, the **Featured** products and picks: **On sale**, **Within reach**, **Nearly sold out**, **Looks boosters to open**, **Mediacards boosters** and **Free**.
+The shop — the **Marketplace** section of the menu: **Storefront** (`/marketplace`), **My purchases** and **My reserve** — is where you spend Coins, which are earned only on the portal, never with real money. Its home, the **Spotlight**, shows your balance and how many items are **within reach**, the **Featured** products and picks: **On sale**, **Within reach**, **Nearly sold out**, **Looks boosters to open**, **Mediacards boosters** and **Free**.
 
 ### Departments
 
@@ -268,38 +297,45 @@ Some boosters can be opened a limited number of times; seasonal boosters are on 
 
 ### My reserve
 
-**My reserve** (`/marketplace/reserve`) keeps the items won in boosters. They add up and never expire.
+**My reserve** (`/marketplace/reserve`) keeps "The items won in boosters, to use whenever you want. They never expire." Its badge in the menu counts what came in since you last opened it.
 
-- **Use** an item, then **Use now**: it takes effect as if bought. If it needs a form, the form waits in **My purchases**.
-- **Open** an offered booster (a level or achievement reward): it costs nothing.
-- **Waiting for their level** lists the looks you won that are still locked. A **level pass** unlocks one of them at once.
+Everything is a tile, grouped by what it waits for; **Go to** jumps to a group:
+
+- **To complete**: purchases waiting for your choices, such as a project launch or a special request. Tap one to fill in its form in a window; its badge stays until it is done.
+- **To open**: the boosters you were given or bought (a level or achievement reward costs nothing). The Mediacards boosters make a row you swipe, identical ones piled with their number.
+- **To use**: tap an item to see what it does, then **Use** and **Use now**: it takes effect as if bought. If it needs a form, the form then waits under **To complete**.
+- **Waiting for their level**: the looks you won that are still locked. A **level pass** unlocks one of them at once.
+
+![My reserve: genre boosters piled with their count](../../assets/screenshots/booster-range.jpg)
 
 ### My purchases
 
 **My purchases** (`/marketplace/owned`) gathers what you bought or were given, and your requests.
 
-- **To complete**: products waiting for you, such as a project launch (title and pitch, then **Launch the project**) or a special request (fill in the form, then **Send my request**).
+- A purchase still waiting for its form is completed in **My reserve**: "A purchase waits for its form in "My reserve"." — **Complete** takes you there.
 - **My collection**: everything you own, with a search.
 - **My requests**: Waiting, Being handled, Done, or "Declined — Coins given back".
 - **Refund (until …)** stays available while the product's refund window lasts. Packs, boosters, boosts, streak freezes, rescues, quotas, special requests, service access and project launches are not refundable; the sheet says so before you buy.
 
 ## Community projects
 
-**Community projects** (`/projects`) gathers members' ideas, funded together with Coins.
+**Projects** (`/projects`), in the **Community** section, gathers members' ideas, funded together with Coins. Its badge in the menu counts the projects added or moved on since you last looked; their cards are marked **New**.
 
-- Filter by stage: **Proposed**, **To fund**, **Being built**, **Released**, **Closed**.
+- The key figures in one line, then the projects; filter by stage: **Proposed**, **To fund**, **Being built**, **Released**, **Closed**. Each card shows its step ("Step 3 of 7") and where its funding stands toward its goal.
 - A project goes through: Idea, Proposal, Open for votes and funding, In validation, In development, In beta, Released (or Rejected, Abandoned).
+
+A project's page shows its **Lifecycle** as a horizontal timeline (each step with its date, the current one lit; swipe it sideways on a phone), where the funding stands — Coins gathered, the goal and what is left ("… Coins left to gather", **Goal reached!**, or *No set goal: every contribution counts.*), the **Backers**, what is **Reserved** and **Used**, and **My contribution** — then who backs it, the largest first, each with their amount and since when. A member who keeps their progression to themselves shows as "A member". The **Project notes** left along the way follow.
 
 To fund an open project:
 
-1. Open it and go to **Funding**.
-2. Enter the **Coins to reserve**, within the limits shown.
+1. Open it and go to **Contribute**.
+2. Enter the **Coins to reserve**, or pick one of the **Quick amounts**, within the limits shown ("Between … and … Coins for you").
 3. Tick "I understand that funding does not guarantee the project will be built."
 4. Tap **Reserve Coins**.
 
-Your Coins are **reserved**, not spent at once: they are used when the project is released, or at the milestones the project shows. If it is rejected or abandoned, they are refunded in full. **My fundings** shows, for each project, what you reserved, what was used and what was refunded, and you are notified when a project you fund changes state.
+Your Coins are **reserved**, not spent at once: they are used when the project is released, or at the milestones the project shows (the **Funding rules**, folded below). If it is rejected or abandoned, they are refunded in full. **My fundings**, on the projects page, shows, for each project, what you reserved, what was used and what was refunded, and you are notified when a project you fund changes state.
 
-**Launch a project** takes you to the **Project launch** product of the shop; after buying it, finish it in **My purchases**. Your idea opens as a proposal that anyone can support and fund. Voting for a project is free and separate from funding (see [Community](community.md#proposals-and-votes)).
+**Launch a project** takes you to the **Project launch** product of the shop. After buying it, complete it from **My reserve**: a **Project title**, a pitch (**Why this project?**) and the **Goal to reach**, then **Launch the project**. The administrators confirm the goal, or adjust it, when they open its funding; until then the project shows it as proposed. Your idea opens as a proposal that anyone can support and fund. Voting for a project is free and separate from funding (see [Community](community.md#proposals-and-votes)).
 
 ---
 

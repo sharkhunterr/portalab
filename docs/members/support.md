@@ -2,7 +2,7 @@
 
 Ask the team for help with a ticket, tell them what you think, check whether a problem is already known, and keep up with your notifications.
 
-The **Support** section of the menu holds **Support** (your tickets), **Feedback**, **Incidents** and **Guided tours**. The service status page is under **Services**.
+The **Help** section of the menu holds **Guide** (the guided tours), **Wiki**, **Support** (your tickets), **Feedback**, **Service status** and **Incidents**.
 
 ## Is it already known?
 
