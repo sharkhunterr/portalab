@@ -743,5 +743,81 @@
         "wait": 300
       }
     ]
+  },
+  {
+    "name": "automatic-newsletters",
+    "page": "readme",
+    "route": "/admin/newsletters",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 8000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); } .status-banner { display: none; }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "my-feed",
+    "page": "readme",
+    "route": "/feed",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 10000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); } .status-banner { display: none; }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "booster-range",
+    "page": "readme",
+    "route": "/marketplace/reserve",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 8000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); } .status-banner { display: none; }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "games-quests",
+    "page": "readme",
+    "route": "/games/quests",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 8000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); } .status-banner { display: none; }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
   }
 ]

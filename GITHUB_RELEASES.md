@@ -69,18 +69,33 @@ reliably again.
   is coming, built on visual templates. Each one has its own name, e-mail subject, contents and charts, and
   each can be switched on or off. Preview the real e-mail without sending it, then publish it as a news
   item, send it by e-mail, or both. Members are subscribed by default and can unsubscribe from each one.
+
+![Automatic newsletters, each on its own cadence and template](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.1.0/assets/screenshots/automatic-newsletters.jpg)
+
 - **E-mails in Portalab's look** — every e-mail keeps its art direction, Gmail included. It is sent under a
   sender name rather than a bare address. The administrator can turn off e-mails to members while keeping
   their own.
 - **Headlines and My feed** — the administrator's front page plus each member's own feed of followed
   channels. You can set up RSS sources, give each channel its own colour, see unread badges, page through
   older items and play YouTube videos in place. My feed also comes as a dashboard widget.
+
+![My feed: the server and every followed source, each in its colour](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.1.0/assets/screenshots/my-feed.jpg)
+
 - **Quests and achievements** — new goals on using the portal, plays, requests, games and support. They
   have conditions per step, translated texts and a clear done state, with the time left until the next
   reset. Quests now appear on the Games page, with filters, a progress bar and a reminder in Today's games.
-- **Boosters and cards** — new opening scenes: the genre and edition scenes for Mediacards, Impact, Sumi,
-  Géode, a manga universe and Apothéose. They can be played as video or revealed over the whole screen.
-  Identical boosters are stacked with a count, and a booster opens in its own product's scene.
+
+![Quests on the Games page, with filters and a progress bar](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.1.0/assets/screenshots/games-quests.jpg)
+
+- **Boosters and cards** — a full booster range: eighteen genres, three rarities, fourteen editions and four
+  themes, each with its own opening scene, in video or over the whole screen. New scenes include Impact,
+  Sumi, Géode, a manga universe and Apothéose. Genre frames sit next to the edition frames, and the frame
+  seen at the opening is the one the card keeps. Identical boosters are stacked with a count.
+
+![Genre boosters waiting in the reserve, stacked with a count](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.1.0/assets/screenshots/booster-range.jpg)
+
+- **A clearer member menu** — arranged by intent: News, Media, Games, Community, Shop, Help, Statistics and
+  Me.
 - **Community projects and the reserve** — a project page shows who backed it, what is still needed and a
   timeline. Unread badges mark what arrived in the reserve.
 - **Quick access widget** — pick the services it shows and their order. Each one is coloured by its state,
@@ -139,6 +154,17 @@ reliably again.
 - Filters on the quests page (#311)
 - Quests show a done / total progress bar instead of « 29 to do » (#312)
 - A quest reminder in Today's games (#313)
+- Booster scenes can play video: MP4 or WebM with transparency, looping backdrops, and an effect played over
+  the card (#287)
+- A card's reveal can take the whole screen: the rarity first, then the card turning (#290)
+- Impact: a booster opening in the style of an animated trading-card game, drawn as a comic (#285)
+- Sumi: a booster scene in ink and gold, like Japanese lacquerware (#286)
+- Géode: a booster scene inside a geode, made for video (#288)
+- A manga universe of booster scenes: Shōnen, Magical girl, Ninja and Mecha (#289)
+- Genre frames for media cards, next to the edition frames: eighteen frames, one for each main genre (#295)
+- The full booster range: eighteen genre boosters, each with its own video scene, plus rarity and theme
+  boosters (Japan, Anime, Kaijū and robots, Samurai and ninjas). The frame seen at the opening is the one the
+  card keeps (#296)
 - Plays are caught up from the moment an account was linked, not only from the last 48 hours (#341)
 - A film or episode stopped in the last two minutes before its end credits counts as finished, and
   earlier plays have been reviewed (#342)
@@ -147,6 +173,7 @@ reliably again.
 
 - News: Headlines (administrators) and My feed (members), with follows, configurable RSS sources and
   unread items (#299)
+- The member menu is arranged by intent: News, Media, Games, Community, Shop, Help, Statistics and Me (#298)
 
 ### Upgrading
 
