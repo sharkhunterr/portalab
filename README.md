@@ -113,8 +113,9 @@ any period, plus a yearly recap.
   </tr>
 </table>
 
-Gamification is **optional for every member** — play it all, play without the cards, or don't play at all
-(your profile then stays anonymous).
+Gamification is **optional for every member** — a four-notch gauge, from *Just the media* (no game, and an anonymous
+profile) through *Passive* (XP, levels and quests as you watch) and *Collector* (the Mediacards) to *Keen* (the day's
+mini-games, challenges and parties), and each member's home starts from the dashboard prepared for their notch.
 
 - **XP, levels, coins and contribution** earned by watching, reading and listening, by asking for titles,
   and by taking part: news, wiki, tickets, feedback, events. Quests, achievements, streaks, leaderboards

@@ -25,18 +25,35 @@ Si votre portail en a publié, il vous demande de lire et d'accepter ses **condi
 
 ## L'accueil des nouveaux membres
 
-À votre première visite, quelques écrans de bienvenue s'ouvrent (« Étape 1 sur 5 », etc.) :
+À votre première visite, quelques écrans de bienvenue s'ouvrent (« Étape 1 sur 7 », etc.) :
 
-- **Une photo et un nom** : c'est comme ça que les autres membres vous verront.
-- **Vos centres d'intérêt** : films, séries, livres, livres audio, magazines, mangas, BD & comics, jeux vidéo rétro. Le portail s'en servira pour mettre en avant ce qui vous plaît.
-- **Tu veux jouer ?** : c'est le cœur du portail. On y gagne de l'XP et des niveaux, des Coins à dépenser dans la boutique, et les Mediacards, des cartes de collection. Trois réponses :
-  - « Oui, à tout » ou « Oui, sans les cartes » : votre profil est **public**, mais seulement pour les membres du portail. Ils voient votre nom, votre niveau et votre place dans les classements.
-  - « Oui, sans les cartes » et « Non » cachent aussi les Mediacards : ni dans le menu, ni sur la fiche des titres, ni dans la boutique, et plus de booster Mediacards en regardant. Les autres boosters restent.
-  - « Non, je viens pour les médias » : votre profil est **anonyme**. Les autres membres ne vous voient ni dans l'annuaire, ni dans l'activité ; dans les classements, vous restez compté, sans nom.
-- **Votre style** : clair, sombre ou « Comme mon appareil », et une couleur.
+- **Bienvenue** : ce que vous ferez sur le portail (regarder et lire, jouer si vous le voulez, tout régler à votre goût). « C'est parti » ouvre la suite.
+- **Une photo et un nom** : c'est comme ça que les autres membres vous verront ; vous y choisissez aussi votre « Langue ».
+- **Tes comptes médias** : reliez votre compte Plex, Jellyfin… ; ce que vous y regardez compte alors dans vos statistiques et votre progression. Choisissez le « Service », saisissez votre « Compte sur ce service » et touchez « Lier le compte ». Si le service vous a donné un « Code de vérification », saisissez-le et touchez « Vérifier ». Vous lierez d'autres comptes plus tard, dans « Comptes médias » (voir [Compte, apparence et confidentialité](portalab://wiki/guide-compte)).
+- **Jusqu'où veux-tu jouer ?** : une jauge à quatre crans. Faites glisser le curseur : chaque cran ajoute au précédent.
+
+  | Cran | Ce qu'il apporte |
+  |---|---|
+  | « Juste les médias » | Regarder, lire et demander, sans le jeu : ni cartes, ni jeux, ni quêtes dans votre menu. Votre profil est **anonyme** : les autres membres ne vous voient ni dans l'annuaire, ni dans l'activité ; dans les classements, vous restez compté, sans nom. |
+  | « Passif » | Le jeu se fait tout seul : de l'XP et des niveaux par ce que vous regardez, lisez ou demandez, et aussi les quêtes, les succès, les classements. Votre profil est **public**, mais seulement pour les membres du portail : ils voient votre nom, votre niveau et votre place dans les classements. |
+  | « Collectionneur » | En plus, les Mediacards : des boosters en regardant, une collection à compléter. |
+  | « Passionné » | Tout le jeu : en plus, les mini-jeux du jour, les défis de la semaine et les parties à plusieurs. |
+
+  Sous « Collectionneur », les Mediacards sont cachées : ni dans le menu, ni sur la fiche des titres, ni dans la boutique, et plus de booster Mediacards en regardant. Les autres boosters restent. Dans le menu, « Jeux du jour » et « Jouer à plusieurs » n'apparaissent qu'à « Passionné », « Mediacards » dès « Collectionneur » et « Quêtes » dès « Passif ».
+- **Ton portail à ton goût** : dites ce que vous aimez, votre accueil se compose avec.
+  - « Tu viens pour quoi ? » : films, séries, livres, livres audio, magazines, mangas, BD & comics, jeux vidéo rétro. Le portail s'en servira pour mettre en avant ce qui vous plaît.
+  - « Sur ton accueil » : « Reprendre et découvrir », « Les dernières sorties », « Les news de mes favoris », « Mes demandes », « Jouer », « Les statistiques », « L'état des services », « La communauté », « La radio ». Au départ sont cochés « Reprendre et découvrir », « Les dernières sorties », « Les news de mes favoris », « Mes demandes » et « L'état des services », plus « Jouer » si vous jouez. « Jouer » est grisé à « Juste les médias » : remontez la jauge pour l'ajouter.
+  - « Composer mon accueil avec ces choix », coché à votre première visite : votre tableau de bord part de celui que l'équipe a prévu pour votre profil de joueur, garde les widgets de ce que vous avez coché, ajoute ceux qui lui manquent et laisse de côté ceux de ce que vous n'avez pas coché. Vous pourrez tout déplacer ensuite. Quand vous revoyez ces écrans, la case est décochée : la cocher remplace votre disposition actuelle.
+- **Comment te prévenir ?** : choisissez un réglage tout prêt, puis affinez thème par thème.
+  - « Tout » : chaque nouvelle, dans le portail et par e-mail.
+  - « L'essentiel » : tout dans le portail ; par e-mail votre compte, vos médias et vos tickets, en un résumé par jour.
+  - « Le minimum » : votre compte, vos médias et vos tickets dans le portail ; par e-mail votre compte seulement, une fois par semaine.
+
+  Pour chaque thème, deux interrupteurs : « Dans le portail » et « Par e-mail ». En dessous, « Résumé par e-mail » règle le rythme des e-mails (« Envoyer chaque e-mail », « Résumé quotidien », « Résumé hebdomadaire ») et « Newsletters par e-mail » les canaux d'actualités que vous recevez. Tout se règle aussi en détail dans « Mes notifications » (voir [Notifications](portalab://wiki/guide-notifications)).
+- **Ton style** : clair, sombre ou « Comme mon appareil », et une couleur.
 - **Tout est prêt** : tout reste personnalisable (l'interface, le tableau de bord, les notifications et les e-mails, la confidentialité), chaque réglage à un geste. « Faire la visite » lance une visite d'une minute, « Explorer seul » vous laisse découvrir.
 
-Chaque écran peut être passé avec « Passer », et tout se change plus tard : public ou anonyme dans votre compte, carte « Ma présence dans la communauté ». Vous pouvez revoir ces écrans depuis la page [Visites guidées](/guide), bouton « Écrans de bienvenue ».
+Chaque écran peut être passé avec « Passer », et tout se change plus tard : la jauge de jeu et le tableau de bord de votre profil dans [Mes paramètres → Jeu](/settings/play), public ou anonyme dans votre compte, carte « Ma présence dans la communauté ». Vous pouvez revoir ces écrans depuis la page [Visites guidées](/guide), bouton « Écrans de bienvenue ».
 
 ## L'en-tête
 
@@ -72,14 +89,14 @@ Le détail de ces réglages est dans [Compte, apparence et confidentialité](por
 
 ## Le menu et ses rubriques
 
-Le menu regroupe tout le portail par rubriques. Selon votre portail et vos droits, vous y verrez :
+Le menu regroupe tout le portail par rubriques. Selon votre portail, vos droits et votre niveau de jeu, vous y verrez :
 
 | Rubrique | Ses pages |
 |---|---|
 | **Accueil** | votre tableau de bord |
 | **Actualités** | « À la une », « Mon fil », « Calendrier » |
 | **Médias** | « Bibliothèque », « Demander un titre », « Mes demandes », « Mes goûts » |
-| **Jeux** | « Jeux du jour », « Quêtes », « Jouer à plusieurs », « Mediacards » |
+| **Jeux** | « Jeux du jour », « Quêtes », « Jouer à plusieurs », « Mediacards » (selon votre niveau de jeu : voir plus haut, « Jusqu'où veux-tu jouer ? ») |
 | **Communauté** | « Aperçu », « Membres », « Classements », « Événements », « Propositions », « Projets » |
 | **Statistiques** | « Mes médias », « Mon activité », « Mes demandes », « Communauté » |
 | **Boutique** | « Vitrine », « Mes achats », « Ma réserve » |

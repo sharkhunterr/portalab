@@ -1,6 +1,7 @@
 """#48 — who read what: opening a published article is remembered once; the listing, the featured news
-and the widget say which ones this member has not read (#336: « Headlines »'s badge counts them); the editors see who read it and who has not;
-a member's reads are exported with their data and erased with them."""
+and the widget say which ones this member has not read (#336: « Headlines »'s badge counts them); the
+editors see who read it and who has not; a member's reads are exported with their data and erased
+with them."""
 
 from uuid import UUID
 

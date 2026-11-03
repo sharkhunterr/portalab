@@ -6375,7 +6375,7 @@ export interface paths {
         put?: never;
         /**
          * Reset
-         * @description 027: back to the default dashboard (the starter layout and the pinned widgets).
+         * @description 027: back to the default dashboard (the starter layout and the pinned widgets); #347: to taste.
          */
         post: operations["reset_api_v1_dashboard_reset_post"];
         delete?: never;
@@ -13884,6 +13884,8 @@ export interface components {
              */
             move: boolean;
             phone?: components["schemas"]["PlaceIn"] | null;
+            /** Profiles */
+            profiles?: ("none" | "progression" | "collector" | "full")[] | null;
             /**
              * Resize
              * @default false
@@ -18118,13 +18120,6 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
-        /** ResetIn */
-        ResetIn: {
-            /** Confirm */
-            confirm: string;
-            /** Password */
-            password: string;
-        };
         /** ResolveIn */
         ResolveIn: {
             /** Resolution */
@@ -20276,6 +20271,13 @@ export interface components {
              */
             status: "draft" | "active" | "retired";
         };
+        /** ResetIn */
+        portalab__modules__administration__api__backups__ResetIn: {
+            /** Confirm */
+            confirm: string;
+            /** Password */
+            password: string;
+        };
         /** PolicyIn */
         portalab__modules__administration__api__routes__PolicyIn: {
             /** Bounds */
@@ -20307,6 +20309,14 @@ export interface components {
             secrets?: {
                 [key: string]: string;
             };
+        };
+        /**
+         * ResetIn
+         * @description #347: a dashboard made to the member's tastes (said at the welcome); none: the default one.
+         */
+        portalab__modules__dashboard__api__router__ResetIn: {
+            /** Tastes */
+            tastes?: ("watch" | "releases" | "news" | "requests" | "play" | "stats" | "services" | "community" | "radio")[] | null;
         };
         /** DayOut */
         portalab__modules__gamification__api__tuning__DayOut: {
@@ -29414,7 +29424,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ResetIn"];
+                "application/json": components["schemas"]["portalab__modules__administration__api__backups__ResetIn"];
             };
         };
         responses: {
@@ -32778,7 +32788,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["portalab__modules__dashboard__api__router__ResetIn"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

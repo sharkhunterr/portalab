@@ -1,3 +1,4 @@
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -24,6 +25,7 @@ import GuidePage from "../../src/features/onboarding/GuidePage";
 import { TOUR_TIMING, Tour } from "../../src/features/onboarding/Tour";
 import { TOURS } from "../../src/features/onboarding/tours";
 import { WelcomeFlow } from "../../src/features/onboarding/WelcomeFlow";
+import { Notify } from "../../src/features/onboarding/WelcomeSteps";
 import { BUNDLED } from "../../src/i18n/bundled";
 import { json, ME } from "../support/fake-api";
 
@@ -53,6 +55,7 @@ function backend({
   const puts: Array<Record<string, unknown>> = [];
   const posts: string[] = [];
   const visibility: Array<[string, unknown]> = [];
+  const resets: string[] = []; // issue 347: the home made to the member's tastes
   fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
     if (request.method === "PUT" && path === "/api/v1/me/preferences") {
@@ -66,6 +69,7 @@ function backend({
     }
     if (request.method === "POST") {
       posts.push(path);
+      if (path === "/api/v1/dashboard/reset") resets.push(await request.text());
       return json(200, []);
     }
     if (path === "/api/v1/me") return json(200, ME);
@@ -80,7 +84,7 @@ function backend({
       });
     return json(404, {});
   };
-  return { puts, posts, visibility };
+  return { puts, posts, visibility, resets };
 }
 
 const mission = (key: string, done = false) => ({
@@ -132,33 +136,63 @@ describe("welcome", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Let's go" }));
     await screen.findByRole("heading", { name: "A face and a name" });
     fireEvent.click(screen.getByRole("button", { name: "Next" })); // profile unchanged
-    fireEvent.click(await screen.findByRole("checkbox", { name: "Films" }));
+    await screen.findByRole("heading", { name: "Your media accounts" }); // issue 347
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "How far do you want to play?" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your portal, to your taste" });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Films" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Retro video games" }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    expect(await screen.findByRole("heading", { name: "Do you want to play?" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "How should we tell you?" })).toBeInTheDocument();
     await waitFor(() =>
       expect(puts).toContainEqual({ "shell.onboarding.interests": ["movies", "retro_games"] }),
     );
     expect(posts).toContain("/api/v1/me/onboarding/interests/complete");
   });
 
-  // issue 243: a player is public within the portal; one who does not play is anonymous to the other members
+  // issue 243: a player is public within the portal; one who does not play is anonymous to the other members.
+  // Issue 347: a notch of the play gauge, the dashboard made for it on a first visit, then how they are told.
   it.each([
-    ["Yes, without the cards", "progression", "community"],
-    ["No, I am here for the media", "none", "private"],
+    ["Passive", "progression", "community"],
+    ["Just the media", "none", "private"],
   ])("« %s » keeps the choice and sets who sees the member", async (answer, play, level) => {
     window.localStorage.clear();
-    const { puts, visibility } = backend({});
+    const { puts, resets, visibility } = backend({});
     show(<WelcomeFlow />);
     fireEvent.click(await screen.findByRole("button", { name: "Let's go" }));
     await screen.findByRole("heading", { name: "A face and a name" });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    await screen.findByRole("heading", { name: "What are you here for?" });
+    await screen.findByRole("heading", { name: "Your media accounts" });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    fireEvent.click(await screen.findByRole("radio", { name: new RegExp(answer) }));
+    fireEvent.click(await screen.findByRole("button", { name: answer }));
+    expect(screen.getByRole("slider", { name: "How much you play" })).toHaveAttribute(
+      "aria-valuetext",
+      answer,
+    );
     expect(
       screen.getByText(level === "private" ? /will be anonymous/ : /will be public/),
     ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    // the portal to their taste: the game ticked for a player, out of reach for one who does not play
+    await screen.findByRole("heading", { name: "Your portal, to your taste" });
+    const game = screen.getByRole("checkbox", { name: "Play" });
+    expect(game).toHaveProperty("checked", play !== "none");
+    expect(game).toHaveProperty("disabled", play === "none");
+    fireEvent.click(screen.getByRole("checkbox", { name: "The radio" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(await screen.findByRole("heading", { name: "How should we tell you?" })).toBeInTheDocument();
+    // a first visit: the home made at once, from the profile's dashboard, to these tastes
+    const tastes = [
+      "watch",
+      "releases",
+      "news",
+      "requests",
+      ...(play === "none" ? [] : ["play"]),
+      "services",
+      "radio",
+    ];
+    expect(resets.map((body) => JSON.parse(body))).toEqual([{ tastes }]);
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(await screen.findByRole("heading", { name: "Your look" })).toBeInTheDocument();
     expect(visibility).toEqual(
@@ -283,5 +317,59 @@ describe("guide", () => {
     expect(await screen.findByRole("heading", { name: "The assistant" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Power up the assistant" })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 4 })).toHaveLength(TOURS.length - 1);
+  });
+});
+
+// issue 347: how the member is told — a ready-made choice sets every switch they may turn, never a required one
+describe("welcome: how to be told", () => {
+  it("« The essentials » keeps everything on the portal and the e-mails for what matters", async () => {
+    const sent: unknown[] = [];
+    const channel = (enabled: boolean, mandatory = false) => ({ enabled, mandatory, locked: false });
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/me/notification-preferences" && request.method === "PUT") {
+        sent.push(await request.json());
+        return json(200, { categories: [], digest: "daily" });
+      }
+      if (path === "/api/v1/me/notification-preferences")
+        return json(200, {
+          digest: "off",
+          categories: [
+            {
+              key: "account.security",
+              label_key: "x",
+              channels: { portal: channel(true, true), email: channel(true, true) },
+            },
+            {
+              key: "media.available",
+              label_key: "x",
+              channels: { portal: channel(false), email: channel(false) },
+            },
+            {
+              key: "community.reply",
+              label_key: "x",
+              channels: { portal: channel(false), email: channel(true) },
+            },
+          ],
+        });
+      return json(404, {});
+    };
+    show(
+      <DialogPrimitive.Root open>
+        <DialogPrimitive.Content aria-describedby={undefined}>
+          <Notify titleId="t" nav={null} />
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Root>,
+    );
+    await screen.findByRole("table"); // the switches, once the preferences are read
+    fireEvent.click(screen.getByRole("radio", { name: /The essentials/ }));
+    await waitFor(() => expect(sent).toHaveLength(1));
+    expect(sent[0]).toEqual({
+      digest: "daily",
+      preferences: {
+        "media.available": { portal: true, email: true },
+        "community.reply": { portal: true, email: false },
+      },
+    });
   });
 });

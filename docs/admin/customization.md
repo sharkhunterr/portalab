@@ -129,8 +129,23 @@ Every action is in the audit log. Pack authors will find the format, element typ
   | **Locked** | At this place, this size and with these settings for everyone. |
 
 - **The other widgets** stay available for members to add, unless **Switched off for everyone**.
+- show a **Free** widget to some play profiles only: its **Shown to these play profiles** picker lists the four notches of the members' play gauge (**Just the media**, **Passive**, **Collector**, **Keen**). None ticked, it reaches **Every member**; otherwise the picker shows how many profiles get it. **Seen as**, above the grid, shows the dashboard as one profile gets it: the widgets that profile will not get are faded.
 
 **Save** writes it all. "Always there" and "Locked" widgets reach every member at once; the rest applies to new members and to anyone who resets to Default. Widgets sold in the shop are marked as such.
+
+A member's starter dashboard follows their play profile: it holds the widgets meant for every member and those ticked for their profile (a member who has not answered the gauge counts as **Keen**). At the welcome, **Make my home with these choices** builds it to the member's tastes: the widgets of the tastes they left unticked are left out, those of the tastes they ticked that your composition lacks are added, and the widgets of no taste (a clock, a note, the welcome) and the "Always there" and "Locked" ones stay as you put them. Members get their profile's dashboard again with **Default** or, in **My settings → Play**, **Take my profile's dashboard**.
+
+| Taste (welcome) | Its widgets |
+|---|---|
+| **Resume and discover** | **Continue**, **For you**, **Recently added** |
+| **The latest releases** | **Recent releases**, **Next releases**, **Upcoming** |
+| **News about my favourites** | **My feed**, **Featured news** |
+| **My requests** | **My requests**, **My requests coming soon** |
+| **Play** | **My progression**, **Daily objectives**, **Wheel of fortune**, **My Mediacards**, **My reserve** |
+| **Statistics** | **My statistics**, **Top of the week**, **Playing on the server** |
+| **Service status** | **Services**, **Quick access**, **Open incidents** |
+| **The community** | **Community activity**, **Leaderboard**, **Community projects** |
+| **The radio** | **Radio** |
 
 Related settings (Configuration, area Dashboard): *Starter dashboard*, *Widget rules*, *Widget time limit*, and the *"Since last visit"* range, break, items and changes.
 

@@ -23,7 +23,7 @@ interface Service {
   connector?: string | null;
 }
 
-function useServices() {
+export function useServices() {
   return useQuery({
     queryKey: ["services", "health", "names"],
     retry: false,

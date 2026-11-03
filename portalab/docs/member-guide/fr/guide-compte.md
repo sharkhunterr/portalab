@@ -39,7 +39,7 @@ Sur votre profil, « Personnaliser » ouvre « Personnaliser mon profil » : « 
 
 ### Ma présence dans la communauté
 
-Cette carte règle ce que les autres membres voient de vous : les classements, l'activité récente et l'annuaire des membres. C'est le même choix que l'écran de bienvenue « Tu veux jouer ? ».
+Cette carte règle ce que les autres membres voient de vous : les classements, l'activité récente et l'annuaire des membres. Votre niveau de jeu la règle aussi : « Juste les médias » vous rend anonyme, les autres crans public (voir la page [Jeu](/settings/play), plus bas).
 
 - « Public » : les membres du portail, et eux seuls, voient votre nom et votre avatar dans les classements, l'activité et l'annuaire.
 - « Anonyme » : les autres membres ne vous voient nulle part, ni dans l'annuaire, ni dans l'activité. Dans les classements, vous restez compté, sans nom, sans avatar et sans lien vers votre profil.
@@ -138,8 +138,17 @@ Pour retirer un lien, touchez la corbeille (« Supprimer »). Voir aussi [Regard
 
 ## Jeu
 
-La page [Jeu](/settings/play) reprend la question « Tu veux jouer ? » de l'accueil ; changez d'avis quand vous voulez :
+La page [Jeu](/settings/play) reprend la jauge « Jusqu'où veux-tu jouer ? » de l'écran de bienvenue ; changez d'avis quand vous voulez. Faites glisser le curseur : chaque cran ajoute au précédent, et le choix s'enregistre aussitôt.
 
-- « Oui, à tout » : la progression, la boutique et les Mediacards ; votre profil est public, seulement pour les membres du portail.
-- « Oui, sans les cartes » : la progression et la boutique, sans les Mediacards. Elles disparaissent du menu, des fiches des titres, de la boutique et de la réserve, et regarder ne donne plus de booster Mediacards. Les boosters de looks restent.
-- « Non » : votre profil est anonyme et les Mediacards sont cachées.
+| Cran | Ce qu'il apporte |
+|---|---|
+| « Juste les médias » | Regarder, lire et demander, sans le jeu : ni cartes, ni jeux, ni quêtes dans votre menu. Votre profil est anonyme. |
+| « Passif » | De l'XP et des niveaux par ce que vous regardez, lisez ou demandez ; les quêtes, les succès, les classements. Votre profil est public, seulement pour les membres du portail. |
+| « Collectionneur » | En plus, les Mediacards : des boosters en regardant, une collection à compléter. |
+| « Passionné » | En plus, les mini-jeux du jour, les défis de la semaine et les parties à plusieurs. |
+
+Sous « Collectionneur », les Mediacards disparaissent du menu, des fiches des titres, de la boutique et de la réserve, et regarder ne donne plus de booster Mediacards. Les boosters de looks restent. Dans le menu, « Jeux du jour » et « Jouer à plusieurs » n'apparaissent qu'à « Passionné », et « Quêtes » disparaît à « Juste les médias ».
+
+« Régler plus finement qui voit quoi, dans la confidentialité » ouvre le centre de confidentialité.
+
+La carte « Le tableau de bord de ce profil » propose le tableau de bord que l'équipe a prévu pour votre niveau de jeu. « Prendre le tableau de bord de mon profil » remplace votre disposition actuelle par celui-ci ; « Tableau de bord mis à jour » confirme le changement.

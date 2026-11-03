@@ -1098,3 +1098,250 @@ button.first-steps__start:focus-visible {
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 0%, transparent);
   }
 }
+
+/* issue 347: the play gauge — a slider, its notches named under it, what the chosen one brings */
+.play-scale {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.play-scale__range {
+  inline-size: 100%;
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.play-scale__stops {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.play-scale__stop {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  inline-size: 100%;
+  padding: var(--space-2) var(--space-1);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+  cursor: pointer;
+}
+
+.play-scale__stop:hover {
+  color: var(--color-text);
+}
+
+.play-scale__stop[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  color: var(--color-text);
+}
+
+.play-scale__card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-accent) 4%, transparent);
+}
+
+.play-scale__name,
+.play-scale__hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.play-scale__hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.play-scale__features {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+}
+
+.play-scale__feature {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--color-text-muted) 50%, transparent);
+}
+
+.play-scale__feature[data-on] {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.play-scale__feature[data-on] .play-scale__mark {
+  color: var(--color-accent);
+}
+
+/* a choice that goes with a screen: a box ticked, its words beside it */
+.onboarding-check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.onboarding-check input {
+  margin-block-start: 0.2rem;
+  accent-color: var(--color-accent);
+}
+
+.onboarding-check__text {
+  display: grid;
+}
+
+.onboarding-check__hint {
+  color: var(--color-text-muted);
+}
+
+/* the media accounts: one line each, its state, a code to verify it */
+.onboarding-accounts {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.onboarding-accounts li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.onboarding-accounts__name {
+  display: grid;
+  flex: 1;
+  font-size: var(--font-size-sm);
+}
+
+.onboarding-accounts__who,
+.onboarding-accounts__none {
+  color: var(--color-text-muted);
+}
+
+.onboarding-accounts__state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.onboarding-accounts li[data-verified] .onboarding-accounts__state {
+  color: var(--state-available-fg);
+}
+
+.onboarding-accounts__proof,
+.onboarding-accounts__add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
+  inline-size: 100%;
+}
+
+.onboarding-accounts__proof > *,
+.onboarding-accounts__add > :not(button) {
+  flex: 1 1 10rem;
+}
+
+/* how the member is told: three ready-made choices, a switch per theme and channel */
+.onboarding-presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.onboarding-presets .onboarding-tile > span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.onboarding-notify {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.onboarding-notify th,
+.onboarding-notify td {
+  padding: var(--space-1) var(--space-2);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.onboarding-notify thead th {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+}
+
+.onboarding-notify tbody th {
+  font-weight: var(--font-weight-medium);
+  text-align: start;
+}
+
+.onboarding-notify__icon {
+  margin-inline-end: var(--space-2);
+  vertical-align: -0.15em;
+}
+
+.onboarding-notify td {
+  text-align: center;
+}
+
+@media (max-width: 40rem) {
+  .onboarding-presets {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* issue 347: « your portal to your taste » — a screen in parts, a taste out of reach greyed */
+.onboarding-welcome__part {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.onboarding-chip[data-off] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

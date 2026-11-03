@@ -111,7 +111,7 @@ Les **premiers pas**, des missions de découverte pour les nouveaux membres, app
 
 ## Les jeux
 
-La rubrique **Jeux** du menu réunit « Jeux du jour », « Quêtes », « Jouer à plusieurs » et « Mediacards » (voir [Les Mediacards](portalab://wiki/guide-cartes)). Les jeux sont « tirés de la médiathèque du foyer : seul, chaque jour, ou à plusieurs ».
+La rubrique **Jeux** du menu réunit « Jeux du jour », « Quêtes », « Jouer à plusieurs » et « Mediacards » (voir [Les Mediacards](portalab://wiki/guide-cartes)). Les jeux sont « tirés de la médiathèque du foyer : seul, chaque jour, ou à plusieurs ». Ce que vous y voyez suit votre niveau de jeu, réglé dans [Mes paramètres → Jeu](/settings/play) : « Jeux du jour » et « Jouer à plusieurs » à « Passionné », « Mediacards » dès « Collectionneur », « Quêtes » dès « Passif » ; à « Juste les médias », aucune de ces pages.
 
 ### Jeux du jour
 

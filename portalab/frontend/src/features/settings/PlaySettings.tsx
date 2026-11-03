@@ -1,21 +1,25 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { SavedNote, SettingsCard, SettingsPage } from "../account/SettingsKit";
-import { PLAY, type Play, usePlay } from "../onboarding/play";
+import { PlayScale } from "../onboarding/PlayScale";
+import { usePlay, useProfileDashboard } from "../onboarding/play";
 import "../onboarding/onboarding.css";
 
 /**
- * « Play » (issue 14, issue 243): the welcome's « do you want to play? », changed at any time — all of it,
- * without the Mediacards (they are hidden, no card booster is given by watching), or not at all (an anonymous
- * profile). The looks boosters, the progression and the shop stay whatever the answer.
+ * « Play » (issue 14, issue 243): the welcome's « do you want to play? », changed at any time. Issue 347: the
+ * play gauge — just the media (an anonymous profile, no cards, games nor quests in the menu), passive (the
+ * progression), collector (and the Mediacards), keen (and the day's games) — and the dashboard the
+ * administrator prepared for it, taken on demand (it replaces the member's own arrangement).
  */
 export default function PlaySettings() {
   const t = useT();
   const [done, setDone] = useState(false);
   const { saved, save } = usePlay(() => setDone(true));
-  const current: Play = saved ?? "full";
+  const dashboard = useProfileDashboard();
+  const current = saved ?? "full";
   return (
     <SettingsPage
       icon="gamepad"
@@ -29,34 +33,14 @@ export default function PlaySettings() {
         aside={<SavedNote shown={done && !save.isPending} text={t("account:saved")} />}
         level={2}
       >
-        <fieldset className="onboarding-play settings-play" disabled={save.isPending}>
-          <legend className="visually-hidden">{t("onboarding:play.title")}</legend>
-          {PLAY.map((choice) => (
-            <label
-              key={choice.key}
-              className="onboarding-play__choice"
-              data-current={current === choice.key || undefined}
-            >
-              <input
-                type="radio"
-                name="settings-play"
-                value={choice.key}
-                checked={current === choice.key}
-                onChange={() => {
-                  setDone(false);
-                  save.mutate(choice.key);
-                }}
-              />
-              <span className="onboarding-play__icon" aria-hidden="true">
-                <Icon name={choice.icon} size={20} />
-              </span>
-              <span className="onboarding-play__text">
-                <strong>{t(`onboarding:play.${choice.key}`)}</strong>
-                <span>{t(`account:settings.play.${choice.key}`)}</span>
-              </span>
-            </label>
-          ))}
-        </fieldset>
+        <PlayScale
+          value={current}
+          disabled={save.isPending}
+          onChange={(play) => {
+            setDone(false);
+            save.mutate(play);
+          }}
+        />
         {save.error ? (
           <p className="settings-play__problem" role="alert">
             {t("onboarding:play.error")}
@@ -65,6 +49,25 @@ export default function PlaySettings() {
         <p className="settings-play__more">
           <Link to="/privacy">{t("account:settings.playPrivacy")}</Link>
         </p>
+      </SettingsCard>
+      <SettingsCard
+        icon="dashboard"
+        title={t("onboarding:play.dashboard")}
+        hint={t("onboarding:play.dashboardReplace")}
+        aside={<SavedNote shown={dashboard.isSuccess} text={t("account:settings.playDashboardDone")} />}
+        level={2}
+      >
+        <div className="settings-actions">
+          <Button variant="secondary" disabled={dashboard.isPending} onClick={() => dashboard.mutate()}>
+            <Icon name="dashboard" size={16} />
+            {t("account:settings.playDashboard")}
+          </Button>
+        </div>
+        {dashboard.error ? (
+          <p className="settings-play__problem" role="alert">
+            {t("onboarding:play.error")}
+          </p>
+        ) : null}
       </SettingsCard>
     </SettingsPage>
   );

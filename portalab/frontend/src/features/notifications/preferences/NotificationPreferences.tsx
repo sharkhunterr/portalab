@@ -17,11 +17,11 @@ import "../notifications.css";
  * « e-mail » companion (the same thing, sent by e-mail too when the administrator's rule says so) are one
  * line — its switches set both.
  */
-const CHANNELS = ["portal", "email"] as const;
-type Category = Preferences["categories"][number];
+export const CHANNELS = ["portal", "email"] as const;
+export type Category = Preferences["categories"][number];
 
 /** Which card a category goes in, from its key's prefix (« media.available » → media). */
-const GROUPS: ReadonlyArray<{ key: string; icon: string; prefixes: readonly string[] }> = [
+export const GROUPS: ReadonlyArray<{ key: string; icon: string; prefixes: readonly string[] }> = [
   { key: "account", icon: "shield", prefixes: ["account"] },
   { key: "media", icon: "film", prefixes: ["media"] },
   { key: "community", icon: "users", prefixes: ["community", "campaigns"] },
@@ -33,11 +33,11 @@ const GROUPS: ReadonlyArray<{ key: string; icon: string; prefixes: readonly stri
 ];
 
 /** Issue 124: the category a companion is shown with — one line for the member, two keys behind it. */
-const COMPANIONS: Record<string, string> = {
+export const COMPANIONS: Record<string, string> = {
   "system.health": "system.health_email",
   "communications.broadcast": "communications.announcement_email",
 };
-const SHOWN_WITH = new Set(Object.values(COMPANIONS));
+export const SHOWN_WITH = new Set(Object.values(COMPANIONS));
 
 /** The line of a category with its companion: portal as the category says, e-mail as the companion does. */
 function merged(category: Category, all: readonly Category[]): { line: Category; keys: string[] } {
@@ -48,7 +48,7 @@ function merged(category: Category, all: readonly Category[]): { line: Category;
   return { line: { ...category, channels }, keys: [category.key, companion.key] };
 }
 
-function groupOf(category: Category): string {
+export function groupOf(category: Category): string {
   const prefix = category.key.split(".")[0] ?? "";
   return GROUPS.find((group) => group.prefixes.includes(prefix))?.key ?? "other";
 }
