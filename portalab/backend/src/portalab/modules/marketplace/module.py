@@ -63,8 +63,10 @@ from portalab.modules.marketplace.funding.service import Fundings
 from portalab.modules.marketplace.grants.service import Grants
 from portalab.modules.marketplace.integrations import (
     FEATURED_WIDGET,
+    RESERVE_WIDGET,
     FeaturedWidget,
     ProductSearchProvider,
+    ReserveWidget,
     catalog_tool,
     cosmetics_section,
 )
@@ -340,6 +342,8 @@ class MarketplaceModule:
             self.search.register(ProductSearchProvider(self.catalog, self.authorizer), owner=OWNER)
         if self.widgets.get(FEATURED_WIDGET.key) is None:
             self.widgets.register(FEATURED_WIDGET, FeaturedWidget(self.catalog, self.clock), owner=OWNER)
+        if self.widgets.get(RESERVE_WIDGET.key) is None:  # #347: « My reserve »
+            self.widgets.register(RESERVE_WIDGET, ReserveWidget(self.database, self.clock), owner=OWNER)
         if not any(p.kind == "shop" for p in self.widgets.summaries()):  # 027: since your last visit
             self.widgets.register_summary(ShopChanges(self.database, self.authorizer), owner=OWNER)
         if self.tools.get("marketplace.catalog") is None:

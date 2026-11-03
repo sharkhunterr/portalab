@@ -1,0 +1,139 @@
+/* issue 347: « My Mediacards » on the dashboard — the collection's figures on top, the packs to open below */
+.mediacards-widget {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-3);
+  block-size: 100%;
+  min-inline-size: 0;
+}
+.mediacards-widget__summary {
+  display: grid;
+  gap: var(--space-2);
+}
+.mediacards-widget__main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  color: var(--color-text-muted);
+}
+.mediacards-widget__main strong {
+  color: var(--color-text);
+  font-size: var(--font-size-xl);
+}
+.mediacards-widget__share {
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+.mediacards-widget__meter {
+  display: block;
+  block-size: 0.45rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+}
+.mediacards-widget__meter > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+}
+.mediacards-widget__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.mediacards-widget__stats strong {
+  color: var(--color-text);
+}
+.mediacards-widget__packs {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-block-size: 0;
+}
+.mediacards-widget__to-open {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--space-1);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+.mediacards-widget__to-open:hover,
+.mediacards-widget__to-open:focus-visible {
+  text-decoration: underline;
+}
+/* as many piles as the block holds: a row that does not fit is left out and counted */
+.mediacards-widget__piles {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: var(--space-4);
+  margin: 0;
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+  list-style: none;
+}
+.mediacards-widget__piles > li {
+  display: flex;
+}
+.mediacards-widget__pack {
+  position: relative;
+  display: flex;
+  isolation: isolate;
+  block-size: clamp(4.5rem, 45cqh, 8rem);
+  border-radius: var(--radius-md);
+  transition: transform var(--motion-duration-fast) ease;
+}
+.mediacards-widget__pack:hover,
+.mediacards-widget__pack:focus-visible {
+  transform: translateY(-2px);
+}
+/* issue 297: the same boosters in a pile — the ones under it peeking out, how many on a badge */
+.mediacards-widget__pack[data-pile]::before,
+.mediacards-widget__pack[data-pile]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  box-shadow: 0 0 0 1px var(--color-border);
+}
+.mediacards-widget__pack[data-pile]::before {
+  transform: translate(0.3rem, 0.25rem) rotate(3deg);
+}
+.mediacards-widget__pack[data-pile]::after {
+  transform: translate(0.6rem, 0.5rem) rotate(6deg);
+  opacity: 0.6;
+}
+.mediacards-widget__pile {
+  position: absolute;
+  inset: -0.45rem auto auto -0.45rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-sm);
+}
+
+/* a low block (two rows): the figures only — the way to the packs stays */
+@container (max-height: 9rem) {
+  .mediacards-widget__main strong {
+    font-size: var(--font-size-lg);
+  }
+  .mediacards-widget__piles {
+    display: none;
+  }
+}

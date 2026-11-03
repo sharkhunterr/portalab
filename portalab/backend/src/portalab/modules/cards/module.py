@@ -10,6 +10,7 @@ from sqlalchemy import update
 
 from portalab.capabilities.administration import BACKUP_LEFT_OUT_CAPABILITY
 from portalab.capabilities.config import CAPABILITY as CONFIG
+from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
 from portalab.capabilities.events import (
     ConsumerRegistry,
     EventTypeRegistry,
@@ -37,6 +38,7 @@ from portalab.modules.cards.faces import FaceMatcher
 from portalab.modules.cards.focus import ArtFocus
 from portalab.modules.cards.frames import FilmFrames
 from portalab.modules.cards.generator import CardForge
+from portalab.modules.cards.integrations import COLLECTION_WIDGET, CollectionWidget
 from portalab.modules.cards.models import Card
 from portalab.modules.cards.packs import (
     BOOSTER_FIELDS,
@@ -74,6 +76,7 @@ class CardsModule:
         product_types: ProductTypeRegistry = default_product_types,
         events: EventPublisher | None = None,
         event_types: EventTypeRegistry = default_event_types,
+        widgets: WidgetRegistry = default_widgets,
         blobs: BlobStore | None = None,
         root: Path | None = None,
     ) -> None:
@@ -85,6 +88,7 @@ class CardsModule:
         self.forge = CardForge(database, capabilities, clock=clock)
         self.packs = Packs(database, capabilities, clock=clock, events=events)
         self.event_types = event_types
+        self.widgets = widgets
         self.service = CardService(database)
         self.roles = RoleArt(database, capabilities, clock=clock)
         self.fan_art = FanArt(database, capabilities, clock=clock)
@@ -153,6 +157,10 @@ class CardsModule:
             self.capabilities.provide(
                 CONTENT_BOOSTERS, ContentBoosters(self.packs), instance_ref="cards", owner=OWNER
             )
+        # #347: « My Mediacards » on the dashboard
+        if self.widgets.get(COLLECTION_WIDGET.key) is None:
+            widget = CollectionWidget(self.service, self.packs, self.clock)
+            self.widgets.register(COLLECTION_WIDGET, widget, owner=OWNER)
 
     async def refresh_config(self) -> None:
         try:

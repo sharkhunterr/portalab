@@ -9,6 +9,8 @@ import "./calendar";
 import "../../gamification/widget";
 import "../../community/widget";
 import "../../marketplace/widget";
+import "../../marketplace/reserve/ReserveWidget"; // issue 347: « Ma réserve »
+import "../../cards/CollectionWidget"; // issue 347: « Mes Mediacards »
 import "../../support/incidents/widget";
 import "../../support/tickets/widget";
 import "../../campaigns/widget";

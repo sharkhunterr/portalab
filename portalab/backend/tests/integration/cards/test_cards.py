@@ -5,6 +5,7 @@ revealed when opened; borderless versions only at the high rarities; a member's 
 import random
 from dataclasses import replace
 from datetime import UTC, datetime
+from types import SimpleNamespace
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -12,9 +13,13 @@ import pytest
 from sqlalchemy import select
 
 from portalab.capabilities.catalog import new_registry
+from portalab.capabilities.config import CAPABILITY as CONFIG
+from portalab.capabilities.dashboard import WidgetRegistry
+from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.marketplace import OwnershipView
 from portalab.capabilities.media import ARTWORK, Artwork
 from portalab.capabilities.media_core import CARD_SOURCES, CardImage, CardPerson, CardWork
+from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.modules.cards.artwork import FanArt
 from portalab.modules.cards.generator import CardForge, plan, set_code
@@ -903,3 +908,62 @@ async def test_a_booster_opened_and_a_collection_completed(database: Database) -
     done = published.events[2][1]
     assert done["set"] == str(film.object_id) and done["size"] == len(cards) and done["kind"] == "movie"
     assert published.events[1][1]["foil"] == len(cards)
+
+
+class Play:
+    """The welcome's « do you want to play? » answer of each member (issue 243)."""
+
+    def __init__(self, answers: dict[UUID, str]) -> None:
+        self.answers = answers
+
+    async def get(self, key: str, user_id: UUID | None = None) -> Any:
+        return SimpleNamespace(value=self.answers.get(user_id) if user_id else None)
+
+
+async def test_my_mediacards_on_the_dashboard(database: Database, tmp_path: Any) -> None:
+    """#347 — « My Mediacards » on the dashboard: where the collection stands, as on ``/cards``, and the packs
+    to open, sealed (their cards hidden); nothing for a member who does not collect the cards."""
+    from portalab.modules.cards.module import CardsModule
+
+    capabilities = new_registry()
+    film = work("Top Gun: Maverick", 11000, "US", ["Tom Cruise", "Miles Teller"])
+    capabilities.provide(CARD_SOURCES, Sources([film]), instance_ref="t", owner="test")
+    collector, other = uuid4(), uuid4()
+    async with database.unit_of_work() as uow:
+        for user in (collector, other):
+            await uow.session.execute(INSERT_USER, {"id": user, "login": f"u{user.hex[:8]}"})
+    capabilities.provide(CONFIG, Play({other: "progression"}), instance_ref="t", owner="test")
+    widgets = WidgetRegistry()
+    module = CardsModule(database, capabilities, widgets=widgets, root=tmp_path)
+    module.register()
+    registered = widgets.get("cards.collection")
+    assert registered is not None and registered.definition.component_id == "cards.collection"
+    assert registered.definition.required_permission == "cards.read"
+
+    async def load(user: UUID) -> Any:
+        return await registered.provider.load(Principal(user_id=user), {}, LocaleContext())
+
+    assert (await load(collector)).state == "no-data"  # no card made yet
+    await module.forge.sync()
+    empty = await load(collector)
+    assert empty.state == "available" and empty.data is not None
+    assert [empty.data[k] for k in ("unique", "cards", "unopened", "packs")] == [0, 4, 0, []]
+    module.packs.rng = random.Random(4)  # noqa: S311 — deterministic test data
+    first = await module.packs.give(collector, "content", str(film.object_id), "k1", size=2)
+    await module.packs.give(collector, "content", str(film.object_id), "k2", size=2)
+    assert first is not None
+    await module.packs.open(collector, first)
+    widget = await load(collector)
+    assert widget.state == "available" and widget.data is not None
+    assert {k: widget.data[k] for k in ("copies", "sets_started", "sets", "cards", "unopened")} == {
+        "copies": 2,
+        "sets_started": 1,
+        "sets": 1,
+        "cards": 4,
+        "unopened": 1,
+    }
+    [pack] = widget.data["packs"]
+    assert pack["set"] == str(film.object_id) and pack["count"] == 2 and pack["cards"] == []  # still sealed
+    # a member who plays without the cards: nothing, never an error
+    await module.packs.give(other, "trial", None, "t1")
+    assert (await load(other)).state == "no-data"

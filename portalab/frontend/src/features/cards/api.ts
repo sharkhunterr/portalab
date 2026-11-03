@@ -303,9 +303,11 @@ export function useCardPool(filters: {
   });
 }
 
-export function usePacks() {
+/** ``enabled``: issue 347 — not asked for a member who does not collect the cards. */
+export function usePacks(enabled = true) {
   return useQuery({
     queryKey: [...KEY, "packs"],
+    enabled,
     queryFn: async () =>
       (await api.GET("/api/v1/me/cards/packs", { params: { query: { unopened: true } } }))
         .data as unknown as CardPack[],
