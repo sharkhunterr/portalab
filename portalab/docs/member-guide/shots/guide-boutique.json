@@ -103,5 +103,29 @@
         "pad": 4
       }
     ]
+  },
+  {
+    "name": "boutique-reserve",
+    "page": "guide-boutique",
+    "route": "/marketplace/reserve",
+    "height": 1000,
+    "settle": 4000,
+    "before": [
+      {
+        "waitFor": ".reserve-tile",
+        "wait": 2500
+      }
+    ],
+    "maxHeight": 700,
+    "marks": [
+      {
+        "target": ".reserve-jump",
+        "pad": 4
+      },
+      {
+        "target": ".reserve-tile",
+        "pad": 4
+      }
+    ]
   }
 ]

@@ -11,10 +11,10 @@
         "wait": 5000
       }
     ],
-    "maxHeight": 304,
+    "maxHeight": 420,
     "marks": [
       {
-        "target": ".community-tabs",
+        "target": ".hub-tabs ul",
         "pad": 4
       },
       {
@@ -35,22 +35,18 @@
     "settle": 3000,
     "before": [
       {
-        "waitFor": ".project-launch-cta",
+        "waitFor": ".project-card",
         "wait": 2500
       }
     ],
     "maxHeight": 980,
     "marks": [
       {
-        "target": ".admin-stats",
+        "target": ".projects-figures",
         "pad": 4
       },
       {
-        "target": ".project-launch-cta .ds-button",
-        "pad": 4
-      },
-      {
-        "target": ".ds-subnav",
+        "target": ".projects-page > fieldset.ds-subnav",
         "pad": 4
       },
       {

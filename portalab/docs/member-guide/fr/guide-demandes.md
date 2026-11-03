@@ -9,14 +9,14 @@ Un film ou une série manque à la médiathèque ? Le demander, savoir ce que ce
 
 ## Trouver un titre à demander
 
-Ouvrez [Faire une demande](/media/discover) dans la section « Médias » du menu, ou cliquez sur **« Demander un média »** depuis la page Médias.
+Ouvrez [Demander un titre](/media/discover) dans la rubrique « Médias » du menu, ou cliquez sur **« Demander un média »** depuis la page Médias.
 
 - Tapez dans **« Chercher un film ou une série »** : vous trouvez aussi les titres absents de la médiathèque.
 - Ou parcourez les rangées : **« Tendances »**, **« Films populaires »**, **« Séries populaires »**, **« Films à venir »**, **« Séries à venir »**.
 
 Chaque affiche porte un badge : **« À demander »**, **« Demandé »**, **« Vous l'avez demandé »**, **« Déjà demandé »**, **« En cours »**, **« En partie disponible »** ou **« Disponible »**.
 
-![La page Faire une demande : la recherche, et le badge de chaque affiche](shot:demandes-chercher)
+![La page Demander un titre : la recherche, et le badge de chaque affiche](shot:demandes-chercher)
 
 Cliquez sur une affiche pour voir sa fiche : synopsis, genres, durée, note, distribution, **« Bande-annonce »** et, pour une série, ses saisons. Si le titre est déjà là, **« Voir dans la médiathèque »** vous y emmène.
 
@@ -45,7 +45,7 @@ Le nombre de demandes que vous pouvez faire est limité. Les limites dépendent 
 - si votre compte sur le service de demandes est lié, ce sont **ses** limites qui comptent : un nombre de films et un nombre de séries, à part, tous les tant de jours. Le portail affiche la date où une demande revient ;
 - sinon, le portail vous donne un nombre de demandes pour la journée, la semaine ou le mois.
 
-Votre quota s'affiche dans **« Mon quota de demandes »** sur la page Faire une demande, et en haut de [Mes demandes](/media/requests).
+Votre quota s'affiche dans **« Mon quota de demandes »** sur la page Demander un titre, et en haut de vos demandes en chiffres ([Mes demandes](/media/requests/stats), rubrique Statistiques).
 
 **Quand votre quota est atteint**, vous pouvez acheter des demandes en plus dans la boutique, avec la monnaie du portail (Coins) : suivez le lien **« Plus de demandes en boutique »**. Elles servent seulement une fois votre quota épuisé, et restent à vous jusqu'à ce que vous les utilisiez.
 
@@ -54,15 +54,21 @@ Votre quota s'affiche dans **« Mon quota de demandes »** sur la page Faire une
 
 ## Suivre vos demandes
 
-Ouvrez [Mes demandes](/media/requests). La page a trois onglets.
+Ouvrez [Mes demandes](/media/requests), dans la rubrique « Médias ». La page a deux onglets :
 
-![Mes demandes : les onglets (1), la période (2) et le résumé de vos demandes (3)](shot:demandes-mes-demandes)
-
-Sur l'image : les trois onglets (1), la **« Période »** (2) et le résumé de vos demandes sur cette période (3).
-
-- **« Aperçu »** : vos chiffres sur la **« Période »** choisie, **« Statut de mes demandes »**, **« Ce qu'elles sont devenues »**, **« Mon rang de demandeur »** (anonyme), **« Demandes dans le temps »**, **« Temps de mise à disposition »**, les titres les plus regardés parmi les demandés, et vos genres demandés face à vos genres regardés. Certaines de ces cartes se débloquent dans la boutique, selon votre portail.
 - **« Liste »** : toutes vos demandes, avec une recherche et des filtres **« En attente »**, **« En cours »**, **« Disponibles »** et **« Refusées »**. Chaque ligne indique son étape : « En attente de validation », « Sortie le… », « Recherche d'une version », « Téléchargement 60 % », « Importation », « Disponible »…
 - **« Bientôt disponible »** : ce qui se télécharge, s'importe ou a une date de sortie.
+
+### Vos demandes en chiffres
+
+Vos chiffres sont dans la rubrique **Statistiques**, page [Mes demandes](/media/requests/stats).
+
+![Mes demandes en chiffres : la période (1) et le résumé de vos demandes (2)](shot:demandes-mes-demandes)
+
+1. La **« Période »**.
+2. Le résumé de vos demandes sur cette période.
+
+Plus bas : **« Statut de mes demandes »**, **« Ce qu'elles sont devenues »**, **« Mon rang de demandeur »** (anonyme), **« Demandes dans le temps »**, **« Temps de mise à disposition »**, les titres les plus regardés parmi les demandés, et vos genres demandés face à vos genres regardés. Certaines de ces cartes se débloquent dans la boutique, selon votre portail. Voir [Mes statistiques et mon récap](portalab://wiki/guide-statistiques).
 
 **Annuler une demande** : tant qu'elle est en attente, cliquez sur **« Annuler »** dans la liste, ou sur **« Annuler la demande »** dans la section « Demandes » de la fiche du titre.
 
@@ -82,7 +88,7 @@ Sur la fiche d'un titre demandé, l'encadré **« Où en est ce titre »** montr
 
 Chaque étape est « fait », « en cours », « en attente », « bloqué » (quelqu'un doit intervenir), « en échec » ou « à venir ». L'étape en cours est expliquée juste sous la frise. Dépliez **« Toutes les étapes »** pour lire le détail de chacune.
 
-![L'encadré « Où en est ce titre » d'un film qui attend sa sortie](shot:demandes-parcours)
+![L'encadré « Où en est ce titre » d'un titre demandé, pas encore arrivé](shot:demandes-parcours)
 
 Sur l'image : la frise des étapes (1), l'étape en cours expliquée (2), **« Toutes les étapes »** (3) et **« Demander à l'assistant »** (4).
 

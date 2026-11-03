@@ -65,7 +65,7 @@ Dans [Apparence](/settings/appearance), vous pouvez choisir la place de ces mess
 
 ## Choisir ce que vous recevez
 
-Ouvrez « Préférences de notification » : depuis le menu personnel (votre photo), depuis le panneau de la cloche, ou directement sur [cette page](/settings/notifications).
+Ouvrez « Préférences de notification » : dans [Mes paramètres](/settings) (menu personnel, derrière votre photo), « Notifications » ; depuis le panneau de la cloche ; ou directement sur [cette page](/settings/notifications).
 
 Les sortes de notifications sont rangées par thème, une carte chacun : « Compte et sécurité », « Médias », « Communauté », « Progression », « Boutique », « Actualités et annonces », « Support et services »… Pour chaque ligne, deux interrupteurs :
 
@@ -73,6 +73,8 @@ Les sortes de notifications sont rangées par thème, une carte chacun : « Comp
 - « Par e-mail » : vous la recevez aussi par e-mail.
 
 Chaque changement est enregistré tout de suite (« Préférences enregistrées. »).
+
+La ligne « Mon fil : ce qui arrive pour ce que je suis » règle les nouveautés de [Mon fil](/feed) : dans la cloche (c'est le réglage de départ), par e-mail aussi, ou pas du tout.
 
 ![Les préférences de notification, une carte par thème](shot:notifications-preferences)
 
@@ -95,14 +97,19 @@ Dans la carte « Résumé par e-mail », choisissez comment recevoir vos e-mails
 
 ## Les newsletters
 
-Le portail peut publier des newsletters, par exemple les nouveautés arrivées dans la médiathèque, les sorties récentes ou les sorties à venir. Elles paraissent dans les [actualités](/news) et peuvent aussi être envoyées par e-mail.
+Le portail peut publier des newsletters, par exemple les titres arrivés dans la médiathèque, les sorties récentes ou les sorties à venir. Les **newsletters automatiques** s'écrivent toutes seules, chaque jour, chaque semaine ou chaque mois. Elles paraissent dans les [actualités](/news) et peuvent aussi être envoyées par e-mail. Voir [Actualités, calendrier et wiki](portalab://wiki/guide-actualites).
 
-Vous êtes abonné à chaque newsletter par e-mail tant que vous ne vous désabonnez pas. Pour choisir :
+Vous êtes abonné à chaque newsletter par e-mail tant que vous ne vous en désabonnez pas. Pour choisir :
 
 1. Ouvrez les [Préférences de notification](/settings/notifications).
-2. Dans la carte « Newsletters par e-mail », allumez ou éteignez l'interrupteur de chaque newsletter.
+2. Dans la carte « Newsletters par e-mail », repérez la newsletter :
+   - « Lettres automatiques » : chaque newsletter automatique, avec quand elle part (par exemple « chaque lundi à 9 h ») ;
+   - « Chaînes » : les chaînes d'actualités que l'équipe envoie par e-mail.
+3. Allumez ou éteignez son interrupteur. Chaque newsletter se règle à part : vous pouvez en garder une et quitter les autres.
 
-Chaque e-mail de newsletter contient aussi un lien pour vous désabonner, qui mène à cette même carte. Les newsletters restent toujours lisibles dans les actualités, même si vous ne les recevez plus par e-mail.
+Éteindre une chaîne coupe aussi les newsletters automatiques qui y paraissent : leur ligne indique « Désactivée avec sa chaîne « … » ».
+
+En bas de chaque e-mail de newsletter, « Se désabonner de cette lettre » mène directement à cette carte. Les newsletters restent toujours lisibles dans les actualités, même si vous ne les recevez plus par e-mail.
 
 > [!NOTE]
 > Cette carte n'apparaît que si votre portail envoie des newsletters par e-mail.

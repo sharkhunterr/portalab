@@ -9,15 +9,15 @@ Découvrir les membres, personnaliser votre profil, suivre l'activité et les cl
 
 ## Se repérer dans la communauté
 
-Ouvrez [la communauté](/community) depuis le menu « Communauté ». Les onglets sont « Découvrir », « Classements », « Quêtes », « Succès », « Membres » et « Propositions ».
+Ouvrez la rubrique **Communauté** du menu. Ses pages sont des onglets, en haut du contenu : « Aperçu », « Membres », « Classements », « Événements », « Propositions » et « Projets ».
 
-L'onglet « Découvrir » donne une vue d'ensemble :
-- le podium du classement et votre place ;
+L'onglet [Aperçu](/community) donne une vue d'ensemble :
+- le podium du « Classement » et votre place ;
 - « Mes quêtes » et les « Campagnes en cours » ;
 - les « Dernières activités » ;
 - les « Nouveaux membres », les « Propositions à soutenir » et les « Succès récents ».
 
-Les quêtes et les succès sont expliqués dans [XP, niveaux, séries et succès](portalab://wiki/guide-progression).
+Les quêtes sont dans la rubrique **Jeux**, et vos succès dans votre menu personnel (« Succès »). Les deux sont expliqués dans [Progression, quêtes et jeux](portalab://wiki/guide-progression).
 
 ## Trouver un membre
 
@@ -51,7 +51,7 @@ Un succès secret s'affiche comme « un succès secret ». Un membre qui a chois
 
 ## Consulter les classements
 
-![Les onglets de la communauté (1), « Classer par » (2) et la période (3)](shot:communaute-classements)
+![Les onglets de la rubrique Communauté (1), « Classer par » (2) et la période (3)](shot:communaute-classements)
 
 1. Ouvrez l'onglet [Classements](/community/leaderboards).
 2. Choisissez quoi classer dans « Classer par » : « XP », « Niveau », « Contribution », « Succès » et, si votre portail le propose, « Coins ».
@@ -67,7 +67,7 @@ Le classement affiche le podium, votre position et les places gagnées ou perdue
 
 ## Les événements
 
-La page [Événements de la communauté](/community/events) liste les événements à venir qui vous concernent. Ils apparaissent aussi dans le calendrier. Voir [Actualités, calendrier et wiki](portalab://wiki/guide-actualites).
+L'onglet [Événements](/community/events) liste les événements à venir qui vous concernent, avec, en tête, les campagnes en cours. Ils apparaissent aussi dans le calendrier. Voir [Actualités, calendrier et wiki](portalab://wiki/guide-actualites).
 
 ## Proposer une idée
 
@@ -88,29 +88,38 @@ Si vous êtes l'auteur, vous pouvez « Demander de l'aide », « Retirer la prop
 
 ## Financer un projet communautaire
 
-La page [Projets de la communauté](/projects) réunit les idées des membres, financées ensemble en Coins.
+L'onglet [Projets](/projects) (« Projets de la communauté ») réunit les idées des membres, financées ensemble en Coins.
 
-![Les projets de la communauté : les chiffres, « Lancer un projet », les étapes et un projet, numérotés](shot:communaute-projets)
+![Les projets de la communauté : les chiffres, les étapes et un projet, numérotés](shot:communaute-projets)
 
 1. **Les chiffres** : les projets ouverts au financement, en construction et publiés, les Coins rassemblés et vos contributions.
-2. **« Lancer un projet »** : votre propre idée (voir plus bas).
-3. **Les étapes** pour filtrer les projets.
-4. **Un projet** : son état, les Coins rassemblés, ses contributeurs et, s'il est ouvert, « Contribuer ».
+2. **Les étapes** pour filtrer les projets, avec le nombre de projets de chacune.
+3. **Un projet** : son état, son étape (« Étape … sur … »), les Coins rassemblés sur son objectif, ses contributeurs et, s'il est ouvert, « Contribuer ». « Du nouveau » signale un projet ajouté ou qui a avancé depuis votre dernière visite.
 
-- Filtrez par étape : « Proposés », « À financer », « En construction », « Publiés » ou « Clos ».
+- Filtrez par étape : « Tous », « Proposés », « À financer », « En construction », « Publiés » ou « Clos ».
 - Un projet passe par plusieurs états : « Idée », « Proposition », « Ouvert aux votes et au financement », « En validation », « En développement », « En bêta », puis « Publié ».
+- Dans le menu, un badge sur « Projets » signale les projets nouveaux ou qui ont avancé depuis votre dernière visite.
+
+### La page d'un projet
+
+Touchez un projet pour ouvrir sa page :
+
+- **ce qui est rassemblé**, sa barre vers l'objectif et ce qu'il reste : « Reste … Coins à réunir », ou « Objectif atteint ! » ;
+- les **« Contributeurs »**, avec ce que chacun a apporté et depuis quand. Un membre anonyme apparaît comme « Un membre » ;
+- le **« Cycle de vie »** : une frise horizontale, de l'idée à la publication, avec l'étape où en est le projet ;
+- les « Notes du projet » et, s'il vient d'une proposition, « Voir la proposition ».
 
 Pour financer un projet ouvert :
-1. Ouvrez le projet et allez à « Financement ».
-2. Saisissez les « Coins à réserver », dans les limites indiquées.
+1. Sur sa page, allez à « Contribuer ».
+2. Choisissez un des « Montants rapides », ou saisissez les « Coins à réserver », dans les limites indiquées.
 3. Cochez « Je comprends que financer ne garantit pas la réalisation du projet. »
 4. Touchez « Réserver des Coins ».
 
 > [!IMPORTANT]
-> Vos Coins sont **réservés**, pas dépensés tout de suite. Ils sont utilisés à la publication du projet ou à certaines étapes, comme l'indique le projet. Si le projet est refusé ou abandonné, ils vous sont intégralement remboursés.
+> Vos Coins sont **réservés**, pas dépensés tout de suite. Ils sont utilisés à la publication du projet ou à certaines étapes, comme l'indiquent ses « Règles du financement ». Si le projet est refusé ou abandonné, ils vous sont intégralement remboursés.
 
-« Mes financements », en bas de la page, montre pour chaque projet vos Coins réservés, utilisés et remboursés. Vous êtes notifié quand un projet que vous financez change d'état.
+« Mes financements », en bas de la page des projets, montre pour chaque projet vos Coins réservés, utilisés et remboursés. Vous êtes notifié quand un projet que vous financez change d'état.
 
 ### Lancer votre propre projet
 
-Touchez « Lancer un projet » : il vous mène au produit « Lancement de projet » de la boutique. Après l'achat, ouvrez « Mes achats », saisissez le titre et le pitch, puis touchez « Lancer le projet ». Votre idée s'ouvre en proposition, et chacun peut la financer.
+En bas de la page des projets, « Une idée de fonctionnalité ? » propose **« Lancer un projet »** : il vous mène au produit « Lancement de projet » de la boutique. Après l'achat, ouvrez [Ma réserve](/marketplace/reserve) : le projet vous y attend dans « À compléter ». Touchez-le : son formulaire s'ouvre dans une fenêtre. Saisissez le « Titre du projet », le pitch et l'« Objectif à atteindre » (les administrateurs le confirment ou l'ajustent), puis touchez « Lancer le projet ». Votre idée s'ouvre en proposition, et chacun peut la financer.

@@ -38,7 +38,7 @@
   {
     "name": "statistiques-verrou",
     "page": "guide-statistiques",
-    "route": "/media/requests",
+    "route": "/media/requests/stats",
     "height": 900,
     "settle": 14000,
     "before": [

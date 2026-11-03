@@ -2,35 +2,78 @@
 slug: guide-actualites
 title: Actualités, calendrier et wiki
 position: 15
-help_keys: [news, calendar, wiki]
-tags: [guide, actualités, calendrier, wiki]
+help_keys: [news, feed, calendar, wiki]
+tags: [guide, actualités, mon fil, newsletters, calendrier, wiki]
 ---
-Trois rubriques pour rester informé : les actualités du portail, le calendrier de ce qui arrive et le wiki, où se trouvent guides et réponses.
+Pour rester informé : les actualités de l'équipe, votre fil personnel, les newsletters, le calendrier de ce qui arrive et le wiki, où se trouvent guides et réponses.
 
-Vous les trouvez dans la rubrique **Découvrir** du menu, si votre portail les propose.
+Dans le menu, la rubrique **Actualités** réunit « À la une », « Mon fil » et « Calendrier ». Le wiki est dans la rubrique **Aide**.
 
 ## Lire les actualités
 
-La page [Actualités](/news) rassemble « Les nouveautés du portail, directement par l'équipe ».
+La page [À la une](/news) rassemble « Les nouveautés du portail, directement par l'équipe ».
 
-![La page Actualités et ses trois repères numérotés](shot:actualites-liste)
+![La page À la une et ses trois repères numérotés](shot:actualites-liste)
 
 1. En haut, les articles **« À la une »** : le premier en grand, les suivants à côté.
-2. La barre des **catégories** : cliquez sur une catégorie pour ne voir qu'un sujet. « Toutes les catégories » revient à la liste complète.
-3. En dessous, les **derniers articles**, chacun sous forme de carte avec sa catégorie et sa date.
+2. La barre des **catégories** : chaque catégorie a sa couleur, reprise sur ses articles. Cliquez sur une catégorie pour ne voir qu'un sujet. « Toutes les catégories » revient à la liste complète.
+3. En dessous, les **« Dernières actualités »**, chacune sous forme de carte avec sa catégorie et sa date.
 
-Un point signale un article « Pas encore lue ». Il disparaît dès que vous ouvrez l'article.
+Un point signale un article pas encore lu. Il disparaît dès que vous ouvrez l'article. Dans le menu, un badge sur « À la une » compte les articles que vous n'avez pas encore lus.
+
+Plus bas, **« Sur le web »** reprend les dernières nouvelles des sites que l'équipe suit pour le portail.
 
 Ouvrez un article pour le lire en entier : sa catégorie, sa date et son temps de lecture (« 3 min de lecture », par exemple) sont indiqués en haut. « Toutes les actualités » vous ramène à la liste.
 
 > [!NOTE]
 > Si un article n'existe pas dans votre langue, le portail l'indique : « Cet article n'est pas encore traduit dans votre langue. »
 
-### Être prévenu des nouveaux articles
+Selon le choix de l'équipe, un nouvel article peut aussi vous arriver en notification (« Nouvel article : … »). Vous pouvez ajouter le widget « Dernières actualités » ou « À la une » à votre [accueil](portalab://wiki/guide-accueil).
 
-Selon le choix de l'équipe, un nouvel article peut vous arriver en notification (« Nouvel article : … »). Les newsletters du portail paraissent aussi dans les actualités, et peuvent être envoyées par e-mail. Pour choisir ce que vous recevez, voir [Notifications](portalab://wiki/guide-notifications).
+## Mon fil
 
-Vous pouvez aussi ajouter le widget « Dernières actualités » ou « À la une » à votre [accueil](portalab://wiki/guide-accueil).
+[Mon fil](/feed) est votre page à vous : « Tout ce qui arrive, mêlé : le serveur et chaque source, avec sa couleur. » Personne d'autre ne voit ce que vous y suivez.
+
+![Mon fil : ce qui arrive bientôt (1), les filtres (2), une entrée et sa source (3), une nouveauté (4)](shot:actualites-fil)
+
+1. **« Bientôt »** : ce qui est annoncé pour les personnes que vous suivez (un film à venir avec une actrice, par exemple), et s'il est déjà « Demandé » ou « Disponible ».
+2. **Les filtres** : « Tout », « Pour moi », puis une pastille par source, chacune de sa couleur. Touchez une source pour ne voir qu'elle ; touchez-la encore pour tout revoir.
+3. **Une entrée**, rangée par jour (« Aujourd'hui », « Hier »…) : sa source, sa couleur, quand elle est arrivée.
+4. **« Nouveau »** marque ce qui est arrivé depuis votre dernière visite.
+
+Ce que mêle votre fil :
+
+- **« Sur le serveur »** : ce qui vient d'arriver dans la médiathèque pour ce que vous suivez (« Nouveau film », « Nouvelle série », de nouveaux épisodes…) ;
+- **les sources de l'équipe** : sites, flux RSS, chaînes YouTube, podcasts, choisis par l'administrateur ;
+- **vos propres sources**, si vous en ajoutez (voir plus bas).
+
+**« Pour moi »** ne garde que ce qui concerne ce que vous suivez : un article qui parle d'une personne ou d'une série que vous suivez porte aussi la mention « Pour moi ».
+
+Une vidéo YouTube se lit **sur place** : touchez son image pour la lancer, sans quitter le portail. Les autres articles s'ouvrent sur leur site, dans un nouvel onglet. Quand le fil est long, il se lit par pages (« Page précédente », « Page suivante »).
+
+Dans le menu, un badge sur « Mon fil » compte ce qui est arrivé depuis votre dernière visite. Ouvrir le fil le remet à zéro.
+
+### Choisir ce que vous suivez
+
+En bas du fil, dépliez **« Gérer mon fil : ce que je suis, mes sources »** :
+
+- **« Ce que je suis »** : les personnes, les séries et les genres que vous suivez. La croix « Ne plus suivre … » en retire un. « Suivre un genre » en ajoute un.
+- Pour suivre une personne (un acteur, une réalisatrice, un auteur…) ou une série, touchez **« Suivre »** sur sa page.
+- **« Mes sources »** : vos propres flux RSS ou Atom (un blog, une chaîne YouTube, un forum…). Collez son adresse dans « Adresse d'un flux ou d'un site », puis touchez « Suivre ». Leurs articles n'apparaissent que dans votre fil. « Importer un fichier OPML » et « Exporter (OPML) » reprennent ou sauvegardent une liste de flux.
+
+> [!TIP]
+> Le widget **« Mon fil »** montre les dernières actualités de vos sources sur votre [accueil](portalab://wiki/guide-accueil) : articles, vidéos, podcasts. Les vidéos YouTube s'y lisent aussi sur place. « Tout mon fil » ouvre la page.
+
+## Les newsletters
+
+Le portail peut écrire lui-même des **newsletters automatiques**, à intervalle régulier (chaque jour, chaque semaine ou chaque mois), à partir de ce qui se passe sur le portail : les titres arrivés dans la médiathèque, les sorties récentes, les sorties à venir… Chacune a sa propre mise en page.
+
+Selon le choix de l'équipe, une newsletter :
+
+- **paraît dans les actualités**, comme un article ordinaire de sa chaîne (sa catégorie dans « À la une »), avec sa couleur ;
+- et/ou **part par e-mail** à ceux qui y sont abonnés, à l'allure du portail.
+
+Vous êtes abonné à chaque newsletter par e-mail tant que vous ne vous en désabonnez pas, et vous pouvez vous désabonner **de l'une sans les autres**. En bas de chaque e-mail, « Se désabonner de cette lettre » ouvre vos préférences, là où se trouve son interrupteur. Le détail est dans [Notifications](portalab://wiki/guide-notifications).
 
 ## Le calendrier
 
@@ -51,7 +94,7 @@ Chaque élément a une icône et le nom de sa catégorie, par exemple « Films �
 2. Le mois ou la semaine affichés.
 3. Choisissez une vue : « Mois », « Semaine » ou « Liste ».
 4. Les catégories servent aussi de filtres : cliquez sur l'une d'elles pour la masquer ou la réafficher. « Tout afficher » les remet toutes.
-5. Dans les vues « Mois » et « Semaine », cliquez sur un jour pour voir son détail.
+5. Dans les vues « Mois » et « Semaine », cliquez sur un jour pour voir son détail. À l'arrivée, celui d'aujourd'hui est déjà ouvert : ce qui se passe aujourd'hui s'affiche sans un clic.
 
 Les heures suivent votre fuseau horaire et le premier jour de la semaine choisi dans « Langue et région ».
 
@@ -74,7 +117,7 @@ Le widget « Calendrier » ou « À venir » peut aussi montrer tout cela sur vo
 
 ## Le wiki
 
-Le [wiki](/wiki) contient des « Guides, tutoriels et réponses, écrits par la communauté ». Ce guide du membre en fait partie.
+Le [wiki](/wiki), dans la rubrique Aide du menu, contient des « Guides, tutoriels et réponses, écrits par la communauté ». Ce guide du membre en fait partie.
 
 ### Trouver une page
 
