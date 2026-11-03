@@ -399,5 +399,6 @@
   "compose.profilesHint": "Les profils de joueur à qui ce widget est montré ; aucun coché : tous les membres.",
   "compose.profilesAll": "Tous les membres",
   "compose.profilesSome": "{count, plural, one {# profil} other {# profils}}",
-  "compose.seenAs": "Voir comme"
+  "compose.seenAs": "Voir comme",
+  "compose.profilesEveryone": "Tous"
 }

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { api } from "../../../api/client";
 import { AdminPage, AdminSection } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
@@ -261,30 +261,45 @@ function ProfilesPicker({
   onChange: (next: Profile[]) => void;
 }) {
   const t = useT();
+  const id = useId();
+  // a panel of the browser's top layer: never cut by the widget's frame, closed by Escape or a click outside
   return (
-    <details className="dash-profiles" data-preview-out={out || undefined}>
-      <summary title={t("dashboard:compose.profilesHint")}>
+    <span className="dash-profiles" data-preview-out={out || undefined}>
+      <button
+        type="button"
+        className="dash-profiles__pill"
+        popoverTarget={id}
+        title={t("dashboard:compose.profilesHint")}
+        aria-label={`${t("dashboard:compose.profiles")}: ${
+          value.length
+            ? value.map((profile) => t(`onboarding:play.${profile}`)).join(", ")
+            : t("dashboard:compose.profilesAll")
+        }`}
+      >
         <Icon name="users" size={14} />
-        <span className="dash-profiles__label">
+        <span className="dash-profiles__label" aria-hidden="true">
           {value.length
             ? t("dashboard:compose.profilesSome", { count: value.length })
-            : t("dashboard:compose.profilesAll")}
+            : t("dashboard:compose.profilesEveryone")}
         </span>
-      </summary>
-      <fieldset>
-        <legend>{t("dashboard:compose.profiles")}</legend>
-        {PROFILES.map((profile) => (
-          <CheckboxField
-            key={profile}
-            label={t(`onboarding:play.${profile}`)}
-            checked={value.includes(profile)}
-            onChange={(event) =>
-              onChange(PROFILES.filter((p) => (p === profile ? event.target.checked : value.includes(p))))
-            }
-          />
-        ))}
-      </fieldset>
-    </details>
+      </button>
+      <div id={id} popover="auto" className="dash-profiles__panel">
+        <fieldset>
+          <legend>{t("dashboard:compose.profiles")}</legend>
+          <p>{t("dashboard:compose.profilesHint")}</p>
+          {PROFILES.map((profile) => (
+            <CheckboxField
+              key={profile}
+              label={t(`onboarding:play.${profile}`)}
+              checked={value.includes(profile)}
+              onChange={(event) =>
+                onChange(PROFILES.filter((p) => (p === profile ? event.target.checked : value.includes(p))))
+              }
+            />
+          ))}
+        </fieldset>
+      </div>
+    </span>
   );
 }
 

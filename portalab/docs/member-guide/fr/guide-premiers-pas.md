@@ -37,7 +37,7 @@ Si votre portail en a publié, il vous demande de lire et d'accepter ses **condi
   | « Juste les médias » | Regarder, lire et demander, sans le jeu : ni cartes, ni jeux, ni quêtes dans votre menu. Votre profil est **anonyme** : les autres membres ne vous voient ni dans l'annuaire, ni dans l'activité ; dans les classements, vous restez compté, sans nom. |
   | « Passif » | Le jeu se fait tout seul : de l'XP et des niveaux par ce que vous regardez, lisez ou demandez, et aussi les quêtes, les succès, les classements. Votre profil est **public**, mais seulement pour les membres du portail : ils voient votre nom, votre niveau et votre place dans les classements. |
   | « Collectionneur » | En plus, les Mediacards : des boosters en regardant, une collection à compléter. |
-  | « Passionné » | Tout le jeu : en plus, les mini-jeux du jour, les défis de la semaine et les parties à plusieurs. |
+  | « Passionné » (recommandé) | Tout le jeu : en plus, les mini-jeux du jour, les défis de la semaine et les parties à plusieurs. Aucune obligation de jouer : tout est simplement à portée de main. |
 
   Sous « Collectionneur », les Mediacards sont cachées : ni dans le menu, ni sur la fiche des titres, ni dans la boutique, et plus de booster Mediacards en regardant. Les autres boosters restent. Dans le menu, « Jeux du jour » et « Jouer à plusieurs » n'apparaissent qu'à « Passionné », « Mediacards » dès « Collectionneur » et « Quêtes » dès « Passif ».
 - **Ton portail à ton goût** : dites ce que vous aimez, votre accueil se compose avec.
@@ -46,7 +46,7 @@ Si votre portail en a publié, il vous demande de lire et d'accepter ses **condi
   - « Composer mon accueil avec ces choix », coché à votre première visite : votre tableau de bord part de celui que l'équipe a prévu pour votre profil de joueur, garde les widgets de ce que vous avez coché, ajoute ceux qui lui manquent et laisse de côté ceux de ce que vous n'avez pas coché. Vous pourrez tout déplacer ensuite. Quand vous revoyez ces écrans, la case est décochée : la cocher remplace votre disposition actuelle.
 - **Comment te prévenir ?** : choisissez un réglage tout prêt, puis affinez thème par thème.
   - « Tout » : chaque nouvelle, dans le portail et par e-mail.
-  - « L'essentiel » : tout dans le portail ; par e-mail votre compte, vos médias et vos tickets, en un résumé par jour.
+  - « L'essentiel » (recommandé, proposé d'office à la première visite : il s'applique si vous passez à la suite sans rien changer) : tout dans le portail ; par e-mail votre compte, vos médias et vos tickets, en un résumé par jour.
   - « Le minimum » : votre compte, vos médias et vos tickets dans le portail ; par e-mail votre compte seulement, une fois par semaine.
 
   Pour chaque thème, deux interrupteurs : « Dans le portail » et « Par e-mail ». En dessous, « Résumé par e-mail » règle le rythme des e-mails (« Envoyer chaque e-mail », « Résumé quotidien », « Résumé hebdomadaire ») et « Newsletters par e-mail » les canaux d'actualités que vous recevez. Tout se règle aussi en détail dans « Mes notifications » (voir [Notifications](portalab://wiki/guide-notifications)).

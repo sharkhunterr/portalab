@@ -399,5 +399,6 @@
   "compose.profilesHint": "The play profiles this widget is shown to; none ticked: every member.",
   "compose.profilesAll": "Every member",
   "compose.profilesSome": "{count, plural, one {# profile} other {# profiles}}",
-  "compose.seenAs": "Seen as"
+  "compose.seenAs": "Seen as",
+  "compose.profilesEveryone": "Everyone"
 }

@@ -132,6 +132,8 @@ export function Accounts({ titleId, nav }: { titleId: string; nav: ReactNode }) 
 
 const PRESETS = ["all", "essential", "minimum"] as const;
 type Preset = (typeof PRESETS)[number];
+/** Issue 347: the ready-made choice the portal recommends. */
+const RECOMMENDED: Preset = "essential";
 /** What each ready-made choice keeps: the themes told on the portal, those told by e-mail too, the pace. */
 const KEEPS: Record<
   Preset,
@@ -156,11 +158,23 @@ const keysOf = (category: Category) => [
 
 /** How the member is told: a ready-made choice, a switch per theme and channel, the e-mails' pace, the
  * newsletters. */
-export function Notify({ titleId, nav }: { titleId: string; nav: ReactNode }) {
+export function Notify({
+  titleId,
+  first,
+  onNext,
+  renderNav,
+}: {
+  titleId: string;
+  first: boolean;
+  onNext: () => void;
+  renderNav: (go: () => void) => ReactNode;
+}) {
   const t = useT();
   const query = usePreferences();
   const save = useSavePreferences();
-  const [preset, setPreset] = useState<Preset | null>(null);
+  // the recommended choice offered on a first visit, applied on « Next » unless the member set something
+  const [preset, setPreset] = useState<Preset | null>(first ? RECOMMENDED : null);
+  const [touched, setTouched] = useState(false);
   const data = query.data;
   const lines = (data?.categories ?? []).filter((c) => !SHOWN_WITH.has(c.key));
   const groups = GROUPS.map((group) => ({
@@ -178,6 +192,7 @@ export function Notify({ titleId, nav }: { titleId: string; nav: ReactNode }) {
   };
   const apply = (choice: Preset) => {
     setPreset(choice);
+    setTouched(true);
     const keep = KEEPS[choice];
     const wants = (rule: readonly string[] | "all", group: string) => rule === "all" || rule.includes(group);
     const preferences: Record<string, Record<string, boolean>> = {};
@@ -207,6 +222,9 @@ export function Notify({ titleId, nav }: { titleId: string; nav: ReactNode }) {
               onChange={() => apply(choice)}
             />
             <strong>{t(`onboarding:notify.preset.${choice}`)}</strong>
+            {choice === RECOMMENDED ? (
+              <span className="onboarding-tile__badge">{t("onboarding:recommended")}</span>
+            ) : null}
             <span>{t(`onboarding:notify.preset.${choice}Hint`)}</span>
           </label>
         ))}
@@ -251,6 +269,7 @@ export function Notify({ titleId, nav }: { titleId: string; nav: ReactNode }) {
                           disabled={!turnable || save.isPending}
                           onChange={(event) => {
                             setPreset(null);
+                            setTouched(true);
                             set(own, channel, event.currentTarget.checked);
                           }}
                         />
@@ -288,7 +307,10 @@ export function Notify({ titleId, nav }: { titleId: string; nav: ReactNode }) {
         {t("onboarding:notify.later")}{" "}
         <Link to="/settings/notifications">{t("onboarding:notify.settings")}</Link>
       </p>
-      {nav}
+      {renderNav(() => {
+        if (first && !touched && data && preset === RECOMMENDED) apply(RECOMMENDED);
+        onNext();
+      })}
     </>
   );
 }
