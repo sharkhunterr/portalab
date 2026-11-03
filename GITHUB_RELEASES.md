@@ -169,6 +169,11 @@ reliably again.
 - A film or episode stopped in the last two minutes before its end credits counts as finished, and
   earlier plays have been reviewed (#342)
 
+#### Documentation and tooling
+
+- The guided tours, the member guide (the wiki) and the documentation follow the new menu and every new
+  feature, with four new tours: the news, games and quests, my reserve, community projects (#344)
+
 #### Improved
 
 - News: Headlines (administrators) and My feed (members), with follows, configurable RSS sources and
