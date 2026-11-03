@@ -1,0 +1,141 @@
+/* issue 347: « My reserve » on the dashboard — the sections' counts on top, the first things as tiles */
+.reserve-widget {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-3);
+  block-size: 100%;
+  min-inline-size: 0;
+}
+.reserve-widget__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reserve-widget__section {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.reserve-widget__section:hover,
+.reserve-widget__section:focus-visible {
+  border-color: var(--color-accent);
+}
+.reserve-widget__section strong {
+  font-size: var(--font-size-md);
+}
+.reserve-widget__section span {
+  color: var(--color-text-muted);
+}
+/* a purchase waiting for its form: the reserve page's accent */
+.reserve-widget__section[data-tone="todo"] {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.reserve-widget__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  align-content: start;
+  gap: var(--space-3) var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-2) 0 0;
+  list-style: none;
+}
+.reserve-widget__link {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-block-start: 3px solid var(--rarity);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--rarity) 6%, var(--color-surface-raised));
+  color: var(--color-text);
+  text-decoration: none;
+}
+.reserve-widget__link:hover,
+.reserve-widget__link:focus-visible {
+  border-color: var(--rarity);
+}
+.reserve-widget__tile[data-tone="todo"] .reserve-widget__link {
+  border-color: color-mix(in srgb, var(--color-accent) 60%, var(--color-border));
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+}
+.reserve-widget__art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--rarity) 32%, transparent), transparent 72%);
+  color: var(--rarity);
+}
+.reserve-widget__tile[data-tone="locked"] .reserve-widget__art {
+  opacity: 0.6;
+  filter: grayscale(0.5);
+}
+/* identical ones stacked: how many, as on the reserve page's tiles */
+.reserve-widget__count {
+  position: absolute;
+  inset: -0.4rem -1rem auto auto;
+  min-inline-size: 1.6rem;
+  padding: 0 0.35rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.reserve-widget__lock {
+  position: absolute;
+  inset: auto auto -0.2rem -0.2rem;
+  display: grid;
+  place-items: center;
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+.reserve-widget__name {
+  display: -webkit-box;
+  max-inline-size: 100%;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.25;
+  text-align: center;
+}
+
+/* a low block (two rows): the counts only */
+@container (max-height: 9rem) {
+  .reserve-widget__tiles {
+    display: none;
+  }
+}
+/* narrow: the counts without their words — the icon says which section */
+@container (max-width: 18rem) {
+  .reserve-widget__section span {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

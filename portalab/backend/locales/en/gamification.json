@@ -493,6 +493,8 @@
   "cards.views.boosters": "To open",
   "cards.views.collection": "My collection",
   "cards.views.pool": "Every card",
+  "cards.widget.description": "Where your collection stands — cards, sets started, copies — and the boosters waiting to be opened.",
+  "cards.widget.title": "My Mediacards",
   "cards.work.copies": "{count, plural, one {# copy} other {# copies}}",
   "cards.work.doubles": "{count, plural, =0 {no duplicates} one {# duplicate} other {# duplicates}}",
   "cards.work.foils": "{count, plural, =0 {no foils} one {# foil} other {# foils}}",

@@ -12,6 +12,7 @@ from typing import Any
 
 from httpx import AsyncClient
 
+from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.media_core import QUOTA
 from portalab.modules.gamification.ledger.writer import Entry
 from tests.integration.identity.helpers import login
@@ -249,6 +250,56 @@ async def test_the_reserve(mk: MkHarness, client: AsyncClient) -> None:
     assert (await client.get("/api/v1/marketplace/reserve")).json() == []
     other = await client.post("/api/v1/marketplace/reserve/plus_3/use")
     assert other.status_code == 409 and other.json()["code"] == "marketplace.reserve_empty"
+
+
+async def test_the_reserve_on_the_dashboard(mk: MkHarness, client: AsyncClient) -> None:
+    """#347 — « My reserve » on the dashboard: how many things wait, by the reserve page's sections, the
+    first ones as tiles (identical ones stacked) in its order, and what came in since it was last opened."""
+    registered = mk.module.widgets.get("marketplace.reserve")
+    assert registered is not None and registered.definition.component_id == "marketplace.reserve"
+
+    async def load(name: str) -> Any:
+        return await registered.provider.load(mk.p(name), {}, LocaleContext())
+
+    assert (await load("ursula")).state == "no-data"  # nothing in it yet
+    mk.module.capabilities.provide(
+        QUOTA, FakeQuota(), instance_ref="fake024", owner="module:test", priority=1
+    )
+    for key, units in (("plus_3", 3), ("plus_5", 5), ("plus_10", 10)):
+        body = {
+            **product_def(key, "quota", price_coins=150, payload={"kind": "media_requests", "units": units}),
+            "repeatable": True,
+        }
+        await mk.module.catalog.create(mk.p("boss"), body)
+        await mk.module.catalog.move(mk.p("boss"), key, "available")
+    await look(mk, "night_owl", "epic", conditions=[{"kind": "min_level", "level": 30}])
+    await booster(mk, "booster_looks", 100, cards=1, items=["night_owl"])
+    await booster(mk, "booster_reserve", 300, pool="reserve", cards=3, items=["plus_3", "plus_5", "plus_10"])
+    await mk.coins("ursula", 1000)
+    await login(client, "ursula")
+    await client.post("/api/v1/marketplace/boosters/booster_looks/open")  # won below its level: waiting
+    await client.post("/api/v1/marketplace/boosters/booster_reserve/open")
+    for reason in ("achievement", "level 5"):  # offered twice: sealed, stacked
+        await mk.module.grants.grant(mk.p("boss"), mk.people["ursula"], "booster_looks", reason)
+
+    widget = await load("ursula")
+    assert widget.state == "available" and widget.data is not None
+    assert widget.data["counts"] == {"todo": 0, "open": 2, "use": 3, "waiting": 1}
+    assert [(i["section"], i["key"], i["quantity"], i["new"]) for i in widget.data["items"]] == [
+        ("open", "booster_looks", 2, True),
+        ("use", "plus_10", 1, True),
+        ("use", "plus_3", 1, True),
+        ("use", "plus_5", 1, True),
+        ("waiting", "night_owl", 1, False),
+    ]
+    assert widget.data["new"] == 4 == await mk.module.openings.unseen(mk.people["ursula"])
+    assert widget.data["items"][-1]["rarity"] == "epic" and widget.data["items"][-1]["name"]
+    # the reserve opened: nothing new any more
+    assert (await client.post("/api/v1/marketplace/reserve/seen")).status_code == 204
+    seen = await load("ursula")
+    assert seen.data is not None and seen.data["new"] == 0
+    assert not any(i["new"] for i in seen.data["items"])
+    assert (await load("vera")).state == "no-data"  # someone else's reserve is their own
 
 
 async def test_discovery_opens_three_times(mk: MkHarness, client: AsyncClient) -> None:

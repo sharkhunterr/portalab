@@ -493,6 +493,8 @@
   "cards.views.boosters": "À ouvrir",
   "cards.views.collection": "Ma collection",
   "cards.views.pool": "Toutes les cartes",
+  "cards.widget.description": "Où en est votre collection — cartes, extensions commencées, exemplaires — et les boosters qui attendent d’être ouverts.",
+  "cards.widget.title": "Mes Mediacards",
   "cards.work.copies": "{count, plural, one {# exemplaire} other {# exemplaires}}",
   "cards.work.doubles": "{count, plural, =0 {aucun doublon} one {# doublon} other {# doublons}}",
   "cards.work.foils": "{count, plural, =0 {aucune brillante} one {# brillante} other {# brillantes}}",
