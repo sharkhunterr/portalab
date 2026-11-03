@@ -1289,7 +1289,7 @@ button.first-steps__start:focus-visible {
   border: 0;
 }
 
-.onboarding-presets .onboarding-tile > span {
+.onboarding-presets .onboarding-tile > span:not(.onboarding-tile__badge) {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
 }
