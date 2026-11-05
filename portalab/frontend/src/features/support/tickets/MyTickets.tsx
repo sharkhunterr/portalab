@@ -7,6 +7,7 @@ import { EmptyState } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { imageUrl, useMediaDetail } from "../../media/api";
 import { type TicketCard, useMyTickets } from "./api";
 import { isActive, PriorityBadge, StateBadge } from "./TicketBadges";
 
@@ -14,6 +15,19 @@ import { isActive, PriorityBadge, StateBadge } from "./TicketBadges";
  * My tickets (spec 016 T025, 027 T095): one card per ticket — reference, title, state and priority badges,
  * last update — filtered between the ones still in progress and the finished ones.
  */
+
+/** Issue 354: a report about a media shows its poster rather than the ticket's icon. */
+function MediaThumb({ mediaId }: { mediaId: string }) {
+  const poster = imageUrl(useMediaDetail(mediaId).data?.image_id);
+  return poster ? (
+    <img className="support-card__poster" src={poster} alt="" loading="lazy" />
+  ) : (
+    <span className="support-card__icon" aria-hidden="true">
+      <Icon name="film" size={20} />
+    </span>
+  );
+}
+
 export function TicketList({
   items,
   label,
@@ -30,9 +44,13 @@ export function TicketList({
     <ul className="support-list" aria-label={label}>
       {items.map((ticket) => (
         <li key={ticket.id} className="support-card" data-active={isActive(ticket.state)}>
-          <span className="support-card__icon" aria-hidden="true">
-            <Icon name="ticket" size={20} />
-          </span>
+          {ticket.media_id ? (
+            <MediaThumb mediaId={ticket.media_id} />
+          ) : (
+            <span className="support-card__icon" aria-hidden="true">
+              <Icon name="ticket" size={20} />
+            </span>
+          )}
           <span className="support-card__main">
             <span className="support-card__ref">{ticket.reference}</span>
             <Link to={`${base}/${ticket.id}`} className="support-card__title">
