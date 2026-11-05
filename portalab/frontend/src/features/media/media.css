@@ -975,6 +975,57 @@ a.media-card__link:focus-visible .media-card__frame {
 .media-facts dd {
   margin: 0;
 }
+/* issue 351: a game's play times by style (HowLongToBeat), side by side */
+.media-playtimes {
+  display: grid;
+  gap: var(--space-2);
+  margin-block-start: var(--space-4);
+}
+.media-playtimes h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.media-playtimes dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.media-playtimes dl > div {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  text-align: center;
+}
+.media-playtimes dl > div + div {
+  border-inline-start: 1px solid var(--color-border);
+}
+.media-playtimes dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.media-playtimes dd {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+}
+.media-playtimes dd strong {
+  font-size: var(--font-size-lg);
+}
+.media-playtimes dd span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
 .media-source__link {
   display: inline-flex;
   align-items: center;

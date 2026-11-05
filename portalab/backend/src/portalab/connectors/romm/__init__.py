@@ -1,7 +1,8 @@
 """``romm`` connector: RomM, the retro games library manager.
 
 * ``media.library`` (sync): every game (ROM) with its platform as a genre, IGDB id and cover — paged
-  through ``/api/roms`` (both the list answer of RomM 3 and the ``{items, total}`` page of RomM 4).
+  through ``/api/roms`` (both the list answer of RomM 3 and the ``{items, total}`` page of RomM 4); #351:
+  how long it takes to play by style (HowLongToBeat, when RomM knows it), its main story as its length.
 * ``service.health_probe``: an authenticated ``/api/users/me`` round trip.
 * ``media.activity_history`` (#190): what the configured account played — each play session with its length
   (``/api/play-sessions``) and each game it played, dated by its last play and finished or not
@@ -33,6 +34,7 @@ from portalab.capabilities.media import (
     ACTIVITY_HISTORY,
     ITEM_LINKS,
     LIBRARY,
+    PLAY_STYLES,
     ActivityPage,
     ServiceAccount,
     SourceActivity,
@@ -73,6 +75,24 @@ def _names(values: Any) -> list[str]:
     return out
 
 
+def play_times(game: Mapping[str, Any]) -> dict[str, dict[str, float | int | None]]:
+    """#351: how long the game takes by play style, in seconds, with how many players told it (RomM's
+    HowLongToBeat block — none for many games)."""
+    raw = game.get("hltb_metadata")
+    block: Mapping[str, Any] = raw if isinstance(raw, Mapping) else {}
+    out: dict[str, dict[str, float | int | None]] = {}
+    for style in PLAY_STYLES:
+        seconds, players = block.get(style), block.get(f"{style}_count")
+        if isinstance(seconds, int | float) and not isinstance(seconds, bool) and 0 < seconds <= 36_000_000:
+            count = (
+                players
+                if isinstance(players, int) and not isinstance(players, bool) and players >= 0
+                else None
+            )
+            out[style] = {"seconds": float(seconds), "players": count}
+    return out
+
+
 def game_payload(game: Mapping[str, Any], title: str) -> dict[str, Any]:
     """027: a game's metadata from RomM 3 (on the game itself) or RomM 4 (``metadatum`` — the merged
     metadata — and the IGDB block): year, genres (the platform first), franchises and game modes as tags
@@ -97,6 +117,7 @@ def game_payload(game: Mapping[str, Any], title: str) -> dict[str, Any]:
     cover = game.get("path_cover_large") or game.get("path_cover_l")
     companies = _names(pick("companies"))
     franchises = _names(pick("franchises"))
+    times = play_times(game)
     variant = [
         str(platform) if platform else "",
         ", ".join(_names(game.get("regions"))),
@@ -117,6 +138,9 @@ def game_payload(game: Mapping[str, Any], title: str) -> dict[str, Any]:
         "platform": str(platform)[:120] if platform else None,
         "image": str(cover).split("?")[0] if cover else None,
         "variant": " · ".join(v for v in variant if v)[:200] or str(game.get("fs_name") or "")[:200] or None,
+        # #351: its length is its main story's; every style's for its page
+        "duration_s": times["main_story"]["seconds"] if "main_story" in times else None,
+        "play_times": times or None,
     }
 
 

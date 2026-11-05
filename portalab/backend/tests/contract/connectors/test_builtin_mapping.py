@@ -316,6 +316,32 @@ def test_romm4_metadata_and_copies() -> None:
     assert payload["tags"] == ["Alien", "Single player"]
     assert payload["publisher"] == "Fox Video Games"
     assert payload["variant"] == "Atari 2600 · USA, Europe · Rev 1"
+    assert payload["duration_s"] is None and payload["play_times"] is None  # no HowLongToBeat: none
+
+
+def test_romm_game_play_times() -> None:
+    """#351: how long a game takes by style (HowLongToBeat through RomM), its main story as its length."""
+    payload = game_payload(
+        {
+            "id": 6602,
+            "hltb_metadata": {
+                "main_story": 19800,
+                "main_story_count": 145,
+                "main_plus_extra": 54000,
+                "completionist": 82800,
+                "completionist_count": 58,
+                "all_styles": -1,  # nonsense: left out
+            },
+        },
+        "Crash Team Racing",
+    )
+    assert payload["duration_s"] == 19800.0
+    assert payload["play_times"] == {
+        "main_story": {"seconds": 19800.0, "players": 145},
+        "main_plus_extra": {"seconds": 54000.0, "players": None},
+        "completionist": {"seconds": 82800.0, "players": 58},
+    }
+    assert LibraryPayload.model_validate({"title": "x", **payload}).play_times["main_story"].players == 145
 
 
 def test_nonsense_timestamps_are_no_date() -> None:

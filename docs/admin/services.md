@@ -171,7 +171,7 @@ The library's cleanup: which titles its rules will delete, and when, and saving 
 
 Your retro games library: every game, its platform and its cover.
 
-- **For members**: the games in the catalog, links to open them in RomM, and the play sessions of the account configured here (RomM only reveals them to the account itself, so the member linked to it gets them).
+- **For members**: the games in the catalog with how long each takes to play (main story, main + extras, completionist, all styles, from HowLongToBeat when RomM has it), links to open them in RomM, and the play sessions of the account configured here (RomM only reveals them to the account itself, so the member linked to it gets them). Play sessions count in the statistics and, through your gain rules, in the progression.
 - **For admins**: RomM accounts to link to members.
 - **Credentials**: a RomM username and password, ideally a dedicated read-only (viewer) account. RomM 3 and 4 are supported.
 

@@ -37,6 +37,7 @@ FIELDS = (
     "released",
     "tags",
     "platform",  # 027: a game's console or system (RomM)
+    "play_times",  # #351: how long a game takes, by play style (RomM)
     "resolution",  # 027: the video file's resolution (statistics)
 )
 ADMIN = "admin"

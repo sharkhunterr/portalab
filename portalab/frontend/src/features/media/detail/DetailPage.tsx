@@ -73,6 +73,43 @@ function list(value: unknown): Data[] {
 const BOOKS = ["book", "audiobook"];
 
 /** 027: a game's facts (RomM): its platform, publisher and studios, release date, franchises and modes. */
+/** Issue 351: how long a game takes by play style (HowLongToBeat, through RomM), as RomM's page shows it. */
+const PLAY_STYLES = ["main_story", "main_plus_extra", "completionist", "all_styles"] as const;
+export type PlayTimes = Partial<
+  Record<(typeof PLAY_STYLES)[number], { seconds: number; players?: number | null }>
+>;
+
+export function PlayTimesFacts({ times }: { times: PlayTimes }) {
+  const t = useT();
+  const measures = useMeasures();
+  const styles = PLAY_STYLES.filter((style) => times[style]?.seconds);
+  if (!styles.length) return null;
+  return (
+    <section className="media-playtimes" aria-labelledby="media-playtimes-title">
+      <h3 id="media-playtimes-title">
+        <Icon name="clock" size={16} />
+        {t("media:facts.playTimes")}
+      </h3>
+      <dl>
+        {styles.map((style) => {
+          const time = times[style];
+          return (
+            <div key={style}>
+              <dt>{t(`media:facts.playTime.${style}`)}</dt>
+              <dd>
+                <strong>{measures.duration(Number(time?.seconds))}</strong>
+                {typeof time?.players === "number" ? (
+                  <span>{t("media:facts.playTimePlayers", { count: time.players })}</span>
+                ) : null}
+              </dd>
+            </div>
+          );
+        })}
+      </dl>
+    </section>
+  );
+}
+
 function GameFacts({ data }: { data: Data }) {
   const t = useT();
   const format = useFormat();
@@ -89,7 +126,8 @@ function GameFacts({ data }: { data: Data }) {
         : null,
   ].filter((row) => row !== null);
   const tags = Array.isArray(data.tags) ? (data.tags as string[]) : [];
-  if (!rows.length && !tags.length) return null;
+  const times = (data.play_times && typeof data.play_times === "object" ? data.play_times : {}) as PlayTimes;
+  if (!rows.length && !tags.length && !Object.keys(times).length) return null;
   return (
     <>
       <dl className="media-facts">
@@ -107,6 +145,7 @@ function GameFacts({ data }: { data: Data }) {
           ))}
         </ul>
       ) : null}
+      <PlayTimesFacts times={times} />
     </>
   );
 }
@@ -538,7 +577,8 @@ function hasContent(name: string, data: Data, enriched = false): boolean {
         // #92: a book's summary and facts are laid out like a film's (BookView), above the sections
         (Boolean(data.overview) && !enriched && !BOOKS.includes(String(data.kind))) ||
         list(data.children).length > 0 ||
-        (data.kind === "game" && Boolean(data.platform || data.publisher || data.people || data.released))
+        (data.kind === "game" &&
+          Boolean(data.platform || data.publisher || data.people || data.released || data.play_times))
       );
     case "history":
       return list(data.mine).length > 0 || list(data.concerned_users).length > 0;

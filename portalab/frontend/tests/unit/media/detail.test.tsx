@@ -19,7 +19,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 });
 
 import { CatalogPage } from "../../../src/features/media/catalog/CatalogPage";
-import { DetailPage } from "../../../src/features/media/detail/DetailPage";
+import { DetailPage, PlayTimesFacts } from "../../../src/features/media/detail/DetailPage";
 import { RequestsPage } from "../../../src/features/media/requests/RequestsPage";
 import { json } from "../../support/fake-api";
 import { INFO } from "./player-fixtures";
@@ -342,5 +342,26 @@ describe("catalog and requests", () => {
     cleanup();
     renderAt("/media/requests", [{ path: "/media/requests", element: <RequestsPage /> }]); // the list first
     fireEvent.click(await screen.findByRole("button", { name: "Cancel: Arrival" }));
+  });
+});
+
+describe("a game's play times", () => {
+  it("shows each style's length and players, skipping the unknown ones (#351)", () => {
+    render(
+      <PlayTimesFacts
+        times={{
+          main_story: { seconds: 19800, players: 145 },
+          completionist: { seconds: 82800, players: null },
+        }}
+      />,
+    );
+    expect(screen.getByRole("heading", { name: "Time to beat" })).toBeTruthy();
+    expect(screen.getByText("Main story")).toBeTruthy();
+    expect(screen.getByText("145 players")).toBeTruthy();
+    expect(screen.getByText("Completionist")).toBeTruthy();
+    expect(screen.queryByText("Main + extras")).toBeNull();
+    cleanup();
+    const { container } = render(<PlayTimesFacts times={{}} />);
+    expect(container.innerHTML).toBe("");
   });
 });

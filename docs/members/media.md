@@ -73,6 +73,7 @@ Depending on the title:
 
 - **Enriched details** (from the metadata provider, such as TMDB): **Cast**, **Crew**, **Genres**, **Saga**, **Studios**, **Languages**, **Keywords**, **Budget and box office**;
 - **About**, **Contents** (a series' seasons and episodes), **Requests** and **External links**;
+- for a game, **Time to beat**: how long it takes by play style — **Main story**, **Main + extras**, **Completionist**, **All styles** — with how many players told it (HowLongToBeat, when RomM knows it);
 - **My history**: when you played it and how far you went. Once enough members have seen it, the number of plays and members appears too — never their names;
 - for a book or an audiobook: **Authors and narrators**, **Series**, **Publisher**, **Pages** or listening length, **ISBN**…
 

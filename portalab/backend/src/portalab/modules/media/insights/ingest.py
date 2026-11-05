@@ -358,7 +358,10 @@ class ActivityIngestor:
             values = []
             for item in rows:
                 object_id, work_id = await resolver.resolve(service_id, item)
-                duration = item.duration_s or await resolver.duration(object_id)
+                # #351: a game's length (HowLongToBeat) is no play's — a game played lasts what it was played
+                duration = item.duration_s or (
+                    None if item.kind == "game" else await resolver.duration(object_id)
+                )
                 watched = float(item.watched_s or 0)
                 if watched <= 0 and duration:  # the source only says it was played: use what was reached
                     watched = duration * (item.progress if item.progress is not None else 1.0)

@@ -30,8 +30,8 @@ from portalab.modules.media.models import (
 )
 
 CATEGORIES: dict[str, tuple[str, ...]] = {
-    # #283: games stay out of « all » — a game played is no time watched, listened to or read
-    "all": ("movie", "episode", "live", "track", "book", "audiobook", "radio", "other"),
+    # #351: the games count in « all » too (#283 kept them out)
+    "all": ("movie", "episode", "live", "track", "book", "audiobook", "radio", "game", "other"),
     "movies": ("movie",),
     "series": ("episode",),
     "live": ("live",),

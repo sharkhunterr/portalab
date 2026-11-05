@@ -122,7 +122,7 @@ export function actionLabel(t: Translate, name: string): string {
 }
 
 /** Durations are counted per minute in forms; events carry seconds. */
-export const PER_MINUTE_FIELDS = new Set(["duration_s", "position_s", "watched_s"]);
+export const PER_MINUTE_FIELDS = new Set(["duration_s", "position_s", "watched_s", "played_s", "length_s"]);
 
 /** The actions a rule may reward; issue 309: with ``goals``, also what an achievement or a quest may count of
  * the progression itself (a quest done, an achievement unlocked, a level reached). */
