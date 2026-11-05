@@ -49,6 +49,11 @@ interface Card {
   route: string | null;
 }
 
+/** Issue 354: the library title a card stands for — its id, else the one its route names. */
+function mediaOf(card: { id?: string | null; route?: string | null }): string | undefined {
+  return card.id ?? /^\/media\/([0-9a-f-]{36})$/.exec(card.route ?? "")?.[1];
+}
+
 function poster(id: string | null): string | null {
   return id ? `/api/v1/media/images/${id}` : null;
 }
@@ -117,9 +122,7 @@ function Posters({ payload, compact }: WidgetProps) {
               <span className="widget-posters__art">
                 {src ? <img src={src} alt="" loading="lazy" /> : <Icon name="film" size={24} />}
                 {card.state ? <span className="widget-posters__badge" data-request={card.state} /> : null}
-                <PosterTickets
-                  mediaId={card.id ?? /^\/media\/([0-9a-f-]{36})$/.exec(card.route ?? "")?.[1]}
-                />
+                <PosterTickets mediaId={mediaOf(card)} />
               </span>
               <span className="widget-posters__title">{card.title}</span>
               {card.subtitle ? <span className="widget-posters__meta">{card.subtitle}</span> : null}
@@ -157,7 +160,7 @@ function PosterWall({ payload, compact }: WidgetProps) {
             ) : (
               <span className="widget-wall__title">{card.title}</span>
             )}
-            <PosterTickets mediaId={card.id} />
+            <PosterTickets mediaId={mediaOf(card)} />
             {card.plays ? (
               <span className="widget-wall__plays">
                 <Icon name="play" size={10} />
@@ -311,7 +314,7 @@ function Continue({ payload, config, compact }: WidgetProps) {
                 ) : (
                   <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={26} />
                 )}
-                <PosterTickets mediaId={card.id} />
+                <PosterTickets mediaId={mediaOf(card)} />
                 <span className="widget-continue__kind" aria-hidden="true">
                   <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={12} />
                 </span>
