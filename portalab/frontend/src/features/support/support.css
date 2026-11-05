@@ -1922,9 +1922,52 @@
   margin: 0;
 }
 .ticket-media {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 0.75rem);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-1);
+}
+.ticket-media__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.ticket-media__poster {
+  flex: none;
+  inline-size: 5rem;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  box-shadow: var(--shadow-1);
+}
+.ticket-media__poster--none {
+  display: grid;
+  place-items: center;
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
+}
+.ticket-media__text {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+.ticket-media__eyebrow,
+.ticket-media__facts {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.ticket-media__text strong {
+  font-size: var(--font-size-lg, 1.125rem);
+}
+.ticket-media__open {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
+  justify-self: start;
+  font-weight: 600;
 }
 
 /* issue 354: a media type's kinds of problem, edited as a list */

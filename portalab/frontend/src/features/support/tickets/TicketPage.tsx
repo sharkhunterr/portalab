@@ -179,11 +179,12 @@ export function TicketPage({ team = false }: { team?: boolean }) {
             {data.incident_reference && data.incident_id ? (
               <Link to={`/incidents/${data.incident_id}`}>{data.incident_reference}</Link>
             ) : null}
-            {data.media_id ? <TicketMedia objectId={data.media_id} /> : null}
           </span>
         }
       />
       <div className="ticket-page">
+        {/* issue 354: the media the ticket is about, at its head */}
+        {data.media_id ? <TicketMedia objectId={data.media_id} /> : null}
         {origin ? (
           <section className="ticket-origin" aria-label={t("support:ticket.origin")}>
             <header className="ticket-origin__head">
