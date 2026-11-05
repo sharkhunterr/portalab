@@ -114,6 +114,22 @@ function presets(t: Translate): Array<{ key: string; icon: string; definition: R
         ],
       },
     },
+    // issue 357: live TV (Plex, Jellyfin, Tautulli) — its minutes apart from films and series, to be tuned on
+    // their own (the generic minute rules then leave it out: « kind » not « live »)
+    {
+      key: "media.live_time",
+      icon: "tv",
+      definition: {
+        event_type: "media.playback_finished",
+        label: t("gamification:admin.presets.liveTime"),
+        predicate: [{ field: "kind", op: "in", value: ["live"] }],
+        grants: [
+          { value: "xp", per_unit: { field: "watched_s", factor: 1 / 60, max: 120 } },
+          { value: "coins", per_unit: { field: "watched_s", factor: 2 / 3600, max: 4 } },
+        ],
+        limits: { caps: [{ period: "day", max_amount: 150, value: "xp" }] },
+      },
+    },
     {
       key: "marketplace.purchase",
       icon: "shop",

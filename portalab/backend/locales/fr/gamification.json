@@ -970,6 +970,7 @@
   "action.user_level_up": "Niveau atteint",
   "admin.presets.gameLength": "Jeu mené jusqu'à sa durée estimée",
   "admin.presets.gameTime": "Temps passé à jouer (XP par minute, pièces par heure)",
+  "admin.presets.liveTime": "Minutes de TV en direct (XP par minute, pièces par heure)",
   "quests.filter.label": "Filtrer les quêtes",
   "quests.filter.all": "Tout",
   "quests.filter.day": "Aujourd’hui",
