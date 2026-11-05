@@ -8,7 +8,7 @@ from datetime import UTC, datetime
 from typing import Any, Literal
 
 from portalab.capabilities.connector_sdk import ServiceHandle
-from portalab.capabilities.media import TechnicalFile, TechnicalSheet, TechnicalStream
+from portalab.capabilities.media import TechnicalFile, TechnicalSheet, TechnicalStream, video_resolution
 from portalab.connectors.http_base import HttpConnector, safe_id
 
 KINDS: dict[int, Literal["video", "audio", "subtitle"]] = {1: "video", 2: "audio", 3: "subtitle"}
@@ -48,7 +48,7 @@ def stream_of(stream: Mapping[str, Any]) -> TechnicalStream | None:
         channels=_text(stream.get("audioChannelLayout") or stream.get("channels"), 40)
         if kind == "audio"
         else None,
-        resolution=f"{height}p" if kind == "video" and height else None,
+        resolution=video_resolution(_int(stream.get("width")), height) if kind == "video" else None,
         dynamic_range=_range(stream) if kind == "video" else None,
         bitrate=_int(stream.get("bitrate")),
         forced=bool(stream.get("forced")),

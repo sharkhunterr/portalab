@@ -649,6 +649,22 @@ class TechnicalSheet:
     files: tuple[TechnicalFile, ...] = ()
 
 
+def video_resolution(width: int | None, height: int | None) -> str | None:
+    """#354: a picture's resolution as people name it — by its width, so that a scope film (1920 x 800) is
+    1080p, not « 800p »."""
+    if width:
+        for least, name in (
+            (3800, "2160p"),
+            (2500, "1440p"),
+            (1900, "1080p"),
+            (1260, "720p"),
+            (1000, "576p"),
+        ):
+            if width >= least:
+                return name
+    return f"{height}p" if height else None
+
+
 @runtime_checkable
 class MediaTechnical(Protocol):
     async def technical(self, external_id: str, kind: str) -> TechnicalSheet | None:

@@ -20,7 +20,7 @@ PLEX = {
                     "size": 20812345678,
                     "container": "mkv",
                     "Stream": [
-                        {"streamType": 1, "codec": "hevc", "height": 2160, "DOVIPresent": True,
+                        {"streamType": 1, "codec": "hevc", "width": 3840, "height": 1600, "DOVIPresent": True,
                          "displayTitle": "4K DoVi/HDR10 (HEVC Main 10)", "bitrate": 16000},
                         {"streamType": 2, "codec": "eac3", "language": "Français",
                          "audioChannelLayout": "5.1(side)", "extendedDisplayTitle": "Français (EAC3 5.1)",
@@ -93,6 +93,13 @@ def test_jellyfin_technical_sheet() -> None:
     assert (video.resolution, video.dynamic_range, video.bitrate) == ("1080p", "SDR", 8000)
     assert (audio.language, audio.channels, audio.default) == ("fre", "5.1", True)
     assert subtitles.kind == "subtitle" and subtitles.language == "eng"
+
+
+def test_a_scope_picture_is_named_by_its_width() -> None:
+    from portalab.capabilities.media import video_resolution
+
+    assert video_resolution(1920, 800) == "1080p" and video_resolution(3840, 1600) == "2160p"
+    assert video_resolution(None, 720) == "720p" and video_resolution(None, None) is None
 
 
 def test_radarr_grab_tells_its_indexer_and_torrent() -> None:
