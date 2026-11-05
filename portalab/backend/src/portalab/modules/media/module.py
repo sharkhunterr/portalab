@@ -40,6 +40,7 @@ from portalab.capabilities.media_core import (
     RADIO_CREDITS,
     RECOMMENDATIONS,
     RESCUES,
+    TECHNICAL_SHEETS,
     DetailBlockRegistry,
     MediaTypeRegistry,
     default_detail_blocks,
@@ -183,6 +184,7 @@ from portalab.modules.media.settings import (
 from portalab.modules.media.signals import register_media_signals
 from portalab.modules.media.sink.library import CatalogWriter, LibrarySink
 from portalab.modules.media.taste.service import TasteRecommender, TasteService
+from portalab.modules.media.technical import MediaTechnicalSheets
 
 OWNER = "module:media"
 CATEGORIES = (
@@ -453,6 +455,7 @@ class MediaModule:
             (RADIO_CREDITS, self.radio),
             (CARD_SOURCES, MediaCardSources(self.database, self.capabilities, self.enricher)),  # issue 229
             (GAME_SOURCES, MediaGameSources(self.database, self.capabilities, self.enricher)),  # issue 265
+            (TECHNICAL_SHEETS, MediaTechnicalSheets(self.database, self.capabilities, self.journey)),  # #354
             (RECOMMENDATIONS, self.recommender),
             (ACTIVITY, MediaActivityAttributes(self.database)),
         )

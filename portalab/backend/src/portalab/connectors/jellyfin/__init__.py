@@ -28,6 +28,7 @@ from portalab.capabilities.media import (
     LIBRARY,
     PEOPLE,
     PLAYBACK,
+    TECHNICAL,
     PersonRecord,
     ServiceAccount,
     SourceHistoryItem,
@@ -83,6 +84,7 @@ class JellyfinConnector(HttpConnector):
         binding(HEALTH_PROBE),
         binding(ACCOUNTS),
         binding(ITEM_LINKS),
+        binding(TECHNICAL),  # #354
         binding(PEOPLE),
     )
     status_path = "/System/Info"
@@ -169,6 +171,10 @@ class JellyfinConnector(HttpConnector):
             return _Links(self, service)
         if capability == PEOPLE:
             return _People(self, service)
+        if capability == TECHNICAL:
+            from portalab.connectors.jellyfin.technical import JellyfinTechnical
+
+            return JellyfinTechnical(self, service)
         return None
 
 

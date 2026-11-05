@@ -34,6 +34,7 @@ from portalab.capabilities.media import (
     LIBRARY,
     PLAYBACK,
     STREAMING,
+    TECHNICAL,
     THEMES,
     VIDEO_FRAMES,
     ActivityPage,
@@ -112,6 +113,7 @@ class PlexConnector(HttpConnector):
         binding(ACCOUNTS),
         binding(ACTIVITY_HISTORY, driven=True),
         binding(ITEM_LINKS),
+        binding(TECHNICAL),  # #354
         binding(STREAMING),
         binding(VIDEO_FRAMES),
         binding(THEMES),
@@ -232,6 +234,10 @@ class PlexConnector(HttpConnector):
             return PlexFrames(self, service)
         if capability == THEMES:
             return _Themes(self, service)
+        if capability == TECHNICAL:
+            from portalab.connectors.plex.technical import PlexTechnical
+
+            return PlexTechnical(self, service)
         return None
 
 

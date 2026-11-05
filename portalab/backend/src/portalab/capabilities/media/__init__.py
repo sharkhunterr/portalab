@@ -51,6 +51,7 @@ ACQUISITION = "media.acquisition"  # 027: what a download manager knows of one t
 PORTAL_PLAYER = "Portalab"
 DOWNLOAD_CLIENTS = "media.download_clients"  # 027: torrent clients (qBittorrent, Deluge)
 ITEM_LINKS = "media.item_links"  # 027: where a title opens in its service (Plex, Jellyfin, Grimmory…)
+TECHNICAL = "media.technical"  # #354: a title's files and streams in its media server (the team's sheet)
 STREAMING = "media.streaming"  # 027 (#2): the portal's own player, fed by the service's transcoder
 AUDIO = "media.audio"  # #20: audiobooks (then music) played in the portal, relayed with byte ranges
 READING = "media.reading"  # #21: books read in the portal (EPUB, PDF, comic book archives)
@@ -507,6 +508,8 @@ class AcquisitionEvent:
     release: str | None = None
     client: str | None = None
     detail: str | None = None
+    indexer: str | None = None  # #354: where the release was found
+    download_id: str | None = None  # #354: the download client's id (a torrent's hash)
 
 
 @dataclass(frozen=True, slots=True)
@@ -607,6 +610,49 @@ class ItemLinks(Protocol):
     async def item_path(self, external_id: str, kind: str) -> str | None:
         """The path (and fragment) of a title's page in the service, joined to its public address — or a
         whole ``https://`` address when the service has a universal one (Plex's web app)."""
+        ...
+
+
+@dataclass(frozen=True, slots=True)
+class TechnicalStream:
+    """#354: one stream of a title's file — a video, an audio track or subtitles, as its server reads it."""
+
+    kind: Literal["video", "audio", "subtitle"]
+    codec: str | None = None
+    language: str | None = None
+    title: str | None = (
+        None  # the server's own words: « Français (EAC3 5.1) », « 4K DoVi/HDR10 (HEVC Main 10) »
+    )
+    channels: str | None = None  # 5.1, stereo…
+    resolution: str | None = None  # 2160p, 1080p…
+    dynamic_range: str | None = None  # SDR, HDR10, Dolby Vision…
+    bitrate: int | None = None  # kb/s
+    forced: bool = False
+    default: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class TechnicalFile:
+    path: str | None
+    size: int | None  # bytes
+    container: str | None
+    duration_s: float | None
+    bitrate: int | None  # kb/s
+    streams: tuple[TechnicalStream, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class TechnicalSheet:
+    """#354: what a media server holds of a title — when it was added, its files and their streams."""
+
+    added_at: datetime | None
+    files: tuple[TechnicalFile, ...] = ()
+
+
+@runtime_checkable
+class MediaTechnical(Protocol):
+    async def technical(self, external_id: str, kind: str) -> TechnicalSheet | None:
+        """A title's files and streams in the media server (None: not known there)."""
         ...
 
 
@@ -1276,6 +1322,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(ACQUISITION, Acquisition, "Where a download manager stands on one title, and its search (027)"),
     _spec(DOWNLOAD_CLIENTS, DownloadClient, "Transfers of a torrent client, by hash (027)"),
     _spec(ITEM_LINKS, ItemLinks, "Where a title opens in its service (027)"),
+    _spec(TECHNICAL, MediaTechnical, "A title's files and streams in its media server (#354)"),
     _spec(STREAMING, MediaStreaming, "Play a title in the portal, transcoded by its service (027)"),
     _spec(AUDIO, MediaAudio, "Listen to an audiobook in the portal, relayed with byte ranges (#20)"),
     _spec(READING, MediaReading, "Read a book in the portal: EPUB, PDF, comic book archives (#21)"),

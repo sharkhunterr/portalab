@@ -2077,3 +2077,108 @@ a.media-tickets__item:hover {
   font-size: var(--font-size-sm);
   cursor: pointer;
 }
+
+/* issue 354: the team's technical sheet of a ticket's media */
+.media-sheet {
+  border-block-start: 1px solid var(--color-border);
+  padding-block-start: var(--space-2);
+}
+.media-sheet summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  cursor: pointer;
+}
+.media-sheet__body {
+  display: grid;
+  gap: var(--space-3);
+  margin-block-start: var(--space-3);
+}
+.media-sheet__server {
+  display: grid;
+  gap: var(--space-2);
+}
+.media-sheet__server h4 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+.media-sheet__when,
+.media-sheet__facts {
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+.media-sheet__facts {
+  margin: 0;
+}
+.media-sheet__file {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+.media-sheet__path {
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-sm);
+}
+.media-sheet__streams {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+}
+.media-sheet__streams div {
+  display: grid;
+  grid-template-columns: minmax(6rem, auto) 1fr;
+  gap: var(--space-2);
+}
+.media-sheet__streams dt {
+  font-weight: 600;
+}
+.media-sheet__streams dd {
+  margin: 0;
+}
+.media-sheet__streams ul {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.media-sheet__streams li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+}
+.media-sheet__events {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.media-sheet__events li {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+.media-sheet__event {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+@media (max-width: 30rem) {
+  .media-sheet__streams div {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

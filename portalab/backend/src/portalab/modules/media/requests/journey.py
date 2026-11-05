@@ -83,6 +83,11 @@ class RequestJourney:
             kind, ids = current.kind, dict(current.ids)
         return view, ("series" if kind in SERIES else kind), ids
 
+    async def acquisition_of(self, viewer: Principal, object_id: UUID) -> SourceAcquisition | None:
+        """#354: where the download manager stands on a title (its series for a season or an episode)."""
+        _, kind, ids = await self._target(viewer, object_id)
+        return await self._acquisition(kind, ids)
+
     async def _request(self, object_id: UUID, ids: Mapping[str, str]) -> MediaRequest | None:
         wanted = set(strong_ids(ids).items())
         async with self.database.session() as session:
