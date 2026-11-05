@@ -241,3 +241,39 @@ async def test_a_sitting_ends_even_when_the_page_goes_away_without_a_word(
         ("media.playback_abandoned", 300.0),
         ("media.playback_abandoned", 240.0),
     ]
+
+
+async def test_a_chapter_skipped_is_not_heard(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, clock: FixedClock
+) -> None:
+    """#353: what a sitting heard is its progress report after report — a jump (a chapter picked further
+    on, a skip back) counts nothing, however long the sitting."""
+    await users(app, media, "max")
+    audiobook, _, _, _ = await _library(media)
+    await login(client, "max")
+    ticket = (await client.get(f"/api/v1/media/{audiobook}/listen")).json()["ticket"]
+
+    async def report(state: str, at: float, seq: int) -> None:
+        sent = await client.post(
+            f"/api/v1/media/listen/{ticket}/position",
+            json={"state": state, "position_s": at, "duration_s": 36000, "seq": seq},
+        )
+        assert sent.status_code == 204, sent.text
+
+    await report("playing", 1000.0, 1)  # chapter 5
+    clock.advance(timedelta(minutes=10))
+    await report("playing", 1600.0, 2)  # ten minutes heard
+    clock.advance(timedelta(seconds=20))
+    await report("playing", 6000.0, 3)  # picked chapter 8: a jump of over an hour in 20 s
+    clock.advance(timedelta(minutes=20))
+    await report("playing", 7200.0, 4)  # twenty minutes heard
+    clock.advance(timedelta(seconds=10))
+    await report("playing", 7000.0, 5)  # skipped back
+    clock.advance(timedelta(seconds=30))
+    await report("stopped", 7030.0, 6)
+    ended = [
+        payload["watched_s"]
+        for name, payload, _ in await media.events("media.playback")
+        if name == "media.playback_abandoned"
+    ]
+    assert ended == [1830.0]  # 10 + 20 min + the last 30 s — not the 100 min between its two ends
