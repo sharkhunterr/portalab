@@ -367,6 +367,27 @@ class SeenWork:
     last_at: datetime
 
 
+@dataclass(frozen=True, slots=True)
+class BingoCell:
+    """Issue 356: a square a month's media bingo may hold — its ``key`` (``genre:horror``, ``era:1980``,
+    ``country:JP``, ``kind:audiobook``, ``review``…) and its ``group`` (genre, era, country, length, series,
+    kind, community), the library having what it takes to tick it."""
+
+    key: str
+    group: str
+
+
+@dataclass(frozen=True, slots=True)
+class BingoTick:
+    """Issue 356: what ticked a square for a member — the work (``object_id`` None for live TV or the radio),
+    its title and poster, and when."""
+
+    object_id: UUID | None
+    title: str
+    image_id: UUID | None
+    at: datetime
+
+
 @runtime_checkable
 class GameSources(Protocol):
     """Issue 265: what the games page needs of the media beyond the works the cards are made of — a series'
@@ -392,6 +413,18 @@ class GameSources(Protocol):
 
     async def seen(self, user: UUID, *, limit: int) -> Sequence[SeenWork]:
         """The works a member watched, read or played, the latest first (what their services tell)."""
+        ...
+
+    async def bingo_cells(self, *, year: int) -> Sequence[BingoCell]:
+        """Issue 356: every square this library can fill (enough titles of the genre, the era, the country…);
+        ``year`` is the month's (« a title out this year or last »)."""
+        ...
+
+    async def bingo_ticks(
+        self, keys: Sequence[str], since: datetime, until: datetime, *, user: UUID | None = None
+    ) -> Mapping[UUID, Mapping[str, BingoTick]]:
+        """Issue 356: per member (or one), the squares among ``keys`` ticked between two moments, each by the
+        first title that did it (what their services tell: plays, readings, game sessions, reviews)."""
         ...
 
 

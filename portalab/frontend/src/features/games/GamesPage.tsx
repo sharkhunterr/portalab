@@ -14,6 +14,7 @@ import { ordered, type QuestItem, useQuestText } from "../gamification/quests/Qu
 import { WheelWidget } from "../gamification/wheel/WheelWidget";
 import { imageUrl } from "../media/api";
 import { type ChallengeItem, GAME_ICONS, gamesLeft, type HubGame, useChallenge, useGamesHub } from "./api";
+import { BingoSection } from "./Bingo";
 import { Board } from "./Boards";
 import "./games.css";
 
@@ -359,7 +360,7 @@ export default function GamesPage() {
   const hub = useGamesHub();
   const [boardGame, setBoardGame] = useState("poster");
   const games = hub.data?.games ?? [];
-  const playable = games.filter((g) => g.key !== "challenge");
+  const playable = games.filter((g) => g.key !== "challenge" && g.key !== "bingo");
   return (
     <div className="games-page">
       <PageHeader
@@ -384,6 +385,9 @@ export default function GamesPage() {
               <CampaignReminders />
             </div>
           </section>
+
+          {/* issue 356: the month's media bingo */}
+          {games.some((g) => g.key === "bingo") ? <BingoSection /> : null}
 
           {games.some((g) => g.key === "challenge") ? <Challenges /> : null}
 

@@ -26,7 +26,7 @@ ROUND_GAMES = (
 )
 SOLO_ONLY = ("memories",)  # my own history: a party cannot share it
 PARTY_ONLY = ("whowatched",)  # whose history: the players'
-GAMES = (*ROUND_GAMES, "cinemot", "memory", "challenge")
+GAMES = (*ROUND_GAMES, "cinemot", "memory", "challenge", "bingo")
 
 
 class RoundGame(BaseModel):
@@ -109,6 +109,13 @@ class Challenge(BaseModel):
         return [k for k in CHALLENGE_KINDS if self.enabled and self.of(k).enabled]
 
 
+class Bingo(BaseModel):
+    """Issue 356: the month's media bingo — on or off."""
+
+    model_config = ConfigDict(extra="ignore")
+    enabled: bool = True
+
+
 class Party(BaseModel):
     model_config = ConfigDict(extra="ignore")
     enabled: bool = True
@@ -125,6 +132,7 @@ class GamesConfig(BaseModel):
     cinemot: Cinemot = Field(default_factory=Cinemot)
     memory: Memory = Field(default_factory=Memory)
     challenge: Challenge = Field(default_factory=Challenge)
+    bingo: Bingo = Field(default_factory=Bingo)  # issue 356
     party: Party = Field(default_factory=Party)
 
     def round(self, game: str) -> RoundGame:
@@ -140,7 +148,7 @@ class GamesConfig(BaseModel):
         if not self.enabled:
             return []
         out = [g for g in ROUND_GAMES if self.round(g).enabled]
-        out += [g for g in ("cinemot", "memory", "challenge") if getattr(self, g).enabled]
+        out += [g for g in ("cinemot", "memory", "challenge", "bingo") if getattr(self, g).enabled]
         return out
 
 

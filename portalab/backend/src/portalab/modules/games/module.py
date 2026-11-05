@@ -1,7 +1,7 @@
 """Games module facade (issue 265): a page of games drawn from the household's library — question after
 question alone or in a party, the day's title to find, the memory of one's own cards, the week's retro
-challenge — set up by the administrators (``games.config``), rewarded by the reward rules (``games.played``,
-``games.challenge_completed``)."""
+challenge, the month's media bingo (issue 356) — set up by the administrators (``games.config``), rewarded by
+the reward rules (``games.played``, ``games.challenge_completed``, ``games.bingo_line|card``)."""
 
 from datetime import timedelta
 from typing import Any
@@ -17,6 +17,7 @@ from portalab.core.jobs.registry import JobRegistry
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock
 from portalab.modules.games import permissions as _permissions  # noqa: F401 — declares permissions
+from portalab.modules.games.bingo import Bingo
 from portalab.modules.games.boards import Boards
 from portalab.modules.games.challenge import Challenges
 from portalab.modules.games.cinemot import Cinemot
@@ -30,6 +31,7 @@ from portalab.modules.games.solo import Solo
 
 OWNER = "module:games"
 CHALLENGE_JOB = "games.challenge"
+BINGO_JOB = "games.bingo"
 SWEEP_JOB = "games.sweep"
 BOARDS_JOB = "games.boards"
 log = get_logger("portalab.games")
@@ -54,6 +56,7 @@ class GamesModule:
         self.solo = Solo(database, self.pool, self.shared, clock=clock)
         self.cinemot = Cinemot(database, self.pool, self.shared, clock=clock)
         self.challenges = Challenges(database, self.shared, clock=clock)
+        self.bingo = Bingo(database, self.shared, clock=clock)  # issue 356: the month's media bingo
         self.parties = Parties(database, self.pool, self.shared, clock=clock)
         self.boards = Boards(database, self.shared, clock=clock)
 
@@ -76,6 +79,9 @@ class GamesModule:
         async def challenge() -> None:
             await self.challenges.check()
 
+        async def bingo() -> None:
+            await self.bingo.check()
+
         async def sweep() -> None:
             await self.parties.sweep()
 
@@ -88,6 +94,8 @@ class GamesModule:
             register_periodic(
                 jobs, self.database, CHALLENGE_JOB, timedelta(minutes=30), challenge, owner=OWNER
             ),
+            # issue 356: who completed a line or the card of the month's bingo, every half hour
+            register_periodic(jobs, self.database, BINGO_JOB, timedelta(minutes=30), bingo, owner=OWNER),
             # parties left open without a move close, every hour
             register_periodic(jobs, self.database, SWEEP_JOB, timedelta(hours=1), sweep, owner=OWNER),
             # a week or a month over: each member placed on a board told their place, every hour

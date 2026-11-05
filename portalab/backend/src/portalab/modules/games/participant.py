@@ -8,7 +8,7 @@ from sqlalchemy import delete, select
 
 from portalab.capabilities.privacy_participants import ErasureMode, ExportRecord
 from portalab.core.db import Database
-from portalab.modules.games.models import ChallengeDone, GameSession, Party, PartyPlayer
+from portalab.modules.games.models import BingoDone, ChallengeDone, GameSession, Party, PartyPlayer
 
 
 class GamesParticipant:
@@ -32,6 +32,9 @@ class GamesParticipant:
                     ChallengeDone.user_id == user_id
                 )
             )
+            bingo = await session.execute(  # issue 356: the bingo lines and cards completed
+                select(BingoDone.month, BingoDone.line, BingoDone.at).where(BingoDone.user_id == user_id)
+            )
             return [
                 *(
                     ExportRecord(
@@ -48,6 +51,10 @@ class GamesParticipant:
                     ExportRecord("games.challenge", {"week": w.isoformat(), "kind": k, "at": at.isoformat()})
                     for w, k, at in challenges
                 ),
+                *(
+                    ExportRecord("games.bingo", {"month": m.isoformat(), "line": line, "at": at.isoformat()})
+                    for m, line, at in bingo
+                ),
             ]
 
     async def erase(self, user_id: UUID, mode: ErasureMode) -> None:
@@ -56,3 +63,4 @@ class GamesParticipant:
             await uow.session.execute(delete(PartyPlayer).where(PartyPlayer.user_id == user_id))
             await uow.session.execute(delete(Party).where(Party.host_id == user_id))
             await uow.session.execute(delete(ChallengeDone).where(ChallengeDone.user_id == user_id))
+            await uow.session.execute(delete(BingoDone).where(BingoDone.user_id == user_id))

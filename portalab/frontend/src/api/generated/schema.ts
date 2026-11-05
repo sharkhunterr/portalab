@@ -6629,6 +6629,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/games/bingo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bingo
+         * @description Issue 356: the month's media bingo — its squares (each with the title that ticked it for me), its
+         *     lines (done or not), and how many members completed a line or the card.
+         */
+        get: operations["bingo_api_v1_games_bingo_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/games/challenge": {
         parameters: {
             query?: never;
@@ -33412,6 +33433,28 @@ export interface operations {
         };
     };
     games_api_v1_games_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    bingo_api_v1_games_bingo_get: {
         parameters: {
             query?: never;
             header?: never;

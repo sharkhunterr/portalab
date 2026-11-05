@@ -144,10 +144,11 @@ Settings: *Campaign time zone*, *"Ending soon" notice* (hours), *Active campaign
 - **Titles the games use**: films and/or series, **Minimum votes** (a title known enough), **Only titles present in the library**.
 - Each game: on or off, **Questions**, **Seconds**, **Choices**, and **A day** (games a member may start alone each day, each game its own count; 0: no limit; games played together do not count). **Title of the day** has **Tries**, **Minimum letters** and **Maximum letters**; **Memory** has **Pairs** and **With the member's own cards**.
 - **The week's challenges**: a title drawn at random each week, or one you pick (**Draw again this week**, **Back to drawing at random**), with goals in minutes or percent.
+- **The month's bingo**: on or off. Each month one card for everyone (4 x 4, or 3 x 3 for a small library), drawn from the squares your library can fill — a genre, an era, a country, a long or short film, a series' pilot or three episodes of one series, a book, a comic, an audiobook, a retro game, live TV or the radio when they were used here, a review, a title from the "Watch later" list. Squares tick themselves from what the services tell.
 - Parties: **Maximum players**, **Countdown**, **Reveal seconds**.
 - **Daily wheel on** and **The wheel's segments**: label, gain (Coins, XP, a shop product or nothing), amount and weight.
 
-What the games give is set with the other gain rules (**Gamification → Gains → XP per action**): taking part, a win, a minimum score, a place on the week's or month's board, a place in a party, a weekly challenge completed, each with optional daily caps. The Games page shows how many rules are active and how often each game was played over 30 days.
+What the games give is set with the other gain rules (**Gamification → Gains → XP per action**): taking part, a win, a minimum score, a place on the week's or month's board, a place in a party, a weekly challenge completed, a line of the month's bingo and its full card (**Quick add** proposes 30 XP and 10 coins a line, 200 XP, 100 coins and a booster for the full card), each with optional daily caps. The Games page shows how many rules are active and how often each game was played over 30 days.
 
 ## Mediacards
 

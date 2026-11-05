@@ -35,7 +35,7 @@ Ce qui rapporte, et combien, dépend de votre portail. Selon les réglages, cela
 - jouer à un jeu de la bibliothèque (RomM) : le temps passé à jouer, et une grosse récompense quand vous avez joué à un jeu aussi longtemps que sa durée estimée (son histoire principale, quand elle est connue) ;
 - faire une demande, ou voir une demande devenir disponible ;
 - vous connecter au portail ;
-- jouer aux [jeux](/games), réussir un défi de la semaine ;
+- jouer aux [jeux](/games), réussir un défi de la semaine, compléter une ligne ou le carton plein du bingo du mois ;
 - envoyer un avis ou ouvrir un ticket au support, signaler un problème sur un média (quand l'équipe l'a résolu) ;
 - donner votre avis sur un titre vu, lu ou joué (une fois par titre) ;
 - terminer une quête, débloquer un succès, passer un niveau.
@@ -125,6 +125,8 @@ La rubrique **Jeux** du menu réunit « Jeux du jour », « Quêtes », « Jouer
 3. **« Quêtes validées »** : où en sont vos quêtes, combien sont à faire aujourd'hui et la prochaine. « Voir les quêtes » ouvre la page des quêtes. Une campagne en cours a aussi son rappel à côté.
 4. **« Les défis de la semaine »** : un jeu à jouer, un film à voir en entier, un livre et un livre audio à avancer. Vos services et le lecteur du portail comptent votre avancée tout seuls : rien à déclarer.
 5. **« Tous les jeux »** : chaque jeu indique s'il se joue « Seul » ou « À plusieurs », et ce qu'il vous reste de parties aujourd'hui (« Reste … aujourd'hui »), selon votre portail.
+
+**« Le bingo de … »** (le mois en cours), au-dessus des défis : une grille pour tout le mois, la même pour tous les membres, avec des cases comme « De l'horreur », « Un titre des années 80 », « Origine : Japon », « Le tout premier épisode d'une série », « 30 min de TV en direct » ou « Donner ton avis sur un titre ». Une case se coche toute seule quand vous terminez un titre qui y correspond (un film ou un épisode vu jusqu'au bout ; un livre, un livre audio ou un jeu un quart d'heure à la fois ; la TV en direct ou la radio une demi-heure sur le mois), avec l'affiche du titre en tampon. Une ligne (rangée, colonne ou diagonale) et le carton plein rapportent ; un nouveau carton arrive le 1er du mois.
 
 Selon votre portail, vous y trouvez par exemple « La scène floutée », « Le résumé masqué », « Le casting », « Plus ou moins », « Chronologie », « Blind test », « Souvenirs » ou « Memory ». Touchez un jeu, puis « Commencer ». En bas de la page, les **« Classements »** montrent les meilleurs scores de chaque jeu (« Classement de … »).
 

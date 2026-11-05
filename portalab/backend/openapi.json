@@ -43001,6 +43001,30 @@
         ]
       }
     },
+    "/api/v1/games/bingo": {
+      "get": {
+        "description": "Issue 356: the month's media bingo \u2014 its squares (each with the title that ticked it for me), its\nlines (done or not), and how many members completed a line or the card.",
+        "operationId": "bingo_api_v1_games_bingo_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Bingo Api V1 Games Bingo Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Bingo",
+        "tags": [
+          "games"
+        ]
+      }
+    },
     "/api/v1/games/challenge": {
       "get": {
         "description": "The week's challenges \u2014 a game to play, a film to watch through, a book and an audiobook to take\nsome way: the title, the target, where I am (what my services and the portal tell).",

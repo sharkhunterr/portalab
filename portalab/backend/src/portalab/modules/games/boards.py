@@ -16,7 +16,7 @@ from portalab.core.event_port import SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.games.common import Shared
 from portalab.modules.games.events import BOARD
-from portalab.modules.games.models import ChallengeDone, GameSession, Party, PartyPlayer
+from portalab.modules.games.models import BingoDone, ChallengeDone, GameSession, Party, PartyPlayer
 from portalab.modules.games.settings import GAMES, PARTY_ONLY, ROUND_GAMES, SOLO_ONLY
 from portalab.modules.games.solo import Solo
 
@@ -58,6 +58,13 @@ class Boards:
         elif game == "challenge":
             at = ChallengeDone.at
             query = select(ChallengeDone.user_id, func.count()).group_by(ChallengeDone.user_id)
+        elif game == "bingo":  # issue 356: the bingo lines completed
+            at = BingoDone.at
+            query = (
+                select(BingoDone.user_id, func.count())
+                .where(BingoDone.line != "card")
+                .group_by(BingoDone.user_id)
+            )
         else:
             at = GameSession.finished_at
             query = (
@@ -185,7 +192,7 @@ class Boards:
                 }
             else:
                 entry |= {"kind": game, "solo": True, "party": False}
-            if entry["solo"] and game not in ("cinemot", "challenge"):
+            if entry["solo"] and game not in ("cinemot", "challenge", "bingo"):
                 # how many games of it a day, and how many I started today (0: no limit)
                 entry |= {"per_day": config.per_day(game), "today": started.get(game, 0)}
             games.append(entry)
