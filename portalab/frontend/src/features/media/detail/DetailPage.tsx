@@ -33,7 +33,7 @@ import { BookView } from "./BookView";
 import { EnrichedView, Enrichment, metadataImage, normalize, useMetadata } from "./Enrichment";
 import { RequestJourney, useJourney } from "./Journey";
 import { LeavingNotice } from "./Leaving";
-import { Reviews } from "./Reviews";
+import { ReviewButton, Reviews } from "./Reviews";
 import { TitleHero } from "./TitleHero";
 
 /**
@@ -317,15 +317,19 @@ function TitleBadges({ media }: { media: { id: string; kind: string; available: 
       : null;
   return (
     <span className="media-badges">
-      <span className="media-badge" data-tone={availability}>
-        <Icon name={STAGE_ICONS[stage?.key ?? ""] ?? "blocked"} size={14} />
-        {stage
-          ? t(`media:myRequests.stage.${stage.key}`, {
-              percent: Math.round((stage.progress ?? 0) * 100),
-              date: stage.date ? format.date(stage.date.slice(0, 10), "medium") : "",
-            })
-          : t("media:badge.unavailable")}
-      </span>
+      {/* issue 355: « Available » goes without saying beside « Watch » (and the journey's card tells since
+          when); a title on its way or missing still says so */}
+      {stage?.key === "available" ? null : (
+        <span className="media-badge" data-tone={availability}>
+          <Icon name={STAGE_ICONS[stage?.key ?? ""] ?? "blocked"} size={14} />
+          {stage
+            ? t(`media:myRequests.stage.${stage.key}`, {
+                percent: Math.round((stage.progress ?? 0) * 100),
+                date: stage.date ? format.date(stage.date.slice(0, 10), "medium") : "",
+              })
+            : t("media:badge.unavailable")}
+        </span>
+      )}
       {resume && series && resume.label ? (
         <span className="media-badge" data-tone="progress">
           <Icon name="play" size={14} />
@@ -992,14 +996,21 @@ export function DetailPage() {
           )
         }
       >
-        {/* 030: what plugins add to a title's page (« + Playlist »…), drawn by Portalab */}
-        <PluginSlot name="media.actions" params={{ item: media.id }} />
-        {/* issue 190: what I think of it — it shapes my recommendations */}
-        {TASTED.includes(media.kind) ? <TasteButtons objectId={media.id} title={media.title} /> : null}
-        {/* issue 299: a series followed brings its new episodes into « Mon fil » */}
-        {media.kind === "series" ? <FollowButton kind="title" value={media.id} name={media.title} /> : null}
-        {/* issue 354: a problem with it (subtitles, language, a cut file…) — a ticket about this media */}
-        <ReportMediaProblem objectId={media.id} title={media.title} />
+        {/* issue 355: one bar of small actions under the title — the rest is in dialogs */}
+        <div className="media-actions">
+          {/* issue 190: what I think of it — it shapes my recommendations */}
+          {TASTED.includes(media.kind) ? (
+            <TasteButtons objectId={media.id} title={media.title} compact />
+          ) : null}
+          {/* issue 355: my review (a rating, a few words), in a dialog */}
+          <ReviewButton objectId={media.id} title={media.title} />
+          {/* issue 299: a series followed brings its new episodes into « Mon fil » */}
+          {media.kind === "series" ? <FollowButton kind="title" value={media.id} name={media.title} /> : null}
+          {/* 030: what plugins add to a title's page (« + Playlist »…), drawn by Portalab */}
+          <PluginSlot name="media.actions" params={{ item: media.id }} />
+          {/* issue 354: a problem with it (subtitles, language, a cut file…) — a ticket about this media */}
+          <ReportMediaProblem objectId={media.id} title={media.title} />
+        </div>
       </TitleHero>
       <LeavingNotice objectId={media.id} title={media.title} />
       <RequestJourney objectId={media.id} title={media.title} />
@@ -1016,7 +1027,7 @@ export function DetailPage() {
         <WorkCollection objectId={media.id} />
       ) : null}
       {/* issue 355: what the members thought of it — and mine, once seen, read or played */}
-      <Reviews objectId={media.id} />
+      <Reviews objectId={media.id} title={media.title} />
       <div className="media-sections">
         {SECTIONS.filter(
           (name) =>

@@ -1874,24 +1874,36 @@
 }
 
 /* issue 354: « Report a problem » on a media's page, and the media a ticket is about */
-.media-report {
-  display: inline-flex;
+.media-report__kinds {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.media-report__kinds legend {
+  margin-block-end: var(--space-2);
+  font-weight: 600;
+}
+.media-report__kinds label {
+  display: flex;
   align-items: center;
-  gap: var(--space-1);
-  min-block-size: 2.25rem;
-  padding: var(--space-1) var(--space-3);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--color-text-muted);
-  font: inherit;
+  border-radius: var(--radius-md);
   cursor: pointer;
 }
-.media-report:hover {
-  color: var(--color-text);
+.media-report__kinds label:hover {
   border-color: var(--color-accent);
 }
-.media-report:focus-visible {
+.media-report__kinds label[data-on] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  font-weight: 600;
+}
+.media-report__kinds label:focus-within {
   outline: var(--focus-ring-width, 2px) solid var(--color-focus);
   outline-offset: 2px;
 }

@@ -47,9 +47,14 @@ Cliquez sur une affiche pour ouvrir la fiche du titre. En haut, vous trouvez l'a
 
 ![Le haut de la fiche d'un film : ses badges, et les boutons pour le regarder](shot:medias-fiche)
 
-Un souci avec ce titre (sous-titres manquants, mauvaise langue, fichier coupé, mauvaise qualité…) ? Touchez **« Signaler un problème »** (présent si votre portail accepte ces signalements) : choisissez ce qui ne va pas, précisez si besoin, puis **« Envoyer le signalement »**. C'est un ticket du support rattaché au titre, que vous suivez dans [Mes tickets](/support) ; l'équipe voit le titre dans le ticket.
+Sous le titre, une barre de petites actions :
 
-Plus bas, **« Avis des membres »** (films, séries, livres, livres audio et jeux) donne la note moyenne des membres et le nombre d'avis, puis leurs avis : signés de leur nom, ou **« Anonyme »** pour un membre qui reste discret dans la communauté. Quand vous avez regardé, lu, écouté ou joué le titre, donnez le vôtre : une note de 1 à 5 étoiles (obligatoire), **« Un mot sur ce titre »** si vous voulez, puis **« Publier mon avis »**. Vous pouvez le **« Modifier »** ou le **« Retirer »** à tout moment ; l'avis sur un épisode va à sa série.
+- les trois icônes de goût : **« J'aime »**, **« Pas pour moi »**, **« Plus tard »** (leur nom s'affiche au survol) ;
+- **« Donner mon avis »**, quand vous avez regardé, lu, écouté ou joué le titre : une fenêtre demande une note de 1 à 5 étoiles (chacune dit ce qu'elle veut dire, de « Pas aimé » à « Coup de cœur ! ») et **« Un mot sur ce titre »** si vous voulez, puis **« Publier mon avis »**. Le bouton affiche ensuite votre note (« Mon avis : 4/5 ») et rouvre la fenêtre pour le modifier ou le retirer. L'avis sur un épisode va à sa série ;
+- **« Suivre »** pour une série ;
+- le drapeau **« Signaler un problème »** : sous-titres manquants, mauvaise langue, fichier coupé, image ? Choisissez ce qui ne va pas (« Sous-titres », « Son », « Image », « Langue », « Fichier illisible ou coupé », « Autre chose »), précisez si besoin, puis **« Envoyer le signalement »**. C'est un ticket du support rattaché au titre, que vous suivez dans [Mes tickets](/support) ; l'équipe voit le titre dans le ticket.
+
+Plus bas, **« Avis des membres »** donne la note moyenne et le nombre d'avis, puis les avis : le vôtre d'abord, les autres signés de leur nom, ou **« Anonyme »** pour un membre qui reste discret dans la communauté. La section n'apparaît qu'une fois un premier avis donné.
 
 Plus bas, selon le titre :
 

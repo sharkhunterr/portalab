@@ -1534,7 +1534,61 @@ a.media-person__row:hover {
   text-decoration: underline;
 }
 
-/* issue 355: the members' reviews of a title */
+/* issue 355: a title's head — one bar of small actions (taste, my review, follow, report), the rest in dialogs */
+.media-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+}
+.media-taste--compact {
+  display: inline-flex;
+  gap: var(--space-1);
+  margin: 0;
+}
+.media-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-block-size: 2.25rem;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.media-action--icon {
+  inline-size: 2.25rem;
+  padding: 0;
+}
+.media-action:hover {
+  border-color: var(--color-accent);
+}
+.media-action:focus-visible {
+  outline: var(--focus-ring-width, 2px) solid var(--color-focus);
+  outline-offset: 2px;
+}
+.media-action[aria-pressed="true"],
+.media-action[data-on] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.media-action[data-verdict="dislike"][aria-pressed="true"] {
+  border-color: var(--state-error-fg);
+  background: var(--state-error-bg);
+  color: var(--state-error-fg);
+}
+.media-action[data-on] .ds-icon {
+  fill: currentColor;
+}
+
+/* issue 355: the members' reviews of a title, and mine in its dialog */
 .media-reviews {
   gap: var(--space-3);
 }
@@ -1558,6 +1612,9 @@ a.media-person__row:hover {
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-text) 4%, transparent);
 }
+.media-review[data-mine] {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
 .media-review header {
   display: flex;
   flex-wrap: wrap;
@@ -1568,6 +1625,15 @@ a.media-person__row:hover {
   margin-inline-start: auto;
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+}
+.media-review__edit {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
 }
 .media-review__anonymous {
   font-style: italic;
@@ -1582,24 +1648,26 @@ a.media-person__row:hover {
   color: var(--color-accent);
   fill: currentColor;
 }
-.media-review__hint {
-  color: var(--color-text-muted);
-}
 .media-review__form {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 .media-review__picker {
-  display: flex;
-  align-items: center;
+  display: grid;
+  justify-items: center;
   gap: var(--space-1);
   margin: 0;
   padding: 0;
   border: 0;
 }
 .media-review__picker legend {
-  margin-block-end: var(--space-1);
+  margin-block-end: var(--space-2);
   font-weight: 600;
+  text-align: center;
+}
+.media-review__picker-stars {
+  display: flex;
+  gap: var(--space-1);
 }
 .media-review__picker label {
   display: inline-flex;
@@ -1607,6 +1675,10 @@ a.media-person__row:hover {
   border-radius: var(--radius-sm);
   color: var(--color-border);
   cursor: pointer;
+  transition: transform var(--motion-duration-fast) var(--motion-easing);
+}
+.media-review__picker label:hover {
+  transform: scale(1.12);
 }
 .media-review__picker label.is-on {
   color: var(--color-accent);
@@ -1618,8 +1690,14 @@ a.media-person__row:hover {
   outline: var(--focus-ring-width, 2px) solid var(--color-focus);
   outline-offset: 1px;
 }
-.media-review__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+.media-review__meaning {
+  min-block-size: 1.5em;
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .media-review__picker label {
+    transition: none;
+  }
 }

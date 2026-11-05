@@ -1,8 +1,9 @@
 """Support definitions (T018, T026, T030): ticket types, workflows and feedback forms. Workflows are
 append-only versions (tickets pin theirs); types and forms carry a version bumped on every change; every
 admin change is validated (closed schemas) and audited. The baseline (workflow ``baseline``, types
-``bug|access_request|service_issue|question|other``, forms ``general|bug_report|feature_request``) is
-seeded idempotently at start-up."""
+``bug|access_request|service_issue|question|other|media_issue``, forms
+``general|bug_report|feature_request``) is seeded idempotently at start-up; #354: its ``media_issue`` takes
+the media reports unless an administrator chose another type."""
 
 from collections.abc import Mapping, Sequence
 from datetime import datetime
@@ -50,6 +51,8 @@ class Definitions:
                 .values(key=BASELINE_KEY, version=1, definition=BASELINE, created_at=now)
                 .on_conflict_do_nothing()
             )
+            # #354: the baseline's media type takes the reports unless the administrator chose another
+            taken = await session.scalar(select(TicketType.key).where(TicketType.media.is_(True)).limit(1))
             for item in BASELINE_TYPES:
                 await session.execute(
                     insert(TicketType)
@@ -59,6 +62,7 @@ class Definitions:
                         workflow_key=BASELINE_KEY,
                         fields=item["fields"],
                         enabled=True,
+                        media=bool(item.get("media")) and taken is None,
                         version=1,
                         updated_at=now,
                     )
