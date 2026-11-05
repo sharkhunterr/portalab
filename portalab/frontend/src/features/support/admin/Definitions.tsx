@@ -65,6 +65,8 @@ interface TypeRow {
   workflow_key: string;
   fields: FieldDef[];
   enabled: boolean;
+  /** issue 354: the type « Report a problem » on a media's page opens (one at most) */
+  media?: boolean;
   version: number;
 }
 
@@ -266,6 +268,7 @@ function TypeEditor({
       workflow_key: workflows[0] ?? "baseline",
       fields: [],
       enabled: true,
+      media: false,
       version: 0,
     },
   );
@@ -276,7 +279,11 @@ function TypeEditor({
       return (
         await api.PUT("/api/v1/admin/support/types/{key}", {
           params: { path: { key } },
-          body: { ...body, fields: body.fields as unknown as Array<Record<string, unknown>> },
+          body: {
+            ...body,
+            media: Boolean(body.media),
+            fields: body.fields as unknown as Array<Record<string, unknown>>,
+          },
         })
       ).data;
     },
@@ -321,6 +328,12 @@ function TypeEditor({
         label={t("support:forms.enabled")}
         checked={draft.enabled}
         onChange={(e) => patch({ enabled: e.target.checked })}
+      />
+      <CheckboxField
+        label={t("support:types.media")}
+        hint={t("support:types.mediaHint")}
+        checked={Boolean(draft.media)}
+        onChange={(e) => patch({ media: e.target.checked })}
       />
       {save.isError ? (
         <p role="alert" className="services-admin__ko">
@@ -497,6 +510,7 @@ function TypesPanel() {
               </span>
             </div>
             <span className="gam-card__actions">
+              {type.media ? <StatusBadge tone="info">{t("support:types.mediaBadge")}</StatusBadge> : null}
               {!type.enabled ? (
                 <StatusBadge tone="neutral">{t("support:forms.state.off")}</StatusBadge>
               ) : null}

@@ -11,6 +11,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useAssistantPage } from "../../ai/pageContext";
 import { useMe } from "../../auth/useAuth";
 import { useTicket, useTicketActions } from "./api";
+import { TicketMedia } from "./ReportMedia";
 import { PriorityBadge, StateBadge, stateLabel } from "./TicketBadges";
 
 type Line =
@@ -178,6 +179,7 @@ export function TicketPage({ team = false }: { team?: boolean }) {
             {data.incident_reference && data.incident_id ? (
               <Link to={`/incidents/${data.incident_id}`}>{data.incident_reference}</Link>
             ) : null}
+            {data.media_id ? <TicketMedia objectId={data.media_id} /> : null}
           </span>
         }
       />

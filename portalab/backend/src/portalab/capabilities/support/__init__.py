@@ -51,6 +51,7 @@ class TicketRequest:
     priority: Literal["low", "normal", "high", "urgent"] = "normal"
     tags: Sequence[str] = ()
     source: Literal["manual", "ai_diagnosis", "feedback_conversion", "automation"] = "manual"
+    media_id: UUID | None = None  # #354: the media the problem is about
 
 
 @dataclass(frozen=True, slots=True)

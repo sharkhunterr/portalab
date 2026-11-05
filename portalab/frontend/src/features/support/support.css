@@ -1872,3 +1872,45 @@
   background: color-mix(in srgb, var(--color-text) 6%, transparent);
   white-space: pre-wrap;
 }
+
+/* issue 354: « Report a problem » on a media's page, and the media a ticket is about */
+.media-report {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: 2.25rem;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+.media-report:hover {
+  color: var(--color-text);
+  border-color: var(--color-accent);
+}
+.media-report:focus-visible {
+  outline: var(--focus-ring-width, 2px) solid var(--color-focus);
+  outline-offset: 2px;
+}
+.media-report__form {
+  display: grid;
+  gap: var(--space-3);
+}
+.media-report__lead {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.media-report__done {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+.ticket-media {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}

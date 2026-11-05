@@ -23,6 +23,7 @@ class SupportTypeIn(BaseModel):
     workflow_key: str = Field(default="baseline", max_length=60)
     fields: list[dict[str, Any]] = Field(default_factory=list, max_length=40)
     enabled: bool = True
+    media: bool = False  # #354: the type "Report a problem" on a media's page opens
 
 
 class SupportTypeOut(SupportTypeIn):
@@ -70,6 +71,7 @@ async def list_types(principal: Configurer, module: Module) -> list[SupportTypeO
             workflow_key=t.workflow_key,
             fields=t.fields,
             enabled=t.enabled,
+            media=t.media,
             version=t.version,
             updated_at=t.updated_at,
         )
@@ -80,7 +82,7 @@ async def list_types(principal: Configurer, module: Module) -> list[SupportTypeO
 @router.put("/admin/support/types/{key}", response_model=SupportTypeOut)
 async def put_type(principal: Configurer, key: str, body: SupportTypeIn, module: Module) -> SupportTypeOut:
     t = await module.definitions.save_type(
-        principal, key[:60], body.label, body.workflow_key, body.fields, body.enabled
+        principal, key[:60], body.label, body.workflow_key, body.fields, body.enabled, body.media
     )
     return SupportTypeOut(
         key=t.key,
@@ -88,6 +90,7 @@ async def put_type(principal: Configurer, key: str, body: SupportTypeIn, module:
         workflow_key=t.workflow_key,
         fields=t.fields,
         enabled=t.enabled,
+        media=t.media,
         version=t.version,
         updated_at=t.updated_at,
     )

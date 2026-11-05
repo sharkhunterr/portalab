@@ -56,6 +56,8 @@ Click a poster to open its page. The top of the page shows the artwork (backdrop
 | **In progress · 35 %** | You started it (for a series, the episode you are on) |
 | **Watched**, **Read**, **Listened**, **Played** | You finished it |
 
+Something wrong with it — missing subtitles, the wrong language, a cut file, poor quality? **Report a problem** (shown when your portal takes such reports) opens a short form: say what is wrong, add details if needed, and **Send the report**. It is a support ticket about this title, which you follow in [My tickets](support.md); the team sees the title in it.
+
 ### Where to watch
 
 The action buttons depend on the title and your portal:

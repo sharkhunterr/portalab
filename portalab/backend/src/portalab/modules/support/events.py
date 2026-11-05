@@ -23,6 +23,7 @@ class TicketChanged(BaseModel):
     state: str
     type: str
     priority: Literal["low", "normal", "high", "urgent"]
+    media: bool = False  # #354: about a media (reported from its page)
 
 
 class FeedbackChanged(BaseModel):
@@ -55,7 +56,7 @@ def register_event_types(registry: EventTypeRegistry) -> None:
                     retention_class="business",
                     visibility_class="private",
                     aggregatable=frozenset({"state", "type", "priority"}),
-                    rewardable=frozenset({"type", "priority"}),
+                    rewardable=frozenset({"type", "priority", "media"}),
                     automatable=True,
                 )
             )

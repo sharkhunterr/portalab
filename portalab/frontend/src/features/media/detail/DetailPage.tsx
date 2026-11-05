@@ -20,6 +20,7 @@ import { useCollectsCards } from "../../cards/collects";
 import { WorkCollection } from "../../cards/WorkCollection";
 import { ExternalNews } from "../../news/ExternalNews";
 import { PluginSlot } from "../../plugins/slots/PluginSlot";
+import { ReportMediaProblem } from "../../support/tickets/ReportMedia";
 import { useListenInfo, useReadInfo } from "../books/api";
 import { useDiscoverTitle } from "../discover/api";
 import { RequestDialog } from "../discover/RequestDialog";
@@ -996,6 +997,8 @@ export function DetailPage() {
         {TASTED.includes(media.kind) ? <TasteButtons objectId={media.id} title={media.title} /> : null}
         {/* issue 299: a series followed brings its new episodes into « Mon fil » */}
         {media.kind === "series" ? <FollowButton kind="title" value={media.id} name={media.title} /> : null}
+        {/* issue 354: a problem with it (subtitles, language, a cut file…) — a ticket about this media */}
+        <ReportMediaProblem objectId={media.id} title={media.title} />
       </TitleHero>
       <LeavingNotice objectId={media.id} title={media.title} />
       <RequestJourney objectId={media.id} title={media.title} />

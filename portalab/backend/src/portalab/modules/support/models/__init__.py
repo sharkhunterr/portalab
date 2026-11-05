@@ -93,6 +93,8 @@ class TicketType(SupportBase):
     workflow_key: Mapped[str] = mapped_column(String(60), nullable=False)
     fields: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False)
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    # #354: the type a problem with a media is reported in, from its page (one type at most)
+    media: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
@@ -119,6 +121,7 @@ class Ticket(SupportBase):
         Index("ix_tickets_requester", "requester_id", "created_at"),
         Index("ix_tickets_queue", "state", "updated_at"),
         Index("ix_tickets_incident", "incident_id"),
+        Index("ix_tickets_media", "media_id"),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
@@ -138,6 +141,7 @@ class Ticket(SupportBase):
     source: Mapped[str] = mapped_column(String(20), nullable=False)
     feedback_id: Mapped[UUID | None] = mapped_column(ForeignKey("support.feedback_items.id"))
     technical_context: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    media_id: Mapped[UUID | None] = mapped_column()  # #354: the media reported (media.objects, opaque)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

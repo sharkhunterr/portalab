@@ -19182,6 +19182,11 @@ export interface components {
             /** Label */
             label: string;
             /**
+             * Media
+             * @default false
+             */
+            media: boolean;
+            /**
              * Workflow Key
              * @default baseline
              */
@@ -19202,6 +19207,11 @@ export interface components {
             key: string;
             /** Label */
             label: string;
+            /**
+             * Media
+             * @default false
+             */
+            media: boolean;
             /**
              * Updated At
              * Format: date-time
@@ -19477,6 +19487,8 @@ export interface components {
             id: string;
             /** Incident Id */
             incident_id: string | null;
+            /** Media Id */
+            media_id?: string | null;
             /** Number */
             number: number;
             /** Priority */
@@ -19538,6 +19550,8 @@ export interface components {
             };
             /** Incident Id */
             incident_id?: string | null;
+            /** Media Id */
+            media_id?: string | null;
             /**
              * Priority
              * @default normal
@@ -19584,6 +19598,8 @@ export interface components {
             incident_id: string | null;
             /** Incident Reference */
             incident_reference: string | null;
+            /** Media Id */
+            media_id?: string | null;
             /** Number */
             number: number;
             /** Priority */
@@ -19703,6 +19719,11 @@ export interface components {
             key: string;
             /** Label */
             label: string;
+            /**
+             * Media
+             * @default false
+             */
+            media: boolean;
         };
         /** Tier */
         Tier: {

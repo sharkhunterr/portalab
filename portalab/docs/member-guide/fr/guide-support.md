@@ -33,6 +33,9 @@ Ouvrez [Mes tickets](/support), puis touchez « Ouvrir un ticket ». Vous arrive
 
 Le ticket s'ouvre alors sur sa propre page. S'il manque quelque chose, le formulaire l'indique : « À remplir : … ».
 
+> [!TIP]
+> Un problème sur un titre précis (sous-titres, langue, fichier coupé…) ? Utilisez plutôt **« Signaler un problème »** sur sa fiche : le ticket est rattaché au titre, et sa page l'affiche.
+
 ### Vérifier d'abord
 
 Après avoir décrit le problème, touchez « Vérifier d'abord » :

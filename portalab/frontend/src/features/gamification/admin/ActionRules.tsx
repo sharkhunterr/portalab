@@ -136,6 +136,22 @@ function presets(t: Translate): Array<{ key: string; icon: string; definition: R
         limits: { cooldown_seconds: 600, caps: [{ period: "day", max_amount: 50, value: "xp" }] },
       },
     },
+    // issue 354: a problem reported on a media's page, once the team resolved it (a real one, then)
+    {
+      key: "support.media_report",
+      icon: "flag",
+      definition: {
+        event_type: "ticket.resolved",
+        label: t("gamification:admin.presets.mediaReport"),
+        predicate: [{ field: "media", op: "eq", value: true }],
+        grants: [
+          { value: "xp", amount: 25 },
+          { value: "coins", amount: 15 },
+          { value: "contribution", amount: 3 },
+        ],
+        limits: { caps: [{ period: "day", max_amount: 75, value: "xp" }] },
+      },
+    },
   ];
 }
 

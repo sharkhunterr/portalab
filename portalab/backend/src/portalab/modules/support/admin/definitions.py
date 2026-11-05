@@ -8,7 +8,7 @@ from collections.abc import Mapping, Sequence
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -160,10 +160,17 @@ class Definitions:
         workflow_key: str,
         fields: Sequence[Mapping[str, Any]],
         enabled: bool,
+        media: bool = False,
     ) -> TicketType:
         defs = parse_fields(fields)
         await self.workflow(workflow_key)  # must exist
         async with self.database.unit_of_work() as uow:
+            if media:  # #354: one type takes the problems reported on a media
+                await uow.session.execute(
+                    update(TicketType)
+                    .where(TicketType.key != key, TicketType.media.is_(True))
+                    .values(media=False)
+                )
             row = await uow.session.get(TicketType, key, with_for_update=True)
             payload = [d.model_dump() for d in defs]
             if row is None:
@@ -173,12 +180,14 @@ class Definitions:
                     workflow_key=workflow_key,
                     fields=payload,
                     enabled=enabled,
+                    media=media,
                     version=1,
                     updated_at=utc_now(self.clock),
                 )
                 uow.session.add(row)
             else:
                 row.label, row.workflow_key, row.fields, row.enabled = label, workflow_key, payload, enabled
+                row.media = media
                 row.version, row.updated_at = row.version + 1, utc_now(self.clock)
             await self._audit(uow.session, actor, "support.type_saved", key, {"version": row.version})
             return row

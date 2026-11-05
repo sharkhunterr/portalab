@@ -62,6 +62,7 @@ class TicketTypeOut(BaseModel):
     key: str
     label: str
     fields: list[dict[str, Any]]
+    media: bool = False  # #354: the type a problem with a media is reported in
 
 
 class TicketCreateIn(BaseModel):
@@ -74,6 +75,7 @@ class TicketCreateIn(BaseModel):
     priority: Literal["low", "normal", "high", "urgent"] = "normal"
     incident_id: UUID | None = None
     draft_id: UUID | None = None
+    media_id: UUID | None = None  # #354: reported from a media's page
 
 
 class TicketCard(BaseModel):
@@ -89,6 +91,7 @@ class TicketCard(BaseModel):
     incident_id: UUID | None
     service_id: str | None
     updated_at: datetime
+    media_id: UUID | None = None
 
 
 class TicketCommentOut(BaseModel):
@@ -187,6 +190,7 @@ def card(t: Ticket) -> TicketCard:
         incident_id=t.incident_id,
         service_id=t.service_id,
         updated_at=t.updated_at,
+        media_id=t.media_id,
     )
 
 
@@ -243,7 +247,7 @@ async def types(principal: Requester, module: Module) -> list[TicketTypeOut]:
     out = []
     for row in await module.definitions.types():
         fields = [f for f in row.fields if staff or f.get("visibility") != "staff_only"]
-        out.append(TicketTypeOut(key=row.key, label=row.label, fields=fields))
+        out.append(TicketTypeOut(key=row.key, label=row.label, fields=fields, media=row.media))
     return out
 
 
@@ -268,6 +272,7 @@ async def create(principal: Requester, body: TicketCreateIn, module: Module) -> 
             service_id=body.service_id,
             priority=body.priority,
             source=source,
+            media_id=body.media_id,
         ),
         incident_id=body.incident_id,
         technical_context=context,

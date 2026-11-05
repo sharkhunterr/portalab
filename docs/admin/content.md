@@ -208,7 +208,7 @@ The community has no messaging, comments or likes, by design.
 
 **Support settings** defines "ticket types and their fields, the workflows tickets follow and the feedback forms". Each is a validated definition saved as a new version:
 
-- **Ticket types**: their fields (text, long text, choices, number, yes/no, date, member), required or not, visible to the requester or to staff only. The base types are a bug, an access request, a service issue, a question and other.
+- **Ticket types**: their fields (text, long text, choices, number, yes/no, date, member), required or not, visible to the requester or to staff only. The base types are a bug, an access request, a service issue, a question and other. Tick **Media reports** on one type (one at a time) and every media's page shows **Report a problem**: members pick what is wrong among that type's fields and send a ticket tied to the media, which the ticket shows with a link to its page. Without such a type the button is not shown.
 - **Workflows**: states and the transitions between them, who may make each (requester, assignee, staff), whether a comment is required and whether it reopens. Unreachable states and dead ends are refused.
 - **Feedback forms**: the forms members fill in (general, bug report, feature request).
 
