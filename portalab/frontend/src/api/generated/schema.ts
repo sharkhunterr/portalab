@@ -10038,6 +10038,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/{object_id}/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reviews */
+        get: operations["reviews_api_v1_media__object_id__reviews_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{object_id}/reviews/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Review
+         * @description Give or change my review: a rating from 1 to 5, a few words if I want.
+         */
+        put: operations["review_api_v1_media__object_id__reviews_mine_put"];
+        post?: never;
+        /** Unreview */
+        delete: operations["unreview_api_v1_media__object_id__reviews_mine_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/{object_id}/sections/{name}": {
         parameters: {
             query?: never;
@@ -18204,6 +18242,50 @@ export interface components {
         ReverseIn: {
             /** Reason */
             reason: string;
+        };
+        /** ReviewIn */
+        ReviewIn: {
+            /** Comment */
+            comment?: string | null;
+            /** Rating */
+            rating: number;
+        };
+        /** ReviewOut */
+        ReviewOut: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Author */
+            author: string | null;
+            /** Author Id */
+            author_id: string | null;
+            /** Comment */
+            comment: string | null;
+            /** Mine */
+            mine: boolean;
+            /** Rating */
+            rating: number;
+        };
+        /** ReviewsOut */
+        ReviewsOut: {
+            /** Average */
+            average: number | null;
+            /** Can Review */
+            can_review: boolean;
+            /** Count */
+            count: number;
+            /** Items */
+            items: components["schemas"]["ReviewOut"][];
+            mine: components["schemas"]["ReviewOut"] | null;
+            /**
+             * Object Id
+             * Format: uuid
+             */
+            object_id: string;
+            /** Reviewable */
+            reviewable: boolean;
         };
         /** RewardRuleIn */
         RewardRuleIn: {
@@ -39313,6 +39395,101 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ReadOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reviews_api_v1_media__object_id__reviews_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_api_v1_media__object_id__reviews_mine_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unreview_api_v1_media__object_id__reviews_mine_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

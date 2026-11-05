@@ -33,6 +33,7 @@ import { BookView } from "./BookView";
 import { EnrichedView, Enrichment, metadataImage, normalize, useMetadata } from "./Enrichment";
 import { RequestJourney, useJourney } from "./Journey";
 import { LeavingNotice } from "./Leaving";
+import { Reviews } from "./Reviews";
 import { TitleHero } from "./TitleHero";
 
 /**
@@ -1014,6 +1015,8 @@ export function DetailPage() {
       {collects && (media.kind === "movie" || media.kind === "series") ? (
         <WorkCollection objectId={media.id} />
       ) : null}
+      {/* issue 355: what the members thought of it — and mine, once seen, read or played */}
+      <Reviews objectId={media.id} />
       <div className="media-sections">
         {SECTIONS.filter(
           (name) =>

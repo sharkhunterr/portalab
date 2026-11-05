@@ -489,6 +489,26 @@ class MediaRequest(MediaBase):
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
 
+class Review(MediaBase):
+    """#355: a member's review of a work they watched, read, listened to or played — a rating from 1 to 5,
+    and a few words if they want. One per member and work (an episode's goes to its series)."""
+
+    __tablename__ = "reviews"
+    __table_args__ = (
+        CheckConstraint("rating BETWEEN 1 AND 5", name="rating"),
+        Index("ix_reviews_object", "object_id", "updated_at"),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    object_id: Mapped[UUID] = mapped_column(
+        ForeignKey("media.objects.id", ondelete="CASCADE"), primary_key=True
+    )
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    comment: Mapped[str | None] = mapped_column(Text, info=pii("content"))
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
 class Activity(MediaBase):
     """027 — one play or reading session as a source recorded it (raw history, Telemetra-style): ingested
     from ``media.activity_history`` providers (backfill, then incremental) and from ended live sessions of

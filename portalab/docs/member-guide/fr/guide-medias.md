@@ -49,6 +49,8 @@ Cliquez sur une affiche pour ouvrir la fiche du titre. En haut, vous trouvez l'a
 
 Un souci avec ce titre (sous-titres manquants, mauvaise langue, fichier coupé, mauvaise qualité…) ? Touchez **« Signaler un problème »** (présent si votre portail accepte ces signalements) : choisissez ce qui ne va pas, précisez si besoin, puis **« Envoyer le signalement »**. C'est un ticket du support rattaché au titre, que vous suivez dans [Mes tickets](/support) ; l'équipe voit le titre dans le ticket.
 
+Plus bas, **« Avis des membres »** (films, séries, livres, livres audio et jeux) donne la note moyenne des membres et le nombre d'avis, puis leurs avis : signés de leur nom, ou **« Anonyme »** pour un membre qui reste discret dans la communauté. Quand vous avez regardé, lu, écouté ou joué le titre, donnez le vôtre : une note de 1 à 5 étoiles (obligatoire), **« Un mot sur ce titre »** si vous voulez, puis **« Publier mon avis »**. Vous pouvez le **« Modifier »** ou le **« Retirer »** à tout moment ; l'avis sur un épisode va à sa série.
+
 Plus bas, selon le titre :
 
 - **« Détails enrichis »** : distribution, équipe, genres, saga, budget et box-office, studios… Cliquez sur une personne pour ouvrir sa page : sa biographie et sa filmographie, avec ce qui est disponible et ce que vous pouvez demander ;

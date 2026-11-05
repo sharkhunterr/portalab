@@ -8,7 +8,8 @@ user, private): ``media.playback_started|progressed|paused|finished|abandoned|er
 ``media.radio_listened`` (a sitting's minutes, counted by the server), ``media.radio_requested``; issue 228:
 ``media.leaving_watched`` (a title about to be deleted, watched to the end); issue 234:
 ``media.season_finished`` (every episode of a season finished); #351: ``media.game_length_reached`` (a game
-played as long as it takes — its main story, by HowLongToBeat)."""
+played as long as it takes — its main story, by HowLongToBeat); #355: ``media.reviewed`` (a member's first
+review of a work)."""
 
 from typing import Literal
 
@@ -101,6 +102,15 @@ class RequestEvent(BaseModel):
     object: str | None = None
     kind: str
     state: Literal["pending", "approved", "declined", "processing", "available", "failed", "cancelled"]
+
+
+class Reviewed(BaseModel):
+    """#355: a member's first review of a work (its rating 1-5, whether they said a few words)."""
+
+    object: str
+    kind: str
+    rating: int
+    commented: bool
 
 
 class GameLengthReached(BaseModel):
@@ -197,6 +207,7 @@ def register_event_types(registry: EventTypeRegistry) -> None:
         ("media.leaving_watched", LeavingWatched, ("object",), frozenset({"kind"})),
         ("media.season_finished", SeasonFinished, ("object",), frozenset({"episodes"})),
         ("media.game_length_reached", GameLengthReached, ("object",), frozenset({"played_s", "length_s"})),
+        ("media.reviewed", Reviewed, ("object",), frozenset({"rating", "commented"})),  # #355
     ):
         add(
             EventType(
