@@ -77,6 +77,14 @@
   color: var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 14%, transparent);
 }
+/* issue 354: a media report's poster in place of the icon */
+.support-card__poster {
+  inline-size: 2.5rem;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
 .support-card__main {
   display: flex;
   flex-direction: column;
