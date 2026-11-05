@@ -335,6 +335,43 @@
         "title": "AdminEditUser",
         "type": "object"
       },
+      "AdminPasswordSet": {
+        "additionalProperties": false,
+        "description": "#348: the administrator's own password (a step-up), then the member's new one.",
+        "properties": {
+          "new_password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "New Password",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "password",
+          "new_password"
+        ],
+        "title": "AdminPasswordSet",
+        "type": "object"
+      },
+      "AdminPasswordSetOut": {
+        "properties": {
+          "sessions_signed_out": {
+            "title": "Sessions Signed Out",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sessions_signed_out"
+        ],
+        "title": "AdminPasswordSetOut",
+        "type": "object"
+      },
       "AdminReason": {
         "additionalProperties": false,
         "properties": {
@@ -56258,6 +56295,59 @@
         "summary": "Remove Member",
         "tags": [
           "authz"
+        ]
+      }
+    },
+    "/api/v1/users/{user_id}/password": {
+      "post": {
+        "description": "#348: an administrator sets a member's password; every session of the member is signed out.",
+        "operationId": "set_user_password_api_v1_users__user_id__password_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminPasswordSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPasswordSetOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "identity.password_own_account, identity.password_not_local, admin.sole_admin_protected"
+          },
+          "422": {
+            "description": "identity.password_current_wrong (the administrator's), policy"
+          },
+          "429": {
+            "description": "auth.throttled"
+          }
+        },
+        "summary": "Set User Password",
+        "tags": [
+          "identity-admin"
         ]
       }
     },

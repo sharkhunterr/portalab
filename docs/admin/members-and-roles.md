@@ -30,6 +30,7 @@ Each account has a state:
 - **Invite a member**: a login, a display name and an optional e-mail. The member receives a link to choose a password; share it as you like (message, e-mail…). It works once and expires; **New link** makes another.
 - **Edit** changes the display name, the e-mail and the roles. The User role is implicit; the Admin role is handed over only by transfer.
 - **Suspend** and **Reactivate**.
+- **Password** (on the member's card, **Profile & roles**): set a new password for a member who signs in with a password of their own — forgotten, or to see the portal as they do. Confirm with your own password; every session of the member is signed out and the change is recorded in the audit log (never the password itself). Share the new password with them yourself. It is not offered on your own card (use **Change my password**), and the Admin's password and the accounts of the single sign-on are changed elsewhere.
 - **Delete** starts the deletion: the account waits for the *Account deletion delay*, during which you can **Cancel deletion**; **Confirm deletion (after the legal delay)** finishes it. The Admin account cannot be deleted: transfer the Admin role first.
 
 Open a member's **card** for everything about them, in tabs: **Profile & roles**, **Linked accounts**, **Progression**, **Economy** (give or take Coins, XP, Contribution and items, see [Gamification and economy](gamification-and-economy.md#manual-grants-and-corrections)), **Requests**, **Support** and **Vigilance**, plus **Account suspension**.
