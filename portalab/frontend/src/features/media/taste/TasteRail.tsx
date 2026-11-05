@@ -7,6 +7,7 @@ import { KIND_ICONS, Poster } from "../MediaGrid";
 import type { TasteCard } from "./api";
 import { reasonOf } from "./reason";
 import "./taste.css";
+import { PosterTickets } from "../../support/tickets/MediaTickets";
 
 /** Issue 190: titles of my taste in a row — each poster with why it is here (« Saga Hunger Games »). */
 export function TasteRail({ items, label, grid }: { items: TasteCard[]; label: string; grid?: boolean }) {
@@ -21,6 +22,7 @@ export function TasteRail({ items, label, grid }: { items: TasteCard[]; label: s
             <Link to={`/media/${card.id}`} className="media-card__link" title={why?.like ?? undefined}>
               <span className="media-card__frame">
                 <Poster src={imageUrl(card.image_id)} kind={card.kind} />
+                <PosterTickets mediaId={card.id} />
                 <span className="media-card__kind" title={t(`media:kind.${card.kind}`)}>
                   <Icon name={KIND_ICONS[card.kind] ?? "film"} size={12} />
                 </span>

@@ -104,6 +104,7 @@ export function ReportMediaProblem({
           setValues({});
           void client.invalidateQueries({ queryKey: ["support", "mine"] });
           void client.invalidateQueries({ queryKey: ["support", "media", objectId] });
+          void client.invalidateQueries({ queryKey: ["support", "media-open"] });
         },
       },
     );

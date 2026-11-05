@@ -50058,6 +50058,32 @@
         ]
       }
     },
+    "/api/v1/media-tickets/open": {
+      "get": {
+        "description": "#354: per media, how many open tickets about it I may see \u2014 the warning badge on its posters.",
+        "operationId": "open_media_tickets_api_v1_media_tickets_open_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Open Media Tickets Api V1 Media Tickets Open Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Open Media Tickets",
+        "tags": [
+          "support"
+        ]
+      }
+    },
     "/api/v1/media/artwork-images": {
       "get": {
         "description": "Issue 229: an art site's image (fanart.tv: a work's background, clearart\u2026), served by the portal.",

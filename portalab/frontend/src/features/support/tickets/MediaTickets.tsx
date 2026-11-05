@@ -28,6 +28,32 @@ export function useMediaTickets(mediaId: string, closed = false) {
   });
 }
 
+/** Issue 354: per media, how many open reports I may see — one ask for every poster on the page. */
+export function useOpenMediaTickets() {
+  return useQuery({
+    queryKey: ["support", "media-open"],
+    retry: false,
+    staleTime: 60_000,
+    queryFn: async () => ((await api.GET("/api/v1/media-tickets/open")).data ?? {}) as Record<string, number>,
+  });
+}
+
+/** Issue 354: a media's open reports on its poster, wherever it shows (the library, the shelves, the
+ * widgets, the search): a small warning flag that beats, with how many when more than one. */
+export function PosterTickets({ mediaId }: { mediaId?: string | null | undefined }) {
+  const t = useT();
+  const counts = useOpenMediaTickets().data;
+  const count = mediaId ? (counts?.[mediaId] ?? 0) : 0;
+  if (!count) return null;
+  const label = t("support:media.openBadge", { count });
+  return (
+    <span className="poster-tickets" role="img" aria-label={label} title={label}>
+      <Icon name="flag" size={12} />
+      {count > 1 ? <span>{count}</span> : null}
+    </span>
+  );
+}
+
 export function MediaTicketsBadge({ mediaId }: { mediaId: string }) {
   const t = useT();
   const open = useMediaTickets(mediaId).data?.open ?? 0;

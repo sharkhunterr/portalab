@@ -13,6 +13,7 @@ import { SoonList } from "../../media/requests/SoonList";
 import type { TasteCard, TasteReason } from "../../media/taste/api";
 import { reasonOf } from "../../media/taste/reason";
 import { TasteDeck } from "../../media/taste/TasteDeck";
+import { PosterTickets } from "../../support/tickets/MediaTickets";
 import { WidgetHeaderLink } from "../frame/actions";
 import { CompactLine, PosterStrip } from "./compact";
 import type { StatsPoint } from "./MediaStatsChart";
@@ -116,6 +117,9 @@ function Posters({ payload, compact }: WidgetProps) {
               <span className="widget-posters__art">
                 {src ? <img src={src} alt="" loading="lazy" /> : <Icon name="film" size={24} />}
                 {card.state ? <span className="widget-posters__badge" data-request={card.state} /> : null}
+                <PosterTickets
+                  mediaId={card.id ?? /^\/media\/([0-9a-f-]{36})$/.exec(card.route ?? "")?.[1]}
+                />
               </span>
               <span className="widget-posters__title">{card.title}</span>
               {card.subtitle ? <span className="widget-posters__meta">{card.subtitle}</span> : null}
@@ -153,6 +157,7 @@ function PosterWall({ payload, compact }: WidgetProps) {
             ) : (
               <span className="widget-wall__title">{card.title}</span>
             )}
+            <PosterTickets mediaId={card.id} />
             {card.plays ? (
               <span className="widget-wall__plays">
                 <Icon name="play" size={10} />
@@ -306,6 +311,7 @@ function Continue({ payload, config, compact }: WidgetProps) {
                 ) : (
                   <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={26} />
                 )}
+                <PosterTickets mediaId={card.id} />
                 <span className="widget-continue__kind" aria-hidden="true">
                   <Icon name={KIND_ICON[card.kind ?? ""] ?? "film"} size={12} />
                 </span>

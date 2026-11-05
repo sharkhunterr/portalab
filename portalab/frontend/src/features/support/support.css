@@ -2182,3 +2182,31 @@ a.media-tickets__item:hover {
     gap: 0;
   }
 }
+
+/* issue 354: a media's open reports on its poster, wherever it shows */
+.poster-tickets {
+  position: absolute;
+  inset-block-end: var(--space-1);
+  inset-inline-end: var(--space-1);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-inline-size: 1.5rem;
+  block-size: 1.5rem;
+  padding: 0 var(--space-1);
+  justify-content: center;
+  border: 1px solid var(--state-partial-fg);
+  border-radius: var(--radius-pill);
+  background: var(--state-partial-bg);
+  color: var(--state-partial-fg);
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 800;
+  box-shadow: var(--shadow-1);
+  animation: media-tickets-beat 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .poster-tickets {
+    animation: none;
+  }
+}

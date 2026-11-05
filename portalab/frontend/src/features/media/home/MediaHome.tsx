@@ -18,6 +18,7 @@ import { RadioCard } from "../radio/RadioCard";
 import { useRecommendations, useTasteList } from "../taste/api";
 import { TasteRail } from "../taste/TasteRail";
 import "../media.css";
+import { PosterTickets } from "../../support/tickets/MediaTickets";
 
 /** A title from the services' history (027): in the library (``id``) or not (the provider's poster). */
 interface JournalItem {
@@ -64,6 +65,7 @@ function JournalRail({
           <>
             <span className="media-card__frame">
               <Poster src={src} kind={item.kind} />
+              <PosterTickets mediaId={item.id} />
               <span className="media-card__kind" title={t(`media:kind.${item.kind}`)}>
                 <Icon name={KIND_ICONS[item.kind] ?? "film"} size={12} />
               </span>
