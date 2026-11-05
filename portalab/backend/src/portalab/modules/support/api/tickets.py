@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from portalab.capabilities.config import switched_on
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
+from portalab.capabilities.media_core import TECHNICAL_SHEETS
 from portalab.capabilities.support import TicketRequest
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
@@ -366,6 +367,19 @@ async def attachment(principal: User, attachment_id: UUID, module: Module) -> Re
 @router.get("/tickets/{ticket_id}", response_model=TicketDetail)
 async def get_ticket(principal: User, ticket_id: UUID, module: Module) -> TicketDetail:
     return detail(await module.tickets.view(ticket_id, principal))
+
+
+@router.get("/tickets/{ticket_id}/media-sheet")
+async def media_sheet(principal: Staff, ticket_id: UUID, module: Module) -> dict[str, Any]:
+    """#354: the team's technical sheet of the media a ticket is about — each media server's files and
+    streams, the download manager's release and torrent (asked of the services now)."""
+    view = await module.tickets.view(ticket_id, principal)
+    if view.ticket.media_id is None:
+        raise NotFound("This ticket is about no media.", code="ticket.no_media")
+    providers = module.capabilities.system_providers(TECHNICAL_SHEETS)
+    if not providers:
+        raise Unavailable("The media cannot be read.", code="ticket.media_unavailable")
+    return dict(await providers[0].provider.sheet(principal, view.ticket.media_id))
 
 
 @router.post("/tickets/{ticket_id}/comments", response_model=TicketDetail)

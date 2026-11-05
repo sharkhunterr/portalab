@@ -1,12 +1,14 @@
 """#354 — a problem reported on a media's page: the administrator's ticket type for it (one at most), a ticket
 tied to the media, and its events telling it is about a media (a rule rewards the resolved ones)."""
 
+from typing import Any
 from uuid import UUID, uuid4
 
 import httpx
 import pytest
 from sqlalchemy import text
 
+from portalab.capabilities.media_core import TECHNICAL_SHEETS
 from tests.integration.identity.helpers import login
 from tests.integration.support.conftest import SupportHarness
 
@@ -148,3 +150,34 @@ async def test_a_media_s_tickets_on_its_page(
     assert after["open"] == 0 and after["closed"] == 1 and after["items"] == []  # the closed ones on demand
     every = (await client.get(f"/api/v1/tickets/media/{media}?closed=true")).json()
     assert [t["open"] for t in every["items"]] == [False]
+
+
+class Sheets:
+    def __init__(self) -> None:
+        self.asked: list[UUID] = []
+
+    async def sheet(self, viewer: Any, object_id: UUID) -> dict[str, Any]:
+        self.asked.append(object_id)
+        return {"servers": [{"service": "Plex", "added_at": None, "files": []}], "acquisition": None}
+
+
+async def test_the_team_reads_the_media_s_technical_sheet(
+    client: httpx.AsyncClient, support: SupportHarness, people: dict[str, UUID]
+) -> None:
+    sheets = Sheets()
+    support.module.capabilities.provide(TECHNICAL_SHEETS, sheets, instance_ref="media", owner="test")
+    media = uuid4()
+    await login(client, "ursula")
+    about = await client.post(
+        "/api/v1/tickets",
+        json={"type_key": "media_issue", "title": "Sound — “Alien”", "media_id": str(media)},
+    )
+    other = await client.post("/api/v1/tickets", json={"type_key": "question", "title": "How?"})
+    hidden = await client.get(f"/api/v1/tickets/{about.json()['id']}/media-sheet")
+    assert hidden.status_code == 403  # the team's only
+    await login(client, "sam")
+    sheet = await client.get(f"/api/v1/tickets/{about.json()['id']}/media-sheet")
+    assert sheet.status_code == 200 and sheet.json()["servers"][0]["service"] == "Plex"
+    assert sheets.asked == [media]
+    none = await client.get(f"/api/v1/tickets/{other.json()['id']}/media-sheet")
+    assert none.status_code == 404 and none.json()["code"] == "ticket.no_media"

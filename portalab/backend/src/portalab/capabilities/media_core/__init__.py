@@ -22,6 +22,7 @@ RADIO_CREDITS = "media.radio_credits"  # issue 184: requests to the radio's DJ b
 CARD_SOURCES = "media.card_sources"  # issue 229: the works present, what the cards are made of
 CONTENT_BOOSTERS = "media.content_boosters"  # issue 234: a content's booster, given by a reward rule
 GAME_SOURCES = "media.game_sources"  # issue 265: what the games page draws from beyond the works
+TECHNICAL_SHEETS = "media.technical_sheets"  # #354: a title's technical sheet, for the team on a ticket
 CARD_FACES = "cards.faces"  # issue 265: a member's cards, as the memory game lays them face down
 
 
@@ -367,6 +368,15 @@ class SeenWork:
     last_at: datetime
 
 
+@runtime_checkable
+class TechnicalSheets(Protocol):
+    """#354: what the team needs to answer a report on a title — each media server's files and streams (video,
+    audio tracks, subtitles) and when it was added there, and its download manager's side (the release
+    grabbed, its indexer, the download client and the torrent's hash, its quality and size)."""
+
+    async def sheet(self, viewer: Principal, object_id: UUID) -> Mapping[str, Any]: ...
+
+
 @dataclass(frozen=True, slots=True)
 class BingoCell:
     """Issue 356: a square a month's media bingo may hold — its ``key`` (``genre:horror``, ``era:1980``,
@@ -446,6 +456,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(CARD_SOURCES, CardSources, False, "The works present and their credits, for the cards (issue 229)"),
     _spec(CONTENT_BOOSTERS, ContentBoosters, False, "A content's booster given to a member (issue 234)"),
     _spec(GAME_SOURCES, GameSources, False, "Theme music, games and play time for the games page (265)"),
+    _spec(TECHNICAL_SHEETS, TechnicalSheets, False, "A title's technical sheet for the team (#354)"),
     _spec(CARD_FACES, CardFaces, False, "A member's cards, as the memory game lays them (issue 265)"),
 )
 

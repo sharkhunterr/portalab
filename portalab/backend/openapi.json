@@ -56138,6 +56138,52 @@
         ]
       }
     },
+    "/api/v1/tickets/{ticket_id}/media-sheet": {
+      "get": {
+        "description": "#354: the team's technical sheet of the media a ticket is about \u2014 each media server's files and\nstreams, the download manager's release and torrent (asked of the services now).",
+        "operationId": "media_sheet_api_v1_tickets__ticket_id__media_sheet_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Ticket Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Media Sheet Api V1 Tickets  Ticket Id  Media Sheet Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Media Sheet",
+        "tags": [
+          "support"
+        ]
+      }
+    },
     "/api/v1/tickets/{ticket_id}/tags": {
       "post": {
         "operationId": "tags_api_v1_tickets__ticket_id__tags_post",

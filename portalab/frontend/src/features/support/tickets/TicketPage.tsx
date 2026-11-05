@@ -11,6 +11,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useAssistantPage } from "../../ai/pageContext";
 import { useMe } from "../../auth/useAuth";
 import { useTicket, useTicketActions } from "./api";
+import { MediaSheet } from "./MediaSheet";
 import { TicketMedia } from "./ReportMedia";
 import { PriorityBadge, StateBadge, stateLabel } from "./TicketBadges";
 
@@ -184,7 +185,12 @@ export function TicketPage({ team = false }: { team?: boolean }) {
       />
       <div className="ticket-page">
         {/* issue 354: the media the ticket is about, at its head */}
-        {data.media_id ? <TicketMedia objectId={data.media_id} /> : null}
+        {data.media_id ? (
+          <TicketMedia objectId={data.media_id}>
+            {/* the team: the media's files, streams and download, asked of the services when opened */}
+            {team ? <MediaSheet ticketId={data.id} /> : null}
+          </TicketMedia>
+        ) : null}
         {origin ? (
           <section className="ticket-origin" aria-label={t("support:ticket.origin")}>
             <header className="ticket-origin__head">

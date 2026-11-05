@@ -188,6 +188,8 @@ def acquisition_events(records: Sequence[Mapping[str, Any]]) -> tuple[Acquisitio
                 if (data or {}).get("downloadClient")
                 else None,
                 detail=str(detail)[:300] if detail else None,
+                indexer=str((data or {}).get("indexer"))[:100] if (data or {}).get("indexer") else None,
+                download_id=str(record.get("downloadId"))[:100] if record.get("downloadId") else None,
             )
         )
     return tuple(sorted(out, key=lambda e: e.at, reverse=True)[:12])
