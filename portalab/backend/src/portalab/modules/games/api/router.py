@@ -143,6 +143,13 @@ async def challenge(principal: Player, module: Module) -> dict[str, Any]:
     return await module.challenges.view(me(principal))
 
 
+@router.get("/games/bingo")
+async def bingo(principal: Player, module: Module) -> dict[str, Any]:
+    """Issue 356: the month's media bingo — its squares (each with the title that ticked it for me), its
+    lines (done or not), and how many members completed a line or the card."""
+    return await module.bingo.view(me(principal))
+
+
 @router.get("/games/parties")
 async def my_parties(principal: Player, module: Module) -> dict[str, Any]:
     return {"items": await module.parties.mine(me(principal))}

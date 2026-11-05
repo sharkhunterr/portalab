@@ -19,6 +19,8 @@ from portalab.capabilities.media_core import (
     CARD_FACES,
     CARD_SOURCES,
     GAME_SOURCES,
+    BingoCell,
+    BingoTick,
     CardPerson,
     CardWork,
     PlayableGame,
@@ -136,6 +138,16 @@ class Games:
 
     async def seen(self, user: UUID, *, limit: int) -> list[SeenWork]:
         return self.history.get(user, [])
+
+    async def bingo_cells(
+        self, *, year: int
+    ) -> list[BingoCell]:  # issue 356: tests/integration/games/test_bingo
+        return []
+
+    async def bingo_ticks(
+        self, keys: Any, since: datetime, until: datetime, *, user: UUID | None = None
+    ) -> dict[UUID, dict[str, BingoTick]]:
+        return {}
 
 
 class Faces:

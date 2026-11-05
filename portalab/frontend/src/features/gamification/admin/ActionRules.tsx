@@ -114,6 +114,32 @@ function presets(t: Translate): Array<{ key: string; icon: string; definition: R
         ],
       },
     },
+    // issue 356: the month's media bingo — a line (a row, a column, a diagonal), then the full card's jackpot
+    {
+      key: "games.bingo_line",
+      icon: "blocks",
+      definition: {
+        event_type: "games.bingo_line",
+        label: t("gamification:admin.presets.bingoLine"),
+        grants: [
+          { value: "xp", amount: 30 },
+          { value: "coins", amount: 10 },
+        ],
+      },
+    },
+    {
+      key: "games.bingo_card",
+      icon: "trophy",
+      definition: {
+        event_type: "games.bingo_card",
+        label: t("gamification:admin.presets.bingoCard"),
+        grants: [
+          { value: "xp", amount: 200 },
+          { value: "coins", amount: 100 },
+        ],
+        boosters: 1,
+      },
+    },
     // issue 357: live TV (Plex, Jellyfin, Tautulli) — its minutes apart from films and series, to be tuned on
     // their own (the generic minute rules then leave it out: « kind » not « live »)
     {

@@ -30,6 +30,7 @@ interface GamesConfig {
     enabled: boolean;
     kinds: Record<string, { enabled: boolean; target: number; item: string | null }>;
   };
+  bingo?: { enabled: boolean }; // issue 356
   party: { enabled: boolean; max_players: number; reveal_seconds: number; countdown_seconds: number };
 }
 
@@ -575,6 +576,17 @@ export default function AdminGames() {
               }
             />
             <ChallengePicker config={config} set={setConfig} />
+          </section>
+
+          {/* issue 356: the month's media bingo */}
+          <section className="games-panel">
+            <h2>{t("gamification:games.game.bingo.name")}</h2>
+            <CheckboxField
+              label={t("gamification:games.admin.on")}
+              hint={t("gamification:games.admin.bingoHint")}
+              checked={config.bingo?.enabled ?? true}
+              onChange={(e) => setConfig({ ...config, bingo: { enabled: e.target.checked } })}
+            />
           </section>
 
           <section className="games-panel">

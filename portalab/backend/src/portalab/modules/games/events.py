@@ -2,7 +2,8 @@
 played to its end (alone, the day's puzzle or in a party: its score, whether it was won, the rank among how
 many players) and one of the week's challenges completed (a game, a film, a book, an audiobook). Ids and
 counters only, never titles. When a week or a month is over, each member placed on a game's board is told
-their place once (``games.board_ranked``)."""
+their place once (``games.board_ranked``). Issue 356: a line of the month's media bingo completed
+(``games.bingo_line``), and the full card (``games.bingo_card``)."""
 
 from pydantic import BaseModel
 
@@ -12,6 +13,8 @@ OWNER = "module:games"
 PLAYED = "games.played"
 CHALLENGE = "games.challenge_completed"
 BOARD = "games.board_ranked"
+BINGO_LINE = "games.bingo_line"
+BINGO_CARD = "games.bingo_card"
 
 
 class Played(BaseModel):
@@ -41,6 +44,21 @@ class BoardRanked(BaseModel):
     players: int  # how many were on the board
 
 
+class BingoLine(BaseModel):
+    """Issue 356: a line of the month's media bingo completed (a row, a column, a diagonal)."""
+
+    month: str  # its first day
+    line: str  # row:0…3, col:0…3, diag:0|1
+    lines: int  # how many lines of the card the member completed now
+
+
+class BingoCard(BaseModel):
+    """Issue 356: the month's media bingo card filled, every square."""
+
+    month: str
+    squares: int
+
+
 def register_event_types(registry: EventTypeRegistry) -> None:
     for name, schema, dedup, fields in (
         (
@@ -56,6 +74,8 @@ def register_event_types(registry: EventTypeRegistry) -> None:
             ("game", "period", "start"),
             frozenset({"game", "period", "rank", "value", "players"}),
         ),
+        (BINGO_LINE, BingoLine, ("month", "line"), frozenset({"lines"})),
+        (BINGO_CARD, BingoCard, ("month",), frozenset({"squares"})),
     ):
         if registry.get(name) is None:
             registry.register(

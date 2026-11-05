@@ -135,3 +135,26 @@ class ChallengeDone(GamesBase):
     kind: Mapped[str] = mapped_column(String(12), primary_key=True)
     user_id: Mapped[UUID] = mapped_column(primary_key=True)  # FK identity.users (DB), CASCADE
     at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class BingoCard(GamesBase):
+    """Issue 356: a month's media bingo — the same 4 x 4 card for every member, drawn on the month's first
+    visit from the squares the library can fill (``cells``: their keys and groups, in reading order)."""
+
+    __tablename__ = "bingo_cards"
+
+    month: Mapped[date] = mapped_column(Date, primary_key=True)  # its first day
+    cells: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class BingoDone(GamesBase):
+    """Issue 356: a line of a month's bingo a member completed (``row:0``…, ``col:3``, ``diag:0|1``), or the
+    full card (``card``) — told once each."""
+
+    __tablename__ = "bingo_done"
+
+    month: Mapped[date] = mapped_column(Date, primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)  # FK identity.users (DB), CASCADE
+    line: Mapped[str] = mapped_column(String(8), primary_key=True)
+    at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

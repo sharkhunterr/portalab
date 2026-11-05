@@ -15,7 +15,7 @@ export const ROUND_GAMES = [
   "memories",
   "whowatched",
 ] as const;
-export type GameKey = (typeof ROUND_GAMES)[number] | "cinemot" | "memory" | "challenge";
+export type GameKey = (typeof ROUND_GAMES)[number] | "cinemot" | "memory" | "challenge" | "bingo";
 
 export const GAME_ICONS: Record<string, string> = {
   poster: "image",
@@ -29,6 +29,7 @@ export const GAME_ICONS: Record<string, string> = {
   cinemot: "type",
   memory: "layers",
   challenge: "gamepad",
+  bingo: "blocks", // issue 356
 };
 
 export interface Choice {
@@ -164,6 +165,26 @@ export interface ChallengeView {
   items: ChallengeItem[];
 }
 
+/** Issue 356: the month's media bingo — its squares (each with the title that ticked it for me), its lines. */
+export interface BingoCell {
+  key: string;
+  group: string;
+  by: { id: string | null; title: string; image_id: string | null; at: string } | null;
+}
+
+export interface BingoView {
+  month: string;
+  ends_at: string;
+  size: number;
+  cells: BingoCell[];
+  lines: Array<{ key: string; cells: number[]; done: boolean }>;
+  squares: number;
+  done_lines: number;
+  card: boolean;
+  players: number;
+  cards: number;
+}
+
 export interface PartyPlayer {
   id: string;
   name: string | null;
@@ -231,6 +252,15 @@ export function useChallenge(enabled = true) {
     enabled,
     retry: false,
     queryFn: async () => (await api.GET("/api/v1/games/challenge")).data as unknown as ChallengeView,
+  });
+}
+
+export function useBingo(enabled = true) {
+  return useQuery({
+    queryKey: [...KEY, "bingo"],
+    enabled,
+    retry: false,
+    queryFn: async () => (await api.GET("/api/v1/games/bingo")).data as unknown as BingoView,
   });
 }
 

@@ -1,7 +1,8 @@
 /**
  * Issue 265: the games' rewards as Portalab proposes them — reward rules like any other (the administrators
  * change or retire them on the gains' page): a game played, a game won alone, a party won, the day's title
- * found, a podium on a game's board when the week is over, the week's challenge completed. Bounded per day so that playing all evening stays a pleasure, not
+ * found, a podium on a game's board when the week is over, the week's challenge completed, a line of the month's
+ * bingo and its full card (issue 356). Bounded per day so that playing all evening stays a pleasure, not
  * a mine.
  */
 export const DEFAULT_GAME_RULES: { key: string; definition: Record<string, unknown> }[] = [
@@ -85,6 +86,32 @@ export const DEFAULT_GAME_RULES: { key: string; definition: Record<string, unkno
         { value: "xp", amount: 150 },
         { value: "coins", amount: 50 },
       ],
+    },
+  },
+  // issue 356: the month's media bingo — each line, then the full card (with a booster)
+  {
+    key: "games_bingo_line",
+    definition: {
+      event_type: "games.bingo_line",
+      label: "Une ligne du bingo du mois",
+      predicate: [],
+      grants: [
+        { value: "xp", amount: 30 },
+        { value: "coins", amount: 10 },
+      ],
+    },
+  },
+  {
+    key: "games_bingo_card",
+    definition: {
+      event_type: "games.bingo_card",
+      label: "Le carton plein du bingo du mois",
+      predicate: [],
+      grants: [
+        { value: "xp", amount: 200 },
+        { value: "coins", amount: 100 },
+      ],
+      boosters: 1,
     },
   },
 ];

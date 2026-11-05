@@ -12,9 +12,10 @@ from PIL import Image, ImageFilter
 from sqlalchemy import ColumnElement, func, select
 
 from portalab.capabilities.media import THEMES, SourceUnavailable, unwrap
-from portalab.capabilities.media_core import PlayableGame, SeenWork
+from portalab.capabilities.media_core import BingoCell, BingoTick, PlayableGame, SeenWork
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
+from portalab.modules.media import bingo
 from portalab.modules.media.models import Activity, MediaObject, SourceItem, UserProgress
 from portalab.modules.media.providers.insight_widgets import posters
 from portalab.modules.media.taste.features import not_a_game
@@ -159,6 +160,16 @@ class MediaGameSources:
             if who is not None and share is not None:
                 out[who] = max(out.get(who, 0.0), float(share))
         return out
+
+    async def bingo_cells(self, *, year: int) -> Sequence[BingoCell]:
+        """Issue 356: the squares this library can fill (``year``: the month's)."""
+        return await bingo.cells(self.database, year=year)
+
+    async def bingo_ticks(
+        self, keys: Sequence[str], since: datetime, until: datetime, *, user: UUID | None = None
+    ) -> Mapping[UUID, Mapping[str, BingoTick]]:
+        """Issue 356: the squares each member ticked between two moments, by the first title that did it."""
+        return await bingo.ticks(self.database, keys, since, until, user=user)
 
     async def seen(self, user: UUID, *, limit: int) -> Sequence[SeenWork]:
         """The works a member's services say they watched, read or played (an episode: its series), the
