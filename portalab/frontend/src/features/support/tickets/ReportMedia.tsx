@@ -1,12 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useId, useState } from "react";
+import { type FormEvent, type ReactNode, useId, useState } from "react";
 import { Link } from "react-router";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
-import { useMediaDetail } from "../../media/api";
+import { imageUrl, useMediaDetail } from "../../media/api";
 import { type FieldDef, useTicketActions, useTicketTypes } from "./api";
 import { FieldInputs } from "./FieldInputs";
 import "../support.css";
@@ -197,19 +197,40 @@ export function ReportMediaProblem({
   );
 }
 
-/** Issue 354: the media a ticket is about, on the ticket — its title, a link to its page. */
-export function TicketMedia({ objectId }: { objectId: string }) {
+/** Issue 354: the media a ticket is about, at the head of the ticket — its poster, title, kind and year, a link
+ * to its page; what the team adds below it (the technical sheet). */
+export function TicketMedia({ objectId, children }: { objectId: string; children?: ReactNode }) {
   const t = useT();
   const media = useMediaDetail(objectId);
+  const data = media.data;
+  const poster = data ? imageUrl(data.image_id) : null;
   return (
-    <Link to={`/media/${objectId}`} className="ticket-media">
-      <Icon name="film" size={14} />
-      <span>
-        {media.data
-          ? t("support:media.about", { title: media.data.title, kind: t(`media:kind.${media.data.kind}`) })
-          : t("support:media.aboutUnknown")}
-      </span>
-      <Icon name="chevron-right" size={14} />
-    </Link>
+    <section className="ticket-media" aria-label={t("support:media.aboutUnknown")}>
+      <div className="ticket-media__head">
+        {poster ? (
+          <img className="ticket-media__poster" src={poster} alt="" />
+        ) : (
+          <span className="ticket-media__poster ticket-media__poster--none" aria-hidden="true">
+            <Icon name="film" size={28} />
+          </span>
+        )}
+        <div className="ticket-media__text">
+          <span className="ticket-media__eyebrow">{t("support:media.aboutUnknown")}</span>
+          <strong>{data?.title ?? "…"}</strong>
+          {data ? (
+            <span className="ticket-media__facts">
+              {[data.year ? String(data.year) : null, t(`media:kind.${data.kind}`)]
+                .filter(Boolean)
+                .join(" · ")}
+            </span>
+          ) : null}
+          <Link to={`/media/${objectId}`} className="ticket-media__open">
+            {t("support:media.open")}
+            <Icon name="chevron-right" size={14} />
+          </Link>
+        </div>
+      </div>
+      {children}
+    </section>
   );
 }
