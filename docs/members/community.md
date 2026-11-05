@@ -51,7 +51,7 @@ The **About me** text is written in your **Account**.
 In **Account**, **My presence in the community** sets what other members see of you:
 
 - **Public**: the portal's members, and only them, see your name and avatar in the leaderboards, the activity and the directory.
-- **Anonymous**: other members see you nowhere, not in the directory, not in the activity. In the leaderboards you still count, with no name and no avatar.
+- **Anonymous**: you stay in the community without being recognised. The directory counts you as **Anonymous** at its end (a search by your name does not find you), your activity stays in the feed signed **An anonymous member**, and your place and points still count in the leaderboards as **Anonymous**. Never your name, avatar or a link to your profile.
 
 For finer control, the **Privacy center** (`/privacy`) lets you choose who sees each kind of data: **Everyone**, **Portal members**, **Leaderboards only** or **Only me**. An administrator can force a setting for a while; your own choice is kept and comes back afterwards.
 
@@ -130,6 +130,9 @@ What arrived since you last opened the page is marked **New**, and the badge on 
 - On a person's page (an actor, a director, an author…) or a series' page, select **Follow**; **Following** means it is in your feed. Select it again to stop.
 - In **Manage my feed: what I follow, my sources**, at the bottom of the page, **What I follow** lists your people, series and genres; the cross stops following one. **Follow a genre** adds a genre of the library.
 - **My sources** adds your own RSS or Atom feeds: type **A feed's or a site's address** (a blog, a YouTube channel, a forum…), then **Follow**. Their items only show in your feed. **Export (OPML)** and **Import an OPML file** move your list to or from another reader.
+- **Suggested sources**, above the stream, lists the sources your portal recommends (sites, YouTube channels, podcasts…): select one to follow it in a click. It leaves the list once you follow it.
+
+A source you just followed only counts as new what it publishes from then on: its older items are in the stream, but not in the unread count.
 
 New arrivals for what you follow can also reach you as a notification ("New in your feed: …"), in the **My feed: what arrives for what I follow** category of your [notification preferences](personalization.md#notification-preferences). The **My feed** widget brings the latest items to your home page, YouTube videos included.
 

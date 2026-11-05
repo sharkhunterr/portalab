@@ -19051,6 +19051,36 @@
         "title": "SourceRefreshOut",
         "type": "object"
       },
+      "SourceSuggestionOut": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "youtube",
+              "video",
+              "podcast",
+              "reddit",
+              "rss"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "url",
+          "kind"
+        ],
+        "title": "SourceSuggestionOut",
+        "type": "object"
+      },
       "StatResultOut": {
         "properties": {
           "as_of": {
@@ -21766,6 +21796,18 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "since": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Since"
           }
         },
         "required": [
@@ -47624,6 +47666,32 @@
           }
         },
         "summary": "Unfollow Source",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/v1/me/news/suggestions": {
+      "get": {
+        "description": "#349: the sources the administrator suggests for \u00ab Mon fil \u00bb that I do not read yet.",
+        "operationId": "my_suggestions_api_v1_me_news_suggestions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SourceSuggestionOut"
+                  },
+                  "title": "Response My Suggestions Api V1 Me News Suggestions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "My Suggestions",
         "tags": [
           "news"
         ]

@@ -10,6 +10,7 @@ import { sourceIcon } from "./sourceKind";
 import "./news.css";
 
 const KEY = ["news", "sources", "mine"] as const;
+const TIMELINE = ["news", "timeline"] as const;
 
 function problem(error: unknown): string | null {
   if (!error) return null;
@@ -37,7 +38,10 @@ export function MySources({ items: listed = true }: { items?: boolean }) {
       (await api.GET("/api/v1/me/news/sources/items", { params: { query: { limit: 20 } } })).data?.items ??
       [],
   });
-  const settle = () => void client.invalidateQueries({ queryKey: KEY });
+  const settle = () => {
+    void client.invalidateQueries({ queryKey: KEY });
+    void client.invalidateQueries({ queryKey: TIMELINE });
+  };
   const follow = useMutation({
     mutationFn: async () => {
       const { error } = await api.POST("/api/v1/me/news/sources", { body: { url } });
@@ -149,6 +153,59 @@ export function MySources({ items: listed = true }: { items?: boolean }) {
           </ul>
         </>
       ) : null}
+    </section>
+  );
+}
+
+/**
+ * Issue 349: the sources the administrator suggests for « Mon fil » that I do not read yet — each followed in
+ * one click, then gone from here. Nothing shown when there is none.
+ */
+export function SourceSuggestions() {
+  const t = useT();
+  const client = useQueryClient();
+  const suggestions = useQuery({
+    queryKey: [...KEY, "suggestions"],
+    queryFn: async () => (await api.GET("/api/v1/me/news/suggestions")).data ?? [],
+  });
+  const follow = useMutation({
+    mutationFn: async (url: string) => {
+      const { error } = await api.POST("/api/v1/me/news/sources", { body: { url } });
+      if (error) throw error;
+    },
+    onSettled: () => {
+      void client.invalidateQueries({ queryKey: KEY });
+      void client.invalidateQueries({ queryKey: TIMELINE });
+    },
+  });
+  const offered = suggestions.data ?? [];
+  if (!offered.length) return null;
+  return (
+    <section className="feed-section feed-suggestions" aria-labelledby="feed-suggestions">
+      <h2 id="feed-suggestions">
+        <Icon name="sparkles" size={18} /> {t("news:suggested.title")}
+      </h2>
+      <p className="admin-muted">{t("news:suggested.hint")}</p>
+      <ul className="feed-follows__list">
+        {offered.map((source) => (
+          <li key={source.url}>
+            <button
+              type="button"
+              className="feed-suggest"
+              aria-label={t("news:suggested.add", { name: source.name })}
+              disabled={follow.isPending}
+              onClick={() => follow.mutate(source.url)}
+            >
+              <Icon name={sourceIcon(source.kind)} size={14} />
+              {source.name}
+              <span className="feed-suggest__plus">
+                <Icon name="plus" size={14} />
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {follow.isError ? <p role="alert">{problem(follow.error)}</p> : null}
     </section>
   );
 }

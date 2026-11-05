@@ -415,7 +415,131 @@ export function SourcesPanel() {
           ))}
         </ul>
       </AdminSection>
+      <SuggestionsPanel />
       <LatestItems />
     </>
+  );
+}
+
+interface Suggested {
+  name: string;
+  url: string;
+}
+
+const SUGGESTIONS = "news.feeds.suggestions";
+const SUGGESTIONS_KEY = ["admin", "config", SUGGESTIONS] as const;
+
+/**
+ * Issue 349: the sources suggested to the members in « Mon fil » (the setting ``news.feeds.suggestions``) — each
+ * read once when added, so that its address is the feed's own and its name the feed's title unless one is given.
+ */
+function SuggestionsPanel() {
+  const t = useT();
+  const client = useQueryClient();
+  const [url, setUrl] = useState("");
+  const [name, setName] = useState("");
+  const listed = useQuery({
+    queryKey: SUGGESTIONS_KEY,
+    queryFn: async () => {
+      const all = (
+        (await api.GET("/api/v1/admin/config")).data as unknown as {
+          settings: { key: string; value: unknown }[];
+        }
+      ).settings;
+      return (all.find((s) => s.key === SUGGESTIONS)?.value ?? []) as Suggested[];
+    },
+  });
+  const current = listed.data ?? [];
+  const store = async (next: Suggested[]) => {
+    await api.PUT("/api/v1/admin/config", {
+      body: {
+        changes: [{ key: SUGGESTIONS, value: next, scope: "global", scope_ref: "", unset: false }],
+        reason: "",
+      } as never,
+    });
+  };
+  const settle = () => void client.invalidateQueries({ queryKey: SUGGESTIONS_KEY });
+  const add = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await api.POST("/api/v1/admin/news/sources/preview", { body: { url } });
+      if (error || !data) throw error;
+      const entry = { name: (name.trim() || data.title || data.url).slice(0, 120), url: data.url };
+      await store([...current.filter((s) => s.url !== entry.url), entry]);
+    },
+    onSuccess: () => {
+      setUrl("");
+      setName("");
+    },
+    onSettled: settle,
+  });
+  const remove = useMutation({
+    mutationFn: (gone: string) => store(current.filter((s) => s.url !== gone)),
+    onSettled: settle,
+  });
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    if (url.trim()) add.mutate();
+  };
+  return (
+    <AdminSection
+      title={t("news:suggestions.title")}
+      description={t("news:suggestions.hint")}
+      icon="sparkles"
+    >
+      <form className="admin-form" onSubmit={submit}>
+        <FormGrid>
+          <TextField
+            label={t("news:sources.url")}
+            hint={t("news:sources.urlHint")}
+            type="url"
+            required
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          />
+          <TextField
+            label={t("news:sources.name")}
+            hint={t("news:suggestions.nameHint")}
+            maxLength={120}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </FormGrid>
+        <FormActions>
+          <Button type="submit" disabled={!url.trim() || add.isPending}>
+            <Icon name="plus" size={16} />
+            {add.isPending ? t("news:sources.reading") : t("news:suggestions.add")}
+          </Button>
+        </FormActions>
+      </form>
+      {add.isError ? <p role="alert">{problem(add.error)}</p> : null}
+      {remove.isError ? <p role="alert">{problem(remove.error)}</p> : null}
+      {listed.isSuccess && !current.length ? (
+        <p className="admin-muted">{t("news:suggestions.empty")}</p>
+      ) : null}
+      <ul className="news-channels">
+        {current.map((source) => (
+          <li key={source.url} className="news-channel">
+            <span className="news-channel__icon" aria-hidden="true">
+              <Icon
+                name={sourceIcon(/youtube\.com|youtu\.be/.test(source.url) ? "youtube" : "rss")}
+                size={20}
+              />
+            </span>
+            <span className="news-channel__text">
+              <strong>{source.name}</strong>
+              <span className="admin-muted">{source.url}</span>
+            </span>
+            <Button
+              variant="ghost"
+              aria-label={t("news:sources.remove", { name: source.name })}
+              disabled={remove.isPending}
+              onClick={() => remove.mutate(source.url)}
+            >
+              <Icon name="trash" size={16} />
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </AdminSection>
   );
 }

@@ -85,6 +85,8 @@ Each source shows when it was last read (or **Failing**, or **Never read**), its
 
 Members can add their own sources in **My feed** (**My sources**); those are read for them alone.
 
+**Suggested to the members** lists sources offered in every member's **My feed**, who follows one in a click. Type a feed's or a site's address (and a name, or leave it empty for the feed's own title), then **Suggest this source**: it is read once to find its feed. Unlike the sources above, a suggestion reaches only the members who choose it; a member who already follows it no longer sees it. The list is the `news.feeds.suggestions` setting, so it travels with the configuration export.
+
 ## Newsletters and e-mail
 
 **Newsletters & e-mail** gathers "Everything that goes out by e-mail": whether sending e-mails is on (with **Set up sending**, which leads to the e-mail settings), the **Automatic newsletters**, the **Newsletters written**, the newsletter **Templates**, and the deliveries (**E-mails sent**, **E-mails failed**).

@@ -8591,6 +8591,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/news/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Suggestions
+         * @description #349: the sources the administrator suggests for « Mon fil » that I do not read yet.
+         */
+        get: operations["my_suggestions_api_v1_me_news_suggestions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/news/timeline": {
         parameters: {
             query?: never;
@@ -18734,6 +18754,18 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** SourceSuggestionOut */
+        SourceSuggestionOut: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "youtube" | "video" | "podcast" | "reddit" | "rss";
+            /** Name */
+            name: string;
+            /** Url */
+            url: string;
+        };
         /** StatResultOut */
         StatResultOut: {
             /** As Of */
@@ -19708,6 +19740,8 @@ export interface components {
             kind: "youtube" | "video" | "podcast" | "reddit" | "rss";
             /** Name */
             name: string;
+            /** Since */
+            since?: string | null;
         };
         /** ToggleIn */
         ToggleIn: {
@@ -36757,6 +36791,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_suggestions_api_v1_me_news_suggestions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SourceSuggestionOut"][];
                 };
             };
         };

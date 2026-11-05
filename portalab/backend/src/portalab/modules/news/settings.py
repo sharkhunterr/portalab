@@ -2,10 +2,21 @@
 
 from dataclasses import dataclass
 
+from pydantic import BaseModel, ConfigDict, Field
+
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
 
 OWNER = "module:news"
 NEWSLETTER_ON = "news.newsletter.enabled"
+SUGGESTIONS = "news.feeds.suggestions"
+
+
+class SuggestedSource(BaseModel):
+    """#349: a source the administrator suggests for « Mon fil » — a member follows it in one click."""
+
+    model_config = ConfigDict(extra="ignore")
+    name: str = Field(min_length=1, max_length=120)
+    url: str = Field(min_length=8, max_length=1000, pattern=r"^https?://")
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,6 +104,15 @@ def declare_news_settings(catalog: SettingCatalog = default_catalog) -> None:
             default=20,
             owner=OWNER,
             description="How many sources of their own a member may follow.",
+        )
+    if SUGGESTIONS not in known:
+        declare(
+            scope="global",
+            key=SUGGESTIONS,
+            schema=list[SuggestedSource],
+            default=[],
+            owner=OWNER,
+            description="News sources suggested to the members in « Mon fil » (a name and an address each).",
         )
 
 
