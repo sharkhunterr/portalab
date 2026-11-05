@@ -133,6 +133,17 @@ class AdminTransferRequest(Strict):
     password: str = Field(min_length=1, max_length=1024)
 
 
+class AdminPasswordSet(Strict):
+    """#348: the administrator's own password (a step-up), then the member's new one."""
+
+    password: str = Field(min_length=1, max_length=1024)
+    new_password: str = Field(min_length=1, max_length=1024)
+
+
+class AdminPasswordSetOut(BaseModel):
+    sessions_signed_out: int
+
+
 class DeletionStatus(BaseModel):
     state: str
     deletion_due_at: datetime | None

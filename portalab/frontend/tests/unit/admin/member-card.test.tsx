@@ -29,11 +29,15 @@ const ADA = {
   email: "ada@example.org",
 };
 
-function show(path: string) {
+function show(path: string, sent: unknown[] = []) {
   const asked: string[] = [];
-  fake.handler = (request) => {
+  fake.handler = async (request) => {
     const url = new URL(request.url);
     asked.push(`${url.pathname}${url.search}`);
+    if (url.pathname === "/api/v1/users/u1/password") {
+      sent.push(await request.json());
+      return json(200, { sessions_signed_out: 2 });
+    }
     if (url.pathname === "/api/v1/users") return json(200, { items: [ADA], next_cursor: null });
     if (url.pathname === "/api/v1/support/tickets") return json(200, { items: [], next_cursor: null });
     if (url.pathname.endsWith("/roles") || url.pathname === "/api/v1/roles") return json(200, []);
@@ -69,6 +73,20 @@ describe("member card", () => {
       expect(asked).toContain("/api/v1/support/tickets?requester=u1");
       expect(asked).toContain("/api/v1/support/feedback?user_id=u1");
     });
+  });
+
+  it("sets the member's password, confirmed with the administrator's own (issue 348)", async () => {
+    const sent: unknown[] = [];
+    show("/admin/members/u1", sent);
+    await screen.findByRole("heading", { name: "Ada" });
+    const fill = (label: RegExp, value: string) =>
+      fireEvent.change(screen.getByLabelText(label), { target: { value } });
+    fill(/^New password|signInPhrase.new/, "a brand new passphrase");
+    fill(/^Confirm the new password|signInPhrase.again/, "a brand new passphrase");
+    fill(/Your own password|password.yours/, "mine");
+    fireEvent.click(screen.getByRole("button", { name: /Set the password|password.submit/ }));
+    expect(await screen.findByText(/2 sessions of the member|password.done/)).toBeTruthy();
+    expect(sent).toEqual([{ password: "mine", new_password: "a brand new passphrase" }]);
   });
 
   it("says when the member does not exist", async () => {

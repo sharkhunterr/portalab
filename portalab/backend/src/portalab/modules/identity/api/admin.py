@@ -12,6 +12,8 @@ from portalab.modules.identity.api.middleware import identity_module
 from portalab.modules.identity.api.schemas import (
     AdminCreateUser,
     AdminEditUser,
+    AdminPasswordSet,
+    AdminPasswordSetOut,
     AdminReason,
     AdminTransferRequest,
     DeletionStatus,
@@ -97,6 +99,32 @@ async def reissue_verification(
     return VerificationTokenOut(
         user_id=issued.user_id, verification_token=issued.token, expires_at=issued.expires_at
     )
+
+
+@router.post(
+    "/users/{user_id}/password",
+    response_model=AdminPasswordSetOut,
+    responses={
+        409: {
+            "description": "identity.password_own_account, identity.password_not_local, "
+            "admin.sole_admin_protected"
+        },
+        422: {"description": "identity.password_current_wrong (the administrator's), policy"},
+        429: {"description": "auth.throttled"},
+    },
+)
+async def set_user_password(
+    user_id: UUID,
+    body: AdminPasswordSet,
+    request: Request,
+    module: Module,
+    principal: Principal = require("users.manage"),
+) -> AdminPasswordSetOut:
+    """#348: an administrator sets a member's password; every session of the member is signed out."""
+    signed_out = await module.passwords.set_for(
+        principal, user_id, body.password, body.new_password, client_ip=client_ip(request)
+    )
+    return AdminPasswordSetOut(sessions_signed_out=signed_out)
 
 
 @router.post("/users/{user_id}/suspend", status_code=status.HTTP_204_NO_CONTENT, responses=SOLE_ADMIN)

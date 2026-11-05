@@ -28,7 +28,7 @@ import { useQueue } from "../../support/tickets/api";
 import { TicketList } from "../../support/tickets/MyTickets";
 import "../admin.css";
 import { MediaRequestsList } from "../media/RequestsAdmin";
-import { MemberProfileForm, MemberRoles } from "./MemberEdit";
+import { MemberPassword, MemberProfileForm, MemberRoles } from "./MemberEdit";
 import { allMembers, InviteLink, MEMBERS_KEY, type Member, MemberActions, STATE_TONE } from "./MembersAdmin";
 import { MemberServiceAccounts } from "./ServiceAccountsPanel";
 
@@ -108,7 +108,8 @@ export default function MemberCard() {
   );
 }
 
-/** The account itself: its state and dates, what the « Edit » dialog changes, the roles, the actions. */
+/** The account itself: its state and dates, what the « Edit » dialog changes, the password (issue 348), the
+ * roles, the actions. */
 function ProfileTab({ member }: { member: Member }) {
   const t = useT();
   const format = useFormat();
@@ -150,6 +151,7 @@ function ProfileTab({ member }: { member: Member }) {
           onSaved={() => void client.invalidateQueries({ queryKey: MEMBERS_KEY })}
         />
       </AdminSection>
+      <MemberPassword member={member} />
       <MemberRoles member={member} />
     </>
   );

@@ -7,6 +7,7 @@ import { CheckboxField, TextField } from "../../../design-system/components/Fiel
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
+import { useMe } from "../../auth/useAuth";
 import { ACCOUNTS_KEY, accountLabel, useServiceAccounts } from "./accounts";
 
 /**
@@ -82,6 +83,106 @@ export function MemberProfileForm({ member, onSaved }: { member: EditableMember;
         </Button>
       </FormActions>
     </form>
+  );
+}
+
+/** Issue 348: what a refused password says — the administrator's own password, the policy, the account. */
+function passwordProblem(error: unknown, t: ReturnType<typeof useT>): string {
+  if (error instanceof ApiError) {
+    if (error.code === "identity.password_current_wrong") return t("admin:members.password.wrong");
+    if (error.code === "identity.password_not_local") return t("admin:members.password.notLocal");
+    if (error.code === "admin.sole_admin_protected") return t("admin:members.password.adminOnly");
+    if (error.code === "user.password_invalid")
+      return t("account:signInPhrase.policy", { min: Number(error.extensions.min_length ?? 12) });
+    if (error.code === "auth.throttled")
+      return t("account:signInPhrase.throttled", {
+        minutes: Math.max(1, Math.ceil(Number(error.extensions.retry_after_seconds ?? 60) / 60)),
+      });
+    return error.message;
+  }
+  return t("admin:members.refused");
+}
+
+/** Issue 348: set a member's password (forgotten, or to see the portal as they do), confirmed with the
+ * administrator's own; every session of the member is signed out. Not on the administrator's own card. */
+export function MemberPassword({ member }: { member: EditableMember }) {
+  const t = useT();
+  const me = useMe();
+  const [next, setNext] = useState("");
+  const [again, setAgain] = useState("");
+  const [own, setOwn] = useState("");
+  const mismatch = again.length > 0 && next !== again;
+  const save = useMutation({
+    mutationFn: async () =>
+      (
+        await api.POST("/api/v1/users/{user_id}/password", {
+          params: { path: { user_id: member.id } },
+          body: { password: own, new_password: next },
+        })
+      ).data,
+    onSuccess: () => {
+      setNext("");
+      setAgain("");
+      setOwn("");
+    },
+  });
+  if (me.data?.id === member.id) return null;
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    if (!mismatch) save.mutate();
+  };
+  return (
+    <AdminSection
+      title={t("admin:members.password.title")}
+      icon="key"
+      description={t("admin:members.password.hint")}
+    >
+      <form onSubmit={submit} className="admin-form">
+        <FormGrid>
+          <TextField
+            label={t("account:signInPhrase.new")}
+            type="password"
+            autoComplete="new-password"
+            required
+            value={next}
+            onChange={(e) => setNext(e.target.value)}
+          />
+          <TextField
+            label={t("account:signInPhrase.again")}
+            type="password"
+            autoComplete="new-password"
+            required
+            value={again}
+            error={mismatch ? t("account:signInPhrase.mismatch") : undefined}
+            onChange={(e) => setAgain(e.target.value)}
+          />
+          <TextField
+            label={t("admin:members.password.yours")}
+            type="password"
+            autoComplete="current-password"
+            required
+            value={own}
+            onChange={(e) => setOwn(e.target.value)}
+          />
+        </FormGrid>
+        {save.isSuccess ? (
+          <p role="status" className="services-admin__ok">
+            {t("admin:members.password.done", { count: save.data?.sessions_signed_out ?? 0 })}
+          </p>
+        ) : null}
+        {save.isError ? (
+          <p role="alert" className="services-admin__ko">
+            {passwordProblem(save.error, t)}
+          </p>
+        ) : null}
+        <FormActions>
+          <Button type="submit" disabled={save.isPending || !next || !again || !own || mismatch}>
+            <Icon name="key" size={16} />
+            {t("admin:members.password.submit")}
+          </Button>
+        </FormActions>
+      </form>
+    </AdminSection>
   );
 }
 

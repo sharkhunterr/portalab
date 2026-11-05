@@ -11556,6 +11556,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/{user_id}/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set User Password
+         * @description #348: an administrator sets a member's password; every session of the member is signed out.
+         */
+        post: operations["set_user_password_api_v1_users__user_id__password_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/{user_id}/profile": {
         parameters: {
             query?: never;
@@ -12247,6 +12267,21 @@ export interface components {
             display_name?: string | null;
             /** Email */
             email?: string | null;
+        };
+        /**
+         * AdminPasswordSet
+         * @description #348: the administrator's own password (a step-up), then the member's new one.
+         */
+        AdminPasswordSet: {
+            /** New Password */
+            new_password: string;
+            /** Password */
+            password: string;
+        };
+        /** AdminPasswordSetOut */
+        AdminPasswordSetOut: {
+            /** Sessions Signed Out */
+            sessions_signed_out: number;
         };
         /** AdminReason */
         AdminReason: {
@@ -42254,6 +42289,53 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    set_user_password_api_v1_users__user_id__password_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminPasswordSet"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminPasswordSetOut"];
+                };
+            };
+            /** @description identity.password_own_account, identity.password_not_local, admin.sole_admin_protected */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description identity.password_current_wrong (the administrator's), policy */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description auth.throttled */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
