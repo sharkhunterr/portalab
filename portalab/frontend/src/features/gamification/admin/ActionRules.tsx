@@ -136,6 +136,20 @@ function presets(t: Translate): Array<{ key: string; icon: string; definition: R
         limits: { cooldown_seconds: 600, caps: [{ period: "day", max_amount: 50, value: "xp" }] },
       },
     },
+    // issue 355: a title reviewed (rated, a few words if wanted) — once per title, a few a day
+    {
+      key: "media.review",
+      icon: "star",
+      definition: {
+        event_type: "media.reviewed",
+        label: t("gamification:admin.presets.review"),
+        grants: [
+          { value: "xp", amount: 5 },
+          { value: "coins", amount: 2 },
+        ],
+        limits: { caps: [{ period: "day", max_amount: 25, value: "xp" }] },
+      },
+    },
     // issue 354: a problem reported on a media's page, once the team resolved it (a real one, then)
     {
       key: "support.media_report",

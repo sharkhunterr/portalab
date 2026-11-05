@@ -171,6 +171,7 @@ from portalab.modules.media.requests.moderation import RequestModeration
 from portalab.modules.media.requests.quota import RequestQuota
 from portalab.modules.media.requests.service import Requests, RequestSink
 from portalab.modules.media.requests.watched import LeavingWatched, RequestWatched
+from portalab.modules.media.reviews.service import ReviewService
 from portalab.modules.media.sections.service import Sections
 from portalab.modules.media.settings import (
     PRIORITY_FIELDS,
@@ -279,6 +280,8 @@ class MediaModule:
         self.discovery = Discovery(database, capabilities, self.history, lambda: self.config, clock=clock)
         # issue 190: each member's taste, and the recommendations made from it (with their reasons)
         self.taste = TasteService(database, capabilities, clock=clock)
+        # #355: members' reviews of what they watched, read, listened to or played
+        self.reviews = ReviewService(database, events, capabilities, visibility=visibility, clock=clock)
         self.feed = Feed(database, self.people, clock=clock)  # #299: « Mon fil »
         self.recommender = TasteRecommender(self.taste)
         self.history_reader = HistoryReader(database, visibility)

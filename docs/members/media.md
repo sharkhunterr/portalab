@@ -58,6 +58,8 @@ Click a poster to open its page. The top of the page shows the artwork (backdrop
 
 Something wrong with it — missing subtitles, the wrong language, a cut file, poor quality? **Report a problem** (shown when your portal takes such reports) opens a short form: say what is wrong, add details if needed, and **Send the report**. It is a support ticket about this title, which you follow in [My tickets](support.md); the team sees the title in it.
 
+**Members' reviews**, lower on the page of a film, a series, a book, an audiobook or a game, shows the members' average rating and how many reviewed it, then their reviews — signed with their name, or **Anonymous** for a member who keeps to themselves in the community. Once you watched, read, listened to or played it, give your own: a rating from 1 to 5 stars (required) and **A word on this title** if you want, then **Post my review**. **Edit** or **Take my review back** whenever you like; an episode's review goes to its series.
+
 ### Where to watch
 
 The action buttons depend on the title and your portal:

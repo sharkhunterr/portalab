@@ -26,6 +26,7 @@ from portalab.modules.media.models import (
     RadioCreditLedger,
     RadioSitting,
     RescueLedger,
+    Review,
     TasteVerdict,
     UserLink,
     UserProgress,
@@ -169,6 +170,23 @@ class MediaParticipant:
                         {"title": title, "verdict": verdict.verdict, "at": verdict.updated_at.isoformat()},
                     )
                 )
+            for review, title in await session.execute(
+                select(Review, MediaObject.title)
+                .join(MediaObject, MediaObject.id == Review.object_id)
+                .where(Review.user_id == user_id)
+                .order_by(Review.created_at)
+            ):
+                records.append(  # #355: what I thought of a title
+                    ExportRecord(
+                        "media.review",
+                        {
+                            "title": title,
+                            "rating": review.rating,
+                            "comment": review.comment,
+                            "at": review.updated_at.isoformat(),
+                        },
+                    )
+                )
             for follow in (  # #299: what I follow for « Mon fil »
                 await session.execute(
                     select(Follow).where(Follow.user_id == user_id).order_by(Follow.created_at)
@@ -203,6 +221,7 @@ class MediaParticipant:
                 RadioSitting,
                 BookPosition,
                 TasteVerdict,
+                Review,  # #355
                 Follow,  # #299
                 FeedSeen,
                 FeedNotified,
