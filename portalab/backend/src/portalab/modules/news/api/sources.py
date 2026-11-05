@@ -325,6 +325,7 @@ class TimelineSource(BaseModel):
     id: UUID
     name: str
     kind: SourceKind
+    since: datetime | None = None  # #350: its news are new only from then (followed, or added by the editors)
 
 
 class TimelineOut(BaseModel):
@@ -348,11 +349,30 @@ async def my_timeline(
     rows, total, sources = await module.sources.timeline(
         _me(principal), feeds=source, titles=title, people=person, offset=offset, limit=limit
     )
+    starts = await module.sources.starts(_me(principal))
     return TimelineOut(
         items=[_item(item, feed) for item, feed in rows],
         total=total,
-        sources=[TimelineSource(id=feed.id, name=feed.name, kind=source_kind(feed.url)) for feed in sources],
+        sources=[
+            TimelineSource(id=feed.id, name=feed.name, kind=source_kind(feed.url), since=starts.get(feed.id))
+            for feed in sources
+        ],
     )
+
+
+class SourceSuggestionOut(BaseModel):
+    name: str
+    url: str
+    kind: SourceKind
+
+
+@router.get("/me/news/suggestions", response_model=list[SourceSuggestionOut])
+async def my_suggestions(principal: Reader, module: Module) -> list[SourceSuggestionOut]:
+    """#349: the sources the administrator suggests for « Mon fil » that I do not read yet."""
+    return [
+        SourceSuggestionOut(name=name, url=url, kind=source_kind(url))
+        for name, url in await module.sources.suggestions(_me(principal))
+    ]
 
 
 @router.get("/me/news/sources/opml")

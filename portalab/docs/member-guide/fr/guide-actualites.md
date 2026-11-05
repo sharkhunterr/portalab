@@ -60,6 +60,9 @@ En bas du fil, dépliez **« Gérer mon fil : ce que je suis, mes sources »** :
 - **« Ce que je suis »** : les personnes, les séries et les genres que vous suivez. La croix « Ne plus suivre … » en retire un. « Suivre un genre » en ajoute un.
 - Pour suivre une personne (un acteur, une réalisatrice, un auteur…) ou une série, touchez **« Suivre »** sur sa page.
 - **« Mes sources »** : vos propres flux RSS ou Atom (un blog, une chaîne YouTube, un forum…). Collez son adresse dans « Adresse d'un flux ou d'un site », puis touchez « Suivre ». Leurs articles n'apparaissent que dans votre fil. « Importer un fichier OPML » et « Exporter (OPML) » reprennent ou sauvegardent une liste de flux.
+- **« Sources suggérées »**, au-dessus du fil : les sources que votre portail recommande (sites, chaînes YouTube, podcasts…). Touchez-en une pour la suivre d'un clic ; elle quitte alors la liste.
+
+Une source que vous venez d'ajouter ne compte comme nouveau que ce qu'elle publie ensuite : ses articles plus anciens sont dans le fil, mais pas dans la pastille des non-lus.
 
 > [!TIP]
 > Le widget **« Mon fil »** montre les dernières actualités de vos sources sur votre [accueil](portalab://wiki/guide-accueil) : articles, vidéos, podcasts. Les vidéos YouTube s'y lisent aussi sur place. « Tout mon fil » ouvre la page.

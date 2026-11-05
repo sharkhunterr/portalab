@@ -6,7 +6,7 @@ import { PageHeader } from "../../../design-system/components/PageHeader";
 import { EmptyState } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
-import { MySources } from "../../news/MySources";
+import { MySources, SourceSuggestions } from "../../news/MySources";
 import { personPath, useCatalogFacets } from "../api";
 import { metadataImage } from "../detail/Enrichment";
 import { Poster } from "../MediaGrid";
@@ -191,6 +191,8 @@ export default function FeedPage() {
           </ul>
         </section>
       ) : null}
+      {/* issue 349: the administrator's suggested sources, one click each */}
+      <SourceSuggestions />
       {/* issue 299: one stream — the library's arrivals and every source's news, each with its source's colour */}
       {loaded ? <Timeline arrivals={items} follows={mine} seenAt={feed.data?.seen_at} /> : null}
       <details className="feed-manage">

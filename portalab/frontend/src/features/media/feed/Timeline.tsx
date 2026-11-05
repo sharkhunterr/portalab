@@ -192,7 +192,8 @@ async function timeline(query: Asked & { offset?: number; limit: number }) {
  * « Mon fil » (issue 299) as one stream: what the library brought for what I follow and what every source
  * published — the editors' and mine —, newest first, day by day, each with its source's coloured badge
  * (and its kind's icon: a YouTube channel, a podcast…); a page at a time, filtered to what is for me, or
- * to one source. What came after I last read it is marked new.
+ * to one source. What came after I last read it is marked new (issue 350: not the past of a source just
+ * added).
  */
 export function Timeline({
   arrivals,
@@ -237,6 +238,10 @@ export function Timeline({
     const followedPeople = new Set(people);
     const followedTitles = new Set(titles);
     const since = seenAt ? Date.parse(seenAt) : null;
+    // issue 350: a source's news are new only from when I read it (followed, or added by the editors)
+    const starts = new Map(
+      (listed.data ?? []).map((source) => [source.id, source.since ? Date.parse(source.since) : null]),
+    );
     const bySource = new Map<string, Source>(
       (listed.data ?? []).map((source, index) => [
         source.id,
@@ -277,7 +282,9 @@ export function Timeline({
             (m.kind === "person" && followedPeople.has(m.ref)) ||
             (m.kind === "title" && followedTitles.has(m.ref)),
         ),
-        unread: since !== null && Date.parse(item.published_at) > since,
+        unread:
+          since !== null &&
+          Date.parse(item.published_at) > Math.max(since, starts.get(item.source_id) ?? since),
         news: item,
       });
     }

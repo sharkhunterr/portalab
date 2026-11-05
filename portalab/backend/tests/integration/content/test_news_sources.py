@@ -12,12 +12,12 @@ from typing import Any
 
 import httpx
 from PIL import Image
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from portalab.capabilities.i18n import LocaleContext
 from portalab.capabilities.media import MENTIONS, Mention
 from portalab.core.blobstore import FileSystemBlobStore
-from portalab.modules.news.models import Feed
+from portalab.modules.news.models import Feed, FeedSubscription
 from portalab.modules.news.participant import NewsParticipant
 from tests.integration.content.conftest import ContentHarness
 from tests.integration.identity.helpers import login
@@ -181,7 +181,16 @@ async def test_members_follow_sources_of_their_own(
     # but « in the news » for a title I follow reads my sources too
     about = (await client.get("/api/v1/news/sources/items", params={"title": "obj-dune"})).json()["items"]
     assert [i["title"] for i in about] == ["Dune Part Two arrive en 4K"]
-    # what they published since I last read « Mon fil »: its badge
+    # what they published since I last read « Mon fil »: its badge — #350: not the past of a source just
+    # followed, only what it publishes after
+    assert await sources.published_since(people["rita"], NOW - timedelta(days=1)) == 0
+    assert [s["since"] for s in first["sources"]] == [NOW.isoformat().replace("+00:00", "Z")]
+    async with ct.database.unit_of_work() as uow:  # followed two days ago: what came since is news
+        await uow.session.execute(
+            update(FeedSubscription)
+            .where(FeedSubscription.user_id == people["rita"])
+            .values(created_at=NOW - timedelta(days=2))
+        )
     assert await sources.published_since(people["rita"], NOW - timedelta(days=1)) == 3
     assert await sources.published_since(people["rita"], NOW) == 0  # read since
     assert await sources.published_since(people["sam"], NOW - timedelta(days=1)) == 0
@@ -221,3 +230,37 @@ async def test_members_follow_sources_of_their_own(
     await sources.run_due()
     async with ct.database.session() as session:
         assert (await session.execute(select(Feed))).first() is None
+
+
+async def test_suggested_sources_followed_in_one_click(
+    ct: ContentHarness, client: httpx.AsyncClient, people: dict[str, Any], tmp_path: Path
+) -> None:
+    """#349: the sources the administrator suggests for « Mon fil », one click each — gone once followed."""
+    site = Site()
+    sources = ct.news.sources
+    sources.transport = httpx.MockTransport(site)
+    sources.resolver = _addresses
+    sources.blobs = FileSystemBlobStore(tmp_path / "news-blobs")
+    suggested = [
+        {"name": "Écrans", "url": "https://news.example.org/feed.xml"},
+        {"name": "", "url": "https://other.example.org/rss"},
+    ]
+    read_setting = sources._setting
+
+    async def setting(key: str, default: Any) -> Any:
+        return suggested if key == "news.feeds.suggestions" else await read_setting(key, default)
+
+    sources._setting = setting  # type: ignore[method-assign]
+    await login(client, "rita")
+    offered = (await client.get("/api/v1/me/news/suggestions")).json()
+    assert offered == [
+        {"name": "Écrans", "url": "https://news.example.org/feed.xml", "kind": "rss"},
+        {"name": "other.example.org", "url": "https://other.example.org/rss", "kind": "rss"},
+    ]
+    followed = await client.post("/api/v1/me/news/sources", json={"url": offered[0]["url"]})
+    assert followed.status_code == 200, followed.text
+    assert [s["url"] for s in (await client.get("/api/v1/me/news/suggestions")).json()] == [
+        "https://other.example.org/rss"
+    ]
+    await login(client, "sam")  # another member: still offered
+    assert len((await client.get("/api/v1/me/news/suggestions")).json()) == 2

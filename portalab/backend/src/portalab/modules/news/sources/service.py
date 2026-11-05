@@ -11,8 +11,9 @@ from typing import Any
 from urllib.parse import urlsplit
 from uuid import UUID
 
-from sqlalchemy import delete, func, or_, select, update
+from sqlalchemy import case, delete, func, or_, select, update
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.orm import aliased
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.i18n import normalize_for_search
@@ -33,6 +34,7 @@ ALLOW_PRIVATE = "news.feeds.allowPrivateHosts"
 RETENTION = "news.feeds.retentionDays"
 PERSONAL_ON = "news.feeds.personalEnabled"
 PERSONAL_MAX = "news.feeds.personalMax"
+SUGGESTIONS = "news.feeds.suggestions"  # #349
 PER_SOURCE = 200  # items kept per source at most
 IMAGES = 15  # new pictures copied per reading
 DUE_PER_SWEEP = 20
@@ -313,22 +315,77 @@ class FeedSources:
     # --- what is shown ------------------------------------------------------------------------------
     async def published_since(self, user: UUID, since: datetime, limit: int = 99) -> int:
         """What the editors' sources and the member's own published after ``since`` (dates ahead were brought
-        back to when they were read) — « Mon fil »'s unread news, counted up to ``limit``."""
-        followed = select(FeedSubscription.feed_id).where(FeedSubscription.user_id == user)
+        back to when they were read) — « Mon fil »'s unread news, counted up to ``limit``. #350: a source's
+        items count only from when the member followed it (an editors' source: from when it was added), so
+        that a source just added does not bring its past as news to read."""
+        mine = aliased(FeedSubscription)
+        start = case((Feed.editorial.is_(True), Feed.created_at), else_=mine.created_at)
         fresh = (
             select(FeedItem.id)
             .join(Feed, Feed.id == FeedItem.feed_id)
+            .outerjoin(mine, (mine.feed_id == Feed.id) & (mine.user_id == user))
             .where(
                 Feed.enabled.is_(True),
-                or_(Feed.editorial.is_(True), Feed.id.in_(followed)),
+                or_(Feed.editorial.is_(True), mine.user_id.is_not(None)),
                 FeedItem.hidden.is_(False),
                 FeedItem.published_at > since,
+                FeedItem.published_at > start,
             )
             .limit(limit)
         )
         async with self.database.session() as session:
             count = await session.scalar(select(func.count()).select_from(fresh.subquery()))
         return int(count or 0)
+
+    async def starts(self, user: UUID) -> dict[UUID, datetime]:
+        """#350: from when each source the member reads brings them news — when they followed it, or when the
+        editors added it."""
+        mine = aliased(FeedSubscription)
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(Feed.id, Feed.editorial, Feed.created_at, mine.created_at)
+                    .outerjoin(mine, (mine.feed_id == Feed.id) & (mine.user_id == user))
+                    .where(or_(Feed.editorial.is_(True), mine.user_id.is_not(None)))
+                )
+            ).all()
+        return {feed: added if editorial else followed for feed, editorial, added, followed in rows}
+
+    async def suggestions(self, user: UUID) -> list[tuple[str, str]]:
+        """#349: the sources the administrator suggests for « Mon fil » (name, address) that this member does
+        not read yet — none when members may not add sources of their own."""
+        if not bool(await self._setting(PERSONAL_ON, True)):
+            return []
+        entries = [
+            entry.model_dump() if hasattr(entry, "model_dump") else entry
+            for entry in (await self._setting(SUGGESTIONS, []) or [])
+        ]
+        wanted = [
+            (str(entry.get("name") or ""), str(entry.get("url") or ""))
+            for entry in entries
+            if isinstance(entry, dict) and entry.get("url")
+        ]
+        if not wanted:
+            return []
+        followed = select(FeedSubscription.feed_id).where(FeedSubscription.user_id == user)
+        async with self.database.session() as session:
+            read = set(
+                (
+                    await session.execute(
+                        select(Feed.url).where(
+                            Feed.url.in_([url for _, url in wanted]),
+                            or_(Feed.editorial.is_(True), Feed.id.in_(followed)),
+                        )
+                    )
+                ).scalars()
+            )
+        seen: set[str] = set()
+        out: list[tuple[str, str]] = []
+        for name, url in wanted:
+            if url not in read and url not in seen:
+                seen.add(url)
+                out.append((name or host_of(url), url))
+        return out
 
     async def items(
         self,
