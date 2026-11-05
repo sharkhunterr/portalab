@@ -176,6 +176,7 @@ class TicketService:
                 "state": ticket.state,
                 "type": ticket.type_key,
                 "priority": ticket.priority,
+                "media": ticket.media_id is not None,  # #354: a problem reported on a media
             },
             occurred_at=utc_now(self.clock),
             subject=SubjectRef("user", str(ticket.requester_id)) if ticket.requester_id else None,
@@ -248,6 +249,7 @@ class TicketService:
                 fields=values,
                 service_id=request.service_id,
                 incident_id=incident_id,
+                media_id=request.media_id,
                 source=request.source,
                 feedback_id=feedback_id,
                 technical_context=dict(technical_context or {}),

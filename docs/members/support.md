@@ -68,6 +68,8 @@ When the assistant is on, **Ask the assistant** runs an **Assistant diagnosis**:
 
 > **Tip** — The **My tickets** widget on your home page also has **New ticket**.
 
+A problem with one title (subtitles, language, a cut file…)? Use **Report a problem** on its page instead: the ticket is tied to the title, and its page shows it.
+
 ### Following your tickets
 
 **My tickets** shows one card per ticket: its number (T-…), title, state, priority and last update. Filter with **In progress**, **Done** or **All**.

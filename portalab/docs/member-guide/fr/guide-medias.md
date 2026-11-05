@@ -47,6 +47,8 @@ Cliquez sur une affiche pour ouvrir la fiche du titre. En haut, vous trouvez l'a
 
 ![Le haut de la fiche d'un film : ses badges, et les boutons pour le regarder](shot:medias-fiche)
 
+Un souci avec ce titre (sous-titres manquants, mauvaise langue, fichier coupé, mauvaise qualité…) ? Touchez **« Signaler un problème »** (présent si votre portail accepte ces signalements) : choisissez ce qui ne va pas, précisez si besoin, puis **« Envoyer le signalement »**. C'est un ticket du support rattaché au titre, que vous suivez dans [Mes tickets](/support) ; l'équipe voit le titre dans le ticket.
+
 Plus bas, selon le titre :
 
 - **« Détails enrichis »** : distribution, équipe, genres, saga, budget et box-office, studios… Cliquez sur une personne pour ouvrir sa page : sa biographie et sa filmographie, avec ce qui est disponible et ce que vous pouvez demander ;
