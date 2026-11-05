@@ -14,27 +14,41 @@ export const VERDICTS: { verdict: Verdict; icon: string }[] = [
  * read or played, the services tell).
  * One at a time; pressing the chosen one again takes it back. An episode's goes to its series.
  */
-export function TasteButtons({ objectId, title }: { objectId: string; title: string }) {
+export function TasteButtons({
+  objectId,
+  title,
+  compact = false,
+}: {
+  objectId: string;
+  title: string;
+  /** a title's head: three icons in its action bar (their names as tooltips), issue 355 */
+  compact?: boolean;
+}) {
   const t = useT();
   const current = useVerdict(objectId);
   const judge = useJudge();
   const chosen = judge.isPending ? judge.variables?.verdict : current.data;
   return (
-    <fieldset className="media-taste" aria-label={t("media:taste.about", { title })}>
+    <fieldset
+      className={compact ? "media-taste media-taste--compact" : "media-taste"}
+      aria-label={t("media:taste.about", { title })}
+    >
       {VERDICTS.map(({ verdict, icon }) => {
         const on = chosen === verdict;
+        const name = t(`media:taste.verdict.${verdict}`);
         return (
           <button
             key={verdict}
             type="button"
-            className="media-taste__button"
+            className={compact ? "media-action media-action--icon" : "media-taste__button"}
             data-verdict={verdict}
             aria-pressed={on}
+            title={compact ? name : undefined}
             disabled={current.isPending}
             onClick={() => judge.mutate({ objectId, verdict: on ? null : verdict })}
           >
             <Icon name={icon} size={16} />
-            <span>{t(`media:taste.verdict.${verdict}`)}</span>
+            <span className={compact ? "visually-hidden" : undefined}>{name}</span>
           </button>
         );
       })}

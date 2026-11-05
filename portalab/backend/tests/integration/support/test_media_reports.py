@@ -78,3 +78,17 @@ async def test_a_ticket_without_media_says_so(
             text("SELECT metadata->>'media' FROM core.event_outbox WHERE type = 'ticket.created'")
         )
     assert media == "false"
+
+
+async def test_a_portal_takes_media_reports_from_the_start(
+    client: httpx.AsyncClient, support: SupportHarness, people: dict[str, UUID]
+) -> None:
+    await login(client, "ursula")
+    types = {t["key"]: t["media"] for t in (await client.get("/api/v1/tickets/types")).json()}
+    assert types["media_issue"] is True and sum(types.values()) == 1
+    # seeded again at every start: an administrator's choice stays
+    await login(client, "boss")
+    await client.put("/api/v1/admin/support/types/mine", json={"label": "Mine", "media": True})
+    await support.module.definitions.ensure_baseline()
+    kinds = {t["key"]: t["media"] for t in (await client.get("/api/v1/admin/support/types")).json()}
+    assert kinds["mine"] is True and kinds["media_issue"] is False

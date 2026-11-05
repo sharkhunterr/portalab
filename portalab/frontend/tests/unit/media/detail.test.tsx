@@ -164,7 +164,7 @@ describe("watching from the title's page", () => {
 });
 
 describe("the title's page at a glance", () => {
-  it("shows availability and seen badges, folds the journey and lists my plays with the counts", async () => {
+  it("shows the seen badge, folds the journey and lists my plays with the counts", async () => {
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;
       if (path.endsWith("/player"))
@@ -225,8 +225,9 @@ describe("the title's page at a glance", () => {
       return section(name, "no-data");
     };
     renderAt(`/media/${ID}`, [{ path: "/media/:objectId", element: <DetailPage /> }]);
-    expect(await screen.findByText("Available", { selector: ".media-badge" })).toBeTruthy();
     expect(await screen.findByText("Watched", { selector: ".media-badge" })).toBeTruthy();
+    // issue 355: « Available » goes without saying beside « Watch » — the journey's card says since when
+    expect(screen.queryByText("Available", { selector: ".media-badge" })).toBeNull();
     // the journey folds into one line once the title is here
     const show = await screen.findByRole("button", { name: "See the journey" });
     expect(screen.getByText(/you requested it/)).toBeTruthy();

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
@@ -15,7 +15,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
   return importOriginal();
 });
 
-import { Reviews } from "../../../src/features/media/detail/Reviews";
+import { ReviewButton, Reviews } from "../../../src/features/media/detail/Reviews";
 import { json } from "../../support/fake-api";
 
 const AT = "2027-01-09T10:00:00Z";
@@ -52,7 +52,8 @@ function show(view: Record<string, unknown>) {
   render(
     <QueryClientProvider client={client}>
       <MemoryRouter>
-        <Reviews objectId="m-1" />
+        <ReviewButton objectId="m-1" title="Alien" />
+        <Reviews objectId="m-1" title="Alien" />
       </MemoryRouter>
     </QueryClientProvider>,
   );
@@ -60,23 +61,26 @@ function show(view: Record<string, unknown>) {
 }
 
 describe("a title's reviews", () => {
-  it("lists the others' reviews, signed or anonymous, and posts mine", async () => {
+  it("lists the others' reviews, signed or anonymous, and gives mine in a dialog", async () => {
     const sent = show(BASE);
     expect(await screen.findByRole("link", { name: "Alex" })).toBeTruthy();
     expect(screen.getByText("Anonymous")).toBeTruthy();
     expect(screen.getByText(/3\.5 \/ 5 · 2 reviews/)).toBeTruthy();
-    const submit = screen.getByRole("button", { name: "Post my review" }) as HTMLButtonElement;
+    fireEvent.click(screen.getByRole("button", { name: "Give my review" }));
+    const dialog = await screen.findByRole("dialog");
+    const submit = within(dialog).getByRole("button", { name: "Post my review" }) as HTMLButtonElement;
     expect(submit.disabled).toBe(true); // a rating first
-    fireEvent.click(screen.getByRole("radio", { name: "4 stars out of 5" }));
-    fireEvent.change(screen.getByLabelText(/A word on this title/), { target: { value: "Superbe" } });
+    fireEvent.click(within(dialog).getByRole("radio", { name: /4 stars out of 5 — Really liked it/ }));
+    fireEvent.change(within(dialog).getByLabelText(/A word on this title/), { target: { value: "Superbe" } });
     fireEvent.click(submit);
     await vi.waitFor(() => expect(sent).toEqual([{ rating: 4, comment: "Superbe" }]));
-    expect(await screen.findByText("My review")).toBeTruthy();
+    expect(await screen.findByRole("button", { name: "My review: 4/5" })).toBeTruthy();
     expect(screen.getByText("Superbe")).toBeTruthy();
   });
 
-  it("asks to watch it first, and shows nothing for a title that takes no review", async () => {
+  it("asks nothing before the title was seen, and lists nothing without reviews", async () => {
     show({ ...BASE, can_review: false, count: 0, average: null, items: [] });
-    expect(await screen.findByText(/Watch, read, listen to or play this title/)).toBeTruthy();
+    await vi.waitFor(() => expect(screen.queryByRole("button", { name: "Give my review" })).toBeNull());
+    expect(screen.queryByText("Members' reviews")).toBeNull();
   });
 });

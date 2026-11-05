@@ -14,8 +14,18 @@ import "../support.css";
 /**
  * Issue 354: « Report a problem » on a media's page — subtitles missing, the wrong language, a cut file… A
  * ticket of the type the administrator chose for it (its own fields: what is wrong), about this media: the
- * team sees the media in the ticket and opens it in a click. No such type, or no tickets: no button.
+ * team sees the media in the ticket and opens it in a click. No such type, or no tickets: no button. What is
+ * wrong is picked first (subtitles, sound, image, language, the file, something else): it heads the ticket.
  */
+const PROBLEMS = [
+  { key: "subtitles", icon: "captions" },
+  { key: "sound", icon: "volume" },
+  { key: "image", icon: "image" },
+  { key: "language", icon: "globe" },
+  { key: "file", icon: "blocked" },
+  { key: "other", icon: "more" },
+] as const;
+
 export function ReportMediaProblem({ objectId, title }: { objectId: string; title: string }) {
   const t = useT();
   const formId = useId();
@@ -24,6 +34,7 @@ export function ReportMediaProblem({ objectId, title }: { objectId: string; titl
   const { create } = useTicketActions("");
   const [open, setOpen] = useState(false);
   const [problem, setProblem] = useState("");
+  const [kind, setKind] = useState<string>("");
   const [values, setValues] = useState<Record<string, unknown>>({});
   const [created, setCreated] = useState<string | null>(null);
   const type = Array.isArray(types.data) ? types.data.find((x) => x.media) : undefined;
@@ -33,7 +44,10 @@ export function ReportMediaProblem({ objectId, title }: { objectId: string; titl
     create.mutate(
       {
         type_key: type.key,
-        title: t("support:media.ticketTitle", { title }).slice(0, 200),
+        title: t("support:media.ticketTitle", {
+          problem: t(`support:media.kind.${kind || "other"}`),
+          title,
+        }).slice(0, 200),
         description: problem,
         fields: values,
         priority: "normal",
@@ -43,6 +57,7 @@ export function ReportMediaProblem({ objectId, title }: { objectId: string; titl
         onSuccess: (ticket) => {
           setCreated(ticket.id);
           setProblem("");
+          setKind("");
           setValues({});
           void client.invalidateQueries({ queryKey: ["support", "mine"] });
         },
@@ -62,15 +77,19 @@ export function ReportMediaProblem({ objectId, title }: { objectId: string; titl
       }}
       footer={
         created ? null : (
-          <Button type="submit" form={formId} disabled={create.isPending}>
+          <Button type="submit" form={formId} disabled={!kind || create.isPending}>
             {t("support:media.submit")}
           </Button>
         )
       }
       trigger={
-        <button type="button" className="media-report" title={t("support:media.hint")}>
+        <button
+          type="button"
+          className="media-action media-action--icon"
+          title={t("support:media.report")}
+          aria-label={t("support:media.report")}
+        >
           <Icon name="flag" size={16} />
-          <span>{t("support:media.report")}</span>
         </button>
       }
     >
@@ -82,6 +101,23 @@ export function ReportMediaProblem({ objectId, title }: { objectId: string; titl
       ) : (
         <form id={formId} onSubmit={submit} className="media-report__form">
           <p className="media-report__lead">{t("support:media.lead")}</p>
+          <fieldset className="media-report__kinds">
+            <legend>{t("support:media.what")}</legend>
+            {PROBLEMS.map((item) => (
+              <label key={item.key} data-on={kind === item.key || undefined}>
+                <input
+                  type="radio"
+                  name={`${formId}-kind`}
+                  value={item.key}
+                  checked={kind === item.key}
+                  onChange={() => setKind(item.key)}
+                  className="visually-hidden"
+                />
+                <Icon name={item.icon} size={18} />
+                <span>{t(`support:media.kind.${item.key}`)}</span>
+              </label>
+            ))}
+          </fieldset>
           <FieldInputs
             defs={type.fields as unknown as FieldDef[]}
             values={values}

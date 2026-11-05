@@ -140,6 +140,8 @@ BASELINE_TYPES: tuple[dict[str, Any], ...] = (
     },
     {"key": "question", "label": "Question", "fields": []},
     {"key": "other", "label": "Other", "fields": []},
+    # #354: « Report a problem » on a media's page works from the start (what is wrong is asked by the page)
+    {"key": "media_issue", "label": "A problem with a media", "fields": [], "media": True},
 )
 
 BASELINE_FORMS: tuple[dict[str, Any], ...] = (

@@ -56,9 +56,14 @@ Click a poster to open its page. The top of the page shows the artwork (backdrop
 | **In progress · 35 %** | You started it (for a series, the episode you are on) |
 | **Watched**, **Read**, **Listened**, **Played** | You finished it |
 
-Something wrong with it — missing subtitles, the wrong language, a cut file, poor quality? **Report a problem** (shown when your portal takes such reports) opens a short form: say what is wrong, add details if needed, and **Send the report**. It is a support ticket about this title, which you follow in [My tickets](support.md); the team sees the title in it.
+Under the title, one bar of small actions:
 
-**Members' reviews**, lower on the page of a film, a series, a book, an audiobook or a game, shows the members' average rating and how many reviewed it, then their reviews — signed with their name, or **Anonymous** for a member who keeps to themselves in the community. Once you watched, read, listened to or played it, give your own: a rating from 1 to 5 stars (required) and **A word on this title** if you want, then **Post my review**. **Edit** or **Take my review back** whenever you like; an episode's review goes to its series.
+- the three taste icons — **I like it**, **Not for me**, **Later** (their names show on hover);
+- **Give my review**, once you watched, read, listened to or played it: a dialog asks a rating from 1 to 5 stars (each says what it means, from *Didn't like it* to *Loved it!*) and **A word on this title** if you want, then **Post my review**. The button then shows your rating (**My review: 4/5**) and reopens it to **Edit** or **Take my review back**. An episode's review goes to its series;
+- **Follow** for a series;
+- the flag, **Report a problem**: missing subtitles, the wrong language, a cut file, poor picture? Pick what is wrong (**Subtitles**, **Sound**, **Picture**, **Language**, **File unreadable or cut**, **Something else**), add details if needed, and **Send the report**. It is a support ticket about this title, which you follow in [My tickets](support.md); the team sees the title in it.
+
+**Members' reviews**, lower on the page, shows the members' average rating and how many reviewed it, then the reviews — yours first, the others signed with their name, or **Anonymous** for a member who keeps to themselves in the community. It shows only once someone reviewed the title.
 
 ### Where to watch
 

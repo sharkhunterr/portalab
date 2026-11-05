@@ -22,7 +22,7 @@ const MEDIA_TYPE = {
   key: "media_issue",
   label: "Problem with a media",
   media: true,
-  fields: [{ key: "what", label: "What is wrong", type: "select", options: ["Subtitles", "Sound"] }],
+  fields: [{ key: "what", label: "Which part", type: "select", options: ["Picture", "Sound"] }],
 };
 
 function show(types: unknown[]) {
@@ -51,14 +51,17 @@ describe("report a problem with a media", () => {
   it("sends a ticket of the media type, tied to the media", async () => {
     const sent = show([{ key: "bug", label: "Bug", media: false, fields: [] }, MEDIA_TYPE]);
     fireEvent.click(await screen.findByRole("button", { name: /Report a problem/ }));
-    fireEvent.change(await screen.findByLabelText(/What is wrong/), { target: { value: "Subtitles" } });
-    fireEvent.click(screen.getByRole("button", { name: /Send the report/ }));
+    const send = (await screen.findByRole("button", { name: /Send the report/ })) as HTMLButtonElement;
+    expect(send.disabled).toBe(true); // what is wrong first
+    fireEvent.click(screen.getByRole("radio", { name: "Subtitles" }));
+    fireEvent.change(screen.getByLabelText(/Which part/), { target: { value: "Sound" } });
+    fireEvent.click(send);
     await vi.waitFor(() => expect(sent).toHaveLength(1));
     expect(sent[0]).toMatchObject({
       type_key: "media_issue",
       media_id: "m-1",
-      fields: { what: "Subtitles" },
-      title: "Problem with “Alien”",
+      fields: { what: "Sound" },
+      title: "Subtitles — “Alien”",
     });
     expect(await screen.findByRole("link", { name: /See my ticket/ })).toBeTruthy();
   });
