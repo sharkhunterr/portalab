@@ -28,6 +28,7 @@ async def test_directory(co: CoHarness, client: AsyncClient, app: FastAPI) -> No
     assert (await client.get("/api/v1/community/members", params={"q": "nobody"})).json() == {
         "items": [],
         "next_cursor": None,
+        "anonymous": 0,  # issue 347: never counted in a search
     }
 
     await co.prefer("ulrich", "member_listing", "private")
@@ -50,6 +51,26 @@ async def test_directory(co: CoHarness, client: AsyncClient, app: FastAPI) -> No
     listed = [m["display_name"] for m in (await client.get("/api/v1/community/members")).json()["items"]]
     assert "Vera" not in listed and "sleepy" not in listed
     assert (await client.get(f"/api/v1/community/members/{co.people['vera']}")).status_code == 404
+
+
+async def test_anonymous_members_close_the_directory(co: CoHarness, client: AsyncClient) -> None:
+    """Issue 347: an anonymous member (progression private) stays in the directory, counted at its end with no
+    name nor profile, never found by a search; they still see themself."""
+    await co.prefer("mona", "progression", "private")
+    await login(client, "ursula")
+    page = (await client.get("/api/v1/community/members")).json()
+    assert [m["display_name"] for m in page["items"]] == ["Boss", "Ulrich", "Ursula", "Vera"]
+    assert page["anonymous"] == 1
+    first = (await client.get("/api/v1/community/members", params={"limit": 2})).json()
+    assert first["anonymous"] == 0 and first["next_cursor"]  # counted on the last page only
+    assert (await client.get("/api/v1/community/members", params={"q": "mon"})).json()["items"] == []
+    assert (await client.get(f"/api/v1/community/members/{co.people['mona']}")).status_code == 404
+    await co.prefer("ulrich", "member_listing", "private")  # kept out of the directory: not even counted
+    await co.prefer("ulrich", "progression", "private")
+    assert (await client.get("/api/v1/community/members")).json()["anonymous"] == 1
+    await login(client, "mona")
+    mine = (await client.get("/api/v1/community/members")).json()
+    assert "Mona" in [m["display_name"] for m in mine["items"]] and mine["anonymous"] == 0
 
 
 async def test_requires_sign_in(co: CoHarness, client: AsyncClient) -> None:

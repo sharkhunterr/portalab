@@ -51,11 +51,16 @@ async def test_matrix(co: CoHarness, client: AsyncClient, level: Level) -> None:
 
 async def test_sections_are_independent(co: CoHarness, client: AsyncClient) -> None:
     owner = co.people["ursula"]
-    await co.prefer("ursula", "progression", "private")
+    await co.prefer("ursula", "community_activity", "private")
     seen = await sections(client, "ulrich", owner)
-    assert seen == {"identity": "available", "activity": "no-data", "projects": "no-data"}
-    absent = await client.get(f"/api/v1/community/members/{owner}/sections/progression")
+    assert seen is not None and set(seen) == set(DATA) - {"activity"}
+    absent = await client.get(f"/api/v1/community/members/{owner}/sections/activity")
     assert absent.status_code == 404  # absent, not "hidden"
+    await co.prefer("ursula", "community_activity", "community")
+    await co.prefer("ursula", "progression", "private")  # issue 347: anonymous — no profile for the others
+    assert await sections(client, "ulrich", owner) is None
+    assert await sections(client, "ursula", owner) is not None  # one knows oneself
+    await login(client, "ulrich")
     await co.prefer("ursula", "progression", "community")
     await co.prefer("ursula", "member_listing", "private")
     body = (await client.get(f"/api/v1/community/members/{owner}")).json()

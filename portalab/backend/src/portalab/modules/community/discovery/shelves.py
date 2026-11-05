@@ -33,7 +33,7 @@ def register_builtin_shelves(
     registry: ShelfRegistry, members: Members, feed: FeedService, proposals: Any = None
 ) -> None:
     async def new_members(viewer: Principal, limit: int) -> Sequence[Mapping[str, Any]]:
-        page = await members.page(viewer, limit=limit, newest=True)
+        page = await members.page(viewer, limit=limit, newest=True, anonymous=False)
         return [
             {
                 "id": str(m.id),

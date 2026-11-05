@@ -10,13 +10,15 @@ import { useMembers } from "../api";
 import { MemberAvatar, MemberName } from "../MemberFace";
 
 /** ``/community/members`` (spec 012 T008; 027 redesign): the active members the viewer may see, as cards
- * with their avatar, searchable by name. */
+ * with their avatar, searchable by name. Issue 347: the anonymous members close the list, without name,
+ * avatar, date nor profile (never in a search). */
 export function Directory() {
   const t = useT();
   const format = useFormat();
   const [query, setQuery] = useState("");
   const members = useMembers(query.trim());
   const items = members.data?.pages.flatMap((page) => page.items) ?? [];
+  const anonymous = members.hasNextPage ? 0 : (members.data?.pages.at(-1)?.anonymous ?? 0);
   return (
     <section aria-label={t("community:members.title")} className="ds-stack">
       <label className="community-search">
@@ -32,7 +34,7 @@ export function Directory() {
       </label>
       {members.isPending ? <Skeleton shape="tile" count={4} label={t("community:members.title")} /> : null}
       {members.isError ? <FunctionalState state="unavailable" onRetry={() => members.refetch()} /> : null}
-      {members.isSuccess && items.length === 0 ? (
+      {members.isSuccess && items.length === 0 && anonymous === 0 ? (
         <EmptyState
           icon="users"
           title={t("community:members.empty")}
@@ -55,6 +57,18 @@ export function Directory() {
                 {t("community:members.joined", { date: format.date(member.joined_at) })}
               </span>
             </Link>
+          </li>
+        ))}
+        {Array.from({ length: anonymous }, (_, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: anonymous members have nothing else to tell them apart
+          <li key={`anonymous-${index}`}>
+            <span className="community-member" data-anonymous="true">
+              <span className="community-member__ghost" aria-hidden="true">
+                <Icon name="user" size={28} />
+              </span>
+              <em>{t("gamification:leaderboard.anonymous")}</em>
+              <span className="community-meta">{t("community:members.anonymousHint")}</span>
+            </span>
           </li>
         ))}
       </ul>

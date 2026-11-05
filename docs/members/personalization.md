@@ -12,7 +12,7 @@ Your home page greets you by name (*Good morning*, *Good afternoon*, *Good eveni
 
 > **Note** — Your first dashboard is the one your administrator prepared for your play profile (see [Play](#play)). You can change it as you like, except the widgets they imposed.
 
-At your first sign-in, the welcome's **Your portal, to your taste** screen asks what you like. **What are you here for?** lists films, series, books, audiobooks, magazines, manga, comics and retro video games, for the portal to put forward what you like. **On your home** lists **Resume and discover**, **The latest releases**, **News about my favourites**, **My requests**, **Play**, **Statistics**, **Service status**, **The community** and **The radio**. All but **Statistics**, **The community** and **The radio** are ticked at first (**Play** only if you play). **Play** is greyed out at **Just the media**: raise the play gauge to add it. **Make my home with these choices**, ticked on a first visit, starts from the dashboard the team prepared for your play profile, keeps the widgets of what you ticked, adds those it lacks and leaves out those of what you did not tick; you can move everything afterwards. When you see the welcome again later, the box is unticked: ticking it replaces your current arrangement.
+At your first sign-in, the welcome's **Your portal, to your taste** screen asks what you like. **What are you here for?** lists films, series, books, audiobooks, magazines, manga, comics and retro video games, for the portal to put forward what you like. **On your home** lists **Resume and discover**, **The latest releases**, **News about my favourites**, **My requests**, **Play**, **Statistics**, **Service status**, **The community** and **The radio**. All but **Statistics**, **The community** and **The radio** are ticked at first (**Play** only if you play). **Play** and **The community** are greyed out at **Just the media**: raise the play gauge to add them. **Make my home with these choices**, ticked on a first visit, starts from the dashboard the team prepared for your play profile, keeps the widgets of what you ticked, adds those it lacks and leaves out those of what you did not tick; you can move everything afterwards. When you see the welcome again later, the box is unticked unless you just moved the play gauge: ticking it replaces your current arrangement. At **Just the media**, the home made has no game nor community widget.
 
 ### Arrange and resize
 
@@ -154,10 +154,10 @@ Only what you own is offered; **See in the shop** shows the rest. See [community
 
 ### My presence in the community
 
-Your play gauge sets it too: **Just the media** makes you anonymous, the other notches public (see [Play](#play)).
+It does not depend on your play level: it holds for every notch, even **Just the media**. The welcome asks it on a screen of its own, **How do you want to appear to the others?**. Either way, nothing is shown outside the portal.
 
 - **Public**: the portal's members, and only them, see your name and avatar in the leaderboards, the activity and the directory.
-- **Anonymous**: other members see you nowhere. In the leaderboards you still count, with no name, avatar or link.
+- **Anonymous**: you stay in the directory, the activity and the leaderboards (your place counts), but as **Anonymous**, with no name, avatar or link to your profile.
 
 **Finer settings** opens the privacy centre. *An administrator set this.* means you cannot change it.
 
@@ -231,14 +231,14 @@ Each tour shows its number of steps; **Start**, **Next**, **Back**, **Skip** or 
 
 | Notch | What it brings |
 |---|---|
-| **Just the media** | Watch, read and request, without the game: no cards, games or quests in your menu. Your profile is anonymous. |
-| **Passive** | XP and levels from what you watch, read or request; quests, achievements and leaderboards. Your profile is public, only to the portal's members. |
+| **Just the media** | Watch, read and request, without the game: no cards, games, quests or community in your menu. |
+| **Passive** | XP and levels from what you watch, read or request; quests, achievements and leaderboards. |
 | **Collector** | On top, the Mediacards: boosters as you watch, a collection to complete. |
 | **Keen** (recommended) | On top, the day's mini-games, the week's challenges and parties with others. No obligation to play: everything is simply within reach. |
 
-Below **Collector**, the Mediacards leave the menu, the titles' pages, the shop and the reserve, and watching no longer gives a Mediacards booster; the looks boosters stay. **Today's games** and **Play together** only show in the menu at **Keen**, and **Quests** leaves it at **Just the media**.
+Below **Collector**, the Mediacards leave the menu, the titles' pages, the shop and the reserve, and watching no longer gives a Mediacards booster; the looks boosters stay. **Today's games** and **Play together** only show in the menu at **Keen**, and **Quests** leaves it at **Just the media**, with the **Community** section and your achievements.
 
-The choice saves at once. **Set who sees what more finely, in privacy** opens the privacy centre. See [gamification.md](gamification.md) for what playing brings.
+The choice saves at once. Public or anonymous is not set here but in [My presence in the community](#my-presence-in-the-community). **Set who sees what more finely, in privacy** opens the privacy centre. See [gamification.md](gamification.md) for what playing brings.
 
 The **This profile's dashboard** card offers the dashboard the team prepared for your notch: **Take my profile's dashboard** replaces your current arrangement with it, and *Dashboard updated* confirms.
 

@@ -11,25 +11,52 @@ type Inventory = components["schemas"]["PrivacyInventory"];
 
 const DATUM = "progression";
 /** issue 243: what makes a member seen by the others — their progression, their place in the members'
- * directory and their activity; public or anonymous sets the three at once (within the portal only). */
-const PRESENCE = [DATUM, "member_listing", "community_activity"] as const;
-const CHOICES = [
+ * directory and their activity. Issue 347: public or anonymous, the member stays in the directory and the
+ * activity; anonymous only takes their name and avatar away (their progression kept to themselves). */
+const PRESENT = ["member_listing", "community_activity"] as const;
+export const PRESENCE_CHOICES = [
   { key: "public", level: "community", icon: "users" },
   { key: "anonymous", level: "private", icon: "hide" },
 ] as const;
+export type PresenceLevel = (typeof PRESENCE_CHOICES)[number]["level"];
 
-/** Public (``community``) or anonymous (``private``); only the progression's answer counts (the others may
- * be off, or set by an administrator). */
-export async function setPresence(level: "community" | "private"): Promise<void> {
+/** Public (``community``) or anonymous (``private``): the progression's level, and the member back in the
+ * directory and the activity; only the progression's answer counts (the others may be off, or set by an
+ * administrator). */
+export async function setPresence(level: PresenceLevel): Promise<void> {
   const results = await Promise.all(
-    PRESENCE.map((datum) =>
-      api.PUT("/api/v1/me/privacy/visibility/{datum_class}", {
-        params: { path: { datum_class: datum } },
-        body: { level },
-      }),
+    [{ datum: DATUM, level }, ...PRESENT.map((datum) => ({ datum, level: "community" as const }))].map(
+      ({ datum, level: chosen }) =>
+        api.PUT("/api/v1/me/privacy/visibility/{datum_class}", {
+          params: { path: { datum_class: datum } },
+          body: { level: chosen },
+        }),
     ),
   );
   if (results[0]?.error) throw new Error("presence");
+}
+
+/** Issue 347: the member's presence as it stands — none when the privacy centre is off; ``current`` is null
+ * for a finer level set in the privacy centre (a leaderboard-only progression, or kept out of the directory
+ * or the activity). Asked at the welcome, whatever the play gauge, and here. */
+export function usePresence() {
+  const inventory = useQuery({
+    queryKey: ["privacy", "me"],
+    queryFn: async () => (await api.GET("/api/v1/me/privacy")).data as Inventory,
+  });
+  const items = Array.isArray(inventory.data?.data) ? inventory.data.data : [];
+  const datum = items.find((item) => item.datum_class === DATUM);
+  const level = datum?.effective_level;
+  const away = items.some(
+    (item) => (PRESENT as readonly string[]).includes(item.datum_class) && item.effective_level === "private",
+  );
+  const current: PresenceLevel | null =
+    away || level === "leaderboard" ? null : level === "private" ? "private" : "community";
+  return {
+    available: Boolean(datum),
+    current,
+    locked: Boolean(datum?.locked_by_policy) || !datum?.user_choosable,
+  };
 }
 
 /**
@@ -41,12 +68,7 @@ export function CommunityPresence() {
   const t = useT();
   const notify = useNotify();
   const queryClient = useQueryClient();
-  const inventory = useQuery({
-    queryKey: ["privacy", "me"],
-    queryFn: async () => (await api.GET("/api/v1/me/privacy")).data as Inventory,
-  });
-  const items = Array.isArray(inventory.data?.data) ? inventory.data.data : [];
-  const datum = items.find((item) => item.datum_class === DATUM); // none (privacy off): no card
+  const { available, current, locked } = usePresence();
   const change = useMutation({
     mutationFn: setPresence,
     onSuccess: () => {
@@ -56,10 +78,7 @@ export function CommunityPresence() {
     },
     onError: () => notify({ severity: "warning", title: t("account:error") }),
   });
-  if (!datum) return null;
-  const level = datum.effective_level;
-  const current = level === "private" ? "anonymous" : level === "leaderboard" ? null : "public";
-  const locked = Boolean(datum.locked_by_policy) || !datum.user_choosable;
+  if (!available) return null; // none (privacy off): no card
   return (
     <SettingsCard
       icon="eye"
@@ -73,13 +92,17 @@ export function CommunityPresence() {
     >
       <fieldset className="account-presence" disabled={locked || change.isPending}>
         <legend className="visually-hidden">{t("account:presence.title")}</legend>
-        {CHOICES.map((choice) => (
-          <label key={choice.key} className="account-presence__choice" data-current={current === choice.key}>
+        {PRESENCE_CHOICES.map((choice) => (
+          <label
+            key={choice.key}
+            className="account-presence__choice"
+            data-current={current === choice.level}
+          >
             <input
               type="radio"
               name="community-presence"
               value={choice.key}
-              checked={current === choice.key}
+              checked={current === choice.level}
               onChange={() => change.mutate(choice.level)}
             />
             <span className="account-presence__icon" aria-hidden="true">

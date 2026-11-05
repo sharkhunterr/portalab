@@ -496,17 +496,64 @@
   font-size: var(--font-size-sm);
 }
 
-/* what the answer makes of the profile */
-.onboarding-welcome__hint[data-tone] {
+/* issue 347: public or anonymous — a screen of its own, apart from the game */
+.onboarding-presence {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.onboarding-presence .onboarding-tile {
+  justify-items: start;
+  align-content: start;
+  text-align: start;
+}
+
+.onboarding-presence__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-md);
+}
+
+.onboarding-presence__head > .ds-icon {
+  color: var(--color-accent);
+}
+
+.onboarding-presence__summary {
+  color: var(--color-text-muted);
+}
+
+.onboarding-presence__list,
+.onboarding-presence__facts {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.onboarding-presence__list li,
+.onboarding-presence__facts li {
   display: flex;
   align-items: flex-start;
   gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
 }
 
-.onboarding-welcome__hint[data-tone] > svg {
+.onboarding-presence__list .ds-icon,
+.onboarding-presence__facts .ds-icon {
   flex: none;
-  margin-block-start: 0.15rem;
+  margin-block-start: 0.1rem;
   color: var(--color-accent);
+}
+
+.onboarding-presence__facts li {
+  font-size: var(--font-size-sm);
 }
 
 @media (max-width: 40rem) {
@@ -1329,7 +1376,8 @@ button.first-steps__start:focus-visible {
 }
 
 @media (max-width: 40rem) {
-  .onboarding-presets {
+  .onboarding-presets,
+  .onboarding-presence {
     grid-template-columns: 1fr;
   }
 }

@@ -41,14 +41,19 @@ CARDS_OWNER = "module:cards"
 WITHOUT_GAMES = ("collector", "progression", "none")
 GAMES_ENTRIES = frozenset({"games.page", "games.party"})
 QUESTS_ENTRY = "community.quests"
+# issue 347: « just the media » has no community either — its section, and the achievements kept among mine
+COMMUNITY_GROUP = "community"
+ACHIEVEMENTS_ENTRY = "community.achievements"
 
 
-def hidden_by_play(play: object) -> tuple[bool, frozenset[str]]:
-    """Issue 347: what a member's play gauge leaves out of the menu — the cards (their owner), and entries."""
+def hidden_by_play(play: object) -> tuple[bool, frozenset[str], frozenset[str]]:
+    """Issue 347: what a member's play gauge leaves out of the menu — the cards (their owner), entries, and
+    whole sections."""
     keys = (GAMES_ENTRIES if play in WITHOUT_GAMES else frozenset()) | (
-        {QUESTS_ENTRY} if play == "none" else frozenset()
+        {QUESTS_ENTRY, ACHIEVEMENTS_ENTRY} if play == "none" else frozenset()
     )
-    return play in WITHOUT_CARDS, frozenset(keys)
+    groups = {COMMUNITY_GROUP} if play == "none" else set()
+    return play in WITHOUT_CARDS, frozenset(keys), frozenset(groups)
 
 
 class NavigationAssembler:
@@ -111,7 +116,9 @@ class NavigationAssembler:
         user_order = list(await self._setting("shell.navigation.userOrder", principal, []))
         # issue 243: a member who plays without the cards (or does not play) has no cards in the menu
         # issue 347: the play gauge also leaves the day's games, the parties and the quests out
-        cardless, gameless = hidden_by_play(await self._setting("shell.onboarding.play", principal, None))
+        cardless, gameless, sectionless = hidden_by_play(
+            await self._setting("shell.onboarding.play", principal, None)
+        )
         # issue 246: a feature switched on or off (``visible_when.setting``) shows or hides its entries now
         switches = {
             key: await self._setting(key, principal, True)
@@ -126,7 +133,7 @@ class NavigationAssembler:
         epochs = await self.epochs.current()
         fingerprint = hashlib.sha256(
             json.dumps(
-                [layout, allow_user, user_order, cardless, sorted(gameless), switches],
+                [layout, allow_user, user_order, cardless, sorted(gameless), sorted(sectionless), switches],
                 sort_keys=True,
                 default=str,
             ).encode()
@@ -147,7 +154,13 @@ class NavigationAssembler:
         metrics.increment("shell.cache_misses")
         try:
             view = await self._assemble(
-                principal, layout, user_order, allow_user, cardless=cardless, gameless=gameless
+                principal,
+                layout,
+                user_order,
+                allow_user,
+                cardless=cardless,
+                gameless=gameless,
+                sectionless=sectionless,
             )
         except Exception:
             log.warning("navigation assembly failed; minimal navigation served")
@@ -182,6 +195,7 @@ class NavigationAssembler:
         *,
         cardless: bool = False,
         gameless: frozenset[str] = frozenset(),
+        sectionless: frozenset[str] = frozenset(),
     ) -> dict[str, Any]:
         enabled_memo: dict[tuple[str, str], bool] = {}
         allowed_memo: dict[str, bool] = {}
@@ -189,7 +203,7 @@ class NavigationAssembler:
         for contribution in self.registry.all():
             if cardless and contribution.owner == CARDS_OWNER:
                 continue
-            if contribution.key in gameless:
+            if contribution.key in gameless or contribution.group in sectionless:
                 continue
             try:
                 if not await self._enabled(contribution, enabled_memo):

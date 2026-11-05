@@ -129,7 +129,7 @@ Every action is in the audit log. Pack authors will find the format, element typ
   | **Locked** | At this place, this size and with these settings for everyone. |
 
 - **The other widgets** stay available for members to add, unless **Switched off for everyone**.
-- show a **Free** widget to some play profiles only: its **Shown to these play profiles** picker lists the four notches of the members' play gauge (**Just the media**, **Passive**, **Collector**, **Keen**). None ticked, it reaches **Every member**; otherwise the picker shows how many profiles get it. **Seen as**, above the grid, shows the dashboard as one profile gets it: the widgets that profile will not get are faded.
+- show a **Free** widget to some play profiles only: its **Shown to these play profiles** picker lists the four notches of the members' play gauge (**Just the media**, **Passive**, **Collector**, **Keen**). None ticked, it reaches **Every member**; otherwise the picker shows how many profiles get it. **Seen as**, above the grid, shows the dashboard as one profile gets it: the widgets that profile will not get are faded. Whatever the composition, a member at **Just the media** gets no game nor community widget on a home made for them (the welcome's « your portal to your taste », or **Take my profile's dashboard**); only the widgets you made **Always there** or **Locked** stay.
 
 **Save** writes it all. "Always there" and "Locked" widgets reach every member at once; the rest applies to new members and to anyone who resets to Default. Widgets sold in the shop are marked as such.
 

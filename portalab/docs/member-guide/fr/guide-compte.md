@@ -39,10 +39,10 @@ Sur votre profil, « Personnaliser » ouvre « Personnaliser mon profil » : « 
 
 ### Ma présence dans la communauté
 
-Cette carte règle ce que les autres membres voient de vous : les classements, l'activité récente et l'annuaire des membres. Votre niveau de jeu la règle aussi : « Juste les médias » vous rend anonyme, les autres crans public (voir la page [Jeu](/settings/play), plus bas).
+Cette carte règle ce que les autres membres voient de vous : les classements, l'activité récente et l'annuaire des membres. Elle ne dépend pas de votre niveau de jeu : elle vaut pour tous les crans de la jauge, même « Juste les médias ». L'écran de bienvenue la pose sur un écran à part, « Comment veux-tu apparaître aux autres ? ». Dans les deux cas, rien n'est montré en dehors du portail.
 
 - « Public » : les membres du portail, et eux seuls, voient votre nom et votre avatar dans les classements, l'activité et l'annuaire.
-- « Anonyme » : les autres membres ne vous voient nulle part, ni dans l'annuaire, ni dans l'activité. Dans les classements, vous restez compté, sans nom, sans avatar et sans lien vers votre profil.
+- « Anonyme » : vous restez dans la communauté sans être reconnu. Dans l'annuaire, vous êtes compté comme « Anonyme », en fin de liste, et une recherche par votre nom ne vous trouve pas. Ce que vous faites reste dans l'activité, signé « Un membre anonyme ». Dans les classements, votre place et vos points comptent toujours, sous « Anonyme ». Nulle part votre nom, votre avatar ni de lien vers votre profil.
 
 « Réglages fins » ouvre le centre de confidentialité. Si « Un administrateur a fixé ce réglage. » s'affiche, vous ne pouvez pas le changer.
 
@@ -142,12 +142,12 @@ La page [Jeu](/settings/play) reprend la jauge « Jusqu'où veux-tu jouer ? » d
 
 | Cran | Ce qu'il apporte |
 |---|---|
-| « Juste les médias » | Regarder, lire et demander, sans le jeu : ni cartes, ni jeux, ni quêtes dans votre menu. Votre profil est anonyme. |
-| « Passif » | De l'XP et des niveaux par ce que vous regardez, lisez ou demandez ; les quêtes, les succès, les classements. Votre profil est public, seulement pour les membres du portail. |
+| « Juste les médias » | Regarder, lire et demander, sans le jeu : ni cartes, ni jeux, ni quêtes, ni communauté dans votre menu. |
+| « Passif » | De l'XP et des niveaux par ce que vous regardez, lisez ou demandez ; les quêtes, les succès, les classements. |
 | « Collectionneur » | En plus, les Mediacards : des boosters en regardant, une collection à compléter. |
 | « Passionné » | En plus, les mini-jeux du jour, les défis de la semaine et les parties à plusieurs. |
 
-Sous « Collectionneur », les Mediacards disparaissent du menu, des fiches des titres, de la boutique et de la réserve, et regarder ne donne plus de booster Mediacards. Les boosters de looks restent. Dans le menu, « Jeux du jour » et « Jouer à plusieurs » n'apparaissent qu'à « Passionné », et « Quêtes » disparaît à « Juste les médias ».
+Sous « Collectionneur », les Mediacards disparaissent du menu, des fiches des titres, de la boutique et de la réserve, et regarder ne donne plus de booster Mediacards. Les boosters de looks restent. Dans le menu, « Jeux du jour » et « Jouer à plusieurs » n'apparaissent qu'à « Passionné », et « Quêtes » disparaît à « Juste les médias », avec la rubrique « Communauté » et vos succès. Public ou anonyme ne se règle pas ici, mais dans la carte « Ma présence dans la communauté » (voir plus haut).
 
 « Régler plus finement qui voit quoi, dans la confidentialité » ouvre le centre de confidentialité.
 

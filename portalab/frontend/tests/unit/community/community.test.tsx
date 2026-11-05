@@ -17,6 +17,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 });
 
 import { Feed } from "../../../src/features/community/feed/Feed";
+import { Directory } from "../../../src/features/community/members/Directory";
 import { ProfilePage } from "../../../src/features/community/profile/ProfilePage";
 import { json } from "../../support/fake-api";
 
@@ -154,5 +155,18 @@ describe("leaderboard table", () => {
       "/community/members/u2", // issue 177: mine too, as on the podium
     );
     expect(screen.getByText("Your position: #2 (20)")).toBeTruthy();
+  });
+
+  it("closes the directory with the anonymous members, nameless and unlinked (issue 347)", async () => {
+    fake.handler = () =>
+      json(200, {
+        items: [{ id: MEMBER, display_name: "Mona", joined_at: "2026-10-01T12:00:00Z", look: null }],
+        next_cursor: null,
+        anonymous: 2,
+      });
+    show("/", "/", <Directory />);
+    expect(await screen.findByRole("link", { name: /Mona/ })).toBeTruthy();
+    expect(screen.getAllByText("Anonymous")).toHaveLength(2);
+    expect(screen.getAllByRole("link")).toHaveLength(1);
   });
 });

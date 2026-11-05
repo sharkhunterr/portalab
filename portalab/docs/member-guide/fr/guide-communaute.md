@@ -63,7 +63,7 @@ Le classement affiche le podium, votre position et les places gagnées ou perdue
 > Les classements sont recalculés régulièrement, pas à chaque gain : la date de la dernière mise à jour est indiquée (« Mis à jour le … »).
 
 > [!TIP]
-> Vous préférez rester discret ? Dans votre compte, « Ma présence dans la communauté » permet de choisir « Anonyme ». Vous restez classé, mais sans nom, sans avatar et sans lien vers votre profil. Voir [Compte et confidentialité](portalab://wiki/guide-compte).
+> Vous préférez rester discret ? Dans votre compte, « Ma présence dans la communauté » permet de choisir « Anonyme ». Vous restez dans l'annuaire, l'activité et les classements (votre place compte), mais sous « Anonyme » : sans nom, sans avatar et sans lien vers votre profil. Voir [Compte et confidentialité](portalab://wiki/guide-compte).
 
 ## Les événements
 

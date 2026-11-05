@@ -75,6 +75,17 @@ function backend({
     if (path === "/api/v1/me") return json(200, ME);
     if (path === "/api/v1/me/preferences") return json(200, { preferences });
     if (path === "/api/v1/me/onboarding/welcome") return json(200, welcome);
+    if (path === "/api/v1/me/privacy")
+      return json(200, {
+        data: [
+          {
+            datum_class: "progression",
+            effective_level: "community",
+            locked_by_policy: false,
+            user_choosable: true,
+          },
+        ],
+      });
     if (path === "/api/v1/me/quests") return json(200, quests);
     if (path === "/api/v1/ai/status")
       return json(200, {
@@ -140,6 +151,8 @@ describe("welcome", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await screen.findByRole("heading", { name: "How far do you want to play?" });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "How do you want to appear to the others?" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await screen.findByRole("heading", { name: "Your portal, to your taste" });
     fireEvent.click(screen.getByRole("checkbox", { name: "Films" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Retro video games" }));
@@ -151,12 +164,12 @@ describe("welcome", () => {
     expect(posts).toContain("/api/v1/me/onboarding/interests/complete");
   });
 
-  // issue 243: a player is public within the portal; one who does not play is anonymous to the other members.
-  // Issue 347: a notch of the play gauge, the dashboard made for it on a first visit, then how they are told.
+  // Issue 347: a notch of the play gauge, then — whatever the notch — public or anonymous in the community; the
+  // dashboard made for it on a first visit, then how they are told. « Just the media » has no game nor community.
   it.each([
-    ["Passive", "progression", "community"],
-    ["Just the media", "none", "private"],
-  ])("« %s » keeps the choice and sets who sees the member", async (answer, play, level) => {
+    ["Passive", "progression", "Anonymous", "private"],
+    ["Just the media", "none", "Public", null],
+  ])("« %s » keeps the choice, and « %s » who sees the member", async (answer, play, seen, level) => {
     window.localStorage.clear();
     const { puts, resets, visibility } = backend({});
     show(<WelcomeFlow />);
@@ -170,15 +183,22 @@ describe("welcome", () => {
       "aria-valuetext",
       answer,
     );
-    expect(
-      screen.getByText(level === "private" ? /will be anonymous/ : /will be public/),
-    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    // a screen of its own, apart from the game, for every notch: public as it stands, anonymous on demand
+    await screen.findByRole("heading", { name: "How do you want to appear to the others?" });
+    expect(screen.getByText(/even « Just the media »/)).toBeInTheDocument();
+    expect(await screen.findByRole("radio", { name: /^Public/ })).toHaveProperty("checked", true);
+    fireEvent.click(screen.getByRole("radio", { name: new RegExp(`^${seen}`) }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     // the portal to their taste: the game ticked for a player, out of reach for one who does not play
     await screen.findByRole("heading", { name: "Your portal, to your taste" });
     const game = screen.getByRole("checkbox", { name: "Play" });
     expect(game).toHaveProperty("checked", play !== "none");
     expect(game).toHaveProperty("disabled", play === "none");
+    expect(screen.getByRole("checkbox", { name: "The community" })).toHaveProperty(
+      "disabled",
+      play === "none",
+    );
     fireEvent.click(screen.getByRole("checkbox", { name: "The radio" }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(await screen.findByRole("heading", { name: "How should we tell you?" })).toBeInTheDocument();
@@ -196,11 +216,14 @@ describe("welcome", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(await screen.findByRole("heading", { name: "Your look" })).toBeInTheDocument();
     expect(visibility).toEqual(
-      expect.arrayContaining([
-        ["progression", level],
-        ["member_listing", level],
-        ["community_activity", level],
-      ]),
+      level === null
+        ? []
+        : expect.arrayContaining([
+            ["progression", level],
+            // issue 347: anonymous or not, the member stays in the directory and the activity
+            ["member_listing", "community"],
+            ["community_activity", "community"],
+          ]),
     );
     await waitFor(() => expect(puts).toContainEqual({ "shell.onboarding.play": play }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));

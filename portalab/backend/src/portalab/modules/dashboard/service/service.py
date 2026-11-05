@@ -49,10 +49,12 @@ from portalab.modules.dashboard.overlay.overlay import (
     policy_class,
 )
 from portalab.modules.dashboard.settings import DashboardConfig
-from portalab.modules.dashboard.tastes import TASTES, wanted
+from portalab.modules.dashboard.tastes import TASTE_OF, TASTES, wanted
 
 # #347: the welcome's play gauge, which the starter dashboard follows
 PLAY_SETTING = "shell.onboarding.play"
+# #347: « just the media » — no game nor community on the home, whatever the tastes say
+LEFT_OUT_BY_PLAY: dict[str, frozenset[str]] = {"none": frozenset({"play", "community"})}
 
 
 class PolicyLocked(Conflict):
@@ -930,6 +932,13 @@ class DashboardService:
         }
         roles_ok = await self._roles(principal)
         profile = await self._profile(principal)
+        left_out = LEFT_OUT_BY_PLAY.get(str(profile), frozenset())
+        if tastes is not None:
+            tastes = tastes - left_out
+
+        def fits(key: str) -> bool:
+            return wanted(tastes, key) and TASTE_OF.get(key) not in left_out
+
         pinned = [
             {"widget_key": key, "w": pin[2], "h": pin[3]}
             for key in sorted(policies)
@@ -941,7 +950,7 @@ class DashboardService:
                 widget = widgets.get(key)
                 roles = entry.get("roles")
                 kept = entry in pinned or policy_class(policies, key) == "mandatory"
-                if not kept and not wanted(tastes, key):
+                if not kept and not fits(key):
                     continue
                 if widget is None or policy_class(policies, key) == "disabled":
                     continue
@@ -977,7 +986,7 @@ class DashboardService:
         for key, widget in sorted(widgets.items()):
             if (
                 policy_class(policies, key) == "default"
-                and wanted(tastes, key)
+                and fits(key)
                 and all(c[0].definition.key != key for c in chosen)
                 and await self.gateway.allowed(widget, principal)
             ):
