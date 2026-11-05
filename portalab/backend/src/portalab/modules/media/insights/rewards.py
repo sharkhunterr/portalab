@@ -8,6 +8,12 @@ Only the plays the portal lived: #341 — those after the member linked that acc
 before, #102), however late the catch-up, at most ``MAX_AGE`` back; without a link, the last ``WINDOW``.
 An old history imported later never turns into XP.
 
+#351: a game played (RomM, #190) counts as a film or a series does, through the administrator's rules on the
+play's kind « game » — only its time: each play session its minutes (``abandoned``: a game is never finished
+for the progression, whatever its player marked); and once a member played a game, in all, as long as its
+main story takes (its ``duration_s``, HowLongToBeat through RomM), ``media.game_length_reached`` — once per
+member and game, counting the sessions the portal lived only.
+
 #342: the end credits' leeway grew (30 s → 2 min) — ``review_endings`` looks once at the plays judged
 abandoned since then: one that now reaches its end gets its ``media.playback_finished``, its minutes not
 counted twice (``watched_s`` 0: its abandoned play gave them)."""
@@ -23,7 +29,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
-from portalab.modules.media.models import Activity, PlaybackSession, UserLink
+from portalab.modules.media.models import Activity, MediaObject, PlaybackSession, UserLink
 from portalab.modules.media.observability import metrics
 from portalab.modules.media.playback.normalizer import percent, reached_end
 from portalab.modules.media.playback.poller import HISTORY
@@ -37,6 +43,7 @@ NEARBY = timedelta(hours=6)  # a live session this close to the play is the same
 ALONGSIDE = timedelta(minutes=10)  # #101: a live session followed to its stop during the play is that play
 EVENT = "media.playback_finished"
 PARTIAL = "media.playback_abandoned"  # #94: a play stopped before its end still counts its minutes
+LENGTH = "media.game_length_reached"  # #351
 MIN_WATCHED = 60.0
 
 
@@ -68,6 +75,8 @@ class HistoryRewards:
         self, kind: str, share: float | None, duration: float | None, credits: float | None
     ) -> bool:
         if share is None:
+            return False
+        if kind == "game":  # #351: only the time played counts — a game is never « finished »
             return False
         if not duration:  # a share alone: the kind's threshold decides
             return reached_end(share, 1.0, self.threshold(kind))
@@ -101,8 +110,6 @@ class HistoryRewards:
                             Activity.started_at >= now - MAX_AGE,
                             Activity.started_at >= func.coalesce(linked, now) - WINDOW,
                             Activity.rewarded_at.is_(None),
-                            # #190: a game played is no film watched — its minutes are no watching time
-                            Activity.kind != "game",
                         )
                         .order_by(Activity.started_at)  # #343: told in the order they were watched
                     )
@@ -143,9 +150,48 @@ class HistoryRewards:
                 )
                 if not result.duplicate:
                     published += 1
+                if row.kind == "game" and await self._game_length(session, row, linked, at):
+                    published += 1
         if published:
             metrics.increment("media.playback.finished_from_history", published)
         return published
+
+    async def _game_length(self, session: AsyncSession, row: Activity, linked: Any, at: datetime) -> bool:
+        """#351: the member has now played this game as long as its main story takes — told once."""
+        if row.object_id is None or row.user_id is None:
+            return False
+        length = await session.scalar(
+            select(MediaObject.effective["duration_s"].as_float()).where(MediaObject.id == row.object_id)
+        )
+        if not length or length <= 0:
+            return False  # no length known (many games): no such reward
+        played = await session.scalar(
+            select(func.coalesce(func.sum(Activity.watched_s), 0.0)).where(
+                Activity.user_id == row.user_id,
+                Activity.object_id == row.object_id,
+                Activity.kind == "game",
+                Activity.counted.is_(True),
+                Activity.started_at >= func.coalesce(linked, row.started_at) - WINDOW,  # the portal's own
+            )
+        )
+        total = float(played or 0.0)
+        if total < length:
+            return False
+        result = await self.events.publish(
+            session,
+            LENGTH,
+            {
+                "object": str(row.object_id),
+                "kind": "game",
+                "played_s": round(total, 1),
+                "length_s": length,
+            },
+            occurred_at=at,
+            subject=SubjectRef("user", str(row.user_id)),
+            source="media",
+            dedup_key=f"{LENGTH}:{row.object_id}:{row.user_id}",
+        )
+        return not result.duplicate
 
     async def _ends_now(
         self, kind: str, object_id: UUID | None, position: float, duration: float | None

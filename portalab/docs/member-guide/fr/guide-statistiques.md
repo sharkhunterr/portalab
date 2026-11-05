@@ -26,7 +26,7 @@ Ouvrez [Mes médias](/media/insights) dans la rubrique « Statistiques ». Vous 
 
 1. **« Période »** : « 7 derniers jours », « 30 derniers jours », « 3 derniers mois », « Cette année », « 12 derniers mois », « Depuis toujours », ou une année précise.
 2. **« Moi »** ou **« Tout le serveur »** : vos chiffres, ou l'activité de toute la communauté. La vue du serveur est anonyme : aucun membre n'y est nommé.
-3. **La catégorie** : « Tout », « Films », « Séries », « TV en direct », « Musique », « Livres », « Livres audio » ou « Demandes ».
+3. **La catégorie** : « Tout », « Films », « Séries », « TV en direct », « Musique », « Livres », « Livres audio », « Radio », « Jeux » ou « Demandes ». « Tout » compte aussi le temps passé à jouer.
 4. **Les onglets** : « Aperçu », puis ceux de la catégorie (voir ci-dessous).
 5. **Les quatre chiffres** de l'aperçu.
 

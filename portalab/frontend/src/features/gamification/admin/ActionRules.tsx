@@ -86,6 +86,34 @@ function presets(t: Translate): Array<{ key: string; icon: string; definition: R
         boosters: 1,
       },
     },
+    // issue 351: a game played (RomM) — its time only: XP a minute, a few coins an hour of a session; and a big
+    // reward once a game was played as long as its main story takes
+    {
+      key: "media.game_time",
+      icon: "gamepad",
+      definition: {
+        event_type: "media.playback_abandoned",
+        label: t("gamification:admin.presets.gameTime"),
+        predicate: [{ field: "kind", op: "in", value: ["game"] }],
+        grants: [
+          { value: "xp", per_unit: { field: "watched_s", factor: 1 / 60, max: 240 } },
+          { value: "coins", per_unit: { field: "watched_s", factor: 5 / 3600, max: 20 } },
+        ],
+        limits: { caps: [{ period: "day", max_amount: 300, value: "xp" }] },
+      },
+    },
+    {
+      key: "media.game_length",
+      icon: "trophy",
+      definition: {
+        event_type: "media.game_length_reached",
+        label: t("gamification:admin.presets.gameLength"),
+        grants: [
+          { value: "xp", amount: 200 },
+          { value: "coins", amount: 100 },
+        ],
+      },
+    },
     {
       key: "marketplace.purchase",
       icon: "shop",

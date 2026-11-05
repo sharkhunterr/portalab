@@ -21,7 +21,7 @@ Everything is in the **Statistics** section of the menu:
 
 1. **Me** or **Whole server**: your own figures, or the whole community's activity. The server view is anonymous for members: nobody is named.
 2. **Period**: **Last 7 days**, **Last 30 days**, **Last 3 months**, **This year**, **Last 12 months**, **All time**, or one of the last few years.
-3. **Category**: **All**, **Films**, **Series**, **Live TV**, **Music**, **Books**, **Audiobooks**, **Radio**, **Games** or **Requests**.
+3. **Category**: **All**, **Films**, **Series**, **Live TV**, **Music**, **Books**, **Audiobooks**, **Radio**, **Games** or **Requests**. **All** counts the time spent playing games too.
 4. The **tabs** of that category: **Overview**, then **Casting**, **Production**, **Playback** or **Profile** where they apply.
 
 > **Note** — A category appears only when a service your portal connects feeds it: a library or a play history of that kind (Plex, Jellyfin, Tautulli, Grimmory, RomM…), a connected radio for **Radio**, a request service (Seerr) for **Requests**. A portal without books has no **Books** tab.

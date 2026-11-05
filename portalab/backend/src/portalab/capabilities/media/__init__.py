@@ -130,6 +130,20 @@ def unwrap(value: Any) -> Any:
     return value
 
 
+class PlayTime(BaseModel):
+    """#351: how long a game takes to play in one style (HowLongToBeat, through RomM), and how many players
+    told it."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    seconds: float = Field(gt=0, le=36_000_000)
+    players: int | None = Field(default=None, ge=0)
+
+
+PLAY_STYLES = ("main_story", "main_plus_extra", "completionist", "all_styles")
+PlayStyle = Literal["main_story", "main_plus_extra", "completionist", "all_styles"]
+
+
 class LibraryPayload(BaseModel):
     """Payload of a ``media.library`` record (strong ids anchor identity; everything else is metadata)."""
 
@@ -166,6 +180,8 @@ class LibraryPayload(BaseModel):
     # 027: which copy this item is when a service holds several of one title (a game per platform/region)
     variant: str | None = Field(default=None, max_length=200)
     platform: str | None = Field(default=None, max_length=120)  # 027: a game's console or system
+    # #351: how long a game takes, by play style (its main story is its ``duration_s``)
+    play_times: dict[PlayStyle, PlayTime] = Field(default_factory=dict)
 
 
 class RequestPayload(BaseModel):

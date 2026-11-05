@@ -31,6 +31,7 @@ Ces valeurs ne se convertissent jamais l'une en l'autre.
 
 Ce qui rapporte, et combien, dépend de votre portail. Selon les réglages, cela peut être :
 - regarder un film ou un épisode jusqu'au bout, finir une saison, écouter, lire ;
+- jouer à un jeu de la bibliothèque (RomM) : le temps passé à jouer, et une grosse récompense quand vous avez joué à un jeu aussi longtemps que sa durée estimée (son histoire principale, quand elle est connue) ;
 - faire une demande, ou voir une demande devenir disponible ;
 - vous connecter au portail ;
 - jouer aux [jeux](/games), réussir un défi de la semaine ;
@@ -40,7 +41,7 @@ Ce qui rapporte, et combien, dépend de votre portail. Selon les réglages, cela
 Certaines actions ont un plafond ou un délai entre deux gains.
 
 > [!NOTE]
-> Quand le serveur multimédia sait où commence le générique de fin, un film ou un épisode arrêté dans les **deux dernières minutes** avant ce générique compte comme terminé : inutile de regarder le générique. Sinon, c'est la part regardée qui compte. Une saison compte comme terminée quand tous ses épisodes sont vus, à la date du dernier, quel que soit l'ordre dans lequel vous les avez regardés.
+> Quand le serveur multimédia sait où commence le générique de fin, un film ou un épisode arrêté dans les **deux dernières minutes** avant ce générique compte comme terminé : inutile de regarder le générique. Sinon, c'est la part regardée qui compte. Pour un jeu, seul le temps joué compte : vos parties remontent de RomM quelques minutes après les avoir terminées, et un jeu marqué « terminé » dans RomM ne rapporte rien de plus. Une saison compte comme terminée quand tous ses épisodes sont vus, à la date du dernier, quel que soit l'ordre dans lequel vous les avez regardés.
 
 Pour voir d'où vient votre XP, ouvrez « D'où vient mon XP » sur [Ma progression](/progression). Choisissez une période : le graphique montre vos gains par source (films, épisodes, quêtes, bonus de série…). « Mes lectures par type » détaille vos séances et leur durée. L'« Historique » liste chaque opération : gain, dépense, remboursement, avec votre solde juste après.
 

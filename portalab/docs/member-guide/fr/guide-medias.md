@@ -51,6 +51,7 @@ Plus bas, selon le titre :
 
 - **« Détails enrichis »** : distribution, équipe, genres, saga, budget et box-office, studios… Cliquez sur une personne pour ouvrir sa page : sa biographie et sa filmographie, avec ce qui est disponible et ce que vous pouvez demander ;
 - **« À propos »**, **« Sources »** (où le titre se trouve), **« Demandes »** et **« Liens externes »** ;
+- pour un jeu, **« Durée de jeu »** : le temps qu'il faut selon la façon de jouer (« Histoire principale », « Principal + extras », « Complétionniste », « Tous les styles »), avec le nombre de joueurs qui l'ont indiqué (d'après HowLongToBeat, quand RomM le connaît) ;
 - **« Mon historique »** : vos lectures de ce titre, la date et jusqu'où vous êtes allé. Quand assez de membres l'ont vu, le nombre de lectures et de membres s'affiche aussi, sans aucun nom.
 
 Si le titre n'est pas encore là, un bouton **« Demander »** le remplace. Si un titre risque d'être supprimé, un encadré **« Bientôt supprimé »** vous prévient (voir [Titres bientôt supprimés](portalab://wiki/guide-bientot-supprime)).

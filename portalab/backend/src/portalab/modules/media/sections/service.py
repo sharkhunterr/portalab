@@ -135,8 +135,9 @@ class Sections:
             "released",
             "tags",
             "platform",  # 027: a game's console (RomM)
+            "play_times",  # #351: how long a game takes, by play style (RomM)
         )
-        data = {k: view.effective.get(k) for k in keep if view.effective.get(k) not in (None, "", [])}
+        data = {k: view.effective.get(k) for k in keep if view.effective.get(k) not in (None, "", [], {})}
         for scheme in ("isbn", "asin"):  # #92: an audiobook's ASIN too
             if view.ids.get(scheme):
                 data[scheme] = view.ids[scheme]

@@ -9,10 +9,12 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from fastapi import FastAPI
+from sqlalchemy import select
 
+from portalab.capabilities.media import SourceActivity
 from portalab.core.time import FixedClock
 from portalab.modules.media.insights.rewards import HistoryRewards
-from portalab.modules.media.models import Activity, MediaObject, PlaybackSession, UserLink
+from portalab.modules.media.models import Activity, MediaObject, PlaybackSession, SourceItem, UserLink
 from tests.integration.media.conftest import MediaHarness, users
 
 NOW = datetime(2026, 10, 13, 12, 0, tzinfo=UTC)
@@ -303,3 +305,189 @@ async def test_the_plays_in_the_last_minutes_before_the_credits_are_finished_on_
     named = {v: k for k, v in films.items()}
     finished = {named[UUID(e[1]["object"])]: e[1]["watched_s"] for e in await media.events("media.playback")}
     assert finished == {"Live, a minute short": 0.0, "History, a minute short": 0.0}
+
+
+async def test_a_game_played_counts_its_minutes_only(app: FastAPI, media: MediaHarness) -> None:
+    """#351: a game played (RomM) counts as a film does, but only its time — each session its minutes; a game
+    its player marked finished gives nothing more."""
+    people = await users(app, media, "zoe")
+    zoe = people["zoe"]
+    romm = uuid4()
+
+    def game(ref: str, hours_ago: float, **kw: Any) -> Activity:
+        return Activity(
+            service_id=romm,
+            ref=ref,
+            family="romm",
+            priority=10,
+            counted=True,
+            external_user_id="1",
+            user_id=zoe,
+            kind="game",
+            title="Crash Bandicoot: Warped",
+            object_id=None,
+            item_external_id="6601",
+            ids={},
+            started_at=NOW - timedelta(hours=hours_ago),
+            stopped_at=NOW - timedelta(hours=hours_ago) + timedelta(seconds=kw.pop("played_s", 0)),
+            received_at=NOW,
+            **kw,
+        )
+
+    async with media.database.unit_of_work() as uow:
+        uow.session.add_all(
+            [
+                _link(zoe, romm, NOW - timedelta(days=30)),
+                game("session:10", 30, watched_s=430.0, played_s=430),
+                game("session:11", 28, watched_s=20.0, played_s=20),  # too short to count
+                game("played:6601:2026-10-12", 28, watched_s=0.0, progress=1.0),
+                game("played:6601:2026-10-13", 2, watched_s=0.0, progress=1.0),
+            ]
+        )
+    rewards = HistoryRewards(
+        media.database, media.module.history.events, media.module.threshold, clock=FixedClock(NOW)
+    )
+    assert await rewards.run() == 1
+    await media.dispatch()
+    told = [
+        (e[0], e[1]["kind"], e[1]["watched_s"]) for e in await media.events() if e[1].get("kind") == "game"
+    ]
+    assert told == [("media.playback_abandoned", "game", 430.0)]
+
+
+async def test_a_game_played_as_long_as_it_takes_is_told_once(app: FastAPI, media: MediaHarness) -> None:
+    """#351: once a member played a game, in all, as long as its main story takes,
+    ``media.game_length_reached`` — once; a game of no known length never."""
+    people = await users(app, media, "zoe")
+    zoe = people["zoe"]
+    romm = uuid4()
+    async with media.database.unit_of_work() as uow:
+        crash, other = (
+            MediaObject(
+                kind="game",
+                title=title,
+                sort_title=title.lower(),
+                effective={"title": title, **extra},
+                field_provenance={},
+                status="active",
+                first_seen_at=NOW,
+                created_at=NOW,
+                updated_at=NOW,
+            )
+            for title, extra in (("Crash", {"duration_s": 3600.0}), ("Unknown", {}))
+        )
+        uow.session.add_all([crash, other])
+        await uow.session.flush()
+
+        def session(ref: str, game: MediaObject, hours_ago: float, played_s: float) -> Activity:
+            return Activity(
+                service_id=romm,
+                ref=ref,
+                family="romm",
+                priority=10,
+                counted=True,
+                external_user_id="1",
+                user_id=zoe,
+                kind="game",
+                title=game.title,
+                object_id=game.id,
+                ids={},
+                started_at=NOW - timedelta(hours=hours_ago),
+                stopped_at=NOW - timedelta(hours=hours_ago) + timedelta(seconds=played_s),
+                watched_s=played_s,
+                received_at=NOW,
+            )
+
+        uow.session.add_all(
+            [
+                _link(zoe, romm, NOW - timedelta(days=20)),
+                session("session:1", crash, 50, 1800.0),
+                session("session:2", crash, 30, 1500.0),
+                session("session:3", other, 30, 7200.0),
+            ]
+        )
+    rewards = HistoryRewards(
+        media.database, media.module.history.events, media.module.threshold, clock=FixedClock(NOW)
+    )
+    await rewards.run()
+    await media.dispatch()
+    assert not [e for e in await media.events() if e[0] == "media.game_length_reached"]  # 55 min of 1 h
+    async with media.database.unit_of_work() as uow:
+        uow.session.add(session("session:4", crash, 3, 600.0))
+    await rewards.run()
+    async with media.database.unit_of_work() as uow:
+        uow.session.add(session("session:5", crash, 2, 900.0))  # beyond: told once only
+    await rewards.run()
+    await media.dispatch()
+    reached = [e for e in await media.events() if e[0] == "media.game_length_reached"]
+    assert len(reached) == 1 and reached[0][2] == str(zoe)
+    assert reached[0][1]["object"] == str(crash.id) and reached[0][1]["length_s"] == 3600.0
+    assert reached[0][1]["played_s"] == 3900.0
+
+
+async def test_a_game_played_never_takes_the_game_s_length(app: FastAPI, media: MediaHarness) -> None:
+    """#351: a game's length (HowLongToBeat, 5 h) is no play's: a day told « played » without its minutes
+    stays without time — never the hours a film seen without minutes would take."""
+    romm = uuid4()
+    async with media.database.unit_of_work() as uow:
+        crash = MediaObject(
+            kind="game",
+            title="Crash",
+            sort_title="crash",
+            effective={"title": "Crash", "duration_s": 18938.0},
+            field_provenance={},
+            status="active",
+            first_seen_at=NOW,
+            created_at=NOW,
+            updated_at=NOW,
+        )
+        uow.session.add(crash)
+        await uow.session.flush()
+        uow.session.add(
+            SourceItem(
+                object_id=crash.id,
+                service_id=romm,
+                source_system="romm",
+                capability="media.library",
+                external_id="6601",
+                kind="game",
+                active=True,
+                availability="available",
+                payload={"title": "Crash", "duration_s": 18938.0},
+                payload_hash="x",
+                observed_at=NOW,
+                first_seen_at=NOW,
+                last_seen_at=NOW,
+            )
+        )
+    told = [
+        SourceActivity(
+            ref="played:6601:2026-10-13",
+            external_user_id="1",
+            kind="game",
+            title="Crash",
+            started_at=NOW,
+            stopped_at=NOW,
+            item_external_id="6601",
+            family="romm",
+        ),
+        SourceActivity(
+            ref="session:1",
+            external_user_id="1",
+            kind="game",
+            title="Crash",
+            started_at=NOW - timedelta(minutes=7),
+            stopped_at=NOW,
+            watched_s=430.0,
+            item_external_id="6601",
+            family="romm",
+        ),
+    ]
+    assert await media.module.ingestor.store(romm, told) == 2
+    async with media.database.session() as session:
+        rows = {a.ref: a for a in (await session.execute(select(Activity))).scalars()}
+    assert rows["played:6601:2026-10-13"].object_id == crash.id
+    assert (
+        rows["played:6601:2026-10-13"].watched_s == 0.0 and rows["played:6601:2026-10-13"].duration_s is None
+    )
+    assert rows["session:1"].watched_s == 430.0 and rows["session:1"].duration_s is None
