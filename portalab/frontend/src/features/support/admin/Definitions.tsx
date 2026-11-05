@@ -20,6 +20,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import type { FieldDef } from "../tickets/api";
+import { DEFAULT_PROBLEMS, PROBLEM_FIELD, problemIcon } from "../tickets/ReportMedia";
 import { FieldsBuilder } from "./FieldsBuilder";
 import "../support.css";
 import "../../gamification/gamification.css";
@@ -250,6 +251,72 @@ export function FormEditor({ form, onDone }: { form?: FormRow; onDone: () => voi
   );
 }
 
+/**
+ * Issue 354: the kinds of problem « Report a problem » offers on a media's page (subtitles, sound, the
+ * language…) — the type's ``problem`` choice, edited as a list; empty, the portal's own kinds are offered.
+ */
+function MediaProblems({ fields, onChange }: { fields: FieldDef[]; onChange: (fields: FieldDef[]) => void }) {
+  const t = useT();
+  const own = fields.find((f) => f.key === PROBLEM_FIELD);
+  const others = fields.filter((f) => f.key !== PROBLEM_FIELD);
+  const list = own?.options ?? DEFAULT_PROBLEMS.map((key) => t(`support:media.kind.${key}`));
+  const set = (options: string[]) =>
+    onChange(
+      options.length
+        ? [
+            {
+              key: PROBLEM_FIELD,
+              label: own?.label ?? t("support:media.what"),
+              type: "select",
+              required: true,
+              options,
+            },
+            ...others,
+          ]
+        : others,
+    );
+  return (
+    <fieldset className="gam-fieldset support-problems">
+      <legend>{t("support:media.problems")}</legend>
+      <p className="admin-muted">{t("support:media.problemsHint")}</p>
+      <ol className="support-problems__list">
+        {list.map((label, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: a row of the list being typed, its place is its id
+          <li key={index}>
+            <Icon name={problemIcon(label)} size={16} />
+            <span className="ds-field">
+              <input
+                aria-label={t("support:media.problemsLabel", { index: index + 1 })}
+                value={label}
+                maxLength={80}
+                onChange={(e) => set(list.map((l, i) => (i === index ? e.target.value : l)))}
+              />
+            </span>
+            <Button
+              variant="ghost"
+              aria-label={t("support:media.problemsRemove", { label })}
+              onClick={() => set(list.filter((_, i) => i !== index))}
+            >
+              <Icon name="trash" size={16} />
+            </Button>
+          </li>
+        ))}
+      </ol>
+      <div className="support-problems__actions">
+        <Button variant="secondary" onClick={() => set([...list, ""])}>
+          <Icon name="plus" size={16} />
+          {t("support:media.problemsAdd")}
+        </Button>
+        {own ? (
+          <Button variant="ghost" onClick={() => onChange(others)}>
+            {t("support:media.problemsReset")}
+          </Button>
+        ) : null}
+      </div>
+    </fieldset>
+  );
+}
+
 function TypeEditor({
   type,
   onDone,
@@ -322,7 +389,18 @@ function TypeEditor({
       </FormGrid>
       <fieldset className="gam-fieldset">
         <legend>{t("support:types.fields")}</legend>
-        <FieldsBuilder fields={draft.fields} onChange={(fields) => patch({ fields })} staffOnly />
+        {/* issue 354: a media type's kinds of problem have their own editor, above */}
+        <FieldsBuilder
+          fields={draft.media ? draft.fields.filter((f) => f.key !== PROBLEM_FIELD) : draft.fields}
+          onChange={(fields) =>
+            patch({
+              fields: draft.media
+                ? [...draft.fields.filter((f) => f.key === PROBLEM_FIELD), ...fields]
+                : fields,
+            })
+          }
+          staffOnly
+        />
       </fieldset>
       <CheckboxField
         label={t("support:forms.enabled")}
@@ -335,6 +413,7 @@ function TypeEditor({
         checked={Boolean(draft.media)}
         onChange={(e) => patch({ media: e.target.checked })}
       />
+      {draft.media ? <MediaProblems fields={draft.fields} onChange={(fields) => patch({ fields })} /> : null}
       {save.isError ? (
         <p role="alert" className="services-admin__ko">
           {errorText(save.error, t("support:admin.invalid"))}

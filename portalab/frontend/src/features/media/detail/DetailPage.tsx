@@ -953,6 +953,11 @@ export function DetailPage() {
   const details =
     metadata.data ?? (fallback ? normalize({ ...fallback.metadata, title: media.title }) : undefined);
   const enriched = Boolean(details);
+  const shownPoster = poster ?? metadataImage(metadata.data?.posters?.[0] ?? fallback?.poster, "w342");
+  // issue 354: what the dialogs about this title say under its name
+  const dialogFacts = [media.year ? String(media.year) : null, t(`media:kind.${media.kind}`)]
+    .filter(Boolean)
+    .join(" · ");
   // #92: a book's head tells its length and readers' rating, as a film's does (its genres come below)
   const bookFacts =
     BOOKS.includes(media.kind) && info
@@ -970,7 +975,7 @@ export function DetailPage() {
         level={2}
         title={media.title}
         kind={media.kind}
-        poster={poster ?? metadataImage(metadata.data?.posters?.[0] ?? fallback?.poster, "w342")}
+        poster={shownPoster}
         backdrop={metadataImage(details?.backdrop ?? details?.backdrops?.[0] ?? fallback?.backdrop, "w1280")}
         facts={[
           media.year ? String(media.year) : null,
@@ -1003,13 +1008,18 @@ export function DetailPage() {
             <TasteButtons objectId={media.id} title={media.title} compact />
           ) : null}
           {/* issue 355: my review (a rating, a few words), in a dialog */}
-          <ReviewButton objectId={media.id} title={media.title} />
+          <ReviewButton objectId={media.id} title={media.title} poster={shownPoster} facts={dialogFacts} />
           {/* issue 299: a series followed brings its new episodes into « Mon fil » */}
           {media.kind === "series" ? <FollowButton kind="title" value={media.id} name={media.title} /> : null}
           {/* 030: what plugins add to a title's page (« + Playlist »…), drawn by Portalab */}
           <PluginSlot name="media.actions" params={{ item: media.id }} />
           {/* issue 354: a problem with it (subtitles, language, a cut file…) — a ticket about this media */}
-          <ReportMediaProblem objectId={media.id} title={media.title} />
+          <ReportMediaProblem
+            objectId={media.id}
+            title={media.title}
+            poster={shownPoster}
+            facts={dialogFacts}
+          />
         </div>
       </TitleHero>
       <LeavingNotice objectId={media.id} title={media.title} />
@@ -1027,7 +1037,7 @@ export function DetailPage() {
         <WorkCollection objectId={media.id} />
       ) : null}
       {/* issue 355: what the members thought of it — and mine, once seen, read or played */}
-      <Reviews objectId={media.id} title={media.title} />
+      <Reviews objectId={media.id} title={media.title} poster={shownPoster} facts={dialogFacts} />
       <div className="media-sections">
         {SECTIONS.filter(
           (name) =>

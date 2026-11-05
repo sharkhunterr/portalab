@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
@@ -40,7 +40,7 @@ function show(types: unknown[]) {
   render(
     <QueryClientProvider client={client}>
       <MemoryRouter>
-        <ReportMediaProblem objectId="m-1" title="Alien" />
+        <ReportMediaProblem objectId="m-1" title="Alien" poster="/poster.jpg" facts="1979 · Film" />
       </MemoryRouter>
     </QueryClientProvider>,
   );
@@ -64,6 +64,31 @@ describe("report a problem with a media", () => {
       title: "Subtitles — “Alien”",
     });
     expect(await screen.findByRole("link", { name: /See my ticket/ })).toBeTruthy();
+  });
+
+  it("offers the kinds of problem the administrators set, under the title's poster", async () => {
+    const own = {
+      ...MEDIA_TYPE,
+      fields: [
+        {
+          key: "problem",
+          label: "Quoi ?",
+          type: "select",
+          required: true,
+          options: ["Pas de VF", "Son décalé"],
+        },
+      ],
+    };
+    const sent = show([own]);
+    fireEvent.click(await screen.findByRole("button", { name: /Report a problem/ }));
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog.querySelector("img.media-dialog__poster")?.getAttribute("src")).toBe("/poster.jpg");
+    expect(within(dialog).getByText("1979 · Film")).toBeTruthy();
+    expect(within(dialog).queryByRole("radio", { name: "Subtitles" })).toBeNull(); // the portal's own: not offered
+    fireEvent.click(within(dialog).getByRole("radio", { name: "Son décalé" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: /Send the report/ }));
+    await vi.waitFor(() => expect(sent).toHaveLength(1));
+    expect(sent[0]).toMatchObject({ fields: { problem: "Son décalé" }, title: "Son décalé — “Alien”" });
   });
 
   it("shows no button when no type takes media reports", async () => {

@@ -101,11 +101,14 @@ export function NewTicketForm({
         required
       >
         <option value="">—</option>
-        {(types.data ?? []).map((x) => (
-          <option key={x.key} value={x.key}>
-            {x.label}
-          </option>
-        ))}
+        {/* issue 354: a media report is made from the media's page (« Report a problem »), tied to it */}
+        {(types.data ?? [])
+          .filter((x) => !x.media)
+          .map((x) => (
+            <option key={x.key} value={x.key}>
+              {x.label}
+            </option>
+          ))}
       </SelectField>
       <ServicePicker value={serviceId} onChange={setServiceId} />
       <div className="ds-field">
