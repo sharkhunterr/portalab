@@ -50,6 +50,7 @@ STATES = ("playing", "paused", "stopped", "finished")
 FINISHED = 0.995  # a book read to here is finished
 # #256: a sitting nothing has been heard of for this long is over (its page went away without a word)
 IDLE = timedelta(minutes=30)
+HEARD_SLACK_S = 5.0  # #353: a report's own lateness, on top of 3x the time between two reports
 ENDINGS = ("media.playback_finished", "media.playback_abandoned")
 AUDIO_FORMAT = "audio"
 
@@ -431,6 +432,7 @@ class BookService:
             row = await session.get(
                 BookPosition, (ticket.user, ticket.object_id, format), with_for_update=True
             )
+            last: tuple[float, datetime] | None = None
             if row is None:
                 await session.execute(
                     insert(BookPosition)
@@ -451,6 +453,8 @@ class BookService:
                 )
                 row = await session.get(BookPosition, (ticket.user, ticket.object_id, format))
             else:
+                # #353: where the last report left the player, and when — what an audiobook heard since
+                last = (float(row.position), row.updated_at) if _number(row.position) else None
                 row.service_id, row.external_id = ticket.service, ticket.item
                 row.file_ref, row.position, row.track = file_ref, position[:2000], track
                 row.percent, row.updated_at = percent, now
@@ -463,7 +467,13 @@ class BookService:
                     # a new sitting (or the same page back from the browser's cache once its sitting ended)
                     row.session_ref, row.session_start_s = ticket.session[:64], position_s
                     row.session_started_at, row.session_ended_at = now, None
-                watched = _watched(kind, position_s, row.session_start_s, now - row.session_started_at)
+                    row.session_watched_s, last = None, None
+                if kind == "book":
+                    watched = _watched(kind, position_s, row.session_start_s, now - row.session_started_at)
+                else:  # #353: what was heard report after report — a jump (a chapter skipped) is not heard
+                    watched = (row.session_watched_s or 0.0) + (
+                        _heard(position_s, *last, now) if last is not None else 0.0
+                    )
                 row.session_watched_s = watched
             name = self._event(state, seq, row.event_at if row is not None else None, now)
             if name is None:
@@ -605,6 +615,15 @@ class BookService:
         if last is None or now - last >= every:
             return "media.playback_progressed"
         return None
+
+
+def _heard(position_s: float, last_s: float, last_at: datetime, now: datetime) -> float:
+    """#353: what an audiobook played between two reports — forward, and no faster than 3x (a fast
+    listener); a jump forward or back (a chapter picked, a skip) counts nothing."""
+    gone = position_s - last_s
+    if gone <= 0 or gone > max(0.0, (now - last_at).total_seconds()) * 3 + HEARD_SLACK_S:
+        return 0.0
+    return gone
 
 
 def _watched(kind: str, position_s: float, start_s: float | None, elapsed: timedelta) -> float:
