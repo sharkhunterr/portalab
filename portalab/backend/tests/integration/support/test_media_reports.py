@@ -110,6 +110,7 @@ async def test_a_media_s_tickets_on_its_page(
     assert mine["open"] == 1 and mine["items"][0]["mine"] is True and mine["staff"] is False
 
     await login(client, "ulrich")  # a private type: another member sees nothing of it
+    assert (await client.get("/api/v1/media-tickets/open")).json() == {}
     assert (await client.get(f"/api/v1/tickets/media/{media}")).json() == {
         "open": 0,
         "closed": 0,
@@ -123,6 +124,7 @@ async def test_a_media_s_tickets_on_its_page(
     )
     assert shared.json()["public"] is True
     await login(client, "ulrich")
+    assert (await client.get("/api/v1/media-tickets/open")).json() == {str(media): 1}
     seen = (await client.get(f"/api/v1/tickets/media/{media}")).json()
     assert (
         seen["open"] == 1
@@ -147,6 +149,7 @@ async def test_a_media_s_tickets_on_its_page(
     await client.post(f"/api/v1/tickets/{tid}/transition", json={"transition": "resolve"})
     await login(client, "ulrich")
     after = (await client.get(f"/api/v1/tickets/media/{media}")).json()
+    assert (await client.get("/api/v1/media-tickets/open")).json() == {}  # resolved: no badge
     assert after["open"] == 0 and after["closed"] == 1 and after["items"] == []  # the closed ones on demand
     every = (await client.get(f"/api/v1/tickets/media/{media}?closed=true")).json()
     assert [t["open"] for t in every["items"]] == [False]

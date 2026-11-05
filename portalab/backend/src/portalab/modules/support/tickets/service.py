@@ -394,6 +394,22 @@ class TicketService:
             return True
         return utc_now(self.clock) - ticket.resolved_at <= timedelta(days=max(0, config.reopen_window_days))
 
+    async def open_on_media(self, principal: Principal) -> dict[UUID, int]:
+        """#354: per media, how many open tickets about it this member may see (theirs, a public type's; the
+        team: all) — the warning badge on the posters."""
+        me = self.user_of(principal)
+        staff = await self.allowed(principal, TICKETS_MANAGE)
+        query = (
+            select(Ticket.media_id, func.count())
+            .where(Ticket.media_id.is_not(None), Ticket.resolved_at.is_(None), Ticket.closed_at.is_(None))
+            .group_by(Ticket.media_id)
+        )
+        if not staff:
+            public = select(TicketType.key).where(TicketType.public.is_(True))
+            query = query.where(or_(Ticket.requester_id == me, Ticket.type_key.in_(public)))
+        async with self.database.session() as session:
+            return {media: int(count) for media, count in (await session.execute(query)).all() if media}
+
     async def about_media(
         self, principal: Principal, media_id: UUID, *, closed: bool = False
     ) -> tuple[list[tuple[Ticket, bool]], int, int, bool]:

@@ -2,6 +2,7 @@ import { type ReactNode, useState } from "react";
 import { Link } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
+import { PosterTickets } from "../support/tickets/MediaTickets";
 import { imageUrl, type MediaCard } from "./api";
 import { PosterBadge } from "./discover/StatusBadge";
 
@@ -56,6 +57,7 @@ export function MediaGrid({
           <Link to={`/media/${item.id}`} className="media-card__link">
             <span className="media-card__frame">
               <Poster src={imageUrl(item.image_id)} kind={item.kind} />
+              <PosterTickets mediaId={item.id} />
               {badge ? (
                 badge(item)
               ) : (

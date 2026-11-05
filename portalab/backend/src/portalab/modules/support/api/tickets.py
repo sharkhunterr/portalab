@@ -307,6 +307,12 @@ async def create(principal: Requester, body: TicketCreateIn, module: Module) -> 
     return detail(await module.tickets.view(ticket.id, principal))
 
 
+@router.get("/media-tickets/open", response_model=dict[str, int])
+async def open_media_tickets(principal: Requester, module: Module) -> dict[str, int]:
+    """#354: per media, how many open tickets about it I may see — the warning badge on its posters."""
+    return {str(media): count for media, count in (await module.tickets.open_on_media(principal)).items()}
+
+
 @router.get("/tickets/media/{media_id}", response_model=MediaTicketsOut)
 async def media_tickets(
     principal: Requester, media_id: UUID, module: Module, closed: bool = False

@@ -8,6 +8,7 @@ import { personPath } from "../../media/api";
 import { metadataImage } from "../../media/detail/Enrichment";
 import { PosterBadge } from "../../media/discover/StatusBadge";
 import { Poster } from "../../media/MediaGrid";
+import { PosterTickets } from "../../support/tickets/MediaTickets";
 import { type GroupOut, type ItemOut, kindKey, runSearch, type SearchParams } from "../api";
 import { badgesOf, mediaGroup, ResultBadges, rolesOf, SourceIcon } from "../presentation";
 
@@ -71,6 +72,7 @@ function PosterResult({ item }: { item: ItemOut }) {
         <span className="media-card__frame search-poster__frame">
           <Poster src={src} kind={item.facets?.type ?? "movie"} />
           <PosterBadge status={status} />
+          <PosterTickets mediaId={/^\/media\/([0-9a-f-]{36})/.exec(item.url_ref ?? "")?.[1]} />
         </span>
         <span className="search-poster__title">{item.title}</span>
       </Link>

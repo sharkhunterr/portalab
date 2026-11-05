@@ -8,6 +8,7 @@ import { Poster } from "../MediaGrid";
 import { type DiscoverShelf, type Requestable, useDiscoverShelf } from "./api";
 import { StatusBadge } from "./StatusBadge";
 import "./discover.css";
+import { PosterTickets } from "../../support/tickets/MediaTickets";
 
 /** A title one can ask for, as a poster card: its state on the poster, a click to its page. */
 export function RequestableCard({ item }: { item: Requestable }) {
@@ -17,6 +18,7 @@ export function RequestableCard({ item }: { item: Requestable }) {
       <Link to={item.route} className="media-card__link">
         <span className="media-card__frame">
           <Poster src={metadataImage(item.poster, "w342")} kind={item.kind} />
+          <PosterTickets mediaId={item.object_id} />
           <span className="discover-card__badge">
             <StatusBadge item={item} />
           </span>

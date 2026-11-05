@@ -9352,6 +9352,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media-tickets/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Open Media Tickets
+         * @description #354: per media, how many open tickets about it I may see — the warning badge on its posters.
+         */
+        get: operations["open_media_tickets_api_v1_media_tickets_open_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/artwork-images": {
         parameters: {
             query?: never;
@@ -38333,6 +38353,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_media_tickets_api_v1_media_tickets_open_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
                 };
             };
         };

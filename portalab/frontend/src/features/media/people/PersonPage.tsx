@@ -14,6 +14,7 @@ import { PosterBadge, StatusBadge } from "../discover/StatusBadge";
 import { FollowButton } from "../feed/FollowButton";
 import { MediaGrid, Poster } from "../MediaGrid";
 import "../media.css";
+import { PosterTickets } from "../../support/tickets/MediaTickets";
 
 /**
  * #92 — a person's page: an actor's, a director's, an author's, a narrator's. What the configured
@@ -225,6 +226,7 @@ function KnownCard({ credit, askable }: { credit: Credit; askable: boolean }) {
       <span className="media-card__frame">
         <Poster src={src} kind={credit.kind} />
         <PosterBadge status={credit.status} />
+        <PosterTickets mediaId={credit.object_id} />
       </span>
       <span className="media-card__title">{credit.title}</span>
     </>
