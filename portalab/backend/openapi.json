@@ -11584,6 +11584,89 @@
         "title": "MediaSplitIn",
         "type": "object"
       },
+      "MediaTicketOut": {
+        "description": "#354: a ticket about a media as its page lists it \u2014 its title and state, never who opened it nor\nwhat they wrote (a public type's tickets are seen by every member).",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "mine": {
+            "title": "Mine",
+            "type": "boolean"
+          },
+          "open": {
+            "title": "Open",
+            "type": "boolean"
+          },
+          "reference": {
+            "title": "Reference",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "reference",
+          "title",
+          "state",
+          "open",
+          "mine",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "MediaTicketOut",
+        "type": "object"
+      },
+      "MediaTicketsOut": {
+        "properties": {
+          "closed": {
+            "title": "Closed",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MediaTicketOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "open": {
+            "title": "Open",
+            "type": "integer"
+          },
+          "staff": {
+            "title": "Staff",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "open",
+          "closed",
+          "staff",
+          "items"
+        ],
+        "title": "MediaTicketsOut",
+        "type": "object"
+      },
       "MemberDetailOut": {
         "properties": {
           "coins": {
@@ -20468,6 +20551,11 @@
             "title": "Media",
             "type": "boolean"
           },
+          "public": {
+            "default": false,
+            "title": "Public",
+            "type": "boolean"
+          },
           "workflow_key": {
             "default": "baseline",
             "maxLength": 60,
@@ -20511,6 +20599,11 @@
           "media": {
             "default": false,
             "title": "Media",
+            "type": "boolean"
+          },
+          "public": {
+            "default": false,
+            "title": "Public",
             "type": "boolean"
           },
           "updated_at": {
@@ -21888,6 +21981,11 @@
           "media": {
             "default": false,
             "title": "Media",
+            "type": "boolean"
+          },
+          "public": {
+            "default": false,
+            "title": "Public",
             "type": "boolean"
           }
         },
@@ -55549,6 +55647,60 @@
           }
         },
         "summary": "Get Draft",
+        "tags": [
+          "support"
+        ]
+      }
+    },
+    "/api/v1/tickets/media/{media_id}": {
+      "get": {
+        "description": "#354: the tickets about a media I may see \u2014 mine, and those of a public type (the team: all); the open\nones, and the closed ones too on demand.",
+        "operationId": "media_tickets_api_v1_tickets_media__media_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "media_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Media Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "closed",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Closed",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaTicketsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Media Tickets",
         "tags": [
           "support"
         ]

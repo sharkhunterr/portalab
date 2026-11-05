@@ -63,6 +63,7 @@ class TicketTypeOut(BaseModel):
     label: str
     fields: list[dict[str, Any]]
     media: bool = False  # #354: the type a problem with a media is reported in
+    public: bool = False  # #354: its tickets shown to every member on the media's page
 
 
 class TicketCreateIn(BaseModel):
@@ -135,6 +136,27 @@ class TicketDetail(TicketCard):
     staff: bool
     # 027: the feedback it was made from — its form, when, its answers under their labels
     feedback: dict[str, Any] | None = None
+
+
+class MediaTicketOut(BaseModel):
+    """#354: a ticket about a media as its page lists it — its title and state, never who opened it nor
+    what they wrote (a public type's tickets are seen by every member)."""
+
+    id: UUID
+    reference: str
+    title: str
+    state: str
+    open: bool
+    mine: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+class MediaTicketsOut(BaseModel):
+    open: int
+    closed: int
+    staff: bool  # the team opens any of them in its queue
+    items: list[MediaTicketOut]
 
 
 class TicketQueueOut(BaseModel):
@@ -247,7 +269,9 @@ async def types(principal: Requester, module: Module) -> list[TicketTypeOut]:
     out = []
     for row in await module.definitions.types():
         fields = [f for f in row.fields if staff or f.get("visibility") != "staff_only"]
-        out.append(TicketTypeOut(key=row.key, label=row.label, fields=fields, media=row.media))
+        out.append(
+            TicketTypeOut(key=row.key, label=row.label, fields=fields, media=row.media, public=row.public)
+        )
     return out
 
 
@@ -280,6 +304,33 @@ async def create(principal: Requester, body: TicketCreateIn, module: Module) -> 
     if body.draft_id is not None:
         await module.diagnosis.consume_draft(body.draft_id)
     return detail(await module.tickets.view(ticket.id, principal))
+
+
+@router.get("/tickets/media/{media_id}", response_model=MediaTicketsOut)
+async def media_tickets(
+    principal: Requester, media_id: UUID, module: Module, closed: bool = False
+) -> MediaTicketsOut:
+    """#354: the tickets about a media I may see — mine, and those of a public type (the team: all); the open
+    ones, and the closed ones too on demand."""
+    items, still, done, staff = await module.tickets.about_media(principal, media_id, closed=closed)
+    return MediaTicketsOut(
+        open=still,
+        closed=done,
+        staff=staff,
+        items=[
+            MediaTicketOut(
+                id=t.id,
+                reference=f"T-{t.number:06d}",
+                title=t.title,
+                state=t.state,
+                open=t.resolved_at is None and t.closed_at is None,
+                mine=mine,
+                created_at=t.created_at,
+                updated_at=t.updated_at,
+            )
+            for t, mine in items
+        ],
+    )
 
 
 @router.get("/me/tickets", response_model=list[TicketCard])

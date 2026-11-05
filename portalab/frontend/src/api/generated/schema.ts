@@ -11262,6 +11262,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/tickets/media/{media_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Media Tickets
+         * @description #354: the tickets about a media I may see — mine, and those of a public type (the team: all); the open
+         *     ones, and the closed ones too on demand.
+         */
+        get: operations["media_tickets_api_v1_tickets_media__media_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tickets/precheck": {
         parameters: {
             query?: never;
@@ -16323,6 +16344,49 @@ export interface components {
              */
             merge: string;
         };
+        /**
+         * MediaTicketOut
+         * @description #354: a ticket about a media as its page lists it — its title and state, never who opened it nor
+         *     what they wrote (a public type's tickets are seen by every member).
+         */
+        MediaTicketOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Mine */
+            mine: boolean;
+            /** Open */
+            open: boolean;
+            /** Reference */
+            reference: string;
+            /** State */
+            state: string;
+            /** Title */
+            title: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** MediaTicketsOut */
+        MediaTicketsOut: {
+            /** Closed */
+            closed: number;
+            /** Items */
+            items: components["schemas"]["MediaTicketOut"][];
+            /** Open */
+            open: number;
+            /** Staff */
+            staff: boolean;
+        };
         /** MemberDetailOut */
         MemberDetailOut: {
             coins: components["schemas"]["ValueDetailOut"];
@@ -19290,6 +19354,11 @@ export interface components {
              */
             media: boolean;
             /**
+             * Public
+             * @default false
+             */
+            public: boolean;
+            /**
              * Workflow Key
              * @default baseline
              */
@@ -19315,6 +19384,11 @@ export interface components {
              * @default false
              */
             media: boolean;
+            /**
+             * Public
+             * @default false
+             */
+            public: boolean;
             /**
              * Updated At
              * Format: date-time
@@ -19827,6 +19901,11 @@ export interface components {
              * @default false
              */
             media: boolean;
+            /**
+             * Public
+             * @default false
+             */
+            public: boolean;
         };
         /** Tier */
         Tier: {
@@ -41816,6 +41895,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TicketDraftOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    media_tickets_api_v1_tickets_media__media_id__get: {
+        parameters: {
+            query?: {
+                closed?: boolean;
+            };
+            header?: never;
+            path: {
+                media_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaTicketsOut"];
                 };
             };
             /** @description Validation Error */

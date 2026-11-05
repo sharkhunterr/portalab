@@ -68,6 +68,8 @@ interface TypeRow {
   enabled: boolean;
   /** issue 354: the type « Report a problem » on a media's page opens (one at most) */
   media?: boolean;
+  /** issue 354: its tickets shown to every member on the media's page */
+  public?: boolean;
   version: number;
 }
 
@@ -349,6 +351,7 @@ function TypeEditor({
           body: {
             ...body,
             media: Boolean(body.media),
+            public: Boolean(body.public),
             fields: body.fields as unknown as Array<Record<string, unknown>>,
           },
         })
@@ -413,6 +416,14 @@ function TypeEditor({
         checked={Boolean(draft.media)}
         onChange={(e) => patch({ media: e.target.checked })}
       />
+      {draft.media ? (
+        <CheckboxField
+          label={t("support:types.public")}
+          hint={t("support:types.publicHint")}
+          checked={Boolean(draft.public)}
+          onChange={(e) => patch({ public: e.target.checked })}
+        />
+      ) : null}
       {draft.media ? <MediaProblems fields={draft.fields} onChange={(fields) => patch({ fields })} /> : null}
       {save.isError ? (
         <p role="alert" className="services-admin__ko">
@@ -590,6 +601,7 @@ function TypesPanel() {
             </div>
             <span className="gam-card__actions">
               {type.media ? <StatusBadge tone="info">{t("support:types.mediaBadge")}</StatusBadge> : null}
+              {type.public ? <StatusBadge tone="ok">{t("support:types.publicBadge")}</StatusBadge> : null}
               {!type.enabled ? (
                 <StatusBadge tone="neutral">{t("support:forms.state.off")}</StatusBadge>
               ) : null}

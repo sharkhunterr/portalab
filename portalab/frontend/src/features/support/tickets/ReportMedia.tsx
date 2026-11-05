@@ -103,6 +103,7 @@ export function ReportMediaProblem({
           setKind("");
           setValues({});
           void client.invalidateQueries({ queryKey: ["support", "mine"] });
+          void client.invalidateQueries({ queryKey: ["support", "media", objectId] });
         },
       },
     );

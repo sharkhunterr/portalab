@@ -92,3 +92,59 @@ async def test_a_portal_takes_media_reports_from_the_start(
     await support.module.definitions.ensure_baseline()
     kinds = {t["key"]: t["media"] for t in (await client.get("/api/v1/admin/support/types")).json()}
     assert kinds["mine"] is True and kinds["media_issue"] is False
+
+
+async def test_a_media_s_tickets_on_its_page(
+    client: httpx.AsyncClient, support: SupportHarness, people: dict[str, UUID]
+) -> None:
+    media = uuid4()
+    await login(client, "ursula")
+    made = await client.post(
+        "/api/v1/tickets",
+        json={"type_key": "media_issue", "title": "Sound — “Alien”", "media_id": str(media)},
+    )
+    assert made.status_code == 201, made.text
+    mine = (await client.get(f"/api/v1/tickets/media/{media}")).json()
+    assert mine["open"] == 1 and mine["items"][0]["mine"] is True and mine["staff"] is False
+
+    await login(client, "ulrich")  # a private type: another member sees nothing of it
+    assert (await client.get(f"/api/v1/tickets/media/{media}")).json() == {
+        "open": 0,
+        "closed": 0,
+        "staff": False,
+        "items": [],
+    }
+    await login(client, "boss")
+    shared = await client.put(
+        "/api/v1/admin/support/types/media_issue",
+        json={"label": "A problem with a media", "media": True, "public": True},
+    )
+    assert shared.json()["public"] is True
+    await login(client, "ulrich")
+    seen = (await client.get(f"/api/v1/tickets/media/{media}")).json()
+    assert (
+        seen["open"] == 1
+        and seen["items"][0]["title"] == "Sound — “Alien”"
+        and seen["items"][0]["mine"] is False
+    )
+    assert set(seen["items"][0]) == {
+        "id",
+        "reference",
+        "title",
+        "state",
+        "open",
+        "mine",
+        "created_at",
+        "updated_at",
+    }
+
+    await login(client, "sam")  # the team: all, and resolves it
+    assert (await client.get(f"/api/v1/tickets/media/{media}")).json()["staff"] is True
+    tid = made.json()["id"]
+    await client.post(f"/api/v1/tickets/{tid}/transition", json={"transition": "start"})
+    await client.post(f"/api/v1/tickets/{tid}/transition", json={"transition": "resolve"})
+    await login(client, "ulrich")
+    after = (await client.get(f"/api/v1/tickets/media/{media}")).json()
+    assert after["open"] == 0 and after["closed"] == 1 and after["items"] == []  # the closed ones on demand
+    every = (await client.get(f"/api/v1/tickets/media/{media}?closed=true")).json()
+    assert [t["open"] for t in every["items"]] == [False]
