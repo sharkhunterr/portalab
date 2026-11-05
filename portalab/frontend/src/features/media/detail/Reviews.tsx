@@ -74,15 +74,23 @@ function StarPicker({ value, onChange }: { value: number; onChange: (rating: num
 }
 
 /** My review in a dialog: give it, change it or take it back. */
+interface Shown {
+  objectId: string;
+  title: string;
+  /** the title's poster and facts, at the head of the dialog (issue 354) */
+  poster?: string | null | undefined;
+  facts?: string | undefined;
+}
+
 export function ReviewDialog({
   objectId,
   title,
+  poster,
+  facts,
   data,
   open,
   onOpenChange,
-}: {
-  objectId: string;
-  title: string;
+}: Shown & {
   data: ReviewsOut;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -125,7 +133,7 @@ export function ReviewDialog({
       trigger={null}
       open={open}
       onOpenChange={onOpenChange}
-      title={t("media:reviews.dialog", { title })}
+      title={t("media:reviews.dialogTitle")}
       closeLabel={t("media:reviews.cancel")}
       footer={
         <>
@@ -140,6 +148,19 @@ export function ReviewDialog({
         </>
       }
     >
+      <div className="media-dialog__head">
+        {poster ? (
+          <img className="media-dialog__poster" src={poster} alt="" />
+        ) : (
+          <span className="media-dialog__poster media-dialog__poster--none" aria-hidden="true">
+            <Icon name="film" size={28} />
+          </span>
+        )}
+        <div className="media-dialog__title">
+          <strong>{title}</strong>
+          {facts ? <span>{facts}</span> : null}
+        </div>
+      </div>
       <form
         id={formId}
         className="media-review__form"
@@ -167,7 +188,7 @@ export function ReviewDialog({
 }
 
 /** Issue 355: in the title's head — « Give my review » once seen, read or played; my rating once given. */
-export function ReviewButton({ objectId, title }: { objectId: string; title: string }) {
+export function ReviewButton({ objectId, title, poster, facts }: Shown) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const data = useReviews(objectId).data;
@@ -185,7 +206,15 @@ export function ReviewButton({ objectId, title }: { objectId: string; title: str
         <Icon name="star" size={16} />
         <span>{mine ? t("media:reviews.myRating", { rating: mine.rating }) : t("media:reviews.give")}</span>
       </button>
-      <ReviewDialog objectId={objectId} title={title} data={data} open={open} onOpenChange={setOpen} />
+      <ReviewDialog
+        objectId={objectId}
+        title={title}
+        poster={poster}
+        facts={facts}
+        data={data}
+        open={open}
+        onOpenChange={setOpen}
+      />
     </>
   );
 }
@@ -216,7 +245,7 @@ function Line({ review, onEdit }: { review: Review; onEdit?: () => void }) {
   );
 }
 
-export function Reviews({ objectId, title }: { objectId: string; title: string }) {
+export function Reviews({ objectId, title, poster, facts }: Shown) {
   const t = useT();
   const format = useFormat();
   const headingId = useId();
@@ -244,7 +273,15 @@ export function Reviews({ objectId, title }: { objectId: string; title: string }
         ))}
       </ul>
       {data.mine ? (
-        <ReviewDialog objectId={objectId} title={title} data={data} open={open} onOpenChange={setOpen} />
+        <ReviewDialog
+          objectId={objectId}
+          title={title}
+          poster={poster}
+          facts={facts}
+          data={data}
+          open={open}
+          onOpenChange={setOpen}
+        />
       ) : null}
     </section>
   );

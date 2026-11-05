@@ -1068,7 +1068,7 @@
   "reviews.cancel": "Annuler",
   "reviews.comment": "Un mot sur ce titre (facultatif)",
   "reviews.commentHint": "Ce que tu en as pensé, sans dévoiler la fin…",
-  "reviews.dialog": "Ton avis sur « {title} »",
+  "reviews.dialogTitle": "Ton avis",
   "reviews.edit": "Modifier mon avis",
   "reviews.error": "Ton avis n'a pas pu être enregistré.",
   "reviews.give": "Donner mon avis",

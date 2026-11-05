@@ -1926,3 +1926,27 @@
   align-items: center;
   gap: var(--space-1);
 }
+
+/* issue 354: a media type's kinds of problem, edited as a list */
+.support-problems__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.support-problems__list li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+.support-problems__list .ds-field {
+  margin: 0;
+}
+.support-problems__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block-start: var(--space-2);
+}

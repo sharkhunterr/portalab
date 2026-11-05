@@ -13,20 +13,60 @@ import "../support.css";
 
 /**
  * Issue 354: « Report a problem » on a media's page — subtitles missing, the wrong language, a cut file… A
- * ticket of the type the administrator chose for it (its own fields: what is wrong), about this media: the
- * team sees the media in the ticket and opens it in a click. No such type, or no tickets: no button. What is
- * wrong is picked first (subtitles, sound, image, language, the file, something else): it heads the ticket.
+ * ticket of the type that takes media reports, about this media (its poster heads the dialog): the team sees
+ * the media in the ticket and opens it in a click. What is wrong is picked first among the type's own kinds
+ * of problem (its ``problem`` choice, set by the administrators), else the portal's own; it heads the
+ * ticket's title. No such type, or no tickets: no button.
  */
-const PROBLEMS = [
-  { key: "subtitles", icon: "captions" },
-  { key: "sound", icon: "volume" },
-  { key: "image", icon: "image" },
-  { key: "language", icon: "globe" },
-  { key: "file", icon: "blocked" },
-  { key: "other", icon: "more" },
-] as const;
+export const PROBLEM_FIELD = "problem";
+export const DEFAULT_PROBLEMS = ["subtitles", "sound", "image", "language", "file", "other"] as const;
+const DEFAULT_ICONS: Record<string, string> = {
+  subtitles: "captions",
+  sound: "volume",
+  image: "image",
+  language: "globe",
+  file: "blocked",
+  other: "more",
+};
 
-export function ReportMediaProblem({ objectId, title }: { objectId: string; title: string }) {
+/** An icon for a kind of problem the administrators named, from its words. */
+export function problemIcon(label: string): string {
+  const words = label.toLocaleLowerCase();
+  if (/sous-titr|subtit|caption/.test(words)) return "captions";
+  if (/\bson\b|sound|audio|volume|bruit/.test(words)) return "volume";
+  if (/image|picture|vid[ée]o|qualit|pixel/.test(words)) return "image";
+  if (/langu|vf|vo\b|doubl/.test(words)) return "globe";
+  if (/fichier|file|coup|lecture|play|illisible/.test(words)) return "blocked";
+  return "flag";
+}
+
+/** The kinds of problem a media report offers: the type's own (``problem`` choice), else the portal's. */
+export function useProblems(
+  fields: FieldDef[] | undefined,
+): Array<{ value: string; label: string; icon: string }> {
+  const t = useT();
+  const own = fields?.find((f) => f.key === PROBLEM_FIELD && f.type === "select");
+  const options = (own?.options ?? []).filter((o): o is string => typeof o === "string" && o.trim() !== "");
+  if (options.length) return options.map((o) => ({ value: o, label: o, icon: problemIcon(o) }));
+  return DEFAULT_PROBLEMS.map((key) => ({
+    value: key,
+    label: t(`support:media.kind.${key}`),
+    icon: DEFAULT_ICONS[key] ?? "flag",
+  }));
+}
+
+export function ReportMediaProblem({
+  objectId,
+  title,
+  poster,
+  facts,
+}: {
+  objectId: string;
+  title: string;
+  poster?: string | null;
+  /** what the dialog says under the title: « 2026 · Film » */
+  facts?: string;
+}) {
   const t = useT();
   const formId = useId();
   const client = useQueryClient();
@@ -38,18 +78,21 @@ export function ReportMediaProblem({ objectId, title }: { objectId: string; titl
   const [values, setValues] = useState<Record<string, unknown>>({});
   const [created, setCreated] = useState<string | null>(null);
   const type = Array.isArray(types.data) ? types.data.find((x) => x.media) : undefined;
+  const defs = (type?.fields ?? []) as unknown as FieldDef[];
+  const problems = useProblems(defs);
   if (!type) return null;
+  const own = defs.some((f) => f.key === PROBLEM_FIELD && f.type === "select");
+  const others = defs.filter((f) => f.key !== PROBLEM_FIELD);
+  const chosen = problems.find((p) => p.value === kind);
   const submit = (event: FormEvent) => {
     event.preventDefault();
+    if (!chosen) return;
     create.mutate(
       {
         type_key: type.key,
-        title: t("support:media.ticketTitle", {
-          problem: t(`support:media.kind.${kind || "other"}`),
-          title,
-        }).slice(0, 200),
+        title: t("support:media.ticketTitle", { problem: chosen.label, title }).slice(0, 200),
         description: problem,
-        fields: values,
+        fields: own ? { ...values, [PROBLEM_FIELD]: chosen.value } : values,
         priority: "normal",
         media_id: objectId,
       },
@@ -68,7 +111,7 @@ export function ReportMediaProblem({ objectId, title }: { objectId: string; titl
     create.error instanceof ApiError ? ((create.error.extensions.fields as string[] | undefined) ?? []) : [];
   return (
     <Dialog
-      title={t("support:media.title", { title })}
+      title={t("support:media.title")}
       closeLabel={t("support:media.close")}
       open={open}
       onOpenChange={(next) => {
@@ -85,7 +128,7 @@ export function ReportMediaProblem({ objectId, title }: { objectId: string; titl
       trigger={
         <button
           type="button"
-          className="media-action media-action--icon"
+          className="media-action media-action--icon media-action--warn"
           title={t("support:media.report")}
           aria-label={t("support:media.report")}
         >
@@ -93,6 +136,19 @@ export function ReportMediaProblem({ objectId, title }: { objectId: string; titl
         </button>
       }
     >
+      <div className="media-dialog__head">
+        {poster ? (
+          <img className="media-dialog__poster" src={poster} alt="" />
+        ) : (
+          <span className="media-dialog__poster media-dialog__poster--none" aria-hidden="true">
+            <Icon name="film" size={28} />
+          </span>
+        )}
+        <div className="media-dialog__title">
+          <strong>{title}</strong>
+          {facts ? <span>{facts}</span> : null}
+        </div>
+      </div>
       {created ? (
         <p className="media-report__done" role="status">
           <Icon name="check" size={16} />
@@ -100,35 +156,30 @@ export function ReportMediaProblem({ objectId, title }: { objectId: string; titl
         </p>
       ) : (
         <form id={formId} onSubmit={submit} className="media-report__form">
-          <p className="media-report__lead">{t("support:media.lead")}</p>
           <fieldset className="media-report__kinds">
             <legend>{t("support:media.what")}</legend>
-            {PROBLEMS.map((item) => (
-              <label key={item.key} data-on={kind === item.key || undefined}>
+            {problems.map((item) => (
+              <label key={item.value} data-on={kind === item.value || undefined}>
                 <input
                   type="radio"
                   name={`${formId}-kind`}
-                  value={item.key}
-                  checked={kind === item.key}
-                  onChange={() => setKind(item.key)}
+                  value={item.value}
+                  checked={kind === item.value}
+                  onChange={() => setKind(item.value)}
                   className="visually-hidden"
                 />
                 <Icon name={item.icon} size={18} />
-                <span>{t(`support:media.kind.${item.key}`)}</span>
+                <span>{item.label}</span>
               </label>
             ))}
           </fieldset>
-          <FieldInputs
-            defs={type.fields as unknown as FieldDef[]}
-            values={values}
-            onChange={setValues}
-            errors={missing}
-          />
+          <FieldInputs defs={others} values={values} onChange={setValues} errors={missing} />
           <div className="ds-field">
             <label htmlFor={`${formId}-problem`}>{t("support:media.problem")}</label>
             <textarea
               id={`${formId}-problem`}
-              rows={4}
+              rows={3}
+              placeholder={t("support:media.lead")}
               value={problem}
               onChange={(e) => setProblem(e.target.value)}
             />

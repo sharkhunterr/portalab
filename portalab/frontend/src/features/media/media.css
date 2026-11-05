@@ -1542,17 +1542,22 @@ a.media-person__row:hover {
   gap: var(--space-2);
   margin-block-start: var(--space-3);
 }
-.media-taste--compact {
+.media-actions .media-taste--compact {
   display: inline-flex;
-  gap: var(--space-1);
+  align-items: center;
+  gap: var(--space-2);
   margin: 0;
+  padding: 0;
+  min-inline-size: 0;
 }
 .media-action {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
-  min-block-size: 2.25rem;
+  block-size: 2.25rem;
+  margin: 0;
   padding: var(--space-1) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
@@ -1564,7 +1569,18 @@ a.media-person__row:hover {
 }
 .media-action--icon {
   inline-size: 2.25rem;
+  block-size: 2.25rem;
   padding: 0;
+}
+/* the report's flag: the palette's warning colour, to be found at a glance */
+.media-action--warn {
+  border-color: var(--state-partial-fg);
+  background: var(--state-partial-bg);
+  color: var(--state-partial-fg);
+}
+.media-action--warn:hover {
+  border-color: var(--state-partial-fg);
+  background: color-mix(in srgb, var(--state-partial-fg) 24%, var(--state-partial-bg));
 }
 .media-action:hover {
   border-color: var(--color-accent);
@@ -1588,6 +1604,42 @@ a.media-person__row:hover {
   fill: currentColor;
 }
 
+/* issue 354: the media a dialog is about (a report, a review): its poster, its title */
+.media-dialog__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block-end: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+}
+.media-dialog__poster {
+  flex: none;
+  inline-size: 4rem;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  box-shadow: var(--shadow-1);
+}
+.media-dialog__poster--none {
+  display: grid;
+  place-items: center;
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
+}
+.media-dialog__title {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+.media-dialog__title strong {
+  font-size: var(--font-size-md, 1rem);
+}
+.media-dialog__title span {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
 /* issue 355: the members' reviews of a title, and mine in its dialog */
 .media-reviews {
   gap: var(--space-3);
