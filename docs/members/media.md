@@ -63,6 +63,8 @@ Under the title, one bar of small actions:
 - **Follow** for a series;
 - the flag, **Report a problem**: missing subtitles, the wrong language, a cut file, poor picture? Pick what is wrong (**Subtitles**, **Sound**, **Picture**, **Language**, **File unreadable or cut**, **Something else**), add details if needed, and **Send the report**. It is a support ticket about this title, which you follow in [My tickets](support.md); the team sees the title in it.
 
+While problems reported on the title are open, a beating **N open reports** badge sits in its head; it leads to **Reported problems** at the bottom of the page: yours (open them to follow them) and, when your portal shares them, the other members' — their title and state only, never who reported them — so a known problem is not reported twice. **Show the closed reports too** lists the ones dealt with.
+
 **Members' reviews**, lower on the page, shows the members' average rating and how many reviewed it, then the reviews — yours first, the others signed with their name, or **Anonymous** for a member who keeps to themselves in the community. It shows only once someone reviewed the title.
 
 ### Where to watch

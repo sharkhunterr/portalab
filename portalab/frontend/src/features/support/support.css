@@ -1993,3 +1993,87 @@
   gap: var(--space-2);
   margin-block-start: var(--space-2);
 }
+
+/* issue 354: a media's open tickets — a warning badge that beats in its head, their list at the bottom */
+.media-badge--tickets {
+  border: 1px solid var(--state-partial-fg);
+  background: var(--state-partial-bg);
+  color: var(--state-partial-fg);
+  font-weight: 700;
+  text-decoration: none;
+  animation: media-tickets-beat 1.6s ease-in-out infinite;
+}
+.media-badge--tickets:hover,
+.media-badge--tickets:focus-visible {
+  animation-play-state: paused;
+}
+@keyframes media-tickets-beat {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-partial-fg) 55%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--state-partial-fg) 0%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .media-badge--tickets {
+    animation: none;
+  }
+}
+.media-tickets {
+  gap: var(--space-3);
+  scroll-margin-block-start: var(--space-6, 4rem);
+}
+.media-tickets h3 .ds-icon {
+  color: var(--state-partial-fg);
+}
+.media-tickets__count {
+  margin-inline-start: auto;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.media-tickets__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.media-tickets__item {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-inline-start: 3px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+  color: inherit;
+  text-decoration: none;
+}
+li[data-open] > .media-tickets__item {
+  border-inline-start-color: var(--state-partial-fg);
+}
+a.media-tickets__item:hover {
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+.media-tickets__title {
+  font-weight: 600;
+}
+.media-tickets__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.media-tickets__none {
+  color: var(--color-text-muted);
+}
+.media-tickets__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}

@@ -54,6 +54,8 @@ Sous le titre, une barre de petites actions :
 - **« Suivre »** pour une série ;
 - le drapeau **« Signaler un problème »** : sous-titres manquants, mauvaise langue, fichier coupé, image ? Choisissez ce qui ne va pas (« Sous-titres », « Son », « Image », « Langue », « Fichier illisible ou coupé », « Autre chose »), précisez si besoin, puis **« Envoyer le signalement »**. C'est un ticket du support rattaché au titre, que vous suivez dans [Mes tickets](/support) ; l'équipe voit le titre dans le ticket.
 
+Tant que des problèmes signalés sur le titre sont en cours, un badge **« N signalements en cours »** bat dans son en-tête ; il mène à **« Signalements »**, en bas de la fiche : les vôtres (touchez-les pour les suivre) et, si votre portail les partage, ceux des autres membres — leur titre et leur état seulement, jamais qui les a faits — pour ne pas signaler deux fois un problème déjà connu. **« Afficher aussi les signalements fermés »** montre ceux qui sont réglés.
+
 Plus bas, **« Avis des membres »** donne la note moyenne et le nombre d'avis, puis les avis : le vôtre d'abord, les autres signés de leur nom, ou **« Anonyme »** pour un membre qui reste discret dans la communauté. La section n'apparaît qu'une fois un premier avis donné.
 
 Plus bas, selon le titre :

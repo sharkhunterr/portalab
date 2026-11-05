@@ -33,6 +33,7 @@ from portalab.modules.support.models import (
     TicketComment,
     TicketHistory,
     TicketTag,
+    TicketType,
 )
 from portalab.modules.support.settings import SupportConfig
 from portalab.modules.support.tickets.notify import ASSIGNMENT, STATUS, SupportNotifier
@@ -392,6 +393,26 @@ class TicketService:
         if ticket.resolved_at is None:
             return True
         return utc_now(self.clock) - ticket.resolved_at <= timedelta(days=max(0, config.reopen_window_days))
+
+    async def about_media(
+        self, principal: Principal, media_id: UUID, *, closed: bool = False
+    ) -> tuple[list[tuple[Ticket, bool]], int, int, bool]:
+        """#354: the tickets about a media this member may see — theirs, and those of a public type (the team:
+        all) — open first; with how many are open and closed. Each with whether it is the member's."""
+        me = self.user_of(principal)
+        staff = await self.allowed(principal, TICKETS_MANAGE)
+        async with self.database.session() as session:
+            query = select(Ticket).where(Ticket.media_id == media_id)
+            if not staff:
+                public = select(TicketType.key).where(TicketType.public.is_(True))
+                query = query.where(or_(Ticket.requester_id == me, Ticket.type_key.in_(public)))
+            rows = list(
+                (await session.execute(query.order_by(Ticket.updated_at.desc()).limit(100))).scalars()
+            )
+        still = [t for t in rows if t.resolved_at is None and t.closed_at is None]
+        done = [t for t in rows if t not in still]
+        shown = still + (done if closed else [])
+        return [(t, t.requester_id == me) for t in shown], len(still), len(done), staff
 
     async def mine(self, user: UUID) -> list[Ticket]:
         async with self.database.session() as session:

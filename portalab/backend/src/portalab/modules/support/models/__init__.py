@@ -95,6 +95,8 @@ class TicketType(SupportBase):
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     # #354: the type a problem with a media is reported in, from its page (one type at most)
     media: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    # #354: its tickets shown to every member on the media's page (their title and state only); else theirs
+    public: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 

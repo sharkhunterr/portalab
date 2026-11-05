@@ -20,6 +20,7 @@ import { useCollectsCards } from "../../cards/collects";
 import { WorkCollection } from "../../cards/WorkCollection";
 import { ExternalNews } from "../../news/ExternalNews";
 import { PluginSlot } from "../../plugins/slots/PluginSlot";
+import { MediaTickets, MediaTicketsBadge } from "../../support/tickets/MediaTickets";
 import { ReportMediaProblem } from "../../support/tickets/ReportMedia";
 import { useListenInfo, useReadInfo } from "../books/api";
 import { useDiscoverTitle } from "../discover/api";
@@ -341,6 +342,8 @@ function TitleBadges({ media }: { media: { id: string; kind: string; available: 
           {t("media:badge.inProgress", { percent: Math.round(percent * 100) })}
         </span>
       ) : null}
+      {/* issue 354: the problems reported on it and still open */}
+      <MediaTicketsBadge mediaId={media.id} />
       {seen ? (
         <span className="media-badge" data-tone="seen">
           <Icon name="eye" size={14} />
@@ -1047,6 +1050,8 @@ export function DetailPage() {
           <SectionFrame key={name} objectId={media.id} name={name} enriched={enriched} />
         ))}
       </div>
+      {/* issue 354: the tickets about it — open, and the closed ones on demand */}
+      <MediaTickets mediaId={media.id} />
     </article>
   );
 }

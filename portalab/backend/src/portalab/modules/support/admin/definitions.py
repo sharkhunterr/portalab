@@ -165,6 +165,7 @@ class Definitions:
         fields: Sequence[Mapping[str, Any]],
         enabled: bool,
         media: bool = False,
+        public: bool = False,
     ) -> TicketType:
         defs = parse_fields(fields)
         await self.workflow(workflow_key)  # must exist
@@ -185,13 +186,14 @@ class Definitions:
                     fields=payload,
                     enabled=enabled,
                     media=media,
+                    public=public,
                     version=1,
                     updated_at=utc_now(self.clock),
                 )
                 uow.session.add(row)
             else:
                 row.label, row.workflow_key, row.fields, row.enabled = label, workflow_key, payload, enabled
-                row.media = media
+                row.media, row.public = media, public
                 row.version, row.updated_at = row.version + 1, utc_now(self.clock)
             await self._audit(uow.session, actor, "support.type_saved", key, {"version": row.version})
             return row
