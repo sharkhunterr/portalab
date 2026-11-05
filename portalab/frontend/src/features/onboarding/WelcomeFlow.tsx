@@ -14,23 +14,35 @@ import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { useShellPreference } from "../../shell/preferences";
 import { ApiError } from "../../state/regions";
 import { PalettePicker } from "../appearance/PalettePicker";
+import { PRESENCE_CHOICES, type PresenceLevel, setPresence, usePresence } from "../auth/CommunityPresence";
 import { ME_KEY, type Me, useMe } from "../auth/useAuth";
 import { completeStep, MISSIONS_KEY, startTour, useWelcome, WELCOME_EVENT } from "./api";
 import { PlayScale } from "./PlayScale";
-import { type Play, TASTES, tastesFor, usePlay, useProfileDashboard } from "./play";
+import { type Play, TASTES, tasteOff, tastesFor, usePlay, useProfileDashboard } from "./play";
 import { Accounts, Notify } from "./WelcomeSteps";
 import "../appearance/notification-looks.css";
 import "./onboarding.css";
 
 /**
  * The welcome (#7; new version, issue 243): a member's first visit opens short screens — hello (with the
- * portal's own words), a face and a name, their media accounts, how far they play, their portal to their taste
+ * portal's own words), a face and a name, their media accounts, how far they play, how they appear to the other
+ * members (apart from the game: public or anonymous, issue 347), their portal to their taste
  * (what they came for, their home made with it), how they are told, a look (issue 347) — then everything they can set later and
  * the one-minute tour. Every screen can be skipped and nothing is required; once
  * seen (``shell.onboarding.welcomedAt``) it never opens by itself again, on any device, and the guided tours
  * page brings it back. An administrator can turn it off.
  */
-const STEPS = ["hello", "profile", "accounts", "play", "home", "notify", "style", "ready"] as const;
+const STEPS = [
+  "hello",
+  "profile",
+  "accounts",
+  "play",
+  "presence",
+  "home",
+  "notify",
+  "style",
+  "ready",
+] as const;
 type Step = (typeof STEPS)[number];
 
 const ART: Record<Step, string> = {
@@ -39,6 +51,7 @@ const ART: Record<Step, string> = {
   accounts: "link",
   home: "heart",
   play: "gamepad",
+  presence: "eye",
   notify: "bell",
   style: "palette",
   ready: "rocket",
@@ -69,6 +82,8 @@ export function WelcomeFlow() {
   );
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("hello");
+  // issue 347: the play gauge moved in this welcome — the home is then made again with it, by default
+  const [replayed, setReplayed] = useState(false);
   const decided = useRef(false);
   const titleId = useId();
 
@@ -83,6 +98,7 @@ export function WelcomeFlow() {
   useEffect(() => {
     const reopen = () => {
       setStep("hello");
+      setReplayed(false);
       setOpen(true);
     };
     window.addEventListener(WELCOME_EVENT, reopen);
@@ -93,9 +109,12 @@ export function WelcomeFlow() {
     setOpen(false);
     if (!welcomedAt) setWelcomedAt(new Date().toISOString());
   };
-  const index = STEPS.indexOf(step);
-  const next = () => setStep(STEPS[Math.min(index + 1, STEPS.length - 1)] as Step);
-  const back = () => setStep(STEPS[Math.max(index - 1, 0)] as Step);
+  // issue 347: no presence screen when the privacy centre is off
+  const presence = usePresence();
+  const steps = STEPS.filter((s) => s !== "presence" || presence.available);
+  const index = Math.max(steps.indexOf(step), 0);
+  const next = () => setStep(steps[Math.min(index + 1, steps.length - 1)] as Step);
+  const back = () => setStep(steps[Math.max(index - 1, 0)] as Step);
   const name = me.data?.display_name ?? me.data?.login ?? "";
 
   return (
@@ -126,9 +145,9 @@ export function WelcomeFlow() {
               ) : (
                 <ol
                   className="onboarding-dots"
-                  aria-label={t("onboarding:progress", { step: index + 1, total: STEPS.length - 1 })}
+                  aria-label={t("onboarding:progress", { step: index + 1, total: steps.length - 1 })}
                 >
-                  {STEPS.slice(0, -1).map((s, i) => (
+                  {steps.slice(0, -1).map((s, i) => (
                     <li key={s} data-state={i < index ? "done" : i === index ? "current" : undefined} />
                   ))}
                 </ol>
@@ -148,9 +167,19 @@ export function WelcomeFlow() {
                 <Accounts titleId={titleId} nav={<Nav onBack={back} onNext={next} />} />
               ) : null}
 
-              {step === "play" ? <PlayChoice titleId={titleId} onBack={back} onNext={next} /> : null}
+              {step === "play" ? (
+                <PlayChoice
+                  titleId={titleId}
+                  onBack={back}
+                  onNext={(changed) => {
+                    if (changed) setReplayed(true);
+                    next();
+                  }}
+                />
+              ) : null}
+              {step === "presence" ? <Presence titleId={titleId} onBack={back} onNext={next} /> : null}
               {step === "home" ? (
-                <Home titleId={titleId} first={!welcomedAt} onBack={back} onNext={next} />
+                <Home titleId={titleId} first={!welcomedAt} remake={replayed} onBack={back} onNext={next} />
               ) : null}
               {step === "notify" ? (
                 <Notify
@@ -428,16 +457,19 @@ function Style({ titleId, onBack, onNext }: { titleId: string; onBack: () => voi
  * Issue 347: « your portal to your taste » — what the member watches and reads (kept for the portal to use
  * later), what they want on their home (each taste brings its widgets), and their home made with it: the
  * dashboard the administrator prepared for their play profile, to these tastes (at once on a first visit,
- * nothing to lose; asked otherwise, it replaces their arrangement).
+ * nothing to lose; asked otherwise, it replaces their arrangement — ticked when the play gauge just moved).
+ * « Just the media » leaves the game and the community out.
  */
 function Home({
   titleId,
   first,
+  remake,
   onBack,
   onNext,
 }: {
   titleId: string;
   first: boolean;
+  remake: boolean;
   onBack: () => void;
   onNext: () => void;
 }) {
@@ -448,11 +480,11 @@ function Home({
   const [chosen, setChosen] = useState<string[]>(() =>
     saved.filter((key) => INTERESTS.some((interest) => interest.key === key)),
   );
-  const player = (play ?? "full") !== "none";
+  const level = play ?? "full";
   const [tastes, setTastesChosen] = useState<string[]>(() =>
-    (savedTastes ?? tastesFor(play ?? "full")).filter((key) => key !== "play" || player),
+    (savedTastes ?? tastesFor(level)).filter((key) => !tasteOff(level, key)),
   );
-  const [arrange, setArrange] = useState(first);
+  const [arrange, setArrange] = useState(first || remake);
   const dashboard = useProfileDashboard();
   const toggle = (key: string) =>
     setChosen((current) => (current.includes(key) ? current.filter((k) => k !== key) : [...current, key]));
@@ -494,7 +526,7 @@ function Home({
       <fieldset className="onboarding-chips">
         <legend className="visually-hidden">{t("onboarding:home.tastes")}</legend>
         {TASTES.map((taste) => {
-          const off = taste.key === "play" && !player;
+          const off = tasteOff(level, taste.key);
           return (
             <label
               key={taste.key}
@@ -534,6 +566,7 @@ function Home({
   );
 }
 
+/** How far the member plays; public or anonymous is the next screen, apart from the game (issue 347). */
 function PlayChoice({
   titleId,
   onBack,
@@ -541,26 +574,108 @@ function PlayChoice({
 }: {
   titleId: string;
   onBack: () => void;
-  onNext: () => void;
+  onNext: (changed: boolean) => void;
 }) {
   const t = useT();
   const { saved, save } = usePlay();
   const [chosen, setChosen] = useState<Play>(saved ?? "full");
-  const player = chosen !== "none";
   const go = async () => {
     if (chosen !== saved) await save.mutateAsync(chosen);
-    onNext();
+    onNext(chosen !== saved);
   };
   return (
     <>
       <DialogPrimitive.Title id={titleId}>{t("onboarding:play.title")}</DialogPrimitive.Title>
       <p className="onboarding-welcome__lead">{t("onboarding:play.lead")}</p>
       <PlayScale value={chosen} onChange={setChosen} disabled={save.isPending} />
-      <p className="onboarding-welcome__hint" data-tone={player ? "public" : "anonymous"}>
-        <Icon name={player ? "users" : "hide"} size={16} />
-        {t(player ? "onboarding:play.public" : "onboarding:play.anonymous")}
-      </p>
       {save.error ? (
+        <p className="onboarding-welcome__problem" role="alert">
+          {t("onboarding:play.error")}
+        </p>
+      ) : null}
+      <Nav onBack={onBack} onNext={() => void go().catch(() => undefined)} />
+    </>
+  );
+}
+
+/** Issue 347: what each answer shows of the member to the others — and what it does not. */
+const PRESENCE_SHOWS = {
+  public: ["directory", "activity", "leaderboards"],
+  anonymous: ["directory", "activity", "leaderboards"],
+} as const;
+
+/**
+ * Issue 347: how the member appears to the others — a screen of its own, apart from the game: whatever the
+ * play gauge, public (named in the community, for the portal's members only) or anonymous (absent from the
+ * directory and the activity, counted unnamed in the leaderboards). It starts on the member's present answer
+ * and is kept on « Next ».
+ */
+function Presence({ titleId, onBack, onNext }: { titleId: string; onBack: () => void; onNext: () => void }) {
+  const t = useT();
+  const client = useQueryClient();
+  const presence = usePresence();
+  const [seen, setSeen] = useState<PresenceLevel | null>(null);
+  const shown = seen ?? presence.current;
+  const keep = useMutation({
+    mutationFn: setPresence,
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: ["privacy", "me"] });
+      void client.invalidateQueries({ queryKey: ["community"] });
+    },
+  });
+  const go = async () => {
+    if (seen !== null && seen !== presence.current) await keep.mutateAsync(seen);
+    onNext();
+  };
+  return (
+    <>
+      <DialogPrimitive.Title id={titleId}>{t("onboarding:presence.title")}</DialogPrimitive.Title>
+      <p className="onboarding-welcome__lead">{t("onboarding:presence.lead")}</p>
+      <fieldset className="onboarding-presence" disabled={presence.locked || keep.isPending}>
+        <legend className="visually-hidden">{t("onboarding:presence.title")}</legend>
+        {PRESENCE_CHOICES.map((choice) => (
+          <label
+            key={choice.key}
+            className="onboarding-tile"
+            data-current={shown === choice.level || undefined}
+          >
+            <input
+              type="radio"
+              name="onboarding-presence"
+              checked={shown === choice.level}
+              onChange={() => setSeen(choice.level)}
+            />
+            <span className="onboarding-presence__head">
+              <Icon name={choice.icon} size={20} />
+              <strong>{t(`account:presence.${choice.key}`)}</strong>
+            </span>
+            <span className="onboarding-presence__summary">{t(`onboarding:presence.${choice.key}`)}</span>
+            <ul className="onboarding-presence__list">
+              {PRESENCE_SHOWS[choice.key].map((place) => (
+                <li key={place}>
+                  <Icon name={choice.key === "public" ? "check" : "hide"} size={14} />
+                  {t(`onboarding:presence.${choice.key}.${place}`)}
+                </li>
+              ))}
+            </ul>
+          </label>
+        ))}
+      </fieldset>
+      <ul className="onboarding-presence__facts">
+        <li>
+          <Icon name="gamepad" size={16} />
+          {t("onboarding:presence.apart")}
+        </li>
+        <li>
+          <Icon name="lock" size={16} />
+          {t("onboarding:presence.inside")}
+        </li>
+      </ul>
+      <p className="onboarding-welcome__hint">
+        {presence.locked ? t("account:presence.locked") : t("onboarding:presence.later")}{" "}
+        <Link to="/privacy">{t("onboarding:presence.privacy")}</Link>
+      </p>
+      {keep.error ? (
         <p className="onboarding-welcome__problem" role="alert">
           {t("onboarding:play.error")}
         </p>

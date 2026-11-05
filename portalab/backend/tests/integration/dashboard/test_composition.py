@@ -157,7 +157,8 @@ async def test_a_dashboard_made_to_the_member_s_tastes(
     app: FastAPI, client: httpx.AsyncClient, dash: DashboardHarness
 ) -> None:
     """#347: the welcome's « your portal to your taste » — the starter's widgets of the tastes not chosen left
-    out, the chosen tastes' widgets it lacks added, a widget of no taste kept; no tastes: the default one."""
+    out, the chosen tastes' widgets it lacks added, a widget of no taste kept; no tastes: the default one;
+    « just the media » leaves the game and the community out whatever the tastes."""
     for key in ("media.continue", "gamification.progress", "t.clock", "news.my_feed", "news.featured"):
         dash.registry.register(definition(key), FakeWidget())
     dash.module.config = replace(
@@ -182,3 +183,11 @@ async def test_a_dashboard_made_to_the_member_s_tastes(
     assert (await client.post("/api/v1/dashboard/reset", json={"tastes": ["nope"]})).status_code == 422
     assert (await client.post("/api/v1/dashboard/reset")).status_code == 200
     assert await keys() == {"media.continue", "gamification.progress", "t.clock"}
+    # « just the media »: no game nor community on the home, even asked for
+    play = await client.put("/api/v1/me/preferences", json={"shell.onboarding.play": "none"})
+    assert play.status_code == 200, play.text
+    asked = await client.post("/api/v1/dashboard/reset", json={"tastes": ["watch", "play", "community"]})
+    assert asked.status_code == 200, asked.text
+    assert await keys() == {"media.continue", "t.clock"}
+    assert (await client.post("/api/v1/dashboard/reset")).status_code == 200
+    assert await keys() == {"media.continue", "t.clock"}

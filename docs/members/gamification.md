@@ -10,12 +10,14 @@ The first time you sign in, the welcome asks **"How far do you want to play?"** 
 
 | Notch | What it brings |
 |---|---|
-| **Just the media** | Watch, read and request, without the game: no cards, games or quests in your menu. Your profile is anonymous. |
-| **Passive** | The game plays itself: what you watch, read or request earns you XP and levels you up, plus quests, achievements, leaderboards and a profile the members see. Your profile is public, only to the portal's members. |
+| **Just the media** | Watch, read and request, without the game: no cards, games, quests or community in your menu. |
+| **Passive** | The game plays itself: what you watch, read or request earns you XP and levels you up, plus quests, achievements, leaderboards and a profile the members see. |
 | **Collector** | On top, the Mediacards: boosters as you watch, a collection to complete. |
 | **Keen** | The whole game: on top, the day's mini-games, the week's challenges and parties with others. |
 
-Below **Collector**, the Mediacards leave the menu, the titles' pages, the shop and the reserve, and watching no longer gives a Mediacards booster; the looks boosters stay. In the menu, **Today's games** and **Play together** only show at **Keen**, **Mediacards** from **Collector**, and **Quests** from **Passive**.
+Below **Collector**, the Mediacards leave the menu, the titles' pages, the shop and the reserve, and watching no longer gives a Mediacards booster; the looks boosters stay. In the menu, **Today's games** and **Play together** only show at **Keen**, **Mediacards** from **Collector**, and **Quests** from **Passive**; at **Just the media**, the **Community** section and your achievements leave it too.
+
+Public or anonymous is apart from the game: the next welcome screen, **How do you want to appear to the others?**, asks it whatever the notch, even **Just the media**. **Public**: your name and avatar in the members' directory, what you do in the community's activity, your place in the leaderboards with your name. **Anonymous**: counted in the directory as **Anonymous**, your activity signed **An anonymous member**, your place and points counting in the leaderboards as **Anonymous**, never with your name, avatar or profile. Either way, nothing is shown outside the portal. It is saved with **Next**, and changes later in **My presence in the community** (see [Personalization](personalization.md#my-presence-in-the-community)).
 
 Your home follows your notch too: your first dashboard is the one the team prepared for your play profile (see [Personalization](personalization.md#your-dashboard)), and **Take my profile's dashboard**, on the **Play** page, gives you the one of a new notch.
 

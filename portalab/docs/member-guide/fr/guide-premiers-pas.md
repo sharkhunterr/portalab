@@ -25,7 +25,7 @@ Si votre portail en a publié, il vous demande de lire et d'accepter ses **condi
 
 ## L'accueil des nouveaux membres
 
-À votre première visite, quelques écrans de bienvenue s'ouvrent (« Étape 1 sur 7 », etc.) :
+À votre première visite, quelques écrans de bienvenue s'ouvrent (« Étape 1 sur 8 », etc.) :
 
 - **Bienvenue** : ce que vous ferez sur le portail (regarder et lire, jouer si vous le voulez, tout régler à votre goût). « C'est parti » ouvre la suite.
 - **Une photo et un nom** : c'est comme ça que les autres membres vous verront ; vous y choisissez aussi votre « Langue ».
@@ -34,16 +34,24 @@ Si votre portail en a publié, il vous demande de lire et d'accepter ses **condi
 
   | Cran | Ce qu'il apporte |
   |---|---|
-  | « Juste les médias » | Regarder, lire et demander, sans le jeu : ni cartes, ni jeux, ni quêtes dans votre menu. Votre profil est **anonyme** : les autres membres ne vous voient ni dans l'annuaire, ni dans l'activité ; dans les classements, vous restez compté, sans nom. |
-  | « Passif » | Le jeu se fait tout seul : de l'XP et des niveaux par ce que vous regardez, lisez ou demandez, et aussi les quêtes, les succès, les classements. Votre profil est **public**, mais seulement pour les membres du portail : ils voient votre nom, votre niveau et votre place dans les classements. |
+  | « Juste les médias » | Regarder, lire et demander, sans le jeu : ni cartes, ni jeux, ni quêtes, ni communauté dans votre menu. |
+  | « Passif » | Le jeu se fait tout seul : de l'XP et des niveaux par ce que vous regardez, lisez ou demandez, et aussi les quêtes, les succès, les classements. |
   | « Collectionneur » | En plus, les Mediacards : des boosters en regardant, une collection à compléter. |
   | « Passionné » (recommandé) | Tout le jeu : en plus, les mini-jeux du jour, les défis de la semaine et les parties à plusieurs. Aucune obligation de jouer : tout est simplement à portée de main. |
 
-  Sous « Collectionneur », les Mediacards sont cachées : ni dans le menu, ni sur la fiche des titres, ni dans la boutique, et plus de booster Mediacards en regardant. Les autres boosters restent. Dans le menu, « Jeux du jour » et « Jouer à plusieurs » n'apparaissent qu'à « Passionné », « Mediacards » dès « Collectionneur » et « Quêtes » dès « Passif ».
+  Sous « Collectionneur », les Mediacards sont cachées : ni dans le menu, ni sur la fiche des titres, ni dans la boutique, et plus de booster Mediacards en regardant. Les autres boosters restent. Dans le menu, « Jeux du jour » et « Jouer à plusieurs » n'apparaissent qu'à « Passionné », « Mediacards » dès « Collectionneur » et « Quêtes » dès « Passif ». À « Juste les médias », la rubrique « Communauté » et vos succès quittent aussi le menu.
+- **Comment veux-tu apparaître aux autres ?** : votre vie privée dans la communauté, un écran à part, indépendant de la jauge de jeu (il vaut pour tous les crans, même « Juste les médias »).
+
+  | Choix | Ce que les autres membres voient |
+  |---|---|
+  | « Public » | Votre nom et votre avatar dans l'annuaire des membres ; ce que vous faites (succès, niveaux, contributions) dans l'activité de la communauté ; votre place dans les classements, avec votre nom. |
+  | « Anonyme » | Dans l'annuaire, vous êtes compté comme « Anonyme », sans nom, avatar ni profil ; ce que vous faites reste dans l'activité, signé « Un membre anonyme » ; dans les classements, votre place et vos points comptent, sous « Anonyme ». |
+
+  Dans les deux cas, rien n'est montré en dehors du portail. Le choix affiché au départ est votre réglage actuel ; il s'enregistre avec « Suivant ». « Régler plus finement qui voit quoi » ouvre le centre de confidentialité.
 - **Ton portail à ton goût** : dites ce que vous aimez, votre accueil se compose avec.
   - « Tu viens pour quoi ? » : films, séries, livres, livres audio, magazines, mangas, BD & comics, jeux vidéo rétro. Le portail s'en servira pour mettre en avant ce qui vous plaît.
-  - « Sur ton accueil » : « Reprendre et découvrir », « Les dernières sorties », « Les news de mes favoris », « Mes demandes », « Jouer », « Les statistiques », « L'état des services », « La communauté », « La radio ». Au départ sont cochés « Reprendre et découvrir », « Les dernières sorties », « Les news de mes favoris », « Mes demandes » et « L'état des services », plus « Jouer » si vous jouez. « Jouer » est grisé à « Juste les médias » : remontez la jauge pour l'ajouter.
-  - « Composer mon accueil avec ces choix », coché à votre première visite : votre tableau de bord part de celui que l'équipe a prévu pour votre profil de joueur, garde les widgets de ce que vous avez coché, ajoute ceux qui lui manquent et laisse de côté ceux de ce que vous n'avez pas coché. Vous pourrez tout déplacer ensuite. Quand vous revoyez ces écrans, la case est décochée : la cocher remplace votre disposition actuelle.
+  - « Sur ton accueil » : « Reprendre et découvrir », « Les dernières sorties », « Les news de mes favoris », « Mes demandes », « Jouer », « Les statistiques », « L'état des services », « La communauté », « La radio ». Au départ sont cochés « Reprendre et découvrir », « Les dernières sorties », « Les news de mes favoris », « Mes demandes » et « L'état des services », plus « Jouer » si vous jouez. « Jouer » et « La communauté » sont grisés à « Juste les médias » : remontez la jauge pour les ajouter.
+  - « Composer mon accueil avec ces choix », coché à votre première visite : votre tableau de bord part de celui que l'équipe a prévu pour votre profil de joueur, garde les widgets de ce que vous avez coché, ajoute ceux qui lui manquent et laisse de côté ceux de ce que vous n'avez pas coché. Vous pourrez tout déplacer ensuite. Quand vous revoyez ces écrans, la case est décochée, sauf si vous venez de changer de cran sur la jauge : la cocher remplace votre disposition actuelle. À « Juste les médias », l'accueil composé n'a ni widget de jeu, ni widget de la communauté.
 - **Comment te prévenir ?** : choisissez un réglage tout prêt, puis affinez thème par thème.
   - « Tout » : chaque nouvelle, dans le portail et par e-mail.
   - « L'essentiel » (recommandé, proposé d'office à la première visite : il s'applique si vous passez à la suite sans rien changer) : tout dans le portail ; par e-mail votre compte, vos médias et vos tickets, en un résumé par jour.

@@ -13687,6 +13687,11 @@ export interface components {
         };
         /** CommunityMemberPage */
         CommunityMemberPage: {
+            /**
+             * Anonymous
+             * @default 0
+             */
+            anonymous: number;
             /** Items */
             items: components["schemas"]["CommunityMemberOut"][];
             /** Next Cursor */

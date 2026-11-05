@@ -2,16 +2,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import { NAVIGATION_KEY } from "../../shell/nav/NavigationProvider";
 import { useShellPreference } from "../../shell/preferences";
-import { setPresence } from "../auth/CommunityPresence";
 
-/** Whether the member plays (``shell.onboarding.play``): a player is public, within the portal only; the
- * others are anonymous, seen by no other member. Without the cards (issue 243), the Mediacards are hidden.
- * Issue 347: a gauge from no game to all of it — each notch adds to the one below (``from``: what it adds). */
+/** How far the member plays (``shell.onboarding.play``). Without the cards (issue 243), the Mediacards are
+ * hidden. Issue 347: a gauge from no game to all of it — each notch adds to the one below (``from``: what it
+ * adds); « just the media » has no community either. Public or anonymous is asked apart, whatever the notch. */
 export const PLAY = [
-  { key: "none", icon: "hide", level: "private" },
-  { key: "progression", icon: "trophy", level: "community" },
-  { key: "collector", icon: "layers", level: "community" },
-  { key: "full", icon: "game", level: "community" },
+  { key: "none", icon: "film" },
+  { key: "progression", icon: "trophy" },
+  { key: "collector", icon: "layers" },
+  { key: "full", icon: "game" },
 ] as const;
 export type Play = (typeof PLAY)[number]["key"];
 
@@ -26,22 +25,19 @@ export const PLAY_FEATURES = [
 
 export const playIndex = (play: Play) => PLAY.findIndex((choice) => choice.key === play);
 
-/** The answer kept, and its saving: the profile's presence follows it, the menu shows the cards or not. Asked
- * at the welcome and changed in the settings (« Play », issue 14). */
+/** The answer kept, and its saving: the menu shows the cards, the games and the community or not. Asked at
+ * the welcome and changed in the settings (« Play », issue 14). */
 export function usePlay(onSaved?: () => void) {
   const client = useQueryClient();
   const [saved, setSaved] = useShellPreference<Play | null>("shell.onboarding.play", null);
   const save = useMutation({
     mutationFn: async (play: Play) => {
-      await setPresence(PLAY.find((choice) => choice.key === play)?.level ?? "community");
       // issue 347: kept before anything follows it (the profile's dashboard reads it)
       await api.PUT("/api/v1/me/preferences", { body: { "shell.onboarding.play": play } as never });
     },
     onSuccess: async (_, play) => {
       setSaved(play);
       await client.invalidateQueries({ queryKey: NAVIGATION_KEY }); // issue 243: the cards, or not, in the menu
-      await client.invalidateQueries({ queryKey: ["privacy", "me"] });
-      await client.invalidateQueries({ queryKey: ["community"] });
       onSaved?.();
     },
   });
@@ -60,6 +56,10 @@ export const TASTES = [
   { key: "community", icon: "users" },
   { key: "radio", icon: "radio" },
 ] as const;
+
+/** Issue 347: the tastes « just the media » leaves out — the game and the community. */
+export const tasteOff = (play: Play, taste: string) =>
+  play === "none" && (taste === "play" || taste === "community");
 
 /** The tastes ticked at first: the media, the news and the services, and the game for a player. */
 export const tastesFor = (play: Play) =>

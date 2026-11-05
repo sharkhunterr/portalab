@@ -204,6 +204,26 @@
 .community-member .community-meta {
   font-size: var(--font-size-xs);
 }
+/* issue 347: an anonymous member — counted, never named nor linked */
+.community-member[data-anonymous] {
+  border-style: dashed;
+}
+.community-member[data-anonymous]:hover {
+  transform: none;
+  border-color: var(--color-border);
+}
+.community-member[data-anonymous] em {
+  color: var(--color-text-muted);
+}
+.community-member__ghost {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+  color: var(--color-text-muted);
+}
 
 /* activity timeline */
 .community-day {

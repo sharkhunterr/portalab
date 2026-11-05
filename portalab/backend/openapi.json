@@ -4348,6 +4348,11 @@
       },
       "CommunityMemberPage": {
         "properties": {
+          "anonymous": {
+            "default": 0,
+            "title": "Anonymous",
+            "type": "integer"
+          },
           "items": {
             "items": {
               "$ref": "#/components/schemas/CommunityMemberOut"

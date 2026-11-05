@@ -52,6 +52,7 @@ class CommunityMemberOut(BaseModel):
 class CommunityMemberPage(BaseModel):
     items: list[CommunityMemberOut]
     next_cursor: str | None
+    anonymous: int = 0  # issue 347: on the last page, how many anonymous members close the directory
 
 
 class CommunitySectionOut(BaseModel):
@@ -129,6 +130,7 @@ async def members(
             for m in page.items
         ],
         next_cursor=encode_cursor(page.next_offset) if page.next_offset is not None else None,
+        anonymous=page.anonymous,
     )
 
 

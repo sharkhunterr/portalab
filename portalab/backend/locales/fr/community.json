@@ -406,6 +406,7 @@
   "looks.waiting.unavailableShort": "Indisponible",
   "looks.wornBadges": "Badges",
   "looks.wornTitle": "Titre",
+  "members.anonymousHint": "A choisi de rester anonyme",
   "members.empty": "Aucun membre ne correspond à cette recherche.",
   "members.emptyAction": "Effacer la recherche",
   "members.joined": "Membre depuis le {date}",

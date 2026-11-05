@@ -52,7 +52,7 @@ In Configuration, area Accounts:
 | Setting | What it does |
 |---|---|
 | *Registration* | **Open registration** (people sign up themselves) or **Invitation only**. |
-| *Welcome new members*, *Welcome message* | A few welcome steps and a guided tour at the first sign-in: a face and a name, media accounts, how far the member plays (the play gauge, from **Just the media** to **Keen**, see [Playing on the portal](../members/gamification.md#choosing-to-play)), their home to their taste, how they are told, a look. |
+| *Welcome new members*, *Welcome message* | A few welcome steps and a guided tour at the first sign-in: a face and a name, media accounts, how far the member plays (the play gauge, from **Just the media** to **Keen**, see [Playing on the portal](../members/gamification.md#choosing-to-play)), public or anonymous in the community (a screen of its own, whatever the play gauge), their home to their taste, how they are told, a look. |
 | *Password length*, *Password hashing strength* | Local password policy. |
 | *Idle session expiry*, *Maximum session length* | Sessions. |
 | *Verification link validity*, *Data export availability* | Links and exports. |
