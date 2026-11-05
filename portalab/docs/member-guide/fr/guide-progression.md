@@ -31,11 +31,13 @@ Ces valeurs ne se convertissent jamais l'une en l'autre.
 
 Ce qui rapporte, et combien, dépend de votre portail. Selon les réglages, cela peut être :
 - regarder un film ou un épisode jusqu'au bout, finir une saison, écouter, lire ;
+- regarder la TV en direct : le temps passé devant chaque programme ;
 - jouer à un jeu de la bibliothèque (RomM) : le temps passé à jouer, et une grosse récompense quand vous avez joué à un jeu aussi longtemps que sa durée estimée (son histoire principale, quand elle est connue) ;
 - faire une demande, ou voir une demande devenir disponible ;
 - vous connecter au portail ;
 - jouer aux [jeux](/games), réussir un défi de la semaine ;
-- envoyer un avis ou ouvrir un ticket au support ;
+- envoyer un avis ou ouvrir un ticket au support, signaler un problème sur un média (quand l'équipe l'a résolu) ;
+- donner votre avis sur un titre vu, lu ou joué (une fois par titre) ;
 - terminer une quête, débloquer un succès, passer un niveau.
 
 Certaines actions ont un plafond ou un délai entre deux gains.

@@ -970,6 +970,7 @@
   "action.user_level_up": "Level reached",
   "admin.presets.gameLength": "Game played through its estimated length",
   "admin.presets.gameTime": "Time spent playing (XP a minute, coins an hour)",
+  "admin.presets.liveTime": "Live TV minutes (XP a minute, coins an hour)",
   "quests.filter.label": "Filter the quests",
   "quests.filter.all": "All",
   "quests.filter.day": "Today",
