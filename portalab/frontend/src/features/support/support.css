@@ -2210,3 +2210,18 @@ a.media-tickets__item:hover {
     animation: none;
   }
 }
+/* in a widget row's small poster: smaller, on its corner */
+.widget-row__thumb--poster {
+  position: relative;
+  overflow: visible;
+}
+.widget-row__thumb--poster .poster-tickets {
+  inset-block-end: -0.3rem;
+  inset-inline-end: -0.4rem;
+  min-inline-size: 1.15rem;
+  block-size: 1.15rem;
+  padding: 0 2px;
+}
+.widget-row__thumb--poster img {
+  border-radius: inherit;
+}

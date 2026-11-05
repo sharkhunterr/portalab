@@ -3,6 +3,7 @@ import { StatusBadge, type Tone } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { PosterTickets } from "../../support/tickets/MediaTickets";
 import type { WidgetProps } from "../widgets/registry";
 
 /**
@@ -72,6 +73,10 @@ function Thumb({ item, icon }: { item: Row; icon: string | null | undefined }) {
     return (
       <span className="widget-row__thumb widget-row__thumb--poster">
         <img src={image} alt="" loading="lazy" />
+        {/* issue 354: a library title's open reports */}
+        <PosterTickets
+          mediaId={typeof item.route === "string" ? /^\/media\/([0-9a-f-]{36})$/.exec(item.route)?.[1] : null}
+        />
       </span>
     );
   }
