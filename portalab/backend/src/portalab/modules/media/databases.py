@@ -3,6 +3,7 @@ search's « ask for it » results beside the request service's films and series,
 (where it is asked of the team). A title the library has in that kind is left to the library's results."""
 
 import asyncio
+import time
 from collections.abc import Sequence
 from typing import Any
 from urllib.parse import urlencode
@@ -17,7 +18,9 @@ from portalab.core.logging import get_logger
 from portalab.modules.media.library_match import MediaLibraryMatch
 
 log = get_logger("portalab.media")
-TIMEOUT = 6.0  # seconds a database may take before the search goes on without it
+TIMEOUT = 6.0  # seconds a database may take before its answer is given up
+BUDGET = 1.0  # seconds a search waits for them: a slower answer is kept for the next keystroke
+KEPT_SECONDS = 600
 # per database: its capability, the kind of its titles, its sheet's route and its images' address
 KINDS: tuple[tuple[str, str, str, str, dict[str, str]], ...] = (
     (BOOK_SERIES, "book", "/media/book", "/api/v1/media/book-covers", {}),
@@ -29,6 +32,38 @@ class DatabaseTitles:
     def __init__(self, capabilities: CapabilityRegistry, database: Database) -> None:
         self.capabilities = capabilities
         self.database = database
+        self._kept: dict[tuple[str, str, int], tuple[float, list[SearchItem]]] = {}
+        self._asking: dict[tuple[str, str, int], asyncio.Task[list[SearchItem]]] = {}
+
+    async def found(
+        self, text: str, language: str, limit: int, *, budget: float = BUDGET
+    ) -> list[SearchItem]:
+        """What the databases answer within the search's budget — a slower answer goes on in the background
+        and is kept a while, so the next keystroke (or a second look) has it."""
+        key = (" ".join(text.lower().split()), language, limit)
+        kept = self._kept.get(key)
+        if kept is not None and time.monotonic() - kept[0] < KEPT_SECONDS:
+            return kept[1]
+        task = self._asking.get(key)
+        if task is None:
+            task = asyncio.create_task(self._keep(key, text, language, limit))
+            self._asking[key] = task
+        try:
+            return await asyncio.wait_for(asyncio.shield(task), timeout=budget)
+        except TimeoutError:
+            return []
+
+    async def _keep(
+        self, key: tuple[str, str, int], text: str, language: str, limit: int
+    ) -> list[SearchItem]:
+        try:
+            items = await self._found(text, language, limit)
+            if len(self._kept) > 500:
+                self._kept.clear()
+            self._kept[key] = (time.monotonic(), items)
+            return items
+        finally:
+            self._asking.pop(key, None)
 
     async def _ask(self, capability: str, provider: Any, text: str, language: str, limit: int) -> Any:
         found = (
@@ -38,7 +73,7 @@ class DatabaseTitles:
         )
         return unwrap(await asyncio.wait_for(found, timeout=TIMEOUT))
 
-    async def found(self, text: str, language: str, limit: int) -> list[SearchItem]:
+    async def _found(self, text: str, language: str, limit: int) -> list[SearchItem]:
         asked: list[tuple[str, str, str, str, dict[str, str], Any]] = []
         for capability, kind, sheet, images, extra in KINDS:
             for registration in self.capabilities.system_providers(capability):
