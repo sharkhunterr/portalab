@@ -170,3 +170,15 @@ def test_a_rule_gives_a_contents_boosters() -> None:
     types.register(EventType(name="ticket.created", owner="t"))
     with pytest.raises(ValidationFailed):
         parse_rule({"event_type": "ticket.created", "boosters": 1}, types)  # about no content
+
+
+def test_a_rule_gives_the_boosters_of_the_works_its_event_names() -> None:
+    """Issue 356: the bingo's full card is about no content, but names the works its booster draws among."""
+    from portalab.modules.games.events import register_event_types
+
+    types = EventTypeRegistry()
+    register_event_types(types)
+    rule = parse_rule({"event_type": "games.bingo_card", "boosters": 1}, types)
+    assert rule.boosters == 1
+    with pytest.raises(ValidationFailed):
+        parse_rule({"event_type": "games.bingo_line", "boosters": 1}, types)  # a line names none
