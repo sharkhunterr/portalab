@@ -114,7 +114,9 @@ class DatabaseTitles:
         for index, (kind, service, sheet, images, extra, credit) in enumerate(hits):
             if str(index) in held:
                 continue  # the library has it in that kind: its own result tells it
-            facets = {"type": kind}
+            facets = {"type": kind, "name": credit.title}
+            if credit.role:
+                facets["creator"] = credit.role
             if credit.poster:
                 facets["cover"] = f"{images}?{urlencode({'service': service, 'ref': credit.poster, **extra})}"
             if credit.year:

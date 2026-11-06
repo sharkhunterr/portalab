@@ -31,6 +31,7 @@ import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { AskLists } from "../../requests/RequestsPage";
 import { useRequestActions } from "../api";
 import type { RequestQuota } from "../discover/api";
 import { useMeasures } from "../insights/api";
@@ -583,6 +584,8 @@ export function RequestsPage({ stats = false }: { stats?: boolean }) {
       ) : null}
       {tab === "overview" && data ? <Overview data={data} /> : null}
       {tab === "list" ? <List /> : null}
+      {/* issue 375: the books, games… asked of the team, and the others' to want too */}
+      {tab === "list" ? <AskLists /> : null}
       {tab === "soon" ? <Soon /> : null}
     </AdminPage>
   );

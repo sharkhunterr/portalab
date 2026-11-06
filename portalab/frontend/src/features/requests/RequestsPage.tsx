@@ -15,7 +15,8 @@ import "./requests.css";
 
 /**
  * Issue 363: asking the team for a title no service asks for — a book, an audiobook, a game… —, my requests
- * and where they stand, and the other members' open requests to say « me too » to. A title the library has,
+ * and where they stand (issue 375: in « My requests »), and the other members' open requests to say « me
+ * too » to. A title the library has,
  * or another member asked for already, is told at once (the latter becomes a « me too »). Reached from the
  * menu and from a title told absent (its kind, title and author filled in).
  */
@@ -258,11 +259,50 @@ function AskRow({ item, open }: { item: Asked; open: boolean }) {
   );
 }
 
+/**
+ * Issue 375: my requests to the team and the other members' open ones (« me too ») — shown in « My
+ * requests », beside the request service's; nothing while the module is switched off.
+ */
+export function AskLists() {
+  const t = useT();
+  const options = useAskOptions();
+  const lists = useMyAsks();
+  if (!options.data || !lists.data) return null;
+  const others = lists.data.open.filter((item) => !item.mine);
+  return (
+    <>
+      <Card title={t("media:ask.mine")} icon="inbox" level={2}>
+        {lists.data.mine.length ? (
+          <ul className="asks-list" aria-label={t("media:ask.mine")}>
+            {lists.data.mine.map((item) => (
+              <AskRow key={item.id} item={item} open={false} />
+            ))}
+          </ul>
+        ) : (
+          <p className="asks-muted">
+            {t("media:ask.mineEmpty")} <Link to="/requests">{t("media:ask.page.title")}</Link>
+          </p>
+        )}
+      </Card>
+      {others.length ? (
+        <Card title={t("media:ask.others")} icon="heart" level={2}>
+          <ul className="asks-list" aria-label={t("media:ask.others")}>
+            {others.map((item) => (
+              <AskRow key={item.id} item={item} open />
+            ))}
+          </ul>
+        </Card>
+      ) : null}
+    </>
+  );
+}
+
+/** Issue 375: asking the team — the form alone, reached from « Ask for a title » and a title's sheet; the
+ * requests themselves are in « My requests ». */
 export function RequestsPage() {
   const t = useT();
   const headingId = useId();
   const options = useAskOptions();
-  const lists = useMyAsks();
   if (options.isPending) return <FunctionalState state="loading" />;
   if (!options.data) {
     return (
@@ -272,7 +312,6 @@ export function RequestsPage() {
       </section>
     );
   }
-  const others = (lists.data?.open ?? []).filter((item) => !item.mine);
   return (
     <section aria-labelledby={headingId} className="asks-page">
       <PageHeader
@@ -281,34 +320,17 @@ export function RequestsPage() {
         icon="inbox"
         title={t("media:ask.page.title")}
         context={t("media:ask.page.context")}
+        secondary={
+          <Link className="ds-button ds-button--secondary" to="/media/requests">
+            {t("media:ask.seeMine")}
+          </Link>
+        }
       />
       {options.data.kinds.length ? (
         <AskForm kinds={options.data.kinds} price={options.data.price} left={options.data.left} />
       ) : (
         <p className="ds-panel">{t("media:ask.page.closed")}</p>
       )}
-      <Card title={t("media:ask.mine")} icon="inbox" level={2}>
-        {lists.data?.mine.length ? (
-          <ul className="asks-list" aria-label={t("media:ask.mine")}>
-            {lists.data.mine.map((item) => (
-              <AskRow key={item.id} item={item} open={false} />
-            ))}
-          </ul>
-        ) : (
-          <p className="asks-muted">{t("media:ask.mineEmpty")}</p>
-        )}
-      </Card>
-      <Card title={t("media:ask.others")} icon="heart" level={2}>
-        {others.length ? (
-          <ul className="asks-list" aria-label={t("media:ask.others")}>
-            {others.map((item) => (
-              <AskRow key={item.id} item={item} open />
-            ))}
-          </ul>
-        ) : (
-          <p className="asks-muted">{t("media:ask.othersEmpty")}</p>
-        )}
-      </Card>
     </section>
   );
 }

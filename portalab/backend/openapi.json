@@ -5999,6 +5999,63 @@
         "title": "DashboardOut",
         "type": "object"
       },
+      "DatabaseTitleOut": {
+        "description": "#375: a book or a game the library lacks, from the book or game database \u2014 opening its sheet.",
+        "properties": {
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover"
+          },
+          "creator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Creator"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "route": {
+            "title": "Route",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "kind",
+          "title",
+          "route"
+        ],
+        "title": "DatabaseTitleOut",
+        "type": "object"
+      },
       "DatumOut": {
         "properties": {
           "classification": {
@@ -7314,6 +7371,17 @@
             ],
             "title": "Route"
           },
+          "sheet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
+          },
           "status": {
             "enum": [
               "available",
@@ -8135,6 +8203,17 @@
               }
             ],
             "title": "Route"
+          },
+          "sheet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
           },
           "status": {
             "enum": [
@@ -51333,6 +51412,55 @@
           }
         },
         "summary": "Discover Shelf",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/discover/titles": {
+      "get": {
+        "description": "#375: \u00ab Ask for a title \u00bb finds books and games too \u2014 those the library lacks, in the member's\nlanguage (the request service's films and series are its own search).",
+        "operationId": "database_titles_api_v1_media_discover_titles_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 2,
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DatabaseTitleOut"
+                  },
+                  "title": "Response Database Titles Api V1 Media Discover Titles Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Database Titles",
         "tags": [
           "media"
         ]

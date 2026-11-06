@@ -103,7 +103,7 @@ Une fois le titre arrivé, le parcours se replie en une ligne (« Disponible · 
 
 Les films et les séries passent par le service de demandes. Pour le reste (un livre, un livre audio, un jeu…), si votre portail le propose, vous demandez directement à l'équipe.
 
-Ouvrez [Demander un livre, un jeu…](/requests) dans la rubrique « Médias » du menu. Sur la page d'un auteur ou d'une série de livres, un livre absent de la médiathèque a aussi son bouton **« Le demander »** : le formulaire s'ouvre avec son titre et son auteur déjà remplis.
+Tout part de [Demander un titre](/media/discover) : tapez un film, une série, un livre ou un jeu. Sous les films et séries, la section **« Livres, livres audio et jeux »** liste ceux que la médiathèque n'a pas ; chacun ouvre sa fiche. Vous ne trouvez pas ? Le lien **« Demander à l'équipe »**, sous les résultats, ouvre un formulaire libre. Sur la page d'un auteur ou d'une série de livres, un livre absent a aussi son bouton **« Le demander »**. Un livre que la médiathèque n'a qu'en livre audio a le bouton **« Le demander en livre »**, qui ouvre sa fiche.
 
 La section **« À demander »** de la recherche propose aussi ces livres, et les jeux quand le portail a une base de jeux : chacun ouvre sa fiche. Cliquez sur la couverture ou le titre d'un livre absent pour ouvrir **sa fiche**, présentée comme celle d'un livre de la médiathèque : auteurs, séries, genres, note, résumé, et ses **« Éditions »**, celles de votre langue d'abord (titre traduit, format, livre audio, éditeur, ISBN). Si la médiathèque a déjà le livre, c'est sa page de la médiathèque qui s'ouvre. Si elle ne l'a qu'en livre audio, la fiche le dit (**« En livre audio dans la médiathèque »**) et le livre reste demandable. Sinon, **« Le demander »** demande le livre, ou une édition précise depuis sa ligne : son titre, sa langue, son format et son ISBN partent avec la demande, ce qui aide l'équipe à trouver la bonne.
 
@@ -123,7 +123,7 @@ Pour les jeux, quand le portail a une base de jeux (IGDB), la page d'une franchi
 
 ### Suivre et soutenir les demandes
 
-Sur la même page :
+Dans [Mes demandes](/media/requests), sous vos demandes de films et de séries :
 
 - **« Mes demandes »** : celles que vous avez faites et celles que vous voulez aussi, avec leur état : **« Envoyée »**, **« Acceptée »**, **« En cours »**, **« Arrivée »** ou **« Refusée »** (avec le motif). Vous n'en voulez plus ? Cliquez sur **« Ne plus le vouloir »**. Si vous l'aviez demandée, elle continue au nom du membre qui a dit « moi aussi » en premier.
 - **« Les demandes des autres membres »** : chaque demande en cours, la plus voulue d'abord, avec le nombre de membres qui la veulent. Personne ne voit qui. Cliquez sur **« Moi aussi je le veux »** pour en soutenir une.

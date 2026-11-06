@@ -328,3 +328,22 @@ async def test_books_to_ask_for_in_the_search(app: FastAPI, media: MediaHarness)
     ]
     assert items[1].facets["cover"] == f"/api/v1/media/book-covers?service={service}&ref=%2Fq.jpg"
     assert hardcover.searched[0] == "assassin"
+
+
+async def test_books_to_ask_for_from_ask_for_a_title(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """#375: « Ask for a title » finds the books the library lacks too, each leading to its sheet; #376: a
+    book the library has as an audiobook still has its sheet, to ask for the book itself."""
+    await _library(app, media)
+    await login(client, "zoe")
+    found = (await client.get("/api/v1/media/discover/titles", params={"q": "assassin"})).json()
+    service = str(UUID(int=9))
+    assert [(f["kind"], f["title"], f["year"], f["creator"], f["route"]) for f in found] == [
+        ("book", "Royal Assassin", 1996, "Robin Hobb", f"/media/book?service={service}&ref=102"),
+        ("book", "Assassin's Quest", 1997, "Robin Hobb", f"/media/book?service={service}&ref=103"),
+    ]
+    page = (await client.get("/api/v1/media/person", params={"name": "Robin Hobb"})).json()
+    royal = next(c for c in page["filmography"] if c["tmdb_id"] == "102")
+    assert royal["kind"] == "audiobook" and royal["route"] == f"/media/{await _id(media, 'Royal Assassin')}"
+    assert royal["sheet"] == f"/media/book?service={service}&ref=102"

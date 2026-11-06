@@ -95,7 +95,6 @@ const GameParty = lazy(() => import("../../features/games/PartyPage"));
 const GamesAdmin = lazy(() => import("../../features/games/AdminGames"));
 // issue 363: the members' requests for titles no service asks for, and the team's queue
 const Requests = lazy(() => import("../../features/requests/RequestsPage"));
-const RequestsAdmin = lazy(() => import("../../features/requests/AdminRequests"));
 const CardSet = lazy(() => import("../../features/cards/SetPage"));
 const CardPerson = lazy(() => import("../../features/cards/PersonPage"));
 const Community = lazy(() => import("../../features/community/CommunityPage"));
@@ -504,7 +503,8 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             })),
             { path: "gamification", element: <GamificationAdmin />, handle: h({ crumb: "Gamification" }) },
             { path: "games", element: <GamesAdmin />, handle: h({ crumb: "Games" }) },
-            { path: "requests", element: <RequestsAdmin />, handle: h({ crumb: "Title requests" }) },
+            // issue 375: the title requests are tabs of the media's « Requests » page
+            { path: "requests", loader: () => redirect("/admin/media-requests?tab=titles") },
             { path: "campaigns", element: <CampaignConsole />, handle: h({ crumb: "Campaigns" }) },
             { path: "automations", element: <Automations />, handle: h({ crumb: "Automations" }) },
             { path: "projects", element: <ProjectConsole />, handle: h({ crumb: "Projects" }) },
