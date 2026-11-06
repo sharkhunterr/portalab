@@ -372,11 +372,19 @@ class RequestableSearchProvider:
     label_key = "search.kind.request"
     required_permission = MEDIA_READ
 
-    def __init__(self, catalog: Any, authorizer: Authorizer, language: Any, titles: Any = None) -> None:
+    def __init__(
+        self,
+        catalog: Any,
+        authorizer: Authorizer,
+        language: Any,
+        titles: Any = None,
+        member_language: Any = None,
+    ) -> None:
         self.catalog = catalog
         self.authorizer = authorizer
         self.language = language
         self.titles = titles  # #373: the book and game databases' titles (DatabaseTitles)
+        self.member_language = member_language  # #373: the language a member reads titles in
 
     def facets(self) -> Sequence[FacetDef]:
         # #92: the media subtypes — a book or a game chosen leaves nothing to ask for here
@@ -388,7 +396,8 @@ class RequestableSearchProvider:
         user = principal.acting_for or principal.user_id
         if user is None or not query.text.strip():
             return []
-        language = language or await self.language()
+        if not language:  # the suggestions as one types: the member's own language, as on their pages
+            language = await (self.member_language(principal) if self.member_language else self.language())
         wanted = set(query.filters.get("subtype") or ())
         found = (
             await self.titles.found(query.text, language, limit)

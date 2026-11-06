@@ -527,6 +527,7 @@ class MediaModule:
                     self.authorizer,
                     self.language,
                     DatabaseTitles(self.capabilities, self.database),  # #373: books and games too
+                    self.member_language,
                 ),
                 owner=OWNER,
             )
