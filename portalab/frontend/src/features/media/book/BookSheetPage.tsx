@@ -73,6 +73,8 @@ function useBookSheet(service: string, ref: string) {
 function askStart(kind: string, title: string, authors: string[], edition?: Edition): AskStart {
   return {
     kind,
+    cover: edition?.cover ?? null,
+    sheet: `${window.location.pathname}${window.location.search}`, // issue 378: back to this sheet
     title,
     creator: authors.join(", ") || undefined,
     year: edition?.year ?? null,
@@ -156,7 +158,7 @@ export function BookSheetPage() {
         primary={
           canAsk("book") ? (
             <AskDialog
-              start={askStart("book", title, book.authors, mine)}
+              start={{ ...askStart("book", title, book.authors, mine), cover: mine?.cover ?? book.cover }}
               trigger={
                 <button type="button" className="ds-button ds-button--primary">
                   <Icon name="plus" size={16} />

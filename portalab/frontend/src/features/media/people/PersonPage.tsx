@@ -229,7 +229,14 @@ function Standing({
     // the button says it is not here: no « Not here » beside it; issue 377: the request in a dialog
     return asks.data?.kinds.includes(credit.kind) ? (
       <AskDialog
-        start={{ kind: credit.kind, title: credit.title, creator, year: credit.year }}
+        start={{
+          kind: credit.kind,
+          title: credit.title,
+          creator,
+          year: credit.year,
+          cover: credit.cover ?? null, // issue 378: what « My requests » shows of it
+          sheet: credit.route ?? null,
+        }}
         trigger={
           <button type="button" className="media-person__ask">
             <Icon name="plus" size={14} />

@@ -4,9 +4,9 @@ import type { ReactNode } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-// Issue 363 — asking the team for a title no service asks for: the form filled from a title told absent, a
-// title another member asked for turned into « I want it too », my requests and the others' to want too; a
-// book told absent leads to it while the requests take books.
+// Issue 363, issue 378 — asking for a book, a game… as a film is asked for (the portal's own request): the
+// form filled from a title told absent or an address; a book told absent leads to it while the team takes
+// books; an audiobook the library has leads to asking for the book.
 
 const fake = vi.hoisted(() => ({
   handler: (_: Request): Response | Promise<Response> => new Response(null),
@@ -19,33 +19,10 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 });
 
 import { KnownCard } from "../../../src/features/media/people/PersonPage";
-import { AskLists, RequestsPage } from "../../../src/features/requests/RequestsPage";
+import { RequestsPage } from "../../../src/features/requests/RequestsPage";
 import { json } from "../../support/fake-api";
 
-const OPTIONS = { kinds: ["book", "game"], price: 0, left: { book: null, game: 2 }, quotas: {} };
-
-function asked(id: string, title: string, extra: Record<string, unknown> = {}) {
-  return {
-    id,
-    kind: "book",
-    title,
-    creators: ["Robin Hobb"],
-    year: null,
-    details: {},
-    ids: {},
-    note: null,
-    status: "new",
-    reason: null,
-    supporters: 1,
-    mine: false,
-    asked: false,
-    route: null,
-    object_id: null,
-    created_at: "2026-11-06T10:00:00Z",
-    updated_at: "2026-11-06T10:00:00Z",
-    ...extra,
-  };
-}
+const OPTIONS = { kinds: ["book", "game"], known: ["album", "audiobook", "book", "game"] };
 
 function renderAt(path: string, routes: Array<{ path: string; element: ReactNode }>) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -59,65 +36,36 @@ function renderAt(path: string, routes: Array<{ path: string; element: ReactNode
 afterEach(cleanup);
 
 describe("title requests", () => {
-  it("turns a title another member asked for into « I want it too »", async () => {
-    const posted: Array<{ path: string; body: unknown }> = [];
+  it("asks for a book as a film is asked for, and says when it is asked already", async () => {
+    const posted: unknown[] = [];
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;
       if (path === "/api/v1/requests/options") return json(200, OPTIONS);
-      if (path === "/api/v1/requests" && request.method === "GET")
-        return json(200, {
-          mine: [asked("r1", "Le Prophète blanc", { mine: true, asked: true })],
-          open: [
-            asked("r1", "Le Prophète blanc", { mine: true }),
-            asked("r2", "Fool's Errand", { supporters: 3 }),
-          ],
-        });
-      if (path === "/api/v1/requests" && request.method === "POST") {
-        posted.push({ path, body: await request.json() });
-        return json(409, { code: "requests.already_asked", title: "Asked", request_id: "r2" });
-      }
-      if (path === "/api/v1/requests/r2/support") {
-        posted.push({ path, body: null });
-        return json(200, asked("r2", "Fool's Errand", { supporters: 4, mine: true }));
+      if (path === "/api/v1/media/requests" && request.method === "POST") {
+        posted.push(await request.json());
+        return posted.length === 1
+          ? json(201, { id: "r1", title: "Fool's Errand", kind: "book", state: "pending" })
+          : json(409, { code: "media.request_duplicate", title: "Already requested" });
       }
       return json(404, {});
     };
-    renderAt("/requests?kind=book&title=Fool%27s%20Errand&creator=Robin%20Hobb", [
+    renderAt("/requests?kind=book&title=Fool%27s%20Errand&creator=Robin%20Hobb&id.isbn=9780553582444", [
       { path: "/requests", element: <RequestsPage /> },
     ]);
     const title = (await screen.findByLabelText("Title")) as HTMLInputElement;
     expect(title.value).toBe("Fool's Errand");
-    expect((screen.getByLabelText("Author, studio or creator") as HTMLInputElement).value).toBe("Robin Hobb");
     fireEvent.click(screen.getByRole("button", { name: "Send the request" }));
-    const alert = await screen.findByRole("alert");
-    expect(alert.textContent).toContain("Another member asked for it already.");
-    expect(posted[0]?.body).toMatchObject({ kind: "book", title: "Fool's Errand", creators: ["Robin Hobb"] });
-    fireEvent.click(within(alert).getByRole("button", { name: /I want it too/ }));
-    await waitFor(() => expect(posted.map((p) => p.path)).toContain("/api/v1/requests/r2/support"));
-    expect((await screen.findByRole("status")).textContent).toContain("4 members want « Fool's Errand »");
-  });
-
-  it("lists my requests and the others' to want too, in « My requests » (issue 375)", async () => {
-    fake.handler = async (request) => {
-      const path = new URL(request.url).pathname;
-      if (path === "/api/v1/requests/options") return json(200, OPTIONS);
-      if (path === "/api/v1/requests")
-        return json(200, {
-          mine: [asked("r1", "Le Prophète blanc", { mine: true, asked: true })],
-          open: [
-            asked("r1", "Le Prophète blanc", { mine: true }),
-            asked("r2", "Fool's Errand", { supporters: 3 }),
-          ],
-        });
-      return json(404, {});
-    };
-    renderAt("/media/requests", [{ path: "/media/requests", element: <AskLists /> }]);
-    // mine, then the others' open requests (mine left out)
-    const mine = await screen.findByRole("list", { name: "My requests" });
-    expect(within(mine).getByText("Le Prophète blanc")).toBeTruthy();
-    const others = screen.getByRole("list", { name: "The other members' requests" });
-    expect(within(others).getAllByRole("listitem")).toHaveLength(1);
-    expect(within(others).getByText("3 members want it")).toBeTruthy();
+    // issue 378: the portal's own request, with what was told of the book
+    await waitFor(() => expect(posted).toHaveLength(1));
+    expect(posted[0]).toMatchObject({
+      kind: "book",
+      title: "Fool's Errand",
+      creators: ["Robin Hobb"],
+      ids: { isbn: "9780553582444" },
+    });
+    expect((await screen.findByRole("status")).textContent).toContain("Fool's Errand");
+    for (const link of screen.getAllByRole("link", { name: "See my requests" }))
+      expect(link.getAttribute("href")).toBe("/media/requests");
   });
 
   it("leads from a book told absent to its request", async () => {

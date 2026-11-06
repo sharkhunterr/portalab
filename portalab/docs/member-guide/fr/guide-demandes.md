@@ -99,36 +99,24 @@ Une fois le titre arrivé, le parcours se replie en une ligne (« Disponible · 
 > [!NOTE]
 > Si vous avez débloqué cette fonction (par exemple dans la boutique, selon votre portail), le bouton **« Voir les résultats des indexeurs »** montre les versions trouvées en ce moment : leur qualité, leurs sources, et si elles sont acceptées ou refusées. La recherche peut prendre une minute. Son résultat est gardé 30 minutes.
 
-## Demander un livre, un jeu… à l'équipe
+## Demander un livre, un jeu…
 
-Les films et les séries passent par le service de demandes. Pour le reste (un livre, un livre audio, un jeu…), si votre portail le propose, vous demandez directement à l'équipe.
+Les films et les séries passent par le service de demandes ; un livre, un livre audio ou un jeu, si votre portail le propose, par l'équipe. Pour vous, c'est la même demande : elle a les mêmes étapes, compte dans le même quota et se suit au même endroit.
 
-Tout part de [Demander un titre](/media/discover) : tapez un film, une série, un livre ou un jeu. Sous les films et séries, la section **« Livres, livres audio et jeux »** liste ceux que la médiathèque n'a pas ; chacun ouvre sa fiche. Vous ne trouvez pas ? Le lien **« Demander à l'équipe »**, sous les résultats, ouvre un formulaire libre. Sur la page d'un auteur ou d'une série de livres, un livre absent a aussi son bouton **« Le demander »**. Un livre que la médiathèque n'a qu'en livre audio a le bouton **« Le demander en livre »**, qui ouvre sa fiche.
+Tout part de [Demander un titre](/media/discover) : tapez un film, une série, un livre ou un jeu. Sous les films et séries, la section **« Livres, livres audio et jeux »** liste ceux que la médiathèque n'a pas ; chacun ouvre sa fiche. Vous ne trouvez pas ? **« Demander à l'équipe »**, sous les résultats, ouvre le formulaire. La section **« À demander »** de la recherche propose aussi ces livres et ces jeux. Sur la page d'un auteur ou d'une série de livres, un livre absent a son bouton **« Le demander »**. Un livre que la médiathèque n'a qu'en livre audio a le bouton **« Le demander en livre »**, qui ouvre sa fiche.
 
-La section **« À demander »** de la recherche propose aussi ces livres, et les jeux quand le portail a une base de jeux : chacun ouvre sa fiche. Cliquez sur la couverture ou le titre d'un livre absent pour ouvrir **sa fiche**, présentée comme celle d'un livre de la médiathèque : auteurs, séries, genres, note, résumé, et ses **« Éditions »**, celles de votre langue d'abord (titre traduit, format, livre audio, éditeur, ISBN). Si la médiathèque a déjà le livre, c'est sa page de la médiathèque qui s'ouvre. Si elle ne l'a qu'en livre audio, la fiche le dit (**« En livre audio dans la médiathèque »**) et le livre reste demandable. Sinon, **« Le demander »** demande le livre, ou une édition précise depuis sa ligne : son titre, sa langue, son format et son ISBN partent avec la demande, ce qui aide l'équipe à trouver la bonne.
+La **fiche** d'un livre absent est présentée comme celle d'un livre de la médiathèque : auteurs, séries, genres, note, résumé, et ses **« Éditions »**, celles de votre langue d'abord (titre traduit, format, livre audio, éditeur, ISBN). Si la médiathèque a déjà le livre, c'est sa page qui s'ouvre. Si elle ne l'a qu'en livre audio, la fiche le dit (**« En livre audio dans la médiathèque »**) et le livre reste demandable. Pour un jeu, quand le portail a une base de jeux (IGDB), la page d'une franchise liste tous ses jeux. Un jeu absent a aussi sa fiche : résumé, plateformes, studios, genres, note, bande-annonce, captures.
 
-1. Choisissez le **« Type »**, puis tapez le **« Titre »**.
-2. Ajoutez l'**« Auteur, studio ou créateur »** : il aide à trouver le bon titre. Plusieurs ? Séparez-les par une virgule.
+**« Le demander »** ouvre le formulaire dans une fenêtre, déjà rempli. Depuis la ligne d'une édition ou d'une plateforme, son titre, sa langue, son format et son ISBN partent avec la demande :
+
+1. Vérifiez le **« Type »** et le **« Titre »**.
+2. L'**« Auteur, studio ou créateur »** aide à trouver le bon titre. Plusieurs ? Séparez-les par une virgule.
 3. Si vous le voulez, précisez l'**« Année »**, la **« Langue »**, l'**« Édition »** (un format, une plateforme, un éditeur…) et **« Un mot pour l'équipe »**.
 4. Cliquez sur **« Envoyer la demande »**.
 
-Le portail vous répond tout de suite si :
+Le portail vous répond tout de suite si la médiathèque a déjà ce titre (le lien **« Le voir »** vous y emmène), ou s'il est déjà demandé : comme un film, il arrivera pour tout le monde.
 
-- **la médiathèque a déjà ce titre** : le lien **« Le voir »** vous y emmène ;
-- **un autre membre l'a déjà demandé** : cliquez sur **« Moi aussi je le veux »**. Vous êtes prévenu comme lui, et l'équipe voit que plusieurs membres le veulent.
-
-Selon votre portail, le nombre de demandes de chaque type peut être limité sur une période. Une demande peut aussi coûter des Coins. Ils vous sont rendus si elle est refusée.
-
-Pour les jeux, quand le portail a une base de jeux (IGDB), la page d'une franchise liste tous ses jeux, pas seulement ceux de la médiathèque. Un jeu absent ouvre **sa fiche**, présentée comme celle d'un jeu de la médiathèque : résumé, plateformes, studios, genres, note, bande-annonce, captures. **« Le demander »**, ou **« Le demander sur »** une plateforme, envoie la demande à l'équipe.
-
-### Suivre et soutenir les demandes
-
-Dans [Mes demandes](/media/requests), sous vos demandes de films et de séries :
-
-- **« Mes demandes »** : celles que vous avez faites et celles que vous voulez aussi, avec leur état : **« Envoyée »**, **« Acceptée »**, **« En cours »**, **« Arrivée »** ou **« Refusée »** (avec le motif). Vous n'en voulez plus ? Cliquez sur **« Ne plus le vouloir »**. Si vous l'aviez demandée, elle continue au nom du membre qui a dit « moi aussi » en premier.
-- **« Les demandes des autres membres »** : chaque demande en cours, la plus voulue d'abord, avec le nombre de membres qui la veulent. Personne ne voit qui. Cliquez sur **« Moi aussi je le veux »** pour en soutenir une.
-
-Quand le titre arrive dans la médiathèque, la demande se ferme d'elle-même et chaque membre qui le voulait reçoit une notification avec son lien. Ces notifications se règlent dans la catégorie « Mes demandes de titres ».
+Votre demande rejoint [Mes demandes](/media/requests), avec vos films et vos séries. L'équipe l'accepte ou la refuse (avec son motif). Elle se ferme d'elle-même quand le titre arrive dans la médiathèque, et vous en êtes prévenu comme pour un film.
 
 ## Être prévenu
 

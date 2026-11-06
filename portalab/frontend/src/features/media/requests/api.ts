@@ -6,12 +6,16 @@ export interface RequestCard {
   request_id: string;
   id: string | null;
   title: string;
-  kind: "movie" | "series";
+  kind: string; // a film, a series — issue 378: a book, an audiobook, a game…
   state: string;
   requested_at: string;
   updated_at?: string;
   image_id: string | null;
   poster_ref?: string | null;
+  /** issue 378: a book's or a game's cover, a ready address (through the portal) */
+  cover?: string | null;
+  /** issue 378: its sheet, while the library does not have it */
+  sheet?: string | null;
   route: string | null;
   /** 027: where it stands, in the words of the title's journey */
   stage?: string;
@@ -128,8 +132,11 @@ export function useSoon() {
 export function posterOf(card: {
   image_id: string | null;
   poster_ref?: string | null | undefined;
+  cover?: string | null | undefined;
 }): string | null {
   if (card.image_id) return `/api/v1/media/images/${card.image_id}`;
+  if (card.cover) return card.cover; // issue 378: a book's, a game's
+
   return card.poster_ref
     ? `/api/v1/media/metadata-images?ref=${encodeURIComponent(card.poster_ref)}&size=w342`
     : null;

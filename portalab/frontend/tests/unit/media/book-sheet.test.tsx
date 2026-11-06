@@ -70,7 +70,7 @@ function renderSheet(sheet: Record<string, unknown>) {
   fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
     if (path === "/api/v1/media/book") return json(200, sheet);
-    if (path === "/api/v1/requests" && request.method === "POST") {
+    if (path === "/api/v1/media/requests" && request.method === "POST") {
       posted.push(await request.json());
       return json(201, { id: "r1", title: "asked", supporters: 1 });
     }
@@ -125,7 +125,7 @@ describe("a book's sheet", () => {
       title: "Le Fou et l'Assassin, Intégrale 2",
       creators: ["Robin Hobb"],
       details: { language: "fr", edition: "Read, J'ai Lu" },
-      ids: { isbn: ["9782290359303"] },
+      ids: { isbn: "9782290359303" }, // issue 378: one per scheme, as every request's
     });
     fireEvent.keyDown(dialog, { key: "Escape" });
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());

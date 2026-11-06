@@ -54,7 +54,7 @@ function renderSheet(sheet: Record<string, unknown>) {
   fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
     if (path === "/api/v1/media/game") return json(200, sheet);
-    if (path === "/api/v1/requests" && request.method === "POST") {
+    if (path === "/api/v1/media/requests" && request.method === "POST") {
       posted.push(await request.json());
       return json(201, { id: "r1", title: "asked", supporters: 1 });
     }
@@ -99,7 +99,7 @@ describe("a game's sheet", () => {
       creators: ["Nintendo R&D4"],
       year: 1987,
       details: { edition: "NES" },
-      ids: { igdb: ["1025"] },
+      ids: { igdb: "1025" }, // issue 378: one per scheme, as every request's
     });
   });
 

@@ -35,14 +35,7 @@ export function AskDialog({ start, trigger }: { start: AskStart; trigger: ReactE
         </Link>
       }
     >
-      <AskForm
-        key={round}
-        kinds={options.data.kinds}
-        price={options.data.price}
-        left={options.data.left}
-        start={start}
-        bare
-      />
+      <AskForm key={round} kinds={options.data.kinds} start={start} bare />
     </Dialog>
   );
 }
