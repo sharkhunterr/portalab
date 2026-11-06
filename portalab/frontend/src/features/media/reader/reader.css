@@ -140,6 +140,18 @@
 .reader-comic[data-double] .reader-comic__page {
   max-inline-size: 50%;
 }
+/* issue 359: the page as wide as the screen, scrolled down */
+.reader-comic[data-fit="width"] {
+  align-items: flex-start;
+  overflow-y: auto;
+}
+.reader-comic[data-fit="width"] .reader-comic__page {
+  inline-size: 100%;
+  max-block-size: none;
+}
+.reader-comic[data-fit="width"][data-double] .reader-comic__page {
+  inline-size: 50%;
+}
 /* the edges of the page turn it (on the side the member reads towards) */
 .reader-zone {
   position: absolute;

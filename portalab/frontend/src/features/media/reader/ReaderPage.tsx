@@ -444,36 +444,43 @@ function Reader({
                   </label>
                 </>
               ) : null}
+              {format.format === "pdf" || format.format === "cbx" ? (
+                // issue 359: the whole page on the screen, or as wide as the screen (scrolled down)
+                <fieldset>
+                  <legend>{t("media:reader.fit")}</legend>
+                  {(["page", "width"] as const).map((fit) => (
+                    <label key={fit}>
+                      <input
+                        type="radio"
+                        name="reader-fit"
+                        checked={settings.fit === fit}
+                        onChange={() => update({ fit })}
+                      />
+                      {t(`media:reader.fits.${fit}`)}
+                    </label>
+                  ))}
+                </fieldset>
+              ) : null}
               {format.format === "pdf" ? (
-                <>
-                  <label className="reader-settings__check">
-                    <input
-                      type="checkbox"
-                      checked={settings.fit === "width"}
-                      onChange={(e) => update({ fit: e.target.checked ? "width" : "page" })}
-                    />
-                    {t("media:reader.fitWidth")}
-                  </label>
-                  <div className="reader-settings__zoom">
-                    <button
-                      type="button"
-                      className="player-icon reader-icon"
-                      onClick={() => setZoom((z) => Math.max(0.5, z - 0.25))}
-                      aria-label={t("media:reader.zoomOut")}
-                    >
-                      −
-                    </button>
-                    <span>{number.percent(zoom)}</span>
-                    <button
-                      type="button"
-                      className="player-icon reader-icon"
-                      onClick={() => setZoom((z) => Math.min(4, z + 0.25))}
-                      aria-label={t("media:reader.zoomIn")}
-                    >
-                      +
-                    </button>
-                  </div>
-                </>
+                <div className="reader-settings__zoom">
+                  <button
+                    type="button"
+                    className="player-icon reader-icon"
+                    onClick={() => setZoom((z) => Math.max(0.5, z - 0.25))}
+                    aria-label={t("media:reader.zoomOut")}
+                  >
+                    −
+                  </button>
+                  <span>{number.percent(zoom)}</span>
+                  <button
+                    type="button"
+                    className="player-icon reader-icon"
+                    onClick={() => setZoom((z) => Math.min(4, z + 0.25))}
+                    aria-label={t("media:reader.zoomIn")}
+                  >
+                    +
+                  </button>
+                </div>
               ) : null}
               {format.format !== "pdf" ? (
                 <label className="reader-settings__check">

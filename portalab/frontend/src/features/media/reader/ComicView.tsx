@@ -90,6 +90,7 @@ export function ComicView({ ticket, format, resume, settings, onMoved, onReady, 
       className="reader-comic"
       data-rtl={settings.rtl || undefined}
       data-double={double || undefined}
+      data-fit={settings.fit}
       style={{ background: colors.background }}
       onTouchStart={(event) => {
         touch.current = event.changedTouches[0]?.screenX ?? null;
