@@ -8351,6 +8351,206 @@
         "title": "FoundOut",
         "type": "object"
       },
+      "GameSheetOut": {
+        "description": "#368: a game the library may lack, as the game database tells it \u2014 and the library's title when it\nhas it (by its id there, else its title).",
+        "properties": {
+          "backdrop": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backdrop"
+          },
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover"
+          },
+          "developers": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Developers",
+            "type": "array"
+          },
+          "franchises": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/BookSeriesOut"
+            },
+            "title": "Franchises",
+            "type": "array"
+          },
+          "genres": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Genres",
+            "type": "array"
+          },
+          "images": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Images",
+            "type": "array"
+          },
+          "library": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Library"
+          },
+          "modes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Modes",
+            "type": "array"
+          },
+          "names": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "title": "Names",
+            "type": "object"
+          },
+          "platforms": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Platforms",
+            "type": "array"
+          },
+          "publishers": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Publishers",
+            "type": "array"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "release_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Release Date"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          },
+          "storyline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storyline"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "themes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Themes",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "trailer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trailer"
+          },
+          "votes": {
+            "default": 0,
+            "title": "Votes",
+            "type": "integer"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "service",
+          "ref",
+          "title"
+        ],
+        "title": "GameSheetOut",
+        "type": "object"
+      },
       "GitHubIn": {
         "additionalProperties": false,
         "properties": {
@@ -51282,6 +51482,127 @@
           }
         },
         "summary": "Facets",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/game": {
+      "get": {
+        "description": "#368: a game's sheet from the game database that knows it (IGDB), and where the library has it.",
+        "operationId": "game_sheet_api_v1_media_game_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "service",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f-]{36}$",
+              "title": "Service",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 20,
+              "minLength": 1,
+              "pattern": "^[0-9]+$",
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameSheetOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Game Sheet",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/game-images": {
+      "get": {
+        "description": "#368: a game's cover, screenshot or artwork from the game database, through the portal.",
+        "operationId": "game_image_api_v1_media_game_images_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "service",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f-]{36}$",
+              "title": "Service",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 40,
+              "minLength": 1,
+              "pattern": "^[a-z0-9]+$",
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "default": "cover",
+              "pattern": "^(cover|screenshot|artwork)$",
+              "title": "Size",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Game Image",
         "tags": [
           "media"
         ]

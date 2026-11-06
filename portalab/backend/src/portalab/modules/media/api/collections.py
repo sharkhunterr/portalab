@@ -19,7 +19,16 @@ from fastapi import APIRouter, Query, Response
 from pydantic import BaseModel
 from sqlalchemy import func, select
 
-from portalab.capabilities.media import BOOK_SERIES, METADATA, BookDetails, BookSeries, unwrap
+from portalab.capabilities.media import (
+    BOOK_SERIES,
+    GAME_DATABASE,
+    METADATA,
+    BookDetails,
+    BookSeries,
+    GameDetails,
+    GameFranchise,
+    unwrap,
+)
 from portalab.capabilities.media_core import WantedTitle
 from portalab.core.errors import NotFound, Unavailable
 from portalab.modules.media.api.people import (
@@ -32,7 +41,8 @@ from portalab.modules.media.api.people import (
 )
 from portalab.modules.media.api.router import MediaCard, Module, Reader, _asked, _card
 from portalab.modules.media.library_match import MediaLibraryMatch
-from portalab.modules.media.models import MediaObject, ObjectMetadata
+from portalab.modules.media.matching import fold
+from portalab.modules.media.models import ExternalId, MediaObject, ObjectMetadata
 from portalab.modules.media.permissions import MEDIA_REQUEST
 from portalab.modules.media.providers.insight_widgets import posters
 
@@ -331,6 +341,203 @@ async def book_sheet(
     )
 
 
+def _game_image(service: str, ref: str | None, size: str = "cover") -> str | None:
+    if not ref:
+        return None
+    return f"/api/v1/media/game-images?{urlencode({'service': service, 'ref': ref, 'size': size})}"
+
+
+def _game_sheet(service: str, ref: str) -> str:
+    return f"/media/game?{urlencode({'service': service, 'ref': ref})}"
+
+
+async def _igdb_of(module: Module, ids: list[UUID]) -> dict[str, UUID]:
+    """The library's games by the game database's ids they carry (RomM keeps IGDB's)."""
+    async with module.database.session() as session:
+        rows = await session.execute(
+            select(ExternalId.value, ExternalId.object_id).where(
+                ExternalId.object_id.in_(ids), ExternalId.scheme == "igdb"
+            )
+        )
+        return {str(value): object_id for value, object_id in rows}
+
+
+async def _games(module: Module, name: str, rows: list[MediaObject]) -> list[FilmCreditOut]:
+    """#368: every game of a franchise as a game database knows it (IGDB) — the franchise told apart from
+    its namesakes by the library's own games —, each found in the library by its id there, else by its
+    title; the others absent, leading to their sheet."""
+    games = [row for row in rows if row.kind == "game"]
+    if not games:
+        return []
+    by_id = await _igdb_of(module, [row.id for row in games])
+    rows_of = {row.id: row for row in games}
+    by_title = {fold(row.title): row for row in games}
+    for registration in module.capabilities.system_providers(GAME_DATABASE):
+        service = registration.instance_ref
+        try:
+            found = unwrap(await registration.provider.franchise(name, sorted(by_id)))
+        except Exception as exc:
+            log.info("game franchise lookup failed: %s: %s", type(exc).__name__, exc)
+            continue
+        if not isinstance(found, GameFranchise) or not found.games:
+            continue
+        images = await posters(module.database, [row.id for row in games])
+        parts: list[FilmCreditOut] = []
+        claimed: set[UUID] = set()
+        for game in found.games:
+            object_id = by_id.get(game.tmdb_id)
+            row = rows_of.get(object_id) if object_id else by_title.get(fold(game.title))
+            if row is not None and row.id in claimed:
+                row = None  # a library game is one of them only
+            if row is not None:
+                claimed.add(row.id)
+            parts.append(
+                FilmCreditOut(
+                    tmdb_id=game.tmdb_id,
+                    kind="game",
+                    title=row.title if row else game.title,
+                    year=game.year,
+                    role=None,
+                    department="game",
+                    poster=None,
+                    image_id=images.get(row.id) if row else None,
+                    rating=game.vote_average,
+                    votes=game.vote_count,
+                    status=("available" if row.available else "unavailable") if row else "absent",
+                    object_id=str(row.id) if row else None,
+                    route=f"/media/{row.id}" if row else _game_sheet(service, game.tmdb_id),
+                    cover=_game_image(service, game.poster),
+                )
+            )
+        return parts
+    return []
+
+
+class GameSheetOut(BaseModel):
+    """#368: a game the library may lack, as the game database tells it — and the library's title when it
+    has it (by its id there, else its title)."""
+
+    service: str
+    ref: str
+    title: str
+    summary: str | None = None
+    storyline: str | None = None
+    year: int | None = None
+    release_date: str | None = None
+    cover: str | None = None
+    backdrop: str | None = None  # its first artwork or screenshot
+    images: list[str] = []  # its screenshots and artworks, ready URLs
+    genres: list[str] = []
+    themes: list[str] = []
+    modes: list[str] = []
+    platforms: list[str] = []
+    developers: list[str] = []
+    publishers: list[str] = []
+    franchises: list[BookSeriesOut] = []  # each linked when the library has some of its games
+    names: dict[str, str] = {}
+    rating: float | None = None
+    votes: int = 0
+    trailer: str | None = None
+    library: str | None = None  # the library's title's id
+
+
+@router.get("/media/game", response_model=GameSheetOut)
+async def game_sheet(
+    _: Reader,
+    module: Module,
+    service: Annotated[str, Query(pattern=r"^[0-9a-f-]{36}$")],
+    ref: Annotated[str, Query(min_length=1, max_length=20, pattern=r"^[0-9]+$")],
+) -> GameSheetOut:
+    """#368: a game's sheet from the game database that knows it (IGDB), and where the library has it."""
+    provider = next(
+        (
+            r.provider
+            for r in module.capabilities.system_providers(GAME_DATABASE)
+            if r.instance_ref == service
+        ),
+        None,
+    )
+    if provider is None:
+        raise CollectionNotFound("No such game database.")
+    try:
+        game = unwrap(await provider.game(ref))
+    except Exception as exc:
+        raise Unavailable("The game cannot be told right now.", code="media.game_unavailable") from exc
+    if not isinstance(game, GameDetails):
+        raise CollectionNotFound(f"no game {ref[:20]!r}")
+    held = await MediaLibraryMatch(module.database).find(
+        [WantedTitle("game", "game", game.title, (), {"igdb": [game.ref]})]
+    )
+    franchises = []
+    for name in game.franchises:
+        found, rows = await _series(module, name)
+        franchises.append(
+            BookSeriesOut(
+                name=name,
+                route=f"/media/collection?{urlencode({'ref': f'{SERIES}{found}'})}" if rows else None,
+            )
+        )
+    images = [_game_image(service, ref_, "screenshot") for ref_ in game.images]
+    return GameSheetOut(
+        service=service,
+        ref=game.ref,
+        title=game.title,
+        summary=game.summary,
+        storyline=game.storyline,
+        year=game.year,
+        release_date=game.release_date,
+        cover=_game_image(service, game.cover),
+        backdrop=_game_image(service, game.images[0], "artwork") if game.images else None,
+        images=[url for url in images if url],
+        genres=list(game.genres),
+        themes=list(game.themes),
+        modes=list(game.modes),
+        platforms=list(game.platforms),
+        developers=list(game.developers),
+        publishers=list(game.publishers),
+        franchises=franchises,
+        names=dict(game.names),
+        rating=game.rating,
+        votes=game.votes,
+        trailer=game.trailer,
+        library=str(held["game"].object_id) if "game" in held else None,
+    )
+
+
+@router.get("/media/game-images")
+async def game_image(
+    _: Reader,
+    module: Module,
+    service: Annotated[str, Query(pattern=r"^[0-9a-f-]{36}$")],
+    ref: Annotated[str, Query(min_length=1, max_length=40, pattern=r"^[a-z0-9]+$")],
+    size: Annotated[str, Query(pattern=r"^(cover|screenshot|artwork)$")] = "cover",
+) -> Response:
+    """#368: a game's cover, screenshot or artwork from the game database, through the portal."""
+    provider = next(
+        (
+            r.provider
+            for r in module.capabilities.system_providers(GAME_DATABASE)
+            if r.instance_ref == service
+        ),
+        None,
+    )
+    if provider is None:
+        raise CollectionNotFound("No such image.")
+    try:
+        data = unwrap(await provider.image(ref, size))
+    except Exception as exc:
+        raise Unavailable("The image cannot be fetched right now.", code="media.image_unavailable") from exc
+    return Response(
+        content=data,
+        media_type=_image_type(data),
+        headers={
+            "Cache-Control": "private, max-age=2592000, immutable",
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "default-src 'none'",
+        },
+    )
+
+
 @router.get("/media/book-covers")
 async def book_cover(
     _: Reader,
@@ -430,6 +637,7 @@ async def collection(
             source="series",
             name=name,
             items=await _items(module, rows),
-            parts=await _volumes(module, name, rows),
+            # a book series' volumes (issue 362), a game franchise's games (#368)
+            parts=await _volumes(module, name, rows) or await _games(module, name, rows),
         )
     raise CollectionNotFound(f"no collection {ref[:60]!r}")

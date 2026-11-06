@@ -9585,6 +9585,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/game": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Game Sheet
+         * @description #368: a game's sheet from the game database that knows it (IGDB), and where the library has it.
+         */
+        get: operations["game_sheet_api_v1_media_game_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/game-images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Game Image
+         * @description #368: a game's cover, screenshot or artwork from the game database, through the portal.
+         */
+        get: operations["game_image_api_v1_media_game_images_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/images/{image_id}": {
         parameters: {
             query?: never;
@@ -15368,6 +15408,89 @@ export interface components {
             population?: number | null;
             /** Region */
             region?: string | null;
+        };
+        /**
+         * GameSheetOut
+         * @description #368: a game the library may lack, as the game database tells it — and the library's title when it
+         *     has it (by its id there, else its title).
+         */
+        GameSheetOut: {
+            /** Backdrop */
+            backdrop?: string | null;
+            /** Cover */
+            cover?: string | null;
+            /**
+             * Developers
+             * @default []
+             */
+            developers: string[];
+            /**
+             * Franchises
+             * @default []
+             */
+            franchises: components["schemas"]["BookSeriesOut"][];
+            /**
+             * Genres
+             * @default []
+             */
+            genres: string[];
+            /**
+             * Images
+             * @default []
+             */
+            images: string[];
+            /** Library */
+            library?: string | null;
+            /**
+             * Modes
+             * @default []
+             */
+            modes: string[];
+            /**
+             * Names
+             * @default {}
+             */
+            names: {
+                [key: string]: string;
+            };
+            /**
+             * Platforms
+             * @default []
+             */
+            platforms: string[];
+            /**
+             * Publishers
+             * @default []
+             */
+            publishers: string[];
+            /** Rating */
+            rating?: number | null;
+            /** Ref */
+            ref: string;
+            /** Release Date */
+            release_date?: string | null;
+            /** Service */
+            service: string;
+            /** Storyline */
+            storyline?: string | null;
+            /** Summary */
+            summary?: string | null;
+            /**
+             * Themes
+             * @default []
+             */
+            themes: string[];
+            /** Title */
+            title: string;
+            /** Trailer */
+            trailer?: string | null;
+            /**
+             * Votes
+             * @default 0
+             */
+            votes: number;
+            /** Year */
+            year?: number | null;
         };
         /** GitHubIn */
         GitHubIn: {
@@ -39105,6 +39228,71 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaFacets"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    game_sheet_api_v1_media_game_get: {
+        parameters: {
+            query: {
+                service: string;
+                ref: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GameSheetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    game_image_api_v1_media_game_images_get: {
+        parameters: {
+            query: {
+                service: string;
+                ref: string;
+                size?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
