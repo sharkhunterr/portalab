@@ -1276,6 +1276,11 @@ a.media-card__link:focus-visible .media-card__frame {
 .media-person > * {
   min-inline-size: 0;
 }
+/* issue 362: a book of theirs the library does not have */
+.media-person__absent {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
 .media-person__ask {
   display: inline-flex;
   justify-self: start;

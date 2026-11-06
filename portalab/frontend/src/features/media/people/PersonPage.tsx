@@ -12,7 +12,7 @@ import { metadataImage } from "../detail/Enrichment";
 import { RequestDialog } from "../discover/RequestDialog";
 import { PosterBadge, StatusBadge } from "../discover/StatusBadge";
 import { FollowButton } from "../feed/FollowButton";
-import { MediaGrid, Poster } from "../MediaGrid";
+import { KIND_ICONS, MediaGrid, Poster } from "../MediaGrid";
 import "../media.css";
 import { PosterTickets } from "../../support/tickets/MediaTickets";
 
@@ -90,6 +90,7 @@ function PersonView({ headingId, data }: { headingId: string; data: Person }) {
     { key: "available", value: counts.available ?? 0, tone: "ok" },
     { key: "requested", value: counts.requested ?? 0, tone: "warn" },
     { key: "missing", value: counts.missing ?? 0, tone: "neutral" },
+    { key: "absent", value: counts.absent ?? 0, tone: "neutral" }, // issue 362: their books not there
   ].filter((stat) => stat.key === "library" || stat.value > 0);
   const known = profile?.known_for ? department(t, profile.known_for) : null;
   // an author, a narrator: their books first; what the film services know of them after
@@ -192,7 +193,11 @@ function Standing({ credit, askable }: { credit: Credit; askable: boolean }) {
       />
     );
   }
-  if (!askable) return null;
+  // issue 362: a book not in the library — no service asks for books
+  if (credit.status === "absent") {
+    return <span className="media-person__absent">{t("media:person.status.absent")}</span>;
+  }
+  if (!askable || credit.kind === "book") return null;
   return (
     <RequestDialog
       target={{
@@ -213,13 +218,15 @@ function Standing({ credit, askable }: { credit: Credit; askable: boolean }) {
 }
 
 function posterOf(credit: Credit, size: string): string | null {
-  return credit.image_id ? imageUrl(credit.image_id) : metadataImage(credit.poster, size);
+  if (credit.image_id) return imageUrl(credit.image_id);
+  return credit.cover ?? metadataImage(credit.poster, size); // issue 362: a book's, through the portal
 }
 
 /** A title they are known for: the media pages' own card — poster, standing on its corner, title, role —
  * and, when it can be asked for, the button under it. */
 export function KnownCard({ credit, askable }: { credit: Credit; askable: boolean }) {
   const t = useT();
+  const format = useFormat();
   const src = posterOf(credit, "w342");
   const frame = (
     <>
@@ -240,10 +247,15 @@ export function KnownCard({ credit, askable }: { credit: Credit; askable: boolea
       ) : (
         <div className="media-card__link">{frame}</div>
       )}
+      {credit.position !== null && credit.position !== undefined ? (
+        <span className="media-card__note">
+          {t("media:collection.volume", { number: format.number(credit.position) })}
+        </span>
+      ) : null}
       <span className="media-card__meta">
         {[t(`media:kind.${credit.kind}`), credit.year, credit.role].filter(Boolean).join(" · ")}
       </span>
-      {credit.status === "missing" || credit.status === "unavailable" ? (
+      {credit.status === "missing" || credit.status === "unavailable" || credit.status === "absent" ? (
         <Standing credit={credit} askable={askable} />
       ) : null}
     </li>
@@ -277,17 +289,26 @@ function Filmography({ credits, askable }: { credits: Credit[]; askable: boolean
       (filter === "all" ||
         (filter === "available"
           ? c.status === "available"
-          : c.status === "missing" || c.status === "unavailable")) &&
+          : c.status === "missing" || c.status === "unavailable" || c.status === "absent")) &&
       (chosen === "all" || c.departments.includes(chosen)),
+  );
+  // issue 362: an author's books — a bibliography, or their works when films are there too
+  const books = titles.filter((c) => c.kind === "book").length;
+  const heading = t(
+    books === 0
+      ? "media:person.filmography"
+      : books === titles.length
+        ? "media:person.bibliography"
+        : "media:person.works",
   );
   return (
     <section className="media-row media-person__section">
       <h3>
-        {t("media:person.filmography")} <span className="media-person__count">{titles.length}</span>
+        {heading} <span className="media-person__count">{titles.length}</span>
       </h3>
       <div className="media-person__filters">
         <fieldset className="ds-subnav">
-          <legend className="visually-hidden">{t("media:person.filmography")}</legend>
+          <legend className="visually-hidden">{heading}</legend>
           {(["all", "available", "missing"] as Filter[]).map((value) => (
             <button
               key={value}
@@ -295,7 +316,11 @@ function Filmography({ credits, askable }: { credits: Credit[]; askable: boolean
               aria-pressed={filter === value}
               onClick={() => setFilter(value)}
             >
-              {t(`media:person.filter.${value}`)}
+              {t(
+                value === "missing" && books === titles.length
+                  ? "media:person.filter.absent"
+                  : `media:person.filter.${value}`,
+              )}
             </button>
           ))}
         </fieldset>
@@ -322,7 +347,11 @@ function Filmography({ credits, askable }: { credits: Credit[]; askable: boolean
             <>
               <span className="media-person__year">{credit.year ?? "—"}</span>
               <span className="media-person__thumb" aria-hidden="true">
-                {src ? <img src={src} alt="" loading="lazy" /> : <Icon name="film" size={16} />}
+                {src ? (
+                  <img src={src} alt="" loading="lazy" />
+                ) : (
+                  <Icon name={KIND_ICONS[credit.kind] ?? "film"} size={16} />
+                )}
               </span>
               <span className="media-person__line">
                 <strong>{credit.title}</strong>

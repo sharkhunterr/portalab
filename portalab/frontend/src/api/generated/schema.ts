@@ -9392,6 +9392,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/book-covers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Book Cover
+         * @description Issue 362: a volume's cover from the book database that has it, through the portal: browsers never
+         *     call the services.
+         */
+        get: operations["book_cover_api_v1_media_book_covers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/collection": {
         parameters: {
             query?: never;
@@ -14754,6 +14775,8 @@ export interface components {
         };
         /** FeedUpcomingOut */
         FeedUpcomingOut: {
+            /** Cover */
+            cover?: string | null;
             /** Department */
             department: string;
             /** Image Id */
@@ -14764,6 +14787,8 @@ export interface components {
             object_id: string | null;
             /** Person */
             person: string;
+            /** Position */
+            position?: number | null;
             /** Poster */
             poster: string | null;
             /** Rating */
@@ -14776,7 +14801,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "available" | "requested" | "unavailable" | "missing";
+            status: "available" | "requested" | "unavailable" | "missing" | "absent";
             /** Title */
             title: string;
             /** Tmdb Id */
@@ -15017,6 +15042,8 @@ export interface components {
         };
         /** FilmCreditOut */
         FilmCreditOut: {
+            /** Cover */
+            cover?: string | null;
             /** Department */
             department: string;
             /** Image Id */
@@ -15025,6 +15052,8 @@ export interface components {
             kind: string;
             /** Object Id */
             object_id: string | null;
+            /** Position */
+            position?: number | null;
             /** Poster */
             poster: string | null;
             /** Rating */
@@ -15037,7 +15066,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "available" | "requested" | "unavailable" | "missing";
+            status: "available" | "requested" | "unavailable" | "missing" | "absent";
             /** Title */
             title: string;
             /** Tmdb Id */
@@ -38475,6 +38504,38 @@ export interface operations {
             query: {
                 ref: string;
                 preview?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    book_cover_api_v1_media_book_covers_get: {
+        parameters: {
+            query: {
+                service: string;
+                ref: string;
             };
             header?: never;
             path?: never;

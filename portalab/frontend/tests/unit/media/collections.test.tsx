@@ -67,6 +67,60 @@ describe("collections", () => {
     expect(within(block).getByText("Volume 1")).toBeTruthy();
   });
 
+  it("lists a book series' volumes, those the library lacks told absent", async () => {
+    const part = (id: string, title: string, position: number, extra: Record<string, unknown>) => ({
+      tmdb_id: id,
+      kind: "book",
+      title,
+      year: 1995,
+      role: null,
+      department: "writing",
+      poster: null,
+      image_id: null,
+      rating: null,
+      votes: 0,
+      status: "absent",
+      object_id: null,
+      route: null,
+      cover: null,
+      position,
+      ...extra,
+    });
+    fake.handler = (request) => {
+      const url = new URL(request.url);
+      if (url.pathname === "/api/v1/media/collection")
+        return json(200, {
+          ref: "series:L'Assassin royal",
+          source: "series",
+          name: "L'Assassin royal",
+          poster: null,
+          items: [card(BOOK, "L'Apprenti assassin", { position: 1 })],
+          parts: [
+            part("101", "Assassin's Apprentice", 1, {
+              status: "available",
+              object_id: BOOK,
+              route: `/media/${BOOK}`,
+            }),
+            part("102", "Royal Assassin", 2, { cover: "/api/v1/media/book-covers?service=s&ref=%2Fa.jpg" }),
+          ],
+          askable: true,
+        });
+      return json(404, {});
+    };
+    renderAt("/media/collection?ref=series%3AL'Assassin%20royal", [
+      { path: "/media/collection", element: <CollectionPage /> },
+    ]);
+    const volumes = await screen.findByRole("list", { name: "The series' volumes" });
+    const [first, second] = within(volumes).getAllByRole("listitem");
+    expect(within(first as HTMLElement).getByText("Volume 1")).toBeTruthy();
+    expect(within(second as HTMLElement).getByText("Not here")).toBeTruthy();
+    // never « Ask for it » for a book; its cover through the portal
+    expect(within(volumes).queryByRole("button")).toBeNull();
+    expect((second as HTMLElement).querySelector("img")?.getAttribute("src")).toContain(
+      "/api/v1/media/book-covers",
+    );
+  });
+
   it("lists a saga's films, the missing ones to ask for", async () => {
     fake.handler = (request) => {
       const url = new URL(request.url);

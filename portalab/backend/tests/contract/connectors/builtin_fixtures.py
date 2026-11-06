@@ -2,6 +2,7 @@
 ``httpx.MockTransport`` so the real ``ConnectorHttpClient`` (headers, redirects, size cap) is exercised."""
 
 import asyncio
+import json
 from collections.abc import Callable, Mapping
 from typing import Any
 from uuid import uuid4
@@ -619,6 +620,88 @@ THETVDB: Routes = {
     },
 }
 
+
+def _hardcover(request: httpx.Request) -> Any:
+    """Issue 362: Hardcover's GraphQL API — each query answered by its name."""
+    asked = json.loads(request.content)
+    query, variables = asked["query"], asked.get("variables") or {}
+    if "query Status" in query:
+        return {"data": {"authors": [{"id": 1}]}}
+    if "query Search" in query and variables["type"] == "author":
+        return {
+            "data": {
+                "search": {
+                    "ids": ["204214", "9"],
+                    "results": {
+                        "hits": [
+                            {"document": {"id": "204214", "name": "Robin Hobb", "books_count": 80}},
+                            {"document": {"id": "9", "name": "Robin Hobbs", "books_count": 2}},
+                        ]
+                    },
+                }
+            }
+        }
+    if "query Search" in query:  # a series
+        return {"data": {"search": {"ids": ["7", "8"], "results": {"hits": []}}}}
+    if "query Author" in query:
+        book = {
+            "id": 101,
+            "title": "Assassin's Apprentice",
+            "release_year": 1995,
+            "users_count": 9000,
+            "rating": 4.1,
+            "ratings_count": 3000,
+            "image": {"url": "https://assets.hardcover.app/edition/1/apprentice.jpg"},
+            "editions": [{"isbn_13": "9780553573398", "isbn_10": "0553573403"}, {"isbn_13": "bad"}],
+        }
+        other = {"id": 102, "title": "Royal Assassin", "image": {"url": "https://evil.example/x.jpg"}}
+        return {
+            "data": {
+                "authors": [
+                    {
+                        "id": 204214,
+                        "name": "Robin Hobb",
+                        "bio": "An American writer.",
+                        "born_date": "1952-03-05",
+                        "image": {"url": "https://assets.hardcover.app/author/204214/photo.jpeg"},
+                        "contributions": [{"book": book}, {"book": other}, {"book": book}],
+                    }
+                ]
+            }
+        }
+    if "query Series" in query:
+        return {
+            "data": {
+                "series": [
+                    {
+                        "id": 7,
+                        "name": "Farseer",
+                        "book_series": [{"position": 1, "book": {"id": 1, "title": "Other"}}],
+                    },
+                    {
+                        "id": 8,
+                        "name": "The Farseer Trilogy",
+                        "author": {"name": "Robin Hobb"},
+                        "book_series": [
+                            {
+                                "position": 1,
+                                "book": {
+                                    "id": 101,
+                                    "title": "Assassin's Apprentice",
+                                    "editions": [{"isbn_13": "9780553573398"}],
+                                },
+                            },
+                            {"position": 2, "book": {"id": 102, "title": "Royal Assassin"}},
+                        ],
+                    },
+                ]
+            }
+        }
+    return {"errors": [{"message": "unknown query"}]}
+
+
+HARDCOVER = {"/v1/graphql": _hardcover}
+
 SECRETS = {
     "jellyfin": {"api_key": "jf-secret-key"},
     "plex": {"token": "plex-secret-token"},
@@ -631,6 +714,7 @@ SECRETS = {
     "tmdb": {"api_key": "tmdb-secret-key"},
     "fanart": {"api_key": "fanart-secret-key"},
     "thetvdb": {"api_key": "tvdb-secret-key"},
+    "hardcover": {"api_key": "Bearer hardcover-secret-token"},
     "searxng": {},
     "authentik": {"api_token": "authentik-secret-token"},
     "maintainerr": {},
@@ -648,6 +732,7 @@ ROUTES = {
     "tmdb": TMDB,
     "fanart": FANART,
     "thetvdb": THETVDB,
+    "hardcover": HARDCOVER,
     "searxng": SEARXNG,
     "authentik": AUTHENTIK,
     "maintainerr": MAINTAINERR,

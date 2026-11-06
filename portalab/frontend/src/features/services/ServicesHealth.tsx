@@ -356,6 +356,7 @@ const CONNECTOR_ICONS: Record<string, string> = {
   tautulli: "chart",
   tmdb: "database",
   grimmory: "book",
+  hardcover: "book-open", // issue 362
   romm: "joystick",
   qbittorrent: "package",
   deluge: "package",

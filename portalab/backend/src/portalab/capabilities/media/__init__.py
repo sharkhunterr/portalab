@@ -65,6 +65,7 @@ CHARACTERS = "media.characters"  # issue 231: each role's own image, made by a c
 REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the request service (Seerr)
 REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
 PEOPLE = "media.people"  # #92: what a service knows of a person — biography, portrait, filmography
+BOOK_SERIES = "media.book_series"  # issue 362: a book series' volumes, from a book database (Hardcover)
 ACTIVITY_KINDS: tuple[str, ...] = (
     "movie",
     "episode",
@@ -717,10 +718,13 @@ class MetadataRecord:
 
 @dataclass(frozen=True, slots=True)
 class PersonCredit:
-    """#92 — one title of a person's filmography, as the metadata provider knows it."""
+    """#92 — one title of a person's filmography, as the metadata provider knows it. Issue 362: a book of
+    their bibliography too (a book database's: Hardcover) — then ``tmdb_id`` is that database's id of the
+    book, ``poster`` its cover's reference (fetched back through the provider), ``isbns`` its editions' and
+    ``position`` its volume in a series."""
 
     tmdb_id: str
-    kind: Literal["movie", "series"]
+    kind: Literal["movie", "series", "book"]
     title: str
     year: int | None = None
     role: str | None = None  # the character, or the job (« Director »)
@@ -729,6 +733,8 @@ class PersonCredit:
     popularity: float = 0.0
     vote_average: float | None = None
     vote_count: int = 0
+    isbns: Sequence[str] = ()
+    position: float | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -852,6 +858,27 @@ class PeopleProvider(Protocol):
     async def person(self, name: str, ids: Mapping[str, str], language: str) -> PersonRecord | None: ...
 
     async def portrait(self, ref: str, size: str) -> bytes: ...
+
+
+@dataclass(frozen=True, slots=True)
+class BookSeries:
+    """Issue 362 — a book series as a book database knows it: its volumes in order (``position``), each
+    with its editions' ISBNs to find it in the library."""
+
+    ids: Mapping[str, str]
+    name: str
+    author: str | None = None
+    volumes: Sequence[PersonCredit] = ()
+
+
+@runtime_checkable
+class BookSeriesProvider(Protocol):
+    """Issue 362 — a book series' volumes (Hardcover), found by its name and told apart from its namesakes
+    by the ISBNs of the library's own volumes; ``cover`` returns the image of a volume's ``poster``."""
+
+    async def series(self, name: str, isbns: Sequence[str]) -> BookSeries | None: ...
+
+    async def cover(self, ref: str, size: str) -> bytes: ...
 
 
 @runtime_checkable
@@ -1357,6 +1384,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(REQUEST_QUOTAS, RequestQuotas, "Each account's request limits on the request service (#3)"),
     _spec(REQUEST_DISCOVERY, RequestDiscovery, "Titles one can ask for: search, shelves, details (#4)"),
     _spec(PEOPLE, PeopleProvider, "What a service knows of a person: biography, portrait, titles (#92)"),
+    _spec(BOOK_SERIES, BookSeriesProvider, "A book series' volumes, from a book database (issue 362)"),
     _spec(
         DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
     ),

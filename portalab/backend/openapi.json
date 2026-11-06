@@ -6892,6 +6892,17 @@
       },
       "FeedUpcomingOut": {
         "properties": {
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover"
+          },
           "department": {
             "title": "Department",
             "type": "string"
@@ -6925,6 +6936,17 @@
           "person": {
             "title": "Person",
             "type": "string"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
           },
           "poster": {
             "anyOf": [
@@ -6975,7 +6997,8 @@
               "available",
               "requested",
               "unavailable",
-              "missing"
+              "missing",
+              "absent"
             ],
             "title": "Status",
             "type": "string"
@@ -7695,6 +7718,17 @@
       },
       "FilmCreditOut": {
         "properties": {
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover"
+          },
           "department": {
             "title": "Department",
             "type": "string"
@@ -7724,6 +7758,17 @@
               }
             ],
             "title": "Object Id"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
           },
           "poster": {
             "anyOf": [
@@ -7774,7 +7819,8 @@
               "available",
               "requested",
               "unavailable",
-              "missing"
+              "missing",
+              "absent"
             ],
             "title": "Status",
             "type": "string"
@@ -50292,6 +50338,60 @@
           }
         },
         "summary": "Artwork Image",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/book-covers": {
+      "get": {
+        "description": "Issue 362: a volume's cover from the book database that has it, through the portal: browsers never\ncall the services.",
+        "operationId": "book_cover_api_v1_media_book_covers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "service",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f-]{36}$",
+              "title": "Service",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 120,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_./-]+$",
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Book Cover",
         "tags": [
           "media"
         ]

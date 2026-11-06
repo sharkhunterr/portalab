@@ -11,6 +11,7 @@ export const CONNECTOR_ICON: Record<string, string> = {
   overseerr: "inbox",
   jellyseerr: "inbox",
   grimmory: "book",
+  hardcover: "book-open", // issue 362
   audiobookshelf: "headphones",
   romm: "joystick",
   tmdb: "database",
