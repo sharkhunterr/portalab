@@ -11,7 +11,7 @@ import pytest
 from portalab.capabilities.media_core import BingoCell, BingoTick
 from portalab.core.db import Database
 from portalab.core.time import FixedClock
-from portalab.modules.games.bingo import NoBingo, draw, lines
+from portalab.modules.games.bingo import NoBingo, booster_of, draw, lines
 from portalab.modules.games.participant import GamesParticipant
 from tests.integration.games.test_games import NOW, _module, _users
 
@@ -40,6 +40,15 @@ def test_a_month_s_card_is_drawn_the_same_for_everyone() -> None:
     assert len(draw(CELLS[:10], month)) == 9  # a small library: 3 x 3
     assert draw(CELLS[:8], month) == []
     assert len(lines(4)) == 10 and lines(3)[-1] == ("diag:1", (2, 4, 6))
+
+
+def test_the_full_card_s_booster_is_its_genre_else_its_era() -> None:
+    month = date(2026, 11, 1)
+    assert booster_of(["review", "genre:scifi", "genre:drama"], month) == {"genre": "scifi"}
+    assert booster_of(["kind:book", "era:1980"], month) == {"year": 1985}
+    assert booster_of(["era:before1970"], month) == {"year": 1965}
+    assert booster_of(["era:recent"], month) == {"year": 2026}
+    assert booster_of(["kind:book", "review"], month) == {}  # the whole library's
 
 
 async def test_the_month_s_bingo(database: Database) -> None:
@@ -84,8 +93,9 @@ async def test_the_month_s_bingo(database: Database) -> None:
     ticked[alex] = {key: tick for key in keys}  # alex filled the card: 10 lines and the card
     assert await module.bingo.check() == 11
     assert await module.bingo.check() == 0
+    first_genre = next(k for k in keys if k.startswith("genre:")).removeprefix("genre:")
     assert [m for t, m, _ in events.told if t == "games.bingo_card"] == [
-        {"month": "2026-10-01", "squares": 16}
+        {"month": "2026-10-01", "squares": 16, "booster": {"genre": first_genre}}  # its booster: that genre's
     ]
     seen = await module.bingo.view(zoe)
     assert seen["players"] == 2 and seen["cards"] == 1

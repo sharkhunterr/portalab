@@ -729,6 +729,44 @@ async def test_a_shops_booster_draws_among_the_works_it_names(database: Database
     assert len(sets) == 5 and set(sets) == {str(space.object_id)}  # science fiction since 2010 only
 
 
+async def test_a_reward_s_booster_draws_among_the_works_its_event_names(database: Database) -> None:
+    """Issue 356: the month's bingo filled — a booster of its card's genre (the bingo's words), of a year's
+    edition, the whole library's when none of those works has cards; once per reason."""
+    capabilities = new_registry()
+    space = replace(work("Interstellar", 9000, "US", ["Matthew"]), genres=("Science-Fiction",), year=2014)
+    comedy = replace(work("OSS 117", 3000, "FR", ["Jean"]), genres=("Comédie",), year=2006)
+    capabilities.provide(CARD_SOURCES, Sources([space, comedy]), instance_ref="t", owner="test")
+    await CardForge(database, capabilities).sync()
+    user = uuid4()
+    async with database.unit_of_work() as uow:
+        await uow.session.execute(INSERT_USER, {"id": user, "login": f"u{user.hex[:8]}"})
+    packs = Packs(database, capabilities, rng=random.Random(3))  # noqa: S311 — deterministic test data
+    boosters = ContentBoosters(packs)
+    assert await boosters.give_among(user, {"genre": "scifi"}, 1, "rule:bingo:1") == 1
+    assert await boosters.give_among(user, {"genre": "scifi"}, 1, "rule:bingo:1") == 0  # told again
+    assert await boosters.give_among(user, {"genre": "western", "year": 1955}, 1, "rule:bingo:2") == 1
+    unopened = [p for p in await packs.unopened(user) if p.source == "reward"]
+    assert len(unopened) == 2
+    looks = {str(p.detail.get("reason")): p.detail for p in unopened}
+    assert looks["rule:bingo:1"]["genre"] == "sf"
+    assert "genre" not in looks["rule:bingo:2"] and "edition" not in looks["rule:bingo:2"]  # none: any
+    genre_pack = next(p.id for p in unopened if p.detail["reason"] == "rule:bingo:1")
+    async with database.session() as session:
+        sets = (
+            (
+                await session.execute(
+                    Card.__table__.select()
+                    .with_only_columns(Card.set_key)
+                    .join(Copy, Copy.card_id == Card.id)
+                    .where(Copy.pack_id == genre_pack)
+                )
+            )
+            .scalars()
+            .all()
+        )
+    assert sets and set(sets) == {str(space.object_id)}  # science fiction only
+
+
 async def test_a_booster_guarantees_its_rarity(database: Database) -> None:
     """Issue 255: a booster of the shop that guarantees a rarity holds a card of it — one that names a rarity
     its works have none of is not sold."""

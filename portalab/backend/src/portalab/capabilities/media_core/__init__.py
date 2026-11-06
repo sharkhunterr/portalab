@@ -343,6 +343,12 @@ class ContentBoosters(Protocol):
 
     async def give(self, user: UUID, object_id: UUID, count: int, reason: str) -> int: ...
 
+    async def give_among(self, user: UUID, among: Mapping[str, Any], count: int, reason: str) -> int:
+        """Issue 356: ``count`` boosters of the works an event names rather than one content — a ``genre``
+        (the bingo's words: ``scifi``, ``comedy``…), a release ``year`` (its edition), the whole library when
+        it names neither or nothing is drawable there; once per ``reason``."""
+        ...
+
 
 @dataclass(frozen=True, slots=True)
 class PlayableGame:

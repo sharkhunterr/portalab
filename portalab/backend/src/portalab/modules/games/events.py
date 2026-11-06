@@ -5,6 +5,8 @@ counters only, never titles. When a week or a month is over, each member placed 
 their place once (``games.board_ranked``). Issue 356: a line of the month's media bingo completed
 (``games.bingo_line``), and the full card (``games.bingo_card``)."""
 
+from typing import Any
+
 from pydantic import BaseModel
 
 from portalab.capabilities.events import EventType, EventTypeRegistry
@@ -57,6 +59,9 @@ class BingoCard(BaseModel):
 
     month: str
     squares: int
+    # issue 356: what its booster draws among — the card's genre (its first genre square), else its era's
+    # year; the whole library when it has neither
+    booster: dict[str, Any] = {}
 
 
 def register_event_types(registry: EventTypeRegistry) -> None:

@@ -77,6 +77,24 @@ def draw(cells: Sequence[BingoCell], month: date) -> list[dict[str, str]]:
     return [{"key": c.key, "group": c.group} for c in chosen]
 
 
+def booster_of(keys: Sequence[str], month: date) -> dict[str, Any]:
+    """The full card's booster: the works of its first genre square, else a year of its first era square
+    (the middle of its decade, the month's own for « out this year or last »), else the whole library's."""
+    for key in keys:
+        if key.startswith("genre:"):
+            return {"genre": key.removeprefix("genre:")}
+    for key in keys:
+        if key.startswith("era:"):
+            era = key.removeprefix("era:")
+            if era == "recent":
+                return {"year": month.year}
+            if era == "before1970":
+                return {"year": 1965}
+            if era.isdigit():
+                return {"year": int(era) + 5}
+    return {}
+
+
 class Bingo:
     def __init__(self, database: Database, shared: Shared, *, clock: Clock | None = None) -> None:
         self.database = database
@@ -150,7 +168,10 @@ class Bingo:
                     if inserted.first() is None or self.shared.events is None:
                         continue
                     if name == CARD:
-                        event, payload = BINGO_CARD, {"month": month, "squares": len(keys)}
+                        event, payload = (
+                            BINGO_CARD,
+                            {"month": month, "squares": len(keys), "booster": booster_of(keys, card.month)},
+                        )
                     else:
                         count = len([d for d in done if d != CARD])
                         event, payload = BINGO_LINE, {"month": month, "line": name, "lines": count}

@@ -97,6 +97,8 @@ def _among(among: Mapping[str, Any]) -> list[Any]:
     return out
 
 
+# issue 356: the bingo's genres as the cards name them
+BINGO_GENRES = {"scifi": "sf"}
 BOOSTER_FIELDS = ("family", "genre", "theme", "edition", "kind", "cards", "rarity", "signature")
 # issue 255: a booster that guarantees a card of this rarity (one of its cards drawn at it)
 GUARANTEES = ("rare", "epic", "legendary")
@@ -388,6 +390,32 @@ class Packs:
                 out += 1
         return out
 
+    async def give_among(self, user: UUID, among: Mapping[str, Any], count: int, reason: str) -> int:
+        """Issue 356: ``count`` boosters of a genre's works, or a year's edition, for an event that names no
+        content (the month's bingo filled) — the whole library's when it names neither or none of its works
+        has cards; once per ``reason`` (the rule and its event); none to a member who does not collect."""
+        if count < 1 or not await self.collects(user):
+            return 0
+        booster: dict[str, Any] = {}
+        genre = BINGO_GENRES.get(str(among.get("genre")), among.get("genre"))
+        if genre in GENRES:
+            booster["genre"] = genre
+        year = among.get("year")
+        edition = edition_of(year) if isinstance(year, int) else None
+        if edition is not None:
+            booster["edition"] = edition
+        if booster and not await self.drawable(booster):
+            booster.pop("edition", None)  # its genre alone, else any
+            if not booster or not await self.drawable(booster):
+                booster = {}
+        detail = {**booster, "reason": reason[:200]}
+        out = 0
+        for index in range(min(count, 3)):
+            key = f"reward:{user}:{reason}:{index}"
+            if await self.give(user, "reward", None, key, detail, among=booster) is not None:
+                out += 1
+        return out
+
     # --- opening ------------------------------------------------------------------------------------------
     async def open(self, user: UUID, pack_id: UUID) -> datetime | None:
         now = utc_now(self.clock)
@@ -483,6 +511,9 @@ class ContentBoosters:
 
     async def give(self, user: UUID, object_id: UUID, count: int, reason: str) -> int:
         return await self.packs.give_content(user, object_id, count, reason)
+
+    async def give_among(self, user: UUID, among: Mapping[str, Any], count: int, reason: str) -> int:
+        return await self.packs.give_among(user, among, count, reason)
 
 
 class CardBoosterHandler:
