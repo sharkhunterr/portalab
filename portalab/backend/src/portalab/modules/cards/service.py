@@ -13,6 +13,7 @@ from portalab.modules.cards.editions import edition_of
 from portalab.modules.cards.models import Card, CardSet, Copy, Pack
 
 PAGE = 48
+SEALED = 500  # #358: every pack still to open is listed (stacked when identical), within reason
 
 
 def card_out(card: Card, card_set: CardSet, owned: dict[str, int] | None = None) -> dict[str, Any]:
@@ -314,7 +315,10 @@ class CardService:
             "cards": cards,
         }
 
-    async def packs(self, user: UUID, *, unopened: bool = True, limit: int = 20) -> list[dict[str, Any]]:
+    async def packs(
+        self, user: UUID, *, unopened: bool = True, limit: int | None = None
+    ) -> list[dict[str, Any]]:
+        limit = limit or (SEALED if unopened else 20)
         async with self.database.session() as session:
             query = select(Pack).where(Pack.user_id == user)
             if unopened:
