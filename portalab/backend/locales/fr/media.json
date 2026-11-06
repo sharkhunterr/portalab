@@ -99,6 +99,7 @@
   "book.absent": "Pas dans la médiathèque",
   "book.editions": "Éditions",
   "book.isbn": "ISBN {isbn}",
+  "book.listened": "En livre audio dans la médiathèque",
   "book.notFound": "Ce livre est introuvable.",
   "book.readers": "{count, plural, one {# lecteur} other {# lecteurs}}",
   "book.series": "Séries",

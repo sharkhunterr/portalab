@@ -117,8 +117,19 @@ describe("a book's sheet", () => {
     expect(listened.getAttribute("href")).toContain("kind=audiobook");
   });
 
-  it("opens the library's page when the library has it", async () => {
-    renderSheet({ ...SHEET, library: { audiobook: "0190f0a0-0000-7000-8000-0000000000b2" } });
+  it("opens the library's page when the library has the book", async () => {
+    renderSheet({ ...SHEET, library: { book: "0190f0a0-0000-7000-8000-0000000000b2" } });
     expect(await screen.findByText("The library's page")).toBeTruthy();
+  });
+
+  it("leaves the book to ask for when the library has it as an audiobook only", async () => {
+    renderSheet({ ...SHEET, library: { audiobook: "0190f0a0-0000-7000-8000-0000000000b2" } });
+    const listened = await screen.findByRole("link", { name: /As an audiobook in the library/ });
+    expect(listened.getAttribute("href")).toBe("/media/0190f0a0-0000-7000-8000-0000000000b2");
+    const editions = screen.getByRole("list", { name: "Editions" });
+    // the paper edition to ask for, not the audiobook it has
+    const asked = within(editions).getAllByRole("link", { name: /Ask for it/ });
+    expect(asked).toHaveLength(1);
+    expect(asked[0]?.getAttribute("href")).toContain("kind=book");
   });
 });

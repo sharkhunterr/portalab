@@ -99,6 +99,7 @@
   "book.absent": "Not in the library",
   "book.editions": "Editions",
   "book.isbn": "ISBN {isbn}",
+  "book.listened": "As an audiobook in the library",
   "book.notFound": "This book cannot be found.",
   "book.readers": "{count, plural, one {# reader} other {# readers}}",
   "book.series": "Series",
