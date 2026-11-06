@@ -1916,7 +1916,25 @@ div.shell-status__item {
   background: color-mix(in srgb, var(--color-text) 10%, transparent);
 }
 .header-search__spin {
+  display: inline-flex;
   margin-inline-end: 0.4rem;
+  color: var(--color-accent);
+}
+.header-search__spin svg {
+  animation: header-search-spin 0.9s linear infinite;
+}
+@keyframes header-search-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .header-search__spin svg {
+    animation-duration: 2.4s;
+  }
+}
+:root[data-motion="none"] .header-search__spin svg {
+  animation: none;
 }
 .header-search__list {
   position: absolute;
