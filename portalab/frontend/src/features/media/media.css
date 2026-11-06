@@ -1277,6 +1277,13 @@ a.media-card__link:focus-visible .media-card__frame {
   min-inline-size: 0;
 }
 /* issue 362: a book of theirs the library does not have */
+.media-person__held {
+  /* issue 376: an audiobook held, the book to ask for beside it */
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
 .media-person__absent {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
