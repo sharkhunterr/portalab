@@ -32,6 +32,8 @@ export function PdfView({
   const doc = useRef<PDFDocumentProxy | null>(null);
   const [page, setPage] = useState(() => Math.max(1, Number(resume?.position) || 1));
   const [pages, setPages] = useState(0);
+  // issue 359: the frame's size — the page drawn again when it changes (full screen, the phone turned)
+  const [frameSize, setFrameSize] = useState("");
   const pageRef = useRef(page);
   pageRef.current = page;
 
@@ -112,7 +114,16 @@ export function PdfView({
     };
   }, [ticket, format.file_ref]);
 
+  useEffect(() => {
+    const frame = box.current;
+    if (!frame) return;
+    const observer = new ResizeObserver(() => setFrameSize(`${frame.clientWidth}x${frame.clientHeight}`));
+    observer.observe(frame);
+    return () => observer.disconnect();
+  }, []);
+
   // the page, drawn sharp on high-density screens
+  // biome-ignore lint/correctness/useExhaustiveDependencies: drawn again when the frame's size changes
   useEffect(() => {
     const opened = doc.current;
     const target = canvas.current;
@@ -128,7 +139,8 @@ export function PdfView({
         settings.fit === "width"
           ? frame.clientWidth / natural.width
           : Math.min(frame.clientWidth / natural.width, frame.clientHeight / natural.height);
-      const scale = Math.max(0.2, fit * zoom);
+      // issue 359: a big page (a comic scanned at 2232 x 3056) is drawn small enough to fit — no floor
+      const scale = Math.max(0.01, fit * zoom);
       const ratio = window.devicePixelRatio || 1;
       const viewport = current.getViewport({ scale: scale * ratio });
       target.width = Math.floor(viewport.width);
@@ -150,7 +162,7 @@ export function PdfView({
       cancelled = true;
       task?.cancel();
     };
-  }, [page, pages, zoom, settings.fit, onMoved]);
+  }, [page, pages, zoom, settings.fit, onMoved, frameSize]);
 
   // keys and swipes turn pages
   useEffect(() => {
