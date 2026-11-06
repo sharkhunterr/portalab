@@ -54,6 +54,20 @@ async def test_a_game_s_sheet() -> None:
     assert await provider.game("1") is None and await provider.game("../x") is None
 
 
+async def test_games_found_by_words() -> None:
+    """#373: games found by words of their name — not a DLC —, with their studio."""
+    provider = FakeTwitch().provider(GAME_DATABASE, handle_for("igdb"))
+    [found] = await provider.search("breath wild", 5)
+    assert (found.tmdb_id, found.title, found.year, found.role) == (
+        "7346",
+        "Breath of the Wild",
+        2017,
+        "Nintendo EPD",
+    )
+    assert found.poster == "co3p2d"
+    assert await provider.search('"', 5) == []
+
+
 def test_queries_and_images_stay_ours() -> None:
     assert quoted('Zelda"; fields *') == '"Zelda fields *"' and quoted("a\\b") == '"a b"'
     assert image_ref({"image_id": "co1uii"}) == "co1uii" and image_ref("../x") is None

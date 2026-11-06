@@ -736,6 +736,29 @@ class _Series:
         named = [s for s in candidates if fold(s.name) == wanted]
         return max(named, key=lambda s: len(s.volumes), default=None)
 
+    async def search(self, query: str, language: str, limit: int) -> Sequence[PersonCredit]:
+        """#373: books found by words of their title or author — those readers know, not an omnibus —, each
+        told by its most held edition in the language books are told in."""
+        answer = await self._ask(SEARCH, {"query": query[:200], "type": "book", "per": min(limit * 2, 20)})
+        found: list[PersonCredit] = []
+        for _, document in hits(answer):
+            if (
+                not document.get("users_count")
+                or document.get("compilation")
+                or document.get("is_partial_book")
+            ):
+                continue
+            credit = map_book(document)
+            if credit is not None:
+                authors = [str(a)[:120] for a in document.get("author_names") or [] if a][:3]
+                found.append(replace(credit, role=", ".join(authors) or None))
+        found = found[:limit]
+        wanted = told_in(language, languages(self.service.config.get("languages")))
+        if wanted and found:
+            titles = await local_titles(self.connector, self.service, [c.tmdb_id for c in found], wanted)
+            found = [replace(c, title=titles.get(c.tmdb_id, c.title)) for c in found]
+        return found
+
     async def book(self, ref: str) -> BookDetails | None:
         """#367: a book's sheet (a merged duplicate's: the book it was merged into's), kept a while."""
         if not ref.isdigit():

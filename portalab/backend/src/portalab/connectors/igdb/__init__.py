@@ -18,6 +18,7 @@ import asyncio
 import re
 import time
 from collections.abc import Mapping, Sequence
+from dataclasses import replace
 from datetime import UTC, datetime
 from typing import Any
 
@@ -50,6 +51,11 @@ _FRANCHISE = "fields id, name, games; where name ~ {name}; limit {limit};"
 _GAMES = (
     "fields id, name, first_release_date, cover.image_id, total_rating, total_rating_count, version_parent,"
     " parent_game, game_type; where id = ({ids}); limit {limit};"
+)
+_SEARCH = (
+    "search {words}; fields id, name, first_release_date, cover.image_id, total_rating, total_rating_count,"
+    " version_parent, parent_game, game_type, involved_companies.developer, involved_companies.company.name;"
+    " limit {limit};"
 )
 _GAME = (
     "fields name, summary, storyline, first_release_date, cover.image_id, screenshots.image_id,"
@@ -355,6 +361,32 @@ class _Games:
         return GameFranchise(
             ids={"igdb": f"{endpoint}:{chosen['id']}"}, name=str(chosen["name"])[:200], games=kept
         )
+
+    async def search(self, query: str, limit: int) -> Sequence[PersonCredit]:
+        """#373: games found by words of their name (IGDB's search), not a version of another nor a DLC."""
+        words = quoted(query)
+        if words == '""':
+            return []
+        answer = await self.connector.query(
+            self.service, "games", _SEARCH.format(words=words, limit=limit * 2)
+        )
+        out: list[PersonCredit] = []
+        for document in answer or []:
+            if not isinstance(document, Mapping) or not told(document) or document.get("parent_game"):
+                continue
+            game = map_game(document)
+            if game is None:
+                continue
+            studio = next(
+                (
+                    str((c.get("company") or {}).get("name"))[:120]
+                    for c in document.get("involved_companies") or []
+                    if isinstance(c, Mapping) and c.get("developer") and (c.get("company") or {}).get("name")
+                ),
+                None,
+            )
+            out.append(replace(game, role=studio))
+        return out[:limit]
 
     async def game(self, ref: str) -> GameDetails | None:
         if not ref.isdigit():

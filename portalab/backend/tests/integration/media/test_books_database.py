@@ -26,6 +26,8 @@ from portalab.capabilities.media import (
     PersonRecord,
 )
 from portalab.capabilities.media.testkit import library_record
+from portalab.capabilities.search import ParsedQuery
+from portalab.core.authz_port import Principal
 from portalab.modules.connectors.breaker.breaker import CircuitBreaker
 from portalab.modules.connectors.services.providers import guarded_provider
 from portalab.modules.media.models import ExternalId, MediaObject
@@ -60,6 +62,7 @@ WHOLE = PersonCredit(tmdb_id="120", kind="book", title="The Golden Fool", year=2
 class _Hardcover:
     def __init__(self) -> None:
         self.series_asked: list[tuple[str, list[str]]] = []
+        self.searched: tuple[str, str] = ("", "")
         self.identified: list[OwnedBook] = []
 
     async def person(self, name: str, ids: Mapping[str, str], language: str) -> PersonRecord | None:
@@ -110,6 +113,21 @@ class _Hardcover:
                 BookEdition(title="Royal Assassin", language="en", format="Listened", audio=True),
             ],
         )
+
+    async def search(self, query: str, language: str, limit: int) -> Sequence[PersonCredit]:
+        self.searched = (query, language)
+        return [
+            PersonCredit(tmdb_id="102", kind="book", title="Royal Assassin", year=1996, role="Robin Hobb"),
+            PersonCredit(
+                tmdb_id="103",
+                kind="book",
+                title="Assassin's Quest",
+                year=1997,
+                role="Robin Hobb",
+                poster="/q.jpg",
+            ),
+            PersonCredit(tmdb_id="150", kind="book", title="La Nef du crépuscule", role="Robin Hobb"),
+        ]
 
     async def cover(self, ref: str, size: str) -> bytes:
         return b"\xff\xd8cover" + ref.encode()
@@ -289,3 +307,24 @@ async def test_a_book_s_sheet(app: FastAPI, client: httpx.AsyncClient, media: Me
     assert unknown.status_code == 404
     elsewhere = await client.get("/api/v1/media/book", params={"service": "0" * 36, "ref": "102"})
     assert elsewhere.status_code == 404
+
+
+async def test_books_to_ask_for_in_the_search(app: FastAPI, media: MediaHarness) -> None:
+    """#373: the search's « ask for it » results hold the books the library lacks, from the book database,
+    each opening its sheet; a book the library has as a book is left to the library's own results (« La Nef
+    du crépuscule »), one it has as an audiobook only is not (« Royal Assassin »)."""
+    hardcover = await _library(app, media)
+    people = await users(app, media, "leo")
+    provider = media.module.search.provider("request")
+    assert provider is not None
+    query = ParsedQuery(text="assassin", normalized="assassin", terms=("assassin",))
+    items = (
+        await provider.search(query, Principal(user_id=people["leo"]), None, limit=10, cursor=None)  # type: ignore[arg-type]
+    ).items
+    service = str(UUID(int=9))
+    assert [(i.title, i.url_ref, i.facets.get("type")) for i in items] == [
+        ("Royal Assassin (1996)", f"/media/book?service={service}&ref=102", "book"),
+        ("Assassin's Quest (1997)", f"/media/book?service={service}&ref=103", "book"),
+    ]
+    assert items[1].facets["cover"] == f"/api/v1/media/book-covers?service={service}&ref=%2Fq.jpg"
+    assert hardcover.searched[0] == "assassin"

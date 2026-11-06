@@ -740,6 +740,37 @@ def _hardcover(request: httpx.Request) -> Any:
                 }
             }
         }
+    if "query Search" in query and variables["type"] == "book":  # #373: books by words of their title
+        return {
+            "data": {
+                "search": {
+                    "ids": ["101", "543680", "2641752"],
+                    "results": {
+                        "hits": [
+                            {
+                                "document": {
+                                    "id": "101",
+                                    "title": "Assassin's Apprentice",
+                                    "release_year": 1995,
+                                    "author_names": ["Robin Hobb", "Stephen Youll"],
+                                    "users_count": 9000,
+                                    "image": {"url": "https://assets.hardcover.app/edition/1/apprentice.jpg"},
+                                }
+                            },
+                            {
+                                "document": {
+                                    "id": "543680",
+                                    "title": "Omnibus",
+                                    "compilation": True,
+                                    "users_count": 69,
+                                }
+                            },
+                            {"document": {"id": "2641752", "title": "Nobody's", "users_count": 0}},
+                        ]
+                    },
+                }
+            }
+        }
     if "query Search" in query:  # a series
         return {"data": {"search": {"ids": ["7", "8"], "results": {"hits": []}}}}
     if "query Author" in query:
@@ -861,8 +892,23 @@ HARDCOVER = {"/v1/graphql": _hardcover}
 
 
 def _igdb_games(request: httpx.Request) -> Any:
-    """#368: IGDB's games — a franchise's (by ids), or one game's sheet (by its id)."""
+    """#368: IGDB's games — a franchise's (by ids), or one game's sheet (by its id); #373: found by words."""
     body = request.content.decode()
+    if body.startswith("search "):
+        return [
+            {
+                "id": 7346,
+                "name": "Breath of the Wild",
+                "first_release_date": 1488499200,
+                "cover": {"image_id": "co3p2d"},
+                "involved_companies": [
+                    {"developer": False, "company": {"name": "Nintendo"}},
+                    {"developer": True, "company": {"name": "Nintendo EPD"}},
+                ],
+                "game_type": 0,
+            },
+            {"id": 9000, "name": "Breath of the Wild - DLC", "parent_game": 7346, "game_type": 1},
+        ]
     if "summary" not in body:  # a franchise's games
         return [
             {
