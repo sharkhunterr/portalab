@@ -37,7 +37,9 @@ async def test_a_title_s_technical_sheet(app: FastAPI, media: MediaHarness) -> N
     one, two = media.service(1), media.service(2)
     for service in (one, two):
         media.library(service)
-        await media.module.library.upsert([library_record("m1", title="Alien", year=1979, ids={"tmdb": "348"})], service)
+        await media.module.library.upsert(
+            [library_record("m1", title="Alien", year=1979, ids={"tmdb": "348"})], service
+        )
     plex = media.provide(TECHNICAL, one, Plex())
     media.provide(TECHNICAL, two, Broken())
     async with media.database.session() as session:
