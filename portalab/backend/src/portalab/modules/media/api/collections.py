@@ -21,9 +21,15 @@ from sqlalchemy import func, select
 
 from portalab.capabilities.media import BOOK_SERIES, METADATA, BookSeries, unwrap
 from portalab.core.errors import NotFound, Unavailable
-from portalab.modules.media.api.people import BOOK_KINDS, FilmCreditOut, _bibliography, _filmography
+from portalab.modules.media.api.people import (
+    BOOK_KINDS,
+    FilmCreditOut,
+    _bibliography,
+    _filmography,
+    _identify,
+)
 from portalab.modules.media.api.router import MediaCard, Module, Reader, _asked, _card
-from portalab.modules.media.models import ExternalId, MediaObject, ObjectMetadata
+from portalab.modules.media.models import MediaObject, ObjectMetadata
 from portalab.modules.media.permissions import MEDIA_REQUEST
 from portalab.modules.media.providers.insight_widgets import posters
 
@@ -152,36 +158,26 @@ def _cover_url(service: str, ref: str | None) -> str | None:
 
 async def _volumes(module: Module, name: str, rows: list[MediaObject]) -> list[FilmCreditOut]:
     """Issue 362: every volume of a book series as a book database knows it (Hardcover) — the series
-    told apart from its namesakes by the library's own volumes' ISBNs —, each found in the library by its
-    ISBN, its title or its volume number."""
+    told apart from its namesakes by the library's own volumes, as it identified them —, each found in the
+    library as identified, by its title or by its volume number."""
     books = [row for row in rows if row.kind in BOOK_KINDS]
     if not books:
         return []
-    async with module.database.session() as session:
-        isbns = sorted(
-            set(
-                (
-                    await session.execute(
-                        select(ExternalId.value).where(
-                            ExternalId.object_id.in_([row.id for row in books]), ExternalId.scheme == "isbn"
-                        )
-                    )
-                ).scalars()
-            )
-        )
     for registration in module.capabilities.system_providers(BOOK_SERIES):
+        service = registration.instance_ref
+        known, _ = await _identify(module, service, [row.id for row in books])
         try:
-            found = unwrap(await registration.provider.series(name, isbns))
+            found = unwrap(await registration.provider.series(name, sorted(known)))
         except Exception as exc:
             log.info("book series lookup failed: %s: %s", type(exc).__name__, exc)
             continue
         if not isinstance(found, BookSeries) or not found.volumes:
             continue
-        service = registration.instance_ref
         parts = await _bibliography(
             module,
             found.volumes,
             works=[row.id for row in books],
+            known=known,
             cover=partial(_cover_url, service),
         )
         # a volume the library has under another title and without its ISBN: by its number
@@ -193,6 +189,7 @@ async def _volumes(module: Module, name: str, rows: list[MediaObject]) -> list[F
             if row is not None:
                 parts[index] = part.model_copy(
                     update={
+                        "title": row.title,
                         "status": "available" if row.available else "unavailable",
                         "object_id": str(row.id),
                         "route": f"/media/{row.id}",

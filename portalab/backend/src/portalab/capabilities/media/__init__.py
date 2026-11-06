@@ -720,8 +720,8 @@ class MetadataRecord:
 class PersonCredit:
     """#92 — one title of a person's filmography, as the metadata provider knows it. Issue 362: a book of
     their bibliography too (a book database's: Hardcover) — then ``tmdb_id`` is that database's id of the
-    book, ``poster`` its cover's reference (fetched back through the provider), ``isbns`` its editions' and
-    ``position`` its volume in a series."""
+    book, ``poster`` its cover's reference (fetched back through the provider) and ``position`` its volume in
+    a series."""
 
     tmdb_id: str
     kind: Literal["movie", "series", "book"]
@@ -733,7 +733,6 @@ class PersonCredit:
     popularity: float = 0.0
     vote_average: float | None = None
     vote_count: int = 0
-    isbns: Sequence[str] = ()
     position: float | None = None
 
 
@@ -862,8 +861,7 @@ class PeopleProvider(Protocol):
 
 @dataclass(frozen=True, slots=True)
 class BookSeries:
-    """Issue 362 — a book series as a book database knows it: its volumes in order (``position``), each
-    with its editions' ISBNs to find it in the library."""
+    """Issue 362 — a book series as a book database knows it: its volumes in order (``position``)."""
 
     ids: Mapping[str, str]
     name: str
@@ -871,12 +869,28 @@ class BookSeries:
     volumes: Sequence[PersonCredit] = ()
 
 
+@dataclass(frozen=True, slots=True)
+class OwnedBook:
+    """Issue 362 — a book of the library, told to a book database to find it there: ``key`` the library's
+    reference of it, its title and authors, its identifiers by scheme (``isbn``, the database's own…)."""
+
+    key: str
+    title: str
+    authors: Sequence[str] = ()
+    ids: Mapping[str, Sequence[str]] = field(default_factory=dict)
+
+
 @runtime_checkable
 class BookSeriesProvider(Protocol):
-    """Issue 362 — a book series' volumes (Hardcover), found by its name and told apart from its namesakes
-    by the ISBNs of the library's own volumes; ``cover`` returns the image of a volume's ``poster``."""
+    """Issue 362 — a book database (Hardcover). ``identify``: the library's books as it knows them (by an
+    edition's ISBN, its own id, an edition's title by the same author), each ``OwnedBook.key`` with the
+    books it may be (the likeliest first; ``tmdb_id`` their id); ``series``: a series' volumes, found by
+    its name and told apart from its namesakes by the library's own volumes (``known``: their ids there);
+    ``cover``: the image of a book's ``poster``."""
 
-    async def series(self, name: str, isbns: Sequence[str]) -> BookSeries | None: ...
+    async def identify(self, books: Sequence[OwnedBook]) -> Mapping[str, Sequence[PersonCredit]]: ...
+
+    async def series(self, name: str, known: Sequence[str]) -> BookSeries | None: ...
 
     async def cover(self, ref: str, size: str) -> bytes: ...
 

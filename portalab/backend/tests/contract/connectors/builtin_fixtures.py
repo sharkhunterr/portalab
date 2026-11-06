@@ -652,9 +652,14 @@ def _hardcover(request: httpx.Request) -> Any:
             "rating": 4.1,
             "ratings_count": 3000,
             "image": {"url": "https://assets.hardcover.app/edition/1/apprentice.jpg"},
-            "editions": [{"isbn_13": "9780553573398", "isbn_10": "0553573403"}, {"isbn_13": "bad"}],
         }
-        other = {"id": 102, "title": "Royal Assassin", "image": {"url": "https://evil.example/x.jpg"}}
+        other = {
+            "id": 102,
+            "title": "Royal Assassin",
+            "users_count": 5000,
+            "image": {"url": "https://evil.example/x.jpg"},
+        }
+        stray = {"id": 109, "title": "Asesino real", "users_count": 10}  # a translation few read
         return {
             "data": {
                 "authors": [
@@ -664,7 +669,7 @@ def _hardcover(request: httpx.Request) -> Any:
                         "bio": "An American writer.",
                         "born_date": "1952-03-05",
                         "image": {"url": "https://assets.hardcover.app/author/204214/photo.jpeg"},
-                        "contributions": [{"book": book}, {"book": other}, {"book": book}],
+                        "contributions": [{"book": book}, {"book": other}, {"book": book}, {"book": stray}],
                     }
                 ]
             }
@@ -678,21 +683,74 @@ def _hardcover(request: httpx.Request) -> Any:
                         "name": "Farseer",
                         "book_series": [{"position": 1, "book": {"id": 1, "title": "Other"}}],
                     },
+                    {"id": 6, "name": "Farseer", "book_series": []},  # a namesake readers left empty
                     {
                         "id": 8,
-                        "name": "The Farseer Trilogy",
+                        "name": "L'Assassin royal",
                         "author": {"name": "Robin Hobb"},
                         "book_series": [
+                            # a translation: its own book, merged into the original
                             {
                                 "position": 1,
-                                "book": {
-                                    "id": 101,
-                                    "title": "Assassin's Apprentice",
-                                    "editions": [{"isbn_13": "9780553573398"}],
-                                },
+                                "featured": True,
+                                "details": "1",
+                                "book": {"id": 555, "title": "L'Apprenti assassin", "canonical": {"id": 101}},
                             },
-                            {"position": 2, "book": {"id": 102, "title": "Royal Assassin"}},
+                            {
+                                "position": 1,
+                                "book": {"id": 556, "title": "Учень убивці", "canonical": {"id": 101}},
+                            },
+                            {"position": 1.5, "book": {"id": 300, "title": "A novella"}},
+                            # an omnibus featured at that place, and the volume itself
+                            {
+                                "position": 2,
+                                "featured": True,
+                                "details": "1-3",
+                                "book": {"id": 400, "title": "Omnibus"},
+                            },
+                            {
+                                "position": 2,
+                                "featured": True,
+                                "details": "2",
+                                "book": {"id": 102, "title": "L'Assassin du roi"},
+                            },
+                            {
+                                "position": 3,
+                                "book": {"id": 103, "title": "La Nef du crépuscule", "is_partial_book": True},
+                            },
                         ],
+                    },
+                ]
+            }
+        }
+    if "query ByIsbn" in query:
+        edition = {"isbn_13": "9780553573398", "isbn_10": "0553573403"}
+        return {
+            "data": {
+                "editions": [
+                    {**edition, "book": {"id": 555, "title": "L'Apprenti assassin", "canonical": {"id": 101}}}
+                ]
+            }
+        }
+    if "query BySlug" in query:
+        return {"data": {"books": [{"slug": "royal-assassin", "id": 102, "title": "Royal Assassin"}]}}
+    if "query ByTitle" in query:
+        hobb = [{"author": {"name": "Robin Hobb"}}]
+        return {
+            "data": {
+                "editions": [
+                    {
+                        "title": "La nef du crépuscule",
+                        "book": {"id": 103, "title": "Ship", "contributions": hobb},
+                    },
+                    # the same title by someone else
+                    {
+                        "title": "La nef du crépuscule",
+                        "book": {
+                            "id": 900,
+                            "title": "Other",
+                            "contributions": [{"author": {"name": "Jane Doe"}}],
+                        },
                     },
                 ]
             }
