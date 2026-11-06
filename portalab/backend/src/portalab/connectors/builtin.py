@@ -7,6 +7,7 @@ from portalab.connectors.fanart import FanartConnector
 from portalab.connectors.glances import GlancesConnector
 from portalab.connectors.grimmory import GrimmoryConnector
 from portalab.connectors.hardcover import HardcoverConnector
+from portalab.connectors.igdb import IgdbConnector
 from portalab.connectors.jellyfin import JellyfinConnector
 from portalab.connectors.maintainerr import MaintainerrConnector
 from portalab.connectors.ollama import OllamaConnector
@@ -39,6 +40,7 @@ def builtin_connectors() -> list[Connector]:
         SearxngConnector(),  # issue 229: images on the web (an actor's character, for the cards)
         TvdbConnector(),  # issue 231: each role's own image (the cards' characters, drawn ones too)
         HardcoverConnector(),  # issue 362: an author's books, a book series' volumes (Hardcover)
+        IgdbConnector(),  # #368: a franchise's games and a game's sheet (IGDB)
         QBittorrentConnector(),
         DelugeConnector(),
         AuthentikConnector(),  # 027: the single sign-on — accounts and the groups opening each service

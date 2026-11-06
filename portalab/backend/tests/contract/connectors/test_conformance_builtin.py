@@ -13,6 +13,7 @@ from portalab.connectors.seerr import SeerrConnector
 from portalab.connectors.tautulli import TautulliConnector
 from portalab.connectors.tmdb import TmdbConnector
 from tests.contract.connectors.builtin_fixtures import handle_for
+from tests.contract.connectors.test_igdb import FakeTwitch
 
 
 class _Kit(ConformanceKit):
@@ -65,3 +66,7 @@ class TestTmdb(_Kit):
 
 class TestHardcover(_Kit):
     connector_class = HardcoverConnector
+
+
+class TestIgdb(_Kit):
+    connector_class = FakeTwitch  # #368: Twitch's token endpoint answered by the same fake server

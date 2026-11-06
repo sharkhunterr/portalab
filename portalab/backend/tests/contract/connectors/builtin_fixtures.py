@@ -835,6 +835,78 @@ def _hardcover(request: httpx.Request) -> Any:
 
 HARDCOVER = {"/v1/graphql": _hardcover}
 
+
+def _igdb_games(request: httpx.Request) -> Any:
+    """#368: IGDB's games — a franchise's (by ids), or one game's sheet (by its id)."""
+    body = request.content.decode()
+    if "summary" not in body:  # a franchise's games
+        return [
+            {
+                "id": 1022,
+                "name": "The Legend of Zelda",
+                "first_release_date": 509328000,
+                "cover": {"image_id": "co1uii"},
+                "total_rating": 84.6,
+                "total_rating_count": 900,
+                "game_type": 0,
+            },
+            {"id": 1025, "name": "Zelda II", "first_release_date": 537926400, "game_type": 0},
+            {
+                "id": 7346,
+                "name": "Breath of the Wild",
+                "first_release_date": 1488499200,
+                "total_rating": 96.9,
+                "total_rating_count": 4000,
+                "game_type": 0,
+            },
+            {"id": 9000, "name": "Breath of the Wild - DLC Pack", "game_type": 1},
+            {"id": 9001, "name": "Breath of the Wild (Switch)", "version_parent": 7346, "game_type": 0},
+        ]
+    if "where id = 7346;" in body:
+        return [
+            {
+                "id": 7346,
+                "name": "The Legend of Zelda: Breath of the Wild",
+                "summary": "Step into a world of discovery.",
+                "first_release_date": 1488499200,
+                "cover": {"image_id": "co3p2d"},
+                "screenshots": [{"image_id": "sc6lvu"}, {"image_id": "../evil"}],
+                "artworks": [{"image_id": "ar5s3"}],
+                "genres": [{"name": "Adventure"}, {"name": "Role-playing (RPG)"}],
+                "themes": [{"name": "Open world"}],
+                "game_modes": [{"name": "Single player"}],
+                "platforms": [{"name": "Nintendo Switch"}, {"name": "Wii U"}],
+                "involved_companies": [
+                    {"developer": True, "publisher": False, "company": {"name": "Nintendo EPD"}},
+                    {"developer": False, "publisher": True, "company": {"name": "Nintendo"}},
+                ],
+                "franchises": [{"name": "The Legend of Zelda"}],
+                "total_rating": 96.9,
+                "total_rating_count": 4000,
+                "videos": [{"video_id": "zw47_q9wbBE"}],
+                "alternative_names": [{"name": "Zelda BOTW", "comment": "Acronym"}],
+                "game_localizations": [{"name": "ゼルダの伝説", "region": {"identifier": "ja-JP"}}],
+            }
+        ]
+    return []
+
+
+IGDB = {
+    "/oauth2/token": {"access_token": "igdb-app-token", "expires_in": 5000000, "token_type": "bearer"},
+    "/v4/platforms": [{"id": 6}],
+    "/v4/franchises": lambda request: (
+        [{"id": 596, "name": "The Legend of Zelda", "games": [1022, 1025, 7346, 9000, 9001]}]
+        if '"the legend of zelda"' in request.content.decode().lower()
+        else []
+    ),
+    "/v4/collections": lambda request: (
+        [{"id": 106, "name": "The Legend of Zelda", "games": [1022]}]
+        if '"the legend of zelda"' in request.content.decode().lower()
+        else []
+    ),
+    "/v4/games": _igdb_games,
+}
+
 SECRETS = {
     "jellyfin": {"api_key": "jf-secret-key"},
     "plex": {"token": "plex-secret-token"},
@@ -848,6 +920,7 @@ SECRETS = {
     "fanart": {"api_key": "fanart-secret-key"},
     "thetvdb": {"api_key": "tvdb-secret-key"},
     "hardcover": {"api_key": "Bearer hardcover-secret-token"},
+    "igdb": {"client_secret": "igdb-secret-client"},
     "searxng": {},
     "authentik": {"api_token": "authentik-secret-token"},
     "maintainerr": {},
@@ -866,6 +939,7 @@ ROUTES = {
     "fanart": FANART,
     "thetvdb": THETVDB,
     "hardcover": HARDCOVER,
+    "igdb": IGDB,
     "searxng": SEARXNG,
     "authentik": AUTHENTIK,
     "maintainerr": MAINTAINERR,
@@ -920,6 +994,8 @@ def handle_for(
         transport=transport(routes or ROUTES[key], scenario, seen),
     )
     user = {"username": "portal"} if key in ("romm", "grimmory") else {}
+    if key == "igdb":  # #368: its Twitch application's id
+        user = {"client_id": "abcdef0123456789"}
     settings = {"base_url": base, **user, **(config or {})}
     return ServiceHandle(service_id=uuid4(), name=key, config=settings, secrets=secrets, http=http)
 

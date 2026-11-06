@@ -12,6 +12,7 @@ export const CONNECTOR_ICON: Record<string, string> = {
   jellyseerr: "inbox",
   grimmory: "book",
   hardcover: "book-open", // issue 362
+  igdb: "gamepad", // issue 368
   audiobookshelf: "headphones",
   romm: "joystick",
   tmdb: "database",

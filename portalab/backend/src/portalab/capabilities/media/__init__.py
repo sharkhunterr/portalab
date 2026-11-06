@@ -66,6 +66,7 @@ REQUEST_QUOTAS = "request.quotas"  # #3: each account's request limits on the re
 REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search, shelves, details (Seerr)
 PEOPLE = "media.people"  # #92: what a service knows of a person — biography, portrait, filmography
 BOOK_SERIES = "media.book_series"  # issue 362: a book series' volumes, from a book database (Hardcover)
+GAME_DATABASE = "media.game_database"  # #368: a franchise's games and a game's sheet, from a game database
 ACTIVITY_KINDS: tuple[str, ...] = (
     "movie",
     "episode",
@@ -721,10 +722,10 @@ class PersonCredit:
     """#92 — one title of a person's filmography, as the metadata provider knows it. Issue 362: a book of
     their bibliography too (a book database's: Hardcover) — then ``tmdb_id`` is that database's id of the
     book, ``poster`` its cover's reference (fetched back through the provider) and ``position`` its volume in
-    a series."""
+    a series. #368: a game of a franchise (a game database's: IGDB), told the same way."""
 
     tmdb_id: str
-    kind: Literal["movie", "series", "book"]
+    kind: Literal["movie", "series", "book", "game"]
     title: str
     year: int | None = None
     role: str | None = None  # the character, or the job (« Director »)
@@ -938,6 +939,57 @@ class BookSeriesProvider(Protocol):
         ...
 
     async def cover(self, ref: str, size: str) -> bytes: ...
+
+
+@dataclass(frozen=True, slots=True)
+class GameFranchise:
+    """#368 — a franchise (or a series) as a game database knows it: its games, the oldest first
+    (``tmdb_id`` their id there, ``poster`` their cover's reference)."""
+
+    ids: Mapping[str, str]
+    name: str
+    games: Sequence[PersonCredit] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class GameDetails:
+    """#368 — a game as a game database tells it: ``ref`` its id there; its titles in other languages
+    (``names``: language or region → title); its rating out of 10 like a film's; its platforms, studios and
+    publishers; its franchises; ``images`` its screenshots and artworks (references); ``trailer`` a YouTube
+    video id."""
+
+    ref: str
+    title: str
+    summary: str | None = None
+    storyline: str | None = None
+    year: int | None = None
+    release_date: str | None = None
+    cover: str | None = None
+    images: Sequence[str] = ()
+    genres: Sequence[str] = ()
+    themes: Sequence[str] = ()
+    modes: Sequence[str] = ()
+    platforms: Sequence[str] = ()
+    developers: Sequence[str] = ()
+    publishers: Sequence[str] = ()
+    franchises: Sequence[str] = ()
+    names: Mapping[str, str] = field(default_factory=dict)
+    rating: float | None = None
+    votes: int = 0
+    trailer: str | None = None
+
+
+@runtime_checkable
+class GameDatabase(Protocol):
+    """#368 — a game database (IGDB). ``franchise``: a franchise's games, found by its name and told apart
+    from its namesakes by the library's own games (``known``: their ids there); ``game``: a game's sheet;
+    ``image``: a cover, screenshot or artwork (``size``: ``cover``, ``screenshot``, ``artwork``)."""
+
+    async def franchise(self, name: str, known: Sequence[str]) -> GameFranchise | None: ...
+
+    async def game(self, ref: str) -> GameDetails | None: ...
+
+    async def image(self, ref: str, size: str) -> bytes: ...
 
 
 @runtime_checkable
@@ -1444,6 +1496,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(REQUEST_DISCOVERY, RequestDiscovery, "Titles one can ask for: search, shelves, details (#4)"),
     _spec(PEOPLE, PeopleProvider, "What a service knows of a person: biography, portrait, titles (#92)"),
     _spec(BOOK_SERIES, BookSeriesProvider, "A book series' volumes, from a book database (issue 362)"),
+    _spec(GAME_DATABASE, GameDatabase, "A franchise's games and a game's sheet, from a game database (#368)"),
     _spec(
         DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
     ),

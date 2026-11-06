@@ -247,6 +247,7 @@ def test_builtin_catalog_registers_once() -> None:
         "searxng",  # issue 229: images on the web
         "thetvdb",  # issue 231: each role's own image
         "hardcover",  # issue 362: an author's books, a book series' volumes
+        "igdb",  # #368: a franchise's games, a game's sheet
         "qbittorrent",  # 027: torrent clients behind the download managers
         "deluge",
         "authentik",  # 027: the single sign-on, for services' access

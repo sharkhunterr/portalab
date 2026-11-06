@@ -669,6 +669,7 @@
   "securityBlocks.title": "Security blocks",
   "services.access.account": "Password",
   "services.access.app": "API key",
+  "services.access.client_secret": "Client Secret (Twitch application)",
   "services.access.generic": "API token",
   "services.access.plex": "Plex token",
   "services.add": "Add a service",
