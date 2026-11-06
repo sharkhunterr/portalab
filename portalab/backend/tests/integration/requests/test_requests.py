@@ -230,6 +230,6 @@ async def test_a_book_asked_by_hand_is_given_its_cover_and_sheet(
         assert row is not None
         row.external_ref = {k: v for k, v in row.external_ref.items() if k not in ("cover", "sheet")}
     assert await media.module.requests.give_faces() == 1
-    assert await media.module.requests.give_faces() == 0  # each looked for once
+    assert await media.module.requests.give_faces() == 0  # each looked for once in turn
     mine = {i["title"]: i for i in (await client.get("/api/v1/me/media/requests/list")).json()["items"]}
     assert mine["Assassin's Apprentice"]["sheet"].endswith("ref=1")
