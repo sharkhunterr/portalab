@@ -1,19 +1,5 @@
-/* Issue 367: a book's sheet — its cover, its facts, its editions (each with its own cover and request). */
-.media-book {
-  display: grid;
-  gap: var(--space-4);
-}
-.media-book__cover {
-  display: grid;
-  inline-size: clamp(6.5rem, 26vw, 11rem);
-  overflow: hidden;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-2);
-}
-.media-book__authors {
-  margin: 0;
-  font-weight: var(--font-weight-semibold);
-}
+/* Issue 367: a book's sheet — laid out as a library title's page (issue 370), with its series and its
+   editions (each with its own cover and request). */
 .media-book__facts {
   display: inline-flex;
   flex-wrap: wrap;
@@ -23,21 +9,15 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
-.media-book__library,
 .media-book__series {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-2) var(--space-4);
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: var(--font-size-sm);
 }
-.media-book__about p {
-  max-inline-size: 70ch;
-  margin-block: 0 var(--space-2);
-}
-.media-book__editions ul {
+.media-book__editions {
   display: grid;
   gap: var(--space-2);
   margin: 0;
@@ -58,7 +38,7 @@
   display: grid;
   inline-size: 3rem;
   overflow: hidden;
-  border-radius: var(--radius-sm, var(--radius-md));
+  border-radius: var(--radius-md);
 }
 .media-book__edition-text {
   display: grid;

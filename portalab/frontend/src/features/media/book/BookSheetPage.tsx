@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useId } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, Navigate, useSearchParams } from "react-router";
 import { api } from "../../../api/client";
 import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
@@ -10,12 +10,15 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import { ApiError } from "../../../state/regions";
 import { useAskOptions } from "../../requests/api";
+import { BookFacts } from "../detail/BookView";
+import { TitleHero } from "../detail/TitleHero";
 import { Poster } from "../MediaGrid";
 import "../media.css";
 import "./book.css";
 
 /**
- * Issue 367: a book the library may lack, as the book database tells it (Hardcover) — its cover, authors, series,
+ * Issue 367: a book the library may lack, as the book database tells it (Hardcover); issue 370: laid out as a
+ * library title's page (the same head, facts, summary, genres, authors) — its cover, authors, series,
  * genres, rating and description; its editions, the member's language first (a translation's title, its
  * format, publisher and ISBN); where the library has it (as a book, as an audiobook); and, while the
  * requests take its kind, asking the team for it — the book itself or one of its editions. Reached from an
@@ -39,6 +42,7 @@ interface Sheet {
   subtitle: string | null;
   description: string | null;
   year: number | null;
+  release_date: string | null;
   pages: number | null;
   cover: string | null;
   authors: string[];
@@ -111,76 +115,60 @@ export function BookSheetPage() {
     );
   }
   const book = sheet.data;
-  // the member's language first, then the most held
+  // one page per title: the library's (same look, with reading and listening) when it has it
+  const held = book.library.book ?? book.library.audiobook;
+  if (held) return <Navigate to={`/media/${held}`} replace />;
+  // the editions in the member's language first (the service keeps those in its languages)
   const editions = [...book.editions].sort(
     (a, b) => Number(b.language === language) - Number(a.language === language),
   );
   const mine = editions.find((e) => e.language === language && !e.audio);
-  const canAsk = (kind: string) => Boolean(asks.data?.kinds.includes(kind)) && !book.library[kind];
-  const facts = [
-    book.year,
-    book.pages ? t("media:book.pages", { count: book.pages }) : null,
-    book.readers ? t("media:book.readers", { count: book.readers }) : null,
-  ].filter(Boolean);
+  const title = mine?.title ?? book.title;
+  const canAsk = (kind: string) => Boolean(asks.data?.kinds.includes(kind));
   return (
-    <section aria-labelledby={headingId} className="media-book">
-      <PageHeader
-        titleId={headingId}
+    <article aria-labelledby={headingId} className="media-detail media-book">
+      {/* issue 370: the same head and book page as a title of the library */}
+      <TitleHero
+        headingId={headingId}
         level={2}
-        icon="book"
-        title={book.title}
-        context={book.subtitle ?? undefined}
+        title={title}
+        kind="book"
+        poster={mine?.cover ?? book.cover}
+        backdrop={null}
+        facts={[
+          book.year ? String(book.year) : null,
+          t("media:kind.book"),
+          book.pages ? t("media:facts.pageCount", { count: book.pages }) : null,
+          book.rating !== null ? `★ ${format.number(book.rating)}` : null,
+        ]}
+        badges={<span className="media-person__absent">{t("media:book.absent")}</span>}
         primary={
           canAsk("book") ? (
-            <Link
-              className="ds-button ds-button--primary"
-              to={askLink("book", mine?.title ?? book.title, book.authors, mine)}
-            >
+            <Link className="ds-button ds-button--primary" to={askLink("book", title, book.authors, mine)}>
               <Icon name="plus" size={16} />
               {t("media:ask.askIt")}
             </Link>
-          ) : undefined
+          ) : null
         }
       />
-      <div className="media-person__hero">
-        <span className="media-book__cover">
-          <Poster src={book.cover} kind="book" />
-        </span>
-        <div className="media-person__about">
-          {book.authors.length ? (
-            <p className="media-book__authors">
-              {t("media:book.by")}{" "}
-              {book.authors.map((name, index) => (
-                <span key={name}>
-                  {index ? ", " : ""}
-                  <Link to={`/media/people/${encodeURIComponent(name)}`}>{name}</Link>
-                </span>
-              ))}
-            </p>
-          ) : null}
-          {facts.length ? <p className="media-book__facts">{facts.join(" · ")}</p> : null}
-          {book.rating !== null ? (
-            <p className="media-book__facts">
-              <Icon name="star" size={14} /> {format.number(book.rating)}/10 ·{" "}
-              {t("media:book.votes", { count: book.votes })}
-            </p>
-          ) : null}
-          {Object.keys(book.library).length ? (
-            <ul className="media-book__library">
-              {Object.entries(book.library).map(([kind, id]) => (
-                <li key={kind}>
-                  <Link className="ds-button ds-button--secondary" to={`/media/${id}`}>
-                    <Icon name="check" size={14} />
-                    {t("media:book.inLibrary", { kind: t(`media:kind.${kind}`) })}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="media-person__absent">{t("media:book.absent")}</p>
-          )}
-          {book.series.length ? (
-            <ul className="media-book__series" aria-label={t("media:book.series")}>
+      <BookFacts
+        data={{
+          title,
+          original_title: book.title,
+          overview: book.description,
+          released: book.release_date,
+          rating: book.rating,
+          pages: book.pages,
+          authors: book.authors,
+          tags: book.moods,
+        }}
+        genres={book.genres}
+      />
+      {book.series.length ? (
+        <section className="media-enriched" aria-label={t("media:book.series")}>
+          <div className="media-enriched__block">
+            <h3>{t("media:book.series")}</h3>
+            <ul className="media-book__series">
               {book.series.map((s) => {
                 const label =
                   s.position !== null
@@ -189,72 +177,61 @@ export function BookSheetPage() {
                 return <li key={s.name}>{s.route ? <Link to={s.route}>{label}</Link> : label}</li>;
               })}
             </ul>
-          ) : null}
-          {book.genres.length || book.moods.length ? (
-            <ul className="media-person__roles" aria-label={t("media:book.genres")}>
-              {[...book.genres, ...book.moods].map((tag) => (
-                <li key={tag}>{tag}</li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-      </div>
-      {book.description ? (
-        <section className="media-book__about">
-          <h3>{t("media:book.about")}</h3>
-          {book.description.split(/\n+/).map((part, index) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: paragraphs of one text, never reordered
-            <p key={index}>{part}</p>
-          ))}
+          </div>
         </section>
       ) : null}
       {editions.length ? (
-        <section className="media-book__editions">
-          <h3>{t("media:book.editions")}</h3>
-          <ul aria-label={t("media:book.editions")}>
-            {editions.map((edition, index) => {
-              const kind = edition.audio ? "audiobook" : "book";
-              return (
-                // biome-ignore lint/suspicious/noArrayIndexKey: editions may share every field shown
-                <li key={index} className="media-book__edition">
-                  <span className="media-book__edition-cover">
-                    <Poster src={edition.cover} kind={kind} />
-                  </span>
-                  <span className="media-book__edition-text">
-                    <strong>{edition.title}</strong>
-                    <span className="media-book__facts">
-                      {[
-                        languageName(edition.language, locale),
-                        edition.audio ? t("media:kind.audiobook") : edition.format,
-                        edition.publisher,
-                        edition.year,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")}
+        <section className="media-enriched" aria-label={t("media:book.editions")}>
+          <div className="media-enriched__block">
+            <h3>{t("media:book.editions")}</h3>
+            <ul className="media-book__editions" aria-label={t("media:book.editions")}>
+              {editions.map((edition, index) => {
+                const kind = edition.audio ? "audiobook" : "book";
+                return (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: editions may share every field shown
+                  <li key={index} className="media-book__edition">
+                    <span className="media-book__edition-cover">
+                      <Poster src={edition.cover} kind={kind} />
                     </span>
-                    {edition.ids.isbn?.[0] ? (
+                    <span className="media-book__edition-text">
+                      <strong>{edition.title}</strong>
                       <span className="media-book__facts">
-                        {t("media:book.isbn", { isbn: edition.ids.isbn[0] })}
+                        {[
+                          languageName(edition.language, locale),
+                          edition.audio ? t("media:kind.audiobook") : edition.format,
+                          edition.publisher,
+                          edition.year,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
                       </span>
+                      {edition.ids.isbn?.[0] ? (
+                        <span className="media-book__facts">
+                          {t("media:book.isbn", { isbn: edition.ids.isbn[0] })}
+                        </span>
+                      ) : null}
+                    </span>
+                    {canAsk(kind) ? (
+                      <Link
+                        className="media-person__ask"
+                        to={askLink(kind, edition.title, book.authors, edition)}
+                      >
+                        <Icon name="plus" size={14} />
+                        {t("media:ask.askIt")}
+                      </Link>
                     ) : null}
-                  </span>
-                  {canAsk(kind) ? (
-                    <Link
-                      className="media-person__ask"
-                      to={askLink(kind, edition.title, book.authors, edition)}
-                    >
-                      <Icon name="plus" size={14} />
-                      {t("media:ask.askIt")}
-                    </Link>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </section>
       ) : null}
-      <p className="media-book__source">{t("media:book.source")}</p>
-    </section>
+      <p className="media-book__source">
+        {t("media:book.source")}
+        {book.readers ? ` ${t("media:book.readers", { count: book.readers })}.` : ""}
+      </p>
+    </article>
   );
 }
 
