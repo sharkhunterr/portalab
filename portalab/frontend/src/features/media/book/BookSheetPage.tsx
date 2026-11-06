@@ -115,16 +115,17 @@ export function BookSheetPage() {
     );
   }
   const book = sheet.data;
-  // one page per title: the library's (same look, with reading and listening) when it has it
-  const held = book.library.book ?? book.library.audiobook;
-  if (held) return <Navigate to={`/media/${held}`} replace />;
+  // one page per title: the library's (same look, with reading) when it has the book itself; an audiobook
+  // only (issue 374) leaves the book to ask for, its audiobook one click away
+  if (book.library.book) return <Navigate to={`/media/${book.library.book}`} replace />;
+  const listened = book.library.audiobook;
   // the editions in the member's language first (the service keeps those in its languages)
   const editions = [...book.editions].sort(
     (a, b) => Number(b.language === language) - Number(a.language === language),
   );
   const mine = editions.find((e) => e.language === language && !e.audio);
   const title = mine?.title ?? book.title;
-  const canAsk = (kind: string) => Boolean(asks.data?.kinds.includes(kind));
+  const canAsk = (kind: string) => Boolean(asks.data?.kinds.includes(kind)) && !book.library[kind];
   return (
     <article aria-labelledby={headingId} className="media-detail media-book">
       {/* issue 370: the same head and book page as a title of the library */}
@@ -141,7 +142,16 @@ export function BookSheetPage() {
           book.pages ? t("media:facts.pageCount", { count: book.pages }) : null,
           book.rating !== null ? `★ ${format.number(book.rating)}` : null,
         ]}
-        badges={<span className="media-person__absent">{t("media:book.absent")}</span>}
+        badges={
+          listened ? (
+            <Link className="ds-button ds-button--secondary" to={`/media/${listened}`}>
+              <Icon name="headphones" size={14} />
+              {t("media:book.listened")}
+            </Link>
+          ) : (
+            <span className="media-person__absent">{t("media:book.absent")}</span>
+          )
+        }
         primary={
           canAsk("book") ? (
             <Link className="ds-button ds-button--primary" to={askLink("book", title, book.authors, mine)}>
