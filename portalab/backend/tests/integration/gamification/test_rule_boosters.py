@@ -20,11 +20,16 @@ pytestmark = pytest.mark.integration
 class Cards:
     def __init__(self) -> None:
         self.given: set[tuple[UUID, UUID]] = set()
+        self.among: list[tuple[UUID, dict[str, Any], str]] = []
 
     async def give(self, user: UUID, object_id: UUID, count: int, reason: str) -> int:
         if (user, object_id) in self.given:
             return 0  # once per member and content
         self.given.add((user, object_id))
+        return count
+
+    async def give_among(self, user: UUID, among: Any, count: int, reason: str) -> int:
+        self.among.append((user, dict(among), reason))
         return count
 
 
@@ -56,3 +61,28 @@ async def test_a_rules_boosters_are_journaled(gm: GamHarness, client: AsyncClien
     assert [(row["value"], row["balance"]) for row in only["items"]] == [("booster", 1)]
     sources = (await client.get("/api/v1/me/progression/sources?value=booster&days=7")).json()
     assert {s["source"]: s["amount"] for s in sources["sources"]} == {"movie": 1}
+
+
+async def test_an_event_of_no_content_gives_the_boosters_of_the_works_it_names(gm: GamHarness) -> None:
+    """Issue 356: the month's bingo filled is about no content — its booster draws among the works the event
+    names (the card's genre); an event naming neither a content nor works gives none."""
+    register_event_types(gm.ev.types)
+    cards = Cards()
+    gm.module.capabilities.provide(CONTENT_BOOSTERS, cards, instance_ref="cards", owner="module:cards")
+    await gm.rule(
+        "card",
+        {
+            "event_type": "media.playback_finished",
+            "label": "Carton plein",
+            "grants": [{"value": "xp", "amount": 200}],
+            "boosters": 1,
+        },
+    )
+    ursula = gm.people["ursula"]
+    finished = "media.playback_finished"
+    nothing = {k: v for k, v in sitting("movie", 6_000).items() if k != "object"}  # about no content
+    named = {**nothing, "booster": {"genre": "scifi"}}
+    await gm.module.pipeline.process(gm.envelope(ursula, named, event_type=finished))
+    await gm.module.pipeline.process(gm.envelope(ursula, nothing, event_type=finished))
+    assert [(user, among) for user, among, _ in cards.among] == [(ursula, {"genre": "scifi"})]
+    assert cards.among[0][2].startswith("rule:card:")

@@ -148,7 +148,7 @@ Settings: *Campaign time zone*, *"Ending soon" notice* (hours), *Active campaign
 - Parties: **Maximum players**, **Countdown**, **Reveal seconds**.
 - **Daily wheel on** and **The wheel's segments**: label, gain (Coins, XP, a shop product or nothing), amount and weight.
 
-What the games give is set with the other gain rules (**Gamification → Gains → XP per action**): taking part, a win, a minimum score, a place on the week's or month's board, a place in a party, a weekly challenge completed, a line of the month's bingo and its full card (**Quick add** proposes 30 XP and 10 coins a line, 200 XP, 100 coins and a booster for the full card), each with optional daily caps. The Games page shows how many rules are active and how often each game was played over 30 days.
+What the games give is set with the other gain rules (**Gamification → Gains → XP per action**): taking part, a win, a minimum score, a place on the week's or month's board, a place in a party, a weekly challenge completed, a line of the month's bingo and its full card (**Quick add** proposes 30 XP and 10 coins a line, 200 XP, 100 coins and a booster for the full card — a Mediacards booster of the card's genre, else of its era's edition, else of the whole library), each with optional daily caps. The Games page shows how many rules are active and how often each game was played over 30 days.
 
 ## Mediacards
 

@@ -63,12 +63,14 @@ class Boosters:
     """Issue 234: a rule's boosters of its event's content, for its member."""
 
     user: UUID
-    content: UUID
+    content: UUID | None
     count: int
     rule: str
     version: int
     label: str
     envelope: Envelope
+    # issue 356: an event of no content names the works its boosters draw among (a genre, a year)
+    among: dict[str, Any] | None = None
 
 
 @dataclass
@@ -187,7 +189,8 @@ class RewardPipeline:
                 if matches(rule.definition.predicate, envelope.payload):
                     await self._apply(session, user, rule, envelope, outcome)
                     content = _uuid(envelope.payload.get("object"))
-                    if rule.definition.boosters and content is not None:
+                    among = envelope.payload.get("booster")
+                    if rule.definition.boosters and (content is not None or isinstance(among, dict)):
                         outcome.boosters.append(
                             Boosters(
                                 user,
@@ -197,6 +200,7 @@ class RewardPipeline:
                                 rule.version,
                                 (rule.definition.label or "").strip()[:120] or "none",
                                 envelope,
+                                among if content is None and isinstance(among, dict) else None,
                             )
                         )
             outcome.notes.extend(await self.achievements.on_event(session, user, envelope))
@@ -213,7 +217,7 @@ class RewardPipeline:
         reward is committed, then journaled as a value of their own and told to the member."""
         for item in wanted:
             reason = f"rule:{item.rule}:{item.envelope.event_id}"
-            given = await self.notifier.boosters(item.user, item.content, item.count, reason)
+            given = await self.notifier.boosters(item.user, item.content, item.count, reason, item.among)
             if not given:
                 continue  # given already for that content, or none to give
             key = f"rule:{item.envelope.event_id}:{item.rule}:booster"

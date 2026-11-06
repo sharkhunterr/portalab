@@ -96,13 +96,18 @@ class Notifier:
             params["work"] = work_name(work)[:160]
         return replace(note, params=params)
 
-    async def boosters(self, user: UUID, content: UUID, count: int, reason: str) -> int:
-        """Issue 234: a content's boosters a rule gives (the cards') — how many were given; a failure never
-        affects the reward."""
+    async def boosters(
+        self, user: UUID, content: UUID | None, count: int, reason: str, among: dict[str, Any] | None = None
+    ) -> int:
+        """Issue 234: a content's boosters a rule gives (the cards') — issue 356: or the works its event names
+        (a genre, a year) when it is about no content; how many were given; a failure never affects the
+        reward."""
         try:
             providers = self.capabilities.system_providers(CONTENT_BOOSTERS)
             if not providers:
                 return 0
+            if content is None:
+                return int(await providers[0].provider.give_among(user, among or {}, count, reason[:200]))
             return int(await providers[0].provider.give(user, content, count, reason[:200]))
         except Exception:
             log.warning("content booster not given", extra={"fields": {"content": str(content)}})
