@@ -302,7 +302,7 @@ def wire_platform(
     games = GamesModule(database, capabilities, events=events)
     games.register()
     # issue 363: the requests for titles no service asks for — their events go to the reward rules
-    requests = RequestsModule(database, capabilities, events=events)
+    requests = RequestsModule(database, capabilities)
     requests.register()
     plugins = PluginsModule(
         database,
