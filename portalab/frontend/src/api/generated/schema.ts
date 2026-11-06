@@ -9392,6 +9392,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/collection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Collection */
+        get: operations["collection_api_v1_media_collection_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/discover/search": {
         parameters: {
             query?: never;
@@ -9879,6 +9896,23 @@ export interface paths {
         };
         /** Detail */
         get: operations["detail_api_v1_media__object_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{object_id}/collection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Title Collection */
+        get: operations["title_collection_api_v1_media__object_id__collection_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -13673,6 +13707,63 @@ export interface components {
             locked: boolean;
             /** Mandatory */
             mandatory: boolean;
+        };
+        /** CollectionItemOut */
+        CollectionItemOut: {
+            /** At */
+            at?: string | null;
+            /** Available */
+            available: boolean;
+            /** Episode */
+            episode?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Image Id */
+            image_id?: string | null;
+            /** Kind */
+            kind: string;
+            /** Platform */
+            platform?: string | null;
+            /** Position */
+            position?: number | null;
+            /**
+             * Requested
+             * @default false
+             */
+            requested: boolean;
+            /** Title */
+            title: string;
+            /** Year */
+            year: number | null;
+        };
+        /** CollectionOut */
+        CollectionOut: {
+            /**
+             * Askable
+             * @default false
+             */
+            askable: boolean;
+            /** Items */
+            items: components["schemas"]["CollectionItemOut"][];
+            /** Name */
+            name: string;
+            /**
+             * Parts
+             * @default []
+             */
+            parts: components["schemas"]["FilmCreditOut"][];
+            /** Poster */
+            poster?: string | null;
+            /** Ref */
+            ref: string;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "saga" | "series";
         };
         /** CommunityCatalogOut */
         CommunityCatalogOut: {
@@ -38411,6 +38502,37 @@ export interface operations {
             };
         };
     };
+    collection_api_v1_media_collection_get: {
+        parameters: {
+            query: {
+                ref: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     discover_search_api_v1_media_discover_search_get: {
         parameters: {
             query: {
@@ -39251,6 +39373,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    title_collection_api_v1_media__object_id__collection_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionOut"] | null;
                 };
             };
             /** @description Validation Error */

@@ -397,6 +397,21 @@ TMDB: Routes = {
     "/3/configuration": {"images": {"secure_base_url": "https://image.tmdb.org/t/p/"}},
     "/3/movie/438631": TMDB_MOVIE,
     "/3/find/tt1160419": {"movie_results": [{"id": 438631}], "tv_results": []},
+    # issue 361: a saga's films
+    "/3/collection/726871": {
+        "id": 726871,
+        "name": "Dune - Saga",
+        "parts": [
+            {"id": 438631, "title": "Dune", "release_date": "2021-09-15", "poster_path": "/dune.jpg"},
+            {
+                "id": 693134,
+                "title": "Dune : Deuxième partie",
+                "release_date": "2024-02-27",
+                "media_type": "movie",
+            },
+            {"id": 9, "title": "Not a film", "media_type": "tv"},
+        ],
+    },
     "/3/search/movie": {"results": [{"id": 438631}]},
 }
 

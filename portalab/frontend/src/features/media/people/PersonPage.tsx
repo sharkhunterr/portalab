@@ -218,7 +218,7 @@ function posterOf(credit: Credit, size: string): string | null {
 
 /** A title they are known for: the media pages' own card — poster, standing on its corner, title, role —
  * and, when it can be asked for, the button under it. */
-function KnownCard({ credit, askable }: { credit: Credit; askable: boolean }) {
+export function KnownCard({ credit, askable }: { credit: Credit; askable: boolean }) {
   const t = useT();
   const src = posterOf(credit, "w342");
   const frame = (

@@ -26,12 +26,13 @@ from portalab.capabilities.media import (
     PEOPLE,
     MetadataPerson,
     MetadataRecord,
+    PersonCredit,
     PersonRecord,
     RoleImage,
 )
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding
-from portalab.connectors.tmdb.people import IMAGE_PATH, image_ref, map_person, same_name
+from portalab.connectors.tmdb.people import IMAGE_PATH, _year, image_ref, map_person, same_name
 
 IMAGE_HOST = "https://image.tmdb.org"
 SIZES = frozenset({"w92", "w154", "w185", "w300", "w342", "w500", "w780", "w1280", "h632", "original"})
@@ -344,6 +345,32 @@ class _Metadata:
             if isinstance(english, Mapping) and english.get("biography"):
                 document = {**document, "biography": english["biography"]}
         return map_person(document)
+
+    async def saga(self, collection_id: str, language: str) -> list[PersonCredit] | None:
+        """Issue 361: the films of a saga (TMDB's « collection »), in the portal's language — each as a
+        filmography's title, for the saga's page; ``None`` when TMDB does not know it."""
+        if not str(collection_id).isdigit():
+            return None
+        document = await self.connector.get_json(
+            self.service, f"/3/collection/{int(collection_id)}", language=self._language(language)
+        )
+        if not isinstance(document, Mapping) or not document.get("id"):
+            return None
+        return [
+            PersonCredit(
+                tmdb_id=str(part["id"]),
+                kind="movie",
+                title=str(part.get("title") or part.get("original_title") or "")[:300],
+                year=_year(part.get("release_date")),
+                department="saga",
+                poster=image_ref(part.get("poster_path")),
+                popularity=float(part.get("popularity") or 0),
+                vote_average=float(part["vote_average"]) if part.get("vote_average") else None,
+                vote_count=int(part.get("vote_count") or 0),
+            )
+            for part in document.get("parts") or []
+            if isinstance(part, Mapping) and part.get("id") and (part.get("media_type") or "movie") == "movie"
+        ]
 
     async def role_images(self, person_id: str, pages: int = 2) -> list[RoleImage]:
         """Issue 229: the images a person is tagged in (stills, backdrops, posters), each with the film or

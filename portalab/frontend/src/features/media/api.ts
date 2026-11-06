@@ -116,6 +116,43 @@ export function usePerson(name: string) {
   });
 }
 
+/** Issue 361: a collection — a film's saga, a book's series, a game's franchise — and the one a title is in. */
+export type Collection = components["schemas"]["CollectionOut"];
+
+export function collectionPath(ref: string): string {
+  return `/media/collection?ref=${encodeURIComponent(ref)}`;
+}
+
+export function useTitleCollection(objectId: string) {
+  return useQuery({
+    queryKey: [...KEY, "collection-of", objectId],
+    retry: false,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data, error, response } = await api.GET("/api/v1/media/{object_id}/collection", {
+        params: { path: { object_id: objectId } },
+      });
+      if (error) fail(error, response);
+      return (data ?? null) as Collection | null;
+    },
+  });
+}
+
+export function useCollection(ref: string) {
+  return useQuery({
+    queryKey: [...KEY, "collection", ref],
+    retry: false,
+    enabled: ref !== "",
+    queryFn: async () => {
+      const { data, error, response } = await api.GET("/api/v1/media/collection", {
+        params: { query: { ref } },
+      });
+      if (!data) fail(error, response);
+      return data;
+    },
+  });
+}
+
 export function useSection(id: string, name: string) {
   return useQuery({
     queryKey: [...KEY, "section", id, name],

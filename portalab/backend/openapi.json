@@ -4007,6 +4007,167 @@
         "title": "ChannelStateOut",
         "type": "object"
       },
+      "CollectionItemOut": {
+        "properties": {
+          "at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "episode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Episode"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "image_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Id"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "platform": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Platform"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "requested": {
+            "default": false,
+            "title": "Requested",
+            "type": "boolean"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "year",
+          "available"
+        ],
+        "title": "CollectionItemOut",
+        "type": "object"
+      },
+      "CollectionOut": {
+        "properties": {
+          "askable": {
+            "default": false,
+            "title": "Askable",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CollectionItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "parts": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FilmCreditOut"
+            },
+            "title": "Parts",
+            "type": "array"
+          },
+          "poster": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Poster"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "saga",
+              "series"
+            ],
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref",
+          "source",
+          "name",
+          "items"
+        ],
+        "title": "CollectionOut",
+        "type": "object"
+      },
       "CommunityCatalogOut": {
         "properties": {
           "items": {
@@ -50136,6 +50297,50 @@
         ]
       }
     },
+    "/api/v1/media/collection": {
+      "get": {
+        "operationId": "collection_api_v1_media_collection_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 260,
+              "minLength": 2,
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Collection",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/discover/search": {
       "get": {
         "description": "#4: films and series one can ask for (the request service's search, over TMDB), each with its\npage in the catalog when it is there and the open request for it (mine, or a member's).",
@@ -51464,6 +51669,57 @@
           }
         },
         "summary": "Detail",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/collection": {
+      "get": {
+        "operationId": "title_collection_api_v1_media__object_id__collection_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/CollectionOut"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Title Collection Api V1 Media  Object Id  Collection Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Title Collection",
         "tags": [
           "media"
         ]

@@ -866,6 +866,11 @@ class MetadataProvider(Protocol):
         """Issue 229: the images a person (its provider's id) is tagged in, each with its work."""
         ...
 
+    async def saga(self, collection_id: str, language: str) -> Sequence[PersonCredit] | None:
+        """Issue 361: the films of a saga (a ``MetadataRecord.collection``'s id), for its page; ``None`` when
+        the provider does not know it."""
+        ...
+
 
 # --- 027 (#2): the portal's player ---------------------------------------------------------------------
 # The qualities a member picks, as Plex offers them: ``original`` streams the file as it is whenever the

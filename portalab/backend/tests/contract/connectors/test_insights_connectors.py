@@ -102,6 +102,18 @@ async def test_tmdb_metadata() -> None:
         await provider.fetch_image("/poster.jpg", "w9999")
 
 
+async def test_tmdb_saga() -> None:
+    """Issue 361: a saga's films, for its page — none when TMDB does not know it."""
+    provider = TmdbConnector().provider(METADATA, handle_for("tmdb"))
+    parts = await provider.saga("726871", "fr")
+    assert [(p.tmdb_id, p.title, p.year, p.kind) for p in parts] == [
+        ("438631", "Dune", 2021, "movie"),
+        ("693134", "Dune : Deuxième partie", 2024, "movie"),
+    ]
+    assert parts[0].poster == "/dune.jpg"
+    assert await provider.saga("not-a-number", "fr") is None
+
+
 async def test_release_calendars() -> None:
     start, end = datetime(2026, 10, 1, tzinfo=UTC), datetime(2027, 3, 1, tzinfo=UTC)
     movies = await RadarrConnector().provider(CALENDAR, handle_for("radarr")).upcoming(start, end)

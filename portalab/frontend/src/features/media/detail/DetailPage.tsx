@@ -23,6 +23,7 @@ import { PluginSlot } from "../../plugins/slots/PluginSlot";
 import { MediaTickets, MediaTicketsBadge } from "../../support/tickets/MediaTickets";
 import { ReportMediaProblem } from "../../support/tickets/ReportMedia";
 import { useListenInfo, useReadInfo } from "../books/api";
+import { CollectionRow } from "../collections/CollectionRow";
 import { useDiscoverTitle } from "../discover/api";
 import { RequestDialog } from "../discover/RequestDialog";
 import { FollowButton } from "../feed/FollowButton";
@@ -1027,12 +1028,14 @@ export function DetailPage() {
       {/* issue 299: what the news sources say of it */}
       <ExternalNews heading={t("news:external.aboutTitle")} asked={{ title: [media.id] }} />
       {metadata.data ? (
-        <Enrichment objectId={media.id} />
+        <Enrichment objectId={media.id} saga={false} />
       ) : details ? (
-        <EnrichedView data={details} />
+        <EnrichedView data={details} saga={false} />
       ) : BOOKS.includes(media.kind) ? (
         <BookView objectId={media.id} genres={media.genres} />
       ) : null}
+      {/* issue 361: its saga, series or franchise — the same block for a film, a book, a game */}
+      <CollectionRow objectId={media.id} />
       {collects && (media.kind === "movie" || media.kind === "series") ? (
         <WorkCollection objectId={media.id} />
       ) : null}

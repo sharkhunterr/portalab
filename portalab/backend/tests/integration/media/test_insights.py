@@ -270,6 +270,9 @@ class _Tmdb:
     def __init__(self) -> None:
         self.asked: list[tuple[str, dict[str, str], str]] = []
 
+    async def saga(self, collection_id: str, language: str) -> None:
+        return None
+
     async def lookup(
         self, kind: str, ids: Any, title: str, year: Any, language: str
     ) -> MetadataRecord | None:
