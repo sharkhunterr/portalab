@@ -1,6 +1,8 @@
-"""Issue 362 — with a book database (Hardcover): an author's page tells their books, found in the library by
-an edition's ISBN or by their title (else absent: no service asks for books), with their covers through the
-portal, beside every film or series they took part in; a book series' page lists every volume."""
+"""Issue 362 — with a book database (Hardcover): an author's page tells their books, found in the library as
+the database identified the library's own (from every identifier the library holds) or by their title (else
+absent: no service asks for books), told by the library's title, with their covers through the portal,
+beside every film or series they took part in; a library book it lists none of is told too; a book series'
+page lists every volume."""
 
 from collections.abc import Mapping, Sequence
 from typing import Any
@@ -15,6 +17,7 @@ from portalab.capabilities.media import (
     PEOPLE,
     BookSeries,
     BookSeriesProvider,
+    OwnedBook,
     PeopleProvider,
     PersonCredit,
     PersonRecord,
@@ -34,7 +37,6 @@ APPRENTICE = PersonCredit(
     department="writing",
     poster="/edition/1/apprentice.jpg",
     vote_count=3000,
-    isbns=("9780553573398",),
     position=1,
 )
 ROYAL = PersonCredit(
@@ -44,11 +46,14 @@ QUEST = PersonCredit(
     tmdb_id="103", kind="book", title="Assassin's Quest", year=1997, department="writing", position=3
 )
 BOOKS = (APPRENTICE, ROYAL, QUEST)
+# the library's « Le Prophète blanc »: a split part of a book, listed in no bibliography
+SPLIT = PersonCredit(tmdb_id="917", kind="book", title="The Golden Fool, Part 1", department="writing")
 
 
 class _Hardcover:
     def __init__(self) -> None:
         self.series_asked: list[tuple[str, list[str]]] = []
+        self.identified: list[OwnedBook] = []
 
     async def person(self, name: str, ids: Mapping[str, str], language: str) -> PersonRecord | None:
         if name != "Robin Hobb":
@@ -60,8 +65,18 @@ class _Hardcover:
     async def portrait(self, ref: str, size: str) -> bytes:
         return b"\xff\xd8cover" + ref.encode()
 
-    async def series(self, name: str, isbns: Sequence[str]) -> BookSeries | None:
-        self.series_asked.append((name, list(isbns)))
+    async def identify(self, books: Sequence[OwnedBook]) -> Mapping[str, Sequence[PersonCredit]]:
+        self.identified += books
+        found: dict[str, Sequence[PersonCredit]] = {}
+        for book in books:
+            if "9780553573398" in book.ids.get("isbn", ()):
+                found[book.key] = [APPRENTICE]
+            elif "le-prophete-blanc" in book.ids.get("hardcover", ()):
+                found[book.key] = [SPLIT]
+        return found
+
+    async def series(self, name: str, known: Sequence[str]) -> BookSeries | None:
+        self.series_asked.append((name, list(known)))
         return BookSeries(
             ids={"hardcover": "8"}, name="The Farseer Trilogy", author="Robin Hobb", volumes=BOOKS
         )
@@ -129,6 +144,9 @@ async def _library(app: FastAPI, media: MediaHarness) -> _Hardcover:
                 authors=["Robin Hobb"],
                 people=["Robin Hobb"],
             ),
+            library_record(
+                "b4", kind="book", title="Le Prophète blanc", authors=["Robin Hobb"], people=["Robin Hobb"]
+            ),
         ],
         one,
     )
@@ -137,6 +155,10 @@ async def _library(app: FastAPI, media: MediaHarness) -> _Hardcover:
             await uow.session.execute(select(MediaObject).where(MediaObject.title == "L'Apprenti assassin"))
         ).scalar_one()
         uow.session.add(ExternalId(scheme="isbn", value="9780553573398", object_id=first.id))
+        split = (
+            await uow.session.execute(select(MediaObject).where(MediaObject.title == "Le Prophète blanc"))
+        ).scalar_one()
+        uow.session.add(ExternalId(scheme="hardcover", value="le-prophete-blanc", object_id=split.id))
     hardcover = _Hardcover()
     service = media.service(9, "hardcover")
     media.ev.full.identity.capabilities.provide(
@@ -166,15 +188,17 @@ async def _id(media: MediaHarness, title: str) -> str:
 
 
 async def test_an_author_s_books(app: FastAPI, client: httpx.AsyncClient, media: MediaHarness) -> None:
-    await _library(app, media)
+    hardcover = await _library(app, media)
     await login(client, "zoe")
     page = (await client.get("/api/v1/media/person", params={"name": "Robin Hobb"})).json()
     assert page["profile"]["biography"] == "An American writer."
     standing = {(c["title"], c["kind"]): (c["status"], c["object_id"]) for c in page["filmography"]}
     assert standing == {
-        ("Assassin's Apprentice", "book"): ("available", await _id(media, "L'Apprenti assassin")),
-        ("Royal Assassin", "book"): ("available", await _id(media, "Royal Assassin")),
+        # identified (its ISBN), told by the library's title
+        ("L'Apprenti assassin", "book"): ("available", await _id(media, "L'Apprenti assassin")),
+        ("Royal Assassin", "book"): ("available", await _id(media, "Royal Assassin")),  # its title
         ("Assassin's Quest", "book"): ("absent", None),
+        ("Le Prophète blanc", "book"): ("available", await _id(media, "Le Prophète blanc")),  # unlisted
         # every part they took in films and series stays, whatever it was
         ("A Cameo", "movie"): ("missing", None),
         ("Farseer", "series"): ("missing", None),
@@ -186,18 +210,22 @@ async def test_an_author_s_books(app: FastAPI, client: httpx.AsyncClient, media:
     assert apprentice["cover"].startswith("/api/v1/media/person/portrait?service=")
     cover = await client.get(apprentice["cover"])
     assert cover.status_code == 200 and cover.content == b"\xff\xd8cover/edition/1/apprentice.jpg"
-    assert page["counts"] == {"available": 2, "absent": 1, "missing": 2}
+    assert page["counts"] == {"available": 3, "absent": 1, "missing": 2}
+    # every identifier the library holds, told to the database: it reads those it knows
+    told = {book.title: dict(book.ids) for book in hardcover.identified}
+    assert told["L'Apprenti assassin"] == {"isbn": ["9780553573398"]}
+    assert told["Le Prophète blanc"] == {"hardcover": ["le-prophete-blanc"]}
 
 
 async def test_a_book_series_volumes(app: FastAPI, client: httpx.AsyncClient, media: MediaHarness) -> None:
     hardcover = await _library(app, media)
     await login(client, "zoe")
     page = (await client.get("/api/v1/media/collection", params={"ref": "series:L'Assassin royal"})).json()
-    assert hardcover.series_asked == [("L'Assassin royal", ["9780553573398"])]  # told apart by its ISBNs
+    assert hardcover.series_asked == [("L'Assassin royal", ["101"])]  # told apart by its identified volumes
     assert [(p["title"], p["position"], p["status"], p["object_id"]) for p in page["parts"]] == [
-        ("Assassin's Apprentice", 1.0, "available", await _id(media, "L'Apprenti assassin")),
+        ("L'Apprenti assassin", 1.0, "available", await _id(media, "L'Apprenti assassin")),
         ("Royal Assassin", 2.0, "absent", None),  # not one of the series' own titles in the library
-        ("Assassin's Quest", 3.0, "available", await _id(media, "La Nef du crépuscule")),  # its number
+        ("La Nef du crépuscule", 3.0, "available", await _id(media, "La Nef du crépuscule")),  # its number
     ]
     cover = await client.get(page["parts"][0]["cover"])
     assert cover.status_code == 200 and cover.content.startswith(b"\xff\xd8cover")

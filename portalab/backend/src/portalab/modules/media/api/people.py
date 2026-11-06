@@ -4,7 +4,9 @@ knows of them — biography, birth, what they are known for — with their whole
 available, asked for, not available or missing from the library (and then where to ask for it).
 The name is a query parameter: a name may hold a slash (« AC/DC »)."""
 
-from collections.abc import Callable, Sequence
+import logging
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
 from typing import Annotated, Literal
 from urllib.parse import urlencode
 from uuid import UUID
@@ -13,7 +15,7 @@ from fastapi import APIRouter, Query, Response
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from portalab.capabilities.media import PersonCredit, PersonRecord
+from portalab.capabilities.media import BOOK_SERIES, OwnedBook, PersonCredit, PersonRecord, unwrap
 from portalab.core.errors import NotFound, Unavailable
 from portalab.modules.media.api.router import MediaCard, Module, Reader, _asked, _card
 from portalab.modules.media.matching import fold
@@ -23,6 +25,7 @@ from portalab.modules.media.providers.insight_widgets import posters
 from portalab.modules.media.requests.discovery import OPEN
 
 router = APIRouter(prefix="/api/v1", tags=["media"])
+log = logging.getLogger(__name__)
 KNOWN_FOR = 10
 BOOK_KINDS = ("book", "audiobook")
 Status = Literal["available", "requested", "unavailable", "missing", "absent"]  # absent: a book not there
@@ -164,38 +167,93 @@ def _cover_url(service: str | None, ref: str | None) -> str | None:
     return f"/api/v1/media/person/portrait?{urlencode({'service': service, 'ref': ref, 'size': 'w185'})}"
 
 
+@dataclass(frozen=True, slots=True)
+class _Owned:
+    object_id: UUID
+    available: bool
+    title: str
+
+
+async def _identify(
+    module: Module, service: str | None, works: Sequence[UUID]
+) -> tuple[dict[str, _Owned], list[list[PersonCredit]]]:
+    """Issue 362: the library's books among ``works`` as the book database ``service`` knows them (by an
+    edition's ISBN, its own id, an edition's title by the same author) — each of its books' ids with the
+    library's book; and each library book's candidates, the likeliest first (a bibliography may list none
+    of them: a translation's split part)."""
+    provider = next(
+        (r.provider for r in module.capabilities.system_providers(BOOK_SERIES) if r.instance_ref == service),
+        None,
+    )
+    if provider is None or not works:
+        return {}, []
+    async with module.database.session() as session:
+        rows = list(
+            (
+                await session.execute(
+                    select(MediaObject).where(
+                        MediaObject.id.in_(works),
+                        MediaObject.kind.in_(BOOK_KINDS),
+                        MediaObject.status == "active",
+                    )
+                )
+            ).scalars()
+        )
+        ids: dict[UUID, dict[str, list[str]]] = {}
+        for object_id, scheme, value in await session.execute(
+            # every identifier the library holds: the book database reads those it knows
+            select(ExternalId.object_id, ExternalId.scheme, ExternalId.value).where(
+                ExternalId.object_id.in_([row.id for row in rows])
+            )
+        ):
+            ids.setdefault(object_id, {}).setdefault(scheme, []).append(value)
+    owned = [
+        OwnedBook(
+            key=str(row.id),
+            title=row.title,
+            authors=tuple(str(a) for a in (row.effective.get("authors") or [])[:10] if a),
+            ids=ids.get(row.id, {}),
+        )
+        for row in rows
+    ]
+    try:
+        found = unwrap(await provider.identify(owned))
+    except Exception as exc:
+        log.info("book identification failed: %s: %s", type(exc).__name__, exc)
+        return {}, []
+    known: dict[str, _Owned] = {}
+    candidates: list[list[PersonCredit]] = []
+    for row in rows:
+        credits = list((found or {}).get(str(row.id)) or ())
+        mine = _Owned(row.id, bool(row.available), row.title)
+        for credit in credits:
+            if credit.tmdb_id not in known or (mine.available and not known[credit.tmdb_id].available):
+                known[credit.tmdb_id] = mine
+        if credits:
+            candidates.append(credits)
+    return known, candidates
+
+
 async def _bibliography(
     module: Module,
     credits: Sequence[PersonCredit],
     *,
     works: Sequence[UUID] = (),
+    known: Mapping[str, _Owned] | None = None,
     cover: Callable[[str | None], str | None] = lambda _: None,
 ) -> list[FilmCreditOut]:
-    """Issue 362: each book of a bibliography (or a series) with its standing in the library — found by its
-    editions' ISBNs, else by its title among ``works`` (the person's, the series' own titles: a translated
-    title is found by its ISBN): available, there but not available, or absent (no service asks for books).
-    Its cover: the library's, else the book database's (``cover`` turns its reference into a URL)."""
+    """Issue 362: each book of a bibliography (or a series) with its standing in the library — found as
+    the book database identified the library's books (``known``, by the database's id), else by its title
+    among ``works`` (the person's, the series' own titles): available, there but not available, or absent
+    (no service asks for books), told by the library's title when there. Its cover: the library's, else the
+    book database's (``cover`` turns its reference into a URL)."""
     books = [credit for credit in credits if credit.kind == "book"]
     if not books:
         return []
-    isbns = {isbn for credit in books for isbn in credit.isbns}
-    by_isbn: dict[str, tuple[UUID, bool]] = {}
-    by_title: dict[str, tuple[UUID, bool]] = {}
-    async with module.database.session() as session:
-        if isbns:
-            for value, object_id, available in await session.execute(
-                select(ExternalId.value, MediaObject.id, MediaObject.available)
-                .join(MediaObject, MediaObject.id == ExternalId.object_id)
-                .where(
-                    ExternalId.scheme == "isbn",
-                    ExternalId.value.in_(isbns),
-                    MediaObject.kind.in_(BOOK_KINDS),
-                    MediaObject.status == "active",
-                )
-            ):
-                if value not in by_isbn or (available and not by_isbn[value][1]):
-                    by_isbn[value] = (object_id, bool(available))
-        if works:
+    known = known or {}
+    by_title: dict[str, _Owned] = {}
+    if works:
+        async with module.database.session() as session:
             for object_id, title, available in await session.execute(
                 select(MediaObject.id, MediaObject.title, MediaObject.available).where(
                     MediaObject.id.in_(works),
@@ -204,32 +262,38 @@ async def _bibliography(
                 )
             ):
                 key = fold(title)
-                if key not in by_title or (available and not by_title[key][1]):
-                    by_title[key] = (object_id, bool(available))
-    found_ids = [found[0] for found in (*by_isbn.values(), *by_title.values())]
-    images = await posters(module.database, found_ids)
+                if key not in by_title or (available and not by_title[key].available):
+                    by_title[key] = _Owned(object_id, bool(available), title)
+    images = await posters(module.database, [o.object_id for o in (*known.values(), *by_title.values())])
+    matched = [known.get(credit.tmdb_id) or by_title.get(fold(credit.title)) for credit in books]
+    # a library book is one of them only (the most voted for: a whole book rather than its split part)
+    claimed: dict[UUID, int] = {}
+    for index, found in enumerate(matched):
+        if found is not None:
+            best = claimed.get(found.object_id)
+            if best is None or books[index].vote_count > books[best].vote_count:
+                claimed[found.object_id] = index
     out = []
-    for credit in books:
-        found = next((by_isbn[i] for i in credit.isbns if i in by_isbn), None) or by_title.get(
-            fold(credit.title)
-        )
-        object_id = found[0] if found else None
-        status: Status = ("available" if found[1] else "unavailable") if found else "absent"
+    for index, credit in enumerate(books):
+        found = matched[index]
+        if found is not None and claimed[found.object_id] != index:
+            found = None  # told by another
+        status: Status = ("available" if found.available else "unavailable") if found else "absent"
         out.append(
             FilmCreditOut(
                 tmdb_id=credit.tmdb_id,
                 kind="book",
-                title=credit.title,
+                title=found.title if found else credit.title,
                 year=credit.year,
                 role=None,
                 department=credit.department,
                 poster=None,
-                image_id=images.get(object_id) if object_id else None,
+                image_id=images.get(found.object_id) if found else None,
                 rating=credit.vote_average,
                 votes=credit.vote_count,
                 status=status,
-                object_id=str(object_id) if object_id else None,
-                route=f"/media/{object_id}" if object_id else None,
+                object_id=str(found.object_id) if found else None,
+                route=f"/media/{found.object_id}" if found else None,
                 cover=cover(credit.poster),
                 position=credit.position,
             )
@@ -287,12 +351,15 @@ async def person(
     filmography: list[FilmCreditOut] = []
     if record is not None:
         filmography = await _filmography(module, record.credits)
-        # issue 362: their books (a book database's), found in the library among their own titles too
+        # issue 362: their books (a book database's), found in the library as it identified the library's
+        # own, or among their titles; those of the library it does not list too (a translation's split part)
+        service = profile.books if profile else None
+        known, candidates = await _identify(module, service, list(ids))
+        listed = {credit.tmdb_id for credit in record.credits if credit.kind == "book"}
+        unlisted = [found[0] for found in candidates if not listed & {c.tmdb_id for c in found}]
+        books = [*record.credits, *{c.tmdb_id: c for c in unlisted}.values()]
         filmography += await _bibliography(
-            module,
-            record.credits,
-            works=list(ids),
-            cover=lambda ref: _cover_url(profile.books if profile else None, ref),
+            module, books, works=list(ids), known=known, cover=lambda ref: _cover_url(service, ref)
         )
         # the most recent first; the undated (announced, or minor) last
         filmography.sort(key=lambda c: (c.year is not None, c.year or 0, c.votes), reverse=True)
