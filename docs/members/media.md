@@ -206,7 +206,7 @@ Films and series go through the request service. For anything else (a book, an a
 
 Open **Ask for a book, a game…** in the menu (`/requests`). On an author's or a book series' page, a book the library lacks has an **Ask for it** button too: the form opens with its title and author filled in.
 
-Click a missing book's cover or title to open **its sheet**: authors, series, genres, rating, summary, and its **Editions**, those in your language first (translated title, format, audiobook, publisher, ISBN). When the library has it, as a book or an audiobook, the sheet takes you there. Otherwise **Ask for it** asks for the book, or for one edition from its line: its title, language, format and ISBN go with the request, which helps the team find the right one.
+Click a missing book's cover or title to open **its sheet**, laid out like a library book's page: authors, series, genres, rating, summary, and its **Editions**, those in your language first (translated title, format, audiobook, publisher, ISBN). When the library has it, as a book or an audiobook, its library page opens instead. Otherwise **Ask for it** asks for the book, or for one edition from its line: its title, language, format and ISBN go with the request, which helps the team find the right one.
 
 1. Pick the **Kind**, then type the **Title**.
 2. Add the **Author, studio or creator**: it helps find the right title. Several? Separate them with a comma.

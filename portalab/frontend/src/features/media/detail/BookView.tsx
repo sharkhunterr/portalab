@@ -43,12 +43,17 @@ function Person({ name, role }: { name: string; role: string }) {
  * then its series and edition as blocks, and its tags — from what the library's services know (Grimmory…).
  */
 export function BookView({ objectId, genres }: { objectId: string; genres: string[] }) {
+  const info = useSection(objectId, "info");
+  if (!info.data) return null;
+  return <BookFacts data={(info.data.data ?? {}) as Data} genres={genres} />;
+}
+
+/** The same book page from any source — the library's services, or a book database for a book the
+ * library lacks (issue 370). */
+export function BookFacts({ data, genres }: { data: Data; genres: string[] }) {
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
-  const info = useSection(objectId, "info");
-  const data = (info.data?.data ?? {}) as Data;
-  if (!info.data) return null;
   const { authors, narrators } = bookPeople(data);
   const facts = [
     data.released

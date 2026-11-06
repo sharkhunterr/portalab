@@ -3,9 +3,10 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-// Issue 367 — a book the library lacks, as the book database tells it: its authors leading to their page, its
-// series, its editions; asking the team for the book or for one edition (its title, language, format and
-// ISBN carried to the request); where the library has it instead of asking.
+// Issue 367 — a book the library lacks, as the book database tells it, laid out as a library title (issue
+// 370): its authors leading to their page, its series, its editions; asking the team for the book or for
+// one edition (its title, language, format and ISBN carried to the request); the library's page instead
+// when it has it.
 
 const fake = vi.hoisted(() => ({
   handler: (_: Request): Response | Promise<Response> => new Response(null),
@@ -74,9 +75,15 @@ function renderSheet(sheet: Record<string, unknown>) {
   return render(
     <QueryClientProvider client={client}>
       <RouterProvider
-        router={createMemoryRouter([{ path: "/media/book", element: <BookSheetPage /> }], {
-          initialEntries: ["/media/book?service=s1&ref=458644"],
-        })}
+        router={createMemoryRouter(
+          [
+            { path: "/media/book", element: <BookSheetPage /> },
+            { path: "/media/:id", element: <p>The library's page</p> },
+          ],
+          {
+            initialEntries: ["/media/book?service=s1&ref=458644"],
+          },
+        )}
       />
     </QueryClientProvider>,
   );
@@ -92,7 +99,8 @@ describe("a book's sheet", () => {
       "/media/people/Robin%20Hobb",
     );
     expect(screen.getByRole("link", { name: "Fitz and the Fool, volume 2" })).toBeTruthy();
-    expect(screen.getByText("Now, betrayed by his own people…")).toBeTruthy();
+    expect(screen.getByText(/Now, betrayed by his own people…/)).toBeTruthy();
+    expect(screen.getByText("Not in the library")).toBeTruthy();
     const editions = screen.getByRole("list", { name: "Editions" });
     const [audio, paper] = within(editions).getAllByRole("listitem");
     const asked = within(paper as HTMLElement).getByRole("link", { name: /Ask for it/ });
@@ -109,12 +117,8 @@ describe("a book's sheet", () => {
     expect(listened.getAttribute("href")).toContain("kind=audiobook");
   });
 
-  it("leads to the library's title instead of asking for it", async () => {
-    renderSheet({ ...SHEET, library: { book: "0190f0a0-0000-7000-8000-0000000000b2" } });
-    const there = await screen.findByRole("link", { name: /In the library/ });
-    expect(there.getAttribute("href")).toBe("/media/0190f0a0-0000-7000-8000-0000000000b2");
-    const editions = screen.getByRole("list", { name: "Editions" });
-    // the audiobook still to ask for, the book no longer
-    expect(within(editions).getAllByRole("link", { name: /Ask for it/ })).toHaveLength(1);
+  it("opens the library's page when the library has it", async () => {
+    renderSheet({ ...SHEET, library: { audiobook: "0190f0a0-0000-7000-8000-0000000000b2" } });
+    expect(await screen.findByText("The library's page")).toBeTruthy();
   });
 });

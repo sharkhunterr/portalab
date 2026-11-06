@@ -105,7 +105,7 @@ Les films et les séries passent par le service de demandes. Pour le reste (un l
 
 Ouvrez [Demander un livre, un jeu…](/requests) dans la rubrique « Médias » du menu. Sur la page d'un auteur ou d'une série de livres, un livre absent de la médiathèque a aussi son bouton **« Le demander »** : le formulaire s'ouvre avec son titre et son auteur déjà remplis.
 
-Cliquez sur la couverture ou le titre d'un livre absent pour ouvrir **sa fiche** : auteurs, séries, genres, note, résumé, et ses **« Éditions »**, celles de votre langue d'abord (titre traduit, format, livre audio, éditeur, ISBN). Si la médiathèque l'a déjà, en livre ou en livre audio, la fiche vous y emmène. Sinon, **« Le demander »** demande le livre, ou une édition précise depuis sa ligne : son titre, sa langue, son format et son ISBN partent avec la demande, ce qui aide l'équipe à trouver la bonne.
+Cliquez sur la couverture ou le titre d'un livre absent pour ouvrir **sa fiche**, présentée comme celle d'un livre de la médiathèque : auteurs, séries, genres, note, résumé, et ses **« Éditions »**, celles de votre langue d'abord (titre traduit, format, livre audio, éditeur, ISBN). Si la médiathèque l'a déjà, en livre ou en livre audio, c'est sa page de la médiathèque qui s'ouvre. Sinon, **« Le demander »** demande le livre, ou une édition précise depuis sa ligne : son titre, sa langue, son format et son ISBN partent avec la demande, ce qui aide l'équipe à trouver la bonne.
 
 1. Choisissez le **« Type »**, puis tapez le **« Titre »**.
 2. Ajoutez l'**« Auteur, studio ou créateur »** : il aide à trouver le bon titre. Plusieurs ? Séparez-les par une virgule.
