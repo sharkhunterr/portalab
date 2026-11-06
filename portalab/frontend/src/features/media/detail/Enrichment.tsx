@@ -5,7 +5,7 @@ import { api } from "../../../api/client";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import { personPath } from "../api";
+import { collectionPath, personPath } from "../api";
 import { useFollowed } from "../feed/api";
 import { FollowedMark } from "../feed/FollowedMark";
 import { useMeasures } from "../insights/api";
@@ -202,14 +202,21 @@ export function Backdrop({ objectId, fill = false }: { objectId: string; fill?: 
   );
 }
 
-export function Enrichment({ objectId }: { objectId: string }) {
+export function Enrichment({ objectId, saga = true }: { objectId: string; saga?: boolean }) {
   const metadata = useMetadata(objectId);
-  return metadata.data ? <EnrichedView data={metadata.data} /> : null;
+  return metadata.data ? <EnrichedView data={metadata.data} saga={saga} /> : null;
 }
 
 /** The enriched details as such — a library title's (the metadata provider's) or, #4, one the request
  * service describes before it is asked for. */
-export function EnrichedView({ data }: { data: Metadata }) {
+export function EnrichedView({
+  data,
+  saga = true,
+}: {
+  data: Metadata;
+  /** issue 361: a library title's page tells its saga in its collection's block instead */
+  saga?: boolean;
+}) {
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
@@ -302,13 +309,14 @@ export function EnrichedView({ data }: { data: Metadata }) {
             </dl>
           </div>
         ) : null}
-        {data.collection ? (
+        {data.collection && saga ? (
           <div className="media-enriched__block media-enriched__saga">
             <h3>{t("media:enriched.saga")}</h3>
             {metadataImage(data.collection.poster, "w185") ? (
               <img src={metadataImage(data.collection.poster, "w185") ?? ""} alt="" loading="lazy" />
             ) : null}
-            <p>{data.collection.name}</p>
+            {/* issue 361: its page — every film of the saga, those the library has and those to ask for */}
+            <Link to={collectionPath(`tmdb:${data.collection.id}`)}>{data.collection.name}</Link>
           </div>
         ) : null}
         {data.budget || data.revenue ? (

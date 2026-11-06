@@ -60,7 +60,8 @@ Plus bas, **« Avis des membres »** donne la note moyenne et le nombre d'avis, 
 
 Plus bas, selon le titre :
 
-- **« Détails enrichis »** : distribution, équipe, genres, saga, budget et box-office, studios… Cliquez sur une personne pour ouvrir sa page : sa biographie et sa filmographie, avec ce qui est disponible et ce que vous pouvez demander ;
+- **« Détails enrichis »** : distribution, équipe, genres, budget et box-office, studios… Cliquez sur une personne pour ouvrir sa page : sa biographie et sa filmographie, avec ce qui est disponible et ce que vous pouvez demander ;
+- la **collection** du titre, présentée de la même façon pour un film (**« Saga »**), un livre ou un livre audio (**« Série »**) et un jeu (**« Franchise »**) : son nom, la place du titre (« Tome 2 »), le nombre de titres dans la bibliothèque et leurs jaquettes à faire défiler. **« Voir la saga »** (ou la série, la franchise) ouvre sa page avec tous ses titres dans l'ordre ; pour une saga, elle montre aussi les films qui manquent, avec **« Demander »** ;
 - **« À propos »**, **« Sources »** (où le titre se trouve), **« Demandes »** et **« Liens externes »** ;
 - pour un jeu, **« Durée de jeu »** : le temps qu'il faut selon la façon de jouer (« Histoire principale », « Principal + extras », « Complétionniste », « Tous les styles »), avec le nombre de joueurs qui l'ont indiqué (d'après HowLongToBeat, quand RomM le connaît) ;
 - **« Mon historique »** : vos lectures de ce titre, la date et jusqu'où vous êtes allé. Quand assez de membres l'ont vu, le nombre de lectures et de membres s'affiche aussi, sans aucun nom.

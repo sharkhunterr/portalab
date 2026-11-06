@@ -49,6 +49,7 @@ const MediaRequests = lazy(() => import("../../features/media/requests/RequestsP
 const MediaDiscover = lazy(() => import("../../features/media/discover/DiscoverPage"));
 const MediaDiscoverTitle = lazy(() => import("../../features/media/discover/DiscoverTitlePage"));
 const MediaPerson = lazy(() => import("../../features/media/people/PersonPage"));
+const MediaCollection = lazy(() => import("../../features/media/collections/CollectionPage")); // issue 361
 const MediaInsights = lazy(() => import("../../features/media/insights/InsightsPage"));
 const MediaFeed = lazy(() => import("../../features/media/feed/FeedPage")); // issue 299
 const MediaTaste = lazy(() => import("../../features/media/taste/TastePage")); // issue 190
@@ -316,6 +317,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               path: "people/:name",
               element: <MediaPerson />,
               handle: h({ crumb: "Person" }),
+            },
+            {
+              // issue 361: a saga's, a series', a franchise's page
+              path: "collection",
+              element: <MediaCollection />,
+              handle: h({ crumb: "Collection" }),
             },
             {
               path: ":objectId",

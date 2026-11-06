@@ -119,38 +119,20 @@ export function BookView({ objectId, genres }: { objectId: string; genres: strin
           </ul>
         </div>
       ) : null}
-      {data.series || edition.length ? (
+      {/* issue 361: its series is told by the collection's block, with its other volumes */}
+      {edition.length ? (
         <div className="media-enriched__grid">
-          {data.series ? (
-            <div className="media-enriched__block">
-              <h3>{t("media:facts.series")}</h3>
-              <dl className="media-enriched__pairs">
-                <div>
-                  <dt>{t("media:facts.seriesName")}</dt>
-                  <dd>{String(data.series)}</dd>
+          <div className="media-enriched__block">
+            <h3>{t("media:facts.edition")}</h3>
+            <dl className="media-enriched__pairs">
+              {edition.map((row) => (
+                <div key={row.key}>
+                  <dt>{t(`media:facts.${row.key}`)}</dt>
+                  <dd>{row.value}</dd>
                 </div>
-                {data.series_position ? (
-                  <div>
-                    <dt>{t("media:facts.volume")}</dt>
-                    <dd>{format.number(Number(data.series_position))}</dd>
-                  </div>
-                ) : null}
-              </dl>
-            </div>
-          ) : null}
-          {edition.length ? (
-            <div className="media-enriched__block">
-              <h3>{t("media:facts.edition")}</h3>
-              <dl className="media-enriched__pairs">
-                {edition.map((row) => (
-                  <div key={row.key}>
-                    <dt>{t(`media:facts.${row.key}`)}</dt>
-                    <dd>{row.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          ) : null}
+              ))}
+            </dl>
+          </div>
         </div>
       ) : null}
       {tags.length ? (

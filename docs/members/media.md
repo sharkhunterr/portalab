@@ -82,11 +82,12 @@ The **Sources** section lists every service that holds the title, whether it is 
 
 Depending on the title:
 
-- **Enriched details** (from the metadata provider, such as TMDB): **Cast**, **Crew**, **Genres**, **Saga**, **Studios**, **Languages**, **Keywords**, **Budget and box office**;
+- **Enriched details** (from the metadata provider, such as TMDB): **Cast**, **Crew**, **Genres**, **Studios**, **Languages**, **Keywords**, **Budget and box office**;
+- the title's **collection**, told the same way for a film (**Saga**), a book or an audiobook (**Series**) and a game (**Franchise**, from RomM): its name, the title's place in it (**Volume 2**), how many of its titles the library has and their posters on a rail. **See the saga** (the series, the franchise) opens its page: every title in order, and for a saga the films the library lacks, each with **Ask for it**;
 - **About**, **Contents** (a series' seasons and episodes), **Requests** and **External links**;
 - for a game, **Time to beat**: how long it takes by play style — **Main story**, **Main + extras**, **Completionist**, **All styles** — with how many players told it (HowLongToBeat, when RomM knows it);
 - **My history**: when you played it and how far you went. Once enough members have seen it, the number of plays and members appears too — never their names;
-- for a book or an audiobook: **Authors and narrators**, **Series**, **Publisher**, **Pages** or listening length, **ISBN**…
+- for a book or an audiobook: **Authors and narrators**, **Publisher**, **Pages** or listening length, **ISBN**…
 
 Click a person in the cast or crew to open their page: **Biography**, **Known for** and **Filmography**. The filters **All**, **Available** and **To ask for** show what the library has of their work and what you could request, with an **Ask for it** button on each missing title.
 
