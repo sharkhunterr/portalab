@@ -3,6 +3,7 @@ series, book, audiobook…), ``genre``, ``year`` and ``availability`` facets, sc
 source, plus the ``media:`` / ``tmdb:``… ``ObjectResolver`` and the palette actions ``media.open`` /
 ``media.request``."""
 
+import asyncio
 import time
 from collections.abc import Sequence
 from typing import Any
@@ -361,6 +362,10 @@ class MediaResolver:
         return ObjectRef(kind="media", id=str(found.id), title=found.title, route=found.route)
 
 
+async def _nothing() -> list[Any]:
+    return []
+
+
 class RequestableSearchProvider:
     """#4: « Ask for it » — the films and series the library does not have, found through the request
     service (Seerr, over TMDB), each opening the page where one asks for it. Titles already available
@@ -399,15 +404,17 @@ class RequestableSearchProvider:
         if not language:  # the suggestions as one types: the member's own language, as on their pages
             language = await (self.member_language(principal) if self.member_language else self.language())
         wanted = set(query.filters.get("subtype") or ())
-        found = (
-            await self.titles.found(query.text, language, limit)
+        # the request service and the book and game databases asked together (#373)
+        databases = (
+            self.titles.found(query.text, language, limit)
             if self.titles is not None and await self.authorizer.is_allowed(principal, MEDIA_READ)
-            else []
+            else _nothing()
+        )
+        service = self.catalog.configured() and await self.authorizer.is_allowed(principal, MEDIA_REQUEST)
+        found, cards = await asyncio.gather(
+            databases, self.catalog.search(query.text, user, language) if service else _nothing()
         )
         found = [item for item in found if not wanted or item.facets.get("type") in wanted]
-        if not self.catalog.configured() or not await self.authorizer.is_allowed(principal, MEDIA_REQUEST):
-            return found[:limit]
-        cards = await self.catalog.search(query.text, user, language)
         items = []
         for card in cards:
             if card["status"] == "available" or (wanted and card["kind"] not in wanted):

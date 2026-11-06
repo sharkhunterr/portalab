@@ -3,6 +3,7 @@ found by their IGDB id (RomM's) or their title, the others absent and leading to
 covers through the portal; a game's sheet tells it, its franchises linked when the library has some of
 their games, and which library title it is when the library has it."""
 
+import asyncio
 from collections.abc import Sequence
 from typing import Any
 from uuid import UUID
@@ -32,6 +33,7 @@ def _game(ref: str, title: str, year: int, cover: str | None = None) -> PersonCr
 class _Igdb:
     def __init__(self) -> None:
         self.asked: list[tuple[str, list[str]]] = []
+        self.delay = 0.0  # how long a search takes
 
     async def franchise(self, name: str, known: Sequence[str]) -> GameFranchise | None:
         self.asked.append((name, list(known)))
@@ -65,6 +67,7 @@ class _Igdb:
         return None
 
     async def search(self, query: str, limit: int) -> Sequence[PersonCredit]:
+        await asyncio.sleep(self.delay)
         return [_game("1025", "Zelda II: The Adventure of Link", 1987, "co2zii"), _game("7346", "BOTW", 2017)]
 
     async def image(self, ref: str, size: str) -> bytes:
@@ -167,3 +170,19 @@ async def test_games_to_ask_for_in_the_search(app: FastAPI, media: MediaHarness)
         ("Zelda II: The Adventure of Link (1987)", f"/media/game?service={service}&ref=1025")
     ]
     assert items[0].facets["cover"].endswith("ref=co2zii&size=cover")
+
+
+async def test_a_slow_database_answers_the_next_keystroke(app: FastAPI, media: MediaHarness) -> None:
+    """#373: a game database slower than the search's budget does not hold the search: its answer, kept,
+    comes with the next search of the same words."""
+    igdb, _ = await _library(app, media)
+    igdb.delay = 1.3
+    leo = (await users(app, media, "leo"))["leo"]
+    provider = media.module.search.provider("request")
+    assert provider is not None
+    query = ParsedQuery(text="zelda", normalized="zelda", terms=("zelda",))
+    first = (await provider.search(query, Principal(user_id=leo), None, limit=10, cursor=None)).items  # type: ignore[arg-type]
+    assert first == []
+    await asyncio.sleep(0.5)  # the answer arrives meanwhile
+    again = (await provider.search(query, Principal(user_id=leo), None, limit=10, cursor=None)).items  # type: ignore[arg-type]
+    assert [i.title for i in again] == ["Zelda II: The Adventure of Link (1987)"]
