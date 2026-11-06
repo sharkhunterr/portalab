@@ -2,7 +2,7 @@
 slug: guide-demandes
 title: Demander un titre
 position: 5
-help_keys: [media.discover, media.discover.movie.detail, media.discover.series.detail, media.requests]
+help_keys: [media.discover, media.discover.movie.detail, media.discover.series.detail, media.requests, requests.page]
 tags: [guide, médias, demandes]
 ---
 Un film ou une série manque à la médiathèque ? Le demander, savoir ce que cela prend sur votre quota et suivre la demande jusqu'à ce qu'il soit disponible.
@@ -98,6 +98,33 @@ Une fois le titre arrivé, le parcours se replie en une ligne (« Disponible · 
 
 > [!NOTE]
 > Si vous avez débloqué cette fonction (par exemple dans la boutique, selon votre portail), le bouton **« Voir les résultats des indexeurs »** montre les versions trouvées en ce moment : leur qualité, leurs sources, et si elles sont acceptées ou refusées. La recherche peut prendre une minute. Son résultat est gardé 30 minutes.
+
+## Demander un livre, un jeu… à l'équipe
+
+Les films et les séries passent par le service de demandes. Pour le reste (un livre, un livre audio, un jeu…), si votre portail le propose, vous demandez directement à l'équipe.
+
+Ouvrez [Demander un livre, un jeu…](/requests) dans la rubrique « Médias » du menu. Sur la page d'un auteur ou d'une série de livres, un livre marqué « Absent » a aussi son lien **« Le demander »** : le formulaire s'ouvre avec son titre et son auteur déjà remplis.
+
+1. Choisissez le **« Type »**, puis tapez le **« Titre »**.
+2. Ajoutez l'**« Auteur, studio ou créateur »** : il aide à trouver le bon titre. Plusieurs ? Séparez-les par une virgule.
+3. Si vous le voulez, précisez l'**« Année »**, la **« Langue »**, l'**« Édition »** (un format, une plateforme, un éditeur…) et **« Un mot pour l'équipe »**.
+4. Cliquez sur **« Envoyer la demande »**.
+
+Le portail vous répond tout de suite si :
+
+- **la médiathèque a déjà ce titre** : le lien **« Le voir »** vous y emmène ;
+- **un autre membre l'a déjà demandé** : cliquez sur **« Moi aussi je le veux »**. Vous êtes prévenu comme lui, et l'équipe voit que plusieurs membres le veulent.
+
+Selon votre portail, le nombre de demandes de chaque type peut être limité sur une période. Une demande peut aussi coûter des Coins. Ils vous sont rendus si elle est refusée.
+
+### Suivre et soutenir les demandes
+
+Sur la même page :
+
+- **« Mes demandes »** : celles que vous avez faites et celles que vous voulez aussi, avec leur état : **« Envoyée »**, **« Acceptée »**, **« En cours »**, **« Arrivée »** ou **« Refusée »** (avec le motif). Vous n'en voulez plus ? Cliquez sur **« Ne plus le vouloir »**. Si vous l'aviez demandée, elle continue au nom du membre qui a dit « moi aussi » en premier.
+- **« Les demandes des autres membres »** : chaque demande en cours, la plus voulue d'abord, avec le nombre de membres qui la veulent. Personne ne voit qui. Cliquez sur **« Moi aussi je le veux »** pour en soutenir une.
+
+Quand le titre arrive dans la médiathèque, la demande se ferme d'elle-même et chaque membre qui le voulait reçoit une notification avec son lien. Ces notifications se règlent dans la catégorie « Mes demandes de titres ».
 
 ## Être prévenu
 

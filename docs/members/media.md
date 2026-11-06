@@ -200,6 +200,28 @@ Your requests in figures are in the **Statistics** section, under **My requests*
 
 Your request notifications are set in the categories **My media requests** and **Requested media available** — see [personalization.md](personalization.md#notification-preferences). On your home page, the widgets **My requests**, **My requests coming soon**, **Downloads in progress** and **Next releases** follow them too.
 
+## Asking the team for a book, a game…
+
+Films and series go through the request service. For anything else (a book, an audiobook, a game…), when your portal offers it, you ask the team directly.
+
+Open **Ask for a book, a game…** in the menu (`/requests`). On an author's or a book series' page, a book marked **Not here** has an **Ask for it** link too: the form opens with its title and author filled in.
+
+1. Pick the **Kind**, then type the **Title**.
+2. Add the **Author, studio or creator**: it helps find the right title. Several? Separate them with a comma.
+3. If you like, add the **Year**, the **Language**, the **Edition** (a format, a platform, a publisher…) and **A word for the team**.
+4. Click **Send the request**.
+
+The portal answers at once when:
+
+- **the library has the title already**: **See it** takes you there;
+- **another member asked for it already**: click **I want it too**. You are told as they are, and the team sees that several members want it.
+
+Depending on your portal, the requests of each kind may be limited over a period, and a request may cost Coins. They come back to you if it is refused.
+
+On the same page, **My requests** lists those you made and those you want too, with their state: **Sent**, **Accepted**, **In progress**, **Arrived** or **Refused** (with the reason). **No longer want it** takes yours back; if you had asked for it, it goes on in the name of the member who said « me too » first. **The other members' requests** lists every open request, the most wanted first, with how many members want each, never who.
+
+Once the title is in the library, the request closes by itself and each member who wanted it gets a notification with its link (category **My title requests**).
+
 ## Watching in the browser
 
 On an available film or episode, **Watch** opens the portal's player full screen. If the title has a resume point, the player asks *Pick up where you left off?* — **Resume at …** or **From the beginning**.
