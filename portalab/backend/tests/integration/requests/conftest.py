@@ -1,5 +1,5 @@
-"""Requests fixtures (issue 363): the media harness (the library the requests are checked against) and an app
-with the requests module wired."""
+"""Requests fixtures (issue 363, #378): the media harness (the portal's requests, the library they are checked
+against) and an app with the team's request service wired."""
 
 import pytest
 from fastapi import FastAPI
@@ -9,20 +9,16 @@ from tests.integration.media.conftest import MediaHarness, client, clock, media 
 
 
 @pytest.fixture
-def wishes(media: MediaHarness) -> RequestsModule:  # noqa: F811
+def team(media: MediaHarness) -> RequestsModule:  # noqa: F811
     module = RequestsModule(
-        media.database,
-        media.ev.full.identity.capabilities,
-        clock=media.module.clock,
-        events=media.ev.publisher,
-        event_types=media.ev.types,
+        media.database, media.ev.full.identity.capabilities, clock=media.module.clock, sinks=media.sinks
     )
     module.register()
     return module
 
 
 @pytest.fixture
-def app(media: MediaHarness, heads: set[str], wishes: RequestsModule) -> FastAPI:  # noqa: F811
+def app(media: MediaHarness, heads: set[str], team: RequestsModule) -> FastAPI:  # noqa: F811
     from portalab.app.main import create_app
 
     full = media.ev.full
@@ -34,6 +30,6 @@ def app(media: MediaHarness, heads: set[str], wishes: RequestsModule) -> FastAPI
         privacy=full.privacy,
         administration=full.administration,
         media=media.module,
-        requests=wishes,
+        requests=team,
         static_dir=None,
     )

@@ -24,7 +24,7 @@ from portalab.modules.gamification.models import Balance, LedgerTransaction
 from portalab.modules.gamification.models import Reservation as ReservationRow
 from portalab.modules.gamification.observability import metrics
 
-SPEND_SOURCES = ("marketplace", "community_funding", "system", "requests")  # issue 363: a priced request
+SPEND_SOURCES = ("marketplace", "community_funding", "system")
 T = TypeVar("T")
 
 

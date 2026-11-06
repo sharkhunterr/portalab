@@ -60,7 +60,6 @@ SourceKind = Literal[
     "marketplace",
     "community_funding",
     "system",
-    "requests",  # issue 363: a request for a title the library lacks, when the administrators price it
 ]
 
 
