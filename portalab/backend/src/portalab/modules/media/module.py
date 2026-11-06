@@ -2,6 +2,7 @@
 
 import contextlib
 import os
+from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from datetime import timedelta
 from typing import Any
@@ -267,7 +268,9 @@ class MediaModule:
             database, events, self.threshold, credits=self.credits_start, clock=clock
         )
         self.quota = RequestQuota(database, lambda: self.config, clock=clock)
-        self.requests = Requests(database, events, capabilities, self.quota, self.links, clock=clock)
+        self.requests = Requests(
+            database, events, capabilities, self.quota, self.links, clock=clock, faces=self.request_face
+        )
         self.request_sink = RequestSink(self.requests)
         self.catalog = CatalogQuery(database, authorizer)
         self.catalog_port = CatalogPort(self.catalog)
@@ -376,6 +379,15 @@ class MediaModule:
                 if isinstance(ctx, LocaleContext) and ctx.language:
                     return str(ctx.language)
         return await self.language()
+
+    async def request_face(
+        self, kind: str, title: str, creators: Sequence[str], details: Mapping[str, str]
+    ) -> dict[str, str] | None:
+        """#379: a requested book's, game's cover and sheet — looked for in the edition's language the
+        member told, else the portal's."""
+        told = str(details.get("language") or "").strip().lower()
+        language = told if 2 <= len(told) <= 3 and told.isalpha() else await self.language()
+        return await self.database_titles.face(kind, title, creators, language)
 
     async def credits_start(self, object_id: UUID) -> float | None:
         """#101: where a title's end credits begin (the player asks its media server)."""
@@ -593,6 +605,9 @@ class MediaModule:
             while await self.radio.sweep():  # #259: the radio's too
                 pass
 
+        async def request_faces() -> None:  # #379: books, games… asked without their cover and sheet
+            await self.requests.give_faces()
+
         async def feed_notices() -> None:  # #299: what arrived in « Mon fil », told once
             providers = self.capabilities.system_providers(NOTIFY)
             if providers:
@@ -618,6 +633,9 @@ class MediaModule:
             ),
             register_periodic(
                 jobs, self.database, "media.images_backfill", timedelta(hours=1), images, owner=OWNER
+            ),
+            register_periodic(
+                jobs, self.database, "media.request_faces", timedelta(hours=6), request_faces, owner=OWNER
             ),
             register_periodic(
                 jobs, self.database, "media.books_sweep", timedelta(minutes=5), sittings, owner=OWNER

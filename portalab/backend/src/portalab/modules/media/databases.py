@@ -16,6 +16,7 @@ from portalab.capabilities.search.fts import snippet
 from portalab.core.db import Database
 from portalab.core.logging import get_logger
 from portalab.modules.media.library_match import MediaLibraryMatch
+from portalab.modules.media.matching import fold
 
 log = get_logger("portalab.media")
 TIMEOUT = 6.0  # seconds a database may take before its answer is given up
@@ -72,6 +73,37 @@ class DatabaseTitles:
             else provider.search(text, limit)
         )
         return unwrap(await asyncio.wait_for(found, timeout=TIMEOUT))
+
+    async def face(
+        self, kind: str, title: str, creators: Sequence[str], language: str
+    ) -> dict[str, str] | None:
+        """#379: a requested book's or game's cover and sheet — the database's title of that very name, told
+        in ``language`` or by its own name (« Assassin's Apprentice » asked by a French reader), by one of its
+        creators when they are told; else the likeliest of theirs."""
+        wanted = "game" if kind == "game" else "book"
+        if not title.strip() or wanted not in {k for _, k, _, _, _ in KINDS}:
+            return None
+        named, by = fold(title), {fold(c) for c in creators} - {""}
+
+        async def hits(told_in: str) -> list[SearchItem]:
+            found = await self.found(title, told_in, 10, budget=TIMEOUT)
+            return [i for i in found if i.facets.get("type") == wanted]
+
+        def theirs(item: SearchItem) -> set[str]:
+            return {fold(c) for c in item.facets.get("creator", "").split(",")} - {""}
+
+        local = await hits(language)
+        same = [i for i in local if fold(i.facets.get("name", "")) == named]
+        if not same and language != "en":
+            told = [i for i in await hits("en") if fold(i.facets.get("name", "")) == named]
+            same = [i for i in local if i.id in {t.id for t in told}] or told
+        chosen = next((i for i in same + local if by & theirs(i)), None) if by else next(iter(same), None)
+        if chosen is None:
+            return None
+        out = {"sheet": chosen.url_ref}
+        if chosen.facets.get("cover"):
+            out["cover"] = chosen.facets["cover"]
+        return out
 
     async def _found(self, text: str, language: str, limit: int) -> list[SearchItem]:
         asked: list[tuple[str, str, str, str, dict[str, str], Any]] = []
