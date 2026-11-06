@@ -9,7 +9,9 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 import { ApiError } from "../../../state/regions";
+import { AskDialog } from "../../requests/AskDialog";
 import { useAskOptions } from "../../requests/api";
+import type { AskStart } from "../../requests/RequestsPage";
 import { BookFacts } from "../detail/BookView";
 import { TitleHero } from "../detail/TitleHero";
 import { Poster } from "../MediaGrid";
@@ -68,17 +70,16 @@ function useBookSheet(service: string, ref: string) {
 }
 
 /** Where a request for it begins: its kind, the title (an edition's), its authors, language, edition, ids. */
-function askLink(kind: string, title: string, authors: string[], edition?: Edition): string {
-  const query = new URLSearchParams({ kind, title });
-  if (authors.length) query.set("creator", authors.join(", "));
-  if (edition?.year) query.set("year", String(edition.year));
-  if (edition?.language) query.set("language", edition.language);
-  const said = [edition?.format, edition?.publisher].filter(Boolean).join(", ");
-  if (said) query.set("edition", said);
-  for (const [scheme, values] of Object.entries(edition?.ids ?? {})) {
-    for (const value of values) query.append(`id.${scheme}`, value);
-  }
-  return `/requests?${query}`;
+function askStart(kind: string, title: string, authors: string[], edition?: Edition): AskStart {
+  return {
+    kind,
+    title,
+    creator: authors.join(", ") || undefined,
+    year: edition?.year ?? null,
+    language: edition?.language ?? null,
+    edition: [edition?.format, edition?.publisher].filter(Boolean).join(", ") || null,
+    ids: edition?.ids ?? {},
+  };
 }
 
 function languageName(code: string | null, locale: string): string | null {
@@ -154,10 +155,15 @@ export function BookSheetPage() {
         }
         primary={
           canAsk("book") ? (
-            <Link className="ds-button ds-button--primary" to={askLink("book", title, book.authors, mine)}>
-              <Icon name="plus" size={16} />
-              {t("media:ask.askIt")}
-            </Link>
+            <AskDialog
+              start={askStart("book", title, book.authors, mine)}
+              trigger={
+                <button type="button" className="ds-button ds-button--primary">
+                  <Icon name="plus" size={16} />
+                  {t("media:ask.askIt")}
+                </button>
+              }
+            />
           ) : null
         }
       />
@@ -222,13 +228,15 @@ export function BookSheetPage() {
                       ) : null}
                     </span>
                     {canAsk(kind) ? (
-                      <Link
-                        className="media-person__ask"
-                        to={askLink(kind, edition.title, book.authors, edition)}
-                      >
-                        <Icon name="plus" size={14} />
-                        {t("media:ask.askIt")}
-                      </Link>
+                      <AskDialog
+                        start={askStart(kind, edition.title, book.authors, edition)}
+                        trigger={
+                          <button type="button" className="media-person__ask">
+                            <Icon name="plus" size={14} />
+                            {t("media:ask.askIt")}
+                          </button>
+                        }
+                      />
                     ) : null}
                   </li>
                 );

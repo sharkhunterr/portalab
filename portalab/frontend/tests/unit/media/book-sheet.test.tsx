@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -63,10 +63,17 @@ const SHEET = {
   library: {},
 };
 
+const posted: unknown[] = [];
+
 function renderSheet(sheet: Record<string, unknown>) {
-  fake.handler = (request) => {
+  posted.length = 0;
+  fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
     if (path === "/api/v1/media/book") return json(200, sheet);
+    if (path === "/api/v1/requests" && request.method === "POST") {
+      posted.push(await request.json());
+      return json(201, { id: "r1", title: "asked", supporters: 1 });
+    }
     if (path === "/api/v1/requests/options")
       return json(200, { kinds: ["book", "audiobook"], price: 0, left: {}, quotas: {} });
     return json(404, {});
@@ -103,18 +110,28 @@ describe("a book's sheet", () => {
     expect(screen.getByText("Not in the library")).toBeTruthy();
     const editions = screen.getByRole("list", { name: "Editions" });
     const [audio, paper] = within(editions).getAllByRole("listitem");
-    const asked = within(paper as HTMLElement).getByRole("link", { name: /Ask for it/ });
-    const query = new URLSearchParams(asked.getAttribute("href")?.split("?")[1]);
-    expect(Object.fromEntries(query)).toMatchObject({
+    // issue 377: asked in a dialog, filled from the edition
+    fireEvent.click(within(paper as HTMLElement).getByRole("button", { name: /Ask for it/ }));
+    const dialog = await screen.findByRole("dialog");
+    expect((within(dialog).getByLabelText("Title") as HTMLInputElement).value).toBe(
+      "Le Fou et l'Assassin, Intégrale 2",
+    );
+    expect((within(dialog).getByLabelText("Kind") as HTMLSelectElement).value).toBe("book");
+    expect((within(dialog).getByLabelText("Edition") as HTMLInputElement).value).toBe("Read, J'ai Lu");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Send the request" }));
+    await waitFor(() => expect(posted).toHaveLength(1));
+    expect(posted[0]).toMatchObject({
       kind: "book",
       title: "Le Fou et l'Assassin, Intégrale 2",
-      creator: "Robin Hobb",
-      language: "fr",
-      edition: "Read, J'ai Lu",
-      "id.isbn": "9782290359303",
+      creators: ["Robin Hobb"],
+      details: { language: "fr", edition: "Read, J'ai Lu" },
+      ids: { isbn: ["9782290359303"] },
     });
-    const listened = within(audio as HTMLElement).getByRole("link", { name: /Ask for it/ });
-    expect(listened.getAttribute("href")).toContain("kind=audiobook");
+    fireEvent.keyDown(dialog, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    fireEvent.click(within(audio as HTMLElement).getByRole("button", { name: /Ask for it/ }));
+    const listened = await screen.findByRole("dialog");
+    expect((within(listened).getByLabelText("Kind") as HTMLSelectElement).value).toBe("audiobook");
   });
 
   it("opens the library's page when the library has the book", async () => {
@@ -128,8 +145,10 @@ describe("a book's sheet", () => {
     expect(listened.getAttribute("href")).toBe("/media/0190f0a0-0000-7000-8000-0000000000b2");
     const editions = screen.getByRole("list", { name: "Editions" });
     // the paper edition to ask for, not the audiobook it has
-    const asked = within(editions).getAllByRole("link", { name: /Ask for it/ });
+    const asked = within(editions).getAllByRole("button", { name: /Ask for it/ });
     expect(asked).toHaveLength(1);
-    expect(asked[0]?.getAttribute("href")).toContain("kind=book");
+    fireEvent.click(asked[0] as HTMLElement);
+    const dialog = await screen.findByRole("dialog");
+    expect((within(dialog).getByLabelText("Kind") as HTMLSelectElement).value).toBe("book");
   });
 });

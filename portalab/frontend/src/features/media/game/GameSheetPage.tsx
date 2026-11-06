@@ -8,7 +8,9 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
+import { AskDialog } from "../../requests/AskDialog";
 import { useAskOptions } from "../../requests/api";
+import type { AskStart } from "../../requests/RequestsPage";
 import { GameFacts } from "../detail/DetailPage";
 import { TitleHero } from "../detail/TitleHero";
 import "../media.css";
@@ -59,14 +61,15 @@ function useGameSheet(service: string, ref: string) {
 }
 
 /** Where a request for it begins: the game, its studio, its id there, the platform wanted. */
-function askLink(game: Sheet, platform?: string): string {
-  const query = new URLSearchParams({ kind: "game", title: game.title });
-  const studio = game.developers[0] ?? game.publishers[0];
-  if (studio) query.set("creator", studio);
-  if (game.year) query.set("year", String(game.year));
-  if (platform) query.set("edition", platform);
-  query.set("id.igdb", game.ref);
-  return `/requests?${query}`;
+function askStart(game: Sheet, platform?: string): AskStart {
+  return {
+    kind: "game",
+    title: game.title,
+    creator: game.developers[0] ?? game.publishers[0],
+    year: game.year,
+    edition: platform ?? null,
+    ids: { igdb: [game.ref] },
+  };
 }
 
 export function GameSheetPage() {
@@ -114,10 +117,15 @@ export function GameSheetPage() {
         badges={<span className="media-person__absent">{t("media:game.absent")}</span>}
         primary={
           canAsk ? (
-            <Link className="ds-button ds-button--primary" to={askLink(game)}>
-              <Icon name="plus" size={16} />
-              {t("media:ask.askIt")}
-            </Link>
+            <AskDialog
+              start={askStart(game)}
+              trigger={
+                <button type="button" className="ds-button ds-button--primary">
+                  <Icon name="plus" size={16} />
+                  {t("media:ask.askIt")}
+                </button>
+              }
+            />
           ) : null
         }
         secondary={
@@ -171,10 +179,15 @@ export function GameSheetPage() {
                     <strong>{platform}</strong>
                   </span>
                   {canAsk ? (
-                    <Link className="media-person__ask" to={askLink(game, platform)}>
-                      <Icon name="plus" size={14} />
-                      {t("media:game.askOn", { platform })}
-                    </Link>
+                    <AskDialog
+                      start={askStart(game, platform)}
+                      trigger={
+                        <button type="button" className="media-person__ask">
+                          <Icon name="plus" size={14} />
+                          {t("media:game.askOn", { platform })}
+                        </button>
+                      }
+                    />
                   ) : null}
                 </li>
               ))}

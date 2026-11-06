@@ -93,29 +93,57 @@ function Problem({ error, onSupport }: { error: unknown; onSupport: (id: string)
   }
 }
 
-function AskForm({
-  kinds,
-  price,
-  left,
-}: {
-  kinds: string[];
-  price: number;
-  left: Record<string, number | null>;
-}) {
-  const t = useT();
-  const [params] = useSearchParams();
-  const asked = params.get("kind");
-  const [kind, setKind] = useState(asked && kinds.includes(asked) ? asked : (kinds[0] ?? ""));
-  const [title, setTitle] = useState(params.get("title") ?? "");
-  const [creators, setCreators] = useState(params.get("creator") ?? "");
-  const [year, setYear] = useState(params.get("year") ?? "");
-  const [language, setLanguage] = useState(params.get("language") ?? "");
-  const [edition, setEdition] = useState(params.get("edition") ?? "");
-  // every identifier a sheet knows of it (issue 367), whatever its scheme: ``id.<scheme>=<value>``
+/** What a request begins with — from a sheet, a title told absent, the words searched (issue 377). */
+export interface AskStart {
+  kind?: string | undefined;
+  title?: string | undefined;
+  creator?: string | undefined;
+  year?: number | null | undefined;
+  language?: string | null | undefined;
+  edition?: string | null | undefined;
+  ids?: Record<string, string[]> | undefined;
+}
+
+/** The form's start read from an address (``id.<scheme>=<value>`` for each identifier, issue 367). */
+function startOf(params: URLSearchParams): AskStart {
   const ids: Record<string, string[]> = {};
   for (const [key, value] of params) {
     if (key.startsWith("id.") && value) ids[key.slice(3)] = [...(ids[key.slice(3)] ?? []), value];
   }
+  const year = params.get("year");
+  return {
+    kind: params.get("kind") ?? undefined,
+    title: params.get("title") ?? undefined,
+    creator: params.get("creator") ?? undefined,
+    year: year && /^\d{1,4}$/.test(year) ? Number(year) : null,
+    language: params.get("language"),
+    edition: params.get("edition"),
+    ids,
+  };
+}
+
+export function AskForm({
+  kinds,
+  price,
+  left,
+  start = {},
+  bare = false,
+}: {
+  kinds: string[];
+  price: number;
+  left: Record<string, number | null>;
+  start?: AskStart;
+  /** issue 377: inside a dialog — no card around it */
+  bare?: boolean;
+}) {
+  const t = useT();
+  const [kind, setKind] = useState(start.kind && kinds.includes(start.kind) ? start.kind : (kinds[0] ?? ""));
+  const [title, setTitle] = useState(start.title ?? "");
+  const [creators, setCreators] = useState(start.creator ?? "");
+  const [year, setYear] = useState(start.year ? String(start.year) : "");
+  const [language, setLanguage] = useState(start.language ?? "");
+  const [edition, setEdition] = useState(start.edition ?? "");
+  const ids = start.ids ?? {};
   const [note, setNote] = useState("");
   const { ask, support } = useAskActions();
   const remaining = left[kind];
@@ -135,7 +163,83 @@ function AskForm({
       note: note.trim() || null,
     });
   };
-  return (
+  return bare ? (
+    <form className="asks-form" onSubmit={submit}>
+      <SelectField label={t("media:ask.form.kind")} value={kind} onChange={(e) => setKind(e.target.value)}>
+        {kinds.map((k) => (
+          <option key={k} value={k}>
+            {t(`media:kind.${k}`)}
+          </option>
+        ))}
+      </SelectField>
+      <TextField
+        label={t("media:ask.form.titleField")}
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        maxLength={300}
+        required
+      />
+      <TextField
+        label={t("media:ask.form.creators")}
+        hint={t("media:ask.form.creatorsHint")}
+        value={creators}
+        onChange={(e) => setCreators(e.target.value)}
+        maxLength={600}
+      />
+      <TextField
+        label={t("media:ask.form.year")}
+        value={year}
+        inputMode="numeric"
+        onChange={(e) => setYear(e.target.value)}
+        maxLength={4}
+      />
+      <TextField
+        label={t("media:ask.form.language")}
+        value={language}
+        onChange={(e) => setLanguage(e.target.value)}
+        maxLength={120}
+      />
+      <TextField
+        label={t("media:ask.form.edition")}
+        hint={t("media:ask.form.editionHint")}
+        value={edition}
+        onChange={(e) => setEdition(e.target.value)}
+        maxLength={120}
+      />
+      <TextAreaField
+        label={t("media:ask.form.note")}
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        maxLength={1000}
+        rows={3}
+      />
+      <div className="asks-form__actions">
+        {price > 0 ? <CoinBadge amount={price} label={t("gamification:value.coins")} /> : null}
+        {remaining !== null && remaining !== undefined ? (
+          <span className="asks-muted">{t("media:ask.form.left", { count: remaining })}</span>
+        ) : null}
+        <Button type="submit" disabled={ask.isPending || !title.trim() || remaining === 0}>
+          {t("media:ask.form.send")}
+        </Button>
+      </div>
+      {ask.isSuccess ? (
+        <p role="status" className="asks-done">
+          {t("media:ask.form.sent", { title: ask.data?.title ?? "" })}
+        </p>
+      ) : null}
+      {support.isSuccess ? (
+        <p role="status" className="asks-done">
+          {t("media:ask.supported", {
+            title: support.data?.title ?? "",
+            count: support.data?.supporters ?? 1,
+          })}
+        </p>
+      ) : null}
+      {ask.isError && !support.isSuccess ? (
+        <Problem error={ask.error} onSupport={(id) => support.mutate(id)} />
+      ) : null}
+    </form>
+  ) : (
     <Card title={t("media:ask.form.title")} icon="plus" level={2}>
       <form className="asks-form" onSubmit={submit}>
         <SelectField label={t("media:ask.form.kind")} value={kind} onChange={(e) => setKind(e.target.value)}>
@@ -302,6 +406,7 @@ export function AskLists() {
 export function RequestsPage() {
   const t = useT();
   const headingId = useId();
+  const [params] = useSearchParams();
   const options = useAskOptions();
   if (options.isPending) return <FunctionalState state="loading" />;
   if (!options.data) {
@@ -327,7 +432,12 @@ export function RequestsPage() {
         }
       />
       {options.data.kinds.length ? (
-        <AskForm kinds={options.data.kinds} price={options.data.price} left={options.data.left} />
+        <AskForm
+          kinds={options.data.kinds}
+          price={options.data.price}
+          left={options.data.left}
+          start={startOf(params)}
+        />
       ) : (
         <p className="ds-panel">{t("media:ask.page.closed")}</p>
       )}

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -47,10 +47,17 @@ const SHEET = {
   library: null,
 };
 
+const posted: unknown[] = [];
+
 function renderSheet(sheet: Record<string, unknown>) {
-  fake.handler = (request) => {
+  posted.length = 0;
+  fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
     if (path === "/api/v1/media/game") return json(200, sheet);
+    if (path === "/api/v1/requests" && request.method === "POST") {
+      posted.push(await request.json());
+      return json(201, { id: "r1", title: "asked", supporters: 1 });
+    }
     if (path === "/api/v1/requests/options")
       return json(200, { kinds: ["game"], price: 0, left: {}, quotas: {} });
     return json(404, {});
@@ -80,14 +87,19 @@ describe("a game's sheet", () => {
     expect(screen.getByText("Link's second quest.")).toBeTruthy();
     expect(screen.getByRole("link", { name: "The Legend of Zelda" })).toBeTruthy();
     const platforms = screen.getByRole("list", { name: "Platforms" });
-    const nes = within(platforms).getByRole("link", { name: /Ask for it on NES/ });
-    const query = new URLSearchParams(nes.getAttribute("href")?.split("?")[1]);
-    expect(Object.fromEntries(query)).toMatchObject({
+    // issue 377: asked in a dialog, on that platform
+    fireEvent.click(within(platforms).getByRole("button", { name: /Ask for it on NES/ }));
+    const dialog = await screen.findByRole("dialog");
+    expect((within(dialog).getByLabelText("Edition") as HTMLInputElement).value).toBe("NES");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Send the request" }));
+    await waitFor(() => expect(posted).toHaveLength(1));
+    expect(posted[0]).toMatchObject({
       kind: "game",
       title: "Zelda II: The Adventure of Link",
-      creator: "Nintendo R&D4",
-      edition: "NES",
-      "id.igdb": "1025",
+      creators: ["Nintendo R&D4"],
+      year: 1987,
+      details: { edition: "NES" },
+      ids: { igdb: ["1025"] },
     });
   });
 

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
+import { AskDialog } from "../../requests/AskDialog";
 import { useAskOptions } from "../../requests/api";
 import { QuotaSummary } from "../requests/QuotaSummary";
 import { useDiscoverSearch } from "./api";
@@ -80,9 +81,15 @@ export function DiscoverPage() {
           {asks.data?.kinds.length ? (
             <p className="media-muted">
               {t("media:discover.askTeam")}{" "}
-              <Link to={`/requests?${new URLSearchParams({ title: query })}`}>
-                {t("media:ask.page.title")}
-              </Link>
+              <AskDialog
+                start={{ title: query }}
+                trigger={
+                  <button type="button" className="media-person__ask">
+                    <Icon name="plus" size={14} />
+                    {t("media:ask.page.title")}
+                  </button>
+                }
+              />
             </p>
           ) : null}
         </>
