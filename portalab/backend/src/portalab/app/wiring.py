@@ -51,6 +51,7 @@ from portalab.modules.notifications.module import NotificationsModule
 from portalab.modules.observability.module import ObservabilityModule
 from portalab.modules.plugins.module import PluginsModule
 from portalab.modules.privacy.module import PrivacyModule
+from portalab.modules.requests.module import RequestsModule
 from portalab.modules.search.module import SearchModule
 from portalab.modules.shell.module import ShellModule
 from portalab.modules.statistics.module import StatisticsModule
@@ -140,6 +141,7 @@ class Platform:
     visuals: VisualsModule | None = None  # 028: visual packs
     cards: CardsModule | None = None  # issue 229: the media trading cards
     games: GamesModule | None = None  # issue 265: the games page
+    requests: RequestsModule | None = None  # issue 363: the members' requests for titles no service asks for
 
     async def seed_periodic_jobs(self) -> None:
         for seed in self.seeds:
@@ -299,6 +301,9 @@ def wire_platform(
     # issue 265: the games page — its events (a game played, the week's challenge) go to the reward rules
     games = GamesModule(database, capabilities, events=events)
     games.register()
+    # issue 363: the requests for titles no service asks for — their events go to the reward rules
+    requests = RequestsModule(database, capabilities, events=events)
+    requests.register()
     plugins = PluginsModule(
         database,
         events,
@@ -354,6 +359,7 @@ def wire_platform(
         seeds.extend(plugins.register_jobs(jobs))
         seeds.extend(cards.register_jobs(jobs))
         seeds.extend(games.register_jobs(jobs))
+        seeds.extend(requests.register_jobs(jobs))
     platform = Platform(
         authz,
         privacy,
@@ -387,6 +393,7 @@ def wire_platform(
         visuals,
         cards,
         games,
+        requests,
     )
     from portalab.app.config_bindings import bind
 

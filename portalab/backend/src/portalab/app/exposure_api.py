@@ -22,13 +22,14 @@ from portalab.modules.marketplace import exposure as marketplace
 from portalab.modules.media import exposure as media
 from portalab.modules.news import exposure as news
 from portalab.modules.notifications import exposure as notifications
+from portalab.modules.requests import exposure as requests
 from portalab.modules.search import exposure as search
 from portalab.modules.statistics import exposure as statistics
 from portalab.modules.wiki import exposure as wiki
 
 TABLES = (
     calendar, cards, community, dashboard, games, gamification, marketplace, media,
-    news, notifications, search, statistics, wiki,
+    news, notifications, requests, search, statistics, wiki,
 )  # fmt: skip
 
 

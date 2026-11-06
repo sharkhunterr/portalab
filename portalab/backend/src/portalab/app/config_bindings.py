@@ -104,6 +104,7 @@ async def _refresh(platform: Any, config: ConfigService) -> None:
         "plugins",
         "cards",
         "games",
+        "requests",
     ):
         module = getattr(platform, name, None)
         if module is not None:
@@ -167,5 +168,6 @@ def bind(platform: Any) -> None:
         "plugins.",
         "cards.",
         "games.",
+        "requests.",
     ):
         platform.administration.config.on_change(prefix, on_change)
