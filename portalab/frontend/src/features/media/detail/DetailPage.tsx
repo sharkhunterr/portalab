@@ -720,7 +720,6 @@ function Watch({
 /** #20: listen here — the audiobook plays in the portal's bar and carries on while browsing. */
 function Listen({ objectId, title, image }: { objectId: string; title: string; image: string | null }) {
   const t = useT();
-  const format = useFormat();
   const info = useListenInfo(objectId, true);
   const listen = useListen();
   const resume = info.data?.resume;
@@ -740,7 +739,7 @@ function Listen({ objectId, title, image }: { objectId: string; title: string; i
             {here && listen.playing
               ? t("media:listen.cta.playing")
               : started
-                ? t("media:listen.cta.resume", { percent: format.percent(share) })
+                ? t("media:listen.cta.resume")
                 : t("media:listen.cta.listen")}
           </button>
           {started ? (
@@ -764,7 +763,6 @@ function Listen({ objectId, title, image }: { objectId: string; title: string; i
 /** #21: read here — the reader opens over the whole window (a page of its own, entered by a full load). */
 function Read({ objectId }: { objectId: string }) {
   const t = useT();
-  const format = useFormat();
   const info = useReadInfo(objectId);
   const readable = info.data?.book.formats.filter((f) => ["epub", "pdf", "cbx"].includes(f.format)) ?? [];
   const best = [...(info.data?.resume ?? [])].sort((a, b) => b.percent - a.percent)[0];
@@ -774,9 +772,8 @@ function Read({ objectId }: { objectId: string }) {
       {readable.length ? (
         <a className="ds-button ds-button--primary media-watch-here" href={`/media/${objectId}/read`}>
           <Icon name="book-open" size={18} />
-          {started && best
-            ? t("media:reader.cta.resume", { percent: format.percent(best.percent) })
-            : t("media:reader.cta.read")}
+          {/* issue 360: how far I am is the « In progress » badge's to say, as for a film */}
+          {t(started ? "media:reader.cta.resume" : "media:reader.cta.read")}
         </a>
       ) : null}
       <OpenIn objectId={objectId} kind="book" secondary={readable.length > 0} />
