@@ -36,6 +36,7 @@ from portalab.capabilities.media_core import (
     CATALOG,
     GAME_SOURCES,
     HISTORY,
+    LIBRARY_MATCH,
     QUOTA,
     RADIO_CREDITS,
     RECOMMENDATIONS,
@@ -102,6 +103,7 @@ from portalab.modules.media.insights.portal import PortalActivity
 from portalab.modules.media.insights.rewards import REVIEW_JOB, HistoryRewards
 from portalab.modules.media.insights.stats import InsightsQuery
 from portalab.modules.media.insights.upcoming import Upcoming
+from portalab.modules.media.library_match import MediaLibraryMatch
 from portalab.modules.media.links.accounts import AccountMatching
 from portalab.modules.media.links.service import UserLinkService
 from portalab.modules.media.mentions import LibraryMentions
@@ -456,6 +458,7 @@ class MediaModule:
             (CARD_SOURCES, MediaCardSources(self.database, self.capabilities, self.enricher)),  # issue 229
             (GAME_SOURCES, MediaGameSources(self.database, self.capabilities, self.enricher)),  # issue 265
             (TECHNICAL_SHEETS, MediaTechnicalSheets(self.database, self.capabilities, self.journey)),  # #354
+            (LIBRARY_MATCH, MediaLibraryMatch(self.database)),  # issue 363: a title asked for, in the library
             (RECOMMENDATIONS, self.recommender),
             (ACTIVITY, MediaActivityAttributes(self.database)),
         )

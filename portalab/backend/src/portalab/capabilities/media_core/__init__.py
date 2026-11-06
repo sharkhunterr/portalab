@@ -24,6 +24,7 @@ CONTENT_BOOSTERS = "media.content_boosters"  # issue 234: a content's booster, g
 GAME_SOURCES = "media.game_sources"  # issue 265: what the games page draws from beyond the works
 TECHNICAL_SHEETS = "media.technical_sheets"  # #354: a title's technical sheet, for the team on a ticket
 CARD_FACES = "cards.faces"  # issue 265: a member's cards, as the memory game lays them face down
+LIBRARY_MATCH = "media.library_match"  # issue 363: a title asked for, found in the library
 
 
 _KIND = re.compile(r"[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)?")
@@ -452,6 +453,37 @@ class CardFaces(Protocol):
     async def faces(self, user: UUID, count: int) -> Sequence[Mapping[str, Any]]: ...
 
 
+@dataclass(frozen=True, slots=True)
+class WantedTitle:
+    """Issue 363: a title a member asks for — its kind, its title, who made it (its authors, a game's
+    studio…) and every identifier known of it, by scheme (``isbn``, ``hardcover``, ``igdb``…)."""
+
+    key: str
+    kind: str
+    title: str
+    creators: Sequence[str] = ()
+    ids: Mapping[str, Sequence[str]] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class LibraryTitle:
+    object_id: UUID
+    kind: str
+    title: str
+    available: bool
+    year: int | None = None
+
+
+@runtime_checkable
+class LibraryMatch(Protocol):
+    """Issue 363: the library's title for each title asked for — one of its identifiers, else its title (and
+    one of its creators when they are told) — and a library title by its id."""
+
+    async def find(self, wanted: Sequence[WantedTitle]) -> Mapping[str, LibraryTitle]: ...
+
+    async def get(self, object_id: UUID) -> LibraryTitle | None: ...
+
+
 SPECS: tuple[CapabilitySpec, ...] = (
     _spec(CATALOG, MediaCatalog, False, "Media catalog lookups (024)"),
     _spec(HISTORY, MediaHistoryReader, False, "Privacy-bounded media history and progress (024)"),
@@ -464,6 +496,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(GAME_SOURCES, GameSources, False, "Theme music, games and play time for the games page (265)"),
     _spec(TECHNICAL_SHEETS, TechnicalSheets, False, "A title's technical sheet for the team (#354)"),
     _spec(CARD_FACES, CardFaces, False, "A member's cards, as the memory game lays them (issue 265)"),
+    _spec(LIBRARY_MATCH, LibraryMatch, False, "A title asked for, found in the library (issue 363)"),
 )
 
 QuotaSummary = Mapping[str, int]
