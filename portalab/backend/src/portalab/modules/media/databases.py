@@ -86,7 +86,7 @@ class DatabaseTitles:
         named, by = fold(title), {fold(c) for c in creators} - {""}
 
         async def hits(told_in: str) -> list[SearchItem]:
-            found = await self.found(title, told_in, 10, budget=TIMEOUT)
+            found = await self.found(title, told_in, 10, budget=TIMEOUT + 4)  # beyond a database's own wait
             return [i for i in found if i.facets.get("type") == wanted]
 
         def theirs(item: SearchItem) -> set[str]:

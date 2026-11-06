@@ -94,7 +94,7 @@ class Requests:
         self.links = links
         self.clock = clock
         self.faces = faces
-        self._faced: set[UUID] = set()  # looked for already (found or not), while the portal runs
+        self._faced: set[UUID] = set()  # looked for already (found or not) in this round
         # #3: the request service's own quotas (Seerr) — the truth for members whose account is linked
         self.service_quotas = ServiceQuotas(database, capabilities, clock=clock)
 
@@ -350,7 +350,7 @@ class Requests:
 
     async def give_faces(self) -> int:
         """#379: the books, games… asked without a cover or a sheet (asked by hand, or before requests kept
-        them) given those a database knows — each looked for once while the portal runs."""
+        them) given those a database knows — each looked for once in turn, then all again."""
         if self.faces is None:
             return 0
         async with self.database.session() as session:
@@ -372,6 +372,8 @@ class Requests:
                 ).scalars()
                 if row.id not in self._faced
             ][:FACES]
+        if not rows:  # every one looked for: the next run looks again (a database may know them now)
+            self._faced.clear()
         given = 0
         for request_id, ref in rows:
             self._faced.add(request_id)
