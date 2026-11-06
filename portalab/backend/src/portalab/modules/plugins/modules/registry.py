@@ -51,6 +51,7 @@ MODULES: tuple[ModuleDescriptor, ...] = (
     ModuleDescriptor("automations", ("events",)),
     ModuleDescriptor("community", ("gamification",)),
     ModuleDescriptor("marketplace", ("gamification",)),
+    ModuleDescriptor("requests", ("media", "notifications")),  # issue 363
 )
 
 
