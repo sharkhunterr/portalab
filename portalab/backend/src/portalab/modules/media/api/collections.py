@@ -4,23 +4,26 @@ audiobook's series, a game's franchise — told the same way on every title's pa
 ``GET /media/{object_id}/collection``: the collection a title belongs to, with its other titles in the
 library, in order (no service asked: what the library knows). ``GET /media/collection?ref=…``: the whole
 collection — ``tmdb:<id>`` a saga, ``series:<name>`` a series or a franchise —, and for a saga every film
-TMDB knows of it, each told available, asked for or missing (then where to ask for it). The reference is a
-query parameter: a series' name may hold a slash."""
+TMDB knows of it, each told available, asked for or missing (then where to ask for it); issue 362: for a
+book series every volume a book database knows (Hardcover), each in the library or absent. The reference is
+a query parameter: a series' name may hold a slash."""
 
 import logging
 from collections import Counter
+from functools import partial
 from typing import Annotated, Any, Literal
+from urllib.parse import urlencode
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Response
 from pydantic import BaseModel
 from sqlalchemy import func, select
 
-from portalab.capabilities.media import METADATA, unwrap
-from portalab.core.errors import NotFound
-from portalab.modules.media.api.people import FilmCreditOut, _filmography
+from portalab.capabilities.media import BOOK_SERIES, METADATA, BookSeries, unwrap
+from portalab.core.errors import NotFound, Unavailable
+from portalab.modules.media.api.people import BOOK_KINDS, FilmCreditOut, _bibliography, _filmography
 from portalab.modules.media.api.router import MediaCard, Module, Reader, _asked, _card
-from portalab.modules.media.models import MediaObject, ObjectMetadata
+from portalab.modules.media.models import ExternalId, MediaObject, ObjectMetadata
 from portalab.modules.media.permissions import MEDIA_REQUEST
 from portalab.modules.media.providers.insight_widgets import posters
 
@@ -42,7 +45,7 @@ class CollectionOut(BaseModel):
     name: str
     poster: str | None = None  # a saga's own poster, the provider's image (``/media/metadata-images``)
     items: list[CollectionItemOut]  # its titles in the library, in order
-    parts: list[FilmCreditOut] = []  # the page of a saga: every film of it, in the library or not
+    parts: list[FilmCreditOut] = []  # its page: every film of a saga, every volume of a book series
     askable: bool = False  # the member may ask for the films missing
 
 
@@ -141,6 +144,104 @@ async def _parts(module: Module, saga_id: str, language: str) -> list[FilmCredit
     return None
 
 
+def _cover_url(service: str, ref: str | None) -> str | None:
+    if not ref:
+        return None
+    return f"/api/v1/media/book-covers?{urlencode({'service': service, 'ref': ref})}"
+
+
+async def _volumes(module: Module, name: str, rows: list[MediaObject]) -> list[FilmCreditOut]:
+    """Issue 362: every volume of a book series as a book database knows it (Hardcover) — the series
+    told apart from its namesakes by the library's own volumes' ISBNs —, each found in the library by its
+    ISBN, its title or its volume number."""
+    books = [row for row in rows if row.kind in BOOK_KINDS]
+    if not books:
+        return []
+    async with module.database.session() as session:
+        isbns = sorted(
+            set(
+                (
+                    await session.execute(
+                        select(ExternalId.value).where(
+                            ExternalId.object_id.in_([row.id for row in books]), ExternalId.scheme == "isbn"
+                        )
+                    )
+                ).scalars()
+            )
+        )
+    for registration in module.capabilities.system_providers(BOOK_SERIES):
+        try:
+            found = unwrap(await registration.provider.series(name, isbns))
+        except Exception as exc:
+            log.info("book series lookup failed: %s: %s", type(exc).__name__, exc)
+            continue
+        if not isinstance(found, BookSeries) or not found.volumes:
+            continue
+        service = registration.instance_ref
+        parts = await _bibliography(
+            module,
+            found.volumes,
+            works=[row.id for row in books],
+            cover=partial(_cover_url, service),
+        )
+        # a volume the library has under another title and without its ISBN: by its number
+        numbered = {_position(row.effective.get("series_position")): row for row in books}
+        numbered.pop(None, None)
+        images = await posters(module.database, [row.id for row in numbered.values()])
+        for index, part in enumerate(parts):
+            row = numbered.get(part.position) if part.status == "absent" else None
+            if row is not None:
+                parts[index] = part.model_copy(
+                    update={
+                        "status": "available" if row.available else "unavailable",
+                        "object_id": str(row.id),
+                        "route": f"/media/{row.id}",
+                        "image_id": images.get(row.id),
+                    }
+                )
+        parts.sort(key=lambda part: (part.position is None, part.position or 0, part.year or 0))
+        return parts
+    return []
+
+
+@router.get("/media/book-covers")
+async def book_cover(
+    _: Reader,
+    module: Module,
+    service: Annotated[str, Query(pattern=r"^[0-9a-f-]{36}$")],
+    ref: Annotated[str, Query(min_length=1, max_length=120, pattern=r"^[A-Za-z0-9_./-]+$")],
+) -> Response:
+    """Issue 362: a volume's cover from the book database that has it, through the portal: browsers never
+    call the services."""
+    provider = next(
+        (r.provider for r in module.capabilities.system_providers(BOOK_SERIES) if r.instance_ref == service),
+        None,
+    )
+    if provider is None:
+        raise CollectionNotFound("No such cover.")
+    try:
+        data = unwrap(await provider.cover(ref, "w185"))
+    except Exception as exc:
+        raise Unavailable("The cover cannot be fetched right now.", code="media.image_unavailable") from exc
+    return Response(
+        content=data,
+        media_type=_image_type(data),
+        headers={
+            "Cache-Control": "private, max-age=2592000, immutable",
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "default-src 'none'",
+        },
+    )
+
+
+def _image_type(data: bytes) -> str:
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return "image/png"
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        return "image/webp"
+    return "image/jpeg"
+
+
 @router.get("/media/{object_id}/collection", response_model=CollectionOut | None)
 async def title_collection(_: Reader, module: Module, object_id: UUID) -> CollectionOut | None:
     async with module.database.session() as session:
@@ -198,6 +299,10 @@ async def collection(
         if not rows or name is None:
             raise CollectionNotFound(f"no series {ref[:60]!r}")
         return CollectionOut(
-            ref=f"{SERIES}{name}", source="series", name=name, items=await _items(module, rows)
+            ref=f"{SERIES}{name}",
+            source="series",
+            name=name,
+            items=await _items(module, rows),
+            parts=await _volumes(module, name, rows),
         )
     raise CollectionNotFound(f"no collection {ref[:60]!r}")

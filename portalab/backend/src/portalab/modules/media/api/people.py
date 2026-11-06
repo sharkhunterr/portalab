@@ -4,7 +4,7 @@ knows of them — biography, birth, what they are known for — with their whole
 available, asked for, not available or missing from the library (and then where to ask for it).
 The name is a query parameter: a name may hold a slash (« AC/DC »)."""
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import Annotated, Literal
 from urllib.parse import urlencode
 from uuid import UUID
@@ -16,6 +16,7 @@ from sqlalchemy import select
 from portalab.capabilities.media import PersonCredit, PersonRecord
 from portalab.core.errors import NotFound, Unavailable
 from portalab.modules.media.api.router import MediaCard, Module, Reader, _asked, _card
+from portalab.modules.media.matching import fold
 from portalab.modules.media.models import ExternalId, MediaObject, MediaRequest
 from portalab.modules.media.permissions import MEDIA_REQUEST
 from portalab.modules.media.providers.insight_widgets import posters
@@ -23,7 +24,8 @@ from portalab.modules.media.requests.discovery import OPEN
 
 router = APIRouter(prefix="/api/v1", tags=["media"])
 KNOWN_FOR = 10
-Status = Literal["available", "requested", "unavailable", "missing"]
+BOOK_KINDS = ("book", "audiobook")
+Status = Literal["available", "requested", "unavailable", "missing", "absent"]  # absent: a book not there
 
 
 class PersonCreditOut(BaseModel):
@@ -56,6 +58,8 @@ class FilmCreditOut(BaseModel):
     status: Status
     object_id: str | None
     route: str | None  # its page in the library, else where to ask for it (when one can)
+    cover: str | None = None  # issue 362: a book's cover from its book database, a ready URL (the portal's)
+    position: float | None = None  # issue 362: its volume in a series
 
 
 class PersonOut(BaseModel):
@@ -84,6 +88,7 @@ def _image(value: str | None) -> UUID | None:
 async def _filmography(module: Module, credits: Sequence[PersonCredit]) -> list[FilmCreditOut]:
     """Each title of the filmography with its standing in the library: available, asked for (a request in
     progress), there but not available, or missing (then its « ask for it » page, when one can ask)."""
+    credits = [credit for credit in credits if credit.kind != "book"]  # the books: ``_bibliography``
     wanted = {credit.tmdb_id for credit in credits}
     known: dict[tuple[str, str], tuple[UUID, bool]] = {}
     asked: set[UUID] = set()
@@ -153,6 +158,85 @@ async def _filmography(module: Module, credits: Sequence[PersonCredit]) -> list[
     return out
 
 
+def _cover_url(service: str | None, ref: str | None) -> str | None:
+    if not service or not ref:
+        return None
+    return f"/api/v1/media/person/portrait?{urlencode({'service': service, 'ref': ref, 'size': 'w185'})}"
+
+
+async def _bibliography(
+    module: Module,
+    credits: Sequence[PersonCredit],
+    *,
+    works: Sequence[UUID] = (),
+    cover: Callable[[str | None], str | None] = lambda _: None,
+) -> list[FilmCreditOut]:
+    """Issue 362: each book of a bibliography (or a series) with its standing in the library — found by its
+    editions' ISBNs, else by its title among ``works`` (the person's, the series' own titles: a translated
+    title is found by its ISBN): available, there but not available, or absent (no service asks for books).
+    Its cover: the library's, else the book database's (``cover`` turns its reference into a URL)."""
+    books = [credit for credit in credits if credit.kind == "book"]
+    if not books:
+        return []
+    isbns = {isbn for credit in books for isbn in credit.isbns}
+    by_isbn: dict[str, tuple[UUID, bool]] = {}
+    by_title: dict[str, tuple[UUID, bool]] = {}
+    async with module.database.session() as session:
+        if isbns:
+            for value, object_id, available in await session.execute(
+                select(ExternalId.value, MediaObject.id, MediaObject.available)
+                .join(MediaObject, MediaObject.id == ExternalId.object_id)
+                .where(
+                    ExternalId.scheme == "isbn",
+                    ExternalId.value.in_(isbns),
+                    MediaObject.kind.in_(BOOK_KINDS),
+                    MediaObject.status == "active",
+                )
+            ):
+                if value not in by_isbn or (available and not by_isbn[value][1]):
+                    by_isbn[value] = (object_id, bool(available))
+        if works:
+            for object_id, title, available in await session.execute(
+                select(MediaObject.id, MediaObject.title, MediaObject.available).where(
+                    MediaObject.id.in_(works),
+                    MediaObject.kind.in_(BOOK_KINDS),
+                    MediaObject.status == "active",
+                )
+            ):
+                key = fold(title)
+                if key not in by_title or (available and not by_title[key][1]):
+                    by_title[key] = (object_id, bool(available))
+    found_ids = [found[0] for found in (*by_isbn.values(), *by_title.values())]
+    images = await posters(module.database, found_ids)
+    out = []
+    for credit in books:
+        found = next((by_isbn[i] for i in credit.isbns if i in by_isbn), None) or by_title.get(
+            fold(credit.title)
+        )
+        object_id = found[0] if found else None
+        status: Status = ("available" if found[1] else "unavailable") if found else "absent"
+        out.append(
+            FilmCreditOut(
+                tmdb_id=credit.tmdb_id,
+                kind="book",
+                title=credit.title,
+                year=credit.year,
+                role=None,
+                department=credit.department,
+                poster=None,
+                image_id=images.get(object_id) if object_id else None,
+                rating=credit.vote_average,
+                votes=credit.vote_count,
+                status=status,
+                object_id=str(object_id) if object_id else None,
+                route=f"/media/{object_id}" if object_id else None,
+                cover=cover(credit.poster),
+                position=credit.position,
+            )
+        )
+    return out
+
+
 def _profile(record: PersonRecord) -> PersonProfileOut:
     return PersonProfileOut(
         biography=record.biography,
@@ -203,6 +287,13 @@ async def person(
     filmography: list[FilmCreditOut] = []
     if record is not None:
         filmography = await _filmography(module, record.credits)
+        # issue 362: their books (a book database's), found in the library among their own titles too
+        filmography += await _bibliography(
+            module,
+            record.credits,
+            works=list(ids),
+            cover=lambda ref: _cover_url(profile.books if profile else None, ref),
+        )
         # the most recent first; the undated (announced, or minor) last
         filmography.sort(key=lambda c: (c.year is not None, c.year or 0, c.votes), reverse=True)
     counts: dict[str, int] = {}

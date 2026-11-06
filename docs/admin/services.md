@@ -216,6 +216,15 @@ The community database of series and films. Portalab uses it for **each role's o
 
 - **Credentials**: a project API key (thetvdb.com → dashboard → API keys). TheTVDB asks for attribution wherever its data is shown.
 
+#### Hardcover
+
+The community book database. Portalab uses it for **an author's books** and **a book series' volumes**.
+
+- **For members**: an author's page lists their books, the most read first, each marked available, not available or **Not here**. No service asks for books, so there is no **Ask for it** button on a book. A book series' page lists every volume in order, with the ones the library lacks. Books are found in the library by an edition's ISBN, by their title, or by their volume number. The films and series they took part in stay listed beside their books.
+- Covers are fetched by the portal and served from it: members' browsers never call Hardcover. Its figures (readers, ratings) are Hardcover's.
+- **Credentials**: a personal token (hardcover.app → *Settings → Hardcover API → New API Key*). Give it the **`read:catalog`** scope only: the portal reads the public catalog, never anyone's library. The token expires on the date you choose, and Hardcover may reset tokens while its API is in beta. When the token stops working, the service shows a credentials error: create a new one. Pasting it with or without its `Bearer ` prefix both work. Leave the address at `https://api.hardcover.app`.
+- Hardcover's API is rate-limited per day and per minute. The portal keeps a person's profile and a series' volumes for six hours.
+
 #### SearXNG
 
 Your self-hosted metasearch engine, used to find images on the web, such as an actor's character for the cards.

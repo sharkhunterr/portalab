@@ -12,8 +12,9 @@ import "./collections.css";
 
 /**
  * Issue 361: a collection's page — a book's series in its volumes' order, a game's franchise, a film's saga
- * with every film TMDB knows of it (those the library has, those asked for, those to ask for). Reached from
- * the collection's block on each of its titles' pages.
+ * with every film TMDB knows of it (those the library has, those asked for, those to ask for); issue 362: a
+ * book series with every volume a book database knows (Hardcover), those the library has and the others.
+ * Reached from the collection's block on each of its titles' pages.
  */
 export function CollectionPage() {
   const t = useT();
@@ -46,6 +47,7 @@ function CollectionView({ headingId, data }: { headingId: string; data: Collecti
   const note = useItemNote();
   const word = wordOf(data);
   const parts = data.parts ?? [];
+  const partsHeading = t(data.source === "saga" ? "media:collection.films" : "media:collection.volumes");
   const told = new Set(parts.map((part) => part.object_id).filter(Boolean));
   // a film of the library the provider does not list in the saga (yet): still one of its titles
   const others = data.items.filter((item) => !told.has(item.id));
@@ -60,6 +62,8 @@ function CollectionView({ headingId, data }: { headingId: string; data: Collecti
       value: parts.filter((part) => part.status === "missing" || part.status === "unavailable").length,
       tone: "neutral",
     },
+    // issue 362: a series' volumes not in the library (no service asks for books)
+    { key: "absent", value: parts.filter((part) => part.status === "absent").length, tone: "neutral" },
   ].filter((stat) => stat.key === "library" || stat.value > 0);
   return (
     <section aria-labelledby={headingId} className="media-collection-page">
@@ -84,8 +88,8 @@ function CollectionView({ headingId, data }: { headingId: string; data: Collecti
       </div>
       {parts.length ? (
         <section className="media-row">
-          <h3>{t("media:collection.films")}</h3>
-          <ul className="media-grid" aria-label={t("media:collection.films")}>
+          <h3>{partsHeading}</h3>
+          <ul className="media-grid" aria-label={partsHeading}>
             {parts.map((credit) => (
               <KnownCard key={credit.tmdb_id} credit={credit} askable={data.askable ?? false} />
             ))}

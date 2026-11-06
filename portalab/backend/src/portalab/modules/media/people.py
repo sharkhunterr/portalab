@@ -158,8 +158,8 @@ class People:
 
 log = logging.getLogger(__name__)
 # whose word comes first when services tell different things (the richest sources first)
-PREFERENCE = ("tmdb", "seerr", "jellyfin", "emby", "plex", "grimmory")
-BOOKS_FIRST = ("grimmory",)  # an author or a narrator: the book services know them best
+PREFERENCE = ("tmdb", "seerr", "jellyfin", "emby", "plex", "grimmory", "hardcover")
+BOOKS_FIRST = ("grimmory", "hardcover")  # an author or a narrator: the book services know them best
 PROFILE_TTL = 6 * 3600
 TIMEOUT = 15
 
@@ -179,6 +179,7 @@ class Profile:
     record: PersonRecord
     portrait: tuple[str, str] | None  # (service id, its reference)
     sources: tuple[Source, ...]
+    books: str | None = None  # issue 362: the service whose books they are (their covers fetched there)
 
 
 class Profiles:
@@ -249,7 +250,11 @@ def _merge(name: str, found: Sequence[tuple[Source, PersonRecord]], books: bool 
     def first(field_name: str) -> Any:
         return next((getattr(r, field_name) for _, r in found if getattr(r, field_name)), None)
 
-    richest = max(found, key=lambda pair: len(pair[1].credits))[1]
+    # the films and series (every part they took, whatever it was) from the service listing the most of
+    # them; the books (issue 362) from the first book database knowing them
+    films = [(s, [c for c in r.credits if c.kind != "book"]) for s, r in found]
+    richest = max(films, key=lambda pair: len(pair[1]))[1]
+    shelf = next(((s, [c for c in r.credits if c.kind == "book"]) for s, r in found if _has_books(r)), None)
     ids: dict[str, str] = {}
     for _, record in found:
         for scheme, value in record.ids.items():
@@ -266,6 +271,15 @@ def _merge(name: str, found: Sequence[tuple[Source, PersonRecord]], books: bool 
         portrait=None,
         popularity=first("popularity"),
         also_known_as=first("also_known_as") or (),
-        credits=richest.credits,
+        credits=(*(shelf[1] if shelf else ()), *richest),
     )
-    return Profile(record=record, portrait=portrait, sources=tuple(s for s, _ in found))
+    return Profile(
+        record=record,
+        portrait=portrait,
+        sources=tuple(s for s, _ in found),
+        books=shelf[0].service_id if shelf else None,
+    )
+
+
+def _has_books(record: PersonRecord) -> bool:
+    return any(credit.kind == "book" for credit in record.credits)

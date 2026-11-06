@@ -4,6 +4,7 @@ from portalab.capabilities.connector_sdk import Connector, ServiceHandle
 from portalab.connectors.arr import RadarrConnector, SonarrConnector
 from portalab.connectors.conformance import ConformanceKit, Scenario
 from portalab.connectors.grimmory import GrimmoryConnector
+from portalab.connectors.hardcover import HardcoverConnector
 from portalab.connectors.http_base import HttpConnector
 from portalab.connectors.jellyfin import JellyfinConnector
 from portalab.connectors.plex import PlexConnector
@@ -60,3 +61,7 @@ class TestGrimmory(_Kit):
 
 class TestTmdb(_Kit):
     connector_class = TmdbConnector
+
+
+class TestHardcover(_Kit):
+    connector_class = HardcoverConnector
