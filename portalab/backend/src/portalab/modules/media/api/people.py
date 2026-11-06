@@ -167,6 +167,13 @@ def _cover_url(service: str | None, ref: str | None) -> str | None:
     return f"/api/v1/media/person/portrait?{urlencode({'service': service, 'ref': ref, 'size': 'w185'})}"
 
 
+def _sheet_url(service: str | None, ref: str | None) -> str | None:
+    """#367: the portal's sheet of a book the library lacks, as the book database tells it."""
+    if not service or not ref:
+        return None
+    return f"/media/book?{urlencode({'service': service, 'ref': ref})}"
+
+
 @dataclass(frozen=True, slots=True)
 class _Owned:
     object_id: UUID
@@ -241,6 +248,7 @@ async def _bibliography(
     works: Sequence[UUID] = (),
     known: Mapping[str, _Owned] | None = None,
     cover: Callable[[str | None], str | None] = lambda _: None,
+    sheet: Callable[[str | None], str | None] = lambda _: None,
 ) -> list[FilmCreditOut]:
     """Issue 362: each book of a bibliography (or a series) with its standing in the library — found as
     the book database identified the library's books (``known``, by the database's id), else by its title
@@ -293,7 +301,8 @@ async def _bibliography(
                 votes=credit.vote_count,
                 status=status,
                 object_id=str(found.object_id) if found else None,
-                route=f"/media/{found.object_id}" if found else None,
+                # #367: absent, its sheet as the book database tells it
+                route=f"/media/{found.object_id}" if found else sheet(credit.tmdb_id),
                 cover=cover(credit.poster),
                 position=credit.position,
             )
@@ -359,7 +368,12 @@ async def person(
         unlisted = [found[0] for found in candidates if not listed & {c.tmdb_id for c in found}]
         books = [*record.credits, *{c.tmdb_id: c for c in unlisted}.values()]
         filmography += await _bibliography(
-            module, books, works=list(ids), known=known, cover=lambda ref: _cover_url(service, ref)
+            module,
+            books,
+            works=list(ids),
+            known=known,
+            cover=lambda ref: _cover_url(service, ref),
+            sheet=lambda ref: _sheet_url(service, ref),
         )
         # the most recent first; the undated (announced, or minor) last
         filmography.sort(key=lambda c: (c.year is not None, c.year or 0, c.votes), reverse=True)

@@ -627,6 +627,81 @@ def _hardcover(request: httpx.Request) -> Any:
     query, variables = asked["query"], asked.get("variables") or {}
     if "query Status" in query:
         return {"data": {"authors": [{"id": 1}]}}
+    if "query Book" in query:  # #367: a book's sheet; 102 merged into 101
+        if variables["id"] == 102:
+            return {
+                "data": {"books_by_pk": {"id": 102, "title": "Royal Assassin (dup)", "canonical_id": 101}}
+            }
+        if variables["id"] != 101:
+            return {"data": {"books_by_pk": None}}
+        edition = {"language": None, "reading_format": None, "publisher": None, "image": None}
+        return {
+            "data": {
+                "books_by_pk": {
+                    "id": 101,
+                    "title": "Assassin's Apprentice",
+                    "subtitle": None,
+                    "description": "Young Fitz is the bastard son of the noble Prince Chivalry.",
+                    "release_date": "1995-05-01",
+                    "release_year": 1995,
+                    "pages": 435,
+                    "rating": 4.1,
+                    "ratings_count": 3000,
+                    "users_count": 9000,
+                    "canonical_id": None,
+                    "image": {"url": "https://assets.hardcover.app/edition/1/apprentice.jpg"},
+                    "cached_tags": {
+                        "Genre": [{"tag": "Fantasy", "count": 9}, {"tag": "Epic", "count": 12}],
+                        "Mood": [{"tag": "adventurous", "count": 4}],
+                    },
+                    "contributions": [
+                        {"contribution": None, "author": {"name": "Robin Hobb"}},
+                        {"contribution": "Narrator", "author": {"name": "Paul Boehmer"}},
+                    ],
+                    "book_series": [
+                        {"position": 1, "series": {"name": "Farseer"}},
+                        {"position": None, "series": {"name": "The Realm of the Elderlings"}},
+                    ],
+                    "editions": [
+                        {
+                            **edition,
+                            "title": "L'Apprenti assassin",
+                            "isbn_13": "978-2-290-30251-2",
+                            "isbn_10": None,
+                            "asin": None,
+                            "release_date": "1998-03-01",
+                            "audio_seconds": None,
+                            "users_count": 40,
+                            "language": {"code2": "FR"},
+                            "reading_format": {"format": "Read"},
+                            "publisher": {"name": "J'ai Lu"},
+                            "image": {"url": "https://elsewhere.example/x.jpg"},
+                        },
+                        {
+                            **edition,
+                            "title": "Assassin's Apprentice",
+                            "isbn_13": None,
+                            "isbn_10": None,
+                            "asin": "B00AUDIO01",
+                            "release_date": None,
+                            "audio_seconds": 60000,
+                            "users_count": 12,
+                            "language": {"code2": "en"},
+                        },
+                        {  # tells nothing of itself
+                            **edition,
+                            "title": "Assassin's Apprentice",
+                            "isbn_13": None,
+                            "isbn_10": None,
+                            "asin": None,
+                            "release_date": None,
+                            "audio_seconds": None,
+                            "users_count": 0,
+                        },
+                    ],
+                }
+            }
+        }
     if "query Search" in query and variables["type"] == "author":
         return {
             "data": {

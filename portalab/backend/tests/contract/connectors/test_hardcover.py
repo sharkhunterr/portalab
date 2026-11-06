@@ -78,6 +78,39 @@ async def test_a_series_is_the_one_holding_the_library_s_volumes() -> None:
     assert await provider.series("Unknown series", []) is None
 
 
+async def test_a_book_s_sheet() -> None:
+    """#367: a book's description, authors (not its narrator), series, readers' genres and moods, its rating
+    out of 10, its editions (the empty ones left out, an audiobook's told), a merged duplicate's original."""
+    provider = HardcoverConnector().provider(BOOK_SERIES, handle_for("hardcover"))
+    book = await provider.book("102")
+    assert book is not None and (book.ref, book.title, book.pages, book.year) == (
+        "101",
+        "Assassin's Apprentice",
+        435,
+        1995,
+    )
+    assert book.authors == ["Robin Hobb"] and book.series == [
+        ("Farseer", 1.0),
+        ("The Realm of the Elderlings", None),
+    ]
+    assert book.genres == ["Epic", "Fantasy"] and book.moods == ["adventurous"]
+    assert (book.rating, book.votes, book.readers) == (8.2, 3000, 9000)
+    assert book.cover == "/edition/1/apprentice.jpg"
+    french, audio = book.editions
+    assert (french.title, french.language, french.format, french.year) == (
+        "L'Apprenti assassin",
+        "fr",
+        "Read",
+        1998,
+    )
+    assert (
+        french.ids == {"isbn": ["9782290302512"]} and french.publisher == "J'ai Lu" and french.cover is None
+    )
+    assert audio.audio and audio.ids == {"asin": ["B00AUDIO01"]}
+    assert await provider.book("999") is None
+    assert await provider.book("not-a-number") is None
+
+
 def test_names_and_images() -> None:
     assert fold("Robin  HOBB") == fold("robin hobb") == "robin hobb"
     assert fold("Émile Zola") == "emile zola"

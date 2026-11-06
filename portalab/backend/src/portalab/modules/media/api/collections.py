@@ -19,7 +19,8 @@ from fastapi import APIRouter, Query, Response
 from pydantic import BaseModel
 from sqlalchemy import func, select
 
-from portalab.capabilities.media import BOOK_SERIES, METADATA, BookSeries, unwrap
+from portalab.capabilities.media import BOOK_SERIES, METADATA, BookDetails, BookSeries, unwrap
+from portalab.capabilities.media_core import WantedTitle
 from portalab.core.errors import NotFound, Unavailable
 from portalab.modules.media.api.people import (
     BOOK_KINDS,
@@ -27,8 +28,10 @@ from portalab.modules.media.api.people import (
     _bibliography,
     _filmography,
     _identify,
+    _sheet_url,
 )
 from portalab.modules.media.api.router import MediaCard, Module, Reader, _asked, _card
+from portalab.modules.media.library_match import MediaLibraryMatch
 from portalab.modules.media.models import MediaObject, ObjectMetadata
 from portalab.modules.media.permissions import MEDIA_REQUEST
 from portalab.modules.media.providers.insight_widgets import posters
@@ -179,6 +182,7 @@ async def _volumes(module: Module, name: str, rows: list[MediaObject]) -> list[F
             works=[row.id for row in books],
             known=known,
             cover=partial(_cover_url, service),
+            sheet=partial(_sheet_url, service),
         )
         # a volume the library has under another title and without its ISBN: by its number
         numbered = {_position(row.effective.get("series_position")): row for row in books}
@@ -199,6 +203,132 @@ async def _volumes(module: Module, name: str, rows: list[MediaObject]) -> list[F
         parts.sort(key=lambda part: (part.position is None, part.position or 0, part.year or 0))
         return parts
     return []
+
+
+class BookEditionOut(BaseModel):
+    title: str
+    language: str | None = None
+    format: str | None = None
+    audio: bool = False
+    ids: dict[str, list[str]] = {}
+    publisher: str | None = None
+    year: int | None = None
+    cover: str | None = None  # through the portal (``/media/book-covers``)
+
+
+class BookSeriesOut(BaseModel):
+    name: str
+    position: float | None = None
+    route: str | None = None  # its page, when the library has some of its volumes
+
+
+class BookSheetOut(BaseModel):
+    """#367: a book the library may lack, as the book database tells it — and where the library has it
+    (as a book, as an audiobook), found by one of its editions' identifiers or titles by its authors."""
+
+    service: str
+    ref: str
+    title: str
+    subtitle: str | None = None
+    description: str | None = None
+    year: int | None = None
+    release_date: str | None = None
+    pages: int | None = None
+    cover: str | None = None
+    authors: list[str] = []
+    series: list[BookSeriesOut] = []
+    genres: list[str] = []
+    moods: list[str] = []
+    rating: float | None = None  # out of 10, as a film's
+    votes: int = 0
+    readers: int = 0
+    editions: list[BookEditionOut] = []
+    library: dict[str, str] = {}  # kind (book, audiobook) → the library's title's id
+
+
+async def _held(module: Module, book: BookDetails) -> dict[str, str]:
+    """Where the library has the book: one of its editions' identifiers, else one of their titles by one of
+    its authors — as a book and as an audiobook."""
+    ids: dict[str, list[str]] = {}
+    for edition in book.editions:
+        for scheme, values in edition.ids.items():
+            ids.setdefault(scheme, []).extend(values)
+    titles = list(dict.fromkeys([book.title, *(e.title for e in book.editions)]))[:12]
+    wanted = [
+        WantedTitle(f"{kind}|{index}", kind, title, tuple(book.authors), ids if index == 0 else {})
+        for kind in sorted(BOOK_KINDS)
+        for index, title in enumerate(titles)
+    ]
+    found = await MediaLibraryMatch(module.database).find(wanted)
+    out: dict[str, str] = {}
+    for key in sorted(found, key=lambda k: int(k.split("|")[1])):
+        out.setdefault(key.split("|")[0], str(found[key].object_id))
+    return out
+
+
+@router.get("/media/book", response_model=BookSheetOut)
+async def book_sheet(
+    _: Reader,
+    module: Module,
+    service: Annotated[str, Query(pattern=r"^[0-9a-f-]{36}$")],
+    ref: Annotated[str, Query(min_length=1, max_length=40, pattern=r"^[A-Za-z0-9_-]+$")],
+) -> BookSheetOut:
+    """#367: a book's sheet from the book database that knows it (Hardcover) — its description, authors,
+    series, genres and editions —, and where the library has it."""
+    provider = next(
+        (r.provider for r in module.capabilities.system_providers(BOOK_SERIES) if r.instance_ref == service),
+        None,
+    )
+    if provider is None:
+        raise CollectionNotFound("No such book database.")
+    try:
+        book = unwrap(await provider.book(ref))
+    except Exception as exc:
+        raise Unavailable("The book cannot be told right now.", code="media.book_unavailable") from exc
+    if not isinstance(book, BookDetails):
+        raise CollectionNotFound(f"no book {ref[:40]!r}")
+    series = []
+    for name, position in book.series:
+        found, rows = await _series(module, name)
+        series.append(
+            BookSeriesOut(
+                name=name,
+                position=position,
+                route=f"/media/collection?{urlencode({'ref': f'{SERIES}{found}'})}" if rows else None,
+            )
+        )
+    return BookSheetOut(
+        service=service,
+        ref=book.ref,
+        title=book.title,
+        subtitle=book.subtitle,
+        description=book.description,
+        year=book.year,
+        release_date=book.release_date,
+        pages=book.pages,
+        cover=_cover_url(service, book.cover),
+        authors=list(book.authors),
+        series=series,
+        genres=list(book.genres),
+        moods=list(book.moods),
+        rating=book.rating,
+        votes=book.votes,
+        readers=book.readers,
+        editions=[
+            BookEditionOut(
+                title=e.title,
+                language=e.language,
+                format=e.format,
+                audio=e.audio,
+                ids={k: list(v) for k, v in e.ids.items()},
+                publisher=e.publisher,
+                year=e.year,
+                cover=_cover_url(service, e.cover),
+            )
+            for e in book.editions
+        ],
+        library=await _held(module, book),
+    )
 
 
 @router.get("/media/book-covers")

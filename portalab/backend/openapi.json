@@ -2901,6 +2901,90 @@
         "title": "BonusOut",
         "type": "object"
       },
+      "BookEditionOut": {
+        "properties": {
+          "audio": {
+            "default": false,
+            "title": "Audio",
+            "type": "boolean"
+          },
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Format"
+          },
+          "ids": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "default": {},
+            "title": "Ids",
+            "type": "object"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "publisher": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publisher"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "BookEditionOut",
+        "type": "object"
+      },
       "BookFormatOut": {
         "properties": {
           "file_ref": {
@@ -2967,6 +3051,200 @@
           "formats"
         ],
         "title": "BookOut",
+        "type": "object"
+      },
+      "BookSeriesOut": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "route": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "BookSeriesOut",
+        "type": "object"
+      },
+      "BookSheetOut": {
+        "description": "#367: a book the library may lack, as the book database tells it \u2014 and where the library has it\n(as a book, as an audiobook), found by one of its editions' identifiers or titles by its authors.",
+        "properties": {
+          "authors": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Authors",
+            "type": "array"
+          },
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "editions": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/BookEditionOut"
+            },
+            "title": "Editions",
+            "type": "array"
+          },
+          "genres": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Genres",
+            "type": "array"
+          },
+          "library": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "title": "Library",
+            "type": "object"
+          },
+          "moods": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Moods",
+            "type": "array"
+          },
+          "pages": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "readers": {
+            "default": 0,
+            "title": "Readers",
+            "type": "integer"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "release_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Release Date"
+          },
+          "series": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/BookSeriesOut"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "votes": {
+            "default": 0,
+            "title": "Votes",
+            "type": "integer"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "service",
+          "ref",
+          "title"
+        ],
+        "title": "BookSheetOut",
         "type": "object"
       },
       "BoostOut": {
@@ -50596,6 +50874,62 @@
           }
         },
         "summary": "Artwork Image",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/book": {
+      "get": {
+        "description": "#367: a book's sheet from the book database that knows it (Hardcover) \u2014 its description, authors,\nseries, genres and editions \u2014, and where the library has it.",
+        "operationId": "book_sheet_api_v1_media_book_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "service",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f-]{36}$",
+              "title": "Service",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 40,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookSheetOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Book Sheet",
         "tags": [
           "media"
         ]

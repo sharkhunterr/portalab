@@ -880,6 +880,47 @@ class OwnedBook:
     ids: Mapping[str, Sequence[str]] = field(default_factory=dict)
 
 
+@dataclass(frozen=True, slots=True)
+class BookEdition:
+    """An edition of a book (#367): its own title (a translation's), its language (ISO 639-1), its format as
+    the database names it (read, ebook, listened…), its identifiers, publisher, year and cover; ``readers``
+    how many readers hold it."""
+
+    title: str
+    language: str | None = None
+    format: str | None = None
+    audio: bool = False  # an audiobook's edition
+    ids: Mapping[str, Sequence[str]] = field(default_factory=dict)
+    publisher: str | None = None
+    year: int | None = None
+    cover: str | None = None
+    readers: int = 0
+
+
+@dataclass(frozen=True, slots=True)
+class BookDetails:
+    """A book as a book database tells it (#367): ``ref`` its id there; its rating out of 10 like a film's;
+    ``series`` each series it belongs to with its place; ``genres`` and ``moods`` as its readers tag it; its
+    editions, the most held first."""
+
+    ref: str
+    title: str
+    subtitle: str | None = None
+    description: str | None = None
+    year: int | None = None
+    release_date: str | None = None
+    pages: int | None = None
+    cover: str | None = None
+    authors: Sequence[str] = ()
+    series: Sequence[tuple[str, float | None]] = ()
+    genres: Sequence[str] = ()
+    moods: Sequence[str] = ()
+    rating: float | None = None
+    votes: int = 0
+    readers: int = 0
+    editions: Sequence[BookEdition] = ()
+
+
 @runtime_checkable
 class BookSeriesProvider(Protocol):
     """Issue 362 — a book database (Hardcover). ``identify``: the library's books as it knows them (by an
@@ -891,6 +932,10 @@ class BookSeriesProvider(Protocol):
     async def identify(self, books: Sequence[OwnedBook]) -> Mapping[str, Sequence[PersonCredit]]: ...
 
     async def series(self, name: str, known: Sequence[str]) -> BookSeries | None: ...
+
+    async def book(self, ref: str) -> BookDetails | None:
+        """#367: a book's sheet — its description, authors, series, genres and editions."""
+        ...
 
     async def cover(self, ref: str, size: str) -> bytes: ...
 

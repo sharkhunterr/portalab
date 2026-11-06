@@ -6,6 +6,7 @@ page lists every volume."""
 
 from collections.abc import Mapping, Sequence
 from typing import Any
+from uuid import UUID
 
 import httpx
 from fastapi import FastAPI
@@ -15,6 +16,8 @@ from portalab.capabilities.isolation import IsolationPolicy, ProviderGuard
 from portalab.capabilities.media import (
     BOOK_SERIES,
     PEOPLE,
+    BookDetails,
+    BookEdition,
     BookSeries,
     BookSeriesProvider,
     OwnedBook,
@@ -79,6 +82,29 @@ class _Hardcover:
         self.series_asked.append((name, list(known)))
         return BookSeries(
             ids={"hardcover": "8"}, name="The Farseer Trilogy", author="Robin Hobb", volumes=BOOKS
+        )
+
+    async def book(self, ref: str) -> BookDetails | None:
+        if ref != "102":
+            return None
+        return BookDetails(
+            ref="102",
+            title="Royal Assassin",
+            description="Fitz at court.",
+            year=1996,
+            pages=580,
+            cover="/edition/2/royal.jpg",
+            authors=["Robin Hobb"],
+            series=[("L'Assassin royal", 2.0), ("The Realm of the Elderlings", 2.0)],
+            genres=["Fantasy"],
+            rating=8.4,
+            votes=900,
+            editions=[
+                BookEdition(
+                    title="L'Assassin du roi", language="fr", format="Read", ids={"isbn": ["9782290302529"]}
+                ),
+                BookEdition(title="Royal Assassin", language="en", format="Listened", audio=True),
+            ],
         )
 
     async def cover(self, ref: str, size: str) -> bytes:
@@ -206,7 +232,9 @@ async def test_an_author_s_books(app: FastAPI, client: httpx.AsyncClient, media:
     apprentice = next(c for c in page["filmography"] if c["tmdb_id"] == "101")
     assert apprentice["route"].startswith("/media/") and apprentice["votes"] == 3000
     quest = next(c for c in page["filmography"] if c["tmdb_id"] == "103")
-    assert quest["route"] is None and quest["cover"] is None
+    assert quest["cover"] is None
+    service = str(UUID(int=9))
+    assert quest["route"] == f"/media/book?service={service}&ref=103"  # #367: its sheet
     assert apprentice["cover"].startswith("/api/v1/media/person/portrait?service=")
     cover = await client.get(apprentice["cover"])
     assert cover.status_code == 200 and cover.content == b"\xff\xd8cover/edition/1/apprentice.jpg"
@@ -232,3 +260,27 @@ async def test_a_book_series_volumes(app: FastAPI, client: httpx.AsyncClient, me
     assert (
         await client.get("/api/v1/media/book-covers", params={"service": "0" * 36, "ref": "/x.jpg"})
     ).status_code == 404
+
+
+async def test_a_book_s_sheet(app: FastAPI, client: httpx.AsyncClient, media: MediaHarness) -> None:
+    """#367: a book's sheet from the book database — and where the library has it (« Royal Assassin » by
+    its title and author); its series linked when the library has some of its volumes."""
+    await _library(app, media)
+    await login(client, "zoe")
+    service = str(UUID(int=9))
+    sheet = (await client.get("/api/v1/media/book", params={"service": service, "ref": "102"})).json()
+    assert sheet["title"] == "Royal Assassin" and sheet["pages"] == 580 and sheet["authors"] == ["Robin Hobb"]
+    assert sheet["library"] == {"book": await _id(media, "Royal Assassin")}
+    assert [(s["name"], s["route"] is not None) for s in sheet["series"]] == [
+        ("L'Assassin royal", True),
+        ("The Realm of the Elderlings", False),
+    ]
+    assert [(e["title"], e["language"], e["audio"]) for e in sheet["editions"]] == [
+        ("L'Assassin du roi", "fr", False),
+        ("Royal Assassin", "en", True),
+    ]
+    assert sheet["cover"].startswith("/api/v1/media/book-covers?service=")
+    unknown = await client.get("/api/v1/media/book", params={"service": service, "ref": "999"})
+    assert unknown.status_code == 404
+    elsewhere = await client.get("/api/v1/media/book", params={"service": "0" * 36, "ref": "102"})
+    assert elsewhere.status_code == 404

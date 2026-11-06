@@ -108,8 +108,13 @@ function AskForm({
   const [title, setTitle] = useState(params.get("title") ?? "");
   const [creators, setCreators] = useState(params.get("creator") ?? "");
   const [year, setYear] = useState(params.get("year") ?? "");
-  const [language, setLanguage] = useState("");
-  const [edition, setEdition] = useState("");
+  const [language, setLanguage] = useState(params.get("language") ?? "");
+  const [edition, setEdition] = useState(params.get("edition") ?? "");
+  // every identifier a sheet knows of it (issue 367), whatever its scheme: ``id.<scheme>=<value>``
+  const ids: Record<string, string[]> = {};
+  for (const [key, value] of params) {
+    if (key.startsWith("id.") && value) ids[key.slice(3)] = [...(ids[key.slice(3)] ?? []), value];
+  }
   const [note, setNote] = useState("");
   const { ask, support } = useAskActions();
   const remaining = left[kind];
@@ -125,7 +130,7 @@ function AskForm({
       creators: words(creators),
       year: /^\d{1,4}$/.test(year.trim()) ? Number(year.trim()) : null,
       details,
-      ids: {},
+      ids,
       note: note.trim() || null,
     });
   };
