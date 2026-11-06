@@ -129,7 +129,10 @@ WHOLES = """query Wholes($where: [book_series_bool_exp!]!) {
     where: {_or: $where, book: {is_partial_book: {_eq: false}, compilation: {_eq: false}}}, limit: 500
   ) { position series_id book { id canonical_id } }
 }"""
-# #371: books' titles in a language — their most held edition in it
+# #371: books' titles in a language — their most held edition in it, or a translation's merged into them
+MERGED = f"""query Merged($ids: [Int!]!) {{
+  books(where: {{canonical_id: {{_in: $ids}}}}, limit: {VOLUMES}) {{ id canonical_id }}
+}}"""
 TITLES = f"""query Titles($ids: [Int!]!, $language: String!) {{
   editions(
     where: {{book_id: {{_in: $ids}}, language: {{code2: {{_eq: $language}}}}}}
@@ -551,16 +554,23 @@ class _People:
 async def local_titles(
     connector: HardcoverConnector, service: ServiceHandle, refs: Sequence[str], language: str
 ) -> dict[str, str]:
-    """#371: books' titles in a language — each book's most held edition in it."""
+    """#371: books' titles in a language — each book's most held edition in it, its own or one of the
+    translations Hardcover merged into it (« L'assassin du roi », a book of its own merged into « Royal
+    Assassin »)."""
     ids = sorted({int(ref) for ref in refs if ref.isdigit()})
     if not ids:
         return {}
-    answer = await connector.graphql(service, TITLES, {"ids": ids, "language": language})
+    original = {book: book for book in ids}
+    for book in (await connector.graphql(service, MERGED, {"ids": ids})).get("books") or []:
+        merged, into = (book or {}).get("id"), (book or {}).get("canonical_id")
+        if isinstance(merged, int) and isinstance(into, int):
+            original.setdefault(merged, into)
+    answer = await connector.graphql(service, TITLES, {"ids": sorted(original), "language": language})
     out: dict[str, str] = {}
-    for edition in answer.get("editions") or []:
+    for edition in answer.get("editions") or []:  # the most held first
         book, title = (edition or {}).get("book_id"), str((edition or {}).get("title") or "").strip()
-        if isinstance(book, int) and title:
-            out.setdefault(str(book), title[:300])
+        if isinstance(book, int) and book in original and title:
+            out.setdefault(str(original[book]), title[:300])
     return out
 
 

@@ -25,7 +25,8 @@ async def test_an_author_and_their_books() -> None:
     assert (apprentice.kind, apprentice.tmdb_id, apprentice.year) == ("book", "101", 1995)
     assert apprentice.vote_average == 8.2 and apprentice.popularity == 9000
     assert apprentice.poster == "/edition/1/apprentice.jpg"
-    assert apprentice.title == "L'Apprenti assassin" and royal.title == "Royal Assassin"  # #371: in French
+    # #371: in French — an edition of its own, or of a translation merged into it
+    assert apprentice.title == "L'Apprenti assassin" and royal.title == "L'Assassin du roi"
     assert royal.poster is None  # an image elsewhere than Hardcover's host is never fetched
     # the token, pasted with its « Bearer » prefix, sent once; the portal says who it is
     assert seen[0].headers["authorization"] == "Bearer hardcover-secret-token"

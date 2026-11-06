@@ -645,9 +645,12 @@ def _hardcover(request: httpx.Request) -> Any:
                 ]
             }
         }
+    if "query Merged" in query:  # #371: a French translation (5550) merged into « Royal Assassin » (102)
+        return {"data": {"books": [{"id": 5550, "canonical_id": 102}] if 102 in variables["ids"] else []}}
     if "query Titles" in query:  # #371: books' titles in French
         french = [
             {"book_id": 101, "title": "L'Apprenti assassin"},
+            {"book_id": 5550, "title": "L'Assassin du roi"},
             {"book_id": 101, "title": "Apprenti (poche)"},
         ]
         return {"data": {"editions": french if variables["language"] == "fr" else []}}
