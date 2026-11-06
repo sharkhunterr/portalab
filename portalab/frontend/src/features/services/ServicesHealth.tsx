@@ -357,6 +357,7 @@ const CONNECTOR_ICONS: Record<string, string> = {
   tmdb: "database",
   grimmory: "book",
   hardcover: "book-open", // issue 362
+  igdb: "gamepad", // issue 368
   romm: "joystick",
   qbittorrent: "package",
   deluge: "package",

@@ -669,6 +669,7 @@
   "securityBlocks.title": "Blocages de sécurité",
   "services.access.account": "Mot de passe",
   "services.access.app": "Clé d'API",
+  "services.access.client_secret": "Client Secret (application Twitch)",
   "services.access.generic": "Jeton d'API",
   "services.access.plex": "Jeton Plex",
   "services.add": "Ajouter un service",

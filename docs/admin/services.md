@@ -235,6 +235,15 @@ The community book database. Portalab uses it for **an author's books** and **a 
 - **Credentials**: a personal token (hardcover.app → *Settings → Hardcover API → New API Key*). Give it the **`read:catalog`** scope only: the portal reads the public catalog, never anyone's library. The token expires on the date you choose, and Hardcover may reset tokens while its API is in beta. When the token stops working, the service shows a credentials error: create a new one. Pasting it with or without its `Bearer ` prefix both work. Leave the address at `https://api.hardcover.app`. **Edition languages** (for example `fr, en`) keeps a book's sheet to the editions in those languages, in that order; empty shows every language.
 - Hardcover's API is rate-limited per day and per minute. The portal keeps a person's profile and a series' volumes for six hours.
 
+#### IGDB
+
+The game database RomM matches the library's games with. Portalab uses it for **a game franchise's games** and **a game's sheet**.
+
+- **For members**: a game franchise's page (from a game of the library) lists every game of the franchise. The library's own games are found by their IGDB id (RomM keeps it), else by their title; the others are marked **Not in the library** and open their sheet. The sheet is laid out like a library game's page: summary, platforms, studios and publisher, release, genres, themes and modes, franchises, rating, trailer, screenshots and artworks. When the library has the game, its library page opens instead. With the **Title requests** module on and taking games, **Ask for it** asks the team for it, for one platform if wanted, with its IGDB id.
+- Images (covers, screenshots, artworks) are fetched by the portal and served from it: members' browsers never call IGDB. Its ratings are IGDB's.
+- **Credentials**: a Twitch application. On dev.twitch.tv/console, the Twitch account needs two-factor authentication. Choose **Register Your Application**, with any name, the redirect address `http://localhost` and the category *Application Integration*. Put its **Client ID** in the service's settings and its **Client Secret** in the secret field. The portal exchanges them for an access token and renews it when it expires. Leave the address at `https://api.igdb.com`.
+- IGDB allows 4 requests a second. The portal keeps a franchise's games and a game's sheet for six hours.
+
 #### SearXNG
 
 Your self-hosted metasearch engine, used to find images on the web, such as an actor's character for the cards.
