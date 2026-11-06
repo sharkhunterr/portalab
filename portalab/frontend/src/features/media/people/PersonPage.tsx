@@ -216,16 +216,14 @@ function Standing({
     const query = new URLSearchParams({ kind: credit.kind, title: credit.title });
     if (creator) query.set("creator", creator);
     if (credit.year) query.set("year", String(credit.year));
-    return (
-      <>
-        <span className="media-person__absent">{t("media:person.status.absent")}</span>
-        {asks.data?.kinds.includes(credit.kind) ? (
-          <Link to={`/requests?${query}`} className="media-person__ask">
-            <Icon name="plus" size={14} />
-            {t("media:ask.askIt")}
-          </Link>
-        ) : null}
-      </>
+    // the button says it is not here: no « Not here » beside it
+    return asks.data?.kinds.includes(credit.kind) ? (
+      <Link to={`/requests?${query}`} className="media-person__ask">
+        <Icon name="plus" size={14} />
+        {t("media:ask.askIt")}
+      </Link>
+    ) : (
+      <span className="media-person__absent">{t("media:person.status.absent")}</span>
     );
   }
   if (!askable || credit.kind === "book") return null;

@@ -134,6 +134,7 @@ describe("title requests", () => {
       },
     ]);
     const link = await screen.findByRole("link", { name: /Ask for it/ });
+    expect(screen.queryByText("Not here")).toBeNull(); // the button says it is not here
     expect(link.getAttribute("href")).toBe(
       "/requests?kind=book&title=The+Golden+Fool&creator=Robin+Hobb&year=2002",
     );
