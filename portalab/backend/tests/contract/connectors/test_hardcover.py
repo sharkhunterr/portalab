@@ -123,6 +123,17 @@ async def test_a_book_s_sheet() -> None:
     assert languages(" FR , en,fr ") == ["fr", "en"] and languages("") == []
 
 
+async def test_books_found_by_words() -> None:
+    """#373: books found by words of their title — not an omnibus nor a book nobody reads —, told in the
+    member's language, with their authors."""
+    provider = HardcoverConnector().provider(BOOK_SERIES, handle_for("hardcover"))
+    [found] = await provider.search("assassin", "fr-FR", 5)
+    assert (found.tmdb_id, found.title, found.year) == ("101", "L'Apprenti assassin", 1995)
+    assert found.role == "Robin Hobb, Stephen Youll" and found.poster == "/edition/1/apprentice.jpg"
+    [english] = await provider.search("assassin", "en", 5)
+    assert english.title == "Assassin's Apprentice"
+
+
 def test_names_and_images() -> None:
     assert fold("Robin  HOBB") == fold("robin hobb") == "robin hobb"
     assert fold("Émile Zola") == "emile zola"

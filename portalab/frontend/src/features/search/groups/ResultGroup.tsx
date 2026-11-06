@@ -60,11 +60,11 @@ function PosterResult({ item }: { item: ItemOut }) {
   const badges = badgesOf(t, item)
     .slice(1)
     .filter((badge) => !status || badge.label !== badgesOf(t, { kind: "", facets: { status } })[0]?.label);
-  // #4: a title to ask for carries TMDB's poster
+  // #4: a title to ask for carries TMDB's poster; issue 373: a book's or a game's cover, a ready address
   const src = image
     ? `/api/v1/media/images/${image}`
     : item.kind === "request"
-      ? metadataImage(item.facets?.poster, "w185")
+      ? (item.facets?.cover ?? metadataImage(item.facets?.poster, "w185"))
       : null;
   return (
     <li className="search-poster">

@@ -81,6 +81,7 @@ from portalab.modules.media.books.service import BookService
 from portalab.modules.media.cards import MediaCardSources
 from portalab.modules.media.catalog import CatalogPort, CatalogQuery
 from portalab.modules.media.cleanup import CleanupService
+from portalab.modules.media.databases import DatabaseTitles
 from portalab.modules.media.discovery.shelves import Discovery
 from portalab.modules.media.events import register_event_types
 from portalab.modules.media.feed import Feed
@@ -521,7 +522,13 @@ class MediaModule:
             self.widgets.register_summary(MediaChanges(self.database, self.authorizer), owner=OWNER)
         if self.search.provider("request") is None:  # #4: « Ask for it » in the search
             self.search.register(
-                RequestableSearchProvider(self.requestable, self.authorizer, self.language), owner=OWNER
+                RequestableSearchProvider(
+                    self.requestable,
+                    self.authorizer,
+                    self.language,
+                    DatabaseTitles(self.capabilities, self.database),  # #373: books and games too
+                ),
+                owner=OWNER,
             )
         if self.search.provider("person") is None:  # #92: actors, directors, authors… a section of their own
             self.search.register(PeopleSearchProvider(self.people, self.authorizer), owner=OWNER)

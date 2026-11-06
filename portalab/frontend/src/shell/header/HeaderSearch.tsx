@@ -206,11 +206,13 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
         image:
           item.kind === "media" && item.facets?.image
             ? `/api/v1/media/images/${item.facets.image}`
-            : item.kind === "request" && item.facets?.poster // #4: a title to ask for (TMDB's poster)
-              ? (metadataImage(item.facets.poster, "w92") ?? undefined)
-              : item.kind === "person" && item.facets?.portrait // #92: an actor's, an author's portrait
-                ? (metadataImage(item.facets.portrait, "w92") ?? undefined)
-                : undefined,
+            : item.kind === "request" && item.facets?.cover // issue 373: a book's, a game's, through the portal
+              ? item.facets.cover
+              : item.kind === "request" && item.facets?.poster // #4: a title to ask for (TMDB's poster)
+                ? (metadataImage(item.facets.poster, "w92") ?? undefined)
+                : item.kind === "person" && item.facets?.portrait // #92: an actor's, an author's portrait
+                  ? (metadataImage(item.facets.portrait, "w92") ?? undefined)
+                  : undefined,
         round: item.kind === "person" || undefined,
         badges: badgesOf(t, item),
       });

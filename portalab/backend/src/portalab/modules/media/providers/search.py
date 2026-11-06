@@ -23,6 +23,7 @@ from portalab.capabilities.search import (
 from portalab.capabilities.search.fts import decode_cursor, encode_cursor, snippet
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.modules.media.catalog import CatalogPort, CatalogQuery
+from portalab.modules.media.databases import interleave
 from portalab.modules.media.matching import (
     credited,
     fold,
@@ -363,16 +364,19 @@ class MediaResolver:
 class RequestableSearchProvider:
     """#4: « Ask for it » — the films and series the library does not have, found through the request
     service (Seerr, over TMDB), each opening the page where one asks for it. Titles already available
-    are left to the library's own results."""
+    are left to the library's own results. #373: the books and games it lacks too, found in the book and
+    game databases (Hardcover, IGDB), each opening its sheet — the films and series only for who may ask
+    the request service."""
 
     kind = "request"
     label_key = "search.kind.request"
-    required_permission = MEDIA_REQUEST
+    required_permission = MEDIA_READ
 
-    def __init__(self, catalog: Any, authorizer: Authorizer, language: Any) -> None:
+    def __init__(self, catalog: Any, authorizer: Authorizer, language: Any, titles: Any = None) -> None:
         self.catalog = catalog
         self.authorizer = authorizer
         self.language = language
+        self.titles = titles  # #373: the book and game databases' titles (DatabaseTitles)
 
     def facets(self) -> Sequence[FacetDef]:
         # #92: the media subtypes — a book or a game chosen leaves nothing to ask for here
@@ -382,12 +386,19 @@ class RequestableSearchProvider:
         self, query: ParsedQuery, principal: Principal, limit: int, language: str | None = None
     ) -> list[SearchItem]:
         user = principal.acting_for or principal.user_id
-        if user is None or not query.text.strip() or not self.catalog.configured():
+        if user is None or not query.text.strip():
             return []
-        if not await self.authorizer.is_allowed(principal, MEDIA_REQUEST):
-            return []
-        cards = await self.catalog.search(query.text, user, language or await self.language())
+        language = language or await self.language()
         wanted = set(query.filters.get("subtype") or ())
+        found = (
+            await self.titles.found(query.text, language, limit)
+            if self.titles is not None and await self.authorizer.is_allowed(principal, MEDIA_READ)
+            else []
+        )
+        found = [item for item in found if not wanted or item.facets.get("type") in wanted]
+        if not self.catalog.configured() or not await self.authorizer.is_allowed(principal, MEDIA_REQUEST):
+            return found[:limit]
+        cards = await self.catalog.search(query.text, user, language)
         items = []
         for card in cards:
             if card["status"] == "available" or (wanted and card["kind"] not in wanted):
@@ -409,7 +420,7 @@ class RequestableSearchProvider:
                     facets=facets,
                 )
             )
-        return items[:limit]
+        return interleave(items, found)[:limit]
 
     async def search(
         self, query: ParsedQuery, principal: Principal, ctx: LocaleContext, *, limit: int, cursor: str | None
@@ -423,7 +434,7 @@ class RequestableSearchProvider:
     async def suggestions(
         self, query: ParsedQuery, principal: Principal, *, per_type: int = 2
     ) -> Sequence[SearchItem]:
-        return (await self._found(query, principal, 4))[:4]
+        return (await self._found(query, principal, 6))[:6]
 
     async def hydrate(self, ids: Sequence[str], principal: Principal) -> Sequence[SearchItem]:
         return []  # live results only: nothing to bring back later

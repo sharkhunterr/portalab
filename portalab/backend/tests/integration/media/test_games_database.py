@@ -14,6 +14,8 @@ from sqlalchemy import select
 from portalab.capabilities.isolation import IsolationPolicy, ProviderGuard
 from portalab.capabilities.media import GAME_DATABASE, GameDatabase, GameDetails, GameFranchise, PersonCredit
 from portalab.capabilities.media.testkit import library_record
+from portalab.capabilities.search import ParsedQuery
+from portalab.core.authz_port import Principal
 from portalab.modules.connectors.breaker.breaker import CircuitBreaker
 from portalab.modules.connectors.services.providers import guarded_provider
 from portalab.modules.media.models import ExternalId, MediaObject
@@ -61,6 +63,9 @@ class _Igdb:
         if ref == "7346":
             return GameDetails(ref="7346", title="The Legend of Zelda: Breath of the Wild")
         return None
+
+    async def search(self, query: str, limit: int) -> Sequence[PersonCredit]:
+        return [_game("1025", "Zelda II: The Adventure of Link", 1987, "co2zii"), _game("7346", "BOTW", 2017)]
 
     async def image(self, ref: str, size: str) -> bytes:
         return b"\xff\xd8" + f"{size}:{ref}".encode()
@@ -147,3 +152,18 @@ async def test_a_game_s_sheet(app: FastAPI, client: httpx.AsyncClient, media: Me
     assert elsewhere.status_code == 404
     bad = await client.get("/api/v1/media/game-images", params={"service": service, "ref": "../x"})
     assert bad.status_code == 422
+
+
+async def test_games_to_ask_for_in_the_search(app: FastAPI, media: MediaHarness) -> None:
+    """#373: a game the library lacks among the search's « ask for it » results, opening its sheet; one it
+    has (by its IGDB id) left to the library's own results."""
+    _, service = await _library(app, media)
+    zoe = (await users(app, media, "leo"))["leo"]
+    provider = media.module.search.provider("request")
+    assert provider is not None
+    query = ParsedQuery(text="zelda", normalized="zelda", terms=("zelda",))
+    items = (await provider.search(query, Principal(user_id=zoe), None, limit=10, cursor=None)).items  # type: ignore[arg-type]
+    assert [(i.title, i.url_ref) for i in items] == [
+        ("Zelda II: The Adventure of Link (1987)", f"/media/game?service={service}&ref=1025")
+    ]
+    assert items[0].facets["cover"].endswith("ref=co2zii&size=cover")
