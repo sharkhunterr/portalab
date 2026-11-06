@@ -160,9 +160,9 @@ async def _library(app: FastAPI, media: MediaHarness) -> _Hardcover:
                 authors=["Robin Hobb"],
                 people=["Robin Hobb"],
             ),
-            # found by its title
+            # found by its title — an audiobook, told as one (#372)
             library_record(
-                "b2", kind="book", title="Royal Assassin", authors=["Robin Hobb"], people=["Robin Hobb"]
+                "b2", kind="audiobook", title="Royal Assassin", authors=["Robin Hobb"], people=["Robin Hobb"]
             ),
             # the series' third volume under another title, found by its number on the series' page
             library_record(
@@ -226,7 +226,7 @@ async def test_an_author_s_books(app: FastAPI, client: httpx.AsyncClient, media:
     assert standing == {
         # identified (its ISBN), told by the library's title
         ("L'Apprenti assassin", "book"): ("available", await _id(media, "L'Apprenti assassin")),
-        ("Royal Assassin", "book"): ("available", await _id(media, "Royal Assassin")),  # its title
+        ("Royal Assassin", "audiobook"): ("available", await _id(media, "Royal Assassin")),  # its title
         ("Assassin's Quest", "book"): ("absent", None),
         # unlisted: a part of « The Golden Fool », which is not told absent
         ("Le Prophète blanc", "book"): ("available", await _id(media, "Le Prophète blanc")),
@@ -275,7 +275,7 @@ async def test_a_book_s_sheet(app: FastAPI, client: httpx.AsyncClient, media: Me
     service = str(UUID(int=9))
     sheet = (await client.get("/api/v1/media/book", params={"service": service, "ref": "102"})).json()
     assert sheet["title"] == "Royal Assassin" and sheet["pages"] == 580 and sheet["authors"] == ["Robin Hobb"]
-    assert sheet["library"] == {"book": await _id(media, "Royal Assassin")}
+    assert sheet["library"] == {"audiobook": await _id(media, "Royal Assassin")}  # held as an audiobook
     assert [(s["name"], s["route"] is not None) for s in sheet["series"]] == [
         ("L'Assassin royal", True),
         ("The Realm of the Elderlings", False),

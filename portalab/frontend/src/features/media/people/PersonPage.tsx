@@ -226,7 +226,7 @@ function Standing({
       <span className="media-person__absent">{t("media:person.status.absent")}</span>
     );
   }
-  if (!askable || credit.kind === "book") return null;
+  if (!askable || credit.kind === "book" || credit.kind === "audiobook") return null;
   return (
     <RequestDialog
       target={{
@@ -339,7 +339,7 @@ function Filmography({
       (chosen === "all" || c.departments.includes(chosen)),
   );
   // issue 362: an author's books — a bibliography, or their works when films are there too
-  const books = titles.filter((c) => c.kind === "book").length;
+  const books = titles.filter((c) => c.kind === "book" || c.kind === "audiobook").length; // issue 372
   const heading = t(
     books === 0
       ? "media:person.filmography"

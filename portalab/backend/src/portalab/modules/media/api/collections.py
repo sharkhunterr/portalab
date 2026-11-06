@@ -204,6 +204,7 @@ async def _volumes(module: Module, name: str, rows: list[MediaObject]) -> list[F
                 parts[index] = part.model_copy(
                     update={
                         "title": row.title,
+                        "kind": row.kind,  # #372: an audiobook told as one
                         "status": "available" if row.available else "unavailable",
                         "object_id": str(row.id),
                         "route": f"/media/{row.id}",
