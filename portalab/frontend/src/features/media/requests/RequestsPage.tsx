@@ -31,7 +31,6 @@ import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import { AskLists } from "../../requests/RequestsPage";
 import { useRequestActions } from "../api";
 import type { RequestQuota } from "../discover/api";
 import { useMeasures } from "../insights/api";
@@ -451,7 +450,12 @@ function RequestRow({ card }: { card: RequestCard }) {
   );
   return (
     <li className="requests-row">
-      {card.route ? <Link to={card.route}>{body}</Link> : <span className="requests-row__link">{body}</span>}
+      {card.route || card.sheet ? (
+        // issue 378: a book, a game the library lacks — its sheet
+        <Link to={(card.route ?? card.sheet) as string}>{body}</Link>
+      ) : (
+        <span className="requests-row__link">{body}</span>
+      )}
       <StatusBadge tone={STAGE_TONE[card.stage ?? ""] ?? TONE[group] ?? "neutral"}>
         {card.stage
           ? t(`media:myRequests.stage.${card.stage}`, {
@@ -584,8 +588,6 @@ export function RequestsPage({ stats = false }: { stats?: boolean }) {
       ) : null}
       {tab === "overview" && data ? <Overview data={data} /> : null}
       {tab === "list" ? <List /> : null}
-      {/* issue 375: the books, games… asked of the team, and the others' to want too */}
-      {tab === "list" ? <AskLists /> : null}
       {tab === "soon" ? <Soon /> : null}
     </AdminPage>
   );

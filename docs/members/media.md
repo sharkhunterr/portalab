@@ -200,29 +200,17 @@ Your requests in figures are in the **Statistics** section, under **My requests*
 
 Your request notifications are set in the categories **My media requests** and **Requested media available** — see [personalization.md](personalization.md#notification-preferences). On your home page, the widgets **My requests**, **My requests coming soon**, **Downloads in progress** and **Next releases** follow them too.
 
-## Asking the team for a book, a game…
+## Asking for a book, a game…
 
-Films and series go through the request service. For anything else (a book, an audiobook, a game…), when your portal offers it, you ask the team directly.
+Films and series go through the request service; a book, an audiobook or a game, when your portal offers it, through the team. For you it is the same request: the same stages, the same quota, followed in the same place.
 
-Everything starts from **Ask for a title** (`/media/discover`): type a film, a series, a book or a game. Under the films and series, **Books, audiobooks and games** lists those the library lacks, each opening its sheet. Cannot find it? **Ask the team**, under the results, opens a free form. On an author's or a book series' page, a missing book has an **Ask for it** button too, and a book the library has as an audiobook only has **Ask for the book**, opening its sheet.
+Everything starts from **Ask for a title** (`/media/discover`): type a film, a series, a book or a game. Under the films and series, **Books, audiobooks and games** lists those the library lacks, each opening its sheet; **Ask the team**, under the results, opens the form. The search's **Ask for it** results list these books and games too. On an author's or a book series' page, a missing book has **Ask for it**, and a book the library has as an audiobook only has **Ask for the book**.
 
-The search's **Ask for it** results list these books too, and games when the portal has a game database, each opening its sheet. Click a missing book's cover or title to open **its sheet**, laid out like a library book's page: authors, series, genres, rating, summary, and its **Editions**, those in your language first (translated title, format, audiobook, publisher, ISBN). When the library has the book itself, its library page opens instead; when it has the audiobook only, the sheet says so (**As an audiobook in the library**) and the book can still be asked for. Otherwise **Ask for it** asks for the book, or for one edition from its line: its title, language, format and ISBN go with the request, which helps the team find the right one.
+A missing book's **sheet** is laid out like a library book's page: authors, series, genres, rating, summary, and its **Editions**, those in your language first. When the library has the book itself, its library page opens instead; when it has the audiobook only, the sheet says so and the book can still be asked for. A game's sheet tells its summary, platforms, studios, genres, rating, trailer and screenshots.
 
-1. Pick the **Kind**, then type the **Title**.
-2. Add the **Author, studio or creator**: it helps find the right title. Several? Separate them with a comma.
-3. If you like, add the **Year**, the **Language**, the **Edition** (a format, a platform, a publisher…) and **A word for the team**.
-4. Click **Send the request**.
+**Ask for it** opens the form in a dialog, filled in (from an edition's or a platform's line: its title, language, format and ISBN). Check the **Kind** and the **Title**, add the **Author, studio or creator**, the **Year**, the **Language**, the **Edition** and **A word for the team** if you like, then **Send the request**. The portal answers at once when the library has the title (**See it**) or when it is already requested: as a film, it will come for everyone.
 
-The portal answers at once when:
-
-- **the library has the title already**: **See it** takes you there;
-- **another member asked for it already**: click **I want it too**. You are told as they are, and the team sees that several members want it.
-
-Depending on your portal, the requests of each kind may be limited over a period, and a request may cost Coins. They come back to you if it is refused.
-
-In **My requests** (`/media/requests`), under your film and series requests, **My requests** lists those you made and those you want too, with their state: **Sent**, **Accepted**, **In progress**, **Arrived** or **Refused** (with the reason). **No longer want it** takes yours back; if you had asked for it, it goes on in the name of the member who said « me too » first. **The other members' requests** lists every open request, the most wanted first, with how many members want each, never who.
-
-Once the title is in the library, the request closes by itself and each member who wanted it gets a notification with its link (category **My title requests**).
+The request joins **My requests** (`/media/requests`) with your films and series. The team accepts or refuses it (with its reason); it closes by itself once the title is in the library, and you are told as for a film.
 
 ## A game franchise's games
 

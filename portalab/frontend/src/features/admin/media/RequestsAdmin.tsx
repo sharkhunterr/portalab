@@ -18,7 +18,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { metadataImage } from "../../media/detail/Enrichment";
 import { Poster } from "../../media/MediaGrid";
-import { TitleRequests, useTitleRequestsOn } from "../../requests/AdminRequests";
+import { TitleRequestKinds, useTitleRequestsOn } from "../../requests/AdminRequests";
 import "../admin.css";
 
 interface QueueItem {
@@ -35,6 +35,8 @@ interface QueueItem {
   decision: { approved: boolean; reason: string | null; at: string } | null;
   image_id: string | null;
   poster_ref?: string | null;
+  cover?: string | null; // issue 378: a book's, a game's
+  sheet?: string | null;
 }
 
 const TABS = ["pending", "open", "all"] as const;
@@ -94,8 +96,8 @@ function Decline({ item, onDecline }: { item: QueueItem; onDecline: (reason: str
  * seasons and 4K asked for; « Approve » sends it on (the request service passes it to the download
  * manager), « Decline » with a reason the member reads (a bought request comes back to them).
  */
-// issue 375: the title requests (books, games…: the requests module) beside the request service's
-const TITLE_TABS = ["titles", "titleSettings"] as const;
+// issue 378: the books, games… asked of the team are in the queue with the films; the kinds it takes, a tab
+const TITLE_TABS = ["titleSettings"] as const;
 type Tab = (typeof TABS)[number] | (typeof TITLE_TABS)[number];
 
 export default function RequestsAdmin() {
@@ -123,11 +125,7 @@ export default function RequestsAdmin() {
         />
       }
     >
-      {tab === "titles" || tab === "titleSettings" ? (
-        <TitleRequests settings={tab === "titleSettings"} />
-      ) : (
-        <MediaRequestsList tab={tab} />
-      )}
+      {tab === "titleSettings" ? <TitleRequestKinds /> : <MediaRequestsList tab={tab} />}
     </AdminPage>
   );
 }
@@ -182,15 +180,16 @@ export function MediaRequestsList({ tab, userId }: { tab: (typeof TABS)[number];
                 src={
                   item.image_id
                     ? `/api/v1/media/images/${item.image_id}`
-                    : metadataImage(item.poster_ref, "w185")
+                    : (item.cover ?? metadataImage(item.poster_ref, "w185"))
                 }
                 kind={item.kind}
               />
             </span>
             <div className="moderation-item__body">
               <div className="moderation-item__head">
-                {item.object_id ? (
-                  <Link to={`/media/${item.object_id}`}>
+                {item.object_id || item.sheet ? (
+                  // issue 378: a book, a game the library lacks — its sheet
+                  <Link to={item.object_id ? `/media/${item.object_id}` : (item.sheet as string)}>
                     <strong>{item.title}</strong>
                   </Link>
                 ) : (

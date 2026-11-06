@@ -65,6 +65,8 @@ function askStart(game: Sheet, platform?: string): AskStart {
   return {
     kind: "game",
     title: game.title,
+    cover: game.cover,
+    sheet: `${window.location.pathname}${window.location.search}`, // issue 378: back to this sheet
     creator: game.developers[0] ?? game.publishers[0],
     year: game.year,
     edition: platform ?? null,

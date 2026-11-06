@@ -13,7 +13,7 @@ export function Poster({
   card,
   size = "md",
 }: {
-  card: { image_id: string | null; poster_ref?: string | null };
+  card: { image_id: string | null; poster_ref?: string | null; cover?: string | null | undefined };
   size?: "sm" | "md";
 }) {
   const src = posterOf(card);

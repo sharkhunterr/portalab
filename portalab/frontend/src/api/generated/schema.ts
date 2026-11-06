@@ -4148,40 +4148,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/requests": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Queue */
-        get: operations["queue_api_v1_admin_requests_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/requests/{request_id}/decision": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Decide */
-        post: operations["decide_api_v1_admin_requests__request_id__decision_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/admin/search/reindex": {
         parameters: {
             query?: never;
@@ -10790,27 +10756,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/requests": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Requests
-         * @description My requests (asked for or « me too »), and every open request, the most wanted first.
-         */
-        get: operations["requests_api_v1_requests_get"];
-        put?: never;
-        /** Ask */
-        post: operations["ask_api_v1_requests_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/requests/options": {
         parameters: {
             query?: never;
@@ -10820,36 +10765,13 @@ export interface paths {
         };
         /**
          * Options
-         * @description The kinds of titles open to requests, what a request costs, how many I have left of each.
+         * @description The kinds the team takes, and every kind it could (the whole titles the portal knows beside films
+         *     and series — a plugin's too).
          */
         get: operations["options_api_v1_requests_options_get"];
         put?: never;
         post?: never;
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/requests/{request_id}/support": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Support
-         * @description « Me too ».
-         */
-        post: operations["support_api_v1_requests__request_id__support_post"];
-        /**
-         * Withdraw
-         * @description I no longer want it (the last one cancels it).
-         */
-        delete: operations["withdraw_api_v1_requests__request_id__support_delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -14691,18 +14613,6 @@ export interface components {
             /** User Choosable */
             user_choosable: boolean;
         };
-        /** DecisionIn */
-        DecisionIn: {
-            /** Object Id */
-            object_id?: string | null;
-            /** Reason */
-            reason?: string | null;
-            /**
-             * Status
-             * @enum {string}
-             */
-            status: "new" | "accepted" | "in_progress" | "available" | "refused";
-        };
         /** DeletionStatus */
         DeletionStatus: {
             /** Deletion Due At */
@@ -16820,6 +16730,14 @@ export interface components {
         };
         /** MediaRequestIn */
         MediaRequestIn: {
+            /** Cover */
+            cover?: string | null;
+            /** Creators */
+            creators?: string[];
+            /** Details */
+            details?: {
+                [key: string]: string;
+            };
             /** Idempotency Key */
             idempotency_key?: string | null;
             /** Ids */
@@ -16833,14 +16751,20 @@ export interface components {
             is4k: boolean;
             /** Kind */
             kind?: string | null;
+            /** Note */
+            note?: string | null;
             /** Object Id */
             object_id?: string | null;
             /** Seasons */
             seasons?: number[] | null;
             /** Service Id */
             service_id?: string | null;
+            /** Sheet */
+            sheet?: string | null;
             /** Title */
             title?: string | null;
+            /** Year */
+            year?: number | null;
         };
         /** MediaRequestOut */
         MediaRequestOut: {
@@ -18866,27 +18790,6 @@ export interface components {
         RequestDecisionIn: {
             /** Reason */
             reason?: string | null;
-        };
-        /** RequestIn */
-        RequestIn: {
-            /** Creators */
-            creators?: string[];
-            /** Details */
-            details?: {
-                [key: string]: string;
-            };
-            /** Ids */
-            ids?: {
-                [key: string]: string[];
-            };
-            /** Kind */
-            kind: string;
-            /** Note */
-            note?: string | null;
-            /** Title */
-            title: string;
-            /** Year */
-            year?: number | null;
         };
         /** ResolveIn */
         ResolveIn: {
@@ -29408,77 +29311,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    queue_api_v1_admin_requests_get: {
-        parameters: {
-            query?: {
-                status?: ("new" | "accepted" | "in_progress" | "available" | "refused" | "cancelled") | null;
-                kind?: string | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    decide_api_v1_admin_requests__request_id__decision_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                request_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DecisionIn"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
-                };
             };
             /** @description Validation Error */
             422: {
@@ -41393,74 +41225,6 @@ export interface operations {
             };
         };
     };
-    requests_api_v1_requests_get: {
-        parameters: {
-            query?: {
-                kind?: string | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    ask_api_v1_requests_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RequestIn"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     options_api_v1_requests_options_get: {
         parameters: {
             query?: never;
@@ -41479,72 +41243,6 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
-                };
-            };
-        };
-    };
-    support_api_v1_requests__request_id__support_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                request_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    withdraw_api_v1_requests__request_id__support_delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                request_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    } | null;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

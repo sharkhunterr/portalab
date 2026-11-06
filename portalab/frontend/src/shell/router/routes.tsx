@@ -504,7 +504,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "gamification", element: <GamificationAdmin />, handle: h({ crumb: "Gamification" }) },
             { path: "games", element: <GamesAdmin />, handle: h({ crumb: "Games" }) },
             // issue 375: the title requests are tabs of the media's « Requests » page
-            { path: "requests", loader: () => redirect("/admin/media-requests?tab=titles") },
+            { path: "requests", loader: () => redirect("/admin/media-requests?tab=titleSettings") },
             { path: "campaigns", element: <CampaignConsole />, handle: h({ crumb: "Campaigns" }) },
             { path: "automations", element: <Automations />, handle: h({ crumb: "Automations" }) },
             { path: "projects", element: <ProjectConsole />, handle: h({ crumb: "Projects" }) },
