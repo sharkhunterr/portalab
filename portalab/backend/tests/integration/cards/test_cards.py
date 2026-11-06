@@ -180,6 +180,12 @@ async def test_made_numbered_ranked_drawn_and_erased(database: Database) -> None
     assert pack is not None and await packs.give(user, "watched", str(first.object_id), "k1") is None
     unopened = await service.packs(user)
     assert unopened[0]["count"] == 3 and unopened[0]["cards"] == []  # hidden until opened
+    keen = uuid4()  # #358: every pack to open is listed, not the last 20
+    async with database.unit_of_work() as uow:
+        await uow.session.execute(INSERT_USER, {"id": keen, "login": f"u{keen.hex[:8]}"})
+    for index in range(25):
+        await packs.give(keen, "watched", str(first.object_id), f"keen:{index}")
+    assert len(await service.packs(keen)) == 25 and (await service.summary(keen))["unopened"] == 25
     assert (await service.summary(user))["unique"] == 0
     await packs.open(user, pack)
     opened = await service.pack(user, pack)
