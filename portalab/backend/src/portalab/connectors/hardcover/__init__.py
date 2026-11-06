@@ -9,6 +9,8 @@ most read first) and a book series' volumes in order, with their covers and thei
   series of that name, the one holding the library's own volumes, else the one named exactly so.
 
 Hardcover merges a book's duplicates into one (its ``canonical``): a book is always told by that one's id.
+* #367: a book's sheet — its description, authors, series, the genres and moods its readers tag it with,
+  and its editions (language, format, ISBN, publisher), the most held first.
 * ``service.health_probe``: a one-row read of the catalog.
 
 Its GraphQL API wants a personal token (hardcover.app → Settings → Hardcover API) with the ``read:catalog``
@@ -30,7 +32,16 @@ from pydantic import BaseModel, Field
 from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError
 from portalab.capabilities.connector_sdk import CapabilityBinding, ServiceHandle
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import BOOK_SERIES, PEOPLE, BookSeries, OwnedBook, PersonCredit, PersonRecord
+from portalab.capabilities.media import (
+    BOOK_SERIES,
+    PEOPLE,
+    BookDetails,
+    BookEdition,
+    BookSeries,
+    OwnedBook,
+    PersonCredit,
+    PersonRecord,
+)
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding
 
@@ -44,6 +55,8 @@ VOLUMES = 500  # a series' entries in one request (every edition of every volume
 LOOKUPS = 50  # the library's books looked up by title in one request
 OWNED = 150  # the library's books identified at once
 CANDIDATES = 5  # the authors or series of a name looked at
+EDITIONS = 40  # a book's editions told on its sheet, the most held first
+TAGS = 6  # a book's genres (and moods) told, the most tagged first
 KEPT_SECONDS = 6 * 3600  # a series or a book asked again after that (the API's daily limit)
 USER_AGENT = "Portalab (self-hosted media portal; issue 362)"
 
@@ -105,7 +118,21 @@ BY_TITLE = f"""query ByTitle($titles: [editions_bool_exp!]!, $authors: [String!]
   }}
 }}"""
 
+# #367: a book's sheet — its description, authors, series, readers' tags and editions
+BOOK = f"""query Book($id: Int!) {{
+  books_by_pk(id: $id) {{
+    id title subtitle description release_date release_year pages rating ratings_count users_count
+    canonical_id cached_tags image {{ url }}
+    contributions(limit: 20) {{ contribution author {{ name }} }}
+    book_series(limit: 10) {{ position series {{ name }} }}
+    editions(order_by: {{users_count: desc}}, limit: {EDITIONS}) {{
+      title isbn_13 isbn_10 asin release_date audio_seconds users_count
+      language {{ code2 }} reading_format {{ format }} publisher {{ name }} image {{ url }}
+    }}
+  }}
+}}"""
 _KEPT: dict[tuple[Any, str], tuple[float, BookSeries | None]] = {}
+_SHEETS: dict[tuple[Any, str], tuple[float, BookDetails | None]] = {}
 _OWNED: dict[tuple[Any, str], tuple[float, tuple[PersonCredit, ...]]] = {}
 
 
@@ -186,6 +213,89 @@ def map_book(book: Any, *, position: Any = None) -> PersonCredit | None:
         vote_average=round(float(rating) * 2, 1) if isinstance(rating, int | float) and rating else None,
         vote_count=int(base.get("ratings_count") or 0),
         position=float(position) if isinstance(position, int | float) else None,
+    )
+
+
+def _tags(cached: Any, category: str) -> list[str]:
+    """The tags readers gave a book in a category (Genre, Mood), the most given first."""
+    tags = cached.get(category) if isinstance(cached, Mapping) else None
+    ranked = sorted(
+        (t for t in tags or [] if isinstance(t, Mapping) and t.get("tag")),
+        key=lambda t: -int(t.get("count") or 0),
+    )
+    return list(dict.fromkeys(str(t["tag"])[:60] for t in ranked))[:TAGS]
+
+
+def _year(date: Any) -> int | None:
+    text = str(date or "")
+    return int(text[:4]) if re.fullmatch(r"\d{4}(-.*)?", text) else None
+
+
+def map_edition(edition: Any) -> BookEdition | None:
+    if not isinstance(edition, Mapping) or not edition.get("title"):
+        return None
+    ids: dict[str, list[str]] = {}
+    for value in (edition.get("isbn_13"), edition.get("isbn_10")):
+        if found := isbn(value):
+            ids.setdefault("isbn", []).append(found)
+    if edition.get("asin"):
+        ids["asin"] = [str(edition["asin"])[:20]]
+    language = (edition.get("language") or {}).get("code2")
+    form = (edition.get("reading_format") or {}).get("format")
+    return BookEdition(
+        title=str(edition["title"])[:300],
+        language=str(language).lower()[:8] if language else None,
+        format=str(form)[:20] if form else None,
+        audio=bool(edition.get("audio_seconds")) or str(form or "").lower() == "listened",
+        ids=ids,
+        publisher=str((edition.get("publisher") or {}).get("name") or "").strip()[:120] or None,
+        year=_year(edition.get("release_date")),
+        cover=image_ref(edition.get("image")),
+        readers=int(edition.get("users_count") or 0),
+    )
+
+
+def map_details(book: Any) -> BookDetails | None:
+    """#367: a book's sheet — its authors (the contributions without another role), its series with its
+    place, its readers' genres and moods, its rating out of 10 like a film's, its editions."""
+    if not isinstance(book, Mapping) or not book.get("id") or not book.get("title"):
+        return None
+    authors = [
+        str((c.get("author") or {}).get("name"))[:200]
+        for c in book.get("contributions") or []
+        if isinstance(c, Mapping)
+        and (c.get("author") or {}).get("name")
+        and str(c.get("contribution") or "author").lower() == "author"
+    ]
+    series: dict[str, float | None] = {}
+    for entry in book.get("book_series") or []:
+        name = ((entry or {}).get("series") or {}).get("name")
+        if name:
+            position = entry.get("position")
+            series.setdefault(str(name)[:200], float(position) if isinstance(position, int | float) else None)
+    rating = book.get("rating")
+    return BookDetails(
+        ref=str(book["id"]),
+        title=str(book["title"])[:300],
+        subtitle=str(book.get("subtitle") or "")[:300] or None,
+        description=str(book.get("description") or "").strip()[:6000] or None,
+        year=_int(book.get("release_year")) or _year(book.get("release_date")),
+        release_date=str(book.get("release_date") or "")[:10] or None,
+        pages=_int(book.get("pages")),
+        cover=image_ref(book.get("image")),
+        authors=list(dict.fromkeys(authors)),
+        series=list(series.items()),
+        genres=_tags(book.get("cached_tags"), "Genre"),
+        moods=_tags(book.get("cached_tags"), "Mood"),
+        rating=round(float(rating) * 2, 1) if isinstance(rating, int | float) and rating else None,
+        votes=int(book.get("ratings_count") or 0),
+        readers=int(book.get("users_count") or 0),
+        # an edition that tells nothing of itself (no language, identifier or publisher) left out
+        editions=[
+            e
+            for e in (map_edition(d) for d in book.get("editions") or [])
+            if e is not None and (e.language or e.ids or e.publisher)
+        ],
     )
 
 
@@ -507,6 +617,24 @@ class _Series:
         wanted = fold(name)
         named = [s for s in candidates if fold(s.name) == wanted]
         return max(named, key=lambda s: len(s.volumes), default=None)
+
+    async def book(self, ref: str) -> BookDetails | None:
+        """#367: a book's sheet (a merged duplicate's: the book it was merged into's), kept a while."""
+        if not ref.isdigit():
+            return None
+        key = (self.service.service_id, ref)
+        kept = _SHEETS.get(key)
+        if kept is not None and time.monotonic() - kept[0] < KEPT_SECONDS:
+            return kept[1]
+        found = (await self._ask(BOOK, {"id": int(ref)})).get("books_by_pk")
+        canonical = (found or {}).get("canonical_id")
+        if isinstance(canonical, int) and str(canonical) != ref:
+            found = (await self._ask(BOOK, {"id": canonical})).get("books_by_pk") or found
+        details = map_details(found)
+        if len(_SHEETS) > 2000:
+            _SHEETS.clear()
+        _SHEETS[key] = (time.monotonic(), details)
+        return details
 
     async def cover(self, ref: str, size: str) -> bytes:
         return await self.images.fetch(ref)

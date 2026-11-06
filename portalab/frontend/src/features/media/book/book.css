@@ -1,0 +1,80 @@
+/* Issue 367: a book's sheet — its cover, its facts, its editions (each with its own cover and request). */
+.media-book {
+  display: grid;
+  gap: var(--space-4);
+}
+.media-book__cover {
+  display: grid;
+  inline-size: clamp(6.5rem, 26vw, 11rem);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+}
+.media-book__authors {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+.media-book__facts {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.media-book__library,
+.media-book__series {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+}
+.media-book__about p {
+  max-inline-size: 70ch;
+  margin-block: 0 var(--space-2);
+}
+.media-book__editions ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.media-book__edition {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.media-book__edition-cover {
+  display: grid;
+  inline-size: 3rem;
+  overflow: hidden;
+  border-radius: var(--radius-sm, var(--radius-md));
+}
+.media-book__edition-text {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.media-book__source {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+@media (max-width: 40rem) {
+  .media-book__edition {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .media-book__edition > .media-person__ask {
+    grid-column: 1 / -1;
+  }
+}

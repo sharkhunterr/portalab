@@ -13,6 +13,7 @@ LABELS = (
     read(f"{A}/media/images/{{image_id}}", "Posters and pictures", "Affiches et images"),
     read(f"{A}/media/metadata-images", "Posters and backdrops", "Affiches et fonds"),
     read(f"{A}/media/person", "A person's filmography", "La filmographie d'une personne"),
+    read(f"{A}/media/book", "A book's sheet (#367)", "La fiche d'un livre"),
     read(f"{A}/media/person/portrait", "A person's portrait", "Le portrait d'une personne"),
     read(f"{A}/media/upcoming", "What is coming soon", "Ce qui arrive bientôt"),
     read(f"{A}/media/discover/search", "Search titles to request", "Chercher des titres à demander"),

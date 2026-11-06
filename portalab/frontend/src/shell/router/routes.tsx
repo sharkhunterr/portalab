@@ -49,6 +49,7 @@ const MediaRequests = lazy(() => import("../../features/media/requests/RequestsP
 const MediaDiscover = lazy(() => import("../../features/media/discover/DiscoverPage"));
 const MediaDiscoverTitle = lazy(() => import("../../features/media/discover/DiscoverTitlePage"));
 const MediaPerson = lazy(() => import("../../features/media/people/PersonPage"));
+const MediaBook = lazy(() => import("../../features/media/book/BookSheetPage")); // issue 367: a book's sheet
 const MediaCollection = lazy(() => import("../../features/media/collections/CollectionPage")); // issue 361
 const MediaInsights = lazy(() => import("../../features/media/insights/InsightsPage"));
 const MediaFeed = lazy(() => import("../../features/media/feed/FeedPage")); // issue 299
@@ -296,6 +297,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           children: [
             { index: true, element: <MediaHome /> },
             { path: "browse", element: <MediaCatalog />, handle: h({ crumb: "Catalog" }) },
+            { path: "book", element: <MediaBook />, handle: h({ crumb: "A book" }) },
             {
               path: "requests",
               element: <MediaRequests />,

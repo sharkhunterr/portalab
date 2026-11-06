@@ -9426,6 +9426,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/book": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Book Sheet
+         * @description #367: a book's sheet from the book database that knows it (Hardcover) — its description, authors,
+         *     series, genres and editions —, and where the library has it.
+         */
+        get: operations["book_sheet_api_v1_media_book_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/book-covers": {
         parameters: {
             query?: never;
@@ -13410,6 +13431,33 @@ export interface components {
             /** Source */
             source: string;
         };
+        /** BookEditionOut */
+        BookEditionOut: {
+            /**
+             * Audio
+             * @default false
+             */
+            audio: boolean;
+            /** Cover */
+            cover?: string | null;
+            /** Format */
+            format?: string | null;
+            /**
+             * Ids
+             * @default {}
+             */
+            ids: {
+                [key: string]: string[];
+            };
+            /** Language */
+            language?: string | null;
+            /** Publisher */
+            publisher?: string | null;
+            /** Title */
+            title: string;
+            /** Year */
+            year?: number | null;
+        };
         /** BookFormatOut */
         BookFormatOut: {
             /** File Ref */
@@ -13429,6 +13477,84 @@ export interface components {
             formats: components["schemas"]["BookFormatOut"][];
             /** Title */
             title: string;
+        };
+        /** BookSeriesOut */
+        BookSeriesOut: {
+            /** Name */
+            name: string;
+            /** Position */
+            position?: number | null;
+            /** Route */
+            route?: string | null;
+        };
+        /**
+         * BookSheetOut
+         * @description #367: a book the library may lack, as the book database tells it — and where the library has it
+         *     (as a book, as an audiobook), found by one of its editions' identifiers or titles by its authors.
+         */
+        BookSheetOut: {
+            /**
+             * Authors
+             * @default []
+             */
+            authors: string[];
+            /** Cover */
+            cover?: string | null;
+            /** Description */
+            description?: string | null;
+            /**
+             * Editions
+             * @default []
+             */
+            editions: components["schemas"]["BookEditionOut"][];
+            /**
+             * Genres
+             * @default []
+             */
+            genres: string[];
+            /**
+             * Library
+             * @default {}
+             */
+            library: {
+                [key: string]: string;
+            };
+            /**
+             * Moods
+             * @default []
+             */
+            moods: string[];
+            /** Pages */
+            pages?: number | null;
+            /** Rating */
+            rating?: number | null;
+            /**
+             * Readers
+             * @default 0
+             */
+            readers: number;
+            /** Ref */
+            ref: string;
+            /** Release Date */
+            release_date?: string | null;
+            /**
+             * Series
+             * @default []
+             */
+            series: components["schemas"]["BookSeriesOut"][];
+            /** Service */
+            service: string;
+            /** Subtitle */
+            subtitle?: string | null;
+            /** Title */
+            title: string;
+            /**
+             * Votes
+             * @default 0
+             */
+            votes: number;
+            /** Year */
+            year?: number | null;
         };
         /**
          * BoostOut
@@ -38721,6 +38847,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    book_sheet_api_v1_media_book_get: {
+        parameters: {
+            query: {
+                service: string;
+                ref: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookSheetOut"];
                 };
             };
             /** @description Validation Error */
