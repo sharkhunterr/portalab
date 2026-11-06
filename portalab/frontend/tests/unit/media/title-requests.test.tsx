@@ -149,11 +149,16 @@ describe("title requests", () => {
         ),
       },
     ]);
-    const link = await screen.findByRole("link", { name: /Ask for it/ });
+    const button = await screen.findByRole("button", { name: /Ask for it/ });
     expect(screen.queryByText("Not here")).toBeNull(); // the button says it is not here
-    expect(link.getAttribute("href")).toBe(
-      "/requests?kind=book&title=The+Golden+Fool&creator=Robin+Hobb&year=2002",
+    // issue 377: the request in a dialog, filled from the title
+    fireEvent.click(button);
+    const dialog = await screen.findByRole("dialog");
+    expect((within(dialog).getByLabelText("Title") as HTMLInputElement).value).toBe("The Golden Fool");
+    expect((within(dialog).getByLabelText("Author, studio or creator") as HTMLInputElement).value).toBe(
+      "Robin Hobb",
     );
+    expect((within(dialog).getByLabelText("Year") as HTMLInputElement).value).toBe("2002");
   });
 
   it("leads from an audiobook the library has to asking for the book (issue 376)", async () => {

@@ -14,6 +14,7 @@ import { PosterBadge, StatusBadge } from "../discover/StatusBadge";
 import { FollowButton } from "../feed/FollowButton";
 import { KIND_ICONS, MediaGrid, Poster } from "../MediaGrid";
 import "../media.css";
+import { AskDialog } from "../../requests/AskDialog";
 import { useAskOptions } from "../../requests/api";
 import { PosterTickets } from "../../support/tickets/MediaTickets";
 
@@ -225,15 +226,17 @@ function Standing({
   // issue 362: a book not in the library — no service asks for books
   if (credit.status === "absent") {
     // issue 363: asked of the team, when the requests are on and take this kind of title
-    const query = new URLSearchParams({ kind: credit.kind, title: credit.title });
-    if (creator) query.set("creator", creator);
-    if (credit.year) query.set("year", String(credit.year));
-    // the button says it is not here: no « Not here » beside it
+    // the button says it is not here: no « Not here » beside it; issue 377: the request in a dialog
     return asks.data?.kinds.includes(credit.kind) ? (
-      <Link to={`/requests?${query}`} className="media-person__ask">
-        <Icon name="plus" size={14} />
-        {t("media:ask.askIt")}
-      </Link>
+      <AskDialog
+        start={{ kind: credit.kind, title: credit.title, creator, year: credit.year }}
+        trigger={
+          <button type="button" className="media-person__ask">
+            <Icon name="plus" size={14} />
+            {t("media:ask.askIt")}
+          </button>
+        }
+      />
     ) : (
       <span className="media-person__absent">{t("media:person.status.absent")}</span>
     );
