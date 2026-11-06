@@ -9,7 +9,7 @@ import json
 import httpx
 
 from portalab.capabilities.media import BOOK_SERIES, PEOPLE, OwnedBook
-from portalab.connectors.hardcover import HardcoverConnector, author_names, fold, image_ref
+from portalab.connectors.hardcover import HardcoverConnector, author_names, fold, image_ref, languages
 from tests.contract.connectors.builtin_fixtures import handle_for
 
 
@@ -109,6 +109,15 @@ async def test_a_book_s_sheet() -> None:
     assert audio.audio and audio.ids == {"asin": ["B00AUDIO01"]}
     assert await provider.book("999") is None
     assert await provider.book("not-a-number") is None
+    # #369: the service's edition languages — those alone, in their order
+    english = HardcoverConnector().provider(
+        BOOK_SERIES, handle_for("hardcover", config={"languages": "en, fr"})
+    )
+    shown = await english.book("101")
+    assert shown is not None and [e.language for e in shown.editions] == ["en", "fr"]
+    german = HardcoverConnector().provider(BOOK_SERIES, handle_for("hardcover", config={"languages": "de"}))
+    assert (await german.book("101")).editions == []  # type: ignore[union-attr]
+    assert languages(" FR , en,fr ") == ["fr", "en"] and languages("") == []
 
 
 def test_names_and_images() -> None:

@@ -24,6 +24,7 @@ import re
 import time
 import unicodedata
 from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import replace
 from typing import Any
 from urllib.parse import urlsplit
 
@@ -145,6 +146,30 @@ class HardcoverConfig(BaseConfig):
         title="Address",
         description="Leave https://api.hardcover.app unless you use a proxy.",
     )
+    languages: str = Field(
+        default="",
+        max_length=80,
+        pattern=r"^$|^[a-z]{2}(\s*,\s*[a-z]{2})*$",
+        title="Edition languages",
+        description="The editions a book's sheet shows, in this order — e.g. fr, en; empty = every language.",
+    )
+
+
+def languages(value: Any) -> list[str]:
+    """#369: the edition languages a service shows, in order (``fr, en``); none: every language."""
+    return list(dict.fromkeys(code.strip() for code in str(value or "").lower().split(",") if code.strip()))
+
+
+def preferred(book: BookDetails, wanted: Sequence[str]) -> BookDetails:
+    """#369: only the editions in the wanted languages, in their order (the most held first within one)."""
+    if not wanted:
+        return book
+    rank = {code: index for index, code in enumerate(wanted)}
+    kept = sorted(
+        (e for e in book.editions if e.language in rank),
+        key=lambda e: (rank[e.language or ""], -e.readers),
+    )
+    return replace(book, editions=kept)
 
 
 def fold(text: str) -> str:
@@ -622,10 +647,11 @@ class _Series:
         """#367: a book's sheet (a merged duplicate's: the book it was merged into's), kept a while."""
         if not ref.isdigit():
             return None
+        wanted = languages(self.service.config.get("languages"))
         key = (self.service.service_id, ref)
         kept = _SHEETS.get(key)
         if kept is not None and time.monotonic() - kept[0] < KEPT_SECONDS:
-            return kept[1]
+            return preferred(kept[1], wanted) if kept[1] else None
         found = (await self._ask(BOOK, {"id": int(ref)})).get("books_by_pk")
         canonical = (found or {}).get("canonical_id")
         if isinstance(canonical, int) and str(canonical) != ref:
@@ -634,7 +660,7 @@ class _Series:
         if len(_SHEETS) > 2000:
             _SHEETS.clear()
         _SHEETS[key] = (time.monotonic(), details)
-        return details
+        return preferred(details, wanted) if details else None
 
     async def cover(self, ref: str, size: str) -> bytes:
         return await self.images.fetch(ref)
