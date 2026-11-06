@@ -14,6 +14,7 @@ import { PosterBadge, StatusBadge } from "../discover/StatusBadge";
 import { FollowButton } from "../feed/FollowButton";
 import { KIND_ICONS, MediaGrid, Poster } from "../MediaGrid";
 import "../media.css";
+import { useAskOptions } from "../../requests/api";
 import { PosterTickets } from "../../support/tickets/MediaTickets";
 
 /**
@@ -100,7 +101,12 @@ function PersonView({ headingId, data }: { headingId: string; data: Person }) {
       <h3>{t("media:person.knownFor")}</h3>
       <ul className="media-rail">
         {data.known_for.map((credit) => (
-          <KnownCard key={`${credit.kind}:${credit.tmdb_id}`} credit={credit} askable={data.askable} />
+          <KnownCard
+            key={`${credit.kind}:${credit.tmdb_id}`}
+            credit={credit}
+            askable={data.askable}
+            creator={data.name}
+          />
         ))}
       </ul>
     </section>
@@ -171,7 +177,9 @@ function PersonView({ headingId, data }: { headingId: string; data: Person }) {
         </section>
       ))}
       {books ? knownFor : null}
-      {data.filmography?.length ? <Filmography credits={data.filmography} askable={data.askable} /> : null}
+      {data.filmography?.length ? (
+        <Filmography credits={data.filmography} askable={data.askable} creator={data.name} />
+      ) : null}
       {data.sources?.length ? (
         <p className="media-person__sources">
           {t("media:person.sources", { names: data.sources.join(", ") })}
@@ -183,9 +191,18 @@ function PersonView({ headingId, data }: { headingId: string; data: Person }) {
 
 /** A title's standing: available or asked for, as a badge; otherwise, when one may ask, « Ask for it » —
  * the same request as on a title's page (« not available » alone helps nobody). */
-function Standing({ credit, askable }: { credit: Credit; askable: boolean }) {
+function Standing({
+  credit,
+  askable,
+  creator,
+}: {
+  credit: Credit;
+  askable: boolean;
+  creator?: string | undefined;
+}) {
   const t = useT();
   const client = useQueryClient();
+  const asks = useAskOptions();
   if (credit.status === "available" || credit.status === "requested") {
     return (
       <StatusBadge
@@ -195,7 +212,21 @@ function Standing({ credit, askable }: { credit: Credit; askable: boolean }) {
   }
   // issue 362: a book not in the library — no service asks for books
   if (credit.status === "absent") {
-    return <span className="media-person__absent">{t("media:person.status.absent")}</span>;
+    // issue 363: asked of the team, when the requests are on and take this kind of title
+    const query = new URLSearchParams({ kind: credit.kind, title: credit.title });
+    if (creator) query.set("creator", creator);
+    if (credit.year) query.set("year", String(credit.year));
+    return (
+      <>
+        <span className="media-person__absent">{t("media:person.status.absent")}</span>
+        {asks.data?.kinds.includes(credit.kind) ? (
+          <Link to={`/requests?${query}`} className="media-person__ask">
+            <Icon name="plus" size={14} />
+            {t("media:ask.askIt")}
+          </Link>
+        ) : null}
+      </>
+    );
   }
   if (!askable || credit.kind === "book") return null;
   return (
@@ -224,7 +255,16 @@ function posterOf(credit: Credit, size: string): string | null {
 
 /** A title they are known for: the media pages' own card — poster, standing on its corner, title, role —
  * and, when it can be asked for, the button under it. */
-export function KnownCard({ credit, askable }: { credit: Credit; askable: boolean }) {
+export function KnownCard({
+  credit,
+  askable,
+  creator,
+}: {
+  credit: Credit;
+  askable: boolean;
+  /** Issue 363: who made it, told to a request for it when it is absent. */
+  creator?: string | undefined;
+}) {
   const t = useT();
   const format = useFormat();
   const src = posterOf(credit, "w342");
@@ -256,13 +296,21 @@ export function KnownCard({ credit, askable }: { credit: Credit; askable: boolea
         {[t(`media:kind.${credit.kind}`), credit.year, credit.role].filter(Boolean).join(" · ")}
       </span>
       {credit.status === "missing" || credit.status === "unavailable" || credit.status === "absent" ? (
-        <Standing credit={credit} askable={askable} />
+        <Standing credit={credit} askable={askable} creator={creator} />
       ) : null}
     </li>
   );
 }
 
-function Filmography({ credits, askable }: { credits: Credit[]; askable: boolean }) {
+function Filmography({
+  credits,
+  askable,
+  creator,
+}: {
+  credits: Credit[];
+  askable: boolean;
+  creator: string;
+}) {
   const t = useT();
   const [filter, setFilter] = useState<Filter>("all");
   const [chosen, setChosen] = useState<string>("all");
@@ -377,7 +425,7 @@ function Filmography({ credits, askable }: { credits: Credit[]; askable: boolean
                 <div className="media-person__row">{body}</div>
               )}
               <span className="media-person__standing">
-                <Standing credit={credit} askable={askable} />
+                <Standing credit={credit} askable={askable} creator={creator} />
               </span>
             </li>
           );
