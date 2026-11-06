@@ -179,6 +179,7 @@ class _Owned:
     object_id: UUID
     available: bool
     title: str
+    kind: str = "book"  # #372: how the library has it — a book, an audiobook
 
 
 async def _identify(
@@ -232,7 +233,7 @@ async def _identify(
     candidates: list[list[PersonCredit]] = []
     for row in rows:
         credits = list((found or {}).get(str(row.id)) or ())
-        mine = _Owned(row.id, bool(row.available), row.title)
+        mine = _Owned(row.id, bool(row.available), row.title, row.kind)
         for credit in credits:
             if credit.tmdb_id not in known or (mine.available and not known[credit.tmdb_id].available):
                 known[credit.tmdb_id] = mine
@@ -262,8 +263,8 @@ async def _bibliography(
     by_title: dict[str, _Owned] = {}
     if works:
         async with module.database.session() as session:
-            for object_id, title, available in await session.execute(
-                select(MediaObject.id, MediaObject.title, MediaObject.available).where(
+            for object_id, title, available, kind in await session.execute(
+                select(MediaObject.id, MediaObject.title, MediaObject.available, MediaObject.kind).where(
                     MediaObject.id.in_(works),
                     MediaObject.kind.in_(BOOK_KINDS),
                     MediaObject.status == "active",
@@ -271,7 +272,7 @@ async def _bibliography(
             ):
                 key = fold(title)
                 if key not in by_title or (available and not by_title[key].available):
-                    by_title[key] = _Owned(object_id, bool(available), title)
+                    by_title[key] = _Owned(object_id, bool(available), title, kind)
     images = await posters(module.database, [o.object_id for o in (*known.values(), *by_title.values())])
     matched = [known.get(credit.tmdb_id) or by_title.get(fold(credit.title)) for credit in books]
     # a library book is one of them only (the most voted for: a whole book rather than its split part)
@@ -290,7 +291,7 @@ async def _bibliography(
         out.append(
             FilmCreditOut(
                 tmdb_id=credit.tmdb_id,
-                kind="book",
+                kind=found.kind if found else "book",  # #372: an audiobook told as one
                 title=found.title if found else credit.title,
                 year=credit.year,
                 role=None,
