@@ -224,6 +224,10 @@ On the same page, **My requests** lists those you made and those you want too, w
 
 Once the title is in the library, the request closes by itself and each member who wanted it gets a notification with its link (category **My title requests**).
 
+## A game franchise's games
+
+When the portal has a game database (IGDB), a game franchise's page lists every game of the franchise, not only the library's. A game the library lacks is marked **Not in the library**: click it to open **its sheet**, laid out like a library game's page, with its summary, platforms, studios, genres, rating, trailer, screenshots and franchises. **Ask for it**, or **Ask for it on** a platform, asks the team for it (see above).
+
 ## Watching in the browser
 
 On an available film or episode, **Watch** opens the portal's player full screen. If the title has a resume point, the player asks *Pick up where you left off?* — **Resume at …** or **From the beginning**.

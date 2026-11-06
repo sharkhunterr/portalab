@@ -47,7 +47,13 @@ function CollectionView({ headingId, data }: { headingId: string; data: Collecti
   const note = useItemNote();
   const word = wordOf(data);
   const parts = data.parts ?? [];
-  const partsHeading = t(data.source === "saga" ? "media:collection.films" : "media:collection.volumes");
+  const partsHeading = t(
+    data.source === "saga"
+      ? "media:collection.films"
+      : parts[0]?.kind === "game" // issue 368: a franchise's games
+        ? "media:collection.games"
+        : "media:collection.volumes",
+  );
   const told = new Set(parts.map((part) => part.object_id).filter(Boolean));
   // a film of the library the provider does not list in the saga (yet): still one of its titles
   const others = data.items.filter((item) => !told.has(item.id));

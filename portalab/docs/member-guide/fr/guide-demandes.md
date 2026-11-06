@@ -119,6 +119,8 @@ Le portail vous répond tout de suite si :
 
 Selon votre portail, le nombre de demandes de chaque type peut être limité sur une période. Une demande peut aussi coûter des Coins. Ils vous sont rendus si elle est refusée.
 
+Pour les jeux, quand le portail a une base de jeux (IGDB), la page d'une franchise liste tous ses jeux, pas seulement ceux de la médiathèque. Un jeu absent ouvre **sa fiche**, présentée comme celle d'un jeu de la médiathèque : résumé, plateformes, studios, genres, note, bande-annonce, captures. **« Le demander »**, ou **« Le demander sur »** une plateforme, envoie la demande à l'équipe.
+
 ### Suivre et soutenir les demandes
 
 Sur la même page :

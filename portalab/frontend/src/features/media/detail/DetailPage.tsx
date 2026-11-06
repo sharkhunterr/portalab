@@ -114,7 +114,7 @@ export function PlayTimesFacts({ times }: { times: PlayTimes }) {
   );
 }
 
-function GameFacts({ data }: { data: Data }) {
+export function GameFacts({ data }: { data: Data }) {
   const t = useT();
   const format = useFormat();
   const companies = Array.isArray(data.people) ? (data.people as string[]) : [];
