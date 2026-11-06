@@ -25,6 +25,7 @@ async def test_an_author_and_their_books() -> None:
     assert (apprentice.kind, apprentice.tmdb_id, apprentice.year) == ("book", "101", 1995)
     assert apprentice.vote_average == 8.2 and apprentice.popularity == 9000
     assert apprentice.poster == "/edition/1/apprentice.jpg"
+    assert apprentice.title == "L'Apprenti assassin" and royal.title == "Royal Assassin"  # #371: in French
     assert royal.poster is None  # an image elsewhere than Hardcover's host is never fetched
     # the token, pasted with its « Bearer » prefix, sent once; the portal says who it is
     assert seen[0].headers["authorization"] == "Bearer hardcover-secret-token"
@@ -52,6 +53,8 @@ async def test_the_library_s_books_identified() -> None:
         "b": ["102"],
         "c": ["103"],  # not the same title by someone else
     }
+    # #371: a part (3.1) of a longer book, told with the whole book at its place (3), not a namesake
+    assert found["c"][0].part_of == "149300" and found["a"][0].part_of is None
     asked = [json.loads(r.content) for r in seen]
     by_title = next(a["variables"] for a in asked if "query ByTitle" in a["query"])
     assert by_title["authors"] == ["Hobb,Robin", "Robin Hobb"]  # as the library writes it, and as Hardcover

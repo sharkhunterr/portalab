@@ -50,7 +50,11 @@ QUEST = PersonCredit(
 )
 BOOKS = (APPRENTICE, ROYAL, QUEST)
 # the library's « Le Prophète blanc »: a split part of a book, listed in no bibliography
-SPLIT = PersonCredit(tmdb_id="917", kind="book", title="The Golden Fool, Part 1", department="writing")
+SPLIT = PersonCredit(
+    tmdb_id="917", kind="book", title="The Golden Fool, Part 1", department="writing", part_of="120"
+)
+# #371: the whole book the library holds a part of — told by its part, never as absent
+WHOLE = PersonCredit(tmdb_id="120", kind="book", title="The Golden Fool", year=2002, department="writing")
 
 
 class _Hardcover:
@@ -62,7 +66,7 @@ class _Hardcover:
         if name != "Robin Hobb":
             return None
         return PersonRecord(
-            ids={"hardcover": "204214"}, name=name, biography="An American writer.", credits=BOOKS
+            ids={"hardcover": "204214"}, name=name, biography="An American writer.", credits=(*BOOKS, WHOLE)
         )
 
     async def portrait(self, ref: str, size: str) -> bytes:
@@ -224,7 +228,8 @@ async def test_an_author_s_books(app: FastAPI, client: httpx.AsyncClient, media:
         ("L'Apprenti assassin", "book"): ("available", await _id(media, "L'Apprenti assassin")),
         ("Royal Assassin", "book"): ("available", await _id(media, "Royal Assassin")),  # its title
         ("Assassin's Quest", "book"): ("absent", None),
-        ("Le Prophète blanc", "book"): ("available", await _id(media, "Le Prophète blanc")),  # unlisted
+        # unlisted: a part of « The Golden Fool », which is not told absent
+        ("Le Prophète blanc", "book"): ("available", await _id(media, "Le Prophète blanc")),
         # every part they took in films and series stays, whatever it was
         ("A Cameo", "movie"): ("missing", None),
         ("Farseer", "series"): ("missing", None),
