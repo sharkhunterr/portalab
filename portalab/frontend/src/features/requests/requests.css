@@ -1,0 +1,100 @@
+/* Issue 363: the members' requests to the team — the form, my requests, the others' to say « me too » to. */
+.asks-page {
+  display: grid;
+  gap: var(--space-4);
+}
+.asks-form {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+.asks-form .ds-field:has(textarea),
+.asks-form__actions,
+.asks-form > p {
+  grid-column: 1 / -1;
+}
+.asks-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: flex-end;
+}
+.asks-muted {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.asks-done {
+  color: var(--state-available-fg);
+}
+.asks-problem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--state-error-fg);
+}
+.asks-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.asks-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.asks-row__main {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+.asks-row__title {
+  overflow-wrap: anywhere;
+}
+.asks-row__reason {
+  color: var(--state-error-fg);
+  font-size: var(--font-size-sm);
+}
+.asks-row__side {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+.asks-status {
+  padding: 0 var(--space-2);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+.asks-status[data-tone="stale"] {
+  color: var(--state-stale-fg);
+}
+.asks-status[data-tone="partial"] {
+  color: var(--state-partial-fg);
+}
+.asks-status[data-tone="available"] {
+  color: var(--state-available-fg);
+}
+.asks-status[data-tone="error"] {
+  color: var(--state-error-fg);
+}
+.asks-wanted {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+}

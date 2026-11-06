@@ -91,6 +91,9 @@ const GameCinemot = lazy(() => import("../../features/games/CinemotPage"));
 const GameParties = lazy(() => import("../../features/games/PartyHomePage"));
 const GameParty = lazy(() => import("../../features/games/PartyPage"));
 const GamesAdmin = lazy(() => import("../../features/games/AdminGames"));
+// issue 363: the members' requests for titles no service asks for, and the team's queue
+const Requests = lazy(() => import("../../features/requests/RequestsPage"));
+const RequestsAdmin = lazy(() => import("../../features/requests/AdminRequests"));
 const CardSet = lazy(() => import("../../features/cards/SetPage"));
 const CardPerson = lazy(() => import("../../features/cards/PersonPage"));
 const Community = lazy(() => import("../../features/community/CommunityPage"));
@@ -188,6 +191,11 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             { path: "party", element: <GameParties />, handle: h({ crumb: "Play together" }) },
             { path: "party/:code", element: <GameParty />, handle: h({ crumb: "A party" }) },
           ],
+        },
+        {
+          path: "requests",
+          element: <Requests />,
+          handle: h({ crumb: "Ask the team", requiredPermission: "requests.ask" }),
         },
         { path: "cards/sets/:key", element: <CardSet />, handle: h({ crumb: "A card set" }) },
         { path: "cards/people", element: <CardPerson />, handle: h({ crumb: "A person's cards" }) },
@@ -492,6 +500,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
             })),
             { path: "gamification", element: <GamificationAdmin />, handle: h({ crumb: "Gamification" }) },
             { path: "games", element: <GamesAdmin />, handle: h({ crumb: "Games" }) },
+            { path: "requests", element: <RequestsAdmin />, handle: h({ crumb: "Title requests" }) },
             { path: "campaigns", element: <CampaignConsole />, handle: h({ crumb: "Campaigns" }) },
             { path: "automations", element: <Automations />, handle: h({ crumb: "Automations" }) },
             { path: "projects", element: <ProjectConsole />, handle: h({ crumb: "Projects" }) },
