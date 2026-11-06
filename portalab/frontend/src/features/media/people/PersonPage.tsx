@@ -204,10 +204,22 @@ function Standing({
   const client = useQueryClient();
   const asks = useAskOptions();
   if (credit.status === "available" || credit.status === "requested") {
-    return (
+    const badge = (
       <StatusBadge
         item={{ status: credit.status === "available" ? "available" : "pending", request: null }}
       />
+    );
+    // issue 376: held as an audiobook only — the book itself still to ask for, from its sheet
+    return credit.kind === "audiobook" && credit.sheet && asks.data?.kinds.includes("book") ? (
+      <span className="media-person__held">
+        {badge}
+        <Link to={credit.sheet} className="media-person__ask">
+          <Icon name="book" size={14} />
+          {t("media:ask.askBook")}
+        </Link>
+      </span>
+    ) : (
+      badge
     );
   }
   // issue 362: a book not in the library — no service asks for books
@@ -293,7 +305,10 @@ export function KnownCard({
       <span className="media-card__meta">
         {[t(`media:kind.${credit.kind}`), credit.year, credit.role].filter(Boolean).join(" · ")}
       </span>
-      {credit.status === "missing" || credit.status === "unavailable" || credit.status === "absent" ? (
+      {credit.status === "missing" ||
+      credit.status === "unavailable" ||
+      credit.status === "absent" ||
+      (credit.kind === "audiobook" && credit.sheet) /* issue 376: the book still to ask for */ ? (
         <Standing credit={credit} askable={askable} creator={creator} />
       ) : null}
     </li>

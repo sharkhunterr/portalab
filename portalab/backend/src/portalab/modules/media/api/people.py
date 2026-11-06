@@ -63,6 +63,9 @@ class FilmCreditOut(BaseModel):
     route: str | None  # its page in the library, else where to ask for it (when one can)
     cover: str | None = None  # issue 362: a book's cover from its book database, a ready URL (the portal's)
     position: float | None = None  # issue 362: its volume in a series
+    # #376: a book's sheet in the book database, even when the library has it as an audiobook (to ask for
+    # the book itself)
+    sheet: str | None = None
 
 
 class PersonOut(BaseModel):
@@ -306,6 +309,7 @@ async def _bibliography(
                 route=f"/media/{found.object_id}" if found else sheet(credit.tmdb_id),
                 cover=cover(credit.poster),
                 position=credit.position,
+                sheet=sheet(credit.tmdb_id),
             )
         )
     return out
