@@ -22,7 +22,7 @@ from portalab.core.time import utc_now
 from portalab.modules.media.identity.resolver import MediaNotFound
 from portalab.modules.media.models import MediaRequest
 from portalab.modules.media.observability import log
-from portalab.modules.media.requests.insights import kind_of, lookup_of
+from portalab.modules.media.requests.insights import kind_of, lookup_of, told
 from portalab.modules.media.requests.service import Requests, RequestServiceUnavailable
 
 OPEN = ("pending", "approved", "processing")
@@ -76,6 +76,7 @@ class RequestModeration:
                     "decidable": bool(row.external_request_id) and row.state == "pending",
                     "decision": decision,
                     "_lookup": lookup_of(row),
+                    **told(row),
                 }
             )
         return out

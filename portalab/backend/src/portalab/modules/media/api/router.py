@@ -51,7 +51,7 @@ from portalab.modules.media.permissions import (
     SELF,
 )
 from portalab.modules.media.providers.insight_widgets import posters, with_posters
-from portalab.modules.media.requests.insights import kind_of, lookup_of
+from portalab.modules.media.requests.insights import kind_of, lookup_of, told
 from portalab.modules.media.sections.service import SECTIONS
 
 router = APIRouter(prefix="/api/v1", tags=["media"])
@@ -164,6 +164,16 @@ class MediaRequestIn(BaseModel):
     # #4: a series' seasons (all when left out) and 4K
     seasons: list[Annotated[int, Field(ge=1, le=200)]] | None = Field(default=None, max_length=200)
     is4k: bool = False
+    # #378: what a member says of a book, a game… — its creators, year, edition, a note; the cover and
+    # the sheet of the database that knows it (the portal's own addresses)
+    creators: list[Annotated[str, Field(max_length=120)]] = Field(default_factory=list, max_length=10)
+    year: int | None = Field(default=None, ge=0, le=3000)
+    details: dict[Annotated[str, Field(max_length=32)], Annotated[str, Field(max_length=120)]] = Field(
+        default_factory=dict, max_length=12
+    )
+    note: str | None = Field(default=None, max_length=1000)
+    cover: str | None = Field(default=None, max_length=400, pattern=r"^/api/v1/media/")
+    sheet: str | None = Field(default=None, max_length=400, pattern=r"^/media/")
 
 
 class MediaRequestOut(BaseModel):
@@ -486,6 +496,14 @@ async def create_request(principal: Requester, body: MediaRequestIn, module: Mod
         idempotency_key=body.idempotency_key,
         seasons=body.seasons,
         is4k=body.is4k,
+        told={
+            "creators": body.creators,
+            "year": body.year,
+            "details": body.details,
+            "note": body.note,
+            "cover": body.cover,
+            "sheet": body.sheet,
+        },
     )
     return _request(row)
 
@@ -956,6 +974,7 @@ async def my_requests_list(principal: Requester, module: Module) -> dict[str, An
             "updated_at": r.updated_at.isoformat(),
             **stages.get(r.id, {}),
             "_lookup": lookup_of(r),
+            **told(r),
         }
         for r in rows
     ]

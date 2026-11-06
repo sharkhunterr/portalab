@@ -24,6 +24,7 @@ from portalab.capabilities.media import (
     SourceUnavailable,
     unwrap,
 )
+from portalab.capabilities.media_core import WantedTitle
 from portalab.capabilities.record_sink import ServiceRef, SinkResult
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
@@ -32,7 +33,9 @@ from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.common import sort_title, strong_ids
 from portalab.modules.media.identity.resolver import MediaNotFound, live_object
+from portalab.modules.media.library_match import MediaLibraryMatch
 from portalab.modules.media.links.service import UserLinkService
+from portalab.modules.media.matching import fold
 from portalab.modules.media.models import ExternalId, MediaObject, MediaRequest, UserLink
 from portalab.modules.media.observability import metrics
 from portalab.modules.media.requests.quota import QuotaExceeded, RequestQuota
@@ -54,6 +57,16 @@ class RequestDuplicate(Conflict):
 class RequestRefused(Forbidden):
     default_code = "media.request_refused"
     default_title = "The request service refused this request"
+
+
+class RequestInLibrary(Conflict):
+    default_code = "media.request_in_library"
+    default_title = "The library has this title"
+
+
+# #378: the kinds of titles a request service takes when it does not tell (Seerr: films and series)
+SCREEN_KINDS = ("movie", "series", "tv", "season")
+CREATORS, DETAILS = 10, 12
 
 
 OPEN_STATES = ("pending", "approved", "processing")
@@ -78,6 +91,27 @@ class Requests:
         self.clock = clock
         # #3: the request service's own quotas (Seerr) — the truth for members whose account is linked
         self.service_quotas = ServiceQuotas(database, capabilities, clock=clock)
+
+    @staticmethod
+    def takes(provider: Any, kind: str) -> bool:
+        """#378: whether a request service takes this kind of title — what it tells (``kinds()``), else a
+        film or a series."""
+        kinds = getattr(provider, "kinds", None)
+        if callable(kinds):
+            try:
+                return kind in kinds()
+            except Exception:
+                return False
+        return kind in SCREEN_KINDS
+
+    def kinds(self) -> list[str]:
+        """#378: every kind of title a request service takes."""
+        out: list[str] = []
+        for _, provider in self._providers():
+            kinds = getattr(provider, "kinds", None)
+            told = list(kinds()) if callable(kinds) else ["movie", "series"]
+            out.extend(k for k in told if k not in out)
+        return out
 
     def _providers(self) -> list[tuple[UUID, Any]]:
         try:
@@ -127,9 +161,10 @@ class Requests:
         ids = strong_ids((ref or {}).get("ids") or {})
         title = str((ref or {}).get("title") or "").strip()[:500]
         kind = str((ref or {}).get("kind") or "").strip()[:40]
-        if not ids or not title or not kind:
+        screen = kind in SCREEN_KINDS
+        if (screen and not ids) or not title or not kind:
             raise ValidationFailed("Give the media's ids, kind and title.", code="media.invalid")
-        found = await self.resolve(session, ids, kind, title)
+        found = await self.resolve(session, ids, kind, title) if screen else None
         return found, {"ids": ids, "kind": kind, "title": title}
 
     async def resolve(
@@ -147,11 +182,25 @@ class Requests:
         idempotency_key: str | None,
         seasons: Sequence[int] | None = None,
         is4k: bool = False,
+        told: Mapping[str, Any] | None = None,
     ) -> MediaRequest:
-        providers = self._providers()
-        chosen = next(((s, p) for s, p in providers if service_id is None or s == service_id), None)
+        """``told`` (#378): what a member says of a book, a game… no catalog finds it by — ``creators``,
+        ``year``, ``details`` (edition, language…), ``note``, and the ``cover`` and ``sheet`` of the
+        database that knows it."""
+        kind = await self._kind_of(object_id, ref)
+        chosen = next(
+            (
+                (s, p)
+                for s, p in self._providers()
+                if (service_id is None or s == service_id) and self.takes(p, kind)
+            ),
+            None,
+        )
         if chosen is None:
-            raise RequestServiceUnavailable("No request service is configured.")
+            raise RequestServiceUnavailable("No request service takes this kind of title.")
+        extra = _told(told or {})
+        if kind not in SCREEN_KINDS:  # #378: a book, a game… the library has: nothing to ask for
+            await self._not_in_library(kind, ref or {}, extra)
         service, provider = chosen
         # #3: the service's own quota for a linked account (read before anything is written)
         service_quota = await self.service_quotas.check(user, service)
@@ -166,7 +215,10 @@ class Requests:
                 if existing is not None:
                     return existing
             target, external_ref = await self._target(session, object_id, ref)
-            if kind_of(external_ref["kind"]) == "movie":
+            external_ref.update(extra)
+            if external_ref["kind"] not in SCREEN_KINDS:
+                await self._not_asked_again(session, external_ref)
+            elif kind_of(external_ref["kind"]) == "movie":
                 await self._not_asked_yet(session, external_ref)
             if seasons:
                 external_ref["seasons"] = sorted({int(n) for n in seasons if int(n) > 0})
@@ -199,6 +251,7 @@ class Requests:
             options["is4k"] = True
         if counted == "extra" and service_quota is not None:
             options["bypass_quota"] = True  # #3: paid with a bought unit — not counted by the service
+        options.update({k: v for k, v in extra.items() if k in ("creators", "year", "details", "note")})
         try:
             answer = unwrap(
                 await asyncio.wait_for(
@@ -248,6 +301,50 @@ class Requests:
                 await self.publish(uow.session, row, "media.request_available")
         self.service_quotas.forget(user)
         return row
+
+    async def _kind_of(self, object_id: UUID | None, ref: Mapping[str, Any] | None) -> str:
+        if object_id is None:
+            return str((ref or {}).get("kind") or "").strip()[:40]
+        async with self.database.session() as session:
+            row = await live_object(session, object_id)
+            return row.kind if row is not None else ""
+
+    async def _not_in_library(self, kind: str, ref: Mapping[str, Any], told: Mapping[str, Any]) -> None:
+        """#378: a book, a game… the library has — by one of its identifiers, else its title by its
+        creators — is not asked for: its page instead."""
+        wanted = WantedTitle(
+            "asked",
+            kind,
+            str(ref.get("title") or ""),
+            tuple(told.get("creators") or ()),
+            {scheme: [value] for scheme, value in strong_ids(ref.get("ids") or {}).items()},
+        )
+        found = (await MediaLibraryMatch(self.database).find([wanted])).get("asked")
+        if found is not None:
+            raise RequestInLibrary(
+                "The library has it already.",
+                extensions={"object_id": str(found.object_id), "route": f"/media/{found.object_id}"},
+            )
+
+    async def _not_asked_again(self, session: AsyncSession, external_ref: Mapping[str, Any]) -> None:
+        """#378: a book, a game… someone asked for (still open) is not asked again — by one of its ids, else
+        its title by one of its creators: follow that request."""
+        wanted = set(strong_ids(external_ref.get("ids") or {}).items())
+        title = fold(str(external_ref.get("title") or ""))
+        creators = {fold(c) for c in external_ref.get("creators") or ()} - {""}
+        rows = (
+            await session.execute(select(MediaRequest).where(MediaRequest.state.in_(OPEN_STATES)).limit(2000))
+        ).scalars()
+        for row in rows:
+            ref = row.external_ref or {}
+            if ref.get("kind") != external_ref.get("kind"):
+                continue
+            theirs = {fold(c) for c in ref.get("creators") or ()} - {""}
+            same_title = bool(title) and fold(str(ref.get("title") or "")) == title
+            if wanted & set(strong_ids(ref.get("ids") or {}).items()) or (
+                same_title and (not creators or not theirs or bool(creators & theirs))
+            ):
+                raise RequestDuplicate("This title is already requested.")
 
     async def _not_asked_yet(self, session: AsyncSession, external_ref: Mapping[str, Any]) -> None:
         """#4: a film someone already asked for (still open) is not asked again — follow that request."""
@@ -369,7 +466,9 @@ class RequestSink:
                     await self.requests.publish(session, row, "media.request_created")
                     added += 1
                     continue
-                if row.object_id is None and strong_ids(
+                if row.object_id is None and payload.object_id is not None:
+                    row.object_id = payload.object_id  # #378: the library's book, game… the source found
+                elif row.object_id is None and strong_ids(
                     payload.ids
                 ):  # 027: the title arrived in the catalog later
                     row.object_id = await self.requests.resolve(
@@ -430,6 +529,34 @@ class RequestSink:
                 delete(MediaRequest).where(MediaRequest.service_id == service.service_id)
             )
             return int(getattr(result, "rowcount", 0) or 0)
+
+
+def _told(told: Mapping[str, Any]) -> dict[str, Any]:
+    """#378: what a member said of a book, a game… — kept short; a cover and a sheet only as the portal's
+    own addresses."""
+    out: dict[str, Any] = {}
+    creators = [str(c).strip()[:120] for c in told.get("creators") or () if str(c or "").strip()]
+    if creators:
+        out["creators"] = list(dict.fromkeys(creators))[:CREATORS]
+    year = told.get("year")
+    if isinstance(year, int) and 0 < year < 3000:
+        out["year"] = year
+    details = {
+        str(k)[:32]: str(v).strip()[:120]
+        for k, v in dict(told.get("details") or {}).items()
+        if str(v or "").strip()
+    }
+    if details:
+        out["details"] = dict(list(details.items())[:DETAILS])
+    note = str(told.get("note") or "").strip()[:1000]
+    if note:
+        out["note"] = note
+    cover, sheet = str(told.get("cover") or ""), str(told.get("sheet") or "")
+    if cover.startswith("/api/v1/media/") and len(cover) <= 400:
+        out["cover"] = cover
+    if sheet.startswith("/media/") and len(sheet) <= 400:
+        out["sheet"] = sheet
+    return out
 
 
 SERIES_KINDS = ("tv", "series", "season", "episode")

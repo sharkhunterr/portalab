@@ -56,14 +56,30 @@ def group_of(state: str) -> str:
     return next((group for group, states in GROUPS.items() if state in states), "pending")
 
 
+SCREEN = ("movie", "series", "tv", "")
+
+
 def kind_of(row: MediaRequest) -> str:
-    return "series" if (row.external_ref or {}).get("kind") in ("series", "tv") else "movie"
+    """A film or a series — #378: else the title's own kind (a book, an audiobook, a game…)."""
+    kind = str((row.external_ref or {}).get("kind") or "")
+    if kind in ("series", "tv"):
+        return "series"
+    return "movie" if kind in SCREEN else kind[:40]
 
 
-def lookup_of(row: MediaRequest) -> tuple[str, dict[str, str], str, None]:
-    """What the metadata provider needs to find a request's poster."""
+def lookup_of(row: MediaRequest) -> tuple[str, dict[str, str], str, None] | None:
+    """What the metadata provider (TMDB) needs to find a film's or a series' poster — #378: nothing for
+    another kind of title, whose cover the request keeps itself."""
     ref = row.external_ref or {}
+    if kind_of(row) not in ("movie", "series"):
+        return None
     return kind_of(row), dict(ref.get("ids") or {}), str(ref.get("title") or ""), None
+
+
+def told(row: MediaRequest) -> dict[str, Any]:
+    """#378: a book's or a game's cover and sheet, as the request keeps them (a film's come from TMDB)."""
+    ref = row.external_ref or {}
+    return {key: ref[key] for key in ("cover", "sheet", "creators") if ref.get(key)}
 
 
 def ids_of(row: MediaRequest) -> set[tuple[str, str]]:
@@ -250,7 +266,9 @@ class RequestInsights:
             "period": {"key": win.key, "start": win.start.isoformat() if win.start else None},
             "summary": {"total": len(mine), **{g: int(summary.get(g, 0)) for g in GROUPS}},
             "previous_total": len(previous) if before else None,
-            "by_kind": {"movie": int(kinds.get("movie", 0)), "series": int(kinds.get("series", 0))},
+            # #378: the books, audiobooks, games… asked for too
+            "by_kind": {"movie": int(kinds.get("movie", 0)), "series": int(kinds.get("series", 0))}
+            | {kind: int(count) for kind, count in kinds.items() if kind not in ("movie", "series")},
             "timeline": timeline,
             "watched": {
                 "requested": len(mine),
@@ -389,6 +407,7 @@ class RequestInsights:
                         "viewers": r.viewers,
                         "plays": r.plays,
                         "_lookup": lookup_of(row),
+                        **told(row),
                     }
                     for r in ranked
                     if (row := titles.get(r.request)) is not None
@@ -534,9 +553,10 @@ class RequestInsights:
 
         async def one(row: MediaRequest) -> None:
             raw = known.get(row.object_id) if row.object_id else None
-            if raw is None and self.enricher is not None:
+            lookup = lookup_of(row)
+            if raw is None and self.enricher is not None and lookup is not None:
                 async with gate:
-                    raw = (await self.enricher.brief(*lookup_of(row)))["release_date"]
+                    raw = (await self.enricher.brief(*lookup))["release_date"]
             if raw:
                 with suppress(ValueError):
                     out[row.id] = date.fromisoformat(str(raw)[:10])
@@ -903,6 +923,7 @@ class RequestInsights:
                 "state": row.state,
                 "requested_at": row.requested_at.isoformat(),
                 "_lookup": lookup_of(row),
+                **told(row),
             }
             if fetching:
                 importing = any(d.status == "importing" for d in fetching)

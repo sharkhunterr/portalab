@@ -32,6 +32,7 @@ from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Literal, Protocol, runtime_checkable
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -199,6 +200,8 @@ class RequestPayload(BaseModel):
     source_state: str = Field(default="", max_length=60)
     requester: str | None = Field(default=None, max_length=200)  # external user id on the service
     available_at: datetime | None = None  # 027: when the media became available (time to availability)
+    # #378: the library's title the source found for it (a book, a game: no strong id to find it by)
+    object_id: UUID | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -262,7 +265,9 @@ class RequestService(Protocol):
     ) -> SourceRequest:
         """``options`` (#3, #4), given only when used: ``seasons`` (the season numbers of a series; all by
         default), ``is4k`` and ``bypass_quota`` (a request paid with a unit bought in the shop: it must not
-        count against — nor be refused by — the account's quota on the service)."""
+        count against — nor be refused by — the account's quota on the service). #378: what a member told of
+        a title no catalog finds it by — ``creators``, ``year``, ``details`` (edition, language…), ``note``.
+        A service may tell the kinds of titles it takes (``kinds()``); a film's or a series' else."""
         ...
 
     async def status(self, external_request_id: str) -> SourceRequest: ...
