@@ -204,7 +204,7 @@ Your request notifications are set in the categories **My media requests** and *
 
 Films and series go through the request service. For anything else (a book, an audiobook, a game…), when your portal offers it, you ask the team directly.
 
-Open **Ask for a book, a game…** in the menu (`/requests`). On an author's or a book series' page, a book the library lacks has an **Ask for it** button too: the form opens with its title and author filled in.
+Everything starts from **Ask for a title** (`/media/discover`): type a film, a series, a book or a game. Under the films and series, **Books, audiobooks and games** lists those the library lacks, each opening its sheet. Cannot find it? **Ask the team**, under the results, opens a free form. On an author's or a book series' page, a missing book has an **Ask for it** button too, and a book the library has as an audiobook only has **Ask for the book**, opening its sheet.
 
 The search's **Ask for it** results list these books too, and games when the portal has a game database, each opening its sheet. Click a missing book's cover or title to open **its sheet**, laid out like a library book's page: authors, series, genres, rating, summary, and its **Editions**, those in your language first (translated title, format, audiobook, publisher, ISBN). When the library has the book itself, its library page opens instead; when it has the audiobook only, the sheet says so (**As an audiobook in the library**) and the book can still be asked for. Otherwise **Ask for it** asks for the book, or for one edition from its line: its title, language, format and ISBN go with the request, which helps the team find the right one.
 
@@ -220,7 +220,7 @@ The portal answers at once when:
 
 Depending on your portal, the requests of each kind may be limited over a period, and a request may cost Coins. They come back to you if it is refused.
 
-On the same page, **My requests** lists those you made and those you want too, with their state: **Sent**, **Accepted**, **In progress**, **Arrived** or **Refused** (with the reason). **No longer want it** takes yours back; if you had asked for it, it goes on in the name of the member who said « me too » first. **The other members' requests** lists every open request, the most wanted first, with how many members want each, never who.
+In **My requests** (`/media/requests`), under your film and series requests, **My requests** lists those you made and those you want too, with their state: **Sent**, **Accepted**, **In progress**, **Arrived** or **Refused** (with the reason). **No longer want it** takes yours back; if you had asked for it, it goes on in the name of the member who said « me too » first. **The other members' requests** lists every open request, the most wanted first, with how many members want each, never who.
 
 Once the title is in the library, the request closes by itself and each member who wanted it gets a notification with its link (category **My title requests**).
 

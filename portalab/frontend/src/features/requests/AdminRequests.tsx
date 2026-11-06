@@ -4,7 +4,6 @@ import { Link } from "react-router";
 import { api } from "../../api/client";
 import {
   AdminEmpty,
-  AdminPage,
   AdminSection,
   AdminStats,
   AdminTable,
@@ -33,7 +32,8 @@ import "../admin/admin.css";
 import "./requests.css";
 
 /**
- * Issue 363: the members' requests for titles no service asks for, for the team — the queue (the open and
+ * Issue 363: the members' requests for titles no service asks for, for the team (issue 375: two tabs of the
+ * media's « Requests » page) — the queue (the open and
  * most wanted first, who wants each), moved on in a click (accepted, in progress, refused with the reason the
  * members read, there: the library's title, found by a search), and the module's settings: the kinds of
  * titles open to requests, a quota per kind, what a request costs. Closed by itself once the library has the
@@ -363,30 +363,13 @@ function Settings() {
   );
 }
 
-export function AdminRequests() {
-  const t = useT();
-  const [tab, setTab] = useState<"queue" | "settings">("queue");
+/** Issue 375: the title requests in the media's « Requests » page — their queue, or their settings. */
+export function TitleRequests({ settings = false }: { settings?: boolean }) {
   const [status, setStatus] = useState<AskStatus | "all">("all");
-  return (
-    <AdminPage
-      icon="inbox"
-      title={t("media:ask.admin.page")}
-      description={t("media:ask.admin.context")}
-      tabs={
-        <AdminTabs
-          label={t("media:ask.admin.page")}
-          current={tab}
-          onChange={(key) => setTab(key as "queue" | "settings")}
-          tabs={[
-            { key: "queue", label: t("media:ask.admin.queue") },
-            { key: "settings", label: t("media:ask.admin.settings") },
-          ]}
-        />
-      }
-    >
-      {tab === "queue" ? <Queue status={status} setStatus={setStatus} /> : <Settings />}
-    </AdminPage>
-  );
+  return settings ? <Settings /> : <Queue status={status} setStatus={setStatus} />;
 }
 
-export default AdminRequests;
+/** Whether the title requests answer (the module switched on, the member allowed to handle them). */
+export function useTitleRequestsOn(): boolean {
+  return Boolean(useAskQueue("all").data);
+}

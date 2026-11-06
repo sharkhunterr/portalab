@@ -40,6 +40,7 @@ from portalab.modules.media.api.people import (
     _sheet_url,
 )
 from portalab.modules.media.api.router import MediaCard, Module, Reader, _asked, _card
+from portalab.modules.media.databases import TIMEOUT as DATABASE_TIMEOUT
 from portalab.modules.media.library_match import MediaLibraryMatch
 from portalab.modules.media.matching import fold
 from portalab.modules.media.models import ExternalId, MediaObject, ObjectMetadata
@@ -503,6 +504,39 @@ async def game_sheet(
         trailer=game.trailer,
         library=str(held["game"].object_id) if "game" in held else None,
     )
+
+
+class DatabaseTitleOut(BaseModel):
+    """#375: a book or a game the library lacks, from the book or game database — opening its sheet."""
+
+    kind: str
+    title: str
+    year: int | None = None
+    creator: str | None = None  # its authors, its studio
+    cover: str | None = None  # a ready URL, through the portal
+    route: str  # its sheet
+
+
+@router.get("/media/discover/titles", response_model=list[DatabaseTitleOut])
+async def database_titles(
+    principal: Reader, module: Module, q: Annotated[str, Query(min_length=2, max_length=200)]
+) -> list[DatabaseTitleOut]:
+    """#375: « Ask for a title » finds books and games too — those the library lacks, in the member's
+    language (the request service's films and series are its own search)."""
+    items = await module.database_titles.found(
+        q, await module.member_language(principal), 20, budget=DATABASE_TIMEOUT
+    )
+    return [
+        DatabaseTitleOut(
+            kind=str(item.facets.get("type") or "book"),
+            title=str(item.facets.get("name") or item.title),
+            year=int(item.facets["year"]) if str(item.facets.get("year") or "").isdigit() else None,
+            creator=item.facets.get("creator"),
+            cover=item.facets.get("cover"),
+            route=item.url_ref,
+        )
+        for item in items
+    ]
 
 
 @router.get("/media/game-images")

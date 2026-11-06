@@ -19,7 +19,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 });
 
 import { KnownCard } from "../../../src/features/media/people/PersonPage";
-import { RequestsPage } from "../../../src/features/requests/RequestsPage";
+import { AskLists, RequestsPage } from "../../../src/features/requests/RequestsPage";
 import { json } from "../../support/fake-api";
 
 const OPTIONS = { kinds: ["book", "game"], price: 0, left: { book: null, game: 2 }, quotas: {} };
@@ -95,9 +95,25 @@ describe("title requests", () => {
     fireEvent.click(within(alert).getByRole("button", { name: /I want it too/ }));
     await waitFor(() => expect(posted.map((p) => p.path)).toContain("/api/v1/requests/r2/support"));
     expect((await screen.findByRole("status")).textContent).toContain("4 members want « Fool's Errand »");
+  });
 
+  it("lists my requests and the others' to want too, in « My requests » (issue 375)", async () => {
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/requests/options") return json(200, OPTIONS);
+      if (path === "/api/v1/requests")
+        return json(200, {
+          mine: [asked("r1", "Le Prophète blanc", { mine: true, asked: true })],
+          open: [
+            asked("r1", "Le Prophète blanc", { mine: true }),
+            asked("r2", "Fool's Errand", { supporters: 3 }),
+          ],
+        });
+      return json(404, {});
+    };
+    renderAt("/media/requests", [{ path: "/media/requests", element: <AskLists /> }]);
     // mine, then the others' open requests (mine left out)
-    const mine = screen.getByRole("list", { name: "My requests" });
+    const mine = await screen.findByRole("list", { name: "My requests" });
     expect(within(mine).getByText("Le Prophète blanc")).toBeTruthy();
     const others = screen.getByRole("list", { name: "The other members' requests" });
     expect(within(others).getAllByRole("listitem")).toHaveLength(1);
@@ -138,5 +154,39 @@ describe("title requests", () => {
     expect(link.getAttribute("href")).toBe(
       "/requests?kind=book&title=The+Golden+Fool&creator=Robin+Hobb&year=2002",
     );
+  });
+
+  it("leads from an audiobook the library has to asking for the book (issue 376)", async () => {
+    fake.handler = (request) =>
+      new URL(request.url).pathname === "/api/v1/requests/options" ? json(200, OPTIONS) : json(404, {});
+    const credit = {
+      tmdb_id: "427336",
+      kind: "audiobook",
+      title: "L'apprenti assassin",
+      year: 1995,
+      role: null,
+      department: "writing",
+      poster: null,
+      image_id: null,
+      rating: null,
+      votes: 0,
+      status: "available",
+      object_id: "0190f0a0-0000-7000-8000-0000000000b2",
+      route: "/media/0190f0a0-0000-7000-8000-0000000000b2",
+      cover: null,
+      sheet: "/media/book?service=s1&ref=427336",
+    };
+    renderAt("/media/person", [
+      {
+        path: "/media/person",
+        element: (
+          <ul>
+            <KnownCard credit={credit as never} askable={false} />
+          </ul>
+        ),
+      },
+    ]);
+    const link = await screen.findByRole("link", { name: /Ask for the book/ });
+    expect(link.getAttribute("href")).toBe("/media/book?service=s1&ref=427336");
   });
 });

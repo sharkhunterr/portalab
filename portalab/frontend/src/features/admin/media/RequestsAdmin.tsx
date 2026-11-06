@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { api } from "../../../api/client";
 import {
   AdminEmpty,
@@ -18,6 +18,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { metadataImage } from "../../media/detail/Enrichment";
 import { Poster } from "../../media/MediaGrid";
+import { TitleRequests, useTitleRequestsOn } from "../../requests/AdminRequests";
 import "../admin.css";
 
 interface QueueItem {
@@ -93,9 +94,18 @@ function Decline({ item, onDecline }: { item: QueueItem; onDecline: (reason: str
  * seasons and 4K asked for; « Approve » sends it on (the request service passes it to the download
  * manager), « Decline » with a reason the member reads (a bought request comes back to them).
  */
+// issue 375: the title requests (books, games…: the requests module) beside the request service's
+const TITLE_TABS = ["titles", "titleSettings"] as const;
+type Tab = (typeof TABS)[number] | (typeof TITLE_TABS)[number];
+
 export default function RequestsAdmin() {
   const t = useT();
-  const [tab, setTab] = useState<(typeof TABS)[number]>("pending");
+  const [params] = useSearchParams();
+  const asked = params.get("tab") as Tab | null;
+  const [tab, setTab] = useState<Tab>(
+    asked && [...TABS, ...TITLE_TABS].includes(asked as never) ? asked : "pending",
+  );
+  const titles = useTitleRequestsOn();
   return (
     <AdminPage
       icon="inbox"
@@ -105,12 +115,19 @@ export default function RequestsAdmin() {
         <AdminTabs
           label={t("media:moderation.title")}
           current={tab}
-          onChange={(next) => setTab(next as (typeof TABS)[number])}
-          tabs={TABS.map((key) => ({ key, label: t(`media:moderation.tab.${key}`) }))}
+          onChange={(next) => setTab(next as Tab)}
+          tabs={[
+            ...TABS.map((key) => ({ key, label: t(`media:moderation.tab.${key}`) })),
+            ...(titles ? TITLE_TABS.map((key) => ({ key, label: t(`media:moderation.tab.${key}`) })) : []),
+          ]}
         />
       }
     >
-      <MediaRequestsList tab={tab} />
+      {tab === "titles" || tab === "titleSettings" ? (
+        <TitleRequests settings={tab === "titleSettings"} />
+      ) : (
+        <MediaRequestsList tab={tab} />
+      )}
     </AdminPage>
   );
 }

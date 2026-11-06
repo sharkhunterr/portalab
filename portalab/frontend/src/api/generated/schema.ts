@@ -9527,6 +9527,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/discover/titles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Database Titles
+         * @description #375: « Ask for a title » finds books and games too — those the library lacks, in the member's
+         *     language (the request service's films and series are its own search).
+         */
+        get: operations["database_titles_api_v1_media_discover_titles_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/discover/{kind}/{tmdb_id}": {
         parameters: {
             query?: never;
@@ -14631,6 +14652,24 @@ export interface components {
             /** Layout Version */
             layout_version: number;
         };
+        /**
+         * DatabaseTitleOut
+         * @description #375: a book or a game the library lacks, from the book or game database — opening its sheet.
+         */
+        DatabaseTitleOut: {
+            /** Cover */
+            cover?: string | null;
+            /** Creator */
+            creator?: string | null;
+            /** Kind */
+            kind: string;
+            /** Route */
+            route: string;
+            /** Title */
+            title: string;
+            /** Year */
+            year?: number | null;
+        };
         /** DatumOut */
         DatumOut: {
             /** Classification */
@@ -15074,6 +15113,8 @@ export interface components {
             role: string | null;
             /** Route */
             route: string | null;
+            /** Sheet */
+            sheet?: string | null;
             /**
              * Status
              * @enum {string}
@@ -15339,6 +15380,8 @@ export interface components {
             role: string | null;
             /** Route */
             route: string | null;
+            /** Sheet */
+            sheet?: string | null;
             /**
              * Status
              * @enum {string}
@@ -39132,6 +39175,37 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    database_titles_api_v1_media_discover_titles_get: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DatabaseTitleOut"][];
                 };
             };
             /** @description Validation Error */

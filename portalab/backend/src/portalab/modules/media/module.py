@@ -230,6 +230,8 @@ class MediaModule:
         self.capabilities = capabilities
         self.authorizer = authorizer
         self.clock = clock
+        # #373: the books and games the library lacks, from the book and game databases
+        self.database_titles = DatabaseTitles(capabilities, database)
         self.config = MediaConfig()
         self.event_types = event_types
         self.consumers = consumers
@@ -526,7 +528,7 @@ class MediaModule:
                     self.requestable,
                     self.authorizer,
                     self.language,
-                    DatabaseTitles(self.capabilities, self.database),  # #373: books and games too
+                    self.database_titles,  # #373: books and games too
                     self.member_language,
                 ),
                 owner=OWNER,

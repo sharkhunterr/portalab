@@ -242,17 +242,6 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "order_hint": 24,
         "required_permission": "media.request",
     },
-    {  # issue 363: asking the administrators for a title no service asks for (a book, a game…)
-        "key": "requests.page",
-        "owner": "module:requests",
-        "kind": "entry",
-        "label_key": "nav.requests",
-        "icon": "inbox",
-        "route": "/requests",
-        "group": "media",
-        "order_hint": 25,
-        "required_permission": "requests.ask",
-    },
     {  # #298: my requests in figures — the overview of « My requests », among the statistics
         "key": "media.requests_stats",
         "owner": "module:media",
@@ -925,19 +914,6 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "topic": "media",
         "order_hint": 1,
         "required_permission": "media.manage",
-    },
-    {
-        # issue 363: the members' requests for titles no service asks for, the most wanted first
-        "key": "requests.admin",
-        "owner": "module:requests",
-        "kind": "entry",
-        "label_key": "nav.admin.requests",
-        "icon": "inbox",
-        "route": "/admin/requests",
-        "group": "admin",
-        "topic": "media",
-        "order_hint": 2,
-        "required_permission": "requests.manage",
     },
     {
         # #3: the request service's (Seerr) limits of every member, steered from the portal
