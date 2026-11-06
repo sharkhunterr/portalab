@@ -281,7 +281,10 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
       }
     }
   };
-  const showList = open && (options.length > 0 || (query.trim() && results.isFetching));
+  // searching from the first letter typed (the pause before asking included) until every answer is in
+  const searching =
+    Boolean(query.trim()) && (query.trim() !== text || results.isFetching || resolution.isFetching);
+  const showList = open && (options.length > 0 || searching);
   let lastGroup = "";
   const field = (
     <div
@@ -336,8 +339,11 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
             }
           }}
         />
-        {results.isFetching && query.trim() ? (
-          <Icon name="spinner" size={16} className="header-search__spin" />
+        {searching ? (
+          <span role="status" className="header-search__spin">
+            <Icon name="spinner" size={16} />
+            <span className="visually-hidden">{t("shell:searching")}</span>
+          </span>
         ) : query ? (
           <button
             type="button"
