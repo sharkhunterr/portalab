@@ -627,6 +627,30 @@ def _hardcover(request: httpx.Request) -> Any:
     query, variables = asked["query"], asked.get("variables") or {}
     if "query Status" in query:
         return {"data": {"authors": [{"id": 1}]}}
+    if "query Parts" in query:  # #371: 103 is a part (3.1) of a longer book
+        parts = [
+            {
+                "id": 103,
+                "book_series": [{"position": 3.1, "series_id": 5513}, {"position": 4, "series_id": 10896}],
+            }
+        ]
+        return {"data": {"books": [b for b in parts if b["id"] in variables["ids"]]}}
+    if "query Wholes" in query:  # #371: the books at place 3 — the original, its translation, a namesake
+        return {
+            "data": {
+                "book_series": [
+                    {"position": 3, "series_id": 5513, "book": {"id": 149300, "canonical_id": None}},
+                    {"position": 3, "series_id": 5513, "book": {"id": 1980360, "canonical_id": 149300}},
+                    {"position": 3, "series_id": 5513, "book": {"id": 740, "canonical_id": None}},
+                ]
+            }
+        }
+    if "query Titles" in query:  # #371: books' titles in French
+        french = [
+            {"book_id": 101, "title": "L'Apprenti assassin"},
+            {"book_id": 101, "title": "Apprenti (poche)"},
+        ]
+        return {"data": {"editions": french if variables["language"] == "fr" else []}}
     if "query Book" in query:  # #367: a book's sheet; 102 merged into 101
         if variables["id"] == 102:
             return {

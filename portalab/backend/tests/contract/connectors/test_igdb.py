@@ -55,5 +55,5 @@ async def test_a_game_s_sheet() -> None:
 
 
 def test_queries_and_images_stay_ours() -> None:
-    assert quoted('Zelda"; fields *') == '"Zelda fields *"' and quoted('a\\b') == '"a b"'
+    assert quoted('Zelda"; fields *') == '"Zelda fields *"' and quoted("a\\b") == '"a b"'
     assert image_ref({"image_id": "co1uii"}) == "co1uii" and image_ref("../x") is None

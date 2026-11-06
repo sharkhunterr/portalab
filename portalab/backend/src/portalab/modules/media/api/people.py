@@ -366,7 +366,12 @@ async def person(
         known, candidates = await _identify(module, service, list(ids))
         listed = {credit.tmdb_id for credit in record.credits if credit.kind == "book"}
         unlisted = [found[0] for found in candidates if not listed & {c.tmdb_id for c in found}]
-        books = [*record.credits, *{c.tmdb_id: c for c in unlisted}.values()]
+        # #371: a book the library holds in parts (a translation split in volumes) is told by its parts
+        covered = {c.part_of for found in candidates for c in found if c.part_of} - set(known)
+        books = [
+            *(c for c in record.credits if not (c.kind == "book" and c.tmdb_id in covered)),
+            *{c.tmdb_id: c for c in unlisted}.values(),
+        ]
         filmography += await _bibliography(
             module,
             books,

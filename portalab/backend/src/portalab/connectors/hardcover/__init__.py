@@ -119,6 +119,24 @@ BY_TITLE = f"""query ByTitle($titles: [editions_bool_exp!]!, $authors: [String!]
   }}
 }}"""
 
+# #371: of the library's books, the parts of a longer book (a translation split in volumes): their places
+# in their series (3.1, 3.2…), and the whole books at those places (3)
+PARTS = """query Parts($ids: [Int!]!) {
+  books(where: {id: {_in: $ids}, is_partial_book: {_eq: true}}) { id book_series { position series_id } }
+}"""
+WHOLES = """query Wholes($where: [book_series_bool_exp!]!) {
+  book_series(
+    where: {_or: $where, book: {is_partial_book: {_eq: false}, compilation: {_eq: false}}}, limit: 500
+  ) { position series_id book { id canonical_id } }
+}"""
+# #371: books' titles in a language — their most held edition in it
+TITLES = f"""query Titles($ids: [Int!]!, $language: String!) {{
+  editions(
+    where: {{book_id: {{_in: $ids}}, language: {{code2: {{_eq: $language}}}}}}
+    order_by: {{users_count: desc}}
+    limit: {VOLUMES}
+  ) {{ book_id title }}
+}}"""
 # #367: a book's sheet — its description, authors, series, readers' tags and editions
 BOOK = f"""query Book($id: Int!) {{
   books_by_pk(id: $id) {{
@@ -158,6 +176,15 @@ class HardcoverConfig(BaseConfig):
 def languages(value: Any) -> list[str]:
     """#369: the edition languages a service shows, in order (``fr, en``); none: every language."""
     return list(dict.fromkeys(code.strip() for code in str(value or "").lower().split(",") if code.strip()))
+
+
+def told_in(member: str, wanted: Sequence[str]) -> str | None:
+    """#371: the language books are told in — the member's, when the service shows its editions (or every
+    language), else the service's first."""
+    language = member.split("-")[0].strip().lower()[:8]
+    if wanted and language not in wanted:
+        return wanted[0]
+    return language or None
 
 
 def preferred(book: BookDetails, wanted: Sequence[str]) -> BookDetails:
@@ -507,10 +534,34 @@ class _People:
             return None
         answer = await self.connector.graphql(self.service, AUTHOR, {"id": int(author_id)})
         found = answer.get("authors") or []
-        return map_author(found[0]) if found else None
+        record = map_author(found[0]) if found else None
+        wanted = told_in(language, languages(self.service.config.get("languages")))
+        if record is None or not wanted:
+            return record
+        # #371: each book told by its most held edition in the member's language, when it has one
+        titles = await local_titles(self.connector, self.service, [c.tmdb_id for c in record.credits], wanted)
+        return replace(
+            record, credits=tuple(replace(c, title=titles.get(c.tmdb_id, c.title)) for c in record.credits)
+        )
 
     async def portrait(self, ref: str, size: str) -> bytes:
         return await self.images.fetch(ref)
+
+
+async def local_titles(
+    connector: HardcoverConnector, service: ServiceHandle, refs: Sequence[str], language: str
+) -> dict[str, str]:
+    """#371: books' titles in a language — each book's most held edition in it."""
+    ids = sorted({int(ref) for ref in refs if ref.isdigit()})
+    if not ids:
+        return {}
+    answer = await connector.graphql(service, TITLES, {"ids": ids, "language": language})
+    out: dict[str, str] = {}
+    for edition in answer.get("editions") or []:
+        book, title = (edition or {}).get("book_id"), str((edition or {}).get("title") or "").strip()
+        if isinstance(book, int) and title:
+            out.setdefault(str(book), title[:300])
+    return out
 
 
 async def _nothing() -> Mapping[str, Any]:
@@ -605,7 +656,49 @@ class _Series:
                         fold(name) for name in author_names(book.authors)
                     }:
                         add(book.key, map_book(edition.get("book")))
-        return found
+        return await self._parts(found)
+
+    async def _parts(self, found: dict[str, list[PersonCredit]]) -> dict[str, list[PersonCredit]]:
+        """#371: a part of a longer book (a translation split in volumes: « Le poison de la vengeance »,
+        Assassin's Quest's part 3.1) told with the whole book it is part of — the book at its whole place
+        in the same series (3), the original of that place's translations."""
+        ids = sorted({int(c.tmdb_id) for credits in found.values() for c in credits if c.tmdb_id.isdigit()})
+        if not ids:
+            return found
+        parts = (await self._ask(PARTS, {"ids": ids})).get("books") or []
+        places: dict[str, list[tuple[int, int]]] = {}
+        for book in parts:
+            for entry in (book or {}).get("book_series") or []:
+                position, series = (entry or {}).get("position"), (entry or {}).get("series_id")
+                if (
+                    isinstance(position, int | float)
+                    and isinstance(series, int)
+                    and position != int(position)
+                ):
+                    places.setdefault(str(book["id"]), []).append((series, int(position)))
+        wanted = sorted({place for spots in places.values() for place in spots})
+        if not wanted:
+            return found
+        where = [{"series_id": {"_eq": series}, "position": {"_eq": at}} for series, at in wanted[:100]]
+        votes: dict[tuple[int, int], dict[int, int]] = {}
+        for entry in (await self._ask(WHOLES, {"where": where})).get("book_series") or []:
+            book = (entry or {}).get("book") or {}
+            whole = book.get("canonical_id") or book.get("id")
+            position, series = entry.get("position"), entry.get("series_id")
+            if isinstance(whole, int) and isinstance(position, int | float) and isinstance(series, int):
+                counted = votes.setdefault((series, int(position)), {})
+                counted[whole] = counted.get(whole, 0) + 1  # the original: the one its translations name
+        wholes = {place: max(counted, key=lambda w: counted[w]) for place, counted in votes.items()}
+        out: dict[str, list[PersonCredit]] = {}
+        for key, credits in found.items():
+            told = []
+            for credit in credits:
+                whole = next((wholes[p] for p in places.get(credit.tmdb_id, []) if p in wholes), None)
+                told.append(
+                    replace(credit, part_of=str(whole)) if whole and str(whole) != credit.tmdb_id else credit
+                )
+            out[key] = told
+        return out
 
     async def _ask(self, document: str, variables: Mapping[str, Any]) -> Mapping[str, Any]:
         return await self.connector.graphql(self.service, document, variables)

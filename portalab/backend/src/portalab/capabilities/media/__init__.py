@@ -735,6 +735,8 @@ class PersonCredit:
     vote_average: float | None = None
     vote_count: int = 0
     position: float | None = None
+    # #371: a part of a longer book (a translation split in volumes): the whole book's id there
+    part_of: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
