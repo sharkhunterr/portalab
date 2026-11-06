@@ -11,6 +11,7 @@ import pytest
 from fastapi import FastAPI
 from sqlalchemy import select
 
+from portalab.capabilities.media import BOOK_SERIES, PersonCredit
 from portalab.capabilities.media.testkit import library_record
 from portalab.core.authz_port import Principal
 from portalab.modules.media.models import ExternalId, MediaObject, MediaRequest
@@ -158,3 +159,77 @@ async def test_a_declined_request_and_the_figures(
     assert figures is not None
     stats = (await client.get("/api/v1/me/media/requests/insights", params={"period": "all"})).json()
     assert stats["by_kind"]["game"] == 1 and stats["summary"]["total"] == 1  # the same figures as a film's
+
+
+class _Books:
+    """A book database: « Assassin's Apprentice » as a French member reads it."""
+
+    async def identify(self, books: object) -> dict[str, list[PersonCredit]]:
+        return {}
+
+    async def series(self, name: str, known: object) -> None:
+        return None
+
+    async def book(self, ref: str) -> None:
+        return None
+
+    async def cover(self, ref: str, size: str) -> bytes:
+        return b""
+
+    async def search(self, query: str, language: str, limit: int) -> list[PersonCredit]:
+        french = language == "fr"
+        return [
+            PersonCredit(
+                tmdb_id="7",
+                kind="book",
+                title="Le Fou et l'Assassin" if french else "Fool's Assassin",
+                role="Robin Hobb",
+                poster="/f.jpg",
+            ),
+            PersonCredit(
+                tmdb_id="1",
+                kind="book",
+                title="L'Apprenti assassin" if french else "Assassin's Apprentice",
+                role="Robin Hobb",
+                poster="/a.jpg" if french else "/en.jpg",
+            ),
+        ]
+
+
+async def test_a_book_asked_by_hand_is_given_its_cover_and_sheet(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, team: RequestsModule
+) -> None:
+    """#379: asked without its sheet (by hand, or before requests kept it): its cover and sheet found in the
+    book database — at once, and later for those asked while none answered."""
+    await users(app, media, "zoe")
+    await login(client, "zoe")
+    early = await client.post(
+        "/api/v1/media/requests", json={"kind": "game", "title": "Chrono Trigger", "creators": ["Square"]}
+    )
+    assert early.status_code == 201
+    media.provide(BOOK_SERIES, media.service(9, "hardcover"), _Books())
+
+    asked = await client.post(
+        "/api/v1/media/requests",
+        json={
+            "kind": "book",
+            "title": "Assassin's Apprentice",
+            "creators": ["Robin Hobb"],
+            "details": {"language": "fr"},
+        },
+    )
+    assert asked.status_code == 201
+    mine = {i["title"]: i for i in (await client.get("/api/v1/me/media/requests/list")).json()["items"]}
+    book = mine["Assassin's Apprentice"]  # told in French: the French edition's cover
+    assert book["cover"].startswith("/api/v1/media/book-covers?") and "%2Fa.jpg" in book["cover"]
+    assert book["sheet"].startswith("/media/book?") and book["sheet"].endswith("ref=1")
+    assert "cover" not in mine["Chrono Trigger"]  # no game database: nothing found, nothing invented
+
+    async with media.database.unit_of_work() as uow:  # asked before requests kept it
+        row = await uow.session.get(MediaRequest, UUID(asked.json()["id"]))
+        assert row is not None
+        row.external_ref = {k: v for k, v in row.external_ref.items() if k not in ("cover", "sheet")}
+    assert await media.module.requests.give_faces() == 1
+    assert await media.module.requests.give_faces() == 0  # each looked for once
+    mine = {i["title"]: i for i in (await client.get("/api/v1/me/media/requests/list")).json()["items"]}
+    assert mine["Assassin's Apprentice"]["sheet"].endswith("ref=1")

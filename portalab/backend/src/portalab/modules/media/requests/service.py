@@ -4,7 +4,7 @@ check, are mirrored with a normalized state machine, and follow the source of tr
 priority exists anywhere in the flow."""
 
 import asyncio
-from collections.abc import Mapping, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from datetime import datetime
 from typing import Any
 from uuid import UUID
@@ -70,6 +70,9 @@ CREATORS, DETAILS = 10, 12
 
 
 OPEN_STATES = ("pending", "approved", "processing")
+FACES = 50  # requests given a cover and a sheet per run (#379)
+# #379: a book's, a game's cover and sheet, as a database knows it — (kind, title, creators, details)
+Faces = Callable[[str, str, Sequence[str], Mapping[str, str]], Awaitable[dict[str, str] | None]]
 
 
 class Requests:
@@ -82,6 +85,7 @@ class Requests:
         links: UserLinkService,
         *,
         clock: Clock | None = None,
+        faces: Faces | None = None,
     ) -> None:
         self.database = database
         self.events = events
@@ -89,6 +93,8 @@ class Requests:
         self.quota = quota
         self.links = links
         self.clock = clock
+        self.faces = faces
+        self._faced: set[UUID] = set()  # looked for already (found or not), while the portal runs
         # #3: the request service's own quotas (Seerr) — the truth for members whose account is linked
         self.service_quotas = ServiceQuotas(database, capabilities, clock=clock)
 
@@ -201,6 +207,11 @@ class Requests:
         extra = _told(told or {})
         if kind not in SCREEN_KINDS:  # #378: a book, a game… the library has: nothing to ask for
             await self._not_in_library(kind, ref or {}, extra)
+            if not (extra.get("cover") and extra.get("sheet")):  # #379: asked without its sheet
+                extra = {
+                    **(await self._face(kind, str((ref or {}).get("title") or ""), extra) or {}),
+                    **extra,
+                }
         service, provider = chosen
         # #3: the service's own quota for a linked account (read before anything is written)
         service_quota = await self.service_quotas.check(user, service)
@@ -325,6 +336,54 @@ class Requests:
                 "The library has it already.",
                 extensions={"object_id": str(found.object_id), "route": f"/media/{found.object_id}"},
             )
+
+    async def _face(self, kind: str, title: str, told: Mapping[str, Any]) -> dict[str, str] | None:
+        """#379: the cover and sheet a database gives a book, a game… — nothing when none answers."""
+        if self.faces is None or not title:
+            return None
+        try:
+            return await self.faces(
+                kind, title, list(told.get("creators") or ()), dict(told.get("details") or {})
+            )
+        except Exception:
+            return None
+
+    async def give_faces(self) -> int:
+        """#379: the books, games… asked without a cover or a sheet (asked by hand, or before requests kept
+        them) given those a database knows — each looked for once while the portal runs."""
+        if self.faces is None:
+            return 0
+        async with self.database.session() as session:
+            rows = [
+                (row.id, row.external_ref or {})
+                for row in (
+                    await session.execute(
+                        select(MediaRequest)
+                        .where(MediaRequest.external_ref["kind"].astext.not_in(SCREEN_KINDS))
+                        .where(
+                            or_(
+                                ~MediaRequest.external_ref.has_key("cover"),
+                                ~MediaRequest.external_ref.has_key("sheet"),
+                            )
+                        )
+                        .order_by(MediaRequest.requested_at.desc())
+                        .limit(FACES + len(self._faced))
+                    )
+                ).scalars()
+                if row.id not in self._faced
+            ][:FACES]
+        given = 0
+        for request_id, ref in rows:
+            self._faced.add(request_id)
+            found = await self._face(str(ref.get("kind") or ""), str(ref.get("title") or ""), ref)
+            if not found:
+                continue
+            async with self.database.unit_of_work() as uow:
+                row = await uow.session.get(MediaRequest, request_id, with_for_update=True)
+                if row is not None:
+                    row.external_ref = {**found, **(row.external_ref or {})}
+                    given += 1
+        return given
 
     async def _not_asked_again(self, session: AsyncSession, external_ref: Mapping[str, Any]) -> None:
         """#378: a book, a game… someone asked for (still open) is not asked again — by one of its ids, else
