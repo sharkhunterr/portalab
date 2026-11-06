@@ -122,9 +122,12 @@ def parse_rule(raw: Mapping[str, Any], types: EventTypeRegistry | None = None) -
                 code="economy.rule_invalid",
                 extensions={"fields": unknown},
             )
-        if rule.boosters and (event_type.schema is None or "object" not in event_type.schema.model_fields):
+        # issue 356: or one naming the works its boosters draw among (the bingo's full card)
+        named = set(event_type.schema.model_fields) if event_type.schema is not None else set()
+        if rule.boosters and not named & {"object", "booster"}:
             raise ValidationFailed(
-                "Only an action about a content gives its boosters.", code="economy.rule_invalid"
+                "Only an action about a content, or naming the works of its boosters, gives boosters.",
+                code="economy.rule_invalid",
             )
     return rule
 
