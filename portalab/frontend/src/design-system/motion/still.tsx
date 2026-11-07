@@ -24,21 +24,49 @@ function hold(target: Element) {
   }
 }
 
-/** Holds the CSS animations and transitions inside ``ref`` (and those that start later) while ``held``;
+// issue 382: what started without its event being seen (a browser may not tell them all) is held at the
+// next sweep — one timer for every zone held, none while there is none
+const held = new Set<Element>();
+let sweeper = 0;
+
+function sweep() {
+  for (const root of held) {
+    if (root.getAnimations({ subtree: true }).some((animation) => animation.playState === "running")) {
+      hold(root);
+    }
+  }
+}
+
+function watch(root: Element) {
+  held.add(root);
+  if (!sweeper) sweeper = window.setInterval(sweep, 700);
+}
+
+function unwatch(root: Element) {
+  held.delete(root);
+  if (!held.size && sweeper) {
+    window.clearInterval(sweeper);
+    sweeper = 0;
+  }
+}
+
+/** Holds the CSS animations and transitions inside ``ref`` (and those that start later) while ``still``;
  * marks it a still zone for the canvas renderers. */
-export function useHeldMotion(ref: RefObject<HTMLElement | null>, held: boolean): void {
+export function useHeldMotion(ref: RefObject<HTMLElement | null>, still: boolean): void {
   useEffect(() => {
     const root = ref.current;
-    if (!root || !held) return;
+    if (!root || !still) return;
     root.setAttribute(STILL_ATTRIBUTE, "");
     if (typeof root.getAnimations !== "function") return () => root.removeAttribute(STILL_ATTRIBUTE);
     hold(root);
+    watch(root);
     const started = (event: Event) => {
       if (event.target instanceof Element) hold(event.target);
     };
     root.addEventListener("animationstart", started, true);
     root.addEventListener("transitionrun", started, true);
     return () => {
+      unwatch(root);
       root.removeAttribute(STILL_ATTRIBUTE);
       root.removeEventListener("animationstart", started, true);
       root.removeEventListener("transitionrun", started, true);
@@ -46,5 +74,5 @@ export function useHeldMotion(ref: RefObject<HTMLElement | null>, held: boolean)
         if (animation.playState === "paused") animation.play();
       }
     };
-  }, [ref, held]);
+  }, [ref, still]);
 }

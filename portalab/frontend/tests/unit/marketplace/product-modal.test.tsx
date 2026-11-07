@@ -49,17 +49,17 @@ const PRODUCTS = [
   product("crown", "title", "Crown", { label: "Royal" }, { rarity: "legendary", supply: 2, remaining: 0 }),
 ];
 
-function show(entry = "/marketplace") {
+function show(entry = "/marketplace", products = PRODUCTS) {
   fake.handler = (request) => {
     const path = new URL(request.url).pathname;
     if (path === "/api/v1/me/permissions") {
       return json(200, { permissions: ["marketplace.read", "marketplace.purchase"], roles: ["user"] });
     }
-    if (path === "/api/v1/marketplace/products") return json(200, PRODUCTS);
+    if (path === "/api/v1/marketplace/products") return json(200, products);
     if (path.startsWith("/api/v1/marketplace/products/")) {
       return json(
         200,
-        PRODUCTS.find((p) => path.endsWith(`/${p.key}`)),
+        products.find((p) => path.endsWith(`/${p.key}`)),
       );
     }
     if (path === "/api/v1/marketplace/categories") return json(200, []);
@@ -157,5 +157,29 @@ describe("shop previews' motion", () => {
     const stage = dialog.querySelector(".product-art__notify") as HTMLElement;
     expect(stage.closest("[data-motion-still]")).toBeNull(); // the product opened still moves
     window.localStorage.removeItem("portalab.marketplace.stillPreviews");
+  });
+});
+
+describe("shop pages", () => {
+  it("shows the products a page at a time, back to the first when the filters change (issue 382)", async () => {
+    const many = Array.from({ length: 60 }, (_, i) =>
+      product(`title_${i}`, "title", `Title ${String(i).padStart(2, "0")}`, { label: `T${i}` }),
+    );
+    show("/marketplace?d=profile&sort=name", many);
+    expect(await screen.findByRole("link", { name: /Title 00/ })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /Title 24/ })).toBeNull();
+    const pages = screen.getByRole("navigation", { name: "Pages" });
+    expect(within(pages).getByRole("button", { name: "Page 1" }).getAttribute("aria-current")).toBe("page");
+    expect((within(pages).getByRole("button", { name: "Previous page" }) as HTMLButtonElement).disabled).toBe(
+      true,
+    );
+
+    fireEvent.click(within(pages).getByRole("button", { name: "Page 3" }));
+    expect(await screen.findByRole("link", { name: /Title 59/ })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /Title 00/ })).toBeNull();
+    expect((screen.getByRole("button", { name: "Next page" }) as HTMLButtonElement).disabled).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: /^Epic/ })); // a filter: the first page again
+    expect(await screen.findByRole("link", { name: /Title 00/ })).toBeTruthy();
   });
 });

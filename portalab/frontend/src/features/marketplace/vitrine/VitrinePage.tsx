@@ -295,6 +295,66 @@ function Rail({
   );
 }
 
+/** The pages shown around the current one: the first, the last, its neighbours; « … » between. */
+function around(page: number, pages: number): (number | null)[] {
+  const wanted = [...new Set([1, page - 1, page, page + 1, pages])]
+    .filter((n) => n >= 1 && n <= pages)
+    .sort((a, b) => a - b);
+  const out: (number | null)[] = [];
+  for (const n of wanted) {
+    const last = out[out.length - 1];
+    if (typeof last === "number" && n - last > 1) out.push(null);
+    out.push(n);
+  }
+  return out;
+}
+
+/** Issue 382: the products a page at a time — fewer previews drawn at once than an ever longer list. */
+function Pager({ page, pages, onPage }: { page: number; pages: number; onPage: (page: number) => void }) {
+  const t = useT();
+  return (
+    <nav className="vitrine-pager" aria-label={t("marketplace:vitrine.pages")}>
+      <button
+        type="button"
+        className="vitrine-pager__step"
+        disabled={page <= 1}
+        aria-label={t("marketplace:vitrine.pagePrev")}
+        onClick={() => onPage(page - 1)}
+      >
+        <Icon name="chevron-left" size={16} />
+      </button>
+      {around(page, pages).map((n, index) =>
+        n === null ? (
+          // biome-ignore lint/suspicious/noArrayIndexKey: a gap has no identity of its own
+          <span key={`gap-${index}`} className="vitrine-pager__gap" aria-hidden="true">
+            …
+          </span>
+        ) : (
+          <button
+            key={n}
+            type="button"
+            className="vitrine-pager__page"
+            aria-current={n === page ? "page" : undefined}
+            aria-label={t("marketplace:vitrine.pageNumber", { page: n })}
+            onClick={() => onPage(n)}
+          >
+            {n}
+          </button>
+        ),
+      )}
+      <button
+        type="button"
+        className="vitrine-pager__step"
+        disabled={page >= pages}
+        aria-label={t("marketplace:vitrine.pageNext")}
+        onClick={() => onPage(page + 1)}
+      >
+        <Icon name="chevron-right" size={16} />
+      </button>
+    </nav>
+  );
+}
+
 /** A phone's width: a product opens in a modal there, a side panel would be cramped. */
 function useNarrow(query = "(max-width: 40rem)"): boolean {
   const [narrow, setNarrow] = useState(() => window.matchMedia?.(query).matches ?? false);
@@ -354,7 +414,6 @@ export default function VitrinePage() {
   const format = useFormat();
   const [params, setParams] = useSearchParams();
   const [q, setQ] = useState(params.get("q") ?? "");
-  const [shown, setShown] = useState(PAGE);
   const [opened, setOpened] = useState<Product | null>(null);
   const progression = useProgression().data;
   const coins = progression?.coins ?? 0;
@@ -385,13 +444,14 @@ export default function VitrinePage() {
   const only = (params.get("only") ?? "").split(",").filter(Boolean);
   const home = !department && !pick && !q.trim();
 
+  // issue 382: any other change goes back to the first page
   const set = (changes: Record<string, string | null>) => {
     const next = new URLSearchParams(params);
+    next.delete("p");
     for (const [name, value] of Object.entries(changes)) {
       if (value) next.set(name, value);
       else next.delete(name);
     }
-    setShown(PAGE);
     setParams(next);
   };
   const go = (d: string | null, s: string | null = null) =>
@@ -438,6 +498,13 @@ export default function VitrinePage() {
   );
   const renders = { hd: scoped.filter(isHdProduct), standard: scoped.filter((p) => !isHdProduct(p)) };
   const listed = render === "hd" || render === "standard" ? renders[render] : scoped;
+  const pages = Math.max(1, Math.ceil(listed.length / PAGE));
+  const page = Math.min(pages, Math.max(1, Number.parseInt(params.get("p") ?? "1", 10) || 1));
+  const browse = useRef<HTMLElement>(null);
+  const turn = (to: number) => {
+    set({ p: to > 1 ? String(to) : null });
+    browse.current?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+  };
 
   // a product sheet asked for from elsewhere (« ?product=key »)
   const wanted = params.get("product");
@@ -520,7 +587,7 @@ export default function VitrinePage() {
               placeholder={t("marketplace:catalog.search")}
               onChange={(e) => {
                 setQ(e.target.value);
-                setShown(PAGE);
+                if (params.has("p")) set({});
               }}
             />
           </label>
@@ -637,7 +704,7 @@ export default function VitrinePage() {
           ) : null}
 
           {products.data && !home ? (
-            <section className="vitrine-browse" aria-label={heading}>
+            <section ref={browse} className="vitrine-browse" aria-label={heading}>
               <header className="vitrine-browse__head">
                 {/* on a phone: back to the departments' tiles */}
                 <button
@@ -763,14 +830,8 @@ export default function VitrinePage() {
 
               {listed.length ? (
                 <>
-                  <ul className="vitrine-grid">{listed.slice(0, shown).map(tile)}</ul>
-                  {listed.length > shown ? (
-                    <div className="vitrine-more">
-                      <Button variant="secondary" onClick={() => setShown(shown + PAGE)}>
-                        {t("marketplace:vitrine.more", { count: listed.length - shown })}
-                      </Button>
-                    </div>
-                  ) : null}
+                  <ul className="vitrine-grid">{listed.slice((page - 1) * PAGE, page * PAGE).map(tile)}</ul>
+                  {pages > 1 ? <Pager page={page} pages={pages} onPage={turn} /> : null}
                 </>
               ) : (
                 <EmptyState
