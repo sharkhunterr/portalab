@@ -56,14 +56,53 @@
 
 # v1.1.0
 
-## Portalab v1.1.0 — newsletters that write themselves, a feed of your own
+## Portalab v1.1.0 — every book, saga and game to ask for, newsletters that write themselves
 
-Newsletters now write themselves from what happened on the server and land in members' inboxes in
-Portalab's own look. Each member gets a news feed of the channels they follow. Quests are richer and easier
-to follow, and booster openings have new scenes, in video and over the whole screen. Plays are rewarded
-reliably again.
+**The biggest update since launch.** Members can now find and ask for any book, audiobook or game — not only
+films and series — with a full sheet even when the library doesn't have it yet. Every saga, book series and
+game franchise gets its own page. Members review what they watched and report a problem in two clicks.
+Newsletters write themselves and land in inboxes in Portalab's own look, each member gets a news feed of
+their own, quests move to the Games page with a monthly media bingo, and booster openings get a whole new
+range of scenes, in video and over the whole screen.
+
+![A book the library doesn't have yet: its sheet, its series, and « Ask for it »](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.1.0/assets/screenshots/book-sheet.jpg)
 
 ### Highlights
+
+- **Ask for any title, not just films and series** — books, audiobooks, comics and games are asked for the
+  way films are: the same « Request a title », the same « My requests » with each cover, the same queue
+  and figures for the administrators. A request opens in a window over the page you are on, and Portalab
+  says at once when the library already has the title or another member asked for it. When a book or a game
+  arrives, the request turns « Available » by itself. Administrators choose which kinds members may ask for
+  in the new *Title requests* module.
+
+![Books and films side by side in « My requests »](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.1.0/assets/screenshots/requests-books.jpg)
+
+- **A sheet for every book and game, in the library or not** — with Hardcover, an author's page lists their
+  whole bibliography and a book series every volume, owned or missing, in the member's language and in the
+  editions the administrator prefers. A missing book opens on a sheet laid out like a library title:
+  description, series, editions, authors — and « Ask for it ». A book held only as an audiobook stays
+  available to ask for as a book. Search suggests the books and games to ask for next to the library's.
+  The new IGDB connector brings a game franchise's games and a missing game's sheet.
+- **Sagas, series and franchises** — a film's saga, a book series and a game franchise are told the same way
+  on every title's page: the title's place in it (« Volume 2 ») and its other titles on a rail. Each one has
+  its own page with every title in order, including the films of a saga still to ask for.
+
+![A saga's page: every film in order, those in the library and those to ask for](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.1.0/assets/screenshots/collection.jpg)
+
+- **Reviews and « Report a problem »** — a title's page has one bar of small actions: I like it, not for me,
+  later, my review, follow, report. Members rate what they watched, read, listened to or played from 1 to 5
+  with a few words if they want, and the average shows on the title. « Report a problem » opens a ticket of
+  the type the administrator chose, tied to the title: its poster shows in the ticket lists, and the team
+  sees each media server's files and streams. A title with open reports is flagged on its poster everywhere.
+
+![A title's page: the actions bar — taste, later, review and report](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.1.0/assets/screenshots/title-actions.jpg)
+
+- **The month's media bingo** — one card for every member, drawn from what the library can fill (a genre, an
+  era, a country, a series…). A full card gives a booster of its genre. Retro games played through RomM now
+  earn their minutes like films and series, and live TV can have a reward rule of its own.
+- **A smoother shop** — the marketplace now shows its products a page at a time, and a switch holds the
+  animated previews still while browsing (they still play in a product's window).
 
 - **Automatic newsletters** — editions that write themselves from what arrived, what was watched and what
   is coming, built on visual templates. Each one has its own name, e-mail subject, contents and charts, and
@@ -101,7 +140,10 @@ reliably again.
 - **A clearer member menu** — arranged by intent: News, Media, Games, Community, Shop, Help, Statistics and
   Me.
 - **Community projects and the reserve** — a project page shows who backed it, what is still needed and a
-  timeline. Unread badges mark what arrived in the reserve.
+  timeline. Unread badges mark what arrived in the reserve, and every pack still to open is listed.
+- **For administrators** — set a member's password from their card (your own password asked first, the
+  member signed out everywhere), and suggest feed sources members follow in one click.
+- **The reader** — a PDF or comic page always fits the screen, with whole page or full width for comics.
 - **Quick access widget** — pick the services it shows and their order. Each one is coloured by its state,
   and the widget adapts to its size.
 
@@ -124,6 +166,19 @@ reliably again.
 - Newsletters page: the live preview is on demand, and the misleading « Newsletter » digest block is
   gone (#327)
 - A newsletter's subtitle follows its content (#337)
+- My feed: a newly added source no longer floods the unread badge with its past items (#350)
+- Mediacards: every pack still to open is listed, not only the last 20 (#358)
+- Reader: a PDF page no longer overflows the screen, and comics get whole page or full width (#359)
+- A book's page no longer shows its progress twice (#360)
+- An author's page: « Absent » no longer sits against the « Ask for it » button (#365)
+- The header search shows its spinner while it searches (#366)
+- An author's books are shown in the member's language, and a book the library holds in parts is no longer
+  shown as missing (#371)
+- A library audiobook is shown as an audiobook, not a book, on an author's or a series' page (#372)
+- A book held only as an audiobook can still be asked for as a book (#374)
+- A book held as an audiobook can be asked for as a book from an author's or a series' page (#376)
+- Book and game requests show their cover and link to their sheet in « My requests » (#379)
+- News: smaller cards on a phone, two to a row (#380)
 
 #### New
 
@@ -172,6 +227,20 @@ reliably again.
 - The full booster range: eighteen genre boosters, each with its own video scene, plus rarity and theme
   boosters (Japan, Anime, Kaijū and robots, Samurai and ninjas). The frame seen at the opening is the one the
   card keeps (#296)
+- Set a member's password from the administration (#348)
+- My feed: sources suggested by the administrator (RSS, YouTube…), added in one click (#349)
+- Sagas, book series and game franchises told the same way, each with its own page (#361)
+- Hardcover: an author's bibliography and the missing volumes of a series (#362)
+- Asking for titles no service handles (books, games…): a module to switch on, with « me too » (#363)
+- A missing book's sheet from Hardcover: description, series, editions, and asking for it (#367)
+- Hardcover: the service's preferred edition languages (#369)
+- A missing book's sheet looks like a library title's page (#370)
+- Search: books, audiobooks and games to ask for among the results (#373)
+- One way to ask: « Request a title » and « My requests » for every kind of media, one admin page (#375)
+- Ask for a book or a game in a window, without leaving the page (#377)
+- Book and game requests are requests like films': same lists, same queue, same statistics (#378)
+- Marketplace: a switch to hold the animated previews still (#381)
+- Marketplace: products a page at a time instead of « Show more » (#382)
 - Plays are caught up from the moment an account was linked, not only from the last 48 hours (#341)
 - A film or episode stopped in the last two minutes before its end credits counts as finished, and
   earlier plays have been reviewed (#342)
@@ -180,6 +249,7 @@ reliably again.
 
 - The guided tours, the member guide (the wiki) and the documentation follow the new menu and every new
   feature, with four new tours: the news, games and quests, my reserve, community projects (#344)
+- The release pipeline's lint and built-in pack checks pass again (#383)
 
 #### Improved
 
@@ -189,10 +259,13 @@ reliably again.
 
 ### Upgrading
 
-- Migrations run with `docker compose run --rm migrate` (cards, marketplace, media and news). The upgrade
+- Migrations run with `docker compose run --rm migrate` (cards, games, marketplace, media, news, support
+  and the new `requests` schema). The upgrade
   queues one review of the past 30 days of plays. That review grants the finish bonuses missed under the
   old end-credits rule, without counting any watch minute twice.
 - A visual pack may now weigh up to 40 MB.
+- Optional: to let members ask for books and games, add a Hardcover service (and IGDB for games) under
+  *Services*, then switch on the kinds of titles under *Title requests*.
 - Optional: set a sender name under *Communication → E-mail*. Without one, e-mails go out under the site's
   name.
 
