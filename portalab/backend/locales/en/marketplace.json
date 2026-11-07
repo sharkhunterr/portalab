@@ -764,6 +764,7 @@
   "type.xp_boost": "XP boost",
   "vitrine.affordCount": "{count, plural, =0 {Nothing within reach yet} one {# item within reach} other {# items within reach}}",
   "vitrine.all": "Whole department",
+  "vitrine.animated": "Animated previews",
   "vitrine.browse": "Browse by department",
   "vitrine.dealEnds": "Ends {when}",
   "vitrine.departments": "All departments",

@@ -764,6 +764,7 @@
   "type.xp_boost": "Boost d'XP",
   "vitrine.affordCount": "{count, plural, =0 {Rien à ta portée pour l'instant} one {# article à ta portée} other {# articles à ta portée}}",
   "vitrine.all": "Tout le rayon",
+  "vitrine.animated": "Aperçus animés",
   "vitrine.browse": "Parcourir par rayon",
   "vitrine.dealEnds": "Se termine {when}",
   "vitrine.departments": "Tous les rayons",

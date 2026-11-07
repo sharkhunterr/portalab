@@ -1,4 +1,4 @@
-import { frameInterval, motionBudget } from "../../motion/budget";
+import { frameInterval, motionBudget, stillFor } from "../../motion/budget";
 import { makeNoise } from "./noise";
 
 /**
@@ -463,12 +463,12 @@ export function runFlow(canvas: HTMLCanvasElement, preset: FlowPreset): (() => v
       last = now;
       return;
     }
-    if (held && motionBudget() === "still") return; // #29: one still frame
+    if (held && stillFor(canvas)) return; // #29: one still frame
     const interval = frameInterval();
     const gap = now - last;
     if (gap < interval - 2) return;
     last = now;
-    held = motionBudget() === "still";
+    held = stillFor(canvas);
     frames += 1;
     if (gap > interval * 1.6 && gap < 1000) late += 1;
     if (frames >= 60) {

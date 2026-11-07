@@ -1,5 +1,5 @@
 import type { Container, ISourceOptions } from "@tsparticles/engine";
-import { motionBudget } from "../../motion/budget";
+import { motionBudget, stillFor } from "../../motion/budget";
 
 /**
  * #68: the particle ambiences, by tsParticles (MIT) — loaded only when one is chosen. Transparent, at 30
@@ -92,6 +92,6 @@ export async function runParticles(element: HTMLElement, kind: string): Promise<
     element,
     options: budget === "eco" ? { ...options, fpsLimit: 15 } : options,
   });
-  if (budget === "still") window.setTimeout(() => container?.pause(), 400);
+  if (budget === "still" || stillFor(element)) window.setTimeout(() => container?.pause(), 400);
   return () => container?.destroy();
 }

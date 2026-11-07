@@ -4,6 +4,7 @@ import { LevelBadge } from "../../../design-system/components/Badges";
 import { Icon } from "../../../design-system/components/Icon";
 import { Notification } from "../../../design-system/components/Notification";
 import { CelebrationScene } from "../../../design-system/feedback/Celebration";
+import { useStillMotion } from "../../../design-system/motion/still";
 import { AmbientLayer } from "../../../design-system/themes/AmbientLayer";
 import { builtinTheme } from "../../../design-system/themes/builtin";
 import { paletteFor } from "../../../design-system/themes/palettes";
@@ -101,14 +102,16 @@ function text(preview: Preview, field: string): string | undefined {
   return typeof preview[field] === "string" ? (preview[field] as string) : undefined;
 }
 
-/** Replays an entrance animation every few seconds (the CSS stops it under reduced motion). */
+/** Replays an entrance animation every few seconds (the CSS stops it under reduced motion; held still while
+ * browsing without the previews' motion, issue 381). */
 function useReplay(active: boolean, every = 2600): number {
   const [run, setRun] = useState(0);
+  const still = useStillMotion();
   useEffect(() => {
-    if (!active) return;
+    if (!active || still) return;
     const timer = window.setInterval(() => setRun((n) => n + 1), every);
     return () => window.clearInterval(timer);
-  }, [active, every]);
+  }, [active, every, still]);
   return run;
 }
 

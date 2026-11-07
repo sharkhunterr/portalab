@@ -135,3 +135,27 @@ describe("shop links from elsewhere", () => {
     expect(screen.queryByRole("link", { name: /Crown/ })).toBeNull();
   });
 });
+
+describe("shop previews' motion", () => {
+  it("holds the previews still while browsing, not in the product opened (issue 381)", async () => {
+    window.localStorage.removeItem("portalab.marketplace.stillPreviews");
+    show();
+    const toggle = await screen.findByRole("switch", { name: "Animated previews" });
+    expect((toggle as HTMLInputElement).checked).toBe(true);
+    fireEvent.click(await screen.findByRole("button", { name: /^Notifications & effects/ }));
+    const link = await screen.findByRole("link", { name: /Neon notifications/ });
+    const art = () => link.closest(".vitrine-tile")?.querySelector(".lazy-art") as HTMLElement;
+    expect(art().hasAttribute("data-motion-still")).toBe(false);
+
+    fireEvent.click(toggle);
+    expect((toggle as HTMLInputElement).checked).toBe(false);
+    expect(art().hasAttribute("data-motion-still")).toBe(true);
+    expect(window.localStorage.getItem("portalab.marketplace.stillPreviews")).toBe("1");
+
+    fireEvent.click(link);
+    const dialog = await screen.findByRole("dialog", { name: "Neon notifications" });
+    const stage = dialog.querySelector(".product-art__notify") as HTMLElement;
+    expect(stage.closest("[data-motion-still]")).toBeNull(); // the product opened still moves
+    window.localStorage.removeItem("portalab.marketplace.stillPreviews");
+  });
+});
