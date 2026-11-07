@@ -9,6 +9,7 @@ import { EmptyState, Skeleton } from "../../../design-system/components/Placehol
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { Switch } from "../../account/SettingsKit";
 import { HdTag, isHdProduct } from "../../appearance/Rarity";
 import { useCollectsCards } from "../../cards/collects";
 import { useProgression } from "../../gamification/api";
@@ -28,6 +29,7 @@ import {
 } from "../catalog/departments";
 import { LazyArt } from "../catalog/LazyArt";
 import { Price, priceOf } from "../catalog/Price";
+import { setStillPreviews, useStillPreviews } from "../catalog/stillPreviews";
 import { useEquipment } from "../equip";
 import { ProductSheet, PurchaseBar, TryOn } from "../product/ProductSheet";
 import { productTypeLabel } from "../typeLabel";
@@ -417,6 +419,7 @@ export default function VitrinePage() {
     return { byDepartment, byShelf };
   }, [all, departments]);
   const affordable = all.filter(rule.afford).length;
+  const still = useStillPreviews();
 
   const render = params.get("hd") ?? "";
   const scoped = useMemo(
@@ -521,6 +524,16 @@ export default function VitrinePage() {
               }}
             />
           </label>
+          {/* issue 381: the previews' motion off while browsing — a product opened still moves */}
+          <div className="vitrine-motion">
+            <Switch
+              role="switch"
+              aria-checked={!still}
+              checked={!still}
+              label={t("marketplace:vitrine.animated")}
+              onChange={(event) => setStillPreviews(!event.target.checked)}
+            />
+          </div>
 
           {/* on a phone: the departments as a grid of tiles on the showcase's home */}
           <h2 className="vitrine-nav__title">{t("marketplace:vitrine.browse")}</h2>

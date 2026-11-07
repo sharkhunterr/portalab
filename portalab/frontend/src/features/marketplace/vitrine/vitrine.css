@@ -105,6 +105,13 @@
   font-size: var(--font-size-sm);
 }
 
+/* issue 381: the previews' motion, on or off while browsing */
+.vitrine-motion {
+  display: flex;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
 .vitrine-nav {
   display: grid;
   gap: 0.15rem;
@@ -731,6 +738,9 @@
     display: none;
   }
   .vitrine-wallet__afford {
+    grid-column: 1 / -1;
+  }
+  .vitrine-motion {
     grid-column: 1 / -1;
   }
   /* the departments as tiles, three a row: an icon, the name, how many */

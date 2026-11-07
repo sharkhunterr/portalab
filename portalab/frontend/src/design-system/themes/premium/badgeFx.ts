@@ -11,7 +11,7 @@
  * ``null`` when the device cannot draw it (the element then keeps its CSS look).
  */
 
-import { frameInterval, liveLooks, motionBudget } from "../../motion/budget";
+import { frameInterval, liveLooks, motionBudget, stillFor } from "../../motion/budget";
 import { externalFx } from "../../visuals/registry";
 
 export const FX_EFFECTS = [
@@ -560,7 +560,13 @@ function loop(now: number) {
   // kept small (a ten-minute loop): even in medium precision the noise keeps moving
   const time = frozen ? 3.0 : ((now - started) / 1000) % 600;
   const visible = [...instances].filter((instance) => instance.visible);
-  const live = frozen ? new Set<Instance>() : moving(visible, liveLooks());
+  // issue 381: a look in a part of the page held still is drawn once, then holds
+  const live = frozen
+    ? new Set<Instance>()
+    : moving(
+        visible.filter((instance) => !stillFor(instance.host)),
+        liveLooks(),
+      );
   for (const instance of visible) {
     if (instance.drawn && !live.has(instance)) continue;
     const begun = performance.now();

@@ -8,7 +8,7 @@
 
 export type Uniforms = () => Readonly<Record<string, number>>;
 
-import { frameInterval, motionBudget } from "../../motion/budget";
+import { frameInterval, stillFor } from "../../motion/budget";
 
 const VERTEX = `attribute vec2 a_pos;
 void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
@@ -92,12 +92,12 @@ export function runShader(
     frame = requestAnimationFrame(draw);
     if (document.hidden) return;
     // #29: half the frames when saving, one still frame when motion is « none »
-    if (held && motionBudget() === "still") return;
+    if (held && stillFor(canvas)) return;
     const interval = frameInterval();
     const gap = now - last;
     if (gap < interval - 2) return; // 30 frames a second at most
     last = now;
-    held = motionBudget() === "still";
+    held = stillFor(canvas);
     // a frame much later than asked, often: the device is struggling — fewer pixels
     frames += 1;
     if (gap > interval * 1.6 && gap < 1000) late += 1;

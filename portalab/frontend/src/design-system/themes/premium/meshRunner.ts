@@ -1,4 +1,4 @@
-import { frameInterval, motionBudget } from "../../motion/budget";
+import { frameInterval, stillFor } from "../../motion/budget";
 import { makeNoise } from "./noise";
 
 /**
@@ -93,9 +93,9 @@ export function runMesh(canvas: HTMLCanvasElement): (() => void) | null {
   const step = (now: number) => {
     frame = requestAnimationFrame(step);
     if (document.hidden || now - last < frameInterval() - 2) return;
-    if (held && motionBudget() === "still") return; // #29: one still frame
+    if (held && stillFor(canvas)) return; // #29: one still frame
     last = now;
-    held = motionBudget() === "still";
+    held = stillFor(canvas);
     const w = Math.round(canvas.clientWidth * dpr);
     const h = Math.round(canvas.clientHeight * dpr);
     if (canvas.width !== w || canvas.height !== h) {

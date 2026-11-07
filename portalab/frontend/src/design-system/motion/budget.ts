@@ -65,6 +65,14 @@ export function setMotionChoice(animations: "all" | "discreet" | "none", reduced
   publish();
 }
 
+/** Issue 381: the attribute of a part of a page whose motion is held still (``still.tsx``). */
+export const STILL_ATTRIBUTE = "data-motion-still";
+
+/** Whether what is drawn in ``element`` holds a still frame: the budget says so, or its part of the page. */
+export function stillFor(element: Element | null | undefined): boolean {
+  return current === "still" || Boolean(element?.closest(`[${STILL_ATTRIBUTE}]`));
+}
+
 /** The budget now (read every frame by the renderers: a cheap variable). */
 export function motionBudget(): MotionBudget {
   return current;
