@@ -183,13 +183,45 @@
 .news-page__section {
   margin: var(--space-2) 0 0;
 }
+/* issue 380: two to a row on a phone — a smaller cover, its channel cut short, a smaller title */
 .news-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+.news-grid .news-cover__label {
+  max-inline-size: calc(100% - 2 * var(--space-2));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 39.99rem) {
+  .news-grid .news-card {
+    padding: var(--space-1);
+  }
+  .news-grid .news-card__body {
+    padding: 0 var(--space-1) var(--space-1);
+  }
+  .news-grid .news-card__title {
+    font-size: var(--font-size-sm);
+  }
+  .news-grid .news-card__summary {
+    -webkit-line-clamp: 2;
+    font-size: var(--font-size-sm);
+  }
+  .news-grid .news-cover .ds-icon {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+  }
+}
+@media (min-width: 40rem) {
+  .news-grid {
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: var(--space-4);
+  }
 }
 
 /* article */
