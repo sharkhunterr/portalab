@@ -9,8 +9,9 @@
 >
 > Every release after v1.0.0 lists the GitLab issues it closes, sorted by kind: `npm run release:issues`
 > prints them (security, fixed, new, documentation and tooling, improved) — rewrite each title in English,
-> as a member or an administrator would read it, keeping its `#123`. The release script refuses notes
-> without a `### Closed issues` part (v1.0.0, the first public release, is the exception).
+> as a member or an administrator would read it. The GitLab instance is private: no issue number, each line
+> starts with its kind's tag instead (`security`, `bug`, `feat`, `doc`, `improvement`). The release script
+> refuses notes without a `### Closed issues` part (v1.0.0, the first public release, is the exception).
 >
 > Images are absolute links pinned to the tag (`https://raw.githubusercontent.com/sharkhunterr/portalab/vX.Y.Z/assets/screenshots/<name>.jpg`):
 > release pages do not resolve relative paths.
@@ -32,19 +33,19 @@
 > ### Closed issues
 >
 > #### Security
-> - <what was exposed, what is closed now> (#123)
+> - `security` <what was exposed, what is closed now>
 >
 > #### Fixed
-> - <the symptom as users saw it — what happens now> (#124)
+> - `bug` <the symptom as users saw it — what happens now>
 >
 > #### New
-> - <what members or administrators can now do> (#125)
+> - `feat` <what members or administrators can now do>
 >
 > #### Documentation and tooling
-> - … (#126)
+> - `doc` …
 >
 > #### Improved
-> - … (#127)
+> - `improvement` …
 >
 > ### Upgrading
 > - Migrations run with `docker compose run --rm migrate`; anything else to do.
@@ -151,119 +152,119 @@ range of scenes, in video and over the whole screen.
 
 #### Fixed
 
-- Plays were no longer rewarded after Plex restarted: Plex reused session keys, and plays from its history
-  were taken for live ones. The missed plays have been rewarded since (#340)
-- A finished season was dated by the episode that triggered it; it is now dated by its last episode (#343)
-- A card booster bought from the shop opened in the default scene instead of its product's (#293)
-- Refreshing a page full of images showed « Error » instead of the portal (#305)
-- Backing a community project showed as « Other » in the journals (#314)
-- The calendar shows today's content without a click (#302)
-- The goal bar of a project uses the theme's colours (#306)
-- Goals: texts are translated, the done state is readable, and the time left and next reset are shown (#307)
-- The e-mail (SMTP) settings are gathered in one clear form (#319)
-- The SMTP form no longer appears twice, and the misleading « Delivered » count is gone (#321)
-- E-mails keep Portalab's art direction in Gmail (#322)
-- Newsletters page: the live preview is on demand, and the misleading « Newsletter » digest block is
-  gone (#327)
-- A newsletter's subtitle follows its content (#337)
-- My feed: a newly added source no longer floods the unread badge with its past items (#350)
-- Mediacards: every pack still to open is listed, not only the last 20 (#358)
-- Reader: a PDF page no longer overflows the screen, and comics get whole page or full width (#359)
-- A book's page no longer shows its progress twice (#360)
-- An author's page: « Absent » no longer sits against the « Ask for it » button (#365)
-- The header search shows its spinner while it searches (#366)
-- An author's books are shown in the member's language, and a book the library holds in parts is no longer
-  shown as missing (#371)
-- A library audiobook is shown as an audiobook, not a book, on an author's or a series' page (#372)
-- A book held only as an audiobook can still be asked for as a book (#374)
-- A book held as an audiobook can be asked for as a book from an author's or a series' page (#376)
-- Book and game requests show their cover and link to their sheet in « My requests » (#379)
-- News: smaller cards on a phone, two to a row (#380)
-- An audiobook skipped a chapter ahead and counted it as listened time; only what is heard counts now (#353)
-- The accessibility checks (keyboard journey, component gallery) pass again (#245)
+- `bug` Plays were no longer rewarded after Plex restarted: Plex reused session keys, and plays from its history
+  were taken for live ones. The missed plays have been rewarded since
+- `bug` A finished season was dated by the episode that triggered it; it is now dated by its last episode
+- `bug` A card booster bought from the shop opened in the default scene instead of its product's
+- `bug` Refreshing a page full of images showed « Error » instead of the portal
+- `bug` Backing a community project showed as « Other » in the journals
+- `bug` The calendar shows today's content without a click
+- `bug` The goal bar of a project uses the theme's colours
+- `bug` Goals: texts are translated, the done state is readable, and the time left and next reset are shown
+- `bug` The e-mail (SMTP) settings are gathered in one clear form
+- `bug` The SMTP form no longer appears twice, and the misleading « Delivered » count is gone
+- `bug` E-mails keep Portalab's art direction in Gmail
+- `bug` Newsletters page: the live preview is on demand, and the misleading « Newsletter » digest block is
+  gone
+- `bug` A newsletter's subtitle follows its content
+- `bug` My feed: a newly added source no longer floods the unread badge with its past items
+- `bug` Mediacards: every pack still to open is listed, not only the last 20
+- `bug` Reader: a PDF page no longer overflows the screen, and comics get whole page or full width
+- `bug` A book's page no longer shows its progress twice
+- `bug` An author's page: « Absent » no longer sits against the « Ask for it » button
+- `bug` The header search shows its spinner while it searches
+- `bug` An author's books are shown in the member's language, and a book the library holds in parts is no longer
+  shown as missing
+- `bug` A library audiobook is shown as an audiobook, not a book, on an author's or a series' page
+- `bug` A book held only as an audiobook can still be asked for as a book
+- `bug` A book held as an audiobook can be asked for as a book from an author's or a series' page
+- `bug` Book and game requests show their cover and link to their sheet in « My requests »
+- `bug` News: smaller cards on a phone, two to a row
+- `bug` An audiobook skipped a chapter ahead and counted it as listened time; only what is heard counts now
+- `bug` The accessibility checks (keyboard journey, component gallery) pass again
 
 #### New
 
-- Automatic newsletters: editions that write themselves, built on templates (#316)
-- See an edition's real e-mail without sending it to members (#317)
-- Turn off e-mails to members while administrators keep theirs, through the API for now (#318)
-- E-mails in Portalab's art direction, and a Portalab newsletter template (#320)
-- An edition's contents can each be switched on and off (#323)
-- An edition's statistics as charts, each to switch on (#324)
-- Each automatic newsletter has a name and an e-mail subject (#325)
-- Members are subscribed to each automatic newsletter by default and can unsubscribe one by one (#326)
-- Automatic newsletters shown as cards with a switch, Test / Edit / Delete, and editing in a window (#328)
-- Each automatic newsletter has its own template, chosen visually, and each template says who uses it (#329)
-- Publish an automatic newsletter as a news item, send it by e-mail, or both (#332)
-- Testing an automatic newsletter also publishes it as news when that option is on (#334)
-- A published newsletter is an ordinary news item, no longer duplicated in the Newsletters tab (#335)
-- E-mails go out under a sender name instead of the bare address (#339)
-- My feed: a dashboard widget, and YouTube videos played in place (#315)
-- My feed: news pages, and an icon for each source type (YouTube, podcast…) (#301)
-- Unread badges on My feed's news and on what arrives in the reserve (#300)
-- An unread news badge on « Headlines » (#336)
-- A colour for each news channel (#338)
-- Quick access widget: choose and order the services, coloured by state, adapting to its size (#333)
-- Mediacards boosters: a scene for each genre and rarity, with five new genre scenes in video (#291)
-- Booster scenes for the 14 Mediacards editions (#292)
-- Identical boosters are stacked in the reserve and on the cards page, with a count badge (#297)
-- Projects and reserve: badges, the form in a window, a new look for « My reserve » (#303)
-- A project's page shows who backed it, what is still needed and a horizontal timeline (#304)
-- New goals on using the portal, plays, requests, games and support (#308)
-- Goals editor: conditions per step, progress actions, a Discovery type and more icons (#309)
-- Quests on the Games page (#310)
-- Filters on the quests page (#311)
-- Quests show a done / total progress bar instead of « 29 to do » (#312)
-- The welcome sets the portal up: media accounts, a four-notch play gauge, a home made to the member's
+- `feat` Automatic newsletters: editions that write themselves, built on templates
+- `feat` See an edition's real e-mail without sending it to members
+- `feat` Turn off e-mails to members while administrators keep theirs, through the API for now
+- `feat` E-mails in Portalab's art direction, and a Portalab newsletter template
+- `feat` An edition's contents can each be switched on and off
+- `feat` An edition's statistics as charts, each to switch on
+- `feat` Each automatic newsletter has a name and an e-mail subject
+- `feat` Members are subscribed to each automatic newsletter by default and can unsubscribe one by one
+- `feat` Automatic newsletters shown as cards with a switch, Test / Edit / Delete, and editing in a window
+- `feat` Each automatic newsletter has its own template, chosen visually, and each template says who uses it
+- `feat` Publish an automatic newsletter as a news item, send it by e-mail, or both
+- `feat` Testing an automatic newsletter also publishes it as news when that option is on
+- `feat` A published newsletter is an ordinary news item, no longer duplicated in the Newsletters tab
+- `feat` E-mails go out under a sender name instead of the bare address
+- `feat` My feed: a dashboard widget, and YouTube videos played in place
+- `feat` My feed: news pages, and an icon for each source type (YouTube, podcast…)
+- `feat` Unread badges on My feed's news and on what arrives in the reserve
+- `feat` An unread news badge on « Headlines »
+- `feat` A colour for each news channel
+- `feat` Quick access widget: choose and order the services, coloured by state, adapting to its size
+- `feat` Mediacards boosters: a scene for each genre and rarity, with five new genre scenes in video
+- `feat` Booster scenes for the 14 Mediacards editions
+- `feat` Identical boosters are stacked in the reserve and on the cards page, with a count badge
+- `feat` Projects and reserve: badges, the form in a window, a new look for « My reserve »
+- `feat` A project's page shows who backed it, what is still needed and a horizontal timeline
+- `feat` New goals on using the portal, plays, requests, games and support
+- `feat` Goals editor: conditions per step, progress actions, a Discovery type and more icons
+- `feat` Quests on the Games page
+- `feat` Filters on the quests page
+- `feat` Quests show a done / total progress bar instead of « 29 to do »
+- `feat` The welcome sets the portal up: media accounts, a four-notch play gauge, a home made to the member's
   tastes from the administrator's dashboard for their play profile, notifications and e-mails; new My
-  reserve and My Mediacards widgets (#347)
-- A quest reminder in Today's games (#313)
-- Booster scenes can play video: MP4 or WebM with transparency, looping backdrops, and an effect played over
-  the card (#287)
-- A card's reveal can take the whole screen: the rarity first, then the card turning (#290)
-- Impact: a booster opening in the style of an animated trading-card game, drawn as a comic (#285)
-- Sumi: a booster scene in ink and gold, like Japanese lacquerware (#286)
-- Géode: a booster scene inside a geode, made for video (#288)
-- A manga universe of booster scenes: Shōnen, Magical girl, Ninja and Mecha (#289)
-- Genre frames for media cards, next to the edition frames: eighteen frames, one for each main genre (#295)
-- The full booster range: eighteen genre boosters, each with its own video scene, plus rarity and theme
+  reserve and My Mediacards widgets
+- `feat` A quest reminder in Today's games
+- `feat` Booster scenes can play video: MP4 or WebM with transparency, looping backdrops, and an effect played over
+  the card
+- `feat` A card's reveal can take the whole screen: the rarity first, then the card turning
+- `feat` Impact: a booster opening in the style of an animated trading-card game, drawn as a comic
+- `feat` Sumi: a booster scene in ink and gold, like Japanese lacquerware
+- `feat` Géode: a booster scene inside a geode, made for video
+- `feat` A manga universe of booster scenes: Shōnen, Magical girl, Ninja and Mecha
+- `feat` Genre frames for media cards, next to the edition frames: eighteen frames, one for each main genre
+- `feat` The full booster range: eighteen genre boosters, each with its own video scene, plus rarity and theme
   boosters (Japan, Anime, Kaijū and robots, Samurai and ninjas). The frame seen at the opening is the one the
-  card keeps (#296)
-- Set a member's password from the administration (#348)
-- My feed: sources suggested by the administrator (RSS, YouTube…), added in one click (#349)
-- Sagas, book series and game franchises told the same way, each with its own page (#361)
-- Hardcover: an author's bibliography and the missing volumes of a series (#362)
-- Asking for titles no service handles (books, games…): a module to switch on, with « me too » (#363)
-- A missing book's sheet from Hardcover: description, series, editions, and asking for it (#367)
-- Hardcover: the service's preferred edition languages (#369)
-- A missing book's sheet looks like a library title's page (#370)
-- Search: books, audiobooks and games to ask for among the results (#373)
-- One way to ask: « Request a title » and « My requests » for every kind of media, one admin page (#375)
-- Ask for a book or a game in a window, without leaving the page (#377)
-- Book and game requests are requests like films': same lists, same queue, same statistics (#378)
-- Marketplace: a switch to hold the animated previews still (#381)
-- Marketplace: products a page at a time instead of « Show more » (#382)
-- Retro games played through RomM count like films and series: the administrator's XP rules, quests and
-  statistics, and a game's estimated length on its page (#351)
-- « Report a problem » on a title's page: a ticket tied to the media, its technical sheet for the team,
-  and the open reports flagged on its poster (#354)
-- Members' reviews: a rating from 1 to 5 and an optional comment on what they watched, read or played (#355)
-- The month's media bingo on the Games page, the same card for everyone, a full card earning a booster (#356)
-- Plays are caught up from the moment an account was linked, not only from the last 48 hours (#341)
-- A film or episode stopped in the last two minutes before its end credits counts as finished, and
-  earlier plays have been reviewed (#342)
+  card keeps
+- `feat` Set a member's password from the administration
+- `feat` My feed: sources suggested by the administrator (RSS, YouTube…), added in one click
+- `feat` Sagas, book series and game franchises told the same way, each with its own page
+- `feat` Hardcover: an author's bibliography and the missing volumes of a series
+- `feat` Asking for titles no service handles (books, games…): a module to switch on, with « me too »
+- `feat` A missing book's sheet from Hardcover: description, series, editions, and asking for it
+- `feat` Hardcover: the service's preferred edition languages
+- `feat` A missing book's sheet looks like a library title's page
+- `feat` Search: books, audiobooks and games to ask for among the results
+- `feat` One way to ask: « Request a title » and « My requests » for every kind of media, one admin page
+- `feat` Ask for a book or a game in a window, without leaving the page
+- `feat` Book and game requests are requests like films': same lists, same queue, same statistics
+- `feat` Marketplace: a switch to hold the animated previews still
+- `feat` Marketplace: products a page at a time instead of « Show more »
+- `feat` Retro games played through RomM count like films and series: the administrator's XP rules, quests and
+  statistics, and a game's estimated length on its page
+- `feat` « Report a problem » on a title's page: a ticket tied to the media, its technical sheet for the team,
+  and the open reports flagged on its poster
+- `feat` Members' reviews: a rating from 1 to 5 and an optional comment on what they watched, read or played
+- `feat` The month's media bingo on the Games page, the same card for everyone, a full card earning a booster
+- `feat` Plays are caught up from the moment an account was linked, not only from the last 48 hours
+- `feat` A film or episode stopped in the last two minutes before its end credits counts as finished, and
+  earlier plays have been reviewed
 
 #### Documentation and tooling
 
-- The guided tours, the member guide (the wiki) and the documentation follow the new menu and every new
-  feature, with four new tours: the news, games and quests, my reserve, community projects (#344)
-- The release pipeline's lint and built-in pack checks pass again (#383)
+- `doc` The guided tours, the member guide (the wiki) and the documentation follow the new menu and every new
+  feature, with four new tours: the news, games and quests, my reserve, community projects
+- `doc` The release pipeline's lint and built-in pack checks pass again
 
 #### Improved
 
-- News: Headlines (administrators) and My feed (members), with follows, configurable RSS sources and
-  unread items (#299)
-- The member menu is arranged by intent: News, Media, Games, Community, Shop, Help, Statistics and Me (#298)
+- `improvement` News: Headlines (administrators) and My feed (members), with follows, configurable RSS sources and
+  unread items
+- `improvement` The member menu is arranged by intent: News, Media, Games, Community, Shop, Help, Statistics and Me
 
 ### Upgrading
 
