@@ -179,6 +179,8 @@ range of scenes, in video and over the whole screen.
 - A book held as an audiobook can be asked for as a book from an author's or a series' page (#376)
 - Book and game requests show their cover and link to their sheet in « My requests » (#379)
 - News: smaller cards on a phone, two to a row (#380)
+- An audiobook skipped a chapter ahead and counted it as listened time; only what is heard counts now (#353)
+- The accessibility checks (keyboard journey, component gallery) pass again (#245)
 
 #### New
 
@@ -241,6 +243,12 @@ range of scenes, in video and over the whole screen.
 - Book and game requests are requests like films': same lists, same queue, same statistics (#378)
 - Marketplace: a switch to hold the animated previews still (#381)
 - Marketplace: products a page at a time instead of « Show more » (#382)
+- Retro games played through RomM count like films and series: the administrator's XP rules, quests and
+  statistics, and a game's estimated length on its page (#351)
+- « Report a problem » on a title's page: a ticket tied to the media, its technical sheet for the team,
+  and the open reports flagged on its poster (#354)
+- Members' reviews: a rating from 1 to 5 and an optional comment on what they watched, read or played (#355)
+- The month's media bingo on the Games page, the same card for everyone, a full card earning a booster (#356)
 - Plays are caught up from the moment an account was linked, not only from the last 48 hours (#341)
 - A film or episode stopped in the last two minutes before its end credits counts as finished, and
   earlier plays have been reviewed (#342)
