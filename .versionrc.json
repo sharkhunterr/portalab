@@ -57,6 +57,9 @@
   "issueUrlFormat": "{{host}}/{{owner}}/{{repository}}/issues/{{id}}",
   "userUrlFormat": "{{host}}/{{user}}",
   "releaseCommitMessageFormat": "chore(release): {{currentTag}}",
+  "scripts": {
+    "postchangelog": "node scripts/version/changelog-private.js"
+  },
   "bumpFiles": [
     {
       "filename": "package.json",
