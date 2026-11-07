@@ -258,6 +258,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 .edition-variable {
   padding: 0 var(--space-2);

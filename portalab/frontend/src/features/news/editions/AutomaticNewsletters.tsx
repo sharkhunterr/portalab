@@ -188,7 +188,7 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
             value={values.subject ?? ""}
             onChange={(e) => set("subject", e.target.value || null)}
           />
-          <div className="edition-variables" role="group" aria-label={t("news:auto.variables")}>
+          <fieldset className="edition-variables" aria-label={t("news:auto.variables")}>
             {VARIABLES.map((variable) => (
               <button
                 key={variable}
@@ -199,7 +199,7 @@ function NewsletterEditor({ schedule, onDone }: { schedule: Schedule | null; onD
                 {`{${variable}}`}
               </button>
             ))}
-          </div>
+          </fieldset>
         </fieldset>
 
         <fieldset className="email-setup__block">
