@@ -572,6 +572,7 @@
 .vitrine-browse {
   display: grid;
   gap: var(--space-4);
+  scroll-margin-block-start: calc(var(--header-height, 3.5rem) + var(--space-3));
 }
 .vitrine-tools {
   display: flex;
@@ -654,9 +655,43 @@
   padding: 0;
   list-style: none;
 }
-.vitrine-more {
+/* issue 382: the products a page at a time */
+.vitrine-pager {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
+  gap: var(--space-1);
+}
+.vitrine-pager button {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 2.5rem;
+  block-size: 2.5rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.vitrine-pager button:hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
+.vitrine-pager button[aria-current="page"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.vitrine-pager button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.vitrine-pager__gap {
+  padding: 0 var(--space-1);
+  color: var(--color-text-muted);
 }
 
 /* the product's sheet on sale: the same red pill on its art (laid at the art's bottom, whose height is the
