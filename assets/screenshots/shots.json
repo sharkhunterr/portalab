@@ -819,5 +819,81 @@
         "wait": 800
       }
     ]
+  },
+  {
+    "name": "book-sheet",
+    "page": "readme",
+    "route": "/media/book?service=01a1b155-36c8-7699-a382-a08e6fe94cc8&ref=427336",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 20000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); } .status-banner { display: none; }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "collection",
+    "page": "readme",
+    "route": "/media/collection?ref=tmdb%3A119",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); } .status-banner { display: none; }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "title-actions",
+    "page": "readme",
+    "route": "/media/01a10781-a94d-7ab2-a455-b83f4a6808f8",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); } .status-banner { display: none; }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
+  },
+  {
+    "name": "requests-books",
+    "page": "readme",
+    "route": "/media/requests",
+    "clip": "body",
+    "height": 900,
+    "maxHeight": 900,
+    "settle": 15000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img { filter: blur(7px); } .status-banner { display: none; }",
+        "wait": 300
+      },
+      {
+        "click": "nav button:has-text(\"Administration\")",
+        "wait": 800
+      }
+    ]
   }
 ]
