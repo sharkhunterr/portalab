@@ -8,7 +8,8 @@
  *
  * Kinds come from the labels: security, bug, feature, documentation / deploy (tooling); anything else is an
  * improvement. Titles are printed as written in GitLab: the notes are in English, so rewrite each line as a
- * member or an administrator would read it, keeping its « #123 ».
+ * member or an administrator would read it. The GitLab instance is private: the notes give no issue number,
+ * each line starts with its kind's tag (`bug`, `feat`…).
  */
 
 const { execSync } = require('child_process');
@@ -35,11 +36,11 @@ function since() {
 }
 
 const KINDS = [
-  ['Security', (labels) => labels.includes('security')],
-  ['Fixed', (labels) => labels.includes('bug')],
-  ['New', (labels) => labels.includes('feature')],
-  ['Documentation and tooling', (labels) => labels.includes('documentation') || labels.includes('deploy')],
-  ['Improved', () => true],
+  ['Security', 'security', (labels) => labels.includes('security')],
+  ['Fixed', 'bug', (labels) => labels.includes('bug')],
+  ['New', 'feat', (labels) => labels.includes('feature')],
+  ['Documentation and tooling', 'doc', (labels) => labels.includes('documentation') || labels.includes('deploy')],
+  ['Improved', 'improvement', () => true],
 ];
 
 function closedIssues(after) {
@@ -65,13 +66,13 @@ function main() {
   console.log(`<!-- closed since ${tag || 'the beginning'}: ${issues.length} issue(s) -->`);
   console.log('### Closed issues\n');
   const done = new Set();
-  for (const [title, matches] of KINDS) {
+  for (const [title, kind, matches] of KINDS) {
     const rows = issues.filter((issue) => !done.has(issue.iid) && matches(issue.labels || []));
     if (!rows.length) continue;
     console.log(`#### ${title}\n`);
     for (const issue of rows) {
       done.add(issue.iid);
-      console.log(`- ${issue.title} (#${issue.iid})`);
+      console.log(`- \`${kind}\` ${issue.title}`);
     }
     console.log('');
   }
