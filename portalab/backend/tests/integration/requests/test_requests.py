@@ -11,7 +11,7 @@ import pytest
 from fastapi import FastAPI
 from sqlalchemy import select
 
-from portalab.capabilities.media import BOOK_SERIES, PersonCredit
+from portalab.capabilities.media import BOOK_SERIES, EDITION, BookDetails, PersonCredit
 from portalab.capabilities.media.testkit import library_record
 from portalab.core.authz_port import Principal
 from portalab.modules.media.models import ExternalId, MediaObject, MediaRequest
@@ -233,3 +233,52 @@ async def test_a_book_asked_by_hand_is_given_its_cover_and_sheet(
     assert await media.module.requests.give_faces() == 0  # each looked for once in turn
     mine = {i["title"]: i for i in (await client.get("/api/v1/me/media/requests/list")).json()["items"]}
     assert mine["Assassin's Apprentice"]["sheet"].endswith("ref=1")
+
+
+class _Hardcover(_Books):
+    """A book database that tells « Assassin's Apprentice » and draws its cover."""
+
+    async def book(self, ref: str) -> BookDetails | None:  # type: ignore[override]
+        if ref != "1":
+            return None
+        return BookDetails(
+            ref="1",
+            title="Assassin's Apprentice",
+            description="Fitz, bâtard royal, apprend le métier d'assassin.",
+            year=1995,
+            authors=("Robin Hobb",),
+            genres=("Fantasy", "Aventure"),
+            rating=8.4,
+        )
+
+    async def cover(self, ref: str, size: str) -> bytes:
+        return b"\xff\xd8cover" if ref == "/a.jpg" else b""
+
+
+async def test_a_requested_book_shows_in_the_newsletters_with_its_cover_and_sheet(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, team: RequestsModule
+) -> None:
+    """#387: a book the library lacks, in the newsletters' requests: its cover (an edition picture of its
+    own) and what its book database (Hardcover) tells of it — its year, genres, summary and rating —, its
+    sheet as its link."""
+    await users(app, media, "zoe")
+    await login(client, "zoe")
+    media.provide(BOOK_SERIES, media.service(9, "hardcover"), _Hardcover())
+    asked = await client.post(
+        "/api/v1/media/requests",
+        json={
+            "kind": "book",
+            "title": "Assassin's Apprentice",
+            "creators": ["Robin Hobb"],
+            "details": {"language": "fr"},
+        },
+    )
+    assert asked.status_code == 201
+    edition = media.module.capabilities.system_providers(EDITION)[0].provider
+    [item] = await edition.requests(7, 10)
+    assert (item.title, item.kind, item.year, item.rating) == ("Assassin's Apprentice", "book", 1995, 8.4)
+    assert item.genres == ("Fantasy", "Aventure") and item.overview and item.overview.startswith("Fitz")
+    assert item.route.startswith("/media/book?") and item.route.endswith("ref=1")
+    assert item.picture and item.picture.startswith("b-")
+    assert await edition.picture(item.picture) == b"\xff\xd8cover"
+    assert await edition.picture("b-bm90IGEgY292ZXI") is None  # not a book database's cover

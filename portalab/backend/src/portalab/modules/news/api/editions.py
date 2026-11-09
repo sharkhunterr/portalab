@@ -86,6 +86,10 @@ class EditionOut(BaseModel):
     recipients: int
 
 
+# a portal image, a requested title's poster from the metadata provider, a requested book's cover
+PICTURE = r"^(?:[0-9a-fA-F-]{36}|t-[A-Za-z0-9_.-]{1,120}|b-[A-Za-z0-9_-]{1,380})$"
+
+
 def _framed(row: NewsletterEdition) -> Response:
     """The edition's page in the portal: its links and pictures on the portal itself (the e-mail keeps the
     public address — a portal reached otherwise, on the local network, still shows its pictures)."""
@@ -280,11 +284,12 @@ async def edition_page(principal: Reader, edition_id: UUID, module: Module) -> R
 async def edition_picture(
     module: Module,
     token: Annotated[str, Path(pattern=r"^[A-Za-z0-9_-]{20,64}$")],
-    image_id: Annotated[str, Path(pattern=r"^[0-9a-fA-F-]{36}$")],
+    image_id: Annotated[str, Path(pattern=PICTURE, max_length=400)],
 ) -> Response:
     """A picture of an edition, for the mail clients (no session): the edition's token is the key, and only
-    the pictures it shows answer."""
-    data = await module.editions.picture(token, image_id.lower())
+    the pictures it shows answer — a portal image, a requested title's poster (« t-… ») or a requested
+    book's cover (« b-… », #387), these last two as they were written."""
+    data = await module.editions.picture(token, image_id if image_id[1:2] == "-" else image_id.lower())
     if data is None:
         raise NotFound("No picture.", code="news.picture_not_found")
     return Response(
