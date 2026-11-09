@@ -12,7 +12,6 @@ import type { LedgerValue, Value } from "../api";
 import { GainTimeline } from "./GainTimeline";
 
 type Sources = components["schemas"]["MySourcesOut"];
-type Streak = components["schemas"]["MyStreakOut"];
 
 // each source keeps its colour and icon everywhere (theme tokens; the legend names it, never colour alone)
 export const SOURCES: Record<string, { color: string; icon: string }> = {
@@ -58,20 +57,12 @@ function useSources(value: LedgerValue, days: number) {
   });
 }
 
-function useStreak() {
-  return useQuery({
-    queryKey: ["gamification", "my-streak"],
-    queryFn: async () => (await api.GET("/api/v1/me/streak")).data as Streak,
-    staleTime: 60_000,
-  });
-}
-
 /** Axis ticks: 1.2k, 500k, 3M — never cut. */
 
 /**
  * Where my gains come from (027, progression page): the share of each source — plays, quests, streak and
- * campaign bonuses, achievements, the shop, support… — as one stacked bar, and day by day as stacked bars; my
- * current play streak beside it. A table alternative is one click away.
+ * campaign bonuses, achievements, the shop, support… — as one stacked bar, and day by day as stacked bars (my
+ * play streak has its own card). A table alternative is one click away.
  */
 export function GainSources() {
   const t = useT();
@@ -84,7 +75,6 @@ export function GainSources() {
   // #62: by source, or over time; issue 114: or my XP in all, day after day
   const [mode, setMode] = useState<"sources" | "timeline" | "total">("sources");
   const data = useSources(value, days).data;
-  const streak = useStreak().data;
   const unit = t(`gamification:value.${value}`);
   const label = (source: string) => t(`gamification:sources.${source}`);
   const sources = data?.sources ?? [];
@@ -126,28 +116,6 @@ export function GainSources() {
           />
         </div>
       </header>
-      {streak?.enabled ? (
-        <p className="gain-sources__streak" data-active={streak.days > 1 || undefined}>
-          <Icon name="flame" size={18} />
-          {streak.days > 0
-            ? t("gamification:sources.streakNow", { days: streak.days, multiplier: streak.multiplier })
-            : t("gamification:sources.noStreak")}
-          {streak.next
-            ? ` ${t("gamification:sources.nextTier", { days: streak.next.days - streak.days, multiplier: streak.next.multiplier })}`
-            : ""}
-        </p>
-      ) : null}
-      {streak?.enabled && (streak.freezes || streak.last_frozen) ? (
-        <p className="gain-sources__streak" data-freeze="true">
-          <Icon name="snowflake" size={18} />
-          {streak.freezes
-            ? `${t("gamification:freeze.owned", { count: streak.freezes })} — ${t("gamification:freeze.hint")}`
-            : null}
-          {streak.last_frozen
-            ? ` ${t("gamification:freeze.used", { date: format.date(streak.last_frozen) })}`
-            : null}
-        </p>
-      ) : null}
       {mode === "timeline" ? <GainTimeline days={days} /> : null}
       {mode === "total" ? <GainTimeline days={days} cumulative /> : null}
       {mode === "sources" && data && !sources.length ? (

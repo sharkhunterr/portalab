@@ -136,6 +136,17 @@ export function useEventTypes(goals = false) {
   });
 }
 
+export type MemberStreak = components["schemas"]["MemberStreakOut"];
+
+/** Every member's play streak, the longest now first. */
+export function useMemberStreaks() {
+  return useQuery({
+    queryKey: [...KEY, "member-streaks"],
+    queryFn: async () => (await api.GET("/api/v1/admin/gamification/streaks")).data as MemberStreak[],
+    staleTime: 60_000,
+  });
+}
+
 export function useStreak() {
   const client = useQueryClient();
   const query = useQuery({

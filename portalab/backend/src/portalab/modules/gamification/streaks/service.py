@@ -20,6 +20,7 @@ from portalab.core.db import Database
 from portalab.modules.gamification.models import StreakDay
 
 MAX_DAYS = 366
+RECENT = 14  # the days a streak's page draws, today last
 
 
 class Tier(BaseModel):
@@ -114,19 +115,72 @@ class Streaks:
             length += 1
         return length
 
-    async def current(self, user: UUID, at: datetime) -> dict[str, Any]:
-        """For the member's page: today's streak (or yesterday's, still alive) and its multiplier."""
+    async def _days(self, at: datetime, users: Sequence[UUID] | None = None) -> dict[UUID, dict[date, bool]]:
+        """The counted days of the last year (each: whether a freeze covered it), member by member."""
+        query = select(StreakDay.user_id, StreakDay.day, StreakDay.frozen).where(
+            StreakDay.day > self._day(at) - timedelta(days=MAX_DAYS)
+        )
+        if users is not None:
+            query = query.where(StreakDay.user_id.in_(users))
+        out: dict[UUID, dict[date, bool]] = {}
+        async with self.database.session() as session:
+            for user, day, frozen in (await session.execute(query)).all():
+                out.setdefault(user, {})[day] = bool(frozen)
+        return out
+
+    def summary(self, days: dict[date, bool], today: date) -> dict[str, Any]:
+        """#388: a member's streak as their page (and the administrators') draws it: today's streak (or
+        yesterday's, still alive) and its multiplier, the next tier and all of them, whether today already
+        counts, the longest streak of the year, its last day and the last days one by one (done, covered by
+        a freeze, missed — today, still to come)."""
         config = self.settings()
-        today = self._day(at)
-        days = await self.length(user, today) or await self.length(user, today - timedelta(days=1))
-        upcoming = [t for t in config.tiers if t.days > days]
+
+        def run(end: date) -> int:
+            length = 0
+            while end - timedelta(days=length) in days:
+                length += 1
+            return length
+
+        counted = today in days
+        current = run(today) or run(today - timedelta(days=1))
+        best, length, previous = 0, 0, None
+        for day in sorted(days):
+            length = length + 1 if previous is not None and day - previous == timedelta(days=1) else 1
+            best, previous = max(best, length), day
+        upcoming = [t for t in config.tiers if t.days > current]
         nxt = min(upcoming, key=lambda t: t.days) if upcoming else None
+        recent = []
+        for back in range(RECENT - 1, -1, -1):
+            day = today - timedelta(days=back)
+            state = "frozen" if days.get(day) else "done" if day in days else "missed"
+            recent.append({"day": day, "state": "pending" if day == today and not counted else state})
         return {
             "enabled": config.enabled,
-            "days": days,
-            "multiplier": multiplier_for(config, days),
+            "days": current,
+            "multiplier": multiplier_for(config, current),
             "next": {"days": nxt.days, "multiplier": nxt.multiplier} if nxt else None,
+            "tiers": [
+                {"days": t.days, "multiplier": t.multiplier}
+                for t in sorted(config.tiers, key=lambda t: t.days)
+            ],
+            "today": counted,
+            "best": best,
+            "last_day": max(days) if days else None,
+            "recent": recent,
         }
+
+    async def current(self, user: UUID, at: datetime) -> dict[str, Any]:
+        """For the member's page: today's streak (or yesterday's, still alive), its multiplier, its days."""
+        return self.summary((await self._days(at, [user])).get(user, {}), self._day(at))
+
+    async def board(self, at: datetime) -> list[tuple[UUID, dict[str, Any]]]:
+        """#389: for the administrators, every member who kept a streak this year, the longest streaks
+        now first."""
+        today = self._day(at)
+        rows = [(user, self.summary(days, today)) for user, days in (await self._days(at)).items()]
+        return sorted(
+            rows, key=lambda r: (-r[1]["days"], -r[1]["best"], -(r[1]["last_day"] or date.min).toordinal())
+        )
 
     async def bonus(self, user: UUID, value: Value, at: datetime) -> list[Modifier]:
         """Issue 226: the streak's multiplier for a reward (a quest, an achievement…) — read, never counted:

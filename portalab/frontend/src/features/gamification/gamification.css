@@ -986,22 +986,6 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
-.gain-sources__streak {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-text) 5%, transparent);
-}
-.gain-sources__streak[data-active] {
-  background: color-mix(in srgb, var(--rarity-legendary) 16%, transparent);
-}
-.gain-sources__streak svg {
-  color: var(--rarity-legendary);
-}
 .gain-sources__charts {
   display: grid;
   gap: var(--space-5);
@@ -2172,4 +2156,346 @@
 }
 .quest-summary__bar .ds-bar__fill {
   background: var(--tone);
+}
+
+/* --- play streaks: the member's card, its days and road, the administrators' chips --------------------- */
+.streak-card,
+.streak-chip {
+  /* the flame's hues (a flame is warm whatever the theme); the text keeps the theme's colours */
+  --flame: var(--streak-warm);
+  --flame-hot: var(--streak-hot);
+  --flame-core: var(--streak-core);
+}
+.streak-card[data-heat="2"],
+.streak-chip[data-heat="2"] {
+  --flame: var(--streak-hot);
+  --flame-hot: var(--streak-hotter);
+}
+.streak-card[data-heat="3"],
+.streak-chip[data-heat="3"] {
+  --flame: var(--streak-fire);
+  --flame-hot: var(--streak-blaze);
+}
+.streak-card {
+  display: grid;
+  gap: var(--space-4);
+  overflow: hidden;
+  position: relative;
+}
+.streak-card[data-heat="0"] {
+  --flame: var(--color-text-muted);
+  --flame-hot: var(--color-text-muted);
+}
+.streak-card:not([data-heat="0"])::before {
+  content: "";
+  position: absolute;
+  inset: -40% auto auto -10%;
+  inline-size: 60%;
+  aspect-ratio: 1;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--flame) 22%, transparent), transparent);
+  pointer-events: none;
+}
+.streak-card__hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  align-items: center;
+  position: relative;
+}
+.streak-card__flame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 6rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  color: var(--flame);
+  background: radial-gradient(
+    circle at 50% 65%,
+    color-mix(in srgb, var(--flame) 28%, transparent),
+    transparent 70%
+  );
+}
+.streak-card__flame svg {
+  inline-size: 4.5rem;
+  block-size: 4.5rem;
+  fill: color-mix(in srgb, var(--flame) 35%, transparent);
+  filter: drop-shadow(0 0 0.6rem color-mix(in srgb, var(--flame-hot) 55%, transparent));
+  transform-origin: 50% 90%;
+}
+.streak-card:not([data-heat="0"]) .streak-card__flame svg {
+  animation: streak-flicker 2.4s ease-in-out infinite;
+}
+.streak-card[data-heat="0"] .streak-card__flame svg {
+  filter: none;
+  opacity: 0.5;
+}
+.streak-card__flame strong {
+  position: absolute;
+  inset-block-end: 1.2rem;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--color-text);
+  text-shadow:
+    0 0 0.4rem var(--color-surface),
+    0 0 0.2rem var(--color-surface);
+}
+.streak-card__text {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+.streak-card__text h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+.streak-card__status,
+.streak-card__boost,
+.streak-card__frozen {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+}
+.streak-card__status svg {
+  color: var(--flame);
+}
+.streak-card__status[data-risk] {
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+}
+.streak-card__multiplier {
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--flame) 35%, transparent),
+    color-mix(in srgb, var(--flame-hot) 35%, transparent)
+  );
+}
+.streak-card__facts {
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+  justify-items: end;
+}
+.streak-card__facts div {
+  display: grid;
+  justify-items: end;
+}
+.streak-card__facts dt {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+.streak-card__facts dd {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: var(--font-weight-semibold);
+}
+.streak-card__frozen svg,
+.streak-card__facts div:nth-child(2) svg {
+  color: var(--streak-ice);
+}
+
+.streak-road {
+  padding: var(--space-2) var(--space-3) 2.4rem;
+}
+.streak-road__track {
+  position: relative;
+  block-size: 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+}
+.streak-road__fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--flame-core), var(--flame), var(--flame-hot));
+  transition: inline-size 600ms ease;
+}
+.streak-road__tier {
+  position: absolute;
+  inset-block-start: 50%;
+  translate: -50% -50%;
+  display: grid;
+  justify-items: center;
+}
+.streak-road__dot {
+  inline-size: 1rem;
+  block-size: 1rem;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 2px solid color-mix(in srgb, var(--color-text) 25%, transparent);
+}
+.streak-road__tier[data-reached] .streak-road__dot {
+  background: var(--flame);
+  border-color: var(--flame-hot);
+  box-shadow: 0 0 0.5rem color-mix(in srgb, var(--flame) 60%, transparent);
+}
+.streak-road__label {
+  position: absolute;
+  inset-block-start: 1.2rem;
+  display: grid;
+  justify-items: center;
+  white-space: nowrap;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+.streak-road__label strong {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+.streak-road__marker {
+  position: absolute;
+  inset-block-start: 50%;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border-radius: 50%;
+  color: var(--streak-on-flame);
+  background: radial-gradient(circle at 50% 35%, var(--flame), var(--flame-hot));
+  box-shadow:
+    0 0 0 3px var(--color-surface),
+    0 0 0.8rem color-mix(in srgb, var(--flame-hot) 70%, transparent);
+  transition: inset-inline-start 600ms ease;
+}
+
+.streak-days {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+.streak-days li {
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+}
+.streak-days__cell {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  max-inline-size: 2.25rem;
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+}
+.streak-days li[data-state="done"] .streak-days__cell {
+  color: var(--streak-on-flame);
+  background: linear-gradient(160deg, var(--flame, var(--streak-warm)), var(--flame-hot, var(--streak-hot)));
+}
+.streak-days li[data-state="frozen"] .streak-days__cell {
+  color: var(--streak-ice-text);
+  background: color-mix(in srgb, var(--streak-ice) 45%, var(--color-surface));
+}
+.streak-days li[data-state="pending"] .streak-days__cell {
+  background: transparent;
+  outline: 2px dashed color-mix(in srgb, var(--flame, var(--streak-warm)) 70%, transparent);
+  outline-offset: -2px;
+}
+.streak-days__date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+.streak-days[data-compact] {
+  grid-template-columns: repeat(14, 0.9rem);
+  gap: 2px;
+}
+.streak-days[data-compact] .streak-days__cell {
+  border-radius: 3px;
+}
+
+.streak-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+}
+.streak-chip:not([data-heat="0"]) {
+  background: color-mix(in srgb, var(--flame) 18%, transparent);
+}
+.streak-chip:not([data-heat="0"]) svg {
+  color: var(--flame);
+}
+.streak-chip[data-heat="0"] {
+  color: var(--color-text-muted);
+}
+.streak-today {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+.streak-today[data-risk] {
+  color: var(--color-text-muted);
+}
+
+@keyframes streak-flicker {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  30% {
+    transform: scale(1.04, 0.97) rotate(-2deg);
+  }
+  60% {
+    transform: scale(0.97, 1.04) rotate(2deg);
+  }
+}
+
+@media (max-width: 40rem) {
+  .streak-card__hero {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .streak-card__facts {
+    grid-column: 1 / -1;
+    grid-auto-flow: column;
+    justify-content: start;
+    justify-items: start;
+    gap: var(--space-4);
+  }
+  .streak-card__facts div {
+    justify-items: start;
+  }
+  .streak-card__flame {
+    inline-size: 4.5rem;
+  }
+  .streak-card__flame svg {
+    inline-size: 3.25rem;
+    block-size: 3.25rem;
+  }
+  .streak-card__flame strong {
+    inset-block-end: 0.8rem;
+    font-size: var(--font-size-lg);
+  }
+  .streak-days {
+    gap: 2px;
+  }
+  .streak-days__date {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streak-card .streak-card__flame svg {
+    animation: none;
+  }
+  .streak-road__fill,
+  .streak-road__marker {
+    transition: none;
+  }
 }

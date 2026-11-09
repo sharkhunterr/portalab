@@ -1722,6 +1722,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/gamification/streaks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Member Streaks
+         * @description Every member's play streak — the longest now first —, its record and its last days, with the freezes
+         *     they hold.
+         */
+        get: operations["member_streaks_api_v1_admin_gamification_streaks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/i18n/catalog-entries": {
         parameters: {
             query?: never;
@@ -9193,7 +9214,7 @@ export interface paths {
         };
         /**
          * My Streak
-         * @description The member's play streak today (or yesterday's, still alive) and the next tier.
+         * @description The member's play streak today (or yesterday's, still alive), the tiers and the last days.
          */
         get: operations["my_streak_api_v1_me_streak_get"];
         put?: never;
@@ -16963,6 +16984,50 @@ export interface components {
              */
             user_id: string;
         };
+        /** MemberStreakOut */
+        MemberStreakOut: {
+            /**
+             * Best
+             * @default 0
+             */
+            best: number;
+            /** Days */
+            days: number;
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Freezes
+             * @default 0
+             */
+            freezes: number;
+            /** Last Day */
+            last_day?: string | null;
+            /** Multiplier */
+            multiplier: number;
+            /** Name */
+            name: string | null;
+            next: components["schemas"]["StreakNextOut"] | null;
+            /**
+             * Recent
+             * @default []
+             */
+            recent: components["schemas"]["StreakDayOut"][];
+            /**
+             * Tiers
+             * @default []
+             */
+            tiers: components["schemas"]["StreakNextOut"][];
+            /**
+             * Today
+             * @default false
+             */
+            today: boolean;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
         /** MembersDetailOut */
         MembersDetailOut: {
             /** Members */
@@ -17029,6 +17094,11 @@ export interface components {
         };
         /** MyStreakOut */
         MyStreakOut: {
+            /**
+             * Best
+             * @default 0
+             */
+            best: number;
             /** Days */
             days: number;
             /** Enabled */
@@ -17038,11 +17108,28 @@ export interface components {
              * @default 0
              */
             freezes: number;
+            /** Last Day */
+            last_day?: string | null;
             /** Last Frozen */
             last_frozen?: string | null;
             /** Multiplier */
             multiplier: number;
             next: components["schemas"]["StreakNextOut"] | null;
+            /**
+             * Recent
+             * @default []
+             */
+            recent: components["schemas"]["StreakDayOut"][];
+            /**
+             * Tiers
+             * @default []
+             */
+            tiers: components["schemas"]["StreakNextOut"][];
+            /**
+             * Today
+             * @default false
+             */
+            today: boolean;
         };
         /** MyTermsOut */
         MyTermsOut: {
@@ -19556,6 +19643,19 @@ export interface components {
             tiers?: components["schemas"]["Tier"][];
             /** Values */
             values?: string[];
+        };
+        /** StreakDayOut */
+        StreakDayOut: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "done" | "frozen" | "missed" | "pending";
         };
         /** StreakNextOut */
         StreakNextOut: {
@@ -24617,6 +24717,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StreakConfig"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    member_streaks_api_v1_admin_gamification_streaks_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberStreakOut"][];
                 };
             };
             /** @description Validation Error */
