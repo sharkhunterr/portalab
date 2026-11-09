@@ -81,7 +81,8 @@ describe("play streaks", () => {
     // the strip says what it is: my last days, the active ones counted, today named
     expect(screen.getByText("My last 14 days")).toBeTruthy();
     expect(screen.getByText(/7 active days out of 14/)).toBeTruthy();
-    expect(within(days.at(-1) as HTMLElement).getByText("Today")).toBeTruthy();
+    expect(within(days.at(-1) as HTMLElement).getByText(/^Today, /)).toBeTruthy();
+    expect(days.at(-1)?.querySelector("[data-today]")).toBeTruthy();
     expect(screen.getByText("5 days")).toBeTruthy(); // the record
     expect(screen.getByText("Record")).toBeTruthy();
   });

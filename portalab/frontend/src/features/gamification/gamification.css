@@ -2409,12 +2409,16 @@
 }
 
 .streak-days {
+  --streak-gap: var(--space-1);
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(14, minmax(0, 1fr));
-  gap: var(--space-1);
+  gap: var(--streak-gap);
+}
+.streak-days:not([data-compact]) {
+  container-type: inline-size; /* the cells take their size from the strip's own width */
 }
 .streak-days li {
   display: grid;
@@ -2424,8 +2428,8 @@
 .streak-days__cell {
   display: grid;
   place-items: center;
-  inline-size: 100%;
-  max-inline-size: 2.25rem;
+  /* fourteen in a row, never wider than their column */
+  inline-size: min(2.25rem, calc((100cqi - 13 * var(--streak-gap, 2px)) / 14));
   aspect-ratio: 1;
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-text) 6%, transparent);
@@ -2448,8 +2452,11 @@
   color: var(--color-text-muted);
 }
 .streak-days__date[data-today] {
+  padding-inline: 0.2rem;
+  border-radius: 999px;
   color: var(--color-text);
   font-weight: var(--font-weight-semibold);
+  background: color-mix(in srgb, var(--flame, var(--streak-warm)) 30%, transparent);
 }
 .streak-history {
   display: grid;
@@ -2495,6 +2502,7 @@
   gap: 2px;
 }
 .streak-days[data-compact] .streak-days__cell {
+  inline-size: 0.9rem;
   border-radius: 3px;
 }
 
@@ -2609,7 +2617,7 @@
     font-size: var(--font-size-lg);
   }
   .streak-days {
-    gap: 2px;
+    --streak-gap: 2px;
   }
 }
 

@@ -47,14 +47,12 @@ export function StreakDays({ days, compact = false }: { days: StreakDay[]; compa
               {icon ? <Icon name={icon} size={compact ? 12 : 16} /> : null}
             </span>
             {compact ? null : (
-              <span
-                className="streak-days__date"
-                data-today={index === days.length - 1 || undefined}
-              >
-                {index === days.length - 1 ? t("gamification:streak.todayShort") : format.weekday(noon)}
+              <span className="streak-days__date" data-today={index === days.length - 1 || undefined}>
+                {format.weekday(noon)}
               </span>
             )}
             <span className="visually-hidden">
+              {index === days.length - 1 ? `${t("gamification:streak.todayShort")}, ` : ""}
               {format.date(noon)} : {t(`gamification:streak.state.${day.state}`)}
             </span>
           </li>
