@@ -21,6 +21,8 @@ pytestmark = pytest.mark.integration
 
 POSTER = "0190aaaa-0000-7000-8000-000000000001"
 OTHER = "0190aaaa-0000-7000-8000-000000000002"
+TMDB = "t-kqjL17yufvn9OVLyX.jpg"  # a requested title's poster, its name as the metadata provider writes it
+COVER = "b-MDE5MHxfL2EuanBn"  # a requested book's cover
 
 
 class _Library:
@@ -54,7 +56,12 @@ class _Library:
         ]
 
     async def requests(self, days: int, limit: int) -> list[DigestItem]:
-        return [DigestItem("Arcane", "series", "2026-10-30", "/media/d", "approved", picture="t-arcane.jpg")]
+        return [
+            DigestItem("Arcane", "series", "2026-10-30", "/media/d", "approved", picture=TMDB),
+            DigestItem(
+                "Assassin's Apprentice", "book", "2026-10-31", "/media/book?ref=1", "approved", picture=COVER
+            ),
+        ]
 
     async def period(self, days: int, *, top: int, tz: str = "UTC") -> dict[str, Any]:
         return {
@@ -72,7 +79,7 @@ class _Library:
         }
 
     async def picture(self, image_id: str) -> bytes | None:
-        return b"\xff\xd8poster" if image_id in (POSTER, OTHER, "t-arcane.jpg") else None
+        return b"\xff\xd8poster" if image_id in (POSTER, OTHER, TMDB, COVER) else None
 
 
 async def test_editions(
@@ -241,6 +248,15 @@ async def test_an_edition_tells_the_contents_switched_on(
         json={"template_key": "gazette", "contents": ["weather"]},
     )
     assert bad.status_code == 422
+    # a requested title's poster and a requested book's cover answer by the edition's token, as written
+    draft = await client.post(
+        "/api/v1/admin/news/newsletter-editions", json={"template_key": "classic", "contents": ["requests"]}
+    )
+    page = (await client.get(f"/api/v1/admin/news/newsletter-editions/{draft.json()['id']}/page")).text
+    for picture in (TMDB, COVER):
+        start = page.index(f"/{picture}")
+        address = page[page.rindex('"', 0, start) + 1 : start + len(picture) + 1]
+        assert (await client.get(address)).content.startswith(b"\xff\xd8"), address
 
 
 async def test_the_statistics_draw_the_charts_switched_on(

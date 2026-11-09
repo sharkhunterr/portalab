@@ -4,16 +4,23 @@ calendars) — one entry per work, a new episode naming its series. #316: each w
 (picture, year, genres, overview, rating); and ``media.edition``: the period's figures, its most watched works
 and the pictures an edition shows."""
 
+import asyncio
+import base64
+import binascii
+import logging
 from dataclasses import replace
 from datetime import date, datetime, timedelta
 from typing import Any
+from urllib.parse import parse_qs, urlsplit
 from uuid import UUID
 
 from sqlalchemy import select
 
-from portalab.capabilities.media import DigestItem
+from portalab.capabilities.media import BOOK_SERIES, BookDetails, DigestItem, unwrap
+from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
+from portalab.modules.media.databases import TIMEOUT
 from portalab.modules.media.discovery.recent import Recent, recent_releases, recently_added
 from portalab.modules.media.images.service import ImageService
 from portalab.modules.media.insights.enrich import MetadataEnricher
@@ -23,7 +30,31 @@ from portalab.modules.media.models import MediaObject, MediaRequest
 from portalab.modules.media.providers.insight_widgets import details, posters, with_posters
 from portalab.modules.media.requests.insights import kind_of, lookup_of
 
+log = logging.getLogger(__name__)
+
 PERIODS = ((7, "7d"), (30, "30d"), (90, "90d"), (365, "365d"))
+
+
+def _book_ref(address: object) -> tuple[str, str] | None:
+    """A book's database and its ref there, from the portal address a request keeps (#378): its cover
+    (``/api/v1/media/book-covers?service=…&ref=…``) or its sheet (``/media/book?service=…&ref=…``)."""
+    query = parse_qs(urlsplit(str(address or "")).query)
+    service, ref = (query.get("service") or [""])[0], (query.get("ref") or [""])[0]
+    return (service, ref) if service and ref else None
+
+
+def cover_picture(service: str, ref: str) -> str:
+    """A book's cover as an edition's picture id: « b- » and its database and ref, fit for an address."""
+    return "b-" + base64.urlsafe_b64encode(f"{service}|{ref}".encode()).decode().rstrip("=")
+
+
+def _cover_of(image_id: str) -> tuple[str, str] | None:
+    try:
+        told = base64.urlsafe_b64decode(image_id[2:] + "=" * (-len(image_id[2:]) % 4)).decode()
+    except (binascii.Error, UnicodeDecodeError):
+        return None
+    service, _, ref = told.partition("|")
+    return (service, ref) if service and ref else None
 
 
 async def described(database: Database, items: list[DigestItem]) -> list[DigestItem]:
@@ -138,12 +169,39 @@ class LibraryEdition:
         images: ImageService,
         enricher: MetadataEnricher | None = None,
         clock: Clock | None = None,
+        capabilities: CapabilityRegistry | None = None,
     ) -> None:
         self.database = database
         self.insights = insights
         self.images = images
         self.enricher = enricher
         self.clock = clock
+        self.capabilities = capabilities
+
+    def _books(self, service: str) -> Any:
+        if self.capabilities is None:
+            return None
+        return next(
+            (
+                r.provider
+                for r in self.capabilities.system_providers(BOOK_SERIES)
+                if r.instance_ref == service
+            ),
+            None,
+        )
+
+    async def _book(self, sheet: object) -> BookDetails | None:
+        """#378: a requested book as its database (Hardcover) tells it — none when it cannot say in time."""
+        found = _book_ref(sheet)
+        provider = self._books(found[0]) if found else None
+        if found is None or provider is None:
+            return None
+        try:
+            book = unwrap(await asyncio.wait_for(provider.book(found[1]), timeout=TIMEOUT))
+        except Exception as exc:
+            log.info("edition book lookup failed: %s: %s", type(exc).__name__, exc)
+            return None
+        return book if isinstance(book, BookDetails) else None
 
     async def period(self, days: int, *, top: int, tz: str = "UTC") -> dict[str, Any]:
         key = next((name for length, name in PERIODS if days <= length), "365d")
@@ -201,12 +259,18 @@ class LibraryEdition:
 
     async def picture(self, image_id: str) -> bytes | None:
         """A portal image by its id — #323: or, « t-<file> », a title's poster from the metadata provider (a
-        request not in the library yet)."""
+        request not in the library yet); « b-… » (#387), a requested book's cover from its database."""
         try:
             if image_id.startswith("t-"):
                 if self.enricher is None:
                     return None
                 return await self.enricher.image(f"/{image_id[2:]}", "w342")
+            if image_id.startswith("b-"):
+                cover = _cover_of(image_id)
+                provider = self._books(cover[0]) if cover else None
+                if cover is None or provider is None:
+                    return None
+                return bytes(unwrap(await provider.cover(cover[1], "w342")))
             _, data = await self.images.content(UUID(image_id))
         except Exception:
             return None  # gone, or never was
@@ -214,7 +278,8 @@ class LibraryEdition:
 
     async def requests(self, days: int, limit: int) -> list[DigestItem]:
         """#323: what members asked for over the period, the latest first — each with its poster (the
-        library's, else the metadata provider's) and its state."""
+        library's, else the metadata provider's) and its state; a book not in the library yet, its cover and
+        what its database (Hardcover) tells of it (#387)."""
         since = utc_now(self.clock) - timedelta(days=days)
         async with self.database.session() as session:
             rows = list(
@@ -238,17 +303,36 @@ class LibraryEdition:
                     "state": r.state,
                     "at": r.requested_at.date().isoformat(),
                     "_lookup": lookup_of(r),
+                    "_ref": r.external_ref or {},
                 }
                 for r in rows
             ],
             detailed=True,
         )
-        out = []
-        for card in cards:
-            poster = card.get("poster_ref")
-            picture = card.get("image_id") or (
-                f"t-{str(poster).lstrip('/')}" if poster and str(poster).startswith("/") else None
+        refs = [card.pop("_ref") for card in cards]
+        books = await asyncio.gather(
+            *(
+                self._book(ref.get("sheet")) if not card.get("id") else _none()
+                for card, ref in zip(cards, refs, strict=True)
             )
+        )
+        out = []
+        for card, ref, book in zip(cards, refs, books, strict=True):
+            poster = card.get("poster_ref")
+            cover = _book_ref(ref.get("cover"))
+            picture = (
+                card.get("image_id")
+                or (f"t-{str(poster).lstrip('/')}" if poster and str(poster).startswith("/") else None)
+                or (cover_picture(*cover) if cover else None)
+            )
+            if book is not None:
+                card["year"] = card.get("year") or book.year
+                card["genres"] = card.get("genres") or list(book.genres)
+                card["overview"] = card.get("overview") or book.description
+                card["rating"] = card.get("rating") or book.rating
+            if not card.get("route") and str(ref.get("sheet") or "").startswith("/media/"):
+                card["route"] = ref["sheet"]
+            card["year"] = card.get("year") or ref.get("year")
             out.append(
                 DigestItem(
                     str(card["title"]),
@@ -265,3 +349,7 @@ class LibraryEdition:
                 )
             )
         return out
+
+
+async def _none() -> None:
+    return None
