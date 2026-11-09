@@ -55,6 +55,56 @@
 
 ---
 
+# v1.2.0
+
+## Portalab v1.2.0 — play streaks you can see, audiobooks that count
+
+**Play streaks get a page of their own.** Members see how far their streak has gone, the road to the next
+multiplier and their last two weeks at a glance. Administrators follow every member's streak from the
+gamification overview. Audiobooks listened to in Grimmory now count as one sitting, and finishing one earns
+its reward. Book requests show their cover in the automatic newsletters.
+
+### Highlights
+
+- **A streak card on the progression page** — a flame that burns hotter with each tier, and whether today
+  already counts or is still to play before midnight. Below it, a progress bar cut at each tier (×1.5, ×2…)
+  lights up as the days go by. A strip of the last 14 days shows each day as counted, covered by a freeze,
+  missed, or still to play today. The card also shows the member's record and the freezes they hold.
+- **Every member's streak for the administrators** — the gamification overview lists each member's
+  streak, the longest first. Each row shows the multiplier and progress towards the tiers, whether today
+  counts, the last 14 days, the record and the freezes held. A member's name filters the overview to them.
+
+### Closed issues
+
+#### Fixed
+
+- `bug` An audiobook listened to in Grimmory showed up as many short « interrupted session » lines; a
+  sitting is now one line, like a film
+- `bug` Finishing an audiobook (in Grimmory or in Portalab's player) was not detected; it now earns the
+  rewards the administrator set for a finished audiobook, from the administrator's « finished » threshold
+- `bug` Automatic newsletters showed requested books without a cover or details; they now show the book's
+  cover and its description, year, genres and rating from Hardcover, linked to its sheet
+- `bug` Automatic newsletters could not show the poster of a requested film or series not yet in the
+  library; it now shows
+
+#### New
+
+- `feat` A play streak card on the progression page: the road to the tiers, the last 14 days, the record
+  and the freezes held
+- `feat` Every member's play streak in the gamification overview
+
+#### Documentation and tooling
+
+- `doc` A frontend test no longer fails on a slow CI runner
+
+### Upgrading
+
+- Migrations run with `docker compose run --rm migrate` (media). The upgrade merges past Grimmory audiobook
+  pieces into one play per sitting. The XP those pieces earned stays earned. A book whose last sitting
+  reached its end gets its finish reward at the next reading of Grimmory's history.
+
+---
+
 # v1.1.0
 
 ## Portalab v1.1.0 — every book, saga and game to ask for, newsletters that write themselves
