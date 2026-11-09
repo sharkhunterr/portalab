@@ -6,7 +6,6 @@ import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { useRules } from "../api";
-import { MemberStreaks } from "./MemberStreaks";
 import { actionLabel, type StreakConfig, useEventTypes, useStreak, VALUES } from "./tuning";
 
 const SUGGESTED = ["media.playback_finished"];
@@ -196,7 +195,6 @@ export function StreakPanel() {
           })}
         </p>
       </AdminSection>
-      <MemberStreaks />
       <AdminSection
         span="full"
         icon="play"

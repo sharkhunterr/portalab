@@ -3,12 +3,12 @@ import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import { heat, StreakDays } from "../progression/StreakCard";
+import { heat, StreakDays, StreakMeter } from "../progression/StreakCard";
 import { type MemberStreak, useMemberStreaks } from "./tuning";
 
-/** Every member's play streak (027, #389): where it stands and burns, whether today already counts, its record,
+/** Every member's play streak (027, issue 389): where it stands and burns, whether today already counts, its record,
  * its last fourteen days and the freezes the member holds — the longest streaks now first. */
-export function MemberStreaks() {
+export function MemberStreaks({ onMember }: { onMember?: (user: string) => void }) {
   const t = useT();
   const format = useFormat();
   const query = useMemberStreaks();
@@ -33,16 +33,28 @@ export function MemberStreaks() {
               key: "member",
               header: t("gamification:admin.streak.member"),
               primary: true,
-              render: (row) => row.name ?? t("gamification:admin.streak.unknown"),
+              render: (row) => {
+                const name = row.name ?? t("gamification:admin.streak.unknown");
+                return onMember ? (
+                  <button type="button" className="ds-link" onClick={() => onMember(row.user_id)}>
+                    {name}
+                  </button>
+                ) : (
+                  name
+                );
+              },
             },
             {
               key: "days",
               header: t("gamification:admin.streak.current"),
               render: (row) => (
-                <span className="streak-chip" data-heat={heat(row)}>
-                  <Icon name="flame" size={14} />
-                  {t("gamification:streak.days", { count: row.days })}
-                  {row.multiplier > 1 ? <strong>×{row.multiplier}</strong> : null}
+                <span className="streak-member">
+                  <span className="streak-chip" data-heat={heat(row)}>
+                    <Icon name="flame" size={14} />
+                    {t("gamification:streak.days", { count: row.days })}
+                    {row.multiplier > 1 ? <strong>×{row.multiplier}</strong> : null}
+                  </span>
+                  <StreakMeter streak={row} />
                 </span>
               ),
             },

@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { Fragment, useId } from "react";
 import type { components } from "../../../api/generated/schema";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -57,54 +57,104 @@ export function StreakDays({ days, compact = false }: { days: StreakDay[]; compa
   );
 }
 
-/** The road of a streak: each tier a milestone with its multiplier, the streak's flame where it stands. */
+/** The road of a streak: a bar cut at each tier — every stretch filling as the days go by, every tier a
+ * milestone with its multiplier that lights up once reached —, the streak's flame where it stands. */
 export function StreakRoad({ streak }: { streak: Pick<Streak, "days" | "tiers"> }) {
   const t = useT();
-  const tiers = streak.tiers ?? [];
+  const tiers = [...(streak.tiers ?? [])].sort((a, b) => a.days - b.days);
   if (!tiers.length) return null;
-  const end = Math.max(...tiers.map((tier) => tier.days));
-  const at = (days: number) => `${Math.min(100, (days / end) * 100)}%`;
+  const last = tiers.at(-1)?.days ?? 0;
+  const days = streak.days;
+  const stops = [{ days: 0, multiplier: 1 }, ...tiers];
+  const next = tiers.find((tier) => tier.days > days);
   return (
     <div className="streak-road">
+      <div className="streak-road__head">
+        <strong>{t("gamification:streak.road")}</strong>
+        <span>
+          {next
+            ? t("gamification:streak.dayOf", { days, end: next.days, multiplier: next.multiplier })
+            : t("gamification:streak.top")}
+        </span>
+      </div>
       <div
         className="streak-road__track"
         role="progressbar"
         aria-valuemin={0}
-        aria-valuemax={end}
-        aria-valuenow={Math.min(streak.days, end)}
+        aria-valuemax={last}
+        aria-valuenow={Math.min(days, last)}
+        aria-valuetext={t("gamification:streak.days", { count: days })}
         aria-label={t("gamification:streak.road")}
       >
-        <span className="streak-road__fill" style={{ inlineSize: at(streak.days) }} />
-        {tiers.map((tier) => (
-          <span
-            key={tier.days}
-            className="streak-road__tier"
-            data-reached={streak.days >= tier.days || undefined}
-            style={{ insetInlineStart: at(tier.days) }}
-          >
-            <span className="streak-road__dot" aria-hidden="true" />
-            <span className="streak-road__label">
-              <strong>×{tier.multiplier}</strong>
-              <span>{t("gamification:streak.tierDay", { days: tier.days })}</span>
-            </span>
-          </span>
-        ))}
-        {streak.days > 0 ? (
-          <span
-            className="streak-road__marker"
-            style={{ insetInlineStart: at(streak.days) }}
-            aria-hidden="true"
-          >
-            <Icon name="flame" size={16} />
-          </span>
-        ) : null}
+        {stops.map((stop, index) => {
+          const from = stops[index - 1];
+          const share = from ? Math.min(1, Math.max(0, (days - from.days) / (stop.days - from.days))) : 0;
+          const here = from !== undefined && days > from.days && days < stop.days;
+          return (
+            <Fragment key={stop.days}>
+              {from ? (
+                <span
+                  className="streak-road__stretch"
+                  style={{ flexGrow: stop.days - from.days }}
+                  data-full={share >= 1 || undefined}
+                >
+                  <span className="streak-road__fill" style={{ inlineSize: `${share * 100}%` }} />
+                  {here ? (
+                    <span className="streak-road__marker" style={{ insetInlineStart: `${share * 100}%` }}>
+                      <Icon name="flame" size={14} />
+                    </span>
+                  ) : null}
+                </span>
+              ) : null}
+              <span
+                className="streak-road__tier"
+                data-reached={days >= stop.days || undefined}
+                data-current={stop === next || undefined}
+              >
+                <span className="streak-road__badge">×{stop.multiplier}</span>
+                <span className="streak-road__label">
+                  {stop.days
+                    ? t("gamification:streak.tierDay", { days: stop.days })
+                    : t("gamification:streak.begin")}
+                </span>
+              </span>
+            </Fragment>
+          );
+        })}
       </div>
     </div>
   );
 }
 
+/** A streak's road in a line (the administrators' table): the days towards the last tier, a tick at each. */
+export function StreakMeter({ streak }: { streak: Pick<Streak, "days" | "tiers"> }) {
+  const tiers = streak.tiers ?? [];
+  if (!tiers.length) return null;
+  const last = Math.max(...tiers.map((tier) => tier.days));
+  return (
+    <span
+      className="streak-meter"
+      data-heat={heat(streak)}
+      aria-hidden="true" // the chip beside it tells the days
+    >
+      <span
+        className="streak-meter__fill"
+        style={{ inlineSize: `${Math.min(1, streak.days / last) * 100}%` }}
+      />
+      {tiers.map((tier) => (
+        <span
+          key={tier.days}
+          className="streak-meter__tick"
+          data-reached={streak.days >= tier.days || undefined}
+          style={{ insetInlineStart: `${(tier.days / last) * 100}%` }}
+        />
+      ))}
+    </span>
+  );
+}
+
 /**
- * My play streak (027, #388 — progression page): its days in a big flame that burns hotter with each tier, its
+ * My play streak (027, issue 388 — progression page): its days in a big flame that burns hotter with each tier, its
  * multiplier, whether today already counts, the road to the next tiers, the last fourteen days, its record
  * and the freezes I hold.
  */
@@ -133,7 +183,8 @@ export function StreakCard() {
             {alive ? t("gamification:streak.title", { days: streak.days }) : t("gamification:streak.none")}
           </h2>
           <p className="streak-card__status" data-risk={(alive && !streak.today) || undefined}>
-            <Icon name={alive && streak.today ? "check" : "clock"} size={16} /> {status}
+            <Icon name={alive && streak.today ? "check" : "clock"} size={16} />
+            <span>{status}</span>
           </p>
           <p className="streak-card__boost">
             {streak.multiplier > 1 ? (

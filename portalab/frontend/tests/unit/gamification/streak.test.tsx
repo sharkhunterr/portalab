@@ -66,9 +66,16 @@ describe("play streaks", () => {
     expect(await screen.findByRole("heading", { name: "3 days in a row" })).toBeTruthy();
     expect(screen.getByText(/Today does not count yet/)).toBeTruthy();
     expect(screen.getByText("×1.5", { selector: ".streak-card__multiplier" })).toBeTruthy();
-    const road = screen.getByRole("progressbar", { name: "Progress towards the tiers" });
+    const road = screen.getByRole("progressbar", { name: "Streak progress" });
     expect(road.getAttribute("aria-valuenow")).toBe("3");
     expect(road.getAttribute("aria-valuemax")).toBe("5");
+    expect(screen.getByText("Day 3 of 5 · ×2 at the end")).toBeTruthy();
+    const badges = within(road).getAllByText(/^×/);
+    expect(badges.map((b) => [b.textContent, b.parentElement?.dataset.reached])).toEqual([
+      ["×1", "true"],
+      ["×1.5", "true"],
+      ["×2", undefined],
+    ]);
     const days = within(screen.getByRole("list", { name: "Last 14 days" })).getAllByRole("listitem");
     expect(days.map((d) => d.dataset.state).slice(-3)).toEqual(["done", "frozen", "pending"]);
     expect(screen.getByText("5 days")).toBeTruthy(); // the record

@@ -2249,7 +2249,17 @@
   margin: 0;
   font-size: var(--font-size-xl);
 }
-.streak-card__status,
+.streak-card__status {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+}
+.streak-card__status svg {
+  margin-block-start: 0.2em;
+}
 .streak-card__boost,
 .streak-card__frozen {
   margin: 0;
@@ -2304,62 +2314,91 @@
 }
 
 .streak-road {
-  padding: var(--space-2) var(--space-3) 2.4rem;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+.streak-road__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+}
+.streak-road__head span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 .streak-road__track {
+  display: flex;
+  align-items: center;
+}
+.streak-road__stretch {
   position: relative;
-  block-size: 0.6rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+  flex-basis: 0;
+  min-inline-size: 1.5rem;
+  block-size: 0.75rem;
+  margin-inline: -0.25rem;
+  background: color-mix(in srgb, var(--color-text) 12%, transparent);
 }
 .streak-road__fill {
   position: absolute;
   inset-block: 0;
   inset-inline-start: 0;
-  border-radius: inherit;
   background: linear-gradient(90deg, var(--flame-core), var(--flame), var(--flame-hot));
   transition: inline-size 600ms ease;
 }
+.streak-road__stretch[data-full] .streak-road__fill {
+  background: linear-gradient(90deg, var(--flame), var(--flame-hot));
+}
 .streak-road__tier {
-  position: absolute;
-  inset-block-start: 50%;
-  translate: -50% -50%;
+  position: relative;
+  z-index: 1;
   display: grid;
   justify-items: center;
+  flex: none;
 }
-.streak-road__dot {
-  inline-size: 1rem;
-  block-size: 1rem;
-  border-radius: 50%;
+.streak-road__badge {
+  display: grid;
+  place-items: center;
+  min-inline-size: 2.6rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
   background: var(--color-surface);
-  border: 2px solid color-mix(in srgb, var(--color-text) 25%, transparent);
+  border: 2px solid color-mix(in srgb, var(--color-text) 22%, transparent);
 }
-.streak-road__tier[data-reached] .streak-road__dot {
-  background: var(--flame);
+.streak-road__tier[data-reached] .streak-road__badge {
+  color: var(--streak-on-flame);
   border-color: var(--flame-hot);
-  box-shadow: 0 0 0.5rem color-mix(in srgb, var(--flame) 60%, transparent);
+  background: linear-gradient(160deg, var(--flame), var(--flame-hot));
+  box-shadow: 0 0 0.6rem color-mix(in srgb, var(--flame) 60%, transparent);
+}
+.streak-road__tier[data-current] .streak-road__badge {
+  color: var(--color-text);
+  border-color: var(--flame);
+  border-style: dashed;
 }
 .streak-road__label {
   position: absolute;
-  inset-block-start: 1.2rem;
-  display: grid;
-  justify-items: center;
+  inset-block-start: calc(100% + 0.3rem);
   white-space: nowrap;
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
-.streak-road__label strong {
-  font-size: var(--font-size-sm);
-  color: var(--color-text);
-}
 .streak-road__marker {
   position: absolute;
+  z-index: 2;
   inset-block-start: 50%;
   translate: -50% -50%;
   display: grid;
   place-items: center;
-  inline-size: 1.75rem;
-  block-size: 1.75rem;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
   border-radius: 50%;
   color: var(--streak-on-flame);
   background: radial-gradient(circle at 50% 35%, var(--flame), var(--flame-hot));
@@ -2433,6 +2472,50 @@
 }
 .streak-chip[data-heat="0"] {
   color: var(--color-text-muted);
+}
+.streak-member {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+}
+.streak-meter {
+  --flame: var(--streak-warm);
+  --flame-hot: var(--streak-hot);
+  position: relative;
+  display: block;
+  inline-size: 7rem;
+  block-size: 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-text) 12%, transparent);
+}
+.streak-meter[data-heat="2"] {
+  --flame: var(--streak-hot);
+  --flame-hot: var(--streak-hotter);
+}
+.streak-meter[data-heat="3"] {
+  --flame: var(--streak-fire);
+  --flame-hot: var(--streak-blaze);
+}
+.streak-meter__fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--flame), var(--flame-hot));
+}
+.streak-meter__tick {
+  position: absolute;
+  inset-block-start: 50%;
+  translate: -50% -50%;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 2px solid color-mix(in srgb, var(--color-text) 30%, transparent);
+}
+.streak-meter__tick[data-reached] {
+  background: var(--flame-hot);
+  border-color: var(--flame-hot);
 }
 .streak-today {
   display: inline-flex;
