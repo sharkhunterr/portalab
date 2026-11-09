@@ -34,7 +34,7 @@ export function StreakDays({ days, compact = false }: { days: StreakDay[]; compa
       data-compact={compact || undefined}
       aria-label={t("gamification:streak.recent")}
     >
-      {days.map((day) => {
+      {days.map((day, index) => {
         const noon = `${day.day}T12:00:00Z`; // the day itself, whatever the time zone
         const icon = ICONS[day.state];
         return (
@@ -46,7 +46,14 @@ export function StreakDays({ days, compact = false }: { days: StreakDay[]; compa
             <span className="streak-days__cell" aria-hidden="true">
               {icon ? <Icon name={icon} size={compact ? 12 : 16} /> : null}
             </span>
-            {compact ? null : <span className="streak-days__date">{format.dayMonth(noon).day}</span>}
+            {compact ? null : (
+              <span
+                className="streak-days__date"
+                data-today={index === days.length - 1 || undefined}
+              >
+                {index === days.length - 1 ? t("gamification:streak.todayShort") : format.weekday(noon)}
+              </span>
+            )}
             <span className="visually-hidden">
               {format.date(noon)} : {t(`gamification:streak.state.${day.state}`)}
             </span>
@@ -54,6 +61,38 @@ export function StreakDays({ days, compact = false }: { days: StreakDay[]; compa
         );
       })}
     </ol>
+  );
+}
+
+/** The last fourteen days as their own block: a title with the active days counted, the strip, a legend. */
+function StreakHistory({ days }: { days: StreakDay[] }) {
+  const t = useT();
+  const format = useFormat();
+  const active = days.filter((day) => day.state === "done" || day.state === "frozen").length;
+  const first = days[0];
+  return (
+    <div className="streak-history">
+      <div className="streak-road__head">
+        <strong>{t("gamification:streak.history", { count: days.length })}</strong>
+        <span>
+          {t("gamification:streak.active", { count: active, total: days.length })}
+          {first
+            ? ` · ${t("gamification:streak.since", { date: format.date(`${first.day}T12:00:00Z`) })}`
+            : ""}
+        </span>
+      </div>
+      <StreakDays days={days} />
+      <ul className="streak-legend" aria-hidden="true">
+        {(["done", "frozen", "missed", "pending"] as const).map((state) => (
+          <li key={state} data-state={state}>
+            <span className="streak-days__cell">
+              {ICONS[state] ? <Icon name={ICONS[state] ?? ""} size={10} /> : null}
+            </span>
+            {t(`gamification:streak.legend.${state}`)}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -218,7 +257,7 @@ export function StreakCard() {
         </dl>
       </div>
       <StreakRoad streak={streak} />
-      {streak.recent?.length ? <StreakDays days={streak.recent} /> : null}
+      {streak.recent?.length ? <StreakHistory days={streak.recent} /> : null}
       {streak.last_frozen ? (
         <p className="streak-card__frozen">
           <Icon name="snowflake" size={14} />{" "}

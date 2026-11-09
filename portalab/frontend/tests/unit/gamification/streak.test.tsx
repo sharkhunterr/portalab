@@ -78,6 +78,10 @@ describe("play streaks", () => {
     ]);
     const days = within(screen.getByRole("list", { name: "Last 14 days" })).getAllByRole("listitem");
     expect(days.map((d) => d.dataset.state).slice(-3)).toEqual(["done", "frozen", "pending"]);
+    // the strip says what it is: my last days, the active ones counted, today named
+    expect(screen.getByText("My last 14 days")).toBeTruthy();
+    expect(screen.getByText(/7 active days out of 14/)).toBeTruthy();
+    expect(within(days.at(-1) as HTMLElement).getByText("Today")).toBeTruthy();
     expect(screen.getByText("5 days")).toBeTruthy(); // the record
     expect(screen.getByText("Record")).toBeTruthy();
   });
