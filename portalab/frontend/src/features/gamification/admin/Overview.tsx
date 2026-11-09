@@ -12,6 +12,7 @@ import { type LedgerValue, useRules, useVerify } from "../api";
 import { SOURCES } from "../progression/GainSources";
 import { PlaysByKind } from "../progression/PlaysByKind";
 import { MemberDetails } from "./MemberDetails";
+import { MemberStreaks } from "./MemberStreaks";
 import { Operations } from "./Operations";
 import { LEDGER_VALUES, useLevelRewards, useMembersProgress, useProgress, useStreak } from "./tuning";
 
@@ -275,6 +276,7 @@ export function Overview() {
           </table>
         ) : null}
       </AdminSection>
+      <MemberStreaks onMember={setMember} />
       <PlaysByKind admin days={days} member={member} />
       <Operations
         days={days}

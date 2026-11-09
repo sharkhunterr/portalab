@@ -1053,7 +1053,7 @@
   "streak.freezes": "Gels",
   "streak.none": "Pas de série en cours",
   "streak.recent": "14 derniers jours",
-  "streak.road": "Progression vers les paliers",
+  "streak.road": "Progression de la série",
   "streak.safe": "Aujourd'hui compte déjà : votre série est à l'abri jusqu'à demain.",
   "streak.start": "Regardez, écoutez ou lisez quelque chose aujourd'hui pour la lancer.",
   "streak.state.done": "compté",
@@ -1062,5 +1062,7 @@
   "streak.state.pending": "aujourd'hui, pas encore compté",
   "streak.tierDay": "J{days}",
   "streak.title": "{days, plural, one {# jour} other {# jours}} d'affilée",
-  "streak.top": "Palier maximum atteint : gardez le rythme !"
+  "streak.top": "Palier maximum atteint : gardez le rythme !",
+  "streak.dayOf": "Jour {days} sur {end} · ×{multiplier} au bout",
+  "streak.begin": "Départ"
 }

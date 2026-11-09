@@ -1053,7 +1053,7 @@
   "streak.freezes": "Freezes",
   "streak.none": "No streak going",
   "streak.recent": "Last 14 days",
-  "streak.road": "Progress towards the tiers",
+  "streak.road": "Streak progress",
   "streak.safe": "Today already counts: your streak is safe until tomorrow.",
   "streak.start": "Watch, listen to or read something today to start one.",
   "streak.state.done": "counted",
@@ -1062,5 +1062,7 @@
   "streak.state.pending": "today, not counted yet",
   "streak.tierDay": "Day {days}",
   "streak.title": "{days, plural, one {# day} other {# days}} in a row",
-  "streak.top": "Top tier reached: keep it up!"
+  "streak.top": "Top tier reached: keep it up!",
+  "streak.dayOf": "Day {days} of {end} · ×{multiplier} at the end",
+  "streak.begin": "Start"
 }
