@@ -4,7 +4,9 @@
   ``audiobook`` — with authors, categories, series, publisher, ISBN, page count and cover.
 * ``media.activity_history``: the reading and listening sessions (start, end, time spent, progress).
   Grimmory only reveals the sessions of the signed-in account, so they belong to the account configured
-  here; connect one service per reader to follow several.
+  here; connect one service per reader to follow several. #385: Grimmory saves a sitting in pieces of a
+  few minutes, all from its start — one activity per sitting; #386: its audio pieces tell no progress, the
+  book's own (how far the account is, or read) is the latest sitting's.
 * ``service.accounts``: Grimmory users (administrator account needed; otherwise the configured one).
 * ``service.health_probe``: an authenticated round trip.
 * ``media.audio`` (#20) and ``media.reading`` (#21): listening and reading in the portal (:mod:`.books`).
@@ -15,7 +17,8 @@ bearer token (``POST /api/v1/auth/login``), renewed before it expires or when re
 
 import time
 from collections.abc import AsyncIterator, Mapping, Sequence
-from datetime import datetime
+from dataclasses import replace
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -58,6 +61,10 @@ AUDIOBOOK = "AUDIOBOOK"
 BOOKS_PER_PAGE = 20  # books whose sessions are read per activity page
 SESSION_PAGE = 100
 MARGIN_S = 30
+# #385: Grimmory saves a listening sitting every few minutes; none for this long, the sitting is over
+QUIET = timedelta(minutes=10)
+RECENT = timedelta(days=30)  # #386: a sitting this old never earns anything: its book is not read again
+PROGRESS_FORMATS = ("audiobook", "epub", "pdf", "cbx")
 
 
 class GrimmoryConfig(BaseConfig):
@@ -202,6 +209,61 @@ def map_session(session: Mapping[str, Any], book: Mapping[str, Any], user: str) 
         family=None,
         priority=10,
     )
+
+
+def book_progress(book: Mapping[str, Any]) -> float | None:
+    """#386: how far the account is in the book (0..1), as Grimmory keeps it — read: the end."""
+    if str(book.get("readStatus") or "").upper() == "READ":
+        return 1.0
+    shares = []
+    for name in PROGRESS_FORMATS:
+        progress = book.get(f"{name}Progress")
+        value = progress.get("percentage") if isinstance(progress, Mapping) else None
+        if isinstance(value, int | float):
+            shares.append(min(1.0, max(0.0, float(value) / 100)))
+    return max(shares) if shares else None
+
+
+def knows_progress(book: Mapping[str, Any]) -> bool:
+    return "readStatus" in book or any(f"{name}Progress" in book for name in PROGRESS_FORMATS)
+
+
+def sittings(
+    sessions: Sequence[Mapping[str, Any]],
+    book: Mapping[str, Any],
+    user: str,
+    now: datetime,
+    progress: float | None = None,
+) -> list[SourceActivity]:
+    """#385: the book's sessions as sittings — Grimmory's pieces of one sitting (same start) as one activity:
+    the first piece's ref (it stays as the sitting grows), the minutes added up, the last piece's end and
+    progress. A sitting whose last piece is under ``QUIET`` old goes on: not ended yet. #386: the latest
+    sitting reaches at least ``progress``, the book's own."""
+    groups: dict[datetime, list[SourceActivity]] = {}
+    for session in sessions:
+        piece = map_session(session, book, user)
+        if piece is not None:
+            groups.setdefault(piece.started_at, []).append(piece)
+    out: list[SourceActivity] = []
+    for pieces in groups.values():
+        pieces.sort(key=lambda p: p.stopped_at or p.started_at)
+        first = min(pieces, key=lambda p: (len(p.ref), p.ref))  # the earliest piece: the lowest id
+        reached = [p.progress for p in pieces if p.progress is not None]
+        ended = pieces[-1].stopped_at
+        out.append(
+            replace(
+                first,
+                stopped_at=None if ended is not None and now - ended < QUIET else ended,
+                watched_s=sum(p.watched_s for p in pieces),
+                progress=reached[-1] if reached else None,
+            )
+        )
+    out.sort(key=lambda a: a.started_at)
+    if out and progress is not None:
+        latest = out[-1]
+        if latest.progress is None or latest.progress < progress:
+            out[-1] = replace(latest, progress=progress)
+    return out
 
 
 class GrimmoryConnector(HttpConnector):
@@ -423,6 +485,22 @@ class _Sessions:
                 break
         return out
 
+    async def _progress(
+        self, book: Mapping[str, Any], sessions: Sequence[Mapping[str, Any]], now: datetime
+    ) -> float | None:
+        """#386: the book's progress — from the list, else the book itself when it was read lately."""
+        if knows_progress(book) or not sessions:
+            return book_progress(book)
+        times = [parse_time(s.get("endTime")) or parse_time(s.get("startTime")) for s in sessions]
+        last = max((t for t in times if t is not None), default=None)
+        if last is None or now - last > RECENT:
+            return None
+        try:
+            full = await self.connector.get_json(self.service, f"/api/v1/books/{safe_id(book['id'])}")
+        except (ConnectionError, InvalidPayload):
+            return None
+        return book_progress(full) if isinstance(full, Mapping) else None
+
     async def history(self, *, since: datetime | None, cursor: str | None) -> ActivityPage:
         books = sorted(await self.connector.books(self.service), key=lambda b: str(b.get("id")))
         if since is not None:
@@ -432,12 +510,13 @@ class _Sessions:
         start = int(cursor) if cursor and cursor.isdigit() else 0
         user = await self.connector.self_id(self.service)
         items: list[SourceActivity] = []
+        now = datetime.now(UTC)
         for book in books[start : start + BOOKS_PER_PAGE]:
             if book.get("id") is None:
                 continue
-            for session in await self._sessions(safe_id(book["id"])):
-                activity = map_session(session, book, user)
-                if activity is not None and (since is None or activity.started_at >= since):
+            sessions = await self._sessions(safe_id(book["id"]))
+            for activity in sittings(sessions, book, user, now, await self._progress(book, sessions, now)):
+                if since is None or activity.started_at >= since:
                     items.append(activity)
         end = start + BOOKS_PER_PAGE
         return ActivityPage(

@@ -16,7 +16,12 @@ member and game, counting the sessions the portal lived only.
 
 #342: the end credits' leeway grew (30 s → 2 min) — ``review_endings`` looks once at the plays judged
 abandoned since then: one that now reaches its end gets its ``media.playback_finished``, its minutes not
-counted twice (``watched_s`` 0: its abandoned play gave them)."""
+counted twice (``watched_s`` 0: its abandoned play gave them).
+
+#386: a book's sitting judged abandoned may reach its end afterwards — Grimmory tells where the book is,
+not its audio pieces, and the latest sitting takes the book's progress at the next reading of its history:
+it gets its ``media.playback_finished`` then, once (the finish's own dedup key), its minutes not counted
+twice."""
 
 from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta
@@ -45,6 +50,7 @@ EVENT = "media.playback_finished"
 PARTIAL = "media.playback_abandoned"  # #94: a play stopped before its end still counts its minutes
 LENGTH = "media.game_length_reached"  # #351
 MIN_WATCHED = 60.0
+BOOK_KINDS = ("book", "audiobook")  # #386: their progress may come after their sitting
 
 
 class HistoryRewards:
@@ -152,8 +158,49 @@ class HistoryRewards:
                     published += 1
                 if row.kind == "game" and await self._game_length(session, row, linked, at):
                     published += 1
+            published += await self._books_ended_later(session, now, linked)
         if published:
             metrics.increment("media.playback.finished_from_history", published)
+        return published
+
+    async def _books_ended_later(self, session: AsyncSession, now: datetime, linked: Any) -> int:
+        """#386: the books' sittings already looked at that reach their end now — their finish, once."""
+        rows = (
+            await session.execute(
+                select(Activity)
+                .where(
+                    Activity.user_id.is_not(None),
+                    Activity.counted.is_(True),
+                    Activity.rewarded_at.is_not(None),
+                    Activity.kind.in_(BOOK_KINDS),
+                    Activity.progress.is_not(None),
+                    Activity.stopped_at >= now - MAX_AGE,
+                    Activity.started_at >= func.coalesce(linked, now) - WINDOW,
+                    # the portal's own reader and player: their sittings said it
+                    Activity.external_user_id.not_like("portal:%"),
+                )
+                .order_by(Activity.stopped_at)
+            )
+        ).scalars()
+        published = 0
+        for row in rows:
+            if row.stopped_at is None or not self._finished(row.kind, row.progress, row.duration_s, None):
+                continue
+            if await self._seen_live(session, row, None):
+                continue
+            position = (row.progress or 0.0) * row.duration_s if row.duration_s else row.watched_s
+            published += await self._finished_late(
+                session,
+                row.user_id,
+                row.object_id,
+                row.kind,
+                row.service_id,
+                f"history:{row.ref}",
+                position,
+                row.duration_s,
+                row.stopped_at,
+                f"{EVENT}:history:{row.service_id}:{row.ref}",  # the finish's own key: never twice
+            )
         return published
 
     async def _game_length(self, session: AsyncSession, row: Activity, linked: Any, at: datetime) -> bool:

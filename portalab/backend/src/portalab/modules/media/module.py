@@ -334,7 +334,13 @@ class MediaModule:
         )
         # #20, #21: listening and reading in the portal (their tickets: another key of the same secret)
         self.books = BookService(
-            database, events, capabilities, lambda: self.config, player_key or os.urandom(32), clock=clock
+            database,
+            events,
+            capabilities,
+            lambda: self.config,
+            player_key or os.urandom(32),
+            threshold=self.threshold,  # #386: finished where the administrator says, as everywhere
+            clock=clock,
         )
 
     # --- configuration ---------------------------------------------------------------------------------
