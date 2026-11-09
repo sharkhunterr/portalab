@@ -491,3 +491,35 @@ async def test_a_game_played_never_takes_the_game_s_length(app: FastAPI, media: 
         rows["played:6601:2026-10-13"].watched_s == 0.0 and rows["played:6601:2026-10-13"].duration_s is None
     )
     assert rows["session:1"].watched_s == 430.0 and rows["session:1"].duration_s is None
+
+
+async def test_an_audiobook_sitting_reaching_its_end_later_is_finished_once(
+    app: FastAPI, media: MediaHarness
+) -> None:
+    """#386: Grimmory's audio pieces tell no progress — the sitting is judged abandoned, its minutes count;
+    once the book's progress reaches it (the next reading of the history), its finish comes, once, without
+    its minutes again."""
+    people = await users(app, media, "zoe")
+    zoe = people["zoe"]
+    sitting = _activity(zoe, 5, 0.5, title="Alien")
+    sitting.ref, sitting.family, sitting.kind = "76", None, "audiobook"
+    sitting.watched_s, sitting.duration_s, sitting.progress = 2857.0, 17732.0, None
+    async with media.database.unit_of_work() as uow:
+        uow.session.add(sitting)
+    rewards = HistoryRewards(
+        media.database, media.module.history.events, media.module.threshold, clock=FixedClock(NOW)
+    )
+    assert await rewards.run() == 1  # abandoned: its minutes only (16 % of the book, by them)
+    async with media.database.unit_of_work() as uow:
+        row = await uow.session.scalar(select(Activity).where(Activity.ref == "76"))
+        assert row is not None
+        row.progress = 0.99  # the next reading of Grimmory's history: where the book is now
+    assert await rewards.run() == 1
+    assert await rewards.run() == 0  # once
+    await media.dispatch()
+    finished = [e for e in await media.events() if e[0] == "media.playback_finished"]
+    assert len(finished) == 1 and finished[0][1]["kind"] == "audiobook"
+    assert finished[0][1]["watched_s"] == 0.0  # its minutes: the abandoned sitting gave them
+    assert finished[0][1]["session"] == "history:76"
+    partial = [e for e in await media.events() if e[0] == "media.playback_abandoned"]
+    assert [e[1]["watched_s"] for e in partial] == [2857.0]

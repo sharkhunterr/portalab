@@ -47,7 +47,7 @@ from portalab.modules.media.settings import MediaConfig
 TIMEOUT_S = 30.0
 STREAM_TIMEOUT_S = 90.0
 STATES = ("playing", "paused", "stopped", "finished")
-FINISHED = 0.995  # a book read to here is finished
+FINISHED = 0.995  # a book read to here is finished (without the administrator's threshold)
 # #256: a sitting nothing has been heard of for this long is over (its page went away without a word)
 IDLE = timedelta(minutes=30)
 HEARD_SLACK_S = 5.0  # #353: a report's own lateness, on top of 3x the time between two reports
@@ -126,6 +126,7 @@ class BookService:
         config: Callable[[], MediaConfig],
         key: bytes,
         *,
+        threshold: Callable[[str], float | None] | None = None,
         clock: Clock | None = None,
     ) -> None:
         self.database = database
@@ -133,7 +134,14 @@ class BookService:
         self.capabilities = capabilities
         self.config = config
         self.key = books_key(key)
+        self.threshold = threshold
         self.clock = clock
+
+    def _ends(self, kind: str, share: float | None) -> bool:
+        """#386: read or listened to the end — the administrator's threshold for the kind
+        (``media.finishedThreshold``), as for a film; an explicit-only kind ends with the book alone."""
+        limit = self.threshold(kind) if self.threshold is not None else FINISHED
+        return share is not None and limit is not None and share >= limit
 
     # --- where and as whom --------------------------------------------------------------------------------
     def _providers(self, capability: str) -> dict[str, tuple[Any, str | None]]:
@@ -281,7 +289,7 @@ class BookService:
         """Where the member is: kept, written back to the service, and published as activity."""
         ticket = self.ticket(user, token, "listen")
         share = min(1.0, position_s / duration_s) if duration_s else None
-        finished = state == "finished" or (share is not None and share >= FINISHED)
+        finished = state == "finished" or self._ends("audiobook", share)
         await self._record(
             ticket,
             AUDIO_FORMAT,
@@ -386,7 +394,7 @@ class BookService:
         if format not in READING_FORMATS:
             raise NothingToOpen("The portal does not read this format.")
         share = min(1.0, max(0.0, percent))
-        finished = state == "finished" or share >= FINISHED
+        finished = state == "finished" or self._ends("book", share)
         await self._record(
             ticket,
             format,
@@ -582,7 +590,9 @@ class BookService:
                 row.session_ended_at = now
                 await self._publish(
                     session,
-                    "media.playback_finished" if row.percent >= FINISHED else "media.playback_abandoned",
+                    "media.playback_finished"
+                    if self._ends(kind, row.percent)
+                    else "media.playback_abandoned",
                     user=row.user_id,
                     object_id=row.object_id,
                     service=row.service_id,

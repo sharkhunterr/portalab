@@ -277,3 +277,30 @@ async def test_a_chapter_skipped_is_not_heard(
         if name == "media.playback_abandoned"
     ]
     assert ended == [1830.0]  # 10 + 20 min + the last 30 s — not the 100 min between its two ends
+
+
+async def test_an_audiobook_stopped_past_the_administrators_threshold_is_finished(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """#386: finished where the administrator says for audiobooks (95 % by default), as a film — not only
+    at its very last second: stopping during the closing credits is having listened to it."""
+    people = await users(app, media, "zoe")
+    audiobook, _, _, _ = await _library(media)
+    await media.module.links.claim(people["zoe"], media.service(5).service_id, "owner", verified=True)
+    await login(client, "zoe")
+    base = f"/api/v1/media/listen/{(await client.get(f'/api/v1/media/{audiobook}/listen')).json()['ticket']}"
+    for seq, state, at in ((1, "playing", 3300.0), (2, "paused", 3380.0)):  # 94 %: not yet
+        sent = await client.post(
+            f"{base}/position", json={"state": state, "position_s": at, "duration_s": 3600, "seq": seq}
+        )
+        assert sent.status_code == 204, sent.text
+    names = [name for name, _, _ in await media.events("media.playback")]
+    assert "media.playback_finished" not in names
+    stopped = await client.post(
+        f"{base}/position", json={"state": "stopped", "position_s": 3450, "duration_s": 3600, "seq": 3}
+    )
+    assert stopped.status_code == 204
+    events = await media.events("media.playback")
+    finished = [p for name, p, _ in events if name == "media.playback_finished"]
+    assert len(finished) == 1 and finished[0]["kind"] == "audiobook" and finished[0]["percent"] == 1.0
+    assert not any(name == "media.playback_abandoned" for name, _, _ in events)
