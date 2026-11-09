@@ -1064,5 +1064,13 @@
   "streak.title": "{days, plural, one {# jour} other {# jours}} d'affilée",
   "streak.top": "Palier maximum atteint : gardez le rythme !",
   "streak.dayOf": "Jour {days} sur {end} · ×{multiplier} au bout",
-  "streak.begin": "Départ"
+  "streak.begin": "Départ",
+  "streak.history": "Mes {count} derniers jours",
+  "streak.active": "{count, plural, one {# jour actif} other {# jours actifs}} sur {total}",
+  "streak.since": "depuis le {date}",
+  "streak.todayShort": "Auj.",
+  "streak.legend.done": "jour compté",
+  "streak.legend.frozen": "gel",
+  "streak.legend.missed": "manqué",
+  "streak.legend.pending": "aujourd'hui, à faire"
 }

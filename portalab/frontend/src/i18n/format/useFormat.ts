@@ -24,6 +24,11 @@ export function useFormat() {
         month: parts.find((p) => p.type === "month")?.value ?? "",
       };
     },
+    /** a day of the week in a letter or a short word (« L », « lun. »), for a strip of days */
+    weekday: (value: Date | string, style: "narrow" | "short" = "narrow") =>
+      new Intl.DateTimeFormat(ctx.locale, { weekday: style, timeZone: ctx.time_zone }).format(
+        new Date(value),
+      ),
     time: (value: Date | string) =>
       new Intl.DateTimeFormat(ctx.locale, {
         hour: "numeric",
