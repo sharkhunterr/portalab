@@ -258,6 +258,16 @@ body {
   --booster-pine: #2fbf71;
   --xp-gradient: linear-gradient(90deg, var(--color-accent), var(--color-accent-alt));
   /* 027: calendar categories — readable on light and dark surfaces, always paired with an icon */
+  /* play streaks: a flame warms as it reaches its tiers (warm in every theme); a freeze is ice */
+  --streak-warm: #f59e0b;
+  --streak-hot: #f97316;
+  --streak-hotter: #ea580c;
+  --streak-fire: #ef4444;
+  --streak-blaze: #c026d3;
+  --streak-core: #fde68a;
+  --streak-ice: #38bdf8;
+  --streak-ice-text: #0c4a6e;
+  --streak-on-flame: #ffffff;
   --cal-movie: #e0598b;
   --cal-series: #8b6cf0;
   --cal-book: #2fa889;

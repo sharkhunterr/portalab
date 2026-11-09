@@ -8,6 +8,7 @@ import { QuestPanel } from "../quests/QuestPanel";
 import { GainSources } from "./GainSources";
 import { PlaysByKind } from "./PlaysByKind";
 import { ProgressionCard } from "./ProgressionCard";
+import { StreakCard } from "./StreakCard";
 import "../gamification.css";
 import { PageHeader } from "../../../design-system/components/PageHeader";
 
@@ -21,6 +22,7 @@ export default function ProgressionPage() {
       <PageHeader icon="trophy" title={t("gamification:progression.title")} />
       {progression.isError ? <FunctionalState state="unavailable" /> : null}
       {progression.data ? <ProgressionCard progression={progression.data} /> : null}
+      <StreakCard />
       <GainSources />
       <PlaysByKind />
       {achievements.data?.length ? <AchievementGrid achievements={achievements.data} /> : null}

@@ -300,23 +300,66 @@ class StreakNextOut(BaseModel):
     multiplier: float
 
 
-class MyStreakOut(BaseModel):
+class StreakDayOut(BaseModel):
+    day: date
+    state: Literal["done", "frozen", "missed", "pending"]  # pending: today, not counted yet
+
+
+class StreakOut(BaseModel):
     enabled: bool
     days: int
     multiplier: float
     next: StreakNextOut | None
+    tiers: list[StreakNextOut] = []  # every tier, the first first: the road the streak travels
+    today: bool = False  # today already counts — else the streak waits for today's play
+    best: int = 0  # the longest streak of the last year
+    last_day: date | None = None
+    recent: list[StreakDayOut] = []  # the last 14 days, today last
+
+
+class MyStreakOut(StreakOut):
     freezes: int = 0  # #54: freezes owned, each covering one missed day
     last_frozen: date | None = None
 
 
 @router.get("/me/streak", response_model=MyStreakOut)
 async def my_streak(principal: Me, module: Module) -> MyStreakOut:
-    """The member's play streak today (or yesterday's, still alive) and the next tier."""
+    """The member's play streak today (or yesterday's, still alive), the tiers and the last days."""
     state = await module.streaks.current(_me(principal), utc_now(module.clock))
     perks = await module.perks.state(_me(principal))
     return MyStreakOut.model_validate(
         {**state, "freezes": perks["freezes"], "last_frozen": perks["last_frozen"]}
     )
+
+
+class MemberStreakOut(StreakOut):
+    user_id: UUID
+    name: str | None
+    freezes: int = 0
+
+
+@router.get("/admin/gamification/streaks", response_model=list[MemberStreakOut])
+async def member_streaks(
+    _: Manager, module: Module, limit: Annotated[int, Query(ge=1, le=500)] = 100
+) -> list[MemberStreakOut]:
+    """#389: every member's play streak — the longest now first —, its record and its last days, with
+    the freezes they hold."""
+    board = (await module.streaks.board(utc_now(module.clock)))[:limit]
+    directory = module.capabilities.system_providers(DIRECTORY)
+    out: list[MemberStreakOut] = []
+    for user_id, state in board:
+        name = None
+        if directory:
+            try:
+                summary = await directory[0].provider.get_user_summary(user_id)
+                name = summary.display_name if summary else None
+            except Exception:
+                name = None
+        freezes = await module.perks.freezes_available(user_id)
+        out.append(
+            MemberStreakOut.model_validate({**state, "user_id": user_id, "name": name, "freezes": freezes})
+        )
+    return out
 
 
 class MemberPositionOut(BaseModel):

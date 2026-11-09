@@ -12754,6 +12754,101 @@
         "title": "MemberSeriesOut",
         "type": "object"
       },
+      "MemberStreakOut": {
+        "properties": {
+          "best": {
+            "default": 0,
+            "title": "Best",
+            "type": "integer"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "freezes": {
+            "default": 0,
+            "title": "Freezes",
+            "type": "integer"
+          },
+          "last_day": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Day"
+          },
+          "multiplier": {
+            "title": "Multiplier",
+            "type": "number"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "next": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StreakNextOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recent": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/StreakDayOut"
+            },
+            "title": "Recent",
+            "type": "array"
+          },
+          "tiers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/StreakNextOut"
+            },
+            "title": "Tiers",
+            "type": "array"
+          },
+          "today": {
+            "default": false,
+            "title": "Today",
+            "type": "boolean"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "enabled",
+          "days",
+          "multiplier",
+          "next",
+          "user_id",
+          "name"
+        ],
+        "title": "MemberStreakOut",
+        "type": "object"
+      },
       "MembersDetailOut": {
         "properties": {
           "members": {
@@ -12921,6 +13016,11 @@
       },
       "MyStreakOut": {
         "properties": {
+          "best": {
+            "default": 0,
+            "title": "Best",
+            "type": "integer"
+          },
           "days": {
             "title": "Days",
             "type": "integer"
@@ -12933,6 +13033,18 @@
             "default": 0,
             "title": "Freezes",
             "type": "integer"
+          },
+          "last_day": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Day"
           },
           "last_frozen": {
             "anyOf": [
@@ -12959,6 +13071,27 @@
                 "type": "null"
               }
             ]
+          },
+          "recent": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/StreakDayOut"
+            },
+            "title": "Recent",
+            "type": "array"
+          },
+          "tiers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/StreakNextOut"
+            },
+            "title": "Tiers",
+            "type": "array"
+          },
+          "today": {
+            "default": false,
+            "title": "Today",
+            "type": "boolean"
           }
         },
         "required": [
@@ -20543,6 +20676,31 @@
           }
         },
         "title": "StreakConfig",
+        "type": "object"
+      },
+      "StreakDayOut": {
+        "properties": {
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "done",
+              "frozen",
+              "missed",
+              "pending"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day",
+          "state"
+        ],
+        "title": "StreakDayOut",
         "type": "object"
       },
       "StreakNextOut": {
@@ -29985,6 +30143,56 @@
           }
         },
         "summary": "Put Streak",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/gamification/streaks": {
+      "get": {
+        "description": "Every member's play streak \u2014 the longest now first \u2014, its record and its last days, with the freezes\nthey hold.",
+        "operationId": "member_streaks_api_v1_admin_gamification_streaks_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MemberStreakOut"
+                  },
+                  "title": "Response Member Streaks Api V1 Admin Gamification Streaks Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Member Streaks",
         "tags": [
           "gamification-admin"
         ]
@@ -50338,7 +50546,7 @@
     },
     "/api/v1/me/streak": {
       "get": {
-        "description": "The member's play streak today (or yesterday's, still alive) and the next tier.",
+        "description": "The member's play streak today (or yesterday's, still alive), the tiers and the last days.",
         "operationId": "my_streak_api_v1_me_streak_get",
         "responses": {
           "200": {

@@ -271,3 +271,46 @@ async def test_rewards_follow_the_streak(gm: GamHarness) -> None:
     before = await gm.balance(other)
     await gm.module.level_rewards.give(other, 2, start + timedelta(days=1, hours=2))
     assert await gm.balance(other) == before + 10
+
+
+async def test_a_streak_tells_its_days_its_record_and_its_road(gm: GamHarness, client: AsyncClient) -> None:
+    """#388, #389: a streak as its page draws it: its last days (done, missed, today still to come), its
+    record, its tiers; the administrators see every member's, the longest streaks now first — and only
+    they do."""
+    gm.module.config = replace(gm.module.config, streak=STREAK)
+    await gm.rule("played", RULE)
+    ursula, ulrich = gm.people["ursula"], gm.people["ulrich"]
+    start = gm.clock.now() + timedelta(hours=1)
+    for day in (0, 1, 2, 3, 4, 7, 8):  # five days, two missed, then two days again
+        await gm.emit(ursula, at=start + timedelta(days=day))
+    await gm.emit(ulrich, at=start + timedelta(days=9))
+    today = start + timedelta(days=9)  # Ursula has not played yet today: her streak still lives
+
+    state = await gm.module.streaks.current(ursula, today)
+    assert (state["days"], state["best"], state["today"], state["multiplier"]) == (2, 5, False, 1.5)
+    assert state["next"] == {"days": 5, "multiplier": 2.0} and [t["days"] for t in state["tiers"]] == [2, 5]
+    assert [d["state"] for d in state["recent"]][-10:] == [
+        "done",
+        "done",
+        "done",
+        "done",
+        "done",
+        "missed",
+        "missed",
+        "done",
+        "done",
+        "pending",
+    ]
+    assert len(state["recent"]) == 14 and state["recent"][-1]["day"] == today.date()
+
+    board = await gm.module.streaks.board(today)
+    assert [(user, s["days"], s["today"]) for user, s in board] == [(ursula, 2, False), (ulrich, 1, True)]
+
+    await login(client, "boss")
+    members = (await client.get("/api/v1/admin/gamification/streaks")).json()
+    assert {m["user_id"] for m in members} == {str(ursula), str(ulrich)}
+    assert all(m["name"] and len(m["recent"]) == 14 for m in members)
+    await login(client, "ursula")
+    mine = (await client.get("/api/v1/me/streak")).json()
+    assert {"tiers", "best", "today", "recent"} <= set(mine)
+    assert (await client.get("/api/v1/admin/gamification/streaks")).status_code == 403
