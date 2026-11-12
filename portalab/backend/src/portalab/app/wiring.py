@@ -25,6 +25,7 @@ from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.secrets import SecretBox
 from portalab.modules.administration.backup.service import BackupService
+from portalab.modules.administration.config.registry import SettingRegistry
 from portalab.modules.administration.module import AdministrationModule
 from portalab.modules.ai.module import AiModule
 from portalab.modules.authz.module import AuthzModule
@@ -161,6 +162,18 @@ class Platform:
         return True
 
 
+def _setting_owner(registry: SettingRegistry) -> Callable[[str], str | None]:
+    """The module owning a setting key, from the declarations (read once, when a backup is brought in)."""
+    owners: dict[str, str] = {}
+
+    def owner(key: str) -> str | None:
+        if not owners:
+            owners.update({d.key: d.owner for d in registry.all()})
+        return owners.get(key)
+
+    return owner
+
+
 def wire_platform(
     database: Database,
     *,
@@ -218,6 +231,7 @@ def wire_platform(
         versions=versions,
         site=site_name,
         portalab=portalab_version(),
+        setting_owner=_setting_owner(administration.registry),  # issue 392: a setting's block
     )
     administration.registry.register_user_validator("ui.theme", ui.themes.choice_errors, owner="module:ui")
     for setting in ui.looks.SETTINGS:  # 027: shop cosmetics (notifications, palette, ambient, celebration)

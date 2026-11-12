@@ -39,6 +39,11 @@ class OpenIn(BaseModel):
     passphrase: str = Field(min_length=1, max_length=512)
 
 
+class ImportIn(OpenIn):
+    # issue 392: the blocks to bring (and what they need); absent, everything as before
+    blocks: list[Annotated[str, Field(min_length=1, max_length=40)]] | None = Field(None, max_length=40)
+
+
 def _backups(module: Any) -> BackupService:
     service = getattr(module, "backups", None)
     if not isinstance(service, BackupService):
@@ -132,10 +137,10 @@ async def import_inspect(body: OpenIn, module: Module) -> dict[str, Any]:
 
 @router.post("/admin/first-run/import", status_code=status.HTTP_202_ACCEPTED)
 @public
-async def import_start(body: OpenIn, module: Module) -> dict[str, Any]:
+async def import_start(body: ImportIn, module: Module) -> dict[str, Any]:
     service = await _arrival(module)
     await service.inspect(body.name, body.passphrase)  # a wrong passphrase or another version: said now
-    return service.start_restore(body.name, body.passphrase).as_dict()
+    return service.start_restore(body.name, body.passphrase, body.blocks).as_dict()
 
 
 @router.get("/admin/first-run/import/status")

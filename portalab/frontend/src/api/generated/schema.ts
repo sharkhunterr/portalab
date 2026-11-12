@@ -15577,15 +15577,6 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
-        /** ImportIn */
-        ImportIn: {
-            /** Accept Conflicts */
-            accept_conflicts?: string[];
-            /** Document */
-            document: {
-                [key: string]: unknown;
-            };
-        };
         /** IncidentBulkIn */
         IncidentBulkIn: {
             /** Comment */
@@ -21136,12 +21127,30 @@ export interface components {
              */
             status: "draft" | "active" | "retired";
         };
+        /** ImportIn */
+        portalab__modules__administration__api__backups__ImportIn: {
+            /** Blocks */
+            blocks?: string[] | null;
+            /** Name */
+            name: string;
+            /** Passphrase */
+            passphrase: string;
+        };
         /** ResetIn */
         portalab__modules__administration__api__backups__ResetIn: {
             /** Confirm */
             confirm: string;
             /** Password */
             password: string;
+        };
+        /** ImportIn */
+        portalab__modules__administration__api__routes__ImportIn: {
+            /** Accept Conflicts */
+            accept_conflicts?: string[];
+            /** Document */
+            document: {
+                [key: string]: unknown;
+            };
         };
         /** PolicyIn */
         portalab__modules__administration__api__routes__PolicyIn: {
@@ -22841,7 +22850,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ImportIn"];
+                "application/json": components["schemas"]["portalab__modules__administration__api__routes__ImportIn"];
             };
         };
         responses: {
@@ -23574,7 +23583,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["OpenIn"];
+                "application/json": components["schemas"]["portalab__modules__administration__api__backups__ImportIn"];
             };
         };
         responses: {
