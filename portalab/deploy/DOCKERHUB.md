@@ -30,60 +30,32 @@ Source, documentation and release notes: **https://github.com/sharkhunterr/porta
 
 ## Run it
 
-One image, three entrypoints — `serve` (default), `worker`, `migrate` — next to PostgreSQL 16. Secrets are
-files mounted as Docker secrets (`DATABASE_URL_FILE`, `SECRET_KEY_FILE`).
-
-```yaml
-x-portalab: &portalab
-  image: sharkhunterr/portalab:latest
-  environment:
-    DATABASE_URL_FILE: /run/secrets/database_url
-    SECRET_KEY_FILE: /run/secrets/secret_key
-    DATA_DIR: /var/lib/portalab
-    TRUSTED_PROXIES: 172.18.0.0/16   # your reverse proxy's address or network
-  secrets: [database_url, secret_key]
-  volumes: [portalab-data:/var/lib/portalab]
-  read_only: true
-  tmpfs: [/tmp]
-  security_opt: [no-new-privileges:true]
-  cap_drop: [ALL]
-  restart: unless-stopped
-
-services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: portalab
-      POSTGRES_USER: portalab
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
-    secrets: [db_password]
-    volumes: [postgres-data:/var/lib/postgresql/data]
-  migrate:
-    <<: *portalab
-    command: ["migrate"]
-    restart: "no"
-  portalab:
-    <<: *portalab
-    command: ["serve"]
-    ports: ["8080:8080"]
-  worker:
-    <<: *portalab
-    command: ["worker"]
-
-secrets:
-  db_password: { file: ./secrets/db_password }
-  database_url: { file: ./secrets/database_url }
-  secret_key: { file: ./secrets/secret_key }
-
-volumes:
-  postgres-data:
-  portalab-data:
-```
+One image, three entrypoints — `serve` (default), `worker`, `migrate` — next to PostgreSQL 16. The
+Compose file needs no preparation: on the first start it creates its folders and generates its secrets,
+then migrates the database and starts Portalab.
 
 ```bash
-docker compose up -d postgres && docker compose run --rm migrate && docker compose up -d portalab worker
+mkdir portalab && cd portalab
+curl -fsSLO https://raw.githubusercontent.com/sharkhunterr/portalab/main/portalab/deploy/docker-compose.yml
+docker compose up -d
 ```
 
 Then open `http://<server>:8080` from your local network: the arrival wizard creates the administrator.
+
+- **Everything in one folder**: `appdata/` next to the file holds Portalab's files, the database and the
+  secrets. The secrets are files (`DATABASE_URL_FILE`, `SECRET_KEY_FILE`), never environment values; keep
+  `appdata/secrets/portalab/secret_key` safe, it encrypts the credentials of your services.
+- **Variables** (port, folder, image tag, reverse proxy) go in a `.env` file next to the Compose file:
+  [`.env.example`](https://github.com/sharkhunterr/portalab/blob/main/portalab/deploy/.env.example) lists them.
+- **Upgrade**: `docker compose pull && docker compose up -d` — the migrations run before Portalab restarts.
+- **Hardened**: read-only filesystem, non-root, every capability dropped.
+
+### On Unraid
+
+With the **Docker Compose Manager** plugin: *Docker › Compose › Add New Stack*, paste the Compose file in
+*Edit Stack › Compose File*, set `PORTALAB_APPDATA=/mnt/user/appdata/portalab` in *Edit Stack › ENV File*,
+then **Compose Up**. Portalab appears in the Docker tab with its icon and WebUI. The guide:
+[On Unraid](https://github.com/sharkhunterr/portalab/blob/main/docs/getting-started.md#on-unraid).
+
 Behind a reverse proxy and on the internet, follow the checklist in the repository
 (`portalab/docs/internet-exposure.md`).

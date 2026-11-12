@@ -217,29 +217,30 @@ Every integration is a connector; plugins can add more without touching the core
 
 ## Quick start
 
-Portalab ships as one image (`serve`, `worker` and `migrate` entrypoints) next to PostgreSQL 16.
+Portalab ships as one image (`serve`, `worker` and `migrate` entrypoints) next to PostgreSQL 16. The
+Compose file needs no preparation: on the first start it creates its folders and generates its secrets.
 
 ```bash
-git clone https://github.com/sharkhunterr/portalab.git && cd portalab/portalab/deploy
-
-# secrets are files, never environment values
-mkdir -p secrets
-openssl rand -base64 32 > secrets/db_password
-echo "postgresql://portalab:$(cat secrets/db_password)@postgres:5432/portalab" > secrets/database_url
-openssl rand -base64 48 > secrets/secret_key
-
-docker compose up -d postgres
-docker compose run --rm migrate
-docker compose up -d portalab worker
+mkdir portalab && cd portalab
+curl -fsSLO https://raw.githubusercontent.com/sharkhunterr/portalab/main/portalab/deploy/docker-compose.yml
+docker compose up -d
 ```
 
 Open `http://<server>:8080` **from your local network**: the arrival wizard creates the administrator,
 sets the portal up and can bring a backup in. Then connect your services in *Administration › Services*.
 The full walk-through is in [docs/getting-started.md](docs/getting-started.md).
 
+- Everything is kept in `appdata/` next to the file: Portalab's files, the database and the secrets. Keep
+  `appdata/secrets/portalab/secret_key` safe: it encrypts the credentials of your services.
+- The port, the folder, the image and the reverse proxy are set in a `.env` file:
+  [`portalab/deploy/.env.example`](portalab/deploy/.env.example) lists them.
+- **On Unraid**, paste the file as a stack of the Docker Compose Manager plugin, with
+  `PORTALAB_APPDATA=/mnt/user/appdata/portalab` in its ENV file: see
+  [On Unraid](docs/getting-started.md#on-unraid).
+- Upgrade with `docker compose pull && docker compose up -d`: the migrations run before Portalab restarts.
+
 The image is published as [`sharkhunterr/portalab`](https://hub.docker.com/r/sharkhunterr/portalab)
-(`latest` and one tag per release); `docker-compose.yml` builds it from source when `PORTALAB_IMAGE` is
-not set.
+(`latest` and one tag per release).
 
 ## Configuration
 

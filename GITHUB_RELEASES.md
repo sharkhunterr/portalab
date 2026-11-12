@@ -48,7 +48,7 @@
 > - `improvement` …
 >
 > ### Upgrading
-> - Migrations run with `docker compose run --rm migrate`; anything else to do.
+> - `docker compose pull && docker compose up -d` (the migrations run before Portalab restarts); anything else to do.
 >
 > ---
 > ```
@@ -62,7 +62,8 @@
 **Play streaks get a page of their own.** Members see how far their streak has gone, the road to the next
 multiplier and their last two weeks at a glance. Administrators follow every member's streak from the
 gamification overview. Audiobooks listened to in Grimmory now count as one sitting, and finishing one earns
-its reward. Book requests show their cover in the automatic newsletters.
+its reward. Book requests show their cover in the automatic newsletters. And installing Portalab now takes
+one `docker compose up -d`, on Unraid too.
 
 ### Highlights
 
@@ -73,6 +74,10 @@ its reward. Book requests show their cover in the automatic newsletters.
 - **Every member's streak for the administrators** — the gamification overview lists each member's
   streak, the longest first. Each row shows the multiplier and progress towards the tiers, whether today
   counts, the last 14 days, the record and the freezes held. A member's name filters the overview to them.
+- **Installed with one command, on Unraid too** — the Compose file creates its folder and its secrets on
+  the first start, migrates the database and starts Portalab. Everything lives in one folder (`appdata/`).
+  On Unraid, paste it as a Docker Compose Manager stack: Portalab shows in the Docker tab with its icon and
+  WebUI.
 
 ### Closed issues
 
@@ -86,22 +91,33 @@ its reward. Book requests show their cover in the automatic newsletters.
   cover and its description, year, genres and rating from Hardcover, linked to its sheet
 - `bug` Automatic newsletters could not show the poster of a requested film or series not yet in the
   library; it now shows
+- `bug` On a first install, the migrations could start while the database was still being created, and
+  fail; they now wait for it
 
 #### New
 
 - `feat` A play streak card on the progression page: the road to the tiers, the last 14 days, the record
   and the freezes held
 - `feat` Every member's play streak in the gamification overview
+- `feat` A Compose file that needs no preparation: one `docker compose up -d` creates the folders and the
+  secrets, migrates and starts Portalab, and stops with a clear message instead of replacing a lost secret
 
 #### Documentation and tooling
 
 - `doc` A frontend test no longer fails on a slow CI runner
+- `doc` Installing on Unraid with Docker Compose Manager, and an `.env` example listing every Compose variable
 
 ### Upgrading
 
-- Migrations run with `docker compose run --rm migrate` (media). The upgrade merges past Grimmory audiobook
-  pieces into one play per sitting. The XP those pieces earned stays earned. A book whose last sitting
-  reached its end gets its finish reward at the next reading of Grimmory's history.
+- `docker compose pull && docker compose up -d` with the new Compose file: the migrations now run on their
+  own (media). The upgrade merges past Grimmory audiobook pieces into one play per sitting. The XP those
+  pieces earned stays earned. A book whose last sitting reached its end gets its finish reward at the next
+  reading of Grimmory's history.
+- **The Compose file changed.** Portalab's files, the database and the secrets now live in one folder
+  (`appdata/`) instead of Docker volumes and a `secrets/` folder. Move them once before switching to the new
+  file, as described in
+  [Coming from the Compose file of Portalab 1.1 or earlier](https://github.com/sharkhunterr/portalab/blob/v1.2.0/docs/getting-started.md#coming-from-the-compose-file-of-portalab-11-or-earlier).
+  Until then, your current Compose file keeps working with 1.2.0.
 
 ---
 

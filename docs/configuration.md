@@ -27,24 +27,26 @@ Network lists are validated: every entry must be an IP address or a CIDR network
 
 ### Secrets as files
 
-In the reference Compose file, the secrets are Docker secrets mounted under `/run/secrets/`:
+The reference Compose file generates the secrets on the first start (its `init` service) in `appdata/secrets/`, and mounts each container's own folder, read-only, under `/run/secrets/`:
 
 ```yaml
 environment:
   DATABASE_URL_FILE: /run/secrets/database_url
   SECRET_KEY_FILE: /run/secrets/secret_key
-secrets: [database_url, secret_key]
+volumes:
+  - ${PORTALAB_APPDATA:-./appdata}/secrets/portalab:/run/secrets:ro
 ```
 
-PostgreSQL reads its own password the same way (`POSTGRES_PASSWORD_FILE`). Never commit the `secrets/` folder.
+PostgreSQL reads its own password the same way (`POSTGRES_PASSWORD_FILE`, from `appdata/secrets/postgres/`). To bring your own secrets, write the files before the first start: `init` keeps any file that exists. Never commit the `appdata/` folder. The layout of the folder is in [Getting started](getting-started.md#2-start-portalab).
 
 ### Compose variables (`.env`)
 
-The reference [`docker-compose.yml`](../portalab/deploy/docker-compose.yml) reads a few variables from a `.env` file next to it and passes them to the containers:
+The reference [`docker-compose.yml`](../portalab/deploy/docker-compose.yml) reads a few variables from a `.env` file next to it (on Unraid, the stack's ENV file) and passes them to the containers. [`.env.example`](../portalab/deploy/.env.example) lists them with their defaults:
 
 | `.env` variable | Default in Compose | Sets |
 | --- | --- | --- |
-| `PORTALAB_IMAGE` | `portalab:local` (built from source) | The image to run, e.g. `sharkhunterr/portalab:latest` |
+| `PORTALAB_APPDATA` | `./appdata` | The folder on the host for Portalab's files, the database and the secrets (`/mnt/user/appdata/portalab` on Unraid) |
+| `PORTALAB_IMAGE` | `sharkhunterr/portalab:latest` | The image to run: one release (`sharkhunterr/portalab:1.2.0`) or an image built from source (`portalab:local`) |
 | `PORTALAB_PORT` | `8080` | The host port published for the web interface |
 | `LOG_LEVEL` | `INFO` | `LOG_LEVEL` |
 | `PORTALAB_TRUSTED_PROXIES` | `127.0.0.1` | `TRUSTED_PROXIES` |
@@ -54,7 +56,7 @@ The reference [`docker-compose.yml`](../portalab/deploy/docker-compose.yml) read
 Example:
 
 ```env
-PORTALAB_IMAGE=sharkhunterr/portalab:latest
+PORTALAB_APPDATA=/mnt/user/appdata/portalab
 PORTALAB_PORT=8080
 PORTALAB_TRUSTED_PROXIES=172.18.0.0/16
 ```

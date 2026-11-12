@@ -10,68 +10,72 @@ Portalab ships as **one Docker image** with three entrypoints, next to a **Postg
 | `worker` | Background jobs: synchronising services, health probes, notifications, scheduled tasks |
 | `migrate` | Creates or upgrades the database schema, then exits |
 
-You run `migrate` once per install or upgrade, and keep `serve` and `worker` running side by side.
+The Compose file runs `migrate` before it starts `serve` and `worker`, at the first install and at each upgrade.
 
 ## Requirements
 
-- A Linux host with **Docker** and the **Docker Compose** plugin (`docker compose`).
-- `openssl` (or any other way to generate random strings) to create the secrets.
-- Disk space for the database and the data volume. Posters, artwork and the trading cards' images fetched from your services can grow to several gigabytes.
+- A Linux host with **Docker** and the **Docker Compose** plugin (`docker compose`), or **Unraid** with the Docker Compose Manager plugin (see [On Unraid](#on-unraid)).
+- Disk space for the database and Portalab's files. Posters, artwork and the trading cards' images fetched from your services can grow to several gigabytes.
 - A browser on the **same local network** as the server for the first setup (see [The arrival wizard](#the-arrival-wizard)).
 
 You do not need to install PostgreSQL yourself: the Compose file runs the official `postgres:16-alpine` image.
 
 ## Install with Docker Compose
 
-The reference Compose file is [`portalab/deploy/docker-compose.yml`](../portalab/deploy/docker-compose.yml).
+The reference Compose file is [`portalab/deploy/docker-compose.yml`](../portalab/deploy/docker-compose.yml). It needs no preparation: it creates its folders and its secrets on the first start.
 
-### 1. Get the deployment files
-
-```bash
-git clone https://github.com/sharkhunterr/portalab.git
-cd portalab/portalab/deploy
-```
-
-By default, `docker-compose.yml` **builds** the image from source (`portalab:local`). To run the published image instead, create a `.env` file next to `docker-compose.yml`:
-
-```env
-PORTALAB_IMAGE=sharkhunterr/portalab:latest
-```
-
-The image is published as [`sharkhunterr/portalab`](https://hub.docker.com/r/sharkhunterr/portalab), with `latest` and one tag per release (for example `v1.0.0`). Pin a release tag if you prefer to upgrade on your own schedule.
-
-### 2. Create the secrets
-
-Portalab never reads its secrets from plain environment values: they are **files**, mounted as Docker secrets.
+### 1. Get the Compose file
 
 ```bash
-mkdir -p secrets
-openssl rand -base64 32 > secrets/db_password
-echo "postgresql://portalab:$(cat secrets/db_password)@postgres:5432/portalab" > secrets/database_url
-openssl rand -base64 48 > secrets/secret_key
+mkdir portalab && cd portalab
+curl -fsSLO https://raw.githubusercontent.com/sharkhunterr/portalab/main/portalab/deploy/docker-compose.yml
 ```
 
-| File | Used by | Content |
-| --- | --- | --- |
-| `secrets/db_password` | PostgreSQL | The database password |
-| `secrets/database_url` | Portalab (`DATABASE_URL_FILE`) | The PostgreSQL connection URL |
-| `secrets/secret_key` | Portalab (`SECRET_KEY_FILE`) | The key that encrypts stored credentials (at least 32 bytes) |
+It runs the published image, [`sharkhunterr/portalab:latest`](https://hub.docker.com/r/sharkhunterr/portalab). Each release also has its own tag (for example `1.2.0`): pin one if you prefer to upgrade on your own schedule.
 
-> **Keep `secret_key` safe and never change it.** The passwords, API keys and tokens of your connected services are encrypted at rest with a key derived from it. Without the same key, they cannot be read again.
-
-### 3. Start the database, migrate, start Portalab
+The folder, the port, the image and the reverse-proxy settings can be changed in a `.env` file next to `docker-compose.yml`. [`.env.example`](../portalab/deploy/.env.example) lists them all with their defaults:
 
 ```bash
-docker compose up -d postgres
-docker compose run --rm migrate
-docker compose up -d portalab worker
+curl -fsSL https://raw.githubusercontent.com/sharkhunterr/portalab/main/portalab/deploy/.env.example -o .env
 ```
 
-The containers run hardened by default: read-only filesystem, a scratch `/tmp` only, no new privileges, every Linux capability dropped. Portalab writes only to its data volume (`portalab-data`, mounted at `/var/lib/portalab`).
+### 2. Start Portalab
+
+```bash
+docker compose up -d
+```
+
+The services start in this order:
+
+| Service | What it does |
+| --- | --- |
+| `init` | Creates the folders and generates the secrets, then exits. At each start, it keeps the existing secrets and checks the files' owners. |
+| `postgres` | The database |
+| `migrate` | Creates or upgrades the database schema, then exits |
+| `portalab` | `serve`: the web interface and the API, on port `8080` |
+| `worker` | The background jobs |
+
+Everything is kept in **one folder**, `appdata/` next to `docker-compose.yml` (set `PORTALAB_APPDATA` to move it):
+
+| Path | Holds |
+| --- | --- |
+| `appdata/data/` | Portalab's files (`/var/lib/portalab`): images, cards, visual packs, plugins, backups |
+| `appdata/postgres/` | The database |
+| `appdata/secrets/postgres/db_password` | The database password, read by PostgreSQL only |
+| `appdata/secrets/portalab/database_url` | The PostgreSQL connection URL (`DATABASE_URL_FILE`) |
+| `appdata/secrets/portalab/secret_key` | The key that encrypts stored credentials (`SECRET_KEY_FILE`) |
+
+The secrets are random and never pass through the environment: they show neither in `docker inspect` nor in the logs. Each container mounts only its own secrets folder, read-only, and each file can be read only by the user of the container that needs it. To bring your own secrets, write these files before the first start: `init` keeps any file that exists.
+
+> **Keep `secret_key` safe and never change it.** The passwords, API keys and tokens of your connected services are encrypted at rest with a key derived from it. Without the same key, they cannot be read again. If a secret goes missing while the database exists, `init` stops and names the file to restore, instead of generating a new one.
+
+> **Keep `appdata/` on a disk of your own.** A copy of it holds the database and the key that reads it, unencrypted. To keep a copy off the server, use Portalab's own encrypted backups (see [Backups and restore](#backups-and-restore)).
+
+The containers run hardened by default: read-only filesystem, a scratch `/tmp` only, no new privileges, every Linux capability dropped. Portalab writes only to its data folder. `init` runs as root to set the files' owners, without network and with only the rights it needs for that.
 
 To change the published port, the log level or the reverse-proxy settings, see [Configuration](configuration.md).
 
-### 4. Check it is running
+### 3. Check it is running
 
 ```bash
 docker compose ps
@@ -83,6 +87,39 @@ The image has a built-in health check on `/healthz`. You can also run a read-onl
 ```bash
 docker compose run --rm portalab doctor
 ```
+
+### Run an image built from source
+
+```bash
+git clone https://github.com/sharkhunterr/portalab.git && cd portalab
+docker build -f portalab/deploy/Dockerfile -t portalab:local .
+cd portalab/deploy
+echo "PORTALAB_IMAGE=portalab:local" > .env
+docker compose up -d
+```
+
+## On Unraid
+
+Portalab installs as a stack of the **Docker Compose Manager** plugin.
+
+1. In *Apps*, install **Docker Compose Manager**.
+2. In the *Docker* tab, under *Compose*, choose **Add New Stack** and name it `portalab`.
+3. On the stack, choose **Edit Stack › Compose File** and paste the content of [`docker-compose.yml`](https://raw.githubusercontent.com/sharkhunterr/portalab/main/portalab/deploy/docker-compose.yml).
+4. Choose **Edit Stack › ENV File** and set at least the folder (the other variables are in [`.env.example`](../portalab/deploy/.env.example)):
+
+   ```env
+   PORTALAB_APPDATA=/mnt/user/appdata/portalab
+   # PORTALAB_PORT=8090    when 8080 is already taken
+   ```
+
+5. Choose **Compose Up**. Portalab, its database and its worker appear in the *Docker* tab with their icon, and **WebUI** opens the arrival wizard.
+
+What to know:
+
+- **Always set `PORTALAB_APPDATA`.** The stack's own folder is on the flash drive, which cannot keep the files' owners: `init` stops there and says so.
+- **Upgrading** is **Update Stack**: the new image is pulled, and the migrations run before Portalab restarts.
+- **When the stack does not start**, Compose Manager only shows `service "init" didn't complete successfully`. The reason is in the logs of `portalab-init` (*Docker* tab, the container's icon, *Logs*).
+- **Backups of the appdata share** (the Appdata Backup plugin) hold the database and its key unencrypted: keep them on the server or on a disk of your own, and copy Portalab's encrypted backups off it. Keep the `appdata` share out of SMB (*Shares › appdata › SMB Security Settings › Export: No*).
 
 ## The arrival wizard
 
@@ -140,25 +177,38 @@ How new members arrive depends on the access mode you chose: with open sign-up t
 
 ## Upgrading
 
-Portalab upgrades its own database: pull the new image, run the migrations, restart.
+Portalab upgrades its own database: pull the new image and start again.
 
 ```bash
-docker compose pull                      # with PORTALAB_IMAGE set to the published image
-docker compose run --rm migrate
-docker compose up -d portalab worker
+docker compose pull
+docker compose up -d
 ```
 
-If you build from source, update the repository (`git pull`) and run `docker compose build` instead of `pull`.
+`up` runs `init` and `migrate` again before it restarts `portalab` and `worker`. If you build from source, update the repository (`git pull`), build the image again (see [Run an image built from source](#run-an-image-built-from-source)) and run `docker compose up -d`.
 
 - **Back up first.** Save the portal from *Administration › Backups* before a major upgrade (see below).
-- **Always run `migrate`.** Until the migrations are applied, `/readyz` reports the portal as not ready. To check whether migrations are pending without applying them: `docker compose run --rm migrate migrate --status`.
+- Until the migrations are applied, `/readyz` reports the portal as not ready. To check whether migrations are pending without applying them: `docker compose run --rm migrate migrate --status`.
 - *Administration › Version* shows the running version and revision, the database, and the schema of each module.
+
+### Coming from the Compose file of Portalab 1.1 or earlier
+
+Until 1.1, the Compose file kept the database and Portalab's files in Docker volumes (`postgres-data`, `portalab-data`), with secrets made by hand in `secrets/`. As long as that `secrets/` folder sits next to the new file and `appdata/` is still empty, `init` refuses to start, so that an empty portal never replaces yours by mistake. Move them once into `appdata/`, from the folder of your current `docker-compose.yml`:
+
+```bash
+docker compose down     # stops Portalab, keeps its volumes
+docker volume ls --filter name=postgres-data --filter name=portalab-data
+docker run --rm -v "$PWD:/d" postgres:16-alpine sh -c 'mkdir -p /d/appdata/secrets/postgres /d/appdata/secrets/portalab && cp /d/secrets/db_password /d/appdata/secrets/postgres/ && cp /d/secrets/database_url /d/secrets/secret_key /d/appdata/secrets/portalab/'
+docker run --rm -v deploy_postgres-data:/from -v "$PWD/appdata/postgres:/to" postgres:16-alpine cp -a /from/. /to/
+docker run --rm -v deploy_portalab-data:/from -v "$PWD/appdata/data:/to" postgres:16-alpine cp -a /from/. /to/
+```
+
+The copies run in a container because `appdata/` may already belong to root. Use the volume names `docker volume ls` shows: the folder's name, then `_postgres-data` and `_portalab-data` (`deploy_…` when the file is in `portalab/deploy`). Then take the new `docker-compose.yml` if you have not already (your `.env` stays valid) and start with `docker compose up -d`: the portal comes back as it was, with the same secrets. Once you have checked it, the old volumes (`docker volume rm …`) and the `secrets/` folder can go.
 
 ## Backups and restore
 
 Portalab saves **the whole portal in one archive encrypted with a passphrase**: members and their accounts, settings, services, content, play, media history and files.
 
-- **Save** from *Administration › Backups*. You choose a passphrase (12 characters at least) and, optionally, the technical history (audit log, metrics, logs) and the images fetched from your services. The portal keeps answering while it saves. Archives are kept in the data volume (`/var/lib/portalab/backups`) and can be downloaded.
+- **Save** from *Administration › Backups*. You choose a passphrase (12 characters at least) and, optionally, the technical history (audit log, metrics, logs) and the images fetched from your services. The portal keeps answering while it saves. Archives are kept in the data folder (`appdata/data/backups`, `/var/lib/portalab/backups` in the container) and can be downloaded.
 - **Restore** on a new installation: the arrival wizard's **Import another Portalab** takes the archive (sent from your browser, or copied into the server's backups folder) and its passphrase. Members keep their accounts and passwords; the services' secrets are encrypted again with the new portal's key. Restart `portalab` and `worker` afterwards.
 
 > **Keep the passphrase safe.** Without it the archive cannot be opened, and nobody can recover it. Copy your archives off the server.
