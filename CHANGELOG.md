@@ -3,6 +3,23 @@
 All notable changes to Portalab. The release pages (GitLab, GitHub) show the curated notes of
 [GITHUB_RELEASES.md](GITHUB_RELEASES.md); this file is generated from the commits by `npm run release`.
 
+## [1.2.0](https://github.com/sharkhunterr/portalab/compare/v1.1.0...v1.2.0) (2026-11-12)
+
+
+### Features
+
+* **deploy:** a self-contained Compose file — one docker compose up -d creates the folder and the secrets, migrates and starts Portalab, on Unraid too ([b8cc407](https://github.com/sharkhunterr/portalab/commit/b8cc407c234c360a45f4c301182da91eeac8fb13))
+* **gamification:** a play streak card with its road, and every member's streak for the administrators ([61d6d86](https://github.com/sharkhunterr/portalab/commit/61d6d86ac5f323367164f2fe3d818b453a4ed679))
+* **gamification:** the streak's last days as their own block — titled, counted, each day named, with a legend ([63420b6](https://github.com/sharkhunterr/portalab/commit/63420b61a7e05b4408c20911f193995d6305a689))
+* **gamification:** the streak's road as a bar cut at each tier, and members' streaks on the overview ([d5dd0eb](https://github.com/sharkhunterr/portalab/commit/d5dd0ebc06ee9c6926c6af71cc7ab3a18dd5fd1b))
+
+
+### Bug Fixes
+
+* **gamification:** the streak's days never overlap on a phone — sized from the strip's width, today underlined ([e8c65a5](https://github.com/sharkhunterr/portalab/commit/e8c65a5f606dba9c282791f009d01dee3d6b39a1))
+* **media:** an audiobook listened to in Grimmory is one sitting, and finishing it counts ([a9582bd](https://github.com/sharkhunterr/portalab/commit/a9582bd79693c5601fd4d2d85f15320f216b6b58))
+* **news:** a requested book shows in the newsletters with its cover and its Hardcover sheet ([9a6a2b2](https://github.com/sharkhunterr/portalab/commit/9a6a2b23a75c0cf9aca0c7f1eacbac4e3297709c))
+
 ## [1.1.0](https://github.com/sharkhunterr/portalab/compare/v1.0.0...v1.1.0) (2026-11-07)
 
 
