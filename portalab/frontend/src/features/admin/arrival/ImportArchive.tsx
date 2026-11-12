@@ -8,11 +8,14 @@ import { ApiError } from "../../../state/regions";
 import { type Inspected, percent, type Run, uploadArchive } from "../backup/api";
 import { formatBytes } from "../ControlCenter";
 import { holdArrival } from "./hold";
+import { ImportBlocks } from "./ImportBlocks";
+import { requested } from "./importBlocks";
 import { Launch } from "./Launch";
 import "../backup/backup.css";
 
-const IMPORT_PHASES = ["reading", "schema", "tables", "upgrade", "files"] as const;
+const IMPORT_PHASES = ["reading", "schema", "tables", "selection", "upgrade", "files"] as const;
 const UPGRADE_ONLY = new Set<string>(["schema", "upgrade"]); // an archive of an older Portalab
+const PARTIAL_ONLY = new Set<string>(["selection"]); // issue 392: some blocks only
 const IMPORT_SLIDES: ReadonlyArray<readonly [icon: string, key: string]> = [
   ["users", "members"],
   ["server", "services"],
@@ -34,6 +37,7 @@ export function ImportArchive({ language }: { language: string }) {
   const [sent, setSent] = useState<number | null>(null);
   const [passphrase, setPassphrase] = useState("");
   const [inspected, setInspected] = useState<Inspected | null>(null);
+  const [chosen, setChosen] = useState<Set<string>>(new Set());
   const [started, setStarted] = useState(false);
   const upload = useMutation({
     mutationFn: (file: File) => uploadArchive(file, setSent),
@@ -46,10 +50,15 @@ export function ImportArchive({ language }: { language: string }) {
     mutationFn: async () =>
       (await api.POST("/api/v1/admin/first-run/import/inspect", { body: { name, passphrase } }))
         .data as unknown as Inspected,
-    onSuccess: setInspected,
+    onSuccess: (found) => {
+      setInspected(found);
+      setChosen(new Set(found.blocks.map((b) => b.key))); // everything, until something is unticked
+    },
   });
+  const blocks = inspected ? requested(inspected.blocks, chosen) : undefined;
   const start = useMutation({
-    mutationFn: async () => api.POST("/api/v1/admin/first-run/import", { body: { name, passphrase } }),
+    mutationFn: async () =>
+      api.POST("/api/v1/admin/first-run/import", { body: { name, passphrase, blocks: blocks ?? null } }),
     onSuccess: () => {
       holdArrival(true); // issue 249: the portal set up at the end, the wizard stays until then
       setStarted(true);
@@ -69,7 +78,11 @@ export function ImportArchive({ language }: { language: string }) {
       : t("account:arrival.error");
 
   if (started) {
-    const phases = IMPORT_PHASES.filter((p) => inspected?.compatibility === "older" || !UPGRADE_ONLY.has(p));
+    const phases = IMPORT_PHASES.filter(
+      (p) =>
+        (inspected?.compatibility === "older" || !UPGRADE_ONLY.has(p)) &&
+        (blocks !== undefined || !PARTIAL_ONLY.has(p)),
+    );
     const at =
       run?.state === "done"
         ? phases.length
@@ -206,7 +219,19 @@ export function ImportArchive({ language }: { language: string }) {
           ) : null}
           {inspected.compatible ? (
             <>
-              <p className="arrival__lead">{t("account:arrival.import.warning")}</p>
+              <ImportBlocks
+                blocks={inspected.blocks}
+                chosen={chosen}
+                onChange={setChosen}
+                disabled={start.isPending}
+              />
+              <p className="arrival__lead">
+                {t(
+                  blocks === undefined
+                    ? "account:arrival.import.warning"
+                    : "account:arrival.import.warningPartial",
+                )}
+              </p>
               <Button onClick={() => start.mutate()} disabled={start.isPending} aria-busy={start.isPending}>
                 <Icon name="download" size={16} />
                 {t("account:arrival.import.start")}
