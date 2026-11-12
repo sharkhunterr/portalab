@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api, CSRF_COOKIE, CSRF_HEADER, readCookie } from "../../../api/client";
+import type { OfferedBlock } from "../arrival/importBlocks";
 
 /** Issue 247 — the portal's backups: the archives, the save or restore running, and an archive sent. */
 export interface Archive {
@@ -30,6 +31,7 @@ export interface Inspected {
   compatible: boolean;
   compatibility: "same" | "older" | "newer";
   portalab: string;
+  blocks: OfferedBlock[]; // issue 392: what may be chosen
 }
 
 export const BACKUPS_KEY = ["admin", "backups"] as const;
