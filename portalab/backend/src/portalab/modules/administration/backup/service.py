@@ -5,7 +5,7 @@ comes. Saving is audited; restoring is the arrival wizard's (a new portal, nobod
 import asyncio
 import re
 import secrets
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -17,7 +17,7 @@ from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import Conflict, NotFound, ValidationFailed
 from portalab.core.logging import get_logger
-from portalab.modules.administration.backup import archive
+from portalab.modules.administration.backup import archive, blocks
 from portalab.modules.administration.backup.archive import SUFFIX, BackupError, Options
 from portalab.modules.administration.backup.crypto import NotAnArchive, WrongPassphrase
 
@@ -80,12 +80,14 @@ class BackupService:
         versions: archive.Versions,
         site: Callable[[], Awaitable[str]],
         portalab: str = "unknown",
+        setting_owner: Callable[[str], str | None] = lambda _: None,
     ) -> None:
         self.database = database
         self.data_dir = data_dir
         self.folder = data_dir / "backups"
         self._key = secret_key
         self.capabilities = capabilities
+        self.setting_owner = setting_owner  # issue 392: which module owns a setting (its block)
         self.audit = audit
         self.versions = versions
         self._site = site
@@ -164,6 +166,7 @@ class BackupService:
             "folders": manifest.get("folders", []),
             "compatibility": compatibility,  # same | older (upgraded while imported) | newer (refused)
             "compatible": compatibility != "newer",
+            "blocks": blocks.described(manifest),  # issue 392: what may be chosen, with what each holds
         }
 
     # --- running -----------------------------------------------------------------------------------------
@@ -234,8 +237,13 @@ class BackupService:
 
         return self._start("create", work)
 
-    def start_restore(self, name: str, passphrase: str) -> Run:
+    def start_restore(self, name: str, passphrase: str, chosen: Iterable[str] | None = None) -> Run:
+        """``chosen``: the blocks to bring (issue 392), and what they need; ``None``: everything."""
         path = self.path_of(name)
+        try:
+            selection = None if chosen is None else blocks.close(chosen)
+        except ValueError as exc:
+            raise BackupRefused(str(exc), code="backup.unknown_block") from exc
 
         async def work(run: Run) -> dict[str, Any]:
             result = await archive.restore(
@@ -247,6 +255,8 @@ class BackupService:
                 capabilities=self.capabilities,
                 versions=self.versions,
                 progress=self._progress(run),
+                selection=selection,
+                setting_owner=self.setting_owner,
             )
             await self._audit(None, "admin.backup_restored", {"name": name, **result})
             return result

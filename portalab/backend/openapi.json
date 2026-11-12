@@ -8858,29 +8858,6 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
-      "ImportIn": {
-        "additionalProperties": false,
-        "properties": {
-          "accept_conflicts": {
-            "items": {
-              "type": "string"
-            },
-            "maxItems": 500,
-            "title": "Accept Conflicts",
-            "type": "array"
-          },
-          "document": {
-            "additionalProperties": true,
-            "title": "Document",
-            "type": "object"
-          }
-        },
-        "required": [
-          "document"
-        ],
-        "title": "ImportIn",
-        "type": "object"
-      },
       "IncidentBulkIn": {
         "additionalProperties": false,
         "properties": {
@@ -24873,6 +24850,46 @@
         "title": "WrappedDefinitionIn",
         "type": "object"
       },
+      "portalab__modules__administration__api__backups__ImportIn": {
+        "additionalProperties": false,
+        "properties": {
+          "blocks": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 40,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 40,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blocks"
+          },
+          "name": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "passphrase": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Passphrase",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "passphrase"
+        ],
+        "title": "ImportIn",
+        "type": "object"
+      },
       "portalab__modules__administration__api__backups__ResetIn": {
         "additionalProperties": false,
         "properties": {
@@ -24894,6 +24911,29 @@
           "password"
         ],
         "title": "ResetIn",
+        "type": "object"
+      },
+      "portalab__modules__administration__api__routes__ImportIn": {
+        "additionalProperties": false,
+        "properties": {
+          "accept_conflicts": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "title": "Accept Conflicts",
+            "type": "array"
+          },
+          "document": {
+            "additionalProperties": true,
+            "title": "Document",
+            "type": "object"
+          }
+        },
+        "required": [
+          "document"
+        ],
+        "title": "ImportIn",
         "type": "object"
       },
       "portalab__modules__administration__api__routes__PolicyIn": {
@@ -27403,7 +27443,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ImportIn"
+                "$ref": "#/components/schemas/portalab__modules__administration__api__routes__ImportIn"
               }
             }
           },
@@ -28478,7 +28518,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenIn"
+                "$ref": "#/components/schemas/portalab__modules__administration__api__backups__ImportIn"
               }
             }
           },
