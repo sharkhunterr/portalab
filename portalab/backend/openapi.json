@@ -30150,7 +30150,7 @@
     },
     "/api/v1/admin/gamification/streaks": {
       "get": {
-        "description": "Every member's play streak \u2014 the longest now first \u2014, its record and its last days, with the freezes\nthey hold.",
+        "description": "#389: every member's play streak \u2014 the longest now first \u2014, its record and its last days, with\nthe freezes they hold.",
         "operationId": "member_streaks_api_v1_admin_gamification_streaks_get",
         "parameters": [
           {
