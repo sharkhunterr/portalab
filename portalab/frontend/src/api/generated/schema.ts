@@ -1731,8 +1731,8 @@ export interface paths {
         };
         /**
          * Member Streaks
-         * @description Every member's play streak — the longest now first —, its record and its last days, with the freezes
-         *     they hold.
+         * @description #389: every member's play streak — the longest now first —, its record and its last days, with
+         *     the freezes they hold.
          */
         get: operations["member_streaks_api_v1_admin_gamification_streaks_get"];
         put?: never;
