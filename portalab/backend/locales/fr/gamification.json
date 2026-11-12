@@ -1065,7 +1065,7 @@
   "streak.top": "Palier maximum atteint : gardez le rythme !",
   "streak.dayOf": "Jour {days} sur {end} · ×{multiplier} au bout",
   "streak.begin": "Départ",
-  "streak.history": "Mes {count} derniers jours",
+  "streak.history": "{count, plural, one {Mon dernier jour} other {Mes # derniers jours}}",
   "streak.active": "{count, plural, one {# jour actif} other {# jours actifs}} sur {total}",
   "streak.since": "depuis le {date}",
   "streak.todayShort": "Auj.",
