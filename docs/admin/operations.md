@@ -56,7 +56,18 @@ Restoring is done by the **arrival wizard** of a new (or reset) portal, from the
 1. Choose **Import another Portalab** on the welcome screen.
 2. Send the archive from your browser, or copy it beforehand into the server's backups folder.
 3. Enter its passphrase. The wizard shows what the archive holds (members, services, visual packs, the portal it came from, its version) before you confirm.
-4. When the import is complete, **restart** the portal (`docker compose restart portalab worker`) and sign in with your usual account.
+4. **Choose what to bring.** Every part of the portal is ticked: untick what this portal should not take (see below).
+5. When the import is complete, **restart** the portal (`docker compose restart portalab worker`) and sign in with your usual account.
+
+#### Choosing what to bring
+
+The archive is offered as parts to tick: site and settings, members, services, e-mail and notifications, media, statistics, automations and workflows, content, gamification, marketplace, look, plugins, AI assistant, service status, and the technical history when it was saved.
+
+- **What a part needs comes with it**, and the wizard says why: the marketplace brings the gamification (its currency), media and automations bring the services, statistics bring the media. Unticking a part unticks what needs it.
+- **The settings follow their part**: the e-mail server's settings come with *E-mail and notifications*, the shop's with *Marketplace*, and so on.
+- **The Admin's account always comes.** Without *Members*, it is the only account brought: what the other members made (automations, pages, articles, products, decisions) is handed to the Admin, and what was theirs (balances, XP, achievements, purchases, play history, preferences) stays out. Gamification then arrives with its rules, levels, quests and catalog, everyone at zero.
+- What is not ticked is left as a new installation has it. Every part ticked brings the whole portal, as before.
+- Choosing is only offered for a **new** (or reset) portal: an archive is never merged into a portal in use.
 
 What to know:
 

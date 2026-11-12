@@ -209,7 +209,7 @@ The copies run in a container because `appdata/` may already belong to root. Use
 Portalab saves **the whole portal in one archive encrypted with a passphrase**: members and their accounts, settings, services, content, play, media history and files.
 
 - **Save** from *Administration › Backups*. You choose a passphrase (12 characters at least) and, optionally, the technical history (audit log, metrics, logs) and the images fetched from your services. The portal keeps answering while it saves. Archives are kept in the data folder (`appdata/data/backups`, `/var/lib/portalab/backups` in the container) and can be downloaded.
-- **Restore** on a new installation: the arrival wizard's **Import another Portalab** takes the archive (sent from your browser, or copied into the server's backups folder) and its passphrase. Members keep their accounts and passwords; the services' secrets are encrypted again with the new portal's key. Restart `portalab` and `worker` afterwards.
+- **Restore** on a new installation: the arrival wizard's **Import another Portalab** takes the archive (sent from your browser, or copied into the server's backups folder) and its passphrase, then lets you untick the parts this portal should not take (the members, the marketplace, the services…; what a part needs comes with it, and the Admin's account always comes). Members keep their accounts and passwords; the services' secrets are encrypted again with the new portal's key. Restart `portalab` and `worker` afterwards.
 
 > **Keep the passphrase safe.** Without it the archive cannot be opened, and nobody can recover it. Copy your archives off the server.
 
