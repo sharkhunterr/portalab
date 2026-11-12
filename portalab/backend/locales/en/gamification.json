@@ -1065,7 +1065,7 @@
   "streak.top": "Top tier reached: keep it up!",
   "streak.dayOf": "Day {days} of {end} · ×{multiplier} at the end",
   "streak.begin": "Start",
-  "streak.history": "My last {count} days",
+  "streak.history": "{count, plural, one {My last day} other {My last # days}}",
   "streak.active": "{count, plural, one {# active day} other {# active days}} out of {total}",
   "streak.since": "since {date}",
   "streak.todayShort": "Today",
