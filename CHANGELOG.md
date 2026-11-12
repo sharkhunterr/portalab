@@ -3,6 +3,14 @@
 All notable changes to Portalab. The release pages (GitLab, GitHub) show the curated notes of
 [GITHUB_RELEASES.md](GITHUB_RELEASES.md); this file is generated from the commits by `npm run release`.
 
+## [1.3.0](https://github.com/sharkhunterr/portalab/compare/v1.2.0...v1.3.0) (2026-11-12)
+
+
+### Features
+
+* **arrival:** « what to bring » — the archive's blocks as cards to tick before an import, what each needs said and ticked with it ([9bca968](https://github.com/sharkhunterr/portalab/commit/9bca968470862731d619c36031688533313b63b7))
+* **backup:** a backup brought into a new portal block by block — what a block needs comes with it, the Admin's account always, the other members only when chosen ([26c6930](https://github.com/sharkhunterr/portalab/commit/26c69309d491a9c6cff025774d6f090c5e49754d))
+
 ## [1.2.0](https://github.com/sharkhunterr/portalab/compare/v1.1.0...v1.2.0) (2026-11-12)
 
 
