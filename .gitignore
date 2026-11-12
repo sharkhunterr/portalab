@@ -27,6 +27,8 @@ test-results/
 .env.*
 !.env.example
 secrets/
+# the reference Compose file's folder (data, database, secrets) when it runs from the repository
+portalab/deploy/appdata/
 *.key
 *.pem
 

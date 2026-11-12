@@ -1,25 +1,23 @@
-# Portalab — self-hosted deployment (spec 001 quickstart).
-# Secrets are files mounted with Docker secrets; create them first (never commit real values):
-#   mkdir -p deploy/secrets
-#   openssl rand -base64 32 > deploy/secrets/db_password
-#   echo "postgresql://portalab:$(cat deploy/secrets/db_password)@postgres:5432/portalab" > deploy/secrets/database_url
-#   openssl rand -base64 48 > deploy/secrets/secret_key
-# Then:  docker compose -f deploy/docker-compose.yml up -d postgres
-#        docker compose -f deploy/docker-compose.yml run --rm migrate
-#        docker compose -f deploy/docker-compose.yml up -d portalab worker
+# Portalab — the reference deployment, self-contained: `docker compose up -d` is all it takes (#391).
+# On the first start, `init` creates the folders under PORTALAB_APPDATA (./appdata next to this file by
+# default) and generates the secrets, kept afterwards; then PostgreSQL starts, `migrate` applies the
+# migrations, and `portalab` (serve) and `worker` start. Upgrade: `docker compose pull && docker compose up -d`.
+# Variables go in a .env file next to this one (see .env.example). On Unraid (Docker Compose Manager), set
+# PORTALAB_APPDATA=/mnt/user/appdata/portalab in the stack's ENV file. Guide: docs/getting-started.md.
+#
+#   appdata/data               Portalab's files (/var/lib/portalab): images, cards, packs, plugins, backups
+#   appdata/postgres           the database
+#   appdata/secrets/postgres   db_password, read by PostgreSQL only
+#   appdata/secrets/portalab   database_url and secret_key, read by Portalab only. Keep secret_key safe: it
+#                              encrypts the services' credentials stored in Portalab.
 
 x-portalab: &portalab
-  image: ${PORTALAB_IMAGE:-portalab:local}
-  build:
-    context: ../..
-    dockerfile: portalab/deploy/Dockerfile
+  image: ${PORTALAB_IMAGE:-sharkhunterr/portalab:latest}
   environment:
     DATABASE_URL_FILE: /run/secrets/database_url
     SECRET_KEY_FILE: /run/secrets/secret_key
-    BIND_HOST: 0.0.0.0
-    BIND_PORT: "8080"
-    LOG_LEVEL: ${LOG_LEVEL:-INFO}
     DATA_DIR: /var/lib/portalab
+    LOG_LEVEL: ${LOG_LEVEL:-INFO}
     # #273: behind a reverse proxy (Nginx Proxy Manager…), its address or network as Portalab sees it — the
     # NPM container's Docker network (e.g. 172.18.0.0/16) or the host it runs on. Never 0.0.0.0/0: anyone
     # could then claim any address. Without it, every visitor has the proxy's address (one rate limit for
@@ -29,11 +27,11 @@ x-portalab: &portalab
     HEALTH_NETWORKS: ${PORTALAB_HEALTH_NETWORKS:-127.0.0.1/32,::1/128}
     # #275: where a portal not yet set up (or reset) may be set up from — the local networks, never the internet
     SETUP_NETWORKS: ${PORTALAB_SETUP_NETWORKS:-127.0.0.0/8,::1/128,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7}
-  secrets: [database_url, secret_key]
   volumes:
-    - portalab-data:/var/lib/portalab
+    - ${PORTALAB_APPDATA:-./appdata}/data:/var/lib/portalab
+    - ${PORTALAB_APPDATA:-./appdata}/secrets/portalab:/run/secrets:ro
   # 030 (issue 144): the image's files cannot be changed, no privilege can be gained or used; Portalab writes
-  # only its data volume and a scratch /tmp (check with `portalab doctor`)
+  # only its data folder and a scratch /tmp (check with `portalab doctor`)
   read_only: true
   tmpfs:
     - /tmp
@@ -41,27 +39,108 @@ x-portalab: &portalab
     - no-new-privileges:true
   cap_drop:
     - ALL
+  labels:
+    # the icon of Unraid's Docker tab
+    net.unraid.docker.icon: https://raw.githubusercontent.com/sharkhunterr/portalab/main/assets/icon.png
   restart: unless-stopped
 
 services:
+  # #391: at each start, the folders, the secrets (generated only when missing) and their owners. Portalab
+  # runs as uid 10001; PostgreSQL reads its password as root, then sets up its own folder. Root here, but
+  # without network and with only the rights to set owners and permissions.
+  init:
+    image: ${PORTALAB_IMAGE:-sharkhunterr/portalab:latest}
+    container_name: portalab-init
+    user: "0:0"
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        umask 077
+        cd /appdata
+        # an existing database keeps its secrets: new ones would not open it, nor read what it stores
+        refuse() {
+          echo "Portalab init: $$APPDATA/$$1 is missing, and the database in $$APPDATA/postgres already exists: $$2." >&2
+          echo "Restore $$1 from your backup of $$APPDATA. To start over instead, empty $$APPDATA/postgres and $$APPDATA/data (the arrival wizard can then import a Portalab backup)." >&2
+          exit 1
+        }
+        if [ -f postgres/PG_VERSION ]; then
+          [ -s secrets/postgres/db_password ] || refuse secrets/postgres/db_password "a new password would not open it"
+          [ -s secrets/portalab/secret_key ] || refuse secrets/portalab/secret_key "a new key could not read the services' credentials stored in it"
+        elif [ -s /project/secrets/secret_key ] && [ ! -s secrets/portalab/secret_key ]; then
+          # the Compose file of 1.1 or earlier: its portal lives in Docker volumes, not to be replaced by an empty one
+          echo "Portalab init: the secrets/ folder next to docker-compose.yml comes from the Compose file of Portalab 1.1 or earlier, whose portal is in Docker volumes." >&2
+          echo "Move it into $$APPDATA first: docs/getting-started.md, \"Coming from the Compose file of Portalab 1.1 or earlier\"." >&2
+          exit 1
+        fi
+        mkdir -p data postgres secrets/postgres secrets/portalab
+        if [ ! -s secrets/postgres/db_password ]; then
+          head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n' > secrets/postgres/db_password
+        fi
+        if [ ! -s secrets/portalab/database_url ]; then
+          echo "postgresql://portalab:$$(cat secrets/postgres/db_password)@postgres:5432/portalab" > secrets/portalab/database_url
+        fi
+        if [ ! -s secrets/portalab/secret_key ]; then
+          head -c 48 /dev/urandom | base64 -w0 > secrets/portalab/secret_key
+        fi
+        chmod 700 data secrets/portalab 2>/dev/null || true
+        chmod 600 secrets/postgres/db_password secrets/portalab/database_url secrets/portalab/secret_key 2>/dev/null || true
+        chown -R 10001:10001 secrets/portalab 2>/dev/null || true
+        if [ "$$(stat -c %u:%a secrets/portalab/secret_key)" != 10001:600 ]; then
+          echo "Portalab init: $$APPDATA cannot keep the owners and permissions of its files (a FAT or exFAT drive, a network share…)." >&2
+          echo "Set PORTALAB_APPDATA to a folder on a Linux file system; on Unraid, /mnt/user/appdata/portalab." >&2
+          exit 1
+        fi
+        [ "$$(stat -c %u data)" = 10001 ] || chown -R 10001:10001 data
+        echo "Portalab init: $$APPDATA is ready"
+    environment:
+      # the folder as this machine names it, for the messages
+      APPDATA: ${PORTALAB_APPDATA:-./appdata}
+    volumes:
+      - ${PORTALAB_APPDATA:-./appdata}:/appdata
+      # read-only, to recognise the secrets/ folder of the previous Compose file
+      - .:/project:ro
+    network_mode: none
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+    healthcheck:
+      disable: true
+    labels:
+      net.unraid.docker.icon: https://raw.githubusercontent.com/sharkhunterr/portalab/main/assets/icon.png
+    restart: "no"
+
   postgres:
     image: postgres:16-alpine
+    container_name: portalab-db
     environment:
       POSTGRES_DB: portalab
       POSTGRES_USER: portalab
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
-    secrets: [db_password]
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ${PORTALAB_APPDATA:-./appdata}/postgres:/var/lib/postgresql/data
+      - ${PORTALAB_APPDATA:-./appdata}/secrets/postgres:/run/secrets:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U portalab -d portalab"]
+      # #390: over TCP — on the first start, the socket already answers while the database is being created
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U portalab -d portalab"]
       interval: 5s
       timeout: 5s
       retries: 20
+    labels:
+      net.unraid.docker.icon: https://raw.githubusercontent.com/docker-library/docs/master/postgres/logo.png
+    depends_on:
+      init:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   migrate:
     <<: *portalab
+    container_name: portalab-migrate
     command: ["migrate"]
     restart: "no"
     depends_on:
@@ -70,30 +149,24 @@ services:
 
   portalab:
     <<: *portalab
+    container_name: portalab
     command: ["serve"]
     ports:
       - "${PORTALAB_PORT:-8080}:8080"
+    labels:
+      net.unraid.docker.icon: https://raw.githubusercontent.com/sharkhunterr/portalab/main/assets/icon.png
+      # the WebUI entry of Unraid's Docker tab
+      net.unraid.docker.webui: http://[IP]:[PORT:8080]/
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
   worker:
     <<: *portalab
+    container_name: portalab-worker
     command: ["worker"]
     healthcheck:
       disable: true
     depends_on:
-      postgres:
-        condition: service_healthy
-
-secrets:
-  db_password:
-    file: ./secrets/db_password
-  database_url:
-    file: ./secrets/database_url
-  secret_key:
-    file: ./secrets/secret_key
-
-volumes:
-  postgres-data:
-  portalab-data:
+      migrate:
+        condition: service_completed_successfully
