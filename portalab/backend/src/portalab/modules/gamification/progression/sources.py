@@ -27,6 +27,7 @@ ACTIONS = (
     ("media.request", "requests"),  # #129: asking for a title is not playing it
     ("media.radio", "radio"),  # issue 227: the radio listened to, a song asked for
     ("media.leaving", "rescue"),  # issue 228: a title about to be deleted, watched
+    ("media.reviewed", "reviews"),  # #393: a review given is not a play
     ("media.", "media"),
     ("marketplace.", "shop"),
     ("project.", "projects"),  # #314: backing a community project is not shopping

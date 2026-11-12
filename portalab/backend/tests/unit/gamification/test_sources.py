@@ -7,6 +7,8 @@ def test_each_action_has_its_source() -> None:
     assert action_of("media.request_created") == "requests"
     assert action_of("media.request_available") == "requests"
     assert action_of("media.played") == "media"
+    # #393: a review given is not a play, whatever was reviewed
+    assert action_of("media.reviewed") == action_of("media.reviewed", "movie") == "reviews"
     assert action_of("marketplace.purchased") == "shop"
     assert action_of("ticket.created") == "support"
     # issue 265: the games page's games, the day's title, the week's challenges, the boards
