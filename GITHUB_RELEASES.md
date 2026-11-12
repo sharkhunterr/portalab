@@ -55,6 +55,41 @@
 
 ---
 
+# v1.3.0
+
+## Portalab v1.3.0 — choose what a backup brings into a new portal
+
+**Importing a backup is no longer all or nothing.** A new portal's arrival wizard now shows the archive's
+parts to tick: keep the services, automations, marketplace, e-mail settings and gamification, and leave the
+members out, for instance. What a part needs comes with it, and the Admin's account always comes.
+
+### Highlights
+
+- **What to bring, part by part** — after checking the archive, the wizard lists its parts as cards: site and
+  settings, members, services, e-mail and notifications, media, statistics, automations and workflows,
+  content, gamification, marketplace, look, plugins, AI assistant, service status, and the technical history
+  when it was saved. Each says what it holds. Everything is ticked; untick what this portal should not take.
+- **Linked parts follow** — ticking the marketplace ticks the gamification (its currency), and the card says
+  why; media and automations bring the services. Each module's settings follow its part: the e-mail server
+  comes with *E-mail and notifications*. Nothing is left pointing at something that did not come.
+- **Without the members** — the Admin's account is the only one brought. What the members made (automations,
+  pages, articles, products, decisions) is handed to the Admin; what was theirs (balances, XP, achievements,
+  purchases, play history) stays out, and the gamification starts with everyone at zero.
+
+### Closed issues
+
+#### New
+
+- `feat` Choose what a backup brings into a new portal: parts to tick, what each needs brought with it, the
+  Admin's account always, the other members only when chosen
+
+### Upgrading
+
+- `docker compose pull && docker compose up -d` (the migrations run before Portalab restarts). No migration
+  in this release. Every part ticked imports the whole portal, as before; older archives work as they are.
+
+---
+
 # v1.2.0
 
 ## Portalab v1.2.0 — play streaks you can see, audiobooks that count
