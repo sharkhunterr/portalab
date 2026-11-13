@@ -18,12 +18,14 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from portalab.core.authz_port import ANONYMOUS, Principal
 from portalab.core.errors import Forbidden, Unavailable
+from portalab.core.logging import get_logger
 from portalab.modules.identity.domain.state_machine import AccountState
 from portalab.modules.identity.models import User
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.identity.services.sessions import IssuedSession, csrf_matches
 from portalab.modules.identity.services.visits import record_visit
 
+log = get_logger("portalab.identity")
 SESSION_COOKIE = "__Host-portalab_session"
 CSRF_COOKIE = "__Host-portalab_csrf"
 PLAIN_SESSION_COOKIE = "portalab_session"  # #395: plain HTTP from a local network
@@ -75,6 +77,12 @@ def session_token(request: Request) -> str | None:
 
 def check_csrf(request: Request, token: str) -> None:
     if request.method not in SAFE_METHODS and not csrf_matches(token, request.headers.get(CSRF_HEADER)):
+        # issue 405: a forged or stale request is a security event (never the token itself in the log)
+        log.warning(
+            "CSRF check failed",
+            extra={"fields": {"method": request.method, "path": request.url.path[:200],
+                              "header": CSRF_HEADER.lower() in request.headers}},
+        )  # fmt: skip
         raise CsrfFailed("This request needs a valid X-CSRF-Token header.")
 
 

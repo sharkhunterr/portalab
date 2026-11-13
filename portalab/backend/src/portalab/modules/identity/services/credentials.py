@@ -5,8 +5,12 @@
 * hashing runs in a worker thread: Argon2 is deliberately CPU/memory hard.
 """
 
+import gzip
 import secrets
+from collections.abc import Iterable
 from datetime import datetime
+from functools import cache
+from pathlib import Path
 from uuid import UUID
 
 import anyio
@@ -33,7 +37,22 @@ def params_version(params: Argon2Params) -> str:
     return f"t{params.time_cost}-m{params.memory_cost_kib}-p{params.parallelism}"
 
 
-def check_password_policy(password: str, policy: PasswordPolicy) -> None:
+COMMON = Path(__file__).resolve().parents[1] / "data" / "common-passwords.txt.gz"
+
+
+@cache
+def common_passwords() -> frozenset[str]:
+    """Issue 406: the passwords most used in data breaches (NCSC's 100k, the 8+ characters ones)."""
+    try:
+        with gzip.open(COMMON, "rt", encoding="utf-8") as listed:
+            return frozenset(line.strip() for line in listed if line.strip())
+    except OSError:  # never without it in a build; a missing file must not lock members out
+        return frozenset()
+
+
+def check_password_policy(password: str, policy: PasswordPolicy, *, personal: Iterable[str] = ()) -> None:
+    """Length, not blank — and (issue 406, ASVS 6.2.4 and 6.2.11) neither a password found in data breaches
+    nor one holding the member's own login or name."""
     if not policy.min_length <= len(password) <= policy.max_length:
         raise PasswordRejected(
             f"Use a password of {policy.min_length} to {policy.max_length} characters.",
@@ -41,6 +60,18 @@ def check_password_policy(password: str, policy: PasswordPolicy) -> None:
         )
     if password.strip() == "":
         raise PasswordRejected("A password cannot be blank.")
+    lowered = password.lower()
+    if lowered in common_passwords():
+        raise PasswordRejected(
+            "This password is among the most used ones found in data breaches: choose another.",
+            code="user.password_common",
+        )
+    for word in personal:
+        word = (word or "").strip().lower()
+        if len(word) >= 3 and word in lowered:
+            raise PasswordRejected(
+                "A password cannot hold your login or your name.", code="user.password_personal"
+            )
 
 
 class CredentialHasher:

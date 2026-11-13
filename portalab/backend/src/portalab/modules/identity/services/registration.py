@@ -127,7 +127,7 @@ class RegistrationService:
         """Self-registration (``open`` mode). The answer never tells whether the login already exists."""
         if self.ctx.config.registration_mode != "open":
             raise RegistrationClosed("Accounts are created by the administrator.")
-        check_password_policy(password, self.ctx.config.password_policy)
+        check_password_policy(password, self.ctx.config.password_policy, personal=(login, display_name))
         now = self.ctx.now()
         issued: IssuedToken | None = None
         try:
@@ -205,7 +205,11 @@ class RegistrationService:
                     raise PasswordRejected(
                         "Choose a password to activate the account.", code="user.password_required"
                     )
-                check_password_policy(password, self.ctx.config.password_policy)
+                check_password_policy(
+                    password,
+                    self.ctx.config.password_policy,
+                    personal=(user.login or "", user.display_name or ""),
+                )
                 await set_password(uow.session, self.hasher, user.id, password, now)
             row.consumed_at = now
             await self.accounts.transition(uow.session, user, AccountState.ACTIVE, SYSTEM, reason="verified")

@@ -154,3 +154,23 @@ async def test_a_plain_cookie_never_counts_over_https(app: FastAPI) -> None:
     async with httpx.AsyncClient(transport=secure, base_url="https://portal.test") as https:
         https.cookies.set(PLAIN_SESSION_COOKIE, planted)
         assert (await https.get("/api/v1/me")).status_code == 401
+
+
+@pytest.mark.usefixtures("alice")
+async def test_sign_in_audited_csrf_failure_logged_api_not_cached_cache_cleared_at_sign_out(
+    client: httpx.AsyncClient, app: FastAPI, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Issue 405: a successful sign-in is audited (how, from which network); a CSRF failure is logged; an
+    API answer in JSON is never cached; signing out clears the browser's cache of the portal."""
+    await login(client, "alice")
+    [entry] = [r for r in module_of(app).ctx.audit.records if r.action == "auth.signed_in"]
+    assert entry.context["method"] == "password"
+    me = await client.get("/api/v1/me")
+    assert me.headers["cache-control"] == "no-store"
+    token = client.headers.pop("X-CSRF-Token")
+    with caplog.at_level("WARNING"):
+        assert (await client.patch("/api/v1/me/profile", json={"fields": {}})).status_code == 403
+    assert any("CSRF check failed" in r.getMessage() for r in caplog.records)
+    assert token not in caplog.text
+    out = await client.post("/api/v1/auth/logout", headers={"X-CSRF-Token": token})
+    assert out.status_code == 204 and out.headers["clear-site-data"] == '"cache"'

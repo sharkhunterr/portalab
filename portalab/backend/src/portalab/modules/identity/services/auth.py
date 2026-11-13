@@ -15,7 +15,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from portalab.core.authz_port import Principal
+from portalab.core.authz_port import Principal, ResourceRef
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.domain.display_name import login_lookup_key
 from portalab.modules.identity.domain.state_machine import SIGN_IN_ALLOWED, AccountState
@@ -172,6 +172,7 @@ class AuthService:
         client_ip: str | None,
         user_agent: str | None,
         previous_token: str | None = None,
+        method: str = "password",
     ) -> SignedIn:
         """Open a session for an authenticated user — a password sign-in or (027) the single sign-on — once
         the account's state allows it."""
@@ -205,6 +206,15 @@ class AuthService:
                     occurred_at=now,
                     metadata={"session_id": str(issued.session_id)},
                     dedup_key=f"session:{issued.session_id}:signed_in",
+                )
+                # issue 405: a successful sign-in is in the audit trail too (how, from which network)
+                await audit(
+                    self.ctx,
+                    uow.session,
+                    "auth.signed_in",
+                    Principal(user_id=user.id, session_id=issued.session_id),
+                    resource=ResourceRef("user", str(user.id), owner_id=user.id),
+                    context={"method": method, "ip_prefix": ip_prefix(client_ip)},
                 )
                 await record_visit(self.ctx, uow.session, user.id, now)  # 027: today's visit, once
                 display_name = user.display_name

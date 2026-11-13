@@ -15,6 +15,7 @@ import { CommunityPresence } from "./CommunityPresence";
 import { FormMessage } from "./FormMessage";
 import { ME_KEY, type Me } from "./useAuth";
 import "../community/profile/profile.css";
+import { passwordRuleMessage } from "./passwordRules";
 
 type ExportOut = components["schemas"]["ExportOut"];
 
@@ -63,8 +64,8 @@ function passwordMessage(error: unknown, t: ReturnType<typeof useT>): string {
     if (error.code === "identity.password_current_wrong") return t("account:signInPhrase.wrong");
     if (error.code === "identity.password_unchanged") return t("account:signInPhrase.unchanged");
     if (error.code === "identity.password_not_local") return t("account:signInPhrase.notLocal");
-    if (error.code === "user.password_invalid")
-      return t("account:signInPhrase.policy", { min: Number(error.extensions.min_length ?? 12) });
+    const rule = passwordRuleMessage(error, t);
+    if (rule) return rule;
     if (error.code === "auth.throttled")
       return t("account:signInPhrase.throttled", {
         minutes: Math.max(1, Math.ceil(Number(error.extensions.retry_after_seconds ?? 60) / 60)),

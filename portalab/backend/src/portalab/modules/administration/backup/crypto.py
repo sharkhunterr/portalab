@@ -90,8 +90,17 @@ class DecryptingReader:
             salt, prefix = bytes.fromhex(params["salt"]), bytes.fromhex(params["nonce"])
         except (ValueError, KeyError) as exc:
             raise NotAnArchive("damaged header") from exc
+        try:
+            costs = {k: int(params[k]) for k in ("n", "r", "p")}
+        except (ValueError, KeyError, TypeError) as exc:
+            raise NotAnArchive("damaged header") from exc
+        # issue 405: the header is read before anything is proven — its costs bounded, or a forged archive
+        # would make the portal spend gigabytes and minutes on its key (a power of two up to 2^17, r ≤ 16)
+        n, r, p = costs["n"], costs["r"], costs["p"]
+        if not (2**14 <= n <= 2**17 and n & (n - 1) == 0 and 1 <= r <= 16 and 1 <= p <= 4):
+            raise NotAnArchive("damaged header")
         self._source, self._aad, self._prefix = source, MAGIC + header, prefix
-        self._aead = _key(passphrase, salt, {k: int(params[k]) for k in ("n", "r", "p")})
+        self._aead = _key(passphrase, salt, costs)
         self._buffer = bytearray()
         self._counter = 0
         self._ended = False
@@ -102,6 +111,8 @@ class DecryptingReader:
         if len(raw) < 4:
             raise NotAnArchive("the archive is cut short")
         (size,) = struct.unpack(">I", raw)
+        if size > CHUNK + 16:  # issue 405: a chunk and its tag at most, never what a header claims
+            raise NotAnArchive("damaged archive")
         sealed = self._source.read(size)
         if len(sealed) < size:
             raise NotAnArchive("the archive is cut short")

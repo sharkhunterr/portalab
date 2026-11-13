@@ -98,7 +98,13 @@ async def notify(database: Database, tmp_path: Path, clock: FixedClock) -> Notif
         "maintenance.cancelled",
     ):
         ev.types.register(EventType(name, "module:health"))
-    for name in ("user.suspended", "user.reactivated", "user.deletion_requested"):
+    for name in (
+        "user.suspended",
+        "user.reactivated",
+        "user.deletion_requested",
+        "user.password_changed",
+        "user.sso_linked",
+    ):
         ev.types.register(EventType(name, "module:identity"))
     ev.types.register(STATUS_CHANGED_TYPE)
     mail = Outbox()

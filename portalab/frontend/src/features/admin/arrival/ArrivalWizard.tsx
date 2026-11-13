@@ -14,6 +14,7 @@ import { ImportArchive } from "./ImportArchive";
 import { Launch, type Slide, useTasks } from "./Launch";
 import { Stage, type StageGroup, type StageStep, StepCard } from "./Stage";
 import "./arrival.css";
+import { passwordRuleMessage } from "../../auth/passwordRules";
 
 /**
  * Issues 246, 249 — the arrival wizard: what a new portal shows before anyone has an account, a full page of
@@ -740,7 +741,7 @@ function Create({
   const slides = useArrivalSlides(features);
   const error =
     create.error instanceof ApiError
-      ? create.error.message
+      ? (passwordRuleMessage(create.error, t) ?? create.error.message)
       : create.isError
         ? t("account:arrival.error")
         : null;

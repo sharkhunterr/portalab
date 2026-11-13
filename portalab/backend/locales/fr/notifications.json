@@ -818,5 +818,13 @@
   "maintenance.start.fact.ends_at": "Fin prévue",
   "maintenance.rescheduled.fact.starts_at": "Début",
   "maintenance.rescheduled.fact.ends_at": "Fin prévue",
-  "verification.action": "Confirmer mon compte"
+  "verification.action": "Confirmer mon compte",
+  "account.password_changed": "{by, select, admin {Un administrateur a défini un nouveau mot de passe pour votre compte} other {Votre mot de passe a été changé}}",
+  "account.password_changed.body": "{by, select, admin {Connectez-vous avec le mot de passe qu'il vous a donné. Vos autres sessions ont été fermées.} other {Vos autres sessions ont été fermées. Si ce n'est pas vous, contactez tout de suite l'équipe du portail.}}",
+  "account.password_changed.fact.occurred_at": "Quand",
+  "account.sso_linked": "Un compte d'authentification unique se connecte désormais en votre nom",
+  "account.sso_linked.body": "Vous pouvez maintenant vous connecter avec {provider}. Si ce n'est pas vous, contactez tout de suite l'équipe du portail.",
+  "account.sso_linked.fact.occurred_at": "Quand",
+  "account.blocked": "Votre compte est bloqué pendant {minutes, plural, one {# minute} other {# minutes}}",
+  "account.blocked.body": "Des requêtes de votre compte ressemblaient à une tentative d'intrusion : ses sessions ont été fermées. Il se rouvre tout seul ; si ce n'était pas vous, changez ensuite votre mot de passe."
 }

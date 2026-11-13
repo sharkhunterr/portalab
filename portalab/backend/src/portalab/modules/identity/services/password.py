@@ -20,6 +20,7 @@ from portalab.modules.identity.services.common import (
     InvalidCredentials,
     SoleAdminProtected,
     audit,
+    publish,
     user_ref,
 )
 from portalab.modules.identity.services.credentials import (
@@ -72,7 +73,7 @@ class PasswordChangeService:
             raise ValidationFailed(
                 "Choose a password different from the current one.", code="identity.password_unchanged"
             )
-        check_password_policy(new, self.ctx.config.password_policy)
+        check_password_policy(new, self.ctx.config.password_policy, personal=(row.login,))
         now = self.ctx.now()
         async with self.ctx.database.unit_of_work() as uow:
             await set_password(uow.session, self.hasher, user_id, new, now)
@@ -88,6 +89,11 @@ class PasswordChangeService:
                 context={"other_sessions_signed_out": signed_out},
                 sensitive=True,
             )
+            # issue 407: the member hears of it (a change they did not make tells them at once)
+            await publish(
+                self.ctx, uow.session, "user.password_changed", user_id, actor=principal, occurred_at=now,
+                metadata={"by": "self", "sessions_signed_out": signed_out},
+            )  # fmt: skip
         return signed_out
 
     async def set_for(
@@ -138,4 +144,8 @@ class PasswordChangeService:
                 context={"sessions_signed_out": signed_out},
                 sensitive=True,
             )
+            await publish(
+                self.ctx, uow.session, "user.password_changed", user_id, actor=principal, occurred_at=now,
+                metadata={"by": "admin", "sessions_signed_out": signed_out},
+            )  # fmt: skip
         return signed_out
