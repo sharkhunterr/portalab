@@ -1,0 +1,4 @@
+# Hadolint (CI validate:dockerfile, issue 399)
+ignored:
+  # the image upgrades every Debian package at each build instead: a pinned version would hold back fixes
+  - DL3008
