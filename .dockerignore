@@ -35,3 +35,11 @@ GITHUB_RELEASES.md
 CHANGELOG.md
 README.md
 .gitleaksignore
+# issue 401: test and analysis caches never go in an image
+**/.hypothesis
+**/.schemathesis
+**/.grimp_cache
+**/.import_linter_cache
+**/fuzz-report
+**/dast-report
+.worktrees

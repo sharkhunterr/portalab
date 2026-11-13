@@ -146,7 +146,7 @@ validate:python-audit:
   script:
     # known vulnerabilities in runtime dependencies fail the release
     - uv export --frozen --no-dev --format requirements-txt --no-emit-project > /tmp/requirements.txt
-    - uvx pip-audit --strict -r /tmp/requirements.txt
+    - uvx pip-audit==2.10.1 --strict -r /tmp/requirements.txt
 
 validate:sast:
   extends: .python
@@ -154,7 +154,7 @@ validate:sast:
   script:
     # static analysis of the code (issues 395, 396): a medium-severity finding fails the release; reviewed
     # exceptions carry a « nosec » with their reason on the line
-    - uvx bandit -q -r src -ll -ii
+    - uvx bandit==1.9.4 -q -r src -ll -ii
     # no source file may hide bidirectional control characters (Trojan Source, CVE-2021-42574)
     - |
       if grep -rlP --exclude-dir=__pycache__ --exclude-dir=node_modules '[\x{202A}-\x{202E}\x{2066}-\x{2069}]' src ../frontend/src; then
@@ -164,7 +164,7 @@ validate:sast:
     # « nosemgrep » with their reason. Its SQLAlchemy text() audit is left to Ruff S608 and Bandit B608, which
     # already fail on any built SQL that has no reviewed reason.
     - >
-      uvx semgrep scan --metrics=off --error
+      uvx semgrep==1.185.0 scan --metrics=off --error
       --config p/python --config p/fastapi --config p/typescript --config p/react --config p/owasp-top-ten
       --exclude-rule python.sqlalchemy.security.audit.avoid-sqlalchemy-text.avoid-sqlalchemy-text
       src ../frontend/src
@@ -331,6 +331,36 @@ test:frontend-a11y:
 
 # =============================================================================
 # Stage: build — the image builds, and starts
+test:api-fuzz:
+  # issue 401: requests generated from the OpenAPI contract, signed in as the Admin, on a fresh portal — no
+  # answer may be a server error (a 503 « outside service not connected » is expected); one at a time with
+  # the other test jobs (the runner shares its machine)
+  extends: .python
+  stage: test
+  needs: [{ job: "test:frontend-a11y", artifacts: false, optional: true }]
+  services:
+    - name: postgres:16-alpine
+      alias: postgres
+      variables:
+        POSTGRES_DB: fuzz
+        POSTGRES_USER: portalab
+        POSTGRES_HOST_AUTH_METHOD: trust
+  variables:
+    DATABASE_URL: "postgresql+asyncpg://portalab@postgres:5432/fuzz"
+    MAX_EXAMPLES: "15"
+    WORKERS: "2"
+  script:
+    - sh tests/fuzz/fuzz.sh fuzz-report
+  artifacts:
+    when: always
+    paths:
+      - portalab/backend/fuzz-report/
+    reports:
+      junit: portalab/backend/fuzz-report/junit-*.xml
+    expire_in: 2 weeks
+  rules:
+    - if: '$ENABLE_BACKEND_TESTS == "true"'
+
 # =============================================================================
 # The image is not exported as an artifact (it is far over GitLab's artifact limit): the publish and deploy
 # jobs build it again in their own dind.
@@ -350,11 +380,23 @@ build:docker:
         .
     # one image, three entrypoints (serve, worker, migrate): it starts
     - docker run --rm ${DOCKER_IMAGE}:${CI_COMMIT_SHA} --help
+    # issue 400: OWASP ZAP against this image running (signed in): a rule set to FAIL fails the release
+    - sh portalab/deploy/ci/dast.sh ${DOCKER_IMAGE}:${CI_COMMIT_SHA} dast-report
     # issue 395: a fixed HIGH or CRITICAL vulnerability in the image (system packages, Python, Node) fails it
     - |
       docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.58.1 image \
-        --quiet --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+        --quiet --timeout 20m --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
         ${DOCKER_IMAGE}:${CI_COMMIT_SHA}
+    # issue 402: what the image holds (system packages, Python, Node), as a CycloneDX SBOM for the release
+    - |
+      docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.58.1 image \
+        --quiet --timeout 20m --format cyclonedx ${DOCKER_IMAGE}:${CI_COMMIT_SHA} > sbom.cdx.json
+  artifacts:
+    when: always
+    paths:
+      - dast-report/
+      - sbom.cdx.json
+    expire_in: 2 weeks
   rules:
     - if: '$ENABLE_DOCKER_BUILD == "true"'
 
@@ -455,6 +497,9 @@ release:github:
   needs:
     - job: deploy
       optional: true
+    - job: build:docker
+      artifacts: true
+      optional: true
   before_script:
     - apk add --no-cache curl jq gawk sed
   script:
@@ -475,6 +520,13 @@ release:github:
       BODY=$(echo "$RESPONSE" | sed '$d')
       if [ "$HTTP_CODE" -eq 201 ]; then
         echo "GitHub release created: $(echo "$BODY" | jq -r '.html_url')"
+        # issue 402: the image's SBOM beside the release
+        if [ -s sbom.cdx.json ]; then
+          UPLOAD=$(echo "$BODY" | jq -r '.upload_url' | sed 's/{.*}//')
+          curl -sf -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/json" \
+            --data-binary @sbom.cdx.json "${UPLOAD}?name=portalab-${CI_COMMIT_TAG}-sbom.cdx.json" >/dev/null \
+            && echo "SBOM attached" || echo "SBOM not attached"
+        fi
       else
         echo "GitHub release failed (HTTP $HTTP_CODE)"
         echo "$BODY" | jq '.' || echo "$BODY"

@@ -1,0 +1,1 @@
+^/api/v1/(auth/logout|admin/system/reset|admin/transfer|admin/first-run|admin/backups|admin/config/import|me/password|me/deletion|me/sessions|users/[^/]+/(password|deletion|state|sessions)|admin/plugins/[^/]+/update|admin/security/|admin/game/setup|admin/visuals/builtin/state|admin/plugins/upload|admin/visuals/upload)
