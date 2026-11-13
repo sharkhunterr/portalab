@@ -46,7 +46,7 @@ function walk(elements: MessageFormatElement[]): void {
 }
 
 export function pseudoMessage(message: string, code: PseudoLocale): string {
-  if (code === "ar-XB") return `‮${message}‬`;
+  if (code === "ar-XB") return `\u202e${message}\u202c`;
   try {
     const ast = parse(message);
     walk(ast);

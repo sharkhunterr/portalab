@@ -31,7 +31,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PATH="/app/.venv/bin:$PATH"
 COPY --from=ghcr.io/astral-sh/uv:0.9 /uv /usr/local/bin/uv
 # issue 230: ffmpeg takes the cards' still images from a film's file on the media server
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
+# the base image's Debian packages are upgraded: fixed vulnerabilities never wait for a new base image
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY portalab/backend/pyproject.toml portalab/backend/uv.lock ./

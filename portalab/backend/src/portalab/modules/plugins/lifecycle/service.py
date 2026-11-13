@@ -478,9 +478,7 @@ class Lifecycle:
         manifest = manifests[key]
         incompatible = check(manifest, self.capabilities)
         if incompatible:
-            await self._transition(
-                actor, key, "incompatible", "incompatible" if False else "disabled", "incompatible"
-            )
+            await self._transition(actor, key, "incompatible", "disabled", "incompatible")
             raise PluginIncompatible(
                 "This plugin is not compatible with this portal.",
                 extensions={"reasons": [f"{i.what}: {i.detail}" for i in incompatible]},

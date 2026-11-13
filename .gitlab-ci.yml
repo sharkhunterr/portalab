@@ -148,6 +148,37 @@ validate:python-audit:
     - uv export --frozen --no-dev --format requirements-txt --no-emit-project > /tmp/requirements.txt
     - uvx pip-audit --strict -r /tmp/requirements.txt
 
+validate:sast:
+  extends: .python
+  stage: validate
+  script:
+    # static analysis of the code (issue 395): a high-severity finding fails the release
+    - uvx bandit -q -r src -lll -ii
+    # no source file may hide bidirectional control characters (Trojan Source, CVE-2021-42574)
+    - |
+      if grep -rlP --exclude-dir=__pycache__ --exclude-dir=node_modules '[\x{202A}-\x{202E}\x{2066}-\x{2069}]' src ../frontend/src; then
+        echo "bidirectional control characters in the files above: write them as escapes"; exit 1
+      fi
+    # Semgrep (OWASP Top 10, FastAPI, React): reported while its known findings are triaged (issue 396)
+    - >
+      uvx semgrep scan --metrics=off --error --severity ERROR --severity WARNING
+      --config p/python --config p/fastapi --config p/typescript --config p/react --config p/owasp-top-ten
+      --json-output=$CI_PROJECT_DIR/semgrep.json src ../frontend/src
+  artifacts:
+    when: always
+    paths:
+      - semgrep.json
+    expire_in: 30 days
+  allow_failure:
+    exit_codes: [1]
+
+validate:dead-code:
+  extends: .python
+  stage: validate
+  script:
+    # unused functions, classes, variables, unreachable code (issue 397); false positives in the whitelist
+    - uvx vulture==2.16 src vulture_whitelist.py --min-confidence 80
+
 validate:biome:
   extends: .node
   stage: validate
@@ -171,6 +202,15 @@ validate:i18n-frontend:
   stage: validate
   script:
     - npm run i18n:check
+
+validate:knip:
+  extends: .node
+  stage: validate
+  script:
+    # unused files, exports and dependencies of the interface: reported until they are cleaned (issue 397)
+    - npx --yes knip@5.88.1 --no-progress
+  allow_failure:
+    exit_codes: [1]
 
 validate:node-audit:
   extends: .node
@@ -294,6 +334,11 @@ build:docker:
         .
     # one image, three entrypoints (serve, worker, migrate): it starts
     - docker run --rm ${DOCKER_IMAGE}:${CI_COMMIT_SHA} --help
+    # issue 395: a fixed HIGH or CRITICAL vulnerability in the image (system packages, Python, Node) fails it
+    - |
+      docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.58.1 image \
+        --quiet --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+        ${DOCKER_IMAGE}:${CI_COMMIT_SHA}
   rules:
     - if: '$ENABLE_DOCKER_BUILD == "true"'
 
