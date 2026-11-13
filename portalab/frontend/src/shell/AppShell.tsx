@@ -50,7 +50,6 @@ import { RegionBoundary } from "./router/RouteBoundary";
 import { isSafeMode } from "./safeMode";
 import { ShortcutManager } from "./shortcuts/ShortcutManager";
 import { AnnouncementBanner } from "./status/AnnouncementBanner";
-import { GlobalStatusBanner } from "./status/GlobalStatusBanner";
 import { IncidentBanner } from "./status/IncidentBanner";
 import { MaintenanceBanner } from "./status/MaintenanceBanner";
 import { SafeModeBanner } from "./status/SafeModeBanner";
@@ -197,7 +196,6 @@ export function AppShell({
           onOpenNavigation={nav === "drawer" ? () => setMenuOpen(true) : undefined}
           bottomBar={nav === "bottom-bar"}
         />
-        <GlobalStatusBanner />
         <LevelUpMoment />
         <BoosterStageHost />
         <ListenHost />

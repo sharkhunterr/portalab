@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { headerSearch, stubApi } from "../../a11y/support";
 
-// 004 T021 — several failing services ⇒ one banner; navigation, search and palette keep working; a page
+// 004 T021 — several failing services: navigation, search and palette keep working; a page
 // whose data fails reports its own state with a retry while the shell stays usable.
 
 test("degraded mode keeps the shell usable", async ({ page }) => {
@@ -13,7 +13,8 @@ test("degraded mode keeps the shell usable", async ({ page }) => {
     .first()
     .fill("correct horse battery");
   await page.keyboard.press("Enter");
-  await expect(page.getByText(/2 services are degraded or unavailable/)).toBeVisible();
+  // issue 394: no built-in banner any more (an automation template shows one when wanted)
+  await expect(page.getByText(/services are degraded or unavailable/)).toHaveCount(0);
   await page
     .getByRole("navigation", { name: "Main navigation" })
     .getByRole("link", { name: "Services" })

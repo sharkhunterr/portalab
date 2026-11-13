@@ -129,7 +129,6 @@
   "deck.deck": "Pont {n}",
   "deck.energy": "Énergie",
   "deck.energyLabel": "Énergie : niveau {level}, {percent} % du prochain niveau",
-  "degraded": "{count, plural, one {# service est dégradé ou indisponible.} other {# services sont dégradés ou indisponibles.}} La navigation et la recherche fonctionnent toujours.",
   "down.next": "Nouvel essai dans {seconds} s…",
   "down.text": "Il redémarre peut-être, ou il est en maintenance. Ta page reviendra d'elle-même dès qu'il répondra.",
   "down.title": "Le portail est momentanément indisponible",
