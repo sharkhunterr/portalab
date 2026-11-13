@@ -125,6 +125,22 @@ services:
     volumes:
       - ${PORTALAB_APPDATA:-./appdata}/postgres:/var/lib/postgresql/data
       - ${PORTALAB_APPDATA:-./appdata}/secrets/postgres:/run/secrets:ro
+    # issue 399: the image's files read-only, no privilege gained; only what its entrypoint needs to hand the
+    # data folder to the postgres user and drop to it
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
     healthcheck:
       # #390: over TCP — on the first start, the socket already answers while the database is being created
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U portalab -d portalab"]

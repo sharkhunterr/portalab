@@ -172,6 +172,25 @@ validate:sast:
   allow_failure:
     exit_codes: [1]
 
+validate:dockerfile:
+  stage: validate
+  image:
+    name: hadolint/hadolint:v2.12.0-debian
+    entrypoint: [""]
+  script:
+    # issue 399: the Dockerfile's practices (reviewed exceptions in .hadolint.yaml)
+    - hadolint --config portalab/deploy/.hadolint.yaml portalab/deploy/Dockerfile
+
+validate:docker-config:
+  stage: validate
+  image:
+    name: aquasec/trivy:0.58.1
+    entrypoint: [""]
+  script:
+    # issue 399: misconfigurations of the image's recipe (root user, secrets, healthcheck…) fail the release;
+    # the Compose file's hardening is held by tests/boundary/test_compose_hardening.py
+    - trivy config --quiet --severity HIGH,CRITICAL --exit-code 1 portalab/deploy
+
 validate:dead-code:
   extends: .python
   stage: validate
