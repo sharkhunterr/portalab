@@ -55,6 +55,80 @@
 
 ---
 
+# v1.4.0
+
+## Portalab v1.4.0 — two-step verification, and a portal hardened and checked at every release
+
+**Members can protect their account with a code from an authenticator app**, and are told when something
+changes on their account. Signing in now works on a portal reached in plain HTTP from the LAN (the setup
+wizard no longer stops at « Authentication required »). Behind the scenes, every release is now scanned,
+fuzzed and signed before it is published.
+
+### Highlights
+
+- **Two-step verification** — in *My account*, a member turns it on with their password, scans a QR code
+  with any authenticator app (Aegis, Google Authenticator, 2FAS, Bitwarden…) and gets ten single-use recovery
+  codes. Signing in then asks for the password, then a code. An administrator can turn it off for a member
+  who lost their phone and their codes. Accounts of the single sign-on keep their provider's own.
+- **Told about your account's security** — a notice (and an e-mail when enabled) when the password is
+  changed or set by an administrator, a single sign-on account is linked, the account is blocked by the
+  intrusion guard, or two-step verification is turned on or off.
+- **E-mails that say what they are about** — each notification e-mail now shows its details (who, what,
+  when, the amounts…) instead of the same title and button for everything.
+- **Checked before it ships** — each image is scanned (Trivy, OWASP ZAP), the API fuzzed from its contract,
+  and the image published is the one that was checked. It comes with its SBOM and is signed: verify it with
+  `cosign verify --key cosign.pub sharkhunterr/portalab:1.4.0` (see *Checking the image you run*).
+
+### Closed issues
+
+#### Security
+
+- `security` Two-step verification (TOTP) for local accounts, with recovery codes
+- `security` Members are told about their account's security events: password changed or set, single
+  sign-on linked, account blocked, two-step verification turned on or off
+- `security` Common and leaked passwords are refused (offline list of the 100,000 most used), as is a
+  password holding the login or the name
+- `security` Sign-ins are audited; CSRF and single sign-on failures are logged; API answers are never cached
+  and the browser's cache is cleared at sign-out; backup archives cannot ask for excessive key-derivation work
+- `security` A single sign-on links an existing account by e-mail only when the provider vouches for that
+  e-mail (a setting allows providers that never say), and the provider's issuer is checked
+- `security` A plugin's database queries run on its own connections, signed in as its own role: it can no
+  longer step out of its schema
+- `security` Fixes found by fuzzing the API: a crafted log line could slow the server (ReDoS), a news
+  source could be pointed at an internal address after its check (DNS rebinding), malformed input could
+  answer « internal error » instead of a clear refusal
+- `security` The database container runs read-only, without privileges it does not need
+- `security` Every release is scanned (Bandit, Semgrep, Trivy image and configuration, OWASP ZAP, API
+  fuzzing), published with its SBOM, signed with cosign, and rescanned every week
+- `security` An OWASP ASVS 5.0 level 2 review of the portal, published in the documentation
+
+#### Fixed
+
+- `bug` Signing in did nothing on a portal reached in plain HTTP from the LAN, and the setup wizard stopped
+  at « Authentication required »; it now works, keeping the secure cookies over HTTPS
+- `bug` The « services degraded » banner appeared without having been asked for; it is now an automation
+  template, off unless an administrator turns it on
+- `bug` The XP and coins of a review showed as « Plays (other kinds) »; they now show as « Reviews »
+
+#### New
+
+- `feat` Notification e-mails show what each one is about, with its details
+
+#### Improved
+
+- `improvement` Pages load faster: no more database queries repeated in a loop (the slowest page went from
+  over a second to about a tenth), and a first visit downloads half as much
+- `improvement` Dead code removed and stricter code checks, now blocking in the release pipeline
+
+### Upgrading
+
+- `docker compose pull && docker compose up -d` (the migrations run before Portalab restarts). This release
+  adds the tables of two-step verification.
+- The reference `docker-compose.yml` now runs the database container read-only with fewer privileges: take
+  the new file to benefit from it (your `.env` and `appdata/` stay as they are).
+
+---
+
 # v1.3.0
 
 ## Portalab v1.3.0 — choose what a backup brings into a new portal
