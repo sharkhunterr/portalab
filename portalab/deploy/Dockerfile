@@ -4,7 +4,7 @@
 # ---------------------------------------------------------------- frontend build
 FROM node:22-alpine AS frontend
 WORKDIR /build/frontend
-COPY portalab/frontend/package.json portalab/frontend/package-lock.json ./
+COPY portalab/frontend/package.json portalab/frontend/package-lock.json portalab/frontend/.npmrc ./
 RUN npm ci --no-audit --no-fund
 COPY portalab/frontend/ ./
 COPY portalab/backend/openapi.json ../backend/openapi.json
