@@ -15,8 +15,17 @@ test("keyboard-only: sign in, reach and change appearance settings", async ({ pa
   await page.keyboard.type("correct horse battery");
   await page.keyboard.press("Enter");
   await expect(page.getByRole("navigation", { name: "Main navigation" })).toBeVisible();
-  await page.keyboard.press("Control+k"); // command palette → appearance settings, keyboard only
+  // command palette → appearance settings, keyboard only; on a slow runner the shortcut may come before the
+  // shell listens, and the results come as they are found: each step waits for what it needs
+  const search = page.getByRole("combobox", { name: "Search" });
+  await expect(async () => {
+    if ((await search.getAttribute("aria-expanded")) !== "true") await page.keyboard.press("Control+k");
+    await expect(search).toHaveAttribute("aria-expanded", "true", { timeout: 1_000 });
+  }).toPass({ timeout: 15_000 });
   await page.keyboard.type("appear");
+  await expect(page.getByRole("option", { name: "Appearance", exact: true })).toBeVisible({
+    timeout: 15_000,
+  });
   await page.keyboard.press("Enter");
   const theme = page.getByLabel("Interface", { exact: true }); // the interface picker ('Dark' among them)
   await expect(theme).toBeVisible();
