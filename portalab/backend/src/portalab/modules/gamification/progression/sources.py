@@ -63,10 +63,16 @@ def play_source(kind: str | None) -> str:
     return PLAY_SOURCES.get(kind or "", "media")
 
 
+# issue 412: plays whose event names their kind itself (no play recorded under them)
+IMPLIED_KINDS = {"media.season_finished": "episode", "media.game_length_reached": "game"}
+
+
 def action_of(event_type: str | None, kind: str | None = None) -> str:
     for prefix, source in ACTIONS:
         if event_type and event_type.startswith(prefix):
-            return play_source(kind) if source == "media" else source
+            if source != "media":
+                return source
+            return play_source(kind or IMPLIED_KINDS.get(event_type))
     return "activity"
 
 
