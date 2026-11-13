@@ -66,6 +66,8 @@ async def test_templates(au: AutoHarness, client: AsyncClient) -> None:
         "service-down-10-minutes-incident",  # 027: an incident when a service stays down
         "parity-check-banner",  # issue 122: a banner while a server checks its parity
         "parity-check-banner-end",
+        "service-down-banner",  # issue 394: the degraded banner is an automation, no longer built in
+        "service-back-banner-end",
     }
     # the harness registers no owner actions/events beyond tests: templates report what is missing
     assert all(not t["valid"] for t in templates.values())

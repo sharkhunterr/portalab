@@ -549,9 +549,6 @@
   margin-inline-end: var(--space-2);
   color: var(--color-text-muted);
 }
-.shell-banner {
-  padding: var(--space-2) var(--space-4);
-}
 .shell-palette__input {
   inline-size: 100%;
   min-height: 2.75rem;

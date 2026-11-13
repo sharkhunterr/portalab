@@ -1,0 +1,22 @@
+{
+  "title": "Service back: take the banner down",
+  "description": "When a service answers again, the banner shown for its outage is taken down.",
+  "definition": {
+    "name": "Service back: take the banner down",
+    "trigger": {
+      "kind": "event",
+      "event_type": "service.status_changed",
+      "filter": [
+        {"field": "dimension", "op": "eq", "value": "health"},
+        {"field": "to_state", "op": "in", "value": ["operational", "degraded"]}
+      ]
+    },
+    "steps": [
+      {
+        "id": "end",
+        "action": "announcement.end",
+        "params": {"tag": "outage-${event.service_id}"}
+      }
+    ]
+  }
+}

@@ -55,10 +55,8 @@ describe("ICU golden vectors", () => {
 
 describe("catalog lookup", () => {
   it("renders bundled English outside a provider and falls back to the key", () => {
-    render(<Probe id="shell:degraded" values={{ count: 2 }} />);
-    expect(screen.getByTestId("out").textContent).toBe(
-      "2 services are degraded or unavailable. Navigation and search still work.",
-    );
+    render(<Probe id="shell:health.degraded" values={{ count: 2 }} />);
+    expect(screen.getByTestId("out").textContent).toBe("2 services in trouble");
     render(<Probe id="shell:does.not.exist" />);
     expect(screen.getAllByTestId("out")[1]?.textContent).toBe("does.not.exist");
   });

@@ -1,0 +1,27 @@
+{
+  "title": "Service down: show a banner",
+  "description": "When a service has been unavailable for 5 minutes, a banner tells the members (change « minutes » to 10, 15, 30, 60 or 120; filter on « service_id » for one service). Pair it with « Service back: take the banner down ».",
+  "definition": {
+    "name": "Service down: show a banner",
+    "trigger": {
+      "kind": "event",
+      "event_type": "service.outage_lasting",
+      "filter": [
+        {"field": "minutes", "op": "eq", "value": 5}
+      ]
+    },
+    "steps": [
+      {
+        "id": "banner",
+        "action": "announcement.banner",
+        "params": {
+          "tag": "outage-${event.service_id}",
+          "title": "${event.service_label} is unavailable",
+          "body": "Navigation and search still work.",
+          "tone": "warning",
+          "link": "/services"
+        }
+      }
+    ]
+  }
+}

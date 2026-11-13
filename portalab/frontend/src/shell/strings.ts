@@ -24,8 +24,6 @@ export const shellStrings = {
   paletteEmpty: "No matching command.",
   paletteResults: (count: number) => `${count} result${count === 1 ? "" : "s"}`,
   shortcutsTitle: "Keyboard shortcuts",
-  degraded: (count: number) =>
-    `${count} services are degraded or unavailable. Navigation and search still work.`,
   notAvailable: "This page is not available.",
   notAvailableDetail: "It may not exist, or you may not have access to it.",
   unauthorized: "You do not have access to this page.",
@@ -96,7 +94,7 @@ export type ShellStrings = {
     : string;
 } & { label: (key: string) => string };
 
-const PLURALS = new Set(["degraded", "paletteResults"]);
+const PLURALS = new Set(["paletteResults"]);
 
 /** Shell strings in the active language (catalog namespaces ``shell`` and ``nav``). */
 export function useShellStrings(): ShellStrings {
