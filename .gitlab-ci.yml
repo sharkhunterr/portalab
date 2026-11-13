@@ -152,25 +152,22 @@ validate:sast:
   extends: .python
   stage: validate
   script:
-    # static analysis of the code (issue 395): a high-severity finding fails the release
-    - uvx bandit -q -r src -lll -ii
+    # static analysis of the code (issues 395, 396): a medium-severity finding fails the release; reviewed
+    # exceptions carry a « nosec » with their reason on the line
+    - uvx bandit -q -r src -ll -ii
     # no source file may hide bidirectional control characters (Trojan Source, CVE-2021-42574)
     - |
       if grep -rlP --exclude-dir=__pycache__ --exclude-dir=node_modules '[\x{202A}-\x{202E}\x{2066}-\x{2069}]' src ../frontend/src; then
         echo "bidirectional control characters in the files above: write them as escapes"; exit 1
       fi
-    # Semgrep (OWASP Top 10, FastAPI, React): reported while its known findings are triaged (issue 396)
+    # Semgrep (OWASP Top 10, FastAPI, React): any finding fails the release (issue 396); reviewed ones carry a
+    # « nosemgrep » with their reason. Its SQLAlchemy text() audit is left to Ruff S608 and Bandit B608, which
+    # already fail on any built SQL that has no reviewed reason.
     - >
-      uvx semgrep scan --metrics=off --error --severity ERROR --severity WARNING
+      uvx semgrep scan --metrics=off --error
       --config p/python --config p/fastapi --config p/typescript --config p/react --config p/owasp-top-ten
-      --json-output=$CI_PROJECT_DIR/semgrep.json src ../frontend/src
-  artifacts:
-    when: always
-    paths:
-      - semgrep.json
-    expire_in: 30 days
-  allow_failure:
-    exit_codes: [1]
+      --exclude-rule python.sqlalchemy.security.audit.avoid-sqlalchemy-text.avoid-sqlalchemy-text
+      src ../frontend/src
 
 validate:dockerfile:
   stage: validate

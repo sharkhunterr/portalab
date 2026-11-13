@@ -10,7 +10,6 @@ import pytest
 from sqlalchemy import text
 
 from portalab.core.errors import Conflict, ValidationFailed
-from portalab.modules.plugins.db.plugin_db import RoleBoundDb
 from tests.integration.plugins.conftest import SYSTEM, PlHarness
 
 pytestmark = pytest.mark.integration
@@ -42,7 +41,7 @@ async def events(pl: PlHarness, name: str) -> int:
 
 async def test_update_probation_and_rollbacks(pl: PlHarness) -> None:
     await pl.installed(pl.package("notes", "1.0.0", code=CODE, migrations=V1))
-    db = RoleBoundDb(pl.database, pl.module.storage.role("notes"), "plugin_notes", 1000)
+    db = pl.module.storage.bound("notes", 1000)
     await db.execute("INSERT INTO notes (body) VALUES ('kept')")
     with pytest.raises(Conflict):
         await pl.module.updates.stage(SYSTEM, "notes", pl.package("notes", "0.9.0", code=CODE, migrations=V1))

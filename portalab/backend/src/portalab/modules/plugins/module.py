@@ -106,6 +106,9 @@ class PluginsModule:
             events=events,
             capabilities=capabilities,
         )
+        # issue 396: a plugin's SQL (its migrations, ctx.db) on its own connections, those of its storage
+        self.storage.login = lambda key: self.runtime.storage.engine(key, self.config.statement_timeout_ms)
+        self.storage.release = self.runtime.storage.close
         self.confirmations = Confirmations(database, clock=clock)
         self.lifecycle = Lifecycle(
             database,

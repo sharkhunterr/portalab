@@ -106,8 +106,20 @@ export function runSandbox(
   };
   const base = element.file ? element.file.slice(0, element.file.lastIndexOf("/") + 1) : "";
   const post = (message: Record<string, unknown>, transfer: Transferable[] = []) => {
-    // an opaque origin cannot be named: the message goes to this frame's window only
+    // an opaque origin cannot be named: the message goes to this frame's window only — and only while it
+    // still shows the sandbox page (issue 396: a script that sent its frame elsewhere hears nothing more)
+    if (left) return;
+    // nosemgrep: wildcard-postmessage-configuration — an opaque-origin frame has no origin to name
     frame.contentWindow?.postMessage(message, "*", transfer);
+  };
+  let loads = 0;
+  let left = false;
+  const onLoad = () => {
+    loads += 1;
+    if (loads < 2 || left) return;
+    fail("error", "the script left its sandbox page");
+    left = true;
+    frame.removeAttribute("src");
   };
   const listener = async (event: MessageEvent) => {
     if (stopped || event.source !== frame.contentWindow) return;
@@ -196,6 +208,7 @@ export function runSandbox(
   window.addEventListener("message", listener);
   frame.setAttribute("sandbox", "allow-scripts");
   frame.setAttribute("referrerpolicy", "no-referrer");
+  frame.addEventListener("load", onLoad);
   frame.src = SANDBOX_URL;
   return {
     update: (next) => {
@@ -207,6 +220,7 @@ export function runSandbox(
       if (pendingNavigation) clearTimeout(pendingNavigation);
       if (heartbeat) clearInterval(heartbeat);
       window.removeEventListener("message", listener);
+      frame.removeEventListener("load", onLoad);
       frame.removeAttribute("src");
     },
   };

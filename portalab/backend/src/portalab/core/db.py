@@ -12,6 +12,7 @@ from types import TracebackType
 from typing import Any, Self
 
 from sqlalchemy import DateTime, MetaData, text
+from sqlalchemy.engine import URL
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -63,7 +64,7 @@ def assert_timezone_aware(metadata: MetaData) -> None:
                 )
 
 
-def create_engine(url: str, **kwargs: Any) -> AsyncEngine:
+def create_engine(url: "str | URL", **kwargs: Any) -> AsyncEngine:
     options: dict[str, Any] = {"pool_pre_ping": True, "future": True}
     options.update(kwargs)
     return create_async_engine(url, **options)

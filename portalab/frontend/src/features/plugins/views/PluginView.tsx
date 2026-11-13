@@ -233,7 +233,11 @@ export function PluginView({
   const started = useRef(false);
   const live = useRef<StreamHandle[]>([]);
 
+  // issue 396: a view that sent its frame elsewhere (a second load) hears nothing more from the portal
+  const left = useRef(false);
   const post = useCallback((message: Record<string, unknown>, transfer: Transferable[] = []) => {
+    if (left.current) return;
+    // nosemgrep: wildcard-postmessage-configuration — an opaque-origin frame has no origin to name
     frame.current?.contentWindow?.postMessage(message, "*", transfer);
   }, []);
 
@@ -255,6 +259,16 @@ export function PluginView({
     started.current = false; // a new frame (another view, plugin or place) starts again
     setReady(false);
     let stopped = false;
+    let loads = 0;
+    left.current = false;
+    const onLoad = () => {
+      loads += 1;
+      if (loads < 2 || left.current) return;
+      left.current = stopped = true;
+      current.removeAttribute("src");
+      setFailed(true);
+    };
+    current.addEventListener("load", onLoad);
     const answer = (id: unknown, ok: boolean, value: unknown, error?: { code: string; message: string }) =>
       post({ type: "answer", id, ok, value: ok ? value : null, error: ok ? null : error });
     const listener = async (event: MessageEvent) => {
@@ -455,6 +469,7 @@ export function PluginView({
     window.addEventListener("message", listener);
     return () => {
       stopped = true;
+      current.removeEventListener("load", onLoad);
       window.removeEventListener("message", listener);
       for (const handle of live.current) handle.close();
       live.current = [];
