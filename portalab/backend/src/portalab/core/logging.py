@@ -28,8 +28,12 @@ _SECRET_KEY_RE = re.compile(
     re.IGNORECASE,
 )
 _MESSAGE_PATTERNS: tuple[re.Pattern[str], ...] = (
-    # credentials embedded in URLs: scheme://user:password@host
-    re.compile(r"(?P<prefix>[a-z][a-z0-9+.\-]*://[^\s:/@]+:)(?P<secret>[^\s@]+)(?P<suffix>@)", re.IGNORECASE),
+    # credentials embedded in URLs: scheme://user:password@host — issue 401: the scheme's length bounded, or a
+    # long text without « :// » took quadratic time and held the whole portal (ReDoS)
+    re.compile(
+        r"(?P<prefix>\b[a-z][a-z0-9+.\-]{0,31}://[^\s:/@]{1,256}:)(?P<secret>[^\s@]{1,1024})(?P<suffix>@)",
+        re.IGNORECASE,
+    ),
     # Authorization headers / bearer tokens
     re.compile(r"(?P<prefix>\b(?:bearer|basic|token)\s+)(?P<secret>[A-Za-z0-9._~+/=\-]{6,})", re.IGNORECASE),
     # key=value or key: value pairs for secret-looking keys

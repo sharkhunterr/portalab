@@ -144,6 +144,10 @@ SECURITY_HEADERS: tuple[tuple[bytes, bytes], ...] = (
     (b"permissions-policy", b"camera=(), microphone=(), geolocation=(), payment=()"),
     (b"cross-origin-opener-policy", b"same-origin"),
 )
+# issue 400: an answer in JSON is read by the portal's own pages only — no other site may embed it (a
+# member's data pulled into another page). Pictures and streams stay embeddable: a Chromecast plays the
+# portal's streams from Google's receiver page.
+JSON_ONLY: tuple[tuple[bytes, bytes], ...] = ((b"cross-origin-resource-policy", b"same-origin"),)
 EXEMPT_PATHS = frozenset({"/healthz", "/readyz"})
 # Read-only, cacheable documents the SPA fetches by the dozen on every full load (one catalog per i18n
 # namespace): counting them would rate-limit a member who simply reloads a few pages (027).
@@ -316,6 +320,14 @@ class SlidingWindowLimiter:
             return None
 
 
+def _json(headers: Iterable[tuple[bytes, bytes]]) -> bool:
+    return any(
+        name.lower() == b"content-type"
+        and value.split(b";")[0].strip().lower().endswith((b"/json", b"+json"))
+        for name, value in headers
+    )
+
+
 def _picture(scope: Scope, path: str) -> bool:
     return scope.get("method") == "GET" and (
         path.startswith(IMAGE_GET_PREFIXES) or bool(IMAGE_GET.match(path))
@@ -338,7 +350,12 @@ async def _problem(
     body = json.dumps(
         {"type": f"https://portalab.dev/problems/{code}", "title": title, "status": status, "code": code}
     )
-    headers = [(b"content-type", PROBLEM_CONTENT_TYPE.encode()), *extra_headers, *SECURITY_HEADERS]
+    headers = [
+        (b"content-type", PROBLEM_CONTENT_TYPE.encode()),
+        *extra_headers,
+        *SECURITY_HEADERS,
+        *JSON_ONLY,
+    ]
     await send({"type": "http.response.start", "status": status, "headers": headers})
     await send({"type": "http.response.body", "body": body.encode()})
 
@@ -458,10 +475,16 @@ class SecurityMiddleware:
             if message["type"] == "http.response.start":
                 started = True
                 status = int(message.get("status", 0))
-                existing = {name.lower() for name, _ in message.get("headers", [])}
+                headers = message.get("headers", [])
+                existing = {name.lower() for name, _ in headers}
                 message["headers"] = [
-                    *message.get("headers", []),
+                    *headers,
                     *((name, value) for name, value in SECURITY_HEADERS if name not in existing),
+                    *(
+                        JSON_ONLY
+                        if _json(headers) and b"cross-origin-resource-policy" not in existing
+                        else ()
+                    ),
                 ]
             await send(message)
 

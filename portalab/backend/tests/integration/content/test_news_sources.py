@@ -49,7 +49,8 @@ class Site:
         self.picture = _png()
 
     def __call__(self, request: httpx.Request) -> httpx.Response:
-        url = str(request.url)
+        # issue 401: the portal connects to the checked address; the site it asks is in the Host header
+        url = str(request.url.copy_with(host=request.headers.get("host", request.url.host)))
         if url == "https://news.example.org/":
             return httpx.Response(200, content=PAGE, headers={"content-type": "text/html"})
         if url == "https://news.example.org/feed.xml":

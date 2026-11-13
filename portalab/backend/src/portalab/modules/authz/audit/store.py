@@ -31,12 +31,24 @@ def _actor(entry: AuditRecord) -> tuple[Any, str, Any]:
     return actor.user_id, actor.channel, actor.acting_for
 
 
+def _clean(text: str) -> str:
+    """Text PostgreSQL accepts: no NUL character, no half of a surrogate pair."""
+    return text.replace("\x00", "").encode("utf-8", "replace").decode("utf-8")
+
+
+def _text(value: Any, limit: int) -> str:
+    """Issue 401: a column's text — what PostgreSQL accepts (``_clean``), its length at most."""
+    return _clean(str(value))[:limit]
+
+
 def bounded_context(context: dict[str, Any], max_bytes: int) -> dict[str, Any]:
     safe = redact(dict(context))
-    encoded = json.dumps(safe, default=str, ensure_ascii=False)
+    # issue 401: PostgreSQL's JSON holds neither a NUL character nor half a surrogate pair (a request may
+    # send either): the first goes, the second becomes « ? »
+    encoded = _clean(json.dumps(safe, default=str, ensure_ascii=False).replace("\\u0000", ""))
     if len(encoded.encode("utf-8")) <= max_bytes:
         return json.loads(encoded)  # type: ignore[no-any-return]
-    return {"truncated": True, "keys": sorted(str(key) for key in safe)[:50]}
+    return {"truncated": True, "keys": sorted(_clean(str(key)) for key in safe)[:50]}
 
 
 class DatabaseAuditSink:
@@ -56,10 +68,12 @@ class DatabaseAuditSink:
             "actor_user_id": actor_user_id,
             "actor_kind": actor_kind,
             "acting_for": acting_for,
-            "action": entry.action,
-            "resource_type": entry.resource.kind if entry.resource else None,
-            "resource_id": entry.resource.id if entry.resource else None,
-            "scope": str(entry.context.get("scope")) if entry.context.get("scope") else None,
+            # issue 401: a value as long as its column at most (a request's own words may be longer) — an
+            # entry is never lost to its length
+            "action": _text(entry.action, 128),
+            "resource_type": _text(entry.resource.kind, 64) if entry.resource else None,
+            "resource_id": _text(entry.resource.id, 128) if entry.resource else None,
+            "scope": _text(entry.context.get("scope"), 128) if entry.context.get("scope") else None,
             "decision": entry.decision,
             "result": entry.result,
             "context": bounded_context(dict(entry.context), self.max_context_bytes),
@@ -68,6 +82,10 @@ class DatabaseAuditSink:
         }
 
     async def record(self, session: AsyncSession | None, entry: AuditRecord) -> None:
+        if session is not None:
+            # issue 401: what the caller has pending is written first — its own failure (a value the database
+            # refuses) is its own, never told as the audit's
+            await session.flush()
         try:
             values = self._values(entry)
             if session is not None:

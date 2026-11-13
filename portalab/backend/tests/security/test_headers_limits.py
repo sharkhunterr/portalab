@@ -92,3 +92,19 @@ def test_sliding_window() -> None:
     assert limiter.hit("k") == pytest.approx(60)
     now[0] = 61
     assert limiter.hit("k") is None
+
+
+async def test_an_answer_in_json_cannot_be_embedded_by_another_site() -> None:
+    """Issue 400: JSON (and problem details) is read by the portal's own pages only; pictures and streams
+    stay embeddable (a Chromecast plays the portal's streams from Google's receiver page)."""
+    from portalab.app.security import _json
+
+    async with await _client(SecurityConfig()) as client:
+        for path in ("/api/v1/nope", "/api/v1/auth/oidc"):
+            response = await client.get(path)
+            assert response.headers["content-type"].split(";")[0].endswith("json"), path
+            assert response.headers["cross-origin-resource-policy"] == "same-origin", path
+    assert _json([(b"content-type", b"application/problem+json")]) and _json(
+        [(b"Content-Type", b"application/json; charset=utf-8")]
+    )
+    assert not _json([(b"content-type", b"image/webp")]) and not _json([(b"content-type", b"video/mp4")])

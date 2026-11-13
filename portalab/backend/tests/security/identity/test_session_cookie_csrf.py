@@ -107,10 +107,10 @@ def _session_names(response: httpx.Response) -> list[str]:
 
 @pytest.mark.usefixtures("alice")
 async def test_plain_http_from_the_local_network_keeps_the_session(app: FastAPI) -> None:
-    """#395: a portal reached at ``http://192.168.1.24:8445`` — a browser drops every ``Secure`` cookie
+    """#395: a portal reached at ``http://192.168.1.30:8445`` — a browser drops every ``Secure`` cookie
     there, so the session went nowhere and the setup wizard failed with « Authentication required »."""
     transport = httpx.ASGITransport(app=app, client=("192.168.1.50", 50000))
-    async with httpx.AsyncClient(transport=transport, base_url="http://192.168.1.24:8445") as http:
+    async with httpx.AsyncClient(transport=transport, base_url="http://192.168.1.30:8445") as http:
         response = await login(http, "alice")
         assert _session_names(response) == [PLAIN_CSRF_COOKIE, PLAIN_SESSION_COOKIE]
         session_cookie = _cookie_header(response, PLAIN_SESSION_COOKIE)
@@ -148,7 +148,7 @@ async def test_a_plain_cookie_never_counts_over_https(app: FastAPI) -> None:
     """#395: the plain session cookie carries no ``__Host-`` guarantee — over HTTPS it is ignored, so a
     cookie planted by a sibling subdomain or a network attacker cannot sign anyone into its session."""
     lan = httpx.ASGITransport(app=app, client=("192.168.1.50", 50000))
-    async with httpx.AsyncClient(transport=lan, base_url="http://192.168.1.24:8445") as http:
+    async with httpx.AsyncClient(transport=lan, base_url="http://192.168.1.30:8445") as http:
         planted = (await login(http, "alice")).cookies[PLAIN_SESSION_COOKIE]
     secure = httpx.ASGITransport(app=app, client=("192.168.1.50", 50000))
     async with httpx.AsyncClient(transport=secure, base_url="https://portal.test") as https:

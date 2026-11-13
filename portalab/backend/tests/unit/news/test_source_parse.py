@@ -83,7 +83,7 @@ def test_plain_text_is_short_and_clean() -> None:
 
 def test_only_public_addresses() -> None:
     assert is_public("93.184.216.34")
-    for private in ("127.0.0.1", "192.168.1.87", "10.0.0.1", "::1", "::ffff:192.168.1.1", "169.254.169.254"):
+    for private in ("127.0.0.1", "192.168.1.40", "10.0.0.1", "::1", "::ffff:192.168.1.1", "169.254.169.254"):
         assert not is_public(private)
 
 

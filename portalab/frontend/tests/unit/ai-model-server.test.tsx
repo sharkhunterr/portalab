@@ -27,7 +27,7 @@ const SERVERS = [
     service_id: "s1",
     name: "PC-IA",
     connector: "ollama",
-    endpoint: "http://192.168.1.60:11434/v1",
+    endpoint: "http://192.168.1.20:11434/v1",
     state: "ok",
     models: [
       {
@@ -89,7 +89,7 @@ describe("the assistant's model server", () => {
     const server = await screen.findByLabelText("Server");
     fireEvent.change(server, { target: { value: "s1" } });
     expect(latest).toMatchObject({
-      provider_endpoint: "http://192.168.1.60:11434/v1",
+      provider_endpoint: "http://192.168.1.20:11434/v1",
       provider_model: "qwen3:8b",
     });
     const model = screen.getByLabelText("Model") as HTMLSelectElement;

@@ -59,7 +59,10 @@ async def fetch(
     transport: httpx.AsyncBaseTransport | None = None,
 ) -> Fetched:
     headers = {"User-Agent": AGENT, "Accept": accept}
-    host = (httpx.URL(url).host or "").lower()
+    try:
+        host = (httpx.URL(url).host or "").lower()
+    except (httpx.InvalidURL, ValueError, UnicodeError) as exc:  # issue 401: what a request sent
+        raise FetchFailed("not a valid address") from exc
     if host == "youtube.com" or host.endswith(".youtube.com"):
         # YouTube shows Europe its consent page first: the « refused » answer, a cookie of YouTube's own
         headers["Cookie"] = "SOCS=CAI"
@@ -74,16 +77,26 @@ async def fetch(
             target = httpx.URL(url)
             if target.scheme not in ("http", "https") or not target.host:
                 raise FetchFailed("only http and https addresses")
+            connect, sent = target, dict(headers)
+            extensions: dict[str, str] = {}
             if not allow_private:
                 try:
                     addresses = await resolver(target.host)
-                except OSError as exc:
+                except (OSError, UnicodeError) as exc:  # issue 401: a name too long for the DNS too
                     raise FetchFailed("this address does not resolve") from exc
                 if not addresses or not all(is_public(a) for a in addresses):
                     raise FetchFailed("a private address (allow the local network in the settings)")
+                # issue 401: the connection goes to the address just checked, never to a second lookup (a DNS
+                # answer changed in between — rebinding — would reach the local network); the site's name
+                # stays in the Host header and the TLS handshake
+                connect = target.copy_with(host=addresses[0])
+                sent["Host"] = target.netloc.decode("ascii")
+                extensions = {"egress_host": target.host}
+                if target.scheme == "https":
+                    extensions["sni_hostname"] = target.host
             EGRESS.allow(target.host, "news.sources")
             try:
-                async with client.stream("GET", url, headers=headers) as response:
+                async with client.stream("GET", connect, headers=sent, extensions=extensions) as response:
                     if response.status_code in (301, 302, 303, 307, 308) and "location" in response.headers:
                         url = urljoin(url, response.headers["location"])
                         continue
