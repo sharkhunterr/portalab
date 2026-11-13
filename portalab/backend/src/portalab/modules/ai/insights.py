@@ -164,10 +164,10 @@ class Insights:
             str((m.blocks or {}).get("error")) for m, _ in answers if (m.blocks or {}).get("error")
         )
         answered = [(m, u) for m, u in answers if not (m.blocks or {}).get("error")]
-        latencies = [
+        latencies = [  # issue 404: 0 ms is a latency too (a fast answer is not « no answer »)
             int((m.usage or {}).get("latency_ms") or 0)
             for m, _ in answered
-            if (m.usage or {}).get("latency_ms")
+            if (m.usage or {}).get("latency_ms") is not None
         ]
         tokens = [
             int((m.usage or {}).get("tokens_in") or 0) + int((m.usage or {}).get("tokens_out") or 0)

@@ -22,7 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.config import EffectiveValue
 from portalab.core.audit_port import AuditRecord, AuditSink
-from portalab.core.authorization import request_memo
+from portalab.core.authorization import request_memo, request_once
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.config_declaration import SettingDeclaration, SettingDeclarationError
 from portalab.core.db import Database
@@ -42,6 +42,19 @@ from portalab.modules.administration.models import Policy, Setting, SettingHisto
 from portalab.modules.administration.observability import log, metrics
 
 ChangeListener = Callable[[set[str]], Awaitable[None]]
+
+
+_SHARED = "admin.config.shared"
+_MINE = "admin.config.mine"
+
+
+def _forget_memo() -> None:
+    memo = request_memo()
+    if memo is not None:
+        for key in [
+            k for k in memo if k == _SHARED or (isinstance(k, tuple) and k[0] in (_MINE, "admin.config.rows"))
+        ]:
+            del memo[key]
 
 
 class InvalidSettingValue(ValidationFailed):
@@ -178,6 +191,35 @@ class ConfigService:
             memo[cache_key] = rows
         return rows
 
+    async def _memoized(self, key: str, user_id: UUID | None) -> tuple[list[Setting], Policy | None]:
+        """Issue 404: within a request, every shared setting and policy is read once (one query each), and a
+        member's own settings once — a page reading dozens of settings no longer runs two queries for each
+        (callers side by side share the same read)."""
+
+        async def shared() -> tuple[dict[str, list[Setting]], dict[str, Policy]]:
+            async with self.database.session() as session:
+                rows = (await session.execute(select(Setting).where(Setting.scope != "user"))).scalars()
+                live = select(Policy).where(Policy.removed_at.is_(None))
+                policies = (await session.execute(live)).scalars()
+                by_key: dict[str, list[Setting]] = {}
+                for row in rows:
+                    by_key.setdefault(row.key, []).append(row)
+                return by_key, {policy.key: policy for policy in policies}
+
+        async def mine() -> dict[str, list[Setting]]:
+            async with self.database.session() as session:
+                mine_only = select(Setting).where(Setting.scope == "user", Setting.scope_ref == str(user_id))
+                by_key: dict[str, list[Setting]] = {}
+                for row in (await session.execute(mine_only)).scalars():
+                    by_key.setdefault(row.key, []).append(row)
+                return by_key
+
+        rows, policies = await request_once(_SHARED, shared)
+        found = list(rows.get(key, []))
+        if user_id is not None:
+            found += (await request_once((_MINE, user_id), mine)).get(key, [])
+        return found, policies.get(key)
+
     async def _policy(self, session: AsyncSession, key: str) -> Policy | None:
         return (
             await session.execute(select(Policy).where(Policy.key == key, Policy.removed_at.is_(None)))
@@ -188,8 +230,11 @@ class ConfigService:
     ) -> EffectiveValue:
         declaration = self.registry.declaration(key)
         snapshot = _SNAPSHOT.get()
+        memo = request_memo()
         if snapshot and user_id is None:
             rows, policy = snapshot["rows"].get(key, []), snapshot["policies"].get(key)
+        elif memo is not None:
+            rows, policy = await self._memoized(key, user_id)
         else:
             async with self.database.session() as session:
                 rows = await self._rows(session, key)
@@ -385,6 +430,7 @@ class ConfigService:
             for key in keys:
                 memo.pop(("admin.config.rows", key), None)
         metrics.increment("admin.config.changes", len(items))
+        _forget_memo()  # issue 404: what this request reads next is what it just wrote
         await self._notify(keys)
         return True
 

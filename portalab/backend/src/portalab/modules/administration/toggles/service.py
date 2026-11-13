@@ -10,6 +10,7 @@ from sqlalchemy import select
 from portalab.capabilities.administration import PLUGIN_PERMISSIONS_CAPABILITY, TOGGLE_HOOK_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.audit_port import AuditRecord, AuditSink
+from portalab.core.authorization import request_memo, request_once
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.db import Database
 from portalab.core.errors import Conflict, ValidationFailed
@@ -18,6 +19,7 @@ from portalab.core.time import Clock, utc_now
 from portalab.modules.administration.models import TOGGLE_KINDS, ExtensionToggle
 from portalab.modules.administration.observability import metrics
 
+_TOGGLES = "admin.toggles"
 PERMISSION_BY_KIND = {
     "module": "modules.manage",
     "plugin": "plugins.manage",
@@ -49,15 +51,24 @@ class ToggleService:
         self.clock = clock
 
     async def is_enabled(self, kind: str, ref: str, *, default: bool = True) -> bool:
-        async with self.database.session() as session:
-            row = (
-                await session.execute(
-                    select(ExtensionToggle.enabled).where(
-                        ExtensionToggle.kind == kind, ExtensionToggle.ref == ref
+        if request_memo() is None:  # a job, the CLI: the one toggle
+            async with self.database.session() as session:
+                row = (
+                    await session.execute(
+                        select(ExtensionToggle.enabled).where(
+                            ExtensionToggle.kind == kind, ExtensionToggle.ref == ref
+                        )
                     )
-                )
-            ).scalar_one_or_none()
-        return default if row is None else bool(row)
+                ).scalar_one_or_none()
+            return default if row is None else bool(row)
+        enabled = (await request_once(_TOGGLES, self._states)).get((kind, ref))
+        return default if enabled is None else enabled
+
+    async def _states(self) -> dict[tuple[str, str], bool]:
+        """Issue 404: every toggle at once, for the request (a dashboard asks for each of its widgets)."""
+        async with self.database.session() as session:
+            rows = (await session.execute(select(ExtensionToggle))).scalars().all()
+        return {(row.kind, row.ref): bool(row.enabled) for row in rows}
 
     async def set(
         self, actor: Principal, kind: str, ref: str, enabled: bool, reason: str = ""
@@ -117,6 +128,9 @@ class ToggleService:
                     sensitive=True,
                 ),
             )
+        memo = request_memo()
+        if memo is not None:
+            memo.pop(_TOGGLES, None)  # what this request reads next is what it just set
         if kind == "plugin":
             for registration in self.capabilities.system_providers(PLUGIN_PERMISSIONS_CAPABILITY):
                 await registration.provider.set_enabled(ref, enabled)
