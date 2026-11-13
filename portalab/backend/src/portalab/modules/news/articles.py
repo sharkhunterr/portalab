@@ -444,7 +444,8 @@ class ArticleService:
                             template_key="news:notify.published",
                             audience=target,
                             dedup_key=f"news.published:{row.id}:{row.publish_seq}:{label}",
-                            params={"title": row.title[:200]},
+                            # issue 398: what the article is about, before opening it
+                            params={"title": row.title[:200], "summary": (row.summary or "")[:600] or "none"},
                             source="module",
                             subject_ref=f"news:{row.id}",
                             required_permission=NEWS_READ,

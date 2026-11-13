@@ -74,6 +74,7 @@ from portalab.modules.gamification.modifiers.rewards import RewardBonuses
 from portalab.modules.gamification.notify import CATEGORIES, SERIES_S, Notifier
 from portalab.modules.gamification.observability import log
 from portalab.modules.gamification.privacy.participant import GamificationParticipant
+from portalab.modules.gamification.progression.level_up import level_up_summary
 from portalab.modules.gamification.progression.service import ProgressionService
 from portalab.modules.gamification.progression.summary import ProgressionChanges
 from portalab.modules.gamification.quests.service import Quests
@@ -143,6 +144,9 @@ class GamificationModule:
         )
         self.achievements = Achievements(database, self.writer, events, audit, capabilities, clock=clock)
         self.notifier = Notifier(capabilities)
+        self.notifier.level_summary = lambda user, level: level_up_summary(
+            database, self.levels, self.achievements, self.config, user, level, clock=clock
+        )
         self.pipeline = RewardPipeline(
             database,
             self.writer,

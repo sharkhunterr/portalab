@@ -260,7 +260,14 @@ def security_alert(
                         dedup_key=f"security-block:{block['key']}:{int(block['until'])}",
                         kind="alert",
                         priority="critical",
-                        params={"who": login or address, "reason": block["reason"], "minutes": 15},
+                        # issue 398: the real length of the block, and how it was earned
+                        params={
+                            "who": login or address,
+                            "reason": block["reason"],
+                            "minutes": max(1, round(guard.block_seconds / 60)),
+                            "points": block["points"],
+                            "kind": block["key"].split(":", 1)[0],
+                        },
                         action_url="/admin/audit",
                     )
                 )

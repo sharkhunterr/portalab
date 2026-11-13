@@ -50,3 +50,18 @@ def test_the_rings_gradient_is_a_line_of_stepped_cells() -> None:
     line = ring_line(steps=5)
     colours = [part.split('"')[0] for part in line.split('bgcolor="')[1:]]
     assert colours[0] == HIGHLIGHT and colours[2] == ACCENT and colours[-1] == DEEP and len(set(colours)) == 5
+
+
+def test_facts_chips_and_a_quote_are_escaped_and_a_quote_makes_no_link() -> None:
+    """Issue 398: what an e-mail adds under its title — every word escaped; the words a member wrote never
+    become a link in the portal's own e-mail (an address in a reply stays text)."""
+    from portalab.capabilities.notifications.layout import chips, facts, quote
+
+    table = facts([("Price <b>", "120 Coins"), ("Severity", "Major & rising")])
+    assert "Price &lt;b&gt;" in table and "Major &amp; rising" in table and "<b>" not in table
+    assert facts([]) == "" and chips([]) == "" and quote("  ") == ""
+    assert "+120 XP" in chips(["+120 XP"])
+    said = quote('Go to https://evil.example/login <script>alert(1)</script>\nthen "sign in"')
+    assert "<script>" not in said and "&lt;script&gt;" in said
+    assert "<a " not in said and "https://evil.example/login" in said  # text, never a link
+    assert "<br>" in said

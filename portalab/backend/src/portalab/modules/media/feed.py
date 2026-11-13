@@ -258,17 +258,33 @@ class Feed:
             )
             fresh = [a for a in await self.arrivals(user, follows) if a.at > since]
             if fresh:
+                shown = fresh[:8]  # issue 398: the arrivals by name in the e-mail, and why each is there
                 async with self.database.session() as session:
-                    title = await session.scalar(
-                        select(MediaObject.title).where(MediaObject.id == fresh[0].object_id)
+                    rows = await session.execute(
+                        select(MediaObject.id, MediaObject.title).where(
+                            MediaObject.id.in_([a.object_id for a in shown])
+                        )
                     )
+                    titles: dict[UUID, str] = {row[0]: row[1] for row in rows.all()}
+                title = titles.get(fresh[0].object_id)
+                lines = "\n".join(
+                    f"• {titles.get(a.object_id) or '?'}"
+                    + (f" ({', '.join(a.units[:3])})" if a.units else "")
+                    + (f" — {a.because[0][1]}" if a.because else "")
+                    for a in shown
+                )
                 await notifier.send(
                     CommunicationRequest(
                         category=CATEGORY,
                         template_key="media:notify.feed",
                         audience=Users((user,)),
                         dedup_key=f"media.feed:{user}:{fresh[0].at.isoformat()}",
-                        params={"count": len(fresh), "title": (title or "")[:200]},
+                        params={
+                            "count": len(fresh),
+                            "title": (title or "")[:200],
+                            "list": lines[:1500],
+                            "more": max(0, len(fresh) - len(shown)),
+                        },
                         source="module",
                         subject_ref=f"feed:{user}",
                         required_permission="media.read",

@@ -104,7 +104,8 @@ class Services:
                 template_key="plugins:notify.message",
                 audience=Users(tuple(users)),
                 dedup_key=f"plugin:{key}:{utc_now(self.clock).timestamp():.6f}:{hash(title) & 0xFFFFFF}",
-                params={"plugin": manifest.name[:60], "title": title, "body": body},
+                # issue 398: the plugin's text set apart, never turned into links (a third party wrote it)
+                params={"plugin": manifest.name[:60], "title": title, "body": body, "quote": body},
                 source="module",
                 source_ref=f"plugin:{key}",
                 action_url=link or None,

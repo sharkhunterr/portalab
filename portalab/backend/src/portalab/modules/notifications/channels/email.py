@@ -17,7 +17,7 @@ from uuid import UUID
 from sqlalchemy import delete, select
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
-from portalab.capabilities.i18n import RENDERER, RESOLVER, LocaleContext
+from portalab.capabilities.i18n import RENDERER, RESOLVER, TIME, LocaleContext
 from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.notifications import EmailMessage, EmailTransport
 from portalab.capabilities.notifications.layout import button, code, dress, items_list, paragraphs, site_brand
@@ -322,6 +322,11 @@ class EmailVerificationChannel:
             return
         ctx = await self.channel._locale(user_id)
         renderer = self.channel._provider(RENDERER)
+        time = self.channel._provider(TIME)
+        try:  # issue 398: the moment in the reader's language and time zone
+            expires = str(time.render_instant(expires_at, ctx, "medium")) if time else expires_at.isoformat()
+        except Exception:
+            expires = expires_at.isoformat()
         subject = (
             str(renderer.t("verification.subject", ctx, {}, namespace="notifications"))
             if renderer
@@ -332,7 +337,7 @@ class EmailVerificationChannel:
                 renderer.t(
                     "verification.body",
                     ctx,
-                    {"token": token, "expires": expires_at.isoformat()},
+                    {"token": token, "expires": expires},
                     namespace="notifications",
                 )
             )
@@ -340,10 +345,18 @@ class EmailVerificationChannel:
             else token
         )
         site = await brand(self.channel._provider, self.channel.config().portal_url, ctx.language)
+        # issue 398: one click to the confirmation page, the code in the address's fragment (never sent to
+        # the server, so never in its logs nor in a Referer)
+        page = site.link(f"/verify#token={token}")
+        action = (
+            button(words(self.channel._provider, "notifications:verification.action", ctx), page)
+            if page.startswith("http")
+            else ""
+        )
         html = dress(  # #320: in Portalab's look, the code standing out
             site,
             title=subject,
-            body_html=paragraphs(text.replace(token, "").strip()) + code(token),
+            body_html=paragraphs(text.replace(token, "").strip()) + code(token) + action,
             kicker=words(self.channel._provider, "notifications:email.account", ctx),
             note=words(self.channel._provider, "notifications:email.verificationNote", ctx),
             language=ctx.language,

@@ -552,7 +552,7 @@ class Lifecycle:
                         template_key="plugins:notify.quarantined",
                         audience=WithPermission(MANAGE),
                         dedup_key=f"plugin.quarantined:{key}:{plugin.state_seq + 1}",
-                        params={"plugin": plugin.name[:120]},
+                        params={"plugin": plugin.name[:120], "reason": reason[:200]},  # issue 398
                         subject_ref=f"plugin:{key}",
                         action_url=f"/admin/plugins/{key}",
                     )

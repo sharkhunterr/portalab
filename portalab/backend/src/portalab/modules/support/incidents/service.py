@@ -87,6 +87,21 @@ class Change:
     title: str
     severity: str
     service_ids: tuple[str, ...]
+    # issue 398: what the notification tells beyond the title — where it stands, what was said, since when
+    summary: str = ""
+    state: str = ""
+    message: str = ""
+    created_at: datetime | None = None
+    resolved_at: datetime | None = None
+    version: int = 0
+
+    @classmethod
+    def of(cls, kind: str, view: "IncidentView", message: str = "") -> "Change":
+        return cls(
+            kind, view.id, view.number, view.title, view.severity, tuple(view.service_ids),
+            summary=view.summary, state=view.state, message=message, created_at=view.created_at,
+            resolved_at=view.resolved_at, version=view.version,
+        )  # fmt: skip
 
 
 def evidence_ref(evidence: Mapping[str, Any]) -> str:
@@ -268,9 +283,7 @@ class IncidentService:
                     session, actor, "incident.created", row, {"severity": severity}, severity == "critical"
                 )
             view = await self._view(session, row)
-        self._notify(
-            Change("created", view.id, view.number, view.title, view.severity, tuple(view.service_ids))
-        )
+        self._notify(Change.of("created", view))
         return view, True
 
     async def update(
@@ -302,9 +315,7 @@ class IncidentService:
             await self._publish(session, "incident.updated", row, seq, actor, now)
             await self._audit(session, actor, "incident.updated", row, {"state": row.state}, False)
             view = await self._view(session, row)
-        self._notify(
-            Change("updated", view.id, view.number, view.title, view.severity, tuple(view.service_ids))
-        )
+        self._notify(Change.of("updated", view, message))
         return view
 
     async def patch(
@@ -371,9 +382,7 @@ class IncidentService:
                 session, actor, "incident.changed", row, changed, sensitive or "severity" in changed
             )
             view = await self._view(session, row)
-        self._notify(
-            Change("updated", view.id, view.number, view.title, view.severity, tuple(view.service_ids))
-        )
+        self._notify(Change.of("updated", view))
         return view
 
     async def resolve(
@@ -400,9 +409,7 @@ class IncidentService:
                     row.severity == "critical",
                 )
             view = await self._view(session, row)
-        self._notify(
-            Change("resolved", view.id, view.number, view.title, view.severity, tuple(view.service_ids))
-        )
+        self._notify(Change.of("resolved", view, message))
         return view
 
     async def attach(self, incident_id: UUID, refs: Iterable[str]) -> IncidentView | None:

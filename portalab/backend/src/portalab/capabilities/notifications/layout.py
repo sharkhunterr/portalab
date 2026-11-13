@@ -140,6 +140,60 @@ def items_list(items: Sequence[str]) -> str:
     return f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{rows}</table>'
 
 
+def excerpt(text: str, limit: int = 500) -> str:
+    """Issue 398: someone's words for a notification — their first lines in whole words, the rest in the
+    portal."""
+    text = " ".join(text.split())
+    return text if len(text) <= limit else text[:limit].rsplit(" ", 1)[0] + " …"
+
+
+def facts(rows: Sequence[tuple[str, str]]) -> str:
+    """Issue 398: what a notification is about, as label / value lines (a price, a level, a severity…)."""
+    if not rows:
+        return ""
+    lines = "".join(
+        f'<tr><td valign="top" style="padding:9px 14px 9px 0;border-bottom:1px solid {BORDER};'
+        f'{_style(13, color=MUTED)};white-space:nowrap">{escape(label)}</td>'
+        f'<td valign="top" style="padding:9px 0;border-bottom:1px solid {BORDER};'
+        f'{_style(15, weight=600, color=TEXT)}">{escape(value)}</td></tr>'
+        for label, value in rows
+    )
+    return (
+        f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:4px 0 16px">'
+        f"{lines}</table>"
+    )
+
+
+def chips(items: Sequence[str]) -> str:
+    """Issue 398: what was won, as the interface shows it (« +120 XP », « +15 Coins »)."""
+    if not items:
+        return ""
+    cells = "".join(
+        f'<td style="padding:0 8px 8px 0"><span style="display:inline-block;padding:6px 12px;'
+        f"border-radius:999px;background:{NIGHT};border:1px solid {BORDER};"
+        f'{_style(14, weight=700, color=AMBER)}">{escape(item)}</span></td>'
+        for item in items
+    )
+    return (
+        f'<table role="presentation" cellpadding="0" cellspacing="0" style="margin:2px 0 12px">'
+        f"<tr>{cells}</tr></table>"
+    )
+
+
+def quote(text: str) -> str:
+    """Issue 398: words someone wrote (a reply, a comment, a note) — set apart, escaped, and with no link
+    made from them: an address a member typed never becomes a button in the portal's own e-mail."""
+    if not text.strip():
+        return ""
+    safe = escape(text.strip()).replace("\n", "<br>")
+    return (
+        f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:4px 0 16px">'
+        f'<tr><td width="3" bgcolor="{ACCENT}" style="background:{ACCENT};border-radius:3px;font-size:0">'
+        f'&nbsp;</td><td style="padding:10px 16px;background:{NIGHT};{_style(15, color=SOFT)}">{safe}</td>'
+        "</tr></table>"
+    )
+
+
 def code(value: str) -> str:
     return (
         f'<p style="margin:18px 0;padding:14px 18px;background:{NIGHT};border:1px solid {BORDER};'

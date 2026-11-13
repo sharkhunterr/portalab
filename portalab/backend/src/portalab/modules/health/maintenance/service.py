@@ -85,6 +85,8 @@ class MaintenanceService:
                 "schedule_version": row.schedule_version,
                 "transition": transition,
                 "reference_time_zone": row.reference_time_zone,
+                "title": row.title,
+                "description": (row.description or "")[:500],
             },
             occurred_at=utc_now(self.state.clock),
             actor=actor,

@@ -2,6 +2,7 @@
 through the 010 engine (``marketplace.project``), coalesced per project. Never blocks a transition."""
 
 from collections.abc import Mapping
+from typing import Any
 from uuid import UUID
 
 from portalab.capabilities.i18n import RESOLVER
@@ -19,8 +20,15 @@ CATEGORIES = {
 
 
 async def notify_funders(
-    capabilities: CapabilityRegistry, project_id: UUID, title: str, state: str, seq: int, funders: list[UUID]
+    capabilities: CapabilityRegistry,
+    project_id: UUID,
+    title: str,
+    state: str,
+    seq: int,
+    funders: list[UUID],
+    said: str = "",
 ) -> None:
+    """Issue 398: ``said`` — what the team wrote with the change (its note, else its reason)."""
     if not funders:
         return
     try:
@@ -33,7 +41,7 @@ async def notify_funders(
                 template_key=f"marketplace:notify.project.{state}",
                 audience=Users(tuple(dict.fromkeys(funders))),
                 dedup_key=f"project:{project_id}:{seq}",
-                params={"project": title[:120], "state": state},
+                params={"project": title[:120], "state": state, "quote": said[:500]},
                 subject_ref=f"project:{project_id}",
                 action_url=f"/projects/{project_id}",
             )
@@ -68,8 +76,10 @@ async def notify_owner(
     product: str,
     dedup: str,
     names: Mapping[str, str] | None = None,
+    extra: Mapping[str, Any] | None = None,
 ) -> None:
-    """``marketplace.purchase`` / ``marketplace.refund`` to the owner (never blocks the operation)."""
+    """``marketplace.purchase`` / ``marketplace.refund`` to the owner (never blocks the operation) — issue
+    398: with what it cost or gave back (``extra``)."""
     try:
         shown = await product_name(capabilities, user, product, names)
         providers = capabilities.system_providers(NOTIFY)
@@ -81,7 +91,7 @@ async def notify_owner(
                 template_key=f"marketplace:notify.{kind}",
                 audience=Users((user,)),
                 dedup_key=dedup,
-                params={"product": shown[:120]},
+                params={"product": shown[:120], **dict(extra or {})},
                 subject_ref=f"product:{product}",
                 action_url="/marketplace/owned",
             )

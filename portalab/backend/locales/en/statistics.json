@@ -121,6 +121,9 @@
   "wrapped.next": "Next",
   "wrapped.none": "No recap yet.",
   "wrapped.previous": "Previous",
-  "wrapped.ready": "Your recap {recap} is ready",
+  "wrapped.ready": "Your {period, select, month {monthly} quarter {quarterly} year {yearly} other {}} recap is ready",
+  "wrapped.ready.body": "What you did in the portal, in {count, plural, one {# figure} other {# figures}}.",
+  "wrapped.ready.fact.end_at": "To",
+  "wrapped.ready.fact.start_at": "From",
   "wrapped.title": "Your recap: {start} – {end}"
 }

@@ -50,7 +50,8 @@ class Communication(NotifyBase):
     source_ref: Mapped[str | None] = mapped_column(String(160))
     dedup_key: Mapped[str] = mapped_column(String(200), nullable=False)
     template_key: Mapped[str] = mapped_column(String(128), nullable=False)
-    params: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    # issue 398: may quote a member's words (a ticket's title, a reply) — purged with the deliveries
+    params: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, info=pii("activity", tombstone={}))
     subject_ref: Mapped[str | None] = mapped_column(String(160))
     audience_spec: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     required_permission: Mapped[str | None] = mapped_column(String(128))

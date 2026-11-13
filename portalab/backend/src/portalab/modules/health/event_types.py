@@ -23,6 +23,9 @@ class MaintenancePayload(BaseModel):
     schedule_version: int
     transition: str
     reference_time_zone: str | None = None
+    # issue 398: what the maintenance is, as its window names it (never personal)
+    title: str | None = None
+    description: str | None = None
 
 
 class OutageLasting(BaseModel):

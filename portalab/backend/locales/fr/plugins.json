@@ -159,5 +159,7 @@
   "menu": "Actions sur {name}",
   "toApprove": "À approuver",
   "showDetails": "Réglages, confinement et diagnostic",
-  "hideDetails": "Masquer les réglages, le confinement et le diagnostic"
+  "hideDetails": "Masquer les réglages, le confinement et le diagnostic",
+  "notify.quarantined.body": "Il a été arrêté pour ne pas perturber le portail. Vérifiez ce qui n'allait pas avant de le réactiver.",
+  "notify.quarantined.fact.reason": "Erreur"
 }

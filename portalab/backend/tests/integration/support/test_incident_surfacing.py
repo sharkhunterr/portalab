@@ -37,7 +37,8 @@ async def test_visibility_and_surfacing(
     assert (
         request.kind == "alert"
         and request.priority == "critical"
-        and request.dedup_key.endswith(":created:critical")
+        and request.dedup_key.endswith(":created:1")  # issue 398: per version, every update is told
+        and request.params["severity"] == "critical"
     )
     assert isinstance(request.audience, WithPermission) and request.audience.service_ids == ("s2", "s9")
     assert created["evidence"] == [] and {s["id"] for s in created["services"]} == {"s2", "s9"}
