@@ -9,6 +9,9 @@ def test_each_action_has_its_source() -> None:
     assert action_of("media.played") == "media"
     # #393: a review given is not a play, whatever was reviewed
     assert action_of("media.reviewed") == action_of("media.reviewed", "movie") == "reviews"
+    # issue 412: a season finished is the series' gain, a game played its length the game's
+    assert action_of("media.season_finished") == "episode"
+    assert action_of("media.game_length_reached") == "game"
     assert action_of("marketplace.purchased") == "shop"
     assert action_of("ticket.created") == "support"
     # issue 265: the games page's games, the day's title, the week's challenges, the boards
