@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, CSRF_COOKIE, CSRF_HEADER } from "../../api/client";
+import { api, CSRF_HEADER, csrfToken } from "../../api/client";
 import { ACTIVE_VISUALS_KEY } from "../../design-system/visuals/ExternalVisualsLoader";
 import type { ExternalElement } from "../../design-system/visuals/registry";
 
@@ -207,10 +207,7 @@ export function useVisualAction() {
       raw?: Blob;
       method?: "POST" | "PUT";
     }) => {
-      const token = document.cookie
-        .split("; ")
-        .find((part) => part.startsWith(`${CSRF_COOKIE}=`))
-        ?.slice(CSRF_COOKIE.length + 1);
+      const token = csrfToken();
       const response = await fetch(path, {
         method,
         credentials: "same-origin",

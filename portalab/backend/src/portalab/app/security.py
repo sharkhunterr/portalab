@@ -60,7 +60,11 @@ async def enforce_default_deny(request: Request) -> None:
     """App-wide dependency: refuse any route that declares neither ``public`` nor a permission — and
     (issue 1) every request of a member whose account the intrusion guard blocked."""
     guard: IntrusionGuard | None = request.app.state._state.get("intrusion_guard")
-    if guard is not None and guard.any_user_blocked() and SESSION_COOKIE_NAME in request.cookies:
+    if (
+        guard is not None
+        and guard.any_user_blocked()
+        and any(n in request.cookies for n in SESSION_COOKIE_NAMES)
+    ):
         principal = await current_principal(request)
         if principal.user_id is not None and guard.user_blocked(str(principal.user_id)) is not None:
             raise SecurityBlocked("Your account is blocked for a while after suspicious requests.")
@@ -156,6 +160,7 @@ IMAGE_GET_PREFIXES = (
 IMAGE_GET = re.compile(r"^/api/v1/users/[^/]+/avatar$")
 IMAGE_BUDGET = 4
 SESSION_COOKIE_NAME = "__Host-portalab_session"
+SESSION_COOKIE_NAMES = (SESSION_COOKIE_NAME, "portalab_session")  # #395: plain HTTP from a local network
 log = get_logger("portalab.security")
 _ALERTS: set["asyncio.Task[None]"] = set()  # alerts on their way (kept until done)
 
@@ -322,7 +327,7 @@ def _session_key(scope: Scope) -> str | None:
         if name == b"cookie":
             for part in value.decode("latin-1").split(";"):
                 key, _, token = part.strip().partition("=")
-                if key == SESSION_COOKIE_NAME and token:
+                if key in SESSION_COOKIE_NAMES and token:
                     return hashlib.sha256(token.encode()).hexdigest()
     return None
 

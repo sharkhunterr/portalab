@@ -1,3 +1,4 @@
+import { csrfToken } from "../../api/client";
 import type { ExternalElement } from "./registry";
 
 /**
@@ -23,17 +24,11 @@ export function reportFailure(element: ExternalElement, reason: "timeout" | "err
   const key = `${element.pack}:${element.sha}:${element.product}`;
   if (REPORTED.has(key) || typeof fetch === "undefined") return;
   REPORTED.add(key);
-  const csrf =
-    typeof document === "undefined"
-      ? ""
-      : (document.cookie
-          .split("; ")
-          .find((c) => c.startsWith("__Host-portalab_csrf="))
-          ?.split("=")[1] ?? "");
+  const csrf = csrfToken() ?? "";
   void fetch("/api/v1/visuals/reports", {
     method: "POST",
     credentials: "same-origin",
-    headers: { "Content-Type": "application/json", "X-CSRF-Token": decodeURIComponent(csrf) },
+    headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf },
     body: JSON.stringify({ pack: element.pack, sha: element.sha, element: element.product, reason }),
   }).catch(() => undefined);
 }

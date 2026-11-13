@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CSRF_COOKIE, CSRF_HEADER } from "../../api/client";
+import { CSRF_HEADER, csrfToken } from "../../api/client";
 import { AdminPage, AdminSection, StatusBadge } from "../../design-system/admin/AdminKit";
 import { Button } from "../../design-system/components/Button";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
@@ -20,10 +20,7 @@ interface Block {
 }
 
 async function lift(key: string | null) {
-  const token = document.cookie
-    .split("; ")
-    .find((part) => part.startsWith(`${CSRF_COOKIE}=`))
-    ?.slice(CSRF_COOKIE.length + 1);
+  const token = csrfToken();
   const response = await fetch("/api/v1/admin/security/blocks/lift", {
     method: "POST",
     credentials: "same-origin",

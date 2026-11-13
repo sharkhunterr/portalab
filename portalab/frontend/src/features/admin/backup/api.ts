@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api, CSRF_COOKIE, CSRF_HEADER, readCookie } from "../../../api/client";
+import { api, CSRF_HEADER, csrfToken } from "../../../api/client";
 import type { OfferedBlock } from "../arrival/importBlocks";
 
 /** Issue 247 — the portal's backups: the archives, the save or restore running, and an archive sent. */
@@ -61,7 +61,7 @@ export function uploadArchive(file: File, onProgress: (share: number) => void): 
     request.open("POST", "/api/v1/admin/first-run/import/upload");
     request.withCredentials = true;
     request.setRequestHeader("Content-Type", "application/octet-stream");
-    const token = readCookie(CSRF_COOKIE);
+    const token = csrfToken();
     if (token) request.setRequestHeader(CSRF_HEADER, token);
     request.upload.onprogress = (event) => {
       if (event.lengthComputable) onProgress(event.loaded / event.total);

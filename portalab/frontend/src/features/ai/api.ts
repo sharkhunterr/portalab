@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, CSRF_COOKIE, CSRF_HEADER, readCookie } from "../../api/client";
+import { api, CSRF_HEADER, csrfToken } from "../../api/client";
 import type { components } from "../../api/generated/schema";
 import { ApiError } from "../../state/regions";
 
@@ -132,7 +132,7 @@ export async function streamTurn(
   signal?: AbortSignal,
   context?: { route?: string; title?: string },
 ): Promise<void> {
-  const token = readCookie(CSRF_COOKIE);
+  const token = csrfToken();
   const response = await fetch(`/api/v1/ai/conversations/${encodeURIComponent(conversationId)}/messages`, {
     method: "POST",
     credentials: "include",

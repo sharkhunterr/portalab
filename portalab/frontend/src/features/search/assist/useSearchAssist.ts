@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CSRF_COOKIE, CSRF_HEADER, readCookie } from "../../../api/client";
+import { CSRF_HEADER, csrfToken } from "../../../api/client";
 
 /**
  * ``useSearchAssist`` (spec 008 T020; R5): the AI analysis is its own request (``POST /search/assist``,
@@ -55,7 +55,7 @@ export function useSearchAssist() {
         "Content-Type": "application/json",
         Accept: "text/event-stream",
       };
-      const token = readCookie(CSRF_COOKIE);
+      const token = csrfToken();
       if (token) headers[CSRF_HEADER] = token;
       const response = await fetch("/api/v1/search/assist", {
         method: "POST",
