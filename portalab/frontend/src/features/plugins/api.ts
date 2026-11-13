@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, CSRF_COOKIE, CSRF_HEADER } from "../../api/client";
+import { api, CSRF_HEADER, csrfToken } from "../../api/client";
 import type { components } from "../../api/generated/schema";
 import { ApiError } from "../../state/regions";
 
@@ -187,10 +187,7 @@ export function useUploadPlugin() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: async (file: File) => {
-      const token = document.cookie
-        .split("; ")
-        .find((part) => part.startsWith(`${CSRF_COOKIE}=`))
-        ?.slice(CSRF_COOKIE.length + 1);
+      const token = csrfToken();
       const response = await fetch(`/api/v1/admin/plugins/upload?filename=${encodeURIComponent(file.name)}`, {
         method: "POST",
         credentials: "same-origin",

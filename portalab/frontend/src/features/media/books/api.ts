@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api, CSRF_COOKIE, CSRF_HEADER, readCookie } from "../../../api/client";
+import { api, CSRF_HEADER, csrfToken } from "../../../api/client";
 import type { components } from "../../../api/generated/schema";
 
 /** #20, #21: listening to an audiobook and reading a book in the portal. */
@@ -70,7 +70,7 @@ export async function fetchPages(ticket: string, fileRef: string): Promise<numbe
 /** ``keepalive`` so the last position still reaches the server when the page goes away. */
 function post(path: string, body: unknown): Promise<Response> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  const token = readCookie(CSRF_COOKIE);
+  const token = csrfToken();
   if (token) headers[CSRF_HEADER] = token;
   return fetch(path, {
     method: "POST",

@@ -28,7 +28,7 @@ export const SOURCES: Record<string, { color: string; icon: string }> = {
   requests: { color: "color-mix(in oklab, var(--chart-6) 55%, white)", icon: "inbox" }, // issue 129
   radio: { color: "color-mix(in oklab, var(--chart-2) 60%, var(--chart-4))", icon: "radio" }, // issue 227
   rescue: { color: "color-mix(in oklab, var(--chart-9) 60%, white)", icon: "lifebuoy" }, // issue 228
-  reviews: { color: "color-mix(in oklab, var(--chart-5) 55%, var(--chart-3))", icon: "message" }, // #393
+  reviews: { color: "color-mix(in oklab, var(--chart-5) 55%, var(--chart-3))", icon: "message" }, // issue 393
   minigames: { color: "color-mix(in oklab, var(--chart-10) 55%, var(--chart-6))", icon: "dices" }, // issue 265
   quests: { color: "var(--chart-8)", icon: "target" },
   streak: { color: "var(--chart-2)", icon: "flame" },

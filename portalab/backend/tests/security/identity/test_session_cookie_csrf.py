@@ -5,7 +5,12 @@ import pytest
 from fastapi import FastAPI
 from sqlalchemy import select
 
-from portalab.modules.identity.api.middleware import CSRF_COOKIE, SESSION_COOKIE
+from portalab.modules.identity.api.middleware import (
+    CSRF_COOKIE,
+    PLAIN_CSRF_COOKIE,
+    PLAIN_SESSION_COOKIE,
+    SESSION_COOKIE,
+)
 from portalab.modules.identity.models import UserSession
 from tests.integration.identity.helpers import create_user, login, module_of
 
@@ -94,3 +99,58 @@ async def test_garbage_cookie_is_anonymous(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/me")
     assert response.status_code == 401
     assert response.json()["code"] == "unauthorized"
+
+
+def _session_names(response: httpx.Response) -> list[str]:
+    return sorted(value.split("=", 1)[0] for value in response.headers.get_list("set-cookie"))
+
+
+@pytest.mark.usefixtures("alice")
+async def test_plain_http_from_the_local_network_keeps_the_session(app: FastAPI) -> None:
+    """#395: a portal reached at ``http://192.168.1.24:8445`` — a browser drops every ``Secure`` cookie
+    there, so the session went nowhere and the setup wizard failed with « Authentication required »."""
+    transport = httpx.ASGITransport(app=app, client=("192.168.1.50", 50000))
+    async with httpx.AsyncClient(transport=transport, base_url="http://192.168.1.24:8445") as http:
+        response = await login(http, "alice")
+        assert _session_names(response) == [PLAIN_CSRF_COOKIE, PLAIN_SESSION_COOKIE]
+        session_cookie = _cookie_header(response, PLAIN_SESSION_COOKIE)
+        assert "httponly" in session_cookie and "secure" not in session_cookie
+        assert "secure" not in _cookie_header(response, PLAIN_CSRF_COOKIE)
+        assert (await http.get("/api/v1/me")).status_code == 200
+        refused = await http.patch(
+            "/api/v1/me/profile", json={"fields": {"bio": {"value": "hi"}}}, headers={"X-CSRF-Token": ""}
+        )
+        assert refused.status_code == 403  # the double submit still holds
+        assert (await http.post("/api/v1/auth/logout")).status_code == 204
+        assert (await http.get("/api/v1/me")).status_code == 401
+
+
+@pytest.mark.usefixtures("alice")
+@pytest.mark.parametrize(
+    ("client", "headers"),
+    [
+        (("203.0.113.7", 50000), {}),  # plain HTTP from the internet
+        (("192.168.1.2", 50000), {"X-Forwarded-For": "203.0.113.7"}),  # through a proxy not trusted
+    ],
+)
+async def test_plain_http_from_elsewhere_keeps_the_strict_cookies(
+    app: FastAPI, client: tuple[str, int], headers: dict[str, str]
+) -> None:
+    transport = httpx.ASGITransport(app=app, client=client)
+    async with httpx.AsyncClient(transport=transport, base_url="http://portal.test", headers=headers) as http:
+        response = await login(http, "alice")
+        assert _session_names(response) == [CSRF_COOKIE, SESSION_COOKIE]
+        assert "secure" in _cookie_header(response, SESSION_COOKIE)
+
+
+@pytest.mark.usefixtures("alice")
+async def test_a_plain_cookie_never_counts_over_https(app: FastAPI) -> None:
+    """#395: the plain session cookie carries no ``__Host-`` guarantee — over HTTPS it is ignored, so a
+    cookie planted by a sibling subdomain or a network attacker cannot sign anyone into its session."""
+    lan = httpx.ASGITransport(app=app, client=("192.168.1.50", 50000))
+    async with httpx.AsyncClient(transport=lan, base_url="http://192.168.1.24:8445") as http:
+        planted = (await login(http, "alice")).cookies[PLAIN_SESSION_COOKIE]
+    secure = httpx.ASGITransport(app=app, client=("192.168.1.50", 50000))
+    async with httpx.AsyncClient(transport=secure, base_url="https://portal.test") as https:
+        https.cookies.set(PLAIN_SESSION_COOKIE, planted)
+        assert (await https.get("/api/v1/me")).status_code == 401

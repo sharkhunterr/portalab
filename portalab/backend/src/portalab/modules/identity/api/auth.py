@@ -10,10 +10,11 @@ from sqlalchemy import select
 from portalab.core.authorization import public, require
 from portalab.core.authz_port import Principal
 from portalab.modules.identity.api.middleware import (
-    SESSION_COOKIE,
     check_csrf,
     clear_session_cookies,
     identity_module,
+    plain_http,
+    session_token,
     set_session_cookies,
 )
 from portalab.modules.identity.api.schemas import (
@@ -35,6 +36,7 @@ router = APIRouter(prefix="/api/v1", tags=["identity"])
 Module = Annotated[IdentityModule, Depends(identity_module)]
 
 SSO_COOKIE = "__Host-portalab_sso"  # #277: the browser a single sign-on was started in
+PLAIN_SSO_COOKIE = "portalab_sso"  # #395: plain HTTP from a local network
 
 PROBLEMS: dict[int | str, dict[str, Any]] = {
     401: {"description": "auth.invalid_credentials"},
@@ -56,9 +58,9 @@ async def login(body: LoginRequest, request: Request, response: Response, module
         body.password,
         client_ip=client_ip(request),
         user_agent=request.headers.get("user-agent"),
-        previous_token=request.cookies.get(SESSION_COOKIE),
+        previous_token=session_token(request),
     )
-    set_session_cookies(response, signed_in.issued, module.ctx.config.session_absolute_hours * 3600)
+    set_session_cookies(response, signed_in.issued, module.ctx.config.session_absolute_hours * 3600, request)
     return SessionInfo(
         user_id=signed_in.user_id,
         display_name=signed_in.display_name,
@@ -72,6 +74,11 @@ class SingleSignOn(BaseModel):
 
     enabled: bool
     label: str
+
+
+def _forget_sso(response: Response) -> None:
+    response.delete_cookie(SSO_COOKIE, path="/", secure=True, httponly=True, samesite="lax")
+    response.delete_cookie(PLAIN_SSO_COOKIE, path="/", httponly=True, samesite="lax")
 
 
 def _callback(request: Request) -> str:
@@ -93,12 +100,13 @@ async def oidc_start(request: Request, module: Module, next: str | None = None) 
     account."""
     url = await module.oidc.start(_callback(request), next)
     response = RedirectResponse(url, status_code=302)
+    plain = plain_http(request)
     response.set_cookie(
-        SSO_COOKIE,
+        PLAIN_SSO_COOKIE if plain else SSO_COOKIE,
         browser_binding(state_of(url)),
         max_age=int(PENDING.total_seconds()),
         path="/",
-        secure=True,
+        secure=not plain,
         httponly=True,
         samesite="lax",  # sent back on the provider's redirect (a top-level navigation)
     )
@@ -126,25 +134,26 @@ async def oidc_callback(
             _callback(request),
             client_ip=client_ip(request),
             user_agent=request.headers.get("user-agent"),
-            previous_token=request.cookies.get(SESSION_COOKIE),
-            browser=request.cookies.get(SSO_COOKIE),
+            previous_token=session_token(request),
+            browser=request.cookies.get(SSO_COOKIE)
+            or (request.cookies.get(PLAIN_SSO_COOKIE) if plain_http(request) else None),
         )
     except Exception as exc:
         code_name = getattr(exc, "code", "auth.sso_failed")
         reason = "unavailable" if code_name == "auth.account_unavailable" else "failed"
         refused = RedirectResponse(f"/login?sso={reason}", status_code=302)
-        refused.delete_cookie(SSO_COOKIE, path="/", secure=True, httponly=True, samesite="lax")
+        _forget_sso(refused)
         return refused
     response = RedirectResponse(next_path, status_code=302)
-    response.delete_cookie(SSO_COOKIE, path="/", secure=True, httponly=True, samesite="lax")
-    set_session_cookies(response, signed.issued, module.ctx.config.session_absolute_hours * 3600)
+    _forget_sso(response)
+    set_session_cookies(response, signed.issued, module.ctx.config.session_absolute_hours * 3600, request)
     return response
 
 
 @router.post("/auth/logout", status_code=status.HTTP_204_NO_CONTENT)
 @public
 async def logout(request: Request, module: Module) -> Response:
-    token = request.cookies.get(SESSION_COOKIE)
+    token = session_token(request)
     if token:
         check_csrf(request, token)
         await module.auth.sign_out(token)

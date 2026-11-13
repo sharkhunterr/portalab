@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CSRF_COOKIE, CSRF_HEADER, readCookie } from "../../../api/client";
+import { CSRF_HEADER, csrfToken } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
@@ -46,7 +46,7 @@ export function DiagnosisPanel({
   const start = async () => {
     setSteps([]);
     setState("running");
-    const token = readCookie(CSRF_COOKIE);
+    const token = csrfToken();
     const response = await fetch("/api/v1/diagnosis/runs", {
       method: "POST",
       credentials: "include",

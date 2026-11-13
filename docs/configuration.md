@@ -70,6 +70,12 @@ Two more variables exist for development and unusual layouts. You do not need th
 | `PORTALAB_BUILTIN_PACKS_DIR` | `/app/packs/builtin` in the image | Where Portalab's own visual packs are read from |
 | `PORTALAB_EXAMPLE_PACKS_DIR` | `/app/packs/examples` in the image | Where the example packs offered by the recommended install are read from |
 
+## Plain HTTP on your LAN
+
+Portalab can be used at `http://<server>:8080` from your local network, without a proxy or a certificate. Browsers refuse `Secure` cookies over plain HTTP, so on such a request (plain HTTP from a private address, never through an untrusted proxy) the session cookies are named `portalab_session` / `portalab_csrf` and go without the `Secure` flag. Over HTTPS, Portalab always uses its `__Host-` cookies and ignores the plain ones.
+
+Plain HTTP sends your password and session in clear on the network: keep it to a network you trust. For anything wider, use a reverse proxy with TLS, as below.
+
 ## Behind a reverse proxy
 
 Put Portalab behind a reverse proxy that terminates TLS (Nginx Proxy Manager, Traefik, Caddy…). Three settings decide what answers whom.
