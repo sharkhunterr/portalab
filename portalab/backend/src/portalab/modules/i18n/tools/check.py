@@ -68,7 +68,7 @@ def _pseudo_text(text: str, rtl: bool) -> str:
             out.append(c)
         i += 1
     body = "".join(out)
-    return f"‮{body}‬" if rtl else f"[{body} ~~~]"
+    return f"\u202e{body}\u202c" if rtl else f"[{body} ~~~]"
 
 
 def pseudo(locales: Path, code: str = "en-XA") -> dict[str, dict[str, str]]:
