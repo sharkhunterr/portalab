@@ -51,6 +51,9 @@ PARTIAL = "media.playback_abandoned"  # #94: a play stopped before its end still
 LENGTH = "media.game_length_reached"  # #351
 MIN_WATCHED = 60.0
 BOOK_KINDS = ("book", "audiobook")  # #386: their progress may come after their sitting
+# issue 413: Plex records a live TV sitting in pieces of a few minutes — pieces this close are one sitting,
+# counted once it is over (no new piece for as long)
+LIVE_GAP = timedelta(minutes=5)
 
 
 class HistoryRewards:
@@ -123,7 +126,9 @@ class HistoryRewards:
                 .scalars()
                 .all()
             )
-            for row in rows:
+            live = [row for row in rows if row.kind == "live"]
+            published += await self._live_sittings(session, live, now)
+            for row in (row for row in rows if row.kind != "live"):
                 share = row.progress if row.progress is not None else percent(row.watched_s, row.duration_s)
                 credits = await self._credits(row.object_id) if row.duration_s else None
                 finished = self._finished(row.kind, share, row.duration_s, credits)
@@ -161,6 +166,63 @@ class HistoryRewards:
             published += await self._books_ended_later(session, now, linked)
         if published:
             metrics.increment("media.playback.finished_from_history", published)
+        return published
+
+    async def _live_sittings(self, session: AsyncSession, rows: list[Activity], now: datetime) -> int:
+        """Issue 413: live TV, one event per sitting — its pieces' minutes added up, under its first piece,
+        once no piece came for ``LIVE_GAP`` (a sitting still growing waits for the next run)."""
+        groups: list[list[Activity]] = []
+        last: dict[tuple[Any, ...], list[Activity]] = {}
+        for row in sorted(rows, key=lambda r: r.started_at):
+            key = (row.user_id, row.service_id, row.external_user_id)
+            group = last.get(key) or []
+            previous = group[-1] if group else None
+            if previous is None or row.started_at - (previous.stopped_at or previous.started_at) > LIVE_GAP:
+                group = []
+                groups.append(group)
+                last[key] = group
+            group.append(row)
+        published = 0
+        for pieces in groups:
+            ended = [p.stopped_at for p in pieces]
+            if any(end is None for end in ended):
+                continue  # still watching
+            end = max(e for e in ended if e is not None)
+            if now - end < LIVE_GAP:
+                continue  # a next piece may still come
+            counted = []
+            for piece in pieces:
+                piece.rewarded_at = now  # looked at once
+                if not await self._seen_live(session, piece, None):
+                    counted.append(piece)
+            watched = sum(p.watched_s for p in counted)
+            if not counted or watched < MIN_WATCHED:
+                continue
+            first = counted[0]
+            share = first.progress if first.progress is not None else percent(watched, first.duration_s)
+            event = EVENT if self._finished("live", share, None, None) else PARTIAL
+            result = await self.events.publish(
+                session,
+                event,
+                {
+                    "object": str(first.object_id) if first.object_id else None,
+                    "kind": "live",
+                    "state_seq": 0,
+                    "service": str(first.service_id),
+                    "session": f"history:{first.ref}",
+                    "position_s": round(watched, 1),
+                    "duration_s": None,
+                    "percent": share,
+                    "occurred_at": end.isoformat(),
+                    "watched_s": round(watched, 1),
+                },
+                occurred_at=end,
+                subject=SubjectRef("user", str(first.user_id)),
+                source="media",
+                dedup_key=f"{event}:history:{first.service_id}:{first.ref}",
+            )
+            if not result.duplicate:
+                published += 1
         return published
 
     async def _books_ended_later(self, session: AsyncSession, now: datetime, linked: Any) -> int:

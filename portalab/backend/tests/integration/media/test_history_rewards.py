@@ -523,3 +523,74 @@ async def test_an_audiobook_sitting_reaching_its_end_later_is_finished_once(
     assert finished[0][1]["session"] == "history:76"
     partial = [e for e in await media.events() if e[0] == "media.playback_abandoned"]
     assert [e[1]["watched_s"] for e in partial] == [2857.0]
+
+
+async def test_live_tv_counts_one_line_per_sitting(app: FastAPI, media: MediaHarness) -> None:
+    """Issue 413: Plex records a live TV sitting in pieces of two or three minutes — pieces this close are
+    one sitting: one event, its minutes added up, under its first piece, once no piece came for a while; a
+    sitting still growing waits; a long pause starts another sitting."""
+    people = await users(app, media, "zoe")
+    zoe = people["zoe"]
+    tautulli = uuid4()
+
+    def piece(ref: str, minutes_ago: float, watched: float, *, open_: bool = False) -> Activity:
+        start = NOW - timedelta(minutes=minutes_ago)
+        return Activity(
+            service_id=tautulli,
+            ref=ref,
+            family="plex",
+            priority=20,
+            counted=True,
+            external_user_id="1",
+            user_id=zoe,
+            kind="live",
+            title="France 2",
+            object_id=None,
+            ids={},
+            started_at=start,
+            stopped_at=None if open_ else start + timedelta(seconds=watched),
+            watched_s=watched,
+            duration_s=None,
+            progress=1.0,
+            received_at=NOW,
+        )
+
+    async with media.database.unit_of_work() as uow:
+        uow.session.add_all(
+            [
+                _link(zoe, tautulli, NOW - timedelta(days=30)),
+                # a sitting of four pieces, over for a while
+                piece("16762", 90, 192.0),
+                piece("16763", 86.5, 142.0),
+                piece("16764", 83, 142.0),
+                piece("16765", 79.5, 152.0),
+                # an hour later, another sitting — still growing: its last piece ended a minute ago
+                piece("16800", 6, 150.0),
+                piece("16801", 3.5, 150.0),
+            ]
+        )
+    rewards = HistoryRewards(
+        media.database, media.module.history.events, media.module.threshold, clock=FixedClock(NOW)
+    )
+    assert await rewards.run() == 1
+    await media.dispatch()
+    told = [e for e in await media.events() if e[1].get("kind") == "live"]
+    assert len(told) == 1
+    assert told[0][1]["session"] == "history:16762" and told[0][1]["watched_s"] == 628.0
+    async with media.database.session() as session:
+        waiting = (
+            await session.execute(select(Activity.ref).where(Activity.rewarded_at.is_(None)))
+        ).scalars()
+        assert sorted(waiting) == ["16800", "16801"]
+
+    later = HistoryRewards(
+        media.database,
+        media.module.history.events,
+        media.module.threshold,
+        clock=FixedClock(NOW + timedelta(minutes=10)),
+    )
+    assert await later.run() == 1  # the second sitting, now over
+    await media.dispatch()
+    told = [e[1]["watched_s"] for e in await media.events() if e[1].get("kind") == "live"]
+    assert told == [628.0, 300.0]
+    assert await later.run() == 0
