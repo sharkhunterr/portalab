@@ -132,3 +132,20 @@ async def test_requires_configuration_manage(app: FastAPI, client: httpx.AsyncCl
     await create_user(module_of(app), "plain")
     await login(client, "plain")
     assert (await client.get("/api/v1/admin/config")).status_code == 403
+
+
+async def test_within_a_request_a_setting_reads_what_was_just_written(
+    app: FastAPI, full: FullPlatform
+) -> None:
+    """Issue 404: a request reads the settings once (memo) — and what it writes, it reads back at once."""
+    from portalab.core.authorization import authorization_scope
+    from portalab.core.authz_port import Principal
+    from portalab.modules.administration.config.service import Change
+
+    config = full.administration.config
+    admin_id = await create_user(module_of(app), "memo")
+    with authorization_scope():
+        assert (await config.get("demo.pageSize")).value == 20
+        assert (await config.get("demo.theme", user_id=admin_id)).value == "auto"
+        await config.apply([Change("demo.pageSize", 42)], Principal(user_id=admin_id), admin_change=True)
+        assert (await config.get("demo.pageSize")).value == 42

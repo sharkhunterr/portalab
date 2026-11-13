@@ -14,6 +14,7 @@
 Evaluation reads the current database state; the only cache is the per-request memo.
 """
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
@@ -22,7 +23,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from portalab.core.audit_port import AuditRecord, AuditSink
-from portalab.core.authorization import request_memo
+from portalab.core.authorization import request_memo, request_once
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.db import Database
 from portalab.core.errors import Unavailable
@@ -151,32 +152,47 @@ class AuthorizationEngine:
         return Decision(False, "no_grant", None, confirm, sensitive)
 
     async def _permission(self, key: str) -> PermissionInfo | None:
-        memo = request_memo()
-        cache_key = ("authz.permission", key)
-        if memo is not None and cache_key in memo:
-            return memo[cache_key]  # type: ignore[no-any-return]
+        if request_memo() is None:  # a job, the CLI: the one permission
+            await self.catalog.ensure()
+            async with self.database.session() as session:
+                row = await session.get(Permission, key)
+            return _info(row) if row is not None else None
+        return (await request_once("authz.permissions", self._catalog)).get(key)
+
+    async def _catalog(self) -> dict[str, PermissionInfo]:
+        """Issue 404: every permission at once, for the request (a page checks dozens of them)."""
         await self.catalog.ensure()
         async with self.database.session() as session:
-            row = await session.get(Permission, key)
-        info = (
-            PermissionInfo(row.key, row.enabled, row.sensitive, row.reserved, row.requires_confirmation)
-            if row is not None
-            else None
-        )
-        if memo is not None:
-            memo[cache_key] = info
-        return info
+            rows = (await session.execute(select(Permission))).scalars().all()
+        return {row.key: _info(row) for row in rows}
 
     async def _grants(self, subject: UUID) -> EffectiveGrants:
-        memo = request_memo()
-        cache_key = ("authz.grants", subject)
-        if memo is not None and cache_key in memo:
-            return memo[cache_key]  # type: ignore[no-any-return]
-        async with self.database.session() as session:
-            grants = await load_effective_grants(session, subject)
-        if memo is not None:
-            memo[cache_key] = grants
-        return grants
+        async def load() -> EffectiveGrants:
+            async with self.database.session() as session:
+                return await load_effective_grants(session, subject)
+
+        return await request_once(("authz.grants", subject), load)
+
+    async def visible(self, principal: Principal, permissions: Iterable[str]) -> set[str]:
+        """Issue 404: which of ``permissions`` the principal holds, globally — to decide what a page *shows*
+        (a palette's entries, a menu, a widget). Not an access decision, so not audited: the action itself is
+        authorized (and audited) when it is called. One read of the catalog and the grants for all."""
+        subject, _ = self._subject(principal)
+        if subject is None:
+            return set()
+        wanted = set(permissions)
+        catalog = await request_once("authz.permissions", self._catalog)
+        grants = await self._grants(subject)
+        held = set()
+        for key in wanted:
+            info = catalog.get(key)
+            if info is not None and info.enabled and self._decide(info, grants, subject, None).allowed:
+                held.add(key)
+        if held and principal.channel == "ai":
+            ai = catalog.get("ai.use")
+            if ai is None or not self._decide(ai, grants, subject, None).allowed:
+                return set()
+        return held
 
     async def effective_permissions(self, principal: Principal) -> list[str]:
         """Enabled permissions the principal holds globally or for itself (UI hints, ``/me/permissions``)."""
@@ -245,3 +261,7 @@ class AuthorizationEngine:
             raise AuditFailed("The action was refused because it could not be audited.") from exc
         if memo is not None:
             memo[memo_key] = True
+
+
+def _info(row: Permission) -> PermissionInfo:
+    return PermissionInfo(row.key, row.enabled, row.sensitive, row.reserved, row.requires_confirmation)

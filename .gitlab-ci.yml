@@ -258,10 +258,17 @@ validate:knip:
   stage: validate
   rules: !reference [.unscheduled, rules]
   script:
-    # unused files, exports and dependencies of the interface: reported until they are cleaned (issue 397)
+    # unused files, exports and dependencies of the interface fail the release (issue 397)
     - npx --yes knip@5.88.1 --no-progress
-  allow_failure:
-    exit_codes: [1]
+
+validate:bundle:
+  extends: .node
+  stage: validate
+  rules: !reference [.unscheduled, rules]
+  script:
+    # issue 404: what a first visit downloads stays within budget (entry + its static imports, gzip)
+    - npm run build
+    - npm run check:bundle
 
 validate:node-audit:
   extends: .node

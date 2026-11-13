@@ -39,7 +39,15 @@ export default defineConfig({
             )
           )
             return "charts";
-          return /node_modules\/(react-intl|intl-messageformat|@formatjs)\//.test(id) ? "intl" : "vendor";
+          if (/node_modules\/(react-intl|intl-messageformat|@formatjs)\//.test(id)) return "intl";
+          // issue 404: the long-cached vendor chunk is the core every page needs, loaded up front — anything
+          // else (the player's hls.js, the readers' pdf.js and epub.js, jszip, particles…) loads with the page
+          // that uses it, never on the first visit
+          return /node_modules\/(react|react-dom|scheduler|react-router|@tanstack|@radix-ui|@floating-ui|lucide-react|zod|openapi-fetch|clsx|tailwind-merge|class-variance-authority)\//.test(
+            id,
+          )
+            ? "vendor"
+            : undefined;
         },
       },
     },

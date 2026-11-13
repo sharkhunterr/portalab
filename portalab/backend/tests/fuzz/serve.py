@@ -6,6 +6,7 @@ both are tested apart. Never used in production (it lives with the tests).
 """
 
 import asyncio
+import contextvars
 import faulthandler
 import io
 import sys
@@ -13,6 +14,8 @@ import threading
 import time
 
 import uvicorn
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 from portalab.app.main import create_app, guard_of
 from portalab.core.logging import configure_logging
@@ -20,6 +23,15 @@ from portalab.core.settings import load_settings
 from portalab.modules.privacy.settings import SecurityConfig
 
 UNLIMITED = 10**9
+# issue 404: the SQL statements each request ran, told in « X-Query-Count » (N+1 hunting)
+QUERIES: contextvars.ContextVar[list[int] | None] = contextvars.ContextVar("queries", default=None)
+
+
+@event.listens_for(Engine, "before_cursor_execute")
+def _count(*_args: object) -> None:
+    counter = QUERIES.get()
+    if counter is not None:
+        counter[0] += 1
 
 
 def main() -> None:
@@ -85,8 +97,12 @@ def main() -> None:
         ):  # the app's own lifespan runs no startup hook: the watch starts with the first request
             await watchdog()
         started[id(request)] = time.monotonic()
+        counter = [0]
+        QUERIES.set(counter)
         try:
-            return await call_next(request)
+            response = await call_next(request)
+            response.headers["X-Query-Count"] = str(counter[0])
+            return response
         finally:
             started.pop(id(request), None)
 

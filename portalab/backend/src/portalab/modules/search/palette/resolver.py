@@ -108,6 +108,19 @@ class PaletteResolver:
         self.navigation = navigation
         self.labels = Labels(capabilities)
 
+    async def _held(self, principal: Principal, permissions: list[str]) -> set[str]:
+        """Issue 404: the permissions held among ``permissions`` — one batch, not audited, when the engine
+        offers it (what the palette shows, not what is done); else one check each."""
+        visible = getattr(self.authorizer, "visible", None)
+        if visible is not None:
+            try:
+                return set(await visible(principal, permissions))
+            except Exception:
+                return set()
+        unique = sorted(set(permissions))
+        allowed = await asyncio.gather(*(self._allowed(principal, p) for p in unique))
+        return {p for p, ok in zip(unique, allowed, strict=True) if ok}
+
     async def _allowed(self, principal: Principal, permission: str) -> bool:
         try:
             return await self.authorizer.is_allowed(principal, permission)
@@ -124,10 +137,10 @@ class PaletteResolver:
             for a in self.registry.actions()
             if a.context_route is None or (route or "").startswith(a.context_route)
         ]
-        allowed_nav = await asyncio.gather(
-            *(self._allowed(principal, c.required_permission) for c in contributions)
-        )
-        allowed_act = await asyncio.gather(*(self._allowed(principal, a.permission) for a in actions))
+        wanted = [c.required_permission for c in contributions] + [a.permission for a in actions]
+        held = await self._held(principal, wanted)
+        allowed_nav = [c.required_permission in held for c in contributions]
+        allowed_act = [a.permission in held for a in actions]
         destinations: list[PaletteEntry] = []
         commands: list[PaletteEntry] = []
         for contribution, ok in zip(contributions, allowed_nav, strict=True):

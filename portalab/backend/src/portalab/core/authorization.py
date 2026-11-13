@@ -8,7 +8,8 @@ Authentication (who is the caller) comes from the :class:`PrincipalResolver` ins
 — visibility (spec 021) is applied to the data after ``require()`` allowed the action.
 """
 
-from collections.abc import Callable, Iterable, Iterator
+import asyncio
+from collections.abc import Awaitable, Callable, Iterable, Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import Any, Protocol
@@ -39,6 +40,26 @@ def authorization_scope() -> Iterator[dict[Any, Any]]:
 def request_memo() -> dict[Any, Any] | None:
     """The memo of the current request, or ``None`` outside a request (jobs, CLI)."""
     return _request_memo.get()
+
+
+async def request_once[T](key: Any, load: Callable[[], Awaitable[T]]) -> T:
+    """Issue 404: ``load()`` once per request — callers running side by side (``asyncio.gather``) share the
+    same load instead of each querying the database; a failed load is forgotten (the next call tries again).
+    Outside a request (jobs, CLI), simply ``load()``."""
+    memo = _request_memo.get()
+    if memo is None:
+        return await load()
+    pending = memo.get(key)
+    if pending is None:
+        pending = memo[key] = asyncio.ensure_future(load())
+
+        def forget_failure(task: asyncio.Future[T]) -> None:
+            if not task.cancelled() and task.exception() is not None and memo.get(key) is task:
+                del memo[key]
+
+        pending.add_done_callback(forget_failure)
+    result: T = await pending
+    return result
 
 
 class PrincipalResolver(Protocol):
