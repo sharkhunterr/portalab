@@ -47,6 +47,47 @@ class SessionInfo(BaseModel):
     expires_at: datetime
 
 
+class MfaRequired(BaseModel):
+    """Issue 408: the password was right; the second factor's code finishes the sign-in (no session yet)."""
+
+    mfa_required: bool = True
+    challenge: str
+    expires_in: int
+
+
+class MfaCode(Strict):
+    challenge: str = Field(min_length=10, max_length=128)
+    code: str = Field(min_length=6, max_length=32)
+
+
+class PasswordProof(Strict):
+    password: str = Field(min_length=1, max_length=1024)
+
+
+class MfaConfirm(Strict):
+    code: str = Field(min_length=6, max_length=32)
+
+
+class MfaOff(Strict):
+    password: str = Field(min_length=1, max_length=1024)
+    code: str = Field(min_length=6, max_length=32)
+
+
+class MfaStatus(BaseModel):
+    enabled: bool
+    recovery_codes_left: int
+
+
+class MfaSetup(BaseModel):
+    secret: str
+    uri: str
+    qr_svg: str
+
+
+class RecoveryCodes(BaseModel):
+    codes: list[str]
+
+
 class OnboardingStep(BaseModel):
     step: str
     completed_at: datetime | None

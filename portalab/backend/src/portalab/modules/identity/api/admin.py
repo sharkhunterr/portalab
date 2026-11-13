@@ -17,6 +17,7 @@ from portalab.modules.identity.api.schemas import (
     AdminReason,
     AdminTransferRequest,
     DeletionStatus,
+    PasswordProof,
     UserList,
     UserListItem,
     VerificationTokenOut,
@@ -168,4 +169,25 @@ async def transfer_admin(
 ) -> Response:
     await module.auth.reauthenticate(principal, body.password, client_ip=client_ip(request))
     await module.admin.transfer_admin(principal, body.target_user_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(
+    "/users/{user_id}/mfa/off",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        409: {"description": "auth.mfa_own_account, admin.sole_admin_protected"},
+        422: {"description": "identity.password_current_wrong (the administrator's)"},
+    },
+)
+async def lift_user_mfa(
+    user_id: UUID,
+    body: PasswordProof,
+    request: Request,
+    module: Module,
+    principal: Principal = require("users.manage"),
+) -> Response:
+    """Issue 408: a member who lost their phone and their recovery codes gets their second factor turned off
+    (the administrator's own password asked again; never the Admin's)."""
+    await module.mfa.lift(principal, user_id, body.password, client_ip=client_ip(request))
     return Response(status_code=status.HTTP_204_NO_CONTENT)

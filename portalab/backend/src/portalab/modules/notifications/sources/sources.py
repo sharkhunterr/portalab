@@ -16,6 +16,7 @@ SECURITY_EVENTS = (
     "user.deletion_requested",
     "user.password_changed",  # issue 407: the member's own security events, told to them
     "user.sso_linked",
+    "user.mfa_changed",  # issue 408
 )
 
 Send = Callable[[CommunicationRequest], Awaitable[CommunicationRef]]

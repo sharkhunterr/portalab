@@ -2171,5 +2171,10 @@
   "setting.notifications.digest.defaultMode.choice.daily": "Daily digest",
   "setting.notifications.digest.defaultMode.choice.weekly": "Weekly digest",
   "setting.identity.oidc.trustUnverifiedEmail.label": "Trust the provider's e-mails",
-  "setting.identity.oidc.trustUnverifiedEmail.hint": "Link a provider user to the portal account with the same e-mail even when the provider does not say it verified it (Authentik leaves it out for its own users). Turn on only if your members cannot change their e-mail at the provider; the Admin's account always needs a verified e-mail."
+  "setting.identity.oidc.trustUnverifiedEmail.hint": "Link a provider user to the portal account with the same e-mail even when the provider does not say it verified it (Authentik leaves it out for its own users). Turn on only if your members cannot change their e-mail at the provider; the Admin's account always needs a verified e-mail.",
+  "members.mfa.title": "Two-step verification",
+  "members.mfa.hint": "If this member lost their phone and their recovery codes, turn their two-step verification off: they sign in with their password alone and can turn it back on. They are told by a notice.",
+  "members.mfa.submit": "Turn their two-step verification off",
+  "members.mfa.done": "Two-step verification is off for this member.",
+  "members.mfa.adminOnly": "The Admin turns their two-step verification off from their own account."
 }

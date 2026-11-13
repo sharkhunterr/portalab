@@ -2171,5 +2171,10 @@
   "setting.notifications.digest.defaultMode.choice.daily": "Résumé quotidien",
   "setting.notifications.digest.defaultMode.choice.weekly": "Résumé hebdomadaire",
   "setting.identity.oidc.trustUnverifiedEmail.label": "Faire confiance aux e-mails du fournisseur",
-  "setting.identity.oidc.trustUnverifiedEmail.hint": "Relier un utilisateur du fournisseur au compte du portail qui a le même e-mail, même quand le fournisseur ne dit pas l'avoir vérifié (Authentik l'omet pour ses propres utilisateurs). À activer seulement si vos membres ne peuvent pas changer leur e-mail chez le fournisseur ; le compte Admin exige toujours un e-mail vérifié."
+  "setting.identity.oidc.trustUnverifiedEmail.hint": "Relier un utilisateur du fournisseur au compte du portail qui a le même e-mail, même quand le fournisseur ne dit pas l'avoir vérifié (Authentik l'omet pour ses propres utilisateurs). À activer seulement si vos membres ne peuvent pas changer leur e-mail chez le fournisseur ; le compte Admin exige toujours un e-mail vérifié.",
+  "members.mfa.title": "Validation en deux étapes",
+  "members.mfa.hint": "Si ce membre a perdu son téléphone et ses codes de secours, désactivez sa validation en deux étapes : il se connecte avec son seul mot de passe et peut la réactiver. Il en est averti.",
+  "members.mfa.submit": "Désactiver sa validation en deux étapes",
+  "members.mfa.done": "La validation en deux étapes est désactivée pour ce membre.",
+  "members.mfa.adminOnly": "L'Admin désactive sa validation en deux étapes depuis son propre compte."
 }

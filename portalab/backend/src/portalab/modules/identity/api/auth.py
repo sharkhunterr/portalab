@@ -23,6 +23,8 @@ from portalab.modules.identity.api.schemas import (
     CredentialsConfirmation,
     LoginRequest,
     Me,
+    MfaCode,
+    MfaRequired,
     OnboardingStep,
     RegisterRequest,
     SessionInfo,
@@ -31,10 +33,12 @@ from portalab.modules.identity.api.schemas import (
 from portalab.modules.identity.models import Credential, Profile, User
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.identity.services.common import UserNotFound, self_actor
+from portalab.modules.identity.services.mfa import CHALLENGE_TTL
 from portalab.modules.identity.services.oidc import PENDING, browser_binding, state_of
 
 log = get_logger("portalab.identity")
 router = APIRouter(prefix="/api/v1", tags=["identity"])
+CHALLENGE_SECONDS = int(CHALLENGE_TTL.total_seconds())
 Module = Annotated[IdentityModule, Depends(identity_module)]
 
 SSO_COOKIE = "__Host-portalab_sso"  # #277: the browser a single sign-on was started in
@@ -51,13 +55,35 @@ def client_ip(request: Request) -> str | None:
 
 
 @router.post(
-    "/auth/login", response_model=SessionInfo, responses={**PROBLEMS, 429: {"description": "auth.throttled"}}
+    "/auth/login",
+    response_model=SessionInfo | MfaRequired,
+    responses={**PROBLEMS, 429: {"description": "auth.throttled"}},
 )
 @public
-async def login(body: LoginRequest, request: Request, response: Response, module: Module) -> SessionInfo:
-    signed_in = await module.auth.sign_in(
-        body.login,
-        body.password,
+async def login(
+    body: LoginRequest, request: Request, response: Response, module: Module
+) -> SessionInfo | MfaRequired:
+    user_id = await module.auth.verify_credentials(body.login, body.password, client_ip=client_ip(request))
+    if await module.mfa.enabled(user_id):  # issue 408: no session before the second factor
+        return MfaRequired(challenge=await module.mfa.challenge(user_id), expires_in=CHALLENGE_SECONDS)
+    return await _open(module, request, response, user_id)
+
+
+@router.post(
+    "/auth/login/mfa",
+    response_model=SessionInfo,
+    responses={**PROBLEMS, 429: {"description": "auth.throttled"}},
+)
+@public
+async def login_mfa(body: MfaCode, request: Request, response: Response, module: Module) -> SessionInfo:
+    """Issue 408: the sign-in's second step — the code of the authenticator app, or a recovery code."""
+    user_id = await module.mfa.finish(body.challenge, body.code)
+    return await _open(module, request, response, user_id)
+
+
+async def _open(module: IdentityModule, request: Request, response: Response, user_id: Any) -> SessionInfo:
+    signed_in = await module.auth.open_session(
+        user_id,
         client_ip=client_ip(request),
         user_agent=request.headers.get("user-agent"),
         previous_token=session_token(request),

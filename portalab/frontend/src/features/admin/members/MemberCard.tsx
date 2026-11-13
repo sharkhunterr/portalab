@@ -28,7 +28,7 @@ import { useQueue } from "../../support/tickets/api";
 import { TicketList } from "../../support/tickets/MyTickets";
 import "../admin.css";
 import { MediaRequestsList } from "../media/RequestsAdmin";
-import { MemberPassword, MemberProfileForm, MemberRoles } from "./MemberEdit";
+import { MemberPassword, MemberProfileForm, MemberRoles, MemberTwoFactor } from "./MemberEdit";
 import { allMembers, InviteLink, MEMBERS_KEY, type Member, MemberActions, STATE_TONE } from "./MembersAdmin";
 import { MemberServiceAccounts } from "./ServiceAccountsPanel";
 
@@ -152,6 +152,7 @@ function ProfileTab({ member }: { member: Member }) {
         />
       </AdminSection>
       <MemberPassword member={member} />
+      <MemberTwoFactor member={member} />
       <MemberRoles member={member} />
     </>
   );

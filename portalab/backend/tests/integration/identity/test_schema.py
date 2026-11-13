@@ -24,6 +24,9 @@ TABLES = {
     "security_blocks",  # 028: the intrusion guard's blocks, kept across restarts
     "external_identities",  # 027: single sign-on accounts linked to members
     "oidc_logins",  # 027: single sign-ons in progress
+    "totp_factors",  # issue 408: the second factor, its recovery codes and the sign-ins waiting on it
+    "recovery_codes",
+    "mfa_challenges",
 }
 
 INSERT_USER = (

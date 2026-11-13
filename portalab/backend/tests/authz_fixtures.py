@@ -13,6 +13,7 @@ from portalab.core.authz_port import Principal
 from portalab.core.blobstore import FileSystemBlobStore
 from portalab.core.db import Database
 from portalab.core.event_port import OutboxEventPublisher
+from portalab.core.secrets import SecretBox
 from portalab.core.time import Clock
 from portalab.modules.authz.grants.service import GrantSpec
 from portalab.modules.authz.module import AuthzModule
@@ -54,6 +55,7 @@ def make_platform(database: Database, blob_root: Path, clock: Clock | None = Non
         authorizer=authz.engine,
         config=IdentityConfig(argon2_params=FAST_ARGON2),
         **({"clock": clock} if clock else {}),  # type: ignore[arg-type]
+        secret_box=SecretBox(b"test-only-identity-key-0123456789abcd"),
     )
     return AuthzPlatform(authz, identity)
 

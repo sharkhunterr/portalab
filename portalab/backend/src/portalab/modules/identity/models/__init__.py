@@ -10,6 +10,7 @@ from typing import Any
 from uuid import UUID
 
 from sqlalchemy import (
+    BigInteger,
     CheckConstraint,
     ForeignKey,
     Index,
@@ -312,3 +313,48 @@ class SecurityBlock(IdentityBase):
     until: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     lifted_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     lifted_by: Mapped[str | None] = mapped_column(String(128))
+
+
+class TotpFactor(IdentityBase):
+    """Issue 408: a member's second factor — a TOTP secret (RFC 6238) kept encrypted, the last time step it
+    accepted (a code is never accepted twice), confirmed once the member typed a first code."""
+
+    __tablename__ = "totp_factors"
+
+    user_id: Mapped[UUID] = mapped_column(ForeignKey(USERS_FK, ondelete="CASCADE"), primary_key=True)
+    secret: Mapped[str] = mapped_column(
+        String(512), nullable=False, info=not_personal("an encrypted second-factor secret")
+    )
+    confirmed_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    last_step: Mapped[int | None] = mapped_column(BigInteger)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class RecoveryCode(IdentityBase):
+    """Issue 408: a one-time code standing in for the second factor (a lost phone) — only its SHA-256 kept."""
+
+    __tablename__ = "recovery_codes"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey(USERS_FK, ondelete="CASCADE"), nullable=False, index=True
+    )
+    code_hash: Mapped[str] = mapped_column(
+        String(64), nullable=False, info=not_personal("SHA-256 of a random recovery code")
+    )
+    used_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class MfaChallenge(IdentityBase):
+    """Issue 408: a sign-in whose password was right and which waits for its second factor — a few minutes,
+    a few attempts, used once; only the SHA-256 of its token kept."""
+
+    __tablename__ = "mfa_challenges"
+
+    token_hash: Mapped[str] = mapped_column(
+        String(64), primary_key=True, info=not_personal("SHA-256 of an opaque challenge token")
+    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey(USERS_FK, ondelete="CASCADE"), nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

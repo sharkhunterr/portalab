@@ -93,6 +93,68 @@ describe("LoginForm", () => {
   });
 });
 
+describe("LoginForm second step (issue 408)", () => {
+  it("asks for the app's code after a right password, and signs in with it", async () => {
+    const asked: { path: string; body: unknown }[] = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (request.method === "POST") asked.push({ path, body: await request.json() });
+      if (path === "/api/v1/auth/login")
+        return json(200, { mfa_required: true, challenge: "c".repeat(43), expires_in: 300 });
+      if (path === "/api/v1/auth/login/mfa") {
+        const { code } = (asked.at(-1)?.body ?? {}) as { code?: string };
+        return code === "123456"
+          ? json(200, { csrf_token: "t", expires_at: "2026-12-01T00:00:00Z" })
+          : json(422, { code: "auth.mfa_code_wrong", title: "x", status: 422 });
+      }
+      return json(404, {});
+    };
+    render(withClient(<LoginForm />));
+    fireEvent.change(screen.getByLabelText("Login"), { target: { value: "ada" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "right" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    const code = await screen.findByLabelText("Code");
+    expect(code).toHaveAttribute("autocomplete", "one-time-code");
+    expect(screen.getByRole("heading", { name: "Two-step verification" })).toBeTruthy();
+
+    fireEvent.change(code, { target: { value: "000000" } });
+    fireEvent.click(screen.getByRole("button", { name: "Verify" }));
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("This code is not right");
+    await waitFor(() => expect(alert).toHaveFocus());
+
+    fireEvent.change(code, { target: { value: " 123456 " } });
+    fireEvent.click(screen.getByRole("button", { name: "Verify" }));
+    await waitFor(() =>
+      expect(asked.at(-1)).toEqual({
+        path: "/api/v1/auth/login/mfa",
+        body: { challenge: "c".repeat(43), code: "123456" },
+      }),
+    );
+  });
+
+  it("goes back to the password when the sign-in waited too long", async () => {
+    fake.handler = (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/auth/login")
+        return json(200, { mfa_required: true, challenge: "c".repeat(43), expires_in: 300 });
+      if (path === "/api/v1/auth/login/mfa")
+        return json(401, { code: "auth.mfa_expired", title: "x", status: 401 });
+      return json(404, {});
+    };
+    render(withClient(<LoginForm />));
+    fireEvent.change(screen.getByLabelText("Login"), { target: { value: "ada" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "right" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    fireEvent.change(await screen.findByLabelText("Code"), { target: { value: "123456" } });
+    fireEvent.click(screen.getByRole("button", { name: "Verify" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("waited too long");
+    expect(screen.getByRole("button", { name: "Verify" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Back to the password" }));
+    expect(await screen.findByLabelText("Password")).toHaveValue("");
+  });
+});
+
 describe("LoginForm terms (issue 157)", () => {
   it("shows no terms link while the administrators do not offer them", async () => {
     fake.handler = () => json(401, { code: "unauthorized", title: "Authentication required", status: 401 });

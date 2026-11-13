@@ -176,6 +176,7 @@ _ALERTS: set["asyncio.Task[None]"] = set()  # alerts on their way (kept until do
 ANONYMOUS_PATHS = frozenset(
     {
         "/api/v1/auth/login",
+        "/api/v1/auth/login/mfa",  # issue 408: the sign-in's second step (no session yet)
         "/api/v1/auth/logout",
         "/api/v1/auth/oidc",
         "/api/v1/auth/oidc/start",
@@ -203,7 +204,10 @@ SETUP_PATHS = frozenset(p for p in ANONYMOUS_PATHS if p.startswith("/api/v1/admi
 # #276: where passwords and accounts are tried — held to their own pace per address, and an address blocked
 # stays blocked there whatever session cookie it shows
 SIGN_IN_PATHS = (
-    frozenset({"/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/verify"}) | SETUP_PATHS
+    frozenset(
+        {"/api/v1/auth/login", "/api/v1/auth/login/mfa", "/api/v1/auth/register", "/api/v1/auth/verify"}
+    )
+    | SETUP_PATHS
 )
 ANONYMOUS_PREFIXES = (
     "/api/v1/media/remote/",  # a casting device's stream, by its ticket

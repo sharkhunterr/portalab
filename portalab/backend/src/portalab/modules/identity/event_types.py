@@ -23,6 +23,7 @@ register_event_types(
     "user.tour_completed",  # #7: a guided tour seen to its end (its ``tour``), once — discovery missions
     "user.password_changed",  # issue 407: by the member (« self ») or an administrator (« admin »)
     "user.sso_linked",  # issue 407: a provider account now signs in as this member
+    "user.mfa_changed",  # issue 408: the second factor turned on, off, or lifted by an administrator
     retention_class="business",
     visibility_class="private",
 )

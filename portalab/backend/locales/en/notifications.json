@@ -826,5 +826,8 @@
   "account.sso_linked.body": "From now on you can sign in with {provider}. If you did not do it, contact the portal's team at once.",
   "account.sso_linked.fact.occurred_at": "When",
   "account.blocked": "Your account is blocked for {minutes, plural, one {# minute} other {# minutes}}",
-  "account.blocked.body": "Requests from your account looked like an intrusion attempt, so its sessions were signed out. It opens again by itself; if this was not you, change your password afterwards."
+  "account.blocked.body": "Requests from your account looked like an intrusion attempt, so its sessions were signed out. It opens again by itself; if this was not you, change your password afterwards.",
+  "account.mfa_changed": "{by, select, on {Two-factor authentication is on} admin {An administrator turned your two-factor authentication off} other {Two-factor authentication is off}}",
+  "account.mfa_changed.body": "{by, select, on {Signing in now also asks for a code from your authenticator app. Keep your recovery codes somewhere safe.} admin {You sign in with your password alone again; turn it back on from your account. If you did not ask for it, contact the portal's team at once.} other {You sign in with your password alone. If you did not do it, change your password and contact the portal's team at once.}}",
+  "account.mfa_changed.fact.occurred_at": "When"
 }
