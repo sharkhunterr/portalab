@@ -309,6 +309,7 @@ describe("admin screens", () => {
     expect((progress.arrival as { finished_at?: string }).finished_at).toBeTruthy();
   }, 20_000); // many screens, each checked by axe
   it("version page (issue 247): what runs here, and the reset only once the portal's name is typed", async () => {
+    let checks = 0;
     fake.handler = (request) => {
       const path = new URL(request.url).pathname;
       if (path === "/api/v1/auth/site") return json(200, { name: "Xenoportal" });
@@ -320,11 +321,48 @@ describe("admin screens", () => {
           database: "PostgreSQL 16.14",
           started_at: "2026-10-25T09:00:00Z",
           schema: [{ module: "identity", revision: "identity_0007" }],
+          build: { commit: "4d0c91c7268097ee41665e209742689a68cef054", date: "2026-11-13T17:40:00Z" },
+          update: {
+            enabled: true,
+            current: "0.1.0",
+            latest: "0.2.0",
+            update_available: true,
+            url: "https://github.com/sharkhunterr/portalab/releases/tag/v0.2.0",
+            checked_at: "2026-11-13T18:00:00Z",
+            error: null,
+          },
+          security: [
+            { key: "transport", level: "warn", values: {}, setting: null },
+            { key: "mfa", level: "warn", values: { own: false, members: 2 }, setting: null },
+            { key: "egress", level: "info", values: {}, setting: "security.egress.enabled" },
+            { key: "backup", level: "ok", values: { days: 1 }, setting: null },
+          ],
         });
+      if (path === "/api/v1/admin/system/version/check") {
+        checks += 1;
+        return json(200, { enabled: true, current: "0.1.0", latest: "0.1.0", update_available: false });
+      }
       return json(200, {});
     };
     const { container } = render(withClient(<MemoryRouter>{<SystemVersion />}</MemoryRouter>));
     expect(await screen.findByText("0.1.0")).toBeInTheDocument();
+    // issue 410: the build, a newer release with its notes, the security posture with what to do
+    expect(screen.getByText("4d0c91c7")).toBeInTheDocument();
+    expect(screen.getByText(/0\.2\.0|update\.available/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /What's new|update\.notes/ })).toHaveAttribute(
+      "href",
+      "https://github.com/sharkhunterr/portalab/releases/tag/v0.2.0",
+    );
+    expect(screen.getByText(/plain HTTP|transport\.warn/)).toBeInTheDocument();
+    expect(screen.getByText(/2 members use it|mfa\.warn/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Change the setting|security\.change/ })).toHaveAttribute(
+      "href",
+      "/admin/configuration?q=security.egress.enabled",
+    );
+    await expectAccessible(container);
+    fireEvent.click(screen.getByRole("button", { name: /Check now|update\.check/ }));
+    expect(await screen.findByText(/Up to date|update\.upToDate/)).toBeInTheDocument();
+    expect(checks).toBe(1);
     fireEvent.click(screen.getByText("Show the module"));
     expect(screen.getByText("identity_0007")).toBeInTheDocument();
     const go = screen.getByRole("button", { name: /Erase everything/ });

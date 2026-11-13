@@ -16,6 +16,8 @@ def declare_admin_settings(catalog: SettingCatalog = default_catalog) -> None:
         ("admin.overviewPanelTimeoutMs", int, 1500, "Time budget of each Control Center panel."),
         # issue 6: the setup assistant — the step it is at, the steps done or skipped, when it was finished
         ("admin.setup.progress", dict[str, Any], {}, "Setup assistant: {step, done, skipped, finished_at}."),
+        # issue 410: GitHub's public releases API asked, twice a day at most, whether a newer Portalab is out
+        ("admin.updateCheck", bool, True, "Check on GitHub whether a newer Portalab is released."),
     ):
         if key not in known:
             declare(

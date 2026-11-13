@@ -38646,7 +38646,7 @@
     },
     "/api/v1/admin/system/version": {
       "get": {
-        "description": "Which Portalab this is: its version, its archives' layout, each module's schema, the database.",
+        "description": "Which Portalab this is: its version and build, whether a newer one is released (issue 410), its\narchives' layout, each module's schema, the database \u2014 and the portal's security posture.",
         "operationId": "system_version_api_v1_admin_system_version_get",
         "responses": {
           "200": {
@@ -38663,6 +38663,30 @@
           }
         },
         "summary": "System Version",
+        "tags": [
+          "administration"
+        ]
+      }
+    },
+    "/api/v1/admin/system/version/check": {
+      "post": {
+        "description": "Issue 410: ask GitHub now whether a newer Portalab is released.",
+        "operationId": "check_for_update_api_v1_admin_system_version_check_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Check For Update Api V1 Admin System Version Check Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Check For Update",
         "tags": [
           "administration"
         ]

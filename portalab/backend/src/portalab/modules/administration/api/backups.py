@@ -3,18 +3,22 @@
 the portal up (then the same answer as any address), its progress until the restore is over."""
 
 import platform
+from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import text
 
 from portalab.core.authorization import public, require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import Unauthorized, Unavailable, ValidationFailed
+from portalab.modules.administration import system_info
 from portalab.modules.administration.api.routes import MANAGE, Module
 from portalab.modules.administration.backup.archive import FORMAT, Options
 from portalab.modules.administration.backup.service import BackupService
+from portalab.modules.administration.system_info import SETTING, build, posture
 
 router = APIRouter(prefix="/api/v1", tags=["administration"])
 Manager = Annotated[Principal, require(MANAGE)]
@@ -77,20 +81,81 @@ async def delete_backup(principal: Manager, name: str, module: Module) -> Respon
 
 # --- the portal's version, and starting again from scratch -------------------------------------------------
 @router.get("/admin/system/version")
-async def system_version(_: Manager, module: Module) -> dict[str, Any]:
-    """Which Portalab this is: its version, its archives' layout, each module's schema, the database."""
+async def system_version(principal: Manager, request: Request, module: Module) -> dict[str, Any]:
+    """Which Portalab this is: its version and build, whether a newer one is released (issue 410), its
+    archives' layout, each module's schema, the database — and the portal's security posture."""
     service = _backups(module)
     heads = sorted(await service.versions.current())
     async with service.database.engine.connect() as conn:
         database = str((await conn.exec_driver_sql("SHOW server_version")).scalar())
     return {
         "portalab": service.portalab,
+        "build": build(),
+        "update": await _update(module, service.portalab, force=False),
         "archive_format": FORMAT,
         "python": platform.python_version(),
         "database": f"PostgreSQL {database}",
         "started_at": service.started_at,
         "schema": [{"module": head.rsplit("_", 1)[0], "revision": head} for head in heads],
+        "security": await _posture(principal, request, module, service),
     }
+
+
+@router.post("/admin/system/version/check")
+async def check_for_update(_: Manager, module: Module) -> dict[str, Any]:
+    """Issue 410: ask GitHub now whether a newer Portalab is released."""
+    service = _backups(module)
+    return await _update(module, service.portalab, force=True)
+
+
+async def _update(module: Any, current: str, *, force: bool) -> dict[str, Any]:
+    try:
+        enabled = bool((await module.config.get(SETTING)).value)
+    except Exception:
+        enabled = True
+    if not enabled:
+        return {"enabled": False, "current": current}
+    return (await system_info.UPDATES.get(force=force)).as_dict(current)
+
+
+async def _posture(
+    principal: Principal, request: Request, module: Any, service: BackupService
+) -> list[dict[str, Any]]:
+    async def read(key: str) -> Any:
+        return (await module.config.get(key)).value
+
+    own_mfa: bool | None = None
+    members: int | None = None
+    try:  # the identity module's second factors, counted (no member named)
+        async with service.database.session() as session:
+            members = int(
+                await session.scalar(
+                    text("SELECT count(*) FROM identity.totp_factors WHERE confirmed_at IS NOT NULL")
+                )
+                or 0
+            )
+            if principal.user_id is not None:
+                own_mfa = bool(
+                    await session.scalar(
+                        text(
+                            "SELECT 1 FROM identity.totp_factors"
+                            " WHERE user_id = :me AND confirmed_at IS NOT NULL"
+                        ),
+                        {"me": principal.user_id},
+                    )
+                )
+    except Exception:
+        own_mfa = members = None
+    archives = service.archives()
+    last = datetime.fromisoformat(archives[0]["modified_at"]) if archives else None
+    return await posture(
+        read,
+        https=request.url.scheme == "https",
+        own_mfa=own_mfa,
+        mfa_members=members,
+        last_backup=last,
+        now=datetime.now(UTC),
+    )
 
 
 @router.post("/admin/system/reset", status_code=status.HTTP_202_ACCEPTED)

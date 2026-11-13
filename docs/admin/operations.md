@@ -100,6 +100,10 @@ The API also offers a configuration-only export (`/api/v1/admin/config/export`):
 
 **Administration › Version** shows which Portalab is running: version, revision, database, archive layout, how long it has been running, and the schema of each module (each module's last migration, which is what a backup records).
 
+- **Latest release**: whether a newer Portalab is out, with a link to its release notes and **Check now**. Portalab asks GitHub's public releases page for this, twice a day at most; nothing about your portal is sent. Turn it off with *Check for new versions* in *Administration › Configuration* (Security & data). With the outbound allow-list on, `api.github.com` is already allowed for it.
+- **Build**: the commit and date the image was built from (empty when Portalab runs from the source).
+- **Security**: how the portal is protected and what to do where it could be safer — reached over HTTPS or plain HTTP, your own two-step verification and how many members use it, the password length, the single sign-on's e-mail trust, the outbound allow-list, the `/metrics` token, TLS for e-mails, and the last backup. Each point that can be improved links to its setting.
+
 The same page can **reset the portal**: it erases the members and their accounts, the settings, the services, the content, play, the history and the files, and keeps only the backups. You confirm with your password and by typing the portal's name. The portal then restarts on its arrival wizard, for a new installation or the import of a backup. Save the portal first.
 
 ## Incidents and maintenance

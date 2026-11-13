@@ -11,6 +11,10 @@
     "advanced": true,
     "group": "general"
   },
+  "admin.updateCheck": {
+    "advanced": false,
+    "group": "security"
+  },
   "ai.autoNavigate": {
     "advanced": false,
     "group": "ai"

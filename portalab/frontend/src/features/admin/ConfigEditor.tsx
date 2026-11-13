@@ -330,7 +330,8 @@ export function useSettings() {
 
 export function ConfigEditor() {
   const t = useT();
-  const [query, setQuery] = useState("");
+  // issue 410: a setting asked in the address (« ?q=admin.updateCheck » from the Version page)
+  const [query, setQuery] = useState(() => new URLSearchParams(window.location.search).get("q") ?? "");
   // issue 321: the area asked in the address (« ?area=communication » from Newsletters & e-mail)
   const [tab, setTab] = useState<string>(() => {
     const asked = new URLSearchParams(window.location.search).get("area");

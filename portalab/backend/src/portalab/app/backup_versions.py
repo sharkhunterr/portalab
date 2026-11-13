@@ -10,9 +10,9 @@
 
 import asyncio
 from collections.abc import Awaitable, Callable, Iterable
-from importlib.metadata import PackageNotFoundError, version
 from typing import Literal
 
+import portalab
 from portalab.app.migrations import current_heads, script, upgrade
 from portalab.core.db import Database
 from portalab.modules.administration.backup.archive import ResetStep
@@ -21,10 +21,8 @@ Compatibility = Literal["same", "older", "newer"]
 
 
 def portalab_version() -> str:
-    try:
-        return version("portalab")
-    except PackageNotFoundError:
-        return "unknown"
+    # the source's own version — the installed package's metadata lags behind in a dev venv not re-synced
+    return portalab.__version__
 
 
 class SchemaVersions:
