@@ -488,7 +488,7 @@ class ServicesSummaryProvider:
         counts: dict[str, int] = {}
         for row in rows:
             counts[row["state"]] = counts.get(row["state"], 0) + 1
-        shown = [r for r in rows if config.get("show") != "problems" or r["state"] not in ("operational",)]
+        shown = [r for r in rows if config.get("show") != "problems" or r["state"] != "operational"]
         oldest = min((r["as_of"] for r in rows if r["as_of"] is not None), default=None)
         unknown = [r["name"] for r in rows if r["state"] == "unknown"]
         items = [

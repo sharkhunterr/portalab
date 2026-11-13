@@ -330,7 +330,7 @@ async def product_detail(principal: Reader, key: str, module: Module) -> Marketp
     product, version = await module.catalog.get(key)
     user = _me(principal)
     mine = await owned_ids(module, user)
-    if product.state in ("draft",) or (product.state == "archived" and product.id not in mine):
+    if product.state == "draft" or (product.state == "archived" and product.id not in mine):
         raise ProductNotFound("This product does not exist.")
     stock = await module.availability.stock([product])
     discounts = await active_discounts(module.capabilities, utc_now(module.clock))

@@ -43,9 +43,9 @@ TEXT_MIN = 4.5
 LARGE_OR_UI_MIN = 3.0
 CRITICAL_MIN_OPACITY = 0.9
 
-_HEX = re.compile(r"^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$", re.I)
+_HEX = re.compile(r"^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$", re.IGNORECASE)
 _RGB = re.compile(
-    r"^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(0|1|0?\.\d+))?\s*\)$", re.I
+    r"^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(0|1|0?\.\d+))?\s*\)$", re.IGNORECASE
 )
 
 Color = Annotated[str, StringConstraints(max_length=64)]

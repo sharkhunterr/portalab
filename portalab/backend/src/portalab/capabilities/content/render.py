@@ -117,7 +117,7 @@ def _safe_href(href: str) -> str | None:
     lowered = value.lower()
     if lowered.startswith("//") or "\\" in lowered:
         return None  # protocol-relative or backslash tricks: never a relative path
-    if lowered.startswith(REF_SCHEME) or lowered.startswith(("http://", "https://", "mailto:")):
+    if lowered.startswith((REF_SCHEME, "http://", "https://", "mailto:")):
         return value
     if lowered.startswith(("/", "#", "?")) and not lowered.startswith("//"):
         return value
@@ -323,7 +323,7 @@ async def render_markdown_async(source: str, *, allow_external_images: bool = Fa
     )
 
 
-_HEADING = re.compile(r'<h([1-6]) id="(h-[a-z0-9-]+)">(.*?)</h\1>', re.S)
+_HEADING = re.compile(r'<h([1-6]) id="(h-[a-z0-9-]+)">(.*?)</h\1>', re.DOTALL)
 _TAG = re.compile(r"<[^>]*>")
 
 

@@ -4,10 +4,7 @@ import type { components } from "../../../api/generated/schema";
 
 /** #20, #21: listening to an audiobook and reading a book in the portal. */
 export type ListenInfo = components["schemas"]["ListenOut"];
-export type AudioInfo = components["schemas"]["AudioItemOut"];
 export type AudioChapter = components["schemas"]["AudioChapterOut"];
-export type AudioTrack = components["schemas"]["AudioTrackOut"];
-export type ReadInfo = components["schemas"]["ReadOut"];
 export type BookFormat = components["schemas"]["BookFormatOut"];
 export type ReadingPosition = components["schemas"]["ReadingPositionOut"];
 export type SessionState = "playing" | "paused" | "stopped" | "finished";

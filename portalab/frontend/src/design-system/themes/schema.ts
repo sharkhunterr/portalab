@@ -323,7 +323,6 @@ export const themeDefinitionSchema = z.strictObject({
 });
 
 export type ThemeDefinition = z.infer<typeof themeDefinitionSchema>;
-export type ThemeLayout = z.infer<typeof layoutSchema>;
 
 /** Every layout/motion choice resolved — v1 documents and partial v2 documents get the defaults. */
 export interface ResolvedPresentation {

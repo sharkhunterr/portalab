@@ -25,7 +25,6 @@ import {
   useEconomy,
   useInventory,
   useLedger,
-  useMembers,
   useNameOf,
   type Value,
 } from "./api";
@@ -43,71 +42,6 @@ interface Ask {
 
 const LIVE = ["active", "needs_configuration", "activation_failed", "locked"];
 const VALUES: Value[] = ["coins", "xp", "contribution"];
-
-/**
- * #98 — one member at a time: their balances, Coins (or XP, Contribution) given or taken back, an item
- * given, their inventory (an item taken back, or taken out of the history altogether) and their history
- * (an entry cancelled). Every action asks for a reason; the sensitive ones a confirmation.
- */
-export function Members({ selected, onSelect }: { selected: string | null; onSelect: (id: string) => void }) {
-  const t = useT();
-  const members = useMembers();
-  const economy = useEconomy(30);
-  const [query, setQuery] = useState("");
-  const balances = new Map((economy.data?.holders ?? []).map((h) => [h.user_id, h]));
-  const needle = query.trim().toLowerCase();
-  const list = (members.data ?? []).filter(
-    (m) =>
-      !needle ||
-      m.login.toLowerCase().includes(needle) ||
-      (m.display_name ?? "").toLowerCase().includes(needle),
-  );
-  return (
-    <div className="mk-members">
-      <AdminSection title={t("marketplace:shopadmin.members")} icon="users" flush>
-        <div className="mk-members__search">
-          <SearchBox value={query} onChange={setQuery} label={t("marketplace:shopadmin.findMember")} />
-        </div>
-        <ul className="mk-members__list">
-          {list.map((member) => {
-            const balance = balances.get(member.id);
-            return (
-              <li key={member.id}>
-                <button
-                  type="button"
-                  aria-pressed={selected === member.id}
-                  onClick={() => onSelect(member.id)}
-                  className="mk-members__item"
-                >
-                  <Icon name="user" size={18} />
-                  <span className="mk-members__name">
-                    <strong>{member.display_name ?? member.login}</strong>
-                    <small>
-                      {t("marketplace:shopadmin.levelShort", { level: balance?.level ?? 1 })} ·{" "}
-                      {t("marketplace:shopadmin.coins", { count: balance?.coins ?? 0 })}
-                    </small>
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </AdminSection>
-      {selected ? (
-        <MemberConsole
-          key={selected}
-          userId={selected}
-          name={(() => {
-            const m = (members.data ?? []).find((x) => x.id === selected);
-            return m ? (m.display_name ?? m.login) : selected.slice(0, 8);
-          })()}
-        />
-      ) : (
-        <AdminEmpty icon="user" title={t("marketplace:shopadmin.pickMember")} />
-      )}
-    </div>
-  );
-}
 
 /**
  * One member's console — in the shop console under its member picker, and as the « Economy » tab of the

@@ -58,8 +58,10 @@ target-version = "py312"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP", "S", "ASYNC", "RUF", "SIM", "PTH", "DTZ"]
-ignore = ["S101"]
+# issue 397: RET, PIE, FURB, PERF too — but loops are not forced into comprehensions (PERF401/403: a marginal
+# gain, often less readable)
+select = ["E", "F", "W", "I", "B", "UP", "S", "ASYNC", "RUF", "SIM", "PTH", "DTZ", "RET", "PIE", "FURB", "PERF"]
+ignore = ["S101", "PERF401", "PERF403"]
 
 [tool.ruff.lint.flake8-bugbear]
 # FastAPI dependency markers are immutable declarations, not calls evaluated per request

@@ -12,8 +12,7 @@ pytestmark = pytest.mark.integration
 
 async def _running(cm: CampHarness) -> Occurrence:
     async with cm.database.session() as session:
-        found = (await session.execute(select(Occurrence).where(Occurrence.status == "active"))).scalar_one()
-        return found
+        return (await session.execute(select(Occurrence).where(Occurrence.status == "active"))).scalar_one()
 
 
 async def test_a_moved_end_applies_to_the_running_period(cm: CampHarness) -> None:

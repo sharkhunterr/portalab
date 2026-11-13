@@ -42,7 +42,7 @@ def next_fire(trigger: Trigger, after: datetime) -> datetime | None:
     schedule = trigger.schedule
     at_time = time.fromisoformat(schedule.time)
     day = after.astimezone(zone).date()
-    for offset in range(0, 400):
+    for offset in range(400):
         candidate = day + timedelta(days=offset)
         if schedule.frequency == "weekly" and candidate.weekday() != schedule.weekday:
             continue

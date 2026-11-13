@@ -804,5 +804,3 @@ export function useArrivalSlides(features: Selection): Slide[] {
     [features, t],
   );
 }
-
-export default ArrivalWizard;

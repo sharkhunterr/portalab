@@ -8,7 +8,6 @@ export type DashboardOut = components["schemas"]["DashboardOut"];
 export type Instance = components["schemas"]["DashboardInstanceOut"];
 export type CatalogEntry = components["schemas"]["CatalogEntryOut"];
 export type WidgetPayload = components["schemas"]["WidgetPayloadOut"];
-export type SummaryOut = components["schemas"]["SummaryOut"];
 
 export const DASHBOARD_KEY = ["dashboard"] as const;
 
@@ -40,14 +39,6 @@ export function useWidgetData(key: string, instance: string | null, intervalS: n
     retry: false,
     staleTime: 30_000,
     ...(intervalS ? { refetchInterval: intervalS * 1000 } : {}),
-  });
-}
-
-export function useSummary() {
-  return useQuery({
-    queryKey: ["dashboard", "summary"],
-    queryFn: async () => (await api.GET("/api/v1/dashboard/since-last-login")).data as SummaryOut,
-    retry: false,
   });
 }
 

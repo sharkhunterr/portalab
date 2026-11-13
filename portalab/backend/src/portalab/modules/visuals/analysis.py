@@ -362,7 +362,7 @@ def _step(char: str) -> int:
 def selectors_of(text: str) -> list[str]:
     """The selectors of a stylesheet (comments, keyframes and font faces left out; the rules inside
     @media/@supports/@container/@layer kept), each one alone (commas inside parentheses respected)."""
-    body = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    body = re.sub(r"/\*.*?\*/", "", text, flags=re.DOTALL)
     body = re.sub(
         r"@(font-face|(-webkit-)?keyframes|property|counter-style)[^{]*\{(?:[^{}]|\{[^{}]*\})*\}", "", body
     )
@@ -382,7 +382,7 @@ def selectors_of(text: str) -> list[str]:
 # a sibling combinator (``~``, ``+`` — not the attribute operator ``~=``), :has(), the document's root
 ESCAPES = re.compile(r"\+|~(?!=)|:has\(|:root|(?:^|[\s>(,])(?:html|body)\b")
 # the An+B formula of ``:nth-child(3n + 1)``… is not a combinator (its ``of S`` part is still checked)
-NTH = re.compile(r":nth-[a-z-]+\(\s*(?:[-+]?\d*n\s*(?:[-+]\s*\d+)?|[-+]?\d+|odd|even)\s*", re.I)
+NTH = re.compile(r":nth-[a-z-]+\(\s*(?:[-+]?\d*n\s*(?:[-+]\s*\d+)?|[-+]?\d+|odd|even)\s*", re.IGNORECASE)
 
 
 def _first_compound(selector: str) -> str:
@@ -426,7 +426,7 @@ def _css(report: Report, key: str, element: Element, name: str, text: str) -> No
     if re.search(r"@import\b", text):
         report.add("blocking", "css.import", key, file=name)
     for address in re.findall(r"url\(\s*['\"]?([^'\")]+)", text):
-        if re.match(r"^((https?|ftp|javascript|file):|//)", address.strip(), re.I):
+        if re.match(r"^((https?|ftp|javascript|file):|//)", address.strip(), re.IGNORECASE):
             report.add("blocking", "css.external_url", key, file=name, url=address.strip()[:120])
     if re.search(r"position\s*:\s*fixed", text):
         report.add("info", "css.fixed", key, file=name)
@@ -576,7 +576,7 @@ def _widget_option(report: Report, key: str, element: Element, widgets: Mapping[
 
 def _redeclared(source: str) -> set[str]:
     """The given names a body declares again at its own level (outside any block of its own)."""
-    text = re.sub(r"//[^\n]*|/\*.*?\*/", "", source, flags=re.S)
+    text = re.sub(r"//[^\n]*|/\*.*?\*/", "", source, flags=re.DOTALL)
     text = re.sub(r"\bfor\s*\([^)]*\)", "for", text)  # a loop's own counter is its own
     found: set[str] = set()
     depth = 0
@@ -596,7 +596,7 @@ def _js(report: Report, key: str, source: str) -> None:
     report.add("info", "js.sandboxed", key)
     if not re.search(r"\bexport\s+default\b", source):
         report.add("blocking", "js.no_export", key)
-    if re.search(r"^\s*import\s.+\sfrom\s|^\s*import\s*['\"]", source, re.M):
+    if re.search(r"^\s*import\s.+\sfrom\s|^\s*import\s*['\"]", source, re.MULTILINE):
         report.add("blocking", "js.static_import", key)
     if NETWORK.search(source):
         report.add("info", "js.network", key, calls=sorted(set(NETWORK.findall(source))))
@@ -663,7 +663,7 @@ def _economy(report: Report, key: str, element: Element) -> None:
     if not economy.sold:
         report.add("info", "economy.given", key)  # 028: offered to everyone, never a shop product
         return
-    if economy.price is None and element.type not in ("bundle",):
+    if economy.price is None and element.type != "bundle":
         report.add("info", "economy.reward_only", key)
     low, high = USUAL_PRICES[economy.rarity]
     if economy.price is not None and not low <= economy.price <= high and element.type != "bundle":

@@ -951,7 +951,7 @@ class VisualPacks:
             ).all()
             if not rows:
                 return None
-            _, pack_id, version, scene = sorted(rows, key=lambda r: keys.index(r[0]))[0]
+            _, pack_id, version, scene = min(rows, key=lambda r: keys.index(r[0]))
             by_folder = {
                 e.folder.removeprefix("elements/"): e for e in await self._elements(session, version.id)
             }

@@ -44,8 +44,7 @@ class ConfinedPortal(_Part):
         args: dict[str, Any] = {"operation": operation, "params": dict(params or {})}
         if member is not None:
             args["member_id"] = str(getattr(member, "user_id", member))
-        answer = await self._wire.ask("portal.call", args)
-        return answer
+        return await self._wire.ask("portal.call", args)
 
 
 class HttpResponse:

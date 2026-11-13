@@ -55,15 +55,6 @@ export function useDiscoveries(limit = 12) {
   });
 }
 
-export function useDeck(limit = 12) {
-  return useQuery({
-    queryKey: [...KEY, "deck", limit],
-    staleTime: Number.POSITIVE_INFINITY, // a new deck only when this one is through
-    queryFn: async () =>
-      (await api.GET("/api/v1/me/media/taste/deck", { params: { query: { limit } } })).data?.items ?? [],
-  });
-}
-
 export function useTasteProfile() {
   return useQuery({
     queryKey: [...KEY, "profile"],

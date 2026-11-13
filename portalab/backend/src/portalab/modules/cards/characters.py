@@ -28,7 +28,7 @@ log = get_logger("portalab.cards")
 
 def norm(text: str | None) -> str:
     """A name as compared: no accents, no case, no punctuation, no « (voice) »."""
-    text = re.sub(r"\((voice|voix|uncredited)\)", " ", text or "", flags=re.I)
+    text = re.sub(r"\((voice|voix|uncredited)\)", " ", text or "", flags=re.IGNORECASE)
     plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
     return " ".join(re.findall(r"[a-z0-9]+", plain))
 

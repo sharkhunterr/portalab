@@ -50,11 +50,6 @@ export function setSafeMode(on: boolean): void {
   for (const listener of listeners) listener();
 }
 
-export function subscribeSafeMode(listener: () => void): () => void {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
-
 /** ``?safe=1`` / ``?safe=0`` on the address: applied once at start, then removed from the address. */
 export function applySafeModeFromAddress(): void {
   if (typeof window === "undefined") return;

@@ -493,8 +493,7 @@ async def put_category(principal: CategoryManager, body: NewsCategoryIn, module:
             row.name, row.position, row.enabled = body.name, body.position, body.enabled
         row.description, row.icon, row.newsletter = body.description, body.icon, body.newsletter
         await uow.session.flush()
-        out = _category_out(row)
-    return out
+        return _category_out(row)
 
 
 # --- newsletters (027) -----------------------------------------------------------------------------------

@@ -5,10 +5,7 @@ import type { components } from "../../../api/generated/schema";
 /** Support tickets, feedback and definitions API hooks (spec 016 Slice B). */
 export type TicketCard = components["schemas"]["TicketCard"];
 export type TicketDetail = components["schemas"]["TicketDetail"];
-export type TicketType = components["schemas"]["TicketTypeOut"];
 export type TicketCreate = components["schemas"]["TicketCreateIn"];
-export type FeedbackForm = components["schemas"]["FeedbackFormOut"];
-export type FeedbackItem = components["schemas"]["FeedbackOut"];
 export type FeedbackDetail = components["schemas"]["FeedbackDetail"];
 export interface FieldDef {
   key: string;
@@ -138,28 +135,6 @@ export function useTicketActions(id: string) {
       onSettled: settle,
     }),
   };
-}
-
-export function useFeedbackForms() {
-  return useQuery({
-    queryKey: [...KEY, "forms"],
-    queryFn: async () => (await api.GET("/api/v1/feedback/forms")).data ?? [],
-  });
-}
-
-export function useSubmitFeedback() {
-  return useMutation({
-    mutationFn: async (body: { form_key: string; values: Record<string, unknown> }) =>
-      (await api.POST("/api/v1/feedback", { body })).data,
-  });
-}
-
-export function useFeedbackQueue() {
-  return useQuery({
-    queryKey: [...KEY, "feedback"],
-    retry: false,
-    queryFn: async () => (await api.GET("/api/v1/support/feedback")).data ?? [],
-  });
 }
 
 export function useFeedbackDetail(id: string) {
