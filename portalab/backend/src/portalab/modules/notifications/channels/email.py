@@ -8,9 +8,11 @@ keeps a hash); bodies are removed once sent; errors are recorded as error classe
 import asyncio
 from collections import defaultdict
 from collections.abc import Awaitable, Callable
+from dataclasses import replace
 from datetime import datetime, timedelta
 from email.headerregistry import Address
 from email.message import EmailMessage as MimeMessage
+from email.message import MIMEPart
 from typing import Any
 from uuid import UUID
 
@@ -19,13 +21,14 @@ from sqlalchemy import delete, select
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.i18n import RENDERER, RESOLVER, TIME, LocaleContext
 from portalab.capabilities.identity_directory import CONTACT
-from portalab.capabilities.notifications import EmailMessage, EmailTransport
+from portalab.capabilities.notifications import EMAIL_IMAGES, EmailMessage, EmailTransport
 from portalab.capabilities.notifications.layout import button, code, dress, items_list, paragraphs, site_brand
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.queue import enqueue
 from portalab.core.time import Clock, utc_now
+from portalab.modules.notifications.channels.inline import embed
 from portalab.modules.notifications.channels.look import brand, words
 from portalab.modules.notifications.models import Communication, Delivery, DigestState, EmailOutbox
 from portalab.modules.notifications.observability import log, metrics
@@ -73,6 +76,13 @@ class SmtpTransport:
         mime.set_content(message.text)
         if message.html:
             mime.add_alternative(message.html, subtype="html")
+            page = mime.get_body(("html",))
+            if message.inline and isinstance(page, MIMEPart):
+                for image in message.inline:  # issue 411: the pictures, with the HTML (multipart/related)
+                    maintype, subtype = image.mime.split("/", 1)
+                    page.add_related(
+                        image.data, maintype, subtype, cid=f"<{image.cid}>", disposition="inline"
+                    )
         password = await self.password()
         await aiosmtplib.send(
             mime,
@@ -130,6 +140,17 @@ class EmailChannel:
         """#339: the name the e-mails come from — the one set, else the site's own name."""
         return self.config().email_from_name.strip() or (await site_brand(self._provider, "", "en")).name
 
+    async def with_pictures(self, message: EmailMessage, reader: UUID | None) -> EmailMessage:
+        """Issue 411: the portal's own pictures carried in the e-mail (a mail client may not reach them)."""
+        if not message.html:
+            return message
+        try:
+            sources = [p.provider for p in self.capabilities.system_providers(EMAIL_IMAGES)]
+        except Exception:
+            return message
+        body, images = await embed(message.html, self.config().portal_url, sources, reader)
+        return replace(message, html=body, inline=images) if images else message
+
     async def address(self, user: UUID) -> str | None:
         contact = self._provider(CONTACT)
         return await contact.email_of(user) if contact is not None else None
@@ -148,12 +169,10 @@ class EmailChannel:
             await self._finish(delivery_id, "suppressed", reason="no_address")
             return
         try:
-            await asyncio.wait_for(
-                self.transport.send(
-                    EmailMessage(address, outbox.subject, outbox.body_text, outbox.body_html)
-                ),
-                timeout=30,
+            message = await self.with_pictures(
+                EmailMessage(address, outbox.subject, outbox.body_text, outbox.body_html), delivery.user_id
             )
+            await asyncio.wait_for(self.transport.send(message), timeout=30)
         except Exception as exc:
             await self._failed_attempt(delivery_id, type(exc).__name__, now)
             return

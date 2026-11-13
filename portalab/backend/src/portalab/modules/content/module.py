@@ -1,12 +1,15 @@
 """Content helper module facade (spec 011): assets, link resolution, render preview."""
 
 from dataclasses import replace
+from typing import Any
+from uuid import UUID
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.content import LinkResolverRegistry, default_link_resolvers
+from portalab.capabilities.notifications import EMAIL_IMAGES
 from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
-from portalab.core.authz_port import Authorizer
+from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.blobstore import BlobStore
 from portalab.core.db import Database
 from portalab.core.logging import get_logger
@@ -50,6 +53,11 @@ class ContentModule:
             self.capabilities.provide(
                 ERASURE_CAPABILITY, _Participant(self.service), instance_ref="content", owner=OWNER
             )
+        if not any(p.instance_ref == "content" for p in self.capabilities.system_providers(EMAIL_IMAGES)):
+            # issue 411: an article's pictures travel in the e-mail that carries it — read as its recipient
+            self.capabilities.provide(
+                EMAIL_IMAGES, _EmailPictures(self.service), instance_ref="content", owner=OWNER
+            )
 
     async def refresh_config(self) -> None:
         try:
@@ -61,3 +69,25 @@ class ContentModule:
                 self.config = replace(self.config, **values)
         except Exception:
             log.warning("content configuration not refreshed")
+
+
+class _EmailPictures:
+    """Issue 411: « /api/v1/content/assets/<id> » for an e-mail's recipient — only what they may see."""
+
+    prefix = "/api/v1/content/assets/"
+
+    def __init__(self, service: Any) -> None:
+        self.service = service
+
+    async def image(self, path: str, reader: UUID | None) -> bytes | None:
+        if reader is None:
+            return None
+        try:
+            asset = UUID(path)
+        except ValueError:
+            return None
+        try:
+            data, content_type = await self.service.read(asset, Principal(user_id=reader))
+        except Exception:
+            return None
+        return bytes(data) if str(content_type).startswith("image/") else None

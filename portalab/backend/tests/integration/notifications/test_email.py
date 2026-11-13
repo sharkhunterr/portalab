@@ -191,3 +191,91 @@ async def test_members_email_switched_off_but_the_administrators(
     assert (
         await client.put("/api/v1/admin/notifications/members/email", json={"enabled": True})
     ).status_code == 403
+
+
+async def test_smtp_carries_the_pictures_inline() -> None:
+    """Issue 411: the pictures travel with the HTML — multipart/alternative > multipart/related, each one
+    inline with the Content-ID the HTML shows."""
+    from portalab.capabilities.notifications import InlineImage
+
+    sink = Sink()
+    with socket.socket() as probe:
+        probe.bind(("127.0.0.1", 0))
+        port = probe.getsockname()[1]
+    controller = Controller(sink, hostname="127.0.0.1", port=port)
+    controller.start()
+    try:
+        config = NotificationsConfig(smtp_host="127.0.0.1", smtp_port=port)
+
+        async def no_password() -> str:
+            return ""
+
+        jpeg = b"\xff\xd8\xff\xe0" + b"0" * 64
+        message = EmailMessage(
+            "alex@example.test",
+            "Edition",
+            "Hello",
+            '<p><img src="cid:img1.abc@portalab" alt="Poster"></p>',
+            (InlineImage("img1.abc@portalab", jpeg, "image/jpeg"),),
+        )
+        await SmtpTransport(lambda: config, no_password).send(message)
+        await asyncio.sleep(0)
+    finally:
+        controller.stop()
+    parsed = message_from_bytes(sink.messages[0].content, policy=default)
+    assert parsed.get_content_type() == "multipart/alternative"
+    text_part, related = parsed.get_payload()
+    assert text_part.get_content_type() == "text/plain"
+    assert related.get_content_type() == "multipart/related"
+    page, picture = related.get_payload()
+    assert page.get_content_type() == "text/html" and "cid:img1.abc@portalab" in page.get_content()
+    assert picture.get_content_type() == "image/jpeg"
+    assert picture["Content-ID"] == "<img1.abc@portalab>"
+    assert picture.get_content_disposition() == "inline"
+    assert picture.get_payload(decode=True) == jpeg
+
+
+async def test_the_portals_pictures_travel_in_the_email(app: FastAPI, notify: NotifyHarness) -> None:
+    """Issue 411: an e-mail showing the portal's own pictures carries them (read for its recipient); a
+    picture from elsewhere stays a link."""
+    from portalab.capabilities.notifications import EMAIL_IMAGES
+
+    jpeg = b"\xff\xd8\xff\xe0" + b"x" * 200
+
+    class Posters:
+        prefix = "/api/v1/newsletters/pictures/"
+
+        def __init__(self) -> None:
+            self.readers: list[UUID | None] = []
+
+        async def image(self, path: str, reader: UUID | None) -> bytes | None:
+            self.readers.append(reader)
+            return jpeg if path == "tok/poster" else None
+
+    posters = Posters()
+    notify.module.email.capabilities.provide(EMAIL_IMAGES, posters, instance_ref="test", owner="test")
+    declare_category(
+        "media.new", "module:media", "media:category", default_channels=("email",), registry=notify.categories
+    )
+    notify.module.config = dataclasses.replace(
+        notify.module.config, email_enabled=True, portal_url="https://portal.test"
+    )
+    alex = await create_user(module_of(app), "alex")
+    await with_email(notify, alex, "alex@example.test")
+    html = (
+        '<p><img src="https://portal.test/api/v1/newsletters/pictures/tok/poster" alt="Dune">'
+        '<img src="https://image.tmdb.org/t/p/w342/x.jpg" alt="elsewhere"></p>'
+    )
+    await notify.module.send(
+        dataclasses.replace(
+            request((alex,), "pictures"), email_body={"subject": "Edition", "text": "Edition", "html": html}
+        )
+    )
+    [delivery] = [k for k, v in (await deliveries(notify)).items() if v[1] == "pending"]
+    await notify.module.email.run({"delivery": str(delivery)})
+    [mail] = notify.mail.sent
+    [picture] = mail.inline
+    assert picture.data == jpeg and picture.mime == "image/jpeg"
+    assert f'src="cid:{picture.cid}"' in (mail.html or "")
+    assert 'src="https://image.tmdb.org/t/p/w342/x.jpg"' in (mail.html or "")
+    assert posters.readers == [alex]

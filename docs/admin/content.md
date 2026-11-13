@@ -129,7 +129,7 @@ E-mails are set up in one form, **Sending e-mails**, in **System → Configurati
 - **Send e-mails**: off, no e-mail goes out — no notification, no newsletter, no test. You can set everything up before switching it on.
 - **Sending server (SMTP)**: a **Provider** preset (**Gmail**, **Outlook / Microsoft 365**, **OVH**, **Brevo**, **Server on this machine**, or **Other / custom**, each with its tip), the **Server address**, the **Security** (**STARTTLS (port 587, recommended)**, **SSL/TLS (port 465)**, **None (port 25, local network)**) and the **Port**.
 - **Account**: the **User** and the **Password** (never shown again once saved).
-- **Sender and links**: the **Sender address** (the e-mails' "From"), the **Sender name** ("The name mail clients show instead of the address; empty, the site's name.") and the **Portal's public address** (for the e-mails' links and pictures; recipients must be able to reach it).
+- **Sender and links**: the **Sender address** (the e-mails' "From"), the **Sender name** ("The name mail clients show instead of the address; empty, the site's name.") and the **Portal's public address** (for the e-mails' links; recipients must be able to reach it). The portal's own pictures — an edition's posters and covers, an article's images — travel in the e-mail itself, read for each recipient, so they show even when the mail client cannot reach the portal (a portal on your LAN, or behind a proxy that asks to sign in first). Pictures from other sites stay links.
 - **Save**, or **Save and send me a test**. The test goes to your own account's e-mail address only; a refused test says why.
 
 Every e-mail — notifications, announcements, newsletters — goes out in Portalab's look (Gmail included), under the sender name.
