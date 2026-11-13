@@ -27,6 +27,7 @@ dependencies = [
     "pyjwt[crypto]>=2.9",
     "opencv-python-headless>=4.10",
     "defusedxml>=0.7.1",
+    "segno>=1.6",
 ]
 
 [project.scripts]

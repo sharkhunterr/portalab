@@ -19,6 +19,7 @@ pytestmark = pytest.mark.integration
 
 PUBLIC_ROUTES = {
     "/api/v1/auth/login",
+    "/api/v1/auth/login/mfa",  # issue 408: the sign-in's second step
     "/api/v1/auth/logout",
     "/api/v1/auth/register",
     "/api/v1/auth/verify",
@@ -35,6 +36,11 @@ EXPECTED_PERMISSIONS = {
     ("GET", "/api/v1/me"): "users.self.manage",
     ("PATCH", "/api/v1/me/profile"): "users.self.manage",
     ("POST", "/api/v1/me/password"): "users.self.manage",
+    ("GET", "/api/v1/me/mfa"): "users.self.manage",
+    ("POST", "/api/v1/me/mfa/setup"): "users.self.manage",
+    ("POST", "/api/v1/me/mfa/confirm"): "users.self.manage",
+    ("POST", "/api/v1/me/mfa/off"): "users.self.manage",
+    ("POST", "/api/v1/me/mfa/recovery-codes"): "users.self.manage",
     ("PUT", "/api/v1/me/avatar"): "users.self.manage",
     ("DELETE", "/api/v1/me/avatar"): "users.self.manage",
     ("GET", "/api/v1/me/onboarding"): "users.self.manage",
@@ -53,6 +59,7 @@ EXPECTED_PERMISSIONS = {
     ("PATCH", "/api/v1/users/{user_id}"): "users.manage",
     ("POST", "/api/v1/users/{user_id}/verification"): "users.manage",
     ("POST", "/api/v1/users/{user_id}/password"): "users.manage",
+    ("POST", "/api/v1/users/{user_id}/mfa/off"): "users.manage",
     ("POST", "/api/v1/users/{user_id}/suspend"): "users.manage",
     ("POST", "/api/v1/users/{user_id}/reactivate"): "users.manage",
     ("POST", "/api/v1/users/{user_id}/deletion"): "users.manage",

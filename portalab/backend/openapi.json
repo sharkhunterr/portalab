@@ -12877,6 +12877,133 @@
         "title": "MembersProgressOut",
         "type": "object"
       },
+      "MfaCode": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "maxLength": 128,
+            "minLength": 10,
+            "title": "Challenge",
+            "type": "string"
+          },
+          "code": {
+            "maxLength": 32,
+            "minLength": 6,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge",
+          "code"
+        ],
+        "title": "MfaCode",
+        "type": "object"
+      },
+      "MfaConfirm": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "maxLength": 32,
+            "minLength": 6,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "MfaConfirm",
+        "type": "object"
+      },
+      "MfaOff": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "maxLength": 32,
+            "minLength": 6,
+            "title": "Code",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "password",
+          "code"
+        ],
+        "title": "MfaOff",
+        "type": "object"
+      },
+      "MfaRequired": {
+        "description": "Issue 408: the password was right; the second factor's code finishes the sign-in (no session yet).",
+        "properties": {
+          "challenge": {
+            "title": "Challenge",
+            "type": "string"
+          },
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "mfa_required": {
+            "default": true,
+            "title": "Mfa Required",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "challenge",
+          "expires_in"
+        ],
+        "title": "MfaRequired",
+        "type": "object"
+      },
+      "MfaSetup": {
+        "properties": {
+          "qr_svg": {
+            "title": "Qr Svg",
+            "type": "string"
+          },
+          "secret": {
+            "title": "Secret",
+            "type": "string"
+          },
+          "uri": {
+            "title": "Uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "secret",
+          "uri",
+          "qr_svg"
+        ],
+        "title": "MfaSetup",
+        "type": "object"
+      },
+      "MfaStatus": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "recovery_codes_left": {
+            "title": "Recovery Codes Left",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "enabled",
+          "recovery_codes_left"
+        ],
+        "title": "MfaStatus",
+        "type": "object"
+      },
       "ModuleCascadeIn": {
         "properties": {
           "cascade": {
@@ -15359,6 +15486,22 @@
           "password"
         ],
         "title": "PasswordConfirmation",
+        "type": "object"
+      },
+      "PasswordProof": {
+        "additionalProperties": false,
+        "properties": {
+          "password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "password"
+        ],
+        "title": "PasswordProof",
         "type": "object"
       },
       "PatchWidgetIn": {
@@ -18145,6 +18288,22 @@
           "capped"
         ],
         "title": "ReckoningOut",
+        "type": "object"
+      },
+      "RecoveryCodes": {
+        "properties": {
+          "codes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Codes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "codes"
+        ],
+        "title": "RecoveryCodes",
         "type": "object"
       },
       "RefuseIn": {
@@ -40708,7 +40867,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SessionInfo"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/SessionInfo"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MfaRequired"
+                    }
+                  ],
+                  "title": "Response Login Api V1 Auth Login Post"
                 }
               }
             },
@@ -40735,6 +40902,57 @@
           }
         },
         "summary": "Login",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/auth/login/mfa": {
+      "post": {
+        "description": "Issue 408: the sign-in's second step \u2014 the code of the authenticator app, or a recovery code.",
+        "operationId": "login_mfa_api_v1_auth_login_mfa_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaCode"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "auth.invalid_credentials"
+          },
+          "403": {
+            "description": "auth.account_unavailable"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "description": "auth.throttled"
+          }
+        },
+        "summary": "Login Mfa",
         "tags": [
           "identity"
         ]
@@ -48840,6 +49058,178 @@
         "summary": "Judge",
         "tags": [
           "media"
+        ]
+      }
+    },
+    "/api/v1/me/mfa": {
+      "get": {
+        "operationId": "mfa_status_api_v1_me_mfa_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MfaStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Mfa Status",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/me/mfa/confirm": {
+      "post": {
+        "description": "The first code turns the second factor on; the recovery codes are shown this once.",
+        "operationId": "mfa_confirm_api_v1_me_mfa_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaConfirm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryCodes"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "auth.mfa_not_started"
+          },
+          "422": {
+            "description": "auth.mfa_code_wrong"
+          }
+        },
+        "summary": "Mfa Confirm",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/me/mfa/off": {
+      "post": {
+        "operationId": "mfa_off_api_v1_me_mfa_off_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaOff"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Mfa Off",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/me/mfa/recovery-codes": {
+      "post": {
+        "operationId": "mfa_recovery_codes_api_v1_me_mfa_recovery_codes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordProof"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryCodes"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Mfa Recovery Codes",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/me/mfa/setup": {
+      "post": {
+        "description": "A new secret for the authenticator app (its QR code), in force once a first code confirms it.",
+        "operationId": "mfa_setup_api_v1_me_mfa_setup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordProof"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MfaSetup"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "auth.mfa_already_on"
+          },
+          "422": {
+            "description": "identity.password_current_wrong"
+          }
+        },
+        "summary": "Mfa Setup",
+        "tags": [
+          "identity"
         ]
       }
     },
@@ -58429,6 +58819,49 @@
         "summary": "Remove Member",
         "tags": [
           "authz"
+        ]
+      }
+    },
+    "/api/v1/users/{user_id}/mfa/off": {
+      "post": {
+        "description": "Issue 408: a member who lost their phone and their recovery codes gets their second factor turned off\n(the administrator's own password asked again; never the Admin's).",
+        "operationId": "lift_user_mfa_api_v1_users__user_id__mfa_off_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordProof"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "auth.mfa_own_account, admin.sole_admin_protected"
+          },
+          "422": {
+            "description": "identity.password_current_wrong (the administrator's)"
+          }
+        },
+        "summary": "Lift User Mfa",
+        "tags": [
+          "identity-admin"
         ]
       }
     },

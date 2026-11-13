@@ -12,6 +12,7 @@ from portalab.core.blobstore import BlobStore
 from portalab.core.db import Database
 from portalab.core.errors import Unavailable
 from portalab.core.event_port import EventPublisher
+from portalab.core.secrets import SecretBox
 from portalab.core.time import Clock, SystemClock, utc_now
 from portalab.core.visibility_port import VisibilityFilter
 from portalab.modules.identity.settings import IdentityConfig
@@ -30,6 +31,7 @@ class IdentityContext:
     config: IdentityConfig = field(default_factory=IdentityConfig)
     clock: Clock = field(default_factory=SystemClock)
     visibility: VisibilityFilter | None = None  # privacy engine (021); None ⇒ baseline rule in profile.py
+    secret_box: SecretBox | None = None  # issue 408: the second factors' secrets are kept encrypted
 
     def now(self) -> datetime:
         return utc_now(self.clock)

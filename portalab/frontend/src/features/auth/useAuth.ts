@@ -5,6 +5,7 @@ import { ApiError } from "../../state/regions";
 
 export type Me = components["schemas"]["Me"];
 export type SessionInfo = components["schemas"]["SessionInfo"];
+export type MfaRequired = components["schemas"]["MfaRequired"];
 
 export const ME_KEY = ["identity", "me"] as const;
 
@@ -32,6 +33,25 @@ export function useLogin() {
   return useMutation({
     mutationFn: async (body: { login: string; password: string }) => {
       const { data } = await api.POST("/api/v1/auth/login", { body });
+      return data as SessionInfo | MfaRequired;
+    },
+    onSuccess: (data) => {
+      if (!isMfaRequired(data)) void queryClient.invalidateQueries({ queryKey: ME_KEY });
+    },
+  });
+}
+
+/** Issue 408: the password was right and the account has a second factor — no session yet. */
+export function isMfaRequired(data: SessionInfo | MfaRequired | undefined): data is MfaRequired {
+  return !!data && "challenge" in data;
+}
+
+/** Issue 408: the sign-in's second step — the authenticator app's code, or a recovery code. */
+export function useLoginMfa() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: { challenge: string; code: string }) => {
+      const { data } = await api.POST("/api/v1/auth/login/mfa", { body });
       return data as SessionInfo;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ME_KEY }),

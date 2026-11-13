@@ -25,6 +25,14 @@ export const authStrings = {
   ssoOr: "or with your portal password",
   ssoFailed: "The single sign-on did not succeed. Try again, or sign in with your password.",
   ssoUnavailable: "This account cannot sign in right now.",
+  // issue 408: the second factor
+  mfaTitle: "Two-step verification",
+  mfaHint: "Enter the 6-digit code shown by your authenticator app, or one of your recovery codes.",
+  mfaField: "Code",
+  mfaSubmit: "Verify",
+  mfaWrong: "This code is not right. Check your phone's time and try again.",
+  mfaExpired: "The sign-in waited too long. Enter your password again.",
+  mfaBack: "Back to the password",
   termsLink: "Terms of use", // issue 157: only when the administrators offer them on the sign-in page
   close: "Close",
   verifyTitle: "Activate your account",

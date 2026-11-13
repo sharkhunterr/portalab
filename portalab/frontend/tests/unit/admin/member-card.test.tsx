@@ -34,6 +34,10 @@ function show(path: string, sent: unknown[] = []) {
   fake.handler = async (request) => {
     const url = new URL(request.url);
     asked.push(`${url.pathname}${url.search}`);
+    if (url.pathname === "/api/v1/users/u1/mfa/off") {
+      sent.push({ lift: await request.json() });
+      return new Response(null, { status: 204 });
+    }
     if (url.pathname === "/api/v1/users/u1/password") {
       sent.push(await request.json());
       return json(200, { sessions_signed_out: 2 });
@@ -83,10 +87,24 @@ describe("member card", () => {
       fireEvent.change(screen.getByLabelText(label), { target: { value } });
     fill(/^New password|signInPhrase.new/, "a brand new passphrase");
     fill(/^Confirm the new password|signInPhrase.again/, "a brand new passphrase");
-    fill(/Your own password|password.yours/, "mine");
+    fireEvent.change(screen.getAllByLabelText(/Your own password|password.yours/)[0] as HTMLElement, {
+      target: { value: "mine" },
+    });
     fireEvent.click(screen.getByRole("button", { name: /Set the password|password.submit/ }));
     expect(await screen.findByText(/2 sessions of the member|password.done/)).toBeTruthy();
     expect(sent).toEqual([{ password: "mine", new_password: "a brand new passphrase" }]);
+  });
+
+  it("turns a member's two-step verification off, confirmed with the administrator's own (issue 408)", async () => {
+    const sent: unknown[] = [];
+    show("/admin/members/u1", sent);
+    await screen.findByRole("heading", { name: "Ada" });
+    fireEvent.change(screen.getAllByLabelText(/Your own password|password.yours/)[1] as HTMLElement, {
+      target: { value: "mine" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /two-step verification off|mfa.submit/ }));
+    expect(await screen.findByText(/off for this member|mfa.done/)).toBeTruthy();
+    expect(sent).toEqual([{ lift: { password: "mine" } }]);
   });
 
   it("says when the member does not exist", async () => {

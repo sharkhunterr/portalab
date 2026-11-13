@@ -28,7 +28,7 @@ def main() -> None:
             break
         except (urllib.error.URLError, ConnectionError):
             time.sleep(1)
-    password = "Fuzz-" + secrets.token_hex(16)
+    password = "Q7-" + secrets.token_hex(16)  # never the login inside (issue 406 refuses it)
     admin: dict[str, object] = {"login": "fuzz", "password": password, "settings": {}, "steps": {}}
     call(f"{base}/api/v1/admin/first-run", admin)
     signed = call(f"{base}/api/v1/auth/login", {"login": "fuzz", "password": password})

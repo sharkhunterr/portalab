@@ -187,6 +187,68 @@ export function MemberPassword({ member }: { member: EditableMember }) {
   );
 }
 
+/** Issue 408: turn a member's two-step verification off (a lost phone and no recovery code left), confirmed
+ * with the administrator's own password. Not on the administrator's own card, never the Admin's. */
+export function MemberTwoFactor({ member }: { member: EditableMember }) {
+  const t = useT();
+  const me = useMe();
+  const [own, setOwn] = useState("");
+  const lift = useMutation({
+    mutationFn: async () => {
+      await api.POST("/api/v1/users/{user_id}/mfa/off", {
+        params: { path: { user_id: member.id } },
+        body: { password: own },
+      });
+    },
+    onSuccess: () => setOwn(""),
+  });
+  if (me.data?.id === member.id) return null;
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    lift.mutate();
+  };
+  const refused =
+    lift.error instanceof ApiError && lift.error.code === "admin.sole_admin_protected"
+      ? t("admin:members.mfa.adminOnly")
+      : passwordProblem(lift.error, t);
+  return (
+    <AdminSection
+      title={t("admin:members.mfa.title")}
+      icon="shield"
+      description={t("admin:members.mfa.hint")}
+    >
+      <form onSubmit={submit} className="admin-form">
+        <FormGrid>
+          <TextField
+            label={t("admin:members.password.yours")}
+            type="password"
+            autoComplete="current-password"
+            required
+            value={own}
+            onChange={(e) => setOwn(e.target.value)}
+          />
+        </FormGrid>
+        {lift.isSuccess ? (
+          <p role="status" className="services-admin__ok">
+            {t("admin:members.mfa.done")}
+          </p>
+        ) : null}
+        {lift.isError ? (
+          <p role="alert" className="services-admin__ko">
+            {refused}
+          </p>
+        ) : null}
+        <FormActions>
+          <Button type="submit" variant="danger" disabled={lift.isPending || !own}>
+            <Icon name="shield" size={16} />
+            {t("admin:members.mfa.submit")}
+          </Button>
+        </FormActions>
+      </form>
+    </AdminSection>
+  );
+}
+
 export function MemberRoles({ member }: { member: EditableMember }) {
   const t = useT();
   const client = useQueryClient();

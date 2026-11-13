@@ -23,6 +23,7 @@ PUBLIC = {
     "/healthz",
     "/readyz",
     "/api/v1/auth/login",
+    "/api/v1/auth/login/mfa",  # issue 408: the sign-in's second step
     "/api/v1/auth/logout",
     "/api/v1/auth/register",
     "/api/v1/auth/verify",

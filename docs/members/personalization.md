@@ -134,6 +134,7 @@ If the display misbehaves, **Use safe mode** shows Portalab's own interface, wit
 - **Change my picture** on your avatar: PNG, JPEG, WebP or GIF, up to 2 MiB. **Remove my picture** takes it off.
 - **Profile**: your **Display name**, **About me**, and **Who can see “About me”** — **Everyone**, **Portal members**, **Leaderboards only** or **Only me**. Click **Save**.
 - **Password**: change it with your current one; your other devices are signed out. If you sign in through single sign-on, the password is changed with that provider.
+- **Two-step verification**: add a code from an authenticator app (Aegis, Google Authenticator, 2FAS, Bitwarden…) on top of your password. **Turn on**, confirm with your password, scan the QR code (or type the key shown) and enter the 6-digit code the app shows. You then get **ten recovery codes**, shown only once: copy or download them and keep them somewhere safe — each one signs you in once if you lose your phone. Signing in then asks for your password, then a code. **Make new recovery codes** voids the old ones; turning it off asks for your password and a code. If you lose both your phone and your recovery codes, an administrator can turn it off for you. If you sign in through single sign-on, two-step verification is set up with that provider.
 
 ### Customise my profile
 

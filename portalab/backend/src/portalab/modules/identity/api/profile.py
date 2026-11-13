@@ -11,7 +11,18 @@ from pydantic import BaseModel, ConfigDict, Field
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.modules.identity.api.middleware import identity_module
-from portalab.modules.identity.api.schemas import OnboardingStep, ProfileFieldOut, ProfileOut, ProfilePatch
+from portalab.modules.identity.api.schemas import (
+    MfaConfirm,
+    MfaOff,
+    MfaSetup,
+    MfaStatus,
+    OnboardingStep,
+    PasswordProof,
+    ProfileFieldOut,
+    ProfileOut,
+    ProfilePatch,
+    RecoveryCodes,
+)
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.identity.services.avatar import MAX_BYTES, InvalidAvatar
 from portalab.modules.identity.services.profile import FieldUpdate, ProfileView
@@ -172,3 +183,61 @@ async def change_password(
         client_ip=request.client.host if request.client else None,
     )
     return PasswordChanged(other_sessions_signed_out=signed_out)
+
+
+# --- issue 408: the member's second factor --------------------------------------------------------------
+
+
+def _ip(request: Request) -> str | None:
+    return request.client.host if request.client else None
+
+
+@router.get("/me/mfa", response_model=MfaStatus)
+async def mfa_status(module: Module, principal: Principal = require("users.self.manage")) -> MfaStatus:
+    assert principal.user_id is not None
+    return MfaStatus.model_validate(await module.mfa.status(principal.user_id))
+
+
+@router.post(
+    "/me/mfa/setup",
+    response_model=MfaSetup,
+    responses={
+        409: {"description": "auth.mfa_already_on"},
+        422: {"description": "identity.password_current_wrong"},
+    },
+)
+async def mfa_setup(
+    body: PasswordProof, request: Request, module: Module, principal: Principal = require("users.self.manage")
+) -> MfaSetup:
+    """A new secret for the authenticator app (its QR code), in force once a first code confirms it."""
+    setup = await module.mfa.begin(principal, body.password, client_ip=_ip(request))
+    return MfaSetup(secret=setup.secret, uri=setup.uri, qr_svg=setup.qr_svg)
+
+
+@router.post(
+    "/me/mfa/confirm",
+    response_model=RecoveryCodes,
+    responses={409: {"description": "auth.mfa_not_started"}, 422: {"description": "auth.mfa_code_wrong"}},
+)
+async def mfa_confirm(
+    body: MfaConfirm, module: Module, principal: Principal = require("users.self.manage")
+) -> RecoveryCodes:
+    """The first code turns the second factor on; the recovery codes are shown this once."""
+    return RecoveryCodes(codes=await module.mfa.confirm(principal, body.code))
+
+
+@router.post("/me/mfa/off", status_code=status.HTTP_204_NO_CONTENT)
+async def mfa_off(
+    body: MfaOff, request: Request, module: Module, principal: Principal = require("users.self.manage")
+) -> Response:
+    await module.mfa.disable(principal, body.password, body.code, client_ip=_ip(request))
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/me/mfa/recovery-codes", response_model=RecoveryCodes)
+async def mfa_recovery_codes(
+    body: PasswordProof, request: Request, module: Module, principal: Principal = require("users.self.manage")
+) -> RecoveryCodes:
+    return RecoveryCodes(
+        codes=await module.mfa.new_recovery_codes(principal, body.password, client_ip=_ip(request))
+    )

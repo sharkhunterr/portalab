@@ -201,6 +201,7 @@ def wire_platform(
         events=events,
     )
     context.visibility = privacy.filter
+    context.secret_box = SecretBox(secret_key)  # issue 408
     identity = wire_identity(context, jobs=jobs)
     events_module = EventsModule(
         database, authz.audit, capabilities, visibility=privacy.filter, publisher=events

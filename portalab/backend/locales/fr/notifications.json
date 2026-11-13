@@ -826,5 +826,8 @@
   "account.sso_linked.body": "Vous pouvez maintenant vous connecter avec {provider}. Si ce n'est pas vous, contactez tout de suite l'équipe du portail.",
   "account.sso_linked.fact.occurred_at": "Quand",
   "account.blocked": "Votre compte est bloqué pendant {minutes, plural, one {# minute} other {# minutes}}",
-  "account.blocked.body": "Des requêtes de votre compte ressemblaient à une tentative d'intrusion : ses sessions ont été fermées. Il se rouvre tout seul ; si ce n'était pas vous, changez ensuite votre mot de passe."
+  "account.blocked.body": "Des requêtes de votre compte ressemblaient à une tentative d'intrusion : ses sessions ont été fermées. Il se rouvre tout seul ; si ce n'était pas vous, changez ensuite votre mot de passe.",
+  "account.mfa_changed": "{by, select, on {La double authentification est activée} admin {Un administrateur a désactivé votre double authentification} other {La double authentification est désactivée}}",
+  "account.mfa_changed.body": "{by, select, on {La connexion demande désormais aussi un code de votre application d'authentification. Gardez vos codes de secours en lieu sûr.} admin {Vous vous connectez de nouveau avec votre seul mot de passe ; réactivez-la depuis votre compte. Si vous ne l'avez pas demandé, contactez tout de suite l'équipe du portail.} other {Vous vous connectez avec votre seul mot de passe. Si ce n'est pas vous, changez votre mot de passe et contactez tout de suite l'équipe du portail.}}",
+  "account.mfa_changed.fact.occurred_at": "Quand"
 }

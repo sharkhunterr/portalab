@@ -7,7 +7,7 @@ import { useSignInTerms } from "../terms/api";
 import "../content/content.css";
 import { FormMessage } from "./FormMessage";
 import { authStrings, useAuthStrings } from "./strings";
-import { useLogin } from "./useAuth";
+import { isMfaRequired, useLogin, useLoginMfa } from "./useAuth";
 
 /** Message for a failed sign-in; the server answers identically for unknown logins and wrong passwords. */
 export function loginErrorMessage(error: unknown, t = authStrings): string {
@@ -78,6 +78,68 @@ function TermsLink() {
   );
 }
 
+/** Issue 408: what a refused second step says. */
+export function mfaErrorMessage(error: unknown, t = authStrings): string {
+  if (!(error instanceof ApiError)) return t.genericError;
+  if (error.code === "auth.mfa_code_wrong") return t.mfaWrong;
+  if (error.code === "auth.mfa_expired") return t.mfaExpired;
+  if (error.code === "auth.throttled") return t.throttled(Number(error.extensions.retry_after_seconds ?? 60));
+  return t.genericError;
+}
+
+/** Issue 408: the sign-in's second step, after a right password — the authenticator app's code. */
+function SecondFactorForm({ challenge, onBack }: { challenge: string; onBack: () => void }) {
+  const t = useAuthStrings();
+  const codeId = useId();
+  const [code, setCode] = useState("");
+  const mutation = useLoginMfa();
+  const messageRef = useRef<HTMLParagraphElement>(null);
+  const expired = mutation.error instanceof ApiError && mutation.error.code === "auth.mfa_expired";
+
+  useEffect(() => {
+    if (mutation.error) messageRef.current?.focus();
+  }, [mutation.error]);
+
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    mutation.mutate({ challenge, code: code.trim() });
+  }
+
+  return (
+    <form onSubmit={submit} aria-labelledby={`${codeId}-title`} className="auth-form" noValidate>
+      <h1 id={`${codeId}-title`}>{t.mfaTitle}</h1>
+      <p id={`${codeId}-hint`}>{t.mfaHint}</p>
+      {mutation.error ? (
+        <FormMessage ref={messageRef} kind="error">
+          {mfaErrorMessage(mutation.error, t)}
+        </FormMessage>
+      ) : null}
+      <label htmlFor={codeId}>{t.mfaField}</label>
+      <input
+        id={codeId}
+        name="code"
+        autoComplete="one-time-code"
+        inputMode="text"
+        autoCapitalize="none"
+        spellCheck={false}
+        maxLength={32}
+        aria-describedby={`${codeId}-hint`}
+        required
+        // biome-ignore lint/a11y/noAutofocus: the only field of the step the user just reached
+        autoFocus
+        value={code}
+        onChange={(event) => setCode(event.target.value)}
+      />
+      <button type="submit" disabled={mutation.isPending || expired || code.trim().length < 6}>
+        {mutation.isPending ? t.signingIn : t.mfaSubmit}
+      </button>
+      <button type="button" onClick={onBack}>
+        {t.mfaBack}
+      </button>
+    </form>
+  );
+}
+
 export function LoginForm() {
   const t = useAuthStrings();
   const loginId = useId();
@@ -100,6 +162,18 @@ export function LoginForm() {
     event.preventDefault();
     setCancelled(false);
     mutation.mutate({ login, password });
+  }
+
+  if (isMfaRequired(mutation.data)) {
+    return (
+      <SecondFactorForm
+        challenge={mutation.data.challenge}
+        onBack={() => {
+          mutation.reset();
+          setPassword("");
+        }}
+      />
+    );
   }
 
   async function cancelDeletion() {

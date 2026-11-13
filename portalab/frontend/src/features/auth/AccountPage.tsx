@@ -16,6 +16,7 @@ import { FormMessage } from "./FormMessage";
 import { ME_KEY, type Me } from "./useAuth";
 import "../community/profile/profile.css";
 import { passwordRuleMessage } from "./passwordRules";
+import { TwoFactorSection } from "./TwoFactorSection";
 
 type ExportOut = components["schemas"]["ExportOut"];
 
@@ -55,6 +56,7 @@ function AccountView({ me }: { me: Me }) {
         </ul>
       </SettingsCard>
       <PasswordSection hasPassword={me.has_password ?? true} />
+      <TwoFactorSection hasPassword={me.has_password ?? true} />
     </SettingsPage>
   );
 }

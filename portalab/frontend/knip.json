@@ -1,13 +1,8 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": [
-    "scripts/*.mjs",
-    "tests/fixtures/visual-probes/*.js"
-  ],
+  "entry": ["scripts/*.mjs", "tests/fixtures/visual-probes/*.js"],
   "ignoreExportsUsedInFile": true,
-  "ignore": [
-    "src/api/generated/**"
-  ],
+  "ignore": ["src/api/generated/**"],
   "rules": {
     "duplicates": "off"
   }

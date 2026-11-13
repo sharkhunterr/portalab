@@ -27,6 +27,7 @@ from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.blobstore import FileSystemBlobStore
 from portalab.core.db import Database
 from portalab.core.event_port import OutboxEventPublisher
+from portalab.core.secrets import SecretBox
 from portalab.core.time import Clock
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.settings import Argon2Params, IdentityConfig
@@ -143,5 +144,6 @@ def make_context(
         authorizer=authorizer,
         config=config or IdentityConfig(argon2_params=FAST_ARGON2),
         **kwargs,  # type: ignore[arg-type]
+        secret_box=SecretBox(b"test-only-identity-key-0123456789abcd"),
     )
     return IdentityHarness(context, authority, audit, authorizer)
