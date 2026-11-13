@@ -17,7 +17,8 @@ cleanup() { docker rm -f "$ID" >/dev/null 2>&1 || true; }
 trap cleanup EXIT INT TERM
 
 cosign() {  # cosign ARGS… — the key, the public key and the SBOM copied in first
-  docker create --name "$ID" -e COSIGN_PASSWORD -e COSIGN_YES=true "$COSIGN" "$@" >/dev/null
+  # as root: « docker cp » keeps the key's owner and mode (root, 0600), which cosign's nonroot user cannot read
+  docker create --name "$ID" --user 0:0 -e COSIGN_PASSWORD -e COSIGN_YES=true "$COSIGN" "$@" >/dev/null
   (umask 077 && printf '%s' "$COSIGN_KEY_B64" | base64 -d > /tmp/cosign.key.$$)
   docker cp /tmp/cosign.key.$$ "$ID:/tmp/cosign.key" && rm -f /tmp/cosign.key.$$
   docker cp "$HERE/../cosign.pub" "$ID:/tmp/cosign.pub"
