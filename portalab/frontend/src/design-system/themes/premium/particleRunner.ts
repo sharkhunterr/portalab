@@ -61,8 +61,6 @@ const OPTIONS: Record<string, ISourceOptions> = {
   },
 };
 
-export const PARTICLES = Object.keys(OPTIONS);
-
 let engineReady: Promise<typeof import("@tsparticles/engine")> | null = null;
 
 async function engine(kind: string) {

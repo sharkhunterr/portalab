@@ -4,10 +4,8 @@ import type { components } from "../../../api/generated/schema";
 
 /** The portal's player API (027, #2): what plays, starting a stream, its subtitles and its timeline. */
 export type PlayerInfo = components["schemas"]["PlayerInfoOut"];
-export type Playable = components["schemas"]["PlayableItemOut"];
 export type PlayerVersion = components["schemas"]["StreamVersionOut"];
 export type PlayerTrack = components["schemas"]["StreamTrackOut"];
-export type PlayerMarker = components["schemas"]["StreamMarkerOut"];
 export type StreamStarted = components["schemas"]["StreamStartOut"];
 export type Cue = components["schemas"]["SubtitleCueOut"];
 export type StartRequest = components["schemas"]["StreamStartIn"];

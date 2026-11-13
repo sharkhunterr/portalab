@@ -20,7 +20,8 @@
     "test:a11y": "playwright test",
     "i18n:check": "node scripts/i18n-check.mjs",
     "gen:sounds": "node scripts/gen-sounds.mjs",
-    "gen:worldmap": "node scripts/gen-worldmap.mjs"
+    "gen:worldmap": "node scripts/gen-worldmap.mjs",
+    "check:bundle": "node scripts/bundle-budget.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
@@ -94,7 +95,6 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@biomejs/biome": "^2.5.15",
-    "@formatjs/cli": "^6.16.32",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/dom": "^10.4.2",
@@ -107,6 +107,8 @@
     "axe-core": "^4.13.0",
     "jsdom": "^30.1.1",
     "openapi-typescript": "^7.13.0",
+    "postcss": "^8.5.32",
+    "rollup": "^4.68.3",
     "tailwindcss": "^4.3.3",
     "topojson-client": "^3.1.0",
     "typescript": "~5.9",

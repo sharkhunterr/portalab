@@ -431,7 +431,7 @@ def _instant(value: Any) -> datetime | None:
         moment = value
     elif isinstance(value, str) and len(value) >= 10:
         try:
-            moment = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            moment = datetime.fromisoformat(value)
         except ValueError:
             return None
     else:

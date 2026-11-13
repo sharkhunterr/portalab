@@ -17,7 +17,7 @@ from portalab.core.permissions import PermissionRegistry
 from portalab.modules.automations.definitions.schema import Definition
 from portalab.modules.automations.definitions.substitution import FIXED, references
 
-SECRET = re.compile(r"(password|passwd|secret|token|api_?key|credential|private_key)", re.I)
+SECRET = re.compile(r"(password|passwd|secret|token|api_?key|credential|private_key)", re.IGNORECASE)
 INTERNAL_TRIGGER = "automation.triggered"
 AI_ACTION = "ai.invoke"
 

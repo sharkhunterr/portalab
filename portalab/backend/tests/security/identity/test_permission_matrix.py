@@ -88,7 +88,7 @@ def test_the_matrix_covers_every_identity_route(app: FastAPI) -> None:
 
 
 async def test_anonymous_callers_get_401_everywhere(app: FastAPI, client: httpx.AsyncClient) -> None:
-    for (method, path), _ in EXPECTED_PERMISSIONS.items():
+    for method, path in EXPECTED_PERMISSIONS:
         response = await client.request(method, _concrete(path), json={})
         assert response.status_code == 401, (method, path, response.text)
 
@@ -99,7 +99,7 @@ async def test_users_without_the_permission_get_403(app: FastAPI, client: httpx.
     await login(client, "plain")
     harness_authorizer = app.state.authorizer
     harness_authorizer.denied = {"users.self.manage", "users.read"}
-    for (method, path), _ in EXPECTED_PERMISSIONS.items():
+    for method, path in EXPECTED_PERMISSIONS:
         response = await client.request(method, _concrete(path), json={})
         assert response.status_code == 403, (method, path, response.text)
     harness_authorizer.denied = set()

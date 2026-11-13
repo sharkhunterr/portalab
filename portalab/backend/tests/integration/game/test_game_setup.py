@@ -97,7 +97,7 @@ async def test_the_shop_comes_with_the_recommended_install(
     setup = {"format": game_setup.FORMAT, "version": game_setup.VERSION, "shop": shop}
 
     # the game step: the shop, the packs left for the opening; a level's reward of a pack's product kept
-    academy = sorted(await platform.visuals.packs.product_keys())[0]
+    academy = min(await platform.visuals.packs.product_keys())
     setup["settings"] = {"economy.levelRewards": [{"level": 5, "coins": 10, "xp": 0, "product": academy}]}
     game = await game_setup.apply(platform, actor, setup, ("shop", "settings"))
     assert game["skipped"] == [] and game["applied"]["packs"] == 0

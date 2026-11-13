@@ -65,7 +65,7 @@ def next_occurrence(schedule: Schedule, after: datetime, policy: str | None = No
     tz, _ = zone(schedule.time_zone)
     at = schedule.at or time(0, 0)
     local_day = after.astimezone(tz).date()
-    for offset in range(0, 3):
+    for offset in range(3):
         candidate = resolve_wall_clock(
             datetime.combine(local_day + timedelta(days=offset), at), schedule.time_zone, policy
         )

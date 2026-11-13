@@ -7,7 +7,7 @@ from collections.abc import Iterable
 from typing import Any
 
 SECRET_KEY = re.compile(
-    r"(pass(word)?|secret|token|api[_-]?key|credential|authorization|cookie|private)", re.I
+    r"(pass(word)?|secret|token|api[_-]?key|credential|authorization|cookie|private)", re.IGNORECASE
 )
 MASK = "[redacted]"
 MAX_DATA = 8_000

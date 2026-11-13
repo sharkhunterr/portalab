@@ -155,8 +155,7 @@ class LogTap(logging.Handler):
 
     def drain(self, limit: int = 1_000) -> list[dict[str, Any]]:
         with self._lock:
-            taken = [self._lines.popleft() for _ in range(min(limit, len(self._lines)))]
-        return taken
+            return [self._lines.popleft() for _ in range(min(limit, len(self._lines)))]
 
 
 log_tap = LogTap()

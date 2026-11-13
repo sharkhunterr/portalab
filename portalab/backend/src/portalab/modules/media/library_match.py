@@ -106,6 +106,6 @@ class MediaLibraryMatch:
                     rows = [row for row in candidates if _by(item.creators, row)]
                 if rows:
                     # the one there to be read, watched or played first
-                    best = sorted(rows, key=lambda row: (not row.available, row.title, str(row.id)))[0]
+                    best = min(rows, key=lambda row: (not row.available, row.title, str(row.id)))
                     out[item.key] = _title(best)
         return out

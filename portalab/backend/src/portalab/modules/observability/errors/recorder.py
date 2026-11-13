@@ -26,10 +26,13 @@ from portalab.modules.observability.models import ErrorRecord
 
 _VOLATILE: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"[\w.+-]+@[\w-]+(\.[\w-]+)+"), "<email>"),
-    (re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b", re.I), "<uuid>"),
-    (re.compile(r"[a-z][a-z0-9+.\-]*://\S+", re.I), "<url>"),
+    (
+        re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b", re.IGNORECASE),
+        "<uuid>",
+    ),
+    (re.compile(r"[a-z][a-z0-9+.\-]*://\S+", re.IGNORECASE), "<url>"),
     (re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b"), "<ip>"),
-    (re.compile(r"\b[0-9a-f]{12,}\b", re.I), "<hex>"),
+    (re.compile(r"\b[0-9a-f]{12,}\b", re.IGNORECASE), "<hex>"),
     (re.compile(r"(['\"]).*?\1"), "<value>"),
     (re.compile(r"\d+(\.\d+)?"), "<n>"),
 )

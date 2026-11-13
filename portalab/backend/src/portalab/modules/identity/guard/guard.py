@@ -29,7 +29,7 @@ BLOCK_SECONDS = 900
 # a path leaving its folder, an encoded dot, slash or null byte, markup, a system file: an attack's shape
 ATTACK = re.compile(
     r"\.\./|/\.\.|%2e%2e|%2e/|/%2e|%00|\\x00|%2f\.\.|\.\.%2f|%5c|<script|%3cscript|/etc/passwd|/proc/self",
-    re.I,
+    re.IGNORECASE,
 )
 KINDS = {"session": "session", "ip": "address"}  # the guard's key prefix → the stored kind
 

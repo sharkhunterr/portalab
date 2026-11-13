@@ -208,7 +208,7 @@ def _cpu_name(value: Any) -> str | None:
         return None
     text = str(value).replace("®", "").replace("™", "").replace("(R)", "").replace("(TM)", "")
     text = " ".join(text.split())
-    return text[4:] if text.startswith("Gen ") else text
+    return text.removeprefix("Gen ")
 
 
 def _resync(raw: Mapping[str, Any], resync: Mapping[str, Any]) -> Mapping[str, Any]:

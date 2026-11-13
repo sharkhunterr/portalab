@@ -3,12 +3,9 @@ import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
 import { ApiError } from "../../state/regions";
 
-/** Community API hooks (spec 012, slice A): directory, profiles, feed, discovery and community events. */
-export type CommunityMember = components["schemas"]["CommunityMemberOut"];
 export type CommunityMemberPage = components["schemas"]["CommunityMemberPage"];
 export type CommunityProfile = components["schemas"]["CommunityProfileOut"];
 export type CommunitySection = components["schemas"]["CommunitySectionOut"];
-export type CommunityFeedItem = components["schemas"]["CommunityFeedItemOut"];
 export type CommunityFeedPage = components["schemas"]["CommunityFeedPage"];
 export type CommunityShelf = components["schemas"]["CommunityShelfOut"];
 export type CommunityShelfInfo = components["schemas"]["CommunityShelfInfo"];

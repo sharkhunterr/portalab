@@ -70,7 +70,7 @@ async def test_an_update_asking_nothing_more_keeps_its_grants(
     nextgen = pl.root / "available" / "forum-next"
     shutil.copytree(EXAMPLES / "forum", nextgen, ignore=shutil.ignore_patterns("__pycache__"))
     manifest = re.sub(
-        r'^version = ".*"$', 'version = "9.2.0"', (nextgen / "plugin.toml").read_text(), flags=re.M
+        r'^version = ".*"$', 'version = "9.2.0"', (nextgen / "plugin.toml").read_text(), flags=re.MULTILINE
     )
     (nextgen / "plugin.toml").write_text(manifest)
     staged = await client.post(

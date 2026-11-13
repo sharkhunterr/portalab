@@ -23,7 +23,7 @@ SHORTEST_WORD_TITLE = 7  # letters of a one-word title
 
 def _runs(text: str) -> set[str]:
     tokens = fold(text).split()
-    return {" ".join(tokens[i : i + n]) for n in range(1, LONGEST + 1) for i in range(0, len(tokens) - n + 1)}
+    return {" ".join(tokens[i : i + n]) for n in range(1, LONGEST + 1) for i in range(len(tokens) - n + 1)}
 
 
 def _title_ok(folded: str) -> bool:

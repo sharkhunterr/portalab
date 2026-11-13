@@ -47,11 +47,6 @@ export type ReducedMotion = "system" | "on" | "off";
 
 /** 027: accent colours over the theme — ``theme``, or a pack's palette (028: none is written here). */
 export type PaletteKey = string;
-/**
- * 027: the look of the level (XP) badge, worn on the profile (everyone sees it): ``classic`` is free and
- * changes with the level, the others are sold in the shop or given by achievements.
- */
-export type LevelBadge = string;
 export type LevelUpLook = string;
 // 028: the looks are the visual packs' (``visuals/vocabulary``): none is listed in the interface's code
 export type Ambient = string;

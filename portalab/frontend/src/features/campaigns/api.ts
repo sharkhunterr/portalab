@@ -2,8 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
 
-/** Campaign API hooks (spec 014): active campaigns and theme overlay for me; the admin console. */
-export type CampaignSummary = components["schemas"]["CampaignSummaryOut"];
 export type CampaignPresentation = components["schemas"]["CampaignPresentationOut"];
 export type Campaign = components["schemas"]["CampaignOut"];
 

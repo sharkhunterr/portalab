@@ -31,8 +31,10 @@ log = get_logger("portalab.cards")
 def query_for(name: str | None, character: str | None, film: str) -> str:
     """« Tom Cruise Pete Maverick Mitchell Top Gun Maverick »: a character's ranks, quotes and « (voice) »
     left out; an animated work's without the actor (« Woody Toy Story »)."""
-    role = re.sub(r"\b(capt|lt|cmdr|adm|col|sgt|dr|mr|mrs|ms|wo-\d)\.?\s", " ", character or "", flags=re.I)
-    role = re.sub(r"\((voice|voix|uncredited)\)", " ", role, flags=re.I)
+    role = re.sub(
+        r"\b(capt|lt|cmdr|adm|col|sgt|dr|mr|mrs|ms|wo-\d)\.?\s", " ", character or "", flags=re.IGNORECASE
+    )
+    role = re.sub(r"\((voice|voix|uncredited)\)", " ", role, flags=re.IGNORECASE)
     role = re.sub(r"[\"'()\u2018\u2019\u201c\u201d]", " ", role)
     return " ".join(f"{name or ''} {role} {film}".split())[:200]
 

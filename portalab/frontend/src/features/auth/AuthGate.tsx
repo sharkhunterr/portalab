@@ -11,7 +11,7 @@ import { useArrivalHeld } from "../admin/arrival/hold";
 import { Resetting } from "../admin/arrival/Resetting";
 import { LoginForm } from "./LoginForm";
 import { useAuthStrings } from "./strings";
-import { type Me, useLogout, useMe } from "./useAuth";
+import { type Me, useMe } from "./useAuth";
 import { VerifyForm } from "./VerifyForm";
 
 /**
@@ -88,14 +88,4 @@ function useArrivalOpen(anonymous: boolean) {
       }
     },
   });
-}
-
-export function SignOutButton() {
-  const t = useAuthStrings();
-  const logout = useLogout();
-  return (
-    <button type="button" onClick={() => logout.mutate()} disabled={logout.isPending}>
-      {t.signOut}
-    </button>
-  );
 }

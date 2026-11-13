@@ -4,12 +4,8 @@ import type { components } from "../../../../api/generated/schema";
 import { useLocaleContext } from "../../../../i18n/provider/I18nProvider";
 import { ApiError } from "../../../../state/regions";
 
-/** #98 — the shop's console for administrators: what is going on, members, the catalogue a page at a time. */
-export type Overview = components["schemas"]["OverviewOut"];
 export type Activity = components["schemas"]["ActivityOut"];
-export type EconomySummary = components["schemas"]["EconomySummaryOut"];
 export type InventoryItem = components["schemas"]["InventoryItemOut"];
-export type CatalogPage = components["schemas"]["CatalogPageOut"];
 export interface Season {
   key: string;
   start: readonly number[]; // (month, day)

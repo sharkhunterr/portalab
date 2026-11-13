@@ -40,16 +40,6 @@ export function useMyTerms(enabled = true) {
   });
 }
 
-export function usePublicTerms(enabled = true) {
-  return useQuery({
-    queryKey: ["terms"],
-    enabled,
-    retry: false,
-    staleTime: 5 * 60_000,
-    queryFn: async () => ((await api.GET("/api/v1/terms")).data?.terms ?? null) as Terms | null,
-  });
-}
-
 /** Issue 157: the terms offered on the sign-in page — answered only when the administrators chose so. */
 export function useSignInTerms() {
   return useQuery({

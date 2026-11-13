@@ -10,7 +10,6 @@ export type AiConversationDetail = components["schemas"]["AiConversationDetailOu
 export type AiAction = components["schemas"]["AiActionOut"];
 export type AiConfig = components["schemas"]["AiConfigOut"];
 export type AiConfigUpdate = components["schemas"]["AiConfigIn"];
-export type McpServer = components["schemas"]["McpServerOut"];
 export type AiModelServer = components["schemas"]["AiServerOut"];
 export type AiModel = components["schemas"]["AiModelOut"];
 export type McpServersUpdate = components["schemas"]["McpServersIn"];
@@ -274,13 +273,6 @@ export function useAiDashboard(days: number) {
     queryFn: async () =>
       (await api.GET("/api/v1/admin/ai/dashboard", { params: { query: { days } } }))
         .data as unknown as AiDashboard,
-  });
-}
-
-export function useAiUsage() {
-  return useQuery({
-    queryKey: [...KEY, "admin", "usage"],
-    queryFn: async () => (await api.GET("/api/v1/admin/ai/usage")).data,
   });
 }
 

@@ -43,14 +43,6 @@ export function useBreakpoint(name: keyof typeof BREAKPOINTS): boolean {
   return matches;
 }
 
-export function List({ children, label }: { children: ReactNode; label?: string }) {
-  return (
-    <ul className="ds-list" aria-label={label}>
-      {children}
-    </ul>
-  );
-}
-
 export interface Column<T> {
   key: string;
   header: string;

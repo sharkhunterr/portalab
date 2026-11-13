@@ -15,7 +15,7 @@ from portalab.modules.ai.orchestrator import Orchestrator
 from portalab.modules.ai.principal import subject_of
 from portalab.modules.ai.tools.catalog import NO_TOOLS
 
-JSON_OBJECT = re.compile(r"\{.*\}", re.S)
+JSON_OBJECT = re.compile(r"\{.*\}", re.DOTALL)
 TYPES = ("bug", "access_request", "service_issue", "question", "other")
 INSTRUCTION = (
     "Analyze the user's problem from the facts below. Answer ONLY with a JSON object with keys: "

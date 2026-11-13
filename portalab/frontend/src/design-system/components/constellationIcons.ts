@@ -197,18 +197,3 @@ export const ZODIAC_ICONS = {
     ],
   ]),
 } as const;
-
-export const ZODIAC_SIGNS = [
-  "aries",
-  "taurus",
-  "gemini",
-  "cancer",
-  "leo",
-  "virgo",
-  "libra",
-  "scorpio",
-  "sagittarius",
-  "capricorn",
-  "aquarius",
-  "pisces",
-] as const;

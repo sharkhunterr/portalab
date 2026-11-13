@@ -98,7 +98,7 @@ async def test_a_release_updates_keeps_choices_and_a_new_pack_arrives_off(
     # the next release: alien loses an element, a universe is new
     meta = json.loads((packs / "portalab-alien" / "pack.json").read_text())
     (packs / "portalab-alien" / "pack.json").write_text(json.dumps({**meta, "version": "1.1.0"}))
-    dropped = sorted((packs / "portalab-alien" / "elements").iterdir())[0]
+    dropped = min((packs / "portalab-alien" / "elements").iterdir())
     shutil.rmtree(dropped)
     shutil.copytree(ROOT / "portalab-academy", packs / "portalab-academy")
     report = await BuiltinSync(service, packs).run(ADMIN)

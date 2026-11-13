@@ -155,7 +155,7 @@ EVENT = re.compile(
 )
 # stock photographs carry their site's watermark
 STOCK = re.compile(
-    r"alamy|shutterstock|dreamstime|depositphotos|istockphoto|123rf|agefotostock|bigstock", re.I
+    r"alamy|shutterstock|dreamstime|depositphotos|istockphoto|123rf|agefotostock|bigstock", re.IGNORECASE
 )
 SKIPPED_ENGINES = {"wikicommons.images"}  # public photographs of people: events, almost never a film's
 

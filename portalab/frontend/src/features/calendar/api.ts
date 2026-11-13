@@ -5,7 +5,6 @@ import type { components } from "../../api/generated/schema";
 /** Calendar API hooks (spec 011). */
 export type CalendarView = components["schemas"]["CalendarOut"];
 export type CalendarItem = components["schemas"]["CalendarItemOut"];
-export type Reminder = components["schemas"]["CalendarReminderOut"];
 
 export function useCalendar(from: Date, to: Date) {
   return useQuery({

@@ -7,7 +7,6 @@ export type Automation = components["schemas"]["AutomationOut"];
 export type AutomationSummary = components["schemas"]["AutomationSummaryOut"];
 export type AutomationDetail = components["schemas"]["AutomationDetailOut"];
 export type Execution = components["schemas"]["AutomationExecutionOut"];
-export type Approval = components["schemas"]["AutomationApprovalOut"];
 
 /** An automation's definition (spec 019) — what the builder edits and the flow view draws. */
 export interface Filter {

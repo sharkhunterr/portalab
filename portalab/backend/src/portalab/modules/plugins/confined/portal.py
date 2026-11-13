@@ -67,7 +67,7 @@ class PortalCalls:
         principal = Principal(user_id=acting.user_id, channel="plugin", acting_for=acting.user_id)
         status, content_type, content = await self._request(key, method, path, query, body, principal)
         value: Any
-        if content_type.startswith("application/json") or content_type.startswith("application/problem+json"):
+        if content_type.startswith(("application/json", "application/problem+json")):
             value = json.loads(content or b"null")
         else:
             value = content

@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
 import type { LeaderboardPeriod } from "./leaderboards/Leaderboard";
@@ -6,8 +6,6 @@ import type { QuestItem } from "./quests/QuestList";
 
 /** Gamification & economy API hooks (spec 013): progression, history, achievements and administration. */
 export type Progression = components["schemas"]["ProgressionOut"];
-export type EconomyTransaction = components["schemas"]["EconomyTransactionOut"];
-export type EconomyTransactionPage = components["schemas"]["EconomyTransactionPage"];
 export type RewardRule = components["schemas"]["RewardRuleOut"];
 export type Value = "xp" | "contribution" | "coins";
 /** Issue 234: what the journal and the charts follow — the values, and the boosters a rule gave */
@@ -58,20 +56,6 @@ export function useProgression() {
   return useQuery({
     queryKey: [...KEY, "progression"],
     queryFn: async () => (await api.GET("/api/v1/me/progression")).data as Progression,
-  });
-}
-
-export function useTransactions(value: Value | null) {
-  return useInfiniteQuery({
-    queryKey: [...KEY, "transactions", value],
-    initialPageParam: null as string | null,
-    getNextPageParam: (last: EconomyTransactionPage) => last.next_cursor,
-    queryFn: async ({ pageParam }) =>
-      (
-        await api.GET("/api/v1/me/economy/transactions", {
-          params: { query: { ...(value ? { value } : {}), ...(pageParam ? { cursor: pageParam } : {}) } },
-        })
-      ).data as EconomyTransactionPage,
   });
 }
 

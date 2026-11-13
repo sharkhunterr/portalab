@@ -94,7 +94,7 @@ def _date(value: str) -> datetime | None:
         parsed = parsedate_to_datetime(value)
     except (TypeError, ValueError):
         try:
-            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            parsed = datetime.fromisoformat(value)
         except ValueError:
             return None
     return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)

@@ -33,10 +33,9 @@ class AdminAuthorityService:
         self.clock = clock
 
     async def _lock(self, session: AsyncSession) -> AdminSingleton:
-        row = (
+        return (
             await session.execute(select(AdminSingleton).where(AdminSingleton.id == 1).with_for_update())
         ).scalar_one()
-        return row
 
     async def current_admin(self, session: AsyncSession) -> UUID | None:
         return await session.scalar(

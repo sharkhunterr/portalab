@@ -21,7 +21,7 @@ from portalab.modules.ai.tools.catalog import NO_TOOLS, READ_ONLY, ToolPolicy
 SEARCH_POLICY = ToolPolicy(
     "search_assist", READ_ONLY.sensitivities, frozenset({"wiki.search", "services.status"})
 )
-JSON_ARRAY = re.compile(r"\[.*\]", re.S)
+JSON_ARRAY = re.compile(r"\[.*\]", re.DOTALL)
 
 
 class SearchAssistantFacade:

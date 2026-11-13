@@ -67,4 +67,4 @@ async def login(client: httpx.AsyncClient, login_: str, password: str = PASSWORD
 
 
 def comparable(problem: dict[str, Any]) -> dict[str, Any]:
-    return {key: value for key, value in problem.items() if key not in {"correlation_id"}}
+    return {key: value for key, value in problem.items() if key != "correlation_id"}

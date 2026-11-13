@@ -5,11 +5,7 @@ import { ApiError } from "../../state/regions";
 
 /** Media API hooks (spec 024): catalog, detail sections, shelves, playback, requests, links, admin. */
 export type MediaCard = components["schemas"]["MediaCard"];
-export type MediaDetail = components["schemas"]["MediaDetail"];
 export type MediaSection = components["schemas"]["MediaSectionOut"];
-export type MediaRequest = components["schemas"]["MediaRequestOut"];
-export type MediaLink = components["schemas"]["MediaLinkOut"];
-export type MatchCandidate = components["schemas"]["MediaMatchCandidateOut"];
 export type ShelfName = "new" | "released" | "recent" | "continue" | "trending" | "recommended" | "leaving";
 
 export interface CatalogFilters {
@@ -185,17 +181,6 @@ export function useNowPlaying() {
     queryKey: [...KEY, "now-playing"],
     refetchInterval: 30_000,
     queryFn: async () => (await api.GET("/api/v1/me/media/now-playing")).data ?? [],
-  });
-}
-
-export function useMyRequests() {
-  return useQuery({
-    queryKey: [...KEY, "requests"],
-    queryFn: async () => {
-      const { data, error, response } = await api.GET("/api/v1/me/media/requests");
-      if (!data) fail(error, response);
-      return data;
-    },
   });
 }
 

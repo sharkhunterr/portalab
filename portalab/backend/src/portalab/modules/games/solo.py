@@ -180,8 +180,7 @@ class Solo:
             row.score += points
             row.correct += int(right)
             row.updated_at = now
-            view = self._view(row, now)
-        return view
+            return self._view(row, now)
 
     async def next(self, user: UUID, session_id: UUID) -> dict[str, Any]:
         now = utc_now(self.clock)
@@ -221,8 +220,7 @@ class Solo:
                 state["started"] = now.isoformat()
                 row.state = state
             row.updated_at = now
-            view = self._view(row, now)
-        return view
+            return self._view(row, now)
 
     async def media(self, user: UUID, session_id: UUID, what: str) -> bytes:
         """The current question's poster (blurred as its time runs) or theme music."""
@@ -345,5 +343,4 @@ class Solo:
                     won=state["moves"] <= pairs * 2,
                     at=now,
                 )
-            view = self._view(row, now)
-        return view
+            return self._view(row, now)

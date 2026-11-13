@@ -200,5 +200,4 @@ class Cinemot:
                     won=solved,
                     at=now,
                 )
-            view = self._view(current, puzzle)
-        return view
+            return self._view(current, puzzle)
