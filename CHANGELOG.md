@@ -3,6 +3,26 @@
 All notable changes to Portalab. The release pages (GitLab, GitHub) show the curated notes of
 [GITHUB_RELEASES.md](GITHUB_RELEASES.md); this file is generated from the commits by `npm run release`.
 
+## [1.4.0](https://github.com/sharkhunterr/portalab/compare/v1.3.0...v1.4.0) (2026-11-13)
+
+
+### Features
+
+* **identity:** two-step verification (TOTP) for local accounts, with recovery codes ([85bd7ae](https://github.com/sharkhunterr/portalab/commit/85bd7ae7b204acee1f2f40083e2509e150ce3691))
+* **notifications:** every e-mail says what its notification is about ([925cc03](https://github.com/sharkhunterr/portalab/commit/925cc03a6bb45dd6fcca2c72bdeec4235c269c33))
+
+
+### Bug Fixes
+
+* **gamification:** a review's XP and coins show as « Reviews », no longer « Plays (other kinds) » ([a9eedf0](https://github.com/sharkhunterr/portalab/commit/a9eedf00ae1dc06d6d0faa0cc122dcda30290b9c))
+* **identity:** signing in works on a portal reached in plain HTTP from the LAN ([5676c54](https://github.com/sharkhunterr/portalab/commit/5676c548c6f4bcd7a85b2fe4f1d3de05522dcdb8))
+* **shell:** the « services degraded » banner is an automation template, no longer built in ([8c8672c](https://github.com/sharkhunterr/portalab/commit/8c8672c853bc3899d668de5aa52cfcf03a662a34))
+
+
+### Performance Improvements
+
+* no more queries repeated in a loop, a first visit half as heavy ([aa2ebae](https://github.com/sharkhunterr/portalab/commit/aa2ebae964dd18fdbd28ef5ebb0d2e0cbfb94b61))
+
 ## [1.3.0](https://github.com/sharkhunterr/portalab/compare/v1.2.0...v1.3.0) (2026-11-12)
 
 
