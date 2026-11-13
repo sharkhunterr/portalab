@@ -116,6 +116,7 @@ OIDC_CLIENT_ID = "identity.oidc.clientId"
 OIDC_CLIENT_SECRET = "identity.oidc.clientSecret"  # noqa: S105 — the setting's key, not a secret
 OIDC_LABEL = "identity.oidc.label"
 OIDC_CREATE = "identity.oidc.createAccounts"
+OIDC_TRUST_EMAIL = "identity.oidc.trustUnverifiedEmail"
 _OIDC: tuple[tuple[str, Any, Any, str, bool], ...] = (
     (OIDC_ENABLED, bool, False, "Offer « Sign in with » the single sign-on on the sign-in page.", False),
     (
@@ -133,6 +134,15 @@ _OIDC: tuple[tuple[str, Any, Any, str, bool], ...] = (
         bool,
         True,
         "Create the portal account of a provider user signing in for the first time.",
+        False,
+    ),
+    (
+        OIDC_TRUST_EMAIL,
+        bool,
+        False,
+        "Link a provider user to the portal account with the same e-mail even when the provider does not "
+        "say it verified that e-mail (Authentik leaves it out for its own users). Only when members cannot "
+        "change their e-mail at the provider: otherwise anyone there could take a portal account.",
         False,
     ),
 )

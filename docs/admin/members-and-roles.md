@@ -113,10 +113,12 @@ Accounts are linked **by the server**; nobody links them by hand. When someone s
 
 1. the member this provider account is already linked to;
 2. the member already signed in in this browser, if any;
-3. the member with the same e-mail address;
+3. the member with the same e-mail address, when the provider vouches for it (`email_verified: true`);
 4. otherwise, a new member, if *Create accounts on first sign-in* is on (else the sign-in is refused).
 
-The **Admin** account is linked by e-mail only when the provider vouches for that e-mail (`email_verified: true`); otherwise the Admin keeps signing in with their password. A sign-on can only be finished in the browser that started it, so nobody can sign someone else in with a link. The provider's ID token is checked (signature, issuer, audience, expiry, nonce) and the flow uses PKCE.
+An e-mail the provider does not vouch for links nobody, and no second account is made with it: the sign-in is refused. Authentik leaves `email_verified` out for its own users. Either make its `email` scope report it, or turn on *Trust the provider's e-mails*, but only if your members cannot change their e-mail at the provider (otherwise anyone there could take a portal account by setting its e-mail).
+
+The **Admin** account is linked by e-mail only when the provider vouches for that e-mail (`email_verified: true`), whatever that setting; otherwise the Admin keeps signing in with their password. A sign-on can only be finished in the browser that started it, so nobody can sign someone else in with a link. The provider's ID token is checked (signature, issuer, audience, expiry, nonce) and the flow uses PKCE.
 
 Behind a reverse proxy, also set the trusted proxies so the sign-on can build its way back: see [Operations](operations.md) and the [internet exposure notes](../../portalab/docs/internet-exposure.md).
 

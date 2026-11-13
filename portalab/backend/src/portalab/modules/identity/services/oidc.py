@@ -39,6 +39,7 @@ from portalab.modules.identity.settings import (
     OIDC_ENABLED,
     OIDC_ISSUER,
     OIDC_LABEL,
+    OIDC_TRUST_EMAIL,
 )
 
 PENDING = timedelta(minutes=10)
@@ -53,6 +54,7 @@ class OidcSettings:
     client_secret: str
     label: str
     create_accounts: bool
+    trust_unverified_email: bool = False  # issue 403: an e-mail the provider does not vouch for links nobody
 
     @property
     def ready(self) -> bool:
@@ -101,7 +103,16 @@ class OidcService:
             reader = providers[0].provider if providers else None
         except Exception:
             reader = None
-        for key in (OIDC_ENABLED, OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET, OIDC_LABEL, OIDC_CREATE):
+        keys = (
+            OIDC_ENABLED,
+            OIDC_ISSUER,
+            OIDC_CLIENT_ID,
+            OIDC_CLIENT_SECRET,
+            OIDC_LABEL,
+            OIDC_CREATE,
+            OIDC_TRUST_EMAIL,
+        )
+        for key in keys:
             try:
                 values[key] = (await reader.get(key)).value if reader is not None else None
             except Exception:
@@ -113,6 +124,7 @@ class OidcService:
             client_secret=str(values[OIDC_CLIENT_SECRET] or ""),
             label=str(values[OIDC_LABEL] or "Authentik")[:60],
             create_accounts=values[OIDC_CREATE] is not False,
+            trust_unverified_email=values[OIDC_TRUST_EMAIL] is True,
         )
 
     async def _metadata(self, issuer: str) -> Mapping[str, Any]:
@@ -127,6 +139,11 @@ class OidcService:
             if not isinstance(metadata, Mapping) or "authorization_endpoint" not in metadata:
                 raise Unavailable(
                     "The single sign-on provider cannot be reached.", code="auth.sso_unavailable"
+                )
+            # issue 403: the provider answering is the one configured (OpenID Connect Discovery §4.3)
+            if str(metadata.get("issuer") or "").rstrip("/") != issuer.rstrip("/"):
+                raise Unavailable(
+                    "The single sign-on provider names another issuer.", code="auth.sso_unavailable"
                 )
             self._discovery[issuer] = metadata
         return self._discovery[issuer]
@@ -266,8 +283,10 @@ class OidcService:
         at the provider would otherwise become the Admin); else a new member, when allowed."""
         issuer, subject = config.issuer, str(claims["sub"])[:255]
         email = str(claims.get("email") or "").strip().lower() or None
-        verified = claims.get("email_verified") is not False  # Authentik leaves it out for its own users
         vouched = claims.get("email_verified") is True
+        # issue 403: an e-mail the provider leaves unsaid (Authentik's own users) links an account only when
+        # the administrator trusts the provider's e-mails; one it disowns, never
+        trusted = vouched or (config.trust_unverified_email and claims.get("email_verified") is not False)
         now = self.ctx.now()
         async with self.ctx.database.unit_of_work() as uow:
             session = uow.session
@@ -280,8 +299,11 @@ class OidcService:
                 linked.last_sign_in_at = now
                 return linked.user_id
             user = await session.get(User, signed_in) if signed_in is not None else None
-            if user is None and email and verified:
+            if user is None and email and claims.get("email_verified") is not False:
                 user = await session.scalar(select(User).where(func.lower(User.email) == email))
+                if user is not None and not trusted:
+                    # neither linked (anyone could set that e-mail at the provider) nor duplicated
+                    raise SignOnFailed("the provider does not vouch for this e-mail")
                 if (
                     user is not None
                     and not vouched

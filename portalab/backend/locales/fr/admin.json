@@ -2169,5 +2169,7 @@
   "email.setUp": "Régler l’envoi",
   "setting.notifications.digest.defaultMode.choice.off": "Désactivé (une par une)",
   "setting.notifications.digest.defaultMode.choice.daily": "Résumé quotidien",
-  "setting.notifications.digest.defaultMode.choice.weekly": "Résumé hebdomadaire"
+  "setting.notifications.digest.defaultMode.choice.weekly": "Résumé hebdomadaire",
+  "setting.identity.oidc.trustUnverifiedEmail.label": "Faire confiance aux e-mails du fournisseur",
+  "setting.identity.oidc.trustUnverifiedEmail.hint": "Relier un utilisateur du fournisseur au compte du portail qui a le même e-mail, même quand le fournisseur ne dit pas l'avoir vérifié (Authentik l'omet pour ses propres utilisateurs). À activer seulement si vos membres ne peuvent pas changer leur e-mail chez le fournisseur ; le compte Admin exige toujours un e-mail vérifié."
 }

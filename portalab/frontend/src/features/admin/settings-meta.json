@@ -551,6 +551,10 @@
     "advanced": false,
     "group": "members"
   },
+  "identity.oidc.trustUnverifiedEmail": {
+    "advanced": true,
+    "group": "members"
+  },
   "identity.onboarding.enabled": {
     "advanced": false,
     "group": "members"
