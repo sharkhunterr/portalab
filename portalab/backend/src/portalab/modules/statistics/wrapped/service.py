@@ -209,7 +209,7 @@ class WrappedService:
         if not results:
             return 0
         snapshot = await self._store(definition, start, end, "user", user, results)
-        await self._deliver(user, definition, snapshot)
+        await self._deliver(user, definition, snapshot, start, end)
         return 1
 
     async def _community(self, definition: WrappedDefinition, start: date, end: date) -> int:
@@ -230,7 +230,9 @@ class WrappedService:
         await self._store(definition, start, end, "community", None, results)
         return 1
 
-    async def _deliver(self, user: UUID, definition: WrappedDefinition, snapshot: UUID) -> None:
+    async def _deliver(
+        self, user: UUID, definition: WrappedDefinition, snapshot: UUID, start: date, end: date
+    ) -> None:
         try:
             providers = self.capabilities.system_providers(NOTIFY)
         except Exception:
@@ -245,7 +247,13 @@ class WrappedService:
                         template_key="statistics:wrapped.ready",
                         audience=Users((user,)),
                         dedup_key=f"statistics.wrapped:{snapshot}",
-                        params={"recap": definition.key},
+                        # issue 398: the period it covers, never the definition's technical key
+                        params={
+                            "period": definition.period_kind,
+                            "start_at": start.isoformat(),
+                            "end_at": end.isoformat(),
+                            "count": len(definition.stat_keys),
+                        },
                         source="module",
                         action_url=f"/statistics/wrapped/{snapshot}",
                     )

@@ -14,6 +14,7 @@ from uuid import UUID
 
 from sqlalchemy import func, select
 
+from portalab.capabilities.notifications.layout import excerpt
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.db import Database
 from portalab.core.errors import Conflict, Forbidden, NotFound
@@ -279,7 +280,12 @@ class FeedbackService:
                 "support:notify.feedbackReward",
                 member,
                 f"feedback.reward:{feedback_id}:{int(now.timestamp())}",
-                {"what": str(detail.get("label") or "")},
+                # issue 398: the amount shows as the interface's reward chip
+                {
+                    "what": str(detail.get("label") or ""),
+                    "value": str(detail.get("value") or ""),
+                    "amount": int(detail.get("amount") or 0),
+                },
                 "/feedback",
             )
 
@@ -317,7 +323,7 @@ class FeedbackService:
                 "support:notify.feedbackReply",
                 item.submitter_id,
                 f"feedback.reply:{item.id}:{int(now.timestamp())}",
-                {},
+                {"quote": excerpt(words)},  # issue 398: what the team answered
                 "/feedback",
             )
         return item

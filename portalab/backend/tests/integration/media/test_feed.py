@@ -113,11 +113,13 @@ async def test_my_feed_tells_me_once_what_arrived(
     assert await media.module.feed.notify_due(outbox) == 1
     (notice,) = outbox.sent
     assert notice.category == "media.feed" and notice.action_url == "/feed"
-    assert notice.params == {"count": 1, "title": "Dune"}
+    # issue 398: the arrivals by name, and why each is in the feed
+    assert notice.params == {"count": 1, "title": "Dune", "list": "• Dune — Denis Villeneuve", "more": 0}
     assert await media.module.feed.notify_due(outbox) == 0  # told already
     clock.advance(timedelta(hours=1))
     await media.module.library.upsert(
         [library_record("m2", title="Blade Runner 2049", year=2017, directors=["Denis Villeneuve"])], library
     )
     assert await media.module.feed.notify_due(outbox) == 1
-    assert outbox.sent[-1].params == {"count": 1, "title": "Blade Runner 2049"}  # only what came since
+    later = outbox.sent[-1].params  # only what came since
+    assert later["count"] == 1 and later["list"] == "• Blade Runner 2049 — Denis Villeneuve"

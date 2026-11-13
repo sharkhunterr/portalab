@@ -159,7 +159,7 @@ class RequestModeration:
                     template_key=f"media:notify.request.{outcome}",
                     audience=Users((user,)),
                     dedup_key=f"media-request:{request_id}:{outcome}",
-                    params={"title": title[:200], "reason": (reason or "").strip()[:300]},
+                    params={"title": title[:200], "reason": (reason or "").strip()[:300] or "none"},
                     subject_ref=f"media-request:{request_id}",
                     action_url="/media/requests?tab=list",
                 )

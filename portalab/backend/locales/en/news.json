@@ -435,5 +435,6 @@
   "edition.pre.top": "{count, plural, one {the most watched title} other {the # most watched titles}}",
   "edition.pre.requests": "{count, plural, one {# request} other {# requests}}",
   "edition.pre.articles": "{count, plural, one {# news item} other {# news items}}",
-  "edition.pre.none": "The period's news"
+  "edition.pre.none": "The period's news",
+  "notify.published.body": "{summary, select, none {} other {{summary}}}"
 }

@@ -243,7 +243,9 @@ class StateService:
         if rule.incident and minutes >= rule.incident_after:
             await self._auto_incident(service_id, info, seq, minutes, failures)
         if minutes >= rule.notify_after:
-            await self._announce(service_id, info, rule, seq, minutes, back=False)
+            await self._announce(
+                service_id, info, rule, seq, minutes, back=False, since=since, failures=failures
+            )
 
     async def _back(self, service_id: str, seq: int, since: datetime, now: datetime) -> None:
         """The outage ended: those who were told it was down are told it is back."""
@@ -251,7 +253,7 @@ class StateService:
         rule = self.rule(info)
         minutes = (now - since).total_seconds() / 60
         if minutes >= rule.notify_after:
-            await self._announce(service_id, info, rule, seq, minutes, back=True)
+            await self._announce(service_id, info, rule, seq, minutes, back=True, since=since)
 
     async def _announce(
         self,
@@ -262,6 +264,8 @@ class StateService:
         minutes: float,
         *,
         back: bool,
+        since: datetime | None = None,
+        failures: int = 0,
     ) -> None:
         """One notification per outage and audience: administrators (services.manage) and members
         (services.read, administrators apart), each by e-mail too when the rule says so."""
@@ -289,7 +293,14 @@ class StateService:
                         dedup_key=f"{key}:{audience_key}",
                         kind="notification" if back else "alert",
                         priority="normal" if back else ("critical" if importance == "critical" else "high"),
-                        params={"service": name, "minutes": max(1, round(minutes))},
+                        # issue 398: since when, how many checks failed, how much it matters
+                        params={
+                            "service": name,
+                            "minutes": max(1, round(minutes)),
+                            "since": since.isoformat() if since else "none",
+                            "failures": failures,
+                            "importance": importance,
+                        },
                         source="module",
                         subject_ref=f"service:{service_id}",
                         required_permission=audience.permission,

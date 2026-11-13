@@ -275,7 +275,12 @@ class Requests:
                     template_key=f"marketplace:notify.request.{state}",
                     audience=Users((view.user_id,)),
                     dedup_key=f"request:{view.id}:{state}",
-                    params={"product": view.product_name[:120], "note": (view.note or "")[:300]},
+                    # issue 398: the team's note and the outcome apart from the title (the e-mail's subject)
+                    params={
+                        "product": view.product_name[:120],
+                        "note": (view.note or "")[:300] or "none",
+                        "outcome": str(view.details.get("outcome") or "")[:300],
+                    },
                     subject_ref=f"request:{view.id}",
                     action_url="/marketplace/owned",
                 )

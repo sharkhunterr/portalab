@@ -155,6 +155,12 @@ class Refunds:
         metrics.increment("marketplace.refunds")
         if not ground:  # a revocation sends its own notice
             await notify_owner(
-                self.capabilities, row.user_id, "refund", product.key, f"refund:{row.id}", version.names
+                self.capabilities,
+                row.user_id,
+                "refund",
+                product.key,
+                f"refund:{row.id}",
+                version.names,
+                {"amount": amount, "percent": share, "quote": reason[:500] if by_admin else ""},
             )
         return row

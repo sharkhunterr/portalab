@@ -13,7 +13,8 @@
 
 import hashlib
 from collections.abc import Callable, Mapping, Sequence
-from datetime import timedelta
+from contextlib import suppress
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -22,10 +23,10 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
-from portalab.capabilities.i18n import RENDERER, RESOLVER, LocaleContext
+from portalab.capabilities.i18n import FORMATTER, RENDERER, RESOLVER, TIME, LocaleContext
 from portalab.capabilities.identity_directory import CONTACT
 from portalab.capabilities.notifications import CategoryRegistry
-from portalab.capabilities.notifications.layout import button, dress, paragraphs
+from portalab.capabilities.notifications.layout import button, chips, dress, facts, paragraphs, quote
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.core.db import Database
@@ -33,7 +34,7 @@ from portalab.core.jobs.queue import enqueue
 from portalab.core.live import publish_live
 from portalab.core.time import Clock, utc_now
 from portalab.modules.notifications.channels.look import brand, words
-from portalab.modules.notifications.fanout.merge import merged
+from portalab.modules.notifications.fanout.merge import merged, rewards_of
 from portalab.modules.notifications.models import Communication, Delivery, EmailOutbox, Notification
 from portalab.modules.notifications.observability import log, metrics
 from portalab.modules.notifications.preferences.resolver import decide
@@ -92,14 +93,86 @@ class FanOut:
         except Exception:
             return LocaleContext()
 
-    def render(self, template_key: str, params: Mapping[str, Any], ctx: LocaleContext) -> tuple[str, str]:
-        namespace, _, key = template_key.partition(":")
+    def localized(self, params: Mapping[str, Any], ctx: LocaleContext) -> dict[str, Any]:
+        """Issue 398: the moments a communication names (``starts_at``, ``since``…) in the reader's
+        language and time zone, never as raw ISO strings."""
+        out = dict(params)
+        time = self._provider(TIME)
+        for name, value in params.items():
+            if isinstance(value, dict):  # a text by language (a campaign's names): the reader's
+                out[name] = _in_language(value, ctx)
+                continue
+            if not (name.endswith("_at") or name == "since"):
+                continue
+            if isinstance(value, str) and len(value) == 10:  # a day, not a moment
+                formatter = self._provider(FORMATTER)
+                with suppress(Exception):  # an unreadable day is left as it came
+                    out[name] = (
+                        str(formatter.date(date.fromisoformat(value), ctx, "long")) if formatter else value
+                    )
+                continue
+            if time is None:
+                continue
+            instant = _instant(value)
+            if instant is not None:
+                try:
+                    out[name] = str(time.render_instant(instant, ctx, "medium"))
+                except Exception:
+                    out[name] = instant.isoformat()
+        return out
+
+    def _text(self, namespace: str, key: str, params: Mapping[str, Any], ctx: LocaleContext) -> str | None:
         renderer = self._provider(RENDERER)
         if renderer is None:
-            return key, ""
-        title = str(renderer.t(key, ctx, params, namespace=namespace))
-        body = str(renderer.t(f"{key}.body", ctx, params, namespace=namespace))
-        return title, "" if body == f"{key}.body" else body
+            return None
+        text = str(renderer.t(key, ctx, params, namespace=namespace))
+        return None if text == key else text
+
+    def render(self, template_key: str, params: Mapping[str, Any], ctx: LocaleContext) -> tuple[str, str]:
+        namespace, _, key = template_key.partition(":")
+        shown = self.localized(params, ctx)
+        title = self._text(namespace, key, shown, ctx)
+        return title if title is not None else key, self._text(namespace, f"{key}.body", shown, ctx) or ""
+
+    def details(
+        self, template_key: str, params: Mapping[str, Any], ctx: LocaleContext
+    ) -> tuple[list[tuple[str, str]], list[str], str]:
+        """Issue 398: what an e-mail adds under its title — the facts its template labels
+        (``<key>.fact.<param>``, its value shaped by ``<key>.fact.<param>.value`` when there is one), the
+        rewards won, and the words someone wrote (``quote``)."""
+        namespace, _, key = template_key.partition(":")
+        shown = self.localized(params, ctx)
+        rows: list[tuple[str, str]] = []
+        for name, value in shown.items():
+            if value == 0 or not self._value(value, ctx):
+                continue  # nothing to say (« none », 0, empty)
+            label = self._text(namespace, f"{key}.fact.{name}", shown, ctx)
+            if label is None:
+                continue
+            text = self._text(namespace, f"{key}.fact.{name}.value", shown, ctx) or self._value(value, ctx)
+            if text:
+                rows.append((label, text[:300]))
+        won = []
+        for value, amount in rewards_of(params).items():
+            if amount > 0:
+                name = self._text("gamification", f"value.{value}", {}, ctx) or value
+                won.append(f"+{self._value(int(amount) if amount == int(amount) else amount, ctx)} {name}")
+        said = params.get("quote")
+        return rows, won, str(said)[:2000] if isinstance(said, str) else ""
+
+    def _value(self, value: Any, ctx: LocaleContext) -> str:
+        if isinstance(value, bool) or value is None:
+            return ""
+        if isinstance(value, int | float):
+            formatter = self._provider(FORMATTER)
+            try:
+                return str(formatter.number(value, ctx)) if formatter is not None else str(value)
+            except Exception:
+                return str(value)
+        if isinstance(value, list | tuple):
+            return ", ".join(str(v) for v in value if str(v).strip())
+        text = str(value).strip()
+        return "" if text in ("none", "-") else text
 
     async def __call__(self, communication: Communication, recipients: Sequence[UUID]) -> int:
         delivered = 0
@@ -282,10 +355,12 @@ class FanOut:
             else ""
         )
         manage = site.link("/settings/notifications")
+        rows, won, said = self.details(communication.template_key, communication.params or {}, ctx)
         return dress(
             site,
             title=title,
-            body_html=paragraphs(body) + action,
+            preheader=(body or title)[:140],
+            body_html=chips(won) + paragraphs(body) + quote(said) + facts(rows) + action,
             kicker=words(self._provider, category.label_key, ctx) if category else None,
             note=words(self._provider, "notifications:email.note", ctx),
             manage=(words(self._provider, "notifications:email.manage", ctx), manage)
@@ -311,13 +386,23 @@ class FanOut:
                 not own and digest in ("daily", "weekly") and communication.priority != "critical"
             ):
                 return  # duplicate, or kept for the digest
-            link = f"\n\n{communication.action_url}" if communication.action_url else ""
+            site = await brand(self._provider, self.config().portal_url, ctx.language)
+            address_of = site.link(communication.action_url)
+            link = f"\n\n{address_of}" if address_of else ""
+            rows, won, said = self.details(communication.template_key, communication.params or {}, ctx)
+            extra = "".join(
+                [
+                    f"\n\n{' · '.join(won)}" if won else "",
+                    f"\n\n« {said} »" if said else "",
+                    "\n\n" + "\n".join(f"{label}: {value}" for label, value in rows) if rows else "",
+                ]
+            )
             uow.session.add(
                 EmailOutbox(
                     delivery_id=delivery,
                     to_hash=address_hash(address),
                     subject=str(own.get("subject") or title)[:200],
-                    body_text=str(own.get("text") or f"{title}\n\n{body}{link}").strip(),
+                    body_text=str(own.get("text") or f"{title}\n\n{body}{extra}{link}").strip(),
                     body_html=own.get("html") or await self._dressed(communication, ctx, title, body),
                     next_attempt_at=now,
                     attempts=0,
@@ -339,3 +424,22 @@ class FanOut:
                 stmt = stmt.where(Notification.id.in_(ids))
             result = await uow.session.execute(stmt.values(read_at=now))
             return int(getattr(result, "rowcount", 0) or 0)
+
+
+def _instant(value: Any) -> datetime | None:
+    if isinstance(value, datetime):
+        moment = value
+    elif isinstance(value, str) and len(value) >= 10:
+        try:
+            moment = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+    else:
+        return None
+    return moment if moment.tzinfo else moment.replace(tzinfo=UTC)
+
+
+def _in_language(texts: Mapping[str, Any], ctx: LocaleContext) -> str:
+    named = {str(k): str(v) for k, v in texts.items() if isinstance(v, str) and v.strip()}
+    base = ctx.language.split("-")[0]
+    return named.get(ctx.language) or named.get(base) or named.get("en") or next(iter(named.values()), "")

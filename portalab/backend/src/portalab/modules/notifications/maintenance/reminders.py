@@ -46,7 +46,13 @@ def _request(
         dedup_key=f"maintenance:{maintenance}:v{version}:{kind}",
         kind="alert" if alert else "notification",
         priority="high",
-        params={"starts_at": str(payload.get("starts_at", "")), "ends_at": str(payload.get("ends_at", ""))},
+        params={
+            "starts_at": str(payload.get("starts_at", "")),
+            "ends_at": str(payload.get("ends_at", "")),
+            # issue 398: which maintenance, and what its window says
+            "title": str(payload.get("title") or "")[:160] or "none",
+            "quote": str(payload.get("description") or "")[:500],
+        },
         source="system",
         source_ref=f"maintenance:{maintenance}",
         subject_ref=f"maintenance:{maintenance}",
@@ -144,6 +150,8 @@ class MaintenanceReminders:
                             "reminder": str(inserted),
                             "starts_at": payload["starts_at"],
                             "ends_at": payload["ends_at"],
+                            "title": str(payload.get("title") or "")[:160],
+                            "description": str(payload.get("description") or "")[:500],
                         },
                         dedup_key=f"{JOB}:{maintenance}:v{version}:{kind}",
                         run_at=max(run_at, now),
@@ -166,6 +174,8 @@ class MaintenanceReminders:
                 "service_id": row.service_id,
                 "starts_at": payload.get("starts_at", row.valid_until.isoformat()),
                 "ends_at": payload.get("ends_at", ""),
+                "title": payload.get("title", ""),
+                "description": payload.get("description", ""),
             }
             kind, version = row.kind, row.schedule_version
         ref = await self.send(_request(kind, details, version))

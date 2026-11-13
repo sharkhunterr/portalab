@@ -50,6 +50,17 @@ def start_of(item: CalendarItem) -> datetime | None:
     return None
 
 
+def details(item: CalendarItem, start: datetime) -> dict[str, Any]:
+    """Issue 398: what a reminder tells — the item, when it starts and ends, and its own page."""
+    return {
+        "title": item.title[:200],
+        "starts_at": start.isoformat(),
+        "ends_at": item.ends_at.isoformat() if item.ends_at and not item.all_day else "none",
+        "all_day": "yes" if item.all_day else "no",
+        "route": (item.url_ref or "")[:256],
+    }
+
+
 @dataclass(frozen=True, slots=True)
 class ReminderView:
     id: UUID
@@ -186,7 +197,7 @@ class ReminderService:
             await self._send(
                 row,
                 "calendar:notify.updated",
-                {"title": item.title[:200], "starts_at": start.isoformat()},
+                details(item, start),
                 "updated",
             )
             return "updated"
@@ -194,7 +205,7 @@ class ReminderService:
         await self._send(
             row,
             "calendar:notify.reminder",
-            {"title": item.title[:200], "starts_at": start.isoformat()},
+            details(item, start),
             "sent",
         )
         async with self.database.unit_of_work() as uow:
@@ -216,6 +227,7 @@ class ReminderService:
                 row.status, row.updated_at = status, utc_now(self.clock)
 
     async def _send(self, row: Reminder, template: str, params: dict[str, Any], outcome: str) -> None:
+        route = str(params.pop("route", "") or "")
         try:
             providers = self.capabilities.system_providers(NOTIFY)
         except Exception:
@@ -233,7 +245,10 @@ class ReminderService:
                         params=params,
                         source="module",
                         subject_ref=f"calendar:{row.source_kind}:{row.source_id}",
-                        action_url="/calendar",
+                        # issue 398: straight to the item when it has its own page in the portal
+                        action_url=route
+                        if route.startswith("/") and not route.startswith("//")
+                        else "/calendar",
                     )
                 ),
                 timeout=10,

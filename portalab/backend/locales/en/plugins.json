@@ -159,5 +159,7 @@
   "menu": "Actions on {name}",
   "toApprove": "To approve",
   "showDetails": "Settings, confinement and diagnostics",
-  "hideDetails": "Hide the settings, confinement and diagnostics"
+  "hideDetails": "Hide the settings, confinement and diagnostics",
+  "notify.quarantined.body": "It was stopped so that it cannot disturb the portal. Check what went wrong before enabling it again.",
+  "notify.quarantined.fact.reason": "Error"
 }

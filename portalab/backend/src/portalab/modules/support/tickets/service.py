@@ -14,6 +14,7 @@ from uuid import UUID
 from sqlalchemy import and_, delete, func, literal, or_, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from portalab.capabilities.notifications.layout import excerpt
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.search.fts import decode_cursor, encode_cursor
 from portalab.capabilities.support import TicketRef, TicketRequest
@@ -540,6 +541,7 @@ class TicketService:
             )
             await self._event(session, ticket, "ticket.updated", seq)
             requester, assignee, number = ticket.requester_id, ticket.assignee_id, ticket.number
+            title = ticket.title
         if not internal:
             author = self.user_of(principal)
             target = requester if author != requester else assignee
@@ -548,7 +550,8 @@ class TicketService:
                 "support:notify.comment",
                 target,
                 f"ticket:{ticket_id}:{seq}:comment",
-                {"number": number},
+                # issue 398: which ticket, and the reply's first lines (the rest is in the portal)
+                {"number": number, "title": title, "quote": excerpt(text_body)},
                 f"/support/tickets/{ticket_id}",
             )
         return comment
@@ -615,13 +618,20 @@ class TicketService:
                     session, principal, "ticket.closed_for_requester", ticket, {"state": ticket.state}
                 )
             requester, number, state = ticket.requester_id, ticket.number, ticket.state
+            title, was = ticket.title, getattr(workflow.state(previous), "label", previous)
         if self.user_of(principal) != requester:
             await self.notifier.send(
                 STATUS,
                 "support:notify.state",
                 requester,
                 f"ticket:{ticket_id}:{seq}:state",
-                {"number": number, "state": move.target.label},
+                {
+                    "number": number,
+                    "state": move.target.label,
+                    "title": title,
+                    "previous": was,
+                    "quote": excerpt(comment or ""),
+                },
                 f"/support/tickets/{ticket_id}",
             )
         del state
@@ -655,14 +665,14 @@ class TicketService:
                     ticket,
                     {"to": str(assignee) if assignee else None},
                 )
-            number = ticket.number
+            number, title, priority = ticket.number, ticket.title, ticket.priority
         if assignee is not None and assignee != self.user_of(principal):
             await self.notifier.send(
                 ASSIGNMENT,
                 "support:notify.assigned",
                 assignee,
                 f"ticket:{ticket_id}:{seq}:assigned",
-                {"number": number},
+                {"number": number, "title": title, "priority": priority},
                 f"/support/tickets/{ticket_id}",
             )
         return ticket

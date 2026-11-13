@@ -56,7 +56,7 @@ from portalab.modules.notifications.maintenance.reminders import JOB as REMINDER
 from portalab.modules.notifications.maintenance.reminders import MaintenanceReminders
 from portalab.modules.notifications.models import Category, Delivery
 from portalab.modules.notifications.observability import log, metrics
-from portalab.modules.notifications.participant import NotificationsParticipant
+from portalab.modules.notifications.participant import UNREFERENCED, NotificationsParticipant
 from portalab.modules.notifications.producer.service import Producer
 from portalab.modules.notifications.settings import SETTINGS, NotificationsConfig
 from portalab.modules.notifications.sources.sources import sources_consumer
@@ -205,6 +205,20 @@ class NotificationsModule:
             default_retention_targets.register(
                 RetentionTarget(name, table, "activity", column, "delete", OWNER, window=window)
             )
+        # issue 398: what a communication's parameters say (a ticket's title, a reply's first lines) goes
+        # with its notifications and deliveries, never kept after them
+        default_retention_targets.register(
+            RetentionTarget(
+                "notifications.communications",
+                "notify.communications",
+                "activity",
+                "created_at",
+                "delete",
+                OWNER,
+                extra_condition=UNREFERENCED,
+                window=window,
+            )
+        )
         for consumer in (self.reminders.consumer(), sources_consumer(lambda request: self.send(request))):
             if self.consumers.get(consumer.name) is None:
                 self.consumers.register(consumer)

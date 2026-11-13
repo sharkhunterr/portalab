@@ -4,7 +4,7 @@ notified (``marketplace.revocation``), and a Coins purchase is refunded per its 
 is ``abuse``. Audited."""
 
 from collections.abc import Mapping
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
 from sqlalchemy import select
@@ -65,14 +65,18 @@ class Revocations:
         if ownership.state not in LIVE:
             raise Conflict("This product was already settled.", code="marketplace.already_settled")
         paid = ownership.origin == "purchase" and ownership.price_paid > 0
+        refunded = 0
         if paid and ground != "abuse":
             percent = int(dict(version.refund_policy).get("percent", 100)) if version.refund_policy else 100
             row = await self.refunds.refund(
                 actor, ownership_id, reason, by_admin=True, percent=percent, ground=ground
             )
+            refunded = ownership.price_paid * max(0, min(percent, 100)) // 100
         else:
             row = await self._close(actor, ownership_id, product.key, ground, reason, "revoked")
-        await self._notify(row, product.key, ground, version.names)
+        await self._notify(
+            row, product.key, ground, version.names, {"amount": refunded, "quote": reason[:500]}
+        )
         return row
 
     async def _close(
@@ -107,8 +111,14 @@ class Revocations:
         return row
 
     async def _notify(
-        self, ownership: Ownership, product_key: str, ground: str, names: Mapping[str, str] | None = None
+        self,
+        ownership: Ownership,
+        product_key: str,
+        ground: str,
+        names: Mapping[str, str] | None = None,
+        extra: Mapping[str, Any] | None = None,
     ) -> None:
+        """Issue 398: with the administrator's reason and what was given back (``extra``)."""
         providers = self.capabilities.system_providers(NOTIFY)
         if not providers:
             return
@@ -120,7 +130,7 @@ class Revocations:
                     template_key=f"marketplace:notify.revocation.{ground}",
                     audience=Users((ownership.user_id,)),
                     dedup_key=f"revocation:{ownership.id}",
-                    params={"product": shown[:120]},
+                    params={"product": shown[:120], **dict(extra or {})},
                     subject_ref=f"ownership:{ownership.id}",
                     action_url="/marketplace/owned",
                 )

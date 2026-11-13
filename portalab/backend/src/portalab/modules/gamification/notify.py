@@ -3,7 +3,7 @@ notification engine (010), after the ledger transaction committed, with coalesci
 A notification failure never affects the reward."""
 
 import re
-from collections.abc import Iterable, Mapping
+from collections.abc import Awaitable, Callable, Iterable, Mapping
 from dataclasses import dataclass, field, replace
 from typing import Any
 from uuid import UUID
@@ -47,6 +47,8 @@ class Note:
 class Notifier:
     def __init__(self, capabilities: CapabilityRegistry) -> None:
         self.capabilities = capabilities
+        # issue 398: the level-up moment (total XP, the next level, the tier's rewards), set by the module
+        self.level_summary: Callable[[UUID, int], Awaitable[Mapping[str, Any]]] | None = None
 
     async def send(self, notes: Iterable[Note]) -> None:
         notes = together(list(notes))
@@ -58,7 +60,7 @@ class Notifier:
         if not providers:
             return
         for note in notes:
-            note = await self._work(note)
+            note = await self._level(await self._work(note))
             try:
                 await providers[0].provider.send(
                     CommunicationRequest(
@@ -94,6 +96,32 @@ class Notifier:
             work = None
         if work is not None:
             params["work"] = work_name(work)[:160]
+        return replace(note, params=params)
+
+    async def _level(self, note: Note) -> Note:
+        """Issue 398: a level-up says how far the member went — their XP, what the next level asks, and what
+        the level gave (its Coins and Contribution, a product offered); a failure leaves it unsaid."""
+        level = note.params.get("level")
+        if note.kind != "level_up" or self.level_summary is None or not isinstance(level, int):
+            return note
+        try:
+            summary = await self.level_summary(note.user, level)
+        except Exception:
+            log.warning("level-up summary not read", extra={"fields": {"level": level}})
+            return note
+        params: dict[str, Any] = {**note.params, "total_xp": int(summary.get("xp") or 0)}
+        following = summary.get("next_level_at")
+        if isinstance(following, int):
+            params["to_next"] = max(0, following - params["total_xp"])
+            params["next_level"] = level + 1
+        tiers = list(summary.get("rewards") or [])
+        for value in ("coins", "contribution"):
+            amount = sum(int(tier.get(value) or 0) for tier in tiers)
+            if amount:
+                params[value] = amount
+        gifts = [str(tier.get("label") or tier.get("product")) for tier in tiers if tier.get("product")]
+        if gifts:
+            params["gifts"] = ", ".join(gifts)[:300]
         return replace(note, params=params)
 
     async def boosters(

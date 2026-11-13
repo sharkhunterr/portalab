@@ -471,7 +471,8 @@ class MarketplaceModule:
                 ).scalars()
             )
         seq = len(await self.projects.history(project.id))
-        await notify_funders(self.capabilities, project.id, project.title, project.state, seq, funders)
+        said = (note or reason or "").strip()
+        await notify_funders(self.capabilities, project.id, project.title, project.state, seq, funders, said)
         return project
 
     async def probe(self) -> CheckResult:

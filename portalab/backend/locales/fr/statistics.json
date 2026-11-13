@@ -121,6 +121,9 @@
   "wrapped.next": "Suivant",
   "wrapped.none": "Pas encore de bilan.",
   "wrapped.previous": "Précédent",
-  "wrapped.ready": "Votre bilan {recap} est prêt",
+  "wrapped.ready": "Votre récap {period, select, month {du mois} quarter {du trimestre} year {de l'année} other {}} est prêt",
+  "wrapped.ready.body": "Ce que vous avez fait sur le portail, en {count, plural, one {# chiffre} other {# chiffres}}.",
+  "wrapped.ready.fact.end_at": "Au",
+  "wrapped.ready.fact.start_at": "Du",
   "wrapped.title": "Votre bilan : {start} – {end}"
 }

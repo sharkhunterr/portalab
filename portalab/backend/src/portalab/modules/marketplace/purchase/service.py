@@ -180,8 +180,19 @@ class Purchases:
                 return winner
             raise AlreadyOwned("You already own this product.") from error
         metrics.increment("marketplace.purchases")
+        full = int(version.price_coins or 0)
         await notify_owner(
-            self.capabilities, user, "purchase", product.key, f"purchase:{ownership.id}", version.names
+            self.capabilities,
+            user,
+            "purchase",
+            product.key,
+            f"purchase:{ownership.id}",
+            version.names,
+            {
+                "price": price,
+                "full_price": full if full > price else 0,
+                "setup": "yes" if version.config_required else "no",
+            },
         )
         if not version.config_required:
             return await self.activation.activate(ownership.id)

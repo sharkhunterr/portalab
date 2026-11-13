@@ -35,6 +35,11 @@ def sources_consumer(send: Send) -> Consumer:
                     source_ref=str(envelope.event_id),
                     subject_ref=f"account:{user}",
                     action_url="/account",
+                    # issue 398: when the account goes for good (deletion), and when it all happened
+                    params={
+                        "due_at": str(envelope.payload.get("due_at") or "none"),
+                        "occurred_at": envelope.occurred_at.isoformat(),
+                    },
                 )
             )
 

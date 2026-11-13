@@ -305,7 +305,8 @@ async def announce(
             audience=AllAuthenticated(),
             dedup_key=f"campaign-announcement:{campaign.id}:{now.strftime('%Y%m%d%H%M')}",
             kind="notification",
-            params={"campaign": definition.name(), "message": body.message},
+            # issue 398: the campaign's name in each member's language (the names by language)
+            params={"campaign": dict(definition.names) or definition.name(), "message": body.message},
             source="module",
             source_ref=f"campaign:{campaign.key}",
             action_url=f"/campaigns/{campaign.key}",
