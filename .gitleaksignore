@@ -12,3 +12,6 @@ c3cd508bb5c2ea02adca88d3fc5dafca3a24559e:portalab/backend/src/portalab/app/demo_
 45e31233e45cdc035da0b41a3a2f3d0ac89884a8:portalab/backend/tests/integration/test_jobs_retry.py:generic-api-key:53
 45e31233e45cdc035da0b41a3a2f3d0ac89884a8:portalab/backend/tests/unit/test_errors.py:generic-api-key:63
 45e31233e45cdc035da0b41a3a2f3d0ac89884a8:portalab/backend/tests/unit/test_logging.py:generic-api-key:64
+# issue 408: the RFC 6238 appendix B test secret (base32 of "12345678901234567890"), public by definition
+85bd7ae7b204acee1f2f40083e2509e150ce3691:portalab/backend/tests/integration/identity/test_mfa.py:generic-api-key:53
+85bd7ae7b204acee1f2f40083e2509e150ce3691:portalab/backend/tests/integration/identity/test_mfa.py:generic-api-key:62
