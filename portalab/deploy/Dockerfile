@@ -23,7 +23,10 @@ LABEL org.opencontainers.image.title="Portalab" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.source="https://github.com/sharkhunterr/portalab" \
       org.opencontainers.image.documentation="https://github.com/sharkhunterr/portalab#readme"
-ENV PYTHONDONTWRITEBYTECODE=1 \
+# issue 410: the build shown on the Version page
+ENV PORTALAB_BUILD_REF="${VCS_REF}" \
+    PORTALAB_BUILD_DATE="${BUILD_DATE}" \
+    PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \

@@ -35,6 +35,47 @@
 .system-facts dd {
   margin: 0;
 }
+/* issue 410: the update status and the security posture */
+.system-update {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+.system-update a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.system-update__when {
+  color: var(--color-text-muted);
+}
+.system-posture {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.system-posture__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: start;
+}
+.system-posture__item p {
+  margin: var(--space-1) 0;
+  color: var(--color-text-muted);
+}
+.system-posture__item--ok > svg {
+  color: var(--state-available-fg);
+}
+.system-posture__item--warn > svg {
+  color: var(--state-partial-fg);
+}
+.system-posture__item--info > svg {
+  color: var(--color-text-muted);
+}
 .system-reset {
   display: grid;
   gap: var(--space-3);

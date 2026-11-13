@@ -188,7 +188,7 @@ docker compose up -d
 
 - **Back up first.** Save the portal from *Administration › Backups* before a major upgrade (see below).
 - Until the migrations are applied, `/readyz` reports the portal as not ready. To check whether migrations are pending without applying them: `docker compose run --rm migrate migrate --status`.
-- *Administration › Version* shows the running version and revision, the database, and the schema of each module.
+- *Administration › Version* shows the running version and build, whether a newer release is out, the portal's security posture, the database, and the schema of each module.
 
 ### Coming from the Compose file of Portalab 1.1 or earlier
 

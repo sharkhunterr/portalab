@@ -4602,11 +4602,32 @@ export interface paths {
         };
         /**
          * System Version
-         * @description Which Portalab this is: its version, its archives' layout, each module's schema, the database.
+         * @description Which Portalab this is: its version and build, whether a newer one is released (issue 410), its
+         *     archives' layout, each module's schema, the database — and the portal's security posture.
          */
         get: operations["system_version_api_v1_admin_system_version_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/version/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check For Update
+         * @description Issue 410: ask GitHub now whether a newer Portalab is released.
+         */
+        post: operations["check_for_update_api_v1_admin_system_version_check_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -30548,6 +30569,28 @@ export interface operations {
         };
     };
     system_version_api_v1_admin_system_version_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    check_for_update_api_v1_admin_system_version_check_post: {
         parameters: {
             query?: never;
             header?: never;
