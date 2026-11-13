@@ -39,7 +39,7 @@ from portalab.app.stream import StreamOptions
 from portalab.app.stream import router as stream_router
 from portalab.app.wiring import DeferredAuthorizer, wire_identity, wire_platform
 from portalab.capabilities.catalog import new_registry
-from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, WithPermission
+from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, Users, WithPermission
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.audit_port import AuditRecord
 from portalab.core.authorization import authorization_scope
@@ -255,6 +255,19 @@ def security_alert(
                     ),
                 )
             providers = platform.notifications.capabilities.system_providers(NOTIFY)
+            if providers and user_id:
+                # issue 407: the member hears that their account is blocked for a while (and why it may be)
+                await providers[0].provider.send(
+                    CommunicationRequest(
+                        category="account.security",
+                        template_key="notifications:account.blocked",
+                        audience=Users((user_id,)),
+                        dedup_key=f"account-block:{block['key']}:{int(block['until'])}",
+                        priority="high",
+                        params={"minutes": max(1, round(guard.block_seconds / 60))},
+                        action_url="/account",
+                    )
+                )
             if providers:
                 await providers[0].provider.send(
                     CommunicationRequest(

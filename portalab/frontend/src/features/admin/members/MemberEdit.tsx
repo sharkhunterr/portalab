@@ -7,6 +7,7 @@ import { CheckboxField, TextField } from "../../../design-system/components/Fiel
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
+import { passwordRuleMessage } from "../../auth/passwordRules";
 import { useMe } from "../../auth/useAuth";
 import { ACCOUNTS_KEY, accountLabel, useServiceAccounts } from "./accounts";
 
@@ -92,8 +93,8 @@ function passwordProblem(error: unknown, t: ReturnType<typeof useT>): string {
     if (error.code === "identity.password_current_wrong") return t("admin:members.password.wrong");
     if (error.code === "identity.password_not_local") return t("admin:members.password.notLocal");
     if (error.code === "admin.sole_admin_protected") return t("admin:members.password.adminOnly");
-    if (error.code === "user.password_invalid")
-      return t("account:signInPhrase.policy", { min: Number(error.extensions.min_length ?? 12) });
+    const rule = passwordRuleMessage(error, t);
+    if (rule) return rule;
     if (error.code === "auth.throttled")
       return t("account:signInPhrase.throttled", {
         minutes: Math.max(1, Math.ceil(Number(error.extensions.retry_after_seconds ?? 60) / 60)),

@@ -148,6 +148,7 @@ SECURITY_HEADERS: tuple[tuple[bytes, bytes], ...] = (
 # member's data pulled into another page). Pictures and streams stay embeddable: a Chromecast plays the
 # portal's streams from Google's receiver page.
 JSON_ONLY: tuple[tuple[bytes, bytes], ...] = ((b"cross-origin-resource-policy", b"same-origin"),)
+NO_STORE: tuple[tuple[bytes, bytes], ...] = ((b"cache-control", b"no-store"),)
 EXEMPT_PATHS = frozenset({"/healthz", "/readyz"})
 # Read-only, cacheable documents the SPA fetches by the dozen on every full load (one catalog per i18n
 # namespace): counting them would rate-limit a member who simply reloads a few pages (027).
@@ -483,6 +484,13 @@ class SecurityMiddleware:
                     *(
                         JSON_ONLY
                         if _json(headers) and b"cross-origin-resource-policy" not in existing
+                        else ()
+                    ),
+                    # issue 405: an API answer in JSON is a member's data — kept by no browser cache nor
+                    # proxy, unless the route says otherwise (the catalogs, the visual packs' files)
+                    *(
+                        NO_STORE
+                        if _json(headers) and b"cache-control" not in existing and path.startswith("/api/")
                         else ()
                     ),
                 ]

@@ -49,7 +49,7 @@ class IdentityBootstrap:
     async def create_first_admin(
         self, *, login: str, password: str, display_name: str | None = None, email: str | None = None
     ) -> UUID:
-        check_password_policy(password, self.ctx.config.password_policy)
+        check_password_policy(password, self.ctx.config.password_policy, personal=(login, display_name or ""))
         authority = self.ctx.admin_authority()
         now = self.ctx.now()
         async with self.ctx.database.unit_of_work() as uow:

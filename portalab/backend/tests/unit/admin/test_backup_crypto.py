@@ -2,11 +2,14 @@
 or an altered archive is refused."""
 
 import io
+import json
+import struct
 
 import pytest
 
 from portalab.modules.administration.backup.crypto import (
     CHUNK,
+    MAGIC,
     DecryptingReader,
     EncryptingWriter,
     NotAnArchive,
@@ -49,3 +52,34 @@ def test_refusals() -> None:
         DecryptingReader(io.BytesIO(bytes(altered)), PASSPHRASE).read()
     with pytest.raises(ValueError):
         EncryptingWriter(io.BytesIO(), "short")
+
+
+@pytest.mark.parametrize(
+    "costs",
+    [
+        {"n": 2**24, "r": 8, "p": 1},
+        {"n": 2**15, "r": 512, "p": 1},
+        {"n": 2**15, "r": 8, "p": 64},
+        {"n": 3000, "r": 8, "p": 1},
+    ],
+)
+def test_a_forged_header_cannot_make_the_key_costly(costs: dict[str, int]) -> None:
+    """Issue 405: scrypt's costs come from the archive itself, read before any proof — bounded."""
+    header = json.dumps(
+        {"kdf": "scrypt", **costs, "salt": "00" * 16, "nonce": "00" * 7, "chunk": CHUNK}
+    ).encode()
+    forged = io.BytesIO(MAGIC + struct.pack(">I", len(header)) + header)
+    with pytest.raises(NotAnArchive):
+        DecryptingReader(forged, "a long passphrase")
+
+
+def test_a_chunk_cannot_claim_more_than_a_chunk() -> None:
+    sink = io.BytesIO()
+    writer = EncryptingWriter(sink, "a long passphrase")
+    writer.write(b"hello")
+    writer.close()
+    data = bytearray(sink.getvalue())
+    start = len(MAGIC) + 4 + struct.unpack(">I", data[len(MAGIC) : len(MAGIC) + 4])[0]
+    data[start : start + 4] = struct.pack(">I", 2**31)  # a chunk claiming 2 GB
+    with pytest.raises(NotAnArchive):
+        DecryptingReader(io.BytesIO(bytes(data)), "a long passphrase")

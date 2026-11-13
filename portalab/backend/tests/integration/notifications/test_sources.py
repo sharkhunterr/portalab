@@ -133,3 +133,30 @@ async def test_account_source_and_outages_left_to_health(
         )
     assert [tuple(r) for r in rows] == [("account.security", "notification", "high")]
     assert inbox == ["account.security"]
+
+
+async def test_a_member_hears_of_their_account_security_events(
+    app: FastAPI, notify: NotifyHarness, clock: FixedClock
+) -> None:
+    """Issue 407: a password changed (by them or an administrator) and a single sign-on linked are told to
+    the member, in their notification center (a change they did not make shows at once)."""
+    alex = await create_user(module_of(app), "alex")
+    subject = SubjectRef("user", str(alex))
+    await notify.publish("user.password_changed", {"by": "admin"}, at=clock.now(), subject=subject)
+    await notify.publish("user.sso_linked", {"provider": "sso.example.org"}, at=clock.now(), subject=subject)
+    await notify.dispatch()
+    async with notify.database.session() as session:
+        titles = (
+            (
+                await session.execute(
+                    text("SELECT title FROM notify.notifications WHERE user_id = :u ORDER BY title"),
+                    {"u": alex},
+                )
+            )
+            .scalars()
+            .all()
+        )
+    assert titles == [
+        "A single sign-on account now signs in as you",
+        "An administrator set a new password for your account",
+    ]

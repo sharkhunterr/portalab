@@ -9,6 +9,7 @@ from sqlalchemy import select
 
 from portalab.core.authorization import public, require
 from portalab.core.authz_port import Principal
+from portalab.core.logging import get_logger
 from portalab.modules.identity.api.middleware import (
     check_csrf,
     clear_session_cookies,
@@ -32,6 +33,7 @@ from portalab.modules.identity.module import IdentityModule
 from portalab.modules.identity.services.common import UserNotFound, self_actor
 from portalab.modules.identity.services.oidc import PENDING, browser_binding, state_of
 
+log = get_logger("portalab.identity")
 router = APIRouter(prefix="/api/v1", tags=["identity"])
 Module = Annotated[IdentityModule, Depends(identity_module)]
 
@@ -140,6 +142,13 @@ async def oidc_callback(
         )
     except Exception as exc:
         code_name = getattr(exc, "code", "auth.sso_failed")
+        # issue 405: a refused single sign-on is told in the log (its reason, never a code or a token)
+        log.warning(
+            "single sign-on refused",
+            extra={
+                "fields": {"code": code_name, "reason": str(getattr(exc, "reason", type(exc).__name__))[:120]}
+            },
+        )
         reason = "unavailable" if code_name == "auth.account_unavailable" else "failed"
         refused = RedirectResponse(f"/login?sso={reason}", status_code=302)
         _forget_sso(refused)
@@ -159,6 +168,9 @@ async def logout(request: Request, module: Module) -> Response:
         await module.auth.sign_out(token)
     response = Response(status_code=status.HTTP_204_NO_CONTENT)
     clear_session_cookies(response)
+    # issue 405: what this browser cached of the member's pages goes with the session (the readers keep
+    # their downloaded books: no session data lives in the browser's storage)
+    response.headers["Clear-Site-Data"] = '"cache"'
     return response
 
 

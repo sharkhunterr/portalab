@@ -818,5 +818,13 @@
   "maintenance.start.fact.ends_at": "Ends",
   "maintenance.rescheduled.fact.starts_at": "Starts",
   "maintenance.rescheduled.fact.ends_at": "Ends",
-  "verification.action": "Confirm my account"
+  "verification.action": "Confirm my account",
+  "account.password_changed": "{by, select, admin {An administrator set a new password for your account} other {Your password was changed}}",
+  "account.password_changed.body": "{by, select, admin {Sign in with the password they gave you. Your other sessions were signed out.} other {Your other sessions were signed out. If you did not do it, contact the portal's team at once.}}",
+  "account.password_changed.fact.occurred_at": "When",
+  "account.sso_linked": "A single sign-on account now signs in as you",
+  "account.sso_linked.body": "From now on you can sign in with {provider}. If you did not do it, contact the portal's team at once.",
+  "account.sso_linked.fact.occurred_at": "When",
+  "account.blocked": "Your account is blocked for {minutes, plural, one {# minute} other {# minutes}}",
+  "account.blocked.body": "Requests from your account looked like an intrusion attempt, so its sessions were signed out. It opens again by itself; if this was not you, change your password afterwards."
 }

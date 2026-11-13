@@ -10,7 +10,13 @@ from portalab.capabilities.notifications import CommunicationRef, CommunicationR
 
 CONSUMER = "notifications.sources"
 OWNER = "module:notifications"
-SECURITY_EVENTS = ("user.suspended", "user.reactivated", "user.deletion_requested")
+SECURITY_EVENTS = (
+    "user.suspended",
+    "user.reactivated",
+    "user.deletion_requested",
+    "user.password_changed",  # issue 407: the member's own security events, told to them
+    "user.sso_linked",
+)
 
 Send = Callable[[CommunicationRequest], Awaitable[CommunicationRef]]
 
@@ -33,12 +39,15 @@ def sources_consumer(send: Send) -> Consumer:
                     priority="high",
                     source="event",
                     source_ref=str(envelope.event_id),
-                    subject_ref=f"account:{user}",
+                    # issue 407: each security event stands alone (never merged into another one)
+                    subject_ref=f"account:{user}:{envelope.event_id}",
                     action_url="/account",
                     # issue 398: when the account goes for good (deletion), and when it all happened
                     params={
                         "due_at": str(envelope.payload.get("due_at") or "none"),
                         "occurred_at": envelope.occurred_at.isoformat(),
+                        "by": str(envelope.payload.get("by") or "none"),
+                        "provider": str(envelope.payload.get("provider") or "none")[:120],
                     },
                 )
             )

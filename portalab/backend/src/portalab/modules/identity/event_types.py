@@ -21,6 +21,8 @@ register_event_types(
     "user.onboarding_completed",
     "user.onboarding_step_completed",  # 027: one step of the welcome (its ``step``) — discovery missions
     "user.tour_completed",  # #7: a guided tour seen to its end (its ``tour``), once — discovery missions
+    "user.password_changed",  # issue 407: by the member (« self ») or an administrator (« admin »)
+    "user.sso_linked",  # issue 407: a provider account now signs in as this member
     retention_class="business",
     visibility_class="private",
 )

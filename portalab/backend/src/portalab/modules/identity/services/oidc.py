@@ -31,7 +31,7 @@ from portalab.modules.identity.models import ExternalIdentity, OidcLogin, User
 from portalab.modules.identity.observability import log
 from portalab.modules.identity.services.account_service import AccountService, LoginTaken
 from portalab.modules.identity.services.auth import AuthService, SignedIn
-from portalab.modules.identity.services.common import SYSTEM, DisplayNameTaken
+from portalab.modules.identity.services.common import SYSTEM, DisplayNameTaken, publish
 from portalab.modules.identity.settings import (
     OIDC_CLIENT_ID,
     OIDC_CLIENT_SECRET,
@@ -264,7 +264,7 @@ class OidcService:
         claims = await self._claims(config, code, redirect_uri, login)
         user_id = await self._member(config, claims, await self._signed_in(previous_token))
         signed = await self.auth.open_session(
-            user_id, client_ip=client_ip, user_agent=user_agent, previous_token=previous_token
+            user_id, client_ip=client_ip, user_agent=user_agent, previous_token=previous_token, method="sso"
         )
         return signed, login.next_path
 
@@ -340,4 +340,10 @@ class OidcService:
                     user_id=user.id, issuer=issuer, subject=subject, created_at=now, last_sign_in_at=now
                 )
             )
+            # issue 407: the member hears that a provider account now signs in as them
+            await publish(
+                self.ctx, session, "user.sso_linked", user.id, actor=None, occurred_at=now,
+                metadata={"provider": urlsplit(issuer).hostname or issuer},
+                dedup_key=f"sso_linked:{user.id}:{subject}",
+            )  # fmt: skip
             return user.id
