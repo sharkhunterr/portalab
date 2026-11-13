@@ -87,7 +87,9 @@ class EditionOut(BaseModel):
 
 
 # a portal image, a requested title's poster from the metadata provider, a requested book's cover
-PICTURE = r"^(?:[0-9a-fA-F-]{36}|t-[A-Za-z0-9_.-]{1,120}|b-[A-Za-z0-9_-]{1,380})$"
+PICTURE = (
+    r"^(?:[0-9a-fA-F-]{36}|t-[A-Za-z0-9_.-]{1,120}|b-[A-Za-z0-9_-]{1,380})$"  # same as editions/pictures.py
+)
 
 
 def _framed(row: NewsletterEdition) -> Response:

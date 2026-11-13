@@ -174,11 +174,32 @@ def declare_category(
 
 
 @dataclass(frozen=True, slots=True)
+class InlineImage:
+    """Issue 411: a picture carried in the e-mail itself, which its HTML shows as ``cid:<cid>``."""
+
+    cid: str
+    data: bytes
+    mime: str
+
+
+@dataclass(frozen=True, slots=True)
 class EmailMessage:
     to: str
     subject: str
     text: str
     html: str | None = None
+    inline: tuple[InlineImage, ...] = ()
+
+
+@runtime_checkable
+class EmailImages(Protocol):
+    """Issue 411: the portal's own pictures an e-mail shows, read from the portal so they travel in the e-mail
+    (a mail client cannot reach a LAN portal, nor pass a sign-in proxy). ``prefix`` is the portal path they
+    live under; ``image`` answers the rest of the path for the recipient (their rights apply), or nothing."""
+
+    prefix: str
+
+    async def image(self, path: str, reader: UUID | None) -> bytes | None: ...
 
 
 @runtime_checkable
@@ -193,4 +214,12 @@ NOTIFY_SPEC = CapabilitySpec(
     multi_provider=False,
     description="Produce communications (notifications, alerts) for an audience (Notifications 010).",
 )
-SPECS: tuple[CapabilitySpec, ...] = (NOTIFY_SPEC,)
+EMAIL_IMAGES = "notifications.email_images"
+EMAIL_IMAGES_SPEC = CapabilitySpec(
+    name=EMAIL_IMAGES,
+    version="1.0",
+    protocol=EmailImages,
+    multi_provider=True,
+    description="The portal's own pictures an e-mail shows, embedded in it (issue 411).",
+)
+SPECS: tuple[CapabilitySpec, ...] = (NOTIFY_SPEC, EMAIL_IMAGES_SPEC)
