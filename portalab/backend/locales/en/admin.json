@@ -2169,5 +2169,7 @@
   "email.setUp": "Set up sending",
   "setting.notifications.digest.defaultMode.choice.off": "Off (one by one)",
   "setting.notifications.digest.defaultMode.choice.daily": "Daily digest",
-  "setting.notifications.digest.defaultMode.choice.weekly": "Weekly digest"
+  "setting.notifications.digest.defaultMode.choice.weekly": "Weekly digest",
+  "setting.identity.oidc.trustUnverifiedEmail.label": "Trust the provider's e-mails",
+  "setting.identity.oidc.trustUnverifiedEmail.hint": "Link a provider user to the portal account with the same e-mail even when the provider does not say it verified it (Authentik leaves it out for its own users). Turn on only if your members cannot change their e-mail at the provider; the Admin's account always needs a verified e-mail."
 }

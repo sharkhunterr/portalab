@@ -61,6 +61,7 @@ export const STEPS: readonly Step[] = [
       "identity.oidc.clientId",
       "identity.oidc.clientSecret",
       "identity.oidc.createAccounts",
+      "identity.oidc.trustUnverifiedEmail",
     ],
     links: [["/admin/members", "members"]],
   },

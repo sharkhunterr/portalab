@@ -15,6 +15,7 @@ import pytest
 from cryptography.hazmat.primitives.asymmetric import rsa
 from sqlalchemy import select, update
 
+from portalab.core.errors import Unavailable
 from portalab.modules.identity.models import ExternalIdentity, User
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.identity.services.oidc import OidcSettings, SignOnFailed, browser_binding, safe_next
@@ -74,9 +75,9 @@ def module(harness: IdentityHarness) -> IdentityModule:
     return IdentityModule(harness.context)
 
 
-def ready(module: IdentityModule, provider: Provider, create: bool = True) -> None:
+def ready(module: IdentityModule, provider: Provider, create: bool = True, trust: bool = False) -> None:
     async def settings() -> OidcSettings:
-        return OidcSettings(True, ISSUER, "portal", "s3cret", "Authentik", create)
+        return OidcSettings(True, ISSUER, "portal", "s3cret", "Authentik", create, trust)
 
     module.oidc.settings = settings  # type: ignore[method-assign]
     module.oidc.transport = httpx.MockTransport(provider.handle)
@@ -178,8 +179,17 @@ async def test_an_e_mail_the_provider_disowns_links_nobody(module: IdentityModul
         await uow.session.execute(update(User).where(User.id == user_id).values(email="hedy@example.org"))
     with pytest.raises(SignOnFailed):
         await sign_on(module, provider, {"sub": "ak-5", "email": "hedy@example.org", "email_verified": False})
+    # issue 403: left out (Authentik's own users) — neither linked nor duplicated, unless trusted
+    with pytest.raises(SignOnFailed):
+        await sign_on(module, provider, {"sub": "ak-5", "email": "hedy@example.org"})
+    ready(module, provider, create=True, trust=False)
+    with pytest.raises(SignOnFailed):  # no second account with that e-mail either
+        await sign_on(module, provider, {"sub": "ak-5", "email": "hedy@example.org"})
+    ready(module, provider, create=False, trust=True)  # the administrator trusts the provider's e-mails
+    with pytest.raises(SignOnFailed):  # still never one the provider disowns
+        await sign_on(module, provider, {"sub": "ak-5", "email": "hedy@example.org", "email_verified": False})
     signed, _ = await sign_on(module, provider, {"sub": "ak-5", "email": "hedy@example.org"})
-    assert signed.user_id == user_id  # left out (Authentik's own users): linked by the server
+    assert signed.user_id == user_id
 
 
 async def test_the_admin_is_found_by_e_mail_only_when_the_provider_vouches(
@@ -193,6 +203,9 @@ async def test_the_admin_is_found_by_e_mail_only_when_the_provider_vouches(
     async with module.ctx.database.unit_of_work() as uow:
         await uow.session.execute(update(User).where(User.id == admin).values(email="root@example.org"))
     with pytest.raises(SignOnFailed):
+        await sign_on(module, provider, {"sub": "ak-6", "email": "root@example.org"})
+    ready(module, provider, create=False, trust=True)
+    with pytest.raises(SignOnFailed):  # trusting the provider's e-mails never covers the Admin's
         await sign_on(module, provider, {"sub": "ak-6", "email": "root@example.org"})
     signed, _ = await sign_on(
         module, provider, {"sub": "ak-6", "email": "root@example.org", "email_verified": True}
@@ -209,3 +222,22 @@ async def test_the_way_back_is_refused_in_another_browser(module: IdentityModule
     for browser in (None, "x" * 64, browser_binding("another state")):
         with pytest.raises(SignOnFailed):
             await sign_on(module, provider, {"sub": "ak-7"}, browser=browser)
+
+
+async def test_a_provider_naming_another_issuer_is_refused(module: IdentityModule) -> None:
+    """Issue 403: the discovery document's issuer is the one configured (OpenID Connect Discovery 4.3)."""
+    provider = Provider()
+    ready(module, provider)
+    real = provider.handle
+
+    def lying(request: httpx.Request) -> httpx.Response:
+        answer = real(request)
+        if request.url.path.endswith("/.well-known/openid-configuration"):
+            body = answer.json()
+            return httpx.Response(200, json={**body, "issuer": "https://evil.example.org/"})
+        return answer
+
+    module.oidc.transport = httpx.MockTransport(lying)
+    module.oidc._discovery.clear()
+    with pytest.raises(Unavailable):
+        await module.oidc.start(REDIRECT, "/")
