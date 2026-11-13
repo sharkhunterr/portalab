@@ -34,7 +34,7 @@ from portalab.modules.plugins.confined.runtime import ConfinedRuntime
 from portalab.modules.plugins.context.plugin_context import Context, apply_manifest
 from portalab.modules.plugins.context.registries import Registries
 from portalab.modules.plugins.contributions.ledger_store import Ledger
-from portalab.modules.plugins.db.plugin_db import PluginStorage, RoleBoundDb
+from portalab.modules.plugins.db.plugin_db import PluginStorage
 from portalab.modules.plugins.guard.guard import PluginGuard
 from portalab.modules.plugins.lifecycle import loader
 from portalab.modules.plugins.manifest.schema import Manifest, validate
@@ -365,12 +365,7 @@ class Lifecycle:
         manifest = validate(dict(row.manifest))
         package = self.store.verify(key, row.version, row.sha256)
         priority = int(self.config().contribution_priority.get(key, 100))
-        db = RoleBoundDb(
-            self.database,
-            self.storage.role(key),
-            self.storage.schema(key),
-            self.config().statement_timeout_ms,
-        )
+        db = self.storage.bound(key, self.config().statement_timeout_ms)  # issue 396: its own connections
         ctx = Context(key, self.registries, self.guard, db, priority=priority)
         apply_manifest(ctx, manifest.raw)
         self._visual_types(key, manifest)

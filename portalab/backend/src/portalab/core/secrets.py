@@ -66,6 +66,9 @@ class SecretBox:
         )
         self._aead = AESGCM(derived)
 
+    def __reduce__(self) -> tuple[object, ...]:
+        raise TypeError("the secret box cannot be pickled")  # it holds the application key
+
     def encrypt(self, plaintext: str, *, context: str) -> str:
         nonce = os.urandom(NONCE_BYTES)
         ciphertext = self._aead.encrypt(nonce, plaintext.encode("utf-8"), context.encode("utf-8"))

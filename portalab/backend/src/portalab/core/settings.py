@@ -33,7 +33,7 @@ SETUP_NETWORKS = (
 class BootstrapSettings:
     database_url: SecretValue
     secret_key: bytes = field(repr=False)
-    bind_host: str = "0.0.0.0"  # noqa: S104 — container default, documented
+    bind_host: str = "0.0.0.0"  # noqa: S104 — container default, documented  # nosec B104
     bind_port: int = 8080
     log_level: str = "INFO"
     data_dir: Path = Path("/var/lib/portalab")  # filesystem blob storage root (core.blobstore)
@@ -99,7 +99,7 @@ def load_settings(env: Mapping[str, str] | None = None) -> BootstrapSettings:
         raise SettingsError(f"SECRET_KEY_FILE must contain at least {MIN_SECRET_KEY_BYTES} bytes")
     register_secret_value(key_text)
 
-    bind_host = env.get("BIND_HOST", "0.0.0.0")  # noqa: S104
+    bind_host = env.get("BIND_HOST", "0.0.0.0")  # noqa: S104  # nosec B104
     try:
         bind_port = int(env.get("BIND_PORT", "8080"))
     except ValueError as exc:

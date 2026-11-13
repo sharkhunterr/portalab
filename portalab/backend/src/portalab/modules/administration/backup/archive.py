@@ -351,7 +351,7 @@ async def _partitions_of(apg: Any, names: list[str]) -> list[dict[str, str]]:
 
 async def _dump(apg: Any, table: Table, path: Path) -> int:
     columns = ", ".join(f'"{c}"' for c in table.columns)
-    query = f"SELECT {columns} FROM {_quote(table.name)}"  # noqa: S608 — names read from the catalog
+    query = f"SELECT {columns} FROM {_quote(table.name)}"  # noqa: S608 — names read from the catalog  # nosec B608
     if table.where:
         query += f" WHERE {table.where}"
     with gzip.open(path, "wb", compresslevel=6) as sink:
@@ -627,7 +627,7 @@ async def _set_sequences(apg: Any) -> None:
         """
     )
     for r in rows:
-        highest = f'SELECT max("{r["col"]}") FROM {r["tbl"]}'  # noqa: S608 — names read from the catalog
+        highest = f'SELECT max("{r["col"]}") FROM {r["tbl"]}'  # noqa: S608 — names read from the catalog  # nosec B608
         await apg.execute(f"SELECT setval($1::regclass, COALESCE(({highest}), 0) + 1, false)", r["seq"])
 
 
@@ -660,10 +660,10 @@ async def _select(
     for table in SETTINGS_TABLES:
         if table not in loaded:
             continue
-        keys = [r["key"] for r in await apg.fetch(f"SELECT DISTINCT key FROM {_quote(table)}")]  # noqa: S608
+        keys = [r["key"] for r in await apg.fetch(f"SELECT DISTINCT key FROM {_quote(table)}")]  # noqa: S608  # nosec B608
         dropped = [k for k in keys if not selection.keeps_setting_owner(setting_owner(k))]
         if dropped:
-            await apg.execute(f"DELETE FROM {_quote(table)} WHERE key = ANY($1::text[])", dropped)  # noqa: S608
+            await apg.execute(f"DELETE FROM {_quote(table)} WHERE key = ANY($1::text[])", dropped)  # noqa: S608  # nosec B608
     reassigned = left_out = 0
     keys = await apg.fetch(_FOREIGN_KEYS)
     if not selection.members:
@@ -682,19 +682,19 @@ async def _select(
             name, col = _quote(table), f'"{column}"'
             if policy == "reassign":
                 status = await apg.execute(
-                    f"UPDATE {name} SET {col} = $1 WHERE {col} IS NOT NULL AND {col} <> $1",  # noqa: S608
+                    f"UPDATE {name} SET {col} = $1 WHERE {col} IS NOT NULL AND {col} <> $1",  # noqa: S608  # nosec B608
                     admin,
                 )
                 reassigned += _affected(status)
             else:
                 status = await apg.execute(
-                    f"DELETE FROM {name} WHERE {col} IS NOT NULL AND {col} <> $1",  # noqa: S608
+                    f"DELETE FROM {name} WHERE {col} IS NOT NULL AND {col} <> $1",  # noqa: S608  # nosec B608
                     admin,
                 )
                 left_out += _affected(status)
         for table in MEMBER_TABLES:
             if table in loaded:
-                left_out += _affected(await apg.execute(f"DELETE FROM {_quote(table)}"))  # noqa: S608
+                left_out += _affected(await apg.execute(f"DELETE FROM {_quote(table)}"))  # noqa: S608  # nosec B608
         left_out += _affected(await apg.execute("DELETE FROM identity.users WHERE id <> $1", admin))
     left_out += await _drop_dangling(apg, keys)
     return {
@@ -716,16 +716,16 @@ async def _drop_dangling(apg: Any, keys: list[Any]) -> int:
         for k in keys:
             match = " AND ".join(f'p."{r}" = t."{c}"' for c, r in zip(k["cols"], k["refs"], strict=True))
             filled = " AND ".join(f't."{c}" IS NOT NULL' for c in k["cols"])
-            orphan = f"{filled} AND NOT EXISTS (SELECT 1 FROM {k['dst']} p WHERE {match})"  # noqa: S608
+            orphan = f"{filled} AND NOT EXISTS (SELECT 1 FROM {k['dst']} p WHERE {match})"  # noqa: S608  # nosec B608
             if k["required"]:
-                status = await apg.execute(f"DELETE FROM {k['src']} t WHERE {orphan}")  # noqa: S608
+                status = await apg.execute(f"DELETE FROM {k['src']} t WHERE {orphan}")  # noqa: S608  # nosec B608
             else:
                 emptied = ", ".join(f'"{c}" = NULL' for c in k["cols"])
-                status = await apg.execute(f"UPDATE {k['src']} t SET {emptied} WHERE {orphan}")  # noqa: S608
+                status = await apg.execute(f"UPDATE {k['src']} t SET {emptied} WHERE {orphan}")  # noqa: S608  # nosec B608
             changed += _affected(status)
         for table, column, target in references:
             status = await apg.execute(
-                f'DELETE FROM {_quote(table)} t WHERE t."{column}" IS NOT NULL '  # noqa: S608
+                f'DELETE FROM {_quote(table)} t WHERE t."{column}" IS NOT NULL '  # noqa: S608  # nosec B608
                 f'AND NOT EXISTS (SELECT 1 FROM {_quote(target)} p WHERE p.id = t."{column}")'
             )
             changed += _affected(status)

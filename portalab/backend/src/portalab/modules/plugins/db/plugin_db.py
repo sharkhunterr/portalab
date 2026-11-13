@@ -1,15 +1,21 @@
 """Per-plugin data isolation (T014; R3): schema ``plugin_<key>`` owned by a dedicated PostgreSQL role with
-no rights on core schemas; plugin sessions run ``SET LOCAL ROLE`` with a ``statement_timeout`` and the
-plugin schema as search path, so core tables are unreachable (core data only through capabilities).
-Plugin migrations are ordered SQL files run **with the plugin's role** and tracked in its own schema;
-during an update only *expand* steps are accepted (no drop, rename, truncate or delete)."""
+no rights on core schemas, so core tables are unreachable (core data only through capabilities).
 
+Issue 396: a plugin's SQL runs on **its own connections, signed in as its role** (those of its confined
+storage, spec 030: its password kept encrypted, a SCRAM verifier on the server) — never on the portal's with
+``SET ROLE``, which the plugin's own SQL could undo (``RESET ROLE``: Postgres lets a session take back any
+role its signed-in user belongs to); every statement is bounded in time by the portal, whatever it sets.
+Plugin migrations are ordered SQL files run the same way and tracked in its own schema; during an update
+only *expand* steps are accepted (no drop, rename, truncate or delete)."""
+
+import asyncio
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncEngine
 
 from portalab.core.db import Database
 from portalab.core.errors import ValidationFailed
@@ -33,6 +39,19 @@ class PluginStorage:
     def __init__(self, database: Database, *, role_prefix: str = "plugin_") -> None:
         self.database = database
         self.role_prefix = role_prefix
+        # issue 396: the plugin's own connections (set by the module: the confined storage's), and how to
+        # close them before its role goes
+        self.login: Callable[[str], Awaitable[AsyncEngine]] | None = None
+        self.release: Callable[[str], Awaitable[None]] | None = None
+
+    async def engine(self, key: str) -> AsyncEngine:
+        if self.login is None:
+            raise RuntimeError("a plugin's SQL needs its own connections")
+        return await self.login(key)
+
+    def bound(self, key: str, timeout_ms: int) -> "RoleBoundDb":
+        """``ctx.db`` for the plugin ``key``."""
+        return RoleBoundDb(lambda: self.engine(key), self.schema(key), timeout_ms)
 
     def schema(self, key: str) -> str:
         return f"plugin_{key}"
@@ -48,7 +67,7 @@ class PluginStorage:
                 text("SELECT 1 FROM pg_roles WHERE rolname = :r"), {"r": self.role(key)}
             )
             if exists is None:
-                await session.execute(text(f"CREATE ROLE {role} NOLOGIN"))
+                await session.execute(text(f"CREATE ROLE {role} NOLOGIN NOINHERIT"))
             await session.execute(text(f"GRANT {role} TO CURRENT_USER"))
             await session.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema} AUTHORIZATION {role}"))
             await session.execute(
@@ -79,11 +98,12 @@ class PluginStorage:
             return []
         files = sorted(p for p in directory.iterdir() if MIGRATION.match(p.name))
         applied: list[str] = []
-        role, schema = _ident(self.role(key)), _ident(self.schema(key))
-        async with self.database.unit_of_work() as uow:
-            session = uow.session
+        schema = _ident(self.schema(key))
+        engine = await self.engine(key)
+        async with engine.begin() as conn:  # signed in as the plugin's role: it cannot leave it
+            await conn.execute(text(f"SET LOCAL search_path = {schema}"))
             done = set(
-                (await session.execute(text(f"SELECT version FROM {schema}.portalab_migrations"))).scalars()  # noqa: S608 — identifiers checked by _ident
+                (await conn.execute(text(f"SELECT version FROM {schema}.portalab_migrations"))).scalars()  # noqa: S608 — identifiers checked by _ident  # nosec B608
             )
             for path in files:
                 version = path.name.split("_", 1)[0]
@@ -95,16 +115,13 @@ class PluginStorage:
                         "An update may only add (expand); destructive steps come in a later version.",
                         extensions={"migration": path.name},
                     )
-                await session.execute(text(f"SET LOCAL ROLE {role}"))
-                await session.execute(text(f"SET LOCAL search_path = {schema}"))
                 for statement in (s.strip() for s in sql.split(";")):
                     if statement:
-                        await session.execute(text(statement))
-                await session.execute(
-                    text(f"INSERT INTO {schema}.portalab_migrations (version) VALUES (:v)"),  # noqa: S608
+                        await conn.execute(text(statement))
+                await conn.execute(
+                    text(f"INSERT INTO {schema}.portalab_migrations (version) VALUES (:v)"),  # noqa: S608  # nosec B608
                     {"v": version},
                 )
-                await session.execute(text("RESET ROLE"))
                 applied.append(version)
         return applied
 
@@ -126,12 +143,14 @@ class PluginStorage:
                 .all()
             )
             for table in tables:
-                rows = await session.execute(text(f"SELECT * FROM {_ident(schema)}.{_ident(table)}"))  # noqa: S608 — identifiers checked by _ident
+                rows = await session.execute(text(f"SELECT * FROM {_ident(schema)}.{_ident(table)}"))  # noqa: S608 — identifiers checked by _ident  # nosec B608
                 out[table] = [{k: str(v) for k, v in r._mapping.items()} for r in rows]
         return out
 
     async def drop(self, key: str) -> None:
         role, schema = _ident(self.role(key)), _ident(self.schema(key))
+        if self.release is not None:
+            await self.release(key)
         async with self.database.unit_of_work() as uow:
             session = uow.session
             await session.execute(text(f"DROP SCHEMA IF EXISTS {schema} CASCADE"))
@@ -144,19 +163,19 @@ class PluginStorage:
 
 
 class RoleBoundDb:
-    """``ctx.db`` (SDK ``PluginDb``)."""
+    """``ctx.db`` (SDK ``PluginDb``): the plugin's SQL on its own connections (issue 396), in its schema,
+    each statement bounded in time by the portal even if the plugin changes its ``statement_timeout``."""
 
-    def __init__(self, database: Database, role: str, schema: str, timeout_ms: int) -> None:
-        self.database = database
-        self.role = _ident(role)
+    def __init__(self, engine: Callable[[], Awaitable[AsyncEngine]], schema: str, timeout_ms: int) -> None:
+        self.engine = engine
         self.schema = _ident(schema)
         self.timeout_ms = int(timeout_ms)
 
     async def execute(self, sql: str, params: Mapping[str, Any] | None = None) -> Sequence[Mapping[str, Any]]:
-        async with self.database.unit_of_work() as uow:
-            session = uow.session
-            await session.execute(text(f"SET LOCAL ROLE {self.role}"))
-            await session.execute(text(f"SET LOCAL statement_timeout = {self.timeout_ms}"))
-            await session.execute(text(f"SET LOCAL search_path = {self.schema}"))
-            result = await session.execute(text(sql), dict(params or {}))
-            return [dict(r._mapping) for r in result] if getattr(result, "returns_rows", False) else []
+        engine = await self.engine()
+        async with engine.begin() as conn:
+            await conn.execute(text(f"SET LOCAL statement_timeout = {self.timeout_ms}"))
+            await conn.execute(text(f"SET LOCAL search_path = {self.schema}"))
+            async with asyncio.timeout(self.timeout_ms / 1000 + 1):
+                result = await conn.execute(text(sql), dict(params or {}))
+                return [dict(r._mapping) for r in result] if getattr(result, "returns_rows", False) else []

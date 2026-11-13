@@ -42,3 +42,36 @@ describe("sandbox context", () => {
     sandbox.stop();
   });
 });
+
+describe("a script that leaves its sandbox page", () => {
+  it("hears nothing more: its frame emptied, the failure reported (issue 396)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("export default () => {}", { status: 200 })),
+    );
+    const frame = document.createElement("iframe");
+    document.body.append(frame);
+    const element = normaliseElement({
+      pack: "vigie",
+      type: "widget",
+      look: "cap",
+      file: "/x/sha-a/w/cap.js",
+    });
+    const onError = vi.fn();
+    const sandbox = runSandbox(frame, element, { data: {} }, { onError });
+    const target = frame.contentWindow as Window;
+    const posted: Array<Record<string, unknown>> = [];
+    target.postMessage = ((message: Record<string, unknown>) =>
+      posted.push(message)) as Window["postMessage"];
+    frame.dispatchEvent(new Event("load")); // the sandbox page
+    window.dispatchEvent(new MessageEvent("message", { source: target, data: { type: "loaded" } }));
+    await vi.waitFor(() => expect(posted.some((m) => m.type === "run")).toBe(true));
+    frame.dispatchEvent(new Event("load")); // the script sent its frame elsewhere
+    const before = posted.length;
+    sandbox.update({ data: { "me.statistics": { secret: 1 } } });
+    expect(posted.length).toBe(before);
+    expect(onError).toHaveBeenCalledWith("the script left its sandbox page");
+    expect(frame.hasAttribute("src")).toBe(false);
+    sandbox.stop();
+  });
+});

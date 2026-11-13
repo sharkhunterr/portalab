@@ -4,7 +4,6 @@ timeout; its migrations run with its own role; it has no foreign keys to core ta
 import pytest
 from sqlalchemy import text
 
-from portalab.modules.plugins.db.plugin_db import RoleBoundDb
 from tests.integration.plugins.conftest import PlHarness
 
 pytestmark = pytest.mark.integration
@@ -15,7 +14,7 @@ async def test_role_isolation(pl: PlHarness) -> None:
     await pl.installed(pl.package("alpha", migrations=TABLE))
     await pl.installed(pl.package("beta", migrations=TABLE))
     storage = pl.module.storage
-    alpha = RoleBoundDb(pl.database, storage.role("alpha"), storage.schema("alpha"), 200)
+    alpha = storage.bound("alpha", 200)
     await alpha.execute("INSERT INTO notes (body) VALUES (:b)", {"b": "mine"})
     assert [dict(r) for r in await alpha.execute("SELECT body FROM notes")] == [{"body": "mine"}]
     for forbidden in (
@@ -39,3 +38,33 @@ async def test_role_isolation(pl: PlHarness) -> None:
             )
         )
     assert owner == storage.role("alpha") and foreign == 0
+
+
+ESCAPES = (
+    # issue 396: SET LOCAL ROLE is no boundary for SQL the plugin writes — Postgres lets any role the
+    # *session* user belongs to be taken back; each of these must stay inside the plugin's role
+    "DO $$ BEGIN EXECUTE 'RESET ROLE'; PERFORM count(*) FROM identity.users; END $$",
+    "DO $$ BEGIN EXECUTE 'SET ROLE NONE'; PERFORM count(*) FROM identity.users; END $$",
+    "SELECT set_config('role', 'none', true), (SELECT count(*) FROM identity.users)",
+    "DO $$ BEGIN PERFORM set_config('statement_timeout', '0', true); PERFORM pg_sleep(1); END $$",
+)
+
+
+@pytest.mark.parametrize("attack", ESCAPES)
+async def test_a_plugin_cannot_leave_its_role(pl: PlHarness, attack: str) -> None:
+    await pl.installed(pl.package("alpha", migrations=TABLE))
+    storage = pl.module.storage
+    alpha = storage.bound("alpha", 200)
+    with pytest.raises(
+        Exception, match=r"permission denied|statement timeout|canceling statement|not allowed"
+    ):
+        await alpha.execute(attack)
+
+
+async def test_a_plugin_migration_cannot_leave_its_role(pl: PlHarness) -> None:
+    escape = {"0001_init.sql": "RESET ROLE; CREATE TABLE identity.hack (id int)"}
+    with pytest.raises(Exception, match=r"permission denied|not allowed|refused"):
+        await pl.installed(pl.package("alpha", migrations=escape))
+    async with pl.database.session() as session:
+        made = await session.scalar(text("SELECT to_regclass('identity.hack') IS NOT NULL"))
+    assert made is False

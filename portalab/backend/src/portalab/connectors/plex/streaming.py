@@ -18,10 +18,12 @@ import codecs
 import hashlib
 import re
 import time
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # the error type only: documents are read by defusedxml
 from collections.abc import AsyncIterator, Mapping
 from contextlib import asynccontextmanager
 from typing import Any
+
+from defusedxml import ElementTree as SafeET
 
 from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError
 from portalab.capabilities.connector_sdk import ServiceHandle
@@ -302,7 +304,7 @@ class PlexChannel:
         if response.status_code >= 400:
             raise ConnectionError(f"plex.tv answered HTTP {response.status_code}")
         try:
-            root = ET.fromstring(response.content)  # noqa: S314 — see the import
+            root = SafeET.fromstring(response.content)  # issue 396: no entity expansion from plex.tv
         except ET.ParseError as exc:
             raise InvalidPayload("plex.tv did not answer with XML") from exc
         tokens: dict[str, str] = {}

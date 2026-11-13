@@ -91,6 +91,7 @@ def dims_of(definition: StatisticDefinition, envelope: Envelope) -> dict[str, st
 
 
 def dims_hash(dims: Mapping[str, str]) -> str:
+    # nosemgrep: insecure-hash-algorithm-sha1 — a key for a group of dimensions, not a security use
     return hashlib.sha1(json.dumps(dims, sort_keys=True).encode(), usedforsecurity=False).hexdigest()
 
 
