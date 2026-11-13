@@ -13,8 +13,11 @@ from typing import Any
 from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError as PydanticValidationError
 from sqlalchemy import text
+from sqlalchemy.exc import DBAPIError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.requests import ClientDisconnect
 from starlette.responses import Response
 
 import portalab
@@ -49,6 +52,7 @@ from portalab.core.errors import (
     NotFound,
     PortalError,
     ValidationFailed,
+    database_problem,
     internal_error_problem,
     to_problem,
 )
@@ -535,6 +539,33 @@ def create_app(
 
     @app.exception_handler(RequestValidationError)
     async def validation_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+        errors = [{"loc": list(err.get("loc", ())), "type": err.get("type")} for err in exc.errors()]
+        error = ValidationFailed("The request is invalid.", extensions={"errors": errors})
+        return _problem_response(
+            to_problem(error, correlation_id=get_correlation_id(), instance=request.url.path)
+        )
+
+    @app.exception_handler(DBAPIError)
+    async def database_error_handler(request: Request, exc: DBAPIError) -> JSONResponse:
+        mapped = database_problem(exc)
+        if mapped is None:
+            raise exc  # a real failure: the 500 handler logs it
+        log.warning(
+            "the database refused a request's values",
+            extra={"fields": {"path": request.url.path, "code": mapped.code}},
+        )
+        return _problem_response(
+            to_problem(mapped, correlation_id=get_correlation_id(), instance=request.url.path)
+        )
+
+    @app.exception_handler(ClientDisconnect)
+    async def disconnect_handler(request: Request, exc: ClientDisconnect) -> Response:
+        """Issue 401: the client went away while sending — nobody to answer, nothing failed on our side."""
+        return Response(status_code=400)
+
+    @app.exception_handler(PydanticValidationError)
+    async def model_error_handler(request: Request, exc: PydanticValidationError) -> JSONResponse:
+        """Issue 401: a value checked inside the portal (a setting, a definition) — the request's fault."""
         errors = [{"loc": list(err.get("loc", ())), "type": err.get("type")} for err in exc.errors()]
         error = ValidationFailed("The request is invalid.", extensions={"errors": errors})
         return _problem_response(

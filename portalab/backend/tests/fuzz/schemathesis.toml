@@ -1,0 +1,4 @@
+# Issue 401 — Schemathesis (tests/fuzz/fuzz.sh). A 503 is the portal saying an outside service it needs is
+# not connected (no request service, no AI provider…): expected on a portal set up for nothing else.
+[checks.not_a_server_error]
+expected-statuses = ["1XX", "2XX", "3XX", "4XX", "503"]

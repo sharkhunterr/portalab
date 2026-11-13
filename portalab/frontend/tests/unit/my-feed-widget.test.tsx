@@ -79,7 +79,7 @@ describe("issue 315 — my feed's widget", () => {
   it("plays in place under a host name only — YouTube refuses a page reached by its IP address", () => {
     expect(embeddable("portalab.lan")).toBe(true);
     expect(embeddable("localhost")).toBe(true);
-    expect(embeddable("192.168.1.87")).toBe(false);
+    expect(embeddable("192.168.1.40")).toBe(false);
     expect(embeddable("[::1]")).toBe(false);
   });
 });

@@ -138,3 +138,29 @@ def internal_error_problem(
         correlation_id=correlation_id,
         instance=instance,
     )
+
+
+INVALID_VALUE = "A value of the request is out of range or not allowed."
+UNKNOWN_REFERENCE = "The request refers to something that does not exist."
+
+
+def _sqlstate(error: BaseException) -> str:
+    original = getattr(error, "orig", None)
+    cause = getattr(original, "__cause__", None)
+    return str(getattr(original, "sqlstate", None) or getattr(cause, "sqlstate", "") or "")
+
+
+def database_problem(error: BaseException) -> PortalError | None:
+    """Issue 401: what the database refused because of what a request sent — a number out of range, a NUL
+    character, a reference to nothing, a duplicate — told as the request's fault (422/409), never as a
+    server error. ``None`` for anything else (a real failure stays a 500)."""
+    state = _sqlstate(error)
+    if not state and "invalid input for query argument" in str(error):
+        state = "22003"  # refused by the driver before it reached the server (a number out of range)
+    if state.startswith("22") or state in ("23502", "23514"):
+        return ValidationFailed(INVALID_VALUE, code="request.invalid_value")
+    if state == "23503":
+        return ValidationFailed(UNKNOWN_REFERENCE, code="request.unknown_reference")
+    if state == "23505":
+        return Conflict("This already exists.", code="request.duplicate")
+    return None

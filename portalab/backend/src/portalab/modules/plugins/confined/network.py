@@ -197,7 +197,8 @@ class Network:
         body: bytes | None = args.get("body") if isinstance(args.get("body"), (bytes, bytearray)) else None
         payload = args.get("json")
         timeout = min(MAX_TIMEOUT, max(0.5, float(args.get("timeout_s") or MAX_TIMEOUT)))
-        extensions = {"sni_hostname": host} if scheme == "https" else {}
+        # the address checked above, for the name it is for (the allow-list reads ``egress_host``)
+        extensions = {"egress_host": host, **({"sni_hostname": host} if scheme == "https" else {})}
         async with httpx.AsyncClient(
             transport=self.transport,
             timeout=timeout,

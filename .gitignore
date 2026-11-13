@@ -40,3 +40,8 @@ portalab/deploy/appdata/
 Thumbs.db
 .vscode/
 .idea/
+
+# issue 401: the API fuzzer's cache and reports
+.schemathesis/
+fuzz-report/
+dast-report/

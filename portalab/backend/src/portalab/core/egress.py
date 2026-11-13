@@ -66,7 +66,9 @@ EGRESS = EgressPolicy()
 
 
 async def _check(request: httpx.Request) -> None:
-    host = request.url.host
+    # issue 401: a caller that resolved and checked a name itself connects to its address — the name it is
+    # for comes in the request's ``egress_host`` extension, set by Portalab's code, never by a header
+    host = str(request.extensions.get("egress_host") or request.url.host)
     if not EGRESS.allowed(host):
         default_metrics.counter("security", "egress.refused")
         log.warning("outgoing call refused", extra={"fields": {"host": host[:120]}})

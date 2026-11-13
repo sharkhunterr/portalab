@@ -476,7 +476,7 @@ async def test_searxng_images_and_a_guarded_fetch() -> None:
         ("https://images.example/maverick.jpg", 1600, 900, "brave.images"),
         ("https://images.example/b.jpg", 800, 600, "bing images"),
     ]
-    assert not public("127.0.0.1") and not public("192.168.1.24") and not public("169.254.169.254")
+    assert not public("127.0.0.1") and not public("192.168.1.30") and not public("169.254.169.254")
     assert not public("localhost")
     for url in (
         "http://127.0.0.1/a.jpg",

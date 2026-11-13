@@ -266,7 +266,7 @@ Your single sign-on: the accounts and the groups that open each service.
 Language models on your own network, for the AI assistant.
 
 - **For admins**: the models the server holds (family, size, quantization, whether it supports tools or embeddings) and those loaded in memory. The assistant is then pointed at Ollama's OpenAI-compatible address; choose the model in the assistant's settings.
-- **Credentials**: none. Ollama has no authentication of its own; give its address, e.g. `http://192.168.1.60:11434`.
+- **Credentials**: none. Ollama has no authentication of its own; give its address, e.g. `http://192.168.1.20:11434`.
 - The assistant can also use any other OpenAI-compatible provider. See [AI and automations](ai-and-automations.md).
 
 ### Infrastructure
