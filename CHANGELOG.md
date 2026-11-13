@@ -3,6 +3,21 @@
 All notable changes to Portalab. The release pages (GitLab, GitHub) show the curated notes of
 [GITHUB_RELEASES.md](GITHUB_RELEASES.md); this file is generated from the commits by `npm run release`.
 
+### [1.4.1](https://github.com/sharkhunterr/portalab/compare/v1.4.0...v1.4.1) (2026-11-13)
+
+
+### Features
+
+* **administration:** the Version page announces a newer release, shows the build and a security check-up ([c31c663](https://github.com/sharkhunterr/portalab/commit/c31c663e329e865448b44aa7abd610d26ee66ac0))
+
+
+### Bug Fixes
+
+* **ci:** cosign reads its key as root, the signature no longer fails silently ([4da8cc2](https://github.com/sharkhunterr/portalab/commit/4da8cc27155c8620edef640f71d5f7f6749223f2))
+* **gamification:** a season finished shows with the episodes, no longer « Plays (other kinds) » ([9198160](https://github.com/sharkhunterr/portalab/commit/9198160704d8298c33624cbe2a1b826dab2def7c))
+* **media:** live TV counts one gain per sitting, not one every few minutes ([da4ce01](https://github.com/sharkhunterr/portalab/commit/da4ce0130da2a9d6a84777f0451f70ab7a01e141))
+* **notifications:** the portal's own pictures travel in the e-mail, read for its recipient ([da53f75](https://github.com/sharkhunterr/portalab/commit/da53f756cd8071c143eae5eddd58cc6664f03adf))
+
 ## [1.4.0](https://github.com/sharkhunterr/portalab/compare/v1.3.0...v1.4.0) (2026-11-13)
 
 
