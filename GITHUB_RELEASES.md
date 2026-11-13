@@ -55,6 +55,59 @@
 
 ---
 
+# v1.4.1
+
+## Portalab v1.4.1 — pictures in e-mails, new versions announced, a security check-up
+
+**Pictures show in the e-mails again**: newsletters and articles now carry their pictures inside the e-mail.
+**The Version page tells you when a newer Portalab is released**, and gives a security check-up of your
+portal with what to do for each point.
+
+### Highlights
+
+- **Pictures in the e-mails** — an edition's posters and covers and an article's images travel in the
+  e-mail itself, so they show even when the mail client cannot reach the portal: a portal on your LAN, or
+  behind a proxy that asks to sign in first (Authentik's forward auth, for instance). Each recipient gets only
+  the pictures they may see; pictures from other sites stay links.
+- **New versions announced** — *Administration › Version* shows whether a newer Portalab is out on GitHub,
+  with a link to its release notes and a **Check now** button. Only GitHub's public releases page is read,
+  twice a day at most, and nothing about your portal is sent. Turn it off with *Check for new versions* in
+  *Administration › Configuration*.
+- **A security check-up** — the same page lists how the portal is protected: HTTPS or plain HTTP, your
+  two-step verification and how many members use it, the password length, the single sign-on's e-mail
+  trust, the outbound allow-list, the `/metrics` token, TLS for e-mails and the last backup. Each point
+  that can be improved says why and links to its setting.
+- **The build** — the commit and date the image was built from.
+
+### Closed issues
+
+#### Security
+
+- `security` The release image is signed again: the signing step could not read its key and skipped the
+  signature (v1.4.0 was signed afterwards, by its digest)
+
+#### Fixed
+
+- `bug` Pictures did not show in the newsletters and in the articles sent by e-mail (the mail client was sent
+  to the portal, which it often cannot reach); they now travel in the e-mail
+- `bug` Live TV earned a gain line every two or three minutes; a sitting now counts once, with all its
+  minutes
+- `bug` The booster earned for finishing a season showed as « Plays (other kinds) »; it now shows with the
+  episodes
+- `bug` The Version page could show an older version than the one running
+
+#### New
+
+- `feat` The Version page announces a newer release, shows the image's build and a security check-up of the
+  portal, each point linked to its setting
+
+### Upgrading
+
+- `docker compose pull && docker compose up -d`. No migration in this release. The update check is on by
+  default; with the outbound allow-list on, `api.github.com` is already allowed for it.
+
+---
+
 # v1.4.0
 
 ## Portalab v1.4.0 — two-step verification, and a portal hardened and checked at every release
