@@ -54,6 +54,15 @@ variables:
 workflow:
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
+    # issues 402, 404: a scheduled pipeline does one task (SCHEDULE_TASK): « security » rescans what was
+    # published and audits the dependencies, « renovate » proposes dependency updates — no test, build nor
+    # release runs then
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      variables:
+        ENABLE_BACKEND_TESTS: "false"
+        ENABLE_FRONTEND_TESTS: "false"
+        ENABLE_DOCKER_BUILD: "false"
+        ENABLE_GITLAB_REGISTRY: "false"
 
 stages:
   - validate
@@ -67,6 +76,18 @@ stages:
 # =============================================================================
 # Reusable templates
 # =============================================================================
+.unscheduled:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - when: on_success
+
+.security_scheduled:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULE_TASK != "security"'
+      when: never
+    - when: on_success
+
 .python:
   image: python:${PYTHON_VERSION}-slim
   before_script:
@@ -118,6 +139,7 @@ stages:
 validate:ruff:
   extends: .python
   stage: validate
+  rules: !reference [.unscheduled, rules]
   script:
     - uv run ruff check .
     - uv run ruff format --check .
@@ -125,24 +147,28 @@ validate:ruff:
 validate:mypy:
   extends: .python
   stage: validate
+  rules: !reference [.unscheduled, rules]
   script:
     - uv run mypy
 
 validate:import-linter:
   extends: .python
   stage: validate
+  rules: !reference [.unscheduled, rules]
   script:
     - uv run lint-imports --config importlinter.ini
 
 validate:i18n-backend:
   extends: .python
   stage: validate
+  rules: !reference [.unscheduled, rules]
   script:
     - uv run portalab i18n check
 
 validate:python-audit:
   extends: .python
   stage: validate
+  rules: !reference [.security_scheduled, rules]
   script:
     # known vulnerabilities in runtime dependencies fail the release
     - uv export --frozen --no-dev --format requirements-txt --no-emit-project > /tmp/requirements.txt
@@ -151,6 +177,7 @@ validate:python-audit:
 validate:sast:
   extends: .python
   stage: validate
+  rules: !reference [.security_scheduled, rules]
   script:
     # static analysis of the code (issues 395, 396): a medium-severity finding fails the release; reviewed
     # exceptions carry a « nosec » with their reason on the line
@@ -171,6 +198,7 @@ validate:sast:
 
 validate:dockerfile:
   stage: validate
+  rules: !reference [.unscheduled, rules]
   image:
     name: hadolint/hadolint:v2.12.0-debian
     entrypoint: [""]
@@ -180,6 +208,7 @@ validate:dockerfile:
 
 validate:docker-config:
   stage: validate
+  rules: !reference [.unscheduled, rules]
   image:
     name: aquasec/trivy:0.58.1
     entrypoint: [""]
@@ -191,6 +220,7 @@ validate:docker-config:
 validate:dead-code:
   extends: .python
   stage: validate
+  rules: !reference [.unscheduled, rules]
   script:
     # unused functions, classes, variables, unreachable code (issue 397); false positives in the whitelist
     - uvx vulture==2.16 src vulture_whitelist.py --min-confidence 80
@@ -198,30 +228,35 @@ validate:dead-code:
 validate:biome:
   extends: .node
   stage: validate
+  rules: !reference [.unscheduled, rules]
   script:
     - npx biome ci . --diagnostic-level=error
 
 validate:typescript:
   extends: .node
   stage: validate
+  rules: !reference [.unscheduled, rules]
   script:
     - npm run typecheck
 
 validate:api-drift:
   extends: .node
   stage: validate
+  rules: !reference [.unscheduled, rules]
   script:
     - npm run check:api-drift
 
 validate:i18n-frontend:
   extends: .node
   stage: validate
+  rules: !reference [.unscheduled, rules]
   script:
     - npm run i18n:check
 
 validate:knip:
   extends: .node
   stage: validate
+  rules: !reference [.unscheduled, rules]
   script:
     # unused files, exports and dependencies of the interface: reported until they are cleaned (issue 397)
     - npx --yes knip@5.88.1 --no-progress
@@ -231,11 +266,13 @@ validate:knip:
 validate:node-audit:
   extends: .node
   stage: validate
+  rules: !reference [.security_scheduled, rules]
   script:
     - npm audit --omit=dev --audit-level=high
 
 validate:secrets:
   stage: validate
+  rules: !reference [.security_scheduled, rules]
   image:
     name: zricethezav/gitleaks:v8.21.2
     entrypoint: [""]
@@ -361,6 +398,39 @@ test:api-fuzz:
   rules:
     - if: '$ENABLE_BACKEND_TESTS == "true"'
 
+security:published-image:
+  # issue 402: the images already published, rescanned every week — a vulnerability found after a release
+  # (system packages, Python, Node) is seen without waiting for the next one
+  stage: test
+  image:
+    name: aquasec/trivy:0.58.1
+    entrypoint: [""]
+  script:
+    - |
+      for TAG in latest $(echo "${RESCAN_TAGS:-}" | tr ',' ' '); do
+        echo "== ${DOCKER_HUB_USER}/${CI_PROJECT_NAME}:${TAG}"
+        trivy image --quiet --timeout 20m --image-src remote --scanners vuln \
+          --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 "${DOCKER_HUB_USER}/${CI_PROJECT_NAME}:${TAG}"
+      done
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULE_TASK == "security"'
+
+renovate:
+  # issue 402: dependency updates as merge requests (renovate.json), on its own schedule — with a project
+  # access token (scope « api », role Developer) in the masked variable RENOVATE_TOKEN
+  stage: test
+  image: renovate/renovate:39.86.0
+  variables:
+    RENOVATE_PLATFORM: gitlab
+    RENOVATE_ENDPOINT: $CI_API_V4_URL
+    RENOVATE_REPOSITORIES: $CI_PROJECT_PATH
+    RENOVATE_GIT_AUTHOR: "Renovate Bot <renovate@portalab.local>"
+    LOG_LEVEL: info
+  script:
+    - renovate
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULE_TASK == "renovate" && $RENOVATE_TOKEN'
+
 # =============================================================================
 # The image is not exported as an artifact (it is far over GitLab's artifact limit): the publish and deploy
 # jobs build it again in their own dind.
@@ -378,27 +448,16 @@ build:docker:
         --tag ${DOCKER_IMAGE}:${CI_COMMIT_SHA} \
         --file ${DOCKERFILE} \
         .
-    # one image, three entrypoints (serve, worker, migrate): it starts
-    - docker run --rm ${DOCKER_IMAGE}:${CI_COMMIT_SHA} --help
-    # issue 400: OWASP ZAP against this image running (signed in): a rule set to FAIL fails the release
-    - sh portalab/deploy/ci/dast.sh ${DOCKER_IMAGE}:${CI_COMMIT_SHA} dast-report
-    # issue 395: a fixed HIGH or CRITICAL vulnerability in the image (system packages, Python, Node) fails it
-    - |
-      docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.58.1 image \
-        --quiet --timeout 20m --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
-        ${DOCKER_IMAGE}:${CI_COMMIT_SHA}
-    # issue 402: what the image holds (system packages, Python, Node), as a CycloneDX SBOM for the release
-    - |
-      docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.58.1 image \
-        --quiet --timeout 20m --format cyclonedx ${DOCKER_IMAGE}:${CI_COMMIT_SHA} > sbom.cdx.json
+    # it starts; Trivy (HIGH/CRITICAL fixed), OWASP ZAP signed in (issue 400), its SBOM (issue 402)
+    - sh portalab/deploy/ci/check-image.sh ${DOCKER_IMAGE}:${CI_COMMIT_SHA} image-check
   artifacts:
     when: always
     paths:
-      - dast-report/
-      - sbom.cdx.json
+      - image-check/
     expire_in: 2 weeks
   rules:
-    - if: '$ENABLE_DOCKER_BUILD == "true"'
+    # a publishing pipeline checks the image in « deploy », right before pushing that very image
+    - if: '$ENABLE_DOCKER_BUILD == "true" && $DEPLOY != "true"'
 
 # =============================================================================
 # Stage: publish — GitLab Container Registry (optional)
@@ -449,15 +508,26 @@ deploy:
           --tag ${DOCKER_IMAGE}:${CI_COMMIT_SHA} \
           --file ${DOCKERFILE} \
           .
+        # issues 400, 402: the image pushed is the one checked here (Trivy, OWASP ZAP, SBOM), never a rebuild
+        sh portalab/deploy/ci/check-image.sh ${DOCKER_IMAGE}:${CI_COMMIT_SHA} image-check
         echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin
         DOCKER_HUB_IMAGE="${DOCKER_HUB_USER}/${CI_PROJECT_NAME}"
         for TAG in "${CI_COMMIT_TAG}" "${CI_COMMIT_TAG#v}" latest; do
           docker tag ${DOCKER_IMAGE}:${CI_COMMIT_SHA} ${DOCKER_HUB_IMAGE}:${TAG}
           docker push ${DOCKER_HUB_IMAGE}:${TAG}
         done
+        # issue 402: signed by its digest, its SBOM attested — when a key is set; never blocks the release
+        if [ -n "${COSIGN_KEY_B64:-}" ]; then
+          DIGEST=$(docker inspect --format '{{index .RepoDigests 0}}' ${DOCKER_HUB_IMAGE}:${CI_COMMIT_TAG#v})
+          REGISTRY_USER="$DOCKER_HUB_USER" REGISTRY_TOKEN="$DOCKER_HUB_TOKEN" \
+            sh portalab/deploy/ci/sign-image.sh "$DIGEST" image-check/sbom.cdx.json \
+            || echo "WARNING: the image was not signed"
+        fi
         # the Docker Hub page is portalab/deploy/DOCKERHUB.md
         if [ -f portalab/deploy/DOCKERHUB.md ]; then
           wget -q https://github.com/christian-korneck/docker-pushrm/releases/download/v1.9.0/docker-pushrm_linux_amd64 -O /usr/local/bin/docker-pushrm
+          # issue 402: the binary checked (v1.9.0 publishes no checksums: the one it had on 2026-11-13)
+          echo "2f48649ce6c6aba1656a0fb3fc7a82971caf8ece7d86e6eed3d10c106d20fac8  /usr/local/bin/docker-pushrm" | sha256sum -c -
           chmod +x /usr/local/bin/docker-pushrm
           docker-pushrm --file portalab/deploy/DOCKERHUB.md \
             --short "The self-hosted portal for your community: media, cards, games, wiki and more." \
@@ -471,6 +541,11 @@ deploy:
         git push github HEAD:refs/heads/${CI_DEFAULT_BRANCH} --force
         git push github refs/tags/${CI_COMMIT_TAG}:refs/tags/${CI_COMMIT_TAG} --force
       fi
+  artifacts:
+    when: always
+    paths:
+      - image-check/
+    expire_in: 4 weeks
   rules:
     - if: '$DEPLOY == "true"'
 
@@ -479,6 +554,8 @@ deploy:
 # =============================================================================
 release:gitlab:
   stage: release
+  rules:
+    - if: '$CI_COMMIT_TAG'
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   before_script:
     - apk add --no-cache sed gawk
@@ -496,8 +573,6 @@ release:github:
   image: alpine:latest
   needs:
     - job: deploy
-      optional: true
-    - job: build:docker
       artifacts: true
       optional: true
   before_script:
@@ -521,10 +596,10 @@ release:github:
       if [ "$HTTP_CODE" -eq 201 ]; then
         echo "GitHub release created: $(echo "$BODY" | jq -r '.html_url')"
         # issue 402: the image's SBOM beside the release
-        if [ -s sbom.cdx.json ]; then
+        if [ -s image-check/sbom.cdx.json ]; then
           UPLOAD=$(echo "$BODY" | jq -r '.upload_url' | sed 's/{.*}//')
           curl -sf -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/json" \
-            --data-binary @sbom.cdx.json "${UPLOAD}?name=portalab-${CI_COMMIT_TAG}-sbom.cdx.json" >/dev/null \
+            --data-binary @image-check/sbom.cdx.json "${UPLOAD}?name=portalab-${CI_COMMIT_TAG}-sbom.cdx.json" >/dev/null \
             && echo "SBOM attached" || echo "SBOM not attached"
         fi
       else

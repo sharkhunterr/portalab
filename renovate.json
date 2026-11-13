@@ -1,0 +1,34 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Issue 402 — dependency updates as merge requests: a release waits 7 days (a compromised version is usually caught by then), images are pinned by digest, security fixes come at once.",
+  "extends": ["config:recommended", "docker:pinDigests", ":dependencyDashboard", ":semanticCommits"],
+  "minimumReleaseAge": "7 days",
+  "internalChecksFilter": "strict",
+  "timezone": "Europe/Paris",
+  "schedule": ["before 6am on monday"],
+  "prConcurrentLimit": 6,
+  "labels": ["dependencies"],
+  "vulnerabilityAlerts": { "enabled": true, "minimumReleaseAge": null, "labels": ["dependencies", "security"] },
+  "lockFileMaintenance": { "enabled": true, "schedule": ["before 6am on the first day of the month"] },
+  "packageRules": [
+    {
+      "description": "Small updates of the interface's tooling together",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "interface tooling"
+    },
+    {
+      "description": "Small updates of the backend's tooling together",
+      "matchManagers": ["pep621"],
+      "matchDepTypes": ["dependency-groups", "project.optional-dependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "backend tooling"
+    },
+    {
+      "description": "The CI's own images and tools",
+      "matchFileNames": [".gitlab-ci.yml", "portalab/deploy/ci/**"],
+      "groupName": "CI tools"
+    }
+  ]
+}

@@ -111,6 +111,20 @@ The full checklist for publishing Portalab behind **Nginx Proxy Manager** with *
 - For Authentik: the provider's redirect URI is `https://<your portal>/api/v1/auth/oidc/callback`. Bind the application to your members' group, forbid members from changing their own e-mail, and enforce MFA.
 - Enable backups and copy them off the machine.
 
+## Checking the image you run
+
+Each release's image is scanned before it is pushed (Trivy, OWASP ZAP), and the image pushed is the very one that was scanned. Every week, the published images are scanned again for vulnerabilities found since.
+
+- **SBOM**: each GitHub release has `portalab-vX.Y.Z-sbom.cdx.json`, the CycloneDX list of what the image holds. Feed it to your own scanner (`trivy sbom portalab-vX.Y.Z-sbom.cdx.json`).
+- **Signature**: once the project's public key is published in [`portalab/deploy/cosign.pub`](../portalab/deploy/cosign.pub), each release is signed by its digest. Check it with [cosign](https://docs.sigstore.dev/cosign/system_config/installation/):
+
+  ```sh
+  cosign verify --key cosign.pub sharkhunterr/portalab:1.4.0
+  cosign verify-attestation --key cosign.pub --type cyclonedx sharkhunterr/portalab:1.4.0
+  ```
+
+How to report a vulnerability: [SECURITY.md](../SECURITY.md).
+
 ## Everything else is in the administration
 
 Once Portalab runs, you never need to touch the environment again. Every other setting is declared by the module that owns it and changed from the interface:
