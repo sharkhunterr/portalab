@@ -119,3 +119,24 @@ export function fingerprint(data: Uint8Array): string {
   }
   return `${data.length}:${(hash >>> 0).toString(16)}`;
 }
+
+/** 421: the member's controls and options for a core (they follow the member from device to device). */
+export type EmulatorPreferences = { controlSettings?: unknown; settings?: Record<string, unknown> };
+
+export async function fetchPreferences(core: string): Promise<EmulatorPreferences | null> {
+  const { data } = await api.GET("/api/v1/retro/preferences/{core}", { params: { path: { core } } });
+  return (data?.data as EmulatorPreferences | null | undefined) ?? null;
+}
+
+export function keepPreferences(core: string, data: EmulatorPreferences): Promise<Response> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const token = csrfToken();
+  if (token) headers[CSRF_HEADER] = token;
+  return fetch(`/api/v1/retro/preferences/${encodeURIComponent(core)}`, {
+    method: "PUT",
+    credentials: "include",
+    keepalive: true,
+    headers,
+    body: JSON.stringify({ data }),
+  });
+}

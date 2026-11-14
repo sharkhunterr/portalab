@@ -318,3 +318,26 @@ async def test_the_request_services_titles_follow_the_profile(app: FastAPI, medi
         ("Outside", False),  # unrated titles allowed: kept
     ]
     assert await media.module.gate.requestable(owner, items) == items  # the master sees them all
+
+
+async def test_a_rated_game_is_held_to_the_profiles_age(app: FastAPI, media: MediaHarness) -> None:
+    """Issue 421: a game rated above a child's limit (PEGI, ESRB… from IGDB, through RomM) is kept from it;
+    an unrated game — most retro games are older than the boards — stays open."""
+    people = await users(app, media, "zoe")
+    one = media.service(1)
+    media.library(one)
+    await media.module.library.upsert(
+        [
+            library_record("g1", kind="game", title="Doom", content_rating="PEGI 18"),
+            library_record("g2", kind="game", title="Mario", content_rating="PEGI 3"),
+            library_record("g3", kind="game", title="Pong"),
+        ],
+        one,
+    )
+    async with media.database.session() as session:
+        ids = {t: i for t, i in (await session.execute(select(MediaObject.title, MediaObject.id))).all()}
+    owner = Principal(user_id=people["zoe"])
+    created = await households(app).create(owner, display_name="Léa", kind="child", color=None, pin=None)
+    viewer = Principal(user_id=UUID(str(created["id"])), profile_of=people["zoe"])
+    assert await media.module.gate.blocked(viewer) == frozenset({ids["Doom"]})
+    assert (await media.module.gate.rating(ids["Doom"]))["age"] == 18

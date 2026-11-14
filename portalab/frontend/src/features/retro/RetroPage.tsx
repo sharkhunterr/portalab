@@ -9,9 +9,12 @@ import {
   beat,
   chooseFirmware,
   dropState,
+  type EmulatorPreferences,
   emulatorLanguage,
   endSitting,
+  fetchPreferences,
   fetchSaves,
+  keepPreferences,
   type Progress,
   type Sitting,
   startSitting,
@@ -44,8 +47,12 @@ const LOADER = "script[data-retro-loader]"; // EmulatorJS's settings are the pag
  * RomM's EmulatorJS, as RomM starts it: the core of the game's platform, its file, its firmware — and,
  * issue 420, the saves taken over (the emulator's own save and load buttons go to the portal's slots).
  */
-function launch(sitting: Sitting, language: string, hooks: Hooks) {
+function launch(sitting: Sitting, language: string, hooks: Hooks, preferences: EmulatorPreferences | null) {
   if (document.querySelector(LOADER)) return;
+  if (sitting.game.engine === "ruffle") {
+    launchRuffle(sitting, hooks);
+    return;
+  }
   const w = window as unknown as Record<string, unknown>;
   w.EJS_player = "#retro-game";
   w.EJS_core = sitting.game.core;
@@ -58,7 +65,10 @@ function launch(sitting: Sitting, language: string, hooks: Hooks) {
   w.EJS_threads = sitting.game.threads && window.crossOriginIsolated;
   w.EJS_startOnLoaded = true;
   w.EJS_disableDatabases = true; // each sitting's address is its own: nothing to find again in a cache
-  w.EJS_defaultOptions = { "save-save-interval": "60" }; // the game's own save written every minute
+  // the game's own save written every minute; 421: the member's own options and controls for this core
+  w.EJS_defaultOptions = { "save-save-interval": "60", ...(preferences?.settings ?? {}) };
+  if (preferences?.controlSettings) w.EJS_defaultControls = preferences.controlSettings;
+  if (sitting.game.control_scheme) w.EJS_controlScheme = sitting.game.control_scheme; // a Sega console's pad
   w.EJS_language = language;
   w.EJS_disableAutoLang = true;
   w.EJS_onGameStart = hooks.start;
@@ -72,6 +82,55 @@ function launch(sitting: Sitting, language: string, hooks: Hooks) {
   script.async = true;
   script.dataset.retroLoader = "true";
   document.body.appendChild(script);
+}
+
+type RuffleWindow = {
+  RufflePlayer?: {
+    config?: Record<string, unknown>;
+    newest?: () => {
+      createPlayer: () => HTMLElement & { load: (options: Record<string, unknown>) => unknown };
+    };
+  };
+};
+
+/** 421: a Flash game in Ruffle, as RomM serves it (its files relayed by the portal). */
+function launchRuffle(sitting: Sitting, hooks: Hooks) {
+  const w = window as unknown as RuffleWindow;
+  w.RufflePlayer = {
+    ...(w.RufflePlayer ?? {}),
+    config: { publicPath: sitting.emulator_path, polyfills: false },
+  };
+  const script = document.createElement("script");
+  script.src = `${sitting.emulator_path}ruffle.js`;
+  script.async = true;
+  script.dataset.retroLoader = "true";
+  script.onload = () => {
+    const stage = document.getElementById("retro-game");
+    const player = w.RufflePlayer?.newest?.()?.createPlayer();
+    if (!stage || !player) return;
+    player.style.width = "100%";
+    player.style.height = "100%";
+    stage.appendChild(player);
+    void player.load({
+      url: sitting.game_url,
+      publicPath: sitting.emulator_path,
+      autoplay: "on",
+      allowFullScreen: true,
+      letterbox: "on",
+      forceScale: true,
+      openUrlMode: "confirm",
+      unmuteOverlay: "hidden",
+    });
+    hooks.start();
+  };
+  document.body.appendChild(script);
+}
+
+/** 421: the controls and options the member set during the game, as the emulator holds them. */
+function preferencesNow(): EmulatorPreferences | null {
+  const e = emulator();
+  if (!e?.controls && !e?.settings) return null;
+  return { controlSettings: e.controls, ...(e.settings ? { settings: e.settings } : {}) };
 }
 
 function reasonOf(error: unknown): string {
@@ -110,6 +169,7 @@ export function RetroPage() {
   const keeper = useRef<SaveKeeper | null>(null);
   const active = useRef(1);
   active.current = slot;
+  const preferred = useRef<string | null>(null); // 421: the settings the game started with
 
   useEffect(() => {
     document.documentElement.dataset.playing = "true"; // the shell steps aside
@@ -128,14 +188,24 @@ export function RetroPage() {
     if (current.current) void fetchSaves(current.current).then(setProgress, () => undefined);
   }, []);
 
-  /** The sitting ends: the game's own save last sent (as much as a page going away may send). */
-  const finish = useCallback((goingAway = false) => {
-    if (goingAway) void keeper.current?.keepSram(keeper.current.currentSram(), true);
-    if (current.current) {
-      void endSitting(current.current);
-      current.current = null;
-    }
-  }, []);
+  /** The sitting ends: the game's own save last sent (as much as a page going away may send), and the
+   * controls and options the member changed. */
+  const finish = useCallback(
+    (goingAway = false) => {
+      if (goingAway) void keeper.current?.keepSram(keeper.current.currentSram(), true);
+      const now = preferencesNow();
+      const core = sitting?.game.core;
+      if (now && core && sitting?.game.engine !== "ruffle" && JSON.stringify(now) !== preferred.current) {
+        preferred.current = JSON.stringify(now);
+        void keepPreferences(core, now).catch(() => undefined);
+      }
+      if (current.current) {
+        void endSitting(current.current);
+        current.current = null;
+      }
+    },
+    [sitting],
+  );
 
   useEffect(() => {
     const away = () => finish(true);
@@ -183,27 +253,35 @@ export function RetroPage() {
       setSitting(started);
       setProgress(game.data?.progress ?? null);
       const sram = Boolean(game.data?.progress?.sram_at);
-      launch(started, emulatorLanguage(language), {
-        start: () => {
-          setStage("playing");
-          // a state carries the game's own save: it is loaded only for a new game
-          if (sram && !started.state_url) void saves.loadSram();
+      const preferences =
+        started.game.engine === "ruffle" ? null : await fetchPreferences(started.game.core).catch(() => null);
+      preferred.current = preferences ? JSON.stringify(preferences) : null;
+      launch(
+        started,
+        emulatorLanguage(language),
+        {
+          start: () => {
+            setStage("playing");
+            // a state carries the game's own save: it is loaded only for a new game
+            if (sram && !started.state_url) void saves.loadSram();
+          },
+          ready: () =>
+            emulator()?.on?.("saveSaveFiles", (data) => void saves.keepSram(data as Uint8Array | null)),
+          saveState: (state) => {
+            const target = active.current;
+            void picture()
+              .then((shot) => saves.keepState(target, state, shot))
+              .then((ok) => {
+                setNotice(t(ok ? "retro:saves.saved" : "retro:saves.failed", { slot: target }));
+                refresh();
+              });
+          },
+          loadState: () => void loadFrom(active.current),
+          saveSave: (save) => void saves.keepSram(save),
+          loadSave: () => void saves.loadSram(),
         },
-        ready: () =>
-          emulator()?.on?.("saveSaveFiles", (data) => void saves.keepSram(data as Uint8Array | null)),
-        saveState: (state) => {
-          const target = active.current;
-          void picture()
-            .then((shot) => saves.keepState(target, state, shot))
-            .then((ok) => {
-              setNotice(t(ok ? "retro:saves.saved" : "retro:saves.failed", { slot: target }));
-              refresh();
-            });
-        },
-        loadState: () => void loadFrom(active.current),
-        saveSave: (save) => void saves.keepSram(save),
-        loadSave: () => void saves.loadSram(),
-      });
+        preferences,
+      );
     } catch (error) {
       setFailure(reasonOf(error));
       setStage("ready");
@@ -230,7 +308,7 @@ export function RetroPage() {
   }, [sitting, stage, finish, keepPlace]);
 
   const quit = async () => {
-    if (stage === "playing") {
+    if (stage === "playing" && sitting?.game.engine !== "ruffle") {
       setLeaving(true);
       emulator()?.pause?.(true);
       await keepPlace();
@@ -305,7 +383,7 @@ export function RetroPage() {
             {t("retro:left", { count: left })}
           </span>
         ) : null}
-        {stage === "playing" ? (
+        {stage === "playing" && sitting?.game.engine !== "ruffle" ? (
           <button
             type="button"
             className="player-icon retro-icon"

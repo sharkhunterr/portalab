@@ -49,7 +49,7 @@ from portalab.core.errors import Forbidden, NotFound, PortalError, Unavailable
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
-from portalab.modules.retro.cores import THREADED, core_for
+from portalab.modules.retro.cores import RUFFLE, THREADED, control_scheme, core_for
 from portalab.modules.retro.models import Sitting
 
 TIMEOUT_S = 20.0
@@ -119,6 +119,15 @@ class Playable:
     @property
     def threads(self) -> bool:
         return self.core in THREADED
+
+    @property
+    def engine(self) -> str:
+        """421: the engine the page starts — EmulatorJS, or Ruffle for Flash."""
+        return "ruffle" if self.core == RUFFLE else "emulatorjs"
+
+    @property
+    def control_scheme(self) -> str | None:
+        return control_scheme(self.game.platform)
 
 
 @dataclass(frozen=True, slots=True)

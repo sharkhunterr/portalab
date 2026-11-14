@@ -32,6 +32,7 @@ from portalab.capabilities.connector_sdk import (
     SyncProgress,
 )
 from portalab.capabilities.health import HEALTH_PROBE
+from portalab.capabilities.household import RATING_WORDS, age_of
 from portalab.capabilities.media import (
     ACCOUNTS,
     ACTIVITY_HISTORY,
@@ -107,6 +108,25 @@ def play_times(game: Mapping[str, Any]) -> dict[str, dict[str, float | int | Non
     return out
 
 
+def game_rating(game: Mapping[str, Any]) -> str | None:
+    """Issue 421: a game's strictest age rating among IGDB's (PEGI, ESRB, USK, CERO…, as RomM keeps them:
+    ``{"category": "PEGI", "rating": "Twelve"}``), as its label (« PEGI 12 », « ESRB T »); ``None``: unrated
+    (most games older than the rating boards)."""
+    found: list[tuple[int, str]] = []
+    for source in (game.get("igdb_metadata"), game.get("metadatum")):
+        if not isinstance(source, Mapping) or not isinstance(source.get("age_ratings"), list):
+            continue
+        for item in source["age_ratings"]:
+            if not isinstance(item, Mapping) or not item.get("category") or not item.get("rating"):
+                continue  # a bare rating (« T », « M ») says nothing without its board
+            label = f"{str(item['category']).strip()[:20]} {str(item['rating']).strip()[:20]}"
+            label = " ".join(RATING_WORDS.get(w.upper(), w) for w in label.split())
+            age = age_of(label)
+            if age is not None:
+                found.append((age, label))
+    return max(found)[1] if found else None
+
+
 def game_payload(game: Mapping[str, Any], title: str) -> dict[str, Any]:
     """027: a game's metadata from RomM 3 (on the game itself) or RomM 4 (``metadatum`` — the merged
     metadata — and the IGDB block): year, genres (the platform first), franchises and game modes as tags
@@ -155,6 +175,7 @@ def game_payload(game: Mapping[str, Any], title: str) -> dict[str, Any]:
         # #351: its length is its main story's; every style's for its page
         "duration_s": times["main_story"]["seconds"] if "main_story" in times else None,
         "play_times": times or None,
+        "content_rating": game_rating(game),  # issue 421: a household profile's age limit holds to it
     }
 
 
@@ -437,7 +458,9 @@ class _Retro:
         if kind == "emulator":
             if not EMULATOR_FILE.fullmatch(name):
                 raise ProviderNotFound("no such emulator file")
-            return f"/assets/emulatorjs/data/{name}"
+            if name.startswith("ruffle/"):  # 421: Ruffle (Flash), as RomM serves it
+                return f"/assets/{name}"
+            return f"/assets/emulatorjs/data/{name.removeprefix('emulatorjs/')}"
         if not FILE_NAME.fullmatch(name):
             raise ProviderNotFound("no such file")
         folder = "roms" if kind == "rom" else "firmware"

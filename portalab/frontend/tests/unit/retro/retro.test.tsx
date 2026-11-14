@@ -30,6 +30,7 @@ const GAME = {
   core: "snes9x",
   threads: false,
   service_name: "RomM",
+  engine: "emulatorjs" as const,
 };
 const BASE = "/api/v1/retro/sittings/0190f0a0-0000-7000-8000-0000000000dd";
 const SITTING: Sitting = {
@@ -68,7 +69,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.useRealTimers();
-  for (const script of document.querySelectorAll("script[src*='loader.js']")) script.remove();
+  for (const script of document.querySelectorAll("script[data-retro-loader]")) script.remove();
 });
 
 function show(node: ReactNode) {
@@ -219,5 +220,76 @@ describe("saves and states (issue 420)", () => {
     );
     expect(sent).toContain(`POST ${BASE}/end`);
     delete w.EJS_emulator;
+  });
+});
+
+describe("engines and controls (issue 421)", () => {
+  it("plays a Flash game in Ruffle, without save states", async () => {
+    const flash = { ...GAME, platform: "flash", core: "ruffle", engine: "ruffle" as const };
+    const path = "/api/v1/retro/libraries/0190f0a0-0000-7000-8000-000000000001/emulator/ruffle/";
+    fake.handler = async (request) => {
+      const at = new URL(request.url).pathname;
+      if (at === `/api/v1/retro/games/${OBJECT}`) return json(200, flash);
+      if (at === `/api/v1/retro/games/${OBJECT}/sittings`)
+        return json(201, {
+          ...SITTING,
+          game: flash,
+          emulator_path: path,
+          game_url: `${BASE}/game/alien.swf`,
+        });
+      return json(404, {});
+    };
+    const load = vi.fn();
+    show(<RetroPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Play" }));
+    await waitFor(() => expect(document.querySelector("script[data-retro-loader]")).toBeTruthy());
+    const script = document.querySelector<HTMLScriptElement>("script[data-retro-loader]");
+    expect(script?.getAttribute("src")).toBe(`${path}ruffle.js`);
+    const w = window as unknown as { RufflePlayer?: Record<string, unknown> };
+    expect((w.RufflePlayer?.config as Record<string, unknown> | undefined)?.publicPath).toBe(path);
+    w.RufflePlayer = {
+      ...w.RufflePlayer,
+      newest: () => ({ createPlayer: () => Object.assign(document.createElement("div"), { load }) }),
+    };
+    act(() => script?.onload?.(new Event("load")));
+    expect(load).toHaveBeenCalledWith(
+      expect.objectContaining({ url: `${BASE}/game/alien.swf`, publicPath: path }),
+    );
+    expect(screen.queryByRole("button", { name: "Saves" })).toBeNull(); // Flash keeps its own
+    delete w.RufflePlayer;
+  });
+
+  it("starts with the member's controls and options, and keeps the ones changed", async () => {
+    const sonic = { ...GAME, platform: "genesis", core: "genesis_plus_gx", control_scheme: "segaMD" };
+    const kept: unknown[] = [];
+    fake.handler = async (request) => {
+      const at = new URL(request.url).pathname;
+      if (at === `/api/v1/retro/games/${OBJECT}`) return json(200, sonic);
+      if (at === `/api/v1/retro/games/${OBJECT}/sittings`) return json(201, { ...SITTING, game: sonic });
+      if (at === "/api/v1/retro/preferences/genesis_plus_gx" && request.method === "GET")
+        return json(200, {
+          data: { controlSettings: { 0: { 0: { value: "x" } } }, settings: { shader: "crt" } },
+        });
+      if (at === "/api/v1/retro/preferences/genesis_plus_gx") {
+        kept.push(await request.json());
+        return json(204, null);
+      }
+      if (at === `${BASE}/end`) return json(204, null);
+      return json(404, {});
+    };
+    show(<RetroPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Play" }));
+    const w = window as unknown as Record<string, unknown>;
+    await waitFor(() => expect(w.EJS_controlScheme).toBe("segaMD"));
+    expect(w.EJS_defaultControls).toEqual({ 0: { 0: { value: "x" } } });
+    expect(w.EJS_defaultOptions).toEqual({ "save-save-interval": "60", shader: "crt" });
+    w.EJS_emulator = { controls: { 0: { 0: { value: "z" } } }, settings: { shader: "crt" }, gameManager: {} };
+    fireEvent.click(screen.getByRole("button", { name: "Quit the game" }));
+    await waitFor(() => expect(assign).toHaveBeenCalled());
+    expect(kept).toEqual([
+      { data: { controlSettings: { 0: { 0: { value: "z" } } }, settings: { shader: "crt" } } },
+    ]);
+    delete w.EJS_emulator;
+    delete w.EJS_controlScheme;
   });
 });

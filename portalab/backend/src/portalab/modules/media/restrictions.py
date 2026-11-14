@@ -29,6 +29,9 @@ from portalab.core.errors import Forbidden
 from portalab.modules.media.models import Activity, MediaObject, ObjectMetadata, ObjectTag, PlaybackSession
 
 RATED = ("movie", "series")
+# issue 421: games are held to their age rating when they have one (PEGI, ESRB…); an unrated game stays open —
+# most of a retro library is older than the rating boards
+RATED_GAMES = ("game",)
 CACHE_S = 30.0
 ASKABLE = ("age", "unrated", "genre")  # what an access request may open (not the master's own choices)
 IDS = ("id", "object_id", "media_id", "work_id")
@@ -61,6 +64,12 @@ def labelled(data: Mapping[str, Any] | None, server: str | None) -> list[tuple[s
 
 def ratings(data: Mapping[str, Any] | None, server: str | None) -> list[str]:
     return [value for _, value in labelled(data, server)]
+
+
+def _allowed(restrictions: Restrictions, kind: str, age: int | None) -> bool:
+    if kind in RATED_GAMES and age is None:
+        return True  # an unrated game is no unrated film
+    return restrictions.allows_age(age)
 
 
 def excluded(column: Any, blocked: frozenset[UUID]) -> Any:
@@ -106,26 +115,29 @@ class TitleGate:
             rows = (
                 await session.execute(
                     select(
-                        MediaObject.id, ObjectMetadata.data, MediaObject.effective["content_rating"].astext
+                        MediaObject.id,
+                        MediaObject.kind,
+                        ObjectMetadata.data,
+                        MediaObject.effective["content_rating"].astext,
                     )
                     .outerjoin(
                         ObjectMetadata,
                         (ObjectMetadata.object_id == MediaObject.id) & (ObjectMetadata.status == "found"),
                     )
-                    .where(MediaObject.kind.in_(RATED))
+                    .where(MediaObject.kind.in_((*RATED, *RATED_GAMES)))
                 )
             ).all()
             works = {
                 work
-                for work, data, server in rows
+                for work, kind, data, server in rows
                 if str(work) not in granted
-                and not restrictions.allows_age(strictest_age(ratings(data, server)))
+                and not _allowed(restrictions, kind, strictest_age(ratings(data, server)))
             }
             if restrictions.genres:  # kept out whatever their rating (horror…)
                 tags = await session.execute(
                     select(ObjectTag.object_id, ObjectTag.value)
                     .join(MediaObject, MediaObject.id == ObjectTag.object_id)
-                    .where(ObjectTag.tag_kind == "genre", MediaObject.kind.in_(RATED))
+                    .where(ObjectTag.tag_kind == "genre", MediaObject.kind.in_((*RATED, *RATED_GAMES)))
                 )
                 works |= {
                     work

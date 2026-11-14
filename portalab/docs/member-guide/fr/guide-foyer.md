@@ -45,7 +45,7 @@ Dans **Statistiques**, l'onglet **« Mon foyer »** montre le cumul du foyer, vi
 
 C'est vous, le titulaire, qui fixez la politique de chaque profil : **« Mon foyer » → « Modifier »**. Un profil ne peut rien en changer. Tout se règle avec des interrupteurs.
 
-- **Âge** : une **date de naissance** (l'âge suit le profil, un an de plus à chaque anniversaire, sans limite à partir de 18 ans) ou un **âge maximum** fixe. Les titres au-dessus sont **cachés** ou **affichés verrouillés** (floutés, avec un cadenas). Deux interrupteurs : **titres non classés** autorisés ou non, et **demandes d'accès** possibles ou non.
+- **Âge** : une **date de naissance** (l'âge suit le profil, un an de plus à chaque anniversaire, sans limite à partir de 18 ans) ou un **âge maximum** fixe. Les titres au-dessus sont **cachés** ou **affichés verrouillés** (floutés, avec un cadenas). Deux interrupteurs : **titres non classés** autorisés ou non, et **demandes d'accès** possibles ou non. Un jeu suit sa classification (PEGI, ESRB… venue d'IGDB par RomM) quand il en a une ; un jeu non classé reste ouvert, la plupart des jeux rétro étant antérieurs aux classifications.
 - **Contenus autorisés** : Films, Séries, Livres, Livres audio, Musique, Jeux. Coupez un type et il disparaît pour ce profil.
 - **Genres interdits** : Horreur, Thriller, Policier, Guerre, quelle que soit leur classification. Un profil enfant démarre avec l'horreur interdite.
 - **Titres interdits** : sur la fiche d'un titre, **« Restrictions du foyer »** permet de l'interdire profil par profil. La liste se retrouve dans la fiche du profil, avec **« Autoriser à nouveau »**.

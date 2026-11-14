@@ -15,7 +15,7 @@ from portalab.capabilities.connector_sdk import ServiceHandle
 from portalab.capabilities.media import ACTIVITY_HISTORY
 from portalab.capabilities.results import ProviderNotFound
 from portalab.capabilities.retro import RETRO_SOURCE, RetroSource
-from portalab.connectors.romm import RommConnector
+from portalab.connectors.romm import RommConnector, game_rating
 
 ROM = {
     "id": 12,
@@ -201,3 +201,24 @@ async def test_saves_and_states_copied_and_labelled(server: _Server) -> None:
     assert json.loads(server.requests[-1].content) == {"saves": [5]}
     await retro.delete_file("state", "not-an-id")  # never sent
     assert server.requests[-1].url.path == "/api/saves/delete"
+
+
+def test_a_games_strictest_rating() -> None:
+    """Issue 421: the strictest of IGDB's ratings RomM keeps for a game; bare and pending ones say nothing."""
+    rated = {
+        "igdb_metadata": {
+            "age_ratings": [
+                {"category": "PEGI", "rating": "Seven", "rating_cover_url": ""},
+                {"category": "ESRB", "rating": "T", "rating_cover_url": ""},
+                {"category": "ESRB", "rating": "RP", "rating_cover_url": ""},
+            ]
+        },
+        "metadatum": {"age_ratings": ["M"]},
+    }
+    assert game_rating(rated) == "ESRB T"
+    assert (
+        game_rating({"igdb_metadata": {"age_ratings": [{"category": "PEGI", "rating": "Eighteen"}]}})
+        == "PEGI 18"
+    )
+    assert game_rating({"metadatum": {"age_ratings": ["M"]}}) is None
+    assert game_rating({"name": "Pong"}) is None

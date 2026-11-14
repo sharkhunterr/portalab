@@ -4,9 +4,11 @@ library was told (its play time). The foreign key to ``identity.users`` is the m
 with the account)."""
 
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import CheckConstraint, Float, Index, Integer, LargeBinary, String, UniqueConstraint, text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from portalab.core.db import TZDateTime, schema_metadata
@@ -72,3 +74,17 @@ class GameSave(RetroBase):
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     remote_id: Mapped[str | None] = mapped_column(String(64))  # its copy in the library
     synced_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+
+
+class Preference(RetroBase):
+    """421: a member's emulator settings for one core — its controls (keyboard and gamepad mapping), its
+    options — kept by the portal so they follow the member from one device to another."""
+
+    __tablename__ = "preferences"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    core: Mapped[str] = mapped_column(String(64), primary_key=True)
+    data: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, nullable=False, info=not_personal("an emulator's controls and options")
+    )
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

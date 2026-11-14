@@ -3,6 +3,8 @@ import { fingerprint, getBytes, putBytes, type Sitting } from "./api";
 /** The emulator's own API, as far as the play page uses it (EmulatorJS 4). */
 export type Emulator = {
   pause?: (silent?: boolean) => void;
+  controls?: unknown; // 421: the controls the member set (keyboard and gamepads)
+  settings?: Record<string, unknown>;
   on?: (event: string, callback: (data: unknown) => void) => void;
   takeScreenshot?: (source: string, format: string, upscale: number) => Promise<{ blob?: Blob | null }>;
   capture?: { photo?: { source?: string; upscale?: number } };

@@ -5,7 +5,7 @@ and the files the play page loads — the game, its firmware, the emulator — r
 from collections.abc import AsyncIterator
 from contextlib import AsyncExitStack
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Any, Literal
 from urllib.parse import quote
 from uuid import UUID
 
@@ -57,6 +57,8 @@ class RetroGameOut(BaseModel):
     threads: bool
     service_name: str | None = None
     progress: RetroProgressOut | None = None
+    engine: Literal["emulatorjs", "ruffle"] = "emulatorjs"  # 421
+    control_scheme: str | None = None  # 421: the virtual gamepad of a Sega console
 
 
 class SittingIn(BaseModel):
@@ -111,6 +113,8 @@ def _game(playable: Playable, progress: Progress | None = None) -> RetroGameOut:
         threads=playable.threads,
         service_name=playable.service_name,
         progress=_progress(progress) if progress is not None else None,
+        engine="ruffle" if playable.engine == "ruffle" else "emulatorjs",
+        control_scheme=playable.control_scheme,
     )
 
 
@@ -179,7 +183,8 @@ async def start_sitting(
             )
             for f in started.firmware
         ],
-        emulator_path=f"/api/v1/retro/libraries/{playable.source.service_id}/emulator/",
+        emulator_path=f"/api/v1/retro/libraries/{playable.source.service_id}/emulator/"
+        + ("ruffle/" if playable.engine == "ruffle" else ""),
         heartbeat_s=HEARTBEAT_S,
         saves_path=f"{base}/",
         state_url=f"{base}/states/{resume}" if resume is not None else None,
@@ -332,3 +337,28 @@ async def keep_state_picture(
 ) -> None:
     """The screen when the state was saved (PNG, JPEG or WebP)."""
     await module.saves.write_picture(principal, sitting_id, slot, await request.body())
+
+
+# --- 421: the member's emulator settings ----------------------------------------------------------------
+CORE = Annotated[str, Path(pattern=r"^[a-z0-9_]{1,64}$")]
+
+
+class RetroPreferencesIn(BaseModel):
+    data: dict[str, Any]
+
+
+class RetroPreferencesOut(BaseModel):
+    data: dict[str, Any] | None = None
+
+
+@router.get("/preferences/{core}", response_model=RetroPreferencesOut)
+async def retro_preferences(principal: Player, module: Module, core: CORE) -> RetroPreferencesOut:
+    """The member's controls and options for a core (they follow the member from device to device)."""
+    return RetroPreferencesOut(data=await module.saves.preferences(principal, core))
+
+
+@router.put("/preferences/{core}", status_code=status.HTTP_204_NO_CONTENT)
+async def keep_retro_preferences(
+    principal: Player, module: Module, core: CORE, body: RetroPreferencesIn
+) -> None:
+    await module.saves.keep_preferences(principal, core, body.data)

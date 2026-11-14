@@ -12,6 +12,7 @@ Only the sitting's player reads or writes them, while the sitting is open (as it
 """
 
 import asyncio
+import json
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -29,12 +30,13 @@ from portalab.core.db import Database
 from portalab.core.errors import BadRequest, NotFound
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
-from portalab.modules.retro.models import GameSave, Sitting
-from portalab.modules.retro.service import TIMEOUT_S, RetroService, _value
+from portalab.modules.retro.models import GameSave, Preference, Sitting
+from portalab.modules.retro.service import TIMEOUT_S, RetroService, _value, player_of
 
 SLOTS = 5  # the member's own slots (slot 0: where the game was left)
 MAX_BYTES = 9 * 1024 * 1024  # under the portal's default request cap (an emulator's whole memory)
 MAX_PICTURE = 1024 * 1024
+MAX_PREFERENCES = 64 * 1024  # 421: an emulator's controls and options, as JSON
 PICTURES = {b"\x89PNG\r\n\x1a\n": "image/png", b"\xff\xd8\xff": "image/jpeg", b"RIFF": "image/webp"}
 LABEL = "Portalab"
 KINDS: dict[str, SaveKind] = {"sram": "save", "state": "state"}
@@ -309,3 +311,23 @@ class SaveService:
         for row in rows:
             copied += await self._copy(row)
         return copied
+
+    # --- 421: the member's emulator settings ------------------------------------------------------------
+    async def preferences(self, viewer: Principal, core: str) -> dict[str, Any] | None:
+        async with self.database.session() as session:
+            row = await session.get(Preference, (player_of(viewer), core[:64]))
+        return dict(row.data) if row is not None else None
+
+    async def keep_preferences(self, viewer: Principal, core: str, data: dict[str, Any]) -> None:
+        if len(json.dumps(data, separators=(",", ":"))) > MAX_PREFERENCES:
+            raise SaveRefused("These settings are too large.")
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            await uow.session.execute(
+                insert(Preference)
+                .values(user_id=player_of(viewer), core=core[:64], data=data, updated_at=now)
+                .on_conflict_do_update(
+                    index_elements=[Preference.user_id, Preference.core],
+                    set_={"data": data, "updated_at": now},
+                )
+            )

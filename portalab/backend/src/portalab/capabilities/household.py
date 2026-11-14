@@ -137,7 +137,35 @@ RATING_AGES: dict[str, int] = {
     "TV-MA": 17,
     "NC-17": 18,
     "X": 18,
+    # issue 421: the games' systems without an age in their letters (IGDB's, as RomM keeps them)
+    "ESRB EC": 3,
+    "ESRB E": 0,
+    "ESRB T": 13,
+    "ESRB M": 17,
+    "ESRB AO": 18,
+    "CERO A": 0,
+    "CERO B": 12,
+    "CERO C": 15,
+    "CERO D": 17,
+    "CERO Z": 18,
+    "ACB G": 0,
+    "ACB PG": 8,
+    "ACB M": 15,
+    "CLASS IND L": 0,
+    "GRAC ALL": 0,
 }
+# issue 421: ratings given in words (IGDB's PEGI « Twelve », GRAC « Fifteen »…)
+RATING_WORDS = {
+    "THREE": "3",
+    "SEVEN": "7",
+    "TEN": "10",
+    "TWELVE": "12",
+    "FOURTEEN": "14",
+    "FIFTEEN": "15",
+    "SIXTEEN": "16",
+    "EIGHTEEN": "18",
+}
+UNRATED_WORDS = frozenset({"RP", "RC", "TESTING", "NR", "UNRATED"})
 _NUMBER = re.compile(r"\d{1,2}")
 
 
@@ -147,8 +175,9 @@ def age_of(rating: str | None) -> int | None:
     text = " ".join((rating or "").upper().replace("_", " ").split())
     if "/" in text:
         text = text.split("/", 1)[1].strip()
-    if not text:
+    if not text or text.split()[-1] in UNRATED_WORDS:
         return None
+    text = " ".join(RATING_WORDS.get(word, word) for word in text.split())
     if text in RATING_AGES:
         return RATING_AGES[text]
     found = _NUMBER.search(text)

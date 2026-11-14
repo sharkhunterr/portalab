@@ -110,3 +110,26 @@ def test_a_profile_may_be_kept_to_the_portal() -> None:
         "sources": [{"connector": "plex", "link": None, "item_link": None}],
         "n": 1,
     }
+
+
+@pytest.mark.parametrize(
+    ("rating", "age"),
+    [
+        ("PEGI Twelve", 12),
+        ("PEGI 3", 3),
+        ("ESRB E", 0),
+        ("ESRB E10+", 10),
+        ("ESRB T", 13),
+        ("ESRB M", 17),
+        ("ESRB RP", None),  # rating pending: unrated
+        ("CERO D", 17),
+        ("USK 6", 6),
+        ("ACB MA15", 15),
+        ("ACB RC", None),
+        ("CLASS_IND Fourteen", 14),
+        ("GRAC Fifteen", 15),
+    ],
+)
+def test_the_games_boards_stand_for_an_age(rating: str, age: int | None) -> None:
+    """Issue 421: IGDB's boards, as RomM keeps them — numbers, words and letters."""
+    assert age_of(rating) == age

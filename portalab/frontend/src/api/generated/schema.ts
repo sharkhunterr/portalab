@@ -11143,6 +11143,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/retro/preferences/{core}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retro Preferences
+         * @description The member's controls and options for a core (they follow the member from device to device).
+         */
+        get: operations["retro_preferences_api_v1_retro_preferences__core__get"];
+        /** Keep Retro Preferences */
+        put: operations["keep_retro_preferences_api_v1_retro_preferences__core__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/retro/sittings/{sitting_id}/beat": {
         parameters: {
             query?: never;
@@ -19793,8 +19814,16 @@ export interface components {
         };
         /** RetroGameOut */
         RetroGameOut: {
+            /** Control Scheme */
+            control_scheme?: string | null;
             /** Core */
             core: string;
+            /**
+             * Engine
+             * @default emulatorjs
+             * @enum {string}
+             */
+            engine: "emulatorjs" | "ruffle";
             /** Platform */
             platform: string;
             progress?: components["schemas"]["RetroProgressOut"] | null;
@@ -19804,6 +19833,20 @@ export interface components {
             threads: boolean;
             /** Title */
             title: string;
+        };
+        /** RetroPreferencesIn */
+        RetroPreferencesIn: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+        };
+        /** RetroPreferencesOut */
+        RetroPreferencesOut: {
+            /** Data */
+            data?: {
+                [key: string]: unknown;
+            } | null;
         };
         /**
          * RetroProgressOut
@@ -43031,6 +43074,70 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SittingOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retro_preferences_api_v1_retro_preferences__core__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                core: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetroPreferencesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    keep_retro_preferences_api_v1_retro_preferences__core__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                core: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RetroPreferencesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

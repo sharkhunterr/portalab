@@ -19642,8 +19642,28 @@
       },
       "RetroGameOut": {
         "properties": {
+          "control_scheme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Control Scheme"
+          },
           "core": {
             "title": "Core",
+            "type": "string"
+          },
+          "engine": {
+            "default": "emulatorjs",
+            "enum": [
+              "emulatorjs",
+              "ruffle"
+            ],
+            "title": "Engine",
             "type": "string"
           },
           "platform": {
@@ -19687,6 +19707,38 @@
           "threads"
         ],
         "title": "RetroGameOut",
+        "type": "object"
+      },
+      "RetroPreferencesIn": {
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "RetroPreferencesIn",
+        "type": "object"
+      },
+      "RetroPreferencesOut": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          }
+        },
+        "title": "RetroPreferencesOut",
         "type": "object"
       },
       "RetroProgressOut": {
@@ -57156,6 +57208,94 @@
           }
         },
         "summary": "Start Sitting",
+        "tags": [
+          "retro"
+        ]
+      }
+    },
+    "/api/v1/retro/preferences/{core}": {
+      "get": {
+        "description": "The member's controls and options for a core (they follow the member from device to device).",
+        "operationId": "retro_preferences_api_v1_retro_preferences__core__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "core",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9_]{1,64}$",
+              "title": "Core",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetroPreferencesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Retro Preferences",
+        "tags": [
+          "retro"
+        ]
+      },
+      "put": {
+        "operationId": "keep_retro_preferences_api_v1_retro_preferences__core__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "core",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9_]{1,64}$",
+              "title": "Core",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetroPreferencesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Keep Retro Preferences",
         "tags": [
           "retro"
         ]
