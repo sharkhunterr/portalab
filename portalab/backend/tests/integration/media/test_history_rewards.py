@@ -527,8 +527,9 @@ async def test_an_audiobook_sitting_reaching_its_end_later_is_finished_once(
 
 async def test_live_tv_counts_one_line_per_sitting(app: FastAPI, media: MediaHarness) -> None:
     """Issue 413: Plex records a live TV sitting in pieces of two or three minutes — pieces this close are
-    one sitting: one event, its minutes added up, under its first piece, once no piece came for a while; a
-    sitting still growing waits; a long pause starts another sitting."""
+    one sitting: one event under its first piece, once no piece came for a while; a sitting still growing
+    waits; a long pause starts another sitting. Issue 417: its time runs from its first piece's start to its
+    last piece's end (the moments between two programmes count)."""
     people = await users(app, media, "zoe")
     zoe = people["zoe"]
     tautulli = uuid4()
@@ -576,7 +577,9 @@ async def test_live_tv_counts_one_line_per_sitting(app: FastAPI, media: MediaHar
     await media.dispatch()
     told = [e for e in await media.events() if e[1].get("kind") == "live"]
     assert len(told) == 1
-    assert told[0][1]["session"] == "history:16762" and told[0][1]["watched_s"] == 628.0
+    assert (
+        told[0][1]["session"] == "history:16762" and told[0][1]["watched_s"] == 782.0
+    )  # 10 min 30 s, then 152 s
     async with media.database.session() as session:
         waiting = (
             await session.execute(select(Activity.ref).where(Activity.rewarded_at.is_(None)))
@@ -592,5 +595,5 @@ async def test_live_tv_counts_one_line_per_sitting(app: FastAPI, media: MediaHar
     assert await later.run() == 1  # the second sitting, now over
     await media.dispatch()
     told = [e[1]["watched_s"] for e in await media.events() if e[1].get("kind") == "live"]
-    assert told == [628.0, 300.0]
+    assert told == [782.0, 300.0]
     assert await later.run() == 0

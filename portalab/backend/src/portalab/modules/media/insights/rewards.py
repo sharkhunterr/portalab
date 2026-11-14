@@ -49,6 +49,18 @@ ALONGSIDE = timedelta(minutes=10)  # #101: a live session followed to its stop d
 EVENT = "media.playback_finished"
 PARTIAL = "media.playback_abandoned"  # #94: a play stopped before its end still counts its minutes
 LENGTH = "media.game_length_reached"  # #351
+
+
+def span(pieces: list[Activity]) -> float:
+    """Issue 417: the time from a run of live pieces' first start to its last end (never less than they
+    tell: a piece whose end is unknown or odd keeps its own minutes)."""
+    ends = [p.stopped_at for p in pieces if p.stopped_at is not None]
+    told = sum(p.watched_s for p in pieces)
+    if not ends:
+        return told
+    return max(told, (max(ends) - min(p.started_at for p in pieces)).total_seconds())
+
+
 MIN_WATCHED = 60.0
 BOOK_KINDS = ("book", "audiobook")  # #386: their progress may come after their sitting
 # issue 413: Plex records a live TV sitting in pieces of a few minutes — pieces this close are one sitting,
@@ -169,8 +181,10 @@ class HistoryRewards:
         return published
 
     async def _live_sittings(self, session: AsyncSession, rows: list[Activity], now: datetime) -> int:
-        """Issue 413: live TV, one event per sitting — its pieces' minutes added up, under its first piece,
-        once no piece came for ``LIVE_GAP`` (a sitting still growing waits for the next run)."""
+        """Issue 413: live TV, one event per sitting — under its first piece, once no piece came for
+        ``LIVE_GAP`` (a sitting still growing waits for the next run). Issue 417: its time is the sitting's,
+        from its first piece's start to its last piece's end — the moments between two programmes are the
+        channel moving on, not the member leaving (a channel of short programmes counts its whole evening)."""
         groups: list[list[Activity]] = []
         last: dict[tuple[Any, ...], list[Activity]] = {}
         for row in sorted(rows, key=lambda r: r.started_at):
@@ -190,12 +204,18 @@ class HistoryRewards:
             end = max(e for e in ended if e is not None)
             if now - end < LIVE_GAP:
                 continue  # a next piece may still come
-            counted = []
+            counted: list[Activity] = []
+            runs: list[list[Activity]] = []
             for piece in pieces:
                 piece.rewarded_at = now  # looked at once
-                if not await self._seen_live(session, piece, None):
-                    counted.append(piece)
-            watched = sum(p.watched_s for p in counted)
+                if await self._seen_live(session, piece, None):
+                    runs.append([])  # a piece the live watch rewarded: its time is not counted again
+                    continue
+                counted.append(piece)
+                if not runs or not runs[-1]:
+                    runs.append([])
+                runs[-1].append(piece)
+            watched = sum(span(run) for run in runs if run)
             if not counted or watched < MIN_WATCHED:
                 continue
             first = counted[0]
