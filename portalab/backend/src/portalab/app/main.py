@@ -37,7 +37,7 @@ from portalab.app.security import (
 from portalab.app.spa import SPAStaticFiles, spa_directory
 from portalab.app.stream import StreamOptions
 from portalab.app.stream import router as stream_router
-from portalab.app.wiring import DeferredAuthorizer, wire_identity, wire_platform
+from portalab.app.wiring import DeferredAuthorizer, wire_household, wire_identity, wire_platform
 from portalab.capabilities.catalog import new_registry
 from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, Users, WithPermission
 from portalab.capabilities.registry import CapabilityRegistry
@@ -89,6 +89,8 @@ from portalab.modules.gamification.api import routers as gamification_routers
 from portalab.modules.gamification.module import GamificationModule
 from portalab.modules.health.api import routers as health_routers
 from portalab.modules.health.module import HealthModule
+from portalab.modules.household.api import routers as household_routers
+from portalab.modules.household.module import HouseholdModule
 from portalab.modules.i18n.api import routers as i18n_routers
 from portalab.modules.i18n.module import I18nModule
 from portalab.modules.identity.api import routers as identity_routers
@@ -336,6 +338,7 @@ def create_app(
     cards: CardsModule | None = None,
     games: GamesModule | None = None,
     requests: RequestsModule | None = None,
+    household: HouseholdModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -345,6 +348,10 @@ def create_app(
     def wire_modules(app: FastAPI, db: Database) -> None:
         if identity is not None:  # tests wire their own identity context (and optionally an authz module)
             app.state.identity_module = wire_identity(identity)
+            # 032: the households go with the identity they rest on
+            app.state.household_module = household or wire_household(
+                db, identity.capabilities, identity.audit
+            )
             return
         platform = wire_platform(
             db,
@@ -382,6 +389,7 @@ def create_app(
         app.state.cards_module = platform.cards
         app.state.games_module = platform.games
         app.state.requests_module = platform.requests
+        app.state.household_module = platform.household
         app.state.plugins_module = platform.plugins
         platform.plugins.runtime.portal.app = app  # 030: portal data through the app itself
         app.state.authz_module = platform.authz
@@ -489,6 +497,7 @@ def create_app(
     app.state.cards_module = cards
     app.state.games_module = games
     app.state.requests_module = requests
+    app.state.household_module = household
     app.state.plugins_module = plugins
     if plugins is not None:
         plugins.runtime.portal.app = app  # 030: confined plugins read portal data through the app itself
@@ -652,6 +661,7 @@ def create_app(
         *cards_routers(),
         *games_routers(),
         *requests_routers(),
+        *household_routers(),
         *plugins_routers(),
     ]:
         app.include_router(router)

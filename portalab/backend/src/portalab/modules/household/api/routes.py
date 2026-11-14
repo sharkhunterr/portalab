@@ -10,12 +10,12 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
-from portalab.modules.identity.api.middleware import identity_module
-from portalab.modules.identity.household.rules import RestrictionSettings
-from portalab.modules.identity.module import IdentityModule
+from portalab.modules.household.api.deps import household_module
+from portalab.modules.household.module import HouseholdModule
+from portalab.modules.household.rules import RestrictionSettings
 
-router = APIRouter(prefix="/api/v1/household", tags=["identity"])
-Module = Annotated[IdentityModule, Depends(identity_module)]
+router = APIRouter(prefix="/api/v1/household", tags=["household"])
+Module = Annotated[HouseholdModule, Depends(household_module)]
 SELF = "users.self.manage"
 Kind = Literal["standard", "child", "custom"]
 
@@ -154,7 +154,7 @@ class AccessDecisionIn(_Strict):
 
 @router.get("/session", response_model=HouseholdSession)
 async def household_session(module: Module, principal: Principal = require(SELF)) -> HouseholdSession:
-    return HouseholdSession.model_validate(await module.household.state(principal))
+    return HouseholdSession.model_validate(await module.service.state(principal))
 
 
 @router.post(
@@ -165,12 +165,12 @@ async def household_session(module: Module, principal: Principal = require(SELF)
 async def switch_profile(
     body: HouseholdSwitchIn, module: Module, principal: Principal = require(SELF)
 ) -> HouseholdSwitchOut:
-    return HouseholdSwitchOut.model_validate(await module.household.switch(principal, body.user_id, body.pin))
+    return HouseholdSwitchOut.model_validate(await module.service.switch(principal, body.user_id, body.pin))
 
 
 @router.get("", response_model=HouseholdOut)
 async def household(module: Module, principal: Principal = require(SELF)) -> HouseholdOut:
-    return HouseholdOut.model_validate(await module.household.overview(principal))
+    return HouseholdOut.model_validate(await module.service.overview(principal))
 
 
 @router.post(
@@ -182,7 +182,7 @@ async def household(module: Module, principal: Principal = require(SELF)) -> Hou
 async def create_profile(
     body: HouseholdProfileIn, module: Module, principal: Principal = require(SELF)
 ) -> HouseholdProfileCreated:
-    created = await module.household.create(
+    created = await module.service.create(
         principal, display_name=body.display_name, kind=body.kind, color=body.color, pin=body.pin
     )
     return HouseholdProfileCreated.model_validate(created)
@@ -192,7 +192,7 @@ async def create_profile(
 async def change_profile(
     profile_id: UUID, body: HouseholdProfilePatch, module: Module, principal: Principal = require(SELF)
 ) -> Response:
-    await module.household.change(
+    await module.service.change(
         principal,
         profile_id,
         display_name=body.display_name,
@@ -207,7 +207,7 @@ async def change_profile(
 
 @router.delete("/profiles/{profile_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_profile(profile_id: UUID, module: Module, principal: Principal = require(SELF)) -> Response:
-    await module.household.remove(principal, profile_id)
+    await module.service.remove(principal, profile_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -215,7 +215,7 @@ async def delete_profile(profile_id: UUID, module: Module, principal: Principal 
 async def set_pin(
     member_id: UUID, body: HouseholdPinIn, module: Module, principal: Principal = require(SELF)
 ) -> Response:
-    await module.household.set_pin(principal, member_id, body.pin, body.current)
+    await module.service.set_pin(principal, member_id, body.pin, body.current)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -223,17 +223,17 @@ async def set_pin(
 async def profile_activity(
     profile_id: UUID, module: Module, principal: Principal = require(SELF)
 ) -> ProfileActivityOut:
-    return ProfileActivityOut.model_validate(await module.household.activity(principal, profile_id))
+    return ProfileActivityOut.model_validate(await module.service.activity(principal, profile_id))
 
 
 @router.get("/requests", response_model=list[AccessRequestOut])
 async def access_requests(module: Module, principal: Principal = require(SELF)) -> list[AccessRequestOut]:
-    return [AccessRequestOut.model_validate(r) for r in await module.household.requests(principal)]
+    return [AccessRequestOut.model_validate(r) for r in await module.service.requests(principal)]
 
 
 @router.post("/requests", response_model=AccessAskOut)
 async def ask_access(body: AccessAskIn, module: Module, principal: Principal = require(SELF)) -> AccessAskOut:
-    asked = await module.household.ask(
+    asked = await module.service.ask(
         principal, kind=body.kind, ref=body.ref, title=body.title, rating=body.rating, note=body.note
     )
     return AccessAskOut.model_validate(asked)
@@ -243,5 +243,5 @@ async def ask_access(body: AccessAskIn, module: Module, principal: Principal = r
 async def decide_access(
     request_id: UUID, body: AccessDecisionIn, module: Module, principal: Principal = require(SELF)
 ) -> Response:
-    await module.household.decide(principal, request_id, approve=body.approve, days=body.days)
+    await module.service.decide(principal, request_id, approve=body.approve, days=body.days)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

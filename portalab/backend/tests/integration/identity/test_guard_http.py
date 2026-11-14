@@ -16,6 +16,12 @@ from portalab.core.db import Database
 from portalab.modules.identity.guard import BlockStore
 from tests.integration.identity.helpers import create_user, login, module_of
 
+
+def households(app: FastAPI) -> Any:
+    """032: the household module's service (the households are no longer identity's)."""
+    return app.state.household_module.service
+
+
 pytestmark = pytest.mark.integration
 
 
@@ -88,7 +94,7 @@ async def test_a_household_profile_refused_by_its_masters_rules_is_no_probe(
     _armed(app, database, audit)
     module = module_of(app)
     owner = await create_user(module, "parent")
-    created = await module.household.create(
+    created = await households(app).create(
         Principal(user_id=owner), display_name="Arthur", kind="child", color=None, pin=None
     )
     assert (await login(client, "parent")).status_code == 200

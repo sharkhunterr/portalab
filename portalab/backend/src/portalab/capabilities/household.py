@@ -1,17 +1,26 @@
-"""``identity.household`` (spec 032): households — a member account (the master) and its profiles, each a
-member of its own. Other modules ask here who a profile's master is (the economy mirrors a profile's amounts
-on it), what a profile may not do (kept-out features, a maximum age rating) and whether the master let it
-open one title anyway. Identity owns the households; nothing here changes a connected service."""
+"""Households (spec 032): a member account (the master) and its profiles, each a member of its own.
+
+* ``household.profiles`` — provided by the household module: who a profile's master is (the economy mirrors
+  a profile's amounts on it), what a profile may not do (kept-out features, titles), whether the master let
+  it open one title anyway, which profiles stay out of the community;
+* ``identity.profile_accounts`` — provided by identity: the accounts behind the profiles (created without a
+  login, renamed, deleted), the session acting as one, and the PINs (hashed and throttled like passwords).
+
+Nothing here changes a connected service."""
 
 import re
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Literal, Protocol, get_args, runtime_checkable
 from uuid import UUID
 
 from portalab.capabilities.registry import CapabilitySpec
+from portalab.core.authz_port import Principal
+from portalab.core.errors import BadRequest, Forbidden
 
-CAPABILITY = "identity.household"
+CAPABILITY = "household.profiles"
+PROFILE_ACCOUNTS = "identity.profile_accounts"
 
 Kind = Literal["owner", "standard", "child", "custom"]
 KINDS: tuple[str, ...] = get_args(Kind)
@@ -175,11 +184,79 @@ class Household(Protocol):
         """The profiles their master keeps out of the community."""
         ...
 
+    async def profiles(self) -> frozenset[UUID]:
+        """Every household profile (they never sign in: never dormant, never matched with a service)."""
+        ...
+
+    async def profiles_of(self, owner: UUID) -> frozenset[UUID]:
+        """A master's profiles (they follow its account's deletion)."""
+        ...
+
+
+@dataclass(frozen=True, slots=True)
+class AccountCard:
+    """What a household shows of a member's account."""
+
+    id: UUID
+    display_name: str
+    has_avatar: bool
+    live: bool  # an active account
+    last_seen_at: datetime | None = None
+
+
+class WrongPin(Forbidden):
+    default_code = "household.wrong_pin"
+    default_title = "Wrong PIN"
+
+
+class PinThrottled(BadRequest):
+    status = 429
+    default_code = "household.pin_throttled"
+    default_title = "Too many wrong PINs"
+
+
+@runtime_checkable
+class ProfileAccounts(Protocol):
+    async def create(self, display_name: str, actor: Principal) -> UUID:
+        """A profile's account: no login, a name that needs not be unique, its welcome to come."""
+        ...
+
+    async def rename(self, user: UUID, display_name: str) -> None: ...
+
+    async def remove(self, user: UUID, actor: Principal) -> None:
+        """Its deletion, at once (nobody signs in to cancel it); every browser acting as it signed out."""
+        ...
+
+    async def cards(self, users: Sequence[UUID]) -> Mapping[UUID, AccountCard]: ...
+
+    async def act(self, session_id: UUID, owner: UUID, target: UUID | None) -> None:
+        """The session of ``owner`` acts as ``target`` from now (``None``: the account itself)."""
+        ...
+
+    async def chosen(self, session_id: UUID) -> bool:
+        """Whether « Who's there? » was answered since this session signed in."""
+        ...
+
+    async def hash_pin(self, pin: str) -> str: ...
+
+    async def verify_pin(self, subject: UUID, pin_hash: str, pin: str) -> None:
+        """Raise ``WrongPin`` (counted, slowing the next tries) or ``PinThrottled``."""
+        ...
+
+
+PROFILE_ACCOUNTS_SPEC = CapabilitySpec(
+    name=PROFILE_ACCOUNTS,
+    version="1.0",
+    protocol=ProfileAccounts,
+    multi_provider=False,
+    description="The accounts and sessions behind household profiles, and their PINs (owned by identity).",
+)
+
 
 SPEC = CapabilitySpec(
     name=CAPABILITY,
     version="1.0",
     protocol=Household,
     multi_provider=False,
-    description="Households: profiles' masters, restrictions and access grants (owned by identity).",
+    description="Households: profiles' masters, restrictions and access grants (owned by household).",
 )

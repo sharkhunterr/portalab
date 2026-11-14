@@ -30,9 +30,10 @@ from portalab.modules.identity.api.schemas import (
     SessionInfo,
     VerifyRequest,
 )
-from portalab.modules.identity.models import Credential, HouseholdMember, Profile, User
+from portalab.modules.identity.models import Credential, Profile, User
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.identity.services.common import UserNotFound, self_actor
+from portalab.modules.identity.services.households import profiles_of as household_profiles_of
 from portalab.modules.identity.services.mfa import CHALLENGE_TTL
 from portalab.modules.identity.services.oidc import PENDING, browser_binding, state_of
 
@@ -239,15 +240,13 @@ async def me(module: Module, principal: Principal = require("users.self.manage")
         )
         progress = await module.onboarding.progress(session, user.id)
         has_password = await session.get(Credential, user.id) is not None
-        profiles = await session.scalar(
-            select(func.count())
-            .select_from(HouseholdMember)
-            .join(User, User.id == HouseholdMember.user_id)
-            .where(
-                HouseholdMember.owner_id == (principal.profile_of or user.id),
-                HouseholdMember.kind != "owner",
-                User.state == "active",
+        mine = list(await household_profiles_of(module.ctx, principal.profile_of or user.id))
+        profiles = (
+            await session.scalar(
+                select(func.count()).select_from(User).where(User.id.in_(mine), User.state == "active")
             )
+            if mine
+            else 0
         )
     return Me(
         id=user.id,

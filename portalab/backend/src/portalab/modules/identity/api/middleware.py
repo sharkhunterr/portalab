@@ -22,6 +22,7 @@ from portalab.core.logging import get_logger
 from portalab.modules.identity.domain.state_machine import AccountState
 from portalab.modules.identity.models import User
 from portalab.modules.identity.module import IdentityModule
+from portalab.modules.identity.services.households import acting as acting_profile
 from portalab.modules.identity.services.sessions import IssuedSession, csrf_matches
 from portalab.modules.identity.services.visits import record_visit
 
@@ -102,7 +103,7 @@ class SessionPrincipalResolver:
                     state = await uow.session.scalar(select(User.state).where(User.id == row.user_id))
                     # 032: the household profile this session acts as (a profile gone: no principal at all —
                     # never its master's rights in a child's hands)
-                    acting = await module.household.acting(uow.session, row)
+                    acting = await acting_profile(ctx, uow.session, row)
                     if row.acting_user_id is not None and acting is None:
                         state = None
                 if row is not None and seen and state == AccountState.ACTIVE.value:

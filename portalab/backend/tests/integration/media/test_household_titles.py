@@ -4,6 +4,7 @@ media widgets' lists; its master's approval opens one title; unrated kinds (book
 master and members without restrictions see everything."""
 
 from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -14,13 +15,18 @@ from sqlalchemy import select
 from portalab.capabilities.media import PORTAL_PLAYER
 from portalab.capabilities.media.testkit import library_record
 from portalab.core.authz_port import Principal
-from portalab.modules.identity.household.rules import RestrictionSettings
+from portalab.modules.household.rules import RestrictionSettings
 from portalab.modules.media.models import MediaObject, ObjectMetadata
 from portalab.modules.media.restrictions import _scrub
-from tests.integration.identity.helpers import login, module_of
+from tests.integration.identity.helpers import login
 from tests.integration.media.conftest import MediaHarness, users
 
 RATINGS = {"Toy Story": "Tous publics", "Alien": "16", "Coco": "PG"}
+
+
+def households(app: FastAPI) -> Any:
+    """032: the household module's service (the households are no longer identity's)."""
+    return app.state.household_module.service
 
 
 async def _library(app: FastAPI, media: MediaHarness) -> dict[str, UUID]:
@@ -64,8 +70,7 @@ async def test_a_child_profile_sees_its_age_only(
 ) -> None:
     people = await users(app, media, "zoe")
     ids = await _library(app, media)
-    identity = module_of(app)
-    created = await identity.household.create(
+    created = await households(app).create(
         Principal(user_id=people["zoe"]), display_name="Léa", kind="child", color=None, pin=None
     )
     lea = UUID(str(created["id"]))
@@ -120,16 +125,15 @@ async def test_locked_titles_show_and_requests_can_be_off(
 ) -> None:
     people = await users(app, media, "zoe")
     ids = await _library(app, media)
-    identity = module_of(app)
     owner = Principal(user_id=people["zoe"])
     lea = UUID(
         str(
-            (await identity.household.create(owner, display_name="Léa", kind="child", color=None, pin=None))[
+            (await households(app).create(owner, display_name="Léa", kind="child", color=None, pin=None))[
                 "id"
             ]
         )
     )
-    await identity.household.change(
+    await households(app).change(
         owner,
         lea,
         restrictions=RestrictionSettings(max_age=12, allow_unrated=True, mode="lock", requests=False),
@@ -160,15 +164,12 @@ async def test_a_profile_watches_with_its_master_account(app: FastAPI, media: Me
     )
     link = await media.module.links.claim(people["zoe"], plex.service_id, "zoe@plex")
     await media.module.links.verify(None, link.id, None)
-    identity = module_of(app)
     owner = Principal(user_id=people["zoe"])
     tom = UUID(
         str(
-            (
-                await identity.household.create(
-                    owner, display_name="Tom", kind="standard", color=None, pin=None
-                )
-            )["id"]
+            (await households(app).create(owner, display_name="Tom", kind="standard", color=None, pin=None))[
+                "id"
+            ]
         )
     )
     assert await media.module.player._account(tom, plex.service_id) == "zoe@plex"  # its master's account
@@ -223,16 +224,13 @@ async def test_the_strictest_rating_and_kept_out_genres_hold(
                     fetched_at=datetime(2026, 1, 1, tzinfo=UTC),
                 )
             )
-    identity = module_of(app)
     owner = Principal(user_id=people["zoe"])
-    created = await identity.household.create(
-        owner, display_name="Arthur", kind="child", color=None, pin=None
-    )
+    created = await households(app).create(owner, display_name="Arthur", kind="child", color=None, pin=None)
     arthur = UUID(str(created["id"]))
     viewer = Principal(user_id=arthur, profile_of=people["zoe"])
     # 12 at most, unrated hidden, horror kept out: Smile (US R), Nope (horror), Saw (the server's 16) go
     assert await media.module.gate.blocked(viewer) == frozenset({ids["Smile"], ids["Nope"], ids["Saw"]})
-    await identity.household.change(
+    await households(app).change(
         owner, arthur, restrictions=RestrictionSettings(max_age=18, allow_unrated=True, genres=[])
     )
     media.module.gate.forget()
@@ -248,19 +246,16 @@ async def test_the_strictest_rating_and_kept_out_genres_hold(
 async def test_kinds_titles_and_screen_time(
     app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
 ) -> None:
-    from portalab.modules.identity.household.rules import KeptTitle
+    from portalab.modules.household.rules import KeptTitle
     from portalab.modules.media.insights.portal import PortalActivity
     from portalab.modules.media.restrictions import ScreenTimeUp
 
     people = await users(app, media, "zoe")
     ids = await _library(app, media)
-    identity = module_of(app)
     owner = Principal(user_id=people["zoe"])
-    created = await identity.household.create(
-        owner, display_name="Léa", kind="standard", color=None, pin=None
-    )
+    created = await households(app).create(owner, display_name="Léa", kind="standard", color=None, pin=None)
     lea = UUID(str(created["id"]))
-    await identity.household.change(
+    await households(app).change(
         owner,
         lea,
         restrictions=RestrictionSettings(
@@ -302,9 +297,8 @@ async def test_kinds_titles_and_screen_time(
 async def test_the_request_services_titles_follow_the_profile(app: FastAPI, media: MediaHarness) -> None:
     people = await users(app, media, "zoe")
     ids = await _library(app, media)
-    identity = module_of(app)
     owner = Principal(user_id=people["zoe"])
-    created = await identity.household.create(owner, display_name="Léa", kind="child", color=None, pin=None)
+    created = await households(app).create(owner, display_name="Léa", kind="child", color=None, pin=None)
     lea = UUID(str(created["id"]))
     viewer = Principal(user_id=lea, profile_of=people["zoe"])
     items = [
@@ -313,7 +307,7 @@ async def test_the_request_services_titles_follow_the_profile(app: FastAPI, medi
         {"tmdb_id": "3", "kind": "movie", "title": "Outside", "object_id": None},  # no known rating
     ]
     assert [i["title"] for i in await media.module.gate.requestable(viewer, items)] == ["Toy Story"]
-    await identity.household.change(
+    await households(app).change(
         owner, lea, restrictions=RestrictionSettings(max_age=12, allow_unrated=True, mode="lock")
     )
     media.module.gate.forget()

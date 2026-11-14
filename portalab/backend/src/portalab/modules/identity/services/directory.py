@@ -18,7 +18,9 @@ from portalab.capabilities.identity_directory import (
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.modules.identity.context import OWNER, IdentityContext
 from portalab.modules.identity.domain.state_machine import AccountState, is_active_account
-from portalab.modules.identity.models import HouseholdMember, User
+from portalab.modules.identity.models import User
+from portalab.modules.identity.services.households import hidden as household_hidden
+from portalab.modules.identity.services.households import profiles as household_profiles
 
 
 class IdentityDirectoryService:
@@ -87,9 +89,7 @@ class IdentityMembersService:
         self, *, query: str | None = None, offset: int = 0, limit: int = 30, newest: bool = False
     ) -> MemberPage:
         limit = max(1, min(limit, 100))
-        hidden = select(HouseholdMember.user_id).where(
-            HouseholdMember.kind != "owner", HouseholdMember.community_visible.is_(False)
-        )
+        hidden = list(await household_hidden(self.ctx))
         statement = select(User.id, User.display_name, User.created_at).where(
             User.state == AccountState.ACTIVE.value, User.display_name.is_not(None), User.id.not_in(hidden)
         )
@@ -120,9 +120,7 @@ class IdentityAccountsService:
                     select(User)
                     .where(
                         User.state.in_(live),
-                        User.id.not_in(
-                            select(HouseholdMember.user_id).where(HouseholdMember.kind != "owner")
-                        ),
+                        User.id.not_in(list(await household_profiles(self.ctx))),
                     )
                     .order_by(User.display_name_key, User.id)
                 )

@@ -1,60 +1,50 @@
-"""Households (spec 032): a member account (the master) holds profiles — members of their own without a
-login, used through the master's session. The session remembers which household member it acts as;
-entering a protected member — a profile, or the master from a profile — asks its PIN, whoever comes from.
-Every household member sees the household's figures; only the master manages it, and it decides on its
-profiles' access requests. Nothing here touches a connected service."""
+"""Households (spec 032): a member account (the master) holds profiles — members of their own without a login,
+used through the master's session. Entering a protected member — a profile, or the master from a profile —
+asks its PIN, whoever comes from. Every household member sees the household's figures; only the master
+manages it, sets each profile's policy and decides on its profiles' access requests.
+
+The households are this module's; the accounts behind them, the sessions and the PINs' hashing are
+identity's (``identity.profile_accounts``). Nothing here touches a connected service."""
 
 import time
 from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, select, update
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.economy import ECONOMY
-from portalab.capabilities.household import Restrictions
+from portalab.capabilities.household import PROFILE_ACCOUNTS, AccountCard, ProfileAccounts, Restrictions
 from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, Users
+from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.statistics import PROGRESSION
-from portalab.core.authz_port import Principal
-from portalab.core.errors import Conflict, Forbidden, NotFound
-from portalab.modules.identity.context import IdentityContext
-from portalab.modules.identity.domain.display_name import clean_display_name
-from portalab.modules.identity.domain.state_machine import AccountState
-from portalab.modules.identity.household.rules import (
+from portalab.core.audit_port import AuditRecord, AuditSink
+from portalab.core.authz_port import Principal, ResourceRef
+from portalab.core.db import Database
+from portalab.core.errors import Conflict, Forbidden, NotFound, Unavailable
+from portalab.core.logging import get_logger
+from portalab.core.time import Clock, utc_now
+from portalab.modules.household.models import AccessRequest, HouseholdMember
+from portalab.modules.household.rules import (
     COLORS,
     MAX_PROFILES,
     PROFILE_KINDS,
-    HouseholdDisabled,
     OwnerOnly,
     ProfileLimit,
     RestrictionSettings,
-    WrongPin,
     check_pin,
     color_for,
     parse,
     preset,
 )
-from portalab.modules.identity.models import (
-    AccessRequest,
-    HouseholdMember,
-    Profile,
-    User,
-    UserSession,
-)
-from portalab.modules.identity.services.account_service import AccountService
-from portalab.modules.identity.services.common import Actor, Throttled, audit, log, self_actor, user_ref
-from portalab.modules.identity.services.credentials import CredentialHasher
-from portalab.modules.identity.services.onboarding import OnboardingService
-from portalab.modules.identity.services.throttle import LoginThrottleService, throttle_key
-from portalab.modules.identity.services.visits import record_visit
-from portalab.modules.identity.settings import HOUSEHOLD_ENABLED, HOUSEHOLD_MAX
+from portalab.modules.household.settings import MAX_KEY
 
 CACHE_S = 15.0
 ATTENTION_ENTRY = "shell.household"  # the navigation entry of « My household »
-CATEGORY = "identity.household"
-LIVE = AccountState.ACTIVE.value
+CATEGORY = "household.requests"
+log = get_logger("portalab.household")
 
 
 def household_of(principal: Principal) -> UUID:
@@ -65,57 +55,69 @@ def household_of(principal: Principal) -> UUID:
     return owner
 
 
+def _ref(user: UUID) -> ResourceRef:
+    return ResourceRef(kind="user", id=str(user), owner_id=user)
+
+
 class HouseholdService:
     def __init__(
         self,
-        ctx: IdentityContext,
-        hasher: CredentialHasher,
-        accounts: AccountService,
-        throttle: LoginThrottleService,
-        onboarding: OnboardingService,
+        database: Database,
+        capabilities: CapabilityRegistry,
+        audit: AuditSink,
+        *,
+        clock: Clock | None = None,
     ) -> None:
-        self.ctx = ctx
-        self.hasher = hasher
-        self.accounts = accounts
-        self.throttle = throttle
-        self.onboarding = onboarding
-        self.deletion: Any = None  # wired by the module (the deletion saga needs the sessions)
+        self.database = database
+        self.capabilities = capabilities
+        self.audit = audit
+        self.clock = clock
         self._owners: dict[UUID, UUID | None] = {}
         self._restrictions: dict[UUID, tuple[float, Restrictions | None]] = {}
         self._hidden: tuple[float, frozenset[UUID]] | None = None
+        self._profiles: tuple[float, frozenset[UUID]] | None = None
 
-    # --- settings ------------------------------------------------------------------------------------
-    async def settings(self) -> tuple[bool, int]:
-        """Whether profiles are offered, and how many an account may hold (administrators choose)."""
-        values: dict[str, Any] = {HOUSEHOLD_ENABLED: True, HOUSEHOLD_MAX: MAX_PROFILES}
-        providers = self.ctx.capabilities.system_providers(CONFIG)
-        for key in values:
-            try:
-                if providers:
-                    values[key] = (await providers[0].provider.get(key)).value
-            except Exception:  # noqa: S112 — the default stands
-                continue
-        limit = values[HOUSEHOLD_MAX]
-        return values[HOUSEHOLD_ENABLED] is not False, max(1, min(int(limit), 20)) if isinstance(
-            limit, int
-        ) else MAX_PROFILES
+    def now(self) -> datetime:
+        return utc_now(self.clock)
 
-    async def _enabled(self) -> int:
-        enabled, limit = await self.settings()
-        if not enabled:
-            raise HouseholdDisabled("Profiles are switched off on this portal.")
-        return limit
+    def accounts(self) -> ProfileAccounts:
+        providers = self.capabilities.system_providers(PROFILE_ACCOUNTS)
+        if not providers:
+            raise Unavailable("Accounts are not available.", code="household.unavailable")
+        provider: ProfileAccounts = providers[0].provider
+        return provider
+
+    async def limit(self) -> int:
+        """How many profiles an account may hold (administrators choose)."""
+        try:
+            providers = self.capabilities.system_providers(CONFIG)
+            if providers:
+                value = (await providers[0].provider.get(MAX_KEY)).value
+                if isinstance(value, int):
+                    return max(1, min(value, 20))
+        except Exception:  # noqa: S110 — the default stands
+            pass
+        return MAX_PROFILES
 
     def forget(self, *users: UUID) -> None:
         for user in users:
             self._restrictions.pop(user, None)
         self._hidden = None
+        self._profiles = None
 
-    # --- reads for other modules (``identity.household``) ---------------------------------------------
+    async def _audit(
+        self, session: AsyncSession, action: str, actor: Principal, user: UUID, context: dict[str, Any]
+    ) -> None:
+        try:
+            await self.audit.record(session, AuditRecord(action, actor, resource=_ref(user), context=context))
+        except Exception:
+            log.error("household audit not written", extra={"fields": {"action": action}})
+
+    # --- reads for other modules (``household.profiles``) ---------------------------------------------
     async def owner_of(self, user: UUID) -> UUID | None:
         if user in self._owners:
             return self._owners[user]
-        async with self.ctx.database.session() as session:
+        async with self.database.session() as session:
             owner = await session.scalar(
                 select(HouseholdMember.owner_id).where(
                     HouseholdMember.user_id == user, HouseholdMember.kind != "owner"
@@ -130,7 +132,7 @@ class HouseholdService:
         cached = self._restrictions.get(user)
         if cached is not None and time.monotonic() - cached[0] < CACHE_S:
             return cached[1]
-        async with self.ctx.database.session() as session:
+        async with self.database.session() as session:
             row = await session.get(HouseholdMember, user)
         found = None
         if row is not None and row.kind != "owner":
@@ -140,8 +142,8 @@ class HouseholdService:
         return found
 
     async def grants(self, user: UUID, kind: str) -> frozenset[str]:
-        now = self.ctx.now()
-        async with self.ctx.database.session() as session:
+        now = self.now()
+        async with self.database.session() as session:
             refs = await session.scalars(
                 select(AccessRequest.subject_ref).where(
                     AccessRequest.profile_id == user,
@@ -158,7 +160,7 @@ class HouseholdService:
     async def hidden(self) -> frozenset[UUID]:
         if self._hidden is not None and time.monotonic() - self._hidden[0] < CACHE_S:
             return self._hidden[1]
-        async with self.ctx.database.session() as session:
+        async with self.database.session() as session:
             found = frozenset(
                 await session.scalars(
                     select(HouseholdMember.user_id).where(
@@ -169,163 +171,124 @@ class HouseholdService:
         self._hidden = (time.monotonic(), found)
         return found
 
-    # --- the session ---------------------------------------------------------------------------------
-    async def acting(self, session: AsyncSession, row: UserSession) -> UUID | None:
-        """The live profile a session acts as, or ``None`` when that profile is no longer usable."""
-        if row.acting_user_id is None:
-            return None
-        found: UUID | None = await session.scalar(
-            select(HouseholdMember.user_id)
-            .join(User, User.id == HouseholdMember.user_id)
-            .where(
-                HouseholdMember.user_id == row.acting_user_id,
-                HouseholdMember.owner_id == row.user_id,
-                HouseholdMember.kind != "owner",
-                User.state == LIVE,
+    async def profiles(self) -> frozenset[UUID]:
+        if self._profiles is not None and time.monotonic() - self._profiles[0] < CACHE_S:
+            return self._profiles[1]
+        async with self.database.session() as session:
+            found = frozenset(
+                await session.scalars(select(HouseholdMember.user_id).where(HouseholdMember.kind != "owner"))
             )
-        )
+        self._profiles = (time.monotonic(), found)
         return found
 
-    async def _members(self, session: AsyncSession, owner: UUID) -> list[tuple[User, HouseholdMember | None]]:
+    async def profiles_of(self, owner: UUID) -> frozenset[UUID]:
+        async with self.database.session() as session:
+            return frozenset(
+                await session.scalars(
+                    select(HouseholdMember.user_id).where(
+                        HouseholdMember.owner_id == owner, HouseholdMember.kind != "owner"
+                    )
+                )
+            )
+
+    # --- the household's members ---------------------------------------------------------------------
+    async def _members(self, owner: UUID) -> list[tuple[AccountCard, HouseholdMember | None]]:
         """The master first, then its live profiles in their order."""
-        master = await session.get(User, owner)
+        async with self.database.session() as session:
+            rows = list(
+                (
+                    await session.scalars(
+                        select(HouseholdMember)
+                        .where(HouseholdMember.owner_id == owner)
+                        .order_by(HouseholdMember.kind != "owner", HouseholdMember.position)
+                    )
+                ).all()
+            )
+        cards = await self.accounts().cards([owner, *(r.user_id for r in rows)])
+        master = cards.get(owner)
         if master is None:
             return []
-        rows = (
-            await session.execute(
-                select(User, HouseholdMember)
-                .join(HouseholdMember, HouseholdMember.user_id == User.id)
-                .where(HouseholdMember.owner_id == owner, User.state == LIVE)
-                .order_by(HouseholdMember.kind != "owner", HouseholdMember.position, User.created_at)
-            )
-        ).all()
-        members: list[tuple[User, HouseholdMember | None]] = [(u, m) for u, m in rows]
-        if not members or members[0][0].id != owner:
-            members.insert(0, (master, None))
+        members: list[tuple[AccountCard, HouseholdMember | None]] = [
+            (master, next((r for r in rows if r.user_id == owner), None))
+        ]
+        for row in rows:
+            card = cards.get(row.user_id)
+            if row.kind != "owner" and card is not None and card.live:
+                members.append((card, row))
         return members
 
     @staticmethod
-    def _tile(user: User, member: HouseholdMember | None, avatar: bool) -> dict[str, Any]:
+    def _tile(card: AccountCard, member: HouseholdMember | None) -> dict[str, Any]:
         return {
-            "id": user.id,
-            "display_name": user.display_name or "",
+            "id": card.id,
+            "display_name": card.display_name,
             "kind": member.kind if member is not None else "owner",
             "color": member.color if member is not None else color_for(None, 0),
-            "has_avatar": avatar,
+            "has_avatar": card.has_avatar,
             "has_pin": member is not None and member.pin_hash is not None,
         }
-
-    async def _avatars(self, session: AsyncSession, users: list[UUID]) -> set[UUID]:
-        return set(
-            await session.scalars(
-                select(Profile.user_id).where(
-                    Profile.user_id.in_(users), Profile.avatar_blob_key.is_not(None)
-                )
-            )
-        )
 
     async def state(self, principal: Principal) -> dict[str, Any]:
         """For the « Who's there? » picker: the household's members, who is active, whether to choose."""
         owner = household_of(principal)
-        enabled, _ = await self.settings()
-        async with self.ctx.database.session() as session:
-            members = await self._members(session, owner)
-            avatars = await self._avatars(session, [u.id for u, _ in members])
-            chosen = True
-            if principal.session_id is not None:
-                chosen = bool(
-                    await session.scalar(
-                        select(UserSession.profile_chosen).where(UserSession.id == principal.session_id)
-                    )
-                )
+        members = await self._members(owner)
+        chosen = await self.accounts().chosen(principal.session_id) if principal.session_id else True
         tiles = []
-        for user, member in members:
-            tile = self._tile(user, member, user.id in avatars)
+        for card, member in members:
+            tile = self._tile(card, member)
             # entering a protected member asks its PIN, whoever comes from (the master too)
-            tile["needs_pin"] = tile["has_pin"] and user.id != principal.user_id
+            tile["needs_pin"] = tile["has_pin"] and card.id != principal.user_id
             tiles.append(tile)
-        profiles = len(tiles) > 1
         return {
-            "enabled": enabled,
+            "enabled": True,
             "owner_id": owner,
             "active_id": principal.user_id,
-            "must_choose": enabled and profiles and not chosen,
-            "members": tiles if enabled else tiles[:1],
+            "must_choose": len(tiles) > 1 and not chosen,
+            "members": tiles,
         }
 
     async def switch(self, principal: Principal, target: UUID, pin: str | None) -> dict[str, Any]:
         owner = household_of(principal)
-        await self._enabled()
         if principal.session_id is None:
             raise Forbidden("Profiles are used from a signed-in browser.", code="household.no_session")
-        now = self.ctx.now()
-        async with self.ctx.database.unit_of_work() as uow:
-            member = await uow.session.get(HouseholdMember, target)
-            user = await uow.session.get(User, target)
-            belongs = target == owner or (
-                member is not None and member.owner_id == owner and member.kind != "owner"
-            )
-            if not belongs or user is None or user.state != LIVE:
-                raise NotFound("This profile does not exist.", code="household.member_not_found")
-            if target != principal.user_id and member is not None and member.pin_hash is not None:
-                await self._check_pin(member.user_id, member.pin_hash, pin or "", now)
-            await uow.session.execute(
-                update(UserSession)
-                .where(UserSession.id == principal.session_id, UserSession.user_id == owner)
-                .values(acting_user_id=None if target == owner else target, profile_chosen=True)
-            )
-            if target != owner:
-                user.last_sign_in_at = now  # a profile lives by its use (never dormant while used)
-                await record_visit(self.ctx, uow.session, target, now)
+        async with self.database.session() as session:
+            member = await session.get(HouseholdMember, target)
+        belongs = target == owner or (
+            member is not None and member.owner_id == owner and member.kind != "owner"
+        )
+        card = (await self.accounts().cards([target])).get(target)
+        if not belongs or card is None or not card.live:
+            raise NotFound("This profile does not exist.", code="household.member_not_found")
+        if target != principal.user_id and member is not None and member.pin_hash is not None:
+            await self.accounts().verify_pin(target, member.pin_hash, pin or "")
+        await self.accounts().act(principal.session_id, owner, None if target == owner else target)
         log.info("household profile switched", extra={"fields": {"to_owner": target == owner}})
         return {"active_id": target}
-
-    async def _check_pin(self, member: UUID, pin_hash: str, pin: str, now: datetime) -> None:
-        """A wrong PIN is counted in a transaction of its own (the refused operation's rolls back)."""
-        key, right = throttle_key(f"household-pin:{member}", None), False
-        async with self.ctx.database.unit_of_work() as uow:
-            blocked = await self.throttle.blocked_until(uow.session, key, now)
-            if blocked is None:
-                right = await self.hasher.verify(pin_hash, pin)
-                if right:
-                    await self.throttle.clear(uow.session, key)
-                else:
-                    await self.throttle.record_failure(uow.session, key, now)
-        if blocked is not None:
-            raise Throttled(
-                "Too many wrong PINs; try again later.",
-                code="household.pin_throttled",
-                extensions={"retry_after": max(1, int((blocked - now).total_seconds()))},
-            )
-        if not right:
-            raise WrongPin("This PIN is not the right one.")
 
     # --- the household page --------------------------------------------------------------------------
     async def overview(self, principal: Principal) -> dict[str, Any]:
         """Every household member sees the household: its wallet (the master's balances, which hold every
         profile's earnings) and each member's figures; the restrictions to the master and to the profile."""
         owner = household_of(principal)
-        enabled, limit = await self.settings()
-        async with self.ctx.database.session() as session:
-            members = await self._members(session, owner)
-            avatars = await self._avatars(session, [u.id for u, _ in members])
+        limit = await self.limit()
         manager = principal.profile_of is None
+        today = self.now().date()
         tiles = []
-        for user, member in members:
-            tile = self._tile(user, member, user.id in avatars)
-            tile["progress"] = await self._progress(user.id)
+        for card, member in await self._members(owner):
+            tile = self._tile(card, member)
+            tile["progress"] = await self._progress(card.id)
             tile["community_visible"] = member.community_visible if member is not None else True
-            if member is not None and member.kind != "owner" and (manager or user.id == principal.user_id):
+            if member is not None and member.kind != "owner" and (manager or card.id == principal.user_id):
                 settings = parse(member.restrictions)
                 tile["restrictions"] = settings.model_dump(mode="json")
-                tile["age"] = settings.age(self.ctx.now().date())
-                tile["effective_age"] = settings.effective_age(self.ctx.now().date())
+                tile["age"] = settings.age(today)
+                tile["effective_age"] = settings.effective_age(today)
             tiles.append(tile)
         return {
-            "enabled": enabled,
+            "enabled": True,
             "owner_id": owner,
             "me": principal.user_id,
-            "can_manage": manager and enabled,
+            "can_manage": manager,
             "max_profiles": limit,
             "palette": list(COLORS),
             "totals": tiles[0]["progress"] if tiles else None,
@@ -334,7 +297,7 @@ class HouseholdService:
 
     async def _progress(self, user: UUID) -> dict[str, int]:
         empty = {"xp": 0, "level": 0, "coins": 0, "contribution": 0}
-        providers = self.ctx.capabilities.system_providers(PROGRESSION)
+        providers = self.capabilities.system_providers(PROGRESSION)
         if not providers or not hasattr(providers[0].provider, "progress"):
             return empty
         try:
@@ -356,16 +319,14 @@ class HouseholdService:
             raise OwnerOnly("Only the account's master manages its profiles.")
         return owner
 
-    async def _profile(
-        self, session: AsyncSession, owner: UUID, profile: UUID
-    ) -> tuple[User, HouseholdMember]:
+    async def _profile(self, session: AsyncSession, owner: UUID, profile: UUID) -> HouseholdMember:
         member = await session.get(HouseholdMember, profile, with_for_update=True)
-        user = await session.get(User, profile)
-        if member is None or member.owner_id != owner or member.kind == "owner" or user is None:
+        if member is None or member.owner_id != owner or member.kind == "owner":
             raise NotFound("This profile does not exist.", code="household.member_not_found")
-        if user.state != LIVE:
+        card = (await self.accounts().cards([profile])).get(profile)
+        if card is None or not card.live:
             raise NotFound("This profile does not exist.", code="household.member_not_found")
-        return user, member
+        return member
 
     async def _owner_row(self, session: AsyncSession, owner: UUID, now: datetime) -> HouseholdMember:
         row = await session.get(HouseholdMember, owner, with_for_update=True)
@@ -389,47 +350,27 @@ class HouseholdService:
         self, principal: Principal, *, display_name: str, kind: str, color: str | None, pin: str | None
     ) -> dict[str, Any]:
         owner = self._manager(principal)
-        limit = await self._enabled()
+        limit = await self.limit()
         if kind not in PROFILE_KINDS:
             raise Conflict("Choose standard, child or custom.", code="household.invalid_kind")
-        pin_hash = await self.hasher.hash(check_pin(pin)) if pin else None
-        now = self.ctx.now()
-        actor = self_actor(principal)
-        async with self.ctx.database.unit_of_work() as uow:
+        pin_hash = await self.accounts().hash_pin(check_pin(pin)) if pin else None
+        existing = await self.profiles_of(owner)
+        live = [c for c in (await self.accounts().cards(list(existing))).values() if c.live]
+        if len(live) >= limit:
+            raise ProfileLimit(f"An account holds at most {limit} profiles.", extensions={"limit": limit})
+        user = await self.accounts().create(display_name, principal)
+        now = self.now()
+        async with self.database.unit_of_work() as uow:
             await self._owner_row(uow.session, owner, now)
-            count = int(
-                await uow.session.scalar(
-                    select(func.count())
-                    .select_from(HouseholdMember)
-                    .join(User, User.id == HouseholdMember.user_id)
-                    .where(
-                        HouseholdMember.owner_id == owner,
-                        HouseholdMember.kind != "owner",
-                        User.state.not_in(("deleted", "pending_deletion")),
-                    )
-                )
-                or 0
-            )
-            if count >= limit:
-                raise ProfileLimit(f"An account holds at most {limit} profiles.", extensions={"limit": limit})
-            user = await self.accounts.create_user(
-                uow.session,
-                login=None,
-                display_name=display_name,
-                email=None,
-                state=AccountState.ACTIVE,
-                actor=actor,
-                reason="household_profile",
-                unique_name=False,
-            )
+            position = len(existing) + 1
             restrictions, visible = preset(kind)
             uow.session.add(
                 HouseholdMember(
-                    user_id=user.id,
+                    user_id=user,
                     owner_id=owner,
                     kind=kind,
-                    color=color_for(color, count + 1),
-                    position=count + 1,
+                    color=color_for(color, position),
+                    position=position,
                     pin_hash=pin_hash,
                     community_visible=visible,
                     restrictions=restrictions.model_dump(mode="json"),
@@ -437,18 +378,10 @@ class HouseholdService:
                     updated_at=now,
                 )
             )
-            await self.onboarding.start(uow.session, user.id, now)
-            await audit(
-                self.ctx,
-                uow.session,
-                "household.profile_created",
-                principal,
-                resource=user_ref(user.id),
-                context={"kind": kind},
-            )
-        self._owners[user.id] = owner
-        self.forget(user.id)
-        return {"id": user.id}
+            await self._audit(uow.session, "household.profile_created", principal, user, {"kind": kind})
+        self._owners[user] = owner
+        self.forget(user)
+        return {"id": user}
 
     async def change(
         self,
@@ -463,13 +396,8 @@ class HouseholdService:
         position: int | None = None,
     ) -> None:
         owner = self._manager(principal)
-        await self._enabled()
-        now = self.ctx.now()
-        async with self.ctx.database.unit_of_work() as uow:
-            user, member = await self._profile(uow.session, owner, profile)
-            if display_name is not None:
-                user.display_name = clean_display_name(display_name)
-                user.updated_at = now
+        async with self.database.unit_of_work() as uow:
+            member = await self._profile(uow.session, owner, profile)
             if color is not None:
                 member.color = color_for(color, member.position)
             if kind is not None and kind != member.kind:
@@ -487,15 +415,16 @@ class HouseholdService:
                 member.community_visible = community_visible
             if position is not None:
                 member.position = max(1, min(position, 99))
-            member.updated_at = now
-            await audit(
-                self.ctx,
+            member.updated_at = self.now()
+            await self._audit(
                 uow.session,
                 "household.profile_changed",
                 principal,
-                resource=user_ref(profile),
-                context={"kind": member.kind, "restrictions": member.restrictions},
+                profile,
+                {"kind": member.kind, "restrictions": member.restrictions},
             )
+        if display_name is not None:
+            await self.accounts().rename(profile, display_name)
         self.forget(profile)
 
     async def set_pin(
@@ -504,42 +433,31 @@ class HouseholdService:
         """The master sets or removes any member's PIN (its own included); a profile, its own — giving the
         one it replaces."""
         owner = household_of(principal)
-        await self._enabled()
         if principal.profile_of is not None and member_id != principal.user_id:
             raise OwnerOnly("Only the account's master changes another profile's PIN.")
-        pin_hash = await self.hasher.hash(check_pin(pin)) if pin else None
-        now = self.ctx.now()
-        async with self.ctx.database.unit_of_work() as uow:
+        pin_hash = await self.accounts().hash_pin(check_pin(pin)) if pin else None
+        async with self.database.session() as session:
+            known = await session.get(HouseholdMember, member_id)
+        if principal.profile_of is not None and known is not None and known.pin_hash is not None:
+            await self.accounts().verify_pin(member_id, known.pin_hash, current or "")
+        now = self.now()
+        async with self.database.unit_of_work() as uow:
             if member_id == owner:
                 member = await self._owner_row(uow.session, owner, now)
             else:
-                _, member = await self._profile(uow.session, owner, member_id)
-            if principal.profile_of is not None and member.pin_hash is not None:
-                await self._check_pin(member.user_id, member.pin_hash, current or "", now)
+                member = await self._profile(uow.session, owner, member_id)
             member.pin_hash = pin_hash
             member.updated_at = now
-            await audit(
-                self.ctx,
-                uow.session,
-                "household.pin_changed",
-                principal,
-                resource=user_ref(member_id),
-                context={"set": pin_hash is not None},
+            await self._audit(
+                uow.session, "household.pin_changed", principal, member_id, {"set": pin_hash is not None}
             )
 
     async def remove(self, principal: Principal, profile: UUID) -> None:
-        """The profile follows an account's deletion (at once: nobody signs in to cancel it); every browser
-        using it is signed out."""
+        """The profile follows an account's deletion (at once); every browser using it is signed out."""
         owner = self._manager(principal)
-        now = self.ctx.now()
-        async with self.ctx.database.unit_of_work() as uow:
-            await self._profile(uow.session, owner, profile)
-            await uow.session.execute(
-                update(UserSession)
-                .where(UserSession.acting_user_id == profile, UserSession.revoked_at.is_(None))
-                .values(revoked_at=now, revoke_reason="admin")
-            )
-        await self.deletion.request(Actor("self", principal), profile, reason="household", grace=timedelta(0))
+        async with self.database.session() as session:
+            await self._profile(session, owner, profile)
+        await self.accounts().remove(profile, principal)
         self.forget(profile)
 
     # --- supervision ---------------------------------------------------------------------------------
@@ -548,13 +466,13 @@ class HouseholdService:
         owner = household_of(principal)
         if principal.profile_of is not None and profile != principal.user_id:
             raise OwnerOnly("Only the account's master reads its profiles' activity.")
-        async with self.ctx.database.session() as session:
+        async with self.database.session() as session:
             member = await session.get(HouseholdMember, profile)
-            if member is None or member.owner_id != owner or member.kind == "owner":
-                raise NotFound("This profile does not exist.", code="household.member_not_found")
-            seen = await session.scalar(select(User.last_sign_in_at).where(User.id == profile))
+        if member is None or member.owner_id != owner or member.kind == "owner":
+            raise NotFound("This profile does not exist.", code="household.member_not_found")
+        card = (await self.accounts().cards([profile])).get(profile)
         economy: list[dict[str, Any]] = []
-        providers = self.ctx.capabilities.system_providers(ECONOMY)
+        providers = self.capabilities.system_providers(ECONOMY)
         if providers:
             try:
                 page = await providers[0].provider.history(profile, limit=40)
@@ -572,7 +490,11 @@ class HouseholdService:
                 ]
             except Exception:
                 log.warning("household activity: economy history unavailable")
-        return {"last_seen_at": seen, "economy": economy, "requests": await self.requests(principal, profile)}
+        return {
+            "last_seen_at": card.last_seen_at if card else None,
+            "economy": economy,
+            "requests": await self.requests(principal, profile),
+        }
 
     # --- access requests -----------------------------------------------------------------------------
     @staticmethod
@@ -600,7 +522,7 @@ class HouseholdService:
         statement = select(AccessRequest).where(AccessRequest.owner_id == owner)
         if profile is not None:
             statement = statement.where(AccessRequest.profile_id == profile)
-        async with self.ctx.database.session() as session:
+        async with self.database.session() as session:
             rows = list(
                 (
                     await session.scalars(
@@ -610,25 +532,20 @@ class HouseholdService:
                     )
                 ).all()
             )
-            ids = {row.profile_id for row in rows}
-            names = {
-                u.id: u.display_name or ""
-                for u in (await session.scalars(select(User).where(User.id.in_(ids)))).all()
-            }
+        cards = await self.accounts().cards(list({row.profile_id for row in rows}))
+        names = {user: card.display_name for user, card in cards.items()}
         return [self._request(row, names) for row in rows]
 
     async def ask(
         self, principal: Principal, *, kind: str, ref: str, title: str, rating: str | None, note: str | None
     ) -> dict[str, Any]:
         owner = household_of(principal)
-        await self._enabled()
         if principal.profile_of is None or principal.user_id is None:
             raise Forbidden("Only a profile asks its master for access.", code="household.not_a_profile")
         restrictions = await self.restrictions_of(principal.user_id)
         if restrictions is not None and not restrictions.requests:
             raise Forbidden("Your profile cannot ask for access.", code="household.requests_off")
-        now = self.ctx.now()
-        async with self.ctx.database.unit_of_work() as uow:
+        async with self.database.unit_of_work() as uow:
             pending = await uow.session.scalar(
                 select(AccessRequest).where(
                     AccessRequest.profile_id == principal.user_id,
@@ -648,15 +565,15 @@ class HouseholdService:
                 rating=(rating or "").strip()[:32] or None,
                 note=(note or "").strip()[:300] or None,
                 status="pending",
-                created_at=now,
+                created_at=self.now(),
             )
             uow.session.add(row)
             await uow.session.flush()
-            name = await uow.session.scalar(select(User.display_name).where(User.id == principal.user_id))
+        card = (await self.accounts().cards([principal.user_id])).get(principal.user_id)
         await self._notify(
             owner,
             "household:notify.request",
-            {"profile": name or "", "title": row.title},
+            {"profile": card.display_name if card else "", "title": row.title},
             f"household:request:{row.id}",
             "/household?tab=requests",
         )
@@ -664,8 +581,8 @@ class HouseholdService:
 
     async def decide(self, principal: Principal, request: UUID, *, approve: bool, days: int | None) -> None:
         owner = self._manager(principal)
-        now = self.ctx.now()
-        async with self.ctx.database.unit_of_work() as uow:
+        now = self.now()
+        async with self.database.unit_of_work() as uow:
             row = await uow.session.get(AccessRequest, request, with_for_update=True)
             if row is None or row.owner_id != owner:
                 raise NotFound("This request does not exist.", code="household.request_not_found")
@@ -674,13 +591,12 @@ class HouseholdService:
             row.status = "approved" if approve else "denied"
             row.decided_at = now
             row.expires_at = now + timedelta(days=days) if approve and days else None
-            await audit(
-                self.ctx,
+            await self._audit(
                 uow.session,
                 "household.access_decided",
                 principal,
-                resource=user_ref(row.profile_id),
-                context={"kind": row.kind, "ref": row.subject_ref, "approved": approve, "days": days},
+                row.profile_id,
+                {"kind": row.kind, "ref": row.subject_ref, "approved": approve, "days": days},
             )
         await self._notify(
             row.profile_id,
@@ -690,9 +606,20 @@ class HouseholdService:
             f"/media/{row.subject_ref}" if row.kind == "media" else "/household",
         )
 
+    async def waiting(self, owner: UUID) -> int:
+        async with self.database.session() as session:
+            return int(
+                await session.scalar(
+                    select(func.count())
+                    .select_from(AccessRequest)
+                    .where(AccessRequest.owner_id == owner, AccessRequest.status == "pending")
+                )
+                or 0
+            )
+
     async def _notify(self, user: UUID, template: str, params: dict[str, Any], dedup: str, url: str) -> None:
         try:
-            providers = self.ctx.capabilities.system_providers(NOTIFY)
+            providers = self.capabilities.system_providers(NOTIFY)
             if providers:
                 await providers[0].provider.send(
                     CommunicationRequest(
@@ -718,10 +645,5 @@ class HouseholdAttention:
     async def counts(self, principal: Principal) -> dict[str, int]:
         if principal.user_id is None or principal.profile_of is not None or principal.channel != "user":
             return {}
-        async with self.service.ctx.database.session() as session:
-            waiting = await session.scalar(
-                select(func.count())
-                .select_from(AccessRequest)
-                .where(AccessRequest.owner_id == principal.user_id, AccessRequest.status == "pending")
-            )
-        return {ATTENTION_ENTRY: int(waiting or 0)} if waiting else {}
+        waiting = await self.service.waiting(principal.user_id)
+        return {ATTENTION_ENTRY: waiting} if waiting else {}

@@ -62,9 +62,10 @@ In Configuration, area Accounts:
 
 A member account can hold **profiles** for the people sharing it at home (a shared Plex account with a family behind it). Each profile is a member of its own — dashboard, recommendations, quests, achievements, streaks, notifications — without a login: it is used from its master account's session, picked on « Who's there? » after signing in, optionally behind a 4–6 digit PIN. See [Household profiles](../members/households.md).
 
-| Setting (area Accounts) | What it does |
+Profiles are the **household** module: switch it off in the module manager and the picker, « My household » and every profile restriction disappear (existing profiles stay, and cannot be entered). Its setting, in Configuration, area Accounts:
+
+| Setting | What it does |
 |---|---|
-| *Household profiles* | Offers profiles to members (on by default). Off: the picker and « My household » management disappear; existing profiles stay but cannot be entered. |
 | *Profiles per account* | How many profiles one account may hold (8 by default, 1 to 20). |
 
 What administrators should know:

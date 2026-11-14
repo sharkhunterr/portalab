@@ -463,6 +463,10 @@
     "advanced": true,
     "group": "services"
   },
+  "household.maxProfiles": {
+    "advanced": false,
+    "group": "members"
+  },
   "i18n.ambiguousTimePolicy": {
     "advanced": true,
     "group": "general"
@@ -530,14 +534,6 @@
   "identity.exportTtlHours": {
     "advanced": true,
     "group": "security"
-  },
-  "identity.household.enabled": {
-    "advanced": false,
-    "group": "members"
-  },
-  "identity.household.maxProfiles": {
-    "advanced": false,
-    "group": "members"
   },
   "identity.oidc.clientId": {
     "advanced": false,

@@ -45,6 +45,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     identity_directory.VERIFICATION_SPEC,
     identity_directory.MEMBERS_SPEC,
     household.SPEC,
+    household.PROFILE_ACCOUNTS_SPEC,
     privacy_participants.ERASURE_SPEC,
     privacy_participants.EXPORT_SPEC,
     user_grants.SPEC,

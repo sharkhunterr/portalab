@@ -3,6 +3,7 @@ once more for its master, a replay never doubles it, the copy rewards nothing ag
 is debited from both, refused when the household cannot cover it; a correction is mirrored up to what the
 master holds. A profile's master may keep features out of it: their permissions are withheld."""
 
+from typing import Any
 from uuid import UUID
 
 import pytest
@@ -13,13 +14,18 @@ from portalab.capabilities.economy import ECONOMY, InsufficientCoins
 from portalab.core.authz_port import Principal
 from portalab.modules.gamification.models import LedgerTransaction
 from tests.integration.gamification.conftest import GamHarness
-from tests.integration.identity.helpers import module_of
+
+
+def households(app: FastAPI) -> Any:
+    """032: the household module's service (the households are no longer identity's)."""
+    return app.state.household_module.service
+
 
 pytestmark = pytest.mark.integration
 
 
 async def _child(gm: GamHarness, app: FastAPI, owner: UUID, kind: str = "child") -> UUID:
-    created = await module_of(app).household.create(
+    created = await households(app).create(
         Principal(user_id=owner), display_name="Léa", kind=kind, color=None, pin=None
     )
     return UUID(str(created["id"]))

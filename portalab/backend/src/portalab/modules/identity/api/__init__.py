@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter
 
-from portalab.modules.identity.api import admin, auth, household, lifecycle, profile
+from portalab.modules.identity.api import admin, auth, lifecycle, profile
 
 
 def routers() -> list[APIRouter]:
-    return [auth.router, profile.router, lifecycle.router, admin.router, household.router]
+    return [auth.router, profile.router, lifecycle.router, admin.router]

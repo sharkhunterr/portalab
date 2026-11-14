@@ -167,19 +167,9 @@ class InvalidPin(BadRequest):
     default_title = "Invalid PIN"
 
 
-class WrongPin(Forbidden):
-    default_code = "household.wrong_pin"
-    default_title = "Wrong PIN"
-
-
 class OwnerOnly(Forbidden):
     default_code = "household.owner_only"
     default_title = "Only the account's master can do this"
-
-
-class HouseholdDisabled(Forbidden):
-    default_code = "household.disabled"
-    default_title = "Profiles are switched off"
 
 
 class ProfileLimit(Conflict):

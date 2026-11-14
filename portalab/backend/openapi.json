@@ -46805,7 +46805,7 @@
         },
         "summary": "Household",
         "tags": [
-          "identity"
+          "household"
         ]
       }
     },
@@ -46851,7 +46851,7 @@
         },
         "summary": "Set Pin",
         "tags": [
-          "identity"
+          "household"
         ]
       }
     },
@@ -46895,7 +46895,7 @@
         },
         "summary": "Create Profile",
         "tags": [
-          "identity"
+          "household"
         ]
       }
     },
@@ -46931,7 +46931,7 @@
         },
         "summary": "Delete Profile",
         "tags": [
-          "identity"
+          "household"
         ]
       },
       "patch": {
@@ -46975,7 +46975,7 @@
         },
         "summary": "Change Profile",
         "tags": [
-          "identity"
+          "household"
         ]
       }
     },
@@ -47018,7 +47018,7 @@
         },
         "summary": "Profile Activity",
         "tags": [
-          "identity"
+          "household"
         ]
       }
     },
@@ -47043,7 +47043,7 @@
         },
         "summary": "Access Requests",
         "tags": [
-          "identity"
+          "household"
         ]
       },
       "post": {
@@ -47082,7 +47082,7 @@
         },
         "summary": "Ask Access",
         "tags": [
-          "identity"
+          "household"
         ]
       }
     },
@@ -47128,7 +47128,7 @@
         },
         "summary": "Decide Access",
         "tags": [
-          "identity"
+          "household"
         ]
       }
     },
@@ -47149,7 +47149,7 @@
         },
         "summary": "Household Session",
         "tags": [
-          "identity"
+          "household"
         ]
       }
     },
@@ -47196,7 +47196,7 @@
         },
         "summary": "Switch Profile",
         "tags": [
-          "identity"
+          "household"
         ]
       }
     },

@@ -27,8 +27,6 @@ TABLES = {
     "totp_factors",  # issue 408: the second factor, its recovery codes and the sign-ins waiting on it
     "recovery_codes",
     "mfa_challenges",
-    "household_members",  # 032: households — profiles, and their access requests
-    "access_requests",
 }
 
 INSERT_USER = (

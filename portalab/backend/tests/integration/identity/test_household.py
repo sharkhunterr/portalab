@@ -5,6 +5,7 @@ own routes nor manages the household; every member sees the household, the maste
 its profiles' access requests; deleting a profile signs out the browsers using it, deleting the master
 takes its profiles along; a profile kept out of the community is no member there."""
 
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -17,6 +18,12 @@ from portalab.modules.identity.models import User
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.identity.services.common import self_actor
 from tests.integration.identity.helpers import PASSWORD, create_user, login, module_of
+
+
+def households(app: FastAPI) -> Any:
+    """032: the household module's service (the households are no longer identity's)."""
+    return app.state.household_module.service
+
 
 pytestmark = pytest.mark.integration
 
@@ -122,7 +129,7 @@ async def test_wrong_pins_slow_down(app: FastAPI, client: httpx.AsyncClient) -> 
 async def test_everyone_sees_the_household_the_master_manages_it(
     app: FastAPI, client: httpx.AsyncClient
 ) -> None:
-    module, alice, lea, tom = await _family(app, client)
+    _, alice, lea, tom = await _family(app, client)
     view = (await client.get("/api/v1/household")).json()
     assert view["can_manage"] is True and view["owner_id"] == str(alice) and view["totals"] is not None
     child = next(m for m in view["members"] if m["id"] == str(lea))
@@ -149,14 +156,14 @@ async def test_everyone_sees_the_household_the_master_manages_it(
         },
     )
     assert changed.status_code == 204, changed.text
-    restrictions = await module.household.restrictions_of(lea)
+    restrictions = await households(app).restrictions_of(lea)
     assert (
         restrictions is not None
         and restrictions.max_age == 16
         and restrictions.withholds("marketplace.purchase")
     )
     assert not restrictions.withholds("media.request")
-    assert await module.household.owner_of(lea) == alice and await module.household.owner_of(alice) is None
+    assert await households(app).owner_of(lea) == alice and await households(app).owner_of(alice) is None
     bad = await client.patch(f"/api/v1/household/profiles/{lea}", json={"restrictions": {"max_age": 13}})
     assert bad.status_code == 422
 
@@ -170,7 +177,7 @@ async def test_everyone_sees_the_household_the_master_manages_it(
 
 
 async def test_access_requests(app: FastAPI, client: httpx.AsyncClient) -> None:
-    module, _, lea, _ = await _family(app, client)
+    _, _, lea, _ = await _family(app, client)
     owner_ask = await client.post("/api/v1/household/requests", json={"ref": "x", "title": "X"})
     assert owner_ask.status_code == 403 and owner_ask.json()["code"] == "household.not_a_profile"
     await _switch(client, lea, "1234")
@@ -183,20 +190,20 @@ async def test_access_requests(app: FastAPI, client: httpx.AsyncClient) -> None:
     assert refused.status_code == 403  # a profile decides nothing
 
     await _switch(client, (await _me(client))["profile_of"])  # type: ignore[arg-type]
-    from portalab.modules.identity.household.service import HouseholdAttention
+    from portalab.modules.household.service import HouseholdAttention
 
-    badge = HouseholdAttention(module.household)
+    badge = HouseholdAttention(households(app))
     master = (await _me(client))["id"]
     assert await badge.counts(Principal(user_id=UUID(str(master)))) == {"shell.household": 1}
     assert await badge.counts(Principal(user_id=lea, profile_of=UUID(str(master)))) == {}
     pending = (await client.get("/api/v1/household/requests")).json()
     assert pending[0]["profile_name"] == "Léa" and pending[0]["status"] == "pending"
-    assert not await module.household.granted(lea, "media", body["ref"])
+    assert not await households(app).granted(lea, "media", body["ref"])
     decided = await client.post(
         f"/api/v1/household/requests/{first['id']}/decision", json={"approve": True, "days": 2}
     )
     assert decided.status_code == 204, decided.text
-    assert await module.household.granted(lea, "media", body["ref"])
+    assert await households(app).granted(lea, "media", body["ref"])
     twice = await client.post(f"/api/v1/household/requests/{first['id']}/decision", json={"approve": False})
     assert twice.status_code == 409
     activity = (await client.get(f"/api/v1/household/profiles/{lea}/activity")).json()
@@ -225,7 +232,7 @@ async def test_hidden_profiles_are_no_members_and_follow_their_master(
     listing = module.ctx.capabilities.system_providers(MEMBERS)[0].provider
     listed = {entry.id for entry in (await listing.active_members(limit=50)).items}
     assert alice in listed and tom in listed and lea not in listed  # a child starts out of the community
-    assert await module.household.hidden() == frozenset({lea})
+    assert await households(app).hidden() == frozenset({lea})
 
     await module.deletion.request(self_actor(Principal(user_id=alice)), alice, reason="test")
     async with module.ctx.database.session() as session:

@@ -7,7 +7,7 @@ from datetime import date
 import pytest
 
 from portalab.capabilities.household import Restrictions, age_of
-from portalab.modules.identity.household.rules import (
+from portalab.modules.household.rules import (
     CHILD,
     InvalidPin,
     RestrictionSettings,

@@ -42,6 +42,7 @@ from portalab.modules.events.publisher.publisher import EventStorePublisher
 from portalab.modules.games.module import GamesModule
 from portalab.modules.gamification.module import GamificationModule
 from portalab.modules.health.module import HealthModule
+from portalab.modules.household.module import HouseholdModule
 from portalab.modules.i18n.module import I18nModule
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.module import IdentityModule
@@ -100,6 +101,12 @@ def default_identity_context(
     )
 
 
+def wire_household(database: Database, capabilities: CapabilityRegistry, audit: AuditSink) -> HouseholdModule:
+    module = HouseholdModule(database, capabilities, audit)
+    module.register()
+    return module
+
+
 def wire_identity(context: IdentityContext, *, jobs: JobRegistry | None = None) -> IdentityModule:
     module = IdentityModule(context)
     module.register_capabilities()
@@ -143,6 +150,7 @@ class Platform:
     cards: CardsModule | None = None  # issue 229: the media trading cards
     games: GamesModule | None = None  # issue 265: the games page
     requests: RequestsModule | None = None  # issue 363: the members' requests for titles no service asks for
+    household: HouseholdModule | None = None  # 032: a member account's profiles
 
     async def seed_periodic_jobs(self) -> None:
         for seed in self.seeds:
@@ -319,6 +327,8 @@ def wire_platform(
     # issue 363: the requests for titles no service asks for — their events go to the reward rules
     requests = RequestsModule(database, capabilities)
     requests.register()
+    # 032: a member account's profiles — the accounts behind them stay identity's
+    household = wire_household(database, capabilities, authz.audit)
     plugins = PluginsModule(
         database,
         events,
@@ -409,6 +419,7 @@ def wire_platform(
         cards,
         games,
         requests,
+        household,
     )
     from portalab.app.config_bindings import bind
 

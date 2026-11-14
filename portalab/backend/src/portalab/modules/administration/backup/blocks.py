@@ -42,7 +42,14 @@ BLOCKS: tuple[Block, ...] = (
         schemas=("i18n", "ui", "privacy", "search", "shell"),
         modules=("i18n", "ui", "privacy", "search", "shell", "identity", "observability", "events"),
     ),
-    Block(MEMBERS, folders=("blobs/avatars",), counts={"members": "identity.users"}),
+    # 032: the households are the members' (their profiles are accounts)
+    Block(
+        MEMBERS,
+        schemas=("household",),
+        modules=("household",),
+        folders=("blobs/avatars",),
+        counts={"members": "identity.users"},
+    ),
     Block(
         "services",
         schemas=("connectors",),
