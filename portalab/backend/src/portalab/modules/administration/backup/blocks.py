@@ -59,8 +59,8 @@ BLOCKS: tuple[Block, ...] = (
     Block("notifications", schemas=("notify",), modules=("notifications",)),
     Block(
         "media",
-        schemas=("media", "requests"),
-        modules=("media", "requests"),
+        schemas=("media", "requests", "retro"),  # 419: the games played in the portal
+        modules=("media", "requests", "retro"),
         folders=("blobs/media", "blobs/media-metadata"),
         needs=("services",),
         counts={"requests": "media.requests"},

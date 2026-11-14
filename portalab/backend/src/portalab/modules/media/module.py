@@ -62,6 +62,7 @@ from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPOR
 from portalab.capabilities.record_sink import SinkRegistry, default_sinks
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.retention import RetentionTarget, default_retention_targets
+from portalab.capabilities.retro import GAME_SOURCE
 from portalab.capabilities.search import SearchRegistry, default_search
 from portalab.capabilities.service_signals import default_signals
 from portalab.core.audit_port import AuditSink
@@ -177,6 +178,7 @@ from portalab.modules.media.requests.quota import RequestQuota
 from portalab.modules.media.requests.service import Requests, RequestSink
 from portalab.modules.media.requests.watched import LeavingWatched, RequestWatched
 from portalab.modules.media.restrictions import GatedSearch, GatedWidget, TitleGate
+from portalab.modules.media.retro_games import LibraryGames
 from portalab.modules.media.reviews.service import ReviewService
 from portalab.modules.media.sections.service import Sections
 from portalab.modules.media.settings import (
@@ -465,6 +467,10 @@ class MediaModule:
                 ),
                 instance_ref="media",
                 owner=OWNER,
+            )
+        if not self.capabilities.system_providers(GAME_SOURCE):  # 419: the games the retro module plays
+            self.capabilities.provide(
+                GAME_SOURCE, LibraryGames(self.database, self.gate), instance_ref="media", owner=OWNER
             )
         register_event_types(self.event_types)
         for capability, sink in ((LIBRARY, self.library), (REQUESTS, self.request_sink)):

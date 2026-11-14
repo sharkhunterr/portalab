@@ -11105,6 +11105,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/retro/games/{object_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retro Game
+         * @description Whether the title plays in the portal — its platform and emulator (404 ``retro.not_playable``).
+         */
+        get: operations["retro_game_api_v1_retro_games__object_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/retro/games/{object_id}/sittings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start Sitting */
+        post: operations["start_sitting_api_v1_retro_games__object_id__sittings_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/retro/sittings/{sitting_id}/beat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Beat Sitting
+         * @description The game still runs (sent every ``heartbeat_s`` while it does): a profile's screen time left today.
+         */
+        post: operations["beat_sitting_api_v1_retro_sittings__sitting_id__beat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/retro/sittings/{sitting_id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** End Sitting */
+        post: operations["end_sitting_api_v1_retro_sittings__sitting_id__end_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/roles": {
         parameters: {
             query?: never;
@@ -13842,6 +13916,16 @@ export interface components {
             /** Supply */
             supply?: number | null;
         };
+        /** BeatOut */
+        BeatOut: {
+            /** Minutes Left */
+            minutes_left?: number | null;
+            /**
+             * Stop
+             * @default false
+             */
+            stop: boolean;
+        };
         /** Because */
         Because: {
             /**
@@ -15757,6 +15841,17 @@ export interface components {
             votes: number;
             /** Year */
             year: number | null;
+        };
+        /** FirmwareOut */
+        FirmwareOut: {
+            /** File Name */
+            file_name: string;
+            /** Id */
+            id: string;
+            /** Url */
+            url: string;
+            /** Verified */
+            verified: boolean;
         };
         /** FlipIn */
         FlipIn: {
@@ -19661,6 +19756,19 @@ export interface components {
              */
             mode: "partial" | "full";
         };
+        /** RetroGameOut */
+        RetroGameOut: {
+            /** Core */
+            core: string;
+            /** Platform */
+            platform: string;
+            /** Service Name */
+            service_name?: string | null;
+            /** Threads */
+            threads: boolean;
+            /** Title */
+            title: string;
+        };
         /** ReverseIn */
         ReverseIn: {
             /** Reason */
@@ -20151,6 +20259,25 @@ export interface components {
             };
             /** Version */
             version: number;
+        };
+        /** SittingOut */
+        SittingOut: {
+            /** Emulator Path */
+            emulator_path: string;
+            /** Firmware */
+            firmware: components["schemas"]["FirmwareOut"][];
+            game: components["schemas"]["RetroGameOut"];
+            /** Game Name */
+            game_name: string;
+            /** Game Url */
+            game_url: string;
+            /** Heartbeat S */
+            heartbeat_s: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
         };
         /** SourceDayOut */
         SourceDayOut: {
@@ -42773,6 +42900,128 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    retro_game_api_v1_retro_games__object_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetroGameOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_sitting_api_v1_retro_games__object_id__sittings_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SittingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    beat_sitting_api_v1_retro_sittings__sitting_id__beat_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sitting_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BeatOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    end_sitting_api_v1_retro_sittings__sitting_id__end_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sitting_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

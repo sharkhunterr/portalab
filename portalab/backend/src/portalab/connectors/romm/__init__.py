@@ -16,8 +16,10 @@ username (configuration) and password (secret).
 import base64
 import re
 from collections.abc import AsyncIterator, Mapping, Sequence
+from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Any
+from urllib.parse import quote
 
 from pydantic import BaseModel, Field
 
@@ -38,8 +40,10 @@ from portalab.capabilities.media import (
     ActivityPage,
     ServiceAccount,
     SourceActivity,
+    StreamBody,
 )
-from portalab.capabilities.results import InvalidPayload
+from portalab.capabilities.results import InvalidPayload, ProviderAuthError, ProviderNotFound
+from portalab.capabilities.retro import RETRO_SOURCE, FileKind, RetroFirmware, RetroGame
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding, parse_time, safe_id
 
 PAGE = 100
@@ -51,6 +55,15 @@ COVER = re.compile(r"^(?!.*\.\.)[A-Za-z0-9_./ -]{1,300}$")
 SESSIONS_PAGE = 500
 PLAYED_PAGE = 100
 DONE = ("finished", "completed_100")  # a game the player marked finished (or completed at 100 %)
+# 419: the emulator's files under RomM's EmulatorJS data folder (loader, cores, localisation…)
+EMULATOR_FILE = re.compile(r"^(?!.*\.\.)[A-Za-z0-9_./-]{1,200}$")
+FILE_NAME = re.compile(r"^[^/\\\x00]{1,400}$")
+PORTAL_CLIENT = "portalab"
+PORTAL_DEVICE = {
+    "name": "Portalab",
+    "client": PORTAL_CLIENT,
+    "platform": "web",
+}  # 419: the sessions played here
 
 
 class RommConfig(BaseConfig):
@@ -158,6 +171,7 @@ class RommConnector(HttpConnector):
         binding(ACCOUNTS),
         binding(ITEM_LINKS),  # 027: each game's page in RomM, where it is played
         binding(ACTIVITY_HISTORY, driven=True),  # #190: what the account played
+        binding(RETRO_SOURCE),  # 419: its games played in the portal (RomM's own EmulatorJS)
     )
     status_path = "/api/users/me"
     public_path = "/api/heartbeat"
@@ -232,6 +246,8 @@ class RommConnector(HttpConnector):
             return _Accounts(self, service)
         if capability == ACTIVITY_HISTORY:
             return _Played(self, service)
+        if capability == RETRO_SOURCE:
+            return _Retro(self, service)
         return None
 
 
@@ -349,6 +365,7 @@ class _Played:
             offset += len(games)
             if len(games) < PLAYED_PAGE:
                 break
+        portal = await self._portal_devices()
         offset = 0
         while True:
             params: dict[str, Any] = {"limit": SESSIONS_PAGE, "offset": offset}
@@ -356,6 +373,8 @@ class _Played:
                 params["start_after"] = since.isoformat()
             sessions = _page(await self.connector.get_json(self.service, "/api/play-sessions", **params))
             for session in sessions:
+                if session.get("device_id") is not None and str(session["device_id"]) in portal:
+                    continue  # 419: played in the portal — the portal counted it already
                 rom = str(session.get("rom_id"))
                 if rom not in names:
                     game = await self.connector.get_json(self.service, f"/api/roms/{safe_id(rom)}")
@@ -367,3 +386,123 @@ class _Played:
             if len(sessions) < SESSIONS_PAGE:
                 break
         return ActivityPage(items=items, cursor=None, total=len(items), position=len(items))
+
+    async def _portal_devices(self) -> set[str]:
+        try:
+            devices = await self.connector.get_json(self.service, "/api/devices")
+        except (ConnectionError, InvalidPayload, ProviderNotFound):
+            return set()  # a RomM without devices: no session of the portal's either
+        return {
+            str(d["id"])
+            for d in (devices if isinstance(devices, list) else [])
+            if isinstance(d, Mapping) and d.get("id") is not None and d.get("client") == PORTAL_CLIENT
+        }
+
+
+class _Retro:
+    """419: a game played in the portal — its ROM, its platform's firmware and RomM's EmulatorJS, relayed as
+    RomM sends them; the session told back to RomM, which keeps the account's play time."""
+
+    def __init__(self, connector: RommConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def game(self, external_id: str) -> RetroGame | None:
+        rom = await self.connector.get_json(self.service, f"/api/roms/{safe_id(external_id)}")
+        if not isinstance(rom, Mapping) or rom.get("id") is None or not rom.get("fs_name"):
+            return None
+        size = rom.get("fs_size_bytes")
+        return RetroGame(
+            external_id=str(rom["id"]),
+            title=str(rom.get("name") or rom.get("fs_name"))[:500],
+            platform=str(rom.get("platform_slug") or "").lower(),
+            platform_id=str(rom.get("platform_id") or ""),
+            file_name=str(rom["fs_name"]),
+            size=int(size) if isinstance(size, int) else None,
+            multi=bool(rom.get("has_multiple_files")),
+            present=not rom.get("missing_from_fs") and rom.get("has_file_on_disk") is not False,
+        )
+
+    async def firmware(self, platform_id: str) -> Sequence[RetroFirmware]:
+        if not platform_id.isdigit():
+            return []
+        items = await self.connector.get_json(self.service, "/api/firmware", platform_id=platform_id)
+        return [
+            RetroFirmware(id=str(f["id"]), file_name=str(f["file_name"]), verified=bool(f.get("is_verified")))
+            for f in (items if isinstance(items, list) else [])
+            if isinstance(f, Mapping) and f.get("id") is not None and f.get("file_name")
+        ]
+
+    def _path(self, kind: FileKind, ref: str, name: str) -> str:
+        if kind == "emulator":
+            if not EMULATOR_FILE.fullmatch(name):
+                raise ProviderNotFound("no such emulator file")
+            return f"/assets/emulatorjs/data/{name}"
+        if not FILE_NAME.fullmatch(name):
+            raise ProviderNotFound("no such file")
+        folder = "roms" if kind == "rom" else "firmware"
+        return f"/api/{folder}/{safe_id(ref)}/content/{quote(name, safe='')}"
+
+    @asynccontextmanager
+    async def open(
+        self, kind: FileKind, ref: str, name: str, range_header: str | None = None
+    ) -> AsyncIterator[StreamBody]:
+        path = self._path(kind, ref, name)
+        sent = {"Accept-Encoding": "identity", **({"Range": range_header} if range_header else {})}
+        if kind != "emulator":
+            sent.update(self.connector.auth_headers(self.service))
+        params = {"purpose": "play"} if kind == "rom" else None  # RomM counts a player's load, not a download
+        http = self.connector._http(self.service)
+        async with http.stream("GET", path, headers=sent, params=params, read_timeout=120) as answer:
+            if answer.status_code in (401, 403):
+                raise ProviderAuthError("RomM refused this account")
+            if answer.status_code in (404, 410):
+                raise ProviderNotFound("no such file")
+            if answer.status_code == 416:
+                raise InvalidPayload("range not satisfiable")
+            if answer.status_code >= 400:
+                raise ConnectionError(f"RomM answered HTTP {answer.status_code}")
+            length = answer.headers.get("content-length")
+            encoded = answer.headers.get("content-encoding", "identity") != "identity"
+            yield StreamBody(
+                status=answer.status_code,
+                content_type=answer.headers.get("content-type") or "application/octet-stream",
+                length=int(length) if length and length.isdigit() and not encoded else None,
+                chunks=answer.chunks,
+                content_range=answer.headers.get("content-range"),
+            )
+
+    async def record_session(
+        self, external_id: str, started_at: datetime, ended_at: datetime, duration_ms: int
+    ) -> None:
+        if not external_id.isdigit():
+            return
+        await self.connector.request(
+            self.service,
+            "POST",
+            "/api/play-sessions",
+            json_body={
+                "device_id": await self._device(),
+                "sessions": [
+                    {
+                        "rom_id": int(external_id),
+                        "start_time": started_at.isoformat(),
+                        "end_time": ended_at.isoformat(),
+                        "duration_ms": max(0, duration_ms),
+                    }
+                ],
+            },
+        )
+
+    async def _device(self) -> str | None:
+        """The portal's device in RomM (created once, found again after): its sessions are the portal's."""
+        try:
+            made = await self.connector.request(
+                self.service,
+                "POST",
+                "/api/devices",
+                json_body={**PORTAL_DEVICE, "allow_existing": True, "allow_duplicate": False},
+            )
+        except (ConnectionError, InvalidPayload, ProviderNotFound):
+            return None  # a RomM without devices: the session goes without one
+        found = made.get("device_id") if isinstance(made, Mapping) else None
+        return str(found) if found else None

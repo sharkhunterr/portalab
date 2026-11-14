@@ -116,6 +116,8 @@ from portalab.modules.privacy.module import PrivacyModule
 from portalab.modules.privacy.settings import SecurityConfig
 from portalab.modules.requests.api import routers as requests_routers
 from portalab.modules.requests.module import RequestsModule
+from portalab.modules.retro.api import routers as retro_routers
+from portalab.modules.retro.module import RetroModule
 from portalab.modules.search.api import routers as search_routers
 from portalab.modules.search.module import SearchModule
 from portalab.modules.shell.api import routers as shell_routers
@@ -339,6 +341,7 @@ def create_app(
     games: GamesModule | None = None,
     requests: RequestsModule | None = None,
     household: HouseholdModule | None = None,
+    retro: RetroModule | None = None,
     security_config: SecurityConfig | None = None,
 ) -> FastAPI:
     """Build the API. Dependencies are injectable so tests can wire fakes; production wires real ones."""
@@ -390,6 +393,7 @@ def create_app(
         app.state.games_module = platform.games
         app.state.requests_module = platform.requests
         app.state.household_module = platform.household
+        app.state.retro_module = platform.retro
         app.state.plugins_module = platform.plugins
         platform.plugins.runtime.portal.app = app  # 030: portal data through the app itself
         app.state.authz_module = platform.authz
@@ -498,6 +502,7 @@ def create_app(
     app.state.games_module = games
     app.state.requests_module = requests
     app.state.household_module = household
+    app.state.retro_module = retro
     app.state.plugins_module = plugins
     if plugins is not None:
         plugins.runtime.portal.app = app  # 030: confined plugins read portal data through the app itself
@@ -662,6 +667,7 @@ def create_app(
         *games_routers(),
         *requests_routers(),
         *household_routers(),
+        *retro_routers(),
         *plugins_routers(),
     ]:
         app.include_router(router)

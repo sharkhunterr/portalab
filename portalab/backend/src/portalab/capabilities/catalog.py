@@ -24,6 +24,7 @@ from portalab.capabilities import (
     observability,
     plugins,
     privacy_participants,
+    retro,
     search,
     service_data,
     statistics,
@@ -71,6 +72,7 @@ KERNEL_SPECS: tuple[CapabilitySpec, ...] = (
     *statistics.SPECS,
     *media.SPECS,
     *media_core.SPECS,
+    *retro.SPECS,  # 419: retro play
     activity.SPEC,
     *content.SPECS,
     *ai.SPECS,

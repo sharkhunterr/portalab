@@ -25,6 +25,7 @@ developers.
 | [Community](members/community.md) | profiles, the activity feed, events and proposals, Headlines and My feed, newsletters, the wiki, the calendar, terms of use |
 | [Support](members/support.md) | tickets, feedback and surveys, service status and incidents, notifications |
 | [Personalisation](members/personalization.md) | the dashboard and its widgets, appearance, profile, language, notifications, privacy, guided tours |
+| [Retro games](members/retro-games.md) | playing the RomM library's games in the portal, in RomM's own emulator — what counts, and for household profiles |
 | [Household profiles](members/households.md) | profiles for the people sharing an account, « Who's there? » and PINs, the household wallet, restrictions and access requests |
 | [Assistant and search](members/assistant.md) | the AI assistant and the global search |
 

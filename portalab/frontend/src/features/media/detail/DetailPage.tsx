@@ -20,10 +20,12 @@ import {
 import "../media.css";
 import { StatusBadge } from "../../../design-system/admin/AdminKit";
 import { Icon } from "../../../design-system/components/Icon";
+import { useHasPermission } from "../../authz/useMyPermissions";
 import { useCollectsCards } from "../../cards/collects";
 import { WorkCollection } from "../../cards/WorkCollection";
 import { ExternalNews } from "../../news/ExternalNews";
 import { PluginSlot } from "../../plugins/slots/PluginSlot";
+import { useRetroGame } from "../../retro/api";
 import { MediaTickets, MediaTicketsBadge } from "../../support/tickets/MediaTickets";
 import { ReportMediaProblem } from "../../support/tickets/ReportMedia";
 import { useListenInfo, useReadInfo } from "../books/api";
@@ -719,7 +721,25 @@ function Watch({
 }) {
   if (kind === "audiobook") return <Listen objectId={objectId} title={title} image={image ?? null} />;
   if (kind === "book") return <Read objectId={objectId} />;
+  if (kind === "game") return <PlayGame objectId={objectId} />;
   return <WatchVideo objectId={objectId} kind={kind} />;
+}
+
+/** 419: play here, in the library's own emulator (a page of its own) — the library's page one click away. */
+function PlayGame({ objectId }: { objectId: string }) {
+  const t = useT();
+  const game = useRetroGame(objectId, useHasPermission("retro.play"));
+  return (
+    <div className="media-watch">
+      {game.data ? (
+        <a className="ds-button ds-button--primary media-watch-here" href={`/media/${objectId}/play`}>
+          <Icon name="joystick" size={18} />
+          {t("retro:cta.play")}
+        </a>
+      ) : null}
+      <OpenIn objectId={objectId} kind="game" secondary={Boolean(game.data)} />
+    </div>
+  );
 }
 
 /** #20: listen here — the audiobook plays in the portal's bar and carries on while browsing. */

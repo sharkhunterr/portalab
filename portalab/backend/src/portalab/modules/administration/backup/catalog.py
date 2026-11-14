@@ -39,6 +39,7 @@ SCHEMAS: dict[str, Category] = {
     "identity": "data",
     "marketplace": "data",
     "media": "data",
+    "retro": "data",  # 419: the sittings of the games played in the portal
     "requests": "data",  # issue 363: the members' requests for titles no service asks for
     "news": "data",
     "notify": "data",

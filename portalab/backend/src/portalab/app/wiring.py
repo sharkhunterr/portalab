@@ -54,6 +54,7 @@ from portalab.modules.observability.module import ObservabilityModule
 from portalab.modules.plugins.module import PluginsModule
 from portalab.modules.privacy.module import PrivacyModule
 from portalab.modules.requests.module import RequestsModule
+from portalab.modules.retro.module import RetroModule
 from portalab.modules.search.module import SearchModule
 from portalab.modules.shell.module import ShellModule
 from portalab.modules.statistics.module import StatisticsModule
@@ -151,6 +152,7 @@ class Platform:
     games: GamesModule | None = None  # issue 265: the games page
     requests: RequestsModule | None = None  # issue 363: the members' requests for titles no service asks for
     household: HouseholdModule | None = None  # 032: a member account's profiles
+    retro: RetroModule | None = None  # 419: a library's games played in the portal
 
     async def seed_periodic_jobs(self) -> None:
         for seed in self.seeds:
@@ -329,6 +331,9 @@ def wire_platform(
     requests.register()
     # 032: a member account's profiles — the accounts behind them stay identity's
     household = wire_household(database, capabilities, authz.audit)
+    # 419: a library's games played in the portal — its sittings counted as the player's own plays
+    retro = RetroModule(database, capabilities, events=events)
+    retro.register()
     plugins = PluginsModule(
         database,
         events,
@@ -385,6 +390,7 @@ def wire_platform(
         seeds.extend(cards.register_jobs(jobs))
         seeds.extend(games.register_jobs(jobs))
         seeds.extend(requests.register_jobs(jobs))
+        seeds.extend(retro.register_jobs(jobs))
     platform = Platform(
         authz,
         privacy,
@@ -420,6 +426,7 @@ def wire_platform(
         games,
         requests,
         household,
+        retro,
     )
     from portalab.app.config_bindings import bind
 

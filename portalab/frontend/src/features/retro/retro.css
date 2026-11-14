@@ -1,0 +1,103 @@
+/*
+ * Issue 419 — a library's game over the whole window, dressed like the video player (the --player-* tokens):
+ * a bar on top (back, the title and its console, a profile's screen time left), the emulator below; before
+ * the game starts, its « Play » card over the stage.
+ */
+.retro-page {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-overlay) + 2);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: var(--player-stage);
+  color: var(--player-ink);
+  font-family: var(--player-font);
+}
+.retro-page[data-state] {
+  place-items: center;
+  grid-template-rows: 1fr;
+}
+.retro-page > .player-spinner {
+  position: static;
+  margin: 0;
+}
+.retro-failure {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  max-inline-size: 30rem;
+  padding: var(--space-5);
+  text-align: center;
+}
+.retro-failure > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.retro-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) clamp(0.5rem, 2vw, 1.25rem);
+  padding-block-start: calc(var(--space-1) + env(safe-area-inset-top, 0px));
+  background: linear-gradient(to bottom, var(--player-scrim), var(--player-stage));
+}
+.retro-icon {
+  flex: none;
+}
+.retro-bar__title {
+  display: grid;
+  flex: 1;
+  min-inline-size: 0;
+  padding-inline: var(--space-2);
+}
+.retro-bar__title strong,
+.retro-bar__title small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.retro-bar__title strong {
+  font-family: var(--player-title-font, var(--player-font));
+}
+.retro-bar__title small,
+.retro-hint {
+  color: var(--player-ink-muted);
+}
+.retro-left {
+  flex: none;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--player-ink) 14%, transparent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+.retro-stage {
+  position: relative;
+  min-block-size: 0;
+  overflow: hidden;
+}
+.retro-game {
+  position: absolute;
+  inset: var(--space-2) 0 0; /* the picture never looks tucked under the bar (a phone's portrait layout) */
+}
+.retro-start {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  text-align: center;
+  background: var(--player-stage);
+}
+.retro-start p {
+  max-inline-size: 30rem;
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+.retro-start .player-pill {
+  font-size: var(--font-size-lg);
+}

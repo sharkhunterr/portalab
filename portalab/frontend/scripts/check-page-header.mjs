@@ -16,6 +16,7 @@ const EXEMPT = new Set([
   "features/notifications/bell/OpenNotifications", // issue 112: opens the bell's panel over the page one came from
   "features/media/player/PlayerPage", // 027 (#2): the video player covers the whole window, no page chrome
   "features/media/reader/ReaderPage", // #21: the book reader covers the whole window, no page chrome
+  "features/retro/RetroPage", // 419: a game in its emulator covers the whole window, no page chrome
 ]);
 
 function resolveModule(spec) {

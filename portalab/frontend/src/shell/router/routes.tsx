@@ -45,6 +45,7 @@ const MediaCatalog = lazy(() => import("../../features/media/catalog/CatalogPage
 const MediaDetail = lazy(() => import("../../features/media/detail/DetailPage"));
 const MediaPlayer = lazy(() => import("../../features/media/player/PlayerPage"));
 const MediaReader = lazy(() => import("../../features/media/reader/ReaderPage"));
+const RetroPlay = lazy(() => import("../../features/retro/RetroPage"));
 const MediaRequests = lazy(() => import("../../features/media/requests/RequestsPage"));
 const MediaDiscover = lazy(() => import("../../features/media/discover/DiscoverPage"));
 const MediaDiscoverTitle = lazy(() => import("../../features/media/discover/DiscoverTitlePage"));
@@ -352,6 +353,12 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               path: ":objectId/read",
               element: <MediaReader />,
               handle: h({ crumb: "Read", requiredPermission: "media.play", existenceSensitive: true }),
+            },
+            {
+              // 419: a library's game in its emulator, over the whole window (a page of its own, full load)
+              path: ":objectId/play",
+              element: <RetroPlay />,
+              handle: h({ crumb: "Play", requiredPermission: "retro.play", existenceSensitive: true }),
             },
           ],
         },
