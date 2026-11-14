@@ -162,6 +162,7 @@ function serve(sent: Array<{ method: string; path: string; body: unknown }>, rul
           event_types: ["media.playback_finished"],
           values: ["xp"],
           tiers: [{ days: 2, multiplier: 1.5 }],
+          min_watched_s: 300,
         });
       default:
         return json(200, []);
@@ -265,6 +266,26 @@ describe("gamification administration", () => {
         { days: 2, multiplier: 1.5 },
         { days: 5, multiplier: 2 },
       ],
+    });
+  });
+
+  it("chooses the plays that keep a streak and their minimum length (issue 416)", async () => {
+    const sent: Array<{ method: string; path: string; body: unknown }> = [];
+    serve(sent);
+    show("/admin/gamification?tab=streak");
+    expect(
+      ((await screen.findByRole("checkbox", { name: "Finished plays" })) as HTMLInputElement).checked,
+    ).toBe(true);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Interrupted plays too" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Radio listening" }));
+    const minimum = screen.getByRole("spinbutton", { name: "Minimum length of a sitting (minutes)" });
+    expect((minimum as HTMLInputElement).value).toBe("5");
+    fireEvent.change(minimum, { target: { value: "30" } });
+    fireEvent.click(screen.getAllByRole("button", { name: "Save" }).at(-1) as HTMLElement);
+    await waitFor(() => expect(sent).toHaveLength(1));
+    expect(sent[0]?.body).toMatchObject({
+      event_types: ["media.playback_finished", "media.playback_abandoned", "media.radio_listened"],
+      min_watched_s: 1800,
     });
   });
 

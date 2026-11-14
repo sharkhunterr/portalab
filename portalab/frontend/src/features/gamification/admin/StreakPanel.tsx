@@ -8,7 +8,11 @@ import { useT } from "../../../i18n/hooks/useT";
 import { useRules } from "../api";
 import { actionLabel, type StreakConfig, useEventTypes, useStreak, VALUES } from "./tuning";
 
-const SUGGESTED = ["media.playback_finished"];
+const FINISHED = "media.playback_finished";
+const PARTIAL = "media.playback_abandoned";
+const RADIO = "media.radio_listened";
+// issue 416: the plays are chosen on their own (every kind of media), the other actions below
+const PLAYS = [FINISHED, PARTIAL, RADIO];
 
 function multiplierAt(tiers: StreakConfig["tiers"], days: number): number {
   return Math.max(1, ...tiers.filter((tier) => days >= tier.days).map((tier) => tier.multiplier));
@@ -16,7 +20,7 @@ function multiplierAt(tiers: StreakConfig["tiers"], days: number): number {
 
 /**
  * Play streaks (027): consecutive days on which a member does one of the counted actions (by default:
- * finishing a film or an episode). Each tier multiplies the rewards of those actions — e.g. ×1.5 from 2
+ * finishing a film or an episode; issue 416: interrupted plays and the radio too, from a minimum length). Each tier multiplies the rewards of those actions — e.g. ×1.5 from 2
  * days in a row, ×2 from 5 days; one missed day and the streak starts over.
  */
 export function StreakPanel() {
@@ -39,18 +43,20 @@ export function StreakPanel() {
   const horizon = Math.max(7, ...tiers.map((tier) => tier.days + 2));
   // the actions that already earn something come first; every other action is one click away
   const rewarded = new Set([
-    ...SUGGESTED,
     ...draft.event_types,
     ...(rules.data ?? []).filter((r) => r.status === "active").map((r) => r.event_type),
   ]);
-  const names = (types.data ?? []).map((type) => type.name).sort();
+  const names = (types.data ?? [])
+    .map((type) => type.name)
+    .filter((name) => !PLAYS.includes(name))
+    .sort();
   const counted = names.filter((name) => rewarded.has(name));
   const others = names.filter((name) => !rewarded.has(name));
-  const box = (name: string) => (
+  const box = (name: string, label = actionLabel(t, name), hint = name) => (
     <CheckboxField
       key={name}
-      label={actionLabel(t, name)}
-      hint={name}
+      label={label}
+      hint={hint}
       checked={draft.event_types.includes(name)}
       onChange={(e) =>
         patch({
@@ -78,6 +84,36 @@ export function StreakPanel() {
           checked={draft.enabled}
           onChange={(e) => patch({ enabled: e.target.checked })}
         />
+        <fieldset className="gam-fieldset">
+          <legend>{t("gamification:admin.streak.plays")}</legend>
+          <p className="admin-muted">{t("gamification:admin.streak.playsHint")}</p>
+          <div className="gam-checks">
+            {box(
+              FINISHED,
+              t("gamification:admin.streak.finished"),
+              t("gamification:admin.streak.finishedHint"),
+            )}
+            {box(
+              PARTIAL,
+              t("gamification:admin.streak.interrupted"),
+              t("gamification:admin.streak.interruptedHint"),
+            )}
+            {box(RADIO, t("gamification:admin.streak.radio"), t("gamification:admin.streak.radioHint"))}
+          </div>
+          <TextField
+            label={t("gamification:admin.streak.minimum")}
+            hint={t("gamification:admin.streak.minimumHint")}
+            type="number"
+            min={0}
+            max={1440}
+            value={String(Math.round(draft.min_watched_s / 60))}
+            onChange={(e) =>
+              patch({
+                min_watched_s: Math.min(1440, Math.max(0, Math.round(Number(e.target.value) || 0))) * 60,
+              })
+            }
+          />
+        </fieldset>
         <fieldset className="gam-fieldset">
           <legend>{t("gamification:admin.streak.tiers")}</legend>
           {tiers.map((tier, index) => (
@@ -201,11 +237,11 @@ export function StreakPanel() {
         title={t("gamification:admin.streak.counted")}
         description={t("gamification:admin.streak.countedHint")}
       >
-        <div className="gam-checks gam-checks--wide">{counted.map(box)}</div>
+        <div className="gam-checks gam-checks--wide">{counted.map((name) => box(name))}</div>
         {others.length ? (
           <details className="gam-advanced">
             <summary>{t("gamification:admin.streak.otherActions", { count: others.length })}</summary>
-            <div className="gam-checks gam-checks--wide">{others.map(box)}</div>
+            <div className="gam-checks gam-checks--wide">{others.map((name) => box(name))}</div>
           </details>
         ) : null}
       </AdminSection>

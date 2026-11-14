@@ -75,6 +75,25 @@ async def test_live_tv_keeps_the_streak_of_finished_plays(gm: GamHarness) -> Non
     assert state["days"] == 2  # yesterday's streak, still alive — today not counted
 
 
+async def test_a_counted_play_keeps_the_streak_without_a_rule(gm: GamHarness) -> None:
+    """Issue 416: the radio (or any counted play) keeps the streak even when no rule rewards it — from the
+    minimum length; and a dry run of a rule never writes a streak day."""
+    gm.module.config = replace(
+        gm.module.config, streak={**STREAK, "event_types": ["media.radio_listened"], "min_watched_s": 1800}
+    )
+    gm.ev.types.register(EventType("media.radio_listened", "test:media"))
+    user = gm.people["ursula"]
+    start = gm.clock.now() + timedelta(hours=1)
+    radio = {"minutes": 10, "session": "s1"}
+    await gm.emit(user, radio, at=start, event_type="media.radio_listened")
+    assert (await gm.module.streaks.current(user, start))["days"] == 0  # too short
+    await gm.emit(
+        user, {**radio, "minutes": 45}, at=start + timedelta(minutes=5), event_type="media.radio_listened"
+    )
+    assert (await gm.module.streaks.current(user, start))["days"] == 1
+    assert await gm.balance(user) == 0  # counted, not rewarded
+
+
 async def test_pace_multiplies_every_rule(gm: GamHarness, client: AsyncClient) -> None:
     await gm.rule("played", RULE)
     await login(client, "boss")

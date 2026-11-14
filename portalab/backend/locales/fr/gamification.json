@@ -325,7 +325,7 @@
   "admin.streak.days": "À partir de (jours)",
   "admin.streak.enabled": "Activer les séries",
   "admin.streak.example": "Exemple : une action à {base} XP en rapporte {boosted} au jour {days} de la série.",
-  "admin.streak.hint": "Jours consécutifs avec une action comptée (par défaut : finir un film ou un épisode). Chaque palier multiplie les gains de ces actions ; un jour manqué et la série repart de zéro.",
+  "admin.streak.hint": "Jours consécutifs avec une action comptée (par défaut : finir un film ou un épisode ; les lectures interrompues et la radio peuvent compter aussi). Chaque palier multiplie les gains de ces actions ; un jour manqué et la série repart de zéro.",
   "admin.streak.multiplier": "Multiplicateur",
   "admin.streak.otherActions": "{count, plural, one {# autre action} other {# autres actions}}",
   "admin.streak.preview": "Aperçu jour par jour",
@@ -1085,5 +1085,15 @@
   "notify.reward.fact.boost": "Boost",
   "notify.reward.fact.boost.value": "×{boost}",
   "notify.reward.fact.streak": "Bonus de série",
-  "notify.reward.fact.streak.value": "×{streak}"
+  "notify.reward.fact.streak.value": "×{streak}",
+  "admin.streak.plays": "Lectures qui comptent",
+  "admin.streak.playsHint": "Tous les types de médias comptent : films, épisodes, TV en direct, livres, livres audio, musique, jeux et radio.",
+  "admin.streak.finished": "Lectures terminées",
+  "admin.streak.finishedHint": "Un film, un épisode ou un livre vu ou lu jusqu'au bout, quelle que soit sa durée. La TV en direct, qui ne se termine jamais, compte à partir de la durée minimale.",
+  "admin.streak.interrupted": "Lectures interrompues aussi",
+  "admin.streak.interruptedHint": "Une lecture arrêtée avant la fin (un film arrêté après 50 minutes, une séance de lecture ou d'écoute, une session de jeu) compte à partir de la durée minimale.",
+  "admin.streak.radio": "Écoute de la radio",
+  "admin.streak.radioHint": "Une séance de radio dans le lecteur du portail compte à partir de la durée minimale.",
+  "admin.streak.minimum": "Durée minimale d'une séance (minutes)",
+  "admin.streak.minimumHint": "S'applique aux lectures interrompues, à la TV en direct, à la radio et à la musique. 0 : toute durée."
 }

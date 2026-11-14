@@ -325,7 +325,7 @@
   "admin.streak.days": "From (days)",
   "admin.streak.enabled": "Enable streaks",
   "admin.streak.example": "Example: an action worth {base} XP gives {boosted} on day {days} of the streak.",
-  "admin.streak.hint": "Consecutive days with a counted action (by default: finishing a film or an episode). Each tier multiplies the gains of those actions; one missed day and the streak starts over.",
+  "admin.streak.hint": "Consecutive days with a counted action (by default: finishing a film or an episode; you can count interrupted plays and the radio too). Each tier multiplies the gains of those actions; one missed day and the streak starts over.",
   "admin.streak.multiplier": "Multiplier",
   "admin.streak.otherActions": "{count, plural, one {# other action} other {# other actions}}",
   "admin.streak.preview": "Day-by-day preview",
@@ -1085,5 +1085,15 @@
   "notify.reward.fact.boost": "Boost",
   "notify.reward.fact.boost.value": "×{boost}",
   "notify.reward.fact.streak": "Streak bonus",
-  "notify.reward.fact.streak.value": "×{streak}"
+  "notify.reward.fact.streak.value": "×{streak}",
+  "admin.streak.plays": "Plays that count",
+  "admin.streak.playsHint": "Every kind of media counts: films, episodes, live TV, books, audiobooks, music, games and the radio.",
+  "admin.streak.finished": "Finished plays",
+  "admin.streak.finishedHint": "A film, an episode or a book watched or read to the end, whatever its length. Live TV, which never ends, counts from the minimum length.",
+  "admin.streak.interrupted": "Interrupted plays too",
+  "admin.streak.interruptedHint": "A play stopped before its end (a film stopped after 50 minutes, a reading or listening sitting, a game session) counts from the minimum length.",
+  "admin.streak.radio": "Radio listening",
+  "admin.streak.radioHint": "A radio sitting in the portal's player counts from the minimum length.",
+  "admin.streak.minimum": "Minimum length of a sitting (minutes)",
+  "admin.streak.minimumHint": "Applies to interrupted plays, live TV, the radio and music. 0: any length."
 }

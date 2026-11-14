@@ -36,7 +36,8 @@ class StreakConfig(BaseModel):
     values: list[str] = Field(default_factory=lambda: ["xp"], max_length=3)
     tiers: list[Tier] = Field(default_factory=list, max_length=10)
     # #94: a sitting counts for the streak from this many seconds watched, listened to or read (when the
-    # event tells them: ``watched_s``) — a play opened and closed at once does not keep a streak alive
+    # event tells them: ``watched_s``, the radio's ``minutes``) — a play opened and closed at once does not
+    # keep a streak alive; issue 416: a finished film, episode or book counts whatever its length
     min_watched_s: int = Field(default=300, ge=0, le=86_400)
 
 
@@ -49,14 +50,33 @@ def parse_streak(raw: Any) -> StreakConfig:
 
 FINISHED = "media.playback_finished"
 PARTIAL = "media.playback_abandoned"
+RADIO = "media.radio_listened"
+SITTINGS = frozenset({"live", "track", "album", "artist", "music"})  # no end worth the name: only their time
 
 
 def counts(config: StreakConfig, event: Envelope) -> bool:
     """One of the counted things — or (issue 415) a live TV sitting where finished plays count: live TV has no
-    end, its sitting long enough (``min_watched_s``) is its finished play."""
-    if event.type in config.event_types:
+    end, its sitting long enough is its finished play — and long enough (issue 416): every sitting that tells
+    its length reaches ``min_watched_s``, except a play that reached its end (a film, an episode, a book)."""
+    kind = event.payload.get("kind")
+    live = event.type == PARTIAL and kind == "live" and FINISHED in config.event_types
+    if event.type not in config.event_types and not live:
+        return False
+    if event.type == FINISHED and kind not in SITTINGS:
         return True
-    return event.type == PARTIAL and event.payload.get("kind") == "live" and FINISHED in config.event_types
+    seconds = seconds_of(event)
+    return seconds is None or seconds >= config.min_watched_s
+
+
+def seconds_of(event: Envelope) -> float | None:
+    """The time a sitting lasted, when its event tells it."""
+    watched = event.payload.get("watched_s")
+    if isinstance(watched, int | float) and not isinstance(watched, bool):
+        return float(watched)
+    minutes = event.payload.get("minutes")
+    if event.type == RADIO and isinstance(minutes, int | float) and not isinstance(minutes, bool):
+        return float(minutes) * 60
+    return None
 
 
 def multiplier_for(config: StreakConfig, days: int) -> float:
@@ -205,22 +225,25 @@ class Streaks:
         factor = multiplier_for(config, days)
         return [Modifier(f"streak:{days}d", factor)] if factor > 1 else []
 
+    async def note(self, user: UUID, event: Envelope) -> None:
+        """Issue 416: a counted play's day — whether or not a rule rewards it."""
+        config = self.settings()
+        if not config.enabled or not counts(config, event):
+            return
+        async with self.database.unit_of_work() as uow:
+            await uow.session.execute(
+                insert(StreakDay)
+                .values(user_id=user, day=self._day(event.occurred_at))
+                .on_conflict_do_nothing()
+            )
+
     async def modifiers_for(
         self, user: UUID, event: Envelope, value: Value, at: datetime
     ) -> Sequence[Modifier]:
         config = self.settings()
-        if not config.enabled or not counts(config, event):
-            return []
-        watched = event.payload.get("watched_s")
-        if isinstance(watched, int | float) and watched < config.min_watched_s:
-            return []  # too short to count
-        day = self._day(at)
-        async with self.database.unit_of_work() as uow:
-            await uow.session.execute(
-                insert(StreakDay).values(user_id=user, day=day).on_conflict_do_nothing()
-            )
-        if value not in config.values:
-            return []
-        days = await self.length(user, day)
+        if not config.enabled or not counts(config, event) or value not in config.values:
+            return []  # not counted, too short to count, or a value the streak leaves alone
+        # the event counts, so its day does (recorded by ``note``; read only here — a dry run writes nothing)
+        days = 1 + await self.length(user, self._day(at) - timedelta(days=1))
         factor = multiplier_for(config, days)
         return [Modifier(f"streak:{days}d", factor)] if factor > 1 else []

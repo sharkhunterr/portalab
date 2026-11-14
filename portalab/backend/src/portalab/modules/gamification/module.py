@@ -175,6 +175,7 @@ class GamificationModule:
         self.pipeline.quests = self.quests
         self.progression = ProgressionService(database, self.levels, self.achievements.unlock_shares)
         self.streaks = Streaks(database, config)
+        self.pipeline.streaks = self.streaks
         self.pace = Pace(config)
         self.perks = Perks(database, self.streaks, clock=clock, writer=self.writer)
         self.level_rewards = LevelRewards(database, self.writer, capabilities, config)

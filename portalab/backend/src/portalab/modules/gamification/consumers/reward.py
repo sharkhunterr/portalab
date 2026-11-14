@@ -118,6 +118,9 @@ class RewardPipeline:
         self.achievements = achievements
         self.notifier = notifier
         self.quests: Any = None  # slice C: set by the module (``Quests``)
+        self.streaks: Any = (
+            None  # issue 416: set by the module (``Streaks``) — a counted play keeps the streak
+        )
         self.config = config
         self.clock = clock
 
@@ -134,6 +137,8 @@ class RewardPipeline:
         # quests », « drop by on three days »); each completes once a period, so the chain ends
         own = envelope.type in OWN_TYPES
         rules = [] if own else await self.rules.in_force(envelope.type, envelope.occurred_at)
+        if self.streaks is not None and not own and (member := recipient(envelope)) is not None:
+            await self.streaks.note(member, envelope)  # its day, rewarded by a rule or not (issue 416)
         if (
             not rules
             and not await self.achievements.tracks(envelope.type, envelope.occurred_at)
