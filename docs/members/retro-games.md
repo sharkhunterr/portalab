@@ -21,8 +21,18 @@ Your progress follows **you** (your profile, in a household), on every device:
 - **The game's own save** (what the game saves itself, as on the console) is kept every minute while you play and when you leave, and loaded when you play again.
 - **Save states**: open **Saves** (the floppy disk at the top right while playing) and use **« Save here »** on one of the 5 slots — the slot keeps a picture of the screen — then **« Load »** whenever you want. The emulator's own *Save State* / *Load State* buttons use the slot you last chose.
 - **Where you left off**: leaving the game keeps where you are. Next time, the game's page offers **« Continue »** (from there, or from your latest state) or **« New game »** (your game's own save is still there).
-- Each save and state is also **copied to RomM**, labelled « Portalab » and with your name, so you find them in RomM too. A member's or a profile's saves are never another's, even though the portal uses one RomM account.
+- Each save and state is also **copied to RomM**, labelled « Portalab » and with your name, so you find them in RomM too. A member's or a profile's saves are never another's.
 - A save state is the emulator's whole memory: for the largest consoles it may exceed what the portal accepts (10 MB unless your administrator raised it).
+
+## Your own RomM account
+
+By default, the portal writes your play sessions, saves and states to the RomM account it uses itself (shared by everyone, each save labelled with its owner). To have them in **your own** RomM account:
+
+1. Open *Settings › Media accounts*, card **« My game library account »**, and tap **« Authorise Portalab »**.
+2. A code shows, with **« Approve in RomM »**: open it (signed in to RomM with your account) and approve the code.
+3. The card says **« Your games go to your account … »**: from then on your sessions, saves and states go there (a household profile's go to its master's account, labelled with the profile).
+
+The portal only asks RomM for what it does (who you are, your play sessions, saves and states, its device) and keeps the authorisation encrypted. **« Remove the authorisation »** revokes it (in RomM too); revoking it in RomM works as well — the portal then goes back to the shared account and asks you to authorise again.
 
 ## What counts
 

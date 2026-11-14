@@ -43,6 +43,36 @@ class RetroFirmware:
     verified: bool = False
 
 
+@dataclass(frozen=True, slots=True)
+class LinkStart:
+    """426: a member's authorisation asked of the library — the code they approve there, at ``path``."""
+
+    device_code: str  # kept by the portal (never shown): what it asks the token with
+    user_code: str
+    path: str  # the library's page where the member approves it (relative, the code in it)
+    expires_in: int
+    interval: int
+
+
+@dataclass(frozen=True, slots=True)
+class LinkToken:
+    """426: the member's own token in the library, once approved."""
+
+    token: str
+    device_id: str | None
+    scopes: tuple[str, ...]
+    expires_at: datetime | None
+    username: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class MemberAccount:
+    """426: a member's own account in the library, for what the portal writes there for them."""
+
+    token: str
+    device_id: str | None = None
+
+
 @runtime_checkable
 class RetroSource(Protocol):
     async def game(self, external_id: str) -> RetroGame | None: ...
@@ -57,7 +87,12 @@ class RetroSource(Protocol):
         ...
 
     async def record_session(
-        self, external_id: str, started_at: datetime, ended_at: datetime, duration_ms: int
+        self,
+        external_id: str,
+        started_at: datetime,
+        ended_at: datetime,
+        duration_ms: int,
+        account: MemberAccount | None = None,
     ) -> None:
         """A play session, told to the library (which keeps the account's play time) — as the portal's own
         device, whose sessions the library's history then leaves out (the portal counted them already)."""
@@ -73,13 +108,28 @@ class RetroSource(Protocol):
         screenshot: bytes | None,
         labels: Sequence[str],
         remote_id: str | None = None,
+        account: MemberAccount | None = None,
     ) -> str:
         """420: a member's save or state copied to the library (``remote_id``: the copy to replace, gone
         or not), labelled with who it is (the library's account is shared); its id there."""
         ...
 
-    async def delete_file(self, kind: SaveKind, remote_id: str) -> None:
+    async def delete_file(self, kind: SaveKind, remote_id: str, account: MemberAccount | None = None) -> None:
         """420: a copy removed from the library (gone already: nothing to do)."""
+        ...
+
+    async def begin_link(self, device: str, name: str) -> LinkStart:
+        """426: ask the library for a member's authorisation (``device``: the portal's identifier for this
+        member's link). ``account`` arguments then write as that member instead of the service's account."""
+        ...
+
+    async def finish_link(self, device_code: str) -> LinkToken | None:
+        """426: the member's token once approved; ``None`` while it waits; refused or expired: the library
+        refuses (``ProviderAuthError``)."""
+        ...
+
+    async def end_link(self, account: MemberAccount) -> None:
+        """426: the member's authorisation revoked in the library (gone already: nothing to do)."""
         ...
 
 

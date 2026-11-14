@@ -1,0 +1,16 @@
+/* issue 426 — a member's own account in the library: the code to approve there */
+.retro-account {
+  flex-wrap: wrap;
+}
+.retro-account__code {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  inline-size: 100%;
+}
+.retro-account__code strong {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--font-size-lg);
+  letter-spacing: 0.15em;
+}

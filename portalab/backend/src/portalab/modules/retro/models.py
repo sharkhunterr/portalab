@@ -73,6 +73,8 @@ class GameSave(RetroBase):
     )
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     remote_id: Mapped[str | None] = mapped_column(String(64))  # its copy in the library
+    # 426: whose account in the library holds that copy (the member's master's id; none: the service's)
+    remote_account: Mapped[str | None] = mapped_column(String(64), info=not_personal("an account's id"))
     synced_at: Mapped[datetime | None] = mapped_column(TZDateTime)
 
 
@@ -87,4 +89,32 @@ class Preference(RetroBase):
     data: Mapped[dict[str, Any]] = mapped_column(
         JSONB, nullable=False, info=not_personal("an emulator's controls and options")
     )
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class LibraryAccount(RetroBase):
+    """426: a member's own account in a game library, authorised once by the member (the library's device
+    authorisation): asked (``pending``: the code to approve there), then ``linked`` (its token, encrypted
+    by the portal), or ``expired`` (refused by the library since: authorise again). A household's profiles
+    write to their master's."""
+
+    __tablename__ = "accounts"
+    __table_args__ = (CheckConstraint("state IN ('pending', 'linked', 'expired')", name="state"),)
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    service_id: Mapped[UUID] = mapped_column(primary_key=True)
+    state: Mapped[str] = mapped_column(String(8), nullable=False)
+    token: Mapped[str | None] = mapped_column(String(2048), info=not_personal("an encrypted access token"))
+    device_code: Mapped[str | None] = mapped_column(
+        String(1024), info=not_personal("an encrypted authorisation request")
+    )
+    user_code: Mapped[str | None] = mapped_column(String(32), info=not_personal("a one-time pairing code"))
+    path: Mapped[str | None] = mapped_column(String(512), info=not_personal("the library's approval page"))
+    pending_until: Mapped[datetime | None] = mapped_column(TZDateTime)
+    interval: Mapped[int] = mapped_column(Integer, nullable=False, default=5)
+    device_id: Mapped[str | None] = mapped_column(String(64), info=not_personal("the library's device id"))
+    username: Mapped[str | None] = mapped_column(String(128), info=pii("identifier"))
+    scopes: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    expires_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

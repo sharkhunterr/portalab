@@ -13,8 +13,18 @@ import pytest
 from fastapi import FastAPI
 
 from portalab.capabilities.media import StreamBody
-from portalab.capabilities.results import Available, CapabilityResult, Unavailable
-from portalab.capabilities.retro import RETRO_SOURCE, FileKind, RetroFirmware, RetroGame, SaveKind
+from portalab.capabilities.results import AuthenticationFailed, Available, CapabilityResult, Unavailable
+from portalab.capabilities.retro import (
+    RETRO_SOURCE,
+    FileKind,
+    LinkStart,
+    LinkToken,
+    MemberAccount,
+    RetroFirmware,
+    RetroGame,
+    SaveKind,
+)
+from portalab.core.secrets import SecretBox
 from portalab.core.time import FixedClock
 from portalab.modules.retro.module import RetroModule
 from tests.integration.media.conftest import MediaHarness, client, clock, media  # noqa: F401 — fixtures
@@ -26,10 +36,17 @@ class FakeRetro:
     firmwares: dict[str, list[RetroFirmware]] = field(default_factory=dict)
     opened: list[tuple[str, str, str, str | None]] = field(default_factory=list)
     sessions: list[tuple[str, int]] = field(default_factory=list)
+    accounts_used: list[str | None] = field(default_factory=list)  # 426: whose account each session went to
     refuse_sessions: bool = False
     copies: list[dict[str, Any]] = field(default_factory=list)  # 420: the saves and states copied
     deleted: list[tuple[str, str]] = field(default_factory=list)
     refuse_copies: bool = False
+    # 426: the members' own accounts
+    approved: bool = False
+    refuse_link: bool = False
+    revoked: set[str] = field(default_factory=set)  # tokens the library refuses now
+    links: list[str] = field(default_factory=list)
+    ended: list[MemberAccount] = field(default_factory=list)
 
     async def game(self, external_id: str) -> CapabilityResult[RetroGame | None]:
         return Available(self.games.get(external_id), as_of=datetime.now(UTC))
@@ -56,11 +73,19 @@ class FakeRetro:
         )
 
     async def record_session(
-        self, external_id: str, started_at: datetime, ended_at: datetime, duration_ms: int
+        self,
+        external_id: str,
+        started_at: datetime,
+        ended_at: datetime,
+        duration_ms: int,
+        account: MemberAccount | None = None,
     ) -> CapabilityResult[None]:
         if self.refuse_sessions:
             return Unavailable(detail="down")
+        if account is not None and account.token in self.revoked:
+            return AuthenticationFailed(detail="revoked")
         self.sessions.append((external_id, duration_ms))
+        self.accounts_used.append(account.token if account is not None else None)
         return Available(None, as_of=datetime.now(UTC))
 
     async def put_file(
@@ -73,9 +98,12 @@ class FakeRetro:
         screenshot: bytes | None,
         labels: Sequence[str],
         remote_id: str | None = None,
+        account: MemberAccount | None = None,
     ) -> CapabilityResult[str]:
         if self.refuse_copies:
             return Unavailable(detail="down")
+        if account is not None and account.token in self.revoked:
+            return AuthenticationFailed(detail="revoked")
         self.copies.append(
             {
                 "kind": kind,
@@ -86,13 +114,39 @@ class FakeRetro:
                 "picture": screenshot,
                 "labels": list(labels),
                 "replaces": remote_id,
+                "account": account.token if account is not None else None,
             }
         )
         return Available(remote_id or str(100 + len(self.copies)), as_of=datetime.now(UTC))
 
-    async def delete_file(self, kind: SaveKind, remote_id: str) -> CapabilityResult[None]:
+    async def delete_file(
+        self, kind: SaveKind, remote_id: str, account: MemberAccount | None = None
+    ) -> CapabilityResult[None]:
         self.deleted.append((kind, remote_id))
         return Available(None, as_of=datetime.now(UTC))
+
+    async def begin_link(self, device: str, name: str) -> CapabilityResult[LinkStart]:
+        self.links.append(device)
+        return Available(
+            LinkStart("dev-code", "ABCD-1234", "/pair/device?user_code=ABCD-1234", 600, 5), as_of=_now()
+        )
+
+    async def finish_link(self, device_code: str) -> CapabilityResult[LinkToken | None]:
+        assert device_code == "dev-code"
+        if self.refuse_link:
+            return AuthenticationFailed(detail="denied")
+        if not self.approved:
+            return Available(None, as_of=_now())
+        token = LinkToken("member-token", "dev-9", ("assets.write",), None, "zoe-in-romm")
+        return Available(token, as_of=_now())
+
+    async def end_link(self, account: MemberAccount) -> CapabilityResult[None]:
+        self.ended.append(account)
+        return Available(None, as_of=_now())
+
+
+def _now() -> datetime:
+    return datetime.now(UTC)
 
 
 @pytest.fixture
@@ -111,7 +165,11 @@ def retro(media: MediaHarness) -> FakeRetro:  # noqa: F811
 @pytest.fixture
 def retro_module(media: MediaHarness, clock: FixedClock) -> RetroModule:  # noqa: F811
     module = RetroModule(
-        media.database, media.ev.full.identity.capabilities, clock=clock, events=media.ev.publisher
+        media.database,
+        media.ev.full.identity.capabilities,
+        clock=clock,
+        events=media.ev.publisher,
+        secret_box=SecretBox(b"retro-tests-key-0123456789abcdef"),
     )
     module.register()
     return module

@@ -14,6 +14,7 @@ from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field
 
 from portalab.capabilities.media import StreamBody
+from portalab.modules.retro.accounts import AccountState
 from portalab.modules.retro.api.deps import Module, Player
 from portalab.modules.retro.saves import SLOTS, Progress, StateInfo
 from portalab.modules.retro.service import HEARTBEAT_S, NotPlayable, Playable, player_of
@@ -362,3 +363,52 @@ async def keep_retro_preferences(
     principal: Player, module: Module, core: CORE, body: RetroPreferencesIn
 ) -> None:
     await module.saves.keep_preferences(principal, core, body.data)
+
+
+# --- 426: each member's own account in the libraries ------------------------------------------------------
+class RetroAccountOut(BaseModel):
+    service_id: UUID
+    service_name: str | None = None
+    state: Literal["none", "pending", "linked", "expired"]
+    username: str | None = None
+    expires_at: datetime | None = None
+    user_code: str | None = None  # pending: the code the member approves in the library
+    approve_url: str | None = None
+    pending_until: datetime | None = None
+    interval: int = 5
+
+
+def _account(state: AccountState) -> RetroAccountOut:
+    return RetroAccountOut(
+        service_id=state.service_id,
+        service_name=state.service_name,
+        state=state.state,
+        username=state.username,
+        expires_at=state.expires_at,
+        user_code=state.user_code,
+        approve_url=state.approve_url,
+        pending_until=state.pending_until,
+        interval=state.interval,
+    )
+
+
+@router.get("/accounts", response_model=list[RetroAccountOut])
+async def retro_accounts(principal: Player, module: Module) -> list[RetroAccountOut]:
+    """Whether the member's sessions and saves go to their own account in each library."""
+    return [_account(state) for state in await module.accounts.states(principal)]
+
+
+@router.post("/accounts/{service_id}", response_model=RetroAccountOut)
+async def link_retro_account(principal: Player, module: Module, service_id: UUID) -> RetroAccountOut:
+    """Ask the library for the member's authorisation: the code they approve there."""
+    return _account(await module.accounts.begin(principal, service_id))
+
+
+@router.post("/accounts/{service_id}/check", response_model=RetroAccountOut)
+async def check_retro_account(principal: Player, module: Module, service_id: UUID) -> RetroAccountOut:
+    return _account(await module.accounts.check(principal, service_id))
+
+
+@router.delete("/accounts/{service_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def unlink_retro_account(principal: Player, module: Module, service_id: UUID) -> None:
+    await module.accounts.unlink(principal, service_id)

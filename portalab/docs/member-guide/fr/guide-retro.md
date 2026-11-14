@@ -26,8 +26,18 @@ Votre progression vous suit (votre profil, dans un foyer), sur tous vos appareil
 - **La sauvegarde du jeu** (celle que le jeu fait lui-même, comme sur la console) est gardée chaque minute pendant la partie et quand vous partez, puis rechargée à la partie suivante.
 - **Les sauvegardes d'état** : ouvrez **Sauvegardes** (la disquette en haut à droite pendant la partie) et touchez **« Sauvegarder ici »** sur l'un des 5 emplacements — il garde une image de l'écran — puis **« Charger »** quand vous voulez. Les boutons *Sauvegarder l'état* / *Charger l'état* de l'émulateur utilisent le dernier emplacement choisi.
 - **Là où vous en étiez** : quitter le jeu garde votre progression. La fois suivante, la page propose **« Continuer »** (depuis là, ou depuis votre dernier état) ou **« Nouvelle partie »** (la sauvegarde du jeu reste là).
-- Chaque sauvegarde est aussi **copiée dans RomM**, étiquetée « Portalab » et avec votre nom, pour la retrouver dans RomM. Les sauvegardes d'un membre ou d'un profil ne sont jamais celles d'un autre, même si le portail utilise un seul compte RomM.
+- Chaque sauvegarde est aussi **copiée dans RomM**, étiquetée « Portalab » et avec votre nom, pour la retrouver dans RomM. Les sauvegardes d'un membre ou d'un profil ne sont jamais celles d'un autre.
 - Une sauvegarde d'état contient toute la mémoire de l'émulateur : pour les plus grosses consoles, elle peut dépasser ce que le portail accepte (10 Mo sauf réglage de l'administrateur).
+
+## Votre propre compte RomM
+
+Par défaut, le portail écrit vos parties, sauvegardes et états sur le compte RomM qu'il utilise lui-même (partagé, chaque sauvegarde étiquetée avec son propriétaire). Pour les avoir sur **votre** compte RomM :
+
+1. Ouvrez *Paramètres › Comptes médias*, carte **« Mon compte de ludothèque »**, et touchez **« Autoriser Portalab »**.
+2. Un code s'affiche avec **« Approuver dans RomM »** : ouvrez-le (connecté à RomM avec votre compte) et approuvez le code.
+3. La carte indique **« Vos jeux vont sur votre compte … »** : vos parties, sauvegardes et états y vont désormais (ceux d'un profil du foyer vont sur le compte de son maître, étiquetés avec le profil).
+
+Le portail ne demande à RomM que ce dont il a besoin (qui vous êtes, vos parties, sauvegardes et états, son appareil) et garde l'autorisation chiffrée. **« Retirer l'autorisation »** la révoque (dans RomM aussi) ; la révoquer dans RomM fonctionne aussi : le portail revient alors au compte partagé et vous propose d'autoriser à nouveau.
 
 ## Ce qui compte
 

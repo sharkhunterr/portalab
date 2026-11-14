@@ -164,6 +164,7 @@ class RetroService:
         self.capabilities = capabilities
         self.clock = clock
         self.events = events
+        self.accounts: Any = None  # 426: the members' own accounts (set by the module)
 
     # --- the libraries and the catalog ----------------------------------------------------------------------
     def _libraries(self) -> dict[str, tuple[RetroSource, str | None]]:
@@ -314,18 +315,31 @@ class RetroService:
             return False
         library = self._libraries().get(str(row.service_id))
         if library is not None and row.played_s >= 1:
-            try:
-                _value(
-                    await asyncio.wait_for(
-                        library[0].record_session(
-                            row.external_id, row.started_at, row.ended_at, int(row.played_s * 1000)
-                        ),
-                        timeout=TIMEOUT_S,
+            # 426: to the member's own account when they authorised the portal there, else the service's
+            holder = await self.accounts.account_for(row.user_id, row.service_id) if self.accounts else None
+            for account in ([holder.account] if holder is not None else []) + [None]:
+                try:
+                    _value(
+                        await asyncio.wait_for(
+                            library[0].record_session(
+                                row.external_id,
+                                row.started_at,
+                                row.ended_at,
+                                int(row.played_s * 1000),
+                                account=account,
+                            ),
+                            timeout=TIMEOUT_S,
+                        )
                     )
-                )
-            except Exception:
-                log.warning("retro sitting not told to the library", extra={"sitting": str(sitting)})
-                return False
+                    break
+                except LibraryDenied:
+                    if account is None:
+                        log.warning("retro sitting refused by the library", extra={"sitting": str(sitting)})
+                        return False
+                    await self.accounts.refused(row.user_id, row.service_id)  # revoked there: the service's
+                except Exception:
+                    log.warning("retro sitting not told to the library", extra={"sitting": str(sitting)})
+                    return False
         async with self.database.unit_of_work() as uow:
             told = await uow.session.get(Sitting, sitting, with_for_update=True)
             if told is not None:

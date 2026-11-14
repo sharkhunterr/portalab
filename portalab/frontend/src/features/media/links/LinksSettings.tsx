@@ -7,6 +7,7 @@ import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
 import { SettingsCard, SettingsGrid, SettingsPage } from "../../account/SettingsKit";
+import { RetroAccounts } from "../../retro/RetroAccounts";
 import { connectorIcon } from "../../services/connectorIcons";
 import { useLinkActions, useLinks } from "../api";
 import "../media.css";
@@ -112,6 +113,7 @@ export function LinksSettings() {
             })}
           </ul>
         </SettingsCard>
+        <RetroAccounts />
         <SettingsCard icon="plus" title={t("account:media.add")} hint={t("account:media.addHint")}>
           <form onSubmit={submit}>
             <div className="settings-fields">

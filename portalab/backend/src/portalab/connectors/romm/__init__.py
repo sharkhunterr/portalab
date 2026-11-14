@@ -14,6 +14,7 @@ username (configuration) and password (secret).
 """
 
 import base64
+import json
 import re
 from collections.abc import AsyncIterator, Mapping, Sequence
 from contextlib import asynccontextmanager
@@ -45,7 +46,16 @@ from portalab.capabilities.media import (
     StreamBody,
 )
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError, ProviderNotFound
-from portalab.capabilities.retro import RETRO_SOURCE, FileKind, RetroFirmware, RetroGame, SaveKind
+from portalab.capabilities.retro import (
+    RETRO_SOURCE,
+    FileKind,
+    LinkStart,
+    LinkToken,
+    MemberAccount,
+    RetroFirmware,
+    RetroGame,
+    SaveKind,
+)
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding, parse_time, safe_id
 
 PAGE = 100
@@ -61,6 +71,9 @@ DONE = ("finished", "completed_100")  # a game the player marked finished (or co
 EMULATOR_FILE = re.compile(r"^(?!.*\.\.)[A-Za-z0-9_./-]{1,200}$")
 FILE_NAME = re.compile(r"^[^/\\\x00]{1,400}$")
 PORTAL_CLIENT = "portalab"
+# 426: what a member's own token may do — who they are, their play sessions, saves and states, the device
+MEMBER_SCOPES = ("me.read", "roms.user.write", "assets.read", "assets.write", "devices.read", "devices.write")
+PENDING = ("pending", "slow_down", "slow down")
 PORTAL_DEVICE = {
     "name": "Portalab",
     "client": PORTAL_CLIENT,
@@ -496,7 +509,12 @@ class _Retro:
             )
 
     async def record_session(
-        self, external_id: str, started_at: datetime, ended_at: datetime, duration_ms: int
+        self,
+        external_id: str,
+        started_at: datetime,
+        ended_at: datetime,
+        duration_ms: int,
+        account: MemberAccount | None = None,
     ) -> None:
         if not external_id.isdigit():
             return
@@ -504,8 +522,9 @@ class _Retro:
             self.service,
             "POST",
             "/api/play-sessions",
+            headers=_as(account),
             json_body={
-                "device_id": await self._device(),
+                "device_id": account.device_id if account is not None else await self._device(),
                 "sessions": [
                     {
                         "rom_id": int(external_id),
@@ -527,6 +546,7 @@ class _Retro:
         screenshot: bytes | None,
         labels: Sequence[str],
         remote_id: str | None = None,
+        account: MemberAccount | None = None,
     ) -> str:
         """420: RomM's ``/api/saves`` or ``/api/states`` — the copy replaced in place when RomM still has it,
         else a new one; labelled (the portal's account in RomM is everyone's)."""
@@ -536,12 +556,12 @@ class _Retro:
             files["screenshotFile"] = (f"{file_name}.png", screenshot, "image/png")
         made: Any = None
         if remote_id and remote_id.isdigit():
-            made = await self._multipart("PUT", f"/api/{folder}/{remote_id}", files, None)
+            made = await self._multipart("PUT", f"/api/{folder}/{remote_id}", files, None, account)
         if made is None:
             if not external_id.isdigit():
                 raise ProviderNotFound("no such game")
             made = await self._multipart(
-                "POST", f"/api/{folder}", files, {"rom_id": external_id, "emulator": core[:64]}
+                "POST", f"/api/{folder}", files, {"rom_id": external_id, "emulator": core[:64]}, account
             )
         if not isinstance(made, Mapping) or made.get("id") is None:
             raise InvalidPayload(f"unexpected /api/{folder} payload")
@@ -550,17 +570,22 @@ class _Retro:
             self.service,
             "PUT",
             f"/api/{folder}/{safe_id(found)}/labels",
+            headers=_as(account),
             json_body={"labels": [label[:64] for label in labels if label][:8]},
         )
         return found
 
-    async def delete_file(self, kind: SaveKind, remote_id: str) -> None:
+    async def delete_file(self, kind: SaveKind, remote_id: str, account: MemberAccount | None = None) -> None:
         if not remote_id.isdigit():
             return
         folder = "saves" if kind == "save" else "states"
         try:
             await self.connector.request(
-                self.service, "POST", f"/api/{folder}/delete", json_body={folder: [int(remote_id)]}
+                self.service,
+                "POST",
+                f"/api/{folder}/delete",
+                headers=_as(account),
+                json_body={folder: [int(remote_id)]},
             )
         except ProviderNotFound:
             return  # gone already
@@ -571,13 +596,18 @@ class _Retro:
         path: str,
         files: Mapping[str, tuple[str, bytes, str]],
         params: Mapping[str, str] | None,
+        account: MemberAccount | None = None,
     ) -> Any:
         """A file sent to RomM (``None``: RomM no longer has the item replaced)."""
         try:
             answer = await self.connector._http(self.service).request(
                 method,
                 path,
-                headers={"Accept": "application/json", **self.connector.auth_headers(self.service)},
+                headers={
+                    "Accept": "application/json",
+                    **self.connector.auth_headers(self.service),
+                    **_as(account),
+                },
                 files=dict(files),
                 **({"params": dict(params)} if params else {}),
             )
@@ -594,6 +624,79 @@ class _Retro:
         except ValueError as exc:
             raise InvalidPayload("RomM did not answer with JSON") from exc
 
+    # --- 426: a member's own account ----------------------------------------------------------------------
+    async def begin_link(self, device: str, name: str) -> LinkStart:
+        """RomM's device authorisation: the member approves the code in RomM, signed in as themselves."""
+        answer = await self._open_call(
+            "/api/auth/device/init",
+            {
+                "client_device_identifier": device[:255],
+                "name": name[:255] or "Portalab",
+                "client": PORTAL_CLIENT,
+                "platform": "web",
+                "requested_scopes": list(MEMBER_SCOPES),
+            },
+        )
+        body = _json(answer)
+        if answer.status_code >= 400 or not isinstance(body, Mapping) or not body.get("device_code"):
+            raise ConnectionError(f"RomM answered HTTP {answer.status_code}")
+        path = str(body.get("verification_path_complete") or body.get("verification_path") or "/pair/device")
+        return LinkStart(
+            device_code=str(body["device_code"]),
+            user_code=str(body.get("user_code") or ""),
+            path=path if path.startswith("/") else f"/{path}",
+            expires_in=int(body.get("expires_in") or 600),
+            interval=max(2, int(body.get("interval") or 5)),
+        )
+
+    async def finish_link(self, device_code: str) -> LinkToken | None:
+        answer = await self._open_call("/api/auth/device/token", {"device_code": device_code})
+        body = _json(answer)
+        if answer.status_code >= 500:
+            raise ConnectionError(f"RomM answered HTTP {answer.status_code}")
+        if answer.status_code >= 400:
+            said = json.dumps(body).lower() if body is not None else ""
+            if any(word in said for word in PENDING) or answer.status_code == 428:
+                return None  # the member has not approved it yet
+            raise ProviderAuthError("RomM refused this authorisation")
+        if not isinstance(body, Mapping) or not body.get("access_token"):
+            raise InvalidPayload("unexpected device token payload")
+        token = str(body["access_token"])
+        me = await self.connector.request(
+            self.service, "GET", "/api/users/me", headers=_as(MemberAccount(token))
+        )
+        return LinkToken(
+            token=token,
+            device_id=str(body["device_id"]) if body.get("device_id") else None,
+            scopes=tuple(str(scope) for scope in body.get("scopes") or ()),
+            expires_at=parse_time(body.get("expires_at")),
+            username=str(me.get("username"))[:128]
+            if isinstance(me, Mapping) and me.get("username")
+            else None,
+        )
+
+    async def end_link(self, account: MemberAccount) -> None:
+        if not account.device_id:
+            return
+        try:  # the device goes, and the token bound to it
+            await self.connector.request(
+                self.service,
+                "DELETE",
+                f"/api/devices/{quote(account.device_id, safe='')}",
+                headers=_as(account),
+            )
+        except (ProviderNotFound, ProviderAuthError):
+            return  # gone already, or the member revoked it in RomM
+
+    async def _open_call(self, path: str, body: Mapping[str, Any]) -> Any:
+        """RomM's open device endpoints, without the service's credentials (the member signs in, not it)."""
+        try:
+            return await self.connector._http(self.service).request(
+                "POST", path, headers={"Accept": "application/json"}, json=dict(body)
+            )
+        except ConnectorHttpError as exc:
+            raise ConnectionError(str(exc)) from exc
+
     async def _device(self) -> str | None:
         """The portal's device in RomM (created once, found again after): its sessions are the portal's."""
         try:
@@ -607,3 +710,15 @@ class _Retro:
             return None  # a RomM without devices: the session goes without one
         found = made.get("device_id") if isinstance(made, Mapping) else None
         return str(found) if found else None
+
+
+def _as(account: MemberAccount | None) -> dict[str, str]:
+    """426: the member's own token in place of the service's credentials."""
+    return {"Authorization": f"Bearer {account.token}"} if account is not None else {}
+
+
+def _json(answer: Any) -> Any:
+    try:
+        return answer.json() if answer.content else None
+    except ValueError:
+        return None

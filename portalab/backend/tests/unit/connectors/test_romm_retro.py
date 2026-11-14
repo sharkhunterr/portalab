@@ -13,8 +13,8 @@ import pytest
 from portalab.capabilities.connector_http import ConnectorHttpClient
 from portalab.capabilities.connector_sdk import ServiceHandle
 from portalab.capabilities.media import ACTIVITY_HISTORY
-from portalab.capabilities.results import ProviderNotFound
-from portalab.capabilities.retro import RETRO_SOURCE, RetroSource
+from portalab.capabilities.results import ProviderAuthError, ProviderNotFound
+from portalab.capabilities.retro import RETRO_SOURCE, MemberAccount, RetroSource
 from portalab.connectors.romm import RommConnector, game_rating
 
 ROM = {
@@ -73,6 +73,41 @@ class _Server:
             return httpx.Response(200, json={"id": 77})
         if path == "/api/saves/delete":
             return httpx.Response(200, json={"successful_items": 1})
+        if path == "/api/auth/device/init":
+            assert "authorization" not in request.headers  # the member signs in, not the service
+            body = json.loads(request.content)
+            assert body["client"] == "portalab" and "assets.write" in body["requested_scopes"]
+            return httpx.Response(
+                201,
+                json={
+                    "device_code": "dc",
+                    "user_code": "WXYZ",
+                    "verification_path": "/pair/device",
+                    "verification_path_complete": "/pair/device?user_code=WXYZ",
+                    "expires_in": 900,
+                    "interval": 5,
+                },
+            )
+        if path == "/api/auth/device/token":
+            code = json.loads(request.content)["device_code"]
+            if code == "waiting":
+                return httpx.Response(400, json={"detail": "authorization_pending"})
+            if code == "denied":
+                return httpx.Response(400, json={"detail": "access_denied"})
+            return httpx.Response(
+                200,
+                json={
+                    "access_token": "tok-m",
+                    "device_id": "d-7",
+                    "scopes": ["assets.write"],
+                    "expires_at": None,
+                },
+            )
+        if path == "/api/devices/d-7" and request.method == "DELETE":
+            assert request.headers["authorization"] == "Bearer tok-m"
+            return httpx.Response(204)
+        if path == "/api/users/me" and request.headers.get("authorization") == "Bearer tok-m":
+            return httpx.Response(200, json={"id": 4, "username": "zoe"})
         if path == "/api/users/me":
             return httpx.Response(200, json={"id": 1, "username": "portal"})
         if path == "/api/roms":
@@ -222,3 +257,31 @@ def test_a_games_strictest_rating() -> None:
     )
     assert game_rating({"metadatum": {"age_ratings": ["M"]}}) is None
     assert game_rating({"name": "Pong"}) is None
+
+
+async def test_a_members_authorisation_and_token(server: _Server) -> None:
+    """Issue 426: RomM's device authorisation — the code to approve, waiting, refused, then the member's own
+    token, used in place of the service's credentials and revoked with its device."""
+    retro = _provider(server)
+    started = await retro.begin_link("portalab-abc", "Portalab")
+    assert (started.device_code, started.user_code, started.path, started.interval) == (
+        "dc",
+        "WXYZ",
+        "/pair/device?user_code=WXYZ",
+        5,
+    )
+    assert await retro.finish_link("waiting") is None
+    with pytest.raises(ProviderAuthError):
+        await retro.finish_link("denied")
+    token = await retro.finish_link("dc")
+    assert token is not None and (token.token, token.device_id, token.username) == ("tok-m", "d-7", "zoe")
+    member = MemberAccount(token.token, token.device_id)
+    start = datetime(2026, 11, 15, 10, 0, tzinfo=UTC)
+    await retro.record_session("12", start, start, 1000, account=member)
+    sent = [r for r in server.requests if r.url.path == "/api/play-sessions" and r.method == "POST"][-1]
+    assert sent.headers["authorization"] == "Bearer tok-m" and json.loads(sent.content)["device_id"] == "d-7"
+    await retro.put_file("state", "12", "snes9x", "me.state", b"S", None, ["Portalab"], account=member)
+    made = [r for r in server.requests if r.url.path == "/api/states"][-1]
+    assert made.headers["authorization"] == "Bearer tok-m"
+    await retro.end_link(member)
+    assert server.requests[-1].url.path == "/api/devices/d-7"

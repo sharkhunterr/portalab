@@ -11105,6 +11105,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/retro/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retro Accounts
+         * @description Whether the member's sessions and saves go to their own account in each library.
+         */
+        get: operations["retro_accounts_api_v1_retro_accounts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/retro/accounts/{service_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Link Retro Account
+         * @description Ask the library for the member's authorisation: the code they approve there.
+         */
+        post: operations["link_retro_account_api_v1_retro_accounts__service_id__post"];
+        /** Unlink Retro Account */
+        delete: operations["unlink_retro_account_api_v1_retro_accounts__service_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/retro/accounts/{service_id}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check Retro Account */
+        post: operations["check_retro_account_api_v1_retro_accounts__service_id__check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/retro/games/{object_id}": {
         parameters: {
             query?: never;
@@ -19811,6 +19869,36 @@ export interface components {
              * @enum {string}
              */
             mode: "partial" | "full";
+        };
+        /** RetroAccountOut */
+        RetroAccountOut: {
+            /** Approve Url */
+            approve_url?: string | null;
+            /** Expires At */
+            expires_at?: string | null;
+            /**
+             * Interval
+             * @default 5
+             */
+            interval: number;
+            /** Pending Until */
+            pending_until?: string | null;
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Service Name */
+            service_name?: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "none" | "pending" | "linked" | "expired";
+            /** User Code */
+            user_code?: string | null;
+            /** Username */
+            username?: string | null;
         };
         /** RetroGameOut */
         RetroGameOut: {
@@ -43016,6 +43104,117 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    retro_accounts_api_v1_retro_accounts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetroAccountOut"][];
+                };
+            };
+        };
+    };
+    link_retro_account_api_v1_retro_accounts__service_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetroAccountOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unlink_retro_account_api_v1_retro_accounts__service_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_retro_account_api_v1_retro_accounts__service_id__check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetroAccountOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

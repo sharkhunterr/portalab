@@ -19640,6 +19640,104 @@
         "title": "ResyncIn",
         "type": "object"
       },
+      "RetroAccountOut": {
+        "properties": {
+          "approve_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approve Url"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "interval": {
+            "default": 5,
+            "title": "Interval",
+            "type": "integer"
+          },
+          "pending_until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pending Until"
+          },
+          "service_id": {
+            "format": "uuid",
+            "title": "Service Id",
+            "type": "string"
+          },
+          "service_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Name"
+          },
+          "state": {
+            "enum": [
+              "none",
+              "pending",
+              "linked",
+              "expired"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "user_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Code"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "service_id",
+          "state"
+        ],
+        "title": "RetroAccountOut",
+        "type": "object"
+      },
       "RetroGameOut": {
         "properties": {
           "control_scheme": {
@@ -57106,6 +57204,153 @@
         "summary": "Options",
         "tags": [
           "requests"
+        ]
+      }
+    },
+    "/api/v1/retro/accounts": {
+      "get": {
+        "description": "Whether the member's sessions and saves go to their own account in each library.",
+        "operationId": "retro_accounts_api_v1_retro_accounts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RetroAccountOut"
+                  },
+                  "title": "Response Retro Accounts Api V1 Retro Accounts Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Retro Accounts",
+        "tags": [
+          "retro"
+        ]
+      }
+    },
+    "/api/v1/retro/accounts/{service_id}": {
+      "delete": {
+        "operationId": "unlink_retro_account_api_v1_retro_accounts__service_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "service_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Service Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unlink Retro Account",
+        "tags": [
+          "retro"
+        ]
+      },
+      "post": {
+        "description": "Ask the library for the member's authorisation: the code they approve there.",
+        "operationId": "link_retro_account_api_v1_retro_accounts__service_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "service_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Service Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetroAccountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Link Retro Account",
+        "tags": [
+          "retro"
+        ]
+      }
+    },
+    "/api/v1/retro/accounts/{service_id}/check": {
+      "post": {
+        "operationId": "check_retro_account_api_v1_retro_accounts__service_id__check_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "service_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Service Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetroAccountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Check Retro Account",
+        "tags": [
+          "retro"
         ]
       }
     },

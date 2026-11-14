@@ -12,8 +12,10 @@ from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher
 from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
+from portalab.core.secrets import SecretBox
 from portalab.core.time import Clock
 from portalab.modules.retro import permissions as _permissions  # noqa: F401 — declares its permissions
+from portalab.modules.retro.accounts import AccountService
 from portalab.modules.retro.saves import SaveService
 from portalab.modules.retro.service import RetroService
 
@@ -30,11 +32,15 @@ class RetroModule:
         *,
         clock: Clock | None = None,
         events: EventPublisher | None = None,
+        secret_box: SecretBox | None = None,
     ) -> None:
         self.database = database
         self.capabilities = capabilities
         self.service = RetroService(database, capabilities, clock=clock, events=events)
         self.saves = SaveService(database, capabilities, self.service, clock=clock)  # 420
+        # 426: each member's own account in the libraries (tokens kept encrypted)
+        self.accounts = AccountService(database, capabilities, self.service, secret_box, clock=clock)
+        self.service.accounts = self.accounts
 
     def register(self) -> None:
         """Nothing to provide: the module plays what the libraries (``media.retro_source``) and the catalog

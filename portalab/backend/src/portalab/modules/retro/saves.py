@@ -31,7 +31,7 @@ from portalab.core.errors import BadRequest, NotFound
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
 from portalab.modules.retro.models import GameSave, Preference, Sitting
-from portalab.modules.retro.service import TIMEOUT_S, RetroService, _value, player_of
+from portalab.modules.retro.service import TIMEOUT_S, LibraryDenied, RetroService, _value, player_of
 
 SLOTS = 5  # the member's own slots (slot 0: where the game was left)
 MAX_BYTES = 9 * 1024 * 1024  # under the portal's default request cap (an emulator's whole memory)
@@ -224,15 +224,20 @@ class SaveService:
                 await uow.session.execute(
                     delete(GameSave)
                     .where(*self._key(row, "state", _slot("state", slot)))
-                    .returning(GameSave.remote_id)
+                    .returning(GameSave.remote_id, GameSave.remote_account)
                 )
-            ).scalar_one_or_none()
+            ).one_or_none()
         library = self.retro._libraries().get(str(row.service_id))
-        if gone and library is not None:
-            try:
-                _value(await asyncio.wait_for(library[0].delete_file("state", gone), timeout=TIMEOUT_S))
-            except Exception:
-                log.warning("retro state not deleted from the library", extra={"remote": gone})
+        if gone is None or not gone.remote_id or library is None:
+            return
+        account = None
+        if gone.remote_account is not None:  # 426: in the member's own account, while it still holds
+            accounts = self.retro.accounts
+            holder = await accounts.account_for(row.user_id, row.service_id) if accounts else None
+            if holder is None or holder.key != gone.remote_account:
+                return  # their own RomM keeps it: theirs to delete there
+            account = holder.account
+        await self._forget(library[0], "state", gone.remote_id, account)
 
     # --- copies in the library --------------------------------------------------------------------------
     async def sync_one(self, user: UUID, service: UUID, external_id: str, kind: str, slot: int) -> bool:
@@ -251,39 +256,66 @@ class SaveService:
         return await self._copy(found) if found is not None and found.synced_at is None else False
 
     async def _copy(self, save: GameSave) -> bool:
+        """The save copied to the library — 426: to the member's own account when they authorised the portal
+        there (else the service's); a copy left in the service's account is replaced by theirs."""
         library = self.retro._libraries().get(str(save.service_id))
         if library is None:
             return False
         name = await self._name(save.user_id)
         extension = "srm" if save.kind == "sram" else f"slot{save.slot}.state"
-        try:
-            remote = _value(
-                await asyncio.wait_for(
-                    library[0].put_file(
-                        KINDS[save.kind],
-                        save.external_id,
-                        save.core,
-                        f"portalab-{save.user_id.hex}-{save.external_id}.{extension}",
-                        save.data,
-                        save.screenshot
-                        if save.screenshot and picture_type(save.screenshot) == "image/png"
-                        else None,
-                        [LABEL, *([name] if name else [])],
-                        save.remote_id,
-                    ),
-                    timeout=TIMEOUT_S,
+        accounts = self.retro.accounts
+        holder = await accounts.account_for(save.user_id, save.service_id) if accounts else None
+        for account in ([holder] if holder is not None else []) + [None]:
+            key = account.key if account is not None else None
+            same = save.remote_account == key
+            try:
+                remote = _value(
+                    await asyncio.wait_for(
+                        library[0].put_file(
+                            KINDS[save.kind],
+                            save.external_id,
+                            save.core,
+                            f"portalab-{save.user_id.hex}-{save.external_id}.{extension}",
+                            save.data,
+                            save.screenshot
+                            if save.screenshot and picture_type(save.screenshot) == "image/png"
+                            else None,
+                            [LABEL, *([name] if name else [])],
+                            save.remote_id if same else None,
+                            account=account.account if account is not None else None,
+                        ),
+                        timeout=TIMEOUT_S,
+                    )
                 )
+            except LibraryDenied:
+                if account is None:
+                    log.warning("retro save refused by the library", extra={"save": str(save.id)})
+                    return False
+                await accounts.refused(save.user_id, save.service_id)  # revoked there: the service's
+                continue
+            except Exception:
+                log.warning("retro save not copied to the library", extra={"save": str(save.id)})
+                return False
+            if not same and save.remote_id and save.remote_account is None:
+                await self._forget(
+                    library[0], KINDS[save.kind], save.remote_id, None
+                )  # the service's old copy
+            async with self.database.unit_of_work() as uow:
+                row = await uow.session.get(GameSave, save.id, with_for_update=True)
+                if row is not None:
+                    row.remote_id, row.remote_account = str(remote)[:64], key
+                    if row.updated_at == save.updated_at and row.synced_at is None:
+                        row.synced_at = utc_now(self.clock)  # written again meanwhile: copied again
+            return True
+        return False
+
+    async def _forget(self, library: Any, kind: SaveKind, remote: str, account: Any) -> None:
+        try:
+            _value(
+                await asyncio.wait_for(library.delete_file(kind, remote, account=account), timeout=TIMEOUT_S)
             )
         except Exception:
-            log.warning("retro save not copied to the library", extra={"save": str(save.id)})
-            return False
-        async with self.database.unit_of_work() as uow:
-            row = await uow.session.get(GameSave, save.id, with_for_update=True)
-            if row is not None:
-                row.remote_id = str(remote)[:64]
-                if row.updated_at == save.updated_at and row.synced_at is None:
-                    row.synced_at = utc_now(self.clock)  # written again meanwhile: copied again
-        return True
+            log.warning("retro copy not deleted from the library", extra={"remote": remote})
 
     async def _name(self, user: UUID) -> str | None:
         providers = self.capabilities.system_providers(DIRECTORY)

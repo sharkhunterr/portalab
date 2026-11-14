@@ -332,7 +332,7 @@ def wire_platform(
     # 032: a member account's profiles — the accounts behind them stay identity's
     household = wire_household(database, capabilities, authz.audit)
     # 419: a library's games played in the portal — its sittings counted as the player's own plays
-    retro = RetroModule(database, capabilities, events=events)
+    retro = RetroModule(database, capabilities, events=events, secret_box=SecretBox(secret_key))
     retro.register()
     plugins = PluginsModule(
         database,
