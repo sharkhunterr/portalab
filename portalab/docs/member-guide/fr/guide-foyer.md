@@ -15,13 +15,13 @@ Ouvrez **« Mon foyer »** dans le menu de votre avatar, puis **« Ajouter un pr
 - **Type** : **Standard** (aucune restriction), **Enfant** (restrictions prêtes à l'emploi) ou **Personnalisé** (vous choisissez tout). Le type ne fixe que les réglages de départ : vous pouvez les ajuster ensuite.
 - **Code (facultatif)** : 4 à 6 chiffres demandés quand quelqu'un entre dans ce profil.
 
-Un profil n'a ni identifiant ni mot de passe : il s'utilise depuis votre compte. Chaque profil peut ensuite choisir sa photo, sa langue, son thème et ses préférences comme n'importe quel membre.
+Un profil n'a ni identifiant ni mot de passe : il s'utilise depuis votre compte. À sa première ouverture, il a son propre accueil (sans les comptes médias ni la visibilité dans la communauté, qui restent les vôtres), puis il choisit sa photo, sa langue, son thème et ses préférences comme n'importe quel membre.
 
 ## « Qui est là ? »
 
-Après la connexion, si votre compte a des profils, Portalab demande **« Qui est là ? »** : touchez votre tuile ou celle d'un profil. Pour changer plus tard, ouvrez le menu de l'avatar → **« Changer de profil »**.
+Après la connexion, si votre compte a des profils, Portalab demande **« Qui est là ? »** : touchez votre tuile ou celle d'un profil. Pour changer plus tard, le menu de l'avatar (ou le tiroir sur téléphone) liste les autres membres du foyer : **« Passer sur Léa »** en un geste.
 
-- Entrer dans un profil protégé demande son code. Vous, le titulaire, n'avez pas besoin du code de vos profils.
+- Entrer dans un profil protégé demande toujours son code, même depuis le compte maître.
 - **Revenir sur le compte maître** depuis un profil demande **votre** code si vous en avez un. Choisissez-en un dès que vous avez un profil enfant : sans lui, n'importe quel profil peut revenir sur le vôtre.
 - Trop de codes faux d'affilée : il faut patienter un peu avant de réessayer.
 

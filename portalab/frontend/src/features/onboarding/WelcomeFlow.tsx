@@ -111,7 +111,11 @@ export function WelcomeFlow() {
   };
   // issue 347: no presence screen when the privacy centre is off
   const presence = usePresence();
-  const steps = STEPS.filter((s) => s !== "presence" || presence.available);
+  // 032: a household profile uses its master's media accounts, and its master decides its presence
+  const profile = Boolean(me.data?.profile_of);
+  const steps = STEPS.filter(
+    (s) => (s !== "presence" || presence.available) && !(profile && (s === "accounts" || s === "presence")),
+  );
   const index = Math.max(steps.indexOf(step), 0);
   const next = () => setStep(steps[Math.min(index + 1, steps.length - 1)] as Step);
   const back = () => setStep(steps[Math.max(index - 1, 0)] as Step);

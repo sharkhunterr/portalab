@@ -52,10 +52,11 @@ about profiles.
   each profile's XP, Coins and Contribution.
 - Q: Do profiles appear in the community? → A (owner): the master chooses, profile by profile. Decided by
   default: a child profile starts hidden, a standard profile starts shown.
-- Q: How are PINs used? → Decided by default: a 4–6 digit PIN per profile (optional). Entering a profile asks
-  its PIN, except for the master (who supervises every profile). Coming back to the master from a profile asks
+- Q: How are PINs used? → A (owner, revised the same day): a 4–6 digit PIN per profile (optional); entering a
+  protected profile always asks its PIN, from the master too. Coming back to the master from a profile asks
   the master's PIN when it has one; right after signing in, the master is free (the password was just given).
-  Wrong PINs slow down progressively, like sign-in attempts.
+  Wrong PINs slow down progressively, like sign-in attempts. Switching is one tap from the avatar menu (each
+  other member listed); a profile's first welcome leaves out the media accounts and the community presence.
 - Q: Which restrictions exist? → Decided by default: a maximum age rating (all, 6+, 10+, 12+, 14+, 16+, 18+),
   whether unrated titles are allowed, and features kept out (shop, requests, AI assistant, community
   participation, games, support). Kinds are presets: *standard* (no restriction), *child* (12+, unrated
@@ -79,7 +80,7 @@ notifications follow the active profile and that the master's PIN is required to
 
 1. **Given** an account with profiles, **When** it signs in, **Then** the profile picker is shown before the
    portal, listing the master first, then its profiles in order.
-2. **Given** a profile with a PIN, **When** someone picks it with a wrong PIN, **Then** it stays closed, and
+2. **Given** a profile with a PIN, **When** anyone (the master included) picks it with a wrong PIN, **Then** it stays closed, and
    repeated failures are slowed down.
 3. **Given** a child profile is active, **When** it switches to the master, **Then** the master's PIN is asked
    when the master has one.

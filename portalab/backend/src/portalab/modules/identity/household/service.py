@@ -1,7 +1,7 @@
-"""Households (spec 032): a member account (the master) holds profiles — members of their own without a login,
-used through the master's session. The session remembers which household member it acts as; entering a
-profile asks its PIN (not for the master, who supervises them), coming back to the master asks the master's
-PIN. Every household member sees the household's figures; only the master manages it, and it decides on its
+"""Households (spec 032): a member account (the master) holds profiles — members of their own without a
+login, used through the master's session. The session remembers which household member it acts as;
+entering a protected member — a profile, or the master from a profile — asks its PIN, whoever comes from.
+Every household member sees the household's figures; only the master manages it, and it decides on its
 profiles' access requests. Nothing here touches a connected service."""
 
 import time
@@ -240,10 +240,8 @@ class HouseholdService:
         tiles = []
         for user, member in members:
             tile = self._tile(user, member, user.id in avatars)
-            # entering a profile asks its PIN when another profile is active; the master's, from a profile
-            tile["needs_pin"] = (
-                tile["has_pin"] and principal.profile_of is not None and user.id != principal.user_id
-            )
+            # entering a protected member asks its PIN, whoever comes from (the master too)
+            tile["needs_pin"] = tile["has_pin"] and user.id != principal.user_id
             tiles.append(tile)
         profiles = len(tiles) > 1
         return {
@@ -268,12 +266,7 @@ class HouseholdService:
             )
             if not belongs or user is None or user.state != LIVE:
                 raise NotFound("This profile does not exist.", code="household.member_not_found")
-            if (
-                principal.profile_of is not None
-                and target != principal.user_id
-                and member is not None
-                and member.pin_hash is not None
-            ):
+            if target != principal.user_id and member is not None and member.pin_hash is not None:
                 await self._check_pin(member.user_id, member.pin_hash, pin or "", now)
             await uow.session.execute(
                 update(UserSession)

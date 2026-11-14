@@ -7,13 +7,13 @@ Share your account with your family? Give everyone **a profile of their own**: t
 Open **« My household »** in your avatar's menu, then **« Add a profile »**: a name, a colour, a kind and an optional PIN.
 
 - **Standard**: no restriction. **Child**: up to 12+, unrated titles hidden, kept out of the shop, requests, the AI assistant and community participation, hidden from the community. **Custom**: your choice. A kind only sets the starting point.
-- A profile has no login nor password: it is used from your account. It then chooses its picture, language, look and preferences like any member.
+- A profile has no login nor password: it is used from your account. Its first visit has its own welcome (without the media accounts and the community presence, which stay yours), then it chooses its picture, language, look and preferences like any member.
 
 ## « Who's there? »
 
-After signing in, an account with profiles asks **« Who's there? »**. To change later: avatar menu → **« Switch profile »**. The whole portal reloads as the chosen profile.
+After signing in, an account with profiles asks **« Who's there? »**. To change later, the avatar menu (the drawer on a phone) lists the other household members: **« Switch to Léa »** in one tap. The whole portal reloads as the chosen profile.
 
-- Entering a protected profile asks its PIN — except for you, the master.
+- Entering a protected profile always asks its PIN, from the master account too.
 - Coming back to the master from a profile asks **your** PIN when you have one: set one as soon as you have a child profile.
 - Too many wrong PINs in a row: wait a little before trying again.
 - Account security (password, two-factor authentication, sessions, deletion, export) is reachable from the master account only.

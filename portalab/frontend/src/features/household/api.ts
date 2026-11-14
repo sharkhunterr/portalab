@@ -23,13 +23,15 @@ export const CHOOSE_PROFILE_EVENT = "portalab:choose-profile";
 export const AGES = [0, 6, 10, 12, 14, 16, 18] as const;
 export const FEATURES = ["shop", "requests", "ai", "community", "games", "support"] as const;
 
-export function chooseProfile() {
-  globalThis.dispatchEvent?.(new Event(CHOOSE_PROFILE_EVENT));
+/** Opens the picker — on one member's PIN pad when ``member`` is given. */
+export function chooseProfile(member?: string) {
+  globalThis.dispatchEvent?.(new CustomEvent(CHOOSE_PROFILE_EVENT, { detail: member ?? null }));
 }
 
-export function useHouseholdSession() {
+export function useHouseholdSession(enabled = true) {
   return useQuery({
     queryKey: SESSION_KEY,
+    enabled,
     retry: false,
     queryFn: async () => (await api.GET("/api/v1/household/session")).data as HouseholdSession,
   });

@@ -21,15 +21,25 @@ import "./household.css";
 export function ProfileGate({ children }: { children: ReactNode }) {
   const session = useHouseholdSession();
   const [open, setOpen] = useState(false);
+  const [member, setMember] = useState<string | null>(null);
   useEffect(() => {
-    const show = () => setOpen(true);
+    const show = (event: Event) => {
+      setMember(event instanceof CustomEvent && typeof event.detail === "string" ? event.detail : null);
+      setOpen(true);
+    };
     window.addEventListener(CHOOSE_PROFILE_EVENT, show);
     return () => window.removeEventListener(CHOOSE_PROFILE_EVENT, show);
   }, []);
   if (session.isPending) return null;
   const state = session.data;
   if (state?.enabled && state.members.length > 1 && (state.must_choose || open)) {
-    return <ProfilePicker session={state} onCancel={state.must_choose ? undefined : () => setOpen(false)} />;
+    return (
+      <ProfilePicker
+        session={state}
+        initial={member}
+        onCancel={state.must_choose ? undefined : () => setOpen(false)}
+      />
+    );
   }
   return <>{children}</>;
 }
@@ -56,15 +66,20 @@ export function ProfileFace({
 
 export function ProfilePicker({
   session,
+  initial = null,
   onCancel,
 }: {
   session: HouseholdSession;
+  initial?: string | null;
   onCancel?: (() => void) | undefined;
 }) {
   const t = useT();
   const titleId = useId();
   const switcher = useSwitchProfile();
-  const [asking, setAsking] = useState<{ member: MemberTile; next?: string } | null>(null);
+  const preset = session.members.find((m) => m.id === initial && m.needs_pin);
+  const [asking, setAsking] = useState<{ member: MemberTile; next?: string } | null>(
+    preset ? { member: preset } : null,
+  );
   const owner = session.members.find((m) => m.id === session.owner_id);
   const go = (member: MemberTile, next?: string) => {
     if (member.id === session.active_id && !session.must_choose && !next) {

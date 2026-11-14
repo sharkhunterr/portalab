@@ -14,6 +14,7 @@ import { FRAME_CLIPS, fxFrameOf } from "../../design-system/themes/premium/fxLoo
 import { useExternalRevision } from "../../design-system/visuals/registry";
 import { useProfileLooks } from "../../features/community/profile/looks";
 import { BannerArt } from "../../features/community/profile/ProfileHero";
+import { useQuickSwitch } from "../../features/household/QuickSwitch";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { useShellStrings } from "../strings";
@@ -40,6 +41,7 @@ export function ProfileCard({
 }) {
   const t = useT();
   const strings = useShellStrings();
+  const others = useQuickSwitch(); // 032: the household's other members, one tap away
   const { locale } = useLocaleContext();
   const me = data.me;
   const worn = useProfileLooks(Boolean(me)).data?.equipped;
@@ -139,6 +141,14 @@ export function ProfileCard({
                 </Link>
               </li>
             ))}
+          {others.map((other) => (
+            <li key={other.member.id}>
+              <button type="button" onClick={other.go}>
+                <Icon name={other.icon} size={16} />
+                {t("household:switchTo", { name: other.member.display_name })}
+              </button>
+            </li>
+          ))}
           <li>
             <button type="button" onClick={onSignOut}>
               <Icon name="logout" size={16} />

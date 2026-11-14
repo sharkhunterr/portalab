@@ -102,6 +102,7 @@
   "requests.rating": "Rated {rating}",
   "requests.until": "until {date}",
   "switch": "Switch profile",
+  "switchTo": "Switch to {name}",
   "tabs.members": "Members",
   "tabs.requests": "Requests"
 }

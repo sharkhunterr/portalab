@@ -59,7 +59,7 @@ export default function HouseholdPage() {
         }
         secondary={
           data.members.length > 1 ? (
-            <Button variant="secondary" onClick={chooseProfile}>
+            <Button variant="secondary" onClick={() => chooseProfile()}>
               <Icon name="users" size={16} />
               {t("household:switch")}
             </Button>

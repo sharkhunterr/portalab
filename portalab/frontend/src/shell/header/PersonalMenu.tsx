@@ -1,8 +1,7 @@
 import { Avatar } from "../../design-system/components/Avatar";
 import type { MenuItem } from "../../design-system/components/Overlays";
 import { Menu } from "../../design-system/components/Overlays";
-import { useMe } from "../../features/auth/useAuth";
-import { chooseProfile } from "../../features/household/api";
+import { useQuickSwitch } from "../../features/household/QuickSwitch";
 import { useT } from "../../i18n/hooks/useT";
 import { useShellStrings } from "../strings";
 
@@ -39,7 +38,7 @@ export function PersonalMenu({
 }: PersonalMenuProps) {
   const strings = useShellStrings();
   const t = useT();
-  const household = (useMe().data?.household_profiles ?? 0) > 0; // 032: the household's profiles
+  const others = useQuickSwitch(); // 032: the household's other members, one tap away
   const profile = userId ? `/community/members/${userId}` : "/account"; // 027: the profile with its banner
   const items: MenuItem[] = [
     { key: "profile", label: strings.profile, icon: "user", onSelect: () => onNavigate(profile) },
@@ -58,18 +57,14 @@ export function PersonalMenu({
         separated: index === 0,
         onSelect: () => onNavigate(entry.route as string),
       })),
-    ...(household
-      ? [
-          {
-            key: "household.switch",
-            label: t("household:switch"),
-            icon: "users",
-            separated: true,
-            onSelect: chooseProfile,
-          },
-        ]
-      : []),
-    { key: "signout", label: strings.signOut, icon: "logout", separated: !household, onSelect: onSignOut },
+    ...others.map((other, index) => ({
+      key: `household.${other.member.id}`,
+      label: t("household:switchTo", { name: other.member.display_name }),
+      icon: other.icon,
+      separated: index === 0,
+      onSelect: other.go,
+    })),
+    { key: "signout", label: strings.signOut, icon: "logout", separated: true, onSelect: onSignOut },
   ];
   return (
     <Menu

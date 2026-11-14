@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -19,6 +19,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
   return importOriginal();
 });
 
+import { chooseProfile } from "../../../src/features/household/api";
 import HouseholdPage from "../../../src/features/household/HouseholdPage";
 import { LockedTitle } from "../../../src/features/household/LockedTitle";
 import { ProfileGate } from "../../../src/features/household/ProfilePicker";
@@ -156,6 +157,18 @@ describe("who's there", () => {
     fireEvent.submit(field.closest("form") as HTMLFormElement);
     await waitFor(() => expect(assign).toHaveBeenCalledWith("/"));
     expect(tries).toBe(2);
+  });
+
+  it("opens a protected member's PIN pad straight from the avatar menu", async () => {
+    fake.handler = () => json(200, { ...SESSION, must_choose: false });
+    show(
+      <ProfileGate>
+        <p>The portal</p>
+      </ProfileGate>,
+    );
+    expect(await screen.findByText("The portal")).toBeTruthy();
+    act(() => chooseProfile(LEA));
+    expect(await screen.findByRole("dialog", { name: "Léa's PIN" })).toBeTruthy();
   });
 
   it("shows the portal at once without profiles", async () => {

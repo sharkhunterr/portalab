@@ -60,9 +60,15 @@ async def test_who_is_there_then_switch_with_pins(app: FastAPI, client: httpx.As
     assert state["must_choose"] is True and state["active_id"] == str(alice)
     assert [m["display_name"] for m in state["members"]] == ["alice", "Léa", "Tom"]
     assert [m["kind"] for m in state["members"]] == ["owner", "child", "standard"]
-    assert not any(m["needs_pin"] for m in state["members"])  # the master enters every profile
+    assert [m["needs_pin"] for m in state["members"]] == [
+        False,
+        True,
+        False,
+    ]  # Léa's PIN, even for the master
 
-    assert (await _switch(client, lea)).status_code == 200  # the master needs no profile's PIN
+    asked = await _switch(client, lea)
+    assert asked.status_code == 403 and asked.json()["code"] == "household.wrong_pin"
+    assert (await _switch(client, lea, "1234")).status_code == 200
     me = await _me(client)
     assert me["id"] == str(lea) and me["profile_of"] == str(alice) and me["login"] is None
     state = (await client.get("/api/v1/household/session")).json()
@@ -80,7 +86,7 @@ async def test_who_is_there_then_switch_with_pins(app: FastAPI, client: httpx.As
     assert (
         await client.put(f"/api/v1/household/members/{alice}/pin", json={"pin": "9999"})
     ).status_code == 204
-    assert (await _switch(client, lea)).status_code == 200
+    assert (await _switch(client, lea, "1234")).status_code == 200
     assert (await _switch(client, alice)).status_code == 403
     assert (await _switch(client, alice, "9999")).status_code == 200
     assert (await _me(client))["id"] == str(alice)
@@ -92,7 +98,7 @@ async def test_who_is_there_then_switch_with_pins(app: FastAPI, client: httpx.As
 
 async def test_a_profile_never_reaches_the_account(app: FastAPI, client: httpx.AsyncClient) -> None:
     _, _, lea, _ = await _family(app, client)
-    await _switch(client, lea)
+    await _switch(client, lea, "1234")
     for method, path, body in (
         ("POST", "/api/v1/me/password", {"current_password": PASSWORD, "new_password": "x" * 16}),
         ("POST", "/api/v1/me/mfa/setup", {"password": PASSWORD}),
@@ -159,7 +165,7 @@ async def test_access_requests(app: FastAPI, client: httpx.AsyncClient) -> None:
     module, _, lea, _ = await _family(app, client)
     owner_ask = await client.post("/api/v1/household/requests", json={"ref": "x", "title": "X"})
     assert owner_ask.status_code == 403 and owner_ask.json()["code"] == "household.not_a_profile"
-    await _switch(client, lea)
+    await _switch(client, lea, "1234")
     body = {"ref": "0190a6d2-0000-7000-8000-000000000001", "title": "Alien", "rating": "16"}
     first = (await client.post("/api/v1/household/requests", json=body)).json()
     again = (await client.post("/api/v1/household/requests", json=body)).json()
