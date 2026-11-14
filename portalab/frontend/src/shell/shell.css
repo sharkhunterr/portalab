@@ -1773,19 +1773,22 @@ div.shell-status__item {
 /* 032: the name, and « Switch profile » on its right when the account has household profiles */
 .shell-profile__head {
   display: flex;
-  flex-wrap: wrap; /* issue 429: in a narrow card (the desktop sidebar) the switch goes under the name */
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-1) var(--space-2);
+  gap: var(--space-2);
   min-inline-size: 0;
 }
 .shell-profile__head > .shell-profile__who {
-  flex: 1 1 11rem; /* the name keeps its room: « Switch profile » wraps rather than cut it */
+  flex: 1 1 auto;
 }
 .shell-profile__switch {
+  /* issue 429: an icon beside the name (its words in its label and tooltip) */
+  display: grid;
+  place-items: center;
   flex: none;
-  margin-inline-start: auto;
-  padding: var(--space-1) var(--space-2);
+  inline-size: 2rem;
+  block-size: 2rem;
+  padding: 0;
   border: 0;
   border-radius: var(--radius-md);
   background: transparent;

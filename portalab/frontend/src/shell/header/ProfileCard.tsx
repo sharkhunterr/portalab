@@ -111,12 +111,14 @@ export function ProfileCard({
           <button
             type="button"
             className="shell-profile__switch"
+            aria-label={t("household:switch")}
+            title={t("household:switch")}
             onClick={() => {
               onNavigate?.();
               chooseProfile();
             }}
           >
-            {t("household:switch")}
+            <Icon name="switch-account" size={18} />
           </button>
         ) : null}
       </div>

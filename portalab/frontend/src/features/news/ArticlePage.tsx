@@ -40,47 +40,56 @@ export function ArticlePage() {
   const text = data.html.replace(/<[^>]+>/g, " ");
   const hue = data.category_id ? channelHues(categories.data ?? []).get(data.category_id) : undefined;
   return (
-    <article aria-labelledby={headingId} className="news-article">
-      <Link to="/news" className="news-article__back">
-        <Icon name="chevron-left" size={16} />
-        {t("news:back")}
-      </Link>
-      <div className="news-article__hero">
-        <Cover seed={data.category_id ?? data.slug} hue={hue} size="lg" />
-        <div className="news-article__heading">
-          <span
-            className="news-card__kicker"
-            data-channel={hue !== undefined || undefined}
-            style={channelStyle(hue)}
-          >
-            {category}
-          </span>
-          <PageHeader
-            titleId={headingId}
-            level={2}
-            title={data.title}
-            context={[
-              data.published_at ? format.dateTime(data.published_at) : null,
-              t("news:readingTime", { minutes: readingMinutes(text) }),
-            ]
-              .filter(Boolean)
-              .join(" · ")}
-          />
+    <article
+      aria-labelledby={headingId}
+      className="news-article"
+      data-edition={data.edition_id ? true : undefined}
+    >
+      {/* issue 427: on a wide screen, the cover and the heading beside the text (they stay in view) */}
+      <div className="news-article__aside">
+        <Link to="/news" className="news-article__back">
+          <Icon name="chevron-left" size={16} />
+          {t("news:back")}
+        </Link>
+        <div className="news-article__hero">
+          <Cover seed={data.category_id ?? data.slug} hue={hue} size="lg" />
+          <div className="news-article__heading">
+            <span
+              className="news-card__kicker"
+              data-channel={hue !== undefined || undefined}
+              style={channelStyle(hue)}
+            >
+              {category}
+            </span>
+            <PageHeader
+              titleId={headingId}
+              level={2}
+              title={data.title}
+              context={[
+                data.published_at ? format.dateTime(data.published_at) : null,
+                t("news:readingTime", { minutes: readingMinutes(text) }),
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            />
+          </div>
         </div>
       </div>
-      {data.archived ? <p role="note">{t("news:archived")}</p> : null}
-      {data.translation_missing ? <p role="note">{t("news:notTranslated")}</p> : null}
-      {data.edition_id ? (
-        // issue 335: a newsletter's letter, shown itself — a news as the others
-        <EditionFrame src={`/api/v1/news/editions/${data.edition_id}/page`} title={data.title} fit />
-      ) : (
-        <>
-          {data.summary ? <p className="news-article__lead">{data.summary}</p> : null}
-          <div className="news-article__body">
-            <SafeHtml html={data.html} />
-          </div>
-        </>
-      )}
+      <div className="news-article__main">
+        {data.archived ? <p role="note">{t("news:archived")}</p> : null}
+        {data.translation_missing ? <p role="note">{t("news:notTranslated")}</p> : null}
+        {data.edition_id ? (
+          // issue 335: a newsletter's letter, shown itself — a news as the others
+          <EditionFrame src={`/api/v1/news/editions/${data.edition_id}/page`} title={data.title} fit />
+        ) : (
+          <>
+            {data.summary ? <p className="news-article__lead">{data.summary}</p> : null}
+            <div className="news-article__body">
+              <SafeHtml html={data.html} />
+            </div>
+          </>
+        )}
+      </div>
     </article>
   );
 }

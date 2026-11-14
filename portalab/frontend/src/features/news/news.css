@@ -233,6 +233,34 @@
   margin-inline: auto;
   min-inline-size: 0;
 }
+.news-article__aside,
+.news-article__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+/* issue 427: a wide screen reads the cover and the heading beside the text — a newsletter's letter has the
+   rest of the width, an article's text keeps a reading measure */
+@media (min-width: 75rem) {
+  .news-article {
+    display: grid;
+    grid-template-columns: minmax(18rem, 26rem) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-6);
+    max-inline-size: 86rem;
+  }
+  .news-article__aside {
+    position: sticky;
+    inset-block-start: calc(var(--frame-top, 0px) + var(--space-4));
+  }
+  .news-article__hero .news-cover {
+    aspect-ratio: 4 / 3;
+  }
+  .news-article:not([data-edition]) .news-article__main {
+    max-inline-size: 52rem;
+  }
+}
 .news-article__back {
   display: inline-flex;
   align-items: center;

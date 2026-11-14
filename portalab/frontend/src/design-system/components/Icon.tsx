@@ -6,6 +6,7 @@ import {
   Armchair,
   ArrowDown,
   ArrowLeft,
+  ArrowLeftRight,
   ArrowUp,
   Atom,
   AudioLines,
@@ -372,6 +373,7 @@ export const ICONS: Record<string, LucideIcon> = {
   trophy: Trophy,
   user: User,
   users: Users,
+  "switch-account": ArrowLeftRight, // 032: « Switch profile »
   wrench: Wrench,
   close: X,
   zap: Zap,
