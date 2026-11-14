@@ -27,7 +27,9 @@ export function LockedTitle({ problem }: { problem: ApiError }) {
       <h1 id="household-locked">{t("household:locked.title")}</h1>
       {rating ? <span className="household-badge">{t("household:locked.rating", { rating })}</span> : null}
       <p>{t("household:locked.body", { title })}</p>
-      {ask.isSuccess ? (
+      {problem.extensions.can_ask === false ? (
+        <p>{t("household:locked.noAsk")}</p>
+      ) : ask.isSuccess ? (
         <p role="status">{t("household:locked.asked")}</p>
       ) : (
         <form

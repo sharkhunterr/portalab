@@ -315,7 +315,10 @@ class HouseholdService:
             tile["progress"] = await self._progress(user.id)
             tile["community_visible"] = member.community_visible if member is not None else True
             if member is not None and member.kind != "owner" and (manager or user.id == principal.user_id):
-                tile["restrictions"] = parse(member.restrictions).model_dump()
+                settings = parse(member.restrictions)
+                tile["restrictions"] = settings.model_dump(mode="json")
+                tile["age"] = settings.age(self.ctx.now().date())
+                tile["effective_age"] = settings.effective_age(self.ctx.now().date())
             tiles.append(tile)
         return {
             "enabled": enabled,
@@ -428,7 +431,7 @@ class HouseholdService:
                     position=count + 1,
                     pin_hash=pin_hash,
                     community_visible=visible,
-                    restrictions=restrictions.model_dump(),
+                    restrictions=restrictions.model_dump(mode="json"),
                     created_at=now,
                     updated_at=now,
                 )
@@ -474,11 +477,11 @@ class HouseholdService:
                 member.kind = kind
                 if restrictions is None:
                     settings, visible = preset(kind)
-                    member.restrictions = settings.model_dump()
+                    member.restrictions = settings.model_dump(mode="json")
                     if community_visible is None:
                         member.community_visible = visible
             if restrictions is not None:
-                member.restrictions = restrictions.model_dump()
+                member.restrictions = restrictions.model_dump(mode="json")
             if community_visible is not None:
                 member.community_visible = community_visible
             if position is not None:
@@ -620,6 +623,9 @@ class HouseholdService:
         await self._enabled()
         if principal.profile_of is None or principal.user_id is None:
             raise Forbidden("Only a profile asks its master for access.", code="household.not_a_profile")
+        restrictions = await self.restrictions_of(principal.user_id)
+        if restrictions is not None and not restrictions.requests:
+            raise Forbidden("Your profile cannot ask for access.", code="household.requests_off")
         now = self.ctx.now()
         async with self.ctx.database.unit_of_work() as uow:
             pending = await uow.session.scalar(

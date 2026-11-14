@@ -1770,6 +1770,33 @@ div.shell-status__item {
   gap: var(--space-2);
   min-inline-size: 0;
 }
+/* 032: the name, and « Switch profile » on its right when the account has household profiles */
+.shell-profile__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+.shell-profile__switch {
+  flex: none;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+.shell-profile__switch:hover {
+  text-decoration: underline;
+}
+.shell-profile__switch:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
 .shell-profile__name {
   display: flex;
   flex-direction: column;
@@ -2343,7 +2370,9 @@ div.shell-status__item {
   block-size: 100%;
   object-fit: cover;
 }
-.shell-profile__banner ~ .shell-profile__who .shell-profile__name {
+.shell-profile__banner ~ .shell-profile__who .shell-profile__name,
+.shell-profile__banner ~ .shell-profile__head .shell-profile__name,
+.shell-profile__banner ~ .shell-profile__head .shell-profile__switch {
   text-shadow: 0 1px 3px color-mix(in srgb, var(--color-surface) 85%, transparent);
 }
 

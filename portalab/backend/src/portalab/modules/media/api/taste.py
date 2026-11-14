@@ -42,6 +42,7 @@ class TasteCard(BaseModel):
     reason: TasteReason | None = None
     seen: bool = False  # a title the services say I saw, read or played, not judged yet: « did you like it? »
     verdict: Verdict | None = None
+    locked: bool = False  # 032: above this household profile's age rating, shown locked
 
 
 class TasteCards(BaseModel):
@@ -59,7 +60,8 @@ class TasteVerdictOut(BaseModel):
 
 async def _cards(module: Module, picks: list[Pick], principal: Principal) -> list[TasteCard]:
     found = [TasteCard.model_validate(card) for card in await cards(module.database, picks)]
-    return await module.gate.keep(principal, found)  # 032: not what a profile's age rating keeps from it
+    # 032: not what a profile's age rating keeps from it (or shown locked, as its master chose)
+    return await module.gate.mark(principal, await module.gate.keep(principal, found))
 
 
 @router.get("/me/media/recommendations", response_model=TasteCards)

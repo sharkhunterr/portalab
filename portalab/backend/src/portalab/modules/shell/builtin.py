@@ -82,6 +82,7 @@ SECTIONS: tuple[dict[str, object], ...] = (
     _section("community", "users", 40, "community", "campaigns"),
     # #298: « Statistiques » — mine, my requests', the community's
     _section("stats", "chart", 45, "statistics"),
+    _section("household", "users", 47),  # 032: « My household », a destination of its own
     _section("marketplace", "shop", 50, "marketplace"),
     # « Aide » (#298): the guide, the wiki, tickets and feedback, and the services' status with its incidents
     _section("support", "lifebuoy", 60, "support", "health", "wiki"),
@@ -131,13 +132,13 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "users.self.manage",
     },
     {
-        "key": "identity.household",  # 032: « My household » — its profiles, its wallet, its requests
-        "owner": "module:identity",
-        "kind": "entry",  # an entry of « Me »: the avatar menu (a command shows in the palette only)
+        "key": "shell.household",  # 032: « My household » — its profiles, its wallet, its requests
+        "owner": "module:shell",
+        "kind": "entry",  # its own section of the main navigation (a command shows in the palette only)
         "label_key": "nav.household",
         "icon": "users",
         "route": "/household",
-        "group": "me",
+        "group": "household",
         "order_hint": 8,
         "required_permission": "users.self.manage",
         "keywords": ("household", "profiles", "family", "foyer", "profils", "famille"),

@@ -12,9 +12,10 @@ import { FxLayer } from "../../design-system/components/Fx";
 import { Icon } from "../../design-system/components/Icon";
 import { FRAME_CLIPS, fxFrameOf } from "../../design-system/themes/premium/fxLooks";
 import { useExternalRevision } from "../../design-system/visuals/registry";
+import { useMe } from "../../features/auth/useAuth";
 import { useProfileLooks } from "../../features/community/profile/looks";
 import { BannerArt } from "../../features/community/profile/ProfileHero";
-import { useQuickSwitch } from "../../features/household/QuickSwitch";
+import { chooseProfile } from "../../features/household/api";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { useShellStrings } from "../strings";
@@ -41,7 +42,7 @@ export function ProfileCard({
 }) {
   const t = useT();
   const strings = useShellStrings();
-  const others = useQuickSwitch(); // 032: the household's other members, one tap away
+  const household = (useMe().data?.household_profiles ?? 0) > 0; // 032: « Who's there? » one tap away
   const { locale } = useLocaleContext();
   const me = data.me;
   const worn = useProfileLooks(Boolean(me)).data?.equipped;
@@ -73,38 +74,52 @@ export function ProfileCard({
           backdrop={worn.backdrop ?? null}
         />
       ) : null}
-      <Link to={profile} className="shell-profile__who" onClick={onNavigate}>
-        {frameFx ? (
-          <span
-            className="avatar-frame"
-            data-frame={frame}
-            data-fx-frame={frameFx.shape ?? 0}
-            data-fx-cycle={frameFx.cycle || undefined}
-            style={
-              {
-                "--frame-clip": FRAME_CLIPS[frameFx.shape ?? 0] ?? "none",
-                "--frame-radius": frameFx.radius ?? "50%",
-              } as CSSProperties
-            }
+      <div className="shell-profile__head">
+        <Link to={profile} className="shell-profile__who" onClick={onNavigate}>
+          {frameFx ? (
+            <span
+              className="avatar-frame"
+              data-frame={frame}
+              data-fx-frame={frameFx.shape ?? 0}
+              data-fx-cycle={frameFx.cycle || undefined}
+              style={
+                {
+                  "--frame-clip": FRAME_CLIPS[frameFx.shape ?? 0] ?? "none",
+                  "--frame-radius": frameFx.radius ?? "50%",
+                } as CSSProperties
+              }
+            >
+              <FxLayer
+                effect={frameFx.effect}
+                shape={frameFx.shape ?? 0}
+                cycle={Boolean(frameFx.cycle)}
+                className="avatar-frame__fx"
+              />
+              <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />
+            </span>
+          ) : (
+            <span className="avatar-frame" data-frame={frame}>
+              <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />
+            </span>
+          )}
+          <span className="shell-profile__name">
+            <strong>{name}</strong>
+            <span>{strings.profile}</span>
+          </span>
+        </Link>
+        {household ? (
+          <button
+            type="button"
+            className="shell-profile__switch"
+            onClick={() => {
+              onNavigate?.();
+              chooseProfile();
+            }}
           >
-            <FxLayer
-              effect={frameFx.effect}
-              shape={frameFx.shape ?? 0}
-              cycle={Boolean(frameFx.cycle)}
-              className="avatar-frame__fx"
-            />
-            <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />
-          </span>
-        ) : (
-          <span className="avatar-frame" data-frame={frame}>
-            <Avatar name={name} userId={me.id} src={data.avatarUrl} size="lg" decorative />
-          </span>
-        )}
-        <span className="shell-profile__name">
-          <strong>{name}</strong>
-          <span>{strings.profile}</span>
-        </span>
-      </Link>
+            {t("household:switch")}
+          </button>
+        ) : null}
+      </div>
       {progression ? (
         <Link to="/progression" className="shell-profile__progress" onClick={onNavigate}>
           <span className="shell-profile__level">
@@ -141,14 +156,6 @@ export function ProfileCard({
                 </Link>
               </li>
             ))}
-          {others.map((other) => (
-            <li key={other.member.id}>
-              <button type="button" onClick={other.go}>
-                <Icon name={other.icon} size={16} />
-                {t("household:switchTo", { name: other.member.display_name })}
-              </button>
-            </li>
-          ))}
           <li>
             <button type="button" onClick={onSignOut}>
               <Icon name="logout" size={16} />

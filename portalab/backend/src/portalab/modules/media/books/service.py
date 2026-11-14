@@ -41,6 +41,7 @@ from portalab.core.errors import Forbidden, NotFound, PortalError, Unavailable
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.books.tickets import LIFETIME_S, BookTicket, books_key, read, sign
+from portalab.modules.media.links.household import link_holder
 from portalab.modules.media.models import BookPosition, SourceItem, UserLink
 from portalab.modules.media.settings import MediaConfig
 
@@ -184,11 +185,12 @@ class BookService:
     async def _account(self, user: UUID, service_id: UUID) -> str | None:
         """The member's verified account on the service — or none: the book still opens, through the
         service's own account, and the member's position stays in the portal."""
+        holder = await link_holder(self.capabilities, user)  # 032: a profile reads with its master's account
         async with self.database.session() as session:
             account = (
                 await session.execute(
                     select(UserLink.external_user_id).where(
-                        UserLink.user_id == user,
+                        UserLink.user_id == holder,
                         UserLink.service_id == service_id,
                         UserLink.verified.is_(True),
                     )

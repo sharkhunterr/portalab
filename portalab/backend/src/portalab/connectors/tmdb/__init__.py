@@ -78,6 +78,15 @@ def _certification(document: Mapping[str, Any], country: str) -> str | None:
     return None
 
 
+RATING_COUNTRIES = ("FR", "US", "GB", "DE")  # 032: a child's limit holds to the strictest of them
+
+
+def _certifications(document: Mapping[str, Any], country: str) -> dict[str, str]:
+    """032: the age ratings of the main countries (and the portal's), as TMDB knows them."""
+    found = {c: r for c in dict.fromkeys((country, *RATING_COUNTRIES)) if (r := _certification(document, c))}
+    return dict(sorted(found.items()))
+
+
 def map_document(document: Mapping[str, Any], kind: str, country: str = "FR") -> MetadataRecord:
     """A TMDB movie or tv document (with ``credits``, ``keywords``, ``external_ids``…) as a record."""
     series = kind != "movie"
@@ -154,6 +163,7 @@ def map_document(document: Mapping[str, Any], kind: str, country: str = "FR") ->
         vote_count=_int(document.get("vote_count")),
         status=document.get("status") or None,
         certification=_certification(document, country),
+        certifications=_certifications(document, country),
         collection=(
             {
                 "id": str(collection.get("id")),

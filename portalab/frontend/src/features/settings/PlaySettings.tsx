@@ -4,6 +4,7 @@ import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { SavedNote, SettingsCard, SettingsPage } from "../account/SettingsKit";
+import { useMe } from "../auth/useAuth";
 import { PlayScale } from "../onboarding/PlayScale";
 import { usePlay, useProfileDashboard } from "../onboarding/play";
 import "../onboarding/onboarding.css";
@@ -16,6 +17,7 @@ import "../onboarding/onboarding.css";
  */
 export default function PlaySettings() {
   const t = useT();
+  const profile = Boolean(useMe().data?.profile_of); // 032: its privacy is its master's
   const [done, setDone] = useState(false);
   const { saved, save } = usePlay(() => setDone(true));
   const dashboard = useProfileDashboard();
@@ -46,9 +48,11 @@ export default function PlaySettings() {
             {t("onboarding:play.error")}
           </p>
         ) : null}
-        <p className="settings-play__more">
-          <Link to="/privacy">{t("account:settings.playPrivacy")}</Link>
-        </p>
+        {profile ? null : (
+          <p className="settings-play__more">
+            <Link to="/privacy">{t("account:settings.playPrivacy")}</Link>
+          </p>
+        )}
       </SettingsCard>
       <SettingsCard
         icon="dashboard"

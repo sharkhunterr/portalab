@@ -53,10 +53,22 @@ export function MediaGrid({
   return (
     <ul className={rail ? "media-rail" : "media-grid"} aria-label={label}>
       {items.map((item) => (
-        <li key={item.id} className="media-card" data-available={item.available}>
+        <li
+          key={item.id}
+          className="media-card"
+          data-available={item.available}
+          data-locked={("locked" in item && item.locked) || undefined}
+        >
           <Link to={`/media/${item.id}`} className="media-card__link">
             <span className="media-card__frame">
               <Poster src={imageUrl(item.image_id)} kind={item.kind} />
+              {"locked" in item && item.locked ? (
+                // 032: above this household profile's age rating, shown locked by its master's choice
+                <span className="media-card__lock" title={t("household:lockedBadge")}>
+                  <Icon name="lock" size={22} />
+                  <span className="visually-hidden">{t("household:lockedBadge")}</span>
+                </span>
+              ) : null}
               <PosterTickets mediaId={item.id} />
               {badge ? (
                 badge(item)

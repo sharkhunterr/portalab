@@ -10,8 +10,10 @@ import httpx
 from fastapi import FastAPI
 from sqlalchemy import select
 
+from portalab.capabilities.media import PORTAL_PLAYER
 from portalab.capabilities.media.testkit import library_record
 from portalab.core.authz_port import Principal
+from portalab.modules.identity.household.rules import RestrictionSettings
 from portalab.modules.media.models import MediaObject, ObjectMetadata
 from portalab.modules.media.restrictions import _scrub
 from tests.integration.identity.helpers import login, module_of
@@ -75,7 +77,7 @@ async def test_a_child_profile_sees_its_age_only(
     locked = await client.get(f"/api/v1/media/{ids['Alien']}")
     assert locked.status_code == 403
     problem = locked.json()
-    assert problem["code"] == "household.restricted" and problem["rating"] == "16"
+    assert problem["code"] == "household.restricted" and problem["rating"] == "16+"
     assert problem["object_id"] == str(ids["Alien"])
     assert (await client.get(f"/api/v1/media/{ids['Coco']}")).status_code == 200
     started = await client.get(f"/api/v1/media/{ids['Alien']}/player")
@@ -110,3 +112,132 @@ def test_scrub_leaves_out_the_listed_titles_only() -> None:
         "rows": [[], {"nested": [3]}],
         "id": hidden,
     }
+
+
+async def test_locked_titles_show_and_requests_can_be_off(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    people = await users(app, media, "zoe")
+    ids = await _library(app, media)
+    identity = module_of(app)
+    owner = Principal(user_id=people["zoe"])
+    lea = UUID(
+        str(
+            (await identity.household.create(owner, display_name="Léa", kind="child", color=None, pin=None))[
+                "id"
+            ]
+        )
+    )
+    await identity.household.change(
+        owner,
+        lea,
+        restrictions=RestrictionSettings(max_age=12, allow_unrated=True, mode="lock", requests=False),
+    )
+    await login(client, "zoe")
+    await client.post("/api/v1/household/switch", json={"user_id": str(lea)})
+    items = (await client.get("/api/v1/media", params={"kind": "movie"})).json()["items"]
+    assert {i["title"]: i["locked"] for i in items} == {
+        "Toy Story": False,
+        "Alien": True,  # shown, locked: its master's choice
+        "Coco": False,
+        "Nameless": False,
+    }
+    locked = (await client.get(f"/api/v1/media/{ids['Alien']}")).json()
+    assert locked["code"] == "household.restricted" and locked["can_ask"] is False
+    asked = await client.post("/api/v1/household/requests", json={"ref": str(ids["Alien"]), "title": "Alien"})
+    assert asked.status_code == 403 and asked.json()["code"] == "household.requests_off"
+    household = await client.get("/api/v1/media/insights", params={"scope": "household"})
+    assert household.status_code == 200 and household.json()["scope"] == "me"  # its master's figures
+
+
+async def test_a_profile_watches_with_its_master_account(app: FastAPI, media: MediaHarness) -> None:
+    people = await users(app, media, "zoe")
+    plex = media.service(1, "plex")
+    await media.module.library.upsert(
+        [library_record("m1", title="Alien", ids={"tmdb": "348"}, duration_s=6000)], plex
+    )
+    link = await media.module.links.claim(people["zoe"], plex.service_id, "zoe@plex")
+    await media.module.links.verify(None, link.id, None)
+    identity = module_of(app)
+    owner = Principal(user_id=people["zoe"])
+    tom = UUID(
+        str(
+            (
+                await identity.household.create(
+                    owner, display_name="Tom", kind="standard", color=None, pin=None
+                )
+            )["id"]
+        )
+    )
+    assert await media.module.player._account(tom, plex.service_id) == "zoe@plex"  # its master's account
+
+    # Tom starts a stream with the portal's player: the session the server reports is his
+    await media.module.player._remember(tom, plex.service_id, "zoe@plex", "m1")
+    fake = media.playback(plex)
+    fake.play(
+        "s1",
+        external_user_id="zoe@plex",
+        item_external_id="m1",
+        kind="movie",
+        duration_s=6000,
+        device=PORTAL_PLAYER,
+    )
+    fake.play(
+        "s2", external_user_id="zoe@plex", item_external_id="m1", kind="movie", duration_s=6000, device="TV"
+    )
+    await media.module.poller.poll(plex.service_id, fake)
+    started = {p["session"].split(":")[-1]: who for _, p, who in await media.events("media.playback_started")}
+    assert started == {"s1": str(tom), "s2": str(people["zoe"])}  # the living-room TV stays the master's
+
+
+async def test_the_strictest_rating_and_kept_out_genres_hold(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    people = await users(app, media, "zoe")
+    one = media.service(1)
+    media.library(one)
+    await media.module.library.upsert(
+        [
+            library_record("s1", title="Smile", year=2022),
+            library_record("n1", title="Nope", year=2022, genres=["Horreur"]),
+            library_record("p1", title="Paddington", year=2014, content_rating="fr/TP"),
+            library_record("x1", title="Saw", year=2004, content_rating="fr/-16"),
+        ],
+        one,
+    )
+    async with media.database.unit_of_work() as uow:
+        ids = {t: i for t, i in (await uow.session.execute(select(MediaObject.title, MediaObject.id))).all()}
+        for title, certifications in (
+            ("Smile", {"FR": "12", "US": "R"}),
+            ("Nope", {"FR": "TP", "US": "PG-13"}),
+        ):
+            uow.session.add(
+                ObjectMetadata(
+                    object_id=ids[title],
+                    provider="tmdb",
+                    status="found",
+                    language="fr",
+                    data={"certification": certifications["FR"], "certifications": certifications},
+                    fetched_at=datetime(2026, 1, 1, tzinfo=UTC),
+                )
+            )
+    identity = module_of(app)
+    owner = Principal(user_id=people["zoe"])
+    created = await identity.household.create(
+        owner, display_name="Arthur", kind="child", color=None, pin=None
+    )
+    arthur = UUID(str(created["id"]))
+    viewer = Principal(user_id=arthur, profile_of=people["zoe"])
+    # 12 at most, unrated hidden, horror kept out: Smile (US R), Nope (horror), Saw (the server's 16) go
+    assert await media.module.gate.blocked(viewer) == frozenset({ids["Smile"], ids["Nope"], ids["Saw"]})
+    await identity.household.change(
+        owner, arthur, restrictions=RestrictionSettings(max_age=18, allow_unrated=True, genres=[])
+    )
+    media.module.gate.forget()
+    assert await media.module.gate.blocked(viewer) == frozenset()
+
+    await login(client, "zoe")
+    smile = (await client.get(f"/api/v1/media/{ids['Smile']}")).json()["age_rating"]
+    assert smile == {"age": 17, "ratings": [{"source": "FR", "value": "12"}, {"source": "US", "value": "R"}]}
+    saw = (await client.get(f"/api/v1/media/{ids['Saw']}")).json()["age_rating"]
+    assert saw == {"age": 16, "ratings": [{"source": "server", "value": "fr/-16"}]}

@@ -149,5 +149,6 @@
   "nav.topic.services": "Services & monitoring",
   "nav.topic.system": "System",
   "nav.wiki": "Wiki",
-  "nav.household": "My household"
+  "nav.household": "My household",
+  "nav.section.household": "My household"
 }

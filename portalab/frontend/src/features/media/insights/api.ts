@@ -3,7 +3,7 @@ import { api } from "../../../api/client";
 import { useLocaleContext } from "../../../i18n/provider/I18nProvider";
 
 /** Media statistics (027): what was watched, listened to and read — mine or the server's. */
-export type Scope = "me" | "all";
+export type Scope = "me" | "household" | "all"; // 032: a household's figures, its master's
 export type Category =
   | "all"
   | "movies"

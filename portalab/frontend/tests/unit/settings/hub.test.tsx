@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it } from "vitest";
@@ -6,15 +7,18 @@ import { SettingsHome, SettingsLayout } from "../../../src/features/settings/Set
 // issue 14 — « My settings »: one place, the pages by intent, a search through every setting
 
 function hub(path = "/settings") {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false, enabled: false } } });
   return render(
-    <MemoryRouter initialEntries={[path]}>
-      <Routes>
-        <Route element={<SettingsLayout />}>
-          <Route path="settings" element={<SettingsHome />} />
-          <Route path="account" element={<p>profile page</p>} />
-        </Route>
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={[path]}>
+        <Routes>
+          <Route element={<SettingsLayout />}>
+            <Route path="settings" element={<SettingsHome />} />
+            <Route path="account" element={<p>profile page</p>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 

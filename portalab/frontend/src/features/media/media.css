@@ -1765,3 +1765,16 @@ a.media-person__row:hover {
     transition: none;
   }
 }
+
+/* 032: a title above a household profile's age rating, shown locked by its master's choice */
+.media-card[data-locked] .media-card__frame img {
+  filter: blur(6px) grayscale(0.6) brightness(0.6);
+}
+.media-card__lock {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-surface) 35%, transparent);
+}

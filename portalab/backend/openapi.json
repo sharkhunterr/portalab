@@ -620,6 +620,50 @@
         "title": "AdminTransferRequest",
         "type": "object"
       },
+      "AgeRating": {
+        "description": "032: a title's age ratings and the strictest age they stand for (a household profile's limit).",
+        "properties": {
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "ratings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AgeRatingSource"
+            },
+            "title": "Ratings",
+            "type": "array"
+          }
+        },
+        "title": "AgeRating",
+        "type": "object"
+      },
+      "AgeRatingSource": {
+        "properties": {
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "value"
+        ],
+        "title": "AgeRatingSource",
+        "type": "object"
+      },
       "AiActionOut": {
         "properties": {
           "conversation_id": {
@@ -4544,6 +4588,11 @@
           "kind": {
             "title": "Kind",
             "type": "string"
+          },
+          "locked": {
+            "default": false,
+            "title": "Locked",
+            "type": "boolean"
           },
           "platform": {
             "anyOf": [
@@ -9157,6 +9206,17 @@
       },
       "HouseholdMemberOut": {
         "properties": {
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
           "color": {
             "title": "Color",
             "type": "string"
@@ -9168,6 +9228,17 @@
           "display_name": {
             "title": "Display Name",
             "type": "string"
+          },
+          "effective_age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Age"
           },
           "has_avatar": {
             "title": "Has Avatar",
@@ -12240,6 +12311,11 @@
             "title": "Kind",
             "type": "string"
           },
+          "locked": {
+            "default": false,
+            "title": "Locked",
+            "type": "boolean"
+          },
           "requested": {
             "default": false,
             "title": "Requested",
@@ -12313,6 +12389,12 @@
       },
       "MediaDetail": {
         "properties": {
+          "age_rating": {
+            "$ref": "#/components/schemas/AgeRating",
+            "default": {
+              "ratings": []
+            }
+          },
           "at": {
             "anyOf": [
               {
@@ -12373,6 +12455,11 @@
           "kind": {
             "title": "Kind",
             "type": "string"
+          },
+          "locked": {
+            "default": false,
+            "title": "Locked",
+            "type": "boolean"
           },
           "overview": {
             "anyOf": [
@@ -19350,12 +19437,24 @@
       },
       "RestrictionSettings": {
         "additionalProperties": false,
-        "description": "A profile's restrictions as stored and edited by its master.",
+        "description": "A profile's restrictions as stored and edited by its master: a fixed maximum age, or a birth date\n(the age then follows the profile, one more at each birthday); hidden or locked titles; access requests\nallowed or not.",
         "properties": {
           "allow_unrated": {
             "default": true,
             "title": "Allow Unrated",
             "type": "boolean"
+          },
+          "birth_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Date"
           },
           "blocked": {
             "items": {
@@ -19363,6 +19462,14 @@
             },
             "maxItems": 6,
             "title": "Blocked",
+            "type": "array"
+          },
+          "genres": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 4,
+            "title": "Genres",
             "type": "array"
           },
           "max_age": {
@@ -19375,6 +19482,20 @@
               }
             ],
             "title": "Max Age"
+          },
+          "mode": {
+            "default": "hide",
+            "enum": [
+              "hide",
+              "lock"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "requests": {
+            "default": true,
+            "title": "Requests",
+            "type": "boolean"
           }
         },
         "title": "RestrictionSettings",
@@ -22680,6 +22801,11 @@
           "kind": {
             "title": "Kind",
             "type": "string"
+          },
+          "locked": {
+            "default": false,
+            "title": "Locked",
+            "type": "boolean"
           },
           "overview": {
             "anyOf": [
@@ -53534,6 +53660,7 @@
               "default": "me",
               "enum": [
                 "me",
+                "household",
                 "all"
               ],
               "title": "Scope",
@@ -53656,6 +53783,7 @@
               "default": "me",
               "enum": [
                 "me",
+                "household",
                 "all"
               ],
               "title": "Scope",

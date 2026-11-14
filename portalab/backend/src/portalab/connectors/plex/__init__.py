@@ -202,6 +202,8 @@ class PlexConnector(HttpConnector):
                             # 027: release (or air) date, for « Recent releases »
                             "released": _day(item.get("originallyAvailableAt")),
                             "resolution": resolution_of(_media(item).get("videoResolution")),
+                            # 032: its age rating as the server knows it (« fr/12 », « PG-13 »…)
+                            "content_rating": (str(item.get("contentRating") or "")[:40] or None),
                         }
                         yield self.record(service, key, kind, payload, parse_time(item.get("addedAt")))
                         count += 1

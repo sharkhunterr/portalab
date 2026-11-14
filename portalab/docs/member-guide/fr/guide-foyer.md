@@ -9,17 +9,17 @@ Vous partagez votre compte avec votre famille ? Donnez à chacun **son profil** 
 
 ## Créer des profils
 
-Ouvrez **« Mon foyer »** dans le menu de votre avatar, puis **« Ajouter un profil »**.
+Ouvrez **« Mon foyer »** dans le menu principal, puis **« Ajouter un profil »**.
 
 - **Nom** et **couleur** : c'est ce qui apparaît sur l'écran « Qui est là ? ».
 - **Type** : **Standard** (aucune restriction), **Enfant** (restrictions prêtes à l'emploi) ou **Personnalisé** (vous choisissez tout). Le type ne fixe que les réglages de départ : vous pouvez les ajuster ensuite.
 - **Code (facultatif)** : 4 à 6 chiffres demandés quand quelqu'un entre dans ce profil.
 
-Un profil n'a ni identifiant ni mot de passe : il s'utilise depuis votre compte. À sa première ouverture, il a son propre accueil (sans les comptes médias ni la visibilité dans la communauté, qui restent les vôtres), puis il choisit sa photo, sa langue, son thème et ses préférences comme n'importe quel membre.
+Un profil n'a ni identifiant ni mot de passe : il s'utilise depuis votre compte. Ses réglages ne montrent que ce qui le concerne : le mot de passe, la double authentification, les comptes médias liés, la confidentialité et les données restent ceux du compte maître. À sa première ouverture, il a son propre accueil (sans les comptes médias ni la visibilité dans la communauté, qui restent les vôtres), puis il choisit sa photo, sa langue, son thème et ses préférences comme n'importe quel membre.
 
 ## « Qui est là ? »
 
-Après la connexion, si votre compte a des profils, Portalab demande **« Qui est là ? »** : touchez votre tuile ou celle d'un profil. Pour changer plus tard, le menu de l'avatar (ou le tiroir sur téléphone) liste les autres membres du foyer : **« Passer sur Léa »** en un geste.
+Après la connexion, si votre compte a des profils, Portalab demande **« Qui est là ? »** : touchez votre tuile ou celle d'un profil. Pour changer plus tard, touchez **« Changer de profil »** : à droite de votre nom dans le tiroir sur téléphone, en tête du menu de l'avatar sur ordinateur.
 
 - Entrer dans un profil protégé demande toujours son code, même depuis le compte maître.
 - **Revenir sur le compte maître** depuis un profil demande **votre** code si vous en avez un. Choisissez-en un dès que vous avez un profil enfant : sans lui, n'importe quel profil peut revenir sur le vôtre.
@@ -35,13 +35,22 @@ Chaque profil a **ses propres** XP, Coins et Contribution. Et chaque fois qu'un 
 Quand un profil dépense des Coins à la boutique, ils sont retirés de son solde **et** de la cagnotte : un profil ne peut pas dépenser ce que le foyer n'a plus.
 
 > [!TIP]
-> Les lectures de votre compte Plex ou Jellyfin partagé (les films regardés sur la télé du salon, par exemple) vont au compte maître, comme avant.
+> Les lectures de votre compte Plex ou Jellyfin partagé (les films regardés sur la télé du salon, par exemple) vont au compte maître, comme avant. Un profil regarde dans Portalab avec ce même compte, sans rien lier : ce qu'il regarde avec le lecteur de Portalab compte aussi pour lui (XP, série, statistiques).
+
+## Les statistiques du foyer
+
+Dans **Statistiques**, l'onglet **« Mon foyer »** montre le cumul du foyer, visible par tous les membres : tout ce que le compte partagé a lu, tous les profils compris. **« Moi »** montre ce que le profil a regardé lui-même avec le lecteur de Portalab.
 
 ## Restreindre un profil
 
 Dans **« Modifier »** d'un profil :
 
-- **Âge maximum** : les films et séries classés au-dessus n'apparaissent plus pour ce profil (médiathèque, recherche, recommandations, accueil). Les livres, la musique et les jeux n'ont pas de classification et restent visibles.
+- **Date de naissance** (facultatif) : l'âge suit alors le profil, un an de plus à chaque anniversaire, sans limite à partir de 18 ans. Sinon, choisissez un **âge maximum** fixe.
+- **Titres au-dessus de son âge** : **cachés** (ils n'apparaissent pas : médiathèque, recherche, recommandations, accueil) ou **affichés verrouillés** (listés floutés avec un cadenas, impossibles à ouvrir). Les livres, la musique et les jeux n'ont pas de classification et restent visibles.
+- **Peut demander l'accès** : sans cette case, un titre verrouillé ne propose pas de demande.
+- **Genres tenus à l'écart** : Horreur, Thriller, Policier, Guerre, quelle que soit leur classification (un profil enfant démarre avec l'horreur tenue à l'écart).
+
+L'âge d'un titre est le plus strict de ses classifications : celles de la France, des États-Unis, du Royaume-Uni et de l'Allemagne (via TMDB) et celle de votre serveur Plex ou Jellyfin. La France classe beaucoup de films d'horreur « 12 ans » quand les États-Unis les classent « R » : c'est « R » (17 ans) qui compte. La fiche de chaque titre affiche cet âge et ses sources.
 - **Autoriser les titres non classés** : sans cette case, les films et séries sans classification d'âge sont masqués aussi.
 - **Tenu à l'écart de** : la boutique, les demandes de contenus, l'assistant IA, la participation à la communauté, les jeux ou le support.
 - **Visible dans la communauté** : sinon, le profil n'apparaît ni dans l'annuaire des membres ni dans les classements. Un profil enfant démarre caché.

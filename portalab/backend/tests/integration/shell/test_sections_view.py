@@ -27,7 +27,8 @@ async def test_sections_for_users_and_admins(sh: ShellHarness) -> None:
     view = await sh.module.assembler.build(plain)
     admin = await sh.module.assembler.build(user(admin_id))
 
-    assert len(view["sections"]) <= 8 and len(admin["sections"]) <= 9
+    # 032: « My household » is a section of its own — 027's nine, plus one
+    assert len(view["sections"]) <= 9 and len(admin["sections"]) <= 10
     assert "admin" not in keys(view) and "admin" in keys(admin)
     assert keys(admin)[-1] == "admin"  # the Administration area closes the navigation
     by_key = {s["key"]: s for s in admin["sections"]}

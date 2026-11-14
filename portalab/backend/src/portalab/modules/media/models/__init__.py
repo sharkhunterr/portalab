@@ -251,6 +251,25 @@ class PlaybackSession(MediaBase):
     start_position_s: Mapped[float | None] = mapped_column(Float)  # #94: where this sitting began
     state_seq: Mapped[int] = mapped_column(Integer, nullable=False)
     ended: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    # 032: the household profile that watched it with the portal's player (the account is its master's)
+    played_by: Mapped[UUID | None] = mapped_column()
+
+
+class PortalStream(MediaBase):
+    """032: who started a stream with the portal's player — the media server only knows the account, which a
+    household profile shares with its master; the live session it reports is told the profile's by this."""
+
+    __tablename__ = "portal_streams"
+    __table_args__ = (Index("ix_portal_streams_item", "service_id", "item", "started_at"),)
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)
+    service_id: Mapped[UUID] = mapped_column(nullable=False)
+    account: Mapped[str | None] = mapped_column(String(200), info=pii("activity"))
+    item: Mapped[str] = mapped_column(
+        String(200), nullable=False, info=not_personal("a media server item id")
+    )
+    started_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 
 
 class HistoryEntry(MediaBase):

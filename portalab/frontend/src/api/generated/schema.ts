@@ -13007,6 +13007,26 @@ export interface components {
              */
             target_user_id: string;
         };
+        /**
+         * AgeRating
+         * @description 032: a title's age ratings and the strictest age they stand for (a household profile's limit).
+         */
+        AgeRating: {
+            /** Age */
+            age?: number | null;
+            /**
+             * Ratings
+             * @default []
+             */
+            ratings: components["schemas"]["AgeRatingSource"][];
+        };
+        /** AgeRatingSource */
+        AgeRatingSource: {
+            /** Source */
+            source: string;
+            /** Value */
+            value: string;
+        };
         /** AiActionOut */
         AiActionOut: {
             /** Conversation Id */
@@ -14361,6 +14381,11 @@ export interface components {
             image_id?: string | null;
             /** Kind */
             kind: string;
+            /**
+             * Locked
+             * @default false
+             */
+            locked: boolean;
             /** Platform */
             platform?: string | null;
             /** Position */
@@ -15996,12 +16021,16 @@ export interface components {
         };
         /** HouseholdMemberOut */
         HouseholdMemberOut: {
+            /** Age */
+            age?: number | null;
             /** Color */
             color: string;
             /** Community Visible */
             community_visible: boolean;
             /** Display Name */
             display_name: string;
+            /** Effective Age */
+            effective_age?: number | null;
             /** Has Avatar */
             has_avatar: boolean;
             /** Has Pin */
@@ -17075,6 +17104,11 @@ export interface components {
             /** Kind */
             kind: string;
             /**
+             * Locked
+             * @default false
+             */
+            locked: boolean;
+            /**
              * Requested
              * @default false
              */
@@ -17107,6 +17141,12 @@ export interface components {
         };
         /** MediaDetail */
         MediaDetail: {
+            /**
+             * @default {
+             *       "ratings": []
+             *     }
+             */
+            age_rating: components["schemas"]["AgeRating"];
             /** At */
             at?: string | null;
             /** Available */
@@ -17128,6 +17168,11 @@ export interface components {
             image_id?: string | null;
             /** Kind */
             kind: string;
+            /**
+             * Locked
+             * @default false
+             */
+            locked: boolean;
             /** Overview */
             overview: string | null;
             /** Parent Id */
@@ -19524,7 +19569,9 @@ export interface components {
         };
         /**
          * RestrictionSettings
-         * @description A profile's restrictions as stored and edited by its master.
+         * @description A profile's restrictions as stored and edited by its master: a fixed maximum age, or a birth date
+         *     (the age then follows the profile, one more at each birthday); hidden or locked titles; access requests
+         *     allowed or not.
          */
         RestrictionSettings: {
             /**
@@ -19532,10 +19579,25 @@ export interface components {
              * @default true
              */
             allow_unrated: boolean;
+            /** Birth Date */
+            birth_date?: string | null;
             /** Blocked */
             blocked?: string[];
+            /** Genres */
+            genres?: string[];
             /** Max Age */
             max_age?: number | null;
+            /**
+             * Mode
+             * @default hide
+             * @enum {string}
+             */
+            mode: "hide" | "lock";
+            /**
+             * Requests
+             * @default true
+             */
+            requests: boolean;
         };
         /** ResyncIn */
         ResyncIn: {
@@ -20685,6 +20747,11 @@ export interface components {
             image_id?: string | null;
             /** Kind */
             kind: string;
+            /**
+             * Locked
+             * @default false
+             */
+            locked: boolean;
             /** Overview */
             overview?: string | null;
             /** Rating */
@@ -40626,7 +40693,7 @@ export interface operations {
             query?: {
                 period?: string;
                 category?: string;
-                scope?: "me" | "all";
+                scope?: "me" | "household" | "all";
                 tz?: string;
             };
             header?: never;
@@ -40684,7 +40751,7 @@ export interface operations {
             query?: {
                 period?: string;
                 category?: string;
-                scope?: "me" | "all";
+                scope?: "me" | "household" | "all";
                 tz?: string;
             };
             header?: never;

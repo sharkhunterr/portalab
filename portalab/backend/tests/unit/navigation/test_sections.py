@@ -47,4 +47,4 @@ def test_placement_falls_back_to_owner_default_then_more() -> None:
 
 def test_builtin_sections_stay_within_the_limit() -> None:
     everyone = [s for s in SECTIONS if s["audience"] == "everyone" and s["key"] != FALLBACK_SECTION]
-    assert len(everyone) + 1 <= 9  # + Administration
+    assert len(everyone) + 1 <= 10  # + Administration (032: « My household », a section of its own)

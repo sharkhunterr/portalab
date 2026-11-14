@@ -1,11 +1,12 @@
 """Household rules (spec 032): the kinds' presets, the restrictions as stored, PINs and colours."""
 
 import re
+from datetime import UTC, date, datetime
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
-from portalab.capabilities.household import AGES, FEATURES, Restrictions
+from portalab.capabilities.household import AGES, FEATURES, GENRES, Mode, Restrictions
 from portalab.core.errors import BadRequest, Conflict, Forbidden
 
 PIN = re.compile(r"\d{4,6}")
@@ -13,16 +14,38 @@ COLOR = re.compile(r"#[0-9a-fA-F]{6}")
 COLORS = ("#6366f1", "#ec4899", "#f59e0b", "#10b981", "#06b6d4", "#8b5cf6", "#ef4444", "#84cc16")
 PROFILE_KINDS = ("standard", "child", "custom")
 MAX_PROFILES = 8
+ADULT = 18
 
 
 class RestrictionSettings(BaseModel):
-    """A profile's restrictions as stored and edited by its master."""
+    """A profile's restrictions as stored and edited by its master: a fixed maximum age, or a birth date
+    (the age then follows the profile, one more at each birthday); hidden or locked titles; access requests
+    allowed or not."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     max_age: int | None = None
+    birth_date: date | None = None
     allow_unrated: bool = True
     blocked: list[str] = Field(default_factory=list, max_length=len(FEATURES))
+    mode: Mode = "hide"
+    requests: bool = True
+    genres: list[str] = Field(default_factory=list, max_length=len(GENRES))
+
+    @field_validator("genres")
+    @classmethod
+    def _genres(cls, value: list[str]) -> list[str]:
+        unknown = [genre for genre in value if genre not in GENRES]
+        if unknown:
+            raise ValueError(f"unknown genres {unknown}")
+        return sorted(set(value))
+
+    @field_validator("birth_date")
+    @classmethod
+    def _born(cls, value: date | None) -> date | None:
+        if value is not None and not date(1900, 1, 1) <= value <= datetime.now(UTC).date():
+            raise ValueError("a birth date in the past")
+        return value
 
     @field_validator("max_age")
     @classmethod
@@ -39,12 +62,35 @@ class RestrictionSettings(BaseModel):
             raise ValueError(f"unknown features {unknown}")
         return sorted(set(value))
 
-    def restrictions(self) -> Restrictions:
-        return Restrictions(self.max_age, self.allow_unrated, frozenset(self.blocked))
+    def age(self, today: date) -> int | None:
+        """Its age today, from its birth date."""
+        if self.birth_date is None:
+            return None
+        born = self.birth_date
+        return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+
+    def effective_age(self, today: date) -> int | None:
+        """The age its titles are held to: its own until 18 (then no limit), else the fixed one."""
+        age = self.age(today)
+        if age is None:
+            return self.max_age
+        return None if age >= ADULT else age
+
+    def restrictions(self, today: date | None = None) -> Restrictions:
+        return Restrictions(
+            self.effective_age(today or datetime.now(UTC).date()),
+            self.allow_unrated,
+            frozenset(self.blocked),
+            self.mode,
+            self.requests,
+            frozenset(self.genres),
+        )
 
 
 OPEN = RestrictionSettings()
-CHILD = RestrictionSettings(max_age=12, allow_unrated=False, blocked=["ai", "community", "requests", "shop"])
+CHILD = RestrictionSettings(
+    max_age=12, allow_unrated=False, blocked=["ai", "community", "requests", "shop"], genres=["horror"]
+)
 
 
 def preset(kind: str) -> tuple[RestrictionSettings, bool]:

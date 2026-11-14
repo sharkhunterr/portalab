@@ -62,6 +62,8 @@ class HouseholdMemberOut(HouseholdMemberTile):
     progress: HouseholdFigures
     community_visible: bool
     restrictions: RestrictionSettings | None = None
+    age: int | None = None  # from its birth date
+    effective_age: int | None = None  # the age its titles are held to (None: no limit)
 
 
 class HouseholdOut(BaseModel):

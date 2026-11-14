@@ -15,10 +15,11 @@ import uuid
 from collections.abc import Callable
 from contextlib import AsyncExitStack
 from dataclasses import dataclass, replace
+from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from portalab.capabilities.media import (
     QUALITIES,
@@ -36,7 +37,8 @@ from portalab.core.db import Database
 from portalab.core.errors import Conflict, Forbidden, NotFound, PortalError, Unavailable
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
-from portalab.modules.media.models import SourceItem, UserLink
+from portalab.modules.media.links.household import link_holder
+from portalab.modules.media.models import PortalStream, SourceItem, UserLink
 from portalab.modules.media.player.subtitles import SubtitleFeeds
 from portalab.modules.media.player.tickets import (
     LIFETIME_S,
@@ -54,6 +56,7 @@ TIMEOUT_S = 30.0
 SEGMENT_TIMEOUT_S = 90.0
 CREDITS_TIMEOUT_S = 5.0  # #101: asked as a play ends — never holds it long
 CREDITS_REMEMBERED = 2000
+KEPT = timedelta(days=2)  # 032: who started a stream, for its live session
 
 
 class PlayerOff(Forbidden):
@@ -174,11 +177,14 @@ class PlayerService:
         return row
 
     async def _account(self, user: UUID, service_id: UUID) -> str | None:
+        holder = await link_holder(
+            self.capabilities, user
+        )  # 032: a profile watches with its master's account
         async with self.database.session() as session:
             account = (
                 await session.execute(
                     select(UserLink.external_user_id).where(
-                        UserLink.user_id == user,
+                        UserLink.user_id == holder,
                         UserLink.service_id == service_id,
                         UserLink.verified.is_(True),
                     )
@@ -189,6 +195,18 @@ class PlayerService:
         if self.config().player_owner_fallback:
             return None
         raise PlayerUnlinked("Link your account on the media server to watch here.")
+
+    async def _remember(self, user: UUID, service_id: UUID, account: str | None, item: str) -> None:
+        """032: who started this stream — the live session the server reports is a household profile's when
+        the profile started it (the account is its master's). Kept two days."""
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            await uow.session.execute(delete(PortalStream).where(PortalStream.started_at < now - KEPT))
+            uow.session.add(
+                PortalStream(
+                    user_id=user, service_id=service_id, account=account, item=item[:200], started_at=now
+                )
+            )
 
     def _registrations(self) -> dict[str, tuple[Any, str]]:
         """Streaming providers by service, with their connector (the history family they speak for)."""
@@ -284,6 +302,7 @@ class PlayerService:
         started: StreamStart = await _call(
             self._channel(source.service_id, account).start(item, options, session)
         )
+        await self._remember(user, source.service_id, account, item)
         ticket = Ticket(
             user=user,
             service=source.service_id,
@@ -329,11 +348,12 @@ class PlayerService:
         providers = self._registrations()
         if not providers:
             return Continuing([], set(), set())
+        holder = await link_holder(self.capabilities, user)  # 032: a profile's are its master's
         async with self.database.session() as session:
             links = (
                 await session.execute(
                     select(UserLink.service_id, UserLink.external_user_id).where(
-                        UserLink.user_id == user, UserLink.verified.is_(True)
+                        UserLink.user_id == holder, UserLink.verified.is_(True)
                     )
                 )
             ).all()

@@ -2,10 +2,19 @@
 restrictions decide what it may open and which permissions it loses, the kinds start from their presets,
 PINs are 4 to 6 digits and a damaged record restricts rather than opens."""
 
+from datetime import date
+
 import pytest
 
 from portalab.capabilities.household import Restrictions, age_of
-from portalab.modules.identity.household.rules import CHILD, InvalidPin, check_pin, parse, preset
+from portalab.modules.identity.household.rules import (
+    CHILD,
+    InvalidPin,
+    RestrictionSettings,
+    check_pin,
+    parse,
+    preset,
+)
 
 
 @pytest.mark.parametrize(
@@ -54,3 +63,33 @@ def test_presets_pins_and_damaged_records() -> None:
     for wrong in ("123", "1234567", "12a4", " 1234"):
         with pytest.raises(InvalidPin):
             check_pin(wrong)
+
+
+def test_a_birth_date_holds_titles_to_the_age_of_the_day() -> None:
+    born = RestrictionSettings(birth_date=date(2016, 3, 10), max_age=6, mode="lock", requests=False)
+    assert born.effective_age(date(2026, 3, 9)) == 9
+    assert born.effective_age(date(2026, 3, 10)) == 10  # one more at the birthday
+    restrictions = born.restrictions(date(2026, 3, 10))
+    assert restrictions.max_age == 10 and restrictions.mode == "lock" and not restrictions.requests
+    assert (
+        RestrictionSettings(birth_date=date(2000, 1, 1)).effective_age(date(2026, 1, 1)) is None
+    )  # an adult
+    assert (
+        RestrictionSettings(max_age=12).effective_age(date(2026, 1, 1)) == 12
+    )  # no birth date: the fixed age
+    with pytest.raises(ValueError, match="past"):
+        RestrictionSettings(birth_date=date(2999, 1, 1))
+
+
+def test_the_strictest_rating_holds_and_genres_are_recognised() -> None:
+    from portalab.capabilities.household import genre_of, strictest_age
+
+    assert age_of("fr/12") == 12 and age_of("fr/TP") == 0 and age_of("de/16") == 16  # Plex's country prefix
+    assert strictest_age(["12", "R", None]) == 17  # France rates Smile 12, the United States R
+    assert strictest_age(["NR", None]) is None
+    assert genre_of("Épouvante-horreur") == "horror" and genre_of("Horror") == "horror"
+    assert genre_of("Policier") == "crime" and genre_of("Guerre") == "war"
+    assert genre_of("Comédie") is None and genre_of("Science-Fiction") is None
+    assert parse({"genres": ["horror", "horror"]}).genres == ["horror"]
+    assert parse({"genres": ["cooking"]}) == CHILD  # not a genre one may keep out: restricted
+    assert "horror" in CHILD.genres

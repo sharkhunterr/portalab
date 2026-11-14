@@ -443,6 +443,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
         },
         { path: "notifications", element: <Notifications />, handle: h({ crumb: "Notifications" }) },
         { path: "guide", element: <Guide />, handle: h({ crumb: "Guided tours" }) },
+        { path: "household", element: <Household />, handle: h({ crumb: "My household" }) }, // 032
         // issue 14: « My settings » — every page a member sets things in, around one list and one search
         {
           element: <SettingsLayout />,
@@ -466,7 +467,6 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
               handle: h({ crumb: "Media accounts" }),
             },
             { path: "settings/play", element: <PlaySettings />, handle: h({ crumb: "Play" }) },
-            { path: "household", element: <Household />, handle: h({ crumb: "My household" }) }, // 032
             { path: "privacy", element: <Privacy />, handle: h({ crumb: "Privacy" }) },
           ],
         },

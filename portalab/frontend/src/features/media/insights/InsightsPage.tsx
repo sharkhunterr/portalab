@@ -15,6 +15,7 @@ import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useMe } from "../../auth/useAuth";
 import { imageUrl } from "../api";
 import { metadataImage } from "../detail/Enrichment";
 import { KIND_ICONS } from "../MediaGrid";
@@ -382,7 +383,9 @@ export default function InsightsPage() {
   const format = useFormat();
   const measures = useMeasures();
   const [params, setParams] = useSearchParams();
-  const scope: Scope = params.get("scope") === "all" ? "all" : "me";
+  const household = (useMe().data?.household_profiles ?? 0) > 0; // 032: the household's figures too
+  const asked = params.get("scope");
+  const scope: Scope = asked === "all" ? "all" : asked === "household" && household ? "household" : "me";
   const requests = params.get("category") === "requests"; // 027: my requests, as a category of their own
   const category = (CATEGORIES as string[]).includes(params.get("category") ?? "")
     ? (params.get("category") as Category)
@@ -412,7 +415,13 @@ export default function InsightsPage() {
     <AdminPage
       icon="chart"
       title={t("media:insights.title")}
-      description={t(scope === "me" ? "media:insights.subtitleMe" : "media:insights.subtitleAll")}
+      description={t(
+        scope === "me"
+          ? "media:insights.subtitleMe"
+          : scope === "household"
+            ? "media:insights.subtitleHousehold"
+            : "media:insights.subtitleAll",
+      )}
       tabs={
         <AdminTabs
           label={t("media:insights.title")}
@@ -420,6 +429,7 @@ export default function InsightsPage() {
           onChange={(next) => set("scope", next, "me")}
           tabs={[
             { key: "me", label: t("media:insights.scope.me") },
+            ...(household ? [{ key: "household", label: t("media:insights.scope.household") }] : []),
             { key: "all", label: t("media:insights.scope.all"), locked: shop.server },
           ]}
         />

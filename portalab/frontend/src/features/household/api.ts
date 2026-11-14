@@ -22,6 +22,7 @@ export const REQUESTS_KEY = ["household", "requests"] as const;
 export const CHOOSE_PROFILE_EVENT = "portalab:choose-profile";
 export const AGES = [0, 6, 10, 12, 14, 16, 18] as const;
 export const FEATURES = ["shop", "requests", "ai", "community", "games", "support"] as const;
+export const GENRES = ["horror", "thriller", "crime", "war"] as const; // 032: kept out whatever their rating
 
 /** Opens the picker — on one member's PIN pad when ``member`` is given. */
 export function chooseProfile(member?: string) {

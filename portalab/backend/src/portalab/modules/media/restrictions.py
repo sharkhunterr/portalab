@@ -8,7 +8,7 @@ other kinds (books, music, games, live TV) have no rating and are never held bac
 restriction cost one cached lookup: nothing is computed for them."""
 
 import time
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import replace
 from typing import Any
 from uuid import UUID
@@ -18,12 +18,12 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import aliased
 
 from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
-from portalab.capabilities.household import Household, Restrictions, age_of
+from portalab.capabilities.household import Household, Restrictions, genre_of, strictest_age
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import Forbidden
-from portalab.modules.media.models import MediaObject, ObjectMetadata
+from portalab.modules.media.models import MediaObject, ObjectMetadata, ObjectTag
 
 RATED = ("movie", "series")
 CACHE_S = 30.0
@@ -33,6 +33,25 @@ IDS = ("id", "object_id", "media_id", "work_id")
 class Restricted(Forbidden):
     default_code = "household.restricted"
     default_title = "This title is not open to this profile"
+
+
+def labelled(data: Mapping[str, Any] | None, server: str | None) -> list[tuple[str, str]]:
+    """A title's age ratings by source: TMDB's countries (« FR », « US »…), else its single certification
+    (details found before 032), and the media server's (« server »)."""
+    data = data or {}
+    found: list[tuple[str, str]] = []
+    countries = data.get("certifications")
+    if isinstance(countries, Mapping) and countries:
+        found += [(str(c), str(r)) for c, r in countries.items() if r]
+    elif data.get("certification"):
+        found.append(("TMDB", str(data["certification"])))
+    if server:
+        found.append(("server", server))
+    return found
+
+
+def ratings(data: Mapping[str, Any] | None, server: str | None) -> list[str]:
+    return [value for _, value in labelled(data, server)]
 
 
 def excluded(column: Any, blocked: frozenset[UUID]) -> Any:
@@ -77,7 +96,9 @@ class TitleGate:
         async with self.database.session() as session:
             rows = (
                 await session.execute(
-                    select(MediaObject.id, ObjectMetadata.data["certification"].astext)
+                    select(
+                        MediaObject.id, ObjectMetadata.data, MediaObject.effective["content_rating"].astext
+                    )
                     .outerjoin(
                         ObjectMetadata,
                         (ObjectMetadata.object_id == MediaObject.id) & (ObjectMetadata.status == "found"),
@@ -87,9 +108,21 @@ class TitleGate:
             ).all()
             works = {
                 work
-                for work, rating in rows
-                if str(work) not in granted and not restrictions.allows_age(age_of(rating))
+                for work, data, server in rows
+                if str(work) not in granted
+                and not restrictions.allows_age(strictest_age(ratings(data, server)))
             }
+            if restrictions.genres:  # kept out whatever their rating (horror…)
+                tags = await session.execute(
+                    select(ObjectTag.object_id, ObjectTag.value)
+                    .join(MediaObject, MediaObject.id == ObjectTag.object_id)
+                    .where(ObjectTag.tag_kind == "genre", MediaObject.kind.in_(RATED))
+                )
+                works |= {
+                    work
+                    for work, tag in tags
+                    if str(work) not in granted and genre_of(str(tag)) in restrictions.genres
+                }
             season = aliased(MediaObject)
             children: set[UUID] = set()
             if works:
@@ -106,6 +139,21 @@ class TitleGate:
         self._cache[user] = (time.monotonic(), found)
         return found
 
+    async def hidden(self, viewer: Principal | UUID | None) -> frozenset[UUID]:
+        """The titles left out of the lists — those kept from the viewer, unless its master chose to show
+        them locked."""
+        restrictions = await self.restrictions(viewer)
+        if restrictions is None or restrictions.mode == "lock":
+            return frozenset()
+        return await self.blocked(viewer)
+
+    async def mark(self, viewer: Principal | UUID | None, cards: list[Any]) -> list[Any]:
+        """Cards (pydantic models with ``id`` and ``locked``) of titles kept from the viewer, shown locked."""
+        blocked = await self.blocked(viewer)
+        if not blocked:
+            return cards
+        return [card.model_copy(update={"locked": True}) if card.id in blocked else card for card in cards]
+
     def forget(self) -> None:
         self._cache.clear()
 
@@ -113,31 +161,59 @@ class TitleGate:
         """Refuse one title the viewer may not open, telling enough for « Ask for access »."""
         if object_id in await self.blocked(viewer):
             rating = await self._rating(object_id)
+            restrictions = await self.restrictions(viewer)
             raise Restricted(
                 "This title is above this profile's age rating.",
-                extensions={"object_id": str(object_id), "name": title, "rating": rating},
+                extensions={
+                    "object_id": str(object_id),
+                    "name": title,
+                    "rating": rating,
+                    "can_ask": restrictions is None or restrictions.requests,
+                },
             )
 
     async def _rating(self, object_id: UUID) -> str | None:
-        """The rating of a title, or of the series an episode or a season belongs to."""
+        """The strictest age a title (or the series of an episode or a season) is rated for, as « 17+ »."""
+        found = await self.rating(object_id)
+        return f"{found['age']}+" if found["age"] is not None else None
+
+    async def rating(self, object_id: UUID) -> dict[str, Any]:
+        """032: a title's age ratings, source by source (TMDB's countries, the media server), and the
+        strictest age they stand for — an episode or a season answers with its series' when it has none."""
         async with self.database.session() as session:
             current: UUID | None = object_id
             for _ in range(3):
                 if current is None:
-                    return None
-                rating = await session.scalar(
-                    select(ObjectMetadata.data["certification"].astext).where(
-                        ObjectMetadata.object_id == current, ObjectMetadata.status == "found"
+                    break
+                row = (
+                    await session.execute(
+                        select(
+                            MediaObject.parent_id,
+                            ObjectMetadata.data,
+                            MediaObject.effective["content_rating"].astext,
+                        )
+                        .outerjoin(
+                            ObjectMetadata,
+                            (ObjectMetadata.object_id == MediaObject.id) & (ObjectMetadata.status == "found"),
+                        )
+                        .where(MediaObject.id == current)
                     )
-                )
-                if rating:
-                    return str(rating)
-                current = await session.scalar(select(MediaObject.parent_id).where(MediaObject.id == current))
-        return None
+                ).one_or_none()
+                if row is None:
+                    break
+                parent, data, server = row
+                sources = labelled(data, server)
+                if sources:
+                    return {
+                        "age": strictest_age(v for _, v in sources),
+                        "ratings": [{"source": s, "value": v} for s, v in sources],
+                    }
+                current = parent
+        return {"age": None, "ratings": []}
 
     async def keep(self, viewer: Principal | UUID | None, items: Iterable[Any], key: str = "id") -> list[Any]:
-        """The items (objects or mappings) whose ``key`` is a title the viewer may see."""
-        blocked = await self.blocked(viewer)
+        """The items (objects or mappings) whose ``key`` is a title the viewer's lists may show."""
+        blocked = await self.hidden(viewer)
         items = list(items)
         if not blocked:
             return items
@@ -146,7 +222,7 @@ class TitleGate:
     async def scrub(self, viewer: Principal | UUID | None, payload: Any) -> Any:
         """A response (mappings and lists, as JSON goes) without the entries naming a title kept from the
         viewer — for the many lists of titles a page or a widget draws."""
-        blocked = await self.blocked(viewer)
+        blocked = await self.hidden(viewer)
         return _scrub(payload, {str(b) for b in blocked}) if blocked else payload
 
 
@@ -189,7 +265,7 @@ class GatedWidget:
     async def load(self, principal: Principal, config: Any, ctx: Any) -> Any:
         payload = await self.inner.load(principal, config, ctx)
         data = getattr(payload, "data", None)
-        if data is None or not await self.gate.blocked(principal):
+        if data is None or not await self.gate.hidden(principal):
             return payload
         return replace(payload, data=await self.gate.scrub(principal, dict(data)))
 
@@ -205,14 +281,14 @@ class GatedSearch:
         return getattr(self.inner, name)
 
     async def _visible(self, principal: Principal, items: Iterable[Any]) -> list[Any]:
-        blocked = {str(b) for b in await self.gate.blocked(principal)}
+        blocked = {str(b) for b in await self.gate.hidden(principal)}
         return [item for item in items if str(getattr(item, "id", "")) not in blocked]
 
     async def search(
         self, query: Any, principal: Principal, ctx: Any, *, limit: int, cursor: str | None
     ) -> Any:
         result = await self.inner.search(query, principal, ctx, limit=limit, cursor=cursor)
-        if not await self.gate.blocked(principal):
+        if not await self.gate.hidden(principal):
             return result
         return replace(result, items=await self._visible(principal, result.items))
 

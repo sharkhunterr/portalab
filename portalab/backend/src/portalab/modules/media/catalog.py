@@ -257,7 +257,7 @@ class CatalogQuery:
             )
         if q and (found := words(q)):
             stmt = stmt.where(matching(found))  # #92: its people and series too, typos forgiven
-        if self.gate is not None and (hidden := await self.gate.blocked(principal)):
+        if self.gate is not None and (hidden := await self.gate.hidden(principal)):
             stmt = stmt.where(excluded(MediaObject.id, hidden))
         refine = refine or Refine()
         stmt = refine.apply(stmt, principal.acting_for or principal.user_id)
@@ -379,7 +379,7 @@ class CatalogPort:
             row = await live_object(session, object_id)
             if row is None or row.status != "active":
                 return None
-            if self.query.gate is not None and row.id in await self.query.gate.blocked(viewer):
+            if self.query.gate is not None and row.id in await self.query.gate.hidden(viewer):
                 return None
             if row.kind != "episode" or row.parent_id is None:
                 return summary(row)

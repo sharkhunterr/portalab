@@ -51,7 +51,7 @@ KINDS = {
     "AudioBook": "book",
 }
 IDS = {"Tmdb": "tmdb", "Imdb": "imdb", "Tvdb": "tvdb", "MusicBrainzAlbum": "musicbrainz", "Isbn": "isbn"}
-FIELDS = "ProviderIds,Overview,Genres,ProductionYear,OriginalTitle,People,DateCreated,ParentId"
+FIELDS = "ProviderIds,Overview,Genres,ProductionYear,OriginalTitle,People,DateCreated,ParentId,OfficialRating"
 
 
 def _ids(item: Mapping[str, Any]) -> dict[str, str]:
@@ -151,6 +151,7 @@ class JellyfinConnector(HttpConnector):
                     if (tag := (item.get("ImageTags") or {}).get("Primary"))
                     else None,
                     "resolution": resolution_of(item.get("Height")),  # 027: the file's frame height
+                    "content_rating": (str(item.get("OfficialRating") or "")[:40] or None),  # 032
                 }
                 yield self.record(service, item_id, kind, payload, parse_time(item.get("DateCreated")))
             start += len(page["Items"])

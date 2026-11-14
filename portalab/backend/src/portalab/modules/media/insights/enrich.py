@@ -36,7 +36,7 @@ KINDS = ("movie", "series")
 DRIVEN_LIMIT = 20_000  # « sync now »: titles looked up in one go
 
 
-DATA_VERSION = 2  # 027: 2 = alternative backdrops and posters (the artwork one swipes through)
+DATA_VERSION = 3  # 027: 2 = alternative backdrops and posters; 032: 3 = the main countries' age ratings
 
 
 def record_data(record: MetadataRecord) -> dict[str, Any]:

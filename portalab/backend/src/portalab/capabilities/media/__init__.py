@@ -181,6 +181,8 @@ class LibraryPayload(BaseModel):
     tags: list[str] = Field(default_factory=list, max_length=40)  # moods and themes (Grimmory)
     # 027: the video file's resolution (``4k``, ``1080p``, ``720p``, ``sd``) — statistics' quality fallback
     resolution: str | None = Field(default=None, pattern=r"^(4k|1080p|720p|sd)$")
+    # 032: the media server's age rating (Plex ``contentRating``, Jellyfin ``OfficialRating``: « fr/12 »)
+    content_rating: str | None = Field(default=None, max_length=40)
     # 027: which copy this item is when a service holds several of one title (a game per platform/region)
     variant: str | None = Field(default=None, max_length=200)
     platform: str | None = Field(default=None, max_length=120)  # 027: a game's console or system
@@ -709,6 +711,8 @@ class MetadataRecord:
     vote_count: int | None = None
     status: str | None = None
     certification: str | None = None
+    # 032: the main countries' age ratings ({"FR": "12", "US": "R"…}): a child's limit holds to the strictest
+    certifications: Mapping[str, str] = field(default_factory=dict)
     collection: Mapping[str, Any] | None = None  # {id, name, poster}
     seasons: int | None = None
     episodes: int | None = None

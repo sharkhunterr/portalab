@@ -1,5 +1,6 @@
 import { type ReactNode, useId, useState } from "react";
 import { Link, useParams } from "react-router";
+import type { components } from "../../../api/generated/schema";
 import { Button } from "../../../design-system/components/Button";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
@@ -919,6 +920,19 @@ function DirectRequest({
 
 const TASTED = ["movie", "series", "season", "episode", "book", "audiobook", "game"];
 
+/** 032: « 17+ (FR 12 · US R) » — the strictest age a title's ratings stand for, then each source's. */
+function ageFact(
+  rating: components["schemas"]["MediaDetail"]["age_rating"] | undefined,
+  t: ReturnType<typeof useT>,
+): string | null {
+  if (!rating || rating.age === null || rating.age === undefined) return null;
+  const sources = (rating.ratings ?? [])
+    .map((r) => `${r.source === "server" ? t("household:rating.server") : r.source} ${r.value}`)
+    .join(" · ");
+  const age = t("household:rating.age", { age: rating.age });
+  return sources ? `${age} (${sources})` : age;
+}
+
 export function DetailPage() {
   const t = useT();
   const format = useFormat();
@@ -987,6 +1001,7 @@ export function DetailPage() {
           media.platform ?? null,
           t(`media:kind.${media.kind}`),
           metadata.data?.runtime_min ? measures.duration(metadata.data.runtime_min * 60) : null,
+          ageFact(media.age_rating, t), // 032: the strictest age its ratings stand for, and each one
           metadata.data?.vote_average
             ? `★ ${format.number(Math.round(metadata.data.vote_average * 10) / 10)}`
             : null,

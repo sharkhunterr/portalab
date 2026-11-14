@@ -39,13 +39,26 @@ const LINKS = [
 
 function AccountView({ me }: { me: Me }) {
   const t = useT();
+  const profile = Boolean(me.profile_of); // 032: a household profile
   return (
     <SettingsPage icon="user" title={t("account:title")} lead={t("account:lead")}>
       <MemberProfile memberId={me.id} heading={2} />
-      <CommunityPresence />
+      {profile ? (
+        // 032: a household profile — its security, data and presence are its master's
+        <SettingsCard icon="users" title={t("household:account.title")} hint={t("household:account.hint")}>
+          <p className="account-links">
+            <Link to="/household">
+              <Icon name="users" size={18} />
+              {t("household:page.title")}
+            </Link>
+          </p>
+        </SettingsCard>
+      ) : (
+        <CommunityPresence />
+      )}
       <SettingsCard icon="compass" title={t("account:links.title")} hint={t("account:links.hint")}>
         <ul className="account-links">
-          {LINKS.map((link) => (
+          {LINKS.filter((link) => !profile || link.key !== "privacy").map((link) => (
             <li key={link.key}>
               <Link to={link.to(me.id)}>
                 <Icon name={link.icon} size={18} />
@@ -55,8 +68,12 @@ function AccountView({ me }: { me: Me }) {
           ))}
         </ul>
       </SettingsCard>
-      <PasswordSection hasPassword={me.has_password ?? true} />
-      <TwoFactorSection hasPassword={me.has_password ?? true} />
+      {profile ? null : (
+        <>
+          <PasswordSection hasPassword={me.has_password ?? true} />
+          <TwoFactorSection hasPassword={me.has_password ?? true} />
+        </>
+      )}
     </SettingsPage>
   );
 }

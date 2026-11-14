@@ -184,7 +184,8 @@ function MemberCard({
   const t = useT();
   const format = useFormat();
   const restricted = member.restrictions;
-  const limited = restricted && (restricted.max_age !== null || (restricted.blocked ?? []).length > 0);
+  const age = member.effective_age ?? null; // 032: from its birth date, else the fixed one
+  const limited = restricted && (age !== null || (restricted.blocked ?? []).length > 0);
   return (
     <li className="household-member" style={{ "--profile-color": member.color } as React.CSSProperties}>
       <div className="household-member__head">
@@ -198,8 +199,9 @@ function MemberCard({
           </h3>
           <span className="household-member__kind">
             {member.kind === "owner" ? <Icon name="crown" size={14} /> : null}
-            {t(`household:kind.${member.kind}`)} ·{" "}
-            {t("household:figures.level", { level: member.progress.level })}
+            {t(`household:kind.${member.kind}`)}
+            {typeof member.age === "number" ? ` · ${t("household:page.age", { age: member.age })}` : ""}
+            {` · ${t("household:figures.level", { level: member.progress.level })}`}
           </span>
         </div>
       </div>
@@ -221,7 +223,7 @@ function MemberCard({
         {limited ? (
           <span className="household-badge">
             <Icon name="shield" size={12} />
-            {t("household:page.restricted", { age: restricted?.max_age ?? "none" })}
+            {t("household:page.restricted", { age: age ?? "none" })}
           </span>
         ) : null}
         {member.kind !== "owner" && !member.community_visible ? (

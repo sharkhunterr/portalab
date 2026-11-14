@@ -130,6 +130,10 @@ async def test_everyone_sees_the_household_the_master_manages_it(
         "max_age": 12,
         "allow_unrated": False,
         "blocked": ["ai", "community", "requests", "shop"],
+        "birth_date": None,
+        "mode": "hide",
+        "requests": True,
+        "genres": ["horror"],
     }
     assert child["community_visible"] is False and child["has_pin"] is True
 

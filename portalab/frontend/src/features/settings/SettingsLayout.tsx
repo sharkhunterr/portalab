@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { PageHeader } from "../../design-system/components/PageHeader";
 import { useT } from "../../i18n/hooks/useT";
+import { useMe } from "../auth/useAuth";
 import "./settings.css";
 
 /**
@@ -34,10 +35,17 @@ export const SETTINGS_PAGES = [
   { key: "accounts", to: "/settings/media-accounts", icon: "link", items: ["media"] },
   { key: "privacy", to: "/privacy", icon: "lock", items: ["visibility", "retention", "export"] },
   { key: "play", to: "/settings/play", icon: "gamepad", items: ["play", "cards", "presence"] },
-  { key: "household", to: "/household", icon: "users", items: ["profiles", "pins", "requests"] }, // 032
 ] as const;
 
 type Page = (typeof SETTINGS_PAGES)[number];
+
+/** 032: a household profile uses its master's media accounts, and its privacy is its master's to set. */
+const MASTER_ONLY: readonly string[] = ["accounts", "privacy"];
+
+function usePages(): readonly Page[] {
+  const profile = Boolean(useMe().data?.profile_of);
+  return profile ? SETTINGS_PAGES.filter((page) => !MASTER_ONLY.includes(page.key)) : SETTINGS_PAGES;
+}
 
 function matches(text: string, needle: string): boolean {
   const fold = (value: string) => value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -47,10 +55,11 @@ function matches(text: string, needle: string): boolean {
 /** What the search finds: a page by its name, or one of its settings by name and words. */
 function useResults(needle: string) {
   const t = useT();
+  const pages = usePages();
   return useMemo(() => {
     if (!needle.trim()) return [];
     const out: Array<{ page: Page; item: string | null; title: string; hint: string }> = [];
-    for (const page of SETTINGS_PAGES) {
+    for (const page of pages) {
       const title = t(`account:settings.page.${page.key}`);
       if (matches(title, needle))
         out.push({ page, item: null, title, hint: t(`account:settings.hint.${page.key}`) });
@@ -61,7 +70,7 @@ function useResults(needle: string) {
       }
     }
     return out;
-  }, [needle, t]);
+  }, [needle, t, pages]);
 }
 
 function SettingsSearch({ query, setQuery }: { query: string; setQuery: (value: string) => void }) {
@@ -86,7 +95,7 @@ function SettingsSearch({ query, setQuery }: { query: string; setQuery: (value: 
 
 function PageList({ onPick }: { onPick?: () => void }) {
   const t = useT();
-  const pages = SETTINGS_PAGES;
+  const pages = usePages();
   return (
     <ul className="settings-hub__pages">
       {pages.map((page) => (
@@ -162,7 +171,7 @@ export function SettingsLayout() {
 export function SettingsHome() {
   const t = useT();
   const headingId = useId();
-  const pages = SETTINGS_PAGES;
+  const pages = usePages();
   return (
     <section aria-labelledby={headingId} className="settings-home">
       <PageHeader

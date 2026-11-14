@@ -149,5 +149,6 @@
   "nav.topic.services": "Services & supervision",
   "nav.topic.system": "Système",
   "nav.wiki": "Wiki",
-  "nav.household": "Mon foyer"
+  "nav.household": "Mon foyer",
+  "nav.section.household": "Mon foyer"
 }

@@ -55,12 +55,22 @@ about profiles.
 - Q: How are PINs used? → A (owner, revised the same day): a 4–6 digit PIN per profile (optional); entering a
   protected profile always asks its PIN, from the master too. Coming back to the master from a profile asks
   the master's PIN when it has one; right after signing in, the master is free (the password was just given).
-  Wrong PINs slow down progressively, like sign-in attempts. Switching is one tap from the avatar menu (each
-  other member listed); a profile's first welcome leaves out the media accounts and the community presence.
+  Wrong PINs slow down progressively, like sign-in attempts. Switching is « Switch profile » beside the name (the
+  picker opens); « My household » is a section of the main navigation; a profile's first welcome leaves out the media accounts and the community presence.
 - Q: Which restrictions exist? → Decided by default: a maximum age rating (all, 6+, 10+, 12+, 14+, 16+, 18+),
   whether unrated titles are allowed, and features kept out (shop, requests, AI assistant, community
   participation, games, support). Kinds are presets: *standard* (no restriction), *child* (12+, unrated
   hidden, shop/requests/AI/community kept out, hidden from the community), *custom* (the master's choice).
+- Q: Session 2 (owner feedback) — a profile must play with its master's linked account; its plays through the
+  portal count for it while the master's figures stay the household's cumul (every member sees them); a
+  child's age comes from its birth date (updated at each birthday); the master chooses hidden or locked
+  titles and whether access requests are allowed; a profile's settings drop what is its master's. → Built.
+- Q: Where is « My household »? → A (owner): a section of its own in the main navigation, like Games or
+  Statistics — amending 027 FR-008 (at most nine top-level sections) to ten.
+- Q: Session 3 (owner feedback): a child profile could start horror films — France rates many of them 12. →
+  A title's age is now the strictest of TMDB's FR/US/GB/DE ratings and the media server's (Plex, Jellyfin),
+  shown on its page; genres (horror, thriller, crime, war) may be kept out whatever their rating; the child
+  preset keeps horror out.
 - Q: How does a child get a title above its rating? → A: the locked title offers « Ask for access »; the master
   is notified, approves (for good or for a number of days) or refuses; the profile is told.
 

@@ -34,8 +34,9 @@ from portalab.core.db import Database
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.common import strong_ids
+from portalab.modules.media.links.household import link_holder
 from portalab.modules.media.links.service import UserLinkService
-from portalab.modules.media.models import ExternalId, PlaybackSession, SourceItem
+from portalab.modules.media.models import ExternalId, PlaybackSession, PortalStream, SourceItem
 from portalab.modules.media.observability import log, metrics
 from portalab.modules.media.playback.normalizer import ACTIVE, on_end, on_update, percent
 from portalab.modules.media.settings import MediaConfig
@@ -43,6 +44,7 @@ from portalab.modules.media.settings import MediaConfig
 JOB = "media.playback_poll"
 REUSED = timedelta(minutes=30)  # #340: a key ended longer ago than this names another play
 HISTORY = ":history:"  # the sessions of a play read from a history, not followed live
+STREAM_WINDOW = timedelta(hours=6)  # 032: a portal-player stream tells the session it started that long
 
 
 class PlaybackPoller:
@@ -175,6 +177,28 @@ class PlaybackPoller:
                 return owner
         return None
 
+    async def _played_by(
+        self, session: AsyncSession, service_id: UUID, report: SourcePlayback, user: UUID, now: datetime
+    ) -> UUID | None:
+        """032: the household profile of ``user`` that started this stream with the portal's player — the
+        server only tells the account, which the profile shares with its master."""
+        if not report.item_external_id:
+            return None
+        started = await session.scalar(
+            select(PortalStream.user_id)
+            .where(
+                PortalStream.service_id == service_id,
+                PortalStream.item == report.item_external_id,
+                PortalStream.started_at >= now - STREAM_WINDOW,
+                or_(PortalStream.account == report.external_user_id, PortalStream.account.is_(None)),
+            )
+            .order_by(PortalStream.started_at.desc())
+            .limit(1)
+        )
+        if started is None or started == user:
+            return None
+        return started if await link_holder(self.capabilities, started) == user else None
+
     async def _publish(self, session: AsyncSession, row: PlaybackSession, name: str, now: datetime) -> None:
         if row.user_id is None:
             metrics.increment("media.playback.unlinked")
@@ -205,7 +229,8 @@ class PlaybackPoller:
             name,
             payload,
             occurred_at=now,
-            subject=SubjectRef("user", str(row.user_id)),
+            # 032: a household profile's sitting is its own (its XP mirrored on its master by the economy)
+            subject=SubjectRef("user", str(row.played_by or row.user_id)),
             source="media",
             dedup_key=dedup,
         )
@@ -261,6 +286,8 @@ class PlaybackPoller:
                     state_seq=1,
                     ended=False,
                 )
+                if row.device == PORTAL_PLAYER and user is not None:
+                    row.played_by = await self._played_by(session, service_id, report, user, now)
                 session.add(row)
                 await session.flush()
                 await self._publish(session, row, "media.playback_started", now)

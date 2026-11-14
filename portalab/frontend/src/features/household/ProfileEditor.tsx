@@ -10,6 +10,7 @@ import { Switch } from "../account/SettingsKit";
 import {
   AGES,
   FEATURES,
+  GENRES,
   type HouseholdMember,
   type ProfileKind,
   type RestrictionSettings,
@@ -22,14 +23,35 @@ import { ProfileFace } from "./ProfilePicker";
 
 const KINDS: ProfileKind[] = ["standard", "child", "custom"];
 const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; community: boolean }> = {
-  standard: { restrictions: { max_age: null, allow_unrated: true, blocked: [] }, community: true },
+  standard: {
+    restrictions: { max_age: null, allow_unrated: true, blocked: [], mode: "hide", requests: true },
+    community: true,
+  },
   child: {
-    restrictions: { max_age: 12, allow_unrated: false, blocked: ["ai", "community", "requests", "shop"] },
+    restrictions: {
+      max_age: 12,
+      allow_unrated: false,
+      blocked: ["ai", "community", "requests", "shop"],
+      mode: "hide",
+      requests: true,
+      genres: ["horror"],
+    },
     community: false,
   },
-  custom: { restrictions: { max_age: null, allow_unrated: true, blocked: [] }, community: true },
+  custom: {
+    restrictions: { max_age: null, allow_unrated: true, blocked: [], mode: "hide", requests: true },
+    community: true,
+  },
 };
 const KIND_ICONS: Record<ProfileKind, string> = { standard: "user", child: "smile", custom: "sliders" };
+
+/** Its age today, from its birth date (« 2016-03-10 »). */
+export function ageOf(birth: string | null | undefined, today = new Date()): number | null {
+  if (!birth) return null;
+  const [year, month, day] = birth.split("-").map(Number) as [number, number, number];
+  const before = today.getMonth() + 1 < month || (today.getMonth() + 1 === month && today.getDate() < day);
+  return today.getFullYear() - year - (before ? 1 : 0);
+}
 
 /** Creating a profile, or (the master) setting one: its name, colour, kind, restrictions, PIN, community. */
 export function ProfileEditor({
@@ -178,8 +200,22 @@ export function ProfileEditor({
 
         <fieldset className="household-editor__section">
           <legend>{t("household:editor.restrictions")}</legend>
+          <TextField
+            label={t("household:editor.birthDate")}
+            hint={
+              ageOf(restrictions.birth_date) !== null
+                ? t("household:editor.birthDateAge", { age: ageOf(restrictions.birth_date) ?? 0 })
+                : t("household:editor.birthDateHint")
+            }
+            type="date"
+            max={new Date().toISOString().slice(0, 10)}
+            value={restrictions.birth_date ?? ""}
+            onChange={(event) => setRestrictions((r) => ({ ...r, birth_date: event.target.value || null }))}
+          />
           <SelectField
             label={t("household:editor.age")}
+            hint={restrictions.birth_date ? t("household:editor.ageFromBirth") : undefined}
+            disabled={Boolean(restrictions.birth_date)}
             value={restrictions.max_age ?? ""}
             onChange={(event) =>
               setRestrictions((r) => ({
@@ -201,6 +237,31 @@ export function ProfileEditor({
             onChange={(event) => setRestrictions((r) => ({ ...r, allow_unrated: event.target.checked }))}
           />
           <p className="household-editor__hint">{t("household:editor.unratedHint")}</p>
+          <fieldset className="household-editor__modes">
+            <legend className="household-editor__label">{t("household:editor.mode")}</legend>
+            {(["hide", "lock"] as const).map((mode) => (
+              <label key={mode} data-checked={restrictions.mode === mode || undefined}>
+                <input
+                  type="radio"
+                  name={`${formId}-mode`}
+                  value={mode}
+                  checked={restrictions.mode === mode}
+                  onChange={() => setRestrictions((r) => ({ ...r, mode }))}
+                />
+                <Icon name={mode === "hide" ? "hide" : "lock"} size={18} />
+                <span>
+                  <strong>{t(`household:editor.mode_${mode}`)}</strong>
+                  <small>{t(`household:editor.mode_${mode}Hint`)}</small>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+          <Switch
+            label={t("household:editor.requests")}
+            checked={restrictions.requests ?? true}
+            onChange={(event) => setRestrictions((r) => ({ ...r, requests: event.target.checked }))}
+          />
+          <p className="household-editor__hint">{t("household:editor.requestsHint")}</p>
           <fieldset className="household-editor__features">
             <legend className="household-editor__label">{t("household:editor.blocked")}</legend>
             {FEATURES.map((feature) => (
@@ -212,6 +273,25 @@ export function ProfileEditor({
               />
             ))}
           </fieldset>
+          <fieldset className="household-editor__features">
+            <legend className="household-editor__label">{t("household:editor.genres")}</legend>
+            {GENRES.map((genre) => (
+              <CheckboxField
+                key={genre}
+                label={t(`household:genre.${genre}`)}
+                checked={(restrictions.genres ?? []).includes(genre)}
+                onChange={(event) =>
+                  setRestrictions((r) => ({
+                    ...r,
+                    genres: event.target.checked
+                      ? [...(r.genres ?? []), genre].sort()
+                      : (r.genres ?? []).filter((g) => g !== genre),
+                  }))
+                }
+              />
+            ))}
+          </fieldset>
+          <p className="household-editor__hint">{t("household:editor.genresHint")}</p>
         </fieldset>
 
         <fieldset className="household-editor__section">

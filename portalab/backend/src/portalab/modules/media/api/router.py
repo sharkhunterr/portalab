@@ -32,6 +32,7 @@ from portalab.modules.media.insights.deep import portraits
 from portalab.modules.media.insights.enrich import KINDS as ENRICHED_KINDS
 from portalab.modules.media.insights.enrich import TASK as ENRICH_TASK
 from portalab.modules.media.insights.progress import history_task
+from portalab.modules.media.links.household import link_holder
 from portalab.modules.media.models import (
     Activity,
     ActivityCursor,
@@ -94,6 +95,9 @@ class MediaCard(BaseModel):
     at: str | None = None  # 027: when it was added or released (« new » / « released » shelves)
     episode: str | None = None  # 027: « S02E05 » when a new episode brought the series up
     requested: bool = False  # #92: not available yet, a request for it in progress (its poster says so)
+    locked: bool = (
+        False  # 032: above this household profile's age rating, shown locked by its master's choice
+    )
 
 
 class MediaPage(BaseModel):
@@ -102,7 +106,20 @@ class MediaPage(BaseModel):
     total: int | None = None  # #111: how many titles match the filters in all
 
 
+class AgeRatingSource(BaseModel):
+    source: str  # a country (« FR », « US »…), « TMDB » (one rating only), or « server » (Plex, Jellyfin)
+    value: str
+
+
+class AgeRating(BaseModel):
+    """032: a title's age ratings and the strictest age they stand for (a household profile's limit)."""
+
+    age: int | None = None
+    ratings: list[AgeRatingSource] = []
+
+
 class MediaDetail(MediaCard):
+    age_rating: AgeRating = AgeRating()
     status: str
     parent_id: UUID | None
     position: int | None
@@ -349,7 +366,9 @@ async def browse(
         refine=refine,
     )
     return MediaPage(
-        items=await _asked(module, [_card(row, image) for row, image in rows]),
+        items=await module.gate.mark(
+            principal, await _asked(module, [_card(row, image) for row, image in rows])
+        ),
         next_cursor=next_cursor,
         total=total,
     )
@@ -383,7 +402,7 @@ async def discovery(principal: Reader, shelf: str, module: Module) -> MediaShelf
         raise MediaNotFound("This shelf does not exist.")
     if shelf in ("new", "released"):  # 027: with when it was added or released
         size = max(1, min(module.config.discovery_shelf_size, 50))
-        hidden = await module.gate.blocked(principal)  # 032: not what a profile's age rating keeps from it
+        hidden = await module.gate.hidden(principal)  # 032: not what a profile's age rating keeps from it
         recents = [r for r in await module.discovery.recent(shelf, limit=size) if r[0].id not in hidden]
         async with module.database.session() as session:
             images = await module.catalog._images(session, [r.id for r, _ in recents])
@@ -391,14 +410,15 @@ async def discovery(principal: Reader, shelf: str, module: Module) -> MediaShelf
             _card(r, images.get(r.id)).model_copy(update={"at": note.at, "episode": note.episode})
             for r, note in recents
         ]
-        return MediaShelf(
-            shelf=shelf, items=await _asked(module, items), next_action=None if items else "browse"
-        )
+        items = await module.gate.mark(principal, await _asked(module, items))
+        return MediaShelf(shelf=shelf, items=items, next_action=None if items else "browse")
     rows, next_action = await module.discovery.shelf(shelf, principal)
     rows = await module.gate.keep(principal, rows)
     async with module.database.session() as session:
         images = await module.catalog._images(session, [r.id for r in rows])
-    cards = await _asked(module, [_card(r, images.get(r.id)) for r in rows])
+    cards = await module.gate.mark(
+        principal, await _asked(module, [_card(r, images.get(r.id)) for r in rows])
+    )
     return MediaShelf(shelf=shelf, items=cards, next_action=next_action)
 
 
@@ -599,6 +619,16 @@ async def _guard_filters(module: Any, principal: Principal, period: str, scope: 
     return locked
 
 
+async def _scoped(module: Any, principal: Principal, scope: str) -> UUID | None:
+    """Whose statistics: mine, the server's (``None``), or (032) my household's — its master's, which the
+    shared media account's plays all go to (a profile has its own too: what it watched with the portal's
+    player)."""
+    if scope == "all":
+        return None
+    me = _me(principal)
+    return await link_holder(module.capabilities, me) if scope == "household" else me
+
+
 @router.get("/me/media/insights/locked")
 async def locked_statistics(principal: Reader, module: Module) -> dict[str, list[str]]:
     """061: what is still to unlock in the shop — sections, tabs, filters and request statistics."""
@@ -635,7 +665,7 @@ async def insights(
     module: Module,
     period: Annotated[str, Query(pattern=INSIGHT_PERIOD)] = "30d",
     category: Annotated[str, Query(pattern=INSIGHT_CATEGORY)] = "all",
-    scope: Literal["me", "all"] = "me",
+    scope: Literal["me", "household", "all"] = "me",
     tz: Annotated[str, Query(max_length=64)] = "UTC",
 ) -> dict[str, Any]:
     """What was watched, listened to and read — mine, or the server's (anonymous unless media manager)."""
@@ -644,7 +674,7 @@ async def insights(
     data = await module.insights.overview(
         period=period,
         category=category,
-        user=_me(principal) if scope == "me" else None,
+        user=await _scoped(module, principal, scope),
         manager=manager,
         tz=_zone(tz),
     )
@@ -683,7 +713,7 @@ async def insights_section(
     section: Annotated[str, Path(pattern=r"^(casting|production|playback|profile)$")],
     period: Annotated[str, Query(pattern=INSIGHT_PERIOD)] = "30d",
     category: Annotated[str, Query(pattern=INSIGHT_CATEGORY)] = "all",
-    scope: Literal["me", "all"] = "me",
+    scope: Literal["me", "household", "all"] = "me",
     tz: Annotated[str, Query(max_length=64)] = "UTC",
 ) -> dict[str, Any]:
     """027: one tab of the statistics in depth (casting, production, playback, profile), compared with the
@@ -696,8 +726,8 @@ async def insights_section(
         section,
         period=period,
         category=category,
-        user=_me(principal) if scope == "me" else None,
-        detailed=scope == "me" or manager,
+        user=await _scoped(module, principal, scope),
+        detailed=scope != "all" or manager,
         tz=_zone(tz),
     )
     films = [*(data.get("successes") or []), *(data.get("flops") or [])]
@@ -810,7 +840,9 @@ async def object_metadata(_: Reader, object_id: UUID, module: Module) -> dict[st
 
 @router.get("/media/{object_id}", response_model=MediaDetail)
 async def detail(principal: Reader, object_id: UUID, module: Module) -> MediaDetail:
-    return _detail(await module.catalog.get(principal, object_id))
+    view = _detail(await module.catalog.get(principal, object_id))
+    rating = await module.gate.rating(object_id)  # 032: shown on the title's page
+    return view.model_copy(update={"age_rating": AgeRating.model_validate(rating)})
 
 
 @router.get("/media/{object_id}/journey")

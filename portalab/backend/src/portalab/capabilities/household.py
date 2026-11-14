@@ -4,6 +4,7 @@ on it), what a profile may not do (kept-out features, a maximum age rating) and 
 open one title anyway. Identity owns the households; nothing here changes a connected service."""
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Literal, Protocol, get_args, runtime_checkable
 from uuid import UUID
@@ -17,6 +18,22 @@ KINDS: tuple[str, ...] = get_args(Kind)
 Feature = Literal["shop", "requests", "ai", "community", "games", "support"]
 FEATURES: tuple[str, ...] = get_args(Feature)
 AGES: tuple[int, ...] = (0, 6, 10, 12, 14, 16, 18)
+# 032: genres a master may keep from a profile whatever their rating, by the words their tags use (en, fr)
+GENRE_WORDS: dict[str, tuple[str, ...]] = {
+    "horror": ("horror", "horreur", "épouvante", "epouvante"),
+    "thriller": ("thriller",),
+    "crime": ("crime", "policier"),
+    "war": ("war", "guerre"),
+}
+GENRES: tuple[str, ...] = tuple(GENRE_WORDS)
+_WORD = re.compile(r"[^\W\d_]+")
+
+
+def genre_of(tag: str) -> str | None:
+    """The kept-out genre a title's genre tag stands for (« Épouvante-horreur » → ``horror``), if any."""
+    words = set(_WORD.findall(tag.casefold()))
+    return next((genre for genre, names in GENRE_WORDS.items() if words & set(names)), None)
+
 
 # the permissions a kept-out feature withholds from a profile, whatever its roles grant
 FEATURE_PERMISSIONS: dict[str, tuple[str, ...]] = {
@@ -29,18 +46,26 @@ FEATURE_PERMISSIONS: dict[str, tuple[str, ...]] = {
 }
 
 
+Mode = Literal["hide", "lock"]
+
+
 @dataclass(frozen=True, slots=True)
 class Restrictions:
-    """What a profile may not reach: titles rated above ``max_age`` (``None``: no limit), unrated titles
-    unless ``allow_unrated``, and the kept-out ``blocked`` features."""
+    """What a profile may not reach: titles rated above ``max_age`` (``None``: no limit — its age today when
+    its master gave a birth date), unrated titles unless ``allow_unrated``, and the kept-out ``blocked``
+    features. Titles kept from it are hidden (``hide``) or shown locked (``lock``); ``requests``: whether it
+    may ask its master for one."""
 
     max_age: int | None = None
     allow_unrated: bool = True
     blocked: frozenset[str] = frozenset()
+    mode: Mode = "hide"
+    requests: bool = True
+    genres: frozenset[str] = frozenset()  # kept out whatever their rating (``horror``…)
 
     @property
     def limits_titles(self) -> bool:
-        return self.max_age is not None or not self.allow_unrated
+        return self.max_age is not None or not self.allow_unrated or bool(self.genres)
 
     def withholds(self, permission: str) -> bool:
         return any(permission in FEATURE_PERMISSIONS.get(feature, ()) for feature in self.blocked)
@@ -79,14 +104,24 @@ _NUMBER = re.compile(r"\d{1,2}")
 
 
 def age_of(rating: str | None) -> int | None:
-    """The minimum age a rating stands for, ``None`` when unrated or unknown (« NR », « Unrated »)."""
+    """The minimum age a rating stands for, ``None`` when unrated or unknown (« NR », « Unrated »); a media
+    server's country prefix is dropped (Plex: « fr/12 », « de/16 »)."""
     text = " ".join((rating or "").upper().replace("_", " ").split())
+    if "/" in text:
+        text = text.split("/", 1)[1].strip()
     if not text:
         return None
     if text in RATING_AGES:
         return RATING_AGES[text]
     found = _NUMBER.search(text)
     return min(int(found.group()), 21) if found else None
+
+
+def strictest_age(ratings: Iterable[str | None]) -> int | None:
+    """032: the strictest age among a title's ratings (TMDB's countries, the media server's): a child's limit
+    holds to it — France rates many horror films 12, the United States R. ``None``: no known rating."""
+    ages = [age for rating in ratings if (age := age_of(rating)) is not None]
+    return max(ages) if ages else None
 
 
 @runtime_checkable

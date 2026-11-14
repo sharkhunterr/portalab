@@ -65,7 +65,8 @@ const HOUSEHOLD = {
       ...tile(LEA, "Léa", "child", { has_pin: true }),
       progress: figures(15),
       community_visible: false,
-      restrictions: { max_age: 12, allow_unrated: false, blocked: ["shop"] },
+      effective_age: 12,
+      restrictions: { max_age: 12, allow_unrated: false, blocked: ["shop"], mode: "hide", requests: true },
     },
   ],
 };
@@ -226,6 +227,17 @@ describe("my household", () => {
     expect((within(editor).getByLabelText("Shop") as HTMLInputElement).checked).toBe(true);
     expect((within(editor).getByLabelText("AI assistant") as HTMLInputElement).checked).toBe(false);
     expect((within(editor).getByRole("radio", { name: /Child/ }) as HTMLInputElement).checked).toBe(true);
+    // 032: a birth date sets the age (the fixed one is then disabled), hidden or locked titles, requests
+    fireEvent.change(within(editor).getByLabelText("Birth date (optional)"), {
+      target: { value: "2016-03-10" },
+    });
+    expect((within(editor).getByLabelText("Maximum age rating") as HTMLSelectElement).disabled).toBe(true);
+    expect(within(editor).getByText(/years old today/)).toBeTruthy();
+    fireEvent.click(within(editor).getByRole("radio", { name: /Shown locked/ }));
+    expect((within(editor).getByRole("radio", { name: /Shown locked/ }) as HTMLInputElement).checked).toBe(
+      true,
+    );
+    expect((within(editor).getByLabelText("May ask for access") as HTMLInputElement).checked).toBe(true);
   });
 
   it("hides the master's tools from a profile", async () => {
@@ -244,6 +256,18 @@ describe("my household", () => {
 });
 
 describe("a locked title", () => {
+  it("says when the profile cannot ask", () => {
+    const problem = new ApiError(403, "restricted", "household.restricted", {
+      object_id: REQUEST.subject_ref,
+      name: "Alien",
+      rating: "16",
+      can_ask: false,
+    });
+    show(<LockedTitle problem={problem} />);
+    expect(screen.getByText("Your profile cannot ask for access to this title.")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Ask for access" })).toBeNull();
+  });
+
   it("asks the master for access", async () => {
     const sent: unknown[] = [];
     fake.handler = async (request) => {
