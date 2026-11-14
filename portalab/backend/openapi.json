@@ -19787,6 +19787,14 @@
             "title": "Services",
             "type": "boolean"
           },
+          "slots": {
+            "items": {
+              "$ref": "#/components/schemas/SlotIn"
+            },
+            "maxItems": 42,
+            "title": "Slots",
+            "type": "array"
+          },
           "titles": {
             "items": {
               "$ref": "#/components/schemas/KeptTitle"
@@ -20641,8 +20649,48 @@
       "ScreenTimeOut": {
         "properties": {
           "allowed": {
-            "title": "Allowed",
-            "type": "integer"
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allowed"
+          },
+          "next": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpanOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "open": {
+            "default": true,
+            "title": "Open",
+            "type": "boolean"
+          },
+          "slot": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpanUseOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "slots": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SpanOut"
+            },
+            "title": "Slots",
+            "type": "array"
           },
           "used": {
             "title": "Used",
@@ -20650,8 +20698,7 @@
           }
         },
         "required": [
-          "used",
-          "allowed"
+          "used"
         ],
         "title": "ScreenTimeOut",
         "type": "object"
@@ -21808,6 +21855,46 @@
         "title": "SittingOut",
         "type": "object"
       },
+      "SlotIn": {
+        "additionalProperties": false,
+        "description": "Issue 432: a span of a weekday a profile may watch, with its own screen time (none: the whole span).",
+        "properties": {
+          "day": {
+            "maximum": 6.0,
+            "minimum": 0.0,
+            "title": "Day",
+            "type": "integer"
+          },
+          "end": {
+            "title": "End",
+            "type": "string"
+          },
+          "minutes": {
+            "anyOf": [
+              {
+                "maximum": 1440.0,
+                "minimum": 5.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minutes"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day",
+          "start",
+          "end"
+        ],
+        "title": "SlotIn",
+        "type": "object"
+      },
       "SourceDayOut": {
         "properties": {
           "amounts": {
@@ -22176,6 +22263,69 @@
           "kind"
         ],
         "title": "SourceSuggestionOut",
+        "type": "object"
+      },
+      "SpanOut": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "string"
+          },
+          "minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minutes"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "SpanOut",
+        "type": "object"
+      },
+      "SpanUseOut": {
+        "properties": {
+          "allowed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allowed"
+          },
+          "end": {
+            "title": "End",
+            "type": "string"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          },
+          "used": {
+            "title": "Used",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "used"
+        ],
+        "title": "SpanUseOut",
         "type": "object"
       },
       "StatResultOut": {

@@ -224,7 +224,9 @@ function MemberCard({
           <dd>{format.number(member.progress.contribution)}</dd>
         </div>
       </dl>
-      {member.restrictions?.daily_minutes || member.restrictions?.week_minutes ? (
+      {member.restrictions?.daily_minutes ||
+      member.restrictions?.week_minutes ||
+      member.restrictions?.slots?.length ? (
         <ScreenLine member={member} />
       ) : null}
       <div className="household-member__badges">
@@ -472,15 +474,30 @@ function MyPin({
   );
 }
 
-/** 032: how much of its screen time a profile spent today. */
+/** 032: how much of its screen time a profile spent today — 432: and its span now, or the next one. */
 function ScreenLine({ member }: { member: HouseholdMember }) {
   const t = useT();
   const screen = useScreenTime(member.id).data;
   if (!screen) return null;
+  const parts = [
+    screen.allowed !== null && screen.allowed !== undefined
+      ? t("household:screen.today", { used: screen.used, allowed: screen.allowed })
+      : null,
+    screen.slot
+      ? screen.slot.allowed
+        ? t("household:screen.slot", { used: screen.slot.used, allowed: screen.slot.allowed })
+        : t("household:screen.slotOpen", { end: screen.slot.end })
+      : screen.open === false
+        ? t("household:screen.closed")
+        : null,
+    !screen.slot && screen.next
+      ? t("household:screen.next", { start: screen.next.start, end: screen.next.end })
+      : null,
+  ].filter(Boolean);
+  if (!parts.length) return null;
   return (
     <p className="household-screen">
-      <Icon name="clock" size={14} />{" "}
-      {t("household:screen.today", { used: screen.used, allowed: screen.allowed })}
+      <Icon name="clock" size={14} /> {parts.join(" · ")}
     </p>
   );
 }
@@ -495,7 +512,11 @@ function QuickTime({ member }: { member: HouseholdMember }) {
   const name = member.display_name;
   const until = member.free_until ? new Date(member.free_until) : null;
   const freed = until !== null && until.getTime() > Date.now();
-  const timed = Boolean(member.restrictions?.daily_minutes || member.restrictions?.week_minutes);
+  const timed = Boolean(
+    member.restrictions?.daily_minutes ||
+      member.restrictions?.week_minutes ||
+      member.restrictions?.slots?.length,
+  );
   const failed = () => notify({ severity: "critical", title: t("household:error") });
   const freeFor = (minutes: number) =>
     free.mutate(

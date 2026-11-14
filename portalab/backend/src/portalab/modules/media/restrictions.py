@@ -230,10 +230,50 @@ class TitleGate:
         allowed = restrictions.minutes_on(start.date())  # 432: the weekly plan's, and today's extra minutes
         if allowed is None:
             return None
+        return await self._used(user, start), allowed
+
+    async def screen_now(self, viewer: Principal | UUID | None) -> dict[str, Any] | None:
+        """Issue 432: the profile's screen time now — the day's (``used``/``allowed``), whether it may watch
+        at this hour (``open``), the span it is in with that span's use, today's spans and the next one."""
+        restrictions = await self.restrictions_any(viewer)
+        user = viewer_of(viewer)
+        if restrictions is None or user is None:
+            return None
+        start = await self._day_start()
+        now = datetime.now(start.tzinfo)
+        allowed = restrictions.minutes_on(start.date())
+        spans = restrictions.slots_on(now.weekday())
+        if allowed is None and not spans and restrictions.hours is None:
+            return None
+        is_open, slot = restrictions.window(now)
+        used = await self._used(user, start)
+        current = None
+        if slot is not None:
+            since = start.replace(hour=int(slot.start[:2]), minute=int(slot.start[3:]))
+            current = {
+                "start": slot.start,
+                "end": slot.end,
+                "used": await self._used(user, since),
+                "allowed": restrictions.slot_minutes(slot, start.date()),
+            }
+        clock = now.strftime("%H:%M")
+        upcoming = next((span for span in spans if span.start > clock), None)
+        return {
+            "used": used,
+            "allowed": allowed,
+            "open": is_open,
+            "slot": current,
+            "slots": [{"start": s.start, "end": s.end, "minutes": s.minutes} for s in spans],
+            "next": {"start": upcoming.start, "end": upcoming.end} if upcoming else None,
+            "hours": list(restrictions.hours) if restrictions.hours and not spans else None,
+        }
+
+    async def _used(self, user: UUID, since: datetime) -> int:
+        """Minutes watched, read or played in the portal since then (ended and running sittings)."""
         async with self.database.session() as session:
             ended = await session.scalar(
                 select(func.coalesce(func.sum(Activity.watched_s), 0.0)).where(
-                    Activity.user_id == user, Activity.stopped_at >= start
+                    Activity.user_id == user, Activity.stopped_at >= since
                 )
             )
             running = await session.scalar(
@@ -248,29 +288,39 @@ class TitleGate:
                 ).where(
                     PlaybackSession.played_by == user,
                     PlaybackSession.ended.is_(False),
-                    PlaybackSession.started_at >= start,
+                    PlaybackSession.started_at >= since,
                 )
             )
-        used = int((float(ended or 0) + max(0.0, float(running or 0))) // 60)
-        return used, allowed
+        return int((float(ended or 0) + max(0.0, float(running or 0))) // 60)
 
     async def check_screen(self, viewer: Principal | UUID | None) -> None:
         """Refuse to open a title once the profile's screen time of the day is spent — 432: or outside the
-        hours its master set."""
-        restrictions = await self.restrictions_any(viewer)
-        if restrictions is not None and restrictions.hours is not None:
-            now = await self._day_start()
-            local = datetime.now(now.tzinfo).time()
-            if not restrictions.allowed_at(local):
-                raise ScreenTimeUp(
-                    "This profile may not watch at this hour.",
-                    extensions={"hours": list(restrictions.hours), "reason": "hours"},
-                )
-        today = await self.screen_today(viewer)
-        if today is not None and today[0] >= today[1]:
+        spans (hours) its master set, or once the span's own time is spent."""
+        now = await self.screen_now(viewer)
+        if now is None:
+            return
+        if not now["open"]:
+            hours = now["hours"] or ([now["next"]["start"], now["next"]["end"]] if now["next"] else None)
+            raise ScreenTimeUp(
+                "This profile may not watch at this hour.",
+                extensions={"reason": "hours", "hours": hours, "next": now["next"], "slots": now["slots"]},
+            )
+        slot = now["slot"]
+        if slot is not None and slot["allowed"] is not None and slot["used"] >= slot["allowed"]:
+            raise ScreenTimeUp(
+                "This profile's screen time for this span is spent.",
+                extensions={
+                    "reason": "slot",
+                    "used": slot["used"],
+                    "allowed": slot["allowed"],
+                    "hours": [slot["start"], slot["end"]],
+                    "next": now["next"],
+                },
+            )
+        if now["allowed"] is not None and now["used"] >= now["allowed"]:
             raise ScreenTimeUp(
                 "This profile's screen time for today is spent.",
-                extensions={"used": today[0], "allowed": today[1]},
+                extensions={"used": now["used"], "allowed": now["allowed"]},
             )
 
     async def restrictions_any(self, viewer: Principal | UUID | None) -> Restrictions | None:

@@ -291,7 +291,7 @@ async def test_kinds_titles_and_screen_time(
 
     await login(client, "zoe")
     seen = await client.get("/api/v1/me/media/screen-time", params={"profile": str(lea)})
-    assert seen.json() == {"used": 20, "allowed": 15}  # its master sees it
+    assert seen.json()["used"] == 20 and seen.json()["allowed"] == 15  # its master sees it
     assert (await client.get("/api/v1/me/media/screen-time")).json() is None  # the master has none
 
 
@@ -390,3 +390,38 @@ async def test_a_shown_title_opens_its_page_but_not_its_player(
     assert page.json()["restricted"]["rating"] == "16+" and page.json()["restricted"]["can_ask"] is True
     assert (await client.get(f"/api/v1/media/{ids['Coco']}")).json()["restricted"] is None
     assert (await client.get(f"/api/v1/media/{ids['Alien']}/player")).status_code == 403
+
+
+async def test_spans_shape_what_a_profile_may_open_now(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 432: the screen time now — the span a profile is in, with its own time; outside every span of
+    the day, nothing opens."""
+    from portalab.modules.media.restrictions import ScreenTimeUp
+
+    people = await users(app, media, "zoe")
+    created = await households(app).create(
+        Principal(user_id=people["zoe"]), display_name="Léa", kind="child", color=None, pin=None
+    )
+    lea = UUID(str(created["id"]))
+    viewer = Principal(user_id=lea, profile_of=people["zoe"])
+    await login(client, "zoe")
+    whole_day = [{"day": d, "start": "00:00", "end": "24:00", "minutes": 45} for d in range(7)]
+    changed = await client.patch(
+        f"/api/v1/household/profiles/{lea}", json={"restrictions": {"slots": whole_day}}
+    )
+    assert changed.status_code == 204, changed.text
+    seen = (await client.get("/api/v1/me/media/screen-time", params={"profile": str(lea)})).json()
+    assert seen["open"] is True and seen["slot"]["allowed"] == 45 and seen["slot"]["used"] == 0
+    assert seen["allowed"] is None and len(seen["slots"]) == 1
+    await media.module.gate.check_screen(viewer)  # within its span, time left
+
+    now = datetime.now(UTC)  # the portal's day in the tests: UTC
+    if now.strftime("%H:%M") >= "00:01":
+        closed = [{"day": now.weekday(), "start": "00:00", "end": "00:01"}]
+        await client.patch(f"/api/v1/household/profiles/{lea}", json={"restrictions": {"slots": closed}})
+        seen = (await client.get("/api/v1/me/media/screen-time", params={"profile": str(lea)})).json()
+        assert seen["open"] is False and seen["slot"] is None
+        with pytest.raises(ScreenTimeUp) as up:
+            await media.module.gate.check_screen(viewer)
+        assert up.value.extensions["reason"] == "hours"

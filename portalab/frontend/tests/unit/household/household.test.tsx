@@ -231,7 +231,7 @@ describe("my household", () => {
     expect((within(editor).getByLabelText("Horror") as HTMLInputElement).checked).toBe(false);
     fireEvent.click(within(editor).getByLabelText("Horror"));
     expect((within(editor).getByLabelText("Horror") as HTMLInputElement).checked).toBe(true);
-    expect(within(editor).getByLabelText("A day, in the portal's player and reader")).toBeTruthy();
+    expect(within(editor).getByLabelText("Most screen time on Monday")).toBeTruthy(); // issue 432: the planner
     expect((within(editor).getByRole("radio", { name: /Child/ }) as HTMLInputElement).checked).toBe(true);
     // 032: a birth date sets the age (the fixed one is then disabled), hidden or locked titles, requests
     fireEvent.change(within(editor).getByLabelText("Birth date (optional)"), {
@@ -292,7 +292,7 @@ describe("my household", () => {
     await waitFor(() => expect(posted.at(-1)).toEqual(["free", { minutes: null }]));
   });
 
-  it("keeps out any genre, plans each day and sets the allowed hours", async () => {
+  it("keeps out any genre, plans spans of the week and shows titles above its age", async () => {
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;
       if (path === "/api/v1/household") return json(200, HOUSEHOLD);
@@ -310,12 +310,8 @@ describe("my household", () => {
     fireEvent.click(within(editor).getByRole("button", { name: "Remove science fiction" }));
     expect(within(editor).queryByRole("button", { name: "Remove science fiction" })).toBeNull();
 
-    fireEvent.click(within(editor).getByLabelText("A plan for each day of the week"));
-    expect(within(editor).getByLabelText("Monday")).toBeTruthy();
-    expect(within(editor).getByLabelText("Sunday")).toBeTruthy();
-    fireEvent.click(within(editor).getByLabelText("Allowed hours"));
-    expect((within(editor).getByLabelText(/^From/) as HTMLInputElement).value).toBe("08:00");
-    expect((within(editor).getByLabelText(/^To/) as HTMLInputElement).value).toBe("20:00");
+    fireEvent.click(within(editor).getByRole("button", { name: "Add a span on Saturday" }));
+    expect(within(editor).getByRole("region", { name: "Span on Saturday" })).toBeTruthy();
     fireEvent.click(within(editor).getByRole("radio", { name: /^Shown(?! locked)/ }));
     expect(
       (within(editor).getByRole("radio", { name: /^Shown(?! locked)/ }) as HTMLInputElement).checked,

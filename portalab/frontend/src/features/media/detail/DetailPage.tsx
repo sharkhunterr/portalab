@@ -802,11 +802,16 @@ function Read({ objectId }: { objectId: string }) {
   );
 }
 
-/** 032: why nothing opens now — the day's screen time spent, or (issue 432) outside the allowed hours. */
-function screenUp(error: unknown, t: ReturnType<typeof useT>): string {
-  const hours = error instanceof ApiError ? error.extensions.hours : undefined;
-  if (error instanceof ApiError && error.extensions.reason === "hours" && Array.isArray(hours))
-    return t("household:screen.hours", { from: String(hours[0] ?? ""), to: String(hours[1] ?? "") });
+/** 032: why nothing opens now — the day's screen time spent, or (issue 432) outside its spans, or the
+ * span's own time spent. */
+export function screenUp(error: unknown, t: ReturnType<typeof useT>): string {
+  const extensions = error instanceof ApiError ? error.extensions : {};
+  const next = extensions.next as { start?: string; end?: string } | null | undefined;
+  if (extensions.reason === "slot") return t("household:screen.slotUp");
+  if (extensions.reason === "hours")
+    return next?.start
+      ? t("household:screen.hoursNext", { start: next.start, end: next.end ?? "" })
+      : t("household:screen.hoursNone");
   return t("household:screen.up");
 }
 

@@ -643,9 +643,27 @@ async def _scoped(module: Any, principal: Principal, scope: str) -> UUID | None:
     return await link_holder(module.capabilities, me) if scope == "household" else me
 
 
+class SpanUseOut(BaseModel):
+    start: str
+    end: str
+    used: int
+    allowed: int | None = None  # none: as long as the span lasts
+
+
+class SpanOut(BaseModel):
+    start: str
+    end: str
+    minutes: int | None = None
+
+
 class ScreenTimeOut(BaseModel):
     used: int  # minutes today in the portal's player and reader
-    allowed: int  # minutes a day its master allows
+    allowed: int | None = None  # minutes a day its master allows (none: no daily limit)
+    # issue 432: whether it may watch now, the span it is in, today's spans and the next one
+    open: bool = True
+    slot: SpanUseOut | None = None
+    slots: list[SpanOut] = []
+    next: SpanOut | None = None
 
 
 @router.get("/me/media/screen-time", response_model=ScreenTimeOut | None)
@@ -657,8 +675,8 @@ async def screen_time(principal: Reader, module: Module, profile: UUID | None = 
         principal.profile_of is not None or await link_holder(module.capabilities, whom) != me
     ):
         raise MediaNotFound("This profile does not exist.")
-    today = await module.gate.screen_today(whom)
-    return ScreenTimeOut(used=today[0], allowed=today[1]) if today is not None else None
+    now = await module.gate.screen_now(whom)
+    return ScreenTimeOut.model_validate(now) if now is not None else None
 
 
 @router.get("/me/media/insights/locked")

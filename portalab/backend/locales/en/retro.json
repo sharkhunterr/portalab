@@ -26,6 +26,7 @@
   "error.nothing": "This game cannot be played in the portal: no emulator here runs its console, or the library no longer has its file.",
   "error.restricted": "This game is not available on this profile.",
   "error.screen": "Screen time is up for today. See you tomorrow!",
+  "error.slot": "The time of this span is spent.",
   "error.unavailable": "The game library did not answer. Try again in a moment.",
   "intro": "{title} plays right here, in the library's own emulator. Your saves follow you on every device.",
   "left": "{count, plural, one {# minute left} other {# minutes left}}",

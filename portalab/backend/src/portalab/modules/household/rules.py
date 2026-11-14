@@ -2,10 +2,11 @@
 
 import re
 from datetime import UTC, date, datetime
+from itertools import pairwise
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
 from portalab.capabilities.household import (
     AGES,
@@ -14,12 +15,15 @@ from portalab.capabilities.household import (
     TYPES,
     Mode,
     Restrictions,
+    Slot,
     genre_key,
 )
 from portalab.core.errors import BadRequest, Conflict, Forbidden
 
 PIN = re.compile(r"\d{4,6}")
 HOUR = re.compile(r"(?:[01]\d|2[0-3]):[0-5]\d")
+END = re.compile(r"(?:[01]\d|2[0-3]):[0-5]\d|24:00")
+MAX_SLOTS = 42  # six spans a day
 MAX_GENRES = 40
 DAY_MINUTES = 24 * 60
 COLOR = re.compile(r"#[0-9a-fA-F]{6}")
@@ -36,6 +40,23 @@ class KeptTitle(BaseModel):
 
     id: UUID
     title: str = Field(default="", max_length=300)
+
+
+class SlotIn(BaseModel):
+    """Issue 432: a span of a weekday a profile may watch, with its own screen time (none: the whole span)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    day: int = Field(ge=0, le=6)  # Monday first
+    start: str
+    end: str
+    minutes: int | None = Field(default=None, ge=5, le=DAY_MINUTES)
+
+    @model_validator(mode="after")
+    def _span(self) -> "SlotIn":
+        if not HOUR.fullmatch(self.start) or not END.fullmatch(self.end) or self.end <= self.start:
+            raise ValueError("a span from HH:MM to a later HH:MM (24:00 at most)")
+        return self
 
 
 class RestrictionSettings(BaseModel):
@@ -61,6 +82,17 @@ class RestrictionSettings(BaseModel):
     week_minutes: list[int | None] | None = None
     hours_from: str | None = None
     hours_to: str | None = None
+    slots: list[SlotIn] = Field(default_factory=list, max_length=MAX_SLOTS)
+
+    @field_validator("slots")
+    @classmethod
+    def _slots(cls, value: list[SlotIn]) -> list[SlotIn]:
+        """Spans of one day never overlap; kept in order."""
+        ordered = sorted(value, key=lambda s: (s.day, s.start))
+        for before, after in pairwise(ordered):
+            if before.day == after.day and after.start < before.end:
+                raise ValueError("two spans of a day overlap")
+        return ordered
 
     @field_validator("week_minutes")
     @classmethod
@@ -161,6 +193,7 @@ class RestrictionSettings(BaseModel):
             hours,
             bonus_minutes,
             bonus_day,
+            tuple(Slot(s.day, s.start, s.end, s.minutes) for s in self.slots),
         )
 
 

@@ -26,6 +26,7 @@
   "error.nothing": "Ce jeu ne se joue pas dans le portail : aucun émulateur n'y fait tourner sa console, ou la ludothèque n'a plus son fichier.",
   "error.restricted": "Ce jeu n'est pas disponible pour ce profil.",
   "error.screen": "Le temps d'écran du jour est écoulé. À demain !",
+  "error.slot": "Le temps de cette plage est écoulé.",
   "error.unavailable": "La ludothèque n'a pas répondu. Réessayez dans un instant.",
   "intro": "{title} se joue ici même, dans l'émulateur de la ludothèque. Vos sauvegardes vous suivent sur tous vos appareils.",
   "left": "{count, plural, one {# minute restante} other {# minutes restantes}}",

@@ -141,7 +141,9 @@ function reasonOf(error: unknown): string {
   if (code === "retro.disabled") return "disabled";
   if (code === "retro.not_playable") return "nothing";
   if (code === "household.screen_time_up")
-    return error instanceof ApiError && error.extensions.reason === "hours" ? "hours" : "screen"; // 432
+    return error instanceof ApiError && ["hours", "slot"].includes(String(error.extensions.reason))
+      ? String(error.extensions.reason) // 432: outside its spans, or the span's time spent
+      : "screen";
   if (code === "household.restricted" || (error instanceof ApiError && error.status === 403))
     return "restricted";
   return "unavailable";

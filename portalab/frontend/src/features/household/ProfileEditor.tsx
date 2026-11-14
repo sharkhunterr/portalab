@@ -15,7 +15,6 @@ import {
   type HouseholdMember,
   type ProfileKind,
   type RestrictionSettings,
-  SCREEN_MINUTES,
   TYPES,
   useCreateProfile,
   useDeleteProfile,
@@ -23,6 +22,7 @@ import {
   useUpdateProfile,
 } from "./api";
 import { ProfileFace } from "./ProfilePicker";
+import { ScreenPlanner } from "./ScreenPlanner";
 
 const KINDS: ProfileKind[] = ["standard", "child", "custom"];
 const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; community: boolean }> = {
@@ -64,7 +64,6 @@ const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; communit
 const KIND_ICONS: Record<ProfileKind, string> = { standard: "user", child: "smile", custom: "sliders" };
 const MODES = ["show", "hide", "lock"] as const;
 const MODE_ICONS: Record<(typeof MODES)[number], string> = { show: "eye", hide: "hide", lock: "lock" };
-const DAYS = [0, 1, 2, 3, 4, 5, 6] as const; // Monday first
 
 /** A genre as the portal keeps it out: its words, lowercased (the server knows the four usual ones). */
 export function genreKey(value: string): string {
@@ -366,7 +365,14 @@ export function ProfileEditor({
           </div>
         </fieldset>
 
-        <ScreenField restrictions={restrictions} onChange={setRestrictions} />
+        <fieldset className="household-editor__section">
+          <legend>{t("household:editor.screen")}</legend>
+          <ScreenPlanner
+            plan={restrictions}
+            onChange={(plan) => setRestrictions((r) => ({ ...r, ...plan }))}
+          />
+          <p className="household-editor__hint">{t("household:editor.screenHint")}</p>
+        </fieldset>
 
         <fieldset className="household-editor__section">
           <legend>{t("household:editor.community")}</legend>
@@ -532,111 +538,6 @@ function GenresField({ genres, onChange }: { genres: string[]; onChange: (genres
           {t("household:editor.genresAddButton")}
         </Button>
       </div>
-    </fieldset>
-  );
-}
-
-/** Issue 432: the screen time — one limit for every day or a plan for each, and the allowed hours. */
-function ScreenField({
-  restrictions,
-  onChange,
-}: {
-  restrictions: RestrictionSettings;
-  onChange: (change: (r: RestrictionSettings) => RestrictionSettings) => void;
-}) {
-  const t = useT();
-  const week = restrictions.week_minutes ?? null;
-  const minutesOptions = (
-    <>
-      <option value="">{t("household:editor.screenNone")}</option>
-      {SCREEN_MINUTES.map((minutes) => (
-        <option key={minutes} value={minutes}>
-          {t("household:editor.screenMinutes", { minutes })}
-        </option>
-      ))}
-    </>
-  );
-  const asNumber = (value: string) => (value === "" ? null : Number(value));
-  const hours = Boolean(restrictions.hours_from && restrictions.hours_to);
-  return (
-    <fieldset className="household-editor__section">
-      <legend>{t("household:editor.screen")}</legend>
-      <Switch
-        label={t("household:editor.week")}
-        checked={week !== null}
-        onChange={(event) =>
-          onChange((r) => ({
-            ...r,
-            week_minutes: event.target.checked ? DAYS.map(() => r.daily_minutes ?? null) : null,
-          }))
-        }
-      />
-      {week === null ? (
-        <SelectField
-          label={t("household:editor.screenLabel")}
-          hint={t("household:editor.screenHint")}
-          value={restrictions.daily_minutes ?? ""}
-          onChange={(event) => onChange((r) => ({ ...r, daily_minutes: asNumber(event.target.value) }))}
-        >
-          {minutesOptions}
-        </SelectField>
-      ) : (
-        <>
-          <p className="household-editor__hint">
-            {t("household:editor.weekHint")} {t("household:editor.screenHint")}
-          </p>
-          <div className="household-week">
-            {DAYS.map((day) => (
-              <SelectField
-                key={day}
-                label={t(`household:editor.day.${day}`)}
-                value={week[day] ?? ""}
-                onChange={(event) =>
-                  onChange((r) => {
-                    const next = [...(r.week_minutes ?? DAYS.map(() => null))];
-                    next[day] = asNumber(event.target.value);
-                    return { ...r, week_minutes: next };
-                  })
-                }
-              >
-                {minutesOptions}
-              </SelectField>
-            ))}
-          </div>
-        </>
-      )}
-      <Switch
-        label={t("household:editor.hours")}
-        checked={hours}
-        onChange={(event) =>
-          onChange((r) => ({
-            ...r,
-            hours_from: event.target.checked ? "08:00" : null,
-            hours_to: event.target.checked ? "20:00" : null,
-          }))
-        }
-      />
-      {hours ? (
-        <>
-          <p className="household-editor__hint">{t("household:editor.hoursHint")}</p>
-          <div className="household-hours">
-            <TextField
-              label={t("household:editor.hoursFrom")}
-              type="time"
-              required
-              value={restrictions.hours_from ?? ""}
-              onChange={(event) => onChange((r) => ({ ...r, hours_from: event.target.value || "00:00" }))}
-            />
-            <TextField
-              label={t("household:editor.hoursTo")}
-              type="time"
-              required
-              value={restrictions.hours_to ?? ""}
-              onChange={(event) => onChange((r) => ({ ...r, hours_to: event.target.value || "00:00" }))}
-            />
-          </div>
-        </>
-      ) : null}
     </fieldset>
   );
 }

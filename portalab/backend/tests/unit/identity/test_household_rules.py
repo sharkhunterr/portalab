@@ -162,3 +162,40 @@ def test_a_weekly_plan_hours_and_a_bonus_shape_the_day() -> None:
         except ValidationError:
             continue
         raise AssertionError(wrong)
+
+
+def test_spans_each_with_its_own_time() -> None:
+    """Issue 432: spans of a weekday — a day with spans opens within them only, each its own time."""
+    from datetime import UTC, date, datetime
+
+    from pydantic import ValidationError
+
+    from portalab.modules.household.rules import RestrictionSettings
+
+    plan = RestrictionSettings(
+        slots=[
+            {"day": 5, "start": "14:00", "end": "18:00", "minutes": 60},
+            {"day": 5, "start": "08:00", "end": "10:00"},
+            {"day": 6, "start": "20:00", "end": "24:00", "minutes": 30},
+        ]
+    )
+    assert [(s.day, s.start) for s in plan.slots] == [(5, "08:00"), (5, "14:00"), (6, "20:00")]
+    today = date(2026, 11, 14)  # a Saturday
+    limits = plan.restrictions(today, bonus_minutes=15, bonus_day=today)
+    assert limits.restricts
+    is_open, slot = limits.window(datetime(2026, 11, 14, 15, 0, tzinfo=UTC))
+    assert is_open and slot is not None and limits.slot_minutes(slot, today) == 75  # with today's bonus
+    assert limits.window(datetime(2026, 11, 14, 12, 0, tzinfo=UTC)) == (False, None)  # between two spans
+    assert limits.window(datetime(2026, 11, 15, 23, 59, tzinfo=UTC))[0]  # « 24:00 »: until midnight
+    assert limits.window(datetime(2026, 11, 16, 12, 0, tzinfo=UTC)) == (True, None)  # Monday: no spans, open
+    for wrong in (
+        [{"day": 1, "start": "10:00", "end": "09:00"}],
+        [{"day": 1, "start": "10:00", "end": "12:00"}, {"day": 1, "start": "11:00", "end": "13:00"}],
+        [{"day": 7, "start": "10:00", "end": "12:00"}],
+        [{"day": 1, "start": "10:00", "end": "12:00", "minutes": 2}],
+    ):
+        try:
+            RestrictionSettings(slots=wrong)  # type: ignore[arg-type]
+        except ValidationError:
+            continue
+        raise AssertionError(wrong)

@@ -19983,6 +19983,8 @@ export interface components {
              * @default true
              */
             services: boolean;
+            /** Slots */
+            slots?: components["schemas"]["SlotIn"][];
             /** Titles */
             titles?: components["schemas"]["KeptTitle"][];
             /** Types */
@@ -20267,7 +20269,19 @@ export interface components {
         /** ScreenTimeOut */
         ScreenTimeOut: {
             /** Allowed */
-            allowed: number;
+            allowed?: number | null;
+            next?: components["schemas"]["SpanOut"] | null;
+            /**
+             * Open
+             * @default true
+             */
+            open: boolean;
+            slot?: components["schemas"]["SpanUseOut"] | null;
+            /**
+             * Slots
+             * @default []
+             */
+            slots: components["schemas"]["SpanOut"][];
             /** Used */
             used: number;
         };
@@ -20649,6 +20663,20 @@ export interface components {
             /** State Url */
             state_url?: string | null;
         };
+        /**
+         * SlotIn
+         * @description Issue 432: a span of a weekday a profile may watch, with its own screen time (none: the whole span).
+         */
+        SlotIn: {
+            /** Day */
+            day: number;
+            /** End */
+            end: string;
+            /** Minutes */
+            minutes?: number | null;
+            /** Start */
+            start: string;
+        };
         /** SourceDayOut */
         SourceDayOut: {
             /** Amounts */
@@ -20779,6 +20807,26 @@ export interface components {
             name: string;
             /** Url */
             url: string;
+        };
+        /** SpanOut */
+        SpanOut: {
+            /** End */
+            end: string;
+            /** Minutes */
+            minutes?: number | null;
+            /** Start */
+            start: string;
+        };
+        /** SpanUseOut */
+        SpanUseOut: {
+            /** Allowed */
+            allowed?: number | null;
+            /** End */
+            end: string;
+            /** Start */
+            start: string;
+            /** Used */
+            used: number;
         };
         /** StatResultOut */
         StatResultOut: {

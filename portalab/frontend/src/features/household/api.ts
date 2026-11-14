@@ -164,10 +164,7 @@ export function useDecideAccess() {
   });
 }
 
-export interface ScreenTime {
-  used: number;
-  allowed: number;
-}
+export type ScreenTime = components["schemas"]["ScreenTimeOut"];
 
 /** A profile's screen time today (``null``: none set). */
 export function useScreenTime(profile: string | null, enabled = true) {

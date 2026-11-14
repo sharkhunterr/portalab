@@ -74,6 +74,22 @@ FEATURE_PERMISSIONS: dict[str, tuple[str, ...]] = {
 }
 
 
+@dataclass(frozen=True, slots=True)
+class Slot:
+    """A span of a weekday a profile may watch (``day`` 0 Monday; « HH:MM », ``end`` up to « 24:00 »), with
+    its own screen time (``minutes``; ``None``: as long as the span lasts, within the day's)."""
+
+    day: int
+    start: str
+    end: str
+    minutes: int | None = None
+
+    def holds(self, moment: time) -> bool:
+        return time.fromisoformat(self.start) <= moment and (
+            self.end == "24:00" or moment < time.fromisoformat(self.end)
+        )
+
+
 Mode = Literal["show", "hide", "lock"]  # issue 432: « show » — listed as any title, a padlock, never opened
 
 
@@ -100,6 +116,25 @@ class Restrictions:
     hours: tuple[str, str] | None = None
     bonus_minutes: int = 0
     bonus_day: date | None = None
+    slots: tuple[Slot, ...] = ()  # issue 432: the spans it may watch, each its own screen time
+
+    def slots_on(self, weekday: int) -> tuple[Slot, ...]:
+        return tuple(sorted((s for s in self.slots if s.day == weekday), key=lambda s: s.start))
+
+    def window(self, moment: datetime) -> tuple[bool, Slot | None]:
+        """Whether it may watch at this (local) moment, and the span it falls in: a day with spans opens
+        within them only; a day without, all day (or within the old allowed hours)."""
+        spans = self.slots_on(moment.weekday())
+        if not spans:
+            return self.allowed_at(moment.time()), None
+        found = next((span for span in spans if span.holds(moment.time())), None)
+        return found is not None, found
+
+    def slot_minutes(self, slot: Slot, day: date) -> int | None:
+        """A span's screen time that day, with what its master added for the day."""
+        if slot.minutes is None:
+            return None
+        return slot.minutes + (self.bonus_minutes if self.bonus_day == day else 0)
 
     def minutes_on(self, day: date) -> int | None:
         """Its screen time on that day: the plan's (or every day's), and what its master added for it."""
@@ -130,7 +165,12 @@ class Restrictions:
     @property
     def restricts(self) -> bool:
         """Whether anything at all is restricted (titles, features, screen time, the services)."""
-        timed = self.daily_minutes is not None or self.week_minutes is not None or self.hours is not None
+        timed = (
+            self.daily_minutes is not None
+            or self.week_minutes is not None
+            or self.hours is not None
+            or bool(self.slots)
+        )
         return self.limits_titles or bool(self.blocked) or timed or not self.services
 
     @property

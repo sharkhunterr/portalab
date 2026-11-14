@@ -148,6 +148,7 @@ async def test_everyone_sees_the_household_the_master_manages_it(
         "week_minutes": None,
         "hours_from": None,
         "hours_to": None,
+        "slots": [],
     }
     assert child["community_visible"] is False and child["has_pin"] is True
 
