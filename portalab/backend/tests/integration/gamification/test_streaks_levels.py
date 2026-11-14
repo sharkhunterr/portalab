@@ -8,6 +8,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy import text
 
+from portalab.capabilities.events import EventType
 from portalab.modules.gamification.progression.sources import split
 from portalab.modules.gamification.streaks.service import multiplier_for, parse_streak
 from tests.integration.gamification.conftest import RULE, GamHarness
@@ -43,6 +44,35 @@ async def test_streak_multiplies(gm: GamHarness) -> None:
     assert await gm.balance(user) == 150 + 20
     state = await gm.module.streaks.current(user, start + timedelta(days=7))
     assert state["days"] == 1 and state["next"] == {"days": 2, "multiplier": 1.5}
+
+
+async def test_live_tv_keeps_the_streak_of_finished_plays(gm: GamHarness) -> None:
+    """Issue 415: a live TV sitting never « finishes » — long enough, it keeps a streak of finished plays."""
+    gm.module.config = replace(
+        gm.module.config, streak={**STREAK, "event_types": ["media.playback_finished"]}
+    )
+    gm.ev.types.register(EventType("media.playback_abandoned", "test:media"))
+    await gm.rule("abandoned", {**RULE, "event_type": "media.playback_abandoned"})
+    user = gm.people["ursula"]
+    start = gm.clock.now() + timedelta(hours=1)
+    live = {"kind": "live", "watched_s": 1800}
+    for day in (0, 1):
+        await gm.emit(user, live, at=start + timedelta(days=day), event_type="media.playback_abandoned")
+    assert await gm.balance(user) == 20 + 30
+    await gm.emit(  # a film stopped halfway is not a finished play
+        user,
+        {"kind": "movie", "watched_s": 1800},
+        at=start + timedelta(days=2),
+        event_type="media.playback_abandoned",
+    )
+    await gm.emit(  # a sitting too short does not count
+        user,
+        {**live, "watched_s": 60},
+        at=start + timedelta(days=2, hours=1),
+        event_type="media.playback_abandoned",
+    )
+    state = await gm.module.streaks.current(user, start + timedelta(days=2, hours=2))
+    assert state["days"] == 2  # yesterday's streak, still alive — today not counted
 
 
 async def test_pace_multiplies_every_rule(gm: GamHarness, client: AsyncClient) -> None:

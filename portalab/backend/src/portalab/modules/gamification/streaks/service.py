@@ -47,6 +47,18 @@ def parse_streak(raw: Any) -> StreakConfig:
         return StreakConfig()
 
 
+FINISHED = "media.playback_finished"
+PARTIAL = "media.playback_abandoned"
+
+
+def counts(config: StreakConfig, event: Envelope) -> bool:
+    """One of the counted things — or (issue 415) a live TV sitting where finished plays count: live TV has no
+    end, its sitting long enough (``min_watched_s``) is its finished play."""
+    if event.type in config.event_types:
+        return True
+    return event.type == PARTIAL and event.payload.get("kind") == "live" and FINISHED in config.event_types
+
+
 def multiplier_for(config: StreakConfig, days: int) -> float:
     """The multiplier of the highest tier reached (1 below the first tier)."""
     reached = [t.multiplier for t in config.tiers if days >= t.days]
@@ -197,7 +209,7 @@ class Streaks:
         self, user: UUID, event: Envelope, value: Value, at: datetime
     ) -> Sequence[Modifier]:
         config = self.settings()
-        if not config.enabled or event.type not in config.event_types:
+        if not config.enabled or not counts(config, event):
             return []
         watched = event.payload.get("watched_s")
         if isinstance(watched, int | float) and watched < config.min_watched_s:
