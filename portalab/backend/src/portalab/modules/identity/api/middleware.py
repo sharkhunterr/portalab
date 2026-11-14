@@ -97,16 +97,23 @@ class SessionPrincipalResolver:
             async with ctx.database.unit_of_work() as uow:
                 now, seen = ctx.now(), list[datetime]()
                 row = await module.sessions.resolve(uow.session, token, now, seen=seen)
-                state = None
+                state, acting = None, None
                 if row is not None:
                     state = await uow.session.scalar(select(User.state).where(User.id == row.user_id))
+                    # 032: the household profile this session acts as (a profile gone: no principal at all —
+                    # never its master's rights in a child's hands)
+                    acting = await module.household.acting(uow.session, row)
+                    if row.acting_user_id is not None and acting is None:
+                        state = None
                 if row is not None and seen and state == AccountState.ACTIVE.value:
-                    await record_visit(ctx, uow.session, row.user_id, now, since=seen[0])
+                    await record_visit(ctx, uow.session, acting or row.user_id, now, since=seen[0])
         except (SQLAlchemyError, OSError) as exc:
             raise Unavailable("Authentication is temporarily unavailable.", code="auth.unavailable") from exc
         if row is None or state != AccountState.ACTIVE.value:
             return ANONYMOUS
         check_csrf(request, token)
+        if acting is not None:
+            return Principal(user_id=acting, session_id=row.id, profile_of=row.user_id)
         return Principal(user_id=row.user_id, session_id=row.id)
 
 

@@ -8,10 +8,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.administration import BOOTSTRAP_CAPABILITY as BOOTSTRAP
 from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
+from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
+from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.core.jobs.queue import enqueue
 from portalab.core.jobs.registry import JobRegistry
 from portalab.modules.identity import event_types as _event_types  # noqa: F401 — registers event types
 from portalab.modules.identity.context import OWNER, IdentityContext
+from portalab.modules.identity.household.service import CATEGORY as HOUSEHOLD_CATEGORY
+from portalab.modules.identity.household.service import HouseholdService
 from portalab.modules.identity.jobs import dormancy, finalize_deletion, sessions_prune, verification_expiry
 from portalab.modules.identity.search_provider import register_search
 from portalab.modules.identity.services.account_service import AccountService
@@ -57,6 +61,8 @@ class IdentityModule:
         self.profiles = ProfileService(ctx)
         self.deletion = DeletionService(ctx, self.accounts, self.sessions)
         self.exports = ExportService(ctx)
+        self.household = HouseholdService(ctx, self.hasher, self.accounts, self.throttle, self.onboarding)
+        self.household.deletion = self.deletion
 
     # --- capabilities ----------------------------------------------------------------------------------
     def register_capabilities(self) -> None:
@@ -64,6 +70,12 @@ class IdentityModule:
         register_participants(self.ctx.capabilities, self.ctx)
         register_visibility(self.ctx.capabilities, self.ctx)
         register_search(self.ctx)
+        if not self.ctx.capabilities.system_providers(HOUSEHOLD):
+            self.ctx.capabilities.provide(HOUSEHOLD, self.household, instance_ref="identity", owner=OWNER)
+        if default_categories.get(HOUSEHOLD_CATEGORY) is None:
+            declare_category(
+                HOUSEHOLD_CATEGORY, OWNER, "household:category", default_channels=("portal", "email")
+            )
         self.ctx.capabilities.provide(BOOTSTRAP, self.bootstrap, instance_ref="identity", owner=OWNER)
         default_admin_surfaces.register(
             AdminSurface("users", "admin.surface.users", "/admin/users", "users.manage", OWNER)

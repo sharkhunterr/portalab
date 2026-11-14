@@ -7205,6 +7205,161 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/household": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Household */
+        get: operations["household_api_v1_household_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/household/members/{member_id}/pin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set Pin */
+        put: operations["set_pin_api_v1_household_members__member_id__pin_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/household/profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Profile */
+        post: operations["create_profile_api_v1_household_profiles_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/household/profiles/{profile_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Profile */
+        delete: operations["delete_profile_api_v1_household_profiles__profile_id__delete"];
+        options?: never;
+        head?: never;
+        /** Change Profile */
+        patch: operations["change_profile_api_v1_household_profiles__profile_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/household/profiles/{profile_id}/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Profile Activity */
+        get: operations["profile_activity_api_v1_household_profiles__profile_id__activity_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/household/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Access Requests */
+        get: operations["access_requests_api_v1_household_requests_get"];
+        put?: never;
+        /** Ask Access */
+        post: operations["ask_access_api_v1_household_requests_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/household/requests/{request_id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decide Access */
+        post: operations["decide_access_api_v1_household_requests__request_id__decision_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/household/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Household Session */
+        get: operations["household_session_api_v1_household_session_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/household/switch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Switch Profile */
+        post: operations["switch_profile_api_v1_household_switch_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/i18n/catalogs/{namespace}": {
         parameters: {
             query?: never;
@@ -12639,6 +12794,84 @@ export interface components {
              */
             status: "accepted";
         };
+        /** AccessAskIn */
+        AccessAskIn: {
+            /**
+             * Kind
+             * @default media
+             * @constant
+             */
+            kind: "media";
+            /** Note */
+            note?: string | null;
+            /** Rating */
+            rating?: string | null;
+            /** Ref */
+            ref: string;
+            /** Title */
+            title: string;
+        };
+        /** AccessAskOut */
+        AccessAskOut: {
+            /** Created */
+            created: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Status
+             * @constant
+             */
+            status: "pending";
+        };
+        /** AccessDecisionIn */
+        AccessDecisionIn: {
+            /** Approve */
+            approve: boolean;
+            /** Days */
+            days?: number | null;
+        };
+        /** AccessRequestOut */
+        AccessRequestOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Decided At */
+            decided_at: string | null;
+            /** Expires At */
+            expires_at: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Note */
+            note: string | null;
+            /**
+             * Profile Id
+             * Format: uuid
+             */
+            profile_id: string;
+            /** Profile Name */
+            profile_name: string;
+            /** Rating */
+            rating: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "approved" | "denied";
+            /** Subject Ref */
+            subject_ref: string;
+            /** Title */
+            title: string;
+        };
         /** AccountLinkIn */
         AccountLinkIn: {
             /** External User Id */
@@ -15730,6 +15963,192 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** HouseholdEconomyLine */
+        HouseholdEconomyLine: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Delta */
+            delta: number;
+            /** Kind */
+            kind: string;
+            /** Reason */
+            reason: string | null;
+            /** Rule */
+            rule: string | null;
+            /** Source */
+            source: string;
+            /** Value */
+            value: string;
+        };
+        /** HouseholdFigures */
+        HouseholdFigures: {
+            /** Coins */
+            coins: number;
+            /** Contribution */
+            contribution: number;
+            /** Level */
+            level: number;
+            /** Xp */
+            xp: number;
+        };
+        /** HouseholdMemberOut */
+        HouseholdMemberOut: {
+            /** Color */
+            color: string;
+            /** Community Visible */
+            community_visible: boolean;
+            /** Display Name */
+            display_name: string;
+            /** Has Avatar */
+            has_avatar: boolean;
+            /** Has Pin */
+            has_pin: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "owner" | "standard" | "child" | "custom";
+            /**
+             * Needs Pin
+             * @default false
+             */
+            needs_pin: boolean;
+            progress: components["schemas"]["HouseholdFigures"];
+            restrictions?: components["schemas"]["RestrictionSettings"] | null;
+        };
+        /** HouseholdMemberTile */
+        HouseholdMemberTile: {
+            /** Color */
+            color: string;
+            /** Display Name */
+            display_name: string;
+            /** Has Avatar */
+            has_avatar: boolean;
+            /** Has Pin */
+            has_pin: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "owner" | "standard" | "child" | "custom";
+            /**
+             * Needs Pin
+             * @default false
+             */
+            needs_pin: boolean;
+        };
+        /** HouseholdOut */
+        HouseholdOut: {
+            /** Can Manage */
+            can_manage: boolean;
+            /** Enabled */
+            enabled: boolean;
+            /** Max Profiles */
+            max_profiles: number;
+            /** Me */
+            me: string | null;
+            /** Members */
+            members: components["schemas"]["HouseholdMemberOut"][];
+            /**
+             * Owner Id
+             * Format: uuid
+             */
+            owner_id: string;
+            /** Palette */
+            palette: string[];
+            totals: components["schemas"]["HouseholdFigures"] | null;
+        };
+        /** HouseholdPinIn */
+        HouseholdPinIn: {
+            /** Current */
+            current?: string | null;
+            /** Pin */
+            pin?: string | null;
+        };
+        /** HouseholdProfileCreated */
+        HouseholdProfileCreated: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+        };
+        /** HouseholdProfileIn */
+        HouseholdProfileIn: {
+            /** Color */
+            color?: string | null;
+            /** Display Name */
+            display_name: string;
+            /**
+             * Kind
+             * @default standard
+             * @enum {string}
+             */
+            kind: "standard" | "child" | "custom";
+            /** Pin */
+            pin?: string | null;
+        };
+        /** HouseholdProfilePatch */
+        HouseholdProfilePatch: {
+            /** Color */
+            color?: string | null;
+            /** Community Visible */
+            community_visible?: boolean | null;
+            /** Display Name */
+            display_name?: string | null;
+            /** Kind */
+            kind?: ("standard" | "child" | "custom") | null;
+            /** Position */
+            position?: number | null;
+            restrictions?: components["schemas"]["RestrictionSettings"] | null;
+        };
+        /** HouseholdSession */
+        HouseholdSession: {
+            /** Active Id */
+            active_id: string | null;
+            /** Enabled */
+            enabled: boolean;
+            /** Members */
+            members: components["schemas"]["HouseholdMemberTile"][];
+            /** Must Choose */
+            must_choose: boolean;
+            /**
+             * Owner Id
+             * Format: uuid
+             */
+            owner_id: string;
+        };
+        /** HouseholdSwitchIn */
+        HouseholdSwitchIn: {
+            /** Pin */
+            pin?: string | null;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
+        /** HouseholdSwitchOut */
+        HouseholdSwitchOut: {
+            /**
+             * Active Id
+             * Format: uuid
+             */
+            active_id: string;
+        };
         /** IncidentBulkIn */
         IncidentBulkIn: {
             /** Comment */
@@ -16611,6 +17030,11 @@ export interface components {
              */
             has_password: boolean;
             /**
+             * Household Profiles
+             * @default 0
+             */
+            household_profiles: number;
+            /**
              * Id
              * Format: uuid
              */
@@ -16619,6 +17043,8 @@ export interface components {
             login: string | null;
             /** Onboarding */
             onboarding: components["schemas"]["OnboardingStep"][];
+            /** Profile Of */
+            profile_of?: string | null;
             /** State */
             state: string;
             /** Verified At */
@@ -18539,6 +18965,15 @@ export interface components {
              */
             export_endpoint: string;
         };
+        /** ProfileActivityOut */
+        ProfileActivityOut: {
+            /** Economy */
+            economy: components["schemas"]["HouseholdEconomyLine"][];
+            /** Last Seen At */
+            last_seen_at: string | null;
+            /** Requests */
+            requests: components["schemas"]["AccessRequestOut"][];
+        };
         /** ProfileFieldOut */
         ProfileFieldOut: {
             /** Key */
@@ -19086,6 +19521,21 @@ export interface components {
         ResolveIn: {
             /** Resolution */
             resolution: string;
+        };
+        /**
+         * RestrictionSettings
+         * @description A profile's restrictions as stored and edited by its master.
+         */
+        RestrictionSettings: {
+            /**
+             * Allow Unrated
+             * @default true
+             */
+            allow_unrated: boolean;
+            /** Blocked */
+            blocked?: string[];
+            /** Max Age */
+            max_age?: number | null;
         };
         /** ResyncIn */
         ResyncIn: {
@@ -35442,6 +35892,345 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    household_api_v1_household_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HouseholdOut"];
+                };
+            };
+        };
+    };
+    set_pin_api_v1_household_members__member_id__pin_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HouseholdPinIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_profile_api_v1_household_profiles_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HouseholdProfileIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HouseholdProfileCreated"];
+                };
+            };
+            /** @description household.limit */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_profile_api_v1_household_profiles__profile_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profile_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_profile_api_v1_household_profiles__profile_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profile_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HouseholdProfilePatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    profile_activity_api_v1_household_profiles__profile_id__activity_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profile_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileActivityOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    access_requests_api_v1_household_requests_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessRequestOut"][];
+                };
+            };
+        };
+    };
+    ask_access_api_v1_household_requests_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccessAskIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessAskOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_access_api_v1_household_requests__request_id__decision_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccessDecisionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    household_session_api_v1_household_session_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HouseholdSession"];
+                };
+            };
+        };
+    };
+    switch_profile_api_v1_household_switch_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HouseholdSwitchIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HouseholdSwitchOut"];
+                };
+            };
+            /** @description household.wrong_pin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description household.pin_throttled */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

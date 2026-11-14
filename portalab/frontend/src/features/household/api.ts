@@ -1,0 +1,160 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api } from "../../api/client";
+import type { components } from "../../api/generated/schema";
+
+/**
+ * Households (spec 032): the « Who's there? » picker and the switch, the household page (every member sees
+ * it), its management and the access requests (the master decides).
+ */
+export type HouseholdSession = components["schemas"]["HouseholdSession"];
+export type MemberTile = components["schemas"]["HouseholdMemberTile"];
+export type Household = components["schemas"]["HouseholdOut"];
+export type HouseholdMember = components["schemas"]["HouseholdMemberOut"];
+export type RestrictionSettings = components["schemas"]["RestrictionSettings"];
+export type AccessRequest = components["schemas"]["AccessRequestOut"];
+export type ProfileActivity = components["schemas"]["ProfileActivityOut"];
+export type ProfileKind = "standard" | "child" | "custom";
+
+export const SESSION_KEY = ["household", "session"] as const;
+export const HOUSEHOLD_KEY = ["household", "overview"] as const;
+export const REQUESTS_KEY = ["household", "requests"] as const;
+/** Opens the picker from anywhere (the header's « Switch profile »). */
+export const CHOOSE_PROFILE_EVENT = "portalab:choose-profile";
+export const AGES = [0, 6, 10, 12, 14, 16, 18] as const;
+export const FEATURES = ["shop", "requests", "ai", "community", "games", "support"] as const;
+
+export function chooseProfile() {
+  globalThis.dispatchEvent?.(new Event(CHOOSE_PROFILE_EVENT));
+}
+
+export function useHouseholdSession() {
+  return useQuery({
+    queryKey: SESSION_KEY,
+    retry: false,
+    queryFn: async () => (await api.GET("/api/v1/household/session")).data as HouseholdSession,
+  });
+}
+
+/** Acting as another household member: the whole portal reloads as them (nothing of the previous one stays). */
+export function useSwitchProfile() {
+  return useMutation({
+    mutationFn: async (body: { user_id: string; pin?: string | undefined; next?: string | undefined }) => {
+      await api.POST("/api/v1/household/switch", {
+        body: { user_id: body.user_id, ...(body.pin ? { pin: body.pin } : {}) },
+      });
+      return body.next ?? "/";
+    },
+    onSuccess: (to) => globalThis.location?.assign(to),
+  });
+}
+
+export function useHousehold() {
+  return useQuery({
+    queryKey: HOUSEHOLD_KEY,
+    queryFn: async () => (await api.GET("/api/v1/household")).data as Household,
+  });
+}
+
+function useRefresh() {
+  const client = useQueryClient();
+  return () => {
+    void client.invalidateQueries({ queryKey: ["household"] });
+    void client.invalidateQueries({ queryKey: ["identity", "me"] });
+  };
+}
+
+export function useCreateProfile() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async (body: { display_name: string; kind: ProfileKind; color?: string; pin?: string }) =>
+      (await api.POST("/api/v1/household/profiles", { body })).data as { id: string },
+    onSuccess: refresh,
+  });
+}
+
+export interface ProfileChanges {
+  display_name?: string;
+  color?: string;
+  kind?: ProfileKind;
+  restrictions?: RestrictionSettings;
+  community_visible?: boolean;
+}
+
+export function useUpdateProfile() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async ({ id, ...body }: ProfileChanges & { id: string }) => {
+      await api.PATCH("/api/v1/household/profiles/{profile_id}", {
+        params: { path: { profile_id: id } },
+        body,
+      });
+    },
+    onSuccess: refresh,
+  });
+}
+
+export function useDeleteProfile() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await api.DELETE("/api/v1/household/profiles/{profile_id}", { params: { path: { profile_id: id } } });
+    },
+    onSuccess: refresh,
+  });
+}
+
+export function useSetPin() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async ({ id, pin, current }: { id: string; pin: string | null; current?: string }) => {
+      await api.PUT("/api/v1/household/members/{member_id}/pin", {
+        params: { path: { member_id: id } },
+        body: { pin, ...(current ? { current } : {}) },
+      });
+    },
+    onSuccess: refresh,
+  });
+}
+
+export function useProfileActivity(id: string | null) {
+  return useQuery({
+    queryKey: ["household", "activity", id],
+    enabled: Boolean(id),
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/household/profiles/{profile_id}/activity", {
+          params: { path: { profile_id: id as string } },
+        })
+      ).data as ProfileActivity,
+  });
+}
+
+export function useAccessRequests(enabled = true) {
+  return useQuery({
+    queryKey: REQUESTS_KEY,
+    enabled,
+    queryFn: async () => (await api.GET("/api/v1/household/requests")).data as AccessRequest[],
+  });
+}
+
+export function useAskAccess() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async (body: { ref: string; title: string; rating?: string | null; note?: string }) =>
+      (await api.POST("/api/v1/household/requests", { body: { kind: "media", ...body } })).data,
+    onSuccess: refresh,
+  });
+}
+
+export function useDecideAccess() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async ({ id, approve, days }: { id: string; approve: boolean; days?: number }) => {
+      await api.POST("/api/v1/household/requests/{request_id}/decision", {
+        params: { path: { request_id: id } },
+        body: { approve, ...(days ? { days } : {}) },
+      });
+    },
+    onSuccess: refresh,
+  });
+}

@@ -35,6 +35,217 @@
         "title": "Accepted",
         "type": "object"
       },
+      "AccessAskIn": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "media",
+            "default": "media",
+            "title": "Kind",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "ref": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Ref",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref",
+          "title"
+        ],
+        "title": "AccessAskIn",
+        "type": "object"
+      },
+      "AccessAskOut": {
+        "properties": {
+          "created": {
+            "title": "Created",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "const": "pending",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "created"
+        ],
+        "title": "AccessAskOut",
+        "type": "object"
+      },
+      "AccessDecisionIn": {
+        "additionalProperties": false,
+        "properties": {
+          "approve": {
+            "title": "Approve",
+            "type": "boolean"
+          },
+          "days": {
+            "anyOf": [
+              {
+                "maximum": 365.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days"
+          }
+        },
+        "required": [
+          "approve"
+        ],
+        "title": "AccessDecisionIn",
+        "type": "object"
+      },
+      "AccessRequestOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "profile_id": {
+            "format": "uuid",
+            "title": "Profile Id",
+            "type": "string"
+          },
+          "profile_name": {
+            "title": "Profile Name",
+            "type": "string"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "approved",
+              "denied"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "subject_ref": {
+            "title": "Subject Ref",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "profile_id",
+          "profile_name",
+          "kind",
+          "subject_ref",
+          "title",
+          "rating",
+          "note",
+          "status",
+          "created_at",
+          "decided_at",
+          "expires_at"
+        ],
+        "title": "AccessRequestOut",
+        "type": "object"
+      },
       "AccountLinkIn": {
         "additionalProperties": false,
         "properties": {
@@ -8858,6 +9069,543 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "HouseholdEconomyLine": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "delta": {
+            "title": "Delta",
+            "type": "integer"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "rule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rule"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "delta",
+          "kind",
+          "source",
+          "rule",
+          "reason",
+          "at"
+        ],
+        "title": "HouseholdEconomyLine",
+        "type": "object"
+      },
+      "HouseholdFigures": {
+        "properties": {
+          "coins": {
+            "title": "Coins",
+            "type": "integer"
+          },
+          "contribution": {
+            "title": "Contribution",
+            "type": "integer"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "xp": {
+            "title": "Xp",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "xp",
+          "level",
+          "coins",
+          "contribution"
+        ],
+        "title": "HouseholdFigures",
+        "type": "object"
+      },
+      "HouseholdMemberOut": {
+        "properties": {
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "community_visible": {
+            "title": "Community Visible",
+            "type": "boolean"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "has_avatar": {
+            "title": "Has Avatar",
+            "type": "boolean"
+          },
+          "has_pin": {
+            "title": "Has Pin",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "owner",
+              "standard",
+              "child",
+              "custom"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "needs_pin": {
+            "default": false,
+            "title": "Needs Pin",
+            "type": "boolean"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/HouseholdFigures"
+          },
+          "restrictions": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RestrictionSettings"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "kind",
+          "color",
+          "has_avatar",
+          "has_pin",
+          "progress",
+          "community_visible"
+        ],
+        "title": "HouseholdMemberOut",
+        "type": "object"
+      },
+      "HouseholdMemberTile": {
+        "properties": {
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "has_avatar": {
+            "title": "Has Avatar",
+            "type": "boolean"
+          },
+          "has_pin": {
+            "title": "Has Pin",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "owner",
+              "standard",
+              "child",
+              "custom"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "needs_pin": {
+            "default": false,
+            "title": "Needs Pin",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "kind",
+          "color",
+          "has_avatar",
+          "has_pin"
+        ],
+        "title": "HouseholdMemberTile",
+        "type": "object"
+      },
+      "HouseholdOut": {
+        "properties": {
+          "can_manage": {
+            "title": "Can Manage",
+            "type": "boolean"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "max_profiles": {
+            "title": "Max Profiles",
+            "type": "integer"
+          },
+          "me": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Me"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/HouseholdMemberOut"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "owner_id": {
+            "format": "uuid",
+            "title": "Owner Id",
+            "type": "string"
+          },
+          "palette": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Palette",
+            "type": "array"
+          },
+          "totals": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HouseholdFigures"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "enabled",
+          "owner_id",
+          "me",
+          "can_manage",
+          "max_profiles",
+          "palette",
+          "totals",
+          "members"
+        ],
+        "title": "HouseholdOut",
+        "type": "object"
+      },
+      "HouseholdPinIn": {
+        "additionalProperties": false,
+        "properties": {
+          "current": {
+            "anyOf": [
+              {
+                "maxLength": 6,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current"
+          },
+          "pin": {
+            "anyOf": [
+              {
+                "maxLength": 6,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pin"
+          }
+        },
+        "title": "HouseholdPinIn",
+        "type": "object"
+      },
+      "HouseholdProfileCreated": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "HouseholdProfileCreated",
+        "type": "object"
+      },
+      "HouseholdProfileIn": {
+        "additionalProperties": false,
+        "properties": {
+          "color": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "display_name": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "kind": {
+            "default": "standard",
+            "enum": [
+              "standard",
+              "child",
+              "custom"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "pin": {
+            "anyOf": [
+              {
+                "maxLength": 6,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pin"
+          }
+        },
+        "required": [
+          "display_name"
+        ],
+        "title": "HouseholdProfileIn",
+        "type": "object"
+      },
+      "HouseholdProfilePatch": {
+        "additionalProperties": false,
+        "properties": {
+          "color": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "community_visible": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Community Visible"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "standard",
+                  "child",
+                  "custom"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "maximum": 99.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "restrictions": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RestrictionSettings"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "HouseholdProfilePatch",
+        "type": "object"
+      },
+      "HouseholdSession": {
+        "properties": {
+          "active_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Id"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/HouseholdMemberTile"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "must_choose": {
+            "title": "Must Choose",
+            "type": "boolean"
+          },
+          "owner_id": {
+            "format": "uuid",
+            "title": "Owner Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "enabled",
+          "owner_id",
+          "active_id",
+          "must_choose",
+          "members"
+        ],
+        "title": "HouseholdSession",
+        "type": "object"
+      },
+      "HouseholdSwitchIn": {
+        "additionalProperties": false,
+        "properties": {
+          "pin": {
+            "anyOf": [
+              {
+                "maxLength": 6,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pin"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id"
+        ],
+        "title": "HouseholdSwitchIn",
+        "type": "object"
+      },
+      "HouseholdSwitchOut": {
+        "properties": {
+          "active_id": {
+            "format": "uuid",
+            "title": "Active Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "active_id"
+        ],
+        "title": "HouseholdSwitchOut",
+        "type": "object"
+      },
       "IncidentBulkIn": {
         "additionalProperties": false,
         "properties": {
@@ -11353,6 +12101,11 @@
             "title": "Has Password",
             "type": "boolean"
           },
+          "household_profiles": {
+            "default": 0,
+            "title": "Household Profiles",
+            "type": "integer"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
@@ -11375,6 +12128,18 @@
             },
             "title": "Onboarding",
             "type": "array"
+          },
+          "profile_of": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Of"
           },
           "state": {
             "title": "State",
@@ -16797,6 +17562,43 @@
         "title": "PrivacyInventory",
         "type": "object"
       },
+      "ProfileActivityOut": {
+        "properties": {
+          "economy": {
+            "items": {
+              "$ref": "#/components/schemas/HouseholdEconomyLine"
+            },
+            "title": "Economy",
+            "type": "array"
+          },
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen At"
+          },
+          "requests": {
+            "items": {
+              "$ref": "#/components/schemas/AccessRequestOut"
+            },
+            "title": "Requests",
+            "type": "array"
+          }
+        },
+        "required": [
+          "last_seen_at",
+          "economy",
+          "requests"
+        ],
+        "title": "ProfileActivityOut",
+        "type": "object"
+      },
       "ProfileFieldOut": {
         "properties": {
           "key": {
@@ -18544,6 +19346,38 @@
           "resolution"
         ],
         "title": "ResolveIn",
+        "type": "object"
+      },
+      "RestrictionSettings": {
+        "additionalProperties": false,
+        "description": "A profile's restrictions as stored and edited by its master.",
+        "properties": {
+          "allow_unrated": {
+            "default": true,
+            "title": "Allow Unrated",
+            "type": "boolean"
+          },
+          "blocked": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 6,
+            "title": "Blocked",
+            "type": "array"
+          },
+          "max_age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Age"
+          }
+        },
+        "title": "RestrictionSettings",
         "type": "object"
       },
       "ResyncIn": {
@@ -45753,6 +46587,418 @@
         "summary": "Help Pages",
         "tags": [
           "wiki"
+        ]
+      }
+    },
+    "/api/v1/household": {
+      "get": {
+        "operationId": "household_api_v1_household_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HouseholdOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Household",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/household/members/{member_id}/pin": {
+      "put": {
+        "operationId": "set_pin_api_v1_household_members__member_id__pin_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "member_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Member Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HouseholdPinIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Pin",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/household/profiles": {
+      "post": {
+        "operationId": "create_profile_api_v1_household_profiles_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HouseholdProfileIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HouseholdProfileCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "household.limit"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Profile",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/household/profiles/{profile_id}": {
+      "delete": {
+        "operationId": "delete_profile_api_v1_household_profiles__profile_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profile_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Profile Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Profile",
+        "tags": [
+          "identity"
+        ]
+      },
+      "patch": {
+        "operationId": "change_profile_api_v1_household_profiles__profile_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profile_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Profile Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HouseholdProfilePatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change Profile",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/household/profiles/{profile_id}/activity": {
+      "get": {
+        "operationId": "profile_activity_api_v1_household_profiles__profile_id__activity_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profile_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Profile Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileActivityOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Profile Activity",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/household/requests": {
+      "get": {
+        "operationId": "access_requests_api_v1_household_requests_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AccessRequestOut"
+                  },
+                  "title": "Response Access Requests Api V1 Household Requests Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Access Requests",
+        "tags": [
+          "identity"
+        ]
+      },
+      "post": {
+        "operationId": "ask_access_api_v1_household_requests_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccessAskIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessAskOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ask Access",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/household/requests/{request_id}/decision": {
+      "post": {
+        "operationId": "decide_access_api_v1_household_requests__request_id__decision_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccessDecisionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decide Access",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/household/session": {
+      "get": {
+        "operationId": "household_session_api_v1_household_session_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HouseholdSession"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Household Session",
+        "tags": [
+          "identity"
+        ]
+      }
+    },
+    "/api/v1/household/switch": {
+      "post": {
+        "operationId": "switch_profile_api_v1_household_switch_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HouseholdSwitchIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HouseholdSwitchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "description": "household.wrong_pin"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "description": "household.pin_throttled"
+          }
+        },
+        "summary": "Switch Profile",
+        "tags": [
+          "identity"
         ]
       }
     },

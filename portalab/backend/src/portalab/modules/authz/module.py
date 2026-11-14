@@ -7,6 +7,8 @@ from portalab.capabilities.administration import AUDIT_STATUS_CAPABILITY as AUDI
 from portalab.capabilities.administration import PLUGIN_PERMISSIONS_CAPABILITY as PLUGIN_PERMISSIONS
 from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
+from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
+from portalab.capabilities.household import Household
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.user_grants import CAPABILITY as USER_GRANTS
 from portalab.capabilities.user_grants import ROLES_CAPABILITY as ROLES
@@ -50,6 +52,7 @@ class AuthzModule:
         self.catalog = CatalogSync(database, registry, clock)
         self.admin_authority = AdminAuthorityService(database, self.audit, events, clock=clock)
         self.engine = AuthorizationEngine(database, self.catalog, self.audit, events, clock=clock)
+        self.engine.household = self._household
         self.grants = GrantService(database, self.audit, events, self.admin_authority, clock=clock)
         self.audit_query = AuditQuery(database, self.audit, self.engine)
         self.events = events
@@ -57,6 +60,10 @@ class AuthzModule:
         self.confirmations = ConfirmationService(
             database, ttl_seconds=self.config.confirmation_ttl_seconds, clock=clock
         )
+
+    def _household(self) -> Household | None:
+        providers = self.capabilities.system_providers(HOUSEHOLD)
+        return providers[0].provider if providers else None
 
     def register_capabilities(self) -> None:
         register_admin_authority(self.capabilities, self.admin_authority)

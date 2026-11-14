@@ -54,21 +54,22 @@ class AccountService:
         self,
         session: AsyncSession,
         *,
-        login: str,
+        login: str | None,
         display_name: str,
         email: str | None,
         state: AccountState,
         actor: Actor,
         reason: str,
+        unique_name: bool = True,
     ) -> User:
-        """Insert a user (+ empty profile, first history row) and publish ``user.created``."""
+        """Insert a user (+ empty profile, first history row) and publish ``user.created``. 032: a household
+        profile has no login and a name that needs not be unique (``unique_name=False``)."""
         now = self.ctx.now()
-        normalized = normalize_login(login)
         user = User(
-            login=normalized,
-            login_display=login.strip(),
+            login=normalize_login(login) if login is not None else None,
+            login_display=login.strip() if login is not None else None,
             display_name=clean_display_name(display_name),
-            display_name_key=display_name_key(display_name),
+            display_name_key=display_name_key(display_name) if unique_name else None,
             email=email,
             state=state.value,
             transition_seq=1,

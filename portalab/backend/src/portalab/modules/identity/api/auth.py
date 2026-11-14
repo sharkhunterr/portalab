@@ -5,7 +5,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from portalab.core.authorization import public, require
 from portalab.core.authz_port import Principal
@@ -30,7 +30,7 @@ from portalab.modules.identity.api.schemas import (
     SessionInfo,
     VerifyRequest,
 )
-from portalab.modules.identity.models import Credential, Profile, User
+from portalab.modules.identity.models import Credential, HouseholdMember, Profile, User
 from portalab.modules.identity.module import IdentityModule
 from portalab.modules.identity.services.common import UserNotFound, self_actor
 from portalab.modules.identity.services.mfa import CHALLENGE_TTL
@@ -239,6 +239,16 @@ async def me(module: Module, principal: Principal = require("users.self.manage")
         )
         progress = await module.onboarding.progress(session, user.id)
         has_password = await session.get(Credential, user.id) is not None
+        profiles = await session.scalar(
+            select(func.count())
+            .select_from(HouseholdMember)
+            .join(User, User.id == HouseholdMember.user_id)
+            .where(
+                HouseholdMember.owner_id == (principal.profile_of or user.id),
+                HouseholdMember.kind != "owner",
+                User.state == "active",
+            )
+        )
     return Me(
         id=user.id,
         login=user.login_display,
@@ -251,4 +261,6 @@ async def me(module: Module, principal: Principal = require("users.self.manage")
         onboarding=[OnboardingStep(step=item.step, completed_at=item.completed_at) for item in progress],
         has_password=has_password,
         deletion_due_at=user.deletion_due_at,
+        profile_of=principal.profile_of,
+        household_profiles=int(profiles or 0),
     )

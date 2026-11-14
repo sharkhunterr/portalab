@@ -19,6 +19,8 @@ from portalab.capabilities.events import (
     default_consumers,
     default_event_types,
 )
+from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
+from portalab.capabilities.household import Household
 from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
@@ -135,6 +137,7 @@ class GamificationModule:
         config = lambda: self.config  # noqa: E731
         self.levels = LevelService(database, lambda: self.config.level_curve_active, clock=clock)
         self.writer = LedgerWriter(events, self.levels, clock=clock)
+        self.writer.household = self._household  # 032: a profile's amounts are its household's too
         self.economy = EconomyServiceImpl(database, self.writer, clock=clock)
         self.rules = RuleStore(database, audit, events, event_types, clock=clock)
         self.combiner = ModifierCombiner(capabilities)
@@ -187,6 +190,10 @@ class GamificationModule:
         self.leaderboards = LeaderboardService(
             database, self.levels, self.visibility, capabilities, config, clock=clock
         )
+
+    def _household(self) -> Household | None:
+        providers = self.capabilities.system_providers(HOUSEHOLD)
+        return providers[0].provider if providers else None
 
     def register(self) -> None:
         register_event_types(self.event_types)

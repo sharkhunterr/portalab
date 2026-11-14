@@ -18,7 +18,7 @@ from portalab.capabilities.identity_directory import (
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.modules.identity.context import OWNER, IdentityContext
 from portalab.modules.identity.domain.state_machine import AccountState, is_active_account
-from portalab.modules.identity.models import User
+from portalab.modules.identity.models import HouseholdMember, User
 
 
 class IdentityDirectoryService:
@@ -77,7 +77,8 @@ class IdentityContactService:
 
 
 class IdentityMembersService:
-    """``identity.members``: active accounts with a display name, matched on the normalized name only."""
+    """``identity.members``: active accounts with a display name, matched on the normalized name only. 032: a
+    household profile its master keeps out of the community is not a member there."""
 
     def __init__(self, ctx: IdentityContext) -> None:
         self.ctx = ctx
@@ -86,8 +87,11 @@ class IdentityMembersService:
         self, *, query: str | None = None, offset: int = 0, limit: int = 30, newest: bool = False
     ) -> MemberPage:
         limit = max(1, min(limit, 100))
+        hidden = select(HouseholdMember.user_id).where(
+            HouseholdMember.kind != "owner", HouseholdMember.community_visible.is_(False)
+        )
         statement = select(User.id, User.display_name, User.created_at).where(
-            User.state == AccountState.ACTIVE.value, User.display_name.is_not(None)
+            User.state == AccountState.ACTIVE.value, User.display_name.is_not(None), User.id.not_in(hidden)
         )
         if query and query.strip():
             needle = unicodedata.normalize("NFKC", query.strip().casefold())[:64]
@@ -102,7 +106,8 @@ class IdentityMembersService:
 
 
 class IdentityAccountsService:
-    """``identity.accounts`` (027): live accounts for administrative matching with service accounts."""
+    """``identity.accounts`` (027): live accounts for administrative matching with service accounts — not the
+    household profiles (032: a shared service account stays its master's)."""
 
     def __init__(self, ctx: IdentityContext) -> None:
         self.ctx = ctx
@@ -112,7 +117,14 @@ class IdentityAccountsService:
         async with self.ctx.database.session() as session:
             rows = (
                 await session.execute(
-                    select(User).where(User.state.in_(live)).order_by(User.display_name_key, User.id)
+                    select(User)
+                    .where(
+                        User.state.in_(live),
+                        User.id.not_in(
+                            select(HouseholdMember.user_id).where(HouseholdMember.kind != "owner")
+                        ),
+                    )
+                    .order_by(User.display_name_key, User.id)
                 )
             ).scalars()
             return [AccountSummary(u.id, u.login_display, u.display_name, u.email) for u in rows]

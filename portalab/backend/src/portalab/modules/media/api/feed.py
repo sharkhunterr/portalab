@@ -160,6 +160,7 @@ async def my_feed(principal: Reader, module: Module) -> FeedOut:
         for a in arrivals
         if a.object_id in rows
     ]
+    items = await module.gate.keep(principal, items, key="object_id")  # 032: a profile's age rating
     people = [f.ref for f in follows if f.kind == "person"]
     upcoming = await _upcoming(module, people, await module.member_language(principal)) if people else []
     return FeedOut(items=items, upcoming=upcoming, seen_at=seen_at, follows=len(follows))

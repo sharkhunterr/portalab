@@ -21,6 +21,8 @@ class Principal:
     channel: Channel = "user"
     acting_for: UUID | None = None
     session_id: UUID | None = None  # set by identity's session resolver (spec 002, ``identity.principal``)
+    # 032: set when ``user_id`` is a household profile — its master, whose session this request rides on
+    profile_of: UUID | None = None
 
     @property
     def is_authenticated(self) -> bool:

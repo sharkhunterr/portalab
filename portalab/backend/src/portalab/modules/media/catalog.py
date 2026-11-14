@@ -20,6 +20,7 @@ from portalab.modules.media.identity.resolver import MediaNotFound, live_object
 from portalab.modules.media.matching import matching, words
 from portalab.modules.media.models import ExternalId, Image, MediaObject, ObjectTag, UserProgress
 from portalab.modules.media.permissions import MEDIA_MANAGE, MEDIA_READ
+from portalab.modules.media.restrictions import TitleGate, excluded
 
 PAGE = 48
 FACET_SIZE = 300
@@ -182,9 +183,10 @@ def summary(row: MediaObject) -> MediaSummary:
 
 
 class CatalogQuery:
-    def __init__(self, database: Database, authorizer: Authorizer) -> None:
+    def __init__(self, database: Database, authorizer: Authorizer, gate: TitleGate | None = None) -> None:
         self.database = database
         self.authorizer = authorizer
+        self.gate = gate  # 032: what a household profile's age rating keeps from it
 
     async def _can(self, principal: Principal, permission: str) -> bool:
         try:
@@ -255,6 +257,8 @@ class CatalogQuery:
             )
         if q and (found := words(q)):
             stmt = stmt.where(matching(found))  # #92: its people and series too, typos forgiven
+        if self.gate is not None and (hidden := await self.gate.blocked(principal)):
+            stmt = stmt.where(excluded(MediaObject.id, hidden))
         refine = refine or Refine()
         stmt = refine.apply(stmt, principal.acting_for or principal.user_id)
         offset = decode_cursor(cursor)
@@ -315,6 +319,8 @@ class CatalogQuery:
             row = await live_object(session, object_id)
             if row is None or (row.status == "hidden" and not await self._can(principal, MEDIA_MANAGE)):
                 raise MediaNotFound("This object does not exist.")
+            if self.gate is not None:
+                await self.gate.check(principal, row.id, row.title)
             ids = {
                 scheme: value
                 for scheme, value in await session.execute(
@@ -372,6 +378,8 @@ class CatalogPort:
         async with self.query.database.session() as session:
             row = await live_object(session, object_id)
             if row is None or row.status != "active":
+                return None
+            if self.query.gate is not None and row.id in await self.query.gate.blocked(viewer):
                 return None
             if row.kind != "episode" or row.parent_id is None:
                 return summary(row)

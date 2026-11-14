@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.domain.state_machine import AccountState
-from portalab.modules.identity.models import User
+from portalab.modules.identity.models import HouseholdMember, User
 from portalab.modules.identity.services.account_service import AccountService
 from portalab.modules.identity.services.common import SYSTEM
 
@@ -19,12 +19,15 @@ BATCH = 200
 async def run(ctx: IdentityContext, accounts: AccountService) -> int:
     threshold = ctx.now() - timedelta(days=ctx.config.dormancy_days)
     last_activity = func.coalesce(User.last_sign_in_at, User.verified_at, User.created_at)
+    # 032: a household profile never signs in — it lives by its master's account
+    profiles = select(HouseholdMember.user_id).where(HouseholdMember.kind != "owner")
     async with ctx.database.session() as session:
         candidates = list(
             (
                 await session.execute(
                     select(User.id)
                     .where(User.state == AccountState.ACTIVE.value, last_activity <= threshold)
+                    .where(User.id.not_in(profiles))
                     .order_by(User.id)
                     .limit(BATCH)
                 )

@@ -9,6 +9,7 @@ import content from "../../../backend/locales/en/content.json";
 import core from "../../../backend/locales/en/core.json";
 import dashboard from "../../../backend/locales/en/dashboard.json";
 import gamification from "../../../backend/locales/en/gamification.json";
+import household from "../../../backend/locales/en/household.json";
 import i18n from "../../../backend/locales/en/i18n.json";
 import marketplace from "../../../backend/locales/en/marketplace.json";
 import media from "../../../backend/locales/en/media.json";
@@ -39,6 +40,7 @@ export const BUNDLED: Record<string, Record<string, string>> = {
   core,
   dashboard,
   gamification,
+  household,
   i18n,
   marketplace,
   media,

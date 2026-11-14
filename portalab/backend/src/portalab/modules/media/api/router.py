@@ -383,7 +383,8 @@ async def discovery(principal: Reader, shelf: str, module: Module) -> MediaShelf
         raise MediaNotFound("This shelf does not exist.")
     if shelf in ("new", "released"):  # 027: with when it was added or released
         size = max(1, min(module.config.discovery_shelf_size, 50))
-        recents = await module.discovery.recent(shelf, limit=size)
+        hidden = await module.gate.blocked(principal)  # 032: not what a profile's age rating keeps from it
+        recents = [r for r in await module.discovery.recent(shelf, limit=size) if r[0].id not in hidden]
         async with module.database.session() as session:
             images = await module.catalog._images(session, [r.id for r, _ in recents])
         items = [
@@ -394,6 +395,7 @@ async def discovery(principal: Reader, shelf: str, module: Module) -> MediaShelf
             shelf=shelf, items=await _asked(module, items), next_action=None if items else "browse"
         )
     rows, next_action = await module.discovery.shelf(shelf, principal)
+    rows = await module.gate.keep(principal, rows)
     async with module.database.session() as session:
         images = await module.catalog._images(session, [r.id for r in rows])
     cards = await _asked(module, [_card(r, images.get(r.id)) for r in rows])

@@ -612,7 +612,7 @@ def _image_type(data: bytes) -> str:
 
 
 @router.get("/media/{object_id}/collection", response_model=CollectionOut | None)
-async def title_collection(_: Reader, module: Module, object_id: UUID) -> CollectionOut | None:
+async def title_collection(principal: Reader, module: Module, object_id: UUID) -> CollectionOut | None:
     async with module.database.session() as session:
         row = await session.get(MediaObject, object_id)
         meta = await session.get(ObjectMetadata, object_id)
@@ -627,7 +627,7 @@ async def title_collection(_: Reader, module: Module, object_id: UUID) -> Collec
             source="saga",
             name=name or str(collection.get("name") or ""),
             poster=poster,
-            items=await _items(module, rows),
+            items=await _items(module, await module.gate.keep(principal, rows)),
         )
     series = row.effective.get("series")
     if isinstance(series, str) and series.strip():
@@ -636,7 +636,7 @@ async def title_collection(_: Reader, module: Module, object_id: UUID) -> Collec
             ref=f"{SERIES}{name or series}",
             source="series",
             name=name or series,
-            items=await _items(module, rows),
+            items=await _items(module, await module.gate.keep(principal, rows)),
         )
     return None
 
@@ -659,7 +659,7 @@ async def collection(
             source="saga",
             name=name or "",
             poster=poster,
-            items=await _items(module, rows),
+            items=await _items(module, await module.gate.keep(principal, rows)),
             parts=parts or [],
             askable=askable,
         )
@@ -671,7 +671,7 @@ async def collection(
             ref=f"{SERIES}{name}",
             source="series",
             name=name,
-            items=await _items(module, rows),
+            items=await _items(module, await module.gate.keep(principal, rows)),
             # a book series' volumes (issue 362), a game franchise's games (#368)
             parts=await _volumes(module, name, rows) or await _games(module, name, rows),
         )

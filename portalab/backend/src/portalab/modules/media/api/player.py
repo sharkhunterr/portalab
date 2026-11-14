@@ -211,6 +211,7 @@ async def player_info(
     module: Module,
     item: Annotated[str | None, Query(max_length=200, pattern=r"^[A-Za-z0-9_-]+$")] = None,
 ) -> PlayerInfoOut:
+    await module.gate.check(principal, object_id)  # 032: a household profile's age rating
     info = await module.player.info(_me(principal), object_id, item)
     return PlayerInfoOut(
         service_id=info.service_id,
@@ -226,6 +227,7 @@ async def player_info(
 async def player_start(
     principal: Player, object_id: UUID, body: StreamStartIn, module: Module
 ) -> StreamStartOut:
+    await module.gate.check(principal, object_id)  # 032: a household profile's age rating
     options = StreamOptions(
         version=body.version,
         quality=body.quality if body.quality in QUALITIES else "original",

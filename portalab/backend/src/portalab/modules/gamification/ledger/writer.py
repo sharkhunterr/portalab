@@ -6,10 +6,16 @@
 3. for XP, derive the level from the curve and emit one ``user.level_up`` when it rises;
 4. publish the matching event through the outbox in the same transaction;
 5. for XP and Coins, queue a ``progression.changed`` live notification to the owner only (spec 027 R6), so
-   the header updates without polling — and never on rollback, since it shares the transaction.
+   the header updates without polling — and never on rollback, since it shares the transaction;
+6. 032: for a household profile, record the same XP, Contribution or Coins once more for its master, in the
+   same transaction (the master's balances are the household's): a debit the household cannot cover refuses
+   a spend or a reservation, and an administrator's correction is mirrored up to what the master holds; the
+   copy publishes no reward event (it rewards nothing twice).
 Rows are never updated or deleted (database triggers); corrections are new rows."""
 
-from dataclasses import dataclass, field
+import hashlib
+from collections.abc import Callable
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 from typing import Any
 from uuid import UUID
@@ -19,6 +25,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.economy import InsufficientCoins, Transaction
+from portalab.capabilities.household import Household
 from portalab.core.authz_port import Principal
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.ids import new_id
@@ -33,6 +40,8 @@ EVENTS = {
     "refund": "economy.coins_refunded",
     "destruction": "economy.coins_destroyed",
 }
+MIRRORED = ("xp", "contribution", "coins")
+REFUSED_SHORT = ("spend", "reserve")  # a household that cannot cover them refuses them
 
 
 @dataclass(frozen=True, slots=True)
@@ -55,6 +64,7 @@ class Entry:
     actor_user_id: UUID | None = None
     reason: str | None = None
     reverses_transaction_id: UUID | None = None
+    profile_id: UUID | None = None  # 032: set on a master's copy of a profile's row
 
 
 @dataclass(frozen=True, slots=True)
@@ -96,6 +106,7 @@ class LedgerWriter:
         self.events = events
         self.levels = levels
         self.clock = clock
+        self.household: Callable[[], Household | None] = lambda: None  # 032: wired by the module
 
     async def record(self, session: AsyncSession, entry: Entry) -> Recorded:
         if entry.value not in ("xp", "contribution", "coins", "booster"):
@@ -122,6 +133,7 @@ class LedgerWriter:
             "reverses_transaction_id": entry.reverses_transaction_id,
             "occurred_at": entry.occurred_at,
             "recorded_at": now,
+            "profile_id": entry.profile_id,
         }
         inserted = (
             await session.execute(
@@ -145,10 +157,42 @@ class LedgerWriter:
         ).scalar_one()
         amount = await self._balance(session, row)
         level_up = await self._level(session, row, amount) if row.value == "xp" else None
-        await self._publish(session, row, level_up)
+        if entry.profile_id is None:
+            await self._publish(session, row, level_up)
         if row.value in ("xp", "coins"):
             await self._live(session, row, level_up)
+        if entry.profile_id is None and row.value in MIRRORED:
+            await self._mirror(session, entry)
         return Recorded(to_transaction(row), level_up=level_up)
+
+    async def _mirror(self, session: AsyncSession, entry: Entry) -> None:
+        """032: the same amount for the profile's household master (once: the copy's key derives from the
+        profile row's)."""
+        household = self.household()
+        owner = await household.owner_of(entry.user_id) if household is not None else None
+        if owner is None:
+            return
+        await lock_user(session, owner)
+        delta = entry.delta
+        if delta < 0 and entry.kind not in REFUSED_SHORT:
+            held = await session.scalar(
+                select(Balance.amount).where(Balance.user_id == owner, Balance.value == entry.value)
+            )
+            delta = -min(-delta, int(held or 0))
+            if delta == 0:
+                return
+        digest = hashlib.sha256(entry.idempotency_key.encode("utf-8")).hexdigest()
+        await self.record(
+            session,
+            replace(
+                entry,
+                user_id=owner,
+                delta=delta,
+                idempotency_key=f"household:{digest}",
+                reverses_transaction_id=None,
+                profile_id=entry.user_id,
+            ),
+        )
 
     async def _live(self, session: AsyncSession, row: LedgerTransaction, level_up: int | None) -> None:
         rows = (

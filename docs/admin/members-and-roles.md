@@ -58,6 +58,23 @@ In Configuration, area Accounts:
 | *Idle session expiry*, *Maximum session length* | Sessions. |
 | *Verification link validity*, *Data export availability* | Links and exports. |
 
+### Household profiles
+
+A member account can hold **profiles** for the people sharing it at home (a shared Plex account with a family behind it). Each profile is a member of its own — dashboard, recommendations, quests, achievements, streaks, notifications — without a login: it is used from its master account's session, picked on « Who's there? » after signing in, optionally behind a 4–6 digit PIN. See [Household profiles](../members/households.md).
+
+| Setting (area Accounts) | What it does |
+|---|---|
+| *Household profiles* | Offers profiles to members (on by default). Off: the picker and « My household » management disappear; existing profiles stay but cannot be entered. |
+| *Profiles per account* | How many profiles one account may hold (8 by default, 1 to 20). |
+
+What administrators should know:
+
+- **Economy**: every XP, Coin and Contribution a profile earns or spends is recorded once more on its master account (a ledger row with `profile_id`), so the master's balances and leaderboard scores are the household's. Daily caps apply per profile.
+- **Media services**: profiles are never offered when matching service accounts; plays read from a shared Plex/Jellyfin account stay the master's. Nothing is changed in Plex, Jellyfin or Tautulli.
+- **Restrictions are enforced by the portal**: a kept-out feature withdraws its permissions from the profile whatever its roles grant (shop → `marketplace.purchase`, requests → `media.request`, AI → `ai.use`, community → `community.participate`/`community.propose`, games → `games.play`, support → `tickets.*`, `feedback.submit`); a maximum age hides the films and series rated above it from the catalog, title pages, shelves, search, recommendations, « My feed », the media widgets and the player. Ratings come from TMDB enrichment: without a TMDB service, every film is unrated (a child profile, which hides unrated titles, then sees no film).
+- **Account security** (password, second factor, single sign-on, sessions, deletion, export) answers `household.owner_only` to a profile. Deleting a profile signs out the browsers using it; deleting an account deletes its profiles (and cancelling it keeps them).
+- Profiles are never made inactive for dormancy, and are listed in the users table without a login.
+
 ## Roles and permissions
 
 **Roles & permissions**: "Who may do what: roles and groups, and the permissions they grant."

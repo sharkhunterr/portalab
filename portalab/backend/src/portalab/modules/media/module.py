@@ -176,6 +176,7 @@ from portalab.modules.media.requests.moderation import RequestModeration
 from portalab.modules.media.requests.quota import RequestQuota
 from portalab.modules.media.requests.service import Requests, RequestSink
 from portalab.modules.media.requests.watched import LeavingWatched, RequestWatched
+from portalab.modules.media.restrictions import GatedSearch, GatedWidget, TitleGate
 from portalab.modules.media.reviews.service import ReviewService
 from portalab.modules.media.sections.service import Sections
 from portalab.modules.media.settings import (
@@ -272,7 +273,8 @@ class MediaModule:
             database, events, capabilities, self.quota, self.links, clock=clock, faces=self.request_face
         )
         self.request_sink = RequestSink(self.requests)
-        self.catalog = CatalogQuery(database, authorizer)
+        self.gate = TitleGate(database, capabilities)  # 032: a household profile's age rating
+        self.catalog = CatalogQuery(database, authorizer, self.gate)
         self.catalog_port = CatalogPort(self.catalog)
         self.people = People(database)  # #92: the people behind the titles
         self.profiles = Profiles(capabilities)  # #92: what the services know of them
@@ -539,7 +541,7 @@ class MediaModule:
         )
         for definition, widget in widgets:
             if self.widgets.get(definition.key) is None:
-                self.widgets.register(definition, widget, owner=OWNER)
+                self.widgets.register(definition, GatedWidget(widget, self.gate), owner=OWNER)
         if not any(p.kind == "media" for p in self.widgets.summaries()):  # 027: since your last visit
             self.widgets.register_summary(MediaChanges(self.database, self.authorizer), owner=OWNER)
         if self.search.provider("request") is None:  # #4: « Ask for it » in the search
@@ -556,7 +558,9 @@ class MediaModule:
         if self.search.provider("person") is None:  # #92: actors, directors, authors… a section of their own
             self.search.register(PeopleSearchProvider(self.people, self.authorizer), owner=OWNER)
         if self.search.provider("media") is None:
-            self.search.register(MediaSearchProvider(self.catalog, self.authorizer), owner=OWNER)
+            self.search.register(
+                GatedSearch(MediaSearchProvider(self.catalog, self.authorizer), self.gate), owner=OWNER
+            )
             self.search.register_resolver(MediaResolver(self.catalog_port), owner=OWNER)
             for action in ACTIONS:
                 self.search.register_action(action, owner=OWNER)

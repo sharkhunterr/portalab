@@ -23,7 +23,7 @@ from portalab.core.jobs.queue import enqueue
 from portalab.core.tombstone import scrub
 from portalab.modules.identity.context import IdentityContext
 from portalab.modules.identity.domain.state_machine import AccountState
-from portalab.modules.identity.models import DeletionRequest, ExternalIdentity, User
+from portalab.modules.identity.models import DeletionRequest, ExternalIdentity, HouseholdMember, User
 from portalab.modules.identity.observability import log_event, metrics
 from portalab.modules.identity.services.account_service import AccountService
 from portalab.modules.identity.services.common import (
@@ -65,10 +65,13 @@ class DeletionService:
             )
         ).scalar_one_or_none()
 
-    async def request(self, actor: Actor, user_id: UUID, *, reason: str) -> DeletionRequest:
+    async def request(
+        self, actor: Actor, user_id: UUID, *, reason: str, grace: timedelta | None = None
+    ) -> DeletionRequest:
+        """032: ``grace`` — a household profile goes at once; an account's profiles follow its deletion."""
         authority = self.ctx.admin_authority()
         now = self.ctx.now()
-        due_at = now + timedelta(days=self.ctx.config.deletion_grace_days)
+        due_at = now + (grace if grace is not None else timedelta(days=self.ctx.config.deletion_grace_days))
         async with self.ctx.database.unit_of_work() as uow:
             if await authority.is_admin(uow.session, user_id):
                 raise SoleAdminProtected(
@@ -107,6 +110,19 @@ class DeletionService:
                 max_attempts=20,
                 clock=self.ctx.clock,
             )
+            profiles = list(
+                await uow.session.scalars(
+                    select(HouseholdMember.user_id)
+                    .join(User, User.id == HouseholdMember.user_id)
+                    .where(
+                        HouseholdMember.owner_id == user_id,
+                        HouseholdMember.kind != "owner",
+                        User.state.not_in(("pending_deletion", "deleted")),
+                    )
+                )
+            )
+        for profile in profiles:
+            await self.request(actor, profile, reason="household_owner_deleted", grace=due_at - now)
         return request
 
     async def cancel(self, actor: Actor, user_id: UUID) -> None:
@@ -132,6 +148,20 @@ class DeletionService:
             user.deletion_due_at = None
             request.cancelled_at = now
             request.cancelled_by = actor.user_id
+            profiles = list(
+                await uow.session.scalars(
+                    select(HouseholdMember.user_id)
+                    .join(User, User.id == HouseholdMember.user_id)
+                    .where(
+                        HouseholdMember.owner_id == user_id,
+                        HouseholdMember.kind != "owner",
+                        User.state == AccountState.PENDING_DELETION.value,
+                        User.deletion_due_at == request.due_at,
+                    )
+                )
+            )
+        for profile in profiles:  # 032: the profiles that were to follow the account stay with it
+            await self.cancel(actor, profile)
 
     async def pending_for(self, user_id: UUID) -> DeletionRequest | None:
         async with self.ctx.database.session() as session:

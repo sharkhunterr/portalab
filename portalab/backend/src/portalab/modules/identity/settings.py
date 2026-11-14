@@ -167,6 +167,20 @@ _ONBOARDING: tuple[tuple[str, Any, Any, str], ...] = (
 )
 
 
+# 032: households — a member account's profiles
+HOUSEHOLD_ENABLED = "identity.household.enabled"
+HOUSEHOLD_MAX = "identity.household.maxProfiles"
+_HOUSEHOLD: tuple[tuple[str, Any, Any, str], ...] = (
+    (
+        HOUSEHOLD_ENABLED,
+        bool,
+        True,
+        "Let members create profiles for the people sharing their account (a child, a partner…).",
+    ),
+    (HOUSEHOLD_MAX, int, 8, "How many profiles one account may hold (1 to 20)."),
+)
+
+
 # 028 (FR-041): the intrusion guard's thresholds — points within the window before a session (and its account)
 # or an address is blocked, and for how long
 GUARD_SETTINGS = {
@@ -215,6 +229,11 @@ def declare_identity_settings(catalog: SettingCatalog = default_catalog) -> None
             description=description,
         )
     for key, schema, default, description in _ONBOARDING:
+        if key not in known:
+            declare(
+                scope="global", key=key, schema=schema, default=default, owner=OWNER, description=description
+            )
+    for key, schema, default, description in _HOUSEHOLD:
         if key not in known:
             declare(
                 scope="global", key=key, schema=schema, default=default, owner=OWNER, description=description

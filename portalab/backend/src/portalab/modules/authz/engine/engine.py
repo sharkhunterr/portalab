@@ -9,12 +9,14 @@
 3. an explicit deny in scope wins over everything, including the Admin;
 4. the Admin holds every *enabled* permission; other users need an ``allow`` grant in scope; reserved
    permissions are Admin-only even if a row somehow exists;
-5. sensitive permissions audit both allow and deny (fail closed: no audit ⇒ refused).
+5. sensitive permissions audit both allow and deny (fail closed: no audit ⇒ refused);
+6. 032: a household profile's master may keep features out of it — their permissions are withheld whatever
+   the profile's roles grant.
 
 Evaluation reads the current database state; the only cache is the per-request memo.
 """
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
@@ -22,6 +24,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
+from portalab.capabilities.household import Household, Restrictions
 from portalab.core.audit_port import AuditRecord, AuditSink
 from portalab.core.authorization import request_memo, request_once
 from portalab.core.authz_port import Principal, ResourceRef
@@ -76,6 +79,11 @@ class AuthorizationEngine:
         self.audit = audit
         self.events = events
         self.clock = clock
+        self.household: Callable[[], Household | None] = lambda: None  # 032: wired by the module
+
+    async def _withheld(self, subject: UUID) -> Restrictions | None:
+        household = getattr(self, "household", lambda: None)()
+        return await household.restrictions_of(subject) if household is not None else None
 
     # --- Authorizer port -----------------------------------------------------------------------------
     async def is_allowed(
@@ -115,6 +123,11 @@ class AuthorizationEngine:
             return Decision(False, "permission_disabled", sensitive=info.sensitive)
         grants = await self._grants(subject)
         decision = self._decide(info, grants, subject, resource)
+        restricted = await self._withheld(subject) if decision.allowed else None
+        if restricted is not None and (
+            restricted.withholds(permission) or (principal.channel == "ai" and restricted.withholds("ai.use"))
+        ):
+            return Decision(False, "profile_restricted", sensitive=info.sensitive)
         if decision.allowed and principal.channel == "ai" and permission != "ai.use":
             ai = await self._permission("ai.use")
             if ai is None or not self._decide(ai, grants, subject, None).allowed:
@@ -188,6 +201,8 @@ class AuthorizationEngine:
             info = catalog.get(key)
             if info is not None and info.enabled and self._decide(info, grants, subject, None).allowed:
                 held.add(key)
+        if held and (restricted := await self._withheld(subject)) is not None:
+            held = {key for key in held if not restricted.withholds(key)}
         if held and principal.channel == "ai":
             ai = catalog.get("ai.use")
             if ai is None or not self._decide(ai, grants, subject, None).allowed:
@@ -214,6 +229,8 @@ class AuthorizationEngine:
             )
             if self._decide(info, grants, subject, None).allowed:
                 held.append(row.key)
+        if held and (restricted := await self._withheld(subject)) is not None:
+            held = [key for key in held if not restricted.withholds(key)]
         return sorted(held)
 
     # --- audit of sensitive decisions -----------------------------------------------------------------

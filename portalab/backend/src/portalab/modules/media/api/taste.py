@@ -8,6 +8,7 @@ from uuid import UUID
 from fastapi import APIRouter, Query, status
 from pydantic import BaseModel
 
+from portalab.core.authz_port import Principal
 from portalab.modules.media.api.router import Module, Reader, _me
 from portalab.modules.media.providers.taste_widgets import cards
 from portalab.modules.media.taste.features import KINDS
@@ -56,8 +57,9 @@ class TasteVerdictOut(BaseModel):
     verdict: Verdict | None
 
 
-async def _cards(module: Module, picks: list[Pick]) -> list[TasteCard]:
-    return [TasteCard.model_validate(card) for card in await cards(module.database, picks)]
+async def _cards(module: Module, picks: list[Pick], principal: Principal) -> list[TasteCard]:
+    found = [TasteCard.model_validate(card) for card in await cards(module.database, picks)]
+    return await module.gate.keep(principal, found)  # 032: not what a profile's age rating keeps from it
 
 
 @router.get("/me/media/recommendations", response_model=TasteCards)
@@ -71,7 +73,7 @@ async def my_recommendations(
     one ``kind`` — each with its reason, never ten of one saga or director in a row."""
     kinds = [kind] if kind in KINDS else None
     picks = await module.taste.recommend(_me(principal), limit=limit, kinds=kinds)
-    return TasteCards(items=await _cards(module, picks))
+    return TasteCards(items=await _cards(module, picks, principal))
 
 
 @router.get("/me/media/taste/deck", response_model=TasteCards)
@@ -80,7 +82,9 @@ async def my_deck(
 ) -> TasteCards:
     """Titles to judge one by one (« I like it », « not for me », « later »): mostly what my taste
     recommends, now and then one of mine not judged yet, and a well-rated one out of my habits."""
-    return TasteCards(items=await _cards(module, await module.taste.deck(_me(principal), limit=limit)))
+    return TasteCards(
+        items=await _cards(module, await module.taste.deck(_me(principal), limit=limit), principal)
+    )
 
 
 @router.get("/me/media/taste/discover", response_model=TasteCards)
@@ -90,7 +94,9 @@ async def my_discoveries(
     """Off my beaten track, yet maybe for me: well-rated titles of genres I seldom go to, and titles of a
     medium I do not use yet that share a saga, an author or a theme with what I love — none of my
     recommendations."""
-    return TasteCards(items=await _cards(module, await module.taste.discover(_me(principal), limit=limit)))
+    return TasteCards(
+        items=await _cards(module, await module.taste.discover(_me(principal), limit=limit), principal)
+    )
 
 
 @router.get("/me/media/taste")
@@ -114,7 +120,7 @@ async def my_list(
     index = await module.taste.index()
     rows = await module.taste.listed(_me(principal), verdict, limit=limit)
     picks = [Pick(index.works[i], 0.0, None) for i, _ in rows if i in index.works]
-    cards = await _cards(module, picks)
+    cards = await _cards(module, picks, principal)
     return TasteCards(items=[card.model_copy(update={"verdict": verdict}) for card in cards])
 
 

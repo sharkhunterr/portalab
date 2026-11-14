@@ -131,6 +131,16 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "users.self.manage",
     },
     {
+        "key": "identity.household",  # 032: « My household » — its profiles, its wallet, its requests
+        "owner": "module:identity",
+        "kind": "command",
+        "label_key": "nav.household",
+        "icon": "users",
+        "route": "/household",
+        "required_permission": "users.self.manage",
+        "keywords": ("household", "profiles", "family", "foyer", "profils", "famille"),
+    },
+    {
         "key": "ui.appearance",
         "owner": "module:ui",
         "kind": "command",

@@ -531,6 +531,14 @@
     "advanced": true,
     "group": "security"
   },
+  "identity.household.enabled": {
+    "advanced": false,
+    "group": "members"
+  },
+  "identity.household.maxProfiles": {
+    "advanced": false,
+    "group": "members"
+  },
   "identity.oidc.clientId": {
     "advanced": false,
     "group": "members"

@@ -1,0 +1,682 @@
+/* 032 — households: « Who's there? », the PIN pad, « My household », a locked title. Theme tokens only;
+   each member carries its colour as --profile-color. */
+
+.household-face {
+  --profile-color: var(--color-accent);
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--profile-color) 85%, white),
+    color-mix(in srgb, var(--profile-color) 70%, black)
+  );
+  color: white;
+  font-family: var(--font-display, inherit);
+  font-weight: 700;
+  box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--profile-color) 70%, transparent);
+}
+.household-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.household-face--lg {
+  width: clamp(6rem, 22vw, 9rem);
+  height: clamp(6rem, 22vw, 9rem);
+  font-size: clamp(2.5rem, 9vw, 3.75rem);
+}
+.household-face--md {
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 1.5rem;
+}
+.household-face--sm {
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.95rem;
+  border-radius: var(--radius-md);
+}
+
+/* --- « Who's there? » ------------------------------------------------------------------------------ */
+.household-picker {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+  overflow: hidden;
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: center;
+}
+.household-picker__glow {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      color-mix(in srgb, var(--color-accent) 22%, transparent),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      color-mix(in srgb, var(--color-accent-alt) 16%, transparent),
+      transparent 45%
+    );
+  pointer-events: none;
+  animation: household-drift 18s ease-in-out infinite alternate;
+}
+.household-picker > :not(.household-picker__glow) {
+  position: relative;
+}
+.household-picker__title {
+  margin: 0;
+  font-family: var(--font-display, inherit);
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  letter-spacing: -0.02em;
+}
+.household-picker__subtitle {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.household-picker__grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(var(--space-3), 4vw, var(--space-6));
+  margin: var(--space-5) 0;
+  padding: 0;
+  list-style: none;
+}
+.household-picker__grid > li {
+  animation: household-pop var(--motion-duration-normal, 0.3s) var(--motion-easing, ease-out) both;
+  animation-delay: calc(var(--index, 0) * 60ms);
+}
+.household-picker__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.household-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+.household-tile .household-face {
+  outline: 3px solid transparent;
+  outline-offset: 4px;
+  transition:
+    transform var(--motion-duration-fast, 0.15s) var(--motion-easing, ease-out),
+    outline-color var(--motion-duration-fast, 0.15s);
+}
+.household-tile:hover .household-face,
+.household-tile:focus-visible .household-face {
+  transform: translateY(-4px) scale(1.05);
+  outline-color: var(--profile-color);
+}
+.household-tile:focus-visible {
+  outline: none;
+}
+.household-tile[data-active] .household-face {
+  outline-color: color-mix(in srgb, var(--profile-color) 55%, transparent);
+}
+.household-tile__name {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.household-tile__kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+.household-tile__lock {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- the PIN pad ---------------------------------------------------------------------------------- */
+.household-pin {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+}
+.household-pin[data-shake] {
+  animation: household-shake 0.4s ease-in-out;
+}
+.household-pin__field input {
+  width: 9rem;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 1.5rem;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+.household-pin__dots {
+  display: flex;
+  gap: var(--space-2);
+}
+.household-pin__dots > span {
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid var(--color-text-muted);
+  border-radius: 50%;
+  transition: background var(--motion-duration-fast, 0.15s);
+}
+.household-pin__dots > span[data-optional] {
+  border-style: dashed;
+}
+.household-pin__dots > span[data-filled] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+.household-pin__error {
+  margin: 0;
+  color: var(--state-error-fg, var(--color-text));
+}
+.household-pin__keys {
+  display: grid;
+  grid-template-columns: repeat(3, 4rem);
+  gap: var(--space-2);
+}
+.household-pin__keys button {
+  display: grid;
+  place-items: center;
+  height: 4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+.household-pin__keys button:hover:not(:disabled) {
+  background: var(--color-surface-raised);
+}
+.household-pin__keys button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.household-pin__keys .household-pin__open {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast, white);
+}
+.household-pin__keys button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* --- « My household » ------------------------------------------------------------------------------ */
+.household-page {
+  display: grid;
+  gap: var(--space-4);
+}
+.household-note,
+.household-count {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.household-advice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-raised));
+}
+.household-count {
+  margin-bottom: var(--space-3);
+  font-size: 0.9rem;
+}
+.household-error {
+  color: var(--state-error-fg, var(--color-text));
+}
+.household-wallet {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(
+      circle at 0% 0%,
+      color-mix(in srgb, var(--color-accent) 18%, transparent),
+      transparent 55%
+    ),
+    var(--color-surface-raised);
+}
+.household-wallet__coins {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-accent);
+}
+.household-wallet__coins h2 {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.household-wallet__coins strong {
+  color: var(--color-text);
+  font-size: 2rem;
+  font-family: var(--font-display, inherit);
+}
+.household-wallet__figures {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-5);
+  margin: 0;
+}
+.household-wallet__figures div {
+  display: grid;
+  gap: 0.15rem;
+}
+.household-wallet__figures dt {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+.household-wallet__figures dd {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.household-wallet__hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.household-members {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.household-member {
+  --profile-color: var(--color-accent);
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--profile-color);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+.household-member__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.household-member__head h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 1.15rem;
+}
+.household-member__kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+.household-member__figures {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+}
+.household-member__figures div {
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--profile-color) 8%, var(--color-surface));
+  text-align: center;
+}
+.household-member__figures dt {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+.household-member__figures dd {
+  margin: 0;
+  font-weight: 700;
+}
+.household-member__badges,
+.household-member__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.household-member__badges:empty {
+  display: none;
+}
+.household-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+.household-badge--me {
+  border-color: var(--profile-color);
+  color: var(--color-text);
+}
+.household-badge[data-status="approved"] {
+  border-color: var(--color-accent);
+}
+.household-badge[data-status="pending"] {
+  border-color: var(--color-accent-alt);
+}
+
+.household-requests {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.household-request {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+}
+.household-request > div {
+  display: grid;
+  gap: 0.2rem;
+}
+.household-request__meta {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+.household-request__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.household-activity h3 {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: 1rem;
+}
+.household-activity__lines {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.household-activity__lines li {
+  display: grid;
+  grid-template-columns: 7rem 1fr auto;
+  gap: var(--space-2);
+  font-size: 0.9rem;
+}
+.household-activity__lines time {
+  color: var(--color-text-muted);
+}
+.household-activity__delta {
+  font-weight: 600;
+}
+.household-activity__lines li[data-gain] .household-activity__delta {
+  color: var(--color-accent);
+}
+
+/* --- the editor ----------------------------------------------------------------------------------- */
+.household-editor {
+  display: grid;
+  gap: var(--space-4);
+}
+.household-editor fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.household-editor legend {
+  margin-bottom: var(--space-2);
+  font-weight: 600;
+}
+.household-editor__hint {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+.household-editor__identity {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.household-editor__fields {
+  display: grid;
+  flex: 1;
+  gap: var(--space-3);
+}
+.household-editor__colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.household-editor__colors legend {
+  width: 100%;
+}
+.household-editor__colors label {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--swatch);
+  cursor: pointer;
+}
+.household-editor__colors input {
+  appearance: none;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.household-editor__colors input:checked {
+  box-shadow:
+    0 0 0 3px var(--color-surface-raised),
+    0 0 0 5px var(--swatch);
+}
+.household-editor__colors input:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 4px;
+}
+.household-editor__kinds {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--space-2);
+}
+.household-editor__kinds legend,
+.household-editor__kinds .household-editor__hint {
+  grid-column: 1 / -1;
+}
+.household-editor__kinds label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.household-editor__kinds label[data-checked] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+.household-editor__kinds input {
+  accent-color: var(--color-accent);
+}
+.household-editor__section {
+  display: grid;
+  gap: var(--space-2);
+}
+.household-editor__features {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: var(--space-1) var(--space-3);
+}
+.household-editor__label {
+  grid-column: 1 / -1;
+  font-weight: 500;
+}
+.household-editor__danger {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+.household-editor__danger p {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+/* --- a locked title -------------------------------------------------------------------------------- */
+.household-locked {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  max-width: 34rem;
+  margin: var(--space-6) auto;
+  padding: var(--space-6) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      color-mix(in srgb, var(--color-accent) 16%, transparent),
+      transparent 60%
+    ),
+    var(--color-surface-raised);
+  text-align: center;
+}
+.household-locked__icon {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-accent);
+}
+.household-locked h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+.household-locked p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.household-locked form {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+@keyframes household-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+@keyframes household-shake {
+  20%,
+  60% {
+    transform: translateX(-8px);
+  }
+  40%,
+  80% {
+    transform: translateX(8px);
+  }
+}
+@keyframes household-drift {
+  to {
+    transform: translate3d(4%, -3%, 0) rotate(4deg);
+  }
+}
+
+@media (max-width: 40rem) {
+  .household-wallet {
+    grid-template-columns: 1fr;
+  }
+  .household-wallet__figures {
+    justify-content: flex-start;
+  }
+  .household-activity__lines li {
+    grid-template-columns: 6rem 1fr;
+  }
+  .household-activity__lines time {
+    grid-column: 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .household-picker__glow,
+  .household-picker__grid > li,
+  .household-pin[data-shake] {
+    animation: none;
+  }
+  .household-tile .household-face {
+    transition: none;
+  }
+}

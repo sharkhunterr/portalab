@@ -11,6 +11,7 @@ from uuid import UUID
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     CheckConstraint,
     ForeignKey,
     Index,
@@ -132,6 +133,10 @@ class UserSession(IdentityBase):
     revoke_reason: Mapped[str | None] = mapped_column(String(32))
     user_agent_summary: Mapped[str | None] = mapped_column(String(128), info=pii("technical"))
     ip_prefix: Mapped[str | None] = mapped_column(String(64), info=pii("technical"))
+    # 032: the household profile this session acts as (``None``: the account itself) and whether the
+    # « Who's there? » choice was made since signing in
+    acting_user_id: Mapped[UUID | None] = mapped_column(ForeignKey(USERS_FK, ondelete="CASCADE"))
+    profile_chosen: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
 
 class LoginThrottle(IdentityBase):
@@ -358,3 +363,68 @@ class MfaChallenge(IdentityBase):
     user_id: Mapped[UUID] = mapped_column(ForeignKey(USERS_FK, ondelete="CASCADE"), nullable=False)
     attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+HOUSEHOLD_KINDS: tuple[str, ...] = ("owner", "standard", "child", "custom")
+ACCESS_STATUSES: tuple[str, ...] = ("pending", "approved", "denied")
+
+
+class HouseholdMember(IdentityBase):
+    """032: a member of a household — its master (``owner_id == user_id``, kind ``owner``) or one of its
+    profiles, each a user of its own; the PIN kept as an Argon2 hash, the restrictions as their settings."""
+
+    __tablename__ = "household_members"
+    __table_args__ = (
+        CheckConstraint(_in("kind", HOUSEHOLD_KINDS), name="kind"),
+        CheckConstraint("(kind = 'owner') = (owner_id = user_id)", name="owner"),
+        Index("ix_household_members_owner_id", "owner_id", "position"),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(ForeignKey(USERS_FK, ondelete="CASCADE"), primary_key=True)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey(USERS_FK, ondelete="CASCADE"), nullable=False)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    color: Mapped[str] = mapped_column(
+        String(16), nullable=False, info=not_personal("a display colour picked from the portal's palette")
+    )
+    position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    pin_hash: Mapped[str | None] = mapped_column(
+        String(512), info=not_personal("Argon2 hash of a profile PIN")
+    )
+    community_visible: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    restrictions: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, nullable=False, default=dict, info=not_personal("the master's content settings for a profile")
+    )
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class AccessRequest(IdentityBase):
+    """032: a profile asks its master for one object its restrictions lock (a film above its age); approved
+    for good or until ``expires_at``, or refused."""
+
+    __tablename__ = "access_requests"
+    __table_args__ = (
+        CheckConstraint(_in("status", ACCESS_STATUSES), name="status"),
+        Index(
+            "uq_access_requests_pending",
+            "profile_id",
+            "kind",
+            "subject_ref",
+            unique=True,
+            postgresql_where=text("status = 'pending'"),
+        ),
+        Index("ix_access_requests_owner_id", "owner_id", "status", "created_at"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=new_id)
+    profile_id: Mapped[UUID] = mapped_column(ForeignKey(USERS_FK, ondelete="CASCADE"), nullable=False)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey(USERS_FK, ondelete="CASCADE"), nullable=False)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    subject_ref: Mapped[str] = mapped_column(String(200), nullable=False)
+    title: Mapped[str] = mapped_column(String(300), nullable=False, info=pii("activity", tombstone=""))
+    rating: Mapped[str | None] = mapped_column(String(32), info=not_personal("the title's age rating"))
+    note: Mapped[str | None] = mapped_column(String(300), info=pii("activity"))
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="pending")
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    decided_at: Mapped[datetime | None] = mapped_column(TZDateTime)
+    expires_at: Mapped[datetime | None] = mapped_column(TZDateTime)

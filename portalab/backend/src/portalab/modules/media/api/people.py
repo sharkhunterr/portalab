@@ -398,8 +398,11 @@ async def person(
     else:
         portrait = None
     askable = module.requestable.configured() and await module.authorizer.is_allowed(principal, MEDIA_REQUEST)
+    hidden = await module.gate.blocked(principal)  # 032: not what a profile's age rating keeps from it
     library = {
-        role: await _asked(module, [_card(rows[i], _image(images.get(i))) for i in titles if i in rows])
+        role: await _asked(
+            module, [_card(rows[i], _image(images.get(i))) for i in titles if i in rows and i not in hidden]
+        )
         for role, titles in page.works.items()
     }
     return PersonOut(

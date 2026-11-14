@@ -95,13 +95,38 @@ TERMS_OPEN_PREFIXES = (
 )
 
 
+class MasterOnly(Forbidden):
+    default_code = "household.owner_only"
+    default_title = "Only the account's master can do this"
+
+
+# 032: what belongs to the account itself, never to one of its household profiles — its security (password,
+# second factor, single sign-on, sessions), its deletion and its export
+ACCOUNT_PREFIXES = (
+    "/api/v1/me/password",
+    "/api/v1/me/mfa",
+    "/api/v1/me/sessions",
+    "/api/v1/me/deletion",
+    "/api/v1/me/export",
+    "/api/v1/auth/oidc",
+    "/api/v1/auth/deletion",
+)
+
+
 async def enforce_terms(request: Request) -> None:
     """App-wide dependency (027): a signed-in member who has not accepted the terms in force cannot use the
-    portal — every protected route answers ``terms.acceptance_required`` until they do."""
+    portal — every protected route answers ``terms.acceptance_required`` until they do; a household profile
+    stands by its master's acceptance (032), and never reaches the account's own routes."""
     route = request.scope.get("route")
     if not isinstance(route, APIRoute) or route_access(route) in (None, "public"):
         return
     path = request.url.path
+    if (
+        path.startswith(ACCOUNT_PREFIXES)
+        and any(n in request.cookies for n in SESSION_COOKIE_NAMES)
+        and (await current_principal(request)).profile_of is not None
+    ):
+        raise MasterOnly("This belongs to the account's master.")
     if path in TERMS_OPEN_PATHS or path.startswith(TERMS_OPEN_PREFIXES):
         return
     terms = getattr(getattr(request.app.state, "privacy_module", None), "terms", None)
@@ -113,7 +138,7 @@ async def enforce_terms(request: Request) -> None:
         return  # the route's own permission check answers
     if principal.user_id is None or principal.channel != "user" or principal.acting_for is not None:
         return
-    if await terms.must_accept(principal.user_id):
+    if await terms.must_accept(principal.profile_of or principal.user_id):
         raise TermsNotAccepted("Accept the terms of use to continue.")
 
 

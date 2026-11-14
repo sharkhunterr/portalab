@@ -75,6 +75,7 @@ class LedgerTransaction(GamificationBase):
     reverses_transaction_id: Mapped[UUID | None] = mapped_column(ForeignKey("gamification.transactions.id"))
     occurred_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     recorded_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    profile_id: Mapped[UUID | None] = mapped_column()  # 032: a household master's copy of this profile's row
 
 
 class Balance(GamificationBase):

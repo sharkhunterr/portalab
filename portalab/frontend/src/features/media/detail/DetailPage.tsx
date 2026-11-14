@@ -4,7 +4,9 @@ import { Button } from "../../../design-system/components/Button";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { ApiError } from "../../../state/regions";
 import { useAssistantPage } from "../../ai/pageContext";
+import { LockedTitle, RESTRICTED } from "../../household/LockedTitle";
 import {
   imageUrl,
   MediaError,
@@ -944,6 +946,8 @@ export function DetailPage() {
     known ? `${known.title}${known.year ? ` (${known.year})` : ""} · ${t(`media:kind.${known.kind}`)}` : null,
   );
   if (detail.isPending) return <FunctionalState state="loading" />;
+  if (detail.error instanceof ApiError && detail.error.code === RESTRICTED)
+    return <LockedTitle problem={detail.error} />; // 032: above this household profile's age rating
   if (detail.isError || !detail.data)
     return <FunctionalState state="unavailable" onRetry={() => detail.refetch()} />;
   const media = detail.data;

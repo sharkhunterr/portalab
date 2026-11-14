@@ -106,6 +106,9 @@ class Me(BaseModel):
     deletion_due_at: datetime | None = None
     # a password of the portal's own (else the account signs in through the single sign-on)
     has_password: bool = True
+    # 032: the household — set when this is a profile (its master); how many profiles the household holds
+    profile_of: UUID | None = None
+    household_profiles: int = 0
 
 
 class FieldUpdateBody(Strict):

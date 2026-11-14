@@ -50,6 +50,7 @@ portalab/scripts/smoke.sh
 Python 3.12 (backend); TypeScript 5.9 on Node 22 LTS (frontend toolchain): follow standard conventions; layers `core ← capabilities ← modules|connectors ← app`; plugins import only `portalab.sdk`.
 
 ## Recent Changes
+- 032-household-profiles built: profiles under a master account (« Who's there? », PINs), pooled economy (ledger mirror), child restrictions (features withheld, titles above an age hidden), access requests; `identity.household` capability.
 - 028-visual-packs planned: every look as a pack (built-in included), six-step import workflow, pack navigations, booster scenes, pack widgets, no anonymous route but sign-in, persisted intrusion guard.
 - 027-visual-experience planned: personal header, navigation sections, responsive frames, page kit, theme v2, 2D dashboard editor.
 - All 26 specs planned (research, data model, contracts, quickstart, plan, tasks) in roadmap order; audit 2026-10-01 aligned names/ownership (see `decisions/CANONICAL_DECISIONS.md` §7 and `decisions/PLAN_FOLLOWUPS.md`).
